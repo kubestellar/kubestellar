@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Purpose: ensure that a workload description space exists and has the
+# needed API bindings.
+
+want_kube=true
+wmw_name=""
+kubectl_flags=()
+sub_flags=()
+bindir=$(dirname $(realpath "${BASH_SOURCE[0]}"))
+
+while (( $# > 0 )); do
+    case "$1" in
+	(-h|--help)
+	    echo "Usage: kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean | -X)* wm_workspace_name"
+	    exit 0;;
+	(-X) set -o xtrace
+	    sub_flags[${#sub_flags[*]}]="$1";;
+	(--with-kube)
+	    if (( $# >1 ))
+	    then want_kube="$2"; shift
+	    else echo "$0: missing with-kube value" >&2; exit 1
+	    fi;;
+	(--output-kubeconfig)
+	    if (( $# >1 ))
+	    then wds_kubeconfig="$2"; shift
+	    else echo "$0: missing output kubeconfig value" >&2; exit 1
+	    fi;;
+	(-o|-o=*|--output|--output=*)
+	    echo "$0: -o and --output flags are not supported" >&2; exit 1;;
+	(--*=*|-?=*)
+	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
+	(--*|-?)
+	    kubectl_flags[${#kubectl_flags[*]}]="$1";
+	    if (( $# > 1 )); then 
+		 kubectl_flags[${#kubectl_flags[*]}]="$2"
+		 shift
+	    fi;;
+	(-*)
+	    echo "$0: flag syntax error" >&2
+	    exit 1;;
+	(*)
+	    if [ -z "$wmw_name" ]
+	    then wmw_name="$1"
+	    else echo "$0: too many positional arguments" >&2
+		 exit 1
+	    fi
+    esac
+    shift
+done
+
+if [ "$wmw_name" == "" ]; then
+    echo "$0: workload management workspace name not specified" >&2
+    exit 1
+fi
+
+case "$want_kube" in
+    (true|false) ;;
+    (*) echo "$0: with-kube should be true or false" >&2
+	exit 1;;
+esac
+
+set -e
+
+if [ -z "$wd_kubeconfig" ]; then
+    wds_kubeconfig="$(mktemp "${wmw_name}.kubeconfig#XXXX")"
+    kc_is_temp=true
+fi
+
+kubectl-kubestellar-space-ensure "${sub_flags[@]}" "${kubectl_flags[@]}" $wmw_name --in-cluster --output-kubeconfig "$wds_kubeconfig"
+
+kubestellar-kube-bind "${sub_flags[@]}" "${kubectl_flags[@]}" "$wmw_name" "edgeplacements"
+kubestellar-kube-bind "${sub_flags[@]}" "${kubectl_flags[@]}" "$wmw_name" "customizers"
+kubestellar-kube-bind "${sub_flags[@]}" "${kubectl_flags[@]}" "$wmw_name" "singleplacementslices"
+
+function reconcile_kube_CRDs() {
+	if [ "$want_kube" == true ]; then
+		kubectl --kubeconfig "$wds_kubeconfig" apply --server-side=true -R -f "$bindir/../config/kube/crds/"
+	else
+		kubectl --kubeconfig "$wds_kubeconfig" delete -R -f "$bindir/../config/kube/crds/"
+	fi
+}
+
+reconcile_kube_CRDs
+
+if [ "$kc_is_temp" == true ]
+then rm "$wds_kubeconfig"
+fi

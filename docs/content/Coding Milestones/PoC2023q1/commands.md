@@ -9,29 +9,22 @@ for the executable on the command line. The one exception is [the
 bootstrap script](#bootstrap), which is designed to be fetched from
 github and fed directly into `bash`.
 
-There are two ways of deploying a space provider and the central KubeStellar
-components: (1) as processes on a machine of supported OS and ISA, and
-(2) as workload in a Kubernetes (possibly OpenShift) cluster.  The
-latter is newer and not yet well exercised.
+There normal way of deploying the space framework and the central
+KubeStellar components is as workload in a Kubernetes (possibly
+OpenShift) cluster.  Contributors may instead run these components as
+processes on a machine of supported OS and ISA, with some Kubernetes
+cluster to play the role of Space Management API Space (SMAS, which is
+where the Space objects live).
 
 This document describes both commands that a platform administrator
 uses and commands that a platform user uses.
 
-Most of these executables require that the space provider be running and
-that `kubectl` is configured to use the kubeconfig file produced by
-that space provider. That is: either `$KUBECONFIG` holds the pathname 
-of that kubeconfig file, its contents appear at `~/.kube/config`, or
-`--kubeconfig $pathname` appears on the command line.  The exceptions
-are the bootstrap script, [the kcp control script that runs before
-starting the kcp server](#kubestellar-ensure-kcp-server-creds), and
-the admin commands for deploying KubeStellar in a Kubernetes cluster.
-
-**NOTE**: most of the kubectl plugin usages described here certainly
-or potentially change the setting of which kubeconfig context is "current"
-in your chosen kubeconfig file; for this reason, they are not suitable
-for executing concurrently with anything that depends on that setting
-in that file.  The exceptions are the admin commands for deploying
-KubeStellar in a Kubernetes cluster.
+Most of these executables are given one Kubernetes client
+configuration, either for the SMAS or a space described by a Space
+object. The exceptions are the bootstrap script, [the kcp control
+script that runs before starting the kcp
+server](#kubestellar-ensure-kcp-server-creds), and the admin commands
+for deploying KubeStellar in a Kubernetes cluster.
 
 ## Bare process deployment
 
@@ -211,6 +204,15 @@ outputs and concurrency considerations.
 The `kubestellar` command has three subcommands, one to finish setup
 and two for process control.
 
+Except for the `stop` subcommand, this command has the following
+pre-requisites.
+
+- The space manager is running, there is a space provider named
+  "default", and that is the one to use.
+
+- When not given any command-line flags, `kubectl` will access the
+  Space Management API Space (SMAS).
+
 The usage synopsis is as follows.
 
 ``` { .bash .no-copy }
@@ -240,35 +242,26 @@ not meaningful for the `stop` subcommand. The `--ensure-imw` and
 This subcommand is used after installation to finish setup and does
 the following five things.
 
-1. Waits for the kcp server to be in service and the `root:compute`
-   workspace to be usable.
+1. Ensure that the KubeStellar Core Space (KCS, formerly called edge
+   service provider workspace (ESPW)) exists and has the required
+   contents.
 
-2. Ensure that the edge service provider workspace (ESPW) exists and
-has the required contents.
+2. Ensure the existence of zero, one, or more inventory spaces
+   depending on the value of `--ensure-imw` flag. Default is one
+   inventory space named "imw1".
 
-3. Ensure the existence of zero, one, or more inventory management workspaces
-depending on the value of `--ensure-imw` flag. Default is one inventory management
-workspaces at pathname "root:imw1".
-
-4. Ensure the existence of zero, one, or more workload management workspaces 
-depending on the value of `--ensure-wmw` flag. Default is one workload management
-workspaces at pathname "root:wmw1". The workload management workspaces have CRDs for management of
-containerized workloads. At the completion of `kubestellar init` the current workspace will be
-"root".
-
-6. Creates the space provider objects to be used by the space manager. It requires
-several environment variables - SM_CONFIG, SM_CONTEXT, and IN_CLUSTER. SM_CONFIG
-is the path to the kubeconfig for the space manager. The SM_CONTEXT is the space manager
-context in the config file. The IN_CLUSTER variable specify whether spaces
-are accessed from within the hosting cluster or externally by kubestellar init.
+3. Ensure the existence of zero, one, or more workload description
+   spaces (WDS, formerly workload management workspaces (WMW))
+   depending on the value of `--ensure-wmw` flag. Default is one WDS
+   named "wmw1". The WDSes have CRDs for the Kubernetes APIS for
+   management of containerized workloads.
 
 #### KubeStellar start
 
 This subcommand is used after installation or process stops.
 
 This subcommand stops any running kubestellar controllers and then
-starts them all.  It also does the same thing as `kubestellar init`,
-reading the same environment variables.
+starts them all.  It also does the same things as `kubestellar init`.
 
 #### KubeStellar stop
 
@@ -360,38 +353,6 @@ The Helm chart takes care of setting up the KubeStellar Core,
 accomplishing the same thing as the [kubestellar
 start](#kubestellar-start) command above.
 
-### Fetch kubeconfig for internal clients
-
-To fetch a kubeconfig for use by clients inside the hosting cluster,
-use the `kubectl kubestellar get-internal-kubeconfig -n kubestellar` command.  It
-takes the following on the command line.
-
-- `-o $output_pathname`, saying where to write the kubeconfig. This
-  must appear exactly once on the command line.
-- a `kubectl` command line flag, for accessing the hosting
-  cluster. This includes the usual control over namespace.
-- `-X` turns on debug echoing of all the commands in the script that
-  implements this command.
-- `-h` prints a brief usage message and terminates with success.
-- `-n` namespace is required. default is 'kubestellar'
-
-### Fetch kubeconfig for external clients
-
-To fetch a kubeconfig for use by clients outside of the hosting
-cluster --- those that will reach the kcp server via the external
-endpoint specified in the deployment command --- use the `kubectl
-kubestellar get-external-kubeconfig -n kubestellar` command.  It takes the following
-on the command line.
-
-- `-o $output_pathname`, saying where to write the kubeconfig. This
-  must appear exactly once on the command line.
-- a `kubectl` command line flag, for accessing the hosting cluster.
-  This includes the usual control over namespace.
-- `-X` turns on debug echoing of all the commands in the script that
-  implements this command.
-- `-h` prints a brief usage message and terminates with success.
-- `-n` namespace is required. default is 'kubestellar'
-
 ### Fetch a log from a KubeStellar runtime container
 
 {%
@@ -472,6 +433,48 @@ kubestellar-version
 {"major":"1","minor":"24","gitVersion":"v1.24.3+kcp-v0.2.1-20-g1747254b880cb7","gitCommit":"1747254b","gitTreeState":"dirty","buildDate":"2023-05-19T02:54:01Z","goVersion":"go1.19.9","compiler":"gc","platform":"darwin/amd64"}
 ```
 
+## Creating an Inventory Space
+
+This command will create an inventory space (IS) of a given name if it
+does not already exist and ensure that it is properly prepared for
+use.
+
+This command only works "in cluster". This is a point-in-time
+limitation.
+
+Preparing for use includes using kube-bind to import the definitions
+of `SyncTarget` and `Location`. If that has not already been done then
+it will be done by invoking
+[kubestellar-kube-bind](#kubestellar-kube-bind), with the attendant
+side-effects to the filesystem (possibly creating
+`${PWD}/konnector-${space_name}/` and/or a temporary kubeconfig file
+in `$PWD`) and constraint on working directory (always the same for a
+given WDS).
+
+This command is given a kube client configuration for access to the
+Space Management API Space (SMAS), via the usual `kubectl` flags and
+`$KUBECONFIG`.
+
+The usage synopsis for this command is as follows.
+
+```shell
+kubectl kubestellar ensure inventory-space flag... inventory_space_name
+```
+
+This command accepts the following flags. They can be intermixed with
+the positional argument.
+
+- `-h` or `--help`: print a brief usage message and terminate
+  successfully.
+- `-X`: turn on debug echoing of the commands inside the script that
+  implements this command.
+- a `kubectl` flag (but not `-o` or `--output`).
+- `--output-kubeconfig $file_pathname`: requests that an in-cluster
+  kubeconfig for the space be output to the given file pathname.
+
+This script works in idempotent style, doing whatever work remains to
+be done.
+
 ## Creating SyncTarget/Location pairs
 
 In this PoC, the interface between infrastructure and workload
@@ -488,8 +491,8 @@ API group `edge.kubestellar.io`, and they are exported from the
 
 The following command helps with making that SyncTarget and Location
 pair. This command operates on an existing inventory space. This
-command is given a kube client config for the Space Management API
-Space (SMAS) in an idiosyncratic way.
+command is given a kube client config for that space via the usual
+`kubectl` command line flags and `$KUBECONFIG`.
 
 The usage synopsis is as follows.
 
@@ -503,31 +506,21 @@ and have at least the given labels.
 
 The flags can also appear anywhere later on the command line.
 
-The acceptable flags include all those of `kubectl` except for
-`--context`.  BUT do not actually supply any of these flags; this
-command handles them incorrectly.
-
-This command also accepts the following flags.
+This command accepts the following flags.
 
 - `-h` or `--help`: print a brief usage message and terminate successfully.
 - `-X`: turn on debug echoing of the commands inside the script that
   implements this command.
-- `--imw space_name`: specifies which space to use as the
-  inventory management workspace. This flag is not optional.
-
-This command reads the followig environment variables.
-
-- `SM_CONFIG`: filename of kubeconfig file for access to the space
-  management API space (SMAS).
-- `SM_CONTEXT`: kubeconfig context for access to the SMAS.
+- a `kubectl` flag (but not `-o` or `--output`).
 
 This command does not depend on the action of any of the KubeStellar
-controllers but does require that the KubeStellar Core Space (KCS) has been set up.
+controllers but does require that the KubeStellar Core Space (KCS) has
+been set up.
 
 An example usage follows.
 
 ```shell
-kubectl kubestellar ensure location --imw imw-1 demo1 foo=bar the-word=the-bird
+KUBECONFIG=imw1.kubeconfig kubectl kubestellar ensure location demo1 foo=bar the-word=the-bird
 ```
 ``` { .bash .no-copy }
 synctarget.workload.kcp.io/demo1 created
@@ -543,12 +536,7 @@ Location named `demo1` with labels `foo=bar` and `the-word=the-bird`.
 This was equivalent to the following commands.
 
 ```shell
-imw_space_config="${PWD}/temp-space-config/spaceprovider-default-imw-1"
-secret_name=$(kubectl --kubeconfig $sm_core_config --context $sm_context get space imw-1 -n spaceprovider-default -o jsonpath="{$.status.externalSecretRef.name}")
-secret_namespace=$(kubectl --kubeconfig $sm_core_config --context $sm_context get space imw-1 -n spaceprovider-default -o jsonpath="{$.status.externalSecretRef.namespace}")
-kubectl --kubeconfig $sm_core_config --context $sm_context get secret ${secret_name} -n ${secret_namespace} -o jsonpath='{$.data.kubeconfig}' | base64 -d | base64 -d > $imw_space_config
-
-KUBECONFIG=$imw_space_config kubectl create -f -<<EOF
+KUBECONFIG=imw1.kubeconfig kubectl create -f -<<EOF
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
@@ -573,7 +561,7 @@ EOF
 ```
 
 Note that the extraction of space kubeconfig file can be accomplished using the 
-kubectl-kubestellar-get-config-for-space script.
+`kubectl kubestellar space get-kubeconfig` command.
 
 This command operates in idempotent style, making whatever changes (if
 any) are needed to move from the current state to the desired state.
@@ -609,34 +597,38 @@ This command fetches a kubeconfig for super-user access to a given
 space into a given filename. The kubeconfig will be good for one year
 since the creation of the space unless it was configured unusually.
 
+Each space has two such kubeconfig files. One kubeconfig is known as
+the "in-cluster" kubeconfig and is for accessing the space from within
+the same Kubernetes cluster as the space's apiserver(s) (assuming they
+_are_ in a cluster). The other is known as the "external" kubeconfig
+and is for accessing the space from outside the space's host cluster
+(assuming there is one). Clients inside that cluster generally can use
+the external kubeconfig successfully but it is less efficient. The
+precise truth of the matter depends on the hostname configured for
+external access at deployment time.
+
+This command is given a client configuration for accessing the Space
+Management API Space (SMAS), via the usual ways for configuring
+`kubectl`.
+
 The usage synopsis is as follows.
 
 ```shell
-kubectl kubestellar get config for space flag...
+kubectl kubestellar space get-kubeconfig flag... $space_name $output_pathname
 ```
 
-This command accepts the following flags. The space name, output
-pathname, and SMAS kubeconfig and context are required.
+This command accepts the following flags.
 
 - `-h` or `--help`: print usage and terminate with success.
 - `-X`: turn on debug echoing of the script as it executes.
-- `--space-name $space_name`: the name of the space.
-- `--output $kubeconfig_pathname`: where to write the kubeconfig
-- `--provider-name $provider`: the name of the space provider to use;
-  defaults to `default`.
-- `--sm-core-config $SM_CONFIG`: pathname of the kubeconfig file for
-  access to the SMAS.
-- `--sm-context $SM_CONTEXT`: the name of the context to use in that
-  kubeconfig for access to the SMAS.
-- `--in-cluster`: when the core components are running in a hosting
-  cluster, this flag indicates that this command is being invoked from
-  within that cluster. In general this indicates that the caller wants
-  the kubeconfig for use from places nearer to the space.
+- a `kubectl` flag (but not `-o` or `--output`).
+- `--in-cluster`: indicates that the in-cluster kubeconfig should be
+  output; otherwise the external one will be.
 
 Following is an example usage.
 
 ```shell
-kubectl kubestellar get config for space --space-name imw1 --sm-core-config $SM_CONFIG ${in_cluster} --output imw1.kubeconfig
+kubectl kubestellar space get-kubeconfig imw1 imw1.kubeconfig
 ```
 
 ## Syncer preparation and installation
@@ -649,6 +641,9 @@ objects to give the syncer the privileges that it needs.  The
 following script does those things and also outputs YAML to be used to
 install the syncer in the edge cluster.
 
+This script is given a kube client config for accessing the SMAS via
+the usual `kubectl` command line flags and `$KUBECONFIG`.
+
 The usage synopsis is as follows.
 
 ```shell
@@ -660,12 +655,12 @@ relevant IMW, corresponding to the relevant edge cluster.
 
 The flags can also appear anywhere later on the command line.
 
-The acceptable flags include all those of `kubectl` except for
-`--context`.  BUT do not provide any, this command handles them
-incorrectly.
+This command accepts the following flags.
 
-This command also accepts the following flags.
-
+- `-h` or `--help`: print a brief usage message and terminate successfully.
+- `-X`: turn on debug echoing of commands inside the script that
+  implements this command.
+- a `kubectl` flaag (but not `-o` or `--output`).
 - `--imw space_name`: specifies which space holds the relevant
   SyncTarget object.
 - `--espw space_name`: specifies where to find the edge service
@@ -675,16 +670,9 @@ This command also accepts the following flags.
 - `-o output_pathname`: specifies where to write the YAML definitions
   of the API objects to create in the edge cluster in order to deploy
   the syncer there.  The default is `synctarget_name +
-  "-syncer.yaml"`.
+  "-syncer.yaml"`. **NOTE** this is differnt from the usual meaning of
+  `-o` for `kubectl`.
 - `-s`: exceptionally low info output.
-- `-X`: turn on debug echoing of commands inside the script that
-  implements this command.
-
-This command reads the followig environment variables.
-
-- `SM_CONFIG`: filename of kubeconfig file for access to the space
-  management API space (SMAS).
-- `SM_CONTEXT`: kubeconfig context for access to the SMAS.
 
 This command will only succeed if the mailbox controller has created
 and conditioned the mailbox space for the given SyncTarget.  This
@@ -758,12 +746,11 @@ the list of things that went into the WEC.
 - A ClusterRole with the same name as the namespace.
 - A ClusterRoleBinding with the same name as the namespace.
 
-## Edge cluster on-boarding
+## Workload execution cluster on-boarding
 
 The following command is a combination of `kubectl kubestellar
 ensure-location` and `kubectl kubestellar prep-for-syncer`, and takes
-the union of their command line flags and arguments and reads the
-union of their environment variable read sets.
+the union of their command line flags and arguments.
 
 An example usage follows.
 
@@ -797,15 +784,28 @@ to verify the syncer pod is running.
 
 ## Creating a Workload Description Space
 
-Such a space needs not only to be created but also:
-
-- the KubeStellar edge APIs bound through kube-bind;
-
-- if desired, some CRDs populated for the Kubernetes APIs for
-  management of containerized workloads.
+This command will create a WDS of a given name if it does not already
+exist and ensure that it is properly prepared for use.
 
 This command only works "in cluster". This is a point-in-time
 limitation.
+
+Preparing for use includes using kube-bind to import the relevant
+parts of the KubeStellar API. If that has not already been done then
+it will be done by invoking
+[kubestellar-kube-bind](#kubestellar-kube-bind), with the attendant
+side-effects to the filesystem (possibly creating
+`${PWD}/konnector-${space_name}/` and/or a temporary kubeconfig file
+in `$PWD`) and constraint on working directory (always the same for a
+given WDS).
+
+Preparing for use also includes ensuring the CRDs for the Kubernetes
+  APIs for management of containerized workloads and present iff
+  desired.
+
+This command is given a kube client configuration for access to the
+Space Management API Space (SMAS), via the usual `kubectl` flags and
+`$KUBECONFIG`.
 
 The usage synopsis for this command is as follows.
 
@@ -813,33 +813,20 @@ The usage synopsis for this command is as follows.
 kubectl kubestellar ensure wmw flag... wm_space_name
 ```
 
-The flags can appear anywhere on the command line.
+This command accepts the following flags. They can be intermixed with
+the positional argument.
 
-The acceptable flags include all those of `kubectl` except for
-`--context`.  BUT do not supply any, this command handles them
-incorrectly.
-
-This command also accepts the following flags.
-
-- `--with-kube boolean`: specifies whether or not the WMW should
-  include an APIBindings to the supported subset of the Kubernetes API
-  for management of containerized workloads. See [the categorization
-  in the design](../outline/#data-objects) for details.
+- `-h` or `--help`: print a brief usage message and terminate
+  successfully.
 - `-X`: turn on debug echoing of the commands inside the script that
   implements this command.
-
-This command reads the followig environment variables.
-
-- `SM_CONFIG`: filename of kubeconfig file for access to the space
-  management API space (SMAS). Default value is
-  `$PWD/temp-space-config/config`.
-- `SM_CONTEXT`: kubeconfig context for access to the SMAS. Default
-  value is `sm_mgt`.
-- `IN_CLUSTER`: If there is a KubeStellar host cluster then set this
-  to `true` when invoking this command from within that cluster,
-  `false` when invoking from outside the cluster. More generally
-  `true` says to use the nearer kubeconfigs for the spaces involved,
-  `false` says to use the farther kubeconfigs. Default value is `true`.
+- a `kubectl` flag (but not `-o` or `--output`).
+- `--output-kubeconfig $file_pathname`: requests that an in-cluster
+  kubeconfig for the WDS be output to the given file pathname.
+- `--with-kube boolean`: specifies whether or not the WMW should
+  include CRDs for the supported subset of the Kubernetes API
+  for management of containerized workloads. See [the categorization
+  in the design](../outline/#data-objects) for details.
 
 This script works in idempotent style, doing whatever work remains to
 be done.
@@ -849,13 +836,9 @@ demonstration of idempotency and changing whether the kube CRDs
 are included.
 
 ```shell
-IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw example-wmw
+kubectl kubestellar ensure wmw example-wmw
 ```
 ``` { .bash .no-copy }
-SPACE_MANAGER_KUBECONFIG=/home/ubuntu/.kube/config
-PROVIDER_NAME=default
-PROVIDER_NAMESPACE=spaceprovider-default
-IN_CLUSTER=false
 Error from server (NotFound): spaces.space.kubestellar.io "example-wmw" not found
 space.space.kubestellar.io/example-wmw created
 Waiting for space example-wmw to get into the Ready phase.
@@ -866,6 +849,7 @@ Current workspace is "root".
 kcp workspace example-wmw's ID is fcf8hzj7mlx156cm
 Current workspace is "root:example-wmw".
 starting kube-bind konnector for space example-wmw in background, logs writing to /home/ubuntu/kubestellar/kubestellar-kube-bind-logs/kube-bind-konnector-example-wmw.log
+Storing konnector kubeconfigs in /home/fred/kubestellar-konnectors/231212-010203-edgeplacements-1234
 binding edgeplacements for example-wmw
 cluster namespace is kube-bind-tmflg
 Current workspace is "root:espw".
@@ -875,6 +859,7 @@ Current workspace is "root".
 kcp workspace example-wmw's ID is fcf8hzj7mlx156cm
 Current workspace is "root:example-wmw".
 kube-bind konnector for space example-wmw already running
+Storing konnector kubeconfigs in /home/fred/kubestellar-konnectors/231212-010213-customizers-1245
 binding customizers for example-wmw
 cluster namespace is kube-bind-tmflg
 Current workspace is "root:espw".
@@ -884,6 +869,7 @@ Current workspace is "root".
 kcp workspace example-wmw's ID is fcf8hzj7mlx156cm
 Current workspace is "root:example-wmw".
 kube-bind konnector for space example-wmw already running
+Storing konnector kubeconfigs in /home/fred/kubestellar-konnectors/231212-010233-singleplacementslices-1256
 binding singleplacementslices for example-wmw
 cluster namespace is kube-bind-tmflg
 Current workspace is "root:espw".
@@ -921,13 +907,9 @@ customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.i
 ```
 
 ```shell
-IN_CLUSTER=false kubectl kubestellar ensure wmw example-wmw
+kubectl kubestellar ensure wmw example-wmw
 ```
 ``` { .bash .no-copy }
-SPACE_MANAGER_KUBECONFIG=/home/ubuntu/.kube/config
-PROVIDER_NAME=default
-PROVIDER_NAMESPACE=spaceprovider-default
-IN_CLUSTER=false
 SECRET_NAME=external-example-wmw
 SECRET_NAMESPACE=spaceprovider-default
 Current workspace is "root".
@@ -977,10 +959,6 @@ customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.i
 IN_CLUSTER=false kubectl kubestellar ensure wmw example-wmw --with-kube false
 ```
 ``` { .bash .no-copy }
-SPACE_MANAGER_KUBECONFIG=/home/ubuntu/.kube/config
-PROVIDER_NAME=default
-PROVIDER_NAMESPACE=spaceprovider-default
-IN_CLUSTER=false
 SECRET_NAME=external-example-wmw
 SECRET_NAMESPACE=spaceprovider-default
 Current workspace is "root".
@@ -1219,35 +1197,59 @@ be invoked by users.
 
 ## kubestellar-kube-bind
 
-This command invokes `kubectl bind` to bind one resource into a space,
-launching a kube-bind `konnector` if one is not running locally. Usage
-synposis:
-
-```shell
-kubestellar-kube-bind flag... $space_name $resource flag...
-```
+This command invokes `kubectl bind` to bind one resource into a space.
+Also, this command will launch a kube-bind `konnector` process if
+there is not already one running locally that was launched by an
+earlier invocation of this command.
 
 This command must be invoked from within the hosting cluster when
 there is one, otherwise where the SMAS, dex, and kube-bind backend can
-be reached at their native addresses.
+be reached at their native addresses. This is a point-in-time
+limitation.
+
+This command is given a kube client config for accessing the SMAS, via
+the usual `kubectl` flags and `$KUBECONFIG`.
+
+Usage synposis is as follows.
+
+```shell
+kubestellar-kube-bind flag... space_name resource
+```
 
 This command accepts the following flags.
 
 - `-h` or `--help`: prints usage and terminates successfully.
 - `-X`: turn on echoing of script internals for debugging.
+- a `kubectl` flag (but not `-o` or `--output`).
 
-This command reads the followig environment variables.
+In the context of a given container (or machine if not running
+containerized), for a given space this command should always be
+invoked with the same working directory --- so that the following is
+coherent.
 
-- `SM_CONFIG`: filename of kubeconfig file for access to the space
-  management API space (SMAS).
-- `SM_CONTEXT`: kubeconfig context for access to the SMAS.
+If this command launches a `konnector` then this command will `mkdir
+-p ${PWD}/konnector-$space_name` to hold the konnector's kubeconfig
+input (named `kubeconfig`) and log file (named `log`).
 
-## kubectl-kubestellar-create-space
+Even if this invocation does not launch a konnector, this command will
+dump some contents of `{$PWD}/konnector-${space_name}/log` when
+reporting certain errors.
+
+This command may also create a temporary kubeconfig file in `$PWD`.
+
+## Ensure the existence of a space
+
+This command will create a space if it does not already exist, and can
+optionally output a kubeconfig for super-user access to that space.
+
+This command is given a client configuration for accessing the Space
+Management API Space (SMAS), via the usual ways for configuring
+`kubectl`.
 
 Synopsis:
 
 ```shell
-kubectl kubestellar create space flag...
+kubectl kubestellar space ensure flag... space_name
 ```
 
 This command accepts the following flags. The space name, output
@@ -1255,10 +1257,7 @@ kubeconfig, and SMAS kubeconfig and context must be supplied.
 
 - `-h` or `--help`
 - `-X`
-- `--space-name $space_name`
-- `--output $space_kubeconfig_pathname`
-- `--sm-context $SM_CONTEXT`
-- `--sm-core-config $SM_CONFIG`
-- `--provider-name $name`, defaults to `default`
-- `--in-cluster`
+- A `kubectl` flag (but not `-o` or `--output`).
+- `--output-kubeconfig $pathname`
+- `--in-cluster`: relevant iff requesting a kubeconfig for the space
 

@@ -8,12 +8,10 @@ hosting cluster. If instead you are running these controllers as bare
 processes then launch this controller as follows.
 
 ```shell
-ESPW_SPACE_CONFIG="${PWD}/temp-space-config/spaceprovider-default-espw"
-kubectl-kubestellar-get-config-for-space --space-name espw --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $ESPW_SPACE_CONFIG
-(
-  KUBECONFIG=$SM_CONFIG mailbox-controller -v=4 &> /tmp/mailbox-controller.log &
-  sleep 20
-)
+ESPW_KUBECONFIG="${PWD}/espw.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig espw --kubeconfig $SM_CONFIG $ESPW_KUBECONFIG
+KUBECONFIG=$SM_CONFIG mailbox-controller -v=4 &> /tmp/mailbox-controller.log &
+sleep 20
 ```
 
 This controller is in charge of maintaining the collection of mailbox

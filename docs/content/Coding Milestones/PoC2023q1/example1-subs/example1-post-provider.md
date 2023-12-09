@@ -71,11 +71,12 @@ popd
 
 #### Initialize the KubeStellar platform as bare processes
 
-In this step KubeStellar creates and populates the Edge Service
-Provider Workspace (ESPW), which exports the KubeStellar API.
+In this step KubeStellar creates and populates the KubeStellar Core
+Space (KCS) (formerly called the Edge Service Provider Workspace
+(ESPW)), which exports the KubeStellar API.
 
 ```shell
-IN_CLUSTER=false kubestellar init
+KUBECONFIG=$SM_CONFIG kubestellar -X init
 ```
 
 ### Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
@@ -138,12 +139,12 @@ KubeStellar. They label both florin and guilder with `env=prod`, and
 also label guilder with `extended=yes`.
 
 ```shell
-IMW1_SPACE_CONFIG="${PWD}/temp-space-config/spaceprovider-default-imw1"
-kubectl-kubestellar-get-config-for-space --space-name imw1 --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $IMW1_SPACE_CONFIG
-KUBECONFIG=$IMW1_SPACE_CONFIG kubectl kubestellar ensure location florin  loc-name=florin  env=prod --imw imw1
-KUBECONFIG=$IMW1_SPACE_CONFIG kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes --imw imw1
+IMW1_KUBECONFIG="${PWD}/imw1.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig imw1 --kubeconfig $SM_CONFIG $IMW1_KUBECONFIG
+KUBECONFIG=$IMW1_KUBECONFIG kubectl kubestellar ensure location florin  loc-name=florin  env=prod
+KUBECONFIG=$IMW1_KUBECONFIG kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes
 echo "describe the florin location object"
-KUBECONFIG=$IMW1_SPACE_CONFIG kubectl describe location.edge.kubestellar.io florin
+KUBECONFIG=$IMW1_KUBECONFIG kubectl describe location.edge.kubestellar.io florin
 ```
 
 Those two script invocations are equivalent to creating the following

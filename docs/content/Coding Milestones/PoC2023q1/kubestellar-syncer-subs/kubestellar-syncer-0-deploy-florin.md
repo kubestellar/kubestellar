@@ -1,25 +1,21 @@
 <!--kubestellar-syncer-0-deploy-florin-start-->
-Go to inventory management workspace and find the mailbox workspace name.
+Go to KCS and find the mailbox space name.
 ```shell
-espw_space_config="${PWD}/temp-space-config/espw.config"
-kubectl-kubestellar-get-config-for-space --space-name espw --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $espw_space_config
-
-pvname=`kubectl --kubeconfig $espw_space_config get synctargets.edge.kubestellar.io | grep florin | awk '{print $1}'`
-stuid=`kubectl --kubeconfig $espw_space_config get synctargets.edge.kubestellar.io $pvname -o jsonpath="{.metadata.uid}"`
-mbws="imw1-mb-$stuid"
-echo "mailbox workspace name = $mbws"
+pvname=`kubectl --kubeconfig $espw_kubeconfig get synctargets.edge.kubestellar.io | grep florin | awk '{print $1}'`
+stuid=`kubectl --kubeconfig $espw_kubeconfig get synctargets.edge.kubestellar.io $pvname -o jsonpath="{.metadata.uid}"`
+mbs_name="imw1-mb-$stuid"
+echo "mailbox space name = $mbws"
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:imw1".
-mailbox workspace name = vosh9816n2xmpdwm-mb-bb47149d-52d3-4f14-84dd-7b64ac01c97f
+mailbox space name = vosh9816n2xmpdwm-mb-bb47149d-52d3-4f14-84dd-7b64ac01c97f
 ```
 
-Go to the mailbox workspace and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
+Go to the mailbox space and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
 ```shell
-mbwsname_space_config="${PWD}/temp-space-config/${mbws}.config"
-kubectl-kubestellar-get-config-for-space --space-name ${mbws} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $mbwsname_space_config
+mbs_kubeconfig="${PWD}/${mbs_name}.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig ${mbs_name} --kubeconfig $SM_CONFIG $mbs_kubeconfig
 
-./bin/kubectl-kubestellar-syncer_gen --kubeconfig $mbwsname_space_config florin --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o florin-syncer.yaml
+./bin/kubectl-kubestellar-syncer_gen --kubeconfig $mbs_kubeconfig florin --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o florin-syncer.yaml
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:vosh9816n2xmpdwm-mb-bb47149d-52d3-4f14-84dd-7b64ac01c97f".

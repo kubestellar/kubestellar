@@ -30,20 +30,20 @@ silent="false"
 while (( $# > 0 )); do
     case "$1" in
     (-h|--help)
-        echo "Usage: kubectl kubestellar prep-for-cluster (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename | -s | -X)* synctarget_name labelname=labelvalue..."
+        echo "Usage: kubectl kubestellar prep-for-cluster (-h | --help | -X | \$kubectl_flag | --imw space_name | --espw space_name | --syncer-image image_ref | -o filename | -s)* synctarget_name labelname=labelvalue..."
         exit 0;;
     (-X)
          set -o xtrace
-         flags[${#prep_flags[*]}]="$1";;
+         xflag='-X';;
     (--imw)
         if (( $# >1 ))
         then imw="$2"; shift
-        else echo "$0: missing IMW pathname" >&2; exit 1
+        else echo "$0: missing inventory space name" >&2; exit 1
         fi;;
     (--espw)
         if (( $# >1 ))
         then espw="$2"; shift
-        else echo "$0: missing ESPW pathname" >&2; exit 1
+        else echo "$0: missing ESPW name" >&2; exit 1
         fi;;
     (--syncer-image)
         if (( $# >1 ))
@@ -62,9 +62,8 @@ while (( $# > 0 )); do
     (-s|--silent)
         prep_flags[${#prep_flags[*]}]="-s"
         silent="true";;
-    (--context*)
-        # TODO: support --context
-        echo "$0: --context flag not supported" >&2; exit 1;;
+    (--output)
+        echo "$0: --output flag not supported" >&2; exit 1;;
     (--*=*|-?=*)
         kubectl_flags[${#kubectl_flags[*]}]="$1";;
     (--*|-?)
@@ -108,9 +107,9 @@ if ! [[ "$espw" =~ [a-z0-9].* ]]; then
 fi
 
 if [ "$silent" == "true" ]; then
-    "$bindir/kubectl-kubestellar-ensure-location" --imw ${imw} "${kubectl_flags[@]}" "$stname" "${labels[@]}"  > /dev/null
+    "$bindir/kubectl-kubestellar-ensure-location" $xflag --imw ${imw} "${kubectl_flags[@]}" "$stname" "${labels[@]}"  > /dev/null
 else
-    "$bindir/kubectl-kubestellar-ensure-location" --imw ${imw} "${kubectl_flags[@]}" "$stname" "${labels[@]}" 
+    "$bindir/kubectl-kubestellar-ensure-location" $xflag --imw ${imw} "${kubectl_flags[@]}" "$stname" "${labels[@]}" 
 fi
 
-"$bindir/kubectl-kubestellar-prep_for_syncer" "${kubectl_flags[@]}" --imw ${imw} --espw ${espw} "${prep_flags[@]}" "$stname"
+"$bindir/kubectl-kubestellar-prep_for_syncer" $xflag "${kubectl_flags[@]}" --imw ${imw} --espw ${espw} "${prep_flags[@]}" "$stname"

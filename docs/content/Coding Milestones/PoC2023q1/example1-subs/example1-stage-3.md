@@ -6,7 +6,7 @@
 
 In Stage 3, in response to the EdgePlacement and SinglePlacementSlice
 objects, the placement translator will copy the workload prescriptions
-into the mailbox workspaces and create `SyncerConfig` objects there.
+into the mailbox spaces and create `SyncerConfig` objects there.
 
 If you have deployed the KubeStellar core as workload in a Kubernetes
 cluster then the placement translator is running in a Pod there. If
@@ -15,26 +15,24 @@ use the following commands to launch the placement translator; it
 requires the ESPW to be current at start time.
 
 ```shell
-(
-  KUBECONFIG=$SM_CONFIG placement-translator -v=4  &> /tmp/placement-translator.log &
-  sleep 10
-)
+KUBECONFIG=$SM_CONFIG placement-translator -v=4  &> /tmp/placement-translator.log &
+sleep 10
 ```
 
 The following commands wait for the placement translator to get its
 job done for this example.
 
 ```shell
-FLORIN_MB_CONFIG="${PWD}/temp-space-config/${FLORIN_SPACE}"
-GUILDER_MB_CONFIG="${PWD}/temp-space-config/${GUILDER_SPACE}"
-kubectl-kubestellar-get-config-for-space --space-name $FLORIN_SPACE --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $FLORIN_MB_CONFIG
-kubectl-kubestellar-get-config-for-space --space-name $GUILDER_SPACE --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $GUILDER_MB_CONFIG
+FLORIN_MB_KUBECONFIG="${PWD}/${FLORIN_SPACE}.kubeconfig"
+GUILDER_MB_KUBECONFIG="${PWD}/${GUILDER_SPACE}.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig $FLORIN_SPACE --kubeconfig $SM_CONFIG $FLORIN_MB_KUBECONFIG
+kubectl-kubestellar-space-get_kubeconfig $GUILDER_SPACE --kubeconfig $SM_CONFIG $GUILDER_MB_KUBECONFIG
 
 # wait until SyncerConfig, ReplicaSets and Deployments are ready
 mbxws=($FLORIN_SPACE $GUILDER_SPACE)
 for ii in "${mbxws[@]}"; do
   (
-    export KUBECONFIG="${PWD}/temp-space-config/$ii"
+    export KUBECONFIG="${PWD}/${ii}.kubeconfig"
     # wait for SyncerConfig resource
     while ! kubectl get SyncerConfig the-one &> /dev/null; do
       sleep 10
@@ -53,7 +51,7 @@ for ii in "${mbxws[@]}"; do
   )
 done
 (
-  export KUBECONFIG=$GUILDER_MB_CONFIG
+  export KUBECONFIG=$GUILDER_MB_KUBECONFIG
   # check for deployment in guilder
   while ! kubectl get deploy -A &> /dev/null; do
     sleep 10
@@ -74,10 +72,10 @@ done
 ```
 
 You can check that the common workload's ReplicaSet objects got to
-their mailbox workspaces with the following command. It will list the
+their mailbox spaces with the following command. It will list the
 two copies of that object, each with an annotation whose key is
 `kcp.io/cluster` and whose value is the kcp `logicalcluster.Name` of
-the mailbox workspace; those names appear in the "CLUSTER" column of
+the mailbox space; those names appear in the "CLUSTER" column of
 the custom-columns listing near the end of [the section above about
 the mailbox controller](../#the-mailbox-controller).
 
@@ -118,7 +116,7 @@ status:
   ... (may be filled in by the time you look) ...
 ```
 
-That display should show objects in two different mailbox workspaces;
+That display should show objects in two different mailbox spaces;
 the following command checks that.
 
 ```shell
@@ -127,7 +125,7 @@ test $(kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet |
 ```
 
 The CustomResourceDefinition objects involved
-should also appear in the mailbox workspaces.
+should also appear in the mailbox spaces.
 
 ```shell
 # TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
@@ -150,7 +148,7 @@ The florin cluster gets only the common workload.  Examine florin's
 for florin (which you stored in Stage 1) here.
 
 ```shell
-KUBECONFIG=$FLORIN_MB_CONFIG kubectl get SyncerConfig the-one -o yaml
+KUBECONFIG=$FLORIN_MB_KUBECONFIG kubectl get SyncerConfig the-one -o yaml
 ```
 
 ``` { .bash .no-copy }
@@ -204,7 +202,7 @@ Examine guilder's `SyncerConfig` object and workloads as follows,
 using the mailbox workspace name that you stored in Stage 1.
 
 ```shell
-KUBECONFIG=$GUILDER_MB_CONFIG kubectl get SyncerConfig the-one -o yaml
+KUBECONFIG=$GUILDER_MB_KUBECONFIG kubectl get SyncerConfig the-one -o yaml
 ```
 ``` { .bash .no-copy }
 apiVersion: edge.kubestellar.io/v2alpha1
@@ -294,7 +292,7 @@ You can check for specific workload objects here with the following
 command.
 
 ```shell
-KUBECONFIG=$GUILDER_MB_CONFIG kubectl get deployments,replicasets -A
+KUBECONFIG=$GUILDER_MB_KUBECONFIG kubectl get deployments,replicasets -A
 ```
 ``` { .bash .no-copy }
 NAMESPACE      NAME                       READY   UP-TO-DATE   AVAILABLE   AGE

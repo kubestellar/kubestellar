@@ -21,6 +21,12 @@ This example involves two edge clusters and two workloads.  One
 workload goes on both edge clusters and one workload goes on only one
 edge cluster.  Nothing changes after the initial activity.
 
+When deploying the KubeStellar core as Kubernetes workload there is a
+third `kind` cluster involved. This usually tips `kind` over an edge
+and you need to prepare for that by following [the instructions for
+that on the kind
+website](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
+
 This example is presented in stages.  The controllers involved are
 always maintaining relationships.  This document focuses on changes as
 they appear in this example.
