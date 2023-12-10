@@ -202,7 +202,6 @@ function ensure_espw() {
     sleep 2
     run_kb_backend
     KUBECONFIG=$space_config kubectl apply -f "$bindir/../config/crds/"
-    #KUBECONFIG=$space_config kubectl apply -f "$bindir/../config/exports" 
     echo "Finished populating the espw with kubestellar apiexports"
 }
 
