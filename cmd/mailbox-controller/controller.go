@@ -194,15 +194,13 @@ func (ctl *mbCtl) sync1(ctx context.Context, ref any) {
 // sync returns true to retry, false on success or unrecoverable error
 func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 	logger := klog.FromContext(ctx)
-	mbsName := ""
-	stName, ok := refany.(refSyncTarget)
-	if ok {
+	if stName, ok := refany.(refSyncTarget); ok {
 		st, err := ctl.synctargetLister.Get(string(stName))
 		if err != nil {
 			logger.Error(err, "Failed to fetch SyncTarget from local cache", "stName", stName)
 			return false
 		}
-		mbsName, err = ctl.mbsNameOfSynctarget(st)
+		mbsName, err := ctl.mbsNameOfSynctarget(st)
 		if err != nil {
 			if err.Error() == errNoSpaceId.Error() {
 				logger.V(4).Info("Failed to retrieve Space ID. Retrying", "syncTargetName", st.Name)
@@ -212,13 +210,13 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 				return false
 			}
 		}
+		ctl.queue.Add(mbsName)
+		return false
 	}
-	if mbsName == "" {
-		mbsName, ok = refany.(string)
-		if !ok {
-			logger.Error(nil, "Sync expected a string", "ref", refany, "type", fmt.Sprintf("%T", refany))
-			return false
-		}
+	mbsName, ok := refany.(string)
+	if !ok {
+		logger.Error(nil, "Sync expected a string", "ref", refany, "type", fmt.Sprintf("%T", refany))
+		return false
 	}
 	parts := strings.Split(mbsName, mbsNameSep)
 	if len(parts) != 2 {
