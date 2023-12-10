@@ -515,7 +515,7 @@ This command also accepts the following flags.
 - `--imw space_name`: specifies which space to use as the
   inventory management workspace. This flag is not optional.
 
-This command is sensitive to the followig environment variables.
+This command reads the followig environment variables.
 
 - `SM_CONFIG`: filename of kubeconfig file for access to the space
   management API space (SMAS).
@@ -680,7 +680,7 @@ This command also accepts the following flags.
 - `-X`: turn on debug echoing of commands inside the script that
   implements this command.
 
-This command is sensitive to the followig environment variables.
+This command reads the followig environment variables.
 
 - `SM_CONFIG`: filename of kubeconfig file for access to the space
   management API space (SMAS).
@@ -763,8 +763,7 @@ the list of things that went into the WEC.
 The following command is a combination of `kubectl kubestellar
 ensure-location` and `kubectl kubestellar prep-for-syncer`, and takes
 the union of their command line flags and arguments and reads the
-union of their environment variable read sets.  Upon completion, the
-kcp current workspace will be what it was at the start.
+union of their environment variable read sets.
 
 An example usage follows.
 
@@ -829,7 +828,7 @@ This command also accepts the following flags.
 - `-X`: turn on debug echoing of the commands inside the script that
   implements this command.
 
-This command is sensitive to the followig environment variables.
+This command reads the followig environment variables.
 
 - `SM_CONFIG`: filename of kubeconfig file for access to the space
   management API space (SMAS). Default value is
@@ -1237,7 +1236,7 @@ This command accepts the following flags.
 - `-h` or `--help`: prints usage and terminates successfully.
 - `-X`: turn on echoing of script internals for debugging.
 
-This command is sensitive to the followig environment variables.
+This command reads the followig environment variables.
 
 - `SM_CONFIG`: filename of kubeconfig file for access to the space
   management API space (SMAS).
