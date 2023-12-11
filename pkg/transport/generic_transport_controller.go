@@ -54,7 +54,7 @@ func NewTransportController(ctx context.Context, edgePlacementDecisionInformer e
 	// Set up an event handler for when EdgePlacementDecision resources change
 	edgePlacementDecisionInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: transportController.enqueueEdgePlacementDecision,
-		UpdateFunc: func(old, new interface{}) {
+		UpdateFunc: func(_, new interface{}) {
 			transportController.enqueueEdgePlacementDecision(new)
 		},
 		DeleteFunc: transportController.enqueueEdgePlacementDecision,
@@ -103,7 +103,7 @@ func (ctrl *genericTransportController) enqueueEdgePlacementDecision(obj interfa
 func (ctrl *genericTransportController) Run(ctx context.Context, workersCount int) error {
 	defer utilruntime.HandleCrash()
 	defer ctrl.workqueue.ShutDown()
-	logger := klog.FromContext(ctx)
+	logger := klog.FromContext(ctx).WithName(controllerName)
 
 	logger.Info("Starting transport controller")
 
@@ -145,7 +145,6 @@ func (ctrl *genericTransportController) processNextWorkItem(ctx context.Context)
 
 	if err := ctrl.process(ctx, obj); err != nil {
 		utilruntime.HandleError(err)
-		return true
 	}
 
 	return true
@@ -190,11 +189,11 @@ func (ctrl *genericTransportController) process(ctx context.Context, obj interfa
 // syncHandler compares the actual state with the desired, and attempts to converge the two.
 func (ctrl *genericTransportController) syncHandler(ctx context.Context, key string) error {
 	// Convert the namespace/name string into a distinct namespace and name
-	logger := klog.LoggerWithValues(klog.FromContext(ctx), "objectName", key)
+	logger := klog.FromContext(ctx).WithName(controllerName).WithValues("objectName", key)
 
 	_, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
-		utilruntime.HandleError(fmt.Errorf("invalid resource key: %s", key))
+		utilruntime.HandleError(fmt.Errorf("invalid object key: %s", key))
 		return nil
 	}
 
