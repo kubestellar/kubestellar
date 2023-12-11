@@ -26,8 +26,6 @@ if $IN_CLUSTER; then
     in_cluster="--in-cluster"
 fi 
 
-
-
 while (( $# > 0 )); do
     case "$1" in
     (-h|--help)
