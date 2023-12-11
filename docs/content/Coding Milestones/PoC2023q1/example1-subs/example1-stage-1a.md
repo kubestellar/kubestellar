@@ -21,7 +21,7 @@ appearance of the mailbox spaces implied by the florin and guilder
 `SyncTarget` objects that you made earlier.
 
 ```shell
-while [ KUBECONFIG=$SM_CONFIG $(kubectl get spaces -A | grep "\-mb\-" | wc -l) -ne 2 ]; do
+while [ $(KUBECONFIG=$SM_CONFIG kubectl get spaces -A | grep "\-mb\-" | wc -l) -ne 2 ]; do
   sleep 10
 done
 ```

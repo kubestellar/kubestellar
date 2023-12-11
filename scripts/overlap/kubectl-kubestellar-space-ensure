@@ -61,6 +61,8 @@ if [ -z "$space_name" ]; then
     exit 1
 fi
 
+set -e
+
 space_ns="spaceprovider-${provider_name}"
 
 function ensure_space() { 
