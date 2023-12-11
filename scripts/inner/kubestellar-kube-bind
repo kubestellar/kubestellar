@@ -92,7 +92,7 @@ else
 fi
 
 echo "binding $resource_to_bind for $space_name"
-if ! result="$($resource_to_bind 2>&1)"; then
+if ! result="$(kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource $resource_to_bind 2>&1)"; then
     echo "Error occurred during binding $resource_to_bind for $space_name" >&2
     echo "Result of kubectl bind: $result" >&2
     echo "Tail of konnector's log at $konnector_log_file:" >&2
