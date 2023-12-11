@@ -46,5 +46,5 @@ else descr="c $commit"
 fi
 cp -R . forcount
 cd forcount
-rm -rf counts bin build kubestellar-kube-bind-files .git .vscode docs/venv docs/__pycache__ docs/scripts/generated_script.sh
+rm -rf counts bin build .git .vscode docs/venv docs/__pycache__ docs/scripts/generated_script.sh
 ${bindir}/count-tree.sh ../counts "$ts_pretty" "$commit" "$descr"

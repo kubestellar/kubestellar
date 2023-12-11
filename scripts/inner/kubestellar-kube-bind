@@ -19,7 +19,7 @@
 space_name=""
 resource_to_bind=""
 cm_namespace=kubestellar # the namespace where the configmaps live in on the provider side
-kb_dir=$(pwd)/kubestellar-kube-bind-files
+kb_dir=/tmp/kubestellar-kube-bind-files
 
 in_cluster=
 if $IN_CLUSTER; then
