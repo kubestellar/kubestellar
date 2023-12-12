@@ -129,7 +129,17 @@ Note that you now care about two different kubeconfig files: the one
 that you were using earlier, which holds the contexts for your `kind`
 clusters, and the one that you just fetched and started using for
 working with the KubeStellar interface. The remainder of this document
-assumes that your `kind` cluster contexts are in `~/.kube/config`.
+assumes that your `kind` cluster contexts are in `~/.kube/config` and
+the current context is for the KubeStellar hosting cluster.
+
+The following variable will be used in later commands to indicate that
+they are being invoked close enough to the provider's apiserver to
+use the more efficient networking (see [doc on
+"in-cluster"](../../commands/#in-cluster)).
+
+``` {.bash}
+in_cluster=""
+```
 
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
@@ -140,7 +150,7 @@ also label guilder with `extended=yes`.
 
 ```shell
 IMW1_KUBECONFIG="${PWD}/imw1.kubeconfig"
-kubectl-kubestellar-space-get_kubeconfig imw1 --kubeconfig $SM_CONFIG $IMW1_KUBECONFIG
+kubectl-kubestellar-space-get_kubeconfig imw1 --kubeconfig $SM_CONFIG $in_cluster $IMW1_KUBECONFIG
 KUBECONFIG=$IMW1_KUBECONFIG kubectl kubestellar ensure location florin  loc-name=florin  env=prod
 KUBECONFIG=$IMW1_KUBECONFIG kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes
 echo "describe the florin location object"

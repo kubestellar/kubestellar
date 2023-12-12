@@ -20,8 +20,8 @@ optionally makes some Kubernetes APIs available for the WMW by
 populating a set of CRDs into the WMW.
 
 ```shell
-IN_CLUSTER=false kubectl kubestellar ensure wmw wmw-c
-WMW_C_SPACE_CONFIG=$PWD/temp-space-config/spaceprovider-default-wmw-c
+WMW_C_SPACE_CONFIG=${PWD}/wmw-c.kubeconfig
+kubectl kubestellar ensure wmw $in_cluster wmw-c --output-kubeconfig "$WMW_C_SPACE_CONFIG"
 ```
 
 ``` {.bash .hide-me}
@@ -147,8 +147,8 @@ Use the following `kubectl` commands to create the WMW for the special
 workload.
 
 ```shell
-IN_CLUSTER=false kubectl kubestellar ensure wmw wmw-s
-WMW_S_SPACE_CONFIG=$PWD/temp-space-config/spaceprovider-default-wmw-s
+WMW_S_SPACE_CONFIG=${PWD}/wmw-s.kubeconfig
+kubectl kubestellar ensure wmw $in_cluster wmw-s --output-kubeconfig "$WMW_S_SPACE_CONFIG"
 ```
 
 In this workload we will also demonstrate how to downsync objects
@@ -386,10 +386,9 @@ following commands to launch the where-resolver; it requires the ESPW
 to be the current kcp workspace at start time.
 
 ```shell
-(
-  KUBECONFIG=$SM_CONFIG kubestellar-where-resolver -v=4 &> /tmp/where-resolver.log &
-  sleep 10
-)
+# TODO: pass --in-cluster when acceptable
+KUBECONFIG=$SM_CONFIG kubestellar-where-resolver -v=4 &> /tmp/where-resolver.log &
+sleep 10
 ```
 
 The following commands wait until the where-resolver has done its job

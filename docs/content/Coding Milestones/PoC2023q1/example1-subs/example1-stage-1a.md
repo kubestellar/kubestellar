@@ -8,8 +8,7 @@ hosting cluster. If instead you are running these controllers as bare
 processes then launch this controller as follows.
 
 ```shell
-ESPW_KUBECONFIG="${PWD}/espw.kubeconfig"
-kubectl-kubestellar-space-get_kubeconfig espw --kubeconfig $SM_CONFIG $ESPW_KUBECONFIG
+# TODO: pass --in-cluster when acceptable
 KUBECONFIG=$SM_CONFIG mailbox-controller -v=4 &> /tmp/mailbox-controller.log &
 sleep 20
 ```

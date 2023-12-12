@@ -28,4 +28,13 @@ Next, use the following command to wait for the space-manger to process the prov
 KUBECONFIG=$SM_CONFIG kubectl wait --for=jsonpath='{.status.Phase}'=Ready spaceproviderdesc/default --timeout=90s
 ```
 
+The following variable will be used in later commands to indicate that
+they are being invoked close enough to the provider's apiserver to
+use the more efficient networking (see [doc on
+"in-cluster"](../../commands/#in-cluster)).
+
+```shell
+in_cluster="--in-cluster"
+```
+
 <!--example1-kcp-provider-end-->

@@ -25,8 +25,8 @@ job done for this example.
 ```shell
 FLORIN_MB_KUBECONFIG="${PWD}/${FLORIN_SPACE}.kubeconfig"
 GUILDER_MB_KUBECONFIG="${PWD}/${GUILDER_SPACE}.kubeconfig"
-kubectl-kubestellar-space-get_kubeconfig $FLORIN_SPACE --kubeconfig $SM_CONFIG $FLORIN_MB_KUBECONFIG
-kubectl-kubestellar-space-get_kubeconfig $GUILDER_SPACE --kubeconfig $SM_CONFIG $GUILDER_MB_KUBECONFIG
+kubectl-kubestellar-space-get_kubeconfig $FLORIN_SPACE --kubeconfig $SM_CONFIG $in_cluster $FLORIN_MB_KUBECONFIG
+kubectl-kubestellar-space-get_kubeconfig $GUILDER_SPACE --kubeconfig $SM_CONFIG $in_cluster $GUILDER_MB_KUBECONFIG
 
 # wait until SyncerConfig, ReplicaSets and Deployments are ready
 mbxws=($FLORIN_SPACE $GUILDER_SPACE)
