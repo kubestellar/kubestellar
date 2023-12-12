@@ -4,7 +4,7 @@ Go to KCS and find the mailbox space name.
 pvname=`kubectl --kubeconfig $espw_kubeconfig get synctargets.edge.kubestellar.io | grep florin | awk '{print $1}'`
 stuid=`kubectl --kubeconfig $espw_kubeconfig get synctargets.edge.kubestellar.io $pvname -o jsonpath="{.metadata.uid}"`
 mbs_name="imw1-mb-$stuid"
-echo "mailbox space name = $mbws"
+echo "mailbox space name = $mbs_name"
 ```
 ``` { .bash .no-copy }
 mailbox space name = vosh9816n2xmpdwm-mb-bb47149d-52d3-4f14-84dd-7b64ac01c97f
@@ -13,7 +13,7 @@ mailbox space name = vosh9816n2xmpdwm-mb-bb47149d-52d3-4f14-84dd-7b64ac01c97f
 Go to the mailbox space and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
 ```shell
 mbs_kubeconfig="${MY_KUBECONFIGS}/${mbs_name}.kubeconfig"
-kubectl-kubestellar-space-get_kubeconfig ${mbs_name} --kubeconfig $SM_CONFIG $mbs_kubeconfig
+kubectl-kubestellar-space-get_kubeconfig ${mbs_name} $in_cluster --kubeconfig $SM_CONFIG $mbs_kubeconfig
 
 ./bin/kubectl-kubestellar-syncer_gen --kubeconfig $mbs_kubeconfig florin --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o florin-syncer.yaml
 ```

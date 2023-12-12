@@ -133,9 +133,8 @@ assumes that your `kind` cluster contexts are in `~/.kube/config` and
 the current context is for the KubeStellar hosting cluster.
 
 The following variable will be used in later commands to indicate that
-they are being invoked close enough to the provider's apiserver to
-use the more efficient networking (see [doc on
-"in-cluster"](../../commands/#in-cluster)).
+they are _not_ being invoked from within the hosting cluster (see [doc
+on "in-cluster"](../../commands/#in-cluster)).
 
 ``` {.bash}
 in_cluster=""
