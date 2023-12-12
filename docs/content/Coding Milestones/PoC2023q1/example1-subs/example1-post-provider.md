@@ -149,7 +149,7 @@ KubeStellar. They label both florin and guilder with `env=prod`, and
 also label guilder with `extended=yes`.
 
 ```shell
-IMW1_KUBECONFIG="${PWD}/imw1.kubeconfig"
+IMW1_KUBECONFIG="${MY_KUBECONFIGS}/imw1.kubeconfig"
 kubectl-kubestellar-space-get_kubeconfig imw1 --kubeconfig $SM_CONFIG $in_cluster $IMW1_KUBECONFIG
 KUBECONFIG=$IMW1_KUBECONFIG kubectl kubestellar ensure location florin  loc-name=florin  env=prod
 KUBECONFIG=$IMW1_KUBECONFIG kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes

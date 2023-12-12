@@ -20,7 +20,7 @@ optionally makes some Kubernetes APIs available for the WMW by
 populating a set of CRDs into the WMW.
 
 ```shell
-WMW_C_SPACE_CONFIG=${PWD}/wmw-c.kubeconfig
+WMW_C_SPACE_CONFIG=${MY_KUBECONFIGS}/wmw-c.kubeconfig
 kubectl kubestellar ensure wmw $in_cluster wmw-c --output-kubeconfig "$WMW_C_SPACE_CONFIG"
 ```
 
@@ -147,7 +147,7 @@ Use the following `kubectl` commands to create the WMW for the special
 workload.
 
 ```shell
-WMW_S_SPACE_CONFIG=${PWD}/wmw-s.kubeconfig
+WMW_S_SPACE_CONFIG=${MY_KUBECONFIGS}/wmw-s.kubeconfig
 kubectl kubestellar ensure wmw $in_cluster wmw-s --output-kubeconfig "$WMW_S_SPACE_CONFIG"
 ```
 

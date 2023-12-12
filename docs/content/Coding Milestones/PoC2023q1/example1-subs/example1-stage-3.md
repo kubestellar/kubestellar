@@ -23,8 +23,8 @@ The following commands wait for the placement translator to get its
 job done for this example.
 
 ```shell
-FLORIN_MB_KUBECONFIG="${PWD}/${FLORIN_SPACE}.kubeconfig"
-GUILDER_MB_KUBECONFIG="${PWD}/${GUILDER_SPACE}.kubeconfig"
+FLORIN_MB_KUBECONFIG="${MY_KUBECONFIGS}/${FLORIN_SPACE}.kubeconfig"
+GUILDER_MB_KUBECONFIG="${MY_KUBECONFIGS}/${GUILDER_SPACE}.kubeconfig"
 kubectl-kubestellar-space-get_kubeconfig $FLORIN_SPACE --kubeconfig $SM_CONFIG $in_cluster $FLORIN_MB_KUBECONFIG
 kubectl-kubestellar-space-get_kubeconfig $GUILDER_SPACE --kubeconfig $SM_CONFIG $in_cluster $GUILDER_MB_KUBECONFIG
 
@@ -32,7 +32,7 @@ kubectl-kubestellar-space-get_kubeconfig $GUILDER_SPACE --kubeconfig $SM_CONFIG 
 mbxws=($FLORIN_SPACE $GUILDER_SPACE)
 for ii in "${mbxws[@]}"; do
   (
-    export KUBECONFIG="${PWD}/${ii}.kubeconfig"
+    export KUBECONFIG="${MY_KUBECONFIGS}/${ii}.kubeconfig"
     # wait for SyncerConfig resource
     while ! kubectl get SyncerConfig the-one &> /dev/null; do
       sleep 10

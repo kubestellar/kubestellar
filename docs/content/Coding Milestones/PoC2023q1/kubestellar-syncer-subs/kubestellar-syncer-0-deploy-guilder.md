@@ -16,7 +16,7 @@ mailbox space name = vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5e
 
 Go to the mailbox space and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
 ```shell
-mbs_kubeconfig="${PWD}/${mbs_name}.kubeconfig"
+mbs_kubeconfig="${MY_KUBECONFIGS}/${mbs_name}.kubeconfig"
 kubectl-kubestellar-space-get_kubeconfig ${mbs_name} --kubeconfig $SM_CONFIG $mbs_kubeconfig
 
 ./bin/kubectl-kubestellar-syncer_gen --kubeconfig $mbs_kubeconfig guilder --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o guilder-syncer.yaml
