@@ -30,7 +30,7 @@ cm_namespace=kubestellar # the namespace where the configmaps live in on the pro
 while (( $# > 0 )); do
     case "$1" in
     (-h|--help)
-        echo "Usage: $0 (-h | --help | -X | \$kubectl_flag)* space_name resource_to_bind"
+        echo "Usage: $0 (-h | --help | -X | \$kubectl_flag | --in-cluster)* space_name resource_to_bind"
         echo "space_name is the name of a kube-bind consumer space"
         echo "resource_to_bind is a resource offered by the kube-bind provider, in lower case and plural form"
         exit 0;;

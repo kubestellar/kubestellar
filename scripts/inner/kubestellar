@@ -23,12 +23,16 @@
 # named "default" and that is the one to use.
 
 # Pre-req: `kubectl` with no flags will access the Space Management
-# API Space (SMAS).
+# API Space (SMAS) with high privilege.
 
 # Requirements:
 #    Download KubeStellar binaries
 #    KubeStellar controller binaries are on $PATH.
-#    kubectl is configured to talk to kcp server with high privilege
+
+# Because of the direct way that `kubestellar-kube-bind` is
+# implemented, all uses of that script --- direct and indirect,
+# including the usage by this script --- must be made in the context
+# of the same filesystem, working directory, and procsses space.
 
 bindir=$(dirname $(realpath "${BASH_SOURCE[0]}"))
 
@@ -44,6 +48,7 @@ espw_name="espw"
 log_folder=$(pwd)/kubestellar-logs
 imws="root:imw1"
 wmws="root:wmw1"
+in_cluster=""
 
 function echoerr() {
    echo "ERROR: $1" >&2
@@ -95,7 +100,7 @@ function ensure_imws() {
 
             imw=${i#"root:"}
             echo "Ensuring IMW: $imw"
-            ${bindir}/kubectl-kubestellar-ensure-inventory_space $xflag $imw # &> /dev/null
+            ${bindir}/kubectl-kubestellar-ensure-inventory_space $xflag $in_cluster $imw # &> /dev/null
         done
     done <<< "$1"
 }
@@ -110,7 +115,7 @@ function ensure_wmws() {
             fi
             wmw=${i#"root:"}
             echo "Ensuring WMW: $wmw"
-            ${bindir}/kubectl-kubestellar-ensure-wmw $xflag $wmw --with-kube true # &> /dev/null
+            ${bindir}/kubectl-kubestellar-ensure-wmw $xflag $in_cluster $wmw --with-kube true # &> /dev/null
         done
     done <<< "$1"
 }
@@ -141,8 +146,10 @@ while (( $# > 0 )); do
     (-X)
         xflag="-X"
         set -x;;
+    (--in-cluster)
+        in_cluster="--in-cluster";;
     (-h|--help)
-        echo "Usage: $0 [init | start | stop] [--log-folder log_folder] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [--provider-name provider-name] [-V|--verbose] [-X]"
+        echo "Usage: $0 [init | start | stop] [--log-folder log_folder] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [--provider-name provider-name] [-V|--verbose] [-h|--help] [-X] [--in-cluster]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -161,7 +168,7 @@ fi
 
 function ensure_espw() {
     local kcs_kubeconfig="$(mktemp kcs.kubeconfig#XXXX)"
-    kubectl-kubestellar-space-ensure $espw_name --in-cluster --output-kubeconfig $kcs_kubeconfig
+    kubectl-kubestellar-space-ensure $espw_name $in_cluster --output-kubeconfig $kcs_kubeconfig
     ensure_dex
     sleep 2
     ensure_kb_backend "$kcs_kubeconfig"
@@ -272,6 +279,7 @@ if [[ ! -d $log_folder ]]; then
     mkdir -p $log_folder
 fi
 
+# TODO: pass $in_cluster
 mailbox-controller -v=2 >> $log_folder/mailbox-controller-log.txt 2>&1 &
 
 run_status=$(wait_for_process mailbox-controller)
@@ -286,6 +294,7 @@ fi
 
 # Start the kubestellar where-resolver
 sleep 3
+# TODO: pass $in_cluster
 kubestellar-where-resolver -v 2 >> $log_folder/kubestellar-where-resolver-log.txt 2>&1 &
 
 run_status=$(wait_for_process "kubestellar-where-resolver")
@@ -298,6 +307,7 @@ fi
 
 # Start the Placement Translator
 sleep 3
+# TODO: pass $in_cluster
 placement-translator -v=2 >> $log_folder/placement-translator-log.txt 2>&1 &
 
 run_status=$(wait_for_process placement-translator)

@@ -30,6 +30,8 @@ while (( $# > 0 )); do
 	    exit 0;;
 	(-X) set -o xtrace
 	    sub_flags[${#sub_flags[*]}]="$1";;
+	(--in-cluster)
+	    sub_flags[${#sub_flags[*]}]="$1";;
 	(--with-kube)
 	    if (( $# >1 ))
 	    then want_kube="$2"; shift

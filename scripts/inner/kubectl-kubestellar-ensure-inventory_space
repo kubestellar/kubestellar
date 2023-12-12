@@ -24,9 +24,11 @@ sub_flags=()
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: $0 (-h | --help | -X | \$kubectl_flag)* inventory_space_name"
+	    echo "Usage: $0 (-h | --help | -X | \$kubectl_flag --in-cluster | --output-kubeconfig \$pathname)* inventory_space_name"
 	    exit 0;;
 	(-X) set -o xtrace
+	    sub_flags[${#sub_flags[*]}]="$1";;
+	(--in-cluster)
 	    sub_flags[${#sub_flags[*]}]="$1";;
 	(--output-kubeconfig)
 	    if (( $# >1 ))
@@ -63,7 +65,7 @@ fi
 
 set -e
 
-kubectl-kubestellar-space-ensure "${sub_flags[@]}" "${kubectl_flags[@]}" $is_name --in-cluster $out_flag
+kubectl-kubestellar-space-ensure "${sub_flags[@]}" "${kubectl_flags[@]}" $is_name $out_flag
 
 kubestellar-kube-bind "${sub_flags[@]}" "${kubectl_flags[@]}" "$is_name" "locations"
 kubestellar-kube-bind "${sub_flags[@]}" "${kubectl_flags[@]}" "$is_name" "synctargets"

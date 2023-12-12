@@ -9,22 +9,46 @@ for the executable on the command line. The one exception is [the
 bootstrap script](#bootstrap), which is designed to be fetched from
 github and fed directly into `bash`.
 
-There normal way of deploying the space framework and the central
-KubeStellar components is as workload in a Kubernetes (possibly
-OpenShift) cluster.  Contributors may instead run these components as
-processes on a machine of supported OS and ISA, with some Kubernetes
-cluster to play the role of Space Management API Space (SMAS, which is
-where the Space objects live).
-
 This document describes both commands that a platform administrator
 uses and commands that a platform user uses.
 
-Most of these executables are given one Kubernetes client
-configuration, either for the SMAS or a space described by a Space
-object. The exceptions are the bootstrap script, [the kcp control
-script that runs before starting the kcp
-server](#kubestellar-ensure-kcp-server-creds), and the admin commands
-for deploying KubeStellar in a Kubernetes cluster.
+## Deployment style
+
+There normal way of deploying the space framework, a space provider,
+and the central KubeStellar controllers is as workload in a Kubernetes
+(possibly OpenShift) cluster.  Contributors may instead run the Space
+Manager, possibly space provider (dependening on the provider), and
+KubeStellar central controllers as bare processes on a machine of
+supported OS and ISA. Even in this case a Kubernetes cluster is
+required, at least to hold the Space Management API objects; this role
+is called the Space Management API Space (SMAS). The KubeFlex space
+provider must be deployed in a cluster, which is called the KubeFlex
+hosting cluster. That cluster can also play the SMAS role.
+
+### In-cluster
+
+Some commands take an optional flag `--in-cluster` that is about the
+networking relationship between (a) that running command and (b) the
+apiserver(s) for the space(s) that the command accesses. This flag can
+be used when both (a) and (b) are in the same Kubernetes cluster. This
+flag can also be used when both (a) and (b) are _not_ in a Kubernetes
+cluster but rather are bare processes on the same machine. Omitting
+this flag means that the running command will use the more general way
+of addressing the apiserver(s), which is functional in more situations
+but possibly less efficient.
+
+### OS namespace consistency
+
+For some of the commands, all of them must always be invoked in the
+context of the same filesystem, working directory, and process
+space. This is a point-in-time limitation due to the way kube-bind
+konnectors are launched. The relevant commands are as follows.
+
+- `kubectl kubestellar ensure inventory-space`
+- `kubectl kubestellar ensure wmw`
+- `kubestellar` (which is also constrained because `start` and `stop`
+  are implemented by ordinary commands, no remote agent is involved)
+- `kubestellar-kube-bind`
 
 ## Bare process deployment
 
@@ -212,6 +236,9 @@ pre-requisites.
 
 - When not given any command-line flags, `kubectl` will access the
   Space Management API Space (SMAS).
+
+This command is one of those requiring [OS namespace
+consistency](#os-namespace-consistency).
 
 The usage synopsis is as follows.
 
@@ -439,8 +466,8 @@ This command will create an inventory space (IS) of a given name if it
 does not already exist and ensure that it is properly prepared for
 use.
 
-This command only works "in cluster". This is a point-in-time
-limitation.
+This command is one of those requiring [OS namespace
+consistency](#os-namespace-consistency).
 
 Preparing for use includes using kube-bind to import the definitions
 of `SyncTarget` and `Location`. If that has not already been done then
@@ -469,6 +496,7 @@ the positional argument.
 - `-X`: turn on debug echoing of the commands inside the script that
   implements this command.
 - a `kubectl` flag (but not `-o` or `--output`).
+- `--in-cluster`: as [usual](#in-cluster).
 - `--output-kubeconfig $file_pathname`: requests that an in-cluster
   kubeconfig for the space be output to the given file pathname.
 
@@ -622,8 +650,8 @@ This command accepts the following flags.
 - `-h` or `--help`: print usage and terminate with success.
 - `-X`: turn on debug echoing of the script as it executes.
 - a `kubectl` flag (but not `-o` or `--output`).
-- `--in-cluster`: indicates that the in-cluster kubeconfig should be
-  output; otherwise the external one will be.
+- `--in-cluster`: indicates that the kubeconfig is for use
+  [in-cluster](#in-cluster).
 
 Following is an example usage.
 
@@ -661,6 +689,7 @@ This command accepts the following flags.
 - `-X`: turn on debug echoing of commands inside the script that
   implements this command.
 - a `kubectl` flaag (but not `-o` or `--output`).
+- `--in-cluster`: as [usual](#in-cluster).
 - `--imw space_name`: specifies which space holds the relevant
   SyncTarget object.
 - `--espw space_name`: specifies where to find the edge service
@@ -787,8 +816,8 @@ to verify the syncer pod is running.
 This command will create a WDS of a given name if it does not already
 exist and ensure that it is properly prepared for use.
 
-This command only works "in cluster". This is a point-in-time
-limitation.
+This command is one of those requiring [OS namespace
+consistency](#os-namespace-consistency).
 
 Preparing for use includes using kube-bind to import the relevant
 parts of the KubeStellar API. If that has not already been done then
@@ -800,8 +829,8 @@ in `$PWD`) and constraint on working directory (always the same for a
 given WDS).
 
 Preparing for use also includes ensuring the CRDs for the Kubernetes
-  APIs for management of containerized workloads and present iff
-  desired.
+APIs for management of containerized workloads and present iff
+desired.
 
 This command is given a kube client configuration for access to the
 Space Management API Space (SMAS), via the usual `kubectl` flags and
@@ -820,6 +849,7 @@ the positional argument.
   successfully.
 - `-X`: turn on debug echoing of the commands inside the script that
   implements this command.
+- `--in-cluster`: as [usual](#in-cluster).
 - a `kubectl` flag (but not `-o` or `--output`).
 - `--output-kubeconfig $file_pathname`: requests that an in-cluster
   kubeconfig for the WDS be output to the given file pathname.
@@ -1202,10 +1232,8 @@ Also, this command will launch a kube-bind `konnector` process if
 there is not already one running locally that was launched by an
 earlier invocation of this command.
 
-This command must be invoked from within the hosting cluster when
-there is one, otherwise where the SMAS, dex, and kube-bind backend can
-be reached at their native addresses. This is a point-in-time
-limitation.
+This command is one of those requiring [OS namespace
+consistency](#os-namespace-consistency).
 
 This command is given a kube client config for accessing the SMAS, via
 the usual `kubectl` flags and `$KUBECONFIG`.
@@ -1221,11 +1249,7 @@ This command accepts the following flags.
 - `-h` or `--help`: prints usage and terminates successfully.
 - `-X`: turn on echoing of script internals for debugging.
 - a `kubectl` flag (but not `-o` or `--output`).
-
-In the context of a given container (or machine if not running
-containerized), for a given space this command should always be
-invoked with the same working directory --- so that the following is
-coherent.
+- `--in-cluster`: as [usual](#in-cluster).
 
 If this command launches a `konnector` then this command will `mkdir
 -p ${PWD}/konnector-$space_name` to hold the konnector's kubeconfig

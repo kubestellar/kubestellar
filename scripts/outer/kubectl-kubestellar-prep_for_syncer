@@ -41,9 +41,11 @@ silent="false"
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: kubectl kubestellar prep-for-syncer (-h | --help | -X | \$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename | -s)* synctarget_name"
+	    echo "Usage: kubectl kubestellar prep-for-syncer (-h | --help | -X | \$kubectl_flag | --in-cluster | --imw space_name | --espw space_name | --syncer-image image_ref | -o filename | -s)* synctarget_name"
 	    exit 0;;
 	(-X) set -o xtrace
+	    sub_flags[${#sub_flags[*]}]="$1";;
+	(--in-cluster)
 	    sub_flags[${#sub_flags[*]}]="$1";;
 	(--imw)
 	    if (( $# >1 ))
