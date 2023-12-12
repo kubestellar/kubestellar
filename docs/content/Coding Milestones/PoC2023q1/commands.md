@@ -248,7 +248,7 @@ kubestellar [flags] subcommand [flags]
 
 This command accepts the following command line flags, which can
 appear before and/or after the subcommand.  The `--log-folder` flag is
-only meaningful for the `start` subcommand. The `--local-kcp` flag is
+only meaningful for the `start` subcommand. The `--in-cluster` flag is
 not meaningful for the `stop` subcommand. The `--ensure-imw` and 
 `--ensure-wmw` flags are only meaningful for the `start` or `init` subcommands.
 
@@ -258,8 +258,7 @@ not meaningful for the `stop` subcommand. The `--ensure-imw` and
 - `--log-folder $pathname`: says where to put the logs from the
   controllers.  Will be `mkdir -p` if absent.  Defaults to
   `${PWD}/kubestellar-logs`.
-- `--local-kcp $bool`: says whether to expect to find a local process
-  named "kcp".  Defaults to "true".
+- `--in-cluster`: as [usual](#in-cluster).
 - `--ensure-imw`: provide a comma separated list of pathnames for inventory workspaces, _e.g._ "root:imw1,root:imw2". Defaults to "root:imw1". To prevent the creation of any inventory workspace, then pass "".
 - `--ensure-wmw`: provide a comma separated list of pathnames for workload management workspaces, _e.g._ "root:wmw1,root:imw2". Defaults to "root:wmw1". To prevent the creation of any workload management workspace, then pass "".
 - `-h` or `--help`: print a brief usage message and terminate.
@@ -779,7 +778,12 @@ the list of things that went into the WEC.
 
 The following command is a combination of `kubectl kubestellar
 ensure-location` and `kubectl kubestellar prep-for-syncer`, and takes
-the union of their command line flags and arguments.
+the union of their command line flags and arguments with the following
+exceptions/modifications.
+
+- The `-o` flag is not accepted.
+- The `kubectl` flags and `$KUBECONFIG` say how to access the Space
+  Management API Space (SMAS), not the inventory space.
 
 An example usage follows.
 

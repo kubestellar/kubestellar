@@ -118,8 +118,6 @@ make userbuild
 export PATH=$PWD/bin:$PATH
 bash -c "$(cat bootstrap/install-kcp-with-plugins.sh)" -V -V --version v0.11.0
 export PATH=$PWD/kcp/bin:$PATH
-export SM_CONFIG=~/.kube/config
-export SM_CONTEXT=ks-core
 ```
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
@@ -166,18 +164,18 @@ export SM_CONTEXT=ks-core
 Wait for the mailbox controller to create the corresponding mailbox spaces and remember them.
 
 ```shell
-while [ $(KUBECONFIG=$SM_CONFIG kubectl get spaces -A | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
-MB1=$(KUBECONFIG=$SM_CONFIG kubectl get spaces -n spaceprovider-default -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
+while [ $(KUBECONFIG=~/.kube/config kubectl get spaces -A | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
+MB1=$(KUBECONFIG=~/.kube/config kubectl get spaces -n spaceprovider-default -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
 echo The mailbox for ks-edge-cluster1 is $MB1
-MB2=$(KUBECONFIG=$SM_CONFIG kubectl get spaces -n spaceprovider-default -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
+MB2=$(KUBECONFIG=~/.kube/config kubectl get spaces -n spaceprovider-default -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
 echo The mailbox for ks-edge-cluster2 is $MB2
 
 MB1_KUBECONFIG="${MY_KUBECONFIGS}/${MB1}.kubeconfig"
-kubectl-kubestellar-space-get_kubeconfig $MB1 --kubeconfig $SM_CONFIG $MB1_KUBECONFIG
+kubectl-kubestellar-space-get_kubeconfig $MB1 --kubeconfig ~/.kube/config $MB1_KUBECONFIG
 MB2_KUBECONFIG="${MY_KUBECONFIGS}/${MB2}.kubeconfig"
-kubectl-kubestellar-space-get_kubeconfig $MB2 --kubeconfig $SM_CONFIG $MB2_KUBECONFIG
+kubectl-kubestellar-space-get_kubeconfig $MB2 --kubeconfig ~/.kube/config $MB2_KUBECONFIG
 WMW1_KUBECONFIG="${MY_KUBECONFIGS}/wmw1.kubeconfig"
-kubectl-kubestellar-space-get_kubeconfig wmw1 --kubeconfig $SM_CONFIG $WMW1_KUBECONFIG
+kubectl-kubestellar-space-get_kubeconfig wmw1 --kubeconfig ~/.kube/config $WMW1_KUBECONFIG
 ```
 
 #### 5. Deploy an Apache Web Server to ks-edge-cluster1 and ks-edge-cluster2
@@ -342,7 +340,7 @@ how to create, but not overwrite/update a synchronized resource
            -o jsonpath='{.data.external\.kubeconfig}' \
            -n kubestellar | base64 -d > ks-core.kubeconfig
 
-         KUBECONFIG=$SM_CONFIG kubectl get spaces -A 
+         KUBECONFIG=~/.kube/config kubectl get spaces -A 
          ```
     === "uh oh, error?"
          {%

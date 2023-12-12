@@ -100,7 +100,6 @@ RUN chown -R kubestellar:0 /home/kubestellar && \
 
 # setup the environment variables
 ENV PATH=/home/kubestellar/bin:/home/kubestellar/kcp/bin:/home/kubestellar/kube-bind/bin:/home/kubestellar/dex/bin:/home/kubestellar/easy-rsa:$PATH
-ENV KUBECONFIG=/home/kubestellar/.kcp/admin.kubeconfig
 ENV EXTERNAL_HOSTNAME=""
 ENV EXTERNAL_PORT=""
 

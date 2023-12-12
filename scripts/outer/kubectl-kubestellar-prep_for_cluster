@@ -36,7 +36,7 @@ while (( $# > 0 )); do
          set -o xtrace
          xflag='-X';;
     (--in-cluster)
-        prep_flags[${#prep_flags[*]}]="$1";;
+        kubectl_flags[${#kubectl_flags[*]}]="$1";;
     (--imw)
         if (( $# >1 ))
         then imw="$2"; shift
@@ -108,10 +108,17 @@ if ! [[ "$espw" =~ [a-z0-9].* ]]; then
     exit 1
 fi
 
+function ensure_location() {
+    imw_kubeconfig=$(mktemp "${imw}.kubeconfig#XXXX")
+    trap "rm -rf '$imw_kubeconfig'" EXIT
+    "$bindir/kubectl-kubestellar-space-get_kubeconfig" $xflag "${kubectl_flags[@]}" "${imw}" "$imw_kubeconfig"
+    "$bindir/kubectl-kubestellar-ensure-location" $xflag --kubeconfig "$imw_kubeconfig" "$stname" "${labels[@]}" 
+}
+
 if [ "$silent" == "true" ]; then
-    "$bindir/kubectl-kubestellar-ensure-location" $xflag --imw ${imw} "${kubectl_flags[@]}" "$stname" "${labels[@]}"  > /dev/null
+   ensure_location  > /dev/null
 else
-    "$bindir/kubectl-kubestellar-ensure-location" $xflag --imw ${imw} "${kubectl_flags[@]}" "$stname" "${labels[@]}" 
+   ensure_location
 fi
 
 "$bindir/kubectl-kubestellar-prep_for_syncer" $xflag "${kubectl_flags[@]}" --imw ${imw} --espw ${espw} "${prep_flags[@]}" "$stname"

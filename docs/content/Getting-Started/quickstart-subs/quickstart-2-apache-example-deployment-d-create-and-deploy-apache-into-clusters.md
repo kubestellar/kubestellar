@@ -8,7 +8,7 @@ Create the `EdgePlacement` object for your workload. Its “where predicate” (
 In the `wmw1` space create the following `EdgePlacement` object: 
   
 ```shell
-KUBECONFIG=$WMW1_SPACE_CONFIG kubectl apply -f - <<EOF
+KUBECONFIG=$WMW1_KUBECONFIG kubectl apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:

@@ -168,7 +168,7 @@ fi
 
 function ensure_espw() {
     local kcs_kubeconfig="$(mktemp kcs.kubeconfig#XXXX)"
-    kubectl-kubestellar-space-ensure $espw_name $in_cluster --output-kubeconfig $kcs_kubeconfig
+    kubectl-kubestellar-space-ensure $xflag $espw_name $in_cluster --output-kubeconfig $kcs_kubeconfig
     ensure_dex
     sleep 2
     ensure_kb_backend "$kcs_kubeconfig"
