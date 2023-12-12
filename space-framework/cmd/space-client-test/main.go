@@ -44,7 +44,7 @@ func main() {
 
 	// Create the MC aware client --> initiate the underlying MC aware library
 	// The library actively watches for space updates, and maintain an updated list of accessible spaces
-	spclient, err := spaceclient.NewMultiSpace(ctx, managementSpaceConfig)
+	spclient, err := spaceclient.NewMultiSpace(ctx, managementSpaceConfig, true)
 	if err != nil {
 		logger.Error(err, "get client failed")
 		panic(err)

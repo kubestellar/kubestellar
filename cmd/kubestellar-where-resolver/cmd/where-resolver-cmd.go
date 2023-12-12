@@ -97,7 +97,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		logger.Error(err, "Failed to create space management API client config from flags")
 		return err
 	}
-	spaceClient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig)
+	spaceClient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig, options.ExternalAccess)
 	if err != nil {
 		logger.Error(err, "Failed to create space-aware client")
 		return err

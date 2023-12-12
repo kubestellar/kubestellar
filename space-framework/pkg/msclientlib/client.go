@@ -64,6 +64,7 @@ type multiSpaceClient struct {
 	refToSpace       map[string]string
 	managerClientset *mgtclientset.Clientset
 	kubeClientset    *kubernetes.Clientset
+	externalAccess   bool
 	lock             sync.Mutex
 }
 
@@ -118,7 +119,7 @@ var client *multiSpaceClient
 var clientLock = &sync.Mutex{}
 
 // NewMultiSpace creates new multi-space client and starts collecting space configs
-func NewMultiSpace(ctx context.Context, managerConfig *rest.Config) (KubestellarSpaceInterface, error) {
+func NewMultiSpace(ctx context.Context, managerConfig *rest.Config, externalAccess bool) (KubestellarSpaceInterface, error) {
 	clientLock.Lock()
 	defer clientLock.Unlock()
 
@@ -141,6 +142,7 @@ func NewMultiSpace(ctx context.Context, managerConfig *rest.Config) (Kubestellar
 		refToSpace:       make(map[string]string),
 		managerClientset: managerClientset,
 		kubeClientset:    kubeClientset,
+		externalAccess:   externalAccess,
 		lock:             sync.Mutex{},
 	}
 
@@ -174,7 +176,7 @@ func (mcc *multiSpaceClient) getFromServer(name string, namespace string) (*rest
 		return nil, errors.New("space is not ready")
 	}
 
-	restConfig, err := mcc.getRestConfigFromSecret(true, space)
+	restConfig, err := mcc.getRestConfigFromSecret(space)
 	if err != nil {
 		return nil, err
 	}
@@ -190,17 +192,17 @@ func namespaceKey(name string, ns string) (key string) {
 
 const CUBEKONFIG_KEY = "kubeconfig"
 
-func (mcc *multiSpaceClient) getRestConfigFromSecret(internalAccess bool, space *spacev1alpha1.Space) (*rest.Config, error) {
+func (mcc *multiSpaceClient) getRestConfigFromSecret(space *spacev1alpha1.Space) (*rest.Config, error) {
 	var secretRef *corev1.SecretReference
-	if internalAccess {
-		secretRef = space.Status.InClusterSecretRef
-		if secretRef == nil {
-			return nil, errors.New("missing InClusterSecretRef spec fileld for space: " + space.Name)
-		}
-	} else {
+	if mcc.externalAccess {
 		secretRef = space.Status.ExternalSecretRef
 		if secretRef == nil {
 			return nil, errors.New("missing ExternalSecretRef spec fileld for space: " + space.Name)
+		}
+	} else {
+		secretRef = space.Status.InClusterSecretRef
+		if secretRef == nil {
+			return nil, errors.New("missing InClusterSecretRef spec fileld for space: " + space.Name)
 		}
 	}
 	secret, err := mcc.kubeClientset.CoreV1().Secrets(secretRef.Namespace).Get(mcc.ctx, secretRef.Name, metav1.GetOptions{})
