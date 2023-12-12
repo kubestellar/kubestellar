@@ -152,7 +152,7 @@ func TestWhatResolver(t *testing.T) {
 	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, fakeUpKubeClient)
 	spaceProviderNs := "spaceprovider-fake"
 	// TODO fake
-	spaceclient, _ := msclient.NewMultiSpace(ctx, nil)
+	spaceclient, _ := msclient.NewMultiSpace(ctx, nil, true)
 
 	whatResolver := NewWhatResolver(ctx, epPreInformer, spaceclient, spaceProviderNs, kbSpaceRelation, 3)
 	edgeInformerFactory.Start(ctx.Done())

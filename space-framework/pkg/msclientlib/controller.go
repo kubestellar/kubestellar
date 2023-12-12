@@ -153,9 +153,7 @@ func (c *controller) handleAdd(space interface{}, spaceKey string) {
 	// add space reference to cache
 	c.cacheSpaceReference(nSpace, spaceKey)
 
-	// TODO We assume the space is in a pod in the same cluster where the controllers are deployed
-	// Need to add flags to indicate it
-	config, err := c.msClient.getRestConfigFromSecret(true, nSpace)
+	config, err := c.msClient.getRestConfigFromSecret(nSpace)
 	if err != nil {
 		runtime.HandleError(err)
 		return

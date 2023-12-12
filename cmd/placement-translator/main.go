@@ -89,6 +89,7 @@ func main() {
 	serverBindAddress := ":10204"
 	kcsName := "espw"
 	spaceProvider := "default"
+	externalAccess := false
 	fs := pflag.NewFlagSet("placement-translator", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
@@ -96,6 +97,7 @@ func main() {
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
 	fs.StringVar(&kcsName, "core-space", kcsName, "the name of the KubeStellar core space")
 	fs.StringVar(&spaceProvider, "space-provider", spaceProvider, "the name of the KubeStellar space provider")
+	fs.BoolVar(&externalAccess, "external-access", externalAccess, "the access to the spaces. True for external, default false for in cluster access")
 
 	spaceMgtClientOpts := NewClientOpts("space-mgt", "access to the space reference space")
 	spaceMgtClientOpts.AddFlags(fs)
@@ -125,7 +127,7 @@ func main() {
 		logger.Error(err, "Failed to create space management API client config from flags")
 		os.Exit(3)
 	}
-	spaceclient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig)
+	spaceclient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig, externalAccess)
 	if err != nil {
 		logger.Error(err, "Failed to create space-aware client")
 		os.Exit(4)

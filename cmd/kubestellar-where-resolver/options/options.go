@@ -28,6 +28,7 @@ import (
 const (
 	defaultSpaceProviderName string = "default"
 	defaultKcsName           string = "espw"
+	externalAccess           bool   = false
 )
 
 type Options struct {
@@ -35,6 +36,7 @@ type Options struct {
 	Logs               *logs.Options
 	SpaceProvider      string
 	KcsName            string
+	ExternalAccess     bool
 }
 
 func NewOptions() *Options {
@@ -47,6 +49,7 @@ func NewOptions() *Options {
 		Logs:               logs,
 		SpaceProvider:      defaultSpaceProviderName,
 		KcsName:            defaultKcsName,
+		ExternalAccess:     externalAccess,
 	}
 }
 
@@ -55,6 +58,8 @@ func (options *Options) AddFlags(fs *pflag.FlagSet) {
 	options.Logs.AddFlags(fs)
 	fs.StringVar(&options.SpaceProvider, "space-provider", options.SpaceProvider, "the name of the KubeStellar space provider")
 	fs.StringVar(&options.KcsName, "core-space", options.KcsName, "the name of the KubeStellar Core space")
+	fs.BoolVar(&options.ExternalAccess, "external-access", options.ExternalAccess, "the access to the spaces. True for external, default false for in cluster access")
+
 }
 
 func (options *Options) Complete() error {
