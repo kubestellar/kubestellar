@@ -58,7 +58,7 @@ func (options *Options) AddFlags(fs *pflag.FlagSet) {
 	options.Logs.AddFlags(fs)
 	fs.StringVar(&options.SpaceProvider, "space-provider", options.SpaceProvider, "the name of the KubeStellar space provider")
 	fs.StringVar(&options.KcsName, "core-space", options.KcsName, "the name of the KubeStellar Core space")
-	fs.BoolVar(&options.ExternalAccess, "external-access", options.ExternalAccess, "the access to the spaces. True for external, default false for in cluster access")
+	fs.BoolVar(&options.ExternalAccess, "external-access", options.ExternalAccess, "the access to the spaces. True when the space-provider is hosted in a space while the controller is running outside of that space")
 
 }
 

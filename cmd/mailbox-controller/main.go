@@ -67,7 +67,7 @@ func main() {
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
 	fs.StringVar(&kcsName, "core-space", kcsName, "the name of the KubeStellar core space")
 	fs.StringVar(&spaceProvider, "space-provider", spaceProvider, "the name of the KubeStellar space provider")
-	fs.BoolVar(&externalAccess, "external-access", externalAccess, "the access to the spaces. True for external, default false for in cluster access")
+	fs.BoolVar(&externalAccess, "external-access", externalAccess, "the access to the spaces. True when the space-provider is hosted in a space while the controller is running outside of that space")
 
 	spaceMgtOpts := clientopts.NewClientOpts("space-mgt", "access to the space reference space")
 	spaceMgtOpts.AddFlags(fs)
