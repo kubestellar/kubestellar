@@ -19,7 +19,7 @@
 space_name=""
 resource_to_bind=""
 cm_namespace=kubestellar # the namespace where the configmaps live in on the provider side
-log_dir=$(pwd)/kubestellar-kube-bind-logs
+kb_dir=$(pwd)/kubestellar-kube-bind-files
 
 in_cluster=
 if $IN_CLUSTER; then
@@ -61,17 +61,17 @@ then
     exit 1
 fi
 
-conf_file="/tmp/$space_name.conf"
-kubectl-kubestellar-get-config-for-space --space-name $space_name --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT $in_cluster --output $conf_file
-KUBECONFIG=$conf_file
+space_conf_file="/tmp/$space_name.conf"
+kubectl-kubestellar-get-config-for-space --space-name $space_name --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT $in_cluster --output $space_conf_file
+KUBECONFIG=$space_conf_file
 
 if kubectl get crd $resource_to_bind.edge.kubestellar.io &> /dev/null; then
     echo "CRD for $resource_to_bind already in place"
     exit 0
 fi
 
-mkdir -p $log_dir
-konnector_log_file=$log_dir/kube-bind-konnector-$space_name.log
+mkdir -p $kb_dir
+konnector_log_file=$kb_dir/kube-bind-konnector-$space_name.log
 
 if pgrep konnector | xargs ps e -p 2>/dev/null | egrep "KB_CONSUMER=$space_name(\s|$)" &> /dev/null; then
     echo "kube-bind konnector for space $space_name already running"
@@ -89,8 +89,11 @@ else
     fi
 fi
 
+request_file=$kb_dir/$resource_to_bind-request.yaml
+trap 'rm $request_file' EXIT
+
 echo "binding $resource_to_bind for $space_name"
-if ! result="$(kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource $resource_to_bind 2>&1)"; then
+if ! result="$(kubectl bind http://127.0.0.1:8080/export --dry-run --skip-konnector --unattended --resource $resource_to_bind 2>&1 1>$request_file)"; then
     echo "Error occurred during binding $resource_to_bind for $space_name" >&2
     echo "Result of kubectl bind: $result" >&2
     echo "Tail of konnector's log at $konnector_log_file:" >&2
@@ -125,3 +128,21 @@ metadata:
     kubestellar.io/kube-bind-id: $cluster_ns
 data: {}
 EOF
+
+consumer_secret_name="$(echo $result | grep -e 'kubeconfig-\w*' -o)"
+if [ -z "$consumer_secret_name" ]
+then
+    echo "Failed to find the consumer side secret, result of 'kubectl bind': $result" >&2
+    exit 1
+else
+    echo "consumer side secret is $consumer_secret_name"
+fi
+
+KUBECONFIG=$space_conf_file
+if ! sub_result="$(kubectl bind apiservice --remote-kubeconfig-namespace kube-bind --remote-kubeconfig-name $consumer_secret_name --skip-konnector -f $request_file 2>&1)"; then
+    echo "Error occurred during binding $resource_to_bind for $space_name" >&2
+    echo "Result of kubectl bind apiservice: $sub_result" >&2
+    echo "Tail of konnector's log at $konnector_log_file:" >&2
+    tail $konnector_log_file >&2
+    exit 1
+fi
