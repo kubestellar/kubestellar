@@ -21,6 +21,7 @@ want_kube=true
 wmw_name=""
 kubectl_flags=()
 sub_flags=()
+kc_is_temp=false
 bindir=$(dirname $(realpath "${BASH_SOURCE[0]}"))
 
 while (( $# > 0 )); do
@@ -78,12 +79,12 @@ esac
 
 set -e
 
-if [ -z "$wd_kubeconfig" ]; then
+if [ -z "$wds_kubeconfig" ]; then
     wds_kubeconfig="$(mktemp "${wmw_name}.kubeconfig#XXXX")"
     kc_is_temp=true
 fi
 
-kubectl-kubestellar-space-ensure "${sub_flags[@]}" "${kubectl_flags[@]}" $wmw_name --in-cluster --output-kubeconfig "$wds_kubeconfig"
+kubectl-kubestellar-space-ensure "${sub_flags[@]}" "${kubectl_flags[@]}" $wmw_name --output-kubeconfig "$wds_kubeconfig"
 
 kubestellar-kube-bind "${sub_flags[@]}" "${kubectl_flags[@]}" "$wmw_name" "edgeplacements"
 kubestellar-kube-bind "${sub_flags[@]}" "${kubectl_flags[@]}" "$wmw_name" "customizers"

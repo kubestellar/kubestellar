@@ -30,7 +30,7 @@ if ! [ -x "$bindir/kubectl-kubestellar-syncer_gen" ]; then
     exit 2
 fi
 
-rootws="root"
+espw=espw
 stname=""
 output=""
 syncer_image="quay.io/kubestellar/syncer:release-0.15"
@@ -166,14 +166,21 @@ sleep 5
 TESTMB_CMD="kubectl get space -n spaceprovider-default "$mbsname" -o=jsonpath='{.status.Phase}'"
 
 
-if  phase=($TESTMB_CMD); [ "$phase" != "READY" ]; then
+if  phase=$($TESTMB_CMD); [ "$phase" != "'Ready'" ]; then
     echo "tried once to switch to $mbsname"
     sleep 15
-    if phase=($TESTMB_CMD); [ "$phase" != "READY" ]; then
+    if phase=$($TESTMB_CMD); [ "$phase" != "'Ready'" ]; then
         echo "tried twice to switch to $mbsname"
-        sleep 15
-	if phase=($TESTMB_CMD); [ "$phase" != "READY" ]; then
-            echo "$0: mailbox workspace is not read" >&2
+        sleep 30
+	if phase=$($TESTMB_CMD); [ "$phase" != "'Ready'" ]; then
+            echo "$0: mailbox workspace is not ready, phase=<$phase>" >&2
+            echo "$0: KUBECONFIG=$KUBECONFIG" >&2
+            echo "$0: Current context is $(kubectl config current-context)" >&2
+            echo "$0: mbsname=$mbsname" >&2
+            echo "$0: kubectl get:" >&2
+            kubectl get space -n spaceprovider-default "$mbsname" -o yaml 1>&2
+	    echo "$0: TESTMB_CMD=<$TESTMB_CMD>" >&2
+	    echo "$0: parting try: phase=$($TESTMB_CMD)" >&2
 	    exit 10
 	fi
     fi

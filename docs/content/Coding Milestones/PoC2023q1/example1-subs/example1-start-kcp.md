@@ -40,10 +40,10 @@ line for every HTTP request (among other things).
 
 ```shell
 kcp start -v=3 &> /tmp/kcp.log &
-export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
+PROVIDER_KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
 popd
 # wait until KCP is ready checking availability of ws resource
-while ! kubectl ws tree &> /dev/null; do
+while ! KUBECONFIG="$PROVIDER_KUBECONFIG" kubectl ws tree &> /dev/null; do
   sleep 10
 done
 ```

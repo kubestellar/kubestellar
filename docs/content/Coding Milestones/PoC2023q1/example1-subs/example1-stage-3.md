@@ -81,7 +81,7 @@ the mailbox controller](../#the-mailbox-controller).
 
 ```shell
 # TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
-kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet
+KUBECONFIG="$PROVIDER_KUBECONFIG" kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet
 ```
 
 ``` { .bash .no-copy }
@@ -121,7 +121,7 @@ the following command checks that.
 
 ```shell
 # TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
-test $(kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet | grep "^ *kcp.io/cluster: [0-9a-z]*$" | sort | uniq | wc -l) -ge 2
+test $(KUBECONFIG="$PROVIDER_KUBECONFIG" kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet | grep "^ *kcp.io/cluster: [0-9a-z]*$" | sort | uniq | wc -l) -ge 2
 ```
 
 The CustomResourceDefinition objects involved
@@ -129,9 +129,9 @@ should also appear in the mailbox spaces.
 
 ```shell
 # TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
-kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | fgrep -w "name: crontabs.stable.example.com"
-test $(kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | grep -cw "name: replicasets.apps") -ge 2
-test $(kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | grep -cw "name: deployments.apps") -ge 1
+KUBECONFIG="$PROVIDER_KUBECONFIG" kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | fgrep -w "name: crontabs.stable.example.com"
+test $(KUBECONFIG="$PROVIDER_KUBECONFIG" kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | grep -cw "name: replicasets.apps") -ge 2
+test $(KUBECONFIG="$PROVIDER_KUBECONFIG" kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | grep -cw "name: deployments.apps") -ge 1
 ```
 
 The `APIService` of the special workload should also appear, along
@@ -140,7 +140,7 @@ other mailbox workspaces.
 
 ```shell
 # TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
-kubestellar-list-syncing-objects --api-group apiregistration.k8s.io --api-kind APIService 2>&1 | grep -v "APIService.*the server could not find the requested resource" | fgrep -w "name: v1090.example.my"
+KUBECONFIG="$PROVIDER_KUBECONFIG" kubestellar-list-syncing-objects --api-group apiregistration.k8s.io --api-kind APIService 2>&1 | grep -v "APIService.*the server could not find the requested resource" | fgrep -w "name: v1090.example.my"
 ```
 
 The florin cluster gets only the common workload.  Examine florin's

@@ -389,11 +389,15 @@ func (ctl *mbCtl) mbsNameOfSynctarget(st *edgev2alpha1.SyncTarget) (string, erro
 func (ctl *mbCtl) mbsNameOfObj(obj any) ([]string, error) {
 	st, ok := obj.(*edgev2alpha1.SyncTarget)
 	if !ok {
-		return nil, fmt.Errorf("expected a SyncTarget but got %#+v, a %T", obj, obj)
+		logger := klog.FromContext(ctl.context)
+		logger.Error(nil, "Unexpected type of object", "obj", obj, "type", fmt.Sprintf("%T", obj))
+		return []string{}, nil
 	}
 	mbsName, err := ctl.mbsNameOfSynctarget(st)
 	if err != nil {
-		return nil, err
+		logger := klog.FromContext(ctl.context)
+		logger.Error(err, "Unable to determine MBS name from SyncTarget", "obj", obj)
+		return []string{}, nil
 	}
 	return []string{mbsName}, nil
 }

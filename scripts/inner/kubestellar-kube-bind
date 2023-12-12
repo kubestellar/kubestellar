@@ -75,6 +75,8 @@ then
     exit 1
 fi
 
+set -e
+
 konnector_dir="konnector-${space_name}"
 konnector_log_file="${konnector_dir}/log"
 finally=""
@@ -148,7 +150,7 @@ kubectl kubestellar space get-kubeconfig "${sub_flags[@]}" "${kubectl_flags[@]}"
 KUBECONFIG="$kcs_kubeconfig"
 
 if ! kubectl get namespace "$cm_namespace" &> /dev/null
-then kubectl kubectl apply -f - <<EOF
+then kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
