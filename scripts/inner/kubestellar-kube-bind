@@ -126,7 +126,7 @@ finally="$finally rm -f '$request_file'; "
 trap "$finally" EXIT
 
 echo "binding $resource_to_bind for $space_name"
-if ! result="$(KUBECONFIG=$conf_file kubectl bind http://127.0.0.1:8080/export --dry-run --skip-konnector --unattended --resource $resource_to_bind 2>&1 1>$request_file)"; then
+if ! result="$(KUBECONFIG=$space_conf_file kubectl bind http://127.0.0.1:8080/export --dry-run --skip-konnector --unattended --resource $resource_to_bind 2>&1 1>$request_file)"; then
     echo "Error occurred during binding $resource_to_bind for $space_name" >&2
     echo "Result of kubectl bind: $result" >&2
     echo "Tail of konnector's log at $konnector_log_file:" >&2
