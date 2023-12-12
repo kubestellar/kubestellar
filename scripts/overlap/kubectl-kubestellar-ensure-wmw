@@ -19,7 +19,7 @@
 
 # Usage: $0 ($kubectl_flag | --with-kube boolean | -X)* wmw_name
 
-want_kube=true
+#want_kube=true
 wmw_name=""
 bindir=$(dirname $(realpath "${BASH_SOURCE[0]}"))
 

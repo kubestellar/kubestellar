@@ -21,7 +21,7 @@ populating a set of CRDs into the WMW.
 
 ```shell
 WMW_C_SPACE_CONFIG=${MY_KUBECONFIGS}/wmw-c.kubeconfig
-kubectl kubestellar ensure wmw $in_cluster wmw-c --output-kubeconfig "$WMW_C_SPACE_CONFIG"
+IN_CLUSTER=false kubectl kubestellar ensure wmw wmw-c --with-kube false --output-kubeconfig "$WMW_C_SPACE_CONFIG"
 ```
 
 ``` {.bash .hide-me}
@@ -148,7 +148,7 @@ workload.
 
 ```shell
 WMW_S_SPACE_CONFIG=${MY_KUBECONFIGS}/wmw-s.kubeconfig
-kubectl kubestellar ensure wmw $in_cluster wmw-s --output-kubeconfig "$WMW_S_SPACE_CONFIG"
+IN_CLUSTER=false kubectl kubestellar ensure wmw wmw-s  --with-kube false --output-kubeconfig "$WMW_S_SPACE_CONFIG"
 ```
 
 In this workload we will also demonstrate how to downsync objects
