@@ -386,9 +386,10 @@ following commands to launch the where-resolver; it requires the ESPW
 to be the current kcp workspace at start time.
 
 ```shell
-# TODO: pass --in-cluster when acceptable
-KUBECONFIG=$SM_CONFIG kubestellar-where-resolver -v=4 &> /tmp/where-resolver.log &
-sleep 10
+(
+  KUBECONFIG=$SM_CONFIG kubestellar-where-resolver --external-access -v=4 &> /tmp/where-resolver.log &
+  sleep 10
+)
 ```
 
 The following commands wait until the where-resolver has done its job

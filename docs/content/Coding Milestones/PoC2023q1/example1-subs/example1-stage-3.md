@@ -15,8 +15,10 @@ use the following commands to launch the placement translator; it
 requires the ESPW to be current at start time.
 
 ```shell
-KUBECONFIG=$SM_CONFIG placement-translator -v=4  &> /tmp/placement-translator.log &
-sleep 10
+(
+  KUBECONFIG=$SM_CONFIG placement-translator --external-access -v=4  &> /tmp/placement-translator.log &
+  sleep 10
+)
 ```
 
 The following commands wait for the placement translator to get its
