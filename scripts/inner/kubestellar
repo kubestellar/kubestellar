@@ -111,7 +111,7 @@ function ensure_wmws() {
             fi
             wmw=${i#"root:"}
             echo "Ensuring WMW: $wmw"
-            ${bindir}/kubectl-kubestellar-ensure-wmw $wmw $xflag --with-kube true # &> /dev/null
+            ${bindir}/kubectl-kubestellar-ensure-wmw $wmw $xflag # &> /dev/null
         done
     done <<< "$1"
 }

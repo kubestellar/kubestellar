@@ -17,23 +17,17 @@
 # Purpose: ensure that a workload management workspace exists and has
 # the needed APIBindings.
 
-# Usage: $0 ($kubectl_flag | --with-kube boolean | -X)* wmw_name
+# Usage: $0 ($kubectl_flag | -X)* wmw_name
 
-want_kube=true
 wmw_name=""
 bindir=$(dirname $(realpath "${BASH_SOURCE[0]}"))
 
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean | -X)* wm_workspace_name"
+	    echo "Usage: kubectl kubestellar ensure wmw (\$kubectl_flag | -X)* wm_workspace_name"
 	    exit 0;;
 	(-X) set -o xtrace;;
-	(--with-kube)
-	    if (( $# >1 ))
-	    then want_kube="$2"; shift
-	    else echo "$0: missing with-kube value" >&2; exit 1
-	    fi;;
 	(--context*)
 	    # TODO: support --context
 	    echo "$0: --context flag not supported" >&2; exit 1;;
@@ -90,12 +84,6 @@ if [ "$wmw_name" == "" ]; then
     exit 1
 fi
 
-case "$want_kube" in
-    (true|false) ;;
-    (*) echo "$0: with-kube should be true or false" >&2
-	exit 1;;
-esac
-
 set -e
 
 in_cluster=
@@ -112,7 +100,9 @@ KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$wmw_name" "customizers"
 KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$wmw_name" "singleplacementslices"
 
 function reconcile_kube_CRDs() {
-	if [ "$want_kube" == true ]; then
+    provider_type=$(KUBECONFIG=$SM_CONFIG kubectl get spaceproviderdesc default -o jsonpath='{$.spec.ProviderType}')
+    if [ $provider_type = "kcp" ]; then
+        echo "applying kube crds."
 		kubectl --kubeconfig $space_config "${kubectl_flags[@]}" apply --server-side=true -R -f "$bindir/../config/kube/crds/"
 	else
 		kubectl --kubeconfig $space_config "${kubectl_flags[@]}" delete -R -f "$bindir/../config/kube/crds/"

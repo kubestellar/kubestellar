@@ -940,7 +940,7 @@ customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.i
 ```
 
 ```shell
-IN_CLUSTER=false kubectl kubestellar ensure wmw example-wmw --with-kube false
+IN_CLUSTER=false kubectl kubestellar ensure wmw example-wmw 
 ```
 ``` { .bash .no-copy }
 SPACE_MANAGER_KUBECONFIG=/home/ubuntu/.kube/config
