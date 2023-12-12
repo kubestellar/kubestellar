@@ -25,7 +25,7 @@ sleep 20
 kubectl wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
-  --timeout=360s
+  --timeout=600s
 
 KUBECONFIG=~/.kube/config kubectl config rename-context kind-sm-mgt sm-mgt
 SM_CONFIG=~/.kube/config

@@ -115,7 +115,8 @@ function ensure_wmws() {
             fi
             wmw=${i#"root:"}
             echo "Ensuring WMW: $wmw"
-            ${bindir}/kubectl-kubestellar-ensure-wmw $xflag $in_cluster $wmw --with-kube true # &> /dev/null
+            # TODO: we shouldn't hard code with-kube
+            ${bindir}/kubectl-kubestellar-ensure-wmw $xflag $in_cluster $wmw --with-kube false # &> /dev/null
         done
     done <<< "$1"
 }
@@ -214,9 +215,10 @@ function ensure_kb_backend() {
     cp "$1" $kcs_kubeconfig
     
     ( 
+        # TODO: do we need the explicit setting of the KUBECONFIG here?
         export KUBECONFIG="$kcs_kubeconfig"
-        kubectl apply -f "$bindir/../kube-bind/deploy/crd"
-        example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &> /tmp/example-backend.log &
+        KUBECONFIG=$space_config kubectl apply -f "$bindir/../kube-bind/deploy/crd"
+        KUBECONFIG=$space_config example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &> /tmp/example-backend.log &
     )
 
     local run_status=$(wait_for_process example-backend)

@@ -4,11 +4,11 @@
 #### Initialize KubeFlex
 
 ```shell
-wget https://github.com/kubestellar/kubeflex/releases/download/v0.2.5/kubeflex_0.2.5_linux_amd64.tar.gz
+wget https://github.com/kubestellar/kubeflex/releases/download/v0.3.3/kubeflex_0.3.3_linux_amd64.tar.gz 
 mkdir kubeflex
-tar xf kubeflex_0.2.5_linux_amd64.tar.gz -C kubeflex
+tar xf kubeflex_0.3.3_linux_amd64.tar.gz -C kubeflex
 kubeflex/bin/kflex --kubeconfig $SM_CONFIG init
-rm kubeflex_0.2.5_linux_amd64.tar.gz
+rm kubeflex_0.3.3_linux_amd64.tar.gz
 ```
 
 #### Create a space provider description for KubeFlex
