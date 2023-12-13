@@ -69,3 +69,27 @@ jobs:
       - run: |
           make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
           docs-ecutable
+
+      - name: Investigate the kubestellar container
+        if: always()
+        run: |
+          echo kubestellar secret:
+          kubectl get secret -n kubestellar kubestellar -o yaml
+          echo kcpsec secret:
+          kubectl get secret -n kubestellar kcpsec -o yaml
+          echo pods:
+          kubectl get pods -A
+          kpod=$(kubectl get pod -n kubestellar --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}')
+          kubectl get pod -n kubestellar "$kpod" -o yaml
+          echo kcp container log:
+          kubectl logs -n kubestellar "$kpod" -c kcp
+          echo space-manager container log:
+          kubectl logs -n kubestellar "$kpod" -c space-manager
+          echo init container log:
+          kubectl logs -n kubestellar "$kpod" -c init
+          echo init container previous log:
+          kubectl logs -p -n kubestellar "$kpod" -c init || echo no previous
+          echo space-manager ps:
+          kubectl exec -n kubestellar "$kpod" -c space-manager -- ps axlww
+          echo space-manager home kubeconfig:
+          kubectl exec -n kubestellar "$kpod" -c space-manager -- cat /home/spacecore/.kube/config
