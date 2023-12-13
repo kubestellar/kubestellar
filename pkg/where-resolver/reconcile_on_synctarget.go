@@ -74,7 +74,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 			return err
 		}
 	}
-	_, stOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(st)
+	stOriginalName, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(st)
 	if err != nil {
 		return err
 	}
@@ -288,7 +288,7 @@ func (c *controller) makeSinglePlacementsForSt(locsSelectingSt []*edgev2alpha1.L
 	if len(locsSelectingSt) == 0 || st == nil {
 		return made
 	}
-	_, stOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(st)
+	stOriginalName, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(st)
 	if err != nil {
 		return made
 	}
@@ -297,7 +297,7 @@ func (c *controller) makeSinglePlacementsForSt(locsSelectingSt []*edgev2alpha1.L
 		return made
 	}
 	for _, loc := range locsSelectingSt {
-		_, locOriginalName, _, err := kbuser.AnalyzeObjectID(loc)
+		locOriginalName, _, err := kbuser.AnalyzeClusterScopedObject(loc)
 		if err != nil {
 			continue
 		}

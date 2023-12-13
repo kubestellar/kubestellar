@@ -256,7 +256,7 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 	}
 	// Now we have established that the SyncTarget exists and is not being deleted
 	if space == nil {
-		_, stOriginalName, _, err := kbuser.AnalyzeObjectID(syncTarget)
+		stOriginalName, _, err := kbuser.AnalyzeClusterScopedObject(syncTarget)
 		if err != nil {
 			logger.Error(err, "Object does not appear to be a provider's copy of a consumer's object", "syncTarget", syncTarget.Name)
 			return false
@@ -372,7 +372,7 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, spacename string) bool {
 
 func (ctl *mbCtl) mbsNameOfSynctarget(st *edgev2alpha1.SyncTarget) (string, error) {
 	logger := klog.FromContext(ctl.context)
-	_, _, kbSpaceID, err := kbuser.AnalyzeObjectID(st)
+	_, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(st)
 	if err != nil {
 		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object", "syncTarget", st.Name)
 		return "", err

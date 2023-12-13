@@ -177,7 +177,7 @@ func (wr *whereResolver) process(ctx context.Context, item queueItem) bool {
 		return true // I think these errors are not transient
 	}
 	//change to consumer SpaceID
-	_, spsOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(sps)
+	spsOriginalName, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(sps)
 	if err != nil {
 		logger.Error(err, "Object does not appear to be a provider's copy of a consumer's object")
 		return true

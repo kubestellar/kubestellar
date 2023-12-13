@@ -80,7 +80,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			return err
 		}
 	}
-	_, locOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(loc)
+	locOriginalName, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(loc)
 	if err != nil {
 		return err
 	}
@@ -257,13 +257,13 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 func filterStsByLoc(sts []*edgev2alpha1.SyncTarget, loc *edgev2alpha1.Location) ([]*edgev2alpha1.SyncTarget, error) {
 	filtered := []*edgev2alpha1.SyncTarget{}
 
-	_, _, locKBSpaceID, err := kbuser.AnalyzeObjectID(loc)
+	_, locKBSpaceID, err := kbuser.AnalyzeClusterScopedObject(loc)
 	if err != nil {
 		return filtered, err
 	}
 
 	for _, st := range sts {
-		_, _, stKBSpaceID, err := kbuser.AnalyzeObjectID(st)
+		_, stKBSpaceID, err := kbuser.AnalyzeClusterScopedObject(st)
 		if err != nil {
 			return filtered, err
 		}
@@ -338,7 +338,7 @@ func (c *controller) makeSinglePlacementsForLoc(locSelectingSts *edgev2alpha1.Lo
 	if locSelectingSts == nil || len(sts) == 0 {
 		return made
 	}
-	_, locOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(locSelectingSts)
+	locOriginalName, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(locSelectingSts)
 	if err != nil {
 		return made
 	}
@@ -347,7 +347,7 @@ func (c *controller) makeSinglePlacementsForLoc(locSelectingSts *edgev2alpha1.Lo
 		return made
 	}
 	for _, st := range sts {
-		_, stOriginalName, _, err := kbuser.AnalyzeObjectID(st)
+		stOriginalName, _, err := kbuser.AnalyzeClusterScopedObject(st)
 		if err != nil {
 			continue
 		}
@@ -363,7 +363,7 @@ func (c *controller) makeSinglePlacementsForLoc(locSelectingSts *edgev2alpha1.Lo
 }
 
 func (c *controller) getConsumerSpaceForSPS(sps *edgev2alpha1.SinglePlacementSlice) (string, string, error) {
-	_, name, kbSpaceID, err := kbuser.AnalyzeObjectID(sps)
+	name, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(sps)
 	if err != nil {
 		return "", "", err
 	}
