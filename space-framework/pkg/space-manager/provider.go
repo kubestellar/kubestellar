@@ -249,7 +249,7 @@ func (p *provider) processProviderWatchEvents() {
 					// When a physical space is removed we remove its finalizer
 					// from the space object. when the space returns, we
 					// need to restore the finalizer.
-					refspace.ObjectMeta.Finalizers = append(refspace.ObjectMeta.Finalizers, finalizerName)
+					refspace.SetFinalizers(append(refspace.GetFinalizers(), finalizerName))
 				}
 				refspace.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 				_, err = p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Update(ctx, refspace, metav1.UpdateOptions{})
@@ -265,10 +265,10 @@ func (p *provider) processProviderWatchEvents() {
 			if refspace.Spec.Type == spacev1alpha1apis.SpaceTypeManaged {
 				_ = p.deleteSpaceSecrets(refspace)
 				// If managed then we need to remove the finalizer.
-				f := refspace.ObjectMeta.Finalizers
-				for i := 0; i < len(refspace.ObjectMeta.Finalizers); i++ {
-					if f[i] == finalizerName {
-						refspace.ObjectMeta.Finalizers = append(f[:i], f[i+1:]...)
+				finalizersList := refspace.GetFinalizers()
+				for i := 0; i < len(finalizersList); i++ {
+					if finalizersList[i] == finalizerName {
+						refspace.SetFinalizers(append(finalizersList[:i], finalizersList[i+1:]...))
 						i--
 					}
 				}
