@@ -1874,8 +1874,8 @@ workload, with the following commands.  These commands create the WMW,
 makes KubeStellar edge APIs available for the WMW via kube-bind, and
 optionally makes some Kubernetes APIs available for the WMW by
 populating a set of CRDs into the WMW.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>wmw-c
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">WMW_C_SPACE_CONFIG</span><span class="o">=</span><span class="nv">$PWD</span>/temp-space-config/spaceprovider-default-wmw-c
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">WMW_C_SPACE_CONFIG</span><span class="o">=</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span>/wmw-c.kubeconfig
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span>wmw-c<span class="w"> </span>--output-kubeconfig<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="s2">&quot;</span>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sleep<span class="w"> </span><span class="m">15</span>
 </code></pre></div>
@@ -1988,8 +1988,8 @@ directing the common workload to both edge clusters.</p>
 <h3 id="create-and-populate-the-workload-management-workspace-for-the-special-workload">Create and populate the workload management workspace for the special workload<a class="headerlink" href="#create-and-populate-the-workload-management-workspace-for-the-special-workload" title="Permanent link">#</a></h3>
 <p>Use the following <code>kubectl</code> commands to create the WMW for the special
 workload.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>wmw-s
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nv">WMW_S_SPACE_CONFIG</span><span class="o">=</span><span class="nv">$PWD</span>/temp-space-config/spaceprovider-default-wmw-s
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">WMW_S_SPACE_CONFIG</span><span class="o">=</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span>/wmw-s.kubeconfig
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span>wmw-s<span class="w"> </span>--output-kubeconfig<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="s2">&quot;</span>
 </code></pre></div>
 <p>In this workload we will also demonstrate how to downsync objects
 whose kind is defined by a <code>CustomResourceDefinition</code> object. We will
@@ -2221,10 +2221,9 @@ the where resolver is running in a pod there. If instead you are
 running the core controllers are bare processes then you can use the
 following commands to launch the where-resolver; it requires the ESPW
 to be the current kcp workspace at start time.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="o">(</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar-where-resolver<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/where-resolver.log<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="o">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># TODO: pass --in-cluster when acceptable</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar-where-resolver<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/where-resolver.log<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
 <p>The following commands wait until the where-resolver has done its job
 for the common and special <code>EdgePlacement</code> objects.</p>

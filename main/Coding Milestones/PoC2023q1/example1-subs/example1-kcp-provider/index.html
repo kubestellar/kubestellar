@@ -1839,8 +1839,8 @@
 <p>Space provider for KCP will allow you to use KCP as backend provider for spaces.
 Use the following commands to create a provider secret for KCP access and
 a space provider definition.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>kcpsec<span class="w"> </span>--from-file<span class="o">=</span><span class="nv">kubeconfig</span><span class="o">=</span><span class="nv">$KUBECONFIG</span><span class="w"> </span>--from-file<span class="o">=</span><span class="nv">incluster</span><span class="o">=</span><span class="nv">$KUBECONFIG</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>kcpsec<span class="w"> </span>--from-file<span class="o">=</span><span class="nv">kubeconfig</span><span class="o">=</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="w"> </span>--from-file<span class="o">=</span><span class="nv">incluster</span><span class="o">=</span><span class="nv">$PROVIDER_KUBECONFIG</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s">apiVersion: space.kubestellar.io/v1alpha1</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="s">kind: SpaceProviderDesc</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="s">metadata:</span>
@@ -1854,7 +1854,13 @@ a space provider definition.</p>
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>Next, use the following command to wait for the space-manger to process the provider.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.Phase}&#39;</span><span class="o">=</span>Ready<span class="w"> </span>spaceproviderdesc/default<span class="w"> </span>--timeout<span class="o">=</span>90s
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.Phase}&#39;</span><span class="o">=</span>Ready<span class="w"> </span>spaceproviderdesc/default<span class="w"> </span>--timeout<span class="o">=</span>90s
+</code></pre></div>
+<p>The following variable will be used in later commands to indicate that
+they are being invoked close enough to the provider's apiserver to
+use the more efficient networking (see <a href="../../commands/#in-cluster">doc on
+"in-cluster"</a>).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;--in-cluster&quot;</span>
 </code></pre></div>
 <!--example1-kcp-provider-end-->
 

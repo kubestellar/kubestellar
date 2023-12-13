@@ -2674,7 +2674,7 @@
  Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.</p>
 <p>In the <code>wmw1</code> space create the following <code>EdgePlacement</code> object: 
- <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+ <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="s">kind: EdgePlacement</span>
 <a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="s">metadata:</span>
@@ -2698,10 +2698,10 @@
 <a id="__codelineno-24-22" name="__codelineno-24-22" href="#__codelineno-24-22"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your edgeplacement was applied to the <strong>ks-core</strong> <code>kubestellar</code> namespace correctly
- <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>edgeplacements<span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-o<span class="w"> </span>yaml
+ <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>edgeplacements<span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div></p>
 <p>Now, apply the HTTP server workload definition into the WMW on <strong>ks-core</strong>. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (<code>my-first-edge-placement</code>) object created above. 
- <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+ <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="s">apiVersion: v1</span>
 <a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="s">kind: Namespace</span>
 <a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="s">metadata:</span>
@@ -2751,10 +2751,10 @@
 <a id="__codelineno-26-48" name="__codelineno-26-48" href="#__codelineno-26-48"></a><span class="s">          optional: false</span>
 <a id="__codelineno-26-49" name="__codelineno-26-49" href="#__codelineno-26-49"></a><span class="s">EOF</span>
 </code></pre></div></p>
-<p>check if your configmap and deployment was applied to the <strong>ks-core</strong> <code>my-namespace</code> namespace correctly
- <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments/my-first-kubestellar-deployment<span class="w"> </span>-n<span class="w"> </span>my-namespace<span class="w"> </span>-o<span class="w"> </span>yaml
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments,cm<span class="w"> </span>-n<span class="w"> </span>my-namespace
-</code></pre></div></p>
+<p>Check if your configmap and deployment were created correctly.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments/my-first-kubestellar-deployment<span class="w"> </span>-n<span class="w"> </span>my-namespace<span class="w"> </span>-o<span class="w"> </span>yaml
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments,cm<span class="w"> </span>-n<span class="w"> </span>my-namespace
+</code></pre></div>
 <!-- END INCLUDE -->
 </div>
 </div>
@@ -2938,7 +2938,7 @@ how to create, but not overwrite/update a synchronized resource  </p>
  Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.</p>
 <p>In the <code>wmw1</code> space create the following <code>EdgePlacement</code> object: 
- <div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+ <div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="s">kind: EdgePlacement</span>
 <a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a><span class="s">metadata:</span>
@@ -2962,10 +2962,10 @@ how to create, but not overwrite/update a synchronized resource  </p>
 <a id="__codelineno-46-22" name="__codelineno-46-22" href="#__codelineno-46-22"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your edgeplacement was applied to the <strong>ks-core</strong> <code>kubestellar</code> namespace correctly
- <div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>edgeplacements<span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-o<span class="w"> </span>yaml
+ <div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>edgeplacements<span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div></p>
 <p>Now, apply the HTTP server workload definition into the WMW on <strong>ks-core</strong>. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (<code>my-first-edge-placement</code>) object created above. 
- <div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+ <div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a><span class="s">apiVersion: v1</span>
 <a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="s">kind: Namespace</span>
 <a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a><span class="s">metadata:</span>
@@ -3015,10 +3015,10 @@ how to create, but not overwrite/update a synchronized resource  </p>
 <a id="__codelineno-48-48" name="__codelineno-48-48" href="#__codelineno-48-48"></a><span class="s">          optional: false</span>
 <a id="__codelineno-48-49" name="__codelineno-48-49" href="#__codelineno-48-49"></a><span class="s">EOF</span>
 </code></pre></div></p>
-<p>check if your configmap and deployment was applied to the <strong>ks-core</strong> <code>my-namespace</code> namespace correctly
- <div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments/my-first-kubestellar-deployment<span class="w"> </span>-n<span class="w"> </span>my-namespace<span class="w"> </span>-o<span class="w"> </span>yaml
-<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments,cm<span class="w"> </span>-n<span class="w"> </span>my-namespace
-</code></pre></div></p>
+<p>Check if your configmap and deployment were created correctly.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments/my-first-kubestellar-deployment<span class="w"> </span>-n<span class="w"> </span>my-namespace<span class="w"> </span>-o<span class="w"> </span>yaml
+<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$WMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments,cm<span class="w"> </span>-n<span class="w"> </span>my-namespace
+</code></pre></div>
 <!-- END INCLUDE -->
 </div>
 </div>
