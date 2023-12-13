@@ -27,8 +27,6 @@ sub_flags=()
 
 cm_namespace=kubestellar # the namespace where the configmaps live in on the provider side
 
-in_cluster=
-
 while (( $# > 0 )); do
     case "$1" in
     (-h|--help)
@@ -128,7 +126,7 @@ finally="$finally rm -f '$request_file'; "
 trap "$finally" EXIT
 
 echo "binding $resource_to_bind for $space_name"
-if ! result="$(KUBECONFIG=$space_conf_file kubectl bind http://127.0.0.1:8080/export --dry-run --skip-konnector --unattended --resource $resource_to_bind 2>&1 1>$request_file)"; then
+if ! result="$(kubectl bind http://127.0.0.1:8080/export --dry-run --skip-konnector --unattended --resource $resource_to_bind 2>&1 1>$request_file)"; then
     echo "Error occurred during binding $resource_to_bind for $space_name" >&2
     echo "Result of kubectl bind: $result" >&2
     echo "Tail of konnector's log at $konnector_log_file:" >&2
@@ -166,7 +164,7 @@ EOF
 else echo "namespace $cm_namespace already exists in KCS"
 fi
 
-kubectl --kubeconfig $espwconf apply -f - <<EOF
+kubectl apply -f - <<EOF
 apiVersion: v1
 kind: ConfigMap
 metadata:
