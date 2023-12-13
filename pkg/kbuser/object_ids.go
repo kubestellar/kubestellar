@@ -24,38 +24,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// If in the future a need arises to analyze both cluster-scoped and namespace-scoped objects, switch to using
-// the following AnalyzeObjectID function instead of the existing AnalyzeClusterScopedObject function.
-
-// AnalyzeObjectID examines an object in a kube-bind service provider
-// cluster and returns the object's ID as known in the service consumer
-// cluster and the kube-bind ID for the consumer, or an error if
-// the object does not appear to be a provider's copy of a consumer's object.
-// func AnalyzeObjectID(obj metav1.Object) (namespace, name, kbSpaceID string, err error) {
-// 	if annotations := obj.GetAnnotations(); annotations != nil {
-// 		kbSpaceID = annotations["kube-bind.io/cluster-namespace"]
-// 	}
-// 	if kbSpaceID == "" {
-// 		return "", "", "", errors.New("no 'kube-bind.io/cluster-namespace' annotation found")
-// 	}
-// 	namespace = obj.GetNamespace()
-// 	name = obj.GetName()
-// 	var ok bool
-// 	if namespace == "" { // no namespace, cluster scoped object
-// 		name, ok = cutPrefix(name, kbSpaceID+"-")
-// 		if !ok {
-// 			err = fmt.Errorf("name %q does not have prefix for comsumer %q", name, kbSpaceID)
-// 		}
-// 		return
-// 	}
-// 	// otherwise, it's a namespace scoped object
-// 	if namespace, ok = cutPrefix(namespace, kbSpaceID+"-"); !ok {
-// 		err = fmt.Errorf("namespace %q does not have prefix for comsumer %q", namespace, kbSpaceID)
-// 	}
-
-// 	return
-// }
-
 // AnalyzeClusterScopedObject examines a cluster-scoped object in a kube-bind service provider cluster
 // and returns the object's ID as known in the service consumer cluster and the kube-bind ID for the
 // consumer, or an error if the object does not appear to be a provider's copy of a consumer's object.
@@ -91,3 +59,35 @@ func cutPrefix(s, sep string) (string, bool) {
 func ComposeClusterScopedName(kbSpaceID string, name string) string {
 	return kbSpaceID + "-" + name
 }
+
+// If in the future a need arises to analyze both cluster-scoped and namespace-scoped objects, switch to using
+// the following AnalyzeObjectID function instead of the existing AnalyzeClusterScopedObject function.
+
+// AnalyzeObjectID examines an object in a kube-bind service provider
+// cluster and returns the object's ID as known in the service consumer
+// cluster and the kube-bind ID for the consumer, or an error if
+// the object does not appear to be a provider's copy of a consumer's object.
+// func AnalyzeObjectID(obj metav1.Object) (namespace, name, kbSpaceID string, err error) {
+// 	if annotations := obj.GetAnnotations(); annotations != nil {
+// 		kbSpaceID = annotations["kube-bind.io/cluster-namespace"]
+// 	}
+// 	if kbSpaceID == "" {
+// 		return "", "", "", errors.New("no 'kube-bind.io/cluster-namespace' annotation found")
+// 	}
+// 	namespace = obj.GetNamespace()
+// 	name = obj.GetName()
+// 	var ok bool
+// 	if namespace == "" { // no namespace, cluster scoped object
+// 		name, ok = cutPrefix(name, kbSpaceID+"-")
+// 		if !ok {
+// 			err = fmt.Errorf("name %q does not have prefix for comsumer %q", name, kbSpaceID)
+// 		}
+// 		return
+// 	}
+// 	// otherwise, it's a namespace scoped object
+// 	if namespace, ok = cutPrefix(namespace, kbSpaceID+"-"); !ok {
+// 		err = fmt.Errorf("namespace %q does not have prefix for comsumer %q", namespace, kbSpaceID)
+// 	}
+
+// 	return
+// }
