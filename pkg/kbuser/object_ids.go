@@ -42,14 +42,14 @@ import (
 // 	name = obj.GetName()
 // 	var ok bool
 // 	if namespace == "" { // no namespace, cluster scoped object
-// 		name, ok = strings.CutPrefix(name, kbSpaceID+"-")
+// 		name, ok = cutPrefix(name, kbSpaceID+"-")
 // 		if !ok {
 // 			err = fmt.Errorf("name %q does not have prefix for comsumer %q", name, kbSpaceID)
 // 		}
 // 		return
 // 	}
 // 	// otherwise, it's a namespace scoped object
-// 	if namespace, ok = strings.CutPrefix(namespace, kbSpaceID+"-"); !ok {
+// 	if namespace, ok = cutPrefix(namespace, kbSpaceID+"-"); !ok {
 // 		err = fmt.Errorf("namespace %q does not have prefix for comsumer %q", namespace, kbSpaceID)
 // 	}
 
@@ -69,11 +69,18 @@ func AnalyzeClusterScopedObject(obj metav1.Object) (name, kbSpaceID string, err 
 	if obj.GetNamespace() != "" {
 		return "", "", errors.New("object is namespaced-scoped and not cluster-scoped")
 	}
-	if name, ok := strings.CutPrefix(obj.GetName(), kbSpaceID+"-"); !ok {
+	if name, ok := cutPrefix(obj.GetName(), kbSpaceID+"-"); !ok {
 		err = fmt.Errorf("name %q does not have prefix for comsumer %q", name, kbSpaceID)
 	}
 
 	return
+}
+
+func cutPrefix(s, sep string) (string, bool) {
+	if strings.HasPrefix(s, sep) {
+		return s[len(sep):], true
+	}
+	return s, false
 }
 
 // ComposeClusterScopedName translates the name of a cluster-scoped object
