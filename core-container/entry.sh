@@ -194,7 +194,7 @@ function run_kcp() {
     until [ "$(KUBECONFIG="$PROVIDER_KUBECONFIG" kubectl ws root 2> /dev/null)" != "" ]; do
         sleep 5;
     done
-    echo '"root" workspace is ready'.
+    echo $(date)': "root" workspace is ready'.
     echo "kcp version: $(KUBECONFIG="$PROVIDER_KUBECONFIG" kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
 
     # Generate the external.kubeconfig and cluster.kubeconfig
@@ -211,6 +211,8 @@ function run_kcp() {
     else
 	clucfg=""
     fi
+    sleep 10
+    echo "$(date): Creating kubestellar Secret"
     kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Secret
@@ -233,7 +235,6 @@ EOF
 function run_init() {
     echo "--< Starting init >--"
     create_spaceprovider_object
-    kubectl config view > /tmp/kcfg.yaml
     kubestellar init -X --in-cluster --ensure-imw $ENSURE_IMW --ensure-wmw $ENSURE_WMW
     touch ready
     echo "***READY***"
