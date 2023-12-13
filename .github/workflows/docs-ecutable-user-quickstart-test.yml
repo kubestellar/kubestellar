@@ -73,6 +73,8 @@ jobs:
       - name: Investigate the kubestellar container
         if: always()
         run: |
+          kubectl config get-contexts
+          kubectl config use-context ks-core
           echo kubestellar secret:
           kubectl get secret -n kubestellar kubestellar -o yaml
           echo kcpsec secret:
