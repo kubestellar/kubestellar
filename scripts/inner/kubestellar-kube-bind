@@ -134,7 +134,13 @@ if ! result="$(kubectl bind http://127.0.0.1:8080/export --dry-run --skip-konnec
     exit 1
 fi
 
-cluster_ns="$(echo $result | grep -e 'kube-bind-\w*' -o)"
+info_line="$(echo $result | grep -E '🔒 (Updated|Created) secret .* kube-bind-\w*' -o)"
+if [ -z "$info_line" ]; then
+    echo "Failed to find necessary info to proceed, result of 'kubectl bind': $result" >&2
+    exit 1
+fi
+
+cluster_ns="$(echo $info_line | grep 'kube-bind-\w*' -o)"
 if [ -z "$cluster_ns" ]
 then
     echo "Failed to find the cluster namespace, result of 'kubectl bind': $result" >&2
@@ -172,7 +178,7 @@ EOF
 
 rm $KUBECONFIG
 
-consumer_secret_name="$(echo $result | grep -e 'kubeconfig-\w*' -o)"
+consumer_secret_name="$(echo $info_line | grep 'kubeconfig-\w*' -o)"
 if [ -z "$consumer_secret_name" ]
 then
     echo "Failed to find the consumer side secret, result of 'kubectl bind': $result" >&2
