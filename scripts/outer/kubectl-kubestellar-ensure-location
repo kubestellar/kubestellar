@@ -14,10 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Purpose: ensure the existence of a pair of SyncTarget and Location,
-# and delete the Location named `default` if it appears.
-
-# Usage: $0 ($kubectl_flag | --imw ws_path | -X)* objname labelname=labelvalue ...
+# Purpose: ensure the existence and labels of a pair of SyncTarget and
+# Location.
 
 # This will ensure that a SyncTarget and a Location exist with that
 # name and having at least the given labels.  The SyncTarget will also
@@ -54,17 +52,11 @@ function add_label() {
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: kubectl kubestellar ensure location (\$kubectl_flag | --imw ws_path | -X)* objname labelname=labelvalue ..."
+	    echo "Usage: kubectl kubestellar ensure location (-h | --help | -X | \$kubectl_flag)* objname labelname=labelvalue ..."
 	    exit 0;;
 	(-X) set -o xtrace;;
-	(--imw)
-	    if (( $# >1 ))
-	    then imw="$2"; shift
-	    else echo "$0: missing IMW pathname" >&2; exit 1
-	    fi;;
-	(--context*)
-	    # TODO: support --context
-	    echo "$0: --context flag not supported" >&2; exit 1;;
+	(-o|-o=*|--output|--output=*)
+	    echo "$0: -o and --output flags are not supported" >&2; exit 1;;
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(--*|-?)
@@ -84,11 +76,6 @@ while (( $# > 0 )); do
     esac
     shift
 done
-
-if [ -z "$imw" ]; then
-    echo "$0: must be given a non-empty imw space name" >&2
-    exit 1
-fi
 
 if [ -z "$objname" ]; then
     echo "$0: must be given a non-empty object name" >&2
@@ -114,10 +101,7 @@ set -e
 
 echo "--- current directory is $PWD"
 
-imw_space_config="${PWD}/temp-space-config/spaceprovider-default-${imw}"
-kubectl-kubestellar-get-config-for-space --space-name ${imw} --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $imw_space_config
-
-if ! kubectl "${kubectl_flags[@]}" --kubeconfig $imw_space_config get synctargets.edge.kubestellar.io "$objname" &> /dev/null; then
+if ! kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io "$objname" &> /dev/null; then
 (cat <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: SyncTarget
@@ -126,13 +110,13 @@ metadata:
   labels:
     id: "$objname"
 EOF
-) | kubectl "${kubectl_flags[@]}" --kubeconfig $imw_space_config create -f - || {
+) | kubectl "${kubectl_flags[@]}" create -f - || {
     echo "$0: Creation of SyncTarget failed" >&2
     exit 3
 }
 fi
 
-if ! kubectl "${kubectl_flags[@]}" --kubeconfig $imw_space_config get locations.edge.kubestellar.io "$objname" &> /dev/null; then
+if ! kubectl "${kubectl_flags[@]}" get locations.edge.kubestellar.io "$objname" &> /dev/null; then
 (cat <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: Location
@@ -143,18 +127,14 @@ spec:
 metadata:
   name: "$objname"
 EOF
-) | kubectl "${kubectl_flags[@]}" --kubeconfig $imw_space_config create -f - || {
+) | kubectl "${kubectl_flags[@]}" create -f - || {
     echo "$0: Creation of Location failed" >&2
     exit 3
 }
 fi
 
-if kubectl "${kubectl_flags[@]}" --kubeconfig $imw_space_config get locations.edge.kubestellar.io default &> /dev/null; then
-    kubectl "${kubectl_flags[@]}" --kubeconfig $imw_space_config delete locations.edge.kubestellar.io default &> /dev/null
-fi
-
-stlabs=$(kubectl "${kubectl_flags[@]}" --kubeconfig $imw_space_config get synctargets.edge.kubestellar.io  "$objname" -o json | jq .metadata.labels)
-loclabs=$(kubectl "${kubectl_flags[@]}" --kubeconfig $imw_space_config get locations.edge.kubestellar.io "$objname" -o json | jq .metadata.labels)
+stlabs=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io  "$objname" -o json | jq .metadata.labels)
+loclabs=$(kubectl "${kubectl_flags[@]}" get locations.edge.kubestellar.io "$objname" -o json | jq .metadata.labels)
 
 let index=0 1
 while (( index < ${#labels[*]} )); do
@@ -163,14 +143,14 @@ while (( index < ${#labels[*]} )); do
     let index=index+2
     stval=$(jq -r <<<"$stlabs" ".[\"${key}\"]")
     if [ "$stval" != "$val" ]; then
-	    if ! kubectl "${kubectl_flags[@]}" --kubeconfig $imw_space_config label --overwrite synctargets.edge.kubestellar.io "$objname" "${key}=${val}" ; then
+	    if ! kubectl "${kubectl_flags[@]}" label --overwrite synctargets.edge.kubestellar.io "$objname" "${key}=${val}" ; then
 	        echo "$0: failed to add label to SyncTarget" >&2
 	        exit 4
 	    fi
     fi
     locval=$(jq -r <<<"$loclabs" ".[\"${key}\"]")
     if [ "$locval" != "$val" ]; then
-	    if ! kubectl "${kubectl_flags[@]}" --kubeconfig $imw_space_config label --overwrite locations.edge.kubestellar.io "$objname" "${key}=${val}" ; then
+	    if ! kubectl "${kubectl_flags[@]}" label --overwrite locations.edge.kubestellar.io "$objname" "${key}=${val}" ; then
 	        echo "$0: failed to add label to Location" >&2
 	        exit 4
 	   fi

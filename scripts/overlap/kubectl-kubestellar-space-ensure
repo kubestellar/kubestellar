@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Purpose: ensure the existence of a space in the space framework.
+
+
+provider_name="default"
+kubectl_flags=()
+sub_flags=()
+output=""
+
+while (( $# > 0 )); do
+    case "$1" in
+	(-h|--help)
+	    echo "Usage: kubectl kubestellar space ensure (-h | --help | -X | \$kubectl_flag | --in-cluster | --output-kubeconfig \$pathname)* \$space_name"
+	    exit 0;;
+	(-X) set -o xtrace
+	    sub_flags[${#sub_flags[*]}]="$1";;
+	(--in-cluster)
+	    sub_flags[${#sub_flags[*]}]="$1";;
+	(--output-kubeconfig)
+	    if (( $# >1 ))
+	    then output="$2"; shift
+	    else echo "$0: missing output kubeconfig pathname" >&2; exit 1
+	    fi;;
+	(--*=*|-?=*)
+	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
+	(--*|-?)
+	    kubectl_flags[${#kubectl_flags[*]}]="$1";
+	    if (( $# > 1 )); then 
+		 kubectl_flags[${#kubectl_flags[*]}]="$2"
+		 shift
+	    fi;;
+	(-*)
+            echo "$0: unknown flag" >&2 ; exit 1;
+            exit 1;;
+	(*)
+	    if [ -z "$space_name" ]; then space_name="$1"
+	    else echo "$0: too many positional arguments" &>2
+		 exit 1
+	    fi;;
+    esac
+    shift
+done
+
+if [ -z "$space_name" ]; then
+    echo "$0: must be given a non-empty space name" >&2
+    exit 1
+fi
+
+set -e
+
+space_ns="spaceprovider-${provider_name}"
+
+function ensure_space() { 
+    kubectl "${kubectl_flags[@]}" apply -f - <<EOF
+apiVersion: space.kubestellar.io/v1alpha1
+kind: Space
+metadata:
+  name: $space_name
+  namespace: $space_ns
+spec:
+  SpaceProviderDescName: $provider_name
+  Type: "managed"
+EOF
+    echo "Waiting for space $space_name to get into the Ready phase."
+    until [ "$(kubectl "${kubectl_flags[@]}" get space $space_name -n $space_ns -o yaml | grep Ready)" != "" ]; do
+        sleep 5
+    done
+    echo "Space $space_name is ready for use."
+}
+
+ensure_space $space_name
+if [ -n "$output" ]
+then kubectl kubestellar space get-kubeconfig "${sub_flags[@]}" "${kubectl_flags[@]}" "$space_name" "$output"
+fi

@@ -19,12 +19,20 @@
 #           (a) 1 kcp workspace: edge service provider workspace (espw)
 #           (b) 3 kubestellar controllers: kubestellar-where-resolver, mailbox-controller and placement-translator
 
-# Assumption: kcp server is running.
+# Pre-req: the space manager is running and there is a space provider
+# named "default" and that is the one to use.
+
+# Pre-req: `kubectl` with no flags will access the Space Management
+# API Space (SMAS) with high privilege.
 
 # Requirements:
 #    Download KubeStellar binaries
 #    KubeStellar controller binaries are on $PATH.
-#    kubectl is configured to talk to kcp server with high privilege
+
+# Because of the direct way that `kubestellar-kube-bind` is
+# implemented, all uses of that script --- direct and indirect,
+# including the usage by this script --- must be made in the context
+# of the same filesystem, working directory, and procsses space.
 
 bindir=$(dirname $(realpath "${BASH_SOURCE[0]}"))
 
@@ -40,6 +48,7 @@ espw_name="espw"
 log_folder=$(pwd)/kubestellar-logs
 imws="root:imw1"
 wmws="root:wmw1"
+in_cluster=""
 
 function echoerr() {
    echo "ERROR: $1" >&2
@@ -47,8 +56,9 @@ function echoerr() {
 
 # Check if a given process name is running
 process_running() {
-  SERVICE="$1"
-  NAME_LEN=${#SERVICE}
+  local SERVICE="$1"
+  local NAME_LEN=${#SERVICE}
+  local PGREP_FLAG
   if [ $NAME_LEN -gt 15 ]; then
     PGREP_FLAG="-f"
   else
@@ -63,10 +73,10 @@ process_running() {
 }
 
 wait_for_process(){
-  status=$(process_running $1)
-  MAX_RETRIES=10
-  retries=0
-  status_code=0
+  local status=$(process_running $1)
+  local MAX_RETRIES=10
+  local retries=0
+  local status_code=0
   while [ $status != "running" ]; do
       if [ $retries -eq $MAX_RETRIES ]; then
            status_code=1
@@ -81,29 +91,23 @@ wait_for_process(){
 }
 
 function ensure_imws() {
+    local -a items
     while IFS=',' read -ra items; do
         for i in "${items[@]}"; do
             if [ "$i" == "" ] ; then
                 continue
             fi
-            in_cluster=
-            if $IN_CLUSTER; then
-                in_cluster="--in-cluster"
-            fi 
 
             imw=${i#"root:"}
             echo "Ensuring IMW: $imw"
-            space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${imw}"
-            kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG
-            kubectl-kubestellar-get-config-for-space --space-name $imw --sm-core-config $SM_CONFIG ${in_cluster} --sm-context $SM_CONTEXT --output $space_config
-            KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$imw" "synctargets"
-            KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$imw" "locations"
+            ${bindir}/kubectl-kubestellar-ensure-inventory_space $xflag $in_cluster $imw # &> /dev/null
         done
     done <<< "$1"
 }
 
 
 function ensure_wmws() {
+    local -a items
     while IFS=',' read -ra items; do
         for i in "${items[@]}"; do
             if [ "$i" == "" ] ; then
@@ -111,7 +115,7 @@ function ensure_wmws() {
             fi
             wmw=${i#"root:"}
             echo "Ensuring WMW: $wmw"
-            ${bindir}/kubectl-kubestellar-ensure-wmw $wmw $xflag --with-kube true # &> /dev/null
+            ${bindir}/kubectl-kubestellar-ensure-wmw $xflag $in_cluster $wmw --with-kube true # &> /dev/null
         done
     done <<< "$1"
 }
@@ -142,8 +146,10 @@ while (( $# > 0 )); do
     (-X)
         xflag="-X"
         set -x;;
+    (--in-cluster)
+        in_cluster="--in-cluster";;
     (-h|--help)
-        echo "Usage: $0 [init | start | stop] [--log-folder log_folder] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [--provider-name provider-name] [-V|--verbose] [-X]"
+        echo "Usage: $0 [init | start | stop] [--log-folder log_folder] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [--provider-name provider-name] [-V|--verbose] [-h|--help] [-X] [--in-cluster]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -154,36 +160,6 @@ while (( $# > 0 )); do
     esac
     shift
 done
-if [ "$PROVIDER_NAME" == "" ]; then
-    PROVIDER_NAME="default"
-    export PROVIDER_NAME
-fi
-if [ "$PROVIDER_NAMESPACE" == "" ]; then
-    PROVIDER_NAMESPACE=spaceprovider-${PROVIDER_NAME}
-    export PROVIDER_NAMESPACE
-fi
-if [ "$KUBECONFIG_DIR" == "" ]; then
-    KUBECONFIG_DIR="${PWD}/temp-space-config"
-    mkdir -p $KUBECONFIG_DIR
-    export KUBECONFIG_DIR
-fi
-if [ "$SM_CONFIG" == "" ]; then
-    SM_CONFIG="${KUBECONFIG_DIR}/config"
-    export SM_CONFIG
-fi
-if [ "$SM_CONTEXT" == "" ]; then
-    export SM_CONTEXT=sm-mgt
-fi
-if [ "$IN_CLUSTER" == "" ]; then
-    IN_CLUSTER=true
-    export IN_CLUSTER
-fi
-echo "KUBECONFIG_DIR=${KUBECONFIG_DIR}"
-echo "SM_CONFIG=${SM_CONFIG}"
-echo "SM_CONTEXT=${SM_CONTEXT}"
-echo "PROVIDER_NAME=${PROVIDER_NAME}"
-echo "PROVIDER_NAMESPACE=${PROVIDER_NAMESPACE}"
-echo "IN_CLUSTER=${IN_CLUSTER}"
 
 if [ "$subcommand" == "" ]; then
     echo "$0: missing a subcommand" >&2
@@ -191,21 +167,17 @@ if [ "$subcommand" == "" ]; then
 fi
 
 function ensure_espw() {
-    in_cluster=
-    if $IN_CLUSTER; then
-        in_cluster="--in-cluster"
-    fi 
-    space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${espw_name}"
-    kubectl-kubestellar-create-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG 
-    kubectl-kubestellar-get-config-for-space --space-name $espw_name --sm-core-config $SM_CONFIG ${in_cluster} --sm-context $SM_CONTEXT --output $space_config
-    run_dex
+    local kcs_kubeconfig="$(mktemp kcs.kubeconfig#XXXX)"
+    kubectl-kubestellar-space-ensure $xflag $espw_name $in_cluster --output-kubeconfig $kcs_kubeconfig
+    ensure_dex
     sleep 2
-    run_kb_backend
-    KUBECONFIG=$space_config kubectl apply -f "$bindir/../config/crds/"
+    ensure_kb_backend "$kcs_kubeconfig"
+    KUBECONFIG=$kcs_kubeconfig kubectl apply -f "$bindir/../config/crds/"
+    rm "$kcs_kubeconfig"
     echo "Finished populating the espw with kubestellar apiexports"
 }
 
-function run_dex() {
+function ensure_dex() {
     if [ $(process_running dex) == "running" ]; then
         echo "dex is already running"
         return
@@ -218,7 +190,7 @@ function run_dex() {
     fi
     dex serve $dex_config_file &
 
-    run_status=$(wait_for_process dex)
+    local run_status=$(wait_for_process dex)
     if [ $run_status -eq 0 ]; then
         echo "dex started"
     else
@@ -227,7 +199,10 @@ function run_dex() {
     fi
 }
 
-function run_kb_backend() {
+# ensure_kb_backend takes one positional parameter:
+# - the file pathname of the kubeconfig to use for access to the KCS,
+#   the caller may modify or delete this file after this function returns.
+function ensure_kb_backend() {
     if [ $(process_running example-backend) == "running" ]; then
         echo "example-backend is already running"
         return
@@ -235,15 +210,16 @@ function run_kb_backend() {
 
     echo "starting kube-bind example-backend in background"
 
-    kubectl-kubestellar-get-config-for-space --space-name "espw" --sm-core-config $SM_CONFIG ${in_cluster} --sm-context $SM_CONTEXT --output "/tmp/espw-conf"
+    local kcs_kubeconfig="/tmp/kcs.kubeconfig"
+    cp "$1" $kcs_kubeconfig
     
     ( 
-        KUBECONFIG="/tmp/espw-conf"
+        export KUBECONFIG="$kcs_kubeconfig"
         kubectl apply -f "$bindir/../kube-bind/deploy/crd"
-        example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &> /dev/null &
+        example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &> /tmp/example-backend.log &
     )
 
-    run_status=$(wait_for_process example-backend)
+    local run_status=$(wait_for_process example-backend)
     if [ $run_status -eq 0 ]; then
         echo "example-backend started"
     else
@@ -285,29 +261,10 @@ fi
 ensure_espw
 ensure_imws $imws
 ensure_wmws $wmws
-kubectl ws root &> /dev/null
 
 if [ $subcommand == init ]; then
     exit 0
 fi
-
-wait_for_process(){
-  status=$(process_running $1)
-  MAX_RETRIES=5
-  retries=0
-  status_code=0
-  while [ $status != "running" ]; do
-      if [ $retries -eq $MAX_RETRIES ]; then
-           status_code=1
-           break
-      fi
-
-      retries=$(( retries + 1 ))
-      sleep 3
-      status=$(process_running $1)
-  done
-  echo $status_code
-}
 
 
 # Start the kubestellar controllers
@@ -322,6 +279,7 @@ if [[ ! -d $log_folder ]]; then
     mkdir -p $log_folder
 fi
 
+# TODO: pass $in_cluster
 mailbox-controller -v=2 >> $log_folder/mailbox-controller-log.txt 2>&1 &
 
 run_status=$(wait_for_process mailbox-controller)
@@ -336,6 +294,7 @@ fi
 
 # Start the kubestellar where-resolver
 sleep 3
+# TODO: pass $in_cluster
 kubestellar-where-resolver -v 2 >> $log_folder/kubestellar-where-resolver-log.txt 2>&1 &
 
 run_status=$(wait_for_process "kubestellar-where-resolver")
@@ -348,6 +307,7 @@ fi
 
 # Start the Placement Translator
 sleep 3
+# TODO: pass $in_cluster
 placement-translator -v=2 >> $log_folder/placement-translator-log.txt 2>&1 &
 
 run_status=$(wait_for_process placement-translator)

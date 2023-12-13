@@ -1,26 +1,25 @@
 <!--kubestellar-syncer-0-deploy-guilder-start-->
-Go to inventory management workspace and find the mailbox workspace name.
+Go to KCS and find the mailbox space name.
 ```shell
-espw_space_config="${PWD}/temp-space-config/espw.config"
-kubectl-kubestellar-get-config-for-space --space-name espw --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $espw_space_config
+espw_kubeconfig="${MY_KUBECONFIGS}/espw.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig espw $in_cluster --kubeconfig $SM_CONFIG $espw_kubeconfig
 
-pvname=`kubectl --kubeconfig $espw_space_config get synctargets.edge.kubestellar.io | grep guilder | awk '{print $1}'`
-stuid=`kubectl --kubeconfig $espw_space_config get synctargets.edge.kubestellar.io $pvname -o jsonpath="{.metadata.uid}"`
-mbws="imw1-mb-$stuid"
-echo "mailbox workspace name = $mbws"
+pvname=`kubectl --kubeconfig $espw_kubeconfig get synctargets.edge.kubestellar.io | grep guilder | awk '{print $1}'`
+stuid=`kubectl --kubeconfig $espw_kubeconfig get synctargets.edge.kubestellar.io $pvname -o jsonpath="{.metadata.uid}"`
+mbs_name="imw1-mb-$stuid"
+echo "mailbox space name = $mbs_name"
 ```
 
 ``` { .bash .no-copy }
-Current workspace is "root:imw1".
-mailbox workspace name = vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5e
+mailbox space name = vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5e
 ```
 
-Go to the mailbox workspace and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
+Go to the mailbox space and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
 ```shell
-mbwsname_space_config="${PWD}/temp-space-config/${mbws}.config"
-kubectl-kubestellar-get-config-for-space --space-name ${mbws} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $mbwsname_space_config
+mbs_kubeconfig="${MY_KUBECONFIGS}/${mbs_name}.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig ${mbs_name} $in_cluster --kubeconfig $SM_CONFIG $mbs_kubeconfig
 
-./bin/kubectl-kubestellar-syncer_gen --kubeconfig $mbwsname_space_config guilder --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o guilder-syncer.yaml
+./bin/kubectl-kubestellar-syncer_gen --kubeconfig $mbs_kubeconfig guilder --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o guilder-syncer.yaml
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5e".

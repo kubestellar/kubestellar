@@ -16,13 +16,9 @@
 
 cat <<EOF
 Usage:
-  kubectl kubestellar [command]
+  kubectl kubestellar space subcommand
 
-Available commands:
-  deploy                  Deploy KubeStellar core in a Kubernetes cluster
-  ensure                  Make sure a given thing exists and is setup
-  prep-for-cluster        Ensure location and prep-for-syncer
-  prep-for-syncer         First step in bootstrapping a WEC
-  remove                  Make sure a given thing does not exist
-  space                   Space framework commands
+Available subcommands:
+  ensure         Ensure the existence of a Space having a given name
+  get-kubeconfig Write a kubeconfig file for super-user access to a given space
 EOF

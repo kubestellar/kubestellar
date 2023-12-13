@@ -118,9 +118,6 @@ make userbuild
 export PATH=$PWD/bin:$PATH
 bash -c "$(cat bootstrap/install-kcp-with-plugins.sh)" -V -V --version v0.11.0
 export PATH=$PWD/kcp/bin:$PATH
-export SM_CONFIG=~/.kube/config
-export SM_CONTEXT=ks-core
-mkdir -p ${PWD}/temp-space-config
 ```
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
@@ -164,21 +161,32 @@ mkdir -p ${PWD}/temp-space-config
            end="<!--kubestellar-apply-syncer-end-->"
          %}
 
+This example (and others) involve user-managed kubeconfig files. These
+examples organize those files into one subdirectory. Start by making
+sure that directory exists without any contents left over from
+previous runs.
+
+```shell
+MY_KUBECONFIGS=${PWD}/my-kubeconfigs
+rm -rf "$MY_KUBECONFIGS"
+mkdir -p "$MY_KUBECONFIGS"
+```
+
 Wait for the mailbox controller to create the corresponding mailbox spaces and remember them.
 
 ```shell
-while [ $(KUBECONFIG=$SM_CONFIG kubectl get spaces -A | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
-MB1=$(KUBECONFIG=$SM_CONFIG kubectl get spaces -n spaceprovider-default -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
+while [ $(KUBECONFIG=~/.kube/config kubectl get spaces -A | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
+MB1=$(KUBECONFIG=~/.kube/config kubectl get spaces -n spaceprovider-default -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
 echo The mailbox for ks-edge-cluster1 is $MB1
-MB2=$(KUBECONFIG=$SM_CONFIG kubectl get spaces -n spaceprovider-default -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
+MB2=$(KUBECONFIG=~/.kube/config kubectl get spaces -n spaceprovider-default -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
 echo The mailbox for ks-edge-cluster2 is $MB2
 
-MB1_SPACE="${PWD}/temp-space-config/${MB1}"
-kubectl-kubestellar-get-config-for-space --space-name $MB1 --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $MB1_SPACE
-MB2_SPACE="${PWD}/temp-space-config/${MB2}"
-kubectl-kubestellar-get-config-for-space --space-name $MB2 --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $MB2_SPACE
-WMW1_SPACE_CONFIG="${PWD}/temp-space-config/spaceprovider-default-wmw1"
-kubectl-kubestellar-get-config-for-space --space-name wmw1 --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $WMW1_SPACE_CONFIG
+MB1_KUBECONFIG="${MY_KUBECONFIGS}/${MB1}.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig $MB1 --kubeconfig ~/.kube/config $MB1_KUBECONFIG
+MB2_KUBECONFIG="${MY_KUBECONFIGS}/${MB2}.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig $MB2 --kubeconfig ~/.kube/config $MB2_KUBECONFIG
+WMW1_KUBECONFIG="${MY_KUBECONFIGS}/wmw1.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig wmw1 --kubeconfig ~/.kube/config $WMW1_KUBECONFIG
 ```
 
 #### 5. Deploy an Apache Web Server to ks-edge-cluster1 and ks-edge-cluster2
@@ -193,7 +201,7 @@ kubectl-kubestellar-get-config-for-space --space-name wmw1 --sm-core-config $SM_
 Add a ServiceAccount that will be downsynced.
 
 ```shell
-KUBECONFIG=$WMW1_SPACE_CONFIG kubectl apply -f - <<EOF
+KUBECONFIG=$WMW1_KUBECONFIG kubectl apply -f - <<EOF
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -207,7 +215,7 @@ EOF
 Add an EdgePlacement that calls for that ServiceAccount to be downsynced.
 
 ```shell
-KUBECONFIG=$WMW1_SPACE_CONFIG kubectl apply -f - <<EOF
+KUBECONFIG=$WMW1_KUBECONFIG kubectl apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
@@ -226,10 +234,10 @@ EOF
 Wait for the ServiceAccount to get to the mailbox spaces.
 
 ```shell
-while ! KUBECONFIG=$MB1_SPACE kubectl get ServiceAccount -n my-namespace test-sa ; do
+while ! KUBECONFIG=$MB1_KUBECONFIG kubectl get ServiceAccount -n my-namespace test-sa ; do
     sleep 10
 done
-while ! KUBECONFIG=$MB2_SPACE kubectl get ServiceAccount -n my-namespace test-sa ; do
+while ! KUBECONFIG=$MB2_KUBECONFIG kubectl get ServiceAccount -n my-namespace test-sa ; do
     sleep 10
 done
 ```
@@ -239,7 +247,7 @@ Thrash the ServiceAccount some in its WDS.
 ```shell
 for key in k1 k2 k3 k4; do
     sleep 15
-    KUBECONFIG=$WMW1_SPACE_CONFIG kubectl annotate sa -n my-namespace test-sa ${key}=${key}
+    KUBECONFIG=$WMW1_KUBECONFIG kubectl annotate sa -n my-namespace test-sa ${key}=${key}
 done
 ```
 
@@ -253,8 +261,8 @@ Look for excess secrets in the WDS. Expect 2 token Secrets: one for
 the default ServiceAccount and one for `test-sa`.
 
 ```shell
-KUBECONFIG=$WMW1_SPACE_CONFIG kubectl get secrets -n my-namespace
-[ $(KUBECONFIG=$WMW1_SPACE_CONFIG kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
+KUBECONFIG=$WMW1_KUBECONFIG kubectl get secrets -n my-namespace
+[ $(KUBECONFIG=$WMW1_KUBECONFIG kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
 ```
 
 Look for excess secrets in the two mailbox spaces. Allow up to three:
@@ -263,7 +271,7 @@ for the `test-sa` ServiceAccount, and one generated locally for the
 `test-sa` ServiceAccount.
 
 ```shell
-for mb in $MB1_SPACE $MB2_SPACE; do
+for mb in $MB1_KUBECONFIG $MB2_KUBECONFIG; do
     KUBECONFIG=$mb kubectl get sa -n my-namespace test-sa --show-managed-fields -o yaml
     KUBECONFIG=$mb kubectl get secrets -n my-namespace
     [ $(KUBECONFIG=$mb kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 4 ]
@@ -343,7 +351,7 @@ how to create, but not overwrite/update a synchronized resource
            -o jsonpath='{.data.external\.kubeconfig}' \
            -n kubestellar | base64 -d > ks-core.kubeconfig
 
-         KUBECONFIG=$SM_CONFIG kubectl get spaces -A 
+         KUBECONFIG=~/.kube/config kubectl get spaces -A 
          ```
     === "uh oh, error?"
          {%

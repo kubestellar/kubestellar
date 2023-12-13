@@ -6,7 +6,7 @@ Create an EdgePlacement control object to direct where your workload runs using 
 
 In the `wmw1` space create the following `EdgePlacement` object: 
 ```shell hl_lines="9 10 14 18 19"
-KUBECONFIG=$WMW1_SPACE_CONFIG kubectl apply -f - <<EOF
+KUBECONFIG=$WMW1_KUBECONFIG kubectl apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
@@ -32,12 +32,12 @@ EOF
 
 check if your edgeplacement was applied to the **ks-core** `kubestellar` namespace correctly
 ```shell
-KUBECONFIG=$WMW1_SPACE_CONFIG kubectl get edgeplacements -n kubestellar -o yaml
+KUBECONFIG=$WMW1_KUBECONFIG kubectl get edgeplacements -n kubestellar -o yaml
 ```
 
 Now, apply the HTTP server workload definition into the WMW on **ks-core**. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`my-first-edge-placement`) object created above. 
 ```shell hl_lines="5 10 24 25"
-KUBECONFIG=$WMW1_SPACE_CONFIG kubectl apply -f - <<EOF
+KUBECONFIG=$WMW1_KUBECONFIG kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -88,11 +88,12 @@ spec:
 EOF
 ```
 
-check if your configmap and deployment was applied to the **ks-core** `my-namespace` namespace correctly
+Check if your configmap and deployment were created correctly.
+
 ```shell
 
-KUBECONFIG=$WMW1_SPACE_CONFIG kubectl get deployments/my-first-kubestellar-deployment -n my-namespace -o yaml
-KUBECONFIG=$WMW1_SPACE_CONFIG kubectl get deployments,cm -n my-namespace
+KUBECONFIG=$WMW1_KUBECONFIG kubectl get deployments/my-first-kubestellar-deployment -n my-namespace -o yaml
+KUBECONFIG=$WMW1_KUBECONFIG kubectl get deployments,cm -n my-namespace
 ```
 
 <!--kubestellar-apply-apache-kind-end-->

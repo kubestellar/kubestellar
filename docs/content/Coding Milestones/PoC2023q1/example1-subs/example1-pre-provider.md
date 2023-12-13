@@ -6,6 +6,19 @@ workspace (ESPW) and lets that react to the inventory.  Then the KubeStellar syn
 are deployed, in the edge clusters and configured to work with the
 corresponding mailbox workspaces.  This stage has the following steps.
 
+### Your kubeconfig files
+
+This example (and others) involve user-managed kubeconfig files. These
+examples organize those files into one subdirectory. Start by making
+sure that directory exists without any contents left over from
+previous runs.
+
+```shell
+MY_KUBECONFIGS=${PWD}/my-kubeconfigs
+rm -rf "$MY_KUBECONFIGS"
+mkdir -p "$MY_KUBECONFIGS"
+```
+
 ### Create two kind clusters.
 
 This example uses two [kind](https://kind.sigs.k8s.io/) clusters as
