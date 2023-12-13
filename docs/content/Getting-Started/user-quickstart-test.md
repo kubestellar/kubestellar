@@ -161,6 +161,17 @@ export PATH=$PWD/kcp/bin:$PATH
            end="<!--kubestellar-apply-syncer-end-->"
          %}
 
+This example (and others) involve user-managed kubeconfig files. These
+examples organize those files into one subdirectory. Start by making
+sure that directory exists without any contents left over from
+previous runs.
+
+```shell
+MY_KUBECONFIGS=${PWD}/my-kubeconfigs
+rm -rf "$MY_KUBECONFIGS"
+mkdir -p "$MY_KUBECONFIGS"
+```
+
 Wait for the mailbox controller to create the corresponding mailbox spaces and remember them.
 
 ```shell
