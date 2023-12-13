@@ -211,6 +211,7 @@ function run_kcp() {
     else
 	clucfg=""
     fi
+    echo "kcp appears to be ready at $(date), but is it really? Look in its log for later startup activity. Pausing in expectation of that."
     sleep 10
     echo "$(date): Creating kubestellar Secret"
     kubectl apply -f - <<EOF
