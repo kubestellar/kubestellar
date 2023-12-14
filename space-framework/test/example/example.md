@@ -2,6 +2,9 @@
 
 The Space Framework (SF) allows you to use different space providers to obtain spaces. 
 
+You can find a more detailed document describe the Space Framework and the Space Manager in:   
+[Space Framework high level architecture](https://github.com/kubestellar/kubestellar/blob/main/space-framework/docs/space-framework.md)
+
 The following guide describes how to setup and use the SF.  
 As part of this guide we also describe how to install and setup the space providers. Please note that, this is not part of the SF configuration and and is described here only as a helpful reference.
 The following sections describe how to setup and use the Space Manager (SM) which is the main management component of the Space Framework.
