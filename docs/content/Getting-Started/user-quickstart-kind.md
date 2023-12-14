@@ -225,11 +225,7 @@ how to create, but not overwrite/update a synchronized resource
          Let's store the KubeStellar kubeconfig to a file we can reference later and then check out the Spaces KubeStellar created during installation
 
          ```
-         KUBECONFIG=~/.kube/config kubectl --context ks-core get secrets kubestellar \
-           -o jsonpath='{.data.external\.kubeconfig}' \
-           -n kubestellar | base64 -d > ks-core.kubeconfig
-
-         KUBECONFIG=ks-core.kubeconfig kubectl ws tree
+         KUBECONFIG=~/.kube/config kubectl --context ks-core get spaces -A 
          ```
     === "uh oh, error?"
          {%

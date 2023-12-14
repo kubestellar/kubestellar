@@ -347,10 +347,6 @@ how to create, but not overwrite/update a synchronized resource
          Let's store the KubeStellar kubeconfig to a file we can reference later and then check out the Spaces KubeStellar created during installation
 
          ```
-         KUBECONFIG=~/.kube/config kubectl --context ks-core get secrets kubestellar \
-           -o jsonpath='{.data.external\.kubeconfig}' \
-           -n kubestellar | base64 -d > ks-core.kubeconfig
-
          KUBECONFIG=~/.kube/config kubectl get spaces -A 
          ```
     === "uh oh, error?"
@@ -426,6 +422,6 @@ for clu in $(kind get clusters | grep -v enabling); do kind delete cluster --nam
 The following commands delete the filesystem contents created above.
 
 ``` {.bash}
-rm ks-core.kubeconfig ks-edge-cluster1-syncer.yaml ks-edge-cluster2-syncer.yaml
-rm -rf kcp
+rm ks-edge-cluster1-syncer.yaml ks-edge-cluster2-syncer.yaml
+rm -rf kcp my-kubeconfigs
 ```
