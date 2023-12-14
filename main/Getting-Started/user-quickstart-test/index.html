@@ -2443,11 +2443,7 @@
 <div class="tabbed-block">
 <p>Let's store the KubeStellar kubeconfig to a file we can reference later and then check out the Spaces KubeStellar created during installation</p>
 <!-- BEGIN INCLUDE ../common-subs/kubestellar-show-available-spaces.md '&lt;!--kubestellar-show-available-spaces-start--&gt;' '&lt;!--kubestellar-show-available-spaces-end--&gt;' -->
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>ks-core<span class="w"> </span>get<span class="w"> </span>secrets<span class="w"> </span>kubestellar<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.data.external\.kubeconfig}&#39;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span>-n<span class="w"> </span>kubestellar<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="w"> </span>&gt;<span class="w"> </span>ks-core.kubeconfig
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>ks-core<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-A<span class="w"> </span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>ks-core<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-A<span class="w"> </span>
 </code></pre></div>
 <!-- END INCLUDE -->
 </div>
@@ -2824,11 +2820,7 @@ how to create, but not overwrite/update a synchronized resource  </p>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p>Let's store the KubeStellar kubeconfig to a file we can reference later and then check out the Spaces KubeStellar created during installation</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>KUBECONFIG=~/.kube/config kubectl --context ks-core get secrets kubestellar \
-<a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>  -o jsonpath=&#39;{.data.external\.kubeconfig}&#39; \
-<a id="__codelineno-54-3" name="__codelineno-54-3" href="#__codelineno-54-3"></a>  -n kubestellar | base64 -d &gt; ks-core.kubeconfig
-<a id="__codelineno-54-4" name="__codelineno-54-4" href="#__codelineno-54-4"></a>
-<a id="__codelineno-54-5" name="__codelineno-54-5" href="#__codelineno-54-5"></a>KUBECONFIG=~/.kube/config kubectl get spaces -A 
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>KUBECONFIG=~/.kube/config kubectl get spaces -A 
 </code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -3093,8 +3085,8 @@ your httpd <code>Deployment</code> objects with the following command.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a><span class="k">for</span><span class="w"> </span>clu<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">$(</span>kind<span class="w"> </span>get<span class="w"> </span>clusters<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span>enabling<span class="k">)</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$clu</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">done</span>
 </code></pre></div>
 <p>The following commands delete the filesystem contents created above.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>rm<span class="w"> </span>ks-core.kubeconfig<span class="w"> </span>ks-edge-cluster1-syncer.yaml<span class="w"> </span>ks-edge-cluster2-syncer.yaml
-<a id="__codelineno-74-2" name="__codelineno-74-2" href="#__codelineno-74-2"></a>rm<span class="w"> </span>-rf<span class="w"> </span>kcp
+<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>rm<span class="w"> </span>ks-edge-cluster1-syncer.yaml<span class="w"> </span>ks-edge-cluster2-syncer.yaml
+<a id="__codelineno-74-2" name="__codelineno-74-2" href="#__codelineno-74-2"></a>rm<span class="w"> </span>-rf<span class="w"> </span>kcp<span class="w"> </span>my-kubeconfigs
 </code></pre></div>
 
 
