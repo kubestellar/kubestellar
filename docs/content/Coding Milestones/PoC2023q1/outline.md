@@ -176,8 +176,8 @@ mapping can be inverted with the following interface.
 ```go
 
 // AnalyzeClusterScopedObject examines a cluster-scoped object in a kube-bind service provider cluster
-// and returns the object's ID as known in the service consumer cluster and the kube-bind ID for the
-// consumer, or an error if the object does not appear to be a provider's copy of a consumer's object.
+// and returns the object's name as known in the service consumer cluster and the kube-bind space id for
+// the consumer, or an error if the object does not appear to be a provider's copy of a consumer's object.
 func AnalyzeClusterScopedObject(obj metav1.Object) (name, kbSpaceID string, err error) {..}
 
 // ComposeClusterScopedName translates the name of a cluster-scoped object
