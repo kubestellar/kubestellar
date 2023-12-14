@@ -1,0 +1,8 @@
+apiVersion: space.kubestellar.io/v1alpha1
+kind: Space
+metadata:
+  name: kcpspace
+  namespace: spaceprovider-kcp
+spec:
+  SpaceProviderDescName: kcp
+  Type: "managed"
