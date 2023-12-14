@@ -1,0 +1,10 @@
+apiVersion: space.kubestellar.io/v1alpha1
+kind: SpaceProviderDesc
+metadata:
+  name: kf
+spec:
+  ProviderType: "kubeflex"
+  SpacePrefixForDiscovery: "ks-"
+  secretRef:
+    namespace: default
+    name: kfsec

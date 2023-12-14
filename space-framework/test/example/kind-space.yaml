@@ -1,0 +1,8 @@
+apiVersion: space.kubestellar.io/v1alpha1
+kind: Space
+metadata:
+  name: kindspace
+  namespace: spaceprovider-kind
+spec:
+  SpaceProviderDescName: kind
+  Type: "managed"
