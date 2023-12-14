@@ -8,7 +8,7 @@
 **Space Provider** - A Thing that manages the life cycle of multiple pSpaces. This includes at minimal create/delete/List operations on pSpaces. KIND is an example for Space Provider (that manages KIND clusters), KCP is another example - KCP manages KCP's workspaces. 
 
 ## High level architecture  & Main components
-[SF overall view](images/SF-All.drawio.png "SF overall view")
+[SF overall view](images/SF-All.drawio.svg "SF overall view")
 
 The Space Framework (SF) is a generic management framework for space providers and pSpaces. The framework defines an abstraction layer for space providers and pSpace management that allows clients (both script/kubectl based and client-go based clients) to use spaces while maintaining the clients decoupled from the specific pSpace and space provider that is being used. 
 
