@@ -33,7 +33,7 @@ const SpacePathAnnotationKey = "kubestellar.io/space-path"
 
 // containsFinalizer: returns true if the finalizer list contains the space finalizer
 func containsFinalizer(space *spacev1alpha1.Space, finalizer string) bool {
-	finalizersList := space.ObjectMeta.Finalizers
+	finalizersList := space.GetFinalizers()
 	for _, f := range finalizersList {
 		if f == finalizer {
 			return true
