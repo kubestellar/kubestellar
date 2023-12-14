@@ -93,7 +93,7 @@ func MarshalSet[Key comparable](it map[Key]Empty) ([]byte, error) {
 	enc := json.NewEncoder(&builder)
 	builder.WriteRune('[')
 	first := true
-	for key, _ := range it {
+	for key := range it {
 		if first {
 			first = false
 		} else {

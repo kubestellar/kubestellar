@@ -341,7 +341,7 @@ func (am arMap) toList(logger klog.Logger, prefix []string, consume func(ksmetav
 func (rlw *resourcesListWatcher) listWithSubresources(logger klog.Logger, resourceVersionS string) ([]ksmetav1a1.APIResource, error) {
 	groupList, resourceList, err := rlw.cache.ServerGroupsAndResources()
 	if err != nil {
-		return nil, err
+		rlw.logger.V(3).Info("Did not get all api groups and resources", "err", err.Error())
 	}
 	groupToVersion := map[string]string{}
 	for _, ag := range groupList {
@@ -423,7 +423,7 @@ func definersToSlice(asSet map[objectID]Empty) []ksmetav1a1.Definer {
 func (rlw *resourcesListWatcher) listSansSubresources(resourceVersionS string) ([]ksmetav1a1.APIResource, error) {
 	groupList, err := rlw.cache.ServerPreferredResources()
 	if err != nil {
-		return nil, err
+		rlw.logger.V(3).Info("Did not get all preferred resources", "err", err.Error())
 	}
 	ans := []ksmetav1a1.APIResource{}
 	rlw.mutex.Lock()
