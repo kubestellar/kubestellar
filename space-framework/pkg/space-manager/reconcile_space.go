@@ -26,7 +26,7 @@ import (
 )
 
 // finalizerName is the delete space finalizer
-const finalizerName = "SpaceFinalizer"
+const spaceFinalizerName = "SpaceFinalizer"
 
 // SpacePathAnnotationKey is the path under which space will reside(for providers that support hierarchy)
 const SpacePathAnnotationKey = "kubestellar.io/space-path"
@@ -123,8 +123,8 @@ func (c *controller) processAddOrUpdateSpace(space *spacev1alpha1.Space) error {
 			}
 
 			// Update status Initializing
-			if !containsFinalizer(space, finalizerName) {
-				space.ObjectMeta.Finalizers = append(space.ObjectMeta.Finalizers, finalizerName)
+			if !containsFinalizer(space, spaceFinalizerName) {
+				space.ObjectMeta.Finalizers = append(space.ObjectMeta.Finalizers, spaceFinalizerName)
 			}
 			space.Status.Phase = spacev1alpha1.SpacePhaseInitializing
 			_, err = c.clientset.
