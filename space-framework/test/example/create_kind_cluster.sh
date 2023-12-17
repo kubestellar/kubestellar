@@ -32,7 +32,7 @@ nodes:
         node-labels: "ingress-ready=true"
   extraPortMappings:
   - containerPort: 443
-    hostPort: 1024
+    hostPort: 9443
     protocol: TCP
 EOF
 

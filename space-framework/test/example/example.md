@@ -60,7 +60,7 @@ The above can be done using:
 Follow the installation section on the Kubeflex instructions:  
 [https://github.com/kubestellar/kubeflex/tree/main](https://github.com/kubestellar/kubeflex/tree/main)<br/>
 
-Alternatively yu can use:  
+Alternatively you can use:
 [install_and_run_kubeflex.sh](install_and_run_kubeflex.sh)<br/>
 
 ### KCP
@@ -107,34 +107,34 @@ You can list the existing spaces and see their status. Those are regular Kube ob
 
 ```shell
 # List all spaces
-kubectl get spaces
+kubectl get spaces -A
 
-# Get detailed info on the kcpspace  space
-kubectl get spaces kcpspace -o yaml
+# Get detailed info on the kcpspace space
+kubectl get spaces kcpspace -n spaceprovider-kcp -o yaml
 ```
 
 **Accessing a space**
-Working with spaces is easy, you first get a config file for that space and then access it in a regular kubectl commands. You can ue the `get_kubeconfig_for_space` function to get the config file.
+Working with spaces is easy, you first get a config file for that space and then access it in a regular kubectl commands. You can use the `get_kubeconfig_for_space` function to get the config file.
 
 ```shell
 #Get the config for the kcpspace we create
-get_kubeconfig_for_space kcpspace kcp > kcpspace.kubeconfig
+get_kubeconfig_for_space external-kcpspace kcp > kcpspace.kubeconfig
 
 #Accessing the space
 kubectl --kubeconfig kcpspace.kubeconfig get ns
 
 #Get the config for the kubeflex we create
-get_kubeconfig_for_space kfspace kf > kfspace.kubeconfig
+get_kubeconfig_for_space external-kfspace kf > kfspace.kubeconfig
 
 #Accessing the space
-kubectl --kubeconfig kfspace.kubeconfig get pods -A
+kubectl --kubeconfig kfspace.kubeconfig get configmaps -A
 ```
 
 **Delete a space**
 To delete a space you simply need to delete the space object, the SM will delete the actual space on the space provider. 
 ```shell
 #delete the kfspace
-kubectl delete space kfspace
+kubectl delete space kfspace -n spaceprovider-kf
 ```
 
-You can verify that the space was deleted from the space provider as well 
+You can verify that the space was deleted from the space provider as well
