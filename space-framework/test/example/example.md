@@ -1,35 +1,19 @@
 # Space Framework quick start 
 
-The Space Framework (SF) allows you to use different space providers to obtain spaces. 
+The Space Framework (SF) is a generic management framework for space providers and pSpaces. The framework defines an abstraction layer for space providers and pSpace management that allows clients (both script and kubectl based and client-go based clients) to use spaces while maintaining the clients decoupled from the specific pSpace and space provider that is being used. For a more detailed document describing the space framework and the space manager go to: [Space Framework high level architecture](https://github.com/kubestellar/kubestellar/blob/main/space-framework/docs/space-framework.md)
 
-You can find a more detailed document describe the Space Framework and the Space Manager in:   
-[Space Framework high level architecture](https://github.com/kubestellar/kubestellar/blob/main/space-framework/docs/space-framework.md)
+The following guide describes how to install, setup, and use the SF. Please note that installing the space provider servers is technically not part of the SF and is described here as a helpful reference.
 
-The following guide describes how to setup and use the SF.  
-As part of this guide we also describe how to install and setup the space providers. Please note that, this is not part of the SF configuration and and is described here only as a helpful reference.
-The following sections describe how to setup and use the Space Manager (SM) which is the main management component of the Space Framework.
-
-The setup includes the following sections:
-   * Get (build if needed) space providers
-   * Get and run the SM
-   * Use the SM
-        * Create space-provider-description 
-        * Create spaces
-        * Access spaces and perform operations on spaces
-
-
-**Note**: All helper scripts and predefined object's yaml files that are referenced or used in this guide are under `space-framework/test/example`
+**Note**: All helper scripts and predefined object's yaml files are located in `space-framework/test/example`
 
 ## Setup the environment (clusters & space providers)
-### Create a kind cluster fot the SM
-We need to create an k8s api-server to host the SM CRDs. We will be using a simple KIND cluster. 
-The following script can be used to create the needed cluster:  
-[create_kind_cluster.sh](create_kind_cluster.sh)<br/>
+### Create a kind cluster for the Space Manager
+We need to create a k8s api-server to host the Space Manager (SM) CRDs. We will be using a simple Kind cluster which we create using the following script: [create_kind_cluster.sh](create_kind_cluster.sh)<br/>
 
-Please note the special configuration (e.g., ingress) in the above script is not needed for the SM. The SM itself needs only a **simple k8s api-service** to hosts its CRDs (the SM doesn't need to be run as a k8s workload). The configuration is needed for KubeFlex that will be used as a space provider in this guide.   
+Please note the special ingress configuration in the above script is not needed for the SM. The SM itself needs only a **simple k8s api-service** to hosts its CRDs. The SM doesn't need to be run as a k8s workload. The configuration is needed for KubeFlex which is one of the space provider used in this guide.   
 
-Note: We recommend to set the KUBECONFIG to the location of the kind config assuming the kind cluster is using `$HOME/.kube/config`
-```sell
+Note: We recommend you set the KUBECONFIG to the location of the kind config used by the space manager which by default is `$HOME/.kube/config`:
+```shell
 export KUBECONFIG=$HOME/.kube/config
 ```
 
@@ -40,27 +24,22 @@ git clone git@github.com:kubestellar/kubestellar.git
 cd kubestellar/space-framework
 make 
 ```
-You can also use the following script:  
-[clone_and_build_space_manager.sh](clone_and_build_space_manager.sh)<br/>
 
 ### Run the SM
 The `space-manager` executable should be under `space-framework/bin` 
 
 ```shell
-# Assuming you are under the space-framework directory
+# Assuming you are already in the space-framework directory
 kubectl apply -f config/crds
-
 bin/space-manager --context kind-sm-mgt &> /tmp/space-manager.log &
 ```
-The above can be done using:    
-[run_space_manager.sh](run_space_manager.sh)<br/>
 
 ## install provider backends
 ### KubeFlex
 Follow the installation section on the Kubeflex instructions:  
 [https://github.com/kubestellar/kubeflex/tree/main](https://github.com/kubestellar/kubeflex/tree/main)<br/>
 
-Alternatively you can use:
+Alternatively you can use the following script:
 [install_and_run_kubeflex.sh](install_and_run_kubeflex.sh)<br/>
 
 ### KCP
@@ -71,8 +50,6 @@ cd kcp
 make
 bin/kcp start &> /tmp/kcp.log &
 ```
-Alternatively yu can use:  
-[install_and_run_kcp.sh](install_and_run_kcp.sh)<br/>
 
 ## Using the SM
 Before we can use a space provider through the SM we need to register it with the SM. This process has two steps:
