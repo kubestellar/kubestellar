@@ -245,11 +245,11 @@ func (p *provider) processProviderWatchEvents() {
 					logger.Error(err, "Failed to create secrests for space "+p.name)
 					continue
 				}
-				if refspace.Spec.Type == spacev1alpha1apis.SpaceTypeManaged && !containsFinalizer(refspace, finalizerName) {
+				if refspace.Spec.Type == spacev1alpha1apis.SpaceTypeManaged && !containsFinalizer(refspace, spaceFinalizerName) {
 					// When a physical space is removed we remove its finalizer
 					// from the space object. when the space returns, we
 					// need to restore the finalizer.
-					refspace.SetFinalizers(append(refspace.GetFinalizers(), finalizerName))
+					refspace.SetFinalizers(append(refspace.GetFinalizers(), spaceFinalizerName))
 				}
 				refspace.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 				_, err = p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Update(ctx, refspace, metav1.UpdateOptions{})
@@ -266,10 +266,9 @@ func (p *provider) processProviderWatchEvents() {
 				_ = p.deleteSpaceSecrets(refspace)
 				// If managed then we need to remove the finalizer.
 				finalizersList := refspace.GetFinalizers()
-				for i := 0; i < len(finalizersList); i++ {
-					if finalizersList[i] == finalizerName {
+				for i, finalizer := range finalizersList {
+					if finalizer == spaceFinalizerName {
 						refspace.SetFinalizers(append(finalizersList[:i], finalizersList[i+1:]...))
-						i--
 					}
 				}
 			}
