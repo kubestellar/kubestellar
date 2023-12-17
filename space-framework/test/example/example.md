@@ -55,7 +55,7 @@ bin/space-manager --context kind-sm-mgt &> /tmp/space-manager.log &
 The above can be done using:    
 [run_space_manager.sh](run_space_manager.sh)<br/>
 
-## install provider backends
+## Install provider backends
 ### KubeFlex
 Follow the installation section on the Kubeflex instructions:  
 [https://github.com/kubestellar/kubeflex/tree/main](https://github.com/kubestellar/kubeflex/tree/main)<br/>
@@ -111,7 +111,11 @@ kubectl get spaces -A
 
 # Get detailed info on the kcpspace space
 kubectl get spaces kcpspace -n spaceprovider-kcp -o yaml
+
+# Get detailed info on the kfspace space
+kubectl get space kfspace -n spaceprovider-kf -o yaml
 ```
+Wait for `status.Phase: Ready` for both spaces
 
 **Accessing a space**
 Working with spaces is easy, you first get a config file for that space and then access it in a regular kubectl commands. You can use the `get_kubeconfig_for_space` function to get the config file.
@@ -138,3 +142,11 @@ kubectl delete space kfspace -n spaceprovider-kf
 ```
 
 You can verify that the space was deleted from the space provider as well
+
+## Teardown
+```shell
+kubectl delete space kcpspace -n spaceprovider-kcp
+pkill -f space-manager
+pkill -f kcp
+kind delete cluster --name sm-mgt
+```
