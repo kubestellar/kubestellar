@@ -38,7 +38,8 @@ Building the SM is simple:
 ```shell
 git clone git@github.com:kubestellar/kubestellar.git
 cd kubestellar/space-framework
-make 
+make
+cd ../..
 ```
 You can also use the following script:  
 [clone_and_build_space_manager.sh](clone_and_build_space_manager.sh)<br/>
