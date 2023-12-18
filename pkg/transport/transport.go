@@ -17,20 +17,12 @@ limitations under the License.
 package transport
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
-
-type k8sObject interface {
-	metav1.Object
-	runtime.Object
-}
-
-type WrappedObject k8sObject
 
 type Transport interface {
 	InformerSynced() bool
-	WrapObjects([]k8sObject) WrappedObject
+	WrapObjects([]*unstructured.Unstructured) *unstructured.Unstructured // wrap multiple objects into a singel wrapped object.
 }
 
 // TODO
