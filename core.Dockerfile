@@ -40,12 +40,7 @@ RUN mkdir -p .kcp && \
 
 RUN git clone https://github.com/waltforme/kube-bind.git && \
     pushd kube-bind && \
-    mkdir bin && \
-    IGNORE_GO_VERSION=1 go build -o ./bin/example-backend ./cmd/example-backend/main.go && \
-    git checkout origin/syncmore && \
-    IGNORE_GO_VERSION=1 go build -o ./bin/konnector ./cmd/konnector/main.go && \
-    git checkout origin/autobind && \
-    IGNORE_GO_VERSION=1 go build -o ./bin/kubectl-bind ./cmd/kubectl-bind/main.go && \
+    git checkout origin/kubestellar && \
     popd
 
 ENV PATH=$PATH:/root/go/bin
@@ -64,6 +59,12 @@ ADD .gitattributes Makefile Makefile.venv go.mod go.sum .
 
 RUN make innerbuild GIT_DIRTY=$GIT_DIRTY IGNORE_GO_VERSION=yesplease
 
+FROM ghcr.io/waltforme/kube-bind/example-backend:latest AS example-backend-binary
+
+FROM ghcr.io/waltforme/kube-bind/konnector:latest AS konnector-binary
+
+FROM ghcr.io/waltforme/kube-bind/kubectl-bind:latest AS kubectl-bind-binary
+
 FROM ghcr.io/dexidp/dex:v2.37.0 AS dex-binary
 
 FROM redhat/ubi9
@@ -76,7 +77,7 @@ RUN dnf install -y jq procps && \
     adduser -g kubestellar kubestellar && \
     mkdir -p .kcp
 
-# copy binaries from the builder image
+# copy binaries, dex configurations, and kube-bind CRDs from the builder image
 COPY --from=builder /home/kubestellar/easy-rsa                           easy-rsa/
 COPY --from=builder /root/go/bin                                         /usr/local/bin/
 COPY --from=builder /usr/local/bin/kubectl                               /usr/local/bin/kubectl
@@ -84,9 +85,13 @@ COPY --from=builder /home/kubestellar/kcp/bin                            kcp/bin
 COPY --from=builder /home/kubestellar/kcp-plugins/bin                    kcp/bin/
 COPY --from=builder /home/kubestellar/bin                                bin/
 COPY --from=builder /home/kubestellar/config                             config/
-COPY --from=builder /home/kubestellar/kube-bind/bin                      kube-bind/bin/
 COPY --from=builder /home/kubestellar/kube-bind/hack/dex-config-dev.yaml kube-bind/hack/dex-config-dev.yaml
 COPY --from=builder /home/kubestellar/kube-bind/deploy/crd               kube-bind/deploy/crd
+
+# copy kube-bind binaries from the kube-bind images
+COPY --from=example-backend-binary /ko-app/example-backend kube-bind/bin/
+COPY --from=konnector-binary       /ko-app/konnector       kube-bind/bin/
+COPY --from=kubectl-bind-binary    /ko-app/kubectl-bind    kube-bind/bin/
 
 # copy binary from the dex-binary image
 COPY --from=dex-binary /usr/local/bin/dex dex/bin/dex
