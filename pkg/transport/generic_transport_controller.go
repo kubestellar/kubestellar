@@ -23,12 +23,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
-	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
-	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
-	"github.com/kubestellar/kubestellar/pkg/kbuser"
-	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -42,6 +37,13 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
 const (
