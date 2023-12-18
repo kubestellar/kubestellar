@@ -37,7 +37,8 @@ func AnalyzeClusterScopedObject(obj metav1.Object) (name, kbSpaceID string, err 
 	if obj.GetNamespace() != "" {
 		return "", "", errors.New("object is namespaced-scoped and not cluster-scoped")
 	}
-	if name, ok := cutPrefix(obj.GetName(), kbSpaceID+"-"); !ok {
+	name, ok := cutPrefix(obj.GetName(), kbSpaceID+"-")
+	if !ok {
 		err = fmt.Errorf("name %q does not have prefix for comsumer %q", name, kbSpaceID)
 	}
 
