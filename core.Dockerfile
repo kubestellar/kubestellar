@@ -46,11 +46,6 @@ RUN git clone https://github.com/waltforme/kube-bind.git && \
     IGNORE_GO_VERSION=1 go build -o ./bin/konnector ./cmd/konnector/main.go && \
     git checkout origin/autobind && \
     IGNORE_GO_VERSION=1 go build -o ./bin/kubectl-bind ./cmd/kubectl-bind/main.go && \
-    export PATH=$(pwd)/bin:$PATH && \
-    popd && \
-    git clone https://github.com/dexidp/dex.git && \
-    pushd dex && \
-    IGNORE_GO_VERSION=1 make build && \
     popd
 
 ENV PATH=$PATH:/root/go/bin
@@ -68,6 +63,8 @@ ADD .git/            .git/
 ADD .gitattributes Makefile Makefile.venv go.mod go.sum .
 
 RUN make innerbuild GIT_DIRTY=$GIT_DIRTY IGNORE_GO_VERSION=yesplease
+
+FROM ghcr.io/dexidp/dex:v2.37.0 AS dex-binary
 
 FROM redhat/ubi9
 
@@ -90,7 +87,9 @@ COPY --from=builder /home/kubestellar/config                             config/
 COPY --from=builder /home/kubestellar/kube-bind/bin                      kube-bind/bin/
 COPY --from=builder /home/kubestellar/kube-bind/hack/dex-config-dev.yaml kube-bind/hack/dex-config-dev.yaml
 COPY --from=builder /home/kubestellar/kube-bind/deploy/crd               kube-bind/deploy/crd
-COPY --from=builder /home/kubestellar/dex/bin                            dex/bin/
+
+# copy binary from the dex-binary image
+COPY --from=dex-binary /usr/local/bin/dex dex/bin/dex
 
 # add entry script
 ADD core-container/entry.sh entry.sh
