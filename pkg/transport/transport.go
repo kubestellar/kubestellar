@@ -22,7 +22,7 @@ import (
 
 type Transport interface {
 	InformerSynced() bool
-	WrapObjects([]*unstructured.Unstructured) *unstructured.Unstructured // wrap multiple objects into a singel wrapped object.
+	WrapObjects([]*unstructured.Unstructured) *unstructured.Unstructured // wrap multiple objects into a single wrapped object.
 }
 
 // TODO
