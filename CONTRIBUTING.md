@@ -11,13 +11,13 @@ We can't wait to collaborate with you!
 
 [Install Go](https://golang.org/doc/install) 1.19+.
   Please note that the go language version numbers in these files must exactly agree:
-  
+
     Your local go/go.mod file, kcp/.ci-operator.yaml, and in all the kcp/.github/workflows yaml files that specify go-version.
-    
+
     - In ./ci-operator.yaml the go version is indicated by the "tag" attribute.
     - In go.mod it is indicated by the "go" directive.
     - In the .github/workflows yaml files it is indicated by "go-version"
-    
+
 Check out our [QuickStart Guide](https://docs.kubestellar.io/stable/Getting-Started/quickstart/)
 
 ### Issues
@@ -32,7 +32,7 @@ Your assistance in improving documentation is highly valued, regardless of your 
 To claim an issue that you are interested in, kindly leave a comment on the issue and request the maintainers to assign it to you.
 
 ### Committing
-We encourage all contributors to adopt [best practices in git commit management](https://www.futurelearn.com/info/blog/telling-stories-with-your-git-history) to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.
+We encourage all contributors to adopt [best practices in git commit management](https://hackmd.io/q22nrXjERBeIGb-fqwrUSg) to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.
 
 A recommended format for final commit messages is as follows:
 
