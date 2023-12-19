@@ -50,8 +50,18 @@ vi core-helm-chart/values.yaml
 ```
 
 change the version in the 'values.yaml' file in the following line:
-```shell hl_lines="1"
-tag: {{ config.ks_next_branch }}
+```shell hl_lines="5 11"
+# KubeStellar image parameters
+image:
+  repository: quay.io/kubestellar/kubestellar
+  pullPolicy: IfNotPresent
+  tag: {{ config.ks_next_branch }}
+...
+# Space abstraction layer image parameters
+spaceimage:
+  repository: quay.io/kubestellar/space-framework
+  pullPolicy: IfNotPresent
+  tag: {{ config.ks_next_branch }}
 ```
 
 ### Update the VERSION file
@@ -214,9 +224,14 @@ git push origin --tags
 ### Clean out previous release tar images and the checksums256.txt file from your local build environment
 When you create a build, output goes to your local __/build/release__.  Make sure this path is empty before you start so there is no mixup with your current build.
 
-### Create a build
+### Create a KubeStellar build
 ```shell
 ./hack/make-release-full.sh {{ config.ks_next_tag }}
+```
+### Create a Space Core build
+```shell
+pushd space-framework
+./make spacecore-image {{ config.ks_next_tag }}
 ```
 
 ### Create a release in GH UI
