@@ -68,6 +68,8 @@ Goals not addressed in that PoC are to be explored later.
 
 We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://docs.kubestellar.io/stable/Contribution%20guidelines/CONTRIBUTING/) guide.
 
+This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
+
 ## Getting in touch
 
 There are several ways to communicate with us:
