@@ -502,7 +502,7 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectN
 	}
 	epFound := err == nil
 	//change to consumer SpaceID
-	_, epOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(ep)
+	epOriginalName, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(ep)
 	if err != nil {
 		logger.Error(err, "Object does not appear to be a provider's copy of a consumer's object")
 		return true

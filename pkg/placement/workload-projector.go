@@ -208,7 +208,7 @@ func NewWorkloadProjector(
 			obj = dfu.Obj
 		}
 		syncfg := obj.(*edgeapi.SyncerConfig)
-		_, sourceName, kbIDForMBS, err := kbuser.AnalyzeObjectID(syncfg)
+		sourceName, kbIDForMBS, err := kbuser.AnalyzeClusterScopedObject(syncfg)
 		if err != nil {
 			logger.Error(err, "SyncerConfig name does not look like kube-bind projection", "name", syncfg.Name)
 			return

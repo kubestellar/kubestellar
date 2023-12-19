@@ -114,7 +114,7 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	}
 
 	// 4)
-	_, originalName, kbSpaceID, err := kbuser.AnalyzeObjectID(ep)
+	originalName, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(ep)
 	if err != nil {
 		logger.Error(err, "Object does not appear to be a provider's copy of a consumer's object", "edgePlacement", ep.Name)
 		return err
