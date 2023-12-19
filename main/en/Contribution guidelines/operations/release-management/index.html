@@ -1086,8 +1086,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-a-build" class="md-nav__link">
-    Create a build
+  <a href="#create-a-kubestellar-build" class="md-nav__link">
+    Create a KubeStellar build
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-space-core-build" class="md-nav__link">
+    Create a Space Core build
   </a>
   
 </li>
@@ -2187,8 +2194,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-a-build" class="md-nav__link">
-    Create a build
+  <a href="#create-a-kubestellar-build" class="md-nav__link">
+    Create a KubeStellar build
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-space-core-build" class="md-nav__link">
+    Create a Space Core build
   </a>
   
 </li>
@@ -2319,7 +2333,17 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>vi<span class="w"> </span>core-helm-chart/values.yaml
 </code></pre></div></p>
 <p>change the version in the 'values.yaml' file in the following line:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="hll">tag:<span class="w"> </span>release-0.16
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># KubeStellar image parameters</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>image:
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span>repository:<span class="w"> </span>quay.io/kubestellar/kubestellar
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span>pullPolicy:<span class="w"> </span>IfNotPresent
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="hll"><span class="w">  </span>tag:<span class="w"> </span>release-0.16
+</span><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>...
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Space abstraction layer image parameters</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>spaceimage:
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span>repository:<span class="w"> </span>quay.io/kubestellar/space-framework
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span>pullPolicy:<span class="w"> </span>IfNotPresent
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="hll"><span class="w">  </span>tag:<span class="w"> </span>release-0.16
 </span></code></pre></div></p>
 <h3 id="update-the-version-file">Update the VERSION file<a class="headerlink" href="#update-the-version-file" title="Permanent link">#</a></h3>
 <p>The VERSION file points to the 'latest' and 'stable' release tags associated with the most recent release (latest) and the most stable release (stable).  Update the 'stable' and 'latest tags accordingly</p>
@@ -2434,8 +2458,12 @@
 </code></pre></div>
 <h3 id="clean-out-previous-release-tar-images-and-the-checksums256txt-file-from-your-local-build-environment">Clean out previous release tar images and the checksums256.txt file from your local build environment<a class="headerlink" href="#clean-out-previous-release-tar-images-and-the-checksums256txt-file-from-your-local-build-environment" title="Permanent link">#</a></h3>
 <p>When you create a build, output goes to your local <strong>/build/release</strong>.  Make sure this path is empty before you start so there is no mixup with your current build.</p>
-<h3 id="create-a-build">Create a build<a class="headerlink" href="#create-a-build" title="Permanent link">#</a></h3>
+<h3 id="create-a-kubestellar-build">Create a KubeStellar build<a class="headerlink" href="#create-a-kubestellar-build" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>./hack/make-release-full.sh<span class="w"> </span>v0.16.0
+</code></pre></div>
+<h3 id="create-a-space-core-build">Create a Space Core build<a class="headerlink" href="#create-a-space-core-build" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nb">pushd</span><span class="w"> </span>space-framework
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>./make<span class="w"> </span>spacecore-image<span class="w"> </span>v0.16.0
 </code></pre></div>
 <h3 id="create-a-release-in-gh-ui">Create a release in GH UI<a class="headerlink" href="#create-a-release-in-gh-ui" title="Permanent link">#</a></h3>
 <ul>
@@ -2458,97 +2486,97 @@
 </ul>
 <h3 id="create-the-kubestellar-core-container-image">Create the KubeStellar Core container image<a class="headerlink" href="#create-the-kubestellar-core-container-image" title="Permanent link">#</a></h3>
 <p>First, login to quay.io with a user that has credentials to 'write' to the kubestellar quay repo
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>docker login quay.io
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>docker login quay.io
 </code></pre></div></p>
 <p>then, remove any running container from moby/buildkit
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>CONTAINER ID   IMAGE                           COMMAND              
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>c943925fd137   moby/buildkit:buildx-stable-1   &quot;buildkitd&quot; 
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>
-<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>docker rm c943925fd137 -f
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>CONTAINER ID   IMAGE                           COMMAND              
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>c943925fd137   moby/buildkit:buildx-stable-1   &quot;buildkitd&quot; 
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>docker rm c943925fd137 -f
 </code></pre></div></p>
 <p>and remove the 'buildx' container image from your local docker images
-<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>REPOSITORY      TAG               IMAGE ID       CREATED        SIZE
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>moby/buildkit   buildx-stable-1   16fc6c95ddff   10 days ago    168MB
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
-<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>docker rmi 16fc6c95ddff
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>REPOSITORY      TAG               IMAGE ID       CREATED        SIZE
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>moby/buildkit   buildx-stable-1   16fc6c95ddff   10 days ago    168MB
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>docker rmi 16fc6c95ddff
 </code></pre></div></p>
 <p>finally, make the KubeStellar image from within the local copy of the release branch 'release-0.16'
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>make kubestellar-image
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>make kubestellar-image
 </code></pre></div></p>
 <h3 id="update-the-kubestellar-core-container-image-just-build-and-uploaded-to-quayio">Update the KubeStellar Core container image just build and uploaded to quay.io<a class="headerlink" href="#update-the-kubestellar-core-container-image-just-build-and-uploaded-to-quayio" title="Permanent link">#</a></h3>
 <p>Head up to quay.io and look for the image of KubeStellar Core container just uploaded.
 Tag the image with: <strong>'latest'</strong>, <strong>'release-0.16'</strong>, and <strong>'v0.16.0'</strong> so that helm and other install methods pickup this image.</p>
 <h3 id="update-kubestellar-core-helm-repository">Update KubeStellar Core Helm repository<a class="headerlink" href="#update-kubestellar-core-helm-repository" title="Permanent link">#</a></h3>
 <p>First, make sure you have a version of <strong>'tar'</strong> that supports the <strong>'--transform'</strong> command line option
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>brew install gnu-tar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>brew install gnu-tar
 </code></pre></div></p>
 <p>then, from root of local copy of <a href="https://github.com/kubestellar/kubestellar">https://github.com/kubestellar/kubestellar</a> repo:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>gtar -zcf kubestellar-core-9.tar.gz core-helm-chart/ --transform s/core-helm-chart/kubestellar-core/
-<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>mv kubestellar-core-9.tar.gz ~
-<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>shasum -a 256 ~/kubestellar-core-9.tar.gz
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>gtar -zcf kubestellar-core-9.tar.gz core-helm-chart/ --transform s/core-helm-chart/kubestellar-core/
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>mv kubestellar-core-9.tar.gz ~
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>shasum -a 256 ~/kubestellar-core-9.tar.gz
 </code></pre></div>
 Clone the homebrew-kubestellar repo
-<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/helm.git
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="nb">cd</span><span class="w"> </span>helm
-<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/helm.git
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="nb">cd</span><span class="w"> </span>helm
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 </code></pre></div></p>
 <p>then, from root of local copy of <a href="https://github.com/kubestellar/helm">https://github.com/kubestellar/helm</a> repo
-<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>mv ~/kubestellar-core-9.tar.gz charts
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>mv ~/kubestellar-core-9.tar.gz charts
 </code></pre></div></p>
 <p>next, update 'index.yaml' in root of local copy of <strong>helm repo</strong> (only update the data, not time, on lines 6 and 15):<br />
-<div class="highlight"><span class="filename">index.yaml</span><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>entries:
-<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="w">  </span>kubestellar-core:
-<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v2
-<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="hll"><span class="w">    </span>appVersion:<span class="w"> </span>v0.16.0
-</span><a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="hll"><span class="w">    </span>created:<span class="w"> </span><span class="s2">&quot;2023-10-30T12:00:00.727185806-04:00&quot;</span>
-</span><a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="w">    </span>description:<span class="w"> </span>A<span class="w"> </span>Helm<span class="w"> </span>chart<span class="w"> </span><span class="k">for</span><span class="w"> </span>KubeStellar<span class="w"> </span>Core<span class="w"> </span>deployment<span class="w"> </span>as<span class="w"> </span>a<span class="w"> </span>service
-<a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a><span class="hll"><span class="w">    </span>digest:<span class="w"> </span>6f42d9e850308f8852842cd23d1b03ae5be068440c60b488597e4122809dec1e
-</span><a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a><span class="w">    </span>icon:<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/favicons/favicon.ico
-<a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a><span class="w">    </span>name:<span class="w"> </span>kubestellar
-<a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a><span class="w">    </span>type:<span class="w"> </span>application
-<a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a><span class="w">    </span>urls:
-<a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a><span class="hll"><span class="w">    </span>-<span class="w"> </span>https://helm.kubestellar.io/charts/kubestellar-core-<span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;ks_new_helm_version&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>.tar.gz
-</span><a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a><span class="hll"><span class="w">    </span>version:<span class="w"> </span><span class="s2">&quot;9&quot;</span>
-</span><a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a><span class="hll">generated:<span class="w"> </span><span class="s2">&quot;2023-10-30T12:00:00.727185806-04:00&quot;</span>
+<div class="highlight"><span class="filename">index.yaml</span><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>entries:
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="w">  </span>kubestellar-core:
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v2
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="hll"><span class="w">    </span>appVersion:<span class="w"> </span>v0.16.0
+</span><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="hll"><span class="w">    </span>created:<span class="w"> </span><span class="s2">&quot;2023-10-30T12:00:00.727185806-04:00&quot;</span>
+</span><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="w">    </span>description:<span class="w"> </span>A<span class="w"> </span>Helm<span class="w"> </span>chart<span class="w"> </span><span class="k">for</span><span class="w"> </span>KubeStellar<span class="w"> </span>Core<span class="w"> </span>deployment<span class="w"> </span>as<span class="w"> </span>a<span class="w"> </span>service
+<a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a><span class="hll"><span class="w">    </span>digest:<span class="w"> </span>6f42d9e850308f8852842cd23d1b03ae5be068440c60b488597e4122809dec1e
+</span><a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="w">    </span>icon:<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/favicons/favicon.ico
+<a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a><span class="w">    </span>name:<span class="w"> </span>kubestellar
+<a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a><span class="w">    </span>type:<span class="w"> </span>application
+<a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a><span class="w">    </span>urls:
+<a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="hll"><span class="w">    </span>-<span class="w"> </span>https://helm.kubestellar.io/charts/kubestellar-core-<span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;ks_new_helm_version&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>.tar.gz
+</span><a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a><span class="hll"><span class="w">    </span>version:<span class="w"> </span><span class="s2">&quot;9&quot;</span>
+</span><a id="__codelineno-36-15" name="__codelineno-36-15" href="#__codelineno-36-15"></a><span class="hll">generated:<span class="w"> </span><span class="s2">&quot;2023-10-30T12:00:00.727185806-04:00&quot;</span>
 </span></code></pre></div></p>
 <p>finally,
 finally, push to the main branch
-<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
-<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;updates to main to support release v0.16.0 of KubeStellar Helm component&quot;</span>
-<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;updates to main to support release v0.16.0 of KubeStellar Helm component&quot;</span>
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>main
 </code></pre></div></p>
 <h3 id="update-kubestellar-cli-brew-repository">Update KubeStellar CLI Brew repository<a class="headerlink" href="#update-kubestellar-cli-brew-repository" title="Permanent link">#</a></h3>
 <p>Clone the homebrew-kubestellar repo
-<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/homebrew-kubestellar.git
-<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="nb">cd</span><span class="w"> </span>homebrew-kubestellar
-<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/homebrew-kubestellar.git
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="nb">cd</span><span class="w"> </span>homebrew-kubestellar
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 </code></pre></div></p>
 <p>edit the kubestellar_cli.rb file
-<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>vi<span class="w"> </span>Formula/kubestellar_cli.rb
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>vi<span class="w"> </span>Formula/kubestellar_cli.rb
 </code></pre></div></p>
 <p>update all instances of 'url' from v0.15.0 to <strong>v0.16.0</strong> (should be 6 of these)
-<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>...
-<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="w">    </span>when<span class="w"> </span>:arm64
-<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a><span class="hll"><span class="w">      </span>url<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/v0.16.0/kubestellaruser_v0.16.0_darwin_arm64.tar.gz&quot;</span>
-</span><a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a><span class="w">      </span>sha256<span class="w"> </span><span class="s2">&quot;5be4c0b676e8a4f5985d09f2cfe6c473bd2f56ebd3ef4803ca345e6f04d83d6b&quot;</span><span class="w"> </span>
-<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a>...
-</code></pre></div></p>
-<p>then, update all instances of 'sha256' with the corresponding sha256 hash values in the build/release/checksums256.txt you create during the make-full-release.sh section above. (should be 6 of these)</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>...
 <a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="w">    </span>when<span class="w"> </span>:arm64
-<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="w">      </span>url<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/v0.16.0/kubestellaruser_v0.16.0_darwin_arm64.tar.gz&quot;</span>
-<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="hll"><span class="w">      </span>sha256<span class="w"> </span><span class="s2">&quot;&lt;corresponding sha256 hash from checksums256.txt&gt;&quot;</span><span class="w"> </span>
-</span><a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a>...
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="hll"><span class="w">      </span>url<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/v0.16.0/kubestellaruser_v0.16.0_darwin_arm64.tar.gz&quot;</span>
+</span><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="w">      </span>sha256<span class="w"> </span><span class="s2">&quot;5be4c0b676e8a4f5985d09f2cfe6c473bd2f56ebd3ef4803ca345e6f04d83d6b&quot;</span><span class="w"> </span>
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a>...
+</code></pre></div></p>
+<p>then, update all instances of 'sha256' with the corresponding sha256 hash values in the build/release/checksums256.txt you create during the make-full-release.sh section above. (should be 6 of these)</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>...
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="w">    </span>when<span class="w"> </span>:arm64
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="w">      </span>url<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/v0.16.0/kubestellaruser_v0.16.0_darwin_arm64.tar.gz&quot;</span>
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="hll"><span class="w">      </span>sha256<span class="w"> </span><span class="s2">&quot;&lt;corresponding sha256 hash from checksums256.txt&gt;&quot;</span><span class="w"> </span>
+</span><a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>...
 </code></pre></div>
 <p>finally, push to the main branch
-<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
-<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;updates to main to support release v0.16.0 of KubeStellar Brew component&quot;</span>
-<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;updates to main to support release v0.16.0 of KubeStellar Brew component&quot;</span>
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>main
 </code></pre></div></p>
 <p>and, to test
-<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>brew<span class="w"> </span>update
-<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>brew<span class="w"> </span>install<span class="w"> </span>kubestellar-cli
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>brew<span class="w"> </span>update
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>brew<span class="w"> </span>install<span class="w"> </span>kubestellar-cli
 </code></pre></div></p>
 <p>you should see output that indicates an update for the kubestellar brew tap and then an update to version v0.16.0 of the kubestellar_cli brew formula.</p>
 <h3 id="check-that-gh-workflows-for-docs-are-working">Check that GH Workflows for docs are working<a class="headerlink" href="#check-that-gh-workflows-for-docs-are-working" title="Permanent link">#</a></h3>
@@ -2556,37 +2584,37 @@ finally, push to the main branch
 <a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml">https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml</a>
 <a href="https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml">https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml</a></p>
 <h3 id="create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom">Create an email addressed to <a href="mailto:kubestellar-dev@googlegroups.com,kubestellar-users@googlegroups.com">kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com</a><a class="headerlink" href="#create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>Subject: KubeStellar release v0.16.0
-<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>
-<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>Body:
-<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a>
-<a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a>Dear KubeStellar Community,
-<a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a>    Release v0.16.0 is now available at https://github.com/kubestellar/kubestellar/releases/tag/v0.16.0
-<a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a>
-<a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a>What&#39;s Changed
-<a id="__codelineno-43-9" name="__codelineno-43-9" href="#__codelineno-43-9"></a>
-<a id="__codelineno-43-10" name="__codelineno-43-10" href="#__codelineno-43-10"></a>🐛 Fix display of initial spaces after deploy in kube by @MikeSpreitzer in #1143
-<a id="__codelineno-43-11" name="__codelineno-43-11" href="#__codelineno-43-11"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1144
-<a id="__codelineno-43-12" name="__codelineno-43-12" href="#__codelineno-43-12"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1145
-<a id="__codelineno-43-13" name="__codelineno-43-13" href="#__codelineno-43-13"></a>✨ Switch to use k8s code generators by @ezrasilvera in #1139
-<a id="__codelineno-43-14" name="__codelineno-43-14" href="#__codelineno-43-14"></a>✨ Bump actions/checkout from 4.1.0 to 4.1.1 by @dependabot in #1151
-<a id="__codelineno-43-15" name="__codelineno-43-15" href="#__codelineno-43-15"></a>🌱 Align default core image ref in chart with coming release by @MikeSpreitzer in #1146
-<a id="__codelineno-43-16" name="__codelineno-43-16" href="#__codelineno-43-16"></a>📖Update dev-env.md by @francostellari in #1157
-<a id="__codelineno-43-17" name="__codelineno-43-17" href="#__codelineno-43-17"></a>📖Update Chart.yaml appVersion by @francostellari in #1158
-<a id="__codelineno-43-18" name="__codelineno-43-18" href="#__codelineno-43-18"></a>🐛 Use realpath to see through symlinks by @MikeSpreitzer in #1156
-<a id="__codelineno-43-19" name="__codelineno-43-19" href="#__codelineno-43-19"></a>✨ Increase kind version to v0.20 for ubuntu by @fab7 in #1155
-<a id="__codelineno-43-20" name="__codelineno-43-20" href="#__codelineno-43-20"></a>📖 Document syncer removal by @MikeSpreitzer in #1164
-<a id="__codelineno-43-21" name="__codelineno-43-21" href="#__codelineno-43-21"></a>🌱 Rename urmeta to ksmeta by @MikeSpreitzer in #1166
-<a id="__codelineno-43-22" name="__codelineno-43-22" href="#__codelineno-43-22"></a>✨ Make get-internal-kubeconfig fetch mid-level kubeconfig by @MikeSpreitzer in #1161
-<a id="__codelineno-43-23" name="__codelineno-43-23" href="#__codelineno-43-23"></a>✨ Make ensure/remove wmw insensitive to current workspace by @MikeSpreitzer in #1160
-<a id="__codelineno-43-24" name="__codelineno-43-24" href="#__codelineno-43-24"></a>New Contributors
-<a id="__codelineno-43-25" name="__codelineno-43-25" href="#__codelineno-43-25"></a>
-<a id="__codelineno-43-26" name="__codelineno-43-26" href="#__codelineno-43-26"></a>@fab7 made their first contribution in #1155
-<a id="__codelineno-43-27" name="__codelineno-43-27" href="#__codelineno-43-27"></a>Full Changelog: v0.8.0…v0.9.0
-<a id="__codelineno-43-28" name="__codelineno-43-28" href="#__codelineno-43-28"></a>
-<a id="__codelineno-43-29" name="__codelineno-43-29" href="#__codelineno-43-29"></a>Thank you for your continued support,
-<a id="__codelineno-43-30" name="__codelineno-43-30" href="#__codelineno-43-30"></a>
-<a id="__codelineno-43-31" name="__codelineno-43-31" href="#__codelineno-43-31"></a>Andy
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>Subject: KubeStellar release v0.16.0
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>
+<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>Body:
+<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>
+<a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>Dear KubeStellar Community,
+<a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a>    Release v0.16.0 is now available at https://github.com/kubestellar/kubestellar/releases/tag/v0.16.0
+<a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a>
+<a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a>What&#39;s Changed
+<a id="__codelineno-44-9" name="__codelineno-44-9" href="#__codelineno-44-9"></a>
+<a id="__codelineno-44-10" name="__codelineno-44-10" href="#__codelineno-44-10"></a>🐛 Fix display of initial spaces after deploy in kube by @MikeSpreitzer in #1143
+<a id="__codelineno-44-11" name="__codelineno-44-11" href="#__codelineno-44-11"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1144
+<a id="__codelineno-44-12" name="__codelineno-44-12" href="#__codelineno-44-12"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1145
+<a id="__codelineno-44-13" name="__codelineno-44-13" href="#__codelineno-44-13"></a>✨ Switch to use k8s code generators by @ezrasilvera in #1139
+<a id="__codelineno-44-14" name="__codelineno-44-14" href="#__codelineno-44-14"></a>✨ Bump actions/checkout from 4.1.0 to 4.1.1 by @dependabot in #1151
+<a id="__codelineno-44-15" name="__codelineno-44-15" href="#__codelineno-44-15"></a>🌱 Align default core image ref in chart with coming release by @MikeSpreitzer in #1146
+<a id="__codelineno-44-16" name="__codelineno-44-16" href="#__codelineno-44-16"></a>📖Update dev-env.md by @francostellari in #1157
+<a id="__codelineno-44-17" name="__codelineno-44-17" href="#__codelineno-44-17"></a>📖Update Chart.yaml appVersion by @francostellari in #1158
+<a id="__codelineno-44-18" name="__codelineno-44-18" href="#__codelineno-44-18"></a>🐛 Use realpath to see through symlinks by @MikeSpreitzer in #1156
+<a id="__codelineno-44-19" name="__codelineno-44-19" href="#__codelineno-44-19"></a>✨ Increase kind version to v0.20 for ubuntu by @fab7 in #1155
+<a id="__codelineno-44-20" name="__codelineno-44-20" href="#__codelineno-44-20"></a>📖 Document syncer removal by @MikeSpreitzer in #1164
+<a id="__codelineno-44-21" name="__codelineno-44-21" href="#__codelineno-44-21"></a>🌱 Rename urmeta to ksmeta by @MikeSpreitzer in #1166
+<a id="__codelineno-44-22" name="__codelineno-44-22" href="#__codelineno-44-22"></a>✨ Make get-internal-kubeconfig fetch mid-level kubeconfig by @MikeSpreitzer in #1161
+<a id="__codelineno-44-23" name="__codelineno-44-23" href="#__codelineno-44-23"></a>✨ Make ensure/remove wmw insensitive to current workspace by @MikeSpreitzer in #1160
+<a id="__codelineno-44-24" name="__codelineno-44-24" href="#__codelineno-44-24"></a>New Contributors
+<a id="__codelineno-44-25" name="__codelineno-44-25" href="#__codelineno-44-25"></a>
+<a id="__codelineno-44-26" name="__codelineno-44-26" href="#__codelineno-44-26"></a>@fab7 made their first contribution in #1155
+<a id="__codelineno-44-27" name="__codelineno-44-27" href="#__codelineno-44-27"></a>Full Changelog: v0.8.0…v0.9.0
+<a id="__codelineno-44-28" name="__codelineno-44-28" href="#__codelineno-44-28"></a>
+<a id="__codelineno-44-29" name="__codelineno-44-29" href="#__codelineno-44-29"></a>Thank you for your continued support,
+<a id="__codelineno-44-30" name="__codelineno-44-30" href="#__codelineno-44-30"></a>
+<a id="__codelineno-44-31" name="__codelineno-44-31" href="#__codelineno-44-31"></a>Andy
 </code></pre></div>
 <h3 id="post-the-same-message-in-the-kubestellar-slack-channel">Post the same message in the <a href="https://kubestellar.io/slack">#kubestellar</a> Slack channel<a class="headerlink" href="#post-the-same-message-in-the-kubestellar-slack-channel" title="Permanent link">#</a></h3>
 
