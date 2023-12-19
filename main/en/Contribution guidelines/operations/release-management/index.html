@@ -1086,15 +1086,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-a-kubestellar-build" class="md-nav__link">
-    Create a KubeStellar build
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#create-a-space-core-build" class="md-nav__link">
-    Create a Space Core build
+  <a href="#create-a-kubestellar-full-build" class="md-nav__link">
+    Create a KubeStellar full build
   </a>
   
 </li>
@@ -1114,8 +1107,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#update-the-kubestellar-core-container-image-just-build-and-uploaded-to-quayio" class="md-nav__link">
-    Update the KubeStellar Core container image just build and uploaded to quay.io
+  <a href="#create-a-space-core-build" class="md-nav__link">
+    Create a Space Core build
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-the-kubestellar-and-space-core-container-images-just-build-and-uploaded-to-quayio" class="md-nav__link">
+    Update the KubeStellar and Space Core container images just build and uploaded to quay.io
   </a>
   
 </li>
@@ -2194,15 +2194,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-a-kubestellar-build" class="md-nav__link">
-    Create a KubeStellar build
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#create-a-space-core-build" class="md-nav__link">
-    Create a Space Core build
+  <a href="#create-a-kubestellar-full-build" class="md-nav__link">
+    Create a KubeStellar full build
   </a>
   
 </li>
@@ -2222,8 +2215,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#update-the-kubestellar-core-container-image-just-build-and-uploaded-to-quayio" class="md-nav__link">
-    Update the KubeStellar Core container image just build and uploaded to quay.io
+  <a href="#create-a-space-core-build" class="md-nav__link">
+    Create a Space Core build
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-the-kubestellar-and-space-core-container-images-just-build-and-uploaded-to-quayio" class="md-nav__link">
+    Update the KubeStellar and Space Core container images just build and uploaded to quay.io
   </a>
   
 </li>
@@ -2458,12 +2458,8 @@
 </code></pre></div>
 <h3 id="clean-out-previous-release-tar-images-and-the-checksums256txt-file-from-your-local-build-environment">Clean out previous release tar images and the checksums256.txt file from your local build environment<a class="headerlink" href="#clean-out-previous-release-tar-images-and-the-checksums256txt-file-from-your-local-build-environment" title="Permanent link">#</a></h3>
 <p>When you create a build, output goes to your local <strong>/build/release</strong>.  Make sure this path is empty before you start so there is no mixup with your current build.</p>
-<h3 id="create-a-kubestellar-build">Create a KubeStellar build<a class="headerlink" href="#create-a-kubestellar-build" title="Permanent link">#</a></h3>
+<h3 id="create-a-kubestellar-full-build">Create a KubeStellar full build<a class="headerlink" href="#create-a-kubestellar-full-build" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>./hack/make-release-full.sh<span class="w"> </span>v0.16.0
-</code></pre></div>
-<h3 id="create-a-space-core-build">Create a Space Core build<a class="headerlink" href="#create-a-space-core-build" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nb">pushd</span><span class="w"> </span>space-framework
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>./make<span class="w"> </span>spacecore-image<span class="w"> </span>v0.16.0
 </code></pre></div>
 <h3 id="create-a-release-in-gh-ui">Create a release in GH UI<a class="headerlink" href="#create-a-release-in-gh-ui" title="Permanent link">#</a></h3>
 <ul>
@@ -2486,24 +2482,29 @@
 </ul>
 <h3 id="create-the-kubestellar-core-container-image">Create the KubeStellar Core container image<a class="headerlink" href="#create-the-kubestellar-core-container-image" title="Permanent link">#</a></h3>
 <p>First, login to quay.io with a user that has credentials to 'write' to the kubestellar quay repo
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>docker login quay.io
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>docker login quay.io
 </code></pre></div></p>
 <p>then, remove any running container from moby/buildkit
-<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>CONTAINER ID   IMAGE                           COMMAND              
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>c943925fd137   moby/buildkit:buildx-stable-1   &quot;buildkitd&quot; 
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
-<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>docker rm c943925fd137 -f
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>CONTAINER ID   IMAGE                           COMMAND              
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>c943925fd137   moby/buildkit:buildx-stable-1   &quot;buildkitd&quot; 
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>docker rm c943925fd137 -f
 </code></pre></div></p>
 <p>and remove the 'buildx' container image from your local docker images
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>REPOSITORY      TAG               IMAGE ID       CREATED        SIZE
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>moby/buildkit   buildx-stable-1   16fc6c95ddff   10 days ago    168MB
-<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
-<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>docker rmi 16fc6c95ddff
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>REPOSITORY      TAG               IMAGE ID       CREATED        SIZE
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>moby/buildkit   buildx-stable-1   16fc6c95ddff   10 days ago    168MB
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>docker rmi 16fc6c95ddff
 </code></pre></div></p>
 <p>finally, make the KubeStellar image from within the local copy of the release branch 'release-0.16'
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>make kubestellar-image
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>make kubestellar-image
 </code></pre></div></p>
-<h3 id="update-the-kubestellar-core-container-image-just-build-and-uploaded-to-quayio">Update the KubeStellar Core container image just build and uploaded to quay.io<a class="headerlink" href="#update-the-kubestellar-core-container-image-just-build-and-uploaded-to-quayio" title="Permanent link">#</a></h3>
+<h3 id="create-a-space-core-build">Create a Space Core build<a class="headerlink" href="#create-a-space-core-build" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nb">pushd</span><span class="w"> </span>space-framework
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>./make<span class="w"> </span>spacecore-image<span class="w"> </span>v0.16.0
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="nb">popd</span>
+</code></pre></div>
+<h3 id="update-the-kubestellar-and-space-core-container-images-just-build-and-uploaded-to-quayio">Update the KubeStellar and Space Core container images just build and uploaded to quay.io<a class="headerlink" href="#update-the-kubestellar-and-space-core-container-images-just-build-and-uploaded-to-quayio" title="Permanent link">#</a></h3>
 <p>Head up to quay.io and look for the image of KubeStellar Core container just uploaded.
 Tag the image with: <strong>'latest'</strong>, <strong>'release-0.16'</strong>, and <strong>'v0.16.0'</strong> so that helm and other install methods pickup this image.</p>
 <h3 id="update-kubestellar-core-helm-repository">Update KubeStellar Core Helm repository<a class="headerlink" href="#update-kubestellar-core-helm-repository" title="Permanent link">#</a></h3>
