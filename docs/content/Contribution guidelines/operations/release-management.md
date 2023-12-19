@@ -224,14 +224,9 @@ git push origin --tags
 ### Clean out previous release tar images and the checksums256.txt file from your local build environment
 When you create a build, output goes to your local __/build/release__.  Make sure this path is empty before you start so there is no mixup with your current build.
 
-### Create a KubeStellar build
+### Create a KubeStellar full build
 ```shell
 ./hack/make-release-full.sh {{ config.ks_next_tag }}
-```
-### Create a Space Core build
-```shell
-pushd space-framework
-./make spacecore-image {{ config.ks_next_tag }}
 ```
 
 ### Create a release in GH UI
@@ -274,7 +269,14 @@ finally, make the KubeStellar image from within the local copy of the release br
 make kubestellar-image
 ```
 
-### Update the KubeStellar Core container image just build and uploaded to quay.io
+### Create a Space Core build
+```shell
+pushd space-framework
+./make spacecore-image {{ config.ks_next_tag }}
+popd
+```
+
+### Update the KubeStellar and Space Core container images just build and uploaded to quay.io
 
 Head up to quay.io and look for the image of KubeStellar Core container just uploaded.
 Tag the image with: __'latest'__, __'{{ config.ks_next_branch }}'__, and __'{{ config.ks_next_tag }}'__ so that helm and other install methods pickup this image.
