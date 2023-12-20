@@ -410,11 +410,9 @@ If things are working properly then you will see log lines like the
 following (among many others) in the where-resolver's log.
 
 ``` { .bash .no-copy }
-I0423 01:33:37.036752   11305 main.go:212] "Found APIExport view" exportName="edge.kubestellar.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kubestellar.io"
+I1219 16:40:49.814564  325368 reconcile_on_location.go:213] "updated SinglePlacementSlice" controller="where-resolver" triggeringKind="Location" key="kube-bind-sx6pl-florin" location="kube-bind-sx6pl-florin" singlePlacementSlice="kube-bind-g72bg-edge-placement-c"
 ...
-I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|florin" locationWorkspace="apmziqj9p9fqlflm" location="florin" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
-...
-I0423 01:33:37.391772   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|guilder" locationWorkspace="apmziqj9p9fqlflm" location="guilder" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
+I1219 16:40:49.797689  325368 reconcile_on_location.go:213] "updated SinglePlacementSlice" controller="where-resolver" triggeringKind="Location" key="kube-bind-sx6pl-guilder" location="kube-bind-sx6pl-guilder" singlePlacementSlice="kube-bind-g72bg-edge-placement-c"
 ```
 
 Check out a SinglePlacementSlice object as follows.
