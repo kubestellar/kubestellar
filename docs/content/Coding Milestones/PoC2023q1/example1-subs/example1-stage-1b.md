@@ -1,7 +1,7 @@
 <!--example1-stage-1b-start-->
-### Connect guilder edge cluster with its mailbox workspace
+### Connect guilder edge cluster with its mailbox space
 
-The following command will (a) create, in the mailbox workspace for
+The following command will (a) create, in the mailbox space for
 guilder, an identity and authorizations for the edge syncer and (b)
 write a file containing YAML for deploying the syncer in the guilder
 cluster.
@@ -10,27 +10,23 @@ cluster.
 kubectl kubestellar prep-for-syncer --imw imw1 $in_cluster guilder
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:imw1".
-Current workspace is "root:espw".
-Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
-Creating service account "kubestellar-syncer-guilder-wfeig2lv"
-Creating cluster role "kubestellar-syncer-guilder-wfeig2lv" to give service account "kubestellar-syncer-guilder-wfeig2lv"
+Creating service account "kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df"
+Creating cluster role "kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df" to give service account "kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df"
 
- 1. write and sync access to the synctarget "kubestellar-syncer-guilder-wfeig2lv"
+ 1. write and sync access to the synctarget "kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df"
  2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kubestellar-syncer-guilder-wfeig2lv" to bind service account "kubestellar-syncer-guilder-wfeig2lv" to cluster role "kubestellar-syncer-guilder-wfeig2lv".
+Creating or updating cluster role binding "kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df" to bind service account "kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df" to cluster role "kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df".
 
-Wrote WEC manifest to guilder-syncer.yaml for namespace "kubestellar-syncer-guilder-wfeig2lv". Use
+Wrote workload execution cluster manifest to guilder-syncer.yaml for namespace "kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df". Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "guilder-syncer.yaml"
+  KUBECONFIG=<wec-config> kubectl apply -f "guilder-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-guilder-wfeig2lv" kubestellar-syncer-guilder-wfeig2lv
+  KUBECONFIG=<wec-config> kubectl get deployment -n "kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df" kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df
 
 to verify the syncer pod is running.
-Current workspace is "root:espw".
 ```
 
 The file written was, as mentioned in the output,
@@ -57,13 +53,13 @@ You might check that the syncer is running, as follows.
 KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -A
 ```
 ``` { .bash .no-copy }
-NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
-kubestellar-syncer-guilder-saaywsu5   kubestellar-syncer-guilder-saaywsu5   1/1     1            1           52s
-kube-system                        coredns                            2/2     2            2           35m
-local-path-storage                 local-path-provisioner             1/1     1            1           35m
+NAMESPACE                                             NAME                                                  READY   UP-TO-DATE   AVAILABLE   AGE
+kube-system                                           coredns                                               2/2     2            2           4m1s
+kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df   kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df   1/1     1            1           0s
+local-path-storage                                    local-path-provisioner                                1/1     1            1           3m58s
 ```
 
-### Connect florin edge cluster with its mailbox workspace
+### Connect florin edge cluster with its mailbox space
 
 Do the analogous stuff for the florin cluster.
 
@@ -71,27 +67,23 @@ Do the analogous stuff for the florin cluster.
 kubectl kubestellar prep-for-syncer --imw imw1 $in_cluster florin
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:imw1".
-Current workspace is "root:espw".
-Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
-Creating service account "kubestellar-syncer-florin-32uaph9l"
-Creating cluster role "kubestellar-syncer-florin-32uaph9l" to give service account "kubestellar-syncer-florin-32uaph9l"
+Creating service account "kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj"
+Creating cluster role "kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj" to give service account "kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj"
 
- 1. write and sync access to the synctarget "kubestellar-syncer-florin-32uaph9l"
+ 1. write and sync access to the synctarget "kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj"
  2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kubestellar-syncer-florin-32uaph9l" to bind service account "kubestellar-syncer-florin-32uaph9l" to cluster role "kubestellar-syncer-florin-32uaph9l".
+Creating or updating cluster role binding "kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj" to bind service account "kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj" to cluster role "kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj".
 
-Wrote workload execution cluster (WEC) manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-32uaph9l". Use
+Wrote workload execution cluster manifest to florin-syncer.yaml for namespace "kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj". Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "florin-syncer.yaml"
+  KUBECONFIG=<wec-config> kubectl apply -f "florin-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-florin-32uaph9l" kubestellar-syncer-florin-32uaph9l
+  KUBECONFIG=<wec-config> kubectl get deployment -n "kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj" kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj
 
 to verify the syncer pod is running.
-Current workspace is "root:espw".
 ```
 
 And deploy the syncer in the florin cluster.
@@ -100,12 +92,12 @@ And deploy the syncer in the florin cluster.
 KUBECONFIG=~/.kube/config kubectl --context kind-florin apply -f florin-syncer.yaml 
 ```
 ``` { .bash .no-copy }
-namespace/kubestellar-syncer-florin-32uaph9l created
-serviceaccount/kubestellar-syncer-florin-32uaph9l created
-secret/kubestellar-syncer-florin-32uaph9l-token created
-clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-florin-32uaph9l created
-clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-florin-32uaph9l created
-secret/kubestellar-syncer-florin-32uaph9l created
-deployment.apps/kubestellar-syncer-florin-32uaph9l created
+namespace/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj created
+serviceaccount/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj created
+secret/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj-token created
+clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj created
+clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj created
+secret/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj created
+deployment.apps/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj created
 ```
 <!--example1-stage-1b-end-->
