@@ -1844,7 +1844,7 @@ cluster then the placement translator is running in a Pod there. If
 instead you are running the core controllers as bare processes then
 use the following commands to launch the placement translator; it
 requires the ESPW to be current at start time.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>placement-translator<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w">  </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/placement-translator.log<span class="w"> </span><span class="p">&amp;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>placement-translator<span class="w"> </span>--external-access<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w">  </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/placement-translator.log<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
 <p>The following commands wait for the placement translator to get its

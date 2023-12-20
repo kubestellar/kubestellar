@@ -1840,9 +1840,8 @@ KubeStellar.  If you have deployed the KubeStellar core as Kubernetes
 workload then this controller is already running in a pod in your
 hosting cluster. If instead you are running these controllers as bare
 processes then launch this controller as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># TODO: pass --in-cluster when acceptable</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/mailbox-controller.log<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>sleep<span class="w"> </span><span class="m">20</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>mailbox-controller<span class="w"> </span>--external-access<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/mailbox-controller.log<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sleep<span class="w"> </span><span class="m">20</span>
 </code></pre></div>
 <p>This controller is in charge of maintaining the collection of mailbox
 spaces, which are an implementation detail not intended for user
