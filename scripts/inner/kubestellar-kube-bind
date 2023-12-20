@@ -149,7 +149,6 @@ else
     echo "cluster namespace is $cluster_ns"
 fi
 
-
 KUBECONFIG="$ORIGINAL_KUBECONFIG"
 kcs_kubeconfig="$(mktemp kcs.kubeconfig#XXXX)"
 kubectl kubestellar space get-kubeconfig "${sub_flags[@]}" "${kubectl_flags[@]}" "espw" "$kcs_kubeconfig"

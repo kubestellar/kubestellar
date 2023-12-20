@@ -3,7 +3,30 @@
 ### Create Kind cluster for space management
 
 ```shell
-kind create cluster --name sm-mgt
+kind create cluster --name sm-mgt --config - <<EOF
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 443
+    hostPort: 9443
+    protocol: TCP
+EOF
+
+kubectl create -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
+sleep 20
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=360s
+
 KUBECONFIG=~/.kube/config kubectl config rename-context kind-sm-mgt sm-mgt
 SM_CONFIG=~/.kube/config
 ```

@@ -20,6 +20,7 @@ optionally makes some Kubernetes APIs available for the WMW by
 populating a set of CRDs into the WMW.
 
 ```shell
+# TODO: Needs to pass --with-kube false or true
 WMW_C_SPACE_CONFIG=${MY_KUBECONFIGS}/wmw-c.kubeconfig
 kubectl kubestellar ensure wmw $in_cluster wmw-c --output-kubeconfig "$WMW_C_SPACE_CONFIG"
 ```
@@ -147,6 +148,7 @@ Use the following `kubectl` commands to create the WMW for the special
 workload.
 
 ```shell
+# TODO: needs to set --with-kube false/true
 WMW_S_SPACE_CONFIG=${MY_KUBECONFIGS}/wmw-s.kubeconfig
 kubectl kubestellar ensure wmw $in_cluster wmw-s --output-kubeconfig "$WMW_S_SPACE_CONFIG"
 ```
@@ -218,6 +220,7 @@ to the httpd workload but is here to demonstrate that `APIService`
 objects can be downsynced.
 
 ```shell
+# TODO: verify that APIservices is supported for Kubeflex control plan
 kubectl --kubeconfig $WMW_S_SPACE_CONFIG apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
@@ -325,6 +328,7 @@ common EdgePlacement, which does not explicitly mention the
 namespaces as needed in the WECs.
    
 ```shell
+# TODO: verify that APIservices is supported for Kubeflex control plan
 kubectl --kubeconfig $WMW_S_SPACE_CONFIG apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
@@ -386,8 +390,7 @@ following commands to launch the where-resolver; it requires the ESPW
 to be the current kcp workspace at start time.
 
 ```shell
-# TODO: pass --in-cluster when acceptable
-KUBECONFIG=$SM_CONFIG kubestellar-where-resolver -v=4 &> /tmp/where-resolver.log &
+KUBECONFIG=$SM_CONFIG kubestellar-where-resolver --external-access -v=4 &> /tmp/where-resolver.log &
 sleep 10
 ```
 

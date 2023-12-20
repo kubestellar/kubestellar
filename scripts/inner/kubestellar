@@ -115,6 +115,8 @@ function ensure_wmws() {
             fi
             wmw=${i#"root:"}
             echo "Ensuring WMW: $wmw"
+            # TODO: we shouldn't hard code with-kube. The right approach is to call ensure-wmw 
+            # and pass --with-kube true only if the provider is kcp.
             ${bindir}/kubectl-kubestellar-ensure-wmw $xflag $in_cluster $wmw --with-kube true # &> /dev/null
         done
     done <<< "$1"

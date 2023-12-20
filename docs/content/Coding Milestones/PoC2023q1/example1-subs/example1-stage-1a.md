@@ -8,8 +8,7 @@ hosting cluster. If instead you are running these controllers as bare
 processes then launch this controller as follows.
 
 ```shell
-# TODO: pass --in-cluster when acceptable
-KUBECONFIG=$SM_CONFIG mailbox-controller -v=4 &> /tmp/mailbox-controller.log &
+KUBECONFIG=$SM_CONFIG mailbox-controller --external-access -v=4 &> /tmp/mailbox-controller.log &
 sleep 20
 ```
 

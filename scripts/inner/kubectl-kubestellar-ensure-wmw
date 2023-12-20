@@ -93,8 +93,6 @@ kubestellar-kube-bind "${sub_flags[@]}" "${kubectl_flags[@]}" "$wmw_name" "singl
 function reconcile_kube_CRDs() {
 	if [ "$want_kube" == true ]; then
 		kubectl --kubeconfig "$wds_kubeconfig" apply --server-side=true -R -f "$bindir/../config/kube/crds/"
-	else
-		kubectl --kubeconfig "$wds_kubeconfig" delete -R -f "$bindir/../config/kube/crds/"
 	fi
 }
 
