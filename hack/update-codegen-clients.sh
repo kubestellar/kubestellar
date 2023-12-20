@@ -44,43 +44,4 @@ ${CODE_GENERATOR} \
   "output:dir=./../client"
 popd
 
-# bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy" \
-#   github.com/kubestellar/kubestellar/third_party/conditions/client github.com/kubestellar/kubestellar/third_party/conditions/apis \
-#   "conditions:v2alpha1" \
-#   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
-#   --output-base "${SCRIPT_ROOT}" \
-#   --trim-path-prefix github.com/kubestellar/kubestellar
-
-# bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
-#   github.com/kubestellar/kubestellar/test/e2e/fixtures/wildwest/client github.com/kubestellar/kubestellar/test/e2e/fixtures/wildwest/apis \
-#   "wildwest:v2alpha1" \
-#   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
-#   --output-base "${SCRIPT_ROOT}" \
-#   --trim-path-prefix github.com/kubestellar/kubestellar
-
-# pushd ./test/e2e/fixtures/wildwest/apis
-# ${CODE_GENERATOR} \
-#   "client:outputPackagePath=github.com/kubestellar/kubestellar/test/e2e/fixtures/wildwest/client,apiPackagePath=github.com/kubestellar/kubestellar/test/e2e/fixtures/wildwest/apis,singleClusterClientPackagePath=github.com/kcp-dev/kcp/test/e2e/fixtures/wildwest/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
-#   "lister:apiPackagePath=github.com/kubestellar/kubestellar/test/e2e/fixtures/wildwest/apis,headerFile=${BOILERPLATE_HEADER}" \
-#   "informer:outputPackagePath=github.com/kubestellar/kubestellar/test/e2e/fixtures/wildwest/client,singleClusterClientPackagePath=github.com/kcp-dev/kcp/test/e2e/fixtures/wildwest/client/clientset/versioned,apiPackagePath=github.com/kubestellar/kubestellar/test/e2e/fixtures/wildwest/apis,headerFile=${BOILERPLATE_HEADER}" \
-#   "paths=./..." \
-#   "output:dir=./../client"
-# popd
-
 go install "${CODEGEN_PKG}"/cmd/openapi-gen
-
-# "$GOPATH"/bin/openapi-gen  \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/workload/v2alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/core/v2alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/apiresource/v2alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/tenancy/v2alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/tenancy/v1beta1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/apis/v2alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/scheduling/v2alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/topology/v2alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/third_party/conditions/apis/conditions/v2alpha1 \
-# --input-dirs k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/version \
-# --output-package github.com/kubestellar/kubestellar/pkg/openapi -O zz_generated.openapi \
-# --go-header-file ./hack/../hack/boilerplate/boilerplate.generatego.txt \
-# --output-base "${SCRIPT_ROOT}" \
-# --trim-path-prefix github.com/kubestellar/kubestellar
