@@ -58,7 +58,7 @@ func (c *controller) reconcileSpace(key string) error {
 		return errors.New("unexpected object type. expected Space")
 	}
 
-	if space.ObjectMeta.DeletionTimestamp != nil {
+	if !space.GetDeletionTimestamp().IsZero() {
 		c.logger.V(2).Info("reconcile Space delete", "resource", space.Name)
 		err := c.processDeleteSpace(space)
 		if err != nil {
@@ -124,7 +124,7 @@ func (c *controller) processAddOrUpdateSpace(space *spacev1alpha1.Space) error {
 
 			// Update status Initializing
 			if !containsFinalizer(space, spaceFinalizerName) {
-				space.ObjectMeta.Finalizers = append(space.ObjectMeta.Finalizers, spaceFinalizerName)
+				space.SetFinalizers(append(space.GetFinalizers(), spaceFinalizerName))
 			}
 			space.Status.Phase = spacev1alpha1.SpacePhaseInitializing
 			_, err = c.clientset.
