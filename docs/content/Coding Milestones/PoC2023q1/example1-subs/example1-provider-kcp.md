@@ -89,5 +89,6 @@ use the more efficient networking (see [doc on
 
 ```shell
 in_cluster="--in-cluster"
+kube_needed=true
 ```
 <!--example1-provider-kcp-end-->
