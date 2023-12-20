@@ -107,6 +107,13 @@ function ensure_imws() {
 
 
 function ensure_wmws() {
+    provider_type=$(kubectl get spaceproviderdesc default -o jsonpath='{$.spec.ProviderType}')
+    if [ $provider_type = "kcp" ]; then
+        echo "applying kube crds."
+        kube_needed=true
+    else
+        kube_needed=false
+	fi
     local -a items
     while IFS=',' read -ra items; do
         for i in "${items[@]}"; do
@@ -115,9 +122,7 @@ function ensure_wmws() {
             fi
             wmw=${i#"root:"}
             echo "Ensuring WMW: $wmw"
-            # TODO: we shouldn't hard code with-kube. The right approach is to call ensure-wmw 
-            # and pass --with-kube true only if the provider is kcp.
-            ${bindir}/kubectl-kubestellar-ensure-wmw $xflag $in_cluster $wmw --with-kube true # &> /dev/null
+            ${bindir}/kubectl-kubestellar-ensure-wmw $xflag $in_cluster $wmw --with-kube $kube_needed # &> /dev/null
         done
     done <<< "$1"
 }
