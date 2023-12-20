@@ -186,15 +186,6 @@ else
     echo "consumer side secret is $consumer_secret_name"
 fi
 
-if fgrep -x "${resource_to_bind}" "$request_file"; then
-    echo "The request file has junk in it; see?" >&2
-    cat "$request_file" >&2
-    mv "$request_file" "$request_file".junk
-    fgrep -x -v "${resource_to_bind}" "$request_file".junk > "$request_file"
-    echo Removed >&2
-fi
-
-
 KUBECONFIG="$consumer_kubeconfig"
 if ! sub_result="$(kubectl bind apiservice --remote-kubeconfig-namespace kube-bind --remote-kubeconfig-name $consumer_secret_name --skip-konnector -f $request_file 2>&1)"; then
     echo "Error occurred during binding $resource_to_bind for $space_name" >&2
