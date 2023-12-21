@@ -18,13 +18,13 @@ package transport
 
 import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 type Transport interface {
 	InformerSynced() bool
-	WrapObjects([]*unstructured.Unstructured) *unstructured.Unstructured // wrap multiple objects into a single wrapped object.
-	GetWrappedObjectGVR() schema.GroupVersionResource
+	// WrapObjects gets slice of objects and should wrap them into a single wrapped object returned as unstructured.
+	// In case slice is empty, the function should return an empty wrapped object.
+	WrapObjects([]*unstructured.Unstructured) *unstructured.Unstructured
 }
 
 // TODO
