@@ -30,8 +30,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
+	cacheddiscovery "k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
@@ -54,7 +57,16 @@ const (
 // NewTransportController returns a new transport controller
 func NewTransportController(ctx context.Context, edgePlacementDecisionInformer edgev2alpha1informers.EdgePlacementDecisionInformer, transport Transport,
 	kubeBindSpaceRelation kbuser.KubeBindSpaceRelation, spaceManagementClient msclient.KubestellarSpaceInterface, spaceProviderNs string,
-	transportSpaceClient dynamic.Interface) *genericTransportController {
+	transportSpaceConfig *rest.Config) (*genericTransportController, error) {
+	transportSpaceDynamicClient, err := dynamic.NewForConfig(transportSpaceConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create dynamic k8s clientset for transport space - %w", err)
+	}
+	wrappedObjectGVK := transport.WrapObjects(make([]*unstructured.Unstructured, 0)).GroupVersionKind() // empty wrapped object to get GVK from it.
+	wrappedObjectGVR, err := getGvrFromGvk(transportSpaceConfig, wrappedObjectGVK)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get transport wrapped object GVR - %w", err)
+	}
 
 	transportController := &genericTransportController{
 		logger:                              klog.FromContext(ctx).WithName(controllerName),
@@ -65,8 +77,8 @@ func NewTransportController(ctx context.Context, edgePlacementDecisionInformer e
 		kubeBindSpaceRelation:               kubeBindSpaceRelation,
 		spaceManagementClient:               spaceManagementClient,
 		spaceProviderNs:                     spaceProviderNs,
-		transportSpaceClient:                transportSpaceClient,
-		transportWrappedObjectGVR:           transport.GetWrappedObjectGVR(),
+		transportSpaceClient:                transportSpaceDynamicClient,
+		wrappedObjectGVR:                    *wrappedObjectGVR,
 	}
 
 	transportController.logger.Info("Setting up event handlers")
@@ -87,7 +99,23 @@ func NewTransportController(ctx context.Context, edgePlacementDecisionInformer e
 	// TODO transport.SetupEventHandlers()
 	// (we should have another entry point for the transport specific)
 
-	return transportController
+	return transportController, nil
+}
+
+func getGvrFromGvk(spaceConfig *rest.Config, gvk schema.GroupVersionKind) (*schema.GroupVersionResource, error) {
+	clientset, err := kubernetes.NewForConfig(spaceConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create k8s clientset for given space - %w", err)
+	}
+	discoveryClient := cacheddiscovery.NewMemCacheClient(clientset.Discovery())
+	mapper := restmapper.NewDeferredDiscoveryRESTMapper(discoveryClient)
+
+	restMapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
+	if err != nil {
+		return nil, fmt.Errorf("failed to discover GroupVersionResource from given GroupVersionKind - %w", err)
+	}
+
+	return &(restMapping.Resource), nil
 }
 
 type genericTransportController struct {
@@ -108,8 +136,8 @@ type genericTransportController struct {
 	spaceManagementClient msclient.KubestellarSpaceInterface
 	spaceProviderNs       string
 
-	transportSpaceClient      dynamic.Interface
-	transportWrappedObjectGVR schema.GroupVersionResource
+	transportSpaceClient dynamic.Interface
+	wrappedObjectGVR     schema.GroupVersionResource
 }
 
 // enqueueEdgePlacementDecision takes an EdgePlacementDecision resource and converts it into a namespace/name
@@ -252,7 +280,7 @@ func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx contex
 	}
 
 	for _, destination := range edgePlacementDecision.Spec.Destinations { // TODO need to revisit the destination struct and see how to use it properly
-		if err := c.transportSpaceClient.Resource(c.transportWrappedObjectGVR).Namespace(destination.Namespace).Delete(ctx, edgePlacementDecision.GetName(),
+		if err := c.transportSpaceClient.Resource(c.wrappedObjectGVR).Namespace(destination.Namespace).Delete(ctx, edgePlacementDecision.GetName(),
 			metav1.DeleteOptions{}); err != nil { // wrapped object name is identical to kube-bind copy of the EdgePlacementDecision object. see updateWrappedObject func for explanation.
 			if !strings.HasSuffix(err.Error(), notFoundErrorSuffix) { // if object is already not there, we do not report an error cause desired state was achieved.
 				return fmt.Errorf("failed to delete wrapped object '%s' in destination WEC with namespace '%s' - %w", edgePlacementDecision.GetName(), destination.Namespace, err)
@@ -358,13 +386,13 @@ func (c *genericTransportController) getObjectsFromOriginWDS(ctx context.Context
 }
 
 func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Context, namespace string, wrappedObject *unstructured.Unstructured) error {
-	_, err := c.transportSpaceClient.Resource(c.transportWrappedObjectGVR).Namespace(namespace).Create(ctx, wrappedObject, metav1.CreateOptions{})
+	_, err := c.transportSpaceClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Create(ctx, wrappedObject, metav1.CreateOptions{})
 	if err != nil {
 		if !strings.HasSuffix(err.Error(), alreadyExistsErrorSuffix) { // if object is already there, we need to use update. otherwise report an error.
 			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC with namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 		}
 		// if we reached here, create had an error that object already exists. try update object instead.
-		_, err = c.transportSpaceClient.Resource(c.transportWrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{})
+		_, err = c.transportSpaceClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to update wrapped object '%s' in destination WEC with namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 		}
