@@ -28,7 +28,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
@@ -36,7 +35,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
@@ -56,7 +54,7 @@ const (
 // NewTransportController returns a new transport controller
 func NewTransportController(ctx context.Context, edgePlacementDecisionInformer edgev2alpha1informers.EdgePlacementDecisionInformer, transport Transport,
 	kubeBindSpaceRelation kbuser.KubeBindSpaceRelation, spaceManagementClient msclient.KubestellarSpaceInterface, spaceProviderNs string,
-	transportSpaceClient client.Client) *genericTransportController {
+	transportSpaceClient dynamic.Interface) *genericTransportController {
 
 	transportController := &genericTransportController{
 		logger:                              klog.FromContext(ctx).WithName(controllerName),
@@ -68,6 +66,7 @@ func NewTransportController(ctx context.Context, edgePlacementDecisionInformer e
 		spaceManagementClient:               spaceManagementClient,
 		spaceProviderNs:                     spaceProviderNs,
 		transportSpaceClient:                transportSpaceClient,
+		transportWrappedObjectGVR:           transport.GetWrappedObjectGVR(),
 	}
 
 	transportController.logger.Info("Setting up event handlers")
@@ -108,47 +107,49 @@ type genericTransportController struct {
 	kubeBindSpaceRelation kbuser.KubeBindSpaceRelation
 	spaceManagementClient msclient.KubestellarSpaceInterface
 	spaceProviderNs       string
-	transportSpaceClient  client.Client
+
+	transportSpaceClient      dynamic.Interface
+	transportWrappedObjectGVR schema.GroupVersionResource
 }
 
 // enqueueEdgePlacementDecision takes an EdgePlacementDecision resource and converts it into a namespace/name
 // string which is then put onto the work queue. This method should *not* be passed resources of any type other than EdgePlacementDecision.
-func (ctrl *genericTransportController) enqueueEdgePlacementDecision(obj interface{}) {
+func (c *genericTransportController) enqueueEdgePlacementDecision(obj interface{}) {
 	var key string
 	var err error
 	if key, err = cache.MetaNamespaceKeyFunc(obj); err != nil {
-		ctrl.logger.Error(err, "failed to enqueue EdgePlacementDecision object")
+		c.logger.Error(err, "failed to enqueue EdgePlacementDecision object")
 		return
 	}
-	ctrl.workqueue.Add(key)
+	c.workqueue.Add(key)
 }
 
 // Run will set up the event handlers for types we are interested in, as well
 // as syncing informer caches and starting workers. It will block until stopCh
 // is closed, at which point it will shutdown the workqueue and wait for
 // workers to finish processing their current work items.
-func (ctrl *genericTransportController) Run(ctx context.Context, workersCount int) error {
+func (c *genericTransportController) Run(ctx context.Context, workersCount int) error {
 	defer utilruntime.HandleCrash()
-	defer ctrl.workqueue.ShutDown()
+	defer c.workqueue.ShutDown()
 
-	ctrl.logger.Info("starting transport controller")
+	c.logger.Info("starting transport controller")
 
 	// Wait for the caches to be synced before starting workers
-	ctrl.logger.Info("waiting for informer caches to sync")
+	c.logger.Info("waiting for informer caches to sync")
 
-	if ok := cache.WaitForCacheSync(ctx.Done(), ctrl.transport.InformerSynced, ctrl.edgePlacementDecisionInformerSynced); !ok {
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.transport.InformerSynced, c.edgePlacementDecisionInformerSynced); !ok {
 		return fmt.Errorf("failed to wait for caches to sync")
 	}
 
-	ctrl.logger.Info("starting workers", "count", workersCount)
+	c.logger.Info("starting workers", "count", workersCount)
 	// Launch workers to process EdgePlacementDecision
 	for i := 1; i <= workersCount; i++ {
-		go wait.UntilWithContext(ctx, func(ctx context.Context) { ctrl.runWorker(ctx, i) }, time.Second)
+		go wait.UntilWithContext(ctx, func(ctx context.Context) { c.runWorker(ctx, i) }, time.Second)
 	}
 
-	ctrl.logger.Info("started workers")
+	c.logger.Info("started workers")
 	<-ctx.Done()
-	ctrl.logger.Info("shutting down workers")
+	c.logger.Info("shutting down workers")
 
 	return nil
 }
@@ -156,34 +157,34 @@ func (ctrl *genericTransportController) Run(ctx context.Context, workersCount in
 // runWorker is a long-running function that will continually call the
 // processNextWorkItem function in order to read and process a message on the
 // workqueue.
-func (ctrl *genericTransportController) runWorker(ctx context.Context, workerId int) {
-	for ctrl.processNextWorkItem(ctx, workerId) {
+func (c *genericTransportController) runWorker(ctx context.Context, workerId int) {
+	for c.processNextWorkItem(ctx, workerId) {
 	}
 }
 
 // processNextWorkItem will read a single work item off the workqueue and
 // attempt to process it, by calling the syncHandler.
-func (ctrl *genericTransportController) processNextWorkItem(ctx context.Context, workerID int) bool {
-	obj, shutdown := ctrl.workqueue.Get()
+func (c *genericTransportController) processNextWorkItem(ctx context.Context, workerID int) bool {
+	obj, shutdown := c.workqueue.Get()
 	if shutdown {
 		return false
 	}
 
-	if err := ctrl.process(ctx, obj); err != nil {
-		ctrl.logger.Error(err, "failed to process EdgePlacementDecision object", "objectKey", obj, "workerID", workerID)
+	if err := c.process(ctx, obj); err != nil {
+		c.logger.Error(err, "failed to process EdgePlacementDecision object", "objectKey", obj, "workerID", workerID)
 	} else {
-		ctrl.logger.Info("synced EdgePlacementDecision object successfully.", "objectKey", obj, "workerID", workerID)
+		c.logger.Info("synced EdgePlacementDecision object successfully.", "objectKey", obj, "workerID", workerID)
 	}
 
 	return true
 }
 
-func (ctrl *genericTransportController) process(ctx context.Context, obj interface{}) error {
+func (c *genericTransportController) process(ctx context.Context, obj interface{}) error {
 	// We call Done here so the workqueue knows we have finished processing this item.
 	// We also must remember to call Forget if we do not want this work item being re-queued.
 	// For example, we do not call Forget if a transient error occurs, instead the item is
 	// put back on the workqueue and attempted again after a back-off period.
-	defer ctrl.workqueue.Done(obj)
+	defer c.workqueue.Done(obj)
 	var key string
 	var ok bool
 	// We expect strings to come off the workqueue. These are of the form namespace/name.
@@ -192,7 +193,7 @@ func (ctrl *genericTransportController) process(ctx context.Context, obj interfa
 	if key, ok = obj.(string); !ok {
 		// As the item in the workqueue is actually invalid, we call Forget here else we'd go
 		// into a loop of attempting to process a work item that is invalid.
-		ctrl.workqueue.Forget(obj)
+		c.workqueue.Forget(obj)
 		return fmt.Errorf("expected key from type string in workqueue but got %#v", obj)
 	}
 
@@ -200,29 +201,29 @@ func (ctrl *genericTransportController) process(ctx context.Context, obj interfa
 	if err != nil {
 		// As the item in the workqueue is actually invalid, we call Forget here else we'd go
 		// into a loop of attempting to process a work item that is invalid.
-		ctrl.workqueue.Forget(obj)
+		c.workqueue.Forget(obj)
 		return fmt.Errorf("invalid object key '%s' - %w", key, err)
 	}
 
-	// Run the syncHandler, passing it the object name of the EdgePlacementDecision resource to be synced.
-	if err := ctrl.syncHandler(ctx, objectName); err != nil {
+	// Run the syncHandler, passing it the EdgePlacementDecision object name to be synced.
+	if err := c.syncHandler(ctx, objectName); err != nil {
 		// Put the item back on the workqueue to handle any transient errors.
-		ctrl.workqueue.AddRateLimited(key)
+		c.workqueue.AddRateLimited(key)
 		return fmt.Errorf("failed to process object with key '%s' - %w", key, err)
 	}
 	// Finally, if no error occurs we Forget this item so it does not
 	// get queued again until another change happens.
-	ctrl.workqueue.Forget(obj)
+	c.workqueue.Forget(obj)
 
 	return nil
 }
 
-// syncHandler compares the actual state with the desired, and attempts to converge the two.
+// syncHandler compares the actual state with the desired, and attempts to converge actual state to the desired state.
 // returning an error from this function will result in a requeue of the given object key.
 // therefore, if object shouldn't be requeued, don't return error.
-func (ctrl *genericTransportController) syncHandler(ctx context.Context, objectName string) error {
+func (c *genericTransportController) syncHandler(ctx context.Context, objectName string) error {
 	// Get the EdgePlacementDecision object with this name (from KubeStellar Core Space)
-	edgePlacementDecision, err := ctrl.edgePlacementDecisionLister.Get(objectName)
+	edgePlacementDecision, err := c.edgePlacementDecisionLister.Get(objectName)
 	if err != nil {
 		if errors.IsNotFound(err) { // the object was deleted and it had no finalizer on it. this means transport controller
 			// finished cleanup of wrapped objects from mailbox namespaces. no need to do anything in this state.
@@ -233,10 +234,10 @@ func (ctrl *genericTransportController) syncHandler(ctx context.Context, objectN
 	}
 
 	if isObjectBeingDeleted(edgePlacementDecision) {
-		return ctrl.deleteWrappedObjectsAndFinalizer(ctx, edgePlacementDecision)
+		return c.deleteWrappedObjectsAndFinalizer(ctx, edgePlacementDecision)
 	}
 	// otherwise, object was not deleted and no error occurered while reading provider's copy of the object.
-	return ctrl.updateWrappedObjectsAndFinalizer(ctx, edgePlacementDecision)
+	return c.updateWrappedObjectsAndFinalizer(ctx, edgePlacementDecision)
 }
 
 // isObjectBeingDeleted is a helper function to check if object is being deleted.
@@ -244,87 +245,74 @@ func isObjectBeingDeleted(object metav1.Object) bool {
 	return !object.GetDeletionTimestamp().IsZero()
 }
 
-func (ctrl *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, edgePlacementDecision *v2alpha1.EdgePlacementDecision) error {
+func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, edgePlacementDecision *v2alpha1.EdgePlacementDecision) error {
 	_, originEdgePlacementDecisionName, kbSpaceID, err := kbuser.AnalyzeObjectID(edgePlacementDecision)
 	if err != nil {
 		return fmt.Errorf("object does not appear to be a provider's copy of a consumer's object - %w", err)
 	}
 
-	emptyWrappedObject := ctrl.transport.WrapObjects(make([]*unstructured.Unstructured, 0))
-	// wrapped object name is identical to the kube-bind copy of EdgePlacementDecision object name, see explanation in the updateWrappedObject function
-	emptyWrappedObject.SetName(edgePlacementDecision.GetName())
-
-	for _, destination := range edgePlacementDecision.Spec.Destinations {
-		emptyWrappedObject.SetNamespace(destination.Namespace) // TODO need to revisit the destination struct and see how to get namespace from it properly
-		if err := ctrl.transportSpaceClient.Delete(ctx, emptyWrappedObject); err != nil {
+	for _, destination := range edgePlacementDecision.Spec.Destinations { // TODO need to revisit the destination struct and see how to use it properly
+		if err := c.transportSpaceClient.Resource(c.transportWrappedObjectGVR).Namespace(destination.Namespace).Delete(ctx, edgePlacementDecision.GetName(),
+			metav1.DeleteOptions{}); err != nil { // wrapped object name is identical to kube-bind copy of the EdgePlacementDecision object. see updateWrappedObject func for explanation.
 			if !strings.HasSuffix(err.Error(), notFoundErrorSuffix) { // if object is already not there, we do not report an error cause desired state was achieved.
 				return fmt.Errorf("failed to delete wrapped object '%s' in destination WEC with namespace '%s' - %w", edgePlacementDecision.GetName(), destination.Namespace, err)
 			}
 		}
 	}
 
-	if err := ctrl.removeFinalizerFromOriginEdgePlacementDecision(ctx, originEdgePlacementDecisionName, kbSpaceID); err != nil {
+	if err := c.removeFinalizerFromOriginEdgePlacementDecision(ctx, originEdgePlacementDecisionName, kbSpaceID); err != nil {
 		return fmt.Errorf("failed to remove finalizer from EdgePlacementDecision object '%s' - %w", originEdgePlacementDecisionName, err)
 	}
 
 	return nil
 }
 
-func (ctrl *genericTransportController) removeFinalizerFromOriginEdgePlacementDecision(ctx context.Context, originEdgePlacementDecisionName string, kbSpaceID string) error {
-	return ctrl.updateOriginEdgePlacementDecision(ctx, originEdgePlacementDecisionName, kbSpaceID, func(edgePlacementDecision *v2alpha1.EdgePlacementDecision) bool {
+func (c *genericTransportController) removeFinalizerFromOriginEdgePlacementDecision(ctx context.Context, originEdgePlacementDecisionName string, kbSpaceID string) error {
+	return c.updateOriginEdgePlacementDecision(ctx, originEdgePlacementDecisionName, kbSpaceID, func(edgePlacementDecision *v2alpha1.EdgePlacementDecision) bool {
 		return removeFinalizer(edgePlacementDecision, transportFinalizer)
 	})
 }
 
-func (ctrl *genericTransportController) addFinalizerToOriginEdgePlacementDecision(ctx context.Context, originEdgePlacementDecisionName string, kbSpaceID string) error {
-	return ctrl.updateOriginEdgePlacementDecision(ctx, originEdgePlacementDecisionName, kbSpaceID, func(edgePlacementDecision *v2alpha1.EdgePlacementDecision) bool {
+func (c *genericTransportController) addFinalizerToOriginEdgePlacementDecision(ctx context.Context, originEdgePlacementDecisionName string, kbSpaceID string) error {
+	return c.updateOriginEdgePlacementDecision(ctx, originEdgePlacementDecisionName, kbSpaceID, func(edgePlacementDecision *v2alpha1.EdgePlacementDecision) bool {
 		return addFinalizer(edgePlacementDecision, transportFinalizer)
 	})
 }
 
-func (ctrl *genericTransportController) updateWrappedObjectsAndFinalizer(ctx context.Context, edgePlacementDecision *v2alpha1.EdgePlacementDecision) error {
+func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx context.Context, edgePlacementDecision *v2alpha1.EdgePlacementDecision) error {
 	_, originEdgePlacementDecisionName, kbSpaceID, err := kbuser.AnalyzeObjectID(edgePlacementDecision)
 	if err != nil {
 		return fmt.Errorf("object does not appear to be a provider's copy of a consumer's object - %w", err)
 	}
 
-	if err := ctrl.addFinalizerToOriginEdgePlacementDecision(ctx, originEdgePlacementDecisionName, kbSpaceID); err != nil {
+	if err := c.addFinalizerToOriginEdgePlacementDecision(ctx, originEdgePlacementDecisionName, kbSpaceID); err != nil {
 		return fmt.Errorf("failed to add finalizer to EdgePlacementDecision object '%s' - %w", originEdgePlacementDecisionName, err)
 	}
 
-	objectsToPropagate, err := ctrl.getObjectsFromOriginWDS(ctx, kbSpaceID, edgePlacementDecision)
+	objectsToPropagate, err := c.getObjectsFromOriginWDS(ctx, kbSpaceID, edgePlacementDecision)
 	if err != nil {
 		return fmt.Errorf("failed to get objects to propagate to WECs from EdgePlacementDecision object '%s' - %w", edgePlacementDecision.GetName(), err)
 	}
 
-	wrappedObject := ctrl.transport.WrapObjects(objectsToPropagate)
+	wrappedObject := c.transport.WrapObjects(objectsToPropagate)
 	// wrapped object name is identical to the kube-bind EdgePlacementDecision object name
-	// need to pay attention - we cannot use the origin EdgePlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
+	// pay attention - we cannot use the origin EdgePlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
 	// we use the kube-bind object name to assure name uniqueness,
 	// in order to get the originEdgePlacementDecision object name and kbSpaceID from the wrapped object, one can use the above `kbuser.analyzeObjectID` func.
 	wrappedObject.SetName(edgePlacementDecision.GetName())
 
-	for _, destination := range edgePlacementDecision.Spec.Destinations {
-		wrappedObject.SetNamespace(destination.Namespace) // TODO need to revisit the destination struct and see how to use it properly
-		objectBytes, err := wrappedObject.MarshalJSON()
-		if err != nil {
-			return fmt.Errorf("failed to marshal wrapped object '%s' - %w", edgePlacementDecision.GetName(), err)
-		}
-		forceChanges := true
-		if err := ctrl.transportSpaceClient.Patch(ctx, wrappedObject, client.RawPatch(types.ApplyPatchType, objectBytes), &client.PatchOptions{
-			FieldManager: controllerName,
-			Force:        &forceChanges,
-		}); err != nil {
-			return fmt.Errorf("failed to update wrapped object '%s' in destination WEC with namespace '%s' - %w", edgePlacementDecision.GetName(), destination.Namespace, err)
+	for _, destination := range edgePlacementDecision.Spec.Destinations { // TODO need to revisit the destination struct and see how to use it properly
+		if err := c.createOrUpdateWrappedObject(ctx, destination.Namespace, wrappedObject); err != nil {
+			return fmt.Errorf("failed to propagate wrapped object '%s' to all required WECs - %w", wrappedObject.GetName(), err)
 		}
 	}
 
 	return nil
 }
 
-func (ctrl *genericTransportController) getObjectsFromOriginWDS(ctx context.Context, kbSpaceID string,
+func (c *genericTransportController) getObjectsFromOriginWDS(ctx context.Context, kbSpaceID string,
 	edgePlacementDecision *v2alpha1.EdgePlacementDecision) ([]*unstructured.Unstructured, error) {
-	spaceConfig, err := ctrl.getOriginSpaceConfig(kbSpaceID)
+	spaceConfig, err := c.getOriginSpaceConfig(kbSpaceID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get space config of WDS from kube-bind space id '%s' - %w", kbSpaceID, err)
 	}
@@ -340,7 +328,6 @@ func (ctrl *genericTransportController) getObjectsFromOriginWDS(ctx context.Cont
 		if clusterScopedObject.Objects == nil {
 			continue // no objects from this gvr, skip
 		}
-		// TODO we should use k8s runtime gvr directly in clusterScoped Object struct! do not inherit from existing code this unless there is good reason for that.
 		gvr := schema.GroupVersionResource{Group: clusterScopedObject.Group, Version: clusterScopedObject.APIVersion, Resource: clusterScopedObject.Resource}
 		for _, objectName := range clusterScopedObject.Objects {
 			object, err := dynamicClient.Resource(gvr).Get(ctx, objectName, metav1.GetOptions{})
@@ -352,7 +339,6 @@ func (ctrl *genericTransportController) getObjectsFromOriginWDS(ctx context.Cont
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, namespaceScopedObject := range edgePlacementDecision.Spec.Workload.NamespaceScope {
-		// TODO we should use k8s runtime gvr directly in namespaceScoped Object struct! do not inherit from existing code this unless there is good reason for that.
 		gvr := schema.GroupVersionResource{Group: namespaceScopedObject.Group, Version: namespaceScopedObject.APIVersion, Resource: namespaceScopedObject.Resource}
 		for _, objectsByNamespace := range namespaceScopedObject.ObjectsByNamespace {
 			if objectsByNamespace.Names == nil {
@@ -371,13 +357,29 @@ func (ctrl *genericTransportController) getObjectsFromOriginWDS(ctx context.Cont
 	return objectsToPropagate, nil
 }
 
+func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Context, namespace string, wrappedObject *unstructured.Unstructured) error {
+	_, err := c.transportSpaceClient.Resource(c.transportWrappedObjectGVR).Namespace(namespace).Create(ctx, wrappedObject, metav1.CreateOptions{})
+	if err != nil {
+		if !strings.HasSuffix(err.Error(), alreadyExistsErrorSuffix) { // if object is already there, we need to use update. otherwise report an error.
+			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC with namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
+		}
+		// if we reached here, create had an error that object already exists. try update object instead.
+		_, err = c.transportSpaceClient.Resource(c.transportWrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to update wrapped object '%s' in destination WEC with namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
+		}
+	}
+
+	return nil
+}
+
 // updateObjectFunc is a function that updates the given object. returns true if object was updated, otherwise false.
 type updateObjectFunc func(*v2alpha1.EdgePlacementDecision) bool
 
 // pay attention that given edgePlacementDecision is the kube-bind provider's copy of the original object from WDS.
-func (ctrl *genericTransportController) updateOriginEdgePlacementDecision(ctx context.Context, originEdgePlacementDecisionName string, kbSpaceID string,
+func (c *genericTransportController) updateOriginEdgePlacementDecision(ctx context.Context, originEdgePlacementDecisionName string, kbSpaceID string,
 	updateObjectFunc updateObjectFunc) error {
-	spaceConfig, err := ctrl.getOriginSpaceConfig(kbSpaceID)
+	spaceConfig, err := c.getOriginSpaceConfig(kbSpaceID)
 	if err != nil {
 		return fmt.Errorf("failed to get config for space from consumer space ID - %w", err)
 	}
@@ -404,13 +406,13 @@ func (ctrl *genericTransportController) updateOriginEdgePlacementDecision(ctx co
 	return nil
 }
 
-func (ctrl *genericTransportController) getOriginSpaceConfig(kbSpaceID string) (*rest.Config, error) {
-	spaceID := ctrl.kubeBindSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
+func (c *genericTransportController) getOriginSpaceConfig(kbSpaceID string) (*rest.Config, error) {
+	spaceID := c.kubeBindSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
 	if spaceID == "" {
 		return nil, fmt.Errorf("failed to get consumer space ID from a provider's copy")
 	}
 
-	spaceConfig, err := ctrl.spaceManagementClient.ConfigForSpace(spaceID, ctrl.spaceProviderNs)
+	spaceConfig, err := c.spaceManagementClient.ConfigForSpace(spaceID, c.spaceProviderNs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get config for space from consumer space ID - %w", err)
 	}
