@@ -154,7 +154,7 @@ func (c *genericTransportController) enqueueEdgePlacementDecision(obj interface{
 	var key string
 	var err error
 	if key, err = cache.MetaNamespaceKeyFunc(obj); err != nil {
-		c.logger.Error(err, "failed to extract key from EdgePlacementDecision object")
+		c.logger.Error(err, "failed to enqueue EdgePlacementDecision object")
 		return
 	}
 
