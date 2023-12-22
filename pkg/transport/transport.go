@@ -21,7 +21,6 @@ import (
 )
 
 type Transport interface {
-	InformerSynced() bool
 	// WrapObjects gets slice of objects and should wrap them into a single wrapped object returned as unstructured.
 	// In case slice is empty, the function should return an empty wrapped object.
 	WrapObjects([]*unstructured.Unstructured) *unstructured.Unstructured
