@@ -25,16 +25,3 @@ type Transport interface {
 	// In case slice is empty, the function should return an empty wrapped object.
 	WrapObjects([]*unstructured.Unstructured) *unstructured.Unstructured
 }
-
-// TODO
-// Transport specific should create informer for the specific wrapped object (e.g., ocm should create informer for ManifestWork)
-// then, upon a reconciliation event for WrappedObject, transport specific should parse the name of the edgePlacementDecision object and
-// make sure it's pushed to the generic transport controller work queue.
-
-// explanation - let's assume transport controller works perfect and creates manifest work objects as a result of edge placement decision.
-// somehow the manifest work object in one of the WECs namespaces was updated/deleted - the transport controller should get the event for the
-// edge placement decision, recalculate what's needed and override the changes.
-
-// therefore, transport specific should supply a function that it's informer was synced and it's ready.
-// we will need an additional function(s) for using wrapped object (e.g, manifest work) lister, to get the concrete object and parse from it
-// the edge placement decision object name. edge placement decision should be written in the wrapped objects either as annotation, or any other alternative.
