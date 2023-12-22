@@ -32,6 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	cacheddiscovery "k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
@@ -62,16 +63,21 @@ func NewTransportController(ctx context.Context, edgePlacementDecisionInformer e
 	if err != nil {
 		return nil, fmt.Errorf("failed to create dynamic k8s clientset for transport space - %w", err)
 	}
+
 	wrappedObjectGVK := transport.WrapObjects(make([]*unstructured.Unstructured, 0)).GroupVersionKind() // empty wrapped object to get GVK from it.
 	wrappedObjectGVR, err := getGvrFromGvk(transportSpaceConfig, wrappedObjectGVK)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get transport wrapped object GVR - %w", err)
 	}
 
+	dynamicInformer := dynamicinformer.NewDynamicSharedInformerFactory(transportSpaceDynamicClient, 0)
+	wrappedObjectGenericInformer := dynamicInformer.ForResource(*wrappedObjectGVR)
+
 	transportController := &genericTransportController{
 		logger:                              klog.FromContext(ctx).WithName(controllerName),
 		edgePlacementDecisionLister:         edgePlacementDecisionInformer.Lister(),
 		edgePlacementDecisionInformerSynced: edgePlacementDecisionInformer.Informer().HasSynced,
+		wrappedObjectInformerSynced:         wrappedObjectGenericInformer.Informer().HasSynced,
 		workqueue:                           workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
 		transport:                           transport,
 		kubeBindSpaceRelation:               kubeBindSpaceRelation,
@@ -84,20 +90,19 @@ func NewTransportController(ctx context.Context, edgePlacementDecisionInformer e
 	transportController.logger.Info("Setting up event handlers")
 	// Set up an event handler for when EdgePlacementDecision resources change
 	edgePlacementDecisionInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: transportController.enqueueEdgePlacementDecision,
-		UpdateFunc: func(_, new interface{}) {
-			transportController.enqueueEdgePlacementDecision(new)
-		},
+		AddFunc:    transportController.enqueueEdgePlacementDecision,
+		UpdateFunc: func(_, new interface{}) { transportController.enqueueEdgePlacementDecision(new) },
 		DeleteFunc: transportController.enqueueEdgePlacementDecision,
 	})
-
-	// Set up an event handler for when WrappedObject resources change. This handler will lookup the origin EdgePlacementDecision
+	// Set up event handlers for when WrappedObject resources change. The handlers will lookup the origin EdgePlacementDecision
 	// of the given WrappedObject and enqueue that EdgePlacementDecision resource for processing.
-	// This way, we don't need to implement custom logic for handling WrappedObjects resources. More info on this pattern:
+	// This way, we don't need to implement custom logic for handling WrappedObject resources. More info on this pattern:
 	// https://github.com/kubernetes/community/blob/8cafef897a22026d42f5e5bb3f104febe7e29830/contributors/devel/controllers.md
-
-	// TODO transport.SetupEventHandlers()
-	// (we should have another entry point for the transport specific)
+	wrappedObjectGenericInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    transportController.handleWrappedObject,
+		UpdateFunc: func(_, new interface{}) { transportController.handleWrappedObject(new) },
+		DeleteFunc: transportController.handleWrappedObject,
+	})
 
 	return transportController, nil
 }
@@ -123,10 +128,12 @@ type genericTransportController struct {
 
 	edgePlacementDecisionLister         edgev2alpha1listers.EdgePlacementDecisionLister
 	edgePlacementDecisionInformerSynced cache.InformerSynced
+	wrappedObjectInformerSynced         cache.InformerSynced
 
-	// workqueue is a rate limited work queue. This is used to queue work to be processed instead of performing it as soon as a change happens.
-	// This means we can ensure we only process a fixed amount of resources at a time, and makes it easy to ensure we are never processing the same item
-	// simultaneously in two different workers.
+	// workqueue is a rate limited work queue.
+	// This is used to queue work to be processed instead of performing it as soon as a change happens.
+	// This means we can ensure we only process a fixed amount of resources at a time, and makes it
+	// easy to ensure we are never processing the same item simultaneously in two different workers.
 	workqueue workqueue.RateLimitingInterface
 
 	//transport is a specific implementation for the transport interface.
@@ -140,16 +147,42 @@ type genericTransportController struct {
 	wrappedObjectGVR     schema.GroupVersionResource
 }
 
-// enqueueEdgePlacementDecision takes an EdgePlacementDecision resource and converts it into a namespace/name
-// string which is then put onto the work queue. This method should *not* be passed resources of any type other than EdgePlacementDecision.
+// enqueueEdgePlacementDecision takes an EdgePlacementDecision resource and
+// converts it into a namespace/name string which is put onto the workqueue.
+// This func *shouldn't* handle any resource other than EdgePlacementDecision.
 func (c *genericTransportController) enqueueEdgePlacementDecision(obj interface{}) {
 	var key string
 	var err error
 	if key, err = cache.MetaNamespaceKeyFunc(obj); err != nil {
-		c.logger.Error(err, "failed to enqueue EdgePlacementDecision object")
+		c.logger.Error(err, "failed to extract key from EdgePlacementDecision object")
 		return
 	}
+
 	c.workqueue.Add(key)
+}
+
+// handleWrappedObject takes transport-specific wrapped object resource,
+// extracts the origin EdgePlacementDecision of the given wrapped object and
+// enqueue that EdgePlacementDecision resource for processing. This way, we
+// don't need to implement custom logic for handling WrappedObject resources.
+// More info on this pattern here:
+// https://github.com/kubernetes/community/blob/8cafef897a22026d42f5e5bb3f104febe7e29830/contributors/devel/controllers.md
+func (c *genericTransportController) handleWrappedObject(obj interface{}) {
+	var key string
+	var err error
+	if key, err = cache.MetaNamespaceKeyFunc(obj); err != nil {
+		c.logger.Error(err, "failed to extract key from transport wrapped object")
+		return
+	}
+	_, ownerEdgePlacementDecisionObjectName, err := cache.SplitMetaNamespaceKey(key)
+	if err != nil {
+		c.logger.Error(err, "failed to split transport wrapped object key to name/namespace")
+		return
+	}
+	// enqueue EdgePlacementDecision object name to trigger reconciliation.
+	// if wrapped object was created not as a result of EdgePlacementDecision,
+	// this key won't be found when quering API server and nothing will happen.
+	c.workqueue.Add(ownerEdgePlacementDecisionObjectName)
 }
 
 // Run will set up the event handlers for types we are interested in, as well
@@ -165,7 +198,7 @@ func (c *genericTransportController) Run(ctx context.Context, workersCount int) 
 	// Wait for the caches to be synced before starting workers
 	c.logger.Info("waiting for informer caches to sync")
 
-	if ok := cache.WaitForCacheSync(ctx.Done(), c.transport.InformerSynced, c.edgePlacementDecisionInformerSynced); !ok {
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.edgePlacementDecisionInformerSynced, c.wrappedObjectInformerSynced); !ok {
 		return fmt.Errorf("failed to wait for caches to sync")
 	}
 
@@ -404,7 +437,6 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 // updateObjectFunc is a function that updates the given object. returns true if object was updated, otherwise false.
 type updateObjectFunc func(*v2alpha1.EdgePlacementDecision) bool
 
-// pay attention that given edgePlacementDecision is the kube-bind provider's copy of the original object from WDS.
 func (c *genericTransportController) updateOriginEdgePlacementDecision(ctx context.Context, originEdgePlacementDecisionName string, kbSpaceID string,
 	updateObjectFunc updateObjectFunc) error {
 	spaceConfig, err := c.getOriginSpaceConfig(kbSpaceID)
