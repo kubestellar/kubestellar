@@ -307,7 +307,7 @@ func isObjectBeingDeleted(object metav1.Object) bool {
 }
 
 func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, edgePlacementDecision *v2alpha1.EdgePlacementDecision) error {
-	_, originEdgePlacementDecisionName, kbSpaceID, err := kbuser.AnalyzeObjectID(edgePlacementDecision)
+	originEdgePlacementDecisionName, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(edgePlacementDecision)
 	if err != nil {
 		return fmt.Errorf("object does not appear to be a provider's copy of a consumer's object - %w", err)
 	}
@@ -341,7 +341,7 @@ func (c *genericTransportController) addFinalizerToOriginEdgePlacementDecision(c
 }
 
 func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx context.Context, edgePlacementDecision *v2alpha1.EdgePlacementDecision) error {
-	_, originEdgePlacementDecisionName, kbSpaceID, err := kbuser.AnalyzeObjectID(edgePlacementDecision)
+	originEdgePlacementDecisionName, kbSpaceID, err := kbuser.AnalyzeClusterScopedObject(edgePlacementDecision)
 	if err != nil {
 		return fmt.Errorf("object does not appear to be a provider's copy of a consumer's object - %w", err)
 	}
