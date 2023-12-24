@@ -17,10 +17,11 @@ limitations under the License.
 package ocm
 
 import (
+	workv1 "open-cluster-management.io/api/work/v1"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	workv1 "open-cluster-management.io/api/work/v1"
 
 	"github.com/kubestellar/kubestellar/pkg/transport"
 )
