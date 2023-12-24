@@ -113,14 +113,11 @@ func NewTransportController(ctx context.Context, edgePlacementDecisionInformer e
 }
 
 func convertObjectToUnstructured(object runtime.Object) (*unstructured.Unstructured, error) {
-	unstructured := &unstructured.Unstructured{}
-	var err error
-	unstructured.Object, err = runtime.DefaultUnstructuredConverter.ToUnstructured(object)
+	unstructuredObject, err := runtime.DefaultUnstructuredConverter.ToUnstructured(object)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert given object to unstructured - %w", err)
 	}
-
-	return unstructured, nil
+	return &unstructured.Unstructured{Object: unstructuredObject}, nil
 }
 
 func getGvrFromGvk(spaceConfig *rest.Config, gvk schema.GroupVersionKind) (*schema.GroupVersionResource, error) {
