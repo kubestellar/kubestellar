@@ -108,6 +108,7 @@ func NewTransportController(ctx context.Context, edgePlacementDecisionInformer e
 		UpdateFunc: func(_, new interface{}) { transportController.handleWrappedObject(new) },
 		DeleteFunc: transportController.handleWrappedObject,
 	})
+	dynamicInformer.Start(ctx.Done())
 
 	return transportController, nil
 }
