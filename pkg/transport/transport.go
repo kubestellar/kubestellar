@@ -21,7 +21,7 @@ import (
 )
 
 type Transport interface {
-	// WrapObjects gets slice of objects and should wrap them into a single wrapped object returned as unstructured.
+	// WrapObjects gets slice of objects and wraps them into a single wrapped object returned as unstructured.
 	// In case slice is empty, the function should return an empty wrapped object.
-	WrapObjects([]*unstructured.Unstructured) *unstructured.Unstructured
+	WrapObjects(objects []*unstructured.Unstructured) *unstructured.Unstructured
 }
