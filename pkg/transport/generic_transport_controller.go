@@ -200,8 +200,8 @@ func (c *genericTransportController) handleWrappedObject(obj interface{}) {
 }
 
 // Run will set up the event handlers for types we are interested in, as well
-// as syncing informer caches and starting workers. It will block until stopCh
-// is closed, at which point it will shutdown the workqueue and wait for
+// as syncing informer caches and starting workers. It will block until context
+// is cancelled, at which point it will shutdown the workqueue and wait for
 // workers to finish processing their current work items.
 func (c *genericTransportController) Run(ctx context.Context, workersCount int) error {
 	defer utilruntime.HandleCrash()
