@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -64,8 +65,12 @@ func NewTransportController(ctx context.Context, edgePlacementDecisionInformer e
 		return nil, fmt.Errorf("failed to create dynamic k8s clientset for transport space - %w", err)
 	}
 
-	wrappedObjectGVK := transport.WrapObjects(make([]*unstructured.Unstructured, 0)).GroupVersionKind() // empty wrapped object to get GVK from it.
-	wrappedObjectGVR, err := getGvrFromGvk(transportSpaceConfig, wrappedObjectGVK)
+	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVK from it.
+	unstructuredWrappedObject, err := convertObjectToUnstructured(emptyWrappedObject)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create empty wrapped object - %w", err)
+	}
+	wrappedObjectGVR, err := getGvrFromGvk(transportSpaceConfig, unstructuredWrappedObject.GroupVersionKind())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get transport wrapped object GVR - %w", err)
 	}
@@ -103,8 +108,17 @@ func NewTransportController(ctx context.Context, edgePlacementDecisionInformer e
 		UpdateFunc: func(_, new interface{}) { transportController.handleWrappedObject(new) },
 		DeleteFunc: transportController.handleWrappedObject,
 	})
+	dynamicInformer.Start(ctx.Done())
 
 	return transportController, nil
+}
+
+func convertObjectToUnstructured(object runtime.Object) (*unstructured.Unstructured, error) {
+	unstructuredObject, err := runtime.DefaultUnstructuredConverter.ToUnstructured(object)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert given object to unstructured - %w", err)
+	}
+	return &unstructured.Unstructured{Object: unstructuredObject}, nil
 }
 
 func getGvrFromGvk(spaceConfig *rest.Config, gvk schema.GroupVersionKind) (*schema.GroupVersionResource, error) {
@@ -355,7 +369,10 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 		return fmt.Errorf("failed to get objects to propagate to WECs from EdgePlacementDecision object '%s' - %w", edgePlacementDecision.GetName(), err)
 	}
 
-	wrappedObject := c.transport.WrapObjects(objectsToPropagate)
+	wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(objectsToPropagate))
+	if err != nil {
+		return fmt.Errorf("failed to wrap objects to a single wrapped object - %w", err)
+	}
 	// wrapped object name is identical to the kube-bind EdgePlacementDecision object name
 	// pay attention - we cannot use the origin EdgePlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
 	// we use the kube-bind object name to assure name uniqueness,
