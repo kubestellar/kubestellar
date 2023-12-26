@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package cmd
 
 import (
 	"context"
@@ -48,9 +48,6 @@ const (
 	defaultResyncPeriod             = time.Duration(0)
 	defaultConcurrency              = 4
 	defaultMetricsServerBindAddress = ":10472"
-	defaultKubestellarCoreSpaceName = "espw"
-	defaultTransportSpaceName       = "transport"
-	defaultSpaceProviderObjectName  = "default"
 	defaultExternalAccess           = false
 )
 
@@ -61,10 +58,10 @@ func parseArguments(fs *pflag.FlagSet) (concurrency int, metricsServerBindAddres
 	fs.AddGoFlagSet(flag.CommandLine)
 	fs.IntVar(&concurrency, "concurrency", defaultConcurrency, "number of concurrent workers to run in parallel")
 	fs.Var(&utilflag.IPPortVar{Val: &metricsServerBindAddress}, "metrics-server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
-	fs.StringVar(&kcsName, "core-space", defaultKubestellarCoreSpaceName, "the name of the KubeStellar core space")
-	fs.StringVar(&transportSpaceName, "transport-space", defaultTransportSpaceName, "the name of the transport space")
+	fs.StringVar(&kcsName, "core-space", "espw", "the name of the KubeStellar core space")
+	fs.StringVar(&transportSpaceName, "transport-space", "transport", "the name of the transport space")
 	fs.BoolVar(&externalAccess, "external-access", defaultExternalAccess, "the access to the spaces. True when the space-provider is hosted in a space while the controller is running outside of that space")
-	fs.StringVar(&spaceProvider, "space-provider", defaultSpaceProviderObjectName, "the name of the KubeStellar space provider")
+	fs.StringVar(&spaceProvider, "space-provider", "default", "the name of the KubeStellar space provider")
 	spaceMgtOpts = clientopts.NewClientOpts("space-mgt", "access to the space reference space")
 	spaceMgtOpts.AddFlags(fs)
 
