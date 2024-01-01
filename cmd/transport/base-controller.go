@@ -19,6 +19,7 @@ package cmd
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -70,8 +71,9 @@ func Run(transportImplementation transport.Transport) {
 	fs.AddGoFlagSet(flag.CommandLine)
 	options.AddFlags(fs)
 	fs.Parse(os.Args[1:])
+
 	fs.VisitAll(func(flg *pflag.Flag) {
-		logger.Info("Command line flag", flg.Name, flg.Value) // log all arguments
+		logger.Info(fmt.Sprintf("Command line flag '%s' - value '%s'", flg.Name, flg.Value)) // log all arguments
 	})
 
 	startMetricsServer(options.MetricsServerBindAddress, logger)
