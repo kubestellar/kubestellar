@@ -32,9 +32,8 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/klog/v2"
-	utilflag "k8s.io/kubernetes/pkg/util/flag"
 
-	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
+	transportoptions "github.com/kubestellar/kubestellar/cmd/transport/options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
@@ -44,31 +43,9 @@ import (
 )
 
 const (
-	transportControllerName         = "transport-controller"
-	defaultResyncPeriod             = time.Duration(0)
-	defaultConcurrency              = 4
-	defaultMetricsServerBindAddress = ":10472"
-	defaultExternalAccess           = false
+	transportControllerName = "transport-controller"
+	defaultResyncPeriod     = time.Duration(0)
 )
-
-func parseArguments(fs *pflag.FlagSet) (concurrency int, metricsServerBindAddress string, kcsName string, transportSpaceName string,
-	externalAccess bool, spaceProvider string, spaceMgtOpts *clientopts.ClientOpts) {
-	metricsServerBindAddress = defaultMetricsServerBindAddress
-	klog.InitFlags(flag.CommandLine)
-	fs.AddGoFlagSet(flag.CommandLine)
-	fs.IntVar(&concurrency, "concurrency", defaultConcurrency, "number of concurrent workers to run in parallel")
-	fs.Var(&utilflag.IPPortVar{Val: &metricsServerBindAddress}, "metrics-server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
-	fs.StringVar(&kcsName, "core-space", "espw", "the name of the KubeStellar core space")
-	fs.StringVar(&transportSpaceName, "transport-space", "transport", "the name of the transport space")
-	fs.BoolVar(&externalAccess, "external-access", defaultExternalAccess, "the access to the spaces. True when the space-provider is hosted in a space while the controller is running outside of that space")
-	fs.StringVar(&spaceProvider, "space-provider", "default", "the name of the KubeStellar space provider")
-	spaceMgtOpts = clientopts.NewClientOpts("space-mgt", "access to the space reference space")
-	spaceMgtOpts.AddFlags(fs)
-
-	fs.Parse(os.Args[1:])
-
-	return
-}
 
 func startMetricsServer(serverBindAddress string, logger logr.Logger) {
 	mymux := mux.NewPathRecorderMux(transportControllerName)
@@ -87,37 +64,41 @@ func Run(transportImplementation transport.Transport) {
 	logger := klog.Background().WithName(transportControllerName)
 	ctx := klog.NewContext(context.Background(), logger)
 
+	options := transportoptions.NewOptions()
 	fs := pflag.NewFlagSet(transportControllerName, pflag.ExitOnError)
-	concurrency, metricsServerBindAddress, kcsName, transportSpaceName, externalAccess, spaceProvider, spaceMgtOpts := parseArguments(fs)
+	klog.InitFlags(flag.CommandLine)
+	fs.AddGoFlagSet(flag.CommandLine)
+	options.AddFlags(fs)
+	fs.Parse(os.Args[1:])
 	fs.VisitAll(func(flg *pflag.Flag) {
 		logger.Info("Command line flag", flg.Name, flg.Value) // log all arguments
 	})
 
-	startMetricsServer(metricsServerBindAddress, logger)
+	startMetricsServer(options.MetricsServerBindAddress, logger)
 
 	// create space-aware client
-	spaceManagementConfig, err := spaceMgtOpts.ToRESTConfig()
+	spaceManagementConfig, err := options.SpaceMgtClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "Failed to create space management API client config from flags")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
-	spaceclient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig, externalAccess)
+	spaceclient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig, options.ExternalAccess)
 	if err != nil {
 		logger.Error(err, "Failed to create space-aware client")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
-	spaceProviderNs := spacemanager.ProviderNS(spaceProvider)
+	spaceProviderNs := spacemanager.ProviderNS(options.SpaceProviderObjectName)
 
-	kubestellarCoreSpaceConfig, err := spaceclient.ConfigForSpace(kcsName, spaceProviderNs)
+	kubestellarCoreSpaceConfig, err := spaceclient.ConfigForSpace(options.KubestellarCoreSpaceName, spaceProviderNs)
 	if err != nil {
-		logger.Error(err, "Failed to construct kubestellar core space config", "spacename", kcsName)
+		logger.Error(err, "Failed to construct kubestellar core space config", "spacename", options.KubestellarCoreSpaceName)
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 	kubestellarCoreSpaceConfig.UserAgent = transportControllerName
 
-	transportSpaceConfig, err := spaceclient.ConfigForSpace(transportSpaceName, spaceProviderNs)
+	transportSpaceConfig, err := spaceclient.ConfigForSpace(options.TransportSpaceName, spaceProviderNs)
 	if err != nil {
-		logger.Error(err, "Failed to construct transport space config", "spacename", transportSpaceName)
+		logger.Error(err, "Failed to construct transport space config", "spacename", options.TransportSpaceName)
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
@@ -144,7 +125,7 @@ func Run(transportImplementation transport.Transport) {
 	// Start method is non-blocking and runs all registered informers in a dedicated goroutine.
 	edgeSharedInformerFactory.Start(ctx.Done())
 
-	if err := transportController.Run(ctx, concurrency); err != nil {
+	if err := transportController.Run(ctx, options.Concurrency); err != nil {
 		logger.Error(err, "failed to run transport controller")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
