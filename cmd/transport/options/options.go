@@ -19,14 +19,11 @@ package options
 import (
 	"github.com/spf13/pflag"
 
-	utilflag "k8s.io/kubernetes/pkg/util/flag"
-
 	clientoptions "github.com/kubestellar/kubestellar/pkg/client-options"
 )
 
 const (
 	defaultConcurrency              = 4
-	defaultMetricsServerBindAddress = ":10472"
 	defaultKubestellarCoreSpaceName = "espw"
 	defaultTransportSpaceName       = "transport"
 	defaultSpaceProviderObjectName  = "default"
@@ -35,7 +32,6 @@ const (
 
 type Options struct {
 	Concurrency              int
-	MetricsServerBindAddress string
 	KubestellarCoreSpaceName string
 	TransportSpaceName       string
 	SpaceProviderObjectName  string
@@ -46,7 +42,6 @@ type Options struct {
 func NewOptions() *Options {
 	return &Options{
 		Concurrency:              defaultConcurrency,
-		MetricsServerBindAddress: defaultMetricsServerBindAddress,
 		KubestellarCoreSpaceName: defaultKubestellarCoreSpaceName,
 		TransportSpaceName:       defaultTransportSpaceName,
 		SpaceProviderObjectName:  defaultSpaceProviderObjectName,
@@ -57,7 +52,6 @@ func NewOptions() *Options {
 
 func (options *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.IntVar(&options.Concurrency, "concurrency", options.Concurrency, "number of concurrent workers to run in parallel")
-	fs.Var(&utilflag.IPPortVar{Val: &options.MetricsServerBindAddress}, "metrics-server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 	fs.StringVar(&options.KubestellarCoreSpaceName, "core-space", options.KubestellarCoreSpaceName, "the name of the KubeStellar core space")
 	fs.StringVar(&options.TransportSpaceName, "transport-space", options.TransportSpaceName, "the name of the transport space")
 	fs.StringVar(&options.SpaceProviderObjectName, "space-provider", options.SpaceProviderObjectName, "the name of the KubeStellar space provider")

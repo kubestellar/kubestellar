@@ -20,18 +20,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
 
-	"github.com/go-logr/logr"
 	"github.com/spf13/pflag"
 
-	"k8s.io/apiserver/pkg/server/mux"
-	"k8s.io/apiserver/pkg/server/routes"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/klog/v2"
 
 	transportoptions "github.com/kubestellar/kubestellar/cmd/transport/options"
@@ -48,19 +43,6 @@ const (
 	defaultResyncPeriod     = time.Duration(0)
 )
 
-func startMetricsServer(serverBindAddress string, logger logr.Logger) {
-	mymux := mux.NewPathRecorderMux(transportControllerName)
-	mymux.Handle("/metrics", legacyregistry.Handler())
-	routes.Profiling{}.Install(mymux)
-	go func() {
-		err := http.ListenAndServe(serverBindAddress, mymux)
-		if err != nil {
-			logger.Error(err, "Failure in web serving")
-			klog.FlushAndExit(klog.ExitFlushTimeout, 1)
-		}
-	}()
-}
-
 func Run(transportImplementation transport.Transport) {
 	logger := klog.Background().WithName(transportControllerName)
 	ctx := klog.NewContext(context.Background(), logger)
@@ -75,8 +57,6 @@ func Run(transportImplementation transport.Transport) {
 	fs.VisitAll(func(flg *pflag.Flag) {
 		logger.Info(fmt.Sprintf("Command line flag '%s' - value '%s'", flg.Name, flg.Value)) // log all arguments
 	})
-
-	startMetricsServer(options.MetricsServerBindAddress, logger)
 
 	// create space-aware client
 	spaceManagementConfig, err := options.SpaceMgtClientOpts.ToRESTConfig()
