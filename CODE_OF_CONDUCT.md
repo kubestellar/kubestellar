@@ -1,7 +1,7 @@
 <!--coc-start-->
 This project is following the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md). 
 
-# Community Code of Conduct
+# KubeStellar Community Code of Conduct
 
 As contributors, maintainers, and participants in the CNCF community, and in the interest of fostering
 an open and welcoming community, we pledge to respect all people who participate or contribute
@@ -61,7 +61,7 @@ Project maintainers who do not follow or enforce the Code of Conduct may be temp
 
 ## Reporting 
 
-For incidents occurring in the Kubernetes community, contact the [KubeStellar Code of Conduct Committee of Conduct Committee](mailto:kubestellar-dev-private@googlegroups.com). You can expect a response within three business days.
+For incidents occurring in the KubeStellar community, contact the [KubeStellar Code of Conduct Committee of Conduct Committee](mailto:kubestellar-dev-private@googlegroups.com). You can expect a response within three business days.
 
 For other projects, or for incidents that are project-agnostic or impact multiple CNCF projects, please contact the [CNCF Code of Conduct Committee](https://www.cncf.io/conduct/committee/) via conduct@cncf.io.  Alternatively, you can contact any of the individual members of the [CNCF Code of Conduct Committee](https://www.cncf.io/conduct/committee/) to submit your report. For more detailed instructions on how to submit a report, including how to submit a report anonymously, please see our [Incident Resolution Procedures](https://www.cncf.io/conduct/procedures/). You can expect a response within three business days.
 
