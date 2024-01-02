@@ -2587,12 +2587,10 @@ The following commands will fix the issue:</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-A
 </code></pre></div>
 <p>which should yield:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>.
-<a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a>└──<span class="w"> </span>root
-<a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a><span class="w">    </span>├──<span class="w"> </span>compute
-<a id="__codelineno-65-4" name="__codelineno-65-4" href="#__codelineno-65-4"></a><span class="w">    </span>├──<span class="w"> </span>espw
-<a id="__codelineno-65-5" name="__codelineno-65-5" href="#__codelineno-65-5"></a><span class="w">    </span>├──<span class="w"> </span>imw1
-<a id="__codelineno-65-6" name="__codelineno-65-6" href="#__codelineno-65-6"></a><span class="w">    </span>└──<span class="w"> </span>wmw1
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>NAMESPACE<span class="w">               </span>NAME<span class="w">   </span>AGE
+<a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a>spaceprovider-default<span class="w">   </span>espw<span class="w">   </span>1h
+<a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a>spaceprovider-default<span class="w">   </span>imw1<span class="w">   </span>1h
+<a id="__codelineno-65-4" name="__codelineno-65-4" href="#__codelineno-65-4"></a>spaceprovider-default<span class="w">   </span>wmw1<span class="w">   </span>1h
 </code></pre></div>
 <h3 id="deploy-kcp-and-kubestellar-as-kubernetes-workload">Deploy kcp and KubeStellar as Kubernetes workload<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-kubernetes-workload" title="Permanent link">#</a></h3>
 <p>This requires a KubeStellar release GREATER THAN v0.5.0.</p>
@@ -2633,12 +2631,10 @@ that cluster.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-A
 </code></pre></div>
 <p>which should yield:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>.
-<a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>└──<span class="w"> </span>root
-<a id="__codelineno-72-3" name="__codelineno-72-3" href="#__codelineno-72-3"></a><span class="w">    </span>├──<span class="w"> </span>compute
-<a id="__codelineno-72-4" name="__codelineno-72-4" href="#__codelineno-72-4"></a><span class="w">    </span>├──<span class="w"> </span>espw
-<a id="__codelineno-72-5" name="__codelineno-72-5" href="#__codelineno-72-5"></a><span class="w">    </span>├──<span class="w"> </span>imw1
-<a id="__codelineno-72-6" name="__codelineno-72-6" href="#__codelineno-72-6"></a><span class="w">    </span>└──<span class="w"> </span>wmw1
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>NAMESPACE<span class="w">               </span>NAME<span class="w">   </span>AGE
+<a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>spaceprovider-default<span class="w">   </span>espw<span class="w">   </span>1h
+<a id="__codelineno-72-3" name="__codelineno-72-3" href="#__codelineno-72-3"></a>spaceprovider-default<span class="w">   </span>imw1<span class="w">   </span>1h
+<a id="__codelineno-72-4" name="__codelineno-72-4" href="#__codelineno-72-4"></a>spaceprovider-default<span class="w">   </span>wmw1<span class="w">   </span>1h
 </code></pre></div>
 <!-- END INCLUDE -->
 
