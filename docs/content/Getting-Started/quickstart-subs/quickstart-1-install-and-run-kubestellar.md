@@ -39,12 +39,10 @@ KUBECONFIG=$SM_CONFIG kubectl get spaces -A
 which should yield:
 
 ``` { .sh .no-copy }
-.
-└── root
-    ├── compute
-    ├── espw
-    ├── imw1
-    └── wmw1
+NAMESPACE               NAME   AGE
+spaceprovider-default   espw   1h
+spaceprovider-default   imw1   1h
+spaceprovider-default   wmw1   1h
 ```
 
 ### Deploy kcp and KubeStellar as Kubernetes workload
@@ -112,12 +110,10 @@ KUBECONFIG=$SM_CONFIG kubectl get spaces -A
 which should yield:
 
 ``` { .sh .no-copy }
-.
-└── root
-    ├── compute
-    ├── espw
-    ├── imw1
-    └── wmw1
+NAMESPACE               NAME   AGE
+spaceprovider-default   espw   1h
+spaceprovider-default   imw1   1h
+spaceprovider-default   wmw1   1h
 ```
 
 <!--quickstart-1-install-and-run-kubestellar-end-->
