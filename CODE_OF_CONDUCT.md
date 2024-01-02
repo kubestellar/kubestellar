@@ -1,34 +1,86 @@
 <!--coc-start-->
-The Code of Conduct serves as a set of rules used by the KubeStellar community to establish a safe, respectful and inclusive environment.
+This project is following the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md). 
 
-## KubeStellar Community Code of Conduct
-The KubeStellar Community abides by the CNCF Code of Conduct.
+# Community Code of Conduct
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the [KubeStellar Code of Conduct Committee of Conduct Committee](mailto:kubestellar-dev-private@googlegroups.com).
+As contributors, maintainers, and participants in the CNCF community, and in the interest of fostering
+an open and welcoming community, we pledge to respect all people who participate or contribute
+through reporting issues, posting feature requests, updating documentation,
+submitting pull requests or patches, attending conferences or events, or engaging in other community or project activities.
 
-## Contributor Code of Conduct
+We are committed to making participation in the CNCF community a harassment-free experience for everyone, regardless of age, body size, caste, disability, ethnicity, level of experience, family status, gender, gender identity and expression, marital status, military or veteran status, nationality, personal appearance, race, religion, sexual orientation, socieconomic status, tribe, or any other dimension of diversity.
 
-As contributors and maintainers of this project, and in the interest of fostering an open and welcoming community, we pledge to respect all people who contribute through reporting issues, posting feature requests, updating documentation, submitting pull requests or patches, and other activities.
+## Scope 
 
-We are committed to making participation in this project a harassment-free experience for everyone, regardless of level of experience, gender, gender identity and expression, sexual orientation, disability, personal appearance, body size, race, ethnicity, age, religion, or nationality.
+This code of conduct applies:
+* within project and community spaces,
+* in other spaces when an individual CNCF community participant's words or actions are directed at or are about a CNCF project, the CNCF community, or another CNCF community participant.
 
-Examples of unacceptable behavior by participants include:
+### CNCF Events
 
-The use of sexualized language or imagery
-Personal attacks
-Trolling or insulting/derogatory comments
-Public or private harassment
-Publishing others’ private information, such as physical or electronic addresses, without explicit permission
-Other unethical or unprofessional conduct.
-Project maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct. By adopting this Code of Conduct, project maintainers commit themselves to fairly and consistently applying these principles to every aspect of managing this project. Project maintainers who do not follow or enforce the Code of Conduct may be permanently removed from the project team.
+CNCF events that are produced by the Linux Foundation with professional events staff are governed by the Linux Foundation [Events Code of Conduct](https://events.linuxfoundation.org/code-of-conduct/) available on the event page. This is designed to be used in conjunction with the CNCF Code of Conduct.
 
-This code of conduct applies both within project spaces and in public spaces when an individual is representing the project or its community.
+## Our Standards
 
-Instances of abusive, harassing, or otherwise unacceptable behavior in KubeStellar may be reported by contacting the [KubeStellar Code of Conduct Committee of Conduct Committee](mailto:kubestellar-dev-private@googlegroups.com). For other projects, please contact a CNCF project maintainer or our mediator, Mishi Choudhary mishi@linux.com.
+The CNCF Community is open, inclusive and respectful. Every member of our community has the right to have their identity respected.
 
-This Code of Conduct is adapted from the Contributor Covenant (http://contributor-covenant.org), version 1.2.0, available at http://contributor-covenant.org/version/1/2/0/
+Examples of behavior that contributes to a positive environment include but are not limited to:
 
-CNCF Events Code of Conduct
+* Demonstrating empathy and kindness toward other people
+* Being respectful of differing opinions, viewpoints, and experiences
+* Giving and gracefully accepting constructive feedback
+* Accepting responsibility and apologizing to those affected by our mistakes,
+  and learning from the experience
+* Focusing on what is best not just for us as individuals, but for the
+  overall community
+* Using welcoming and inclusive language
+  
 
-CNCF events are governed by the Linux Foundation Code of Conduct available on the event page. This is designed to be compatible with the above policy and also includes more details on responding to incidents.
+Examples of unacceptable behavior include but are not limited to:
+
+* The use of sexualized language or imagery
+* Trolling, insulting or derogatory comments, and personal or political attacks
+* Public or private harassment in any form
+* Publishing others' private information, such as a physical or email
+  address, without their explicit permission
+* Violence, threatening violence, or encouraging others to engage in violent behavior
+* Stalking or following someone without their consent
+* Unwelcome physical contact
+* Unwelcome sexual or romantic attention or advances
+* Other conduct which could reasonably be considered inappropriate in a
+  professional setting
+  
+The following behaviors are also prohibited:
+* Providing knowingly false or misleading information in connection with a Code of Conduct investigation or otherwise intentionally tampering with an investigation.
+* Retaliating against a person because they reported an incident or provided information about an incident as a witness.
+
+Project maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct. 
+By adopting this Code of Conduct, project maintainers commit themselves to fairly and consistently applying these principles to every aspect
+of managing a CNCF project. 
+Project maintainers who do not follow or enforce the Code of Conduct may be temporarily or permanently removed from the project team.
+
+## Reporting 
+
+For incidents occurring in the Kubernetes community, contact the [KubeStellar Code of Conduct Committee of Conduct Committee](mailto:kubestellar-dev-private@googlegroups.com). You can expect a response within three business days.
+
+For other projects, or for incidents that are project-agnostic or impact multiple CNCF projects, please contact the [CNCF Code of Conduct Committee](https://www.cncf.io/conduct/committee/) via conduct@cncf.io.  Alternatively, you can contact any of the individual members of the [CNCF Code of Conduct Committee](https://www.cncf.io/conduct/committee/) to submit your report. For more detailed instructions on how to submit a report, including how to submit a report anonymously, please see our [Incident Resolution Procedures](https://www.cncf.io/conduct/procedures/). You can expect a response within three business days.
+
+For incidents ocurring at CNCF event that is produced by the Linux Foundation, please contact eventconduct@cncf.io.
+
+## Enforcement 
+
+Upon review and investigation of a reported incident, the CoC response team that has jurisdiction will determine what action is appropriate based on this Code of Conduct and its related documentation. 
+
+For information about which Code of Conduct incidents are handled by project leadership, which incidents are handled by the CNCF Code of Conduct Committee, and which incidents are handled by the Linux Foundation (including its events team), see our [Jurisdiction Policy](https://www.cncf.io/conduct/jurisdiction/).
+
+## Amendments
+
+Consistent with the CNCF Charter, any substantive changes to this Code of Conduct must be approved by the Technical Oversight Committee.
+
+## Acknowledgements
+
+This Code of Conduct is adapted from the Contributor Covenant
+(http://contributor-covenant.org), version 2.0 available at
+http://contributor-covenant.org/version/2/0/code_of_conduct/
+
 <!--coc-end-->
