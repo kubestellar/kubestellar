@@ -23,7 +23,6 @@
 [![docs-ecutable - where-resolver](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-where-resolver.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-where-resolver.yml)&nbsp;&nbsp;&nbsp;
 [![docs-ecutable - kubestellar-syncer](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml)&nbsp;&nbsp;&nbsp;
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8266/badge)](https://www.bestpractices.dev/projects/8266)&nbsp;&nbsp;&nbsp;
-[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B42164%2Fgithub.com%2Fkubestellar%2Fkubestellar.svg?type=shield&issueType=license)](https://app.fossa.com/projects/custom%2B42164%2Fgithub.com%2Fkubestellar%2Fkubestellar?ref=badge_shield&issueType=license)&nbsp;&nbsp;&nbsp;
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
@@ -131,4 +130,5 @@ Thanks go to these wonderful people:
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B42164%2Fgithub.com%2Fkubestellar%2Fkubestellar.svg?type=large&issueType=license)](https://app.fossa.com/projects/custom%2B42164%2Fgithub.com%2Fkubestellar%2Fkubestellar?ref=badge_large&issueType=license)
 <!--readme-for-root-end-->
