@@ -134,7 +134,7 @@ Thanks go to these wonderful people:
 
 <td>
     <a href="https://landscape.cncf.io">
-        <img src="docs/overrides/images/cncf-color.png" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
+        <img src="/docs/overrides/images/cncf-color.png" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
     </a>
 </td>
 We are a Cloud Native Computing Foundation sandbox project.
