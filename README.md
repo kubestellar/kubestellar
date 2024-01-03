@@ -131,12 +131,13 @@ Thanks go to these wonderful people:
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B42164%2Fgithub.com%2Fkubestellar%2Fkubestellar.svg?type=large&issueType=license)](https://app.fossa.com/projects/custom%2B42164%2Fgithub.com%2Fkubestellar%2Fkubestellar?ref=badge_large&issueType=license)
-
+<br>
 <td>
     <a href="https://landscape.cncf.io">
         <img src="/docs/overrides/images/cncf-color.png" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
     </a>
 </td>
+<br>
 <br>We are a Cloud Native Computing Foundation sandbox project.
 <br>Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF).
 <br>© 2022-2024. The KubeStellar Authors.
