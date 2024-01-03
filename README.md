@@ -137,7 +137,7 @@ Thanks go to these wonderful people:
         <img src="/docs/overrides/images/cncf-color.png" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
     </a>
 </td>
-We are a Cloud Native Computing Foundation sandbox project.
-Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF).
-© 2022-2024. The KubeStellar Authors.
+<br>We are a Cloud Native Computing Foundation sandbox project.
+<br>Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF).
+<br>© 2022-2024. The KubeStellar Authors.
 <!--readme-for-root-end-->
