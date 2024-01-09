@@ -156,9 +156,7 @@ echo "describe the florin location object"
 KUBECONFIG=$IMW1_KUBECONFIG kubectl describe location.edge.kubestellar.io florin
 ```
 
-Those two script invocations are equivalent to creating the following
-four objects plus the kcp `APIBinding` objects that import the
-definition of the KubeStellar API.
+Those two `ensure location` calls are equivalent to creating the following four objects.
 
 ```yaml
 apiVersion: edge.kubestellar.io/v2alpha1

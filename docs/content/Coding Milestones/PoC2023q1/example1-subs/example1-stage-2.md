@@ -386,8 +386,7 @@ following resolutions of the "where" predicates.
 If you have deployed the KubeStellar core in a Kubernetes cluster then
 the where resolver is running in a pod there. If instead you are
 running the core controllers are bare processes then you can use the
-following commands to launch the where-resolver; it requires the ESPW
-to be the current kcp workspace at start time.
+following commands to launch the where-resolver.
 
 ```shell
 KUBECONFIG=$SM_CONFIG kubestellar-where-resolver --external-access -v=4 &> /tmp/where-resolver.log &
