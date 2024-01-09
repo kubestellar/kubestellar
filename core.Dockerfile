@@ -1,7 +1,7 @@
 ###############################################################################
 # Builder image
 ###############################################################################
-FROM redhat/ubi9 AS builder
+FROM --platform=$BUILDPLATFORM redhat/ubi9 AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -57,7 +57,7 @@ ADD test/            test/
 ADD .git/            .git/
 ADD .gitattributes Makefile Makefile.venv go.mod go.sum .
 
-RUN make innerbuild GIT_DIRTY=$GIT_DIRTY IGNORE_GO_VERSION=yesplease
+RUN make innerbuild GOOS=$TARGETOS GOARCH=$TARGETARCH GIT_DIRTY=$GIT_DIRTY IGNORE_GO_VERSION=yesplease
 
 FROM ghcr.io/waltforme/kube-bind/example-backend:latest AS example-backend-binary
 
