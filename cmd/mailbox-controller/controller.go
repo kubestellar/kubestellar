@@ -311,6 +311,7 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, spacename string) bool {
 		invokeScript := strings.Join([]string{
 			"KUBECONFIG=$SM_CONFIG",
 			shellScriptName,
+			"--in-cluster",
 			spacename,
 			resource,
 		}, " ")
