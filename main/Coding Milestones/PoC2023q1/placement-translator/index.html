@@ -2970,9 +2970,7 @@ also label guilder with <code>extended=yes</code>.</p>
 <a id="__codelineno-75-5" name="__codelineno-75-5" href="#__codelineno-75-5"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;describe the florin location object&quot;</span>
 <a id="__codelineno-75-6" name="__codelineno-75-6" href="#__codelineno-75-6"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>location.edge.kubestellar.io<span class="w"> </span>florin
 </code></pre></div>
-<p>Those two script invocations are equivalent to creating the following
-four objects plus the kcp <code>APIBinding</code> objects that import the
-definition of the KubeStellar API.</p>
+<p>Those two <code>ensure location</code> calls are equivalent to creating the following four objects.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-76-2" name="__codelineno-76-2" href="#__codelineno-76-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SyncTarget</span>
 <a id="__codelineno-76-3" name="__codelineno-76-3" href="#__codelineno-76-3"></a><span class="nt">metadata</span><span class="p">:</span>
@@ -3536,8 +3534,7 @@ following resolutions of the "where" predicates.</p>
 <p>If you have deployed the KubeStellar core in a Kubernetes cluster then
 the where resolver is running in a pod there. If instead you are
 running the core controllers are bare processes then you can use the
-following commands to launch the where-resolver; it requires the ESPW
-to be the current kcp workspace at start time.</p>
+following commands to launch the where-resolver.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-109-1" name="__codelineno-109-1" href="#__codelineno-109-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar-where-resolver<span class="w"> </span>--external-access<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/where-resolver.log<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-109-2" name="__codelineno-109-2" href="#__codelineno-109-2"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>

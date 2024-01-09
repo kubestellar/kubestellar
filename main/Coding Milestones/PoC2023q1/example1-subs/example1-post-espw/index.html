@@ -2409,8 +2409,7 @@ following resolutions of the "where" predicates.</p>
 <p>If you have deployed the KubeStellar core in a Kubernetes cluster then
 the where resolver is running in a pod there. If instead you are
 running the core controllers are bare processes then you can use the
-following commands to launch the where-resolver; it requires the ESPW
-to be the current kcp workspace at start time.</p>
+following commands to launch the where-resolver.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar-where-resolver<span class="w"> </span>--external-access<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/where-resolver.log<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>

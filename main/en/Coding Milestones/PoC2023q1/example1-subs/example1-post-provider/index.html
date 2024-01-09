@@ -1995,9 +1995,7 @@ also label guilder with <code>extended=yes</code>.</p>
 <a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;describe the florin location object&quot;</span>
 <a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>location.edge.kubestellar.io<span class="w"> </span>florin
 </code></pre></div>
-<p>Those two script invocations are equivalent to creating the following
-four objects plus the kcp <code>APIBinding</code> objects that import the
-definition of the KubeStellar API.</p>
+<p>Those two <code>ensure location</code> calls are equivalent to creating the following four objects.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SyncTarget</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nt">metadata</span><span class="p">:</span>
