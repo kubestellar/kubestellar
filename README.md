@@ -23,22 +23,22 @@
 [![docs-ecutable - where-resolver](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-where-resolver.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-where-resolver.yml)&nbsp;&nbsp;&nbsp;
 [![docs-ecutable - kubestellar-syncer](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml)&nbsp;&nbsp;&nbsp;
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8266/badge)](https://www.bestpractices.dev/projects/8266)&nbsp;&nbsp;&nbsp;
-<a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
+<a href="https://kubernetes.slack.com/archives/C058SUSL5AA">
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 
 Imagine KubeStellar as a post office for your Kubernetes resources. When you drop packages at the post office, they don't open them; they deliver them to the right recipients. Similarly, KubeStellar works like this for your Kubernetes resources. Instead of running resources right away, KubeStellar safely stores and sends resources to selected clusters across the globe—whether they're in public clouds, private clouds, or on the edge of your network. It's a super useful tool for spreading your Kubernetes resources wherever you need them without disrupting your existing tools and workflows.
 
-How does KubeStellar resist the temptation to run your Kubernetes resources right away? KubeStellar accepts your applied resources in a special staging area (virtual cluster) where pods can't be created. Then, at your direction, KubeStellar transfers your applied resources to remote clusters where they can create pods and other required resource dependencies. KubeStellar does this using many different lightweight virtual cluster providers (Kind, KubeFlex, KCP, etc.) to create this special staging area. 
+How does KubeStellar resist the temptation to run your Kubernetes resources right away? KubeStellar accepts your applied resources in a special staging area (virtual cluster) where pods can't be created. Then, at your direction, KubeStellar transfers your applied resources to remote clusters where they can create pods and other required resource dependencies. KubeStellar does this using many different lightweight virtual cluster providers (Kind, KubeFlex, KCP, etc.) to create this special staging area.
 
-KubeStellar is an innovative way to stage inactive Kubernetes resources and then apply them to any cluster to run. KubeStellar introduces a native way to expand, optimize, and protect your Kubernetes resources from individual cluster misconfiguration, utilization, and failure. 
+KubeStellar is an innovative way to stage inactive Kubernetes resources and then apply them to any cluster to run. KubeStellar introduces a native way to expand, optimize, and protect your Kubernetes resources from individual cluster misconfiguration, utilization, and failure.
 
 __Don't change anything, just add KubeStellar!__
 
 
 ## KubeStellar treats multiple Kubernetes clusters as one so you can:
 
-- __Centrally__ apply Kubernetes resources for selective deployment across multiple clusters 
+- __Centrally__ apply Kubernetes resources for selective deployment across multiple clusters
 - Use __standard Kubernetes native deployment tools__ (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required
 - __Discover__ dynamically created objects created on remote clusters
 - Make __disconnected__ cluster operation possible
@@ -91,8 +91,8 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 - Follow us on:
    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
-   
-   
+
+
 ## ❤️ Contributors
 
 Thanks go to these wonderful people:
@@ -123,6 +123,7 @@ Thanks go to these wonderful people:
     <td align="center"><a href="https://github.com/fab7"><img src="https://avatars.githubusercontent.com/u/15231306?v=4" width="100px;" alt=""/><br /><sub><b>Francois Abel</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Afab7+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/nirrozenbaum"><img src="https://avatars.githubusercontent.com/u/19717747?v=4" width="100px;" alt=""/><br /><sub><b>Nir Rozenbaum</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Anirrozenbaum+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/vMaroon"><img src="https://avatars.githubusercontent.com/u/73340153?v=4" width="100px;" alt=""/><br /><sub><b>Maroon Ayoub</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3AvMaroon+" title="Contributed PRs">👀</a></td>
+    <td align="center"><a href="https://github.com/grahamwhiteuk"><img src="https://avatars.githubusercontent.com/u/1632332?v=4" width="100px;" alt=""/><br /><sub><b>Graham White</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/pulls?q=is%3Apr+author%3A%40me+" title="Contributed PRs">👀</a></td>
   </tr>
 </table>
 
