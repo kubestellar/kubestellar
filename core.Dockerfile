@@ -14,7 +14,8 @@ WORKDIR /home/kubestellar
 
 RUN mkdir -p .kcp && \
     dnf install -y git golang jq procps && \
-    go install github.com/mikefarah/yq/v4@v4.34.2 && \
+    curl -SL -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/v4.34.2/yq_${TARGETOS}_${TARGETARCH}" && \
+    chmod +x /usr/local/bin/yq && \
     curl -SL -o /usr/local/bin/kubectl "https://dl.k8s.io/release/v1.25.3/bin/${TARGETPLATFORM}/kubectl" && \
     chmod +x /usr/local/bin/kubectl && \
     curl -SL -o easy-rsa.tar.gz "https://github.com/OpenVPN/easy-rsa/releases/download/v3.1.5/EasyRSA-3.1.5.tgz" && \
@@ -79,8 +80,8 @@ RUN dnf install -y jq procps && \
 
 # copy binaries, dex configurations, and kube-bind CRDs from the builder image
 COPY --from=builder /home/kubestellar/easy-rsa                           easy-rsa/
-COPY --from=builder /root/go/bin                                         /usr/local/bin/
 COPY --from=builder /usr/local/bin/kubectl                               /usr/local/bin/kubectl
+COPY --from=builder /usr/local/bin/yq                                    /usr/local/bin/yq
 COPY --from=builder /home/kubestellar/kcp/bin                            kcp/bin/
 COPY --from=builder /home/kubestellar/kcp-plugins/bin                    kcp/bin/
 COPY --from=builder /home/kubestellar/bin                                bin/
