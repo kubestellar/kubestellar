@@ -147,6 +147,34 @@ qs_sort: kind
            end="<!--kubestellar-apply-syncer-end-->"
          %}
 
+This example (and others) involve user-managed kubeconfig files. These
+examples organize those files into one subdirectory. Start by making
+sure that directory exists without any contents left over from
+previous runs.
+
+```shell
+MY_KUBECONFIGS=${PWD}/my-kubeconfigs
+rm -rf "$MY_KUBECONFIGS"
+mkdir -p "$MY_KUBECONFIGS"
+```
+
+Wait for the mailbox controller to create the corresponding mailbox spaces and remember them.
+
+```shell
+while [ $(KUBECONFIG=~/.kube/config kubectl get spaces -A | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
+MB1=$(KUBECONFIG=~/.kube/config kubectl get spaces -n spaceprovider-default -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
+echo The mailbox for ks-edge-cluster1 is $MB1
+MB2=$(KUBECONFIG=~/.kube/config kubectl get spaces -n spaceprovider-default -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
+echo The mailbox for ks-edge-cluster2 is $MB2
+
+MB1_KUBECONFIG="${MY_KUBECONFIGS}/${MB1}.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig $MB1 --kubeconfig ~/.kube/config $MB1_KUBECONFIG
+MB2_KUBECONFIG="${MY_KUBECONFIGS}/${MB2}.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig $MB2 --kubeconfig ~/.kube/config $MB2_KUBECONFIG
+WMW1_KUBECONFIG="${MY_KUBECONFIGS}/wmw1.kubeconfig"
+kubectl-kubestellar-space-get_kubeconfig wmw1 --kubeconfig ~/.kube/config $WMW1_KUBECONFIG
+```
+
 #### 5. Deploy an Apache Web Server to ks-edge-cluster1 and ks-edge-cluster2
 !!! tip ""
     === "deploy"
