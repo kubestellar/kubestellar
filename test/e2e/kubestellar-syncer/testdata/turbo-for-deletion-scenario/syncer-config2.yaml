@@ -1,6 +1,0 @@
-apiVersion: edge.kubestellar.io/v2alpha1
-kind: SyncerConfig
-metadata:
-  name: the-one
-spec:
-  namespaceScope: {}

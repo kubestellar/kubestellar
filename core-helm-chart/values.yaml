@@ -1,51 +1,6 @@
-# Copyright 2023 The KubeStellar Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Default values for kubestellar.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
 
-# KubeStellar image parameters
-image:
-  repository: quay.io/kubestellar/kubestellar
-  pullPolicy: IfNotPresent
-  tag: sp-mgt-pr2
+ControlPlaneName: wds1
 
-# Space abstraction layer image parameters
-spaceimage:
-  repository: quay.io/kubestellar/space-framework
-  pullPolicy: IfNotPresent
-  tag: sp-mgt-pr2
-
-# The space framework default provider type.
-# Possible values: [kcp|kubeflex]
-defaultSpaceProviderType: kcp
-
-# Storage size
-storageSize: 8Gi
-
-# Select the cluster type
-clusterType: Kubernetes # OpenShift or Kubernetes
-
-# Parameters for setting up the externally accessible kubeconfig
-EXTERNAL_HOSTNAME: "" # an empty string will let the container infer its ingress/route
-EXTERNAL_PORT: 443
-
-# Set KubeStellar controller verbosity (default: 2)
-CONTROLLER_VERBOSITY: 2
-
-# Set the ESPW name (default: espw)
-ESPW_NAME: "espw"
-
-# List comma separated inventories to be created (e.g., "root:inv-1,root:abc:inv-2")
-ENSURE_IMW: "imw1"
-
-# List comma separated WMWs to be created (e.g., "root:wmw-1,root:wmw-2")
-ENSURE_WMW: "wmw1"
