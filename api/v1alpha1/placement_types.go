@@ -111,19 +111,13 @@ const (
 // - the `namespaces` criterion is satisfied;
 // - the `namespaceSelectors` criterion is satisfied;
 // - the `objectNames` criterion is satisfied; and
-// - the `labelSelectors` criterion is satisfied.
+// - the `objectSelectors` criterion is satisfied.
 // At least one of the fields must make some discrimination;
 // it is not valid for every field to match all objects.
 // Validation might not be fully checked by apiservers until the Kubernetes dependency is release 1.25;
 // in the meantime validation error messages will appear
 // in annotations whose key is `validation-error.kubestellar.io/{number}`.
 type ObjectTest struct {
-	// `labelSelectors` is a list of label selectors.
-	// At least one of them must match the labels of the object being tested.
-	// Empty list is a special case, it matches every object.
-	// +optional
-	LabelSelectors []metav1.LabelSelector `json:"labelSelectors,omitempty"`
-
 	// `apiGroup` is the API group of the referenced object, empty string for the core API group.
 	// `nil` matches every API group.
 	// +optional
@@ -135,6 +129,28 @@ type ObjectTest struct {
 	// Empty list is a special case, it matches every object.
 	// +optional
 	Resources []string `json:"resources,omitempty"`
+
+	// `namespaces` is a list of acceptable names for the object's namespace.
+	// An entry of `"*"` means that any namespace is acceptable;
+	// this is the only way to match a cluster-scoped object.
+	// If this list contains `"*"` then it should contain nothing else.
+	// Empty list is a special case, it matches every object.
+	// +optional
+	Namespaces []string `json:"namespaces,omitempty"`
+
+	// `namespaceSelectors` a list of label selectors.
+	// For a namespaced object, at least one of these label selectors has to match
+	// the labels of the Namespace object that defines the namespace of the object that this DownsyncObjectTest is testing.
+	// For a cluster-scoped object, at least one of these label selectors must be `{}`.
+	// Empty list is a special case, it matches every object.
+	// +optional
+	NamespaceSelectors []metav1.LabelSelector `json:"namespaceSelectors,omitempty"`
+
+	// `objectSelectors` is a list of label selectors.
+	// At least one of them must match the labels of the object being tested.
+	// Empty list is a special case, it matches every object.
+	// +optional
+	ObjectSelectors []metav1.LabelSelector `json:"objectSelectors,omitempty"`
 
 	// `objectNames` is a list of object names that match.
 	// An entry of `"*"` means that all match.
