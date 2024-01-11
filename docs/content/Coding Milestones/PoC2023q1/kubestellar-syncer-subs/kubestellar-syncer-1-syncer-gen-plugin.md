@@ -1,5 +1,8 @@
 <!--kubestellar-syncer-1-syncer-gen-plugin-start-->
-``` {.bash .hide-me}
+
+The remainder is not fully debugged.
+
+```shell
 exit 0
 ```
 

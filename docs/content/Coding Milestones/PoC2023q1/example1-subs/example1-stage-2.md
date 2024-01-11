@@ -23,9 +23,6 @@ populating a set of CRDs into the WMW.
 # TODO: Needs to pass --with-kube false or true
 WMW_C_SPACE_CONFIG=${MY_KUBECONFIGS}/wmw-c.kubeconfig
 kubectl kubestellar ensure wmw $in_cluster wmw-c --with-kube $kube_needed --output-kubeconfig "$WMW_C_SPACE_CONFIG"
-```
-
-``` {.bash .hide-me}
 sleep 15
 ```
 
@@ -137,8 +134,6 @@ spec:
     resources: ["cogs"]
     names: ["william"]
 EOF
-```
-``` {.bash .hide-me}
 sleep 10
 ```
 
@@ -367,8 +362,6 @@ spec:
     resources: ["widgets"]
     names: ["*"]
 EOF
-```
-``` {.bash .hide-me}
 sleep 10
 ```
 

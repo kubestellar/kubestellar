@@ -34,6 +34,7 @@ Find just the `commonstuff` namespace and the `commond` Deployment.
   done
   kubectl --context kind-florin get ns
 )
+sleep 15
 ```
 ``` { .bash .no-copy }
 NAME                                 STATUS   AGE
@@ -46,12 +47,9 @@ kube-system                          Active   57m
 local-path-storage                   Active   57m
 ```
 
-``` {.bash .hide-me}
-sleep 15
-```
-
 ```shell
 KUBECONFIG=~/.kube/config kubectl --context kind-florin get deploy,rs -A | egrep 'NAME|stuff'
+sleep 15
 ```
 ``` { .bash .no-copy }
 NAMESPACE                            NAME                                                 READY   UP-TO-DATE   AVAILABLE   AGE
@@ -61,10 +59,6 @@ commonstuff                          replicaset.apps/commond                    
 
 Examine the guilder cluster.  Find both workload namespaces, the
 Deployment, and both ReplicaSets.
-
-``` {.bash .hide-me}
-sleep 15
-```
 
 ```shell
 KUBECONFIG=~/.kube/config kubectl --context kind-guilder get ns | egrep NAME\|stuff
@@ -101,6 +95,7 @@ See the crontab in the guilder cluster.
 
 ```shell
 KUBECONFIG=~/.kube/config kubectl --context kind-guilder get crontabs -n specialstuff
+sleep 15
 ```
 ``` {.bash .no-copy }
 NAME                 AGE
@@ -109,10 +104,6 @@ my-new-cron-object   37m
 
 Examining the common workload in the guilder cluster, for example,
 will show that the replacement-style customization happened.
-
-``` {.bash .hide-me}
-sleep 15
-```
 
 ```shell
 KUBECONFIG=~/.kube/config kubectl --context kind-guilder get rs -n commonstuff commond -o yaml
