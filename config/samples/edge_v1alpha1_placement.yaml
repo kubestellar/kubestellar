@@ -1,0 +1,11 @@
+apiVersion: edge.kubestellar.io/v1alpha1
+kind: Placement
+metadata:
+  name: placement1
+spec:
+  clusterSelectors:
+  - matchLabels: {"location-group":"edge"}
+  downsync:
+  - labelSelectors:
+    - matchLabels: {"argocd.argoproj.io/instance":"guestbook"}
+

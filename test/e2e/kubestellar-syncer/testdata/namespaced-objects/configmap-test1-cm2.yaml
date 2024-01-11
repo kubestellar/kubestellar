@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cm2
-  namespace: test1
-data:
-  field1: value1

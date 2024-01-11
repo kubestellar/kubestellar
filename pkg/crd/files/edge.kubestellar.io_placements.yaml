@@ -1,0 +1,360 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.3
+  creationTimestamp: null
+  name: placements.edge.kubestellar.io
+spec:
+  group: edge.kubestellar.io
+  names:
+    kind: Placement
+    listKind: PlacementList
+    plural: placements
+    shortNames:
+    - pl
+    - pls
+    singular: placement
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .spec.type
+      name: TYPE
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Placement is the Schema for the placementpolicies API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: PlacementSpec defines the desired state of Placement
+            properties:
+              clusterSelectors:
+                description: '`clusterSelectors` identifies the relevant Cluster objects
+                  in terms of their labels. A Cluster is relevant if and only if it
+                  passes any of the LabelSelectors in this field.'
+                items:
+                  description: A label selector is a label query over a set of resources.
+                    The result of matchLabels and matchExpressions are ANDed. An empty
+                    label selector matches all objects. A null label selector matches
+                    no objects.
+                  properties:
+                    matchExpressions:
+                      description: matchExpressions is a list of label selector requirements.
+                        The requirements are ANDed.
+                      items:
+                        description: A label selector requirement is a selector that
+                          contains values, a key, and an operator that relates the
+                          key and values.
+                        properties:
+                          key:
+                            description: key is the label key that the selector applies
+                              to.
+                            type: string
+                          operator:
+                            description: operator represents a key's relationship
+                              to a set of values. Valid operators are In, NotIn, Exists
+                              and DoesNotExist.
+                            type: string
+                          values:
+                            description: values is an array of string values. If the
+                              operator is In or NotIn, the values array must be non-empty.
+                              If the operator is Exists or DoesNotExist, the values
+                              array must be empty. This array is replaced during a
+                              strategic merge patch.
+                            items:
+                              type: string
+                            type: array
+                        required:
+                        - key
+                        - operator
+                        type: object
+                      type: array
+                    matchLabels:
+                      additionalProperties:
+                        type: string
+                      description: matchLabels is a map of {key,value} pairs. A single
+                        {key,value} in the matchLabels map is equivalent to an element
+                        of matchExpressions, whose key field is "key", the operator
+                        is "In", and the values array contains only "value". The requirements
+                        are ANDed.
+                      type: object
+                  type: object
+                  x-kubernetes-map-type: atomic
+                type: array
+              downsync:
+                description: '`downsync` selects the objects to bind with the selected
+                  Locations for downsync. An object is selected if it matches at least
+                  one member of this list.'
+                items:
+                  description: 'DownsyncObjectTest is a set of criteria that characterize
+                    matching objects. An object matches if: - the `apiGroup` criterion
+                    is satisfied; - the `resources` criterion is satisfied; - the
+                    `namespaces` criterion is satisfied; - the `namespaceSelectors`
+                    criterion is satisfied; - the `objectNames` criterion is satisfied;
+                    and - the `labelSelectors` criterion is satisfied. At least one
+                    of the fields must make some discrimination; it is not valid for
+                    every field to match all objects. Validation might not be fully
+                    checked by apiservers until the Kubernetes dependency is release
+                    1.25; in the meantime validation error messages will appear in
+                    annotations whose key is `validation-error.kubestellar.io/{number}`.'
+                  properties:
+                    apiGroup:
+                      description: '`apiGroup` is the API group of the referenced
+                        object, empty string for the core API group. `nil` matches
+                        every API group.'
+                      type: string
+                    labelSelectors:
+                      description: '`labelSelectors` is a list of label selectors.
+                        At least one of them must match the labels of the object being
+                        tested. Empty list is a special case, it matches every object.'
+                      items:
+                        description: A label selector is a label query over a set
+                          of resources. The result of matchLabels and matchExpressions
+                          are ANDed. An empty label selector matches all objects.
+                          A null label selector matches no objects.
+                        properties:
+                          matchExpressions:
+                            description: matchExpressions is a list of label selector
+                              requirements. The requirements are ANDed.
+                            items:
+                              description: A label selector requirement is a selector
+                                that contains values, a key, and an operator that
+                                relates the key and values.
+                              properties:
+                                key:
+                                  description: key is the label key that the selector
+                                    applies to.
+                                  type: string
+                                operator:
+                                  description: operator represents a key's relationship
+                                    to a set of values. Valid operators are In, NotIn,
+                                    Exists and DoesNotExist.
+                                  type: string
+                                values:
+                                  description: values is an array of string values.
+                                    If the operator is In or NotIn, the values array
+                                    must be non-empty. If the operator is Exists or
+                                    DoesNotExist, the values array must be empty.
+                                    This array is replaced during a strategic merge
+                                    patch.
+                                  items:
+                                    type: string
+                                  type: array
+                              required:
+                              - key
+                              - operator
+                              type: object
+                            type: array
+                          matchLabels:
+                            additionalProperties:
+                              type: string
+                            description: matchLabels is a map of {key,value} pairs.
+                              A single {key,value} in the matchLabels map is equivalent
+                              to an element of matchExpressions, whose key field is
+                              "key", the operator is "In", and the values array contains
+                              only "value". The requirements are ANDed.
+                            type: object
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      type: array
+                    objectNames:
+                      description: '`objectNames` is a list of object names that match.
+                        An entry of `"*"` means that all match. If this list contains
+                        `"*"` then it should contain nothing else. Empty list is a
+                        special case, it matches every object.'
+                      items:
+                        type: string
+                      type: array
+                    resources:
+                      description: '`resources` is a list of lowercase plural names
+                        for the sorts of objects to match. An entry of `"*"` means
+                        that all match. If this list contains `"*"` then it should
+                        contain nothing else. Empty list is a special case, it matches
+                        every object.'
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                type: array
+              numberOfClusters:
+                description: NumberOfClusters represents the desired number of ManagedClusters
+                  to be selected which meet the placement requirements. 1) If not
+                  specified, all Clusters which meet the placement requirements will
+                  be selected; 2) Otherwise if the number of Clusters meet the placement
+                  requirements is larger than NumberOfClusters, a random subset with
+                  desired number of ManagedClusters will be selected; 3) If the number
+                  of Clusters meet the placement requirements is equal to NumberOfClusters,
+                  all of them will be selected; 4) If the number of Clusters meet
+                  the placement requirements is less than NumberOfClusters, all of
+                  them will be selected, and the status of condition `PlacementConditionSatisfied`
+                  will be set to false;
+                format: int32
+                type: integer
+              upsync:
+                description: '`upsync` identifies objects to upsync. An object matches
+                  `upsync` if and only if it matches at least one member of `upsync`.'
+                items:
+                  description: 'DownsyncObjectTest is a set of criteria that characterize
+                    matching objects. An object matches if: - the `apiGroup` criterion
+                    is satisfied; - the `resources` criterion is satisfied; - the
+                    `namespaces` criterion is satisfied; - the `namespaceSelectors`
+                    criterion is satisfied; - the `objectNames` criterion is satisfied;
+                    and - the `labelSelectors` criterion is satisfied. At least one
+                    of the fields must make some discrimination; it is not valid for
+                    every field to match all objects. Validation might not be fully
+                    checked by apiservers until the Kubernetes dependency is release
+                    1.25; in the meantime validation error messages will appear in
+                    annotations whose key is `validation-error.kubestellar.io/{number}`.'
+                  properties:
+                    apiGroup:
+                      description: '`apiGroup` is the API group of the referenced
+                        object, empty string for the core API group. `nil` matches
+                        every API group.'
+                      type: string
+                    labelSelectors:
+                      description: '`labelSelectors` is a list of label selectors.
+                        At least one of them must match the labels of the object being
+                        tested. Empty list is a special case, it matches every object.'
+                      items:
+                        description: A label selector is a label query over a set
+                          of resources. The result of matchLabels and matchExpressions
+                          are ANDed. An empty label selector matches all objects.
+                          A null label selector matches no objects.
+                        properties:
+                          matchExpressions:
+                            description: matchExpressions is a list of label selector
+                              requirements. The requirements are ANDed.
+                            items:
+                              description: A label selector requirement is a selector
+                                that contains values, a key, and an operator that
+                                relates the key and values.
+                              properties:
+                                key:
+                                  description: key is the label key that the selector
+                                    applies to.
+                                  type: string
+                                operator:
+                                  description: operator represents a key's relationship
+                                    to a set of values. Valid operators are In, NotIn,
+                                    Exists and DoesNotExist.
+                                  type: string
+                                values:
+                                  description: values is an array of string values.
+                                    If the operator is In or NotIn, the values array
+                                    must be non-empty. If the operator is Exists or
+                                    DoesNotExist, the values array must be empty.
+                                    This array is replaced during a strategic merge
+                                    patch.
+                                  items:
+                                    type: string
+                                  type: array
+                              required:
+                              - key
+                              - operator
+                              type: object
+                            type: array
+                          matchLabels:
+                            additionalProperties:
+                              type: string
+                            description: matchLabels is a map of {key,value} pairs.
+                              A single {key,value} in the matchLabels map is equivalent
+                              to an element of matchExpressions, whose key field is
+                              "key", the operator is "In", and the values array contains
+                              only "value". The requirements are ANDed.
+                            type: object
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      type: array
+                    objectNames:
+                      description: '`objectNames` is a list of object names that match.
+                        An entry of `"*"` means that all match. If this list contains
+                        `"*"` then it should contain nothing else. Empty list is a
+                        special case, it matches every object.'
+                      items:
+                        type: string
+                      type: array
+                    resources:
+                      description: '`resources` is a list of lowercase plural names
+                        for the sorts of objects to match. An entry of `"*"` means
+                        that all match. If this list contains `"*"` then it should
+                        contain nothing else. Empty list is a special case, it matches
+                        every object.'
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                type: array
+              wantSingletonReportedState:
+                description: WantSingletonReportedState indicates that (a) the number
+                  of selected locations is intended to be 1 and (b) the reported state
+                  of each downsynced object should be returned back to the object
+                  in this space. When multiple Placement objects match the same workload
+                  object, the OR of these booleans rules.
+                type: boolean
+            type: object
+          status:
+            description: PlacementStatus defines the observed state of Placement
+            properties:
+              conditions:
+                items:
+                  description: PlacementCondition describes the state of a control
+                    plane at a certain point.
+                  properties:
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    lastUpdateTime:
+                      format: date-time
+                      type: string
+                    message:
+                      type: string
+                    reason:
+                      type: string
+                    status:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - lastUpdateTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              observedGeneration:
+                format: int64
+                type: integer
+            required:
+            - conditions
+            - observedGeneration
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

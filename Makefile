@@ -1,4 +1,4 @@
-# Copyright 2021 The KubeStellar Authors.
+# Copyright 2023 The KubeStellar Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,96 +12,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Image URL to use all building/pushing image targets
+IMG ?= ghcr.io/kubestellar/kubeflex/kubestellar-operator:0.1.0
+# ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
+ENVTEST_K8S_VERSION = 1.26.1
+# Default Namespace to use for make deploy (mainly for local testing)
+DEFAULT_NAMESPACE=default
+# Default WDS name to use for make deploy (mainly for local testing) 
+DEFAULT_WDS_NAME=wds1
+
 # We need bash for some conditional logic below.
 SHELL := /usr/bin/env bash -e
 
-KUBE_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
-KUBE_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
-GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
-GIT_DIRTY ?= $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
-GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
-
-CORE_PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
-CORE_IMAGE_REPO ?= quay.io/kubestellar/kubestellar
-BUILD_TIME_TAG := $(shell date -u +b%y-%m-%d-%H-%M-%S)
-GIT_TAG = git-${GIT_COMMIT}-${GIT_DIRTY}
-
-SYNCER_PLATFORMS ?= linux/amd64,linux/arm64,linux/s390x
-
-GO_INSTALL = ./hack/go-install.sh
-
-TOOLS_DIR=hack/tools
-TOOLS_GOBIN_DIR := $(abspath $(TOOLS_DIR))
-GOBIN_DIR=$(abspath ./bin )
-PATH := $(GOBIN_DIR):$(TOOLS_GOBIN_DIR):$(PATH)
-TMPDIR := $(shell mktemp -d)
-
-# Detect the path used for the install target
+# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
-INSTALL_GOBIN=$(shell go env GOPATH)/bin
+GOBIN=$(shell go env GOPATH)/bin
 else
-INSTALL_GOBIN=$(shell go env GOBIN)
+GOBIN=$(shell go env GOBIN)
 endif
-
-CONTROLLER_GEN_VER := v0.13.0
-CONTROLLER_GEN_BIN := controller-gen
-CONTROLLER_GEN := $(TOOLS_DIR)/$(CONTROLLER_GEN_BIN)-$(CONTROLLER_GEN_VER)
-export CONTROLLER_GEN # so hack scripts can use it
-
-API_GEN_VER := v0.0.0-20230124223207-cb8dd3c46470
-API_GEN_BIN := apigen
-API_GEN := $(TOOLS_DIR)/$(API_GEN_BIN)-$(API_GEN_VER)
-export API_GEN # so hack scripts can use it
-
-YAML_PATCH_VER ?= v0.0.11
-YAML_PATCH_BIN := yaml-patch
-YAML_PATCH := $(TOOLS_DIR)/$(YAML_PATCH_BIN)-$(YAML_PATCH_VER)
-export YAML_PATCH # so hack scripts can use it
-
-OPENSHIFT_GOIMPORTS_VER := 4cd858e694d7dfa32a2e697e0e4bab245c215cf3
-OPENSHIFT_GOIMPORTS_BIN := openshift-goimports
-OPENSHIFT_GOIMPORTS := $(TOOLS_DIR)/$(OPENSHIFT_GOIMPORTS_BIN)-$(OPENSHIFT_GOIMPORTS_VER)
-export OPENSHIFT_GOIMPORTS # so hack scripts can use it
-
-GOLANGCI_LINT_VER := v1.50.1
-GOLANGCI_LINT_BIN := golangci-lint
-GOLANGCI_LINT := $(TOOLS_GOBIN_DIR)/$(GOLANGCI_LINT_BIN)-$(GOLANGCI_LINT_VER)
-
-STATICCHECK_VER := 2022.1
-STATICCHECK_BIN := staticcheck
-STATICCHECK := $(TOOLS_GOBIN_DIR)/$(STATICCHECK_BIN)-$(STATICCHECK_VER)
-
-GOTESTSUM_VER := v1.8.1
-GOTESTSUM_BIN := gotestsum
-GOTESTSUM := $(abspath $(TOOLS_DIR))/$(GOTESTSUM_BIN)-$(GOTESTSUM_VER)
-
-LOGCHECK_VER := v0.4.1
-LOGCHECK_BIN := logcheck
-LOGCHECK := $(TOOLS_GOBIN_DIR)/$(LOGCHECK_BIN)-$(LOGCHECK_VER)
-export LOGCHECK # so hack scripts can use it
-
-CODE_GENERATOR_VER := v2.0.0-alpha.1
-CODE_GENERATOR_BIN := code-generator
-CODE_GENERATOR := $(TOOLS_GOBIN_DIR)/$(CODE_GENERATOR_BIN)-$(CODE_GENERATOR_VER)
-export CODE_GENERATOR # so hack scripts can use it
 
 ARCH := $(shell go env GOARCH)
 OS := $(shell go env GOOS)
 
+KUBE_CLIENT_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/client-go") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
+KUBE_CLIENT_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/client-go") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
+GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
+GIT_DIRTY := $(shell git diff --quiet && echo 'clean' || echo 'dirty')
+GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/client-go") | .Version' --raw-output)+kflex-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+MAIN_VERSION := $(shell git tag -l --sort=-v:refname | head -n1)
 LDFLAGS := \
+	-X main.Version=${MAIN_VERSION}.${GIT_COMMIT} \
+	-X main.BuildDate=${BUILD_DATE} \
 	-X k8s.io/client-go/pkg/version.gitCommit=${GIT_COMMIT} \
 	-X k8s.io/client-go/pkg/version.gitTreeState=${GIT_DIRTY} \
 	-X k8s.io/client-go/pkg/version.gitVersion=${GIT_VERSION} \
-	-X k8s.io/client-go/pkg/version.gitMajor=${KUBE_MAJOR_VERSION} \
-	-X k8s.io/client-go/pkg/version.gitMinor=${KUBE_MINOR_VERSION} \
+	-X k8s.io/client-go/pkg/version.gitMajor=${KUBE_CLIENT_MAJOR_VERSION} \
+	-X k8s.io/client-go/pkg/version.gitMinor=${KUBE_CLIENT_MINOR_VERSION} \
 	-X k8s.io/client-go/pkg/version.buildDate=${BUILD_DATE} \
 	\
 	-X k8s.io/component-base/version.gitCommit=${GIT_COMMIT} \
 	-X k8s.io/component-base/version.gitTreeState=${GIT_DIRTY} \
 	-X k8s.io/component-base/version.gitVersion=${GIT_VERSION} \
-	-X k8s.io/component-base/version.gitMajor=${KUBE_MAJOR_VERSION} \
-	-X k8s.io/component-base/version.gitMinor=${KUBE_MINOR_VERSION} \
+	-X k8s.io/component-base/version.gitMajor=${KUBE_CLIENT_MAJOR_VERSION} \
+	-X k8s.io/component-base/version.gitMinor=${KUBE_CLIENT_MINOR_VERSION} \
 	-X k8s.io/component-base/version.buildDate=${BUILD_DATE} \
 	-extldflags '-static'
 all: build
@@ -110,394 +64,172 @@ all: build
 ldflags:
 	@echo $(LDFLAGS)
 
-.PHONY: require-%
-require-%:
-	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
+# Setting SHELL to bash allows bash commands to be executed by recipes.
+# Options are set to exit when a recipe line exits non-zero or a piped command fails.
+SHELL = /usr/bin/env bash -o pipefail
+.SHELLFLAGS = -ec
 
-build: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator ./cmd/kubestellar-list-syncing-objects
-build: require-jq require-go require-git verify-go-versions ## Build all executables
-	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
-	cp scripts/*/* bin/
-.PHONY: build
+.PHONY: all
+all: build
 
-userbuild: WHAT ?= ./cmd/test-space-framework ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-list-syncing-objects
-userbuild: require-jq require-go require-git verify-go-versions ## Build executables needed by users outside the core image
-	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
-	cp scripts/outer/*   bin/
-	cp scripts/overlap/* bin/
-.PHONY: userbuild
+##@ General
 
-innerbuild: WHAT ?= ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator
-innerbuild: require-jq require-go require-git verify-go-versions ## Build all executables
-	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
-	cp scripts/overlap/* bin/
-	cp scripts/inner/*   bin/
-.PHONY: innerbuild
+# The help target prints out all targets with their descriptions organized
+# beneath their categories. The categories are represented by '##@' and the
+# target descriptions by '##'. The awk commands is responsible for reading the
+# entire set of makefiles included in this invocation, looking for lines of the
+# file as xyz: ## something, and then pretty-format the target and help. Then,
+# if there's a line with ##@ something, that gets pretty-printed as a category.
+# More info on the usage of ANSI control characters for terminal formatting:
+# https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
+# More info on the awk command:
+# http://linuxcommand.org/lc3_adv_awk.php
 
-.PHONY: build-all
-build-all:
-	GOOS=$(OS) GOARCH=$(ARCH) $(MAKE) build WHAT='./cmd/...'
-#'  ./tmc/cmd/...'
+.PHONY: help
+help: ## Display this help.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-.PHONY: kubestellar-image
-kubestellar-image:
-	if ! docker buildx inspect kubestellar &> /dev/null; then docker buildx create --name kubestellar --platform $(CORE_PLATFORMS); fi
-	if [ -n "$(EXTRA_CORE_TAG)" ]; then extra="--tag $(CORE_IMAGE_REPO):$(EXTRA_CORE_TAG)"; else extra=""; fi; eval docker buildx --builder kubestellar build --push --sbom=true --platform $(CORE_PLATFORMS) --tag $(CORE_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CORE_IMAGE_REPO):$(GIT_TAG) $$extra -f core.Dockerfile --build-arg "GIT_DIRTY=$(GIT_DIRTY)" .
+##@ Development
 
-.PHONY: kubestellar-image-local
-kubestellar-image-local:
-	if [ -n "$(EXTRA_CORE_TAG)" ]; then extra="--tag $(CORE_IMAGE_REPO):$(EXTRA_CORE_TAG)"; else extra=""; fi; case "$$HOSTTYPE" in (aarch64*|arm64*) extoo="--platform linux/arm64";; esac; eval docker build --tag $(CORE_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CORE_IMAGE_REPO):$(GIT_TAG) $$extra -f core.Dockerfile $$extoo --build-arg "GIT_DIRTY=$(GIT_DIRTY)" .
+.PHONY: manifests
+manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	cp config/crd/bases/* pkg/crd/files
 
-# .PHONY: build-kind-images
-# build-kind-images-ko: require-ko
-# 	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=kind.local ko build --platform=linux/$(ARCH) ./cmd/syncer))
-# 	$(eval TEST_IMAGE=$(shell KO_DOCKER_REPO=kind.local ko build --platform=linux/$(ARCH) ./test/e2e/fixtures/kcp-test-image))
-# build-kind-images: build-kind-images-ko
-# 	test -n "$(SYNCER_IMAGE)" || (echo Failed to create syncer image; exit 1)
-# 	test -n "$(TEST_IMAGE)" || (echo Failed to create test image; exit 1)
+.PHONY: generate
+generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate/boilerplate.go.txt" paths="./..."
 
-# build and push kubestellar-syncer image by ko
-# e.g. usage:
-#      make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x SYNCER_PLATFORMS=linux/amd64,linux/arm64
-# This example builds ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x image with linux/amd64 and linux/arm64 and push it to ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x
-.PHONY: build-kubestellar-syncer-image
-build-kubestellar-syncer-image: DOCKER_REPO ?= quay.io/kubestellar/syncer
-build-kubestellar-syncer-image: IMAGE_TAG ?= $(GIT_TAG)
-build-kubestellar-syncer-image: ADDITIONAL_ARGS ?= 
-build-kubestellar-syncer-image: require-ko
-	echo KO_DOCKER_REPO=$(DOCKER_REPO) GOFLAGS=-buildvcs=false ko build --platform=$(SYNCER_PLATFORMS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer
-	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) GOFLAGS=-buildvcs=false ko build --platform=$(SYNCER_PLATFORMS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer))
-	@echo "$(SYNCER_IMAGE)"
+.PHONY: fmt
+fmt: ## Run go fmt against code.
+	go fmt ./...
 
-.PHONY: build-kubestellar-syncer-image-local
-build-kubestellar-syncer-image-local: require-ko
-	$(eval SYNCER_IMAGE=$(shell ko build --local --image-label GIT_COMMIT=${GIT_COMMIT},GIT_DIRTY=${GIT_DIRTY} --platform=linux/$(ARCH) ./cmd/syncer))
-	@echo "$(SYNCER_IMAGE)"
-
-install: WHAT ?= ./cmd/...
-install:
-	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go install -ldflags="$(LDFLAGS)" $(WHAT)
-	ln -sf $(INSTALL_GOBIN)/kubectl-workspace $(INSTALL_GOBIN)/kubectl-ws
-	ln -sf $(INSTALL_GOBIN)/kubectl-workspace $(INSTALL_GOBIN)/kubectl-workspaces
-.PHONY: install
-
-$(GOLANGCI_LINT):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/golangci/golangci-lint/cmd/golangci-lint $(GOLANGCI_LINT_BIN) $(GOLANGCI_LINT_VER)
-
-$(STATICCHECK):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) honnef.co/go/tools/cmd/staticcheck $(STATICCHECK_BIN) $(STATICCHECK_VER)
-
-$(LOGCHECK):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) sigs.k8s.io/logtools/logcheck $(LOGCHECK_BIN) $(LOGCHECK_VER)
-
-$(CODE_GENERATOR):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/kcp-dev/code-generator/v2 $(CODE_GENERATOR_BIN) $(CODE_GENERATOR_VER)
-
-lint: $(GOLANGCI_LINT) $(STATICCHECK) $(LOGCHECK)
-#	$(GOLANGCI_LINT) run ./...
-#	$(STATICCHECK) -checks ST1019,ST1005 ./...
-	./hack/verify-contextual-logging.sh
-.PHONY: lint
-
-update-contextual-logging: $(LOGCHECK)
-	UPDATE=true ./hack/verify-contextual-logging.sh
-.PHONY: update-contextual-logging
-
-# generate-docs:
-# 	go run hack/generate/cli-doc/gen-cli-doc.go
-# 	./hack/generate/crd-ref/run-crd-ref-gen.sh
-
-VENVDIR=$(abspath docs/venv)
-REQUIREMENTS_TXT=docs/requirements.txt
-
-.PHONY: serve-docs
-serve-docs: venv
-	. $(VENV)/activate; \
-	VENV=$(VENV) REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/serve-docs.sh
-
-.PHONY: deploy-docs
-deploy-docs: venv
-	. $(VENV)/activate; \
-	REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/deploy-docs.sh
-
-.PHONY: docs-ecutable
-docs-ecutable: 
-	MANIFEST=$(MANIFEST) docs/scripts/docs-ecutable.sh
-
-.PHONY: write-time-to-file
-write-time-to-file: 
-	FILENAME=$(FILENAME) docs/scripts/get-elapsed-time.sh
-
-tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS) $(CODE_GENERATOR)
-.PHONY: tools
-
-$(CONTROLLER_GEN):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) sigs.k8s.io/controller-tools/cmd/controller-gen $(CONTROLLER_GEN_BIN) $(CONTROLLER_GEN_VER)
-
-$(API_GEN):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/kcp-dev/kcp/cmd/apigen $(API_GEN_BIN) $(API_GEN_VER)
-
-$(YAML_PATCH):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/pivotal-cf/yaml-patch/cmd/yaml-patch $(YAML_PATCH_BIN) $(YAML_PATCH_VER)
-
-$(GOTESTSUM):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) gotest.tools/gotestsum $(GOTESTSUM_BIN) $(GOTESTSUM_VER)
-
-crds: $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH)
-	./hack/update-codegen-crds.sh
-.PHONY: crds
-
-codegen: crds $(CODE_GENERATOR)
-	rm -rf pkg/client/*
-	go mod download
-	./hack/update-codegen-clients.sh
-	$(MAKE) imports
-.PHONY: codegen
-
-# Note, running this locally if you have any modified files, even those that are not generated,
-# will result in an error. This target is mostly for CI jobs.
-.PHONY: verify-codegen
-verify-codegen:
-	if [[ -n "${GITHUB_WORKSPACE}" ]]; then \
-		mkdir -p $$(go env GOPATH)/src/github.com/kubestellar; \
-		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kubestellar/kubestellar; \
-	fi
-
-	$(MAKE) codegen
-
-	if ! git diff --quiet HEAD; then \
-		git diff; \
-		echo "You need to run 'make codegen' to update generated files and commit them"; \
-		exit 1; \
-	fi
-
-.PHONY: verify-syncer-codegen
-verify-syncer-codegen:
-	if [[ -n "${GITHUB_WORKSPACE}" ]]; then \
-		mkdir -p $$(go env GOPATH)/src/github.com/kubestellar; \
-		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kubestellar/kubestellar; \
-	fi
-
-#	$(MAKE) syncer-codegen
-
-	if ! git diff --quiet HEAD; then \
-		git diff; \
-		echo "You need to run 'make codegen' to update generated files and commit them"; \
-		exit 1; \
-	fi
-
-$(OPENSHIFT_GOIMPORTS):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/openshift-eng/openshift-goimports $(OPENSHIFT_GOIMPORTS_BIN) $(OPENSHIFT_GOIMPORTS_VER)
-
-.PHONY: imports
-imports: $(OPENSHIFT_GOIMPORTS) verify-go-versions
-	$(OPENSHIFT_GOIMPORTS) -i github.com/kcp-dev -m github.com/kubestellar/kubestellar
-
-$(TOOLS_DIR)/verify_boilerplate.py:
-	mkdir -p $(TOOLS_DIR)
-	curl --fail --retry 3 -L -o $(TOOLS_DIR)/verify_boilerplate.py https://raw.githubusercontent.com/kubernetes/repo-infra/master/hack/verify_boilerplate.py
-	chmod +x $(TOOLS_DIR)/verify_boilerplate.py
-
-.PHONY: verify-boilerplate
-verify-boilerplate: $(TOOLS_DIR)/verify_boilerplate.py
-	$(TOOLS_DIR)/verify_boilerplate.py --boilerplate-dir=hack/boilerplate --skip docs
-
-ifdef ARTIFACT_DIR
-GOTESTSUM_ARGS += --junitfile=$(ARTIFACT_DIR)/junit.xml
-endif
-
-GO_TEST = go test
-ifdef USE_GOTESTSUM
-GO_TEST = $(GOTESTSUM) $(GOTESTSUM_ARGS) --
-endif
-
-COUNT ?=
-COUNT_ARG =
-ifdef COUNT
-COUNT_ARG = -count $(COUNT)
-endif
-E2E_PARALLELISM ?=
-ifdef E2E_PARALLELISM
-PARALLELISM_ARG = -p $(E2E_PARALLELISM) -parallel $(E2E_PARALLELISM)
-endif
-SUITES ?=
-SUITES_ARG =
-COMPLETE_SUITES_ARG =
-ifdef SUITES
-SUITES_ARG = --suites $(SUITES)
-COMPLETE_SUITES_ARG = -args $(SUITES_ARG)
-endif
-
-
-# .PHONY: test-e2e
-# ifdef USE_GOTESTSUM
-# test-e2e: $(GOTESTSUM)
-# endif
-# test-e2e: TEST_ARGS ?=
-# test-e2e: WHAT ?= ./test/e2e...
-# test-e2e: build-all
-# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) $(COMPLETE_SUITES_ARG)
-
-# .PHONY: test-e2e-shared
-# ifdef USE_GOTESTSUM
-# test-e2e-shared: $(GOTESTSUM)
-# endif
-# test-e2e-shared: TEST_ARGS ?=
-# test-e2e-shared: WHAT ?= ./test/e2e...
-# test-e2e-shared: WORK_DIR ?= .
-# ifdef ARTIFACT_DIR
-# test-e2e-shared: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-# else
-# test-e2e-shared: LOG_DIR ?= $(WORK_DIR)/.kcp
-# endif
-# test-e2e-shared: require-kind build-all build-kind-images
-# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-# 	kind get kubeconfig > "$(WORK_DIR)/.kcp/kind.kubeconfig"
-# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/test-server --quiet --log-file-path="$(LOG_DIR)/kcp.log" $(TEST_SERVER_ARGS) 2>&1 & PID=$$! && echo "PID $$PID" && \
-# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
-# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-# 		-args --use-default-kcp-server --syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --wec-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" $(SUITES_ARG) \
-# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
-
-# .PHONY: test-e2e-shared-minimal
-# ifdef USE_GOTESTSUM
-# test-e2e-shared-minimal: $(GOTESTSUM)
-# endif
-# test-e2e-shared-minimal: TEST_ARGS ?=
-# test-e2e-shared-minimal: WHAT ?= ./test/e2e...
-# test-e2e-shared-minimal: WORK_DIR ?= .
-# ifdef ARTIFACT_DIR
-# test-e2e-shared-minimal: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-# else
-# test-e2e-shared-minimal: LOG_DIR ?= $(WORK_DIR)/.kcp
-# endif
-# test-e2e-shared-minimal: build-all
-# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/test-server --quiet --log-file-path="$(LOG_DIR)/kcp.log" $(TEST_SERVER_ARGS) 2>&1 & PID=$$! && echo "PID $$PID" && \
-# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
-# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-# 		-args --use-default-kcp-server $(SUITES_ARG) \
-# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
-
-# .PHONY: test-e2e-sharded
-# ifdef USE_GOTESTSUM
-# test-e2e-sharded: $(GOTESTSUM)
-# endif
-# test-e2e-sharded: TEST_ARGS ?=
-# test-e2e-sharded: WHAT ?= ./test/e2e...
-# test-e2e-sharded: WORK_DIR ?= .
-# ifdef ARTIFACT_DIR
-# test-e2e-sharded: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-# else
-# test-e2e-sharded: LOG_DIR ?= $(WORK_DIR)/.kcp
-# endif
-# test-e2e-sharded: require-kind build-all build-kind-images
-# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-# 	kind get kubeconfig > "$(WORK_DIR)/.kcp/kind.kubeconfig"
-# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/sharded-test-server --quiet --v=2 --log-dir-path="$(LOG_DIR)" --work-dir-path="$(WORK_DIR)" $(TEST_SERVER_ARGS) --number-of-shards=2 2>&1 & PID=$$!; echo "PID $$PID" && \
-# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
-# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-# 		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARG) \
-# 		--syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --wec-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" \
-# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
-
-# .PHONY: test-e2e-sharded-minimal
-# ifdef USE_GOTESTSUM
-# test-e2e-sharded-minimal: $(GOTESTSUM)
-# endif
-# test-e2e-sharded-minimal: TEST_ARGS ?=
-# test-e2e-sharded-minimal: WHAT ?= ./test/e2e...
-# test-e2e-sharded-minimal: WORK_DIR ?= .
-# ifdef ARTIFACT_DIR
-# test-e2e-sharded-minimal: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-# else
-# test-e2e-sharded-minimal: LOG_DIR ?= $(WORK_DIR)/.kcp
-# endif
-# test-e2e-sharded-minimal: build-all
-# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/sharded-test-server --quiet --v=2 --log-dir-path="$(LOG_DIR)" --work-dir-path="$(WORK_DIR)" $(TEST_SERVER_ARGS) --number-of-shards=2 2>&1 & PID=$$!; echo "PID $$PID" && \
-# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
-# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-# 		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARGS) \
-# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
-
-kcp/bin/kcp:
-	bash ./bootstrap/bootstrap-kubestellar.sh --deploy false
-
-.PHONY: e2e-test-kubestellar-syncer
-e2e-test-kubestellar-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-e2e-test-kubestellar-syncer: TEST_ARGS ?=
-e2e-test-kubestellar-syncer: build # so that we can use `kubestellar init` below
-e2e-test-kubestellar-syncer: PATH := $(PWD)/kcp/bin:$(PATH)
-e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup kcp/bin/kcp
-	mkdir -p $(WORK_DIR)/.kcp && \
-	kcp start --root-directory=$(WORK_DIR)/.kcp > $(WORK_DIR)/.kcp/kcp.log 2>&1 & PID=$$! && echo "PID $$PID" && \
-	trap 'kill -TERM $$PID' TERM INT EXIT && \
-	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; echo "kcp is not ready. wait for 1s...";done && \
-	echo 'kcp is ready. Wait for Workspace API to be ready' && \
-	export KUBECONFIG=$(WORK_DIR)/.kcp/admin.kubeconfig && \
-	while ! kubectl get workspaces &> /dev/null; do sleep 1; echo "Workspace API is not ready. wait for 1s...";done && \
-	echo 'Workspace API is ready. Setup spaces by kubestellar init' && \
-	bin/kubestellar init && \
-	echo 'Starting test(s). To add TEST_ARGS=-v option to Make command if displaying the detail logs' && \
-	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) \
-		$(GO_TEST) -race $(COUNT_ARG) ./test/e2e/kubestellar-syncer/... $(TEST_ARGS) \
-		--kcp-kubeconfig $(WORK_DIR)/.kcp/admin.kubeconfig --suites kubestellar-syncer \
-	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
-
-.PHONY: e2e-test-kubestellar-syncer-cleanup
-e2e-test-kubestellar-syncer-cleanup:
-	rm -rf $(WORK_DIR)/.kcp/etcd-server
-	rm -rf $(WORK_DIR)/.kcp/.admin-token-store $(WORK_DIR)/.kcp/admin.kubeconfig
-	rm -rf $(WORK_DIR)/.kcp/apiserver.* $(WORK_DIR)/.kcp/sa.key
-
-.PHONY: test-syncer
-test-syncer:
-	$(GO_TEST) $(COUNT_ARG) `go list ./... | grep "/pkg/cliplugins\|/pkg/syncer"`
+.PHONY: vet
+vet: ## Run go vet against code.
+	go vet ./...
 
 .PHONY: test
-ifdef USE_GOTESTSUM
-test: $(GOTESTSUM)
+test: manifests generate fmt vet envtest ## Run tests.
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test ./... -coverprofile cover.out
+
+##@ Build
+
+
+.PHONY: run
+run: manifests generate fmt vet ## Run a controller from your host.
+	go run ./cmd/kubestellar-operator/main.go $(ARGS)
+
+# If you wish built the manager image targeting other platforms you can use the --platform flag.
+# (i.e. docker build --platform linux/arm64 ). However, you must enable docker buildKit for it.
+# More info: https://docs.docker.com/develop/develop-images/build_enhancements/
+.PHONY: docker-build
+docker-build: test ## Build docker image with the manager.
+	docker build -t ${IMG} .
+
+.PHONY: docker-push
+docker-push: ## Push docker image with the manager.
+	docker push ${IMG}
+
+# PLATFORMS defines the target platforms for  the manager image be build to provide support to multiple
+# architectures. (i.e. make docker-buildx IMG=myregistry/mypoperator:0.0.1). To use this option you need to:
+# - able to use docker buildx . More info: https://docs.docker.com/build/buildx/
+# - have enable BuildKit, More info: https://docs.docker.com/develop/develop-images/build_enhancements/
+# - be able to push the image for your registry (i.e. if you do not inform a valid value via IMG=<myregistry/image:<tag>> then the export will fail)
+# To properly provided solutions that supports more than one platform you should use this option.
+PLATFORMS ?= linux/arm64,linux/amd64,linux/s390x,linux/ppc64le
+.PHONY: docker-buildx
+docker-buildx: test ## Build and push docker image for the manager for cross-platform support
+	# copy existing Dockerfile and insert --platform=${BUILDPLATFORM} into Dockerfile.cross, and preserve the original Dockerfile
+	sed -e '1 s/\(^FROM\)/FROM --platform=\$$\{BUILDPLATFORM\}/; t' -e ' 1,// s//FROM --platform=\$$\{BUILDPLATFORM\}/' Dockerfile > Dockerfile.cross
+	- docker buildx create --name project-v3-builder
+	docker buildx use project-v3-builder
+	- docker buildx build --push --platform=$(PLATFORMS) --tag ${IMG} -f Dockerfile.cross .
+	- docker buildx rm project-v3-builder
+	rm Dockerfile.cross
+
+##@ Deployment
+
+ifndef ignore-not-found
+  ignore-not-found = false
 endif
-test: WHAT ?= ./...
-# We will need to move into the sub package, of pkg/apis to run those tests.
-test:
-# 	$(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $$(go list "$(WHAT)" | grep -v ./test/e2e/)
-# 	cd pkg/apis && $(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $(WHAT)
 
-.PHONY: verify-k8s-deps
-verify-k8s-deps:
-	hack/validate-k8s.sh
+.PHONY: install
+install: manifests kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/config.
+	$(KUSTOMIZE) build config/crd | kubectl apply -f -
 
-.PHONY: verify-imports
-verify-imports:
-	hack/verify-imports.sh
+.PHONY: uninstall
+uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
+	$(KUSTOMIZE) build config/crd | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
+
+.PHONY: deploy
+deploy: manifests kustomize ## Deploy manager to the K8s cluster specified in ~/.kube/config.
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build config/default | sed -e 's/{{.Release.Namespace}}/${DEFAULT_NAMESPACE}/g' -e 's/{{.Values.ControlPlaneName}}/${DEFAULT_WDS_NAME}/g' | kubectl apply -f -
+
+.PHONY: undeploy
+undeploy: ## Undeploy manager from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
+	$(KUSTOMIZE) build config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
+
+.PHONY: chart
+chart: manifests kustomize
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
+	$(KUSTOMIZE) build config/default > core-helm-chart/templates/operator.yaml
+	scripts/add-helm-code.sh add
+
+##@ Build Dependencies
+
+## Location to install dependencies to
+LOCALBIN ?= $(shell pwd)/bin
+$(LOCALBIN):
+	mkdir -p $(LOCALBIN)
+
+## Tool Binaries
+KUSTOMIZE ?= $(LOCALBIN)/kustomize
+CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
+ENVTEST ?= $(LOCALBIN)/setup-envtest
+
+## Tool Versions
+KUSTOMIZE_VERSION ?= v5.1.0
+CONTROLLER_TOOLS_VERSION ?= v0.11.3
+
+KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
+.PHONY: kustomize
+kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary. If wrong version is installed, it will be removed before downloading.
+$(KUSTOMIZE): $(LOCALBIN)
+	@if test -x $(LOCALBIN)/kustomize && ! $(LOCALBIN)/kustomize version | grep -q $(KUSTOMIZE_VERSION); then \
+		echo "$(LOCALBIN)/kustomize version is not expected $(KUSTOMIZE_VERSION). Removing it before installing."; \
+		rm -rf $(LOCALBIN)/kustomize; \
+	fi
+	test -s $(LOCALBIN)/kustomize || { curl -Ss $(KUSTOMIZE_INSTALL_SCRIPT) --output install_kustomize.sh && bash install_kustomize.sh $(subst v,,$(KUSTOMIZE_VERSION)) $(LOCALBIN); rm install_kustomize.sh; }
+
+.PHONY: controller-gen
+controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary. If wrong version is installed, it will be overwritten.
+$(CONTROLLER_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
+	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
+
+.PHONY: envtest
+envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
+$(ENVTEST): $(LOCALBIN)
+	test -s $(LOCALBIN)/setup-envtest || GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
 
 .PHONY: verify-go-versions
 verify-go-versions:
 	hack/verify-go-versions.sh
 
-.PHONY: modules
-modules: ## Run go mod tidy to ensure modules are up to date
-	go mod tidy
+.PHONY: require-%
+require-%:
+	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in ${PATH}"; exit 1; fi
 
-.PHONY: verify-modules
-verify-modules: modules  ## Verify go modules are up to date
-	@if !(git diff --quiet HEAD -- go.sum go.mod); then \
-		git diff; \
-		echo "go module files are out of date"; exit 1; \
-	fi
+.PHONY: build-all
+build-all:
+	GOOS=$(OS) GOARCH=$(ARCH) $(MAKE) build WHAT='./cmd/...'
 
-.PHONY: help
-help: ## Show this help.
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+.PHONY: build
+build: WHAT ?= ./cmd/...
+build: bin-dir require-jq require-go require-git verify-go-versions  ## Build the project
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 
-include Makefile.venv
+.PHONY: bin-dir
+bin-dir:
+	mkdir -p bin
