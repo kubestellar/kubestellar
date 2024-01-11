@@ -87,8 +87,6 @@ export CODE_GENERATOR # so hack scripts can use it
 
 ARCH := $(shell go env GOARCH)
 OS := $(shell go env GOOS)
-TARGETARCH ?= $(ARCH)
-TARGETOS ?= $(OS)
 
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 LDFLAGS := \
@@ -131,7 +129,7 @@ userbuild: require-jq require-go require-git verify-go-versions ## Build executa
 
 innerbuild: WHAT ?= ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator
 innerbuild: require-jq require-go require-git verify-go-versions ## Build all executables
-	GOOS=$(TARGETOS) GOARCH=$(TARGETARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 	cp scripts/overlap/* bin/
 	cp scripts/inner/*   bin/
 .PHONY: innerbuild
