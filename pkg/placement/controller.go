@@ -69,8 +69,8 @@ var excludedResourceNames = map[string]bool{
 	"endpoints":            true,
 }
 
-// Controller watches all objects, find associated placements, when mached a placement wraps and
-// place objects ino mailboxes
+// Controller watches all objects, finds associated placements, when matched a placement wraps and
+// places objects into mailboxes
 type Controller struct {
 	ctx              context.Context
 	logger           logr.Logger

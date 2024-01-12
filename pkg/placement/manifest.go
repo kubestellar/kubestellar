@@ -65,7 +65,7 @@ func reconcileManifest(cl client.Client, manifest *workv1.ManifestWork, namespac
 }
 
 func deleteManifestForObject(cl client.Client, obj runtime.Object, namespace string) error {
-	manifest := ocm.BuilEmptyManifestFromObject(obj)
+	manifest := ocm.BuildEmptyManifestFromObject(obj)
 	manifest.SetNamespace(namespace)
 	if err := cl.Delete(context.TODO(), manifest, &client.DeleteOptions{}); err != nil {
 		return err
