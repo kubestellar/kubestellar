@@ -251,6 +251,15 @@ lint: $(GOLANGCI_LINT) $(STATICCHECK) $(LOGCHECK)
 verify-go-versions:
 	hack/verify-go-versions.sh
 
+$(TOOLS_DIR)/verify_boilerplate.py:
+	mkdir -p $(TOOLS_DIR)
+	curl --fail --retry 3 -L -o $(TOOLS_DIR)/verify_boilerplate.py https://raw.githubusercontent.com/kubernetes/repo-infra/master/hack/verify_boilerplate.py
+	chmod +x $(TOOLS_DIR)/verify_boilerplate.py
+
+.PHONY: verify-boilerplate
+verify-boilerplate: $(TOOLS_DIR)/verify_boilerplate.py
+	$(TOOLS_DIR)/verify_boilerplate.py --boilerplate-dir=hack/boilerplate --skip docs
+
 .PHONY: require-%
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in ${PATH}"; exit 1; fi
