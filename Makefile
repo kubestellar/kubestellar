@@ -34,6 +34,29 @@ endif
 ARCH := $(shell go env GOARCH)
 OS := $(shell go env GOOS)
 
+TOOLS_DIR=hack/tools
+TOOLS_GOBIN_DIR := $(abspath $(TOOLS_DIR))
+GOBIN_DIR=$(abspath ./bin )
+PATH := $(GOBIN_DIR):$(TOOLS_GOBIN_DIR):$(PATH)
+TMPDIR := $(shell mktemp -d)
+GO_INSTALL = ./hack/go-install.sh
+
+# Detect the path used for the install target
+ifeq (,$(shell go env GOBIN))
+INSTALL_GOBIN=$(shell go env GOPATH)/bin
+else
+INSTALL_GOBIN=$(shell go env GOBIN)
+endif
+
+GOLANGCI_LINT_VER := v1.50.1
+GOLANGCI_LINT_BIN := golangci-lint
+GOLANGCI_LINT := $(TOOLS_GOBIN_DIR)/$(GOLANGCI_LINT_BIN)-$(GOLANGCI_LINT_VER)
+
+STATICCHECK_VER := 2022.1
+STATICCHECK_BIN := staticcheck
+STATICCHECK := $(TOOLS_GOBIN_DIR)/$(STATICCHECK_BIN)-$(STATICCHECK_VER)
+
+
 KUBE_CLIENT_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/client-go") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
 KUBE_CLIENT_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/client-go") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
 GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
@@ -189,18 +212,12 @@ CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
 
 ## Tool Versions
-KUSTOMIZE_VERSION ?= v5.1.0
 CONTROLLER_TOOLS_VERSION ?= v0.11.3
 
-KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
-kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary. If wrong version is installed, it will be removed before downloading.
+kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary. 
 $(KUSTOMIZE): $(LOCALBIN)
-	@if test -x $(LOCALBIN)/kustomize && ! $(LOCALBIN)/kustomize version | grep -q $(KUSTOMIZE_VERSION); then \
-		echo "$(LOCALBIN)/kustomize version is not expected $(KUSTOMIZE_VERSION). Removing it before installing."; \
-		rm -rf $(LOCALBIN)/kustomize; \
-	fi
-	test -s $(LOCALBIN)/kustomize || { curl -Ss $(KUSTOMIZE_INSTALL_SCRIPT) --output install_kustomize.sh && bash install_kustomize.sh $(subst v,,$(KUSTOMIZE_VERSION)) $(LOCALBIN); rm install_kustomize.sh; }
+	test -s $(LOCALBIN)/kustomize || GOBIN=$(LOCALBIN) go install sigs.k8s.io/kustomize/kustomize/v5@latest
 
 .PHONY: controller-gen
 controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary. If wrong version is installed, it will be overwritten.
@@ -212,6 +229,23 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
 $(ENVTEST): $(LOCALBIN)
 	test -s $(LOCALBIN)/setup-envtest || GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+
+$(GOLANGCI_LINT):
+	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/golangci/golangci-lint/cmd/golangci-lint $(GOLANGCI_LINT_BIN) $(GOLANGCI_LINT_VER)
+
+$(STATICCHECK):
+	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) honnef.co/go/tools/cmd/staticcheck $(STATICCHECK_BIN) $(STATICCHECK_VER)
+
+$(LOGCHECK):
+	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) sigs.k8s.io/logtools/logcheck $(LOGCHECK_BIN) $(LOGCHECK_VER)
+
+update-contextual-logging: $(LOGCHECK)
+	UPDATE=true ./hack/verify-contextual-logging.sh
+.PHONY: update-contextual-logging
+
+.PHONY: lint
+lint: $(GOLANGCI_LINT) $(STATICCHECK) $(LOGCHECK)
+	./hack/verify-contextual-logging.sh
 
 .PHONY: verify-go-versions
 verify-go-versions:
