@@ -17,8 +17,6 @@ limitations under the License.
 package placement
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/kubestellar/kubestellar/pkg/ocm"
@@ -30,7 +28,7 @@ import (
 // (the latter forces the selection  of only one cluster)
 func (c *Controller) matchSelectors(obj runtime.Object) ([]string, []string, bool, error) {
 	managedByPlacementList := []string{}
-	mObj := obj.(metav1.Object)
+	objMR := obj.(mrObject)
 	placements, err := c.listPlacements()
 	if err != nil {
 		return nil, nil, false, err
@@ -43,22 +41,8 @@ func (c *Controller) matchSelectors(obj runtime.Object) ([]string, []string, boo
 		if err != nil {
 			return nil, nil, false, err
 		}
-		matchAllSelectors := false
-		for _, downsync := range placement.Spec.Downsync {
-			for _, s := range downsync.LabelSelectors {
-				selector, err := metav1.LabelSelectorAsSelector(&s)
-				if err != nil {
-					return nil, nil, false, err
-				}
-				if selector.Matches(labels.Set(mObj.GetLabels())) {
-					matchAllSelectors = true
-				} else {
-					matchAllSelectors = false
-					break
-				}
-			}
-		}
-		if !matchAllSelectors {
+		matchedSome := c.testObject(objMR, placement.Spec.Downsync)
+		if !matchedSome {
 			continue
 		}
 		// WantSingletonReportedState for multiple placement are OR'd

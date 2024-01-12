@@ -22,8 +22,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-logr/logr"
 	workv1 "open-cluster-management.io/api/work/v1"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -304,23 +306,9 @@ func (c *Controller) checkObjectMatchesWhatAndWhere(placementObj, obj runtime.Ob
 	}
 
 	// check the What matches
-	mObj := obj.(metav1.Object)
-	matchAllSelectors := false
-	for _, downsync := range placement.Spec.Downsync {
-		for _, s := range downsync.LabelSelectors {
-			selector, err := metav1.LabelSelectorAsSelector(&s)
-			if err != nil {
-				return match, err
-			}
-			if selector.Matches(labels.Set(mObj.GetLabels())) {
-				matchAllSelectors = true
-			} else {
-				matchAllSelectors = false
-				break
-			}
-		}
-	}
-	if !matchAllSelectors {
+	objMR := obj.(mrObject)
+	matchedSome := c.testObject(objMR, placement.Spec.Downsync)
+	if !matchedSome {
 		c.logger.Info("The 'What' no longer matches. Object marked for removal.", "object", util.GenerateObjectInfoString(obj), "for placement", placement.GetName())
 		return false, nil
 	}
@@ -339,6 +327,80 @@ func (c *Controller) checkObjectMatchesWhatAndWhere(placementObj, obj runtime.Ob
 	return match, nil
 }
 
+type mrObject interface {
+	metav1.Object
+	runtime.Object
+}
+
+func (c *Controller) testObject(obj mrObject, tests []v1alpha1.ObjectTest) bool {
+	objNSName := obj.GetNamespace()
+	objName := obj.GetName()
+	objLabels := obj.GetLabels()
+	gvk := obj.GetObjectKind().GroupVersionKind()
+	gvkKey := util.KeyForGroupVersionKind(gvk.Group, gvk.Version, gvk.Kind)
+	objGVR, haveGVR := c.gvksMap[gvkKey]
+	if !haveGVR {
+		c.logger.Info("No GVR, assuming object does not match", "gvk", gvk, "objNS", objNSName, "objName", objName)
+		return false
+	}
+	var objNS *corev1.Namespace
+	for _, test := range tests {
+		if test.APIGroup != nil && (*test.APIGroup) != gvk.Group {
+			continue
+		}
+		if len(test.Resources) > 0 && !(SliceContains(test.Resources, "*") || SliceContains(test.Resources, objGVR.Resource)) {
+			continue
+		}
+		if len(test.Namespaces) > 0 && !(SliceContains(test.Namespaces, "*") || SliceContains(test.Namespaces, objNSName)) {
+			continue
+		}
+		if len(test.ObjectNames) > 0 && !(SliceContains(test.ObjectNames, "*") || SliceContains(test.ObjectNames, objName)) {
+			continue
+		}
+		if len(test.ObjectSelectors) > 0 && !labelsMatchAny(c.logger, objLabels, test.ObjectSelectors) {
+			continue
+		}
+		if len(test.NamespaceSelectors) > 0 {
+			if objNS == nil {
+				var err error
+				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(nil, objNSName, metav1.GetOptions{})
+				if err != nil {
+					c.logger.Info("Object namespace not found, assuming object does not match", "gvk", gvk, "objNS", objNSName, "objName", objName)
+					continue
+				}
+			}
+			if !labelsMatchAny(c.logger, objNS.Labels, test.NamespaceSelectors) {
+				continue
+			}
+		}
+		return true
+	}
+	return false
+}
+
+func labelsMatchAny(logger logr.Logger, labelSet map[string]string, selectors []metav1.LabelSelector) bool {
+	for _, ls := range selectors {
+		sel, err := metav1.LabelSelectorAsSelector(&ls)
+		if err != nil {
+			logger.Info("Failed to convert LabelSelector to labels.Selector", "ls", ls, "err", err)
+			continue
+		}
+		if sel.Matches(labels.Set(labelSet)) {
+			return true
+		}
+	}
+	return false
+}
+
 func getClusterNameFromManifest(manifest workv1.ManifestWork) string {
 	return manifest.Namespace
+}
+
+func SliceContains[Elt comparable](slice []Elt, seek Elt) bool {
+	for _, elt := range slice {
+		if elt == seek {
+			return true
+		}
+	}
+	return false
 }
