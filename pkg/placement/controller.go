@@ -391,7 +391,7 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		if err != nil {
 			// The resource no longer exist, which means it has been deleted.
 			if errors.IsNotFound(err) {
-				utilruntime.HandleError(fmt.Errorf("resource '%s' for lister '%s' in work queue no longer exists", key.NamespaceNameKey, key.GvkKey))
+				utilruntime.HandleError(fmt.Errorf("object %#v for lister '%s' in work queue no longer exists", key.NamespacedName, key.GvkKey))
 				return nil
 			}
 			return err
@@ -454,13 +454,7 @@ func (c *Controller) getObjectFromKey(key util.Key) (runtime.Object, error) {
 	}
 	lister := *pLister
 
-	namespace, name, err := cache.SplitMetaNamespaceKey(key.NamespaceNameKey)
-	if err != nil {
-		utilruntime.HandleError(fmt.Errorf("invalid resource key: %s %s", key.NamespaceNameKey, err))
-		return nil, nil
-	}
-
-	return getObject(lister, namespace, name)
+	return getObject(lister, key.NamespacedName.Namespace, key.NamespacedName.Name)
 }
 
 func getObject(lister cache.GenericLister, namespace, name string) (runtime.Object, error) {
