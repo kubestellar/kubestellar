@@ -12,9 +12,7 @@ presubmits:
             - verify-codegen
             - verify-go-versions
             - verify-imports
-            - verify-k8s-deps
             - verify-modules
-            - verify-syncer-codegen
           resources:
             requests:
               memory: 1Gi

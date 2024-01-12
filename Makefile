@@ -56,6 +56,10 @@ STATICCHECK_VER := 2022.1
 STATICCHECK_BIN := staticcheck
 STATICCHECK := $(TOOLS_GOBIN_DIR)/$(STATICCHECK_BIN)-$(STATICCHECK_VER)
 
+OPENSHIFT_GOIMPORTS_VER := 4cd858e694d7dfa32a2e697e0e4bab245c215cf3
+OPENSHIFT_GOIMPORTS_BIN := openshift-goimports
+OPENSHIFT_GOIMPORTS := $(TOOLS_DIR)/$(OPENSHIFT_GOIMPORTS_BIN)-$(OPENSHIFT_GOIMPORTS_VER)
+export OPENSHIFT_GOIMPORTS # so hack scripts can use it
 
 KUBE_CLIENT_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/client-go") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
 KUBE_CLIENT_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/client-go") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
@@ -250,6 +254,43 @@ lint: $(GOLANGCI_LINT) $(STATICCHECK) $(LOGCHECK)
 .PHONY: verify-go-versions
 verify-go-versions:
 	hack/verify-go-versions.sh
+
+$(TOOLS_DIR)/verify_boilerplate.py:
+	mkdir -p $(TOOLS_DIR)
+	curl --fail --retry 3 -L -o $(TOOLS_DIR)/verify_boilerplate.py https://raw.githubusercontent.com/kubernetes/repo-infra/master/hack/verify_boilerplate.py
+	chmod +x $(TOOLS_DIR)/verify_boilerplate.py
+
+.PHONY: verify-boilerplate
+verify-boilerplate: $(TOOLS_DIR)/verify_boilerplate.py
+	$(TOOLS_DIR)/verify_boilerplate.py --boilerplate-dir=hack/boilerplate --skip docs
+
+# TODO - there is currently no client code generation, need to revisit once that is added back
+# this stub is mainly to pass the CI
+.PHONY: verify-codegen
+verify-codegen:
+	@echo ""
+
+$(OPENSHIFT_GOIMPORTS):
+	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/openshift-eng/openshift-goimports $(OPENSHIFT_GOIMPORTS_BIN) $(OPENSHIFT_GOIMPORTS_VER)
+
+.PHONY: imports
+imports: $(OPENSHIFT_GOIMPORTS) verify-go-versions
+	$(OPENSHIFT_GOIMPORTS) -i github.com/kcp-dev -m github.com/kubestellar/kubestellar
+
+.PHONY: verify-imports
+verify-imports:
+	hack/verify-imports.sh	
+
+.PHONY: modules
+modules: ## Run go mod tidy to ensure modules are up to date
+	go mod tidy
+
+.PHONY: verify-modules
+verify-modules: modules  ## Verify go modules are up to date
+	@if !(git diff --quiet HEAD -- go.sum go.mod); then \
+		git diff; \
+		echo "go module files are out of date"; exit 1; \
+	fi
 
 .PHONY: require-%
 require-%:

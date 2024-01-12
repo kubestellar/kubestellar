@@ -19,13 +19,14 @@ package util
 import (
 	"fmt"
 
-	"github.com/kubestellar/kubestellar/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
+
+	"github.com/kubestellar/kubestellar/api/v1alpha1"
 )
 
 const (

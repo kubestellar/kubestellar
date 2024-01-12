@@ -21,9 +21,9 @@ import (
 	"os"
 	"path/filepath"
 
+	tenancyv1alpha1 "github.com/kubestellar/kubeflex/api/v1alpha1"
 	homedir "github.com/mitchellh/go-homedir"
 
-	"github.com/openshift/client-go/security/clientset/versioned"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -32,7 +32,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
-	tenancyv1alpha1 "github.com/kubestellar/kubeflex/api/v1alpha1"
+	"github.com/openshift/client-go/security/clientset/versioned"
+
 	edgev1alpha1 "github.com/kubestellar/kubestellar/api/v1alpha1"
 )
 
