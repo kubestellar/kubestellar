@@ -260,6 +260,12 @@ $(TOOLS_DIR)/verify_boilerplate.py:
 verify-boilerplate: $(TOOLS_DIR)/verify_boilerplate.py
 	$(TOOLS_DIR)/verify_boilerplate.py --boilerplate-dir=hack/boilerplate --skip docs
 
+# TODO - there is currently no client code generation, need to revisit once that is added back
+# this stub is mainly to pass the CI
+.PHONY: verify-codegen
+verify-codegen:
+	@echo ""
+
 .PHONY: require-%
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in ${PATH}"; exit 1; fi
