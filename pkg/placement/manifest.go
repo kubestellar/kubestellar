@@ -20,9 +20,9 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	workv1 "open-cluster-management.io/api/work/v1"
 
 	"k8s.io/apimachinery/pkg/runtime"
-	workv1 "open-cluster-management.io/api/work/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kubestellar/kubestellar/pkg/ocm"

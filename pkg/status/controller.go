@@ -35,10 +35,9 @@ import (
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	ctrlm "sigs.k8s.io/controller-runtime/pkg/manager"
-
-	"k8s.io/client-go/tools/cache"
 
 	"github.com/kubestellar/kubestellar/api/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
