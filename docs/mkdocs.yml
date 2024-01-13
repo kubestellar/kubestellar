@@ -203,6 +203,7 @@ markdown_extensions:
   - pymdownx.highlight:
       # Allows linking directly to specific lines in code blocks
       anchor_linenums: true
+      pygments_lang_class: true
   # Inline code block highlighting
   - pymdownx.inlinehilite
   # Lets you embed content from another file
