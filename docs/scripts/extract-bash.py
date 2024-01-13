@@ -2,7 +2,6 @@
 
 import argparse
 import html.parser
-import os
 import sys
 
 def alist_get(alist, key):
@@ -66,13 +65,15 @@ class MyHTMLParser(html.parser.HTMLParser):
         if self.divs :
             if self.divs[0].should_extract():
                 if self.last_collected_anchor_id and self.last_collected_anchor_id != self.divs[0].anchor_id:
-                    print(f'Imagining newline at {self.getpos()}, new anchor={self.divs[0].anchor_id}', file=sys.stderr)
+                    # print(f'Imagining newline at {self.getpos()}, new anchor={self.divs[0].anchor_id}', file=sys.stderr)
                     # self.outfile.write("\n")
-                print(f'Adding data (len={len(data)}) at {self.getpos()}', file=sys.stderr)
+                    pass
+                # print(f'Adding data (len={len(data)}) at {self.getpos()}', file=sys.stderr)
                 self.outfile.write(data)
                 self.last_collected_anchor_id = self.divs[0].anchor_id
             else:
-                print(f'Skipping data (len={len(data)}) at {self.getpos()} because current div is {self.divs[0]}', file=sys.stderr)
+                # print(f'Skipping data (len={len(data)}) at {self.getpos()} because current div is {self.divs[0]}', file=sys.stderr)
+                pass
         return
     pass
 

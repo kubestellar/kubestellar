@@ -224,6 +224,13 @@ deploy-docs: venv
 docs-ecutable: 
 	MANIFEST=$(MANIFEST) docs/scripts/docs-ecutable.sh
 
+.PHONY: execute-html
+execute-html: venv
+	. $(VENV)/activate; \
+	cd docs; \
+	mkdocs build; \
+	scripts/execute-html.sh "$$PWD/.." "generated/$(MANIFEST)/index.html"
+
 .PHONY: write-time-to-file
 write-time-to-file: 
 	FILENAME=$(FILENAME) docs/scripts/get-elapsed-time.sh
