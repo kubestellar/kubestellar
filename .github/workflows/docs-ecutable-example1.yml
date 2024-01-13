@@ -21,7 +21,7 @@ on:
 
 env:
   docs-ecutable-filename: example1
-  docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/example1.md'"
+  docs-ecutable-dirname: "Coding Milestones/PoC2023q1/example1"
 
 jobs:
   docs-ecutable:
@@ -29,12 +29,12 @@ jobs:
     name: docs-ecutable - for example1 e2e
     runs-on: ubuntu-latest
     outputs:
-      docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
+      docs-ecutable-dirname: ${{ steps.step1.outputs.docs-ecutable-dirname }}
     steps:
       - id: step1
-        run: echo "docs-ecutable-filename=${{ env.docs-ecutable-filename }}" >> "$GITHUB_OUTPUT"
+        run: echo "docs-ecutable-dirname=${{ env.docs-ecutable-dirname }}" >> "$GITHUB_OUTPUT"
 
-      - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
+      - run: echo ${{ steps.step1.outputs.docs-ecutable-dirname }}
 
       - uses: actions/checkout@v4.1.1
       
@@ -43,16 +43,25 @@ jobs:
           go-version: v1.19
           cache: true
 
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install PyPy
+        uses: actions/setup-python@v5 
+        with:
+          python-version: 'pypy3.9' 
+
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         # with:
         #  version: 'v1.28.3'
         id: install
-        
-  
+
       - run: |
-          make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
-          docs-ecutable
+          make MANIFEST="${{ env.docs-ecutable-dirname }}" \
+          execute-html
 
       - name: Dump mailbox-controller log
         if: always()
