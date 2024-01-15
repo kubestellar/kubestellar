@@ -40,4 +40,4 @@ jobs:
 
       - name: Run test
         run: |
-          ./test/integration/multi-cluster-deployment/run-test.sh
+          cd test/integration/multi-cluster-deployment && ./run-test.sh
