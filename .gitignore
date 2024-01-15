@@ -1,6 +1,7 @@
 .kcp*
 *.log
 coverage.*
+cover.out
 tools
 build
 .vscode
@@ -15,3 +16,5 @@ docs/scripts/generated_script.sh
 
 # word counts
 /counts
+
+
