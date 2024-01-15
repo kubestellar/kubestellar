@@ -1,5 +1,4 @@
-name: docs-ecutable - example1
-run-name: docs-ecutable - example1 - ${{ github.ref_name }}
+name: pr tester
 
 on:
   workflow_call:
