@@ -19,8 +19,8 @@ limitations under the License.
 package edge
 
 import (
-	v2alpha1 "sample-controller/pkg/generated/informers/externalversions/edge/v2alpha1"
-	internalinterfaces "sample-controller/pkg/generated/informers/externalversions/internalinterfaces"
+	v2alpha1 "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	internalinterfaces "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
 )
 
 // Interface provides access to each of this group's versions.
