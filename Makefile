@@ -12,14 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Image URL to use all building/pushing image targets
-IMG ?= ghcr.io/kubestellar/kubeflex/kubestellar-operator:0.1.0
+# Image repo/tag to use all building/pushing image targets
+DOCKER_REGISTRY ?= ghcr.io/kubestellar/kubestellar
+IMAGE_TAG ?= 0.20.0
+CMD_NAME ?= kubestellar-operator
+IMG ?= ${DOCKER_REGISTRY}/${CMD_NAME}:${IMAGE_TAG}
+
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.26.1
 # Default Namespace to use for make deploy (mainly for local testing)
 DEFAULT_NAMESPACE=default
 # Default WDS name to use for make deploy (mainly for local testing) 
 DEFAULT_WDS_NAME=wds1
+# default kind hosting cluster name
+DEFAULT_KIND_CLUSTER ?= kubeflex
 
 # We need bash for some conditional logic below.
 SHELL := /usr/bin/env bash -e
@@ -141,38 +147,39 @@ test: manifests generate fmt vet envtest ## Run tests.
 
 ##@ Build
 
-
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./cmd/kubestellar-operator/main.go $(ARGS)
 
-# If you wish built the manager image targeting other platforms you can use the --platform flag.
-# (i.e. docker build --platform linux/arm64 ). However, you must enable docker buildKit for it.
-# More info: https://docs.docker.com/develop/develop-images/build_enhancements/
-.PHONY: docker-build
-docker-build: test ## Build docker image with the manager.
-	docker build -t ${IMG} .
+.PHONY: ko-build
+ko-build: test ## Build docker image with ko
+	KO_DOCKER_REPO=ko.local ko build --push=false -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/amd64,linux/arm64
+	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMG}
 
 .PHONY: docker-push
-docker-push: ## Push docker image with the manager.
+docker-push: ## Push docker image 
 	docker push ${IMG}
 
-# PLATFORMS defines the target platforms for  the manager image be build to provide support to multiple
-# architectures. (i.e. make docker-buildx IMG=myregistry/mypoperator:0.0.1). To use this option you need to:
-# - able to use docker buildx . More info: https://docs.docker.com/build/buildx/
-# - have enable BuildKit, More info: https://docs.docker.com/develop/develop-images/build_enhancements/
-# - be able to push the image for your registry (i.e. if you do not inform a valid value via IMG=<myregistry/image:<tag>> then the export will fail)
-# To properly provided solutions that supports more than one platform you should use this option.
-PLATFORMS ?= linux/arm64,linux/amd64,linux/s390x,linux/ppc64le
-.PHONY: docker-buildx
-docker-buildx: test ## Build and push docker image for the manager for cross-platform support
-	# copy existing Dockerfile and insert --platform=${BUILDPLATFORM} into Dockerfile.cross, and preserve the original Dockerfile
-	sed -e '1 s/\(^FROM\)/FROM --platform=\$$\{BUILDPLATFORM\}/; t' -e ' 1,// s//FROM --platform=\$$\{BUILDPLATFORM\}/' Dockerfile > Dockerfile.cross
-	- docker buildx create --name project-v3-builder
-	docker buildx use project-v3-builder
-	- docker buildx build --push --platform=$(PLATFORMS) --tag ${IMG} -f Dockerfile.cross .
-	- docker buildx rm project-v3-builder
-	rm Dockerfile.cross
+.PHONY: ko-build-push
+ko-build-push: test ## Build and push docker image with ko
+	KO_DOCKER_REPO=${DOCKER_REGISTRY} ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/amd64,linux/arm64
+
+# this is used for local testing 
+.PHONY: kind-load-image
+kind-load-image: 
+	kind load --name ${DEFAULT_KIND_CLUSTER} docker-image ${IMG}
+
+.PHONY: chart
+chart: manifests kustomize
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
+	$(KUSTOMIZE) build config/default > core-helm-chart/templates/operator.yaml
+	scripts/add-helm-code.sh add
+
+.PHONY: chart-push
+chart-push: chart ## push helm chart
+	helm package ./core-helm-chart --destination . --version ${IMAGE_TAG}
+	helm push ./*.tgz oci://${DOCKER_REGISTRY}
+	rm ./*.tgz
 
 ##@ Deployment
 
@@ -197,11 +204,12 @@ deploy: manifests kustomize ## Deploy manager to the K8s cluster specified in ~/
 undeploy: ## Undeploy manager from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
 
-.PHONY: chart
-chart: manifests kustomize
-	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
-	$(KUSTOMIZE) build config/default > core-helm-chart/templates/operator.yaml
-	scripts/add-helm-code.sh add
+# installs the chart from ./core-helm-chart for local dev/testing on default WDS using image loaded in kind
+# the deployment is patched to load the image pre-loaded in kind
+.PHONY: install-local-chart
+install-local-chart: kind-load-image
+	helm upgrade --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./core-helm-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME}
+	kubectl -n ${DEFAULT_WDS_NAME}-system patch deployment kubestellar-controller-manager --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/1/imagePullPolicy", "value":"Never"}]'
 
 ##@ Build Dependencies
 

@@ -201,7 +201,7 @@ spec:
         - --metrics-bind-address=127.0.0.1:8080
         - --leader-elect
         - --wds-name={{.Values.ControlPlaneName}}
-        image: ghcr.io/kubestellar/kubeflex/kubestellar-operator:0.1.0
+        image: ghcr.io/kubestellar/kubestellar/kubestellar-operator:0.20.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
