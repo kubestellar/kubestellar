@@ -109,7 +109,7 @@ spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
   downsync:
-  - labelSelectors:
+  - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx"}
 EOF
 ```
@@ -191,9 +191,10 @@ spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
   downsync:
-  - labelSelectors:
-    - matchLabels: {"app.kubernetes.io/managed-by":"Helm"}
-    - matchLabels: {"app.kubernetes.io/instance":"postgres"}
+  - objectSelectors:
+    - matchLabels: {
+      "app.kubernetes.io/managed-by": Helm,
+      "app.kubernetes.io/instance": postgres}
 EOF
 ```
 
@@ -265,7 +266,7 @@ spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
   downsync:
-  - labelSelectors:
+  - objectSelectors:
     - matchLabels: {"argocd.argoproj.io/instance":"guestbook"}
 EOF
 ```
@@ -317,7 +318,7 @@ spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
   downsync:
-  - labelSelectors:
+  - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx-singleton"}
 EOF
 ```
@@ -383,7 +384,7 @@ spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
   downsync:
-  - labelSelectors:
+  - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx-res"}
 EOF
 ```
@@ -445,7 +446,7 @@ spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
   downsync:
-  - labelSelectors:
+  - objectSelectors:
     - matchLabels: {"argocd.argoproj.io/instance":"nginx-sa"}
 EOF
 ```
