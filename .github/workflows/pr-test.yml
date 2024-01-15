@@ -29,7 +29,9 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         id: install
-         
+
+      - uses: ko-build/setup-ko
+      
       - name: Install dependencies
         run: |
           curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
