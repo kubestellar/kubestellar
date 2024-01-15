@@ -22,7 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
-	v2alpha1 "k8s.io/sample-controller/pkg/apis/edge/v2alpha1"
+	v2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
 // PlacementDecisionLister helps list PlacementDecisions.
