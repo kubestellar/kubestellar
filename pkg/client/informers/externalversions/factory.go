@@ -20,9 +20,9 @@ package externalversions
 
 import (
 	reflect "reflect"
-	versioned "sample-controller/pkg/generated/clientset/versioned"
-	edge "sample-controller/pkg/generated/informers/externalversions/edge"
-	internalinterfaces "sample-controller/pkg/generated/informers/externalversions/internalinterfaces"
+	versioned "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	edge "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge"
+	internalinterfaces "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
 	sync "sync"
 	time "time"
 
