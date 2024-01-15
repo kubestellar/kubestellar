@@ -36,5 +36,8 @@ jobs:
           wget https://github.com/kubestellar/kubeflex/releases/download/v0.3.3/kubeflex_0.3.3_linux_amd64.tar.gz
           tar -xvf kubeflex_0.3.3_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          kflex
           rm -fr bin kubeflex_0.3.3_linux_amd64.tar.gz 
+
+      - name: Run test
+        run: |
+          ./test/integration/multi-cluster-deployment/run-test.sh
