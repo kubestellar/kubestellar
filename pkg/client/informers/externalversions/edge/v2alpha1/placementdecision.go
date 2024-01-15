@@ -20,16 +20,17 @@ package v2alpha1
 
 import (
 	"context"
-	versioned "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	internalinterfaces "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
-	v2alpha1 "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
+
 	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
+	versioned "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	internalinterfaces "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
+	v2alpha1 "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 )
 
 // PlacementDecisionInformer provides access to a shared informer and lister for
