@@ -20,9 +20,6 @@ package externalversions
 
 import (
 	reflect "reflect"
-	versioned "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edge "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge"
-	internalinterfaces "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
 	sync "sync"
 	time "time"
 
@@ -30,6 +27,10 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
+
+	versioned "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	edge "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge"
+	internalinterfaces "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.
