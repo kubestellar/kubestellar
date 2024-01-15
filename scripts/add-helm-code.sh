@@ -14,10 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Purpose: make sure that the names of the cluster scoped objects (such as ClusterRole and CLusterRoleBinding)
+# are specific to a control plane.
 
-# Purpose: add helm headers to cluster scoped files such as ClusterRole and CLusterRoleBinding
-# to avoid helm trying to create a copy of the each clusterrClusterRoleole or CLusterRoleBinding
-# for each instance of kubestellar in a different namespace.
+# Usage: $0 add
+# Working directory does not matter.
+
 HOME_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
 if [ "$#" -lt 1 ]; then
