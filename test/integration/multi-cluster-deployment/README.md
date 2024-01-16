@@ -21,8 +21,8 @@ cd test/integration/multi-cluster-deployment
 - Clone the repo and checkout the ks-0.20 branch
 ```
 git clone git@github.com:kubestellar/kubestellar.git
-git branch -b ks-0.20 origin/ks-0.20
 cd kubestellar
+git checkout -b ks-0.20 origin/ks-0.20
 ```
 
 Create a Kind hosting cluster with nginx ingress controller and KubeFlex operator.
@@ -40,11 +40,8 @@ Create a Workload Description Space wds1 directly in KubeFlex.
 kflex create wds1
 kubectl config use-context kind-kubeflex
 kubectl label cp wds1 kflex.kubestellar.io/cptype=wds
-
-cd ../../../
 make ko-build
 make install-local-chart
-cd -
 ```
 
 Create clusters and register with OCM.
