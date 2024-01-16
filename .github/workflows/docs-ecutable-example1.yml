@@ -43,16 +43,6 @@ jobs:
           go-version: v1.19
           cache: true
 
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-
-      - name: Install PyPy
-        uses: actions/setup-python@v5 
-        with:
-          python-version: 'pypy3.9' 
-
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         # with:
