@@ -3,6 +3,8 @@
 
 # TL;DR
 
+**NOTE**: This is unmaintained material that was observed to work around Jan 10, 2024.
+
 KubeStellar 0.20  supports multi-cluster deployment of Kubernetes objects, controlled by a 
 simple placement policy and deploying Kubernetes objects in their native format.  It uses OCM as 
 transport, with standard OCM agents (Klusterlet). We show examples of deploying workloads to 

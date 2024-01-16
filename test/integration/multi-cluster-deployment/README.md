@@ -1,7 +1,7 @@
 # Kubestellar multi-cluster workload deployment with kubectl
 
 ## Prerequisites
-See the list [here](https://github.com/kubestellar/kubestellar/blob/ks-0.20/test/pre-reqs.md).
+See the list [here](../../pre-reqs.md).
 
 ## Running the test using a script
 - Clone the repo and checkout the ks-0.20 branch

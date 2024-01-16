@@ -55,7 +55,9 @@ TODO: Need update!
 
 ## QuickStart
 TBD
-The ks-0.20 documents are here: [https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20](https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20)
+The only supported document is [the one end-to-end test](test/integration/multi-cluster-deployment/README.md).
+
+The freshly deprecated ks-0.20 documents are here: [https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20](https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20)
 
 ## Roadmap for the Project
 TBD
@@ -82,7 +84,7 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 - See [upcoming](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
     - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
-- Read our [documentation](https://kubestellar.io)
+- There is an outdated website at [documentation](https://kubestellar.io); nothing there is valid now, some ideas are being re-used.
 - Follow us on:
    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
