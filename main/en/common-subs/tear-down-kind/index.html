@@ -1817,22 +1817,20 @@
 <p>to remove what you just installed:</p>
 <!-- BEGIN INCLUDE ../common-subs/brew-remove.md '&lt;!--brew-remove-start--&gt;' '&lt;!--brew-remove-end--&gt;' -->
 
-<p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>brew remove kubestellar-cli
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>brew untap kubestellar/kubestellar
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew remove kubestellar-cli
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>brew untap kubestellar/kubestellar
-</code></pre></div></p>
 <!-- END INCLUDE -->
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-core
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-edge-cluster1
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-edge-cluster2
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-core
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-edge-cluster1
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-edge-cluster2
 </code></pre></div>
 <!-- BEGIN INCLUDE ../common-subs/delete-contexts-for-kind-and-openshift-clusters.md '&lt;!--delete-contexts-for-kind-and-openshift-clusters-start--&gt;' '&lt;!--delete-contexts-for-kind-and-openshift-clusters-end--&gt;' -->
 
 <p><strong>important:</strong> delete any existing kubernetes contexts of the clusters you may have created previously
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-core<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-edge-cluster1<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-edge-cluster2<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-core<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-edge-cluster1<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-edge-cluster2<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
