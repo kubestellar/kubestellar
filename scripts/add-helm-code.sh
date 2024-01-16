@@ -23,7 +23,7 @@
 HOME_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
 if [ "$#" -lt 1 ]; then
-    echo "adds/remove helm tags to luster scoped files such as ClusterRole and CLusterRoleBinding"
+    echo "adds/remove helm tags to cluster scoped files such as ClusterRole and CLusterRoleBinding"
     echo "Usage: $(basename $0) add | remove"
     exit
 fi

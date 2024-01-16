@@ -58,8 +58,8 @@ func WrapObject(obj runtime.Object) *workv1.ManifestWork {
 	}
 }
 
-// BuilEmptyManifestFromObject creates an empty ManifestWork which can be used to delete
-func BuilEmptyManifestFromObject(obj runtime.Object) *workv1.ManifestWork {
+// BuildEmptyManifestFromObject creates an empty ManifestWork which can be used to delete
+func BuildEmptyManifestFromObject(obj runtime.Object) *workv1.ManifestWork {
 	return &workv1.ManifestWork{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "ManifestWork",
