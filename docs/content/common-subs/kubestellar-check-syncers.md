@@ -1,6 +1,4 @@
 <!--kubestellar-check-syncers-start-->
-``` {.bash .hide-me}
-```
 If you are unable to see the namespace 'my-namespace' or the deployment 'my-first-kubestellar-deployment' you can view the logs for the KubeStellar syncer on the **ks-edge-cluster1** Kind cluster:
 
 ```shell
