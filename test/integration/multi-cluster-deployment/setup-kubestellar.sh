@@ -17,15 +17,17 @@ set -e # exit on error
 
 echo "Create a Kind hosting cluster with nginx ingress controller and KubeFlex operator"
 echo "-------------------------------------------------------------------------"
-kflex init --create-kind
+kflex init --create-kind &> /dev/null
+echo "Kubeflex kind cluster created."
 
 echo "Create an inventory & mailbox space of type vcluster running OCM (Open Cluster Management) directly in KubeFlex. Note that -p ocm runs a post-create hook on the vcluster control plane which installs OCM on it."
 echo "-------------------------------------------------------------------------"
-kflex create imbs1 --type vcluster -p ocm
+kflex create imbs1 --type vcluster -p ocm &> /dev/null
+echo "imbs1 created."
 
 echo "Create a Workload Description Space wds1 directly in KubeFlex."
 echo "-------------------------------------------------------------------------"
-kflex create wds1 
+kflex create wds1 &> /dev/null
 kubectl config use-context kind-kubeflex
 kubectl label cp wds1 kflex.kubestellar.io/cptype=wds
 
@@ -33,6 +35,7 @@ cd ../../../
 make ko-build
 make install-local-chart
 cd -
+echo "wds1 created."
 
 echo "Create clusters and register with OCM"
 echo "-------------------------------------------------------------------------"
