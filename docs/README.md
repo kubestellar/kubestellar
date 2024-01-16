@@ -1,15 +1,16 @@
 <!--readme-for-documentation-start-->
 ## Overview
 
-Our documentation is powered by [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) with some 
-additional plugins and tools:
+Our documentation is powered by [mike](https://github.com/jimporter/mike) and [MkDocs](https://www.mkdocs.org/). MkDocs is powered by [Python-Markdown](https://pypi.org/project/Markdown/). These are immensely configurable and extensible. You can see our MkDocs configuration in `docs/mkdocs.yml`. Following are some of the choices we have made.
 
-- [awesome-pages plugin](https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin)
-- [macros plugin](https://mkdocs-macros-plugin.readthedocs.io/en/latest/)
-- [mike](https://github.com/jimporter/mike) for multiple version support
-
-We have support in place for multiple languages (i18n), although we currently only have documentation in English. If 
-you're interested in contributing translations, please let us know!
+- The MkDocs theme is [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/).
+- MkDocs plugin [awesome-pages](https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin) for greater control over how navigation links are shown.
+- MkDocs plugin [macros](https://mkdocs-macros-plugin.readthedocs.io/en/latest/).
+- [Our own slightly improved vintage](https://github.com/clubanderson/mkdocs-include-markdown-plugin) of the `include-markdown` MkDocs plugin, allowing the source to be factored into re-used files.
+- Python-Markdown extension [SuperFences](https://facelessuser.github.io/pymdown-extensions/extensions/superfences/), supporting fenced code blocks that play nice with other markdown features.
+- Python-Markdown extension [Highlight](https://facelessuser.github.io/pymdown-extensions/extensions/highlight/), for syntax highlighting of fenced code.
+- [Pygments](https://pypi.org/project/Pygments/) for even fancier code highlighting.
+- MkDocs plugin [mkdocs-static-i18n](https://github.com/ultrabug/mkdocs-static-i18n/tree/0.53#readme) to support multiple languages. We currently only have documentation in English. If you're interested in contributing translations, please let us know!
 
 ### Serving up documents locally
 You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.
@@ -52,6 +53,10 @@ cd ..
 make serve-docs
 ```
 Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
+
+## Jinja templating
+
+Our documentation stack includes [Jinja](https://jinja.palletsprojects.com/en/3.1.x/). The Jinja constructs --- \{\% ... \%\} for statements, \{\{ ... \}\} for expressions, and \{\# ... \#\} for comments --- can appear in the markdown sources.
 
 ## File structure
 
@@ -99,6 +104,19 @@ bash <(curl -s \{\{ config.repo_raw_url \}\}/\{\{ config.ks_branch \}\}/bootstra
 &nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at [mkdocs information](./content/Contribution%20guidelines/operations/all-macros.md) <br />
 &nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our <a href="{{ config.repo_url }}/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br />
 
+### Page variables
+
+A markdown source file can contribute additional variables by defining them in `name: value` lines at the start of the file, set off by lines of triple dashes. For example, suppose a markdown file begins with the following.
+
+```markdown
+---
+short_name: example1
+manifest_name: 'docs/content/Coding Milestones/PoC2023q1/example1.md'
+---
+```
+
+These variables can be referenced as \{\{ page.meta.short_name \}\} and \{\{ page.meta.manifest_name \}\}.
+
 ### Including external markdown
 We make extensive use of 'include-markdown' to help us keep our documentation modular and up-to-date.  To use 'include-markdown' you must add a block in your document that refers to a block in your external document content:
 
@@ -142,9 +160,13 @@ and.. the very important…
 ### Codeblocks
 mkdocs has some very helpful ways to include blocks of code in a style that makes it clear to our readers that console interaction is necessary in the documentation.  There are options to include a plain codeblock (```), shell (shell), console (console - no used in our documentation), language or format-specific (yaml, etc.), and others.  For more detailed information, checkout the [mkdocs information on codeblocks](https://squidfunk.github.io/mkdocs-material/reference/code-blocks/).
 
-Here are some examples of how we use codeblocks:
+**NOTE**: the docs-ecutable technology does _not_ apply Jinja, at any stage; Jinja source inside executed code blocks will not be expanded by Jinja but rather seen directly by `bash`.
 
-- For a codeblock that can be 'tested' (and seen by the reader) as part of our CI, use the <b><i>`shell`</i></b> block:
+Here are some examples of how we use codeblocks.
+
+#### Seen and executed
+
+For a codeblock that can be 'tested' (and seen by the reader) as part of our CI, use the <b><i>`shell`</i></b> block:
 <br/><b>codeblock:</b>
 ````
 ```shell
@@ -157,7 +179,11 @@ mkdocs serve
 ```
 <br/>
 
-- For a codeblock that should be 'tested', BUT <b>not</b> seen by the reader, use the <b><i>`.bash`</i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style (great for hiding a sleep command that user does not need to run, but CI does):
+#### Executed but not seen
+
+(Think hard before hiding stuff from your reader.)
+
+For a codeblock that should be 'tested', BUT <b>not</b> seen by the reader, use the <b><i>`.bash`</i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style (great for hiding a sleep command that user does not need to run, but CI does):
 <br/><b>codeblock:</b>
 ````
 ``` {.bash .hide-me}
@@ -169,7 +195,11 @@ sleep 10
 ```
 <br/>
 
-- For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i>`.bash`</i></b> with the plain codeblock, and <b>without</b> the <b><i>'.hide-me'</b></i> style:
+#### Seen but not executed
+
+(To avoid confusing readers of the HTML, this should be used only for _output_ seen in a shell session.)
+
+For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i>`.bash`</i></b> with the plain codeblock, and <b>without</b> the <b><i>'.hide-me'</b></i> style:
 <br/><b>codeblock:</b>
 ````
 ``` {.bash}
@@ -182,7 +212,9 @@ mkdocs server
 ```
 <br/>
 
-- For a codeblock that should not be 'tested', be seen by the reader, and not include a 'copy' icon (great for output-only instances), use the <b><i>`.bash`</i></b> codeblock <b>without</b> the <b><i>'.no-copy'</b></i> style:
+#### Seen but not executed and no copy button
+
+For a codeblock that should not be 'tested', be seen by the reader, and not include a 'copy' icon (great for output-only instances), use the <b><i>`.bash`</i></b> codeblock <b>without</b> the <b><i>'.no-copy'</b></i> style:
 <br/><b>codeblock:</b>
 ```` {.bash .no-copy}
 ``` {.bash .no-copy}
@@ -199,7 +231,9 @@ I0412 15:15:57.970003   94634 shared_informer.go:282] Waiting for caches to sync
 ```
 <br/>
 
-- For language-specific highlighting (yaml, etc.), use the <b><i>yaml</i></b> codeblock
+#### Other language-specific highlighting
+
+For other language-specific highlighting (yaml, etc.), use the <b><i>yaml</i></b> codeblock
 <br/><b>codeblock:</b>
 ````
 ```yaml
@@ -220,7 +254,9 @@ nav:
 ```
 <br/>
 
-- For a codeblock that has a title, and will not be tested, use the <b><i>'title'</i></b> parameter in conjunction with the plain codeblock (greater for showing or prescribing contents of files):
+#### Codeblock with a title
+
+For a codeblock that has a title, and will not be tested, use the <b><i>'title'</i></b> parameter in conjunction with the plain codeblock (greater for showing or prescribing contents of files):
 <br/><b>codeblock:</b>
 ````
 ``` title="testing.sh"
