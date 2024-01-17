@@ -55,7 +55,10 @@ TODO: Need update!
 
 ## QuickStart
 TBD
-The only supported document is [the one end-to-end test](test/integration/multi-cluster-deployment/README.md).
+The supported documents are as follows.
+
+- [prerequisites](test/pre-reqs.md)
+- [the one end-to-end test](test/e2e/multi-cluster-deployment/README.md)
 
 The freshly deprecated ks-0.20 documents are here: [https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20](https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20)
 

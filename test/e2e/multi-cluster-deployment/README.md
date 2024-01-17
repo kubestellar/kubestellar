@@ -12,7 +12,7 @@ git checkout -b ks-0.20 origin/ks-0.20
 ```
 - Run the test
 ```
-cd test/integration/multi-cluster-deployment
+cd test/e2e/multi-cluster-deployment
 ./run-test.sh
 ```
 
