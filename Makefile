@@ -25,7 +25,7 @@ DEFAULT_NAMESPACE=default
 # Default WDS name to use for make deploy (mainly for local testing) 
 DEFAULT_WDS_NAME=wds1
 # default kind hosting cluster name
-DEFAULT_KIND_CLUSTER ?= kubeflex
+KIND_HOSTING_CLUSTER ?= kubeflex
 
 # We need bash for some conditional logic below.
 SHELL := /usr/bin/env bash -e
@@ -151,9 +151,9 @@ test: manifests generate fmt vet envtest ## Run tests.
 run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./cmd/kubestellar-operator/main.go $(ARGS)
 
-.PHONY: ko-build
-ko-build: test ## Build docker image with ko
-	KO_DOCKER_REPO=ko.local ko build --push=false -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/amd64,linux/arm64
+.PHONY: ko-build-local
+ko-build-local: test ## Build local container image with ko
+	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG}
 	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMG}
 
 .PHONY: docker-push
@@ -161,13 +161,13 @@ docker-push: ## Push docker image
 	docker push ${IMG}
 
 .PHONY: ko-build-push
-ko-build-push: test ## Build and push docker image with ko
+ko-build-push: test ## Build and push container image with ko
 	KO_DOCKER_REPO=${DOCKER_REGISTRY} ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/amd64,linux/arm64
 
 # this is used for local testing 
 .PHONY: kind-load-image
 kind-load-image: 
-	kind load --name ${DEFAULT_KIND_CLUSTER} docker-image ${IMG}
+	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${IMG}
 
 .PHONY: chart
 chart: manifests kustomize
@@ -204,12 +204,12 @@ deploy: manifests kustomize ## Deploy manager to the K8s cluster specified in ~/
 undeploy: ## Undeploy manager from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
 
-# installs the chart from ./core-helm-chart for local dev/testing on default WDS using image loaded in kind
-# the deployment is patched to load the image pre-loaded in kind
+# installs the chart from ./core-helm-chart for local dev/testing a WDS using image loaded in kind.
+# The Helm chart should be instantiated into the KubeFlex hosting cluster.
+# If $(KUBE_CONTEXT) is set then that indicates where to install the chart; otherwise it goes to the current kubeconfig context.
 .PHONY: install-local-chart
 install-local-chart: kind-load-image
-	helm upgrade --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./core-helm-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME}
-	kubectl -n ${DEFAULT_WDS_NAME}-system patch deployment kubestellar-controller-manager --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/1/imagePullPolicy", "value":"Never"}]'
+	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./core-helm-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME}
 
 ##@ Build Dependencies
 

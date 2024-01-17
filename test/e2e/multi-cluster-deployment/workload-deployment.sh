@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -x # echo so that users can understand what is happening
 set -e # exit on error
 
 echo "Create a placement to deliver an app to all clusters in wds1."
@@ -82,15 +83,16 @@ function wait_for_deployment() {
   echo "Waiting for deployment on $cluster"
   waitCounter=0
   while (($(kubectl --context $cluster wait deployment nginx-deployment -n nginx --for=condition=available --timeout=180s 2>/dev/null | grep -c "condition met") < 1)); do
-    if (($waitCounter > 180)); then
+    if (($waitCounter > 36)); then
       echo "Failed to observe deployment on ${cluster}."
       exit 1 
     fi
     ((waitCounter += 1))
-    sleep 1
+    sleep 5
   done
 }
 wait_for_deployment cluster1
 echo "Waiting for deployment on cluster2"
 wait_for_deployment cluster2
 echo "SUCCESS: confirmed deployments on both cluster1 and cluster2."
+rm out

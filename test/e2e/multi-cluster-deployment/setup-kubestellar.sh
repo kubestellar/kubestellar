@@ -13,27 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -x # echo so users can understand what is happening
 set -e # exit on error
 
 echo "Create a Kind hosting cluster with nginx ingress controller and KubeFlex operator"
 echo "-------------------------------------------------------------------------"
-kflex init --create-kind &> /dev/null
+kflex init --create-kind
 echo "Kubeflex kind cluster created."
 
 echo "Create an inventory & mailbox space of type vcluster running OCM (Open Cluster Management) directly in KubeFlex. Note that -p ocm runs a post-create hook on the vcluster control plane which installs OCM on it."
 echo "-------------------------------------------------------------------------"
-kflex create imbs1 --type vcluster -p ocm &> /dev/null
+kflex create imbs1 --type vcluster -p ocm
 echo "imbs1 created."
 
 echo "Create a Workload Description Space wds1 directly in KubeFlex."
 echo "-------------------------------------------------------------------------"
-kflex create wds1 &> /dev/null
-kubectl config use-context kind-kubeflex
-kubectl label cp wds1 kflex.kubestellar.io/cptype=wds
+kflex create wds1
+kubectl --context kind-kubeflex label cp wds1 kflex.kubestellar.io/cptype=wds
 
 cd ../../../
-make ko-build
-make install-local-chart
+make ko-build-local
+make install-local-chart KUBE_CONTEXT=kind-kubeflex
 cd -
 echo "wds1 created."
 
@@ -49,17 +49,15 @@ function create_cluster() {
 create_cluster cluster1
 create_cluster cluster2
 
-kubectl config use-context imbs1
-
 echo "Wait for csr on imbs1"
 waitCounter=0
 while (($(kubectl --context imbs1 get csr 2>/dev/null | grep -c "Pending") < 2)); do
-  if (($waitCounter > 180)); then
+  if (($waitCounter > 36)); then
     echo "Failed to get csr."
     exit 1 
   fi
   ((waitCounter += 1))
-  sleep 1
+  sleep 5
 done
 
 clusteradm --context imbs1 accept --clusters cluster1

@@ -13,11 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -x # echo so that users can understand what is happening
+
 echo "Cleaning up"
 
 kind delete cluster --name cluster1
 kind delete cluster --name cluster2
 kind delete cluster --name kubeflex
-kubectl config delete-context cluster1 
-kubectl config delete-context cluster2 
-rm out
+kubectl config delete-context cluster1 || true
+kubectl config delete-context cluster2 || true
