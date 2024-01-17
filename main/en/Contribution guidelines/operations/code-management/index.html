@@ -2067,13 +2067,13 @@ Quay.io -->
 <p>copy the forked repo from Github to your local system by using the "git clone" command or by downloading the repository's zip file.</p>
 <p>In your new local forked repo, set upstream to kubestellar main</p>
 <p>check what your repo's remote settings are
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git remote -v
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git remote -v
 </code></pre></div></p>
 <h3 id="set-upstream-to-use-kubestellar">Set upstream to use kubestellar:<a class="headerlink" href="#set-upstream-to-use-kubestellar" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git remote add upstream git@github.com:kubestellar/kubestellar.git
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git remote add upstream git@github.com:kubestellar/kubestellar.git
 </code></pre></div>
 <p>For example:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>owner@BOOK-U0EMIUAFHD MINGW64 ~/src/edge-mc (main)
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>owner@BOOK-U0EMIUAFHD MINGW64 ~/src/edge-mc (main)
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a> git remote -v
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>origin  git@github.com:fileppb/edge-mc.git (fetch)
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>origin  git@github.com:fileppb/edge-mc.git (push)
@@ -2113,10 +2113,10 @@ You can do this by opening your github repository page, check that the selected 
 <h3 id="select-an-issue-to-work-on-and-create-a-local-branch">Select an issue to work on and create a local branch,<a class="headerlink" href="#select-an-issue-to-work-on-and-create-a-local-branch" title="Permanent link">#</a></h3>
 <p>Create a local branch for your work, preferably including the issue number in the branch name</p>
 <p>for example if working on issue #11187, then you might name your local branch "issue-1187"
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git checkout -b issue-1187
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git checkout -b issue-1187
 </code></pre></div></p>
 <h3 id="as-you-work-and-change-files-you-should-try-to-commit-relatively-small-pieces-of-work-using-the-following-commands">As you work and change files, you should try to commit relatively small pieces of work, using the following commands<a class="headerlink" href="#as-you-work-and-change-files-you-should-try-to-commit-relatively-small-pieces-of-work-using-the-following-commands" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>git add (there are several options you can specify for the git add command)
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>git add (there are several options you can specify for the git add command)
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>git commit -m &quot;your message&quot;
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
@@ -2133,7 +2133,7 @@ You can do this by opening your github repository page, check that the selected 
 7. Make your edits if any and save and exit the file.
 The commits will then be squashed into one commit.</p>
 <h3 id="when-you-are-done-with-the-squash-push-your-changes-to-your-remote-branch-you-can-either">When you are done with the squash, push your changes to your remote branch. You can either:<a class="headerlink" href="#when-you-are-done-with-the-squash-push-your-changes-to-your-remote-branch-you-can-either" title="Permanent link">#</a></h3>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git push -u origin &lt;branch-name&gt;
+<p><div class="language-text highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git push -u origin &lt;branch-name&gt;
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>or 
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>

@@ -2095,7 +2095,7 @@
 <h4 id="go">Go<a class="headerlink" href="#go" title="Permanent link">#</a></h4>
 <p><a href="https://golang.org/doc/install/">Install Go</a> 1.19+.  See <a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">this gist</a> for another way to install Go.
   Please note that the go language version numbers in these files must exactly agree:</p>
-<div class="highlight"><pre><span></span><code>Your local go/go.mod file, kcp/.ci-operator.yaml, and in all the kcp/.github/workflows yaml files that specify go-version.
+<div class="language-text highlight"><pre><span></span><code>Your local go/go.mod file, kcp/.ci-operator.yaml, and in all the kcp/.github/workflows yaml files that specify go-version.
 
 - In ./ci-operator.yaml the go version is indicated by the &quot;tag&quot; attribute.
 - In go.mod it is indicated by the &quot;go&quot; directive.
@@ -2117,7 +2117,7 @@
 <h3 id="committing">Committing<a class="headerlink" href="#committing" title="Permanent link">#</a></h3>
 <p>We encourage all contributors to adopt <a href="https://gist.github.com/luismts/495d982e8c5b1a0ced4a57cf3d93cf60">best practices in git commit management</a> to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.</p>
 <p>A recommended format for final commit messages is as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>{Short Title}: {Problem this commit is solving and any important contextual information} {issue number if applicable}
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>{Short Title}: {Problem this commit is solving and any important contextual information} {issue number if applicable}
 </code></pre></div>
 <h3 id="pull-requests">Pull Requests<a class="headerlink" href="#pull-requests" title="Permanent link">#</a></h3>
 <p>When submitting a pull request, clear communication is appreciated. This can be achieved by providing the following information:</p>
@@ -2148,12 +2148,12 @@ to build this image is with the following command.  It builds a
 multi-platform image, for all the platforms that KubeStellar can run
 its central components on, and pushes it to quay.io.  Read the remarks
 below before trying this.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span>kubestellar-image
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span>kubestellar-image
 </code></pre></div>
 <p>The set of target platforms can be specified by setting the
 <code>CORE_PLATFORMS</code> variable. The following command is equivalent to the
 default behavior.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>kubestellar-image<span class="w"> </span><span class="nv">CORE_PLATFORMS</span><span class="o">=</span>linux/amd64,linux/arm64,linux/ppc64le
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>kubestellar-image<span class="w"> </span><span class="nv">CORE_PLATFORMS</span><span class="o">=</span>linux/amd64,linux/arm64,linux/ppc64le
 </code></pre></div>
 <p><strong>NOTE VERY SHARP AND BURIED EDGE</strong>: IF the target platforms include
   <code>linux/amd64</code> --- either because you explicitly set that or you let
@@ -2196,7 +2196,7 @@ not push it, using the following command. It also supports the
 <code>CORE_IMAGE_REPO</code> and <code>EXTRA_CORE_TAG</code> variables.  But it only
 builds for your local "platform"; you can use this if you have podman
 pretending to be docker.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span>kubestellar-image-local
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span>kubestellar-image-local
 </code></pre></div>
 <p>Follow that with <code>docker images</code> to find the tag of the image you just
 built.  Get that image:tag known where you are going to run the

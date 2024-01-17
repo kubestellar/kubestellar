@@ -2691,15 +2691,15 @@ Select the tab for your environment for suggested commands to install them</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>brew install jq
+<p><div class="language-text highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>brew install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew install yq
+<div class="language-text highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew install kubectl
+<div class="language-text highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew install kubectl
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew install helm
+<div class="language-text highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew install helm
 </code></pre></div>
-<div class="highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>
+<div class="language-text highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>
 </code></pre></div></p>
 <ol>
 <li>
@@ -2717,19 +2717,19 @@ Select the tab for your environment for suggested commands to install them</p>
 </ol>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo apt-get install jq
+<p><div class="language-text highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo apt-get install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo snap install yq
+<div class="language-text highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo snap install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
+<div class="language-text highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg &gt; /dev/null
+<div class="language-text highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg &gt; /dev/null
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>sudo apt-get install apt-transport-https --yes
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>sudo apt-get update
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>sudo apt-get install helm
 </code></pre></div>
-<div class="highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>
+<div class="language-text highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>
 </code></pre></div></p>
 <p>visit https://go.dev/doc/install for latest instructions</p>
 <ol>
@@ -2755,19 +2755,19 @@ Select the tab for your environment for suggested commands to install them</p>
 </ol>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo apt-get install jq
+<p><div class="language-text highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo apt-get install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sudo apt-get install yq
+<div class="language-text highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sudo apt-get install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
+<div class="language-text highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg &gt; /dev/null
+<div class="language-text highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg &gt; /dev/null
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>sudo apt-get install apt-transport-https --yes
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>sudo apt-get update
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>sudo apt-get install helm
 </code></pre></div>
-<div class="highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>
+<div class="language-text highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>
 </code></pre></div></p>
 <p>visit https://go.dev/doc/install for latest instructions</p>
 <ol>
@@ -2793,19 +2793,19 @@ Select the tab for your environment for suggested commands to install them</p>
 </ol>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>yum -y install jq
+<p><div class="language-text highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>yum -y install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a># easiest to install with snap
+<div class="language-text highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a># easiest to install with snap
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>snap install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a># For AMD64 / x86_64
+<div class="language-text highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a># For AMD64 / x86_64
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a># for ARM64 / aarch64
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>dnf install helm
+<div class="language-text highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>dnf install helm
 </code></pre></div>
-<div class="highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>
+<div class="language-text highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>
 </code></pre></div></p>
 <p>visit https://go.dev/doc/install for latest instructions</p>
 <ol>
@@ -2831,19 +2831,19 @@ Select the tab for your environment for suggested commands to install them</p>
 </ol>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">Chocolatey - https://chocolatey.org/install#individual</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(&#39;https://community.chocolatey.org/install.ps1&#39;))
+<p><div class="language-text highlight"><span class="filename">Chocolatey - https://chocolatey.org/install#individual</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(&#39;https://community.chocolatey.org/install.ps1&#39;))
 </code></pre></div>
-<div class="highlight"><span class="filename">curl</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>choco install curl -y
+<div class="language-text highlight"><span class="filename">curl</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>choco install curl -y
 </code></pre></div>
-<div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>choco install jq -y
+<div class="language-text highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>choco install jq -y
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>choco install yq -y
+<div class="language-text highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>choco install yq -y
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>curl.exe -LO &quot;https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe&quot;    
+<div class="language-text highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>curl.exe -LO &quot;https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe&quot;    
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>choco install kubernetes-helm
+<div class="language-text highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>choco install kubernetes-helm
 </code></pre></div>
-<div class="highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>visit https://go.dev/doc/install for latest instructions
+<div class="language-text highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>visit https://go.dev/doc/install for latest instructions
 </code></pre></div></p>
 <ol>
 <li>
@@ -2880,34 +2880,34 @@ Using Windows 11 Enterprise)</p>
 <p><h6> 1. If you're using a VPN, turn it off</h6></p>
 <p><h6> 2. Install Ubuntu into WSL</h6></p>
 <p><h6> 2.0 If wsl is not yet installed, open a powershell administrator window and run the following</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>wsl --install
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>wsl --install
 </code></pre></div>
 <h6> 2.1 reboot your system</h6></p>
 <p><h6> 2.2 In a Windows command terminal run the following to list all the linux distributions that are available online</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>wsl -l -o
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>wsl -l -o
 </code></pre></div>
 <h6> 2.3 Select a linux distribution and install it into WSL</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>wsl --install -d Ubuntu 22.04.01
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>wsl --install -d Ubuntu 22.04.01
 </code></pre></div>
 You will see something like:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Installing, this may take a few minutes...
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Installing, this may take a few minutes...
 <a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>Please create a default UNIX user account. The username does not need to match your Windows username.
 <a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>For more information visit: https://aka.ms/wslusers
 <a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>Enter new UNIX username:
 </code></pre></div></p>
 <p><h6> 2.4 Enter your new username and password at the prompts, and you will eventually see something like:</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.10.102.1-microsoft-standard-WSL2 x86_64)
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.10.102.1-microsoft-standard-WSL2 x86_64)
 </code></pre></div></p>
 <p><h6> 2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
 Your new linux distribution should appear as a local "App". You can pin it to the Windows task bar or to Start for your future convenience.</h6>
 Start a VM using your distribution by clicking on the App.</p>
 <p><h6> 3. Install pre-requisites into your new VM</h6>
 <h6> 3.1 update and apply apt-get packages</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>sudo apt-get update
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>sudo apt-get update
 <a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>sudo apt-get upgrade
 </code></pre></div></p>
 <p><h6> 3.2 Install golang</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
 <a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>sudo tar -zxvf go1.19.linux-amd64.tar.gz -C /usr/local
 <a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>echo export GOROOT=/usr/local/go | sudo tee -a /etc/profile
 <a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>echo export PATH=&quot;$PATH:/usr/local/go/bin&quot; | sudo tee -a /etc/profile
@@ -2915,32 +2915,32 @@ Start a VM using your distribution by clicking on the App.</p>
 <a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>go version
 </code></pre></div></p>
 <p><h6> 3.3 Install ko (but don't do ko set action step)</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>go install github.com/google/ko@latest
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>go install github.com/google/ko@latest
 </code></pre></div></p>
 <p><h6> 3.4 Install gcc</h6>
 Either run this:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>sudo apt install build-essential
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>sudo apt install build-essential
 </code></pre></div>
 or this:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>sudo apt-get update
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>sudo apt-get update
 <a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>apt install gcc
 <a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>gcc --version
 </code></pre></div></p>
 <p><h6> 3.5 Install make (if you installed build-essential this may already be installed)</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>apt install make
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>apt install make
 </code></pre></div></p>
 <p><h6> 3.6 Install jq</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>DEBIAN_FRONTEND=noninteractive apt-get install -y jq
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>DEBIAN_FRONTEND=noninteractive apt-get install -y jq
 <a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>jq --version
 </code></pre></div></p>
 <p><h6> 3.7 install kubectl</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
 <a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>curl -LO &quot;https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256&quot;
 <a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>echo &quot;$(cat kubectl.sha256)  kubectl&quot; | sha256sum --check
 <a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 </code></pre></div>
 <h6> 3.8 install helm (required when deploying as workload)</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 <a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a>chmod 700 get_helm.sh
 <a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>./get_helm.sh
 </code></pre></div></p>
@@ -2965,29 +2965,29 @@ Select the tab for your environment for suggested commands to install them</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>brew install docker
+<p><div class="language-text highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>brew install docker
 <a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>open -a Docker
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>brew install kind
+<div class="language-text highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>brew install kind
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>sudo mkdir -p /etc/apt/keyrings
+<p><div class="language-text highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>sudo mkdir -p /etc/apt/keyrings
 <a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 <a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
 <a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a>sudo apt update
 <a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a>sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 </code></pre></div>
-<div class="highlight"><span class="filename">Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/</span><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>sudo apt-get install -y dbus-user-session # *** Relogin after this
+<div class="language-text highlight"><span class="filename">Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/</span><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>sudo apt-get install -y dbus-user-session # *** Relogin after this
 <a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>sudo apt-get install -y uidmap
 <a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>dockerd-rootless-setuptool.sh install
 <a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>systemctl --user restart docker.service
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
+<div class="language-text highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a># Add Docker&#39;s official GPG key:
+<p><div class="language-text highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a># Add Docker&#39;s official GPG key:
 <a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>sudo apt-get update
 <a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>sudo apt-get install ca-certificates curl gnupg
 <a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>sudo install -m 0755 -d /etc/apt/keyrings
@@ -3004,19 +3004,19 @@ Select the tab for your environment for suggested commands to install them</p>
 <a id="__codelineno-46-15" name="__codelineno-46-15" href="#__codelineno-46-15"></a># Install packages
 <a id="__codelineno-46-16" name="__codelineno-46-16" href="#__codelineno-46-16"></a>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 </code></pre></div>
-<div class="highlight"><span class="filename">Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/</span><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>sudo apt-get install -y dbus-user-session # *** Relogin after this
+<div class="language-text highlight"><span class="filename">Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/</span><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>sudo apt-get install -y dbus-user-session # *** Relogin after this
 <a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>sudo apt-get install -y fuse-overlayfs
 <a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>sudo apt-get install -y slirp4netns
 <a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a>dockerd-rootless-setuptool.sh install
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
+<div class="language-text highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
+<p><div class="language-text highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
 </code></pre></div>
 Enable rootless usage of Docker by following the instructions at <a href="https://docs.docker.com/engine/security/rootless/">https://docs.docker.com/engine/security/rootless/</a>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a># For AMD64 / x86_64
+<div class="language-text highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a># For AMD64 / x86_64
 <a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
 <a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a># For ARM64
 <a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-arm64 
@@ -3024,9 +3024,9 @@ Enable rootless usage of Docker by following the instructions at <a href="https:
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>choco install docker -y
+<p><div class="language-text highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>choco install docker -y
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
+<div class="language-text highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
@@ -3038,35 +3038,35 @@ The installation instructions from docker are not sufficient to get docker worki
 <p>Here some additional steps you will need to take:</p>
 <p><h6> 2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.</h6>
 If /etc/wsl.conf does not contain [boot] systemd=true, then edit /etc/wsl.com as follows:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>sudo vi /etc/wsl.conf
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>sudo vi /etc/wsl.conf
 </code></pre></div>
 Insert
-<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>[boot]
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>[boot]
 <a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>systemd=true
 </code></pre></div></p>
 <p><h6> 2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>sudo vi /etc/sudoers.d/docker
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>sudo vi /etc/sudoers.d/docker
 </code></pre></div>
 Insert
-<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a># Docker daemon specification
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a># Docker daemon specification
 <a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a>&lt;your user account&gt; ALL=(ALL) NOPASSWD: /usr/bin/dockerd
 </code></pre></div></p>
 <p><h6> 2.4 Add your user to the docker group</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>sudo usermod -aG docker $USER
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>sudo usermod -aG docker $USER
 </code></pre></div></p>
 <p><h6> 2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>sudo systemctl stop docker
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>sudo systemctl stop docker
 <a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a>sudo dockerd &amp;
 </code></pre></div></p>
 <p><h6> 2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655 
 The following commands will fix the issue:</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
 <a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a>sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 <a id="__codelineno-59-3" name="__codelineno-59-3" href="#__codelineno-59-3"></a>sudo dockerd &amp; 
 </code></pre></div></p>
 <p><h6> 3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal</h6></p>
 <p><h6> 3.1 In your new terminal, install kind</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>wget -nv https://github.com/kubernetes-sigs/kind/releases/download/v0.17.0/kind-linux-$(dpkg --print-architecture) -O kind 
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>wget -nv https://github.com/kubernetes-sigs/kind/releases/download/v0.17.0/kind-linux-$(dpkg --print-architecture) -O kind 
 <a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a>sudo install -m 0755 kind /usr/local/bin/kind 
 <a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a>rm kind 
 <a id="__codelineno-60-4" name="__codelineno-60-4" href="#__codelineno-60-4"></a>kind version
@@ -3080,11 +3080,11 @@ The following commands will fix the issue:</h6>
 
 <div class="admonition tip">
 <p class="admonition-title">This document is 'docs-ecutable' - you can 'run' this document, just like we do in our testing, on your local environment</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>git clone -b main https://github.com/kubestellar/kubestellar
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>git clone -b main https://github.com/kubestellar/kubestellar
 <a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a>cd kubestellar
 <a id="__codelineno-61-3" name="__codelineno-61-3" href="#__codelineno-61-3"></a>make MANIFEST=&quot;&#39;docs/content/common-subs/pre-req.md&#39;,&#39;docs/content/Coding Milestones/PoC2023q1/example1.md&#39;&quot; docs-ecutable
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a># done? remove everything
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a># done? remove everything
 <a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a>make MANIFEST=&quot;docs/content/common-subs/remove-all.md&quot; docs-ecutable
 <a id="__codelineno-62-3" name="__codelineno-62-3" href="#__codelineno-62-3"></a>cd ..
 <a id="__codelineno-62-4" name="__codelineno-62-4" href="#__codelineno-62-4"></a>rm -rf kubestellar
@@ -3117,7 +3117,7 @@ corresponding mailbox spaces.  This stage has the following steps.</p>
 examples organize those files into one subdirectory. Start by making
 sure that directory exists without any contents left over from
 previous runs.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a><span class="nv">MY_KUBECONFIGS</span><span class="o">=</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span>/my-kubeconfigs
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a><span class="nv">MY_KUBECONFIGS</span><span class="o">=</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span>/my-kubeconfigs
 <a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a>rm<span class="w"> </span>-rf<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$MY_KUBECONFIGS</span><span class="s2">&quot;</span>
 <a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$MY_KUBECONFIGS</span><span class="s2">&quot;</span>
 </code></pre></div>
@@ -3133,7 +3133,7 @@ file named <code>florin-config.yaml</code> with the following contents.  In a
 <code>kind</code> config file, <code>containerPort</code> is about the container that is
 also a host (a Kubernetes node), while the <code>hostPort</code> is about the
 host that hosts that container.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>cat<span class="w"> </span>&gt;<span class="w"> </span>florin-config.yaml<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>cat<span class="w"> </span>&gt;<span class="w"> </span>florin-config.yaml<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
 <a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a><span class="s">kind: Cluster</span>
 <a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
 <a id="__codelineno-64-4" name="__codelineno-64-4" href="#__codelineno-64-4"></a><span class="s">nodes:</span>
@@ -3147,7 +3147,7 @@ host that hosts that container.</p>
 named <code>guilder-config.yaml</code> with the following contents.  The workload
 that uses hostPort 8081 goes in both clusters, while the workload that
 uses hostPort 8082 goes only in the guilder cluster.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>cat<span class="w"> </span>&gt;<span class="w"> </span>guilder-config.yaml<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>cat<span class="w"> </span>&gt;<span class="w"> </span>guilder-config.yaml<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
 <a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a><span class="s">kind: Cluster</span>
 <a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
 <a id="__codelineno-65-4" name="__codelineno-65-4" href="#__codelineno-65-4"></a><span class="s">nodes:</span>
@@ -3163,7 +3163,7 @@ uses hostPort 8082 goes only in the guilder cluster.</p>
 paying attention to <code>$KUBECONFIG</code> and, if that's empty,
 <code>~/.kube/config</code>: <code>kind create</code> will inject/replace the relevant
 "context" in your active kubeconfig.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin<span class="w"> </span>--config<span class="w"> </span>florin-config.yaml
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin<span class="w"> </span>--config<span class="w"> </span>florin-config.yaml
 <a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder<span class="w"> </span>--config<span class="w"> </span>guilder-config.yaml
 </code></pre></div>
 <!-- END INCLUDE -->
@@ -3171,7 +3171,7 @@ paying attention to <code>$KUBECONFIG</code> and, if that's empty,
 <!-- BEGIN INCLUDE example1-subs/example1-space-manager.md '&lt;!--example1-space-manager-start--&gt;' '&lt;!--example1-space-manager-end--&gt;' -->
 
 <h3 id="create-kind-cluster-for-space-management">Create Kind cluster for space management<a class="headerlink" href="#create-kind-cluster-for-space-management" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>sm-mgt<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>sm-mgt<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-67-2" name="__codelineno-67-2" href="#__codelineno-67-2"></a><span class="s">kind: Cluster</span>
 <a id="__codelineno-67-3" name="__codelineno-67-3" href="#__codelineno-67-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
 <a id="__codelineno-67-4" name="__codelineno-67-4" href="#__codelineno-67-4"></a><span class="s">nodes:</span>
@@ -3204,21 +3204,21 @@ current context is still the one just established, "sm-mgt".</p>
 <p>You can get the latest version from GitHub with the following command,
 which will get you the default branch (which is named "main"); add <code>-b
 $branch</code> to the <code>git</code> command in order to get a different branch.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar
 <a id="__codelineno-68-2" name="__codelineno-68-2" href="#__codelineno-68-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
 </code></pre></div>
 <p>Use the following commands to build and add the executables to your
 <code>$PATH</code>.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a><span class="nb">cd</span><span class="w"> </span>space-framework
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a><span class="nb">cd</span><span class="w"> </span>space-framework
 <a id="__codelineno-69-2" name="__codelineno-69-2" href="#__codelineno-69-2"></a>make<span class="w"> </span>build
 <a id="__codelineno-69-3" name="__codelineno-69-3" href="#__codelineno-69-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
 Next deploy the space framework CRDs in the space management cluster.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>config/crds/
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>config/crds/
 <a id="__codelineno-70-2" name="__codelineno-70-2" href="#__codelineno-70-2"></a><span class="nb">cd</span><span class="w"> </span>..
 </code></pre></div>
 Finally, start the space-manager controller.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>space-manager<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span>-v<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/space-manager.log<span class="w"> </span><span class="p">&amp;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>space-manager<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span>-v<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/space-manager.log<span class="w"> </span><span class="p">&amp;</span>
 </code></pre></div>
 <!-- END INCLUDE -->
 
@@ -3235,10 +3235,10 @@ qualifies).  Do one or the other, not both.</p>
 <p>Download and build or install <a href="https://github.com/kcp-dev/kcp/releases/tag/v0.11.0">kcp</a>,
 according to your preference.  See the start of <a href="https://docs.kcp.io/kcp/v0.11/#quickstart">the kcp quickstart</a> for instructions on that, but get <a href="https://github.com/kcp-dev/kcp/releases/tag/v0.11.0">release v0.11.0</a> rather than the latest (the downloadable assets appear after the long list of changes/features/etc).</p>
 <p>Clone the v0.11.0 branch of the kcp source:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
 </code></pre></div>
 and build the kubectl-ws binary and include it in <code>$PATH</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a><span class="nb">pushd</span><span class="w"> </span>kcp
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a><span class="nb">pushd</span><span class="w"> </span>kcp
 <a id="__codelineno-73-2" name="__codelineno-73-2" href="#__codelineno-73-2"></a>make<span class="w"> </span>build
 <a id="__codelineno-73-3" name="__codelineno-73-3" href="#__codelineno-73-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div></p>
@@ -3252,7 +3252,7 @@ configure <code>kubectl</code> to use the kubeconfig produced by the kcp server,
 and (c) wait for the kcp server to get through some
 initialization. The choice of <code>-v=3</code> for the kcp server makes it log a
 line for every HTTP request (among other things).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>kcp<span class="w"> </span>start<span class="w"> </span>-v<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/kcp.log<span class="w"> </span><span class="p">&amp;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>kcp<span class="w"> </span>start<span class="w"> </span>-v<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/kcp.log<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-74-2" name="__codelineno-74-2" href="#__codelineno-74-2"></a><span class="nv">PROVIDER_KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
 <a id="__codelineno-74-3" name="__codelineno-74-3" href="#__codelineno-74-3"></a><span class="nb">popd</span>
 <a id="__codelineno-74-4" name="__codelineno-74-4" href="#__codelineno-74-4"></a><span class="c1"># wait until KCP is ready checking availability of ws resource</span>
@@ -3269,7 +3269,7 @@ this document assumes that your <code>kind</code> cluster contexts are in
 <p>Space provider for KCP will allow you to use KCP as backend provider for spaces.
 Use the following commands to create a provider secret for KCP access and
 a space provider definition.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>kcpsec<span class="w"> </span>--from-file<span class="o">=</span><span class="nv">kubeconfig</span><span class="o">=</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="w"> </span>--from-file<span class="o">=</span><span class="nv">incluster</span><span class="o">=</span><span class="nv">$PROVIDER_KUBECONFIG</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>kcpsec<span class="w"> </span>--from-file<span class="o">=</span><span class="nv">kubeconfig</span><span class="o">=</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="w"> </span>--from-file<span class="o">=</span><span class="nv">incluster</span><span class="o">=</span><span class="nv">$PROVIDER_KUBECONFIG</span>
 <a id="__codelineno-75-2" name="__codelineno-75-2" href="#__codelineno-75-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-75-3" name="__codelineno-75-3" href="#__codelineno-75-3"></a><span class="s">apiVersion: space.kubestellar.io/v1alpha1</span>
 <a id="__codelineno-75-4" name="__codelineno-75-4" href="#__codelineno-75-4"></a><span class="s">kind: SpaceProviderDesc</span>
@@ -3284,13 +3284,13 @@ a space provider definition.</p>
 <a id="__codelineno-75-13" name="__codelineno-75-13" href="#__codelineno-75-13"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>Next, use the following command to wait for the space-manger to process the provider.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.Phase}&#39;</span><span class="o">=</span>Ready<span class="w"> </span>spaceproviderdesc/default<span class="w"> </span>--timeout<span class="o">=</span>90s
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.Phase}&#39;</span><span class="o">=</span>Ready<span class="w"> </span>spaceproviderdesc/default<span class="w"> </span>--timeout<span class="o">=</span>90s
 </code></pre></div>
 <p>The following variable will be used in later commands to indicate that
 they are being invoked close enough to the provider's apiserver to
 use the more efficient networking (see <a href="../commands/#in-cluster">doc on
 "in-cluster"</a>).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;--in-cluster&quot;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;--in-cluster&quot;</span>
 <a id="__codelineno-77-2" name="__codelineno-77-2" href="#__codelineno-77-2"></a><span class="nv">kube_needed</span><span class="o">=</span><span class="nb">true</span>
 </code></pre></div>
 <!-- END INCLUDE -->
@@ -3308,7 +3308,7 @@ chosen release of KubeStellar (see <a href="https://github.com/kubestellar/kubes
 GitHub</a>) and
 <code>$os_type</code> and <code>$arch_type</code> are chosen according to the list of
 "assets" for your chosen release.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a>curl<span class="w"> </span>-SL<span class="w"> </span>-o<span class="w"> </span>kubestellar.tar.gz<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/</span><span class="si">${</span><span class="nv">kubestellar_version</span><span class="si">}</span><span class="s2">/kubestellar_</span><span class="si">${</span><span class="nv">kubestellar_version</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">os_type</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">arch_type</span><span class="si">}</span><span class="s2">.tar.gz</span>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a>curl<span class="w"> </span>-SL<span class="w"> </span>-o<span class="w"> </span>kubestellar.tar.gz<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/</span><span class="si">${</span><span class="nv">kubestellar_version</span><span class="si">}</span><span class="s2">/kubestellar_</span><span class="si">${</span><span class="nv">kubestellar_version</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">os_type</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">arch_type</span><span class="si">}</span><span class="s2">.tar.gz</span>
 <a id="__codelineno-78-2" name="__codelineno-78-2" href="#__codelineno-78-2"></a><span class="s2">tar xzf kubestellar.tar.gz</span>
 <a id="__codelineno-78-3" name="__codelineno-78-3" href="#__codelineno-78-3"></a><span class="s2">export PATH=</span><span class="nv">$PWD</span><span class="s2">/bin:</span><span class="nv">$PATH</span>
 </code></pre></div>
@@ -3316,12 +3316,12 @@ GitHub</a>) and
 <p>You can get the latest version from GitHub with the following command,
 which will get you the default branch (which is named "main"); add <code>-b
 $branch</code> to the <code>git</code> command in order to get a different branch.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar
 <a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
 </code></pre></div>
 <p>Use the following commands to build and add the executables to your
 <code>$PATH</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a>make<span class="w"> </span>build
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a>make<span class="w"> </span>build
 <a id="__codelineno-80-2" name="__codelineno-80-2" href="#__codelineno-80-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
 <p>In the following exhibited command lines, the commands described as
@@ -3333,7 +3333,7 @@ The kubectl plugin lines use fully specific executables (e.g.,
 <code>bin/kubectl-kubestellar-prep_for_syncer</code>).</p>
 <h4 id="get-binaries-of-kube-bind-and-dex">Get binaries of kube-bind and dex<a class="headerlink" href="#get-binaries-of-kube-bind-and-dex" title="Permanent link">#</a></h4>
 <p>The command below makes kube-bind binaries and dex binary available in <code>$PATH</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>kube-bind
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>kube-bind
 <a id="__codelineno-81-2" name="__codelineno-81-2" href="#__codelineno-81-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/waltforme/kube-bind.git<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-81-3" name="__codelineno-81-3" href="#__codelineno-81-3"></a><span class="nb">pushd</span><span class="w"> </span>kube-bind<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-81-4" name="__codelineno-81-4" href="#__codelineno-81-4"></a>git<span class="w"> </span>checkout<span class="w"> </span>kubestellar<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
@@ -3350,7 +3350,7 @@ The kubectl plugin lines use fully specific executables (e.g.,
 <p>In this step KubeStellar creates and populates the KubeStellar Core
 Space (KCS) (formerly called the Edge Service Provider Workspace
 (ESPW)), which exports the KubeStellar API.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-82-1" name="__codelineno-82-1" href="#__codelineno-82-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar<span class="w"> </span>-X<span class="w"> </span>init
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-82-1" name="__codelineno-82-1" href="#__codelineno-82-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar<span class="w"> </span>-X<span class="w"> </span>init
 </code></pre></div>
 <h3 id="deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster">Deploy kcp and KubeStellar as a workload in a Kubernetes cluster<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster" title="Permanent link">#</a></h3>
 <p>(This style of deployment requires release v0.6 or later of KubeStellar.)</p>
@@ -3384,7 +3384,7 @@ using kcp or KubeStellar. For example, you might use the following
 commands to fetch and start using that kubeconfig file; the first
 assumes that you deployed the core into a Kubernetes namespace named
 "kubestellar".</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>get-external-kubeconfig<span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-o<span class="w"> </span>kcs.kubeconfig
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>get-external-kubeconfig<span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-o<span class="w"> </span>kcs.kubeconfig
 <a id="__codelineno-83-2" name="__codelineno-83-2" href="#__codelineno-83-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/kcs.kubeconfig
 </code></pre></div>
 <p>Note that you now care about two different kubeconfig files: the one
@@ -3396,14 +3396,14 @@ the current context is for the KubeStellar hosting cluster.</p>
 <p>The following variable will be used in later commands to indicate that
 they are <em>not</em> being invoked from within the hosting cluster (see <a href="../commands/#in-cluster">doc
 on "in-cluster"</a>).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
 </code></pre></div>
 <h3 id="create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters">Create SyncTarget and Location objects to represent the florin and guilder clusters<a class="headerlink" href="#create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters" title="Permanent link">#</a></h3>
 <p>Use the following two commands to put inventory objects in the IMW at
 <code>root:imw1</code> that was automatically created during deployment of
 KubeStellar. They label both florin and guilder with <code>env=prod</code>, and
 also label guilder with <code>extended=yes</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a><span class="nv">IMW1_KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span><span class="s2">/imw1.kubeconfig&quot;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a><span class="nv">IMW1_KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span><span class="s2">/imw1.kubeconfig&quot;</span>
 <a id="__codelineno-85-2" name="__codelineno-85-2" href="#__codelineno-85-2"></a>kubectl-kubestellar-space-get_kubeconfig<span class="w"> </span>imw1<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span><span class="nv">$IMW1_KUBECONFIG</span>
 <a id="__codelineno-85-3" name="__codelineno-85-3" href="#__codelineno-85-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>florin<span class="w">  </span>loc-name<span class="o">=</span>florin<span class="w">  </span><span class="nv">env</span><span class="o">=</span>prod
 <a id="__codelineno-85-4" name="__codelineno-85-4" href="#__codelineno-85-4"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>guilder<span class="w"> </span>loc-name<span class="o">=</span>guilder<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">extended</span><span class="o">=</span>yes
@@ -3411,7 +3411,7 @@ also label guilder with <code>extended=yes</code>.</p>
 <a id="__codelineno-85-6" name="__codelineno-85-6" href="#__codelineno-85-6"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>location.edge.kubestellar.io<span class="w"> </span>florin
 </code></pre></div>
 <p>Those two <code>ensure location</code> calls are equivalent to creating the following four objects.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-86-1" name="__codelineno-86-1" href="#__codelineno-86-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v2alpha1</span>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-86-1" name="__codelineno-86-1" href="#__codelineno-86-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-86-2" name="__codelineno-86-2" href="#__codelineno-86-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SyncTarget</span>
 <a id="__codelineno-86-3" name="__codelineno-86-3" href="#__codelineno-86-3"></a><span class="nt">metadata</span><span class="p">:</span>
 <a id="__codelineno-86-4" name="__codelineno-86-4" href="#__codelineno-86-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">florin</span>
@@ -3469,7 +3469,7 @@ KubeStellar.  If you have deployed the KubeStellar core as Kubernetes
 workload then this controller is already running in a pod in your
 hosting cluster. If instead you are running these controllers as bare
 processes then launch this controller as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-87-1" name="__codelineno-87-1" href="#__codelineno-87-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>mailbox-controller<span class="w"> </span>--external-access<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/mailbox-controller.log<span class="w"> </span><span class="p">&amp;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-87-1" name="__codelineno-87-1" href="#__codelineno-87-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>mailbox-controller<span class="w"> </span>--external-access<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/mailbox-controller.log<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-87-2" name="__codelineno-87-2" href="#__codelineno-87-2"></a>sleep<span class="w"> </span><span class="m">20</span>
 </code></pre></div>
 <p>This controller is in charge of maintaining the collection of mailbox
@@ -3477,13 +3477,13 @@ spaces, which are an implementation detail not intended for user
 consumption. You can use the following command to wait for the
 appearance of the mailbox spaces implied by the florin and guilder
 <code>SyncTarget</code> objects that you made earlier.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-88-1" name="__codelineno-88-1" href="#__codelineno-88-1"></a><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;\-mb\-&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l<span class="k">)</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-88-1" name="__codelineno-88-1" href="#__codelineno-88-1"></a><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;\-mb\-&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l<span class="k">)</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-88-2" name="__codelineno-88-2" href="#__codelineno-88-2"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-88-3" name="__codelineno-88-3" href="#__codelineno-88-3"></a><span class="k">done</span>
 </code></pre></div>
 <p>If it is working correctly, lines like the following will appear in
 the controller's log (which is being written into /tmp/mailbox-controller.log if you ran the controller as a bare process above, otherwise you can fetch <a href="../commands/#fetch-a-log-from-a-kubestellar-runtime-container">as directed</a>).</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-89-1" name="__codelineno-89-1" href="#__codelineno-89-1"></a>...
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-89-1" name="__codelineno-89-1" href="#__codelineno-89-1"></a>...
 <a id="__codelineno-89-2" name="__codelineno-89-2" href="#__codelineno-89-2"></a>I1218<span class="w"> </span><span class="m">16</span>:36:14.743434<span class="w">  </span><span class="m">239027</span><span class="w"> </span>controller.go:277<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Created missing space&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">mbsName</span><span class="o">=</span><span class="s2">&quot;imw1-mb-ace9fd79-1c35-410d-879d-d73ec6f9fe6b&quot;</span>
 <a id="__codelineno-89-3" name="__codelineno-89-3" href="#__codelineno-89-3"></a>...
 <a id="__codelineno-89-4" name="__codelineno-89-4" href="#__codelineno-89-4"></a>I1218<span class="w"> </span><span class="m">16</span>:36:14.759426<span class="w">  </span><span class="m">239027</span><span class="w"> </span>controller.go:277<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Created missing space&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">mbsName</span><span class="o">=</span><span class="s2">&quot;imw1-mb-11c4c16a-82f9-48ad-b036-879aba135959&quot;</span>
@@ -3492,9 +3492,9 @@ the controller's log (which is being written into /tmp/mailbox-controller.log if
 about individual mailbox spaces.</p>
 <p>A mailbox space name is distinguished by <code>-mb-</code> separator.
 You can get a listing of those mailbox spaces as follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-90-1" name="__codelineno-90-1" href="#__codelineno-90-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-A
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-90-1" name="__codelineno-90-1" href="#__codelineno-90-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-A
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-91-1" name="__codelineno-91-1" href="#__codelineno-91-1"></a>NAMESPACE<span class="w">               </span>NAME<span class="w">                                           </span>AGE
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-91-1" name="__codelineno-91-1" href="#__codelineno-91-1"></a>NAMESPACE<span class="w">               </span>NAME<span class="w">                                           </span>AGE
 <a id="__codelineno-91-2" name="__codelineno-91-2" href="#__codelineno-91-2"></a>spaceprovider-default<span class="w">   </span>espw<span class="w">                                           </span>84s
 <a id="__codelineno-91-3" name="__codelineno-91-3" href="#__codelineno-91-3"></a>spaceprovider-default<span class="w">   </span>imw1<span class="w">                                           </span>76s
 <a id="__codelineno-91-4" name="__codelineno-91-4" href="#__codelineno-91-4"></a>spaceprovider-default<span class="w">   </span>imw1-mb-11c4c16a-82f9-48ad-b036-879aba135959<span class="w">   </span>20s
@@ -3503,9 +3503,9 @@ You can get a listing of those mailbox spaces as follows.</p>
 </code></pre></div></p>
 <p>More usefully, using custom columns you can get a listing that shows
 the <em>name</em> of the associated SyncTarget.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-92-1" name="__codelineno-92-1" href="#__codelineno-92-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations[&#39;edge\.kubestellar\.io/sync-target-name&#39;],CLUSTER:.spec.cluster&quot;</span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-92-1" name="__codelineno-92-1" href="#__codelineno-92-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations[&#39;edge\.kubestellar\.io/sync-target-name&#39;],CLUSTER:.spec.cluster&quot;</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-93-1" name="__codelineno-93-1" href="#__codelineno-93-1"></a>NAME<span class="w">                                           </span>SYNCTARGET<span class="w">   </span>CLUSTER
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-93-1" name="__codelineno-93-1" href="#__codelineno-93-1"></a>NAME<span class="w">                                           </span>SYNCTARGET<span class="w">   </span>CLUSTER
 <a id="__codelineno-93-2" name="__codelineno-93-2" href="#__codelineno-93-2"></a>espw<span class="w">                                           </span>&lt;none&gt;<span class="w">       </span>&lt;none&gt;
 <a id="__codelineno-93-3" name="__codelineno-93-3" href="#__codelineno-93-3"></a>imw1<span class="w">                                           </span>&lt;none&gt;<span class="w">       </span>&lt;none&gt;
 <a id="__codelineno-93-4" name="__codelineno-93-4" href="#__codelineno-93-4"></a>imw1-mb-11c4c16a-82f9-48ad-b036-879aba135959<span class="w">   </span>florin<span class="w">       </span>&lt;none&gt;
@@ -3514,15 +3514,15 @@ the <em>name</em> of the associated SyncTarget.</p>
 </code></pre></div></p>
 <p>Also: if you ever need to look up just one mailbox space by
 SyncTarget name, you could do it as follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-94-1" name="__codelineno-94-1" href="#__codelineno-94-1"></a><span class="nv">GUILDER_SPACE</span><span class="o">=</span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.items | .[] | .metadata | select(.annotations [&quot;edge.kubestellar.io/sync-target-name&quot;] == &quot;guilder&quot;) | .name&#39;</span><span class="k">)</span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-94-1" name="__codelineno-94-1" href="#__codelineno-94-1"></a><span class="nv">GUILDER_SPACE</span><span class="o">=</span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.items | .[] | .metadata | select(.annotations [&quot;edge.kubestellar.io/sync-target-name&quot;] == &quot;guilder&quot;) | .name&#39;</span><span class="k">)</span>
 <a id="__codelineno-94-2" name="__codelineno-94-2" href="#__codelineno-94-2"></a><span class="nb">echo</span><span class="w"> </span>The<span class="w"> </span>guilder<span class="w"> </span>mailbox<span class="w"> </span>space<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span><span class="nv">$GUILDER_SPACE</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-95-1" name="__codelineno-95-1" href="#__codelineno-95-1"></a>The<span class="w"> </span>guilder<span class="w"> </span>mailbox<span class="w"> </span>space<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span>imw1-mb-ace9fd79-1c35-410d-879d-d73ec6f9fe6b
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-95-1" name="__codelineno-95-1" href="#__codelineno-95-1"></a>The<span class="w"> </span>guilder<span class="w"> </span>mailbox<span class="w"> </span>space<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span>imw1-mb-ace9fd79-1c35-410d-879d-d73ec6f9fe6b
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-96-1" name="__codelineno-96-1" href="#__codelineno-96-1"></a><span class="nv">FLORIN_SPACE</span><span class="o">=</span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.items | .[] | .metadata | select(.annotations [&quot;edge.kubestellar.io/sync-target-name&quot;] == &quot;florin&quot;) | .name&#39;</span><span class="k">)</span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-96-1" name="__codelineno-96-1" href="#__codelineno-96-1"></a><span class="nv">FLORIN_SPACE</span><span class="o">=</span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.items | .[] | .metadata | select(.annotations [&quot;edge.kubestellar.io/sync-target-name&quot;] == &quot;florin&quot;) | .name&#39;</span><span class="k">)</span>
 <a id="__codelineno-96-2" name="__codelineno-96-2" href="#__codelineno-96-2"></a><span class="nb">echo</span><span class="w"> </span>The<span class="w"> </span>florin<span class="w"> </span>mailbox<span class="w"> </span>space<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span><span class="nv">$FLORIN_SPACE</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-97-1" name="__codelineno-97-1" href="#__codelineno-97-1"></a>The<span class="w"> </span>florin<span class="w"> </span>mailbox<span class="w"> </span>space<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span>imw1-mb-11c4c16a-82f9-48ad-b036-879aba135959
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-97-1" name="__codelineno-97-1" href="#__codelineno-97-1"></a>The<span class="w"> </span>florin<span class="w"> </span>mailbox<span class="w"> </span>space<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span>imw1-mb-11c4c16a-82f9-48ad-b036-879aba135959
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
@@ -3533,9 +3533,9 @@ SyncTarget name, you could do it as follows.</p>
 guilder, an identity and authorizations for the edge syncer and (b)
 write a file containing YAML for deploying the syncer in the guilder
 cluster.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-98-1" name="__codelineno-98-1" href="#__codelineno-98-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>imw1<span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span>guilder
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-98-1" name="__codelineno-98-1" href="#__codelineno-98-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>imw1<span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span>guilder
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-99-1" name="__codelineno-99-1" href="#__codelineno-99-1"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df&quot;</span>
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-99-1" name="__codelineno-99-1" href="#__codelineno-99-1"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df&quot;</span>
 <a id="__codelineno-99-2" name="__codelineno-99-2" href="#__codelineno-99-2"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df&quot;</span>
 <a id="__codelineno-99-3" name="__codelineno-99-3" href="#__codelineno-99-3"></a>
 <a id="__codelineno-99-4" name="__codelineno-99-4" href="#__codelineno-99-4"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df&quot;</span>
@@ -3557,9 +3557,9 @@ cluster.</p>
 <code>guilder-syncer.yaml</code>.  Next <code>kubectl apply</code> that to the guilder
 cluster.  That will look something like the following; adjust as
 necessary to make kubectl manipulate <strong>your</strong> guilder cluster.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-100-1" name="__codelineno-100-1" href="#__codelineno-100-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>guilder-syncer.yaml
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-100-1" name="__codelineno-100-1" href="#__codelineno-100-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>guilder-syncer.yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-101-1" name="__codelineno-101-1" href="#__codelineno-101-1"></a>namespace/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-101-1" name="__codelineno-101-1" href="#__codelineno-101-1"></a>namespace/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
 <a id="__codelineno-101-2" name="__codelineno-101-2" href="#__codelineno-101-2"></a>serviceaccount/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
 <a id="__codelineno-101-3" name="__codelineno-101-3" href="#__codelineno-101-3"></a>secret/kubestellar-syncer-guilder-wfeig2lv-token<span class="w"> </span>created
 <a id="__codelineno-101-4" name="__codelineno-101-4" href="#__codelineno-101-4"></a>clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
@@ -3568,18 +3568,18 @@ necessary to make kubectl manipulate <strong>your</strong> guilder cluster.</p>
 <a id="__codelineno-101-7" name="__codelineno-101-7" href="#__codelineno-101-7"></a>deployment.apps/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
 </code></pre></div></p>
 <p>You might check that the syncer is running, as follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-102-1" name="__codelineno-102-1" href="#__codelineno-102-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-102-1" name="__codelineno-102-1" href="#__codelineno-102-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-103-1" name="__codelineno-103-1" href="#__codelineno-103-1"></a>NAMESPACE<span class="w">                                             </span>NAME<span class="w">                                                  </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-103-1" name="__codelineno-103-1" href="#__codelineno-103-1"></a>NAMESPACE<span class="w">                                             </span>NAME<span class="w">                                                  </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
 <a id="__codelineno-103-2" name="__codelineno-103-2" href="#__codelineno-103-2"></a>kube-system<span class="w">                                           </span>coredns<span class="w">                                               </span><span class="m">2</span>/2<span class="w">     </span><span class="m">2</span><span class="w">            </span><span class="m">2</span><span class="w">           </span>4m1s
 <a id="__codelineno-103-3" name="__codelineno-103-3" href="#__codelineno-103-3"></a>kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df<span class="w">   </span>kubestellar-syncer-kube-bind-sx6pl-guilder-2laxc4df<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>0s
 <a id="__codelineno-103-4" name="__codelineno-103-4" href="#__codelineno-103-4"></a>local-path-storage<span class="w">                                    </span>local-path-provisioner<span class="w">                                </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>3m58s
 </code></pre></div></p>
 <h3 id="connect-florin-edge-cluster-with-its-mailbox-space">Connect florin edge cluster with its mailbox space<a class="headerlink" href="#connect-florin-edge-cluster-with-its-mailbox-space" title="Permanent link">#</a></h3>
 <p>Do the analogous stuff for the florin cluster.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>imw1<span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span>florin
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>imw1<span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span>florin
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-105-1" name="__codelineno-105-1" href="#__codelineno-105-1"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj&quot;</span>
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-105-1" name="__codelineno-105-1" href="#__codelineno-105-1"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj&quot;</span>
 <a id="__codelineno-105-2" name="__codelineno-105-2" href="#__codelineno-105-2"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj&quot;</span>
 <a id="__codelineno-105-3" name="__codelineno-105-3" href="#__codelineno-105-3"></a>
 <a id="__codelineno-105-4" name="__codelineno-105-4" href="#__codelineno-105-4"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj&quot;</span>
@@ -3598,9 +3598,9 @@ necessary to make kubectl manipulate <strong>your</strong> guilder cluster.</p>
 <a id="__codelineno-105-17" name="__codelineno-105-17" href="#__codelineno-105-17"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
 </code></pre></div></p>
 <p>And deploy the syncer in the florin cluster.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-106-1" name="__codelineno-106-1" href="#__codelineno-106-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-106-1" name="__codelineno-106-1" href="#__codelineno-106-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-107-1" name="__codelineno-107-1" href="#__codelineno-107-1"></a>namespace/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj<span class="w"> </span>created
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-107-1" name="__codelineno-107-1" href="#__codelineno-107-1"></a>namespace/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj<span class="w"> </span>created
 <a id="__codelineno-107-2" name="__codelineno-107-2" href="#__codelineno-107-2"></a>serviceaccount/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj<span class="w"> </span>created
 <a id="__codelineno-107-3" name="__codelineno-107-3" href="#__codelineno-107-3"></a>secret/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj-token<span class="w"> </span>created
 <a id="__codelineno-107-4" name="__codelineno-107-4" href="#__codelineno-107-4"></a>clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-kube-bind-sx6pl-florin-1pa812aj<span class="w"> </span>created
@@ -3625,7 +3625,7 @@ workload, with the following commands.  These commands create the WMW,
 makes KubeStellar edge APIs available for the WMW via kube-bind, and
 optionally makes some Kubernetes APIs available for the WMW by
 populating a set of CRDs into the WMW.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-108-1" name="__codelineno-108-1" href="#__codelineno-108-1"></a><span class="c1"># TODO: Needs to pass --with-kube false or true</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-108-1" name="__codelineno-108-1" href="#__codelineno-108-1"></a><span class="c1"># TODO: Needs to pass --with-kube false or true</span>
 <a id="__codelineno-108-2" name="__codelineno-108-2" href="#__codelineno-108-2"></a><span class="nv">WMW_C_SPACE_CONFIG</span><span class="o">=</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span>/wmw-c.kubeconfig
 <a id="__codelineno-108-3" name="__codelineno-108-3" href="#__codelineno-108-3"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span>wmw-c<span class="w"> </span>--with-kube<span class="w"> </span><span class="nv">$kube_needed</span><span class="w"> </span>--output-kubeconfig<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="s2">&quot;</span>
 <a id="__codelineno-108-4" name="__codelineno-108-4" href="#__codelineno-108-4"></a>sleep<span class="w"> </span><span class="m">15</span>
@@ -3634,7 +3634,7 @@ populating a set of CRDs into the WMW.</p>
 workspace.  The workload in this example in an Apache httpd server
 that serves up a very simple web page, conveyed via a Kubernetes
 ConfigMap that is mounted as a volume for the httpd pod.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-109-1" name="__codelineno-109-1" href="#__codelineno-109-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-109-1" name="__codelineno-109-1" href="#__codelineno-109-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-109-2" name="__codelineno-109-2" href="#__codelineno-109-2"></a><span class="s">apiVersion: v1</span>
 <a id="__codelineno-109-3" name="__codelineno-109-3" href="#__codelineno-109-3"></a><span class="s">kind: Namespace</span>
 <a id="__codelineno-109-4" name="__codelineno-109-4" href="#__codelineno-109-4"></a><span class="s">metadata:</span>
@@ -3707,7 +3707,7 @@ ConfigMap that is mounted as a volume for the httpd pod.</p>
 Its "where predicate" (the <code>locationSelectors</code> array) has one label
 selector that matches both Location objects created earlier, thus
 directing the common workload to both edge clusters.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-110-1" name="__codelineno-110-1" href="#__codelineno-110-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-110-1" name="__codelineno-110-1" href="#__codelineno-110-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-110-2" name="__codelineno-110-2" href="#__codelineno-110-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-110-3" name="__codelineno-110-3" href="#__codelineno-110-3"></a><span class="s">kind: EdgePlacement</span>
 <a id="__codelineno-110-4" name="__codelineno-110-4" href="#__codelineno-110-4"></a><span class="s">metadata:</span>
@@ -3738,7 +3738,7 @@ directing the common workload to both edge clusters.</p>
 <h3 id="create-and-populate-the-workload-management-workspace-for-the-special-workload">Create and populate the workload management workspace for the special workload<a class="headerlink" href="#create-and-populate-the-workload-management-workspace-for-the-special-workload" title="Permanent link">#</a></h3>
 <p>Use the following <code>kubectl</code> commands to create the WMW for the special
 workload.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a><span class="c1"># TODO: needs to set --with-kube false/true</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a><span class="c1"># TODO: needs to set --with-kube false/true</span>
 <a id="__codelineno-111-2" name="__codelineno-111-2" href="#__codelineno-111-2"></a><span class="nv">WMW_S_SPACE_CONFIG</span><span class="o">=</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span>/wmw-s.kubeconfig
 <a id="__codelineno-111-3" name="__codelineno-111-3" href="#__codelineno-111-3"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span>wmw-s<span class="w"> </span>--with-kube<span class="w"> </span><span class="nv">$kube_needed</span><span class="w"> </span>--output-kubeconfig<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="s2">&quot;</span>
 </code></pre></div>
@@ -3748,7 +3748,7 @@ use the one from <a href="https://kubernetes.io/docs/tasks/extend-kubernetes/cus
 CRDs</a>,
 modified so that the resource it defines is in the category
 <code>all</code>. First, create the definition object with the following command.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-112-1" name="__codelineno-112-1" href="#__codelineno-112-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-112-1" name="__codelineno-112-1" href="#__codelineno-112-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-112-2" name="__codelineno-112-2" href="#__codelineno-112-2"></a><span class="s">apiVersion: apiextensions.k8s.io/v1</span>
 <a id="__codelineno-112-3" name="__codelineno-112-3" href="#__codelineno-112-3"></a><span class="s">kind: CustomResourceDefinition</span>
 <a id="__codelineno-112-4" name="__codelineno-112-4" href="#__codelineno-112-4"></a><span class="s">metadata:</span>
@@ -3795,13 +3795,13 @@ modified so that the resource it defines is in the category
 </code></pre></div>
 <p>Next, use the following command to wait for the apiserver to process
 that definition.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="w"> </span><span class="nv">condition</span><span class="o">=</span>Established<span class="w"> </span>crd<span class="w"> </span>crontabs.stable.example.com
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="w"> </span><span class="nv">condition</span><span class="o">=</span>Established<span class="w"> </span>crd<span class="w"> </span>crontabs.stable.example.com
 </code></pre></div>
 <p>Next, use <code>kubectl</code> to create the following workload objects in that
 workspace. The <code>APIService</code> object included here does not contribute
 to the httpd workload but is here to demonstrate that <code>APIService</code>
 objects can be downsynced.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a><span class="c1"># TODO: verify that APIservices is supported for Kubeflex control plan</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a><span class="c1"># TODO: verify that APIservices is supported for Kubeflex control plan</span>
 <a id="__codelineno-114-2" name="__codelineno-114-2" href="#__codelineno-114-2"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-114-3" name="__codelineno-114-3" href="#__codelineno-114-3"></a><span class="s">apiVersion: v1</span>
 <a id="__codelineno-114-4" name="__codelineno-114-4" href="#__codelineno-114-4"></a><span class="s">kind: Namespace</span>
@@ -3905,7 +3905,7 @@ labels and annotations) to be downsynced. This contrasts with the
 common EdgePlacement, which does not explicitly mention the
 <code>commonstuff</code> namespace, relying on the implicit creation of
 namespaces as needed in the WECs.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-115-1" name="__codelineno-115-1" href="#__codelineno-115-1"></a><span class="c1"># TODO: verify that APIservices is supported for Kubeflex control plan</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-115-1" name="__codelineno-115-1" href="#__codelineno-115-1"></a><span class="c1"># TODO: verify that APIservices is supported for Kubeflex control plan</span>
 <a id="__codelineno-115-2" name="__codelineno-115-2" href="#__codelineno-115-2"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-115-3" name="__codelineno-115-3" href="#__codelineno-115-3"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-115-4" name="__codelineno-115-4" href="#__codelineno-115-4"></a><span class="s">kind: EdgePlacement</span>
@@ -3972,12 +3972,12 @@ following resolutions of the "where" predicates.</p>
 the where resolver is running in a pod there. If instead you are
 running the core controllers are bare processes then you can use the
 following commands to launch the where-resolver.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar-where-resolver<span class="w"> </span>--external-access<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/where-resolver.log<span class="w"> </span><span class="p">&amp;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar-where-resolver<span class="w"> </span>--external-access<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/where-resolver.log<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-116-2" name="__codelineno-116-2" href="#__codelineno-116-2"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
 <p>The following commands wait until the where-resolver has done its job
 for the common and special <code>EdgePlacement</code> objects.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-117-2" name="__codelineno-117-2" href="#__codelineno-117-2"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-117-3" name="__codelineno-117-3" href="#__codelineno-117-3"></a><span class="k">done</span>
 <a id="__codelineno-117-4" name="__codelineno-117-4" href="#__codelineno-117-4"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
@@ -3986,14 +3986,14 @@ for the common and special <code>EdgePlacement</code> objects.</p>
 </code></pre></div>
 <p>If things are working properly then you will see log lines like the
 following (among many others) in the where-resolver's log.</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a>I1219<span class="w"> </span><span class="m">16</span>:40:49.814564<span class="w">  </span><span class="m">325368</span><span class="w"> </span>reconcile_on_location.go:213<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;where-resolver&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span><span class="s2">&quot;Location&quot;</span><span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;kube-bind-sx6pl-florin&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;kube-bind-sx6pl-florin&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;kube-bind-g72bg-edge-placement-c&quot;</span>
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a>I1219<span class="w"> </span><span class="m">16</span>:40:49.814564<span class="w">  </span><span class="m">325368</span><span class="w"> </span>reconcile_on_location.go:213<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;where-resolver&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span><span class="s2">&quot;Location&quot;</span><span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;kube-bind-sx6pl-florin&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;kube-bind-sx6pl-florin&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;kube-bind-g72bg-edge-placement-c&quot;</span>
 <a id="__codelineno-118-2" name="__codelineno-118-2" href="#__codelineno-118-2"></a>...
 <a id="__codelineno-118-3" name="__codelineno-118-3" href="#__codelineno-118-3"></a>I1219<span class="w"> </span><span class="m">16</span>:40:49.797689<span class="w">  </span><span class="m">325368</span><span class="w"> </span>reconcile_on_location.go:213<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;where-resolver&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span><span class="s2">&quot;Location&quot;</span><span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;kube-bind-sx6pl-guilder&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;kube-bind-sx6pl-guilder&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;kube-bind-g72bg-edge-placement-c&quot;</span>
 </code></pre></div>
 <p>Check out a SinglePlacementSlice object as follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-119-1" name="__codelineno-119-1" href="#__codelineno-119-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span>-o<span class="w"> </span>yaml
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-119-1" name="__codelineno-119-1" href="#__codelineno-119-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a>apiVersion:<span class="w"> </span>v1
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a>apiVersion:<span class="w"> </span>v1
 <a id="__codelineno-120-2" name="__codelineno-120-2" href="#__codelineno-120-2"></a>items:
 <a id="__codelineno-120-3" name="__codelineno-120-3" href="#__codelineno-120-3"></a>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-120-4" name="__codelineno-120-4" href="#__codelineno-120-4"></a><span class="w">  </span>destinations:
@@ -4040,12 +4040,12 @@ cluster then the placement translator is running in a Pod there. If
 instead you are running the core controllers as bare processes then
 use the following commands to launch the placement translator; it
 requires the ESPW to be current at start time.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-121-1" name="__codelineno-121-1" href="#__codelineno-121-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>placement-translator<span class="w"> </span>--external-access<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w">  </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/placement-translator.log<span class="w"> </span><span class="p">&amp;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-121-1" name="__codelineno-121-1" href="#__codelineno-121-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>placement-translator<span class="w"> </span>--external-access<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w">  </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/placement-translator.log<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-121-2" name="__codelineno-121-2" href="#__codelineno-121-2"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
 <p>The following commands wait for the placement translator to get its
 job done for this example.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a><span class="nv">FLORIN_MB_KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span><span class="s2">/</span><span class="si">${</span><span class="nv">FLORIN_SPACE</span><span class="si">}</span><span class="s2">.kubeconfig&quot;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a><span class="nv">FLORIN_MB_KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span><span class="s2">/</span><span class="si">${</span><span class="nv">FLORIN_SPACE</span><span class="si">}</span><span class="s2">.kubeconfig&quot;</span>
 <a id="__codelineno-122-2" name="__codelineno-122-2" href="#__codelineno-122-2"></a><span class="nv">GUILDER_MB_KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span><span class="s2">/</span><span class="si">${</span><span class="nv">GUILDER_SPACE</span><span class="si">}</span><span class="s2">.kubeconfig&quot;</span>
 <a id="__codelineno-122-3" name="__codelineno-122-3" href="#__codelineno-122-3"></a>kubectl-kubestellar-space-get_kubeconfig<span class="w"> </span><span class="nv">$FLORIN_SPACE</span><span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span><span class="nv">$FLORIN_MB_KUBECONFIG</span>
 <a id="__codelineno-122-4" name="__codelineno-122-4" href="#__codelineno-122-4"></a>kubectl-kubestellar-space-get_kubeconfig<span class="w"> </span><span class="nv">$GUILDER_SPACE</span><span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span><span class="nv">$GUILDER_MB_KUBECONFIG</span>
@@ -4099,10 +4099,10 @@ two copies of that object, each with an annotation whose key is
 the mailbox space; those names appear in the "CLUSTER" column of
 the custom-columns listing near the end of <a href="./#the-mailbox-controller">the section above about
 the mailbox controller</a>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-123-1" name="__codelineno-123-1" href="#__codelineno-123-1"></a><span class="c1"># TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-123-1" name="__codelineno-123-1" href="#__codelineno-123-1"></a><span class="c1"># TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.</span>
 <a id="__codelineno-123-2" name="__codelineno-123-2" href="#__codelineno-123-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="s2">&quot;</span><span class="w"> </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apps<span class="w"> </span>--api-kind<span class="w"> </span>ReplicaSet
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-124-1" name="__codelineno-124-1" href="#__codelineno-124-1"></a>---
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-124-1" name="__codelineno-124-1" href="#__codelineno-124-1"></a>---
 <a id="__codelineno-124-2" name="__codelineno-124-2" href="#__codelineno-124-2"></a>apiVersion:<span class="w"> </span>apps/v1
 <a id="__codelineno-124-3" name="__codelineno-124-3" href="#__codelineno-124-3"></a>kind:<span class="w"> </span>ReplicaSet
 <a id="__codelineno-124-4" name="__codelineno-124-4" href="#__codelineno-124-4"></a>metadata:
@@ -4134,12 +4134,12 @@ the mailbox controller</a>.</p>
 </code></pre></div>
 <p>That display should show objects in two different mailbox spaces;
 the following command checks that.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a><span class="c1"># TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a><span class="c1"># TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.</span>
 <a id="__codelineno-125-2" name="__codelineno-125-2" href="#__codelineno-125-2"></a><span class="nb">test</span><span class="w"> </span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="s2">&quot;</span><span class="w"> </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apps<span class="w"> </span>--api-kind<span class="w"> </span>ReplicaSet<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;^ *kcp.io/cluster: [0-9a-z]*</span>$<span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span><span class="p">|</span><span class="w"> </span>uniq<span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l<span class="k">)</span><span class="w"> </span>-ge<span class="w"> </span><span class="m">2</span>
 </code></pre></div>
 <p>The CustomResourceDefinition objects involved
 should also appear in the mailbox spaces.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-126-1" name="__codelineno-126-1" href="#__codelineno-126-1"></a><span class="c1"># TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-126-1" name="__codelineno-126-1" href="#__codelineno-126-1"></a><span class="c1"># TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.</span>
 <a id="__codelineno-126-2" name="__codelineno-126-2" href="#__codelineno-126-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="s2">&quot;</span><span class="w"> </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apiextensions.k8s.io<span class="w"> </span>--api-kind<span class="w"> </span>CustomResourceDefinition<span class="w"> </span><span class="p">|</span><span class="w"> </span>fgrep<span class="w"> </span>-w<span class="w"> </span><span class="s2">&quot;name: crontabs.stable.example.com&quot;</span>
 <a id="__codelineno-126-3" name="__codelineno-126-3" href="#__codelineno-126-3"></a><span class="nb">test</span><span class="w"> </span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="s2">&quot;</span><span class="w"> </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apiextensions.k8s.io<span class="w"> </span>--api-kind<span class="w"> </span>CustomResourceDefinition<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-cw<span class="w"> </span><span class="s2">&quot;name: replicasets.apps&quot;</span><span class="k">)</span><span class="w"> </span>-ge<span class="w"> </span><span class="m">2</span>
 <a id="__codelineno-126-4" name="__codelineno-126-4" href="#__codelineno-126-4"></a><span class="nb">test</span><span class="w"> </span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="s2">&quot;</span><span class="w"> </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apiextensions.k8s.io<span class="w"> </span>--api-kind<span class="w"> </span>CustomResourceDefinition<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-cw<span class="w"> </span><span class="s2">&quot;name: deployments.apps&quot;</span><span class="k">)</span><span class="w"> </span>-ge<span class="w"> </span><span class="m">1</span>
@@ -4147,15 +4147,15 @@ should also appear in the mailbox spaces.</p>
 <p>The <code>APIService</code> of the special workload should also appear, along
 with some error messages about <code>APIService</code> not being known in the
 other mailbox workspaces.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-127-1" name="__codelineno-127-1" href="#__codelineno-127-1"></a><span class="c1"># TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-127-1" name="__codelineno-127-1" href="#__codelineno-127-1"></a><span class="c1"># TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.</span>
 <a id="__codelineno-127-2" name="__codelineno-127-2" href="#__codelineno-127-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="s2">&quot;</span><span class="w"> </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apiregistration.k8s.io<span class="w"> </span>--api-kind<span class="w"> </span>APIService<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">&quot;APIService.*the server could not find the requested resource&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>fgrep<span class="w"> </span>-w<span class="w"> </span><span class="s2">&quot;name: v1090.example.my&quot;</span>
 </code></pre></div>
 <p>The florin cluster gets only the common workload.  Examine florin's
 <code>SyncerConfig</code> as follows.  Utilize the name of the mailbox workspace
 for florin (which you stored in Stage 1) here.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-128-1" name="__codelineno-128-1" href="#__codelineno-128-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$FLORIN_MB_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-128-1" name="__codelineno-128-1" href="#__codelineno-128-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$FLORIN_MB_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-129-1" name="__codelineno-129-1" href="#__codelineno-129-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-129-1" name="__codelineno-129-1" href="#__codelineno-129-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-129-2" name="__codelineno-129-2" href="#__codelineno-129-2"></a>kind:<span class="w"> </span>SyncerConfig
 <a id="__codelineno-129-3" name="__codelineno-129-3" href="#__codelineno-129-3"></a>metadata:
 <a id="__codelineno-129-4" name="__codelineno-129-4" href="#__codelineno-129-4"></a><span class="w">  </span>annotations:
@@ -4202,9 +4202,9 @@ for florin (which you stored in Stage 1) here.</p>
 <p>The guilder cluster gets both the common and special workloads.
 Examine guilder's <code>SyncerConfig</code> object and workloads as follows,
 using the mailbox workspace name that you stored in Stage 1.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-130-1" name="__codelineno-130-1" href="#__codelineno-130-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$GUILDER_MB_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-130-1" name="__codelineno-130-1" href="#__codelineno-130-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$GUILDER_MB_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-131-1" name="__codelineno-131-1" href="#__codelineno-131-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-131-1" name="__codelineno-131-1" href="#__codelineno-131-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-131-2" name="__codelineno-131-2" href="#__codelineno-131-2"></a>kind:<span class="w"> </span>SyncerConfig
 <a id="__codelineno-131-3" name="__codelineno-131-3" href="#__codelineno-131-3"></a>metadata:
 <a id="__codelineno-131-4" name="__codelineno-131-4" href="#__codelineno-131-4"></a><span class="w">  </span>annotations:
@@ -4288,9 +4288,9 @@ using the mailbox workspace name that you stored in Stage 1.</p>
 </code></pre></div></p>
 <p>You can check for specific workload objects here with the following
 command.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-132-1" name="__codelineno-132-1" href="#__codelineno-132-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$GUILDER_MB_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments,replicasets<span class="w"> </span>-A
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-132-1" name="__codelineno-132-1" href="#__codelineno-132-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$GUILDER_MB_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments,replicasets<span class="w"> </span>-A
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-133-1" name="__codelineno-133-1" href="#__codelineno-133-1"></a>NAMESPACE<span class="w">      </span>NAME<span class="w">                       </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-133-1" name="__codelineno-133-1" href="#__codelineno-133-1"></a>NAMESPACE<span class="w">      </span>NAME<span class="w">                       </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
 <a id="__codelineno-133-2" name="__codelineno-133-2" href="#__codelineno-133-2"></a>specialstuff<span class="w">   </span>deployment.apps/speciald<span class="w">   </span><span class="m">0</span>/0<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>12m
 <a id="__codelineno-133-3" name="__codelineno-133-3" href="#__codelineno-133-3"></a>
 <a id="__codelineno-133-4" name="__codelineno-133-4" href="#__codelineno-133-4"></a>NAMESPACE<span class="w">     </span>NAME<span class="w">                      </span>DESIRED<span class="w">   </span>CURRENT<span class="w">   </span>READY<span class="w">   </span>AGE
@@ -4317,7 +4317,7 @@ workspace.  This is driven by the <code>SyncerConfig</code> object named
 <code>the-one</code> in that mailbox workspace.</p>
 <p>Using the kubeconfig that <code>kind</code> modified, examine the florin cluster.
 Find just the <code>commonstuff</code> namespace and the <code>commond</code> Deployment.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-134-1" name="__codelineno-134-1" href="#__codelineno-134-1"></a><span class="o">(</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-134-1" name="__codelineno-134-1" href="#__codelineno-134-1"></a><span class="o">(</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config
 <a id="__codelineno-134-2" name="__codelineno-134-2" href="#__codelineno-134-2"></a><span class="w">  </span><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
 <a id="__codelineno-134-3" name="__codelineno-134-3" href="#__codelineno-134-3"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span>commonstuff<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-134-4" name="__codelineno-134-4" href="#__codelineno-134-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>tries<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -4331,7 +4331,7 @@ Find just the <code>commonstuff</code> namespace and the <code>commond</code> De
 <a id="__codelineno-134-12" name="__codelineno-134-12" href="#__codelineno-134-12"></a><span class="o">)</span>
 <a id="__codelineno-134-13" name="__codelineno-134-13" href="#__codelineno-134-13"></a>sleep<span class="w"> </span><span class="m">15</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-135-1" name="__codelineno-135-1" href="#__codelineno-135-1"></a>NAME<span class="w">                                 </span>STATUS<span class="w">   </span>AGE
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-135-1" name="__codelineno-135-1" href="#__codelineno-135-1"></a>NAME<span class="w">                                 </span>STATUS<span class="w">   </span>AGE
 <a id="__codelineno-135-2" name="__codelineno-135-2" href="#__codelineno-135-2"></a>commonstuff<span class="w">                          </span>Active<span class="w">   </span>6m51s
 <a id="__codelineno-135-3" name="__codelineno-135-3" href="#__codelineno-135-3"></a>default<span class="w">                              </span>Active<span class="w">   </span>57m
 <a id="__codelineno-135-4" name="__codelineno-135-4" href="#__codelineno-135-4"></a>kubestellar-syncer-florin-1t9zgidy<span class="w">   </span>Active<span class="w">   </span>17m
@@ -4340,24 +4340,24 @@ Find just the <code>commonstuff</code> namespace and the <code>commond</code> De
 <a id="__codelineno-135-7" name="__codelineno-135-7" href="#__codelineno-135-7"></a>kube-system<span class="w">                          </span>Active<span class="w">   </span>57m
 <a id="__codelineno-135-8" name="__codelineno-135-8" href="#__codelineno-135-8"></a>local-path-storage<span class="w">                   </span>Active<span class="w">   </span>57m
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-136-1" name="__codelineno-136-1" href="#__codelineno-136-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deploy,rs<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span><span class="s1">&#39;NAME|stuff&#39;</span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-136-1" name="__codelineno-136-1" href="#__codelineno-136-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deploy,rs<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span><span class="s1">&#39;NAME|stuff&#39;</span>
 <a id="__codelineno-136-2" name="__codelineno-136-2" href="#__codelineno-136-2"></a>sleep<span class="w"> </span><span class="m">15</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-137-1" name="__codelineno-137-1" href="#__codelineno-137-1"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                 </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-137-1" name="__codelineno-137-1" href="#__codelineno-137-1"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                 </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
 <a id="__codelineno-137-2" name="__codelineno-137-2" href="#__codelineno-137-2"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                            </span>DESIRED<span class="w">   </span>CURRENT<span class="w">   </span>READY<span class="w">   </span>AGE
 <a id="__codelineno-137-3" name="__codelineno-137-3" href="#__codelineno-137-3"></a>commonstuff<span class="w">                          </span>replicaset.apps/commond<span class="w">                                         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>13m
 </code></pre></div></p>
 <p>Examine the guilder cluster.  Find both workload namespaces, the
 Deployment, and both ReplicaSets.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-138-1" name="__codelineno-138-1" href="#__codelineno-138-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-138-1" name="__codelineno-138-1" href="#__codelineno-138-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-139-1" name="__codelineno-139-1" href="#__codelineno-139-1"></a>NAME<span class="w">                               </span>STATUS<span class="w">   </span>AGE
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-139-1" name="__codelineno-139-1" href="#__codelineno-139-1"></a>NAME<span class="w">                               </span>STATUS<span class="w">   </span>AGE
 <a id="__codelineno-139-2" name="__codelineno-139-2" href="#__codelineno-139-2"></a>commonstuff<span class="w">                        </span>Active<span class="w">   </span>8m33s
 <a id="__codelineno-139-3" name="__codelineno-139-3" href="#__codelineno-139-3"></a>specialstuff<span class="w">                       </span>Active<span class="w">   </span>8m33s
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-140-1" name="__codelineno-140-1" href="#__codelineno-140-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy,rs<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-140-1" name="__codelineno-140-1" href="#__codelineno-140-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy,rs<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-141-1" name="__codelineno-141-1" href="#__codelineno-141-1"></a>NAMESPACE<span class="w">                             </span>NAME<span class="w">                                                  </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-141-1" name="__codelineno-141-1" href="#__codelineno-141-1"></a>NAMESPACE<span class="w">                             </span>NAME<span class="w">                                                  </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
 <a id="__codelineno-141-2" name="__codelineno-141-2" href="#__codelineno-141-2"></a>specialstuff<span class="w">                          </span>deployment.apps/speciald<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>23m
 <a id="__codelineno-141-3" name="__codelineno-141-3" href="#__codelineno-141-3"></a>NAMESPACE<span class="w">                             </span>NAME<span class="w">                                                            </span>DESIRED<span class="w">   </span>CURRENT<span class="w">   </span>READY<span class="w">   </span>AGE
 <a id="__codelineno-141-4" name="__codelineno-141-4" href="#__codelineno-141-4"></a>commonstuff<span class="w">                           </span>replicaset.apps/commond<span class="w">                                         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>23m
@@ -4366,22 +4366,22 @@ Deployment, and both ReplicaSets.</p>
 <p>Examine the <code>APIService</code> objects in the guilder cluster, find the one
 named <code>v1090.example.my</code>. It is broken because it refers to a Service
 object that we have not bothered to create.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-142-1" name="__codelineno-142-1" href="#__codelineno-142-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>apiservices<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="m">1090</span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-142-1" name="__codelineno-142-1" href="#__codelineno-142-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>apiservices<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="m">1090</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-143-1" name="__codelineno-143-1" href="#__codelineno-143-1"></a>v1090.example.my<span class="w">                       </span>my-example/my-service<span class="w">   </span>False<span class="w"> </span><span class="o">(</span>ServiceNotFound<span class="o">)</span><span class="w">   </span>2m39s
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-143-1" name="__codelineno-143-1" href="#__codelineno-143-1"></a>v1090.example.my<span class="w">                       </span>my-example/my-service<span class="w">   </span>False<span class="w"> </span><span class="o">(</span>ServiceNotFound<span class="o">)</span><span class="w">   </span>2m39s
 </code></pre></div></p>
 <p>See the crontab in the guilder cluster.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-144-1" name="__codelineno-144-1" href="#__codelineno-144-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>crontabs<span class="w"> </span>-n<span class="w"> </span>specialstuff
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-144-1" name="__codelineno-144-1" href="#__codelineno-144-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>crontabs<span class="w"> </span>-n<span class="w"> </span>specialstuff
 <a id="__codelineno-144-2" name="__codelineno-144-2" href="#__codelineno-144-2"></a>sleep<span class="w"> </span><span class="m">15</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-145-1" name="__codelineno-145-1" href="#__codelineno-145-1"></a>NAME<span class="w">                 </span>AGE
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-145-1" name="__codelineno-145-1" href="#__codelineno-145-1"></a>NAME<span class="w">                 </span>AGE
 <a id="__codelineno-145-2" name="__codelineno-145-2" href="#__codelineno-145-2"></a>my-new-cron-object<span class="w">   </span>37m
 </code></pre></div></p>
 <p>Examining the common workload in the guilder cluster, for example,
 will show that the replacement-style customization happened.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-146-1" name="__codelineno-146-1" href="#__codelineno-146-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-146-1" name="__codelineno-146-1" href="#__codelineno-146-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-147-1" name="__codelineno-147-1" href="#__codelineno-147-1"></a>...
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-147-1" name="__codelineno-147-1" href="#__codelineno-147-1"></a>...
 <a id="__codelineno-147-2" name="__codelineno-147-2" href="#__codelineno-147-2"></a><span class="w">      </span>containers:
 <a id="__codelineno-147-3" name="__codelineno-147-3" href="#__codelineno-147-3"></a><span class="w">      </span>-<span class="w"> </span>env:
 <a id="__codelineno-147-4" name="__codelineno-147-4" href="#__codelineno-147-4"></a><span class="w">        </span>-<span class="w"> </span>name:<span class="w"> </span>EXAMPLE_VAR
@@ -4392,7 +4392,7 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-147-9" name="__codelineno-147-9" href="#__codelineno-147-9"></a>...
 </code></pre></div></p>
 <p>Check that the common workload on the florin cluster is working.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-148-1" name="__codelineno-148-1" href="#__codelineno-148-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-148-1" name="__codelineno-148-1" href="#__codelineno-148-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
 <a id="__codelineno-148-2" name="__codelineno-148-2" href="#__codelineno-148-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>http://localhost:8094<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-148-3" name="__codelineno-148-3" href="#__codelineno-148-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>tries<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <a id="__codelineno-148-4" name="__codelineno-148-4" href="#__codelineno-148-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The common workload failed to come up on florin!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
@@ -4403,7 +4403,7 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-148-9" name="__codelineno-148-9" href="#__codelineno-148-9"></a><span class="k">done</span>
 <a id="__codelineno-148-10" name="__codelineno-148-10" href="#__codelineno-148-10"></a>curl<span class="w"> </span>http://localhost:8094
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-149-1" name="__codelineno-149-1" href="#__codelineno-149-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-149-1" name="__codelineno-149-1" href="#__codelineno-149-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
 <a id="__codelineno-149-2" name="__codelineno-149-2" href="#__codelineno-149-2"></a>&lt;html&gt;
 <a id="__codelineno-149-3" name="__codelineno-149-3" href="#__codelineno-149-3"></a><span class="w">  </span>&lt;body&gt;
 <a id="__codelineno-149-4" name="__codelineno-149-4" href="#__codelineno-149-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>common<span class="w"> </span>web<span class="w"> </span>site.
@@ -4412,7 +4412,7 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-149-7" name="__codelineno-149-7" href="#__codelineno-149-7"></a>&lt;/html&gt;
 </code></pre></div></p>
 <p>Check that the special workload on the guilder cluster is working.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-150-1" name="__codelineno-150-1" href="#__codelineno-150-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-150-1" name="__codelineno-150-1" href="#__codelineno-150-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
 <a id="__codelineno-150-2" name="__codelineno-150-2" href="#__codelineno-150-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>http://localhost:8097<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-150-3" name="__codelineno-150-3" href="#__codelineno-150-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>tries<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <a id="__codelineno-150-4" name="__codelineno-150-4" href="#__codelineno-150-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The special workload failed to come up on guilder!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
@@ -4423,7 +4423,7 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-150-9" name="__codelineno-150-9" href="#__codelineno-150-9"></a><span class="k">done</span>
 <a id="__codelineno-150-10" name="__codelineno-150-10" href="#__codelineno-150-10"></a>curl<span class="w"> </span>http://localhost:8097
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-151-1" name="__codelineno-151-1" href="#__codelineno-151-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-151-1" name="__codelineno-151-1" href="#__codelineno-151-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
 <a id="__codelineno-151-2" name="__codelineno-151-2" href="#__codelineno-151-2"></a>&lt;html&gt;
 <a id="__codelineno-151-3" name="__codelineno-151-3" href="#__codelineno-151-3"></a><span class="w">  </span>&lt;body&gt;
 <a id="__codelineno-151-4" name="__codelineno-151-4" href="#__codelineno-151-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>special<span class="w"> </span>web<span class="w"> </span>site.
@@ -4432,7 +4432,7 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-151-7" name="__codelineno-151-7" href="#__codelineno-151-7"></a>&lt;/html&gt;
 </code></pre></div></p>
 <p>Check that the common workload on the guilder cluster is working.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-152-1" name="__codelineno-152-1" href="#__codelineno-152-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-152-1" name="__codelineno-152-1" href="#__codelineno-152-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
 <a id="__codelineno-152-2" name="__codelineno-152-2" href="#__codelineno-152-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>http://localhost:8096<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-152-3" name="__codelineno-152-3" href="#__codelineno-152-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>tries<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <a id="__codelineno-152-4" name="__codelineno-152-4" href="#__codelineno-152-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The common workload failed to come up on guilder!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
@@ -4443,7 +4443,7 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-152-9" name="__codelineno-152-9" href="#__codelineno-152-9"></a><span class="k">done</span>
 <a id="__codelineno-152-10" name="__codelineno-152-10" href="#__codelineno-152-10"></a>curl<span class="w"> </span>http://localhost:8096
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-153-1" name="__codelineno-153-1" href="#__codelineno-153-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-153-1" name="__codelineno-153-1" href="#__codelineno-153-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
 <a id="__codelineno-153-2" name="__codelineno-153-2" href="#__codelineno-153-2"></a>&lt;html&gt;
 <a id="__codelineno-153-3" name="__codelineno-153-3" href="#__codelineno-153-3"></a><span class="w">  </span>&lt;body&gt;
 <a id="__codelineno-153-4" name="__codelineno-153-4" href="#__codelineno-153-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>common<span class="w"> </span>web<span class="w"> </span>site.
@@ -4467,19 +4467,19 @@ executing copies is exactly 1.</p>
 executing copies should be 2.  The assertion causes the actual number
 of executing copies to be reported.  Check that the reported number is
 2.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-154-1" name="__codelineno-154-1" href="#__codelineno-154-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar.io/executing-count: &quot;2&quot;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml<span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-154-1" name="__codelineno-154-1" href="#__codelineno-154-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar.io/executing-count: &quot;2&quot;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml<span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span>
 </code></pre></div>
 <p>For the special workload, the number of executing copies should be 1.
 Check that the reported number agrees.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-155-1" name="__codelineno-155-1" href="#__codelineno-155-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar.io/executing-count: &quot;1&quot;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-155-1" name="__codelineno-155-1" href="#__codelineno-155-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar.io/executing-count: &quot;1&quot;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span>
 </code></pre></div>
 <p>Look at the status section of the "speciald" <code>Deployment</code> and see that
 it has been filled in with the information from the guilder cluster.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-156-1" name="__codelineno-156-1" href="#__codelineno-156-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-156-1" name="__codelineno-156-1" href="#__codelineno-156-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
 <p>Current status might not be there yet. The following command waits for
 status that reports that there is a special workload pod "ready".</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-157-1" name="__codelineno-157-1" href="#__codelineno-157-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">count</span><span class="o">=</span><span class="m">1</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-157-1" name="__codelineno-157-1" href="#__codelineno-157-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">count</span><span class="o">=</span><span class="m">1</span>
 <a id="__codelineno-157-2" name="__codelineno-157-2" href="#__codelineno-157-2"></a><span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-157-3" name="__codelineno-157-3" href="#__codelineno-157-3"></a><span class="w">    </span><span class="nv">rsyaml</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="k">)</span>
 <a id="__codelineno-157-4" name="__codelineno-157-4" href="#__codelineno-157-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;readyReplicas: 1&#39;</span><span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="s2">&quot;</span><span class="nv">$rsyaml</span><span class="s2">&quot;</span>
@@ -4514,7 +4514,7 @@ the <code>commond</code> Deployment objects in the two mailbox workspaces.</p>
 <!-- BEGIN INCLUDE example1-subs/example1-teardown.md '&lt;!--example1-teardown-start--&gt;' '&lt;!--example1-teardown-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-158-1" name="__codelineno-158-1" href="#__codelineno-158-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-158-1" name="__codelineno-158-1" href="#__codelineno-158-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
 <a id="__codelineno-158-2" name="__codelineno-158-2" href="#__codelineno-158-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>delete<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>imw1
 <a id="__codelineno-158-3" name="__codelineno-158-3" href="#__codelineno-158-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>delete<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span><span class="nv">$FLORIN_SPACE</span>
 <a id="__codelineno-158-4" name="__codelineno-158-4" href="#__codelineno-158-4"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>delete<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span><span class="nv">$GUILDER_SPACE</span>
@@ -4526,14 +4526,14 @@ the <code>commond</code> Deployment objects in the two mailbox workspaces.</p>
 <p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>
 <p>The following command will stop whatever KubeStellar controllers are running.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-159-1" name="__codelineno-159-1" href="#__codelineno-159-1"></a>kubestellar<span class="w"> </span>stop
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-159-1" name="__codelineno-159-1" href="#__codelineno-159-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-160-1" name="__codelineno-160-1" href="#__codelineno-160-1"></a>remove-kubestellar
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-160-1" name="__codelineno-160-1" href="#__codelineno-160-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
 <p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-161-1" name="__codelineno-161-1" href="#__codelineno-161-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-161-1" name="__codelineno-161-1" href="#__codelineno-161-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!-- END INCLUDE -->
 

@@ -2528,7 +2528,7 @@ follows.</p>
 </ol>
 <p>Following is an example of invoking this command and examining its
 results.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="go">bash-5.2$ eval pieces=($(kubestellar-ensure-kcp-server-creds yep.yep))</span>
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="go">bash-5.2$ eval pieces=($(kubestellar-ensure-kcp-server-creds yep.yep))</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">Re-using PKI at /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">Re-using CA at /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/private/ca.key</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">Accepting existing credentials</span>
@@ -2546,7 +2546,7 @@ results.</p>
 server.  The <code>--tls-sni-cert-key</code> flag can appear multiple times on
 the command line, configuring the server to respond in a different way
 to each of multiple different SNIs.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="go">bash-5.2$ kcp start --tls-sni-cert-key ${pieces[1]},${pieces[2]} &amp;&gt; /tmp/kcp.log &amp;</span>
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="go">bash-5.2$ kcp start --tls-sni-cert-key ${pieces[1]},${pieces[2]} &amp;&gt; /tmp/kcp.log &amp;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">[1] 66974</span>
 </code></pre></div>
 <h4 id="wait-and-switch-domain">wait-and-switch-domain<a class="headerlink" href="#wait-and-switch-domain" title="Permanent link">#</a></h4>
@@ -2587,7 +2587,7 @@ There will be the following two differences.</p>
 <p>Following is an example of using this command and examining the
 results.  The context and port number chosen work for the kubeconfig
 file that <code>kcp start</code> (kcp release v0.11.0) creates by default.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="go">bash-5.2$ wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}</span>
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="go">bash-5.2$ wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go">4,5c4,5</span>
@@ -2606,7 +2606,7 @@ file that <code>kcp start</code> (kcp release v0.11.0) creates by default.</p>
 <p>Following is an example of using the alternate kubeconfig file, in a
 context where the domain name "yep.yep" resolves to an IP address of
 the network namespace in which the kcp server is running.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="go">bash-5.2$ KUBECONFIG=.kcp-yep.yep/admin.kubeconfig kubectl ws .</span>
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="go">bash-5.2$ KUBECONFIG=.kcp-yep.yep/admin.kubeconfig kubectl ws .</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="go">Current workspace is &quot;root&quot;.</span>
 </code></pre></div>
 <p>Because this command reads the given kubeconfig file, it is important
@@ -2635,7 +2635,7 @@ pre-requisites.</p>
 <p>This command is one of those requiring <a href="#os-namespace-consistency">OS namespace
 consistency</a>.</p>
 <p>The usage synopsis is as follows.</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubestellar<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span><span class="w"> </span>subcommand<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubestellar<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span><span class="w"> </span>subcommand<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
 </code></pre></div>
 <p>This command accepts the following command line flags, which can
 appear before and/or after the subcommand.  The <code>--log-folder</code> flag is
@@ -2753,7 +2753,7 @@ appear on the command line, in any order.</p>
 controller can be reached at
 <code>my-long-application-name.my-region.some.cloud.com:1234</code>, you would
 issue the following command.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>deploy<span class="w"> </span>--external-endpoint<span class="w"> </span>my-long-application-name.my-region.some.cloud.com:1234
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>deploy<span class="w"> </span>--external-endpoint<span class="w"> </span>my-long-application-name.my-region.some.cloud.com:1234
 </code></pre></div>
 <p>The Helm chart takes care of setting up the KubeStellar Core,
 accomplishing the same thing as the <a href="#kubestellar-start">kubestellar
@@ -2762,7 +2762,7 @@ start</a> command above.</p>
 <!-- BEGIN INCLUDE ../../../../core-helm-chart/README.md '&lt;!--check-log-start--&gt;' '&lt;!--check-log-end--&gt;' -->
 
 <p>The logs of each runtime container in the <strong>KubeStellar</strong> application pods can be access this way:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>logs<span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>--selector<span class="o">=</span><span class="nv">app</span><span class="o">=</span>kubestellar<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="k">)</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-c<span class="w"> </span>kcp
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>logs<span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>--selector<span class="o">=</span><span class="nv">app</span><span class="o">=</span>kubestellar<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="k">)</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-c<span class="w"> </span>kcp
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>kubectl<span class="w"> </span>logs<span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>--selector<span class="o">=</span><span class="nv">app</span><span class="o">=</span>kubestellar<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="k">)</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-c<span class="w"> </span>init
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>kubectl<span class="w"> </span>logs<span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>--selector<span class="o">=</span><span class="nv">app</span><span class="o">=</span>kubestellar<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="k">)</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-c<span class="w"> </span>mailbox-controller
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>kubectl<span class="w"> </span>logs<span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>--selector<span class="o">=</span><span class="nv">app</span><span class="o">=</span>kubestellar<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="k">)</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-c<span class="w"> </span>where-resolver
@@ -2777,7 +2777,7 @@ Helm</a>
 whose meaning might surprise you) of a Helm chart.  This release is
 named "kubestellar".  To undo the deployment, just use the Helm
 command to delete that release.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <p><strong>NOTE</strong>: this is a detail that might change in the future.</p>
 <h2 id="kubestellar-platform-user-commands">KubeStellar platform user commands<a class="headerlink" href="#kubestellar-platform-user-commands" title="Permanent link">#</a></h2>
@@ -2787,9 +2787,9 @@ than administrators of the service that KubeStellar provides.</p>
 <p>This command just echoes the <a href="https://semver.org/">semantic version</a>
 of the release used.  This command is only available in archives built
 for a release.  Following is an example usage.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubestellar-release
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubestellar-release
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>v0.2.3-preview
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>v0.2.3-preview
 </code></pre></div></p>
 <h2 id="kubestellar-version">Kubestellar-version<a class="headerlink" href="#kubestellar-version" title="Permanent link">#</a></h2>
 <p>This executable prints information about itself captured at build
@@ -2798,22 +2798,22 @@ Makefile; otherwise it is <a href="https://github.com/kubernetes/client-go/blob/
 defaults</a>.</p>
 <p>It will either print one requested property or a JSON object
 containing many.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubestellar-version<span class="w"> </span><span class="nb">help</span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubestellar-version<span class="w"> </span><span class="nb">help</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Invalid<span class="w"> </span>component<span class="w"> </span>requested:<span class="w"> </span><span class="s2">&quot;help&quot;</span>
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Invalid<span class="w"> </span>component<span class="w"> </span>requested:<span class="w"> </span><span class="s2">&quot;help&quot;</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Usage:<span class="w"> </span>kubestellar-version<span class="w"> </span><span class="o">[</span>buildDate<span class="p">|</span>gitCommit<span class="p">|</span>gitTreeState<span class="p">|</span>platform<span class="o">]</span>
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubestellar-version<span class="w"> </span>buildDate
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubestellar-version<span class="w"> </span>buildDate
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="m">2023</span>-05-19T02:54:01Z
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="m">2023</span>-05-19T02:54:01Z
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubestellar-version<span class="w"> </span>gitCommit
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubestellar-version<span class="w"> </span>gitCommit
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>1747254b
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>1747254b
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubestellar-version
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubestellar-version
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="o">{</span><span class="s2">&quot;major&quot;</span>:<span class="s2">&quot;1&quot;</span>,<span class="s2">&quot;minor&quot;</span>:<span class="s2">&quot;24&quot;</span>,<span class="s2">&quot;gitVersion&quot;</span>:<span class="s2">&quot;v1.24.3+kcp-v0.2.1-20-g1747254b880cb7&quot;</span>,<span class="s2">&quot;gitCommit&quot;</span>:<span class="s2">&quot;1747254b&quot;</span>,<span class="s2">&quot;gitTreeState&quot;</span>:<span class="s2">&quot;dirty&quot;</span>,<span class="s2">&quot;buildDate&quot;</span>:<span class="s2">&quot;2023-05-19T02:54:01Z&quot;</span>,<span class="s2">&quot;goVersion&quot;</span>:<span class="s2">&quot;go1.19.9&quot;</span>,<span class="s2">&quot;compiler&quot;</span>:<span class="s2">&quot;gc&quot;</span>,<span class="s2">&quot;platform&quot;</span>:<span class="s2">&quot;darwin/amd64&quot;</span><span class="o">}</span>
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="o">{</span><span class="s2">&quot;major&quot;</span>:<span class="s2">&quot;1&quot;</span>,<span class="s2">&quot;minor&quot;</span>:<span class="s2">&quot;24&quot;</span>,<span class="s2">&quot;gitVersion&quot;</span>:<span class="s2">&quot;v1.24.3+kcp-v0.2.1-20-g1747254b880cb7&quot;</span>,<span class="s2">&quot;gitCommit&quot;</span>:<span class="s2">&quot;1747254b&quot;</span>,<span class="s2">&quot;gitTreeState&quot;</span>:<span class="s2">&quot;dirty&quot;</span>,<span class="s2">&quot;buildDate&quot;</span>:<span class="s2">&quot;2023-05-19T02:54:01Z&quot;</span>,<span class="s2">&quot;goVersion&quot;</span>:<span class="s2">&quot;go1.19.9&quot;</span>,<span class="s2">&quot;compiler&quot;</span>:<span class="s2">&quot;gc&quot;</span>,<span class="s2">&quot;platform&quot;</span>:<span class="s2">&quot;darwin/amd64&quot;</span><span class="o">}</span>
 </code></pre></div></p>
 <h2 id="creating-an-inventory-space">Creating an Inventory Space<a class="headerlink" href="#creating-an-inventory-space" title="Permanent link">#</a></h2>
 <p>This command will create an inventory space (IS) of a given name if it
@@ -2833,7 +2833,7 @@ given WDS).</p>
 Space Management API Space (SMAS), via the usual <code>kubectl</code> flags and
 <code>$KUBECONFIG</code>.</p>
 <p>The usage synopsis for this command is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>inventory-space<span class="w"> </span>flag...<span class="w"> </span>inventory_space_name
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>inventory-space<span class="w"> </span>flag...<span class="w"> </span>inventory_space_name
 </code></pre></div>
 <p>This command accepts the following flags. They can be intermixed with
 the positional argument.</p>
@@ -2866,7 +2866,7 @@ pair. This command operates on an existing inventory space. This
 command is given a kube client config for that space via the usual
 <code>kubectl</code> command line flags and <code>$KUBECONFIG</code>.</p>
 <p>The usage synopsis is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>flag...<span class="w"> </span>objname<span class="w"> </span><span class="nv">labelname</span><span class="o">=</span>labelvalue...
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>flag...<span class="w"> </span>objname<span class="w"> </span><span class="nv">labelname</span><span class="o">=</span>labelvalue...
 </code></pre></div>
 <p>Here <code>objname</code> is the name for the SyncTarget object and also the name
 for the Location object.  This command ensures that these objects exist
@@ -2883,9 +2883,9 @@ and have at least the given labels.</p>
 controllers but does require that the KubeStellar Core Space (KCS) has
 been set up.</p>
 <p>An example usage follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>imw1.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>demo1<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>bar<span class="w"> </span>the-word<span class="o">=</span>the-bird
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>imw1.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>demo1<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>bar<span class="w"> </span>the-word<span class="o">=</span>the-bird
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>created
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>created
 <a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>created
 <a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>labeled
 <a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>labeled
@@ -2895,7 +2895,7 @@ been set up.</p>
 <p>The above example shows using this script to create a SyncTarget and a
 Location named <code>demo1</code> with labels <code>foo=bar</code> and <code>the-word=the-bird</code>.
 This was equivalent to the following commands.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>imw1.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>-<span class="s">&lt;&lt;EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>imw1.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>-<span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="s">apiVersion: workload.kcp.io/v1alpha1</span>
 <a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="s">kind: SyncTarget</span>
 <a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="s">metadata:</span>
@@ -2930,12 +2930,12 @@ command line syntax and semantics except that the
 <code>labelname=labelvalue</code> pairs do not appear.</p>
 <p>This command does not depend on the action of any of the KubeStellar controllers.</p>
 <p>The following session demonstrates usage, including idempotency.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>synctarget.workload.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>synctarget.workload.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
 <a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>location.scheduling.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
 </code></pre></div>
 <h2 id="getting-a-kubeconfig-of-a-given-space">Getting a kubeconfig of a given space<a class="headerlink" href="#getting-a-kubeconfig-of-a-given-space" title="Permanent link">#</a></h2>
 <p>This command fetches a kubeconfig for super-user access to a given
@@ -2954,7 +2954,7 @@ external access at deployment time.</p>
 Management API Space (SMAS), via the usual ways for configuring
 <code>kubectl</code>.</p>
 <p>The usage synopsis is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>space<span class="w"> </span>get-kubeconfig<span class="w"> </span>flag...<span class="w"> </span><span class="nv">$space_name</span><span class="w"> </span><span class="nv">$output_pathname</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>space<span class="w"> </span>get-kubeconfig<span class="w"> </span>flag...<span class="w"> </span><span class="nv">$space_name</span><span class="w"> </span><span class="nv">$output_pathname</span>
 </code></pre></div>
 <p>This command accepts the following flags.</p>
 <ul>
@@ -2965,7 +2965,7 @@ Management API Space (SMAS), via the usual ways for configuring
   <a href="#in-cluster">in-cluster</a>.</li>
 </ul>
 <p>Following is an example usage.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>space<span class="w"> </span>get-kubeconfig<span class="w"> </span>imw1<span class="w"> </span>imw1.kubeconfig
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>space<span class="w"> </span>get-kubeconfig<span class="w"> </span>imw1<span class="w"> </span>imw1.kubeconfig
 </code></pre></div>
 <h2 id="syncer-preparation-and-installation">Syncer preparation and installation<a class="headerlink" href="#syncer-preparation-and-installation" title="Permanent link">#</a></h2>
 <p>The syncer runs in each edge cluster and also talks to the
@@ -2978,7 +2978,7 @@ install the syncer in the edge cluster.</p>
 <p>This script is given a kube client config for accessing the SMAS via
 the usual <code>kubectl</code> command line flags and <code>$KUBECONFIG</code>.</p>
 <p>The usage synopsis is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>flag...<span class="w"> </span>synctarget_name
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>flag...<span class="w"> </span>synctarget_name
 </code></pre></div>
 <p>Here <code>synctarget_name</code> is the name of the <code>SyncTarget</code> object, in the
 relevant IMW, corresponding to the relevant edge cluster.</p>
@@ -3007,9 +3007,9 @@ relevant IMW, corresponding to the relevant edge cluster.</p>
 and conditioned the mailbox space for the given SyncTarget.  This
 command will wait for 10 to 70 seconds for that to happen.</p>
 <p>An example usage follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>imw-1<span class="w"> </span>demo1
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>imw-1<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Current<span class="w"> </span>space<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010&quot;</span><span class="w"> </span>
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Current<span class="w"> </span>space<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010&quot;</span><span class="w"> </span>
 <a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>
 <a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>
 <a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>
@@ -3035,7 +3035,7 @@ appended.</p>
 <p>Create those objects with a command like the following; adjust as
 needed to configure <code>kubectl</code> to modify the edge cluster and read your
 chosen output file.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$demo1_kubeconfig</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>demo1-syncer.yaml
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$demo1_kubeconfig</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>demo1-syncer.yaml
 </code></pre></div>
 <p>You can preserve this file for future use if you want to remove the
 syncer later.</p>
@@ -3073,9 +3073,9 @@ exceptions/modifications.</p>
   Management API Space (SMAS), not the inventory space.</li>
 </ul>
 <p>An example usage follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>imw-1<span class="w"> </span>demo2<span class="w"> </span><span class="nv">key1</span><span class="o">=</span>val1
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>imw-1<span class="w"> </span>demo2<span class="w"> </span><span class="nv">key1</span><span class="o">=</span>val1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>synctarget.workload.kcp.io/demo2<span class="w"> </span>created
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>synctarget.workload.kcp.io/demo2<span class="w"> </span>created
 <a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>location.scheduling.kcp.io/demo2<span class="w"> </span>created
 <a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>synctarget.workload.kcp.io/demo2<span class="w"> </span>labeled
 <a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>location.scheduling.kcp.io/demo2<span class="w"> </span>labeled
@@ -3118,7 +3118,7 @@ desired.</p>
 Space Management API Space (SMAS), via the usual <code>kubectl</code> flags and
 <code>$KUBECONFIG</code>.</p>
 <p>The usage synopsis for this command is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>flag...<span class="w"> </span>wm_space_name
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>flag...<span class="w"> </span>wm_space_name
 </code></pre></div>
 <p>This command accepts the following flags. They can be intermixed with
 the positional argument.</p>
@@ -3141,9 +3141,9 @@ be done.</p>
 <p>The following session shows some example usages, including
 demonstration of idempotency and changing whether the kube CRDs
 are included.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>Error<span class="w"> </span>from<span class="w"> </span>server<span class="w"> </span><span class="o">(</span>NotFound<span class="o">)</span>:<span class="w"> </span>spaces.space.kubestellar.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>not<span class="w"> </span>found
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>Error<span class="w"> </span>from<span class="w"> </span>server<span class="w"> </span><span class="o">(</span>NotFound<span class="o">)</span>:<span class="w"> </span>spaces.space.kubestellar.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>not<span class="w"> </span>found
 <a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>space.space.kubestellar.io/example-wmw<span class="w"> </span>created
 <a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>space<span class="w"> </span>example-wmw<span class="w"> </span>to<span class="w"> </span>get<span class="w"> </span>into<span class="w"> </span>the<span class="w"> </span>Ready<span class="w"> </span>phase.
 <a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>Space<span class="w"> </span>example-wmw<span class="w"> </span>created.
@@ -3209,9 +3209,9 @@ are included.</p>
 <a id="__codelineno-36-64" name="__codelineno-36-64" href="#__codelineno-36-64"></a>customresourcedefinition.apiextensions.k8s.io/poddisruptionbudgets.policy<span class="w"> </span>serverside-applied
 <a id="__codelineno-36-65" name="__codelineno-36-65" href="#__codelineno-36-65"></a>customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.io<span class="w"> </span>serverside-applied
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nv">SECRET_NAME</span><span class="o">=</span>external-example-wmw
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nv">SECRET_NAME</span><span class="o">=</span>external-example-wmw
 <a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="nv">SECRET_NAMESPACE</span><span class="o">=</span>spaceprovider-default
 <a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 <a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="s1">&#39;s ID is fcf8hzj7mlx156cm</span>
@@ -3255,9 +3255,9 @@ are included.</p>
 <a id="__codelineno-38-42" name="__codelineno-38-42" href="#__codelineno-38-42"></a>customresourcedefinition.apiextensions.k8s.io/poddisruptionbudgets.policy<span class="w"> </span>serverside-applied
 <a id="__codelineno-38-43" name="__codelineno-38-43" href="#__codelineno-38-43"></a>customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.io<span class="w"> </span>serverside-applied
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw<span class="w"> </span>--with-kube<span class="w"> </span><span class="nb">false</span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw<span class="w"> </span>--with-kube<span class="w"> </span><span class="nb">false</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="nv">SECRET_NAME</span><span class="o">=</span>external-example-wmw
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="nv">SECRET_NAME</span><span class="o">=</span>external-example-wmw
 <a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="nv">SECRET_NAMESPACE</span><span class="o">=</span>spaceprovider-default
 <a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 <a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="s1">&#39;s ID is fcf8hzj7mlx156cm</span>
@@ -3305,25 +3305,25 @@ are included.</p>
 <p>THIS SCRIPT IS BROKEN</p>
 <p>Deleting a WDS (formerly WMW) can be done by simply deleting its
 <code>space</code> object from the parent.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>delete<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>example-wmw
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>delete<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>example-wmw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>deleted
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
 <p>Alternatively, you can use the following command line whose design
 completes the square here.  Invoke it when the current workspace is
 the parent of the workload management workspace to delete.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>-h
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>-h
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>Usage:<span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span><span class="o">[</span>-X<span class="o">]</span><span class="w"> </span>kubectl_flag...<span class="w"> </span>wm_workspace_name
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>Usage:<span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span><span class="o">[</span>-X<span class="o">]</span><span class="w"> </span>kubectl_flag...<span class="w"> </span>wm_workspace_name
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 <a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 </code></pre></div></p>
 <h2 id="kubestellar-list-syncing-objects">kubestellar-list-syncing-objects<a class="headerlink" href="#kubestellar-list-syncing-objects" title="Permanent link">#</a></h2>
 <p><strong>NOTE</strong>: This command works directly with the kcp server, it has not
@@ -3349,7 +3349,7 @@ called "all", is for reading the chosen objects from all workspaces.
 The other, called "parent", is for reading the mailbox Workspace
 objects from their parent Workspace.</p>
 <p>Following are the command line flags beyond the baseline golang flags.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="w">      </span>--api-group<span class="w"> </span>string<span class="w">                 </span>API<span class="w"> </span>group<span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>default<span class="w"> </span>is<span class="w"> </span>Kubernetes<span class="w"> </span>core<span class="w"> </span>group<span class="o">)</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="w">      </span>--api-group<span class="w"> </span>string<span class="w">                 </span>API<span class="w"> </span>group<span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>default<span class="w"> </span>is<span class="w"> </span>Kubernetes<span class="w"> </span>core<span class="w"> </span>group<span class="o">)</span>
 <a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="w">      </span>--api-kind<span class="w"> </span>string<span class="w">                  </span>kind<span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch
 <a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a><span class="w">      </span>--api-resource<span class="w"> </span>string<span class="w">              </span>API<span class="w"> </span>resource<span class="w"> </span><span class="o">(</span>lowercase<span class="w"> </span>plural<span class="o">)</span><span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>defaults<span class="w"> </span>to<span class="w"> </span>lowercase<span class="o">(</span>kind<span class="o">)</span>+<span class="s1">&#39;s&#39;</span><span class="o">)</span>
 <a id="__codelineno-49-4" name="__codelineno-49-4" href="#__codelineno-49-4"></a><span class="w">      </span>--api-version<span class="w"> </span>string<span class="w">               </span>API<span class="w"> </span>version<span class="w"> </span><span class="o">(</span>just<span class="w"> </span>version,<span class="w"> </span>no<span class="w"> </span>group<span class="o">)</span><span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;v1&quot;</span><span class="o">)</span>
@@ -3368,7 +3368,7 @@ objects from their parent Workspace.</p>
 </code></pre></div>
 <p>Following is an example of its usage; the ellipses show where this
 document omits many lines for brevity.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="gp">$ </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apps<span class="w"> </span>--api-kind<span class="w"> </span>ReplicaSet
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="gp">$ </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apps<span class="w"> </span>--api-kind<span class="w"> </span>ReplicaSet
 <a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="go">---</span>
 <a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="go">apiVersion: apps/v1</span>
 <a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a><span class="go">kind: ReplicaSet</span>
@@ -3469,7 +3469,7 @@ consistency</a>.</p>
 <p>This command is given a kube client config for accessing the SMAS, via
 the usual <code>kubectl</code> flags and <code>$KUBECONFIG</code>.</p>
 <p>Usage synposis is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>kubestellar-kube-bind<span class="w"> </span>flag...<span class="w"> </span>space_name<span class="w"> </span>resource
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>kubestellar-kube-bind<span class="w"> </span>flag...<span class="w"> </span>space_name<span class="w"> </span>resource
 </code></pre></div>
 <p>This command accepts the following flags.</p>
 <ul>
@@ -3492,7 +3492,7 @@ optionally output a kubeconfig for super-user access to that space.</p>
 Management API Space (SMAS), via the usual ways for configuring
 <code>kubectl</code>.</p>
 <p>Synopsis:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>space<span class="w"> </span>ensure<span class="w"> </span>flag...<span class="w"> </span>space_name
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>space<span class="w"> </span>ensure<span class="w"> </span>flag...<span class="w"> </span>space_name
 </code></pre></div>
 <p>This command accepts the following flags. The space name, output
 kubeconfig, and SMAS kubeconfig and context must be supplied.</p>

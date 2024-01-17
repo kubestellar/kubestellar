@@ -1816,17 +1816,17 @@
 <!--kubestellar-syncer-1-syncer-gen-plugin-start-->
 
 <p>The remainder is not fully debugged.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
 </code></pre></div>
 <p>Generate UUID for Syncer identification.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="s2">&quot;syncer-&quot;</span><span class="sb">`</span>uuidgen<span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span><span class="s1">&#39;[:upper:]&#39;</span><span class="w"> </span><span class="s1">&#39;[:lower:]&#39;</span><span class="sb">`</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="s2">&quot;syncer-&quot;</span><span class="sb">`</span>uuidgen<span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span><span class="s1">&#39;[:upper:]&#39;</span><span class="w"> </span><span class="s1">&#39;[:lower:]&#39;</span><span class="sb">`</span>
 </code></pre></div></p>
 <p>Go to a workspace.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>ws1<span class="w"> </span>--enter
 </code></pre></div></p>
 <p>Create the following APIBinding in the workspace (Note that in the case of mailbox workspaces, it's done by mailbox controller at creating the mailbox workspace.)
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="s">apiVersion: apis.kcp.io/v1alpha1</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="s">kind: APIBinding</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="s">metadata:</span>
@@ -1839,7 +1839,7 @@
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="s">EOL</span>
 </code></pre></div></p>
 <p>Create a serviceaccount in the workspace.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="s">apiVersion: v1</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="s">kind: ServiceAccount</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="s">metadata:</span>
@@ -1847,7 +1847,7 @@
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="s">EOL</span>
 </code></pre></div></p>
 <p>Create clusterrole and clusterrolebinding to bind the serviceaccount to the role.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="s">kind: ClusterRole</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="s">metadata:</span>
@@ -1875,29 +1875,29 @@
 <a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="s">EOL</span>
 </code></pre></div></p>
 <p>Get the serviceaccount token that will be set in the upstream kubeconfig manifest.  <strong>NOTE</strong> This part is outdated due to the recent denaturing of ServiceAccounts in kcp workspaces; the syncer-gen plugin will actually wait a little while and then create the Secret if nothing else has.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">secret_name</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span><span class="s2">&quot;:.metadata.name&quot;</span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="nv">$syncer_id</span><span class="sb">`</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">secret_name</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span><span class="s2">&quot;:.metadata.name&quot;</span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="nv">$syncer_id</span><span class="sb">`</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nv">token</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span><span class="nv">$secret_name</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.data.token}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="sb">`</span>
 </code></pre></div></p>
 <p>Get the certificates that will be set in the upstream kubeconfig manifest.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">cacrt</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>config<span class="w"> </span>view<span class="w"> </span>--minify<span class="w"> </span>--raw<span class="w"> </span><span class="p">|</span><span class="w"> </span>yq<span class="w"> </span><span class="s2">&quot;.clusters[0].cluster.certificate-authority-data&quot;</span><span class="sb">`</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">cacrt</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>config<span class="w"> </span>view<span class="w"> </span>--minify<span class="w"> </span>--raw<span class="w"> </span><span class="p">|</span><span class="w"> </span>yq<span class="w"> </span><span class="s2">&quot;.clusters[0].cluster.certificate-authority-data&quot;</span><span class="sb">`</span>
 </code></pre></div></p>
 <p>Get server_url that will be set in the upstream kubeconfig manifest.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">server_url</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>config<span class="w"> </span>view<span class="w"> </span>--minify<span class="w"> </span>--raw<span class="w"> </span><span class="p">|</span><span class="w"> </span>yq<span class="w"> </span><span class="s2">&quot;.clusters[0].cluster.server&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;s|https://\(.*\):\([^/]*\)/.*|https://\1:\2|g&#39;</span><span class="sb">`</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">server_url</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>config<span class="w"> </span>view<span class="w"> </span>--minify<span class="w"> </span>--raw<span class="w"> </span><span class="p">|</span><span class="w"> </span>yq<span class="w"> </span><span class="s2">&quot;.clusters[0].cluster.server&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;s|https://\(.*\):\([^/]*\)/.*|https://\1:\2|g&#39;</span><span class="sb">`</span>
 </code></pre></div></p>
 <p>Set some other parameters.</br>
 a. downstream_namespace where Syncer Pod runs
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">downstream_namespace</span><span class="o">=</span><span class="s2">&quot;kubestellar-</span><span class="nv">$syncer_id</span><span class="s2">&quot;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">downstream_namespace</span><span class="o">=</span><span class="s2">&quot;kubestellar-</span><span class="nv">$syncer_id</span><span class="s2">&quot;</span>
 </code></pre></div>
 b. Syncer image
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">image</span><span class="o">=</span><span class="s2">&quot;quay.io/kubestellar/syncer:v0.2.2&quot;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">image</span><span class="o">=</span><span class="s2">&quot;quay.io/kubestellar/syncer:v0.2.2&quot;</span>
 </code></pre></div></p>
 <p>Download manifest template.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
 </code></pre></div></p>
 <p>Generate manifests to bootstrap KubeStellar-Syncer.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="nv">$syncer_id</span><span class="w"> </span><span class="nv">cacrt</span><span class="o">=</span><span class="nv">$cacrt</span><span class="w"> </span><span class="nv">token</span><span class="o">=</span><span class="nv">$token</span><span class="w"> </span><span class="nv">server_url</span><span class="o">=</span><span class="nv">$server_url</span><span class="w"> </span><span class="nv">downstream_namespace</span><span class="o">=</span><span class="nv">$downstream_namespace</span><span class="w"> </span><span class="nv">image</span><span class="o">=</span><span class="nv">$image</span><span class="w"> </span>envsubst<span class="w"> </span>&lt;<span class="w"> </span>kubestellar-syncer-bootstrap.template.yaml
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="nv">$syncer_id</span><span class="w"> </span><span class="nv">cacrt</span><span class="o">=</span><span class="nv">$cacrt</span><span class="w"> </span><span class="nv">token</span><span class="o">=</span><span class="nv">$token</span><span class="w"> </span><span class="nv">server_url</span><span class="o">=</span><span class="nv">$server_url</span><span class="w"> </span><span class="nv">downstream_namespace</span><span class="o">=</span><span class="nv">$downstream_namespace</span><span class="w"> </span><span class="nv">image</span><span class="o">=</span><span class="nv">$image</span><span class="w"> </span>envsubst<span class="w"> </span>&lt;<span class="w"> </span>kubestellar-syncer-bootstrap.template.yaml
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>---
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>---
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>apiVersion: v1
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>kind: Namespace
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>metadata:

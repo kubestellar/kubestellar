@@ -1842,7 +1842,7 @@
 
 <!--example1-teardown-start-->
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>delete<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>imw1
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>delete<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span><span class="nv">$FLORIN_SPACE</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>delete<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span><span class="nv">$GUILDER_SPACE</span>
@@ -1854,14 +1854,14 @@
 <p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>
 <p>The following command will stop whatever KubeStellar controllers are running.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubestellar<span class="w"> </span>stop
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>remove-kubestellar
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
 <p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!--example1-teardown-end-->
 

@@ -1893,7 +1893,7 @@ chosen release of KubeStellar (see <a href="https://github.com/kubestellar/kubes
 GitHub</a>) and
 <code>$os_type</code> and <code>$arch_type</code> are chosen according to the list of
 "assets" for your chosen release.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-SL<span class="w"> </span>-o<span class="w"> </span>kubestellar.tar.gz<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/</span><span class="si">${</span><span class="nv">kubestellar_version</span><span class="si">}</span><span class="s2">/kubestellar_</span><span class="si">${</span><span class="nv">kubestellar_version</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">os_type</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">arch_type</span><span class="si">}</span><span class="s2">.tar.gz</span>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-SL<span class="w"> </span>-o<span class="w"> </span>kubestellar.tar.gz<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/</span><span class="si">${</span><span class="nv">kubestellar_version</span><span class="si">}</span><span class="s2">/kubestellar_</span><span class="si">${</span><span class="nv">kubestellar_version</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">os_type</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">arch_type</span><span class="si">}</span><span class="s2">.tar.gz</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="s2">tar xzf kubestellar.tar.gz</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s2">export PATH=</span><span class="nv">$PWD</span><span class="s2">/bin:</span><span class="nv">$PATH</span>
 </code></pre></div>
@@ -1901,12 +1901,12 @@ GitHub</a>) and
 <p>You can get the latest version from GitHub with the following command,
 which will get you the default branch (which is named "main"); add <code>-b
 $branch</code> to the <code>git</code> command in order to get a different branch.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
 </code></pre></div>
 <p>Use the following commands to build and add the executables to your
 <code>$PATH</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>build
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>build
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
 <p>In the following exhibited command lines, the commands described as
@@ -1918,7 +1918,7 @@ The kubectl plugin lines use fully specific executables (e.g.,
 <code>bin/kubectl-kubestellar-prep_for_syncer</code>).</p>
 <h4 id="get-binaries-of-kube-bind-and-dex">Get binaries of kube-bind and dex<a class="headerlink" href="#get-binaries-of-kube-bind-and-dex" title="Permanent link">#</a></h4>
 <p>The command below makes kube-bind binaries and dex binary available in <code>$PATH</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>kube-bind
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>kube-bind
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/waltforme/kube-bind.git<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nb">pushd</span><span class="w"> </span>kube-bind<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>git<span class="w"> </span>checkout<span class="w"> </span>kubestellar<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
@@ -1935,7 +1935,7 @@ The kubectl plugin lines use fully specific executables (e.g.,
 <p>In this step KubeStellar creates and populates the KubeStellar Core
 Space (KCS) (formerly called the Edge Service Provider Workspace
 (ESPW)), which exports the KubeStellar API.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar<span class="w"> </span>-X<span class="w"> </span>init
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar<span class="w"> </span>-X<span class="w"> </span>init
 </code></pre></div>
 <h3 id="deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster">Deploy kcp and KubeStellar as a workload in a Kubernetes cluster<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster" title="Permanent link">#</a></h3>
 <p>(This style of deployment requires release v0.6 or later of KubeStellar.)</p>
@@ -1969,7 +1969,7 @@ using kcp or KubeStellar. For example, you might use the following
 commands to fetch and start using that kubeconfig file; the first
 assumes that you deployed the core into a Kubernetes namespace named
 "kubestellar".</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>get-external-kubeconfig<span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-o<span class="w"> </span>kcs.kubeconfig
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>get-external-kubeconfig<span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-o<span class="w"> </span>kcs.kubeconfig
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/kcs.kubeconfig
 </code></pre></div>
 <p>Note that you now care about two different kubeconfig files: the one
@@ -1981,14 +1981,14 @@ the current context is for the KubeStellar hosting cluster.</p>
 <p>The following variable will be used in later commands to indicate that
 they are <em>not</em> being invoked from within the hosting cluster (see <a href="../../commands/#in-cluster">doc
 on "in-cluster"</a>).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
 </code></pre></div>
 <h3 id="create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters">Create SyncTarget and Location objects to represent the florin and guilder clusters<a class="headerlink" href="#create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters" title="Permanent link">#</a></h3>
 <p>Use the following two commands to put inventory objects in the IMW at
 <code>root:imw1</code> that was automatically created during deployment of
 KubeStellar. They label both florin and guilder with <code>env=prod</code>, and
 also label guilder with <code>extended=yes</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">IMW1_KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span><span class="s2">/imw1.kubeconfig&quot;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">IMW1_KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">MY_KUBECONFIGS</span><span class="si">}</span><span class="s2">/imw1.kubeconfig&quot;</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>kubectl-kubestellar-space-get_kubeconfig<span class="w"> </span>imw1<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span><span class="nv">$in_cluster</span><span class="w"> </span><span class="nv">$IMW1_KUBECONFIG</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>florin<span class="w">  </span>loc-name<span class="o">=</span>florin<span class="w">  </span><span class="nv">env</span><span class="o">=</span>prod
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>guilder<span class="w"> </span>loc-name<span class="o">=</span>guilder<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">extended</span><span class="o">=</span>yes
@@ -1996,7 +1996,7 @@ also label guilder with <code>extended=yes</code>.</p>
 <a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_KUBECONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>location.edge.kubestellar.io<span class="w"> </span>florin
 </code></pre></div>
 <p>Those two <code>ensure location</code> calls are equivalent to creating the following four objects.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v2alpha1</span>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SyncTarget</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nt">metadata</span><span class="p">:</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">florin</span>

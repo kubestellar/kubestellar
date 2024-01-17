@@ -1815,7 +1815,7 @@
 
 <!--build-syncer-image-start-->
 <p>Build the syncer image.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SYNCER_IMG_REF</span><span class="o">=</span><span class="k">$(</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SYNCER_IMG_REF</span><span class="o">=</span><span class="k">$(</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">(</span>docker<span class="w"> </span>info<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>podman<span class="k">)</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="k">then</span><span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">DOCKER_HOST</span><span class="o">=</span>unix://<span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/.local/share/containers/podman/machine/qemu/podman.sock
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="k">fi</span>

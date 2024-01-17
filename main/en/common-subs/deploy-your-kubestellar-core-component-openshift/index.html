@@ -1820,7 +1820,7 @@
 <div class="tabbed-block">
 <p>deploy the KubeStellar Core components on the <strong>ks-core</strong> OpenShift cluster  </p>
 <!-- BEGIN INCLUDE install-helm-openshift.md '&lt;!--install-helm-openshift-start--&gt;' '&lt;!--install-helm-openshift-end--&gt;' -->
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>ks-core<span class="w">  </span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>ks-core<span class="w">  </span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>kubestellar<span class="w">  </span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>kubestellar<span class="w"> </span>https://helm.kubestellar.io
@@ -1833,7 +1833,7 @@
 <!-- END INCLUDE -->
 <p>run the following to wait for KubeStellar to be ready to take requests:
 <!-- BEGIN INCLUDE check-kubestellar-helm-deployment-running.md '&lt;!--check-kubestellar-helm-deployment-running-start--&gt;' '&lt;!--check-kubestellar-helm-deployment-running-end--&gt;' --></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="s1">&#39;Waiting for KubeStellar to be ready&#39;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="s1">&#39;Waiting for KubeStellar to be ready&#39;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">   </span>--selector<span class="o">=</span><span class="nv">app</span><span class="o">=</span>kubestellar<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="k">)</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">   </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-c<span class="w"> </span>init<span class="w"> </span>--<span class="w"> </span>ls<span class="w"> </span>/home/kubestellar/ready<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
@@ -1847,7 +1847,7 @@
 </div>
 <div class="tabbed-block">
 <p>Checking the initialization log to see if there are any obvious errors:
- <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>KUBECONFIG=~/.kube/config kubectl config use-context ks-core  
+ <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>KUBECONFIG=~/.kube/config kubectl config use-context ks-core  
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl logs \
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  $(kubectl get pod --selector=app=kubestellar \
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  -o jsonpath=&#39;{.items[0].metadata.name}&#39; -n kubestellar) \

@@ -1959,11 +1959,11 @@ Let's take WMW as an example:</p>
 For WMW, we need one for Kubernetes and one for KubeStellar's edge API.</li>
 <li>Exclude `ClusterWorkspace` from discovery and sync.
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>edit<span class="w"> </span>cm<span class="w"> </span>argocd-cm
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>edit<span class="w"> </span>cm<span class="w"> </span>argocd-cm
 </code></pre></div>
 
 Make sure `resource.exclusions` exists in the `data` field of the `argocd-cm` configmap as follows:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">data</span><span class="p">:</span>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">data</span><span class="p">:</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">resource.exclusions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="no">- apiGroups:</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">      </span><span class="no">- &quot;tenancy.kcp.io&quot;</span>
@@ -1974,14 +1974,14 @@ Make sure `resource.exclusions` exists in the `data` field of the `argocd-cm` co
 </code></pre></div>
 
 Restart the Argo CD server.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>argocd-server
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>argocd-server
 </code></pre></div>
 
 Argo CD's documentation mentions this feature as [Resource Exclusion/Inclusion](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#resource-exclusioninclusion).
 </li>
 <li>Make sure the current context uses WMW, then identify the admin.kubeconfig.
 The command and output should be similar to
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>cluster<span class="w"> </span>add<span class="w"> </span>--name<span class="w"> </span>wmw<span class="w"> </span>--kubeconfig<span class="w"> </span>./admin.kubeconfig<span class="w"> </span>workspace.kcp.io/current
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>cluster<span class="w"> </span>add<span class="w"> </span>--name<span class="w"> </span>wmw<span class="w"> </span>--kubeconfig<span class="w"> </span>./admin.kubeconfig<span class="w"> </span>workspace.kcp.io/current
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="go">WARNING: This will create a service account `argocd-manager` on the cluster referenced by context `workspace.kcp.io/current` with full cluster level privileges. Do you want to continue [y/N]? y</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="go">INFO[0001] ServiceAccount &quot;argocd-manager&quot; already exists in namespace &quot;kube-system&quot;</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="go">INFO[0001] ClusterRole &quot;argocd-manager-role&quot; updated</span>
@@ -1996,7 +1996,7 @@ and the commands to use the examples are listed as follows.
 
 #### Create Argo CD Applications against KubeStellar's IMW
 Create two Locations. The command and output should be similar to
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>locations<span class="w"> </span><span class="se">\</span>
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>locations<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>--path<span class="w"> </span>kubestellar/locations/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:imw-turbo<span class="w"> </span><span class="se">\</span>
@@ -2005,7 +2005,7 @@ Create two Locations. The command and output should be similar to
 </code></pre></div>
 
 Create two SyncTargets. The command and output should be similar to
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>synctargets<span class="w"> </span><span class="se">\</span>
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>synctargets<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>--path<span class="w"> </span>kubestellar/synctargets/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:imw-turbo<span class="w"> </span><span class="se">\</span>
@@ -2015,7 +2015,7 @@ Create two SyncTargets. The command and output should be similar to
 
 #### Create Argo CD Application against KubeStellar's WMW
 Create a Namespace. The command and output should be similar to
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span><span class="se">\</span>
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>--path<span class="w"> </span>kubestellar/namespaces/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo<span class="w"> </span><span class="se">\</span>
@@ -2024,7 +2024,7 @@ Create a Namespace. The command and output should be similar to
 </code></pre></div>
 
 Create a Deployment for 'cpumemload'. The command and output should be similar to
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>cpumemload<span class="w"> </span><span class="se">\</span>
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>cpumemload<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>--path<span class="w"> </span>kubestellar/workloads/cpumemload/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo<span class="w"> </span><span class="se">\</span>
@@ -2033,7 +2033,7 @@ Create a Deployment for 'cpumemload'. The command and output should be similar t
 </code></pre></div>
 
 Create an EdgePlacement. The command and output should be similar to
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>edgeplacement<span class="w"> </span><span class="se">\</span>
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>edgeplacement<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>--path<span class="w"> </span>kubestellar/placements/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo<span class="w"> </span><span class="se">\</span>

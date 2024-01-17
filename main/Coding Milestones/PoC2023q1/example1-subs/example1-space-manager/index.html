@@ -1843,7 +1843,7 @@
 <!--example1-space-manager-start-->
 
 <h3 id="create-kind-cluster-for-space-management">Create Kind cluster for space management<a class="headerlink" href="#create-kind-cluster-for-space-management" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>sm-mgt<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>sm-mgt<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="s">kind: Cluster</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="s">nodes:</span>
@@ -1876,21 +1876,21 @@ current context is still the one just established, "sm-mgt".</p>
 <p>You can get the latest version from GitHub with the following command,
 which will get you the default branch (which is named "main"); add <code>-b
 $branch</code> to the <code>git</code> command in order to get a different branch.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
 </code></pre></div>
 <p>Use the following commands to build and add the executables to your
 <code>$PATH</code>.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>space-framework
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>space-framework
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>make<span class="w"> </span>build
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
 Next deploy the space framework CRDs in the space management cluster.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>config/crds/
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>config/crds/
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">cd</span><span class="w"> </span>..
 </code></pre></div>
 Finally, start the space-manager controller.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>space-manager<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span>-v<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/space-manager.log<span class="w"> </span><span class="p">&amp;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>space-manager<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span>-v<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/space-manager.log<span class="w"> </span><span class="p">&amp;</span>
 </code></pre></div>
 <!--example1-space-manager-end-->
 

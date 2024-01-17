@@ -1815,7 +1815,7 @@
 
 <!--create-files-and-contexts-for-openshift-clusters-start-->
 <p><strong>important:</strong> alias the kubernetes contexts of the OpenShift clusters you provided to match their use in this guide
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>oc login &lt;ks-core OpenShift cluster&gt;
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>oc login &lt;ks-core OpenShift cluster&gt;
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>CURRENT_CONTEXT=$(KUBECONFIG=~/.kube/config kubectl config current-context) \
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    &amp;&amp; KUBECONFIG=~/.kube/config kubectl config set-context ks-core \
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    --namespace=$(echo &quot;$CURRENT_CONTEXT&quot; | awk -F &#39;/&#39; &#39;{print $1}&#39;) \

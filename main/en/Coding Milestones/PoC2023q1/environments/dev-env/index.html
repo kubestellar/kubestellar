@@ -1943,7 +1943,7 @@
 controller, which will listen at port 443 on the one kind node.  We
 pick a port number here that does not run afoul of the usual
 prohibition of ordinary user processes listening at low port numbers.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-host<span class="w"> </span>--config<span class="o">=</span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-host<span class="w"> </span>--config<span class="o">=</span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="s">kind: Cluster</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="s">nodes:</span>
@@ -1962,10 +1962,10 @@ prohibition of ordinary user processes listening at low port numbers.</p>
 </code></pre></div>
 <h3 id="create-an-nginx-ingress-controller-with-ssl-passthrough">Create an nginx Ingress controller with SSL passthrough<a class="headerlink" href="#create-an-nginx-ingress-controller-with-ssl-passthrough" title="Permanent link">#</a></h3>
 <p>Create an <code>nginx-ingress</code> with SSL passthrough. Following <a href="https://kind.sigs.k8s.io/docs/user/ingress/">Kind NGINX ingress instructions</a>, we have modified the YAML at https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml to include the <code>--enable-ssl-passthrough=true</code> argument. <a href="https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml">This</a> is the link to our raw modified nginx controller deployment YAML.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
 </code></pre></div>
 <p>Wait for the ingress to be ready:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--namespace<span class="w"> </span>ingress-nginx<span class="w"> </span><span class="se">\</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--namespace<span class="w"> </span>ingress-nginx<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>--for<span class="o">=</span><span class="nv">condition</span><span class="o">=</span>ready<span class="w"> </span>pod<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>--selector<span class="o">=</span>app.kubernetes.io/component<span class="o">=</span>controller<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span>--timeout<span class="o">=</span>90s

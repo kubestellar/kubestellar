@@ -2677,7 +2677,7 @@ using <a href="https://github.com/kube-bind/kube-bind">kube-bind</a>.</p>
 consumer does. The namespace or name is modified so that the objects
 from all the consumers can be copied into the provider. This object ID
 mapping can be inverted with the following interface.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// AnalyzeClusterScopedObject examines a cluster-scoped object in a kube-bind service provider cluster</span>
+<div class="language-go highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// AnalyzeClusterScopedObject examines a cluster-scoped object in a kube-bind service provider cluster</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1">// and returns the object&#39;s name as known in the service consumer cluster and the kube-bind space id for</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">// the consumer, or an error if the object does not appear to be a provider&#39;s copy of a consumer&#39;s object.</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kd">func</span><span class="w"> </span><span class="nx">AnalyzeClusterScopedObject</span><span class="p">(</span><span class="nx">obj</span><span class="w"> </span><span class="nx">metav1</span><span class="p">.</span><span class="nx">Object</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">kbSpaceID</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{..}</span>
@@ -2707,7 +2707,7 @@ the kube-bind identifier for a consumer (the "cluster namespace" in
 the provider) and the kcp identifier for that consumer (the
 <code>logicalcluster.Name</code>). This relation is queried through the following
 interface.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// KubeBindSpaceRelation is specific to one kube-bind service provider</span>
+<div class="language-go highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// KubeBindSpaceRelation is specific to one kube-bind service provider</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1">// and reveals the 1:1 relation between the kube-bind identifier for</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">// a consumer (i.e., the name of the &quot;cluster namespace&quot; for that consumer</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1">// in the provider) and the underlying space identifier (i.e., the</span>

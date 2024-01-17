@@ -1856,7 +1856,7 @@
 <!--example1-provider-kubeflex-start-->
 <h3 id="deploy-kubeflex-and-kubestellar-as-bare-processes">Deploy KubeFlex and KubeStellar as bare processes<a class="headerlink" href="#deploy-kubeflex-and-kubestellar-as-bare-processes" title="Permanent link">#</a></h3>
 <h4 id="initialize-kubeflex">Initialize KubeFlex<a class="headerlink" href="#initialize-kubeflex" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>wget<span class="w"> </span>https://github.com/kubestellar/kubeflex/releases/download/v0.3.3/kubeflex_0.3.3_linux_amd64.tar.gz
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>wget<span class="w"> </span>https://github.com/kubestellar/kubeflex/releases/download/v0.3.3/kubeflex_0.3.3_linux_amd64.tar.gz
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>mkdir<span class="w"> </span>kubeflex
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>tar<span class="w"> </span>xf<span class="w"> </span>kubeflex_0.3.3_linux_amd64.tar.gz<span class="w"> </span>-C<span class="w"> </span>kubeflex
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>kubeflex/bin/kflex<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span>init
@@ -1866,7 +1866,7 @@
 <p>Space provider for KubeFlex will allow you to use KubeFlex as backend provider for spaces.
 Use the following commands to create a provider secret for KubeFlex access and
 a space provider definition.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>kfsec<span class="w"> </span>--from-file<span class="o">=</span><span class="nv">kubeconfig</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--from-file<span class="o">=</span><span class="nv">incluster</span><span class="o">=</span><span class="nv">$SM_CONFIG</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>kfsec<span class="w"> </span>--from-file<span class="o">=</span><span class="nv">kubeconfig</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--from-file<span class="o">=</span><span class="nv">incluster</span><span class="o">=</span><span class="nv">$SM_CONFIG</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="s">apiVersion: space.kubestellar.io/v1alpha1</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="s">kind: SpaceProviderDesc</span>
@@ -1881,13 +1881,13 @@ a space provider definition.</p>
 <a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>Next, use the following command to wait for the space-manger to process the provider.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.Phase}&#39;</span><span class="o">=</span>Ready<span class="w"> </span>spaceproviderdesc/default<span class="w"> </span>--timeout<span class="o">=</span>90s
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>sm-mgt<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.Phase}&#39;</span><span class="o">=</span>Ready<span class="w"> </span>spaceproviderdesc/default<span class="w"> </span>--timeout<span class="o">=</span>90s
 </code></pre></div>
 <p>The following variable will be used in later commands to indicate that
 they are being invoked close enough to the provider's apiserver to
 use the more efficient networking (see <a href="../../commands/#in-cluster">doc on
 "in-cluster"</a>).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;--in-cluster&quot;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;--in-cluster&quot;</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nv">kube_needed</span><span class="o">=</span><span class="nb">false</span>
 </code></pre></div>
 <!--example1-provider-kubeflex-end-->

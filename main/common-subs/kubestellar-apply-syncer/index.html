@@ -1814,7 +1814,7 @@
   <h1>Kubestellar apply syncer</h1>
 
 <!--kubestellar-apply-syncer-start-->
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">#apply ks-edge-cluster1 syncer</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">#apply ks-edge-cluster1 syncer</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>ks-edge-cluster1<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>ks-edge-cluster1-syncer.yaml
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>sleep<span class="w"> </span><span class="m">3</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>ks-edge-cluster1<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>kubestellar<span class="w">  </span><span class="c1">#check if syncer deployed to ks-edge-cluster1 correctly</span>

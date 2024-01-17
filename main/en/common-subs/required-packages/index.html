@@ -1849,15 +1849,15 @@ Select the tab for your environment for suggested commands to install them</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>brew install jq
+<p><div class="language-text highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>brew install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew install yq
+<div class="language-text highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew install kubectl
+<div class="language-text highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew install kubectl
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew install helm
+<div class="language-text highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew install helm
 </code></pre></div>
-<div class="highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>
+<div class="language-text highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>
 </code></pre></div></p>
 <ol>
 <li>
@@ -1875,19 +1875,19 @@ Select the tab for your environment for suggested commands to install them</p>
 </ol>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo apt-get install jq
+<p><div class="language-text highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo apt-get install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo snap install yq
+<div class="language-text highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo snap install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
+<div class="language-text highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg &gt; /dev/null
+<div class="language-text highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg &gt; /dev/null
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>sudo apt-get install apt-transport-https --yes
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>sudo apt-get update
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>sudo apt-get install helm
 </code></pre></div>
-<div class="highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>
+<div class="language-text highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>
 </code></pre></div></p>
 <p>visit https://go.dev/doc/install for latest instructions</p>
 <ol>
@@ -1913,19 +1913,19 @@ Select the tab for your environment for suggested commands to install them</p>
 </ol>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo apt-get install jq
+<p><div class="language-text highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo apt-get install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sudo apt-get install yq
+<div class="language-text highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sudo apt-get install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
+<div class="language-text highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg &gt; /dev/null
+<div class="language-text highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg &gt; /dev/null
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>sudo apt-get install apt-transport-https --yes
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>sudo apt-get update
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>sudo apt-get install helm
 </code></pre></div>
-<div class="highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>
+<div class="language-text highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>
 </code></pre></div></p>
 <p>visit https://go.dev/doc/install for latest instructions</p>
 <ol>
@@ -1951,19 +1951,19 @@ Select the tab for your environment for suggested commands to install them</p>
 </ol>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>yum -y install jq
+<p><div class="language-text highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>yum -y install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a># easiest to install with snap
+<div class="language-text highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a># easiest to install with snap
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>snap install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a># For AMD64 / x86_64
+<div class="language-text highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a># For AMD64 / x86_64
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a># for ARM64 / aarch64
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>dnf install helm
+<div class="language-text highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>dnf install helm
 </code></pre></div>
-<div class="highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>
+<div class="language-text highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>
 </code></pre></div></p>
 <p>visit https://go.dev/doc/install for latest instructions</p>
 <ol>
@@ -1989,19 +1989,19 @@ Select the tab for your environment for suggested commands to install them</p>
 </ol>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">Chocolatey - https://chocolatey.org/install#individual</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(&#39;https://community.chocolatey.org/install.ps1&#39;))
+<p><div class="language-text highlight"><span class="filename">Chocolatey - https://chocolatey.org/install#individual</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(&#39;https://community.chocolatey.org/install.ps1&#39;))
 </code></pre></div>
-<div class="highlight"><span class="filename">curl</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>choco install curl -y
+<div class="language-text highlight"><span class="filename">curl</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>choco install curl -y
 </code></pre></div>
-<div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>choco install jq -y
+<div class="language-text highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>choco install jq -y
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>choco install yq -y
+<div class="language-text highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>choco install yq -y
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>curl.exe -LO &quot;https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe&quot;    
+<div class="language-text highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>curl.exe -LO &quot;https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe&quot;    
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>choco install kubernetes-helm
+<div class="language-text highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>choco install kubernetes-helm
 </code></pre></div>
-<div class="highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>visit https://go.dev/doc/install for latest instructions
+<div class="language-text highlight"><span class="filename">go (only required if you build kubestellar from source)</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>visit https://go.dev/doc/install for latest instructions
 </code></pre></div></p>
 <ol>
 <li>
@@ -2038,34 +2038,34 @@ Using Windows 11 Enterprise)</p>
 <p><h6> 1. If you're using a VPN, turn it off</h6></p>
 <p><h6> 2. Install Ubuntu into WSL</h6></p>
 <p><h6> 2.0 If wsl is not yet installed, open a powershell administrator window and run the following</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>wsl --install
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>wsl --install
 </code></pre></div>
 <h6> 2.1 reboot your system</h6></p>
 <p><h6> 2.2 In a Windows command terminal run the following to list all the linux distributions that are available online</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>wsl -l -o
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>wsl -l -o
 </code></pre></div>
 <h6> 2.3 Select a linux distribution and install it into WSL</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>wsl --install -d Ubuntu 22.04.01
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>wsl --install -d Ubuntu 22.04.01
 </code></pre></div>
 You will see something like:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Installing, this may take a few minutes...
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Installing, this may take a few minutes...
 <a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>Please create a default UNIX user account. The username does not need to match your Windows username.
 <a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>For more information visit: https://aka.ms/wslusers
 <a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>Enter new UNIX username:
 </code></pre></div></p>
 <p><h6> 2.4 Enter your new username and password at the prompts, and you will eventually see something like:</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.10.102.1-microsoft-standard-WSL2 x86_64)
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.10.102.1-microsoft-standard-WSL2 x86_64)
 </code></pre></div></p>
 <p><h6> 2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
 Your new linux distribution should appear as a local "App". You can pin it to the Windows task bar or to Start for your future convenience.</h6>
 Start a VM using your distribution by clicking on the App.</p>
 <p><h6> 3. Install pre-requisites into your new VM</h6>
 <h6> 3.1 update and apply apt-get packages</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>sudo apt-get update
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>sudo apt-get update
 <a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>sudo apt-get upgrade
 </code></pre></div></p>
 <p><h6> 3.2 Install golang</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
 <a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>sudo tar -zxvf go1.19.linux-amd64.tar.gz -C /usr/local
 <a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>echo export GOROOT=/usr/local/go | sudo tee -a /etc/profile
 <a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>echo export PATH=&quot;$PATH:/usr/local/go/bin&quot; | sudo tee -a /etc/profile
@@ -2073,32 +2073,32 @@ Start a VM using your distribution by clicking on the App.</p>
 <a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>go version
 </code></pre></div></p>
 <p><h6> 3.3 Install ko (but don't do ko set action step)</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>go install github.com/google/ko@latest
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>go install github.com/google/ko@latest
 </code></pre></div></p>
 <p><h6> 3.4 Install gcc</h6>
 Either run this:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>sudo apt install build-essential
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>sudo apt install build-essential
 </code></pre></div>
 or this:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>sudo apt-get update
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>sudo apt-get update
 <a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>apt install gcc
 <a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>gcc --version
 </code></pre></div></p>
 <p><h6> 3.5 Install make (if you installed build-essential this may already be installed)</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>apt install make
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>apt install make
 </code></pre></div></p>
 <p><h6> 3.6 Install jq</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>DEBIAN_FRONTEND=noninteractive apt-get install -y jq
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>DEBIAN_FRONTEND=noninteractive apt-get install -y jq
 <a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>jq --version
 </code></pre></div></p>
 <p><h6> 3.7 install kubectl</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
 <a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>curl -LO &quot;https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256&quot;
 <a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>echo &quot;$(cat kubectl.sha256)  kubectl&quot; | sha256sum --check
 <a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 </code></pre></div>
 <h6> 3.8 install helm (required when deploying as workload)</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 <a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a>chmod 700 get_helm.sh
 <a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>./get_helm.sh
 </code></pre></div></p>
@@ -2123,29 +2123,29 @@ Select the tab for your environment for suggested commands to install them</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>brew install docker
+<p><div class="language-text highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>brew install docker
 <a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>open -a Docker
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>brew install kind
+<div class="language-text highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>brew install kind
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>sudo mkdir -p /etc/apt/keyrings
+<p><div class="language-text highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>sudo mkdir -p /etc/apt/keyrings
 <a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 <a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
 <a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a>sudo apt update
 <a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a>sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 </code></pre></div>
-<div class="highlight"><span class="filename">Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/</span><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>sudo apt-get install -y dbus-user-session # *** Relogin after this
+<div class="language-text highlight"><span class="filename">Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/</span><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>sudo apt-get install -y dbus-user-session # *** Relogin after this
 <a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>sudo apt-get install -y uidmap
 <a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>dockerd-rootless-setuptool.sh install
 <a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>systemctl --user restart docker.service
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
+<div class="language-text highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a># Add Docker&#39;s official GPG key:
+<p><div class="language-text highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a># Add Docker&#39;s official GPG key:
 <a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>sudo apt-get update
 <a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>sudo apt-get install ca-certificates curl gnupg
 <a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>sudo install -m 0755 -d /etc/apt/keyrings
@@ -2162,19 +2162,19 @@ Select the tab for your environment for suggested commands to install them</p>
 <a id="__codelineno-46-15" name="__codelineno-46-15" href="#__codelineno-46-15"></a># Install packages
 <a id="__codelineno-46-16" name="__codelineno-46-16" href="#__codelineno-46-16"></a>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 </code></pre></div>
-<div class="highlight"><span class="filename">Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/</span><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>sudo apt-get install -y dbus-user-session # *** Relogin after this
+<div class="language-text highlight"><span class="filename">Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/</span><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>sudo apt-get install -y dbus-user-session # *** Relogin after this
 <a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>sudo apt-get install -y fuse-overlayfs
 <a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>sudo apt-get install -y slirp4netns
 <a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a>dockerd-rootless-setuptool.sh install
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
+<div class="language-text highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
+<p><div class="language-text highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
 </code></pre></div>
 Enable rootless usage of Docker by following the instructions at <a href="https://docs.docker.com/engine/security/rootless/">https://docs.docker.com/engine/security/rootless/</a>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a># For AMD64 / x86_64
+<div class="language-text highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a># For AMD64 / x86_64
 <a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
 <a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a># For ARM64
 <a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-arm64 
@@ -2182,9 +2182,9 @@ Enable rootless usage of Docker by following the instructions at <a href="https:
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>choco install docker -y
+<p><div class="language-text highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>choco install docker -y
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
+<div class="language-text highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
@@ -2196,35 +2196,35 @@ The installation instructions from docker are not sufficient to get docker worki
 <p>Here some additional steps you will need to take:</p>
 <p><h6> 2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.</h6>
 If /etc/wsl.conf does not contain [boot] systemd=true, then edit /etc/wsl.com as follows:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>sudo vi /etc/wsl.conf
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>sudo vi /etc/wsl.conf
 </code></pre></div>
 Insert
-<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>[boot]
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>[boot]
 <a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>systemd=true
 </code></pre></div></p>
 <p><h6> 2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>sudo vi /etc/sudoers.d/docker
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>sudo vi /etc/sudoers.d/docker
 </code></pre></div>
 Insert
-<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a># Docker daemon specification
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a># Docker daemon specification
 <a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a>&lt;your user account&gt; ALL=(ALL) NOPASSWD: /usr/bin/dockerd
 </code></pre></div></p>
 <p><h6> 2.4 Add your user to the docker group</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>sudo usermod -aG docker $USER
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>sudo usermod -aG docker $USER
 </code></pre></div></p>
 <p><h6> 2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>sudo systemctl stop docker
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>sudo systemctl stop docker
 <a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a>sudo dockerd &amp;
 </code></pre></div></p>
 <p><h6> 2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655 
 The following commands will fix the issue:</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
 <a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a>sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 <a id="__codelineno-59-3" name="__codelineno-59-3" href="#__codelineno-59-3"></a>sudo dockerd &amp; 
 </code></pre></div></p>
 <p><h6> 3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal</h6></p>
 <p><h6> 3.1 In your new terminal, install kind</h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>wget -nv https://github.com/kubernetes-sigs/kind/releases/download/v0.17.0/kind-linux-$(dpkg --print-architecture) -O kind 
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>wget -nv https://github.com/kubernetes-sigs/kind/releases/download/v0.17.0/kind-linux-$(dpkg --print-architecture) -O kind 
 <a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a>sudo install -m 0755 kind /usr/local/bin/kind 
 <a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a>rm kind 
 <a id="__codelineno-60-4" name="__codelineno-60-4" href="#__codelineno-60-4"></a>kind version

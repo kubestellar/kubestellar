@@ -1819,10 +1819,10 @@ for the user to put inventory objects in, describing the user's
 clusters. The IMW that is automatically created for the user is at
 <code>imw1</code>.</p>
 <p>Let's begin by onboarding the <code>florin</code> cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:imw1<span class="w"> </span>florin<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:imw1<span class="w"> </span>florin<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod
 </code></pre></div>
 <p>which should yield something like:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>synctarget.edge.kubestellar.io/florin<span class="w"> </span>created
+<div class="language-sh no-copy highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>synctarget.edge.kubestellar.io/florin<span class="w"> </span>created
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>location.edge.kubestellar.io/florin<span class="w"> </span>created
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>synctarget.edge.kubestellar.io/florin<span class="w"> </span>labeled
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>location.edge.kubestellar.io/florin<span class="w"> </span>labeled
@@ -1846,10 +1846,10 @@ clusters. The IMW that is automatically created for the user is at
 </code></pre></div>
 <p>An edge syncer manifest yaml file was created in your current directory: <code>florin-syncer.yaml</code>. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.</p>
 <p>Now let's deploy the edge syncer to the <code>florin</code> edge cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>florin-syncer.yaml
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>florin-syncer.yaml
 </code></pre></div>
 <p>which should yield something like:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>namespace/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
+<div class="language-sh no-copy highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>namespace/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>serviceaccount/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>secret/kubestellar-syncer-florin-1yi5q9c4-token<span class="w"> </span>created
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
@@ -1858,10 +1858,10 @@ clusters. The IMW that is automatically created for the user is at
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>deployment.apps/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
 </code></pre></div>
 <p>Optionally, check that the edge syncer pod is running:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-A
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-A
 </code></pre></div>
 <p>which should yield something like:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                  </span>READY<span class="w">   </span>STATUS<span class="w">    </span>RESTARTS<span class="w">   </span>AGE
+<div class="language-sh no-copy highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                  </span>READY<span class="w">   </span>STATUS<span class="w">    </span>RESTARTS<span class="w">   </span>AGE
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubestellar-syncer-florin-1yi5q9c4<span class="w">   </span>kubestellar-syncer-florin-1yi5q9c4-77cb588c89-xc5qr<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>12m
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>kube-system<span class="w">                          </span>coredns-565d847f94-92f4k<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>kube-system<span class="w">                          </span>coredns-565d847f94-kgddm<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
@@ -1874,10 +1874,10 @@ clusters. The IMW that is automatically created for the user is at
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>local-path-storage<span class="w">                   </span>local-path-provisioner-684f458cdd-kw2xz<span class="w">               </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
 </code></pre></div>
 <p>Now, let's onboard the <code>guilder</code> cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:imw1<span class="w"> </span>guilder<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">extended</span><span class="o">=</span>yes
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:imw1<span class="w"> </span>guilder<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">extended</span><span class="o">=</span>yes
 </code></pre></div>
 <p>Apply the created edge syncer manifest:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>guilder-syncer.yaml
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>guilder-syncer.yaml
 </code></pre></div>
 <!--quickstart-2-apache-example-deployment-c-onboarding-clusters-end-->
 

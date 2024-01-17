@@ -1872,10 +1872,10 @@ qualifies).  Do one or the other, not both.</p>
 <p>Download and build or install <a href="https://github.com/kcp-dev/kcp/releases/tag/v0.11.0">kcp</a>,
 according to your preference.  See the start of <a href="https://docs.kcp.io/kcp/v0.11/#quickstart">the kcp quickstart</a> for instructions on that, but get <a href="https://github.com/kcp-dev/kcp/releases/tag/v0.11.0">release v0.11.0</a> rather than the latest (the downloadable assets appear after the long list of changes/features/etc).</p>
 <p>Clone the v0.11.0 branch of the kcp source:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
 </code></pre></div>
 and build the kubectl-ws binary and include it in <code>$PATH</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">pushd</span><span class="w"> </span>kcp
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">pushd</span><span class="w"> </span>kcp
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>make<span class="w"> </span>build
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div></p>
@@ -1889,7 +1889,7 @@ configure <code>kubectl</code> to use the kubeconfig produced by the kcp server,
 and (c) wait for the kcp server to get through some
 initialization. The choice of <code>-v=3</code> for the kcp server makes it log a
 line for every HTTP request (among other things).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kcp<span class="w"> </span>start<span class="w"> </span>-v<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/kcp.log<span class="w"> </span><span class="p">&amp;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kcp<span class="w"> </span>start<span class="w"> </span>-v<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/kcp.log<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nv">PROVIDER_KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nb">popd</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># wait until KCP is ready checking availability of ws resource</span>
@@ -1906,7 +1906,7 @@ this document assumes that your <code>kind</code> cluster contexts are in
 <p>Space provider for KCP will allow you to use KCP as backend provider for spaces.
 Use the following commands to create a provider secret for KCP access and
 a space provider definition.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>kcpsec<span class="w"> </span>--from-file<span class="o">=</span><span class="nv">kubeconfig</span><span class="o">=</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="w"> </span>--from-file<span class="o">=</span><span class="nv">incluster</span><span class="o">=</span><span class="nv">$PROVIDER_KUBECONFIG</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>kcpsec<span class="w"> </span>--from-file<span class="o">=</span><span class="nv">kubeconfig</span><span class="o">=</span><span class="nv">$PROVIDER_KUBECONFIG</span><span class="w"> </span>--from-file<span class="o">=</span><span class="nv">incluster</span><span class="o">=</span><span class="nv">$PROVIDER_KUBECONFIG</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="s">apiVersion: space.kubestellar.io/v1alpha1</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="s">kind: SpaceProviderDesc</span>
@@ -1921,13 +1921,13 @@ a space provider definition.</p>
 <a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>Next, use the following command to wait for the space-manger to process the provider.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.Phase}&#39;</span><span class="o">=</span>Ready<span class="w"> </span>spaceproviderdesc/default<span class="w"> </span>--timeout<span class="o">=</span>90s
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.Phase}&#39;</span><span class="o">=</span>Ready<span class="w"> </span>spaceproviderdesc/default<span class="w"> </span>--timeout<span class="o">=</span>90s
 </code></pre></div>
 <p>The following variable will be used in later commands to indicate that
 they are being invoked close enough to the provider's apiserver to
 use the more efficient networking (see <a href="../../commands/#in-cluster">doc on
 "in-cluster"</a>).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;--in-cluster&quot;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">in_cluster</span><span class="o">=</span><span class="s2">&quot;--in-cluster&quot;</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nv">kube_needed</span><span class="o">=</span><span class="nb">true</span>
 </code></pre></div>
 <!--example1-provider-kcp-end-->
