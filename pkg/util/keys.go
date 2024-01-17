@@ -31,9 +31,9 @@ import (
 // since they are no longer in the cache, the key stores a shallow copy of the
 // deleted object.
 type Key struct {
-	GvkKey           string
-	NamespaceNameKey string
-	DeletedObject    *runtime.Object
+	GvkKey         string
+	NamespacedName cache.ObjectName
+	DeletedObject  *runtime.Object
 }
 
 // Given an object that implements runtime.Object, create a key of type Key
@@ -42,15 +42,14 @@ func KeyForGroupVersionKindNamespaceName(obj any) (Key, error) {
 	rObj := obj.(runtime.Object)
 	ok := rObj.GetObjectKind()
 	gvk := ok.GroupVersionKind()
-	namespaceName, err := cache.MetaNamespaceKeyFunc(obj)
+	namespacedName, err := cache.ObjectToName(obj)
 	if err != nil {
 		return Key{}, err
 	}
 	key := Key{
-		GvkKey:           fmt.Sprintf("%s/%s", gvk.GroupVersion().String(), gvk.Kind),
-		NamespaceNameKey: namespaceName,
+		GvkKey:         fmt.Sprintf("%s/%s", gvk.GroupVersion().String(), gvk.Kind),
+		NamespacedName: namespacedName,
 	}
-
 	return key, nil
 }
 

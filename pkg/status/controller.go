@@ -253,12 +253,12 @@ func (c *Controller) handleObject(obj any) {
 
 // enqueueObject generates key and put it onto the work queue.
 func (c *Controller) enqueueObject(obj interface{}) {
-	key, err := cache.MetaNamespaceKeyFunc(obj)
+	ref, err := cache.ObjectToName(obj)
 	if err != nil {
 		utilruntime.HandleError(err)
 		return
 	}
-	c.workqueue.Add(key)
+	c.workqueue.Add(ref)
 }
 
 // runWorker is a long-running function that will continually call the
@@ -287,11 +287,11 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 		// period.
 		defer c.workqueue.Done(obj)
 
-		// We expect a string key to come off the workqueue. We do this as the delayed
+		// We expect a cache.ObjectName to come off the workqueue. We do this as the delayed
 		// nature of the workqueue means the items in the informer cache may actually be
 		// more up to date that when the item was initially put onto the
 		// workqueue.
-		key, ok := obj.(string)
+		ref, ok := obj.(cache.ObjectName)
 		if !ok {
 			// if the item in the workqueue is invalid, we call
 			// Forget here to avoid process a work item that is invalid.
@@ -300,7 +300,7 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 			return nil
 		}
 		// Run the reconciler, passing it the full key or the metav1 Object
-		if err := c.reconcile(ctx, key); err != nil {
+		if err := c.reconcile(ctx, ref); err != nil {
 			// Put the item back on the workqueue to handle any transient errors.
 			c.workqueue.AddRateLimited(obj)
 			return fmt.Errorf("error syncing key '%s': %s, requeuing", obj, err.Error())
@@ -320,17 +320,12 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 	return true
 }
 
-func (c *Controller) reconcile(ctx context.Context, key string) error {
-	namespace, name, err := cache.SplitMetaNamespaceKey(key)
-	if err != nil {
-		utilruntime.HandleError(fmt.Errorf("invalid resource key: %s %s", key, err))
-		return nil
-	}
-	obj, err := getObject(c.workStatusLister, namespace, name)
+func (c *Controller) reconcile(ctx context.Context, ref cache.ObjectName) error {
+	obj, err := getObject(c.workStatusLister, ref.Namespace, ref.Name)
 	if err != nil {
 		// The resource no longer exist, which means it has been deleted.
 		if errors.IsNotFound(err) {
-			utilruntime.HandleError(fmt.Errorf("resource '%s' in work queue no longer exists", key))
+			utilruntime.HandleError(fmt.Errorf("object %#v in work queue no longer exists", ref))
 			return nil
 		}
 		return err
