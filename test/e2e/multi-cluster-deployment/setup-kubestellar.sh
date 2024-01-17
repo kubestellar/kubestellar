@@ -52,12 +52,12 @@ create_cluster cluster2
 echo "Wait for csr on imbs1"
 waitCounter=0
 while (($(kubectl --context imbs1 get csr 2>/dev/null | grep -c "Pending") < 2)); do
-  if (($waitCounter > 180)); then
+  if (($waitCounter > 36)); then
     echo "Failed to get csr."
     exit 1 
   fi
   ((waitCounter += 1))
-  sleep 1
+  sleep 5
 done
 
 clusteradm --context imbs1 accept --clusters cluster1

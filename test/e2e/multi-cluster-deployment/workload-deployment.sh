@@ -83,12 +83,12 @@ function wait_for_deployment() {
   echo "Waiting for deployment on $cluster"
   waitCounter=0
   while (($(kubectl --context $cluster wait deployment nginx-deployment -n nginx --for=condition=available --timeout=180s 2>/dev/null | grep -c "condition met") < 1)); do
-    if (($waitCounter > 180)); then
+    if (($waitCounter > 36)); then
       echo "Failed to observe deployment on ${cluster}."
       exit 1 
     fi
     ((waitCounter += 1))
-    sleep 1
+    sleep 5
   done
 }
 wait_for_deployment cluster1
