@@ -4,13 +4,9 @@
 See the list [here](../../pre-reqs.md).
 
 ## Running the test using a script
-- Clone the repo and checkout the ks-0.20 branch
-```
-git clone git@github.com:kubestellar/kubestellar.git
-cd kubestellar
-git checkout -b ks-0.20 origin/ks-0.20
-```
-- Run the test
+
+Starting from a local directory containing the git repo, do the following.
+
 ```
 cd test/e2e/multi-cluster-deployment
 ./run-test.sh
@@ -40,7 +36,7 @@ Create a Workload Description Space wds1 directly in KubeFlex.
 kflex create wds1
 kubectl config use-context kind-kubeflex
 kubectl label cp wds1 kflex.kubestellar.io/cptype=wds
-make ko-build
+make ko-build-local
 make install-local-chart
 ```
 

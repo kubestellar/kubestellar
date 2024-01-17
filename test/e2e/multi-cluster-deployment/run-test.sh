@@ -16,8 +16,9 @@
 # This is an end to end test of multi cluster deployement.  
 # For readable instructions, please visit https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20
 
+set -x # so users can see what is going on
 set -e # exit on error
 
+./cleanup.sh
 ./setup-kubestellar.sh
 ./workload-deployment.sh
-./cleanup.sh

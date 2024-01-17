@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -x # echo so that users can understand what is happening
 set -e # exit on error
 
 echo "Create a placement to deliver an app to all clusters in wds1."
@@ -94,3 +95,4 @@ wait_for_deployment cluster1
 echo "Waiting for deployment on cluster2"
 wait_for_deployment cluster2
 echo "SUCCESS: confirmed deployments on both cluster1 and cluster2."
+rm out
