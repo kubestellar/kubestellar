@@ -42,4 +42,4 @@ jobs:
 
       - name: Run test
         run: |
-          cd test/integration/multi-cluster-deployment && ./run-test.sh
+          cd test/e2e/multi-cluster-deployment && ./run-test.sh

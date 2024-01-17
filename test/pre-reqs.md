@@ -1,4 +1,7 @@
-The following pre-requisites are required:
+The following pre-requisites are required.
+
+## For Using KubeStellar
+
 - kubeflex version 0.3 or higher
     To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). At the end of the install make sure that the kubeflex CLI, kflex, is in your path.
 
@@ -19,6 +22,9 @@ The following pre-requisites are required:
 - helm - to deploy the kubestellar and kubeflex charts
 - kind - to create a few small kubernetes clusters
 - kubectl - to access the kubernetes clusters
+
+## For Building KubeStellar
+
 - go version 1.20 or higher - to build kubestellar
 - make - to build kubestellar and create the kubestellar image 
 - ko - to create the kubestellar image
