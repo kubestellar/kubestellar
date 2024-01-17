@@ -28,6 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
@@ -141,6 +142,18 @@ func RemoveChar(s string, c rune) string {
 		return s
 	}
 	return s[:i] + s[i+1:]
+}
+
+func GetClusterByName(ocmClient client.Client, clusterName string) (clusterv1.ManagedCluster, error) {
+	cluster := clusterv1.ManagedCluster{}
+	nn := types.NamespacedName{
+		Namespace: "",
+		Name:      clusterName,
+	}
+	if err := ocmClient.Get(context.TODO(), nn, &cluster); err != nil {
+		return cluster, err
+	}
+	return cluster, nil
 }
 
 func ListClustersBySelectors(ocmClient client.Client, selectors []metav1.LabelSelector) ([]string, error) {
