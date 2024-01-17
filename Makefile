@@ -204,11 +204,12 @@ deploy: manifests kustomize ## Deploy manager to the K8s cluster specified in ~/
 undeploy: ## Undeploy manager from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
 
-# installs the chart from ./core-helm-chart for local dev/testing on default WDS using image loaded in kind
-# the deployment is patched to load the image pre-loaded in kind
+# installs the chart from ./core-helm-chart for local dev/testing a WDS using image loaded in kind.
+# The Helm chart should be instantiated into the KubeFlex hosting cluster.
+# If $(KUBE_CONTEXT) is set then that indicates where to install the chart; otherwise it goes to the current kubeconfig context.
 .PHONY: install-local-chart
 install-local-chart: kind-load-image
-	helm upgrade --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./core-helm-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME}
+	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./core-helm-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME}
 
 ##@ Build Dependencies
 

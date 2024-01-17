@@ -29,12 +29,11 @@ echo "imbs1 created."
 echo "Create a Workload Description Space wds1 directly in KubeFlex."
 echo "-------------------------------------------------------------------------"
 kflex create wds1
-kubectl config use-context kind-kubeflex
-kubectl label cp wds1 kflex.kubestellar.io/cptype=wds
+kubectl --context kind-kubeflex label cp wds1 kflex.kubestellar.io/cptype=wds
 
 cd ../../../
 make ko-build-local
-make install-local-chart
+make install-local-chart KUBE_CONTEXT=kind-kubeflex
 cd -
 echo "wds1 created."
 
@@ -49,8 +48,6 @@ function create_cluster() {
 
 create_cluster cluster1
 create_cluster cluster2
-
-kubectl config use-context imbs1
 
 echo "Wait for csr on imbs1"
 waitCounter=0
