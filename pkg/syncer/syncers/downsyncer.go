@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/klog/v2"
@@ -104,6 +105,7 @@ func (ds *DownSyncer) SyncOne(resource edgev2alpha1.EdgeSyncConfigResource, conv
 				ds.logger.V(3).Info(fmt.Sprintf("  create %q in downstream since it's not found", resourceToString(resourceForDown)))
 				upstreamResource.SetResourceVersion("")
 				upstreamResource.SetUID("")
+				upstreamResource.SetManagedFields([]metav1.ManagedFieldsEntry{})
 				setDownsyncAnnotation(upstreamResource)
 				applyConversion(upstreamResource, resourceForDown)
 				if _, err := downstreamClient.Create(resourceForDown, upstreamResource); err != nil {
@@ -125,6 +127,7 @@ func (ds *DownSyncer) SyncOne(resource edgev2alpha1.EdgeSyncConfigResource, conv
 				if true || hasDownsyncAnnotation(downstreamResource) {
 					upstreamResource.SetResourceVersion(downstreamResource.GetResourceVersion())
 					upstreamResource.SetUID(downstreamResource.GetUID())
+					upstreamResource.SetManagedFields([]metav1.ManagedFieldsEntry{})
 					setDownsyncAnnotation(upstreamResource)
 					applyConversion(upstreamResource, resourceForDown)
 					_updatedResource, noDiff := ds.computeUpdatedResource(upstreamResource, downstreamResource)
