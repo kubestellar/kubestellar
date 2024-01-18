@@ -7,10 +7,10 @@ on:
   # To confirm any changes to docs build successfully, without deploying them
   pull_request:
     branches:
-      - ks-0.20
+      - main
   push:
     branches:
-      - ks-0.20
+      - main
     tags:
       - 'v*'
 

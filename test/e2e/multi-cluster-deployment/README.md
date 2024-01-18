@@ -14,11 +14,10 @@ cd test/e2e/multi-cluster-deployment
 
 ## Running the test steps manually
 ### Setup Kubestellar
-- Clone the repo and checkout the ks-0.20 branch
+- Clone the repo and cd to it. Naturally, if the branch that you are reading is not `main` then use that branch.
 ```
 git clone git@github.com:kubestellar/kubestellar.git
 cd kubestellar
-git checkout -b ks-0.20 origin/ks-0.20
 ```
 
 Create a Kind hosting cluster with nginx ingress controller and KubeFlex operator.

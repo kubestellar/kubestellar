@@ -61,7 +61,7 @@ The supported documents are as follows.
 - [the multi-cluster end-to-end test](test/e2e/multi-cluster-deployment/README.md)
 - [the singleton status return end-to-end test](test/e2e/singleton-status/README.md)
 
-The interim user documents for v0.20.0-alpha.1 are here: [https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20](https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20)
+The interim user documents for v0.20.0-alpha.1 are here: [docs/content/v0.20](docs/content/v0.20)
 
 ## Roadmap for the Project
 TBD
