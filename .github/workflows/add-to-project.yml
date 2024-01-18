@@ -32,7 +32,7 @@ jobs:
       
       - uses: titoportas/update-project-fields@v0.1.0
         with:
-          project-url: https://github.com/orgs/kubestellar/projects/2
+          project-url: https://github.com/orgs/kubestellar/projects/5
           github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           item-id: ${{ steps.add-project.outputs.itemId }} # Use the item-id output of the previous step
           field-keys: Status,Date Posted
