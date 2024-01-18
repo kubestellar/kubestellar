@@ -22,6 +22,7 @@ import (
 	"os"
 	"strings"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/klog/v2"
@@ -182,7 +183,7 @@ func diff(logger klog.Logger, srcResourceList *unstructured.UnstructuredList, de
 		if ok {
 			srcResource.SetResourceVersion(destResource.GetResourceVersion())
 			srcResource.SetUID(destResource.GetUID())
-			srcResource.SetManagedFields(destResource.GetManagedFields())
+			srcResource.SetManagedFields([]metav1.ManagedFieldsEntry{})
 
 			// Avoid to overwrite status field. Though, not sure this workaround is required.
 			// Actually, when Syncer donwsynces, Syncer doesn't call UpdateStatus() method. Status fields at downstream side aren't updated by downsyncing.
@@ -197,6 +198,7 @@ func diff(logger klog.Logger, srcResourceList *unstructured.UnstructuredList, de
 		} else {
 			srcResource.SetResourceVersion("")
 			srcResource.SetUID("")
+			srcResource.SetManagedFields([]metav1.ManagedFieldsEntry{})
 			setAnnotation(&srcResource)
 			newResources = append(newResources, srcResource)
 		}
