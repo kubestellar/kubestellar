@@ -63,8 +63,8 @@ kflex init --create-kind
 2a. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0-alpha.1 images:
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-alpha.1/config/postcreate-hooks/kubestellar.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-alpha.1/config/postcreate-hooks/ocm.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/ks-0.20/config/postcreate-hooks/kubestellar.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/ks-0.20/config/postcreate-hooks/ocm.yaml
 ```
 
 3. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
