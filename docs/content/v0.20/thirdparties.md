@@ -22,7 +22,7 @@ kubectl config rename-context kind-${CLUSTER} ${CLUSTER}
 clusteradm --context imbs1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${CLUSTER}/" | awk '{print $0 " --context '${CLUSTER}' --force-internal-endpoint-lookup"}' | sh
 ```
 The last line grabs a token from the hub (`imbs1` context), and constructs the command to apply on the new cluster
-to be resistered as managed cluster on the OCM hub.
+to be registered as a managed cluster on the OCM hub.
 
 3. Repeat for a second workload cluster:
 
@@ -33,13 +33,7 @@ kubectl config rename-context kind-${CLUSTER} ${CLUSTER}
 clusteradm --context imbs1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${CLUSTER}/" | awk '{print $0 " --context '${CLUSTER}' --force-internal-endpoint-lookup"}' | sh
 ```
 
-4. Switch back the context to the OCM control plane:
-
-```shell
-kubectl config use-context imbs1
-```
-
-5. Issue the command:
+4. Issue the command:
 
 ```shell 
 watch kubectl --context imbs1 get csr
@@ -48,21 +42,21 @@ watch kubectl --context imbs1 get csr
 and wait until the certificate signing requests (CSR) for both cluster1 and cluster2 are created, then 
 ctrl+C.
 
-6. Once the CSRs are created approve the csrs to complete the cluster registration with the command:
+5. Once the CSRs are created approve the csrs to complete the cluster registration with the command:
 
 ```shell
 clusteradm --context imbs1 accept --clusters cluster1
 clusteradm --context imbs1 accept --clusters cluster2
 ```
 
-7. Check the new clusters are in the OCM inventory and label them:
+6. Check the new clusters are in the OCM inventory and label them:
 
 ```shell
 kubectl --context imbs1 get managedclusters
 kubectl --context imbs1 label managedcluster cluster1 location-group=edge
 kubectl --context imbs1 label managedcluster cluster2 location-group=edge
 ```
-Go back to [README](../README.md).
+Go back to [README](./README.md).
 
 ## Install and configure ArgoCD
 
@@ -131,6 +125,7 @@ and add the line '<VM_IP> argocd.localtest.me' to your '/etc/hosts' file, replac
 Get the password for Argo with:
 
 ```shell
+kubectl config use-context kind-kubeflex
 argocd admin initial-password -n argocd
 ```
 
@@ -142,7 +137,7 @@ https://argocd.localtest.me:9443 on your browser):
 open https://argocd.localtest.me:9443
 ```
 
-Login as well with the argocd CLI with the same credentials.
+Also, login with the argocd CLI with the same credentials.
 
 ```shell
 argocd login --insecure argocd.localtest.me:9443
