@@ -10,6 +10,8 @@
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
 
+**NOTE**: the website kubestellar.io is temporarily out of order.
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/kubestellar/kubestellar)](https://goreportcard.com/report/github.com/kubestellar/kubestellar)
 [![Go Reference](https://pkg.go.dev/badge/github.com/kubestellar/kubestellar.svg)](https://pkg.go.dev/github.com/kubestellar/kubestellar)
 [![License](https://img.shields.io/github/license/kubestellar/kubestellar)](/LICENSE)
@@ -61,7 +63,7 @@ The supported documents are as follows.
 - [the multi-cluster end-to-end test](test/e2e/multi-cluster-deployment/README.md)
 - [the singleton status return end-to-end test](test/e2e/singleton-status/README.md)
 
-The interim user documents for v0.20.0-alpha.1 are here: [https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20](https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20)
+The interim user documents for v0.20.0-alpha.1 are here: [docs/content/v0.20](docs/content/v0.20)
 
 ## Roadmap for the Project
 TBD
