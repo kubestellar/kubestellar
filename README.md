@@ -46,6 +46,7 @@ __Don't change anything, just add KubeStellar!__
 - __Remain compatible__ with cloud-native solutions
 
 ## KubeStellar virtual clusters (Spaces) are our secret
+TODO: Need update!
 - KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
 - Standard Kubernetes clusters have __2-300__ api-resources, KubeStellar Spaces have only __40__
 - Fewer api-resources mean resources remain inactive (denatured) – they do not expand into other resources like replicasets, pods, etc.
@@ -53,17 +54,17 @@ __Don't change anything, just add KubeStellar!__
 - Unbundled resources are the default and preferred output of most cloud-native tools making KubeStellar use and integration easy
 
 ## QuickStart
+TBD
+The supported documents are as follows.
 
-Checkout our [QuickStart Guide](https://docs.kubestellar.io/stable/Getting-Started/user-quickstart-kind/)
+- [prerequisites](test/pre-reqs.md)
+- [the multi-cluster end-to-end test](test/e2e/multi-cluster-deployment/README.md)
+- [the singleton status return end-to-end test](test/e2e/singleton-status/README.md)
+
+The interim user documents for v0.20.0-alpha.1 are here: [https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20](https://github.com/kubestellar/kubestellar/tree/ks-0.20/docs/content/v0.20)
 
 ## Roadmap for the Project
-
-We have defined and largely completed the
-[PoC2023q1](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/outline/).
-The current activity is refining the definition of, and producing, the
-[PoC2023q4](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q4/outline/).
-Goals not addressed in that PoC are to be explored later.
-
+TBD
 
 ## Contributing
 
@@ -87,7 +88,7 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 - See [upcoming](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
     - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
-- Read our [documentation](https://kubestellar.io)
+- There is an outdated website at [documentation](https://kubestellar.io); nothing there is valid now, some ideas are being re-used.
 - Follow us on:
    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)

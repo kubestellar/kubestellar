@@ -1,0 +1,45 @@
+name: test singleton status
+
+on:
+  workflow_call:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  pull_request:
+    branches:
+      - ks-0.20
+  push:
+    branches:
+      - ks-0.20
+    tags:
+      - 'v*'
+
+jobs:
+  test-pr:
+    name: test-pr
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.1
+      
+      - uses: actions/setup-go@v5
+        with:
+          go-version: v1.19
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+
+      - uses: ko-build/setup-ko@v0.6
+      
+      - name: Install dependencies
+        run: |
+          curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.3.3/kubeflex_0.3.3_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.3.3_linux_amd64.tar.gz bin/kflex
+          mv bin/kflex /usr/local/bin
+          rm -fr bin kubeflex_0.3.3_linux_amd64.tar.gz 
+
+      - name: Run test
+        run: |
+          cd test/e2e/singleton-status && ./run-test.sh

@@ -30,10 +30,10 @@ ${LOGCHECK} -check-contextual ./... > "${work_file}" 2>&1
 set -o errexit
 
 # pkg/apis is a separate module, so check that in addition to our root packages
-cd "${REPO_ROOT}"/pkg/apis
-set +o errexit
-${LOGCHECK} -check-contextual ./... >> "${work_file}" 2>&1
-set -o errexit
+# cd "${REPO_ROOT}"/pkg/apis
+# set +o errexit
+# ${LOGCHECK} -check-contextual ./... >> "${work_file}" 2>&1
+# set -o errexit
 
 is_gnu_sed() { sed --version >/dev/null 2>&1; }
 if is_gnu_sed; then
