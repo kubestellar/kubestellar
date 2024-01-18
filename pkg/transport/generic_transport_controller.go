@@ -48,13 +48,11 @@ import (
 )
 
 const (
-	ControllerName           = "transport-controller"
-	transportFinalizer       = "kubestellar.io/transport-object-cleanup"
-	notFoundErrorSuffix      = "not found"
-	alreadyExistsErrorSuffix = "already exists"
-
-	// OriginOwnerReferenceAnnotation - Origin owner reference annotation.
-	originOwnerReferenceAnnotation = "kubestellar.io/originOwnerReferenceName"
+	ControllerName                 = "transport-controller"
+	transportFinalizer             = "transport.kubestellar.io/object-cleanup"
+	notFoundErrorSuffix            = "not found"
+	alreadyExistsErrorSuffix       = "already exists"
+	originOwnerReferenceAnnotation = "transport.kubestellar.io/originOwnerReferencePlacementName"
 )
 
 // NewTransportController returns a new transport controller
