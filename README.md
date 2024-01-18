@@ -10,6 +10,8 @@
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
 
+**NOTE**: the website kubestellar.io is temporarily out of order.
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/kubestellar/kubestellar)](https://goreportcard.com/report/github.com/kubestellar/kubestellar)
 [![Go Reference](https://pkg.go.dev/badge/github.com/kubestellar/kubestellar.svg)](https://pkg.go.dev/github.com/kubestellar/kubestellar)
 [![License](https://img.shields.io/github/license/kubestellar/kubestellar)](/LICENSE)
