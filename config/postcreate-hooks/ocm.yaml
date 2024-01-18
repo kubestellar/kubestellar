@@ -1,0 +1,33 @@
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: ocm
+  labels:
+    kflex.kubestellar.io/cptype: imbs
+spec:
+  templates:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: "{{.HookName}}"
+    spec:
+      template:
+        spec:
+          containers:
+          - name: "{{.HookName}}"
+            image: quay.io/kubestellar/clusteradm:0.7.1
+            args:
+            - init
+            env:
+            - name: KUBECONFIG
+              value: "/etc/kube/config-incluster"    
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true  
+          volumes:
+          - name: kubeconfig
+            secret:
+              secretName: vc-vcluster
+          restartPolicy: Never
+      backoffLimit: 1

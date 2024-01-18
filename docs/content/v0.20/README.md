@@ -3,8 +3,9 @@
 
 # TL;DR
 
-**NOTE**: This is unmaintained material that was observed to work around Jan 17, 2024 with
-the build from commit bd6d379c5ddda6079cdd5a8b8984817e4b2c86c9 Wed Jan 17.
+**NOTE**: This is unmaintained material that has only been observed to work for the commit tagged as
+v0.20.0-alpha.1 
+
 
 KubeStellar 0.20  supports multi-cluster deployment of Kubernetes objects, controlled by a 
 simple placement policy and deploying Kubernetes objects in their native format.  It uses OCM as 
@@ -57,6 +58,13 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 
 ```shell
 kflex init --create-kind
+```
+
+2a. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0-alpha.1 images:
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-alpha.1/config/postcreate-hooks/kubestellar.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-alpha.1/config/postcreate-hooks/ocm.yaml
 ```
 
 3. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)

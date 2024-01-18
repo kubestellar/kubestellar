@@ -2,7 +2,7 @@ The following pre-requisites are required.
 
 ## For Using KubeStellar
 
-- kubeflex version 0.3 or higher
+- kubeflex version 0.4.0 or higher
     To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). At the end of the install make sure that the kubeflex CLI, kflex, is in your path.
 
 - OCM CLI (clusteradm)

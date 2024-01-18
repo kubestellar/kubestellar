@@ -14,7 +14,7 @@
 
 # Image repo/tag to use all building/pushing image targets
 DOCKER_REGISTRY ?= ghcr.io/kubestellar/kubestellar
-IMAGE_TAG ?= 0.20.0
+IMAGE_TAG ?= 0.20.0-alpha.1
 CMD_NAME ?= kubestellar-operator
 IMG ?= ${DOCKER_REGISTRY}/${CMD_NAME}:${IMAGE_TAG}
 

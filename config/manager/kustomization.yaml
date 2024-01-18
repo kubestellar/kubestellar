@@ -6,4 +6,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: ghcr.io/kubestellar/kubestellar/kubestellar-operator
-  newTag: 0.20.0
+  newTag: 0.20.0-alpha.1
