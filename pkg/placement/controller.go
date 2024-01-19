@@ -30,6 +30,7 @@ import (
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -441,9 +442,7 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 	}
 
 	c.logger.Info("Delivering", "object", util.GenerateObjectInfoString(obj), "to clusters", clusters)
-	deliverObjectToManagedClusters(c.logger, c.ocmClient, obj, clusters, managedByPlacements, c.wdsName, singletonStatus)
-
-	return nil
+	return c.deliverObjectToManagedClusters(obj, clusters, managedByPlacements, singletonStatus)
 }
 
 func (c *Controller) getObjectFromKey(key util.Key) (runtime.Object, error) {
@@ -501,4 +500,54 @@ func (c *Controller) GetInformers() map[string]*cache.SharedIndexInformer {
 func pickSingleCluster(clusters []string) []string {
 	sort.Strings(clusters)
 	return []string{clusters[0]}
+}
+
+func (c *Controller) deliverObjectToManagedClusters(
+	obj runtime.Object,
+	managedClusters, managedByPlacements []string,
+	singletonStatus bool) error {
+	for _, clName := range managedClusters {
+		// find which placement(s) select this managedCluster
+		placementNames := []string{}
+		for _, plName := range managedByPlacements {
+			plObj, err := c.getPlacementByName(plName)
+			if err != nil {
+				return err
+			}
+			pl, err := runtimeObjectToPlacement(plObj)
+			if err != nil {
+				return err
+			}
+			cl, err := ocm.GetClusterByName(c.ocmClient, clName)
+			if err != nil {
+				return err
+			}
+			// a placement selects a managedCluster iff the managedCluster is selected by every single selector
+			// i.e. selectors are ANDed
+			matches := true
+			for _, s := range pl.Spec.ClusterSelectors {
+				selector, err := metav1.LabelSelectorAsSelector(&s)
+				if err != nil {
+					return err
+				}
+				if !selector.Matches(labels.Set(cl.Labels)) {
+					matches = false
+					break
+				}
+			}
+			if matches {
+				placementNames = append(placementNames, plName)
+			}
+		}
+		if len(placementNames) == 0 {
+			return nil
+		}
+		manifest := ocm.WrapObject(obj)
+		util.SetManagedByPlacementLabels(manifest, c.wdsName, placementNames, singletonStatus)
+		err := reconcileManifest(c.ocmClient, manifest, clName)
+		if err != nil {
+			c.logger.Error(err, "Error delivering object to mailbox")
+		}
+	}
+	return nil
 }

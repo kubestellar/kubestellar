@@ -85,6 +85,19 @@ func (c *Controller) requeueForPlacementChanges() error {
 	return nil
 }
 
+func (c *Controller) getPlacementByName(name string) (runtime.Object, error) {
+	pLister := c.listers["edge.kubestellar.io/v1alpha1/Placement"]
+	if pLister == nil {
+		return nil, fmt.Errorf("could not get lister for placememt")
+	}
+	lister := *pLister
+	got, err := lister.Get(name)
+	if err != nil {
+		return nil, err
+	}
+	return got, nil
+}
+
 func (c *Controller) listPlacements() ([]runtime.Object, error) {
 	pLister := c.listers["edge.kubestellar.io/v1alpha1/Placement"]
 	if pLister == nil {

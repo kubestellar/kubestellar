@@ -26,20 +26,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kubestellar/kubestellar/pkg/ocm"
-	"github.com/kubestellar/kubestellar/pkg/util"
 )
-
-func deliverObjectToManagedClusters(logger logr.Logger, cl client.Client, obj runtime.Object,
-	managedClusters, managedByPlacements []string, wdsName string, singletonStatus bool) {
-	manifest := ocm.WrapObject(obj)
-	util.SetManagedByPlacementLabels(manifest, wdsName, managedByPlacements, singletonStatus)
-	for _, managedCluster := range managedClusters {
-		err := reconcileManifest(cl, manifest, managedCluster)
-		if err != nil {
-			logger.Error(err, "Error delivering object to mailbox")
-		}
-	}
-}
 
 func deleteObjectOnManagedClusters(logger logr.Logger, cl client.Client, obj runtime.Object, managedClusters []string) {
 	for _, managedCluster := range managedClusters {
