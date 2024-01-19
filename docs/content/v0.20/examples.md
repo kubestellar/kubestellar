@@ -7,7 +7,9 @@ v0.20.0-alpha.1
 
 See [pre-reqs](pre-reqs.md).
 
-## Setup
+## Common Setup
+
+The following steps establish an initial state used in the examples below.
 
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex operator installed:
 
@@ -46,7 +48,7 @@ which installs OCM on it.
    see [here](https://github.ibm.com/dettori/status-addon) for more details on the add-on.
 
 5. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar` 
-runs a post-create hook on the *k8s* control plane that starts an instance of a KubeStellar 0.20 controller
+runs a post-create hook on the *k8s* control plane that starts an instance of a KubeStellar controller
 manager which connects to the `wds1` front-end and the `imbs1` OCM control plane back-end.
 
    ```shell
@@ -63,6 +65,8 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
    ```
 
 ## Scenario 1 - multi-cluster workload deployment with kubectl
+
+This scenario proceeds from the state established by the [common setup](#common-setup).
 
 Check for available clusters with label `location-group=edge`
 
@@ -154,335 +158,10 @@ first followed by the objects, or vice versa. The result remains consistent beca
 the placement controller identifies any changes in either the placement or the objects, 
 triggering the start of the reconciliation loop.
 
-## Scenario 2 - multi-cluster workload deployment with helm
 
-Create a placement for the helm chart app:
+## Scenario 2 - using the hosting cluster as WDS to deploy a custom resource
 
-```shell
-kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
-metadata:
-  name: postgres-placement
-spec:
-  clusterSelectors:
-  - matchLabels: {"location-group":"edge"}
-  downsync:
-  - objectSelectors:
-    - matchLabels: {
-      "app.kubernetes.io/managed-by": Helm,
-      "app.kubernetes.io/instance": postgres}
-EOF
-```
-
-Note that helm sets `app.kubernetes.io/instance` to the *name* of the installed *release*.
-
-Create and label the namespace and install the chart:
-
-```shell
-kubectl --context wds1 create ns postgres-system
-kubectl --context wds1 label ns postgres-system app.kubernetes.io/managed-by=Helm app.kubernetes.io/instance=postgres
-helm --kube-context wds1 install -n postgres-system postgres oci://registry-1.docker.io/bitnamicharts/postgresql
-```
-
-Verify that statefulset has been created in both clusters
-
-```shell
-kubectl --context cluster1 get statefulsets -n postgres-system
-kubectl --context cluster2 get statefulsets -n postgres-system
-```
-
-### [Optional] Propagate helm metadata to managed clusters
-
-Run "helm list" on the wds1:
-
-```shell
-$ helm --kube-context wds1 list -n postgres-system 
-NAME            NAMESPACE       REVISION        UPDATED                                 STATUS       CHART                    APP VERSION
-postgres        postgres-system 1               2023-10-31 13:39:52.550071 -0400 EDT    deployed     postgresql-13.2.0        16.0.0    
-```
-
-And try that on the managed clusters 
-
-```shell
-$ helm list --kube-context cluster1 -n postgres-system
-# returns empty
-$ helm list --kube-context cluster2 -n postgres-system
-# returns empty
-```
-
-This is because the helm secret does not get delivered. That could be automated for example with:
-
-```shell
-kubectl --context wds1 get secrets -n postgres-system -l name=postgres -l owner=helm  -o jsonpath='{.items[0].metadata.name}'  | awk '{print "kubectl --context wds1 label secret -n postgres-system "$1" app.kubernetes.io/managed-by=Helm app.kubernetes.io/instance=postgres"}' | sh
-```
-
-Verify that the chart shows up on the managed clusters:
-
-```shell
-helm list --kube-context cluster1 -n postgres-system
-helm list --kube-context cluster2 -n postgres-system
-```
-Implementing this in a controller for automated propagation of
-helm metadata is tracked in this [issue](https://github.com/kubestellar/kubestellar/issues/1543).
-
-## Scenario 3 - multi-cluster workload deployment with ArgoCD
-
-Before running this scenario, install ArgoCD on the hosting cluster and configure it 
-work with the WDS as outlined [here](./thirdparties.md#install-and-configure-argocd).
-
-Apply the following placement to wds1:
-
-```shell
-kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
-metadata:
-  name: argocd-placement
-spec:
-  clusterSelectors:
-  - matchLabels: {"location-group":"edge"}
-  downsync:
-  - objectSelectors:
-    - matchLabels: {"argocd.argoproj.io/instance":"guestbook"}
-EOF
-```
-
-Switch context to hosting cluster and argocd namespace (this is required by argo to 
-create an app with the CLI)
-
-```shell
-kubectl config use-context kind-kubeflex
-kubectl config set-context --current --namespace=argocd
-```
-
-Create a new application in ArgoCD:
-
-```shell
-argocd app create guestbook --repo https://github.com/argoproj/argocd-example-apps.git --path guestbook --dest-server https://wds1.wds1-system --dest-namespace default
-```
-
-Open browser to Argo UI:
-
-```shell
-open https://argocd.localtest.me:9443
-```
-
-open the app `guestbook` and sync it clicking the "sync" button and then "synchronize", 
-and finally check if the app has been deployed to the two clusters.
-
-```shell
-kubectl --context cluster1 get deployments,svc
-kubectl --context cluster2 get deployments,svc
-```
-
-## Scenario 4 - Singleton status 
-
-This scenario shows how to get the full status updated when setting `wantSingletonReportedState`
-in the placement. This still an experimental feature, so some additional manual steps are required
-at this time, such as the optional setup step 3.a.
-
-Apply a placement with the `wantSingletonReportedState` flag set:
-
-```shell
-kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
-metadata:
-  name: nginx-singleton-placement
-spec:
-  wantSingletonReportedState: true
-  clusterSelectors:
-  - matchLabels: {"location-group":"edge"}
-  downsync:
-  - objectSelectors:
-    - matchLabels: {"app.kubernetes.io/name":"nginx-singleton"}
-EOF
-```
-3. Apply a new deployment for the singleton placement:
-```shell
-kubectl --context wds1 apply -f - <<EOF
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-singleton-deployment
-  labels:
-    app.kubernetes.io/name: nginx-singleton
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: public.ecr.aws/nginx/nginx:latest 
-        ports:
-        - containerPort: 80
-EOF
-```
-Verify that the status is available in wds1 for the deployment by
-running the command:
-
-```shell
-kubectl --context wds1 get deployments nginx-singleton-deployment -o yaml
-```
-Finally, scale the deployment from 1 to 2 replicas in wds1:
-
-```shell
-kubectl --context wds1 scale deployment nginx-singleton-deployment --replicas=2
-```
-
-and verify that replicas has been updated in cluster1 and wds1:
-
-```shell
-kubectl --context cluster1 get deployment nginx-singleton-deployment
-kubectl --context wds1 get deployment nginx-singleton-deployment
-```
-
-## Scenario 4 - Resiliency testing
-
-Bring down the control plane: stop and restart wds1 and imbs1 API servers, 
-KubeFlex and KubeStellar 0.20 controllers:
-
-First stop all:
-
-```shell
-kubectl --context kind-kubeflex scale deployment -n wds1-system kube-apiserver --replicas=0
-kubectl --context kind-kubeflex scale statefulset -n imbs1-system vcluster --replicas=0
-kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-controller-manager --replicas=0
-kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=0
-```
-
-Then restart all:
-
-```shell
-kubectl --context kind-kubeflex scale deployment -n wds1-system kube-apiserver --replicas=1
-kubectl --context kind-kubeflex scale statefulset -n imbs1-system vcluster --replicas=1
-kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-controller-manager --replicas=1
-kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=1
-```
-
-Wait for about a minute for all pods to restart, then apply a new placement:
-
-```shell
-kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
-metadata:
-  name: nginx-res-placement
-spec:
-  clusterSelectors:
-  - matchLabels: {"location-group":"edge"}
-  downsync:
-  - objectSelectors:
-    - matchLabels: {"app.kubernetes.io/name":"nginx-res"}
-EOF
-```
-
-and a new workload:
-
-```shell
-kubectl --context wds1 apply -f - <<EOF
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    app.kubernetes.io/name: nginx-res
-  name: nginx-res
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-res-deployment
-  namespace: nginx-res
-  labels:
-    app.kubernetes.io/name: nginx-res
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: nginx-res
-  template:
-    metadata:
-      labels:
-        app: nginx-res
-    spec:
-      containers:
-      - name: nginx-res
-        image: public.ecr.aws/nginx/nginx:latest 
-        ports:
-        - containerPort: 80
-EOF
-```
-
-Verify that deployment has been created in both clusters
-
-```shell
-kubectl --context cluster1 get deployments -n nginx-res
-kubectl --context cluster2 get deployments -n nginx-res
-```
-
-## Scenario 5 - multi-cluster workload deployment of app with SA with ArgoCD 
-
-Apply the following placement to wds1:
-
-```shell
-kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
-metadata:
-  name: argocd-sa-placement
-spec:
-  clusterSelectors:
-  - matchLabels: {"location-group":"edge"}
-  downsync:
-  - objectSelectors:
-    - matchLabels: {"argocd.argoproj.io/instance":"nginx-sa"}
-EOF
-```
-Switch context to hosting cluster and argocd namespace (this is required by argo to 
-create an app with the CLI)
-
-```shell
-kubectl config use-context kind-kubeflex
-kubectl config set-context --current --namespace=argocd
-```
-
-Create a new application in ArgoCD:
-
-```shell
-argocd app create nginx-sa --repo https://github.com/pdettori/sample-apps.git --path nginx --dest-server https://wds1.wds1-system --dest-namespace nginx-sa
-```
-
-Open browser to Argo UI:
-
-```shell
-open https://argocd.localtest.me:9443
-```
-
-open the app `nginx-sa` and sync it clicking the "sync" button and then "synchronize", 
-and finally check if the app has been deployed to the two clusters.
-
-```shell
-kubectl --context cluster1 -n nginx-sa get deployments,sa,secrets
-kubectl --context cluster2 -n nginx-sa get deployments,sa,secrets
-```
-
-Repeat multiple syncing on Argo and verify that extra secrets for the service acccount 
-are not created both wds1 and clusters:
-
-```shell
-kubectl --context wds1 -n nginx-sa get secrets
-kubectl --context cluster1 -n nginx-sa get secrets
-kubectl --context cluster2 -n nginx-sa get secrets
-```
-
-## Scenario 6 - using the hosting cluster as WDS to deploy a custom resource
+This scenario follows on from the state established by scenario 1.
 
 The hosting cluster can act as a Workload Description Space (WDS) to 
 distribute your workloads to multiple clusters. This feature works 
@@ -616,3 +295,294 @@ Check that the app wrapper has been delivered to both clusters:
 kubectl --context cluster1 get appwrappers
 kubectl --context cluster2 get appwrappers
 ```
+
+## Scenario 3 - multi-cluster workload deployment with helm
+
+This scenario proceeds from the state established by the [common setup](#common-setup).
+
+Create a placement for the helm chart app:
+
+```shell
+kubectl --context wds1 apply -f - <<EOF
+apiVersion: edge.kubestellar.io/v1alpha1
+kind: Placement
+metadata:
+  name: postgres-placement
+spec:
+  clusterSelectors:
+  - matchLabels: {"location-group":"edge"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {
+      "app.kubernetes.io/managed-by": Helm,
+      "app.kubernetes.io/instance": postgres}
+EOF
+```
+
+Note that helm sets `app.kubernetes.io/instance` to the *name* of the installed *release*.
+
+Create and label the namespace and install the chart:
+
+```shell
+kubectl --context wds1 create ns postgres-system
+kubectl --context wds1 label ns postgres-system app.kubernetes.io/managed-by=Helm app.kubernetes.io/instance=postgres
+helm --kube-context wds1 install -n postgres-system postgres oci://registry-1.docker.io/bitnamicharts/postgresql
+```
+
+Verify that statefulset has been created in both clusters
+
+```shell
+kubectl --context cluster1 get statefulsets -n postgres-system
+kubectl --context cluster2 get statefulsets -n postgres-system
+```
+
+### Propagate helm metadata Secret to managed clusters
+
+Run "helm list" on the wds1:
+
+```shell
+$ helm --kube-context wds1 list -n postgres-system 
+NAME            NAMESPACE       REVISION        UPDATED                                 STATUS       CHART                    APP VERSION
+postgres        postgres-system 1               2023-10-31 13:39:52.550071 -0400 EDT    deployed     postgresql-13.2.0        16.0.0    
+```
+
+And try that on the managed clusters 
+
+```shell
+$ helm list --kube-context cluster1 -n postgres-system
+# returns empty
+$ helm list --kube-context cluster2 -n postgres-system
+# returns empty
+```
+
+This is because Helm creates a `Secret` object to hold its metadata about a "release" (chart instance) but Helm does not apply the usual labels to that object, so it is not selected by the `Placement` above and thus does not get delivered. That labeling could be automated for example with:
+
+```shell
+kubectl --context wds1 label secret -n postgres-system $(kubectl --context wds1 get secrets -n postgres-system -l name=postgres -l owner=helm  -o jsonpath='{.items[0].metadata.name}') app.kubernetes.io/managed-by=Helm app.kubernetes.io/instance=postgres
+```
+
+Verify that the chart shows up on the managed clusters:
+
+```shell
+helm list --kube-context cluster1 -n postgres-system
+helm list --kube-context cluster2 -n postgres-system
+```
+Implementing this in a controller for automated propagation of
+helm metadata is tracked in this [issue](https://github.com/kubestellar/kubestellar/issues/1543).
+
+## Scenario 4 - Singleton status 
+
+This scenario proceeds from the state established by the [common setup](#common-setup).
+
+This scenario shows how to get the full status updated when setting `wantSingletonReportedState`
+in the placement. This still an experimental feature.
+
+Apply a placement with the `wantSingletonReportedState` flag set:
+
+```shell
+kubectl --context wds1 apply -f - <<EOF
+apiVersion: edge.kubestellar.io/v1alpha1
+kind: Placement
+metadata:
+  name: nginx-singleton-placement
+spec:
+  wantSingletonReportedState: true
+  clusterSelectors:
+  - matchLabels: {"name":"cluster1"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name":"nginx-singleton"}
+EOF
+```
+
+3. Apply a new deployment for the singleton placement:
+```shell
+kubectl --context wds1 apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-singleton-deployment
+  labels:
+    app.kubernetes.io/name: nginx-singleton
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: public.ecr.aws/nginx/nginx:latest 
+        ports:
+        - containerPort: 80
+EOF
+```
+Verify that the status is available in wds1 for the deployment by
+running the command:
+
+```shell
+kubectl --context wds1 get deployments nginx-singleton-deployment -o yaml
+```
+Finally, scale the deployment from 1 to 2 replicas in wds1:
+
+```shell
+kubectl --context wds1 scale deployment nginx-singleton-deployment --replicas=2
+```
+
+and verify that replicas has been updated in cluster1 and wds1:
+
+```shell
+kubectl --context cluster1 get deployment nginx-singleton-deployment
+kubectl --context wds1 get deployment nginx-singleton-deployment
+```
+
+## Scenario 5 - Resiliency testing
+
+This is a test that you can do after finishing Scenario 1.
+
+TODO: rewrite this so that it makes sense after Scenario 4.
+
+Bring down the control plane: stop and restart wds1 and imbs1 API servers, 
+KubeFlex and KubeStellar controllers:
+
+First stop all:
+
+```shell
+kubectl --context kind-kubeflex scale deployment -n wds1-system kube-apiserver --replicas=0
+kubectl --context kind-kubeflex scale statefulset -n imbs1-system vcluster --replicas=0
+kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-controller-manager --replicas=0
+kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=0
+```
+
+Then restart all:
+
+```shell
+kubectl --context kind-kubeflex scale deployment -n wds1-system kube-apiserver --replicas=1
+kubectl --context kind-kubeflex scale statefulset -n imbs1-system vcluster --replicas=1
+kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-controller-manager --replicas=1
+kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=1
+```
+
+Wait for about a minute for all pods to restart, then apply a new placement:
+
+```shell
+kubectl --context wds1 apply -f - <<EOF
+apiVersion: edge.kubestellar.io/v1alpha1
+kind: Placement
+metadata:
+  name: nginx-res-placement
+spec:
+  clusterSelectors:
+  - matchLabels: {"location-group":"edge"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name":"nginx-res"}
+EOF
+```
+
+and a new workload:
+
+```shell
+kubectl --context wds1 apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/name: nginx-res
+  name: nginx-res
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-res-deployment
+  namespace: nginx-res
+  labels:
+    app.kubernetes.io/name: nginx-res
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-res
+  template:
+    metadata:
+      labels:
+        app: nginx-res
+    spec:
+      containers:
+      - name: nginx-res
+        image: public.ecr.aws/nginx/nginx:latest 
+        ports:
+        - containerPort: 80
+EOF
+```
+
+Verify that deployment has been created in both clusters
+
+```shell
+kubectl --context cluster1 get deployments -n nginx-res
+kubectl --context cluster2 get deployments -n nginx-res
+```
+
+## Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD 
+
+This scenario is something you can do after the [common setup](#common-setup).
+
+Including a ServiceAccount tests whether there will be a controller fight over a token Secret for that ServiceAccount, which was observed in some situations with older code.
+
+Apply the following placement to wds1:
+
+```shell
+kubectl --context wds1 apply -f - <<EOF
+apiVersion: edge.kubestellar.io/v1alpha1
+kind: Placement
+metadata:
+  name: argocd-sa-placement
+spec:
+  clusterSelectors:
+  - matchLabels: {"location-group":"edge"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"argocd.argoproj.io/instance":"nginx-sa"}
+EOF
+```
+Switch context to hosting cluster and argocd namespace (this is required by argo to 
+create an app with the CLI)
+
+```shell
+kubectl config use-context kind-kubeflex
+kubectl config set-context --current --namespace=argocd
+```
+
+Create a new application in ArgoCD:
+
+```shell
+argocd app create nginx-sa --repo https://github.com/pdettori/sample-apps.git --path nginx --dest-server https://wds1.wds1-system --dest-namespace nginx-sa
+```
+
+Open browser to Argo UI:
+
+```shell
+open https://argocd.localtest.me:9443
+```
+
+open the app `nginx-sa` and sync it clicking the "sync" button and then "synchronize", 
+and finally check if the app has been deployed to the two clusters.
+
+```shell
+kubectl --context cluster1 -n nginx-sa get deployments,sa,secrets
+kubectl --context cluster2 -n nginx-sa get deployments,sa,secrets
+```
+
+Repeat multiple syncing on Argo and verify that extra secrets for the service acccount 
+are not created both wds1 and clusters:
+
+```shell
+kubectl --context wds1 -n nginx-sa get secrets
+kubectl --context cluster1 -n nginx-sa get secrets
+kubectl --context cluster2 -n nginx-sa get secrets
+```
+
