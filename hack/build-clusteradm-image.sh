@@ -14,10 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Purpose: make sure that the names of the cluster scoped objects (such as ClusterRole and CLusterRoleBinding)
-# are specific to a control plane.
+# Purpose: build a clusteradm image and push it to the registry.
 
-# Usage: $0 [--version|-v version] [--repo registry] [--verbose|-V] [-X]
+# Usage: $0 [--version|-v version] [--repo registry] [--platform platforms] [--verbose|-V] [-X]
 # Working directory does not matter.
 
 set -e
@@ -26,6 +25,7 @@ clusteradm_version="" # ==> latest
 verbose="false"
 clusteradm_folder=clusteradm
 repo=quay.io/kubestellar
+platform=linux/amd64,linux/arm64,linux/ppc64le
 
 get_latest_version() {
 
@@ -43,6 +43,11 @@ while (( $# > 0 )); do
         if (( $# > 1 ));
         then { repo="$2"; shift; }
         else { echo "$0: missing registry url" >&2; exit 1; }
+        fi;;
+    (--platform)
+        if (( $# > 1 ));
+        then { platform="$2"; shift; }
+        else { echo "$0: missing comma separated list of platforms" >&2; exit 1; }
         fi;;
     (--verbose|-V)
         verbose="true";;
@@ -85,9 +90,9 @@ cd "$clusteradm_folder"
 export KO_DOCKER_REPO=$repo
 
 if [ $verbose == "true" ]; then
-    ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform linux/amd64,linux/arm64,linux/ppc64le
+    ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform
 else
-    ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform linux/amd64,linux/arm64,linux/ppc64le > /dev/null
+    ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform > /dev/null
 fi
 
 cd ~
