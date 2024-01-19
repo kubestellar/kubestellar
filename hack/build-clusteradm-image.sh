@@ -16,19 +16,17 @@
 
 # Purpose: build a clusteradm image and push it to the registry.
 
-# Usage: $0 [--version|-v version] [--repo registry] [--platform platforms] [--verbose|-V] [-X]
+# Usage: $0 [--version|-v version] [--registry registry] [--platform platforms] [-X]
 # Working directory does not matter.
 
 set -e
 
 clusteradm_version="" # ==> latest
-verbose="false"
 clusteradm_folder=clusteradm
-repo=quay.io/kubestellar
+registry=quay.io/kubestellar
 platform=linux/amd64,linux/arm64,linux/ppc64le
 
 get_latest_version() {
-
     curl -sL https://github.com/open-cluster-management-io/clusteradm/releases/latest | grep "</h1>" | tail -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
@@ -39,9 +37,9 @@ while (( $# > 0 )); do
         then { clusteradm_version="$2"; shift; }
         else { echo "$0: missing release version" >&2; exit 1; }
         fi;;
-    (--repo)
+    (--registry)
         if (( $# > 1 ));
-        then { repo="$2"; shift; }
+        then { registry="$2"; shift; }
         else { echo "$0: missing registry url" >&2; exit 1; }
         fi;;
     (--platform)
@@ -49,12 +47,10 @@ while (( $# > 0 )); do
         then { platform="$2"; shift; }
         else { echo "$0: missing comma separated list of platforms" >&2; exit 1; }
         fi;;
-    (--verbose|-V)
-        verbose="true";;
     (-X)
     	set -x;;
     (-h|--help)
-        echo "Usage: $0 [--version|-v release] [--repo registry] [-V|--verbose] [-X]"
+        echo "Usage: $0 [--version|-v release] [--registry registry] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2
@@ -70,30 +66,20 @@ if [ "$clusteradm_version" == "" ]; then
     clusteradm_version=$(get_latest_version)
 fi
 
-# Remove the initial "v" if present
+# Remove the initial "v", if present
 if [[ "$clusteradm_version" == v* ]]; then
     clusteradm_version=${clusteradm_version#v}
 fi
 
-if [ $verbose == "true" ]; then
-    echo "Using clusteradm v${clusteradm_version}."
-fi
+echo "Using clusteradm v${clusteradm_version}."
 
-if [ $verbose == "true" ]; then
-    git clone -b "v$clusteradm_version" --depth 1 https://github.com/open-cluster-management-io/clusteradm.git "$clusteradm_folder"
-else
-    git clone -b "v$clusteradm_version" --depth 1 https://github.com/open-cluster-management-io/clusteradm.git "$clusteradm_folder" > /dev/null
-fi
+git clone -b "v$clusteradm_version" --depth 1 https://github.com/open-cluster-management-io/clusteradm.git "$clusteradm_folder"
 
 cd "$clusteradm_folder"
 
-export KO_DOCKER_REPO=$repo
+export KO_DOCKER_REPO=$registry
 
-if [ $verbose == "true" ]; then
-    ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform
-else
-    ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform > /dev/null
-fi
+ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform
 
 cd ~
 rm -rf $clusteradm_folder
