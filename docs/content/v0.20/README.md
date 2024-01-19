@@ -75,7 +75,15 @@ which installs OCM on it.
 kflex create imbs1 --type vcluster -p ocm
 ```
 
-3.a (Optional) Install status add-on on imbs1:
+3.a Install status add-on on imbs1:
+
+Wait until the `managedclusteraddons` resource shows up on `imbs1`. You can check on that
+with the command:
+
+```shell
+kubectl --context imbs1 api-resources | grep managedclusteraddons 
+```
+and then install the status add-on:
 
 ```shell
 helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://quay.io/pdettori/status-addon-chart --version 0.1.0
@@ -369,6 +377,18 @@ running the command:
 ```shell
 kubectl --context wds1 get deployments nginx-singleton-deployment -o yaml
 ```
+Finally, scale the deployment from 1 to 2 replicas in wds1:
+
+```shell
+kubectl --context wds1 scale deployment nginx-singleton-deployment --replicas=2
+```
+
+and verify that replicas has been updated in cluster1 and wds1:
+
+```shell
+kubectl --context cluster1 get deployment nginx-singleton-deployment
+kubectl --context wds1 get deployment nginx-singleton-deployment
+```
 
 ## Scenario 4 - Resiliency testing
 
@@ -520,7 +540,7 @@ Execution Clusters (WECs). You can use any Custom Resource to wrap any
 Kubernetes object you want to send to the WECs. But if you have operators 
 or controllers on the hosting cluster that work on the Custom Resource 
 you want to send, make sure they don’t create workloads on the hosting 
-cluster that you did not intended to create there.
+cluster that you did not intend to create there.
 
 In order to run this scenario using the post-create-hook method you need
 the raise the permissions for the kubeflex controller manager:
@@ -597,7 +617,7 @@ EOF
 done
 ```
 
-This step will be eventually automated, see [this issue](https://github.com/kubestellar/kubestellar/issues/1543)
+This step will be eventually automated, see [this issue](https://github.com/kubestellar/kubestellar/issues/1542)
 for more details.
 
 Apply the appwrapper CRD to wds2:
