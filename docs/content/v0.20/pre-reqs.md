@@ -3,7 +3,8 @@ The following pre-requisites are required.
 ## For Using KubeStellar
 
 - kubeflex version 0.4.0 or higher
-    To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). At the end of the install make sure that the kubeflex CLI, kflex, is in your path.
+    To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). To upgrade from an existing installation, 
+follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex). At the end of the install make sure that the kubeflex CLI, kflex, is in your path.
 
 - OCM CLI (clusteradm)
     To install OCM CLI use:
@@ -20,8 +21,13 @@ The following pre-requisites are required.
     At the end of the install make sure that the OCM CLI, clusteradm, is in your path.
 
 - helm - to deploy the kubestellar and kubeflex charts
-- kind - to create a few small kubernetes clusters
 - kubectl - to access the kubernetes clusters
+- docker (or compatible docker engine that works with kind)
+
+## For running the examples
+
+- kind - to create a few small kubernetes clusters
+- argocd - for the examples that use it
 
 ## For Building KubeStellar
 
