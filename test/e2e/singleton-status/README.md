@@ -1,7 +1,7 @@
 # Kubestellar multi-cluster workload deployment with kubectl
 
 ## Prerequisites
-See the list [here](../../pre-reqs.md).
+See the list [here](../../../docs/content/v0.20/pre-reqs.md).
 
 ## Running the test using a script
 
