@@ -52,7 +52,8 @@ const (
 	transportFinalizer             = "transport.kubestellar.io/object-cleanup"
 	notFoundErrorSuffix            = "not found"
 	alreadyExistsErrorSuffix       = "already exists"
-	originOwnerReferenceAnnotation = "transport.kubestellar.io/originOwnerReferencePlacementName"
+	originOwnerReferenceAnnotation = "transport.kubestellar.io/originOwnerReferencePlacementDecisionKey"
+	originWdsAnnotation            = "transport.kubestellar.io/originWdsName"
 )
 
 // NewTransportController returns a new transport controller
@@ -181,16 +182,16 @@ func (c *genericTransportController) enqueuePlacementDecision(obj interface{}) {
 // https://github.com/kubernetes/community/blob/8cafef897a22026d42f5e5bb3f104febe7e29830/contributors/devel/controllers.md
 func (c *genericTransportController) handleWrappedObject(obj interface{}) {
 	wrappedObject := obj.(metav1.Object)
-	ownerPlacementDecisionObjectName, found := wrappedObject.GetAnnotations()[originOwnerReferenceAnnotation] // safe if GetAnnotations() returns nil
+	ownerPlacementDecisionKey, found := wrappedObject.GetAnnotations()[originOwnerReferenceAnnotation] // safe if GetAnnotations() returns nil
 	if !found {
 		c.logger.Info("failed to extract placementdecision key from transport wrapped object", "WrappedObjectName", wrappedObject.GetName())
 		return
 	}
 
-	// enqueue PlacementDecision object name to trigger reconciliation.
+	// enqueue PlacementDecision key to trigger reconciliation.
 	// if wrapped object was created not as a result of PlacementDecision,
 	// the required annotation won't be found and nothing will happen.
-	c.workqueue.Add(ownerPlacementDecisionObjectName)
+	c.workqueue.Add(ownerPlacementDecisionKey)
 }
 
 // Run will set up the event handlers for types we are interested in, as well
@@ -361,9 +362,10 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	// wrapped object name is (PlacementDecision.GetName()-WdsName).
 	// pay attention - we cannot use the PlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
 	// we add WdsName to the object name to assure name uniqueness,
-	// in order to easily get the origin PlacementDecision object name, we add it as an annotation.
+	// in order to easily get the origin PlacementDecision object name and wds, we add it as an annotations.
 	wrappedObject.SetName(fmt.Sprintf("%s-%s", placementDecision.GetName(), c.wdsName))
 	setAnnotation(wrappedObject, originOwnerReferenceAnnotation, placementDecision.GetName())
+	setAnnotation(wrappedObject, originWdsAnnotation, c.wdsName)
 
 	for _, destination := range placementDecision.Spec.Destinations { // TODO need to revisit the destination struct and see how to use it properly
 		if err := c.createOrUpdateWrappedObject(ctx, destination.Namespace, wrappedObject); err != nil {
