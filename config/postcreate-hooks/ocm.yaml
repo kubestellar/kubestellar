@@ -15,7 +15,7 @@ spec:
         spec:
           containers:
           - name: "{{.HookName}}"
-            image: quay.io/kubestellar/clusteradm:0.7.1
+            image: quay.io/kubestellar/clusteradm:0.7.2
             args:
             - init
             env:
