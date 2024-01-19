@@ -259,6 +259,19 @@ update-contextual-logging: $(LOGCHECK)
 lint: $(GOLANGCI_LINT) $(STATICCHECK) $(LOGCHECK)
 	./hack/verify-contextual-logging.sh
 
+VENVDIR=$(abspath docs/venv)
+REQUIREMENTS_TXT=docs/requirements.txt
+
+.PHONY: serve-docs
+serve-docs: venv
+	. $(VENV)/activate; \
+	VENV=$(VENV) REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/serve-docs.sh
+
+.PHONY: deploy-docs
+deploy-docs: venv
+	. $(VENV)/activate; \
+	REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/deploy-docs.sh
+
 .PHONY: verify-go-versions
 verify-go-versions:
 	hack/verify-go-versions.sh
@@ -316,3 +329,5 @@ build: bin-dir require-jq require-go require-git verify-go-versions  ## Build th
 .PHONY: bin-dir
 bin-dir:
 	mkdir -p bin
+
+include Makefile.venv
