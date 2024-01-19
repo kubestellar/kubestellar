@@ -1,4 +1,4 @@
-name: pr tester
+name: test multi-cluster distribution
 
 on:
   workflow_call:
@@ -15,8 +15,8 @@ on:
       - 'v*'
 
 jobs:
-  test-pr:
-    name: test-pr
+  test-multicluster:
+    name: Test multicluster distribution
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
