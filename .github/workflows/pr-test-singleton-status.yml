@@ -1,4 +1,4 @@
-name: test singleton status
+name: test singleton status return
 
 on:
   workflow_call:
@@ -15,8 +15,8 @@ on:
       - 'v*'
 
 jobs:
-  test-pr:
-    name: test-pr
+  test-singleton:
+    name: Test singleton status return
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
