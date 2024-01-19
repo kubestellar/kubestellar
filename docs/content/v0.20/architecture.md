@@ -6,11 +6,11 @@
 
 At the higher level there are three modules.
 
-1. KubeFlex
+1. KubeStellar
 2. [the status addon](https://github.ibm.com/dettori/status-addon)
-3. KubeStellar
+3. KubeFlex
 
-The first two are independent and KubeStellar depends on them.
+The last two are independent and KubeStellar depends on them.
 
 The status addon defines the `WorkStatus` Kind of objects and some (what?) associated stuff.
 

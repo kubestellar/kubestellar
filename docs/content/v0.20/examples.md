@@ -336,7 +336,7 @@ kubectl --context cluster1 get statefulsets -n postgres-system
 kubectl --context cluster2 get statefulsets -n postgres-system
 ```
 
-### Propagate helm metadata Secret to managed clusters
+### [Optional] Propagate helm metadata Secret to managed clusters
 
 Run "helm list" on the wds1:
 
@@ -350,12 +350,12 @@ And try that on the managed clusters
 
 ```shell
 $ helm list --kube-context cluster1 -n postgres-system
-# returns empty
+: returns empty
 $ helm list --kube-context cluster2 -n postgres-system
-# returns empty
+: returns empty
 ```
 
-This is because Helm creates a `Secret` object to hold its metadata about a "release" (chart instance) but Helm does not apply the usual labels to that object, so it is not selected by the `Placement` above and thus does not get delivered. That labeling could be automated for example with:
+This is because Helm creates a `Secret` object to hold its metadata about a "release" (chart instance) but Helm does not apply the usual labels to that object, so it is not selected by the `Placement` above and thus does not get delivered. The workload is functioning in the WECs, but `helm list` does not recognize its handiwork there. That labeling could be done for example with:
 
 ```shell
 kubectl --context wds1 label secret -n postgres-system $(kubectl --context wds1 get secrets -n postgres-system -l name=postgres -l owner=helm  -o jsonpath='{.items[0].metadata.name}') app.kubernetes.io/managed-by=Helm app.kubernetes.io/instance=postgres
@@ -530,6 +530,9 @@ kubectl --context cluster2 get deployments -n nginx-res
 ## Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD 
 
 This scenario is something you can do after the [common setup](#common-setup).
+
+Before running this scenario, install ArgoCD on the hosting cluster and configure it 
+work with the WDS as outlined [here](./thirdparties.md#install-and-configure-argocd).
 
 Including a ServiceAccount tests whether there will be a controller fight over a token Secret for that ServiceAccount, which was observed in some situations with older code.
 
