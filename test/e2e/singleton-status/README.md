@@ -1,7 +1,6 @@
-# Kubestellar multi-cluster workload deployment with kubectl
+# Kubestellar singleton status return
 
-## Prerequisites
-See the list [here](../../../docs/content/v0.20/pre-reqs.md).
+This test is an executable form of the singleton status scenario in [the examples doc](../../../docs/content/v0.20/examples.md) and has the same prerequisites.
 
 ## Running the test using a script
 

@@ -16,22 +16,10 @@
 set -x # echo so that users can understand what is happening
 set -e # exit on error
 
-function wait-for-cmd() {
-    local wait_counter
-    cmd="$1"
-    wait_counter=0
-    while ! (eval "$cmd") ; do
-        if (($wait_counter > 36)); then
-            echo "Failed to ${cmd}."
-            exit 1 
-        fi
-        ((wait_counter += 1))
-        sleep 5
-    done
-}
-
-echo "Create a placement to deliver an app to the WEC in wds1."
-echo "-------------------------------------------------------------------------"
+:
+: -------------------------------------------------------------------------
+: "Create a placement in wds1 to deliver an app to one WEC."
+:
 kubectl --context wds1 apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v1alpha1
 kind: Placement
@@ -40,14 +28,16 @@ metadata:
 spec:
   wantSingletonReportedState: true
   clusterSelectors:
-  - matchLabels: {"location-group":"edge"}
+  - matchLabels: {"name":"cluster1"}
   downsync:
   - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx-singleton"}
 EOF
 
-echo "Deploy the app"
-echo "-------------------------------------------------------------------------"
+:
+: -------------------------------------------------------------------------
+: "Deploy the app"
+:
 kubectl --context wds1 apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
@@ -80,18 +70,27 @@ spec:
         - containerPort: 80
 EOF
 
-echo "Verify that manifestworks wrapping the objects have been created in the mailbox namespaces"
-echo "-------------------------------------------------------------------------"
-wait-for-cmd "kubectl --context imbs1 get manifestworks -n cluster1 appsv1-deployment-nginx-nginx-deployment"
+:
+: -------------------------------------------------------------------------
+: "Verify that manifestworks wrapping the objects have been created in the mailbox namespaces"
+: Expect: one header line, one for the nginx namespace, one for the nginx deployment, one for the status agent Deployment
+:
+if ! wait-for-cmd "expect-cmd-output 'kubectl --context imbs1 get manifestworks -n cluster1' 'wc -l | grep -wq 4'"
+then
+    echo "Failed to see expected manifestworks."
+    exit 1
+fi
 
-echo "Verify that the deployment has been created in cluster1"
-echo "-------------------------------------------------------------------------"
+:
+: -------------------------------------------------------------------------
+: "Verify that the deployment has been created in cluster1"
+:
 wait-for-cmd 'kubectl --context cluster1 get deployments -n nginx nginx-deployment'
-echo "Confirmed deployment on cluster1."
+: "Confirmed deployment on cluster1."
 
-echo "Verify that the status has been returned to wds1"
-echo "-------------------------------------------------------------------------"
+:
+: -------------------------------------------------------------------------
+: "Verify that the status has been returned to wds1"
+:
 wait-for-cmd '[ "$(kubectl --context wds1 get deployments -n nginx nginx-deployment -o jsonpath="{.status.availableReplicas}")" == 1 ]'
-echo "SUCCESS: status has been returned to wds1"
-
-rm out
+: "SUCCESS: status has been returned to wds1"
