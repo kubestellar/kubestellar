@@ -67,9 +67,7 @@ if [ "$clusteradm_version" == "" ]; then
 fi
 
 # Remove the initial "v", if present
-if [[ "$clusteradm_version" == v* ]]; then
-    clusteradm_version=${clusteradm_version#v}
-fi
+clusteradm_version=${clusteradm_version#v}
 
 echo "Using clusteradm v${clusteradm_version}."
 
