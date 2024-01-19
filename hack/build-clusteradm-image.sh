@@ -72,7 +72,7 @@ fi
 
 # Remove the initial "v" if present
 if [[ "$clusteradm_version" == v* ]]; then
-    clusteradm_version=${clusteradm_version//v}
+    clusteradm_version=${clusteradm_version#v}
 fi
 
 if [ $verbose == "true" ]; then
