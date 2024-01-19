@@ -16,7 +16,7 @@
 
 # Purpose: build a clusteradm image and push it to the registry.
 
-# Usage: $0 [--version|-v version] [--registry registry] [--platform platforms] [-X]
+# Usage: $0 [--version|-v release] [--registry registry] [--platform platforms] [-X]
 # Working directory does not matter.
 
 set -e
@@ -50,7 +50,7 @@ while (( $# > 0 )); do
     (-X)
     	set -x;;
     (-h|--help)
-        echo "Usage: $0 [--version|-v release] [--registry registry] [-V|--verbose] [-X]"
+        echo "Usage: $0 [--version|-v release] [--registry registry] [--platform platforms] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2
