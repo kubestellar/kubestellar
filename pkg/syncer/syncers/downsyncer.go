@@ -300,7 +300,11 @@ func (ds *DownSyncer) computeUpdatedResource(upstreamResource *unstructured.Unst
 			return downstreamResource, true
 		} else {
 			ds.logger.V(2).Info(fmt.Sprintf("  update only annnotation %q in downstream since downsync-overwrite in downstream is still marked as true", upstreamResource.GetName()))
-			annotations[downsyncOverwriteKey] = "false"
+			if annotations == nil { // This situation occurs if a downstream object exists but annotations is empty.
+				annotations = map[string]string{downsyncOverwriteKey: "false"}
+			} else {
+				annotations[downsyncOverwriteKey] = "false"
+			}
 			_updatedResource := *downstreamResource
 			_updatedResource.SetAnnotations(annotations)
 			return &_updatedResource, false
