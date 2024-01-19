@@ -17,14 +17,15 @@
 # Purpose: make sure that the names of the cluster scoped objects (such as ClusterRole and CLusterRoleBinding)
 # are specific to a control plane.
 
-# Usage: $0 [version] [-X]
+# Usage: $0 [--version|-v version] [--repo registry] [--verbose|-V] [-X]
 # Working directory does not matter.
 
 set -e
 
 clusteradm_version="" # ==> latest
 verbose="false"
-clusteradm_folder="clusteradm"
+clusteradm_folder=clusteradm
+repo=quay.io/kubestellar
 
 get_latest_version() {
 
@@ -33,17 +34,22 @@ get_latest_version() {
 
 while (( $# > 0 )); do
     case "$1" in
-    (--version)
+    (--version|-v)
         if (( $# > 1 ));
         then { clusteradm_version="$2"; shift; }
         else { echo "$0: missing release version" >&2; exit 1; }
+        fi;;
+    (--repo)
+        if (( $# > 1 ));
+        then { repo="$2"; shift; }
+        else { echo "$0: missing registry url" >&2; exit 1; }
         fi;;
     (--verbose|-V)
         verbose="true";;
     (-X)
     	set -x;;
     (-h|--help)
-        echo "Usage: $0 [--version release] [-V|--verbose] [-X]"
+        echo "Usage: $0 [--version|-v release] [--repo registry] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2
@@ -76,9 +82,7 @@ fi
 
 cd "$clusteradm_folder"
 
-export KO_DOCKER_REPO=quay.io/kubestellar
-
-# docker login quay.io
+export KO_DOCKER_REPO=$repo
 
 if [ $verbose == "true" ]; then
     ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform linux/amd64,linux/arm64,linux/ppc64le
