@@ -27,21 +27,11 @@ BOILERPLATE_HEADER="$( pwd )/hack/boilerplate/boilerplate.go.txt"
 popd
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd "${SCRIPT_ROOT}"; go list -f '{{.Dir}}' -m k8s.io/code-generator)}
 
-# "core:v2alpha1 workload:v2alpha1 apiresource:v2alpha1 tenancy:v2alpha1 tenancy:v1beta1 apis:v2alpha1 scheduling:v2alpha1 topology:v2alpha1" \
-bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
-  github.com/kubestellar/kubestellar/pkg/client github.com/kubestellar/kubestellar/pkg/apis \
+bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client,informer,lister" \
+  github.com/kubestellar/kubestellar/pkg/clientgen github.com/kubestellar/kubestellar/api \
   "edge:v2alpha1" \
   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
   --output-base "${SCRIPT_ROOT}" \
   --trim-path-prefix github.com/kubestellar/kubestellar
-
-pushd ./pkg/apis
-${CODE_GENERATOR} \
-  "client:outputPackagePath=github.com/kubestellar/kubestellar/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
-  "lister:apiPackagePath=github.com/kubestellar/kubestellar/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
-  "informer:outputPackagePath=github.com/kubestellar/kubestellar/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
-  "paths={./edge/...}" \
-  "output:dir=./../client"
-popd
 
 go install "${CODEGEN_PKG}"/cmd/openapi-gen
