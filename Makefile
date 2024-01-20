@@ -296,7 +296,7 @@ $(OPENSHIFT_GOIMPORTS):
 
 .PHONY: imports
 imports: $(OPENSHIFT_GOIMPORTS) verify-go-versions
-	$(OPENSHIFT_GOIMPORTS) -i github.com/kcp-dev -m github.com/kubestellar/kubestellar
+	$(OPENSHIFT_GOIMPORTS) -i github.com/kubestellar/kubeflex -m github.com/kubestellar/kubestellar
 
 .PHONY: verify-imports
 verify-imports:
@@ -329,5 +329,6 @@ build: bin-dir require-jq require-go require-git verify-go-versions  ## Build th
 .PHONY: bin-dir
 bin-dir:
 	mkdir -p bin
+
 
 include Makefile.venv
