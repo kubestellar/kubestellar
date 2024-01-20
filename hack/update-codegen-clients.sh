@@ -28,8 +28,8 @@ popd
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd "${SCRIPT_ROOT}"; go list -f '{{.Dir}}' -m k8s.io/code-generator)}
 
 bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client,informer,lister" \
-  github.com/kubestellar/kubestellar/pkg/clientgen github.com/kubestellar/kubestellar/api \
-  "edge:v2alpha1" \
+  github.com/kubestellar/kubestellar/pkg/genclient github.com/kubestellar/kubestellar/api \
+  "edge:v1alpha1" \
   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
   --output-base "${SCRIPT_ROOT}" \
   --trim-path-prefix github.com/kubestellar/kubestellar

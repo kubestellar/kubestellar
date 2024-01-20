@@ -232,6 +232,11 @@ ENVTEST ?= $(LOCALBIN)/setup-envtest
 ## Tool Versions
 CONTROLLER_TOOLS_VERSION ?= v0.11.3
 
+CODE_GEN_VER := v0.28.2
+CODE_GEN_BIN := code-generator
+CODE_GEN := $(TOOLS_DIR)/$(CODE_GEN_BIN)-$(CODE_GEN_VER)
+export CONTROLLER_GEN # so hack scripts can use it
+
 .PHONY: kustomize
 kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary. 
 $(KUSTOMIZE): $(LOCALBIN)
@@ -242,6 +247,9 @@ controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessar
 $(CONTROLLER_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
 	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
+
+$(CODE_GEN):
+	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) k8s.io/controller-tools/cmd/controller-gen $(CONTROLLER_GEN_BIN) $(CONTROLLER_GEN_VER)
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
