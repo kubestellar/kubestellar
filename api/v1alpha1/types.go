@@ -66,7 +66,6 @@ type PlacementStatus struct {
 
 // Placement is the Schema for the placementpolicies API
 // +genclient
-// +k8s:defaulter-gen=true
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
