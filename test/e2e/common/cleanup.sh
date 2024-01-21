@@ -14,9 +14,14 @@
 # limitations under the License.
 
 set -x # echo so that users can understand what is happening
+set -e # exit on error
 
-echo "Cleaning up"
+:
+: -------------------------------------------------------------------------
+: "Cleaning up from previous run of an e2e test"
 
 kind delete cluster --name cluster1
+kind delete cluster --name cluster2
 kind delete cluster --name kubeflex
 kubectl config delete-context cluster1 || true
+kubectl config delete-context cluster2 || true

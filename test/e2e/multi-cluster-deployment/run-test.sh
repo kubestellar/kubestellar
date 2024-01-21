@@ -19,6 +19,10 @@
 set -x # so users can see what is going on
 set -e # exit on error
 
-./cleanup.sh
-./setup-kubestellar.sh
-./workload-deployment.sh
+SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
+COMMON_SRCS="${SRC_DIR}/../common"
+
+"${COMMON_SRCS}/cleanup.sh"
+source "${COMMON_SRCS}/setup-shell.sh"
+"${COMMON_SRCS}/setup-kubestellar.sh"
+"${SRC_DIR}/use-kubestellar.sh"
