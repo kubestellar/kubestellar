@@ -9,7 +9,7 @@ require (
 	github.com/openshift/client-go v0.0.0-20231024221206-506d798bc61c
 	golang.org/x/time v0.3.0
 	k8s.io/api v0.28.2
-	k8s.io/apiextensions-apiserver v0.27.2
+	k8s.io/apiextensions-apiserver v0.28.2
 	k8s.io/apimachinery v0.28.2
 	k8s.io/client-go v0.28.2
 	k8s.io/code-generator v0.28.2
@@ -84,9 +84,4 @@ require (
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
-)
-
-replace (
-	k8s.io/client-go => k8s.io/client-go v0.28.2
-	k8s.io/kubectl => k8s.io/kubectl v0.28.2
 )
