@@ -23,7 +23,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 
-	"github.com/kubestellar/kubestellar/api/v1alpha1"
+	"github.com/kubestellar/kubestellar/api/edge/v1alpha1"
 )
 
 const (

@@ -16,6 +16,7 @@ limitations under the License.
 
 // Package v1alpha1 contains API Schema definitions for the placement v1alpha1 API group
 // +kubebuilder:object:generate=true
+// +k8s:openapi-gen=true
 // +groupName=edge.kubestellar.io
 package v1alpha1
 

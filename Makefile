@@ -122,6 +122,15 @@ all: build
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
+##@ Development Dependencies
+
+CODE_GEN_VER := v0.28.2
+CODE_GEN_DIR := $(TOOLS_DIR)/code-generator-clone-$(CODE_GEN_VER)
+export CODE_GEN_DIR
+
+$(CODE_GEN_DIR):
+	git clone -b $(CODE_GEN_VER) --depth 1 https://github.com/kubernetes/code-generator.git $(CODE_GEN_DIR)
+
 ##@ Development
 
 .PHONY: manifests
@@ -132,6 +141,11 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate/boilerplate.go.txt" paths="./..."
+
+.PHONY: codegenclients
+codegenclients: $(CODE_GEN_DIR)
+	./hack/update-codegen-clients.sh
+	$(MAKE) imports
 
 .PHONY: fmt
 fmt: ## Run go fmt against code.

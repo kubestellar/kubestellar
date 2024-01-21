@@ -35,7 +35,7 @@ import (
 
 	tenancyv1alpha1 "github.com/kubestellar/kubeflex/api/v1alpha1"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/api/v1alpha1"
+	edgev1alpha1 "github.com/kubestellar/kubestellar/api/edge/v1alpha1"
 )
 
 func GetClientSet(kubeconfig string) *kubernetes.Clientset {
