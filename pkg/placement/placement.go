@@ -36,7 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	"github.com/kubestellar/kubestellar/api/v1alpha1"
+	"github.com/kubestellar/kubestellar/api/edge/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/ocm"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )

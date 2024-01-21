@@ -39,7 +39,7 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	ctrlm "sigs.k8s.io/controller-runtime/pkg/manager"
 
-	"github.com/kubestellar/kubestellar/api/v1alpha1"
+	"github.com/kubestellar/kubestellar/api/edge/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
