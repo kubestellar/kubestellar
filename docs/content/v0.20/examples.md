@@ -572,8 +572,15 @@ Open browser to Argo UI:
 open https://argocd.localtest.me:9443
 ```
 
-open the app `nginx-sa` and sync it clicking the "sync" button and then "synchronize", 
-and finally check if the app has been deployed to the two clusters.
+Open the app `nginx-sa` and sync it by clicking the "sync" button and then "synchronize".
+
+Alternatively, use the CLI to sync the app:
+
+```shell
+argocd app sync nginx-sa
+```
+
+Finally, check if the app has been deployed to the two clusters.
 
 ```shell
 kubectl --context cluster1 -n nginx-sa get deployments,sa,secrets
