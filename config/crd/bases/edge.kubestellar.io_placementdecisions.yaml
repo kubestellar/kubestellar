@@ -1,0 +1,151 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.3
+  creationTimestamp: null
+  name: placementdecisions.edge.kubestellar.io
+spec:
+  group: edge.kubestellar.io
+  names:
+    kind: PlacementDecision
+    listKind: PlacementDecisionList
+    plural: placementdecisions
+    shortNames:
+    - pd
+    singular: placementdecision
+  scope: Cluster
+  versions:
+  - name: v2alpha1
+    schema:
+      openAPIV3Schema:
+        description: PlacementDecision is mapped 1:1 to a single Placement resource.
+          The decision resource reflects the resolution of the Placement's selectors,
+          and explicitly reflects which resources should go to what destinations.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: '`spec` explicitly describes a desired binding between workloads
+              and Locations. It reflects the resolution of a Placement''s selectors.'
+            properties:
+              destinations:
+                description: '`destinations` is a list of cluster-identifiers that
+                  the resources should be propagated to.'
+                items:
+                  description: Destination wraps the identifiers required to uniquely
+                    identify a destination cluster.
+                  properties:
+                    namespace:
+                      type: string
+                  type: object
+                type: array
+              workload:
+                description: '`Workload` is a collection of namespaced-scoped resources
+                  and a collection of cluster-scoped resources to be propagated to
+                  destination clusters.'
+                properties:
+                  clusterScope:
+                    description: '`clusterScope` holds a list of individual cluster-scoped
+                      objects to downsync, organized by resource. Remember that a
+                      "resource" is a kind/type/sort of objects, not an individual
+                      object.'
+                    items:
+                      properties:
+                        apiVersion:
+                          description: '`apiVeresion` holds just the version, not
+                            the group too. This is the version to use both upstream
+                            and downstream.'
+                          type: string
+                        group:
+                          type: string
+                        objects:
+                          description: '`objects` holds the names of the objects of
+                            this kind to downsync. Empty list means none of them.'
+                          items:
+                            type: string
+                          type: array
+                        resource:
+                          type: string
+                      required:
+                      - apiVersion
+                      - group
+                      - resource
+                      type: object
+                    type: array
+                  namespaceScope:
+                    description: '`NamespaceScope` matches if and only if at least
+                      one member matches.'
+                    items:
+                      description: NamespaceScopeDownsyncObjects matches some objects
+                        of one particular namespaced resource.
+                      properties:
+                        apiVersion:
+                          description: '`apiVeresion` holds just the version, not
+                            the group too. This is the version to use both upstream
+                            and downstream.'
+                          type: string
+                        group:
+                          type: string
+                        objectsByNamespace:
+                          description: '`objectsByNamespace` matches by namespace
+                            and name. An object matches the list if and only if the
+                            object matches at least one member of the list. Thus,
+                            no object matches the empty list.'
+                          items:
+                            description: NamespaceAndNames identifies some objects
+                              of an implied resource that is namespaced. The objects
+                              are all in the same namespace.
+                            properties:
+                              names:
+                                description: '`names` holds the names of the objects
+                                  that match. Empty list means none of them.'
+                                items:
+                                  type: string
+                                type: array
+                              namespace:
+                                description: '`namespace` identifies the namespace'
+                                type: string
+                            required:
+                            - namespace
+                            type: object
+                          type: array
+                        resource:
+                          type: string
+                      required:
+                      - apiVersion
+                      - group
+                      - resource
+                      type: object
+                    type: array
+                type: object
+            type: object
+          status:
+            description: '`status` describes the status of the process of binding
+              workloads to Locations.'
+            properties:
+              propagatedWorkloadsCount:
+                description: '`propagatedWorkloadsCount` is the number of destinations
+                  that received all the resources in the `spec.workload`.'
+                type: integer
+              specGeneration:
+                description: '`specGeneration` identifies the generation of the spec
+                  that this is the status for. Zero means that no status has yet been
+                  written here.'
+                format: int32
+                type: integer
+            type: object
+        type: object
+    served: true
+    storage: true
