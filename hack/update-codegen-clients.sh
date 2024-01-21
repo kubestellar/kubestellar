@@ -19,19 +19,20 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
-export GOPATH=$(go env GOPATH)
-
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
-pushd "${SCRIPT_ROOT}"
-BOILERPLATE_HEADER="$( pwd )/hack/boilerplate/boilerplate.go.txt"
-popd
-CODEGEN_PKG=${CODEGEN_PKG:-$(cd "${SCRIPT_ROOT}"; go list -f '{{.Dir}}' -m k8s.io/code-generator)}
 
-bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client,informer,lister" \
-  github.com/kubestellar/kubestellar/pkg/genclient github.com/kubestellar/kubestellar/api \
-  "edge:v1alpha1" \
-  --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
-  --output-base "${SCRIPT_ROOT}" \
-  --trim-path-prefix github.com/kubestellar/kubestellar
+source "${CODE_GEN_DIR}/kube_codegen.sh"
 
-go install "${CODEGEN_PKG}"/cmd/openapi-gen
+rm -rf "${SCRIPT_ROOT}/pkg/generated"
+
+kube::codegen::gen_helpers \
+    --input-pkg-root github.com/kubestellar/kubestellar/api \
+    --output-base "${SCRIPT_ROOT}/../../.." \
+    --boilerplate "${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt"
+
+kube::codegen::gen_client \
+    --with-watch \
+    --input-pkg-root github.com/kubestellar/kubestellar/api \
+    --output-pkg-root github.com/kubestellar/kubestellar/pkg/generated \
+    --output-base "${SCRIPT_ROOT}/../../.." \
+    --boilerplate "${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt"

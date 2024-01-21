@@ -122,6 +122,15 @@ all: build
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
+##@ Development Dependencies
+
+CODE_GEN_VER := v0.28.2
+CODE_GEN_DIR := $(TOOLS_DIR)/code-generator-clone-$(CODE_GEN_VER)
+export CODE_GEN_DIR
+
+$(CODE_GEN_DIR):
+	git clone -b $(CODE_GEN_VER) --depth 1 https://github.com/kubernetes/code-generator.git $(CODE_GEN_DIR)
+
 ##@ Development
 
 .PHONY: manifests
@@ -134,8 +143,7 @@ generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate/boilerplate.go.txt" paths="./..."
 
 .PHONY: codegenclients
-codegenclients:  $(CONTROLLER_GEN)
-	go mod download
+codegenclients: $(CODE_GEN_DIR)
 	./hack/update-codegen-clients.sh
 	$(MAKE) imports
 
@@ -232,11 +240,6 @@ ENVTEST ?= $(LOCALBIN)/setup-envtest
 ## Tool Versions
 CONTROLLER_TOOLS_VERSION ?= v0.11.3
 
-CODE_GEN_VER := v0.28.2
-CODE_GEN_BIN := code-generator
-CODE_GEN := $(TOOLS_DIR)/$(CODE_GEN_BIN)-$(CODE_GEN_VER)
-export CONTROLLER_GEN # so hack scripts can use it
-
 .PHONY: kustomize
 kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary. 
 $(KUSTOMIZE): $(LOCALBIN)
@@ -247,9 +250,6 @@ controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessar
 $(CONTROLLER_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
 	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
-
-$(CODE_GEN):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) k8s.io/controller-tools/cmd/controller-gen $(CONTROLLER_GEN_BIN) $(CONTROLLER_GEN_VER)
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
