@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	kfv1aplha1 "github.com/kubestellar/kubeflex/api/v1alpha1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -32,6 +31,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	kfv1aplha1 "github.com/kubestellar/kubeflex/api/v1alpha1"
 
 	kslclient "github.com/kubestellar/kubestellar/pkg/client"
 )
