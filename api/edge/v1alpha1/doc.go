@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:deepcopy-gen=package
+// not k8s:deepcopy-gen=package
 // +groupName=edge.kubestellar.io
 
 package v1alpha1
