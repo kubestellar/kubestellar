@@ -42,5 +42,5 @@ This chart creates (among other things) a `Deployment` object that runs a contai
 
 There are two `PostCreateHook` objects defined in [config/postcreate-hooks](../../../config/postcreate-hooks).
 
-- `ocm.yaml` adds `clusteradm` by running a container using the image `quay.io/kubestellar/clusteradm:0.7.1` which is built from [the OCM source](https://github.com/open-cluster-management-io/clusteradm) by a process that is being documented.
-- `kubestellar.yaml` runs container image `quay.io/kubestellar/helm:v3.13.2` (which is built from [the Helm source](https://github.com/helm/helm) by a process that we need to document) to instantiate the chart from `oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart` (tag?), which is built by (what?) from (what? probably answered above).
+- `ocm.yaml` adds `clusteradm` by running a container using the image `quay.io/kubestellar/clusteradm:0.7.2` which is built from [the OCM source](https://github.com/open-cluster-management-io/clusteradm) using the script [build-clusteradm-image.sh](hack/build-clusteradm-image.sh).
+- `kubestellar.yaml` runs container image `quay.io/kubestellar/helm:v3.14.0` (which is built from [the Helm source](https://github.com/helm/helm) by a process that we need to document) to instantiate the chart from `oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart` (tag?), which is built by (what?) from (what? probably answered above).
