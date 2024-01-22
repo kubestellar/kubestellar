@@ -251,18 +251,15 @@ func deleteManifestOrLabel(managedByLabelKey string, manifest workv1.ManifestWor
 func isAlsoManagedByOtherPlacements(labels map[string]string, managedByLabelKey string) bool {
 	for key := range labels {
 		if key == managedByLabelKey {
-			// This is the key for the instance we know about
+			// This is the key for the Placement we know about
 			continue
 		}
 		if key == util.PlacementLabelSingletonStatus {
 			// This is a singleton marker, ignore it...
-			// Given this is present, we should only have a single Placement
-			// key beyond this singleton marker, but we'll continue to check
-			// for other keys to be safe.
 			continue
 		}
 		if strings.HasPrefix(key, util.PlacementLabelKeyBase) {
-			// This is a key managed by Kubestellar, but not for the instance
+			// This is a key managed by Kubestellar, but not for the Placement
 			// we already know about
 			return true
 		}
