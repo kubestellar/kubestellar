@@ -66,8 +66,7 @@ type PlacementStatus struct {
 
 // Placement is the Schema for the placementpolicies API
 // +genclient
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// not kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
@@ -162,8 +161,7 @@ type ObjectTest struct {
 	ObjectNames []string `json:"objectNames,omitempty"`
 }
 
-// not kubebuilder:object:root=true
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +kubebuilder:object:root=true
 
 // PlacementList contains a list of Placement
 type PlacementList struct {
