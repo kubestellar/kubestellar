@@ -37,8 +37,8 @@ type EdgeV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *EdgeV1alpha1Client) Placements(namespace string) PlacementInterface {
-	return newPlacements(c, namespace)
+func (c *EdgeV1alpha1Client) Placements() PlacementInterface {
+	return newPlacements(c)
 }
 
 // NewForConfig creates a new EdgeV1alpha1Client for the given config.
