@@ -41,5 +41,5 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 
 // Placements returns a PlacementInformer.
 func (v *version) Placements() PlacementInformer {
-	return &placementInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+	return &placementInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

@@ -29,8 +29,8 @@ type FakeEdgeV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeEdgeV1alpha1) Placements(namespace string) v1alpha1.PlacementInterface {
-	return &FakePlacements{c, namespace}
+func (c *FakeEdgeV1alpha1) Placements() v1alpha1.PlacementInterface {
+	return &FakePlacements{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
