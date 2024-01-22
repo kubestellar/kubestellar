@@ -147,6 +147,9 @@ codegenclients: $(CODE_GEN_DIR)
 	./hack/update-codegen-clients.sh
 	$(MAKE) imports
 
+.PHONY: all-generated
+all-generated: manifests generate codegenclients
+
 .PHONY: fmt
 fmt: ## Run go fmt against code.
 	go fmt ./...

@@ -25,11 +25,6 @@ source "${CODE_GEN_DIR}/kube_codegen.sh"
 
 rm -rf "${SCRIPT_ROOT}/pkg/generated"
 
-kube::codegen::gen_helpers \
-    --input-pkg-root github.com/kubestellar/kubestellar/api \
-    --output-base "${SCRIPT_ROOT}/../../.." \
-    --boilerplate "${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt"
-
 kube::codegen::gen_client \
     --with-watch \
     --input-pkg-root github.com/kubestellar/kubestellar/api \
