@@ -33,7 +33,6 @@ import (
 // FakePlacements implements PlacementInterface
 type FakePlacements struct {
 	Fake *FakeEdgeV1alpha1
-	ns   string
 }
 
 var placementsResource = v1alpha1.SchemeGroupVersion.WithResource("placements")
@@ -43,8 +42,7 @@ var placementsKind = v1alpha1.SchemeGroupVersion.WithKind("Placement")
 // Get takes name of the placement, and returns the corresponding placement object, and an error if there is any.
 func (c *FakePlacements) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Placement, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(placementsResource, c.ns, name), &v1alpha1.Placement{})
-
+		Invokes(testing.NewRootGetAction(placementsResource, name), &v1alpha1.Placement{})
 	if obj == nil {
 		return nil, err
 	}
@@ -54,8 +52,7 @@ func (c *FakePlacements) Get(ctx context.Context, name string, options v1.GetOpt
 // List takes label and field selectors, and returns the list of Placements that match those selectors.
 func (c *FakePlacements) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.PlacementList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(placementsResource, placementsKind, c.ns, opts), &v1alpha1.PlacementList{})
-
+		Invokes(testing.NewRootListAction(placementsResource, placementsKind, opts), &v1alpha1.PlacementList{})
 	if obj == nil {
 		return nil, err
 	}
@@ -76,15 +73,13 @@ func (c *FakePlacements) List(ctx context.Context, opts v1.ListOptions) (result 
 // Watch returns a watch.Interface that watches the requested placements.
 func (c *FakePlacements) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(placementsResource, c.ns, opts))
-
+		InvokesWatch(testing.NewRootWatchAction(placementsResource, opts))
 }
 
 // Create takes the representation of a placement and creates it.  Returns the server's representation of the placement, and an error, if there is any.
 func (c *FakePlacements) Create(ctx context.Context, placement *v1alpha1.Placement, opts v1.CreateOptions) (result *v1alpha1.Placement, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(placementsResource, c.ns, placement), &v1alpha1.Placement{})
-
+		Invokes(testing.NewRootCreateAction(placementsResource, placement), &v1alpha1.Placement{})
 	if obj == nil {
 		return nil, err
 	}
@@ -94,8 +89,7 @@ func (c *FakePlacements) Create(ctx context.Context, placement *v1alpha1.Placeme
 // Update takes the representation of a placement and updates it. Returns the server's representation of the placement, and an error, if there is any.
 func (c *FakePlacements) Update(ctx context.Context, placement *v1alpha1.Placement, opts v1.UpdateOptions) (result *v1alpha1.Placement, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(placementsResource, c.ns, placement), &v1alpha1.Placement{})
-
+		Invokes(testing.NewRootUpdateAction(placementsResource, placement), &v1alpha1.Placement{})
 	if obj == nil {
 		return nil, err
 	}
@@ -106,8 +100,7 @@ func (c *FakePlacements) Update(ctx context.Context, placement *v1alpha1.Placeme
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 func (c *FakePlacements) UpdateStatus(ctx context.Context, placement *v1alpha1.Placement, opts v1.UpdateOptions) (*v1alpha1.Placement, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(placementsResource, "status", c.ns, placement), &v1alpha1.Placement{})
-
+		Invokes(testing.NewRootUpdateSubresourceAction(placementsResource, "status", placement), &v1alpha1.Placement{})
 	if obj == nil {
 		return nil, err
 	}
@@ -117,14 +110,13 @@ func (c *FakePlacements) UpdateStatus(ctx context.Context, placement *v1alpha1.P
 // Delete takes name of the placement and deletes it. Returns an error if one occurs.
 func (c *FakePlacements) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(placementsResource, c.ns, name, opts), &v1alpha1.Placement{})
-
+		Invokes(testing.NewRootDeleteActionWithOptions(placementsResource, name, opts), &v1alpha1.Placement{})
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakePlacements) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(placementsResource, c.ns, listOpts)
+	action := testing.NewRootDeleteCollectionAction(placementsResource, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.PlacementList{})
 	return err
@@ -133,8 +125,7 @@ func (c *FakePlacements) DeleteCollection(ctx context.Context, opts v1.DeleteOpt
 // Patch applies the patch and returns the patched placement.
 func (c *FakePlacements) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Placement, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(placementsResource, c.ns, name, pt, data, subresources...), &v1alpha1.Placement{})
-
+		Invokes(testing.NewRootPatchSubresourceAction(placementsResource, name, pt, data, subresources...), &v1alpha1.Placement{})
 	if obj == nil {
 		return nil, err
 	}
