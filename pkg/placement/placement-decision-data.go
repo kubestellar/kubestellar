@@ -88,11 +88,11 @@ func (dd *decisionData) toPlacementDecisionSpec(gvkGvrMapper GvkGvrMapper) (*v1a
 	dd.RLock()
 	defer dd.RUnlock()
 
-	workload := v1alpha1.DownsyncObjectsReferences{}
+	workload := v1alpha1.DownsyncObjectReferences{}
 
 	// the following optimize the building of the workload by maintaining pointers to the object-wrapper structs
 	// that are key'd by GVR
-	clusterScopeDownsyncResources := map[schema.GroupVersionResource]*v1alpha1.ClusterScopeDownsyncObject{}
+	clusterScopeDownsyncResources := map[schema.GroupVersionResource]*v1alpha1.ClusterScopeDownsyncObjects{}
 	// Since namespaceScopeDownsyncObjects groups objects by NS, these maps are used to efficiently locate the
 	// * struct by GVR
 	// * objects slice by namespace (for GVR)
@@ -128,8 +128,8 @@ func (dd *decisionData) toPlacementDecisionSpec(gvkGvrMapper GvkGvrMapper) (*v1a
 // clusterScopeDownsyncResources is used to efficiently locate the object in the workload.
 func (dd *decisionData) handleClusterScopedObject(gvr schema.GroupVersionResource,
 	key *util.Key,
-	workload *v1alpha1.DownsyncObjectsReferences,
-	clusterScopeDownsyncResources map[schema.GroupVersionResource]*v1alpha1.ClusterScopeDownsyncObject) {
+	workload *v1alpha1.DownsyncObjectReferences,
+	clusterScopeDownsyncResources map[schema.GroupVersionResource]*v1alpha1.ClusterScopeDownsyncObjects) {
 	// check if obj GVR already exists in map
 	if csdResource, found := clusterScopeDownsyncResources[gvr]; found {
 		// GVR exists, append cluster-scope object
@@ -138,7 +138,7 @@ func (dd *decisionData) handleClusterScopedObject(gvr schema.GroupVersionResourc
 	}
 	// GVR doesn't exist, this is the first time
 	// add ClusterScopeDownsyncResource to the workload
-	workload.ClusterScope = append(workload.ClusterScope, v1alpha1.ClusterScopeDownsyncObject{
+	workload.ClusterScope = append(workload.ClusterScope, v1alpha1.ClusterScopeDownsyncObjects{
 		GroupVersionResource: metav1.GroupVersionResource{
 			Group:    gvr.Group,
 			Version:  gvr.Version,
@@ -155,7 +155,7 @@ func (dd *decisionData) handleClusterScopedObject(gvr schema.GroupVersionResourc
 // namespaceScopeDownsyncObjects and nsObjectsLocationInSlice are used to efficiently locate the object in the workload.
 func (dd *decisionData) handleNamespacedObject(gvr schema.GroupVersionResource,
 	key *util.Key,
-	workload *v1alpha1.DownsyncObjectsReferences,
+	workload *v1alpha1.DownsyncObjectReferences,
 	namespaceScopeDownsyncObjects map[schema.GroupVersionResource]*v1alpha1.NamespaceScopeDownsyncObjects,
 	nsObjectsLocationInSlice map[string]int) {
 	if nsdResource, found := namespaceScopeDownsyncObjects[gvr]; found {
@@ -246,7 +246,7 @@ func destinationsMatch(destinations []string, placementDecisionDestinations []v1
 
 // workloadMatchesPlacementDecisionSpec returns true if the workload in the
 // decision data matches the workload in the placement decision spec.
-func workloadMatchesPlacementDecisionSpec(placementDecisionSpecWorkload *v1alpha1.DownsyncObjectsReferences,
+func workloadMatchesPlacementDecisionSpec(placementDecisionSpecWorkload *v1alpha1.DownsyncObjectReferences,
 	mappedObjects map[string]*util.Key, gvkGvrMapper GvkGvrMapper) bool {
 	// check lengths
 	clusterScopedObjectsCount := 0
@@ -277,7 +277,7 @@ func workloadMatchesPlacementDecisionSpec(placementDecisionSpecWorkload *v1alpha
 
 // clusterScopeMatchesPlacementDecisionSpec returns true if the cluster-scope
 // section in the placement decision spec all exist in the decision data.
-func placementDecisionClusterScopeIsMapped(placementDecisionSpecClusterScope []v1alpha1.ClusterScopeDownsyncObject,
+func placementDecisionClusterScopeIsMapped(placementDecisionSpecClusterScope []v1alpha1.ClusterScopeDownsyncObjects,
 	mappedObjects map[string]*util.Key, gvkGvrMapper GvkGvrMapper) bool {
 	for _, clusterScopeDownsyncResource := range placementDecisionSpecClusterScope {
 		for _, objName := range clusterScopeDownsyncResource.ObjectNames {
