@@ -210,7 +210,7 @@ func (c *Controller) run(workers int) error {
 				})
 
 				// create and index the lister
-				lister := cache.NewGenericLister(informer.GetIndexer(), schema.ParseGroupResource(resource.Group))
+				lister := cache.NewGenericLister(informer.GetIndexer(), schema.GroupResource{Group: resource.Group, Resource: resource.Name})
 				c.listers[key] = &lister
 				c.gvksMap[key] = &schema.GroupVersionResource{Group: resource.Group, Version: resource.Version, Resource: resource.Name}
 

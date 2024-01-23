@@ -186,7 +186,7 @@ func (c *Controller) startPlacementInformer() {
 		Resource: util.PlacementResource}
 
 	c.placementInformer = informerFactory.ForResource(gvr).Informer()
-	c.placementLister = cache.NewGenericLister(c.placementInformer.GetIndexer(), schema.ParseGroupResource(gvr.Resource))
+	c.placementLister = cache.NewGenericLister(c.placementInformer.GetIndexer(), gvr.GroupResource())
 
 	stopper := make(chan struct{})
 	defer close(stopper)
@@ -203,7 +203,7 @@ func (c *Controller) startWorkStatusInformer() {
 		Resource: util.WorkStatusResource}
 
 	c.workStatusInformer = informerFactory.ForResource(gvr).Informer()
-	c.workStatusLister = cache.NewGenericLister(c.workStatusInformer.GetIndexer(), schema.ParseGroupResource(gvr.Resource))
+	c.workStatusLister = cache.NewGenericLister(c.workStatusInformer.GetIndexer(), gvr.GroupResource())
 
 	// add the event handler functions
 	c.workStatusInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
