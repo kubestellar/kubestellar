@@ -380,11 +380,11 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 	objectsToPropagate := make([]*unstructured.Unstructured, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clusterScopedObject := range placementDecision.Spec.Workload.ClusterScope {
-		if clusterScopedObject.Objects == nil {
+		if clusterScopedObject.ObjectNames == nil {
 			continue // no objects from this gvr, skip
 		}
 		gvr := schema.GroupVersionResource{Group: clusterScopedObject.Group, Version: clusterScopedObject.Version, Resource: clusterScopedObject.Resource}
-		for _, objectName := range clusterScopedObject.Objects {
+		for _, objectName := range clusterScopedObject.ObjectNames {
 			object, err := c.wdsDynamicClient.Resource(gvr).Get(ctx, objectName, metav1.GetOptions{})
 			if err != nil {
 				return nil, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", objectName, gvr, err)
@@ -394,7 +394,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, namespaceScopedObject := range placementDecision.Spec.Workload.NamespaceScope {
-		gvr := schema.GroupVersionResource{Group: namespaceScopedObject.Group, Version: namespaceScopedObject.APIVersion, Resource: namespaceScopedObject.Resource}
+		gvr := schema.GroupVersionResource{Group: namespaceScopedObject.Group, Version: namespaceScopedObject.Version, Resource: namespaceScopedObject.Resource}
 		for _, objectsByNamespace := range namespaceScopedObject.ObjectsByNamespace {
 			if objectsByNamespace.Names == nil {
 				continue // no objects from this namespace, skip
@@ -496,7 +496,10 @@ func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	object.SetSelfLink("")
 	object.SetResourceVersion("")
 	object.SetUID("")
-	delete(object.GetAnnotations(), "kubectl.kubernetes.io/last-applied-configuration")
+
+	annotations := object.GetAnnotations()
+	delete(annotations, "kubectl.kubernetes.io/last-applied-configuration")
+	object.SetAnnotations(annotations)
 
 	return object
 

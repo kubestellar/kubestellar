@@ -177,9 +177,9 @@ type PlacementList struct {
 
 /******************** Start PlacementDecision Type *********************/
 
-// PlacementDecision is mapped 1:1 to a single Placement resource.
+// PlacementDecision is mapped 1:1 to a single Placement object.
 // The decision resource reflects the resolution of the Placement's selectors,
-// and explicitly reflects which resources should go to what destinations.
+// and explicitly reflects which objects should go to what destinations.
 //
 // +genclient
 // +genclient:nonNamespaced
@@ -201,41 +201,37 @@ type PlacementDecision struct {
 	Status PlacementDecisionStatus `json:"status,omitempty"`
 }
 
-// PlacementDecisionSpec holds a list of resources and a list of destinations which are the resolution
-// of a Placement's `what` and `where`: what resources to propagate and to where.
-// All resources present in this spec are propagated to all destinations present.
+// PlacementDecisionSpec holds a list of objects and a list of destinations which are the resolution
+// of a Placement's `what` and `where`: what objects to propagate and to where.
+// All objects present in this spec are propagated to all destinations present.
 type PlacementDecisionSpec struct {
-	// `Workload` is a collection of namespaced-scoped resources and a collection of cluster-scoped resources to be propagated to destination clusters.
-	Workload PlacementDecisionSpecResources `json:"workload,omitempty"`
+	// `Workload` is a collection of namespaced-scoped objects and a collection of cluster-scoped objects to be propagated to destination clusters.
+	Workload DownsyncObjectsReferences `json:"workload,omitempty"`
 
-	// `destinations` is a list of cluster-identifiers that the resources should be propagated to.
+	// `destinations` is a list of cluster-identifiers that the objects should be propagated to.
 	Destinations []Destination `json:"destinations,omitempty"`
 }
 
-// PlacementDecisionSpecResources explicitly defines the resources to be down-synced.
-// The ClusterScope list defines the cluster-scope resources, while NamespacedObjects packs individual resources
+// DownsyncObjectsReferences explicitly defines the objects to be down-synced.
+// The ClusterScope list defines the cluster-scope objects, while NamespacedObjects packs individual objects
 // identifiable by namespace & name.
-type PlacementDecisionSpecResources struct {
+type DownsyncObjectsReferences struct {
 	// `clusterScope` holds a list of individual cluster-scoped objects
 	// to downsync, organized by resource.
 	// Remember that a "resource" is a kind/type/sort of objects,
 	// not an individual object.
 	// +optional
-	ClusterScope []ClusterScopeDownsyncResource `json:"clusterScope,omitempty"`
+	ClusterScope []ClusterScopeDownsyncObject `json:"clusterScope,omitempty"`
 
 	// `NamespaceScope` matches if and only if at least one member matches.
 	// +optional
 	NamespaceScope []NamespaceScopeDownsyncObjects `json:"namespaceScope,omitempty"`
 }
 
-// NamespaceScopeDownsyncObjects matches some objects of one particular namespaced resource.
+// NamespaceScopeDownsyncObjects matches some objects of one particular namespaced object.
 type NamespaceScopeDownsyncObjects struct {
-	// GroupResource holds the API group and resource name.
-	metav1.GroupResource `json:",inline"`
-
-	// `apiVeresion` holds just the version, not the group too.
-	// This is the version to use both upstream and downstream.
-	APIVersion string `json:"apiVersion"`
+	// GroupVersionResource holds the API group, API version and resource name.
+	metav1.GroupVersionResource `json:",inline"`
 
 	// `objectsByNamespace` matches by namespace and name.
 	// An object matches the list if and only if the object matches at least one member of the list.
@@ -256,14 +252,14 @@ type NamespaceAndNames struct {
 	Names []string `json:"names,omitempty"`
 }
 
-type ClusterScopeDownsyncResource struct {
+type ClusterScopeDownsyncObject struct {
 	// GroupVersionResource holds the API group, API version and resource name.
 	metav1.GroupVersionResource `json:",inline"`
 
-	// `objects` holds the names of the objects of this kind to downsync.
+	// `objectNames` holds the names of the objects of this kind to downsync.
 	// Empty list means none of them.
 	// +optional
-	Objects []string `json:"objects,omitempty"`
+	ObjectNames []string `json:"objectNames,omitempty"`
 }
 
 // Destination wraps the identifiers required to uniquely identify a destination cluster.
@@ -277,7 +273,7 @@ type PlacementDecisionStatus struct {
 	// +optional
 	SpecGeneration int32 `json:"specGeneration,omitempty"`
 
-	// `propagatedWorkloadsCount` is the number of destinations that received all the resources in the `spec.workload`.
+	// `propagatedWorkloadsCount` is the number of destinations that received all the objects in the `spec.workload`.
 	PropagatedWorkloadsCount int `json:"propagatedWorkloadsCount,omitempty"`
 }
 

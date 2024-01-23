@@ -20,9 +20,9 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: PlacementDecision is mapped 1:1 to a single Placement resource.
+        description: PlacementDecision is mapped 1:1 to a single Placement object.
           The decision resource reflects the resolution of the Placement's selectors,
-          and explicitly reflects which resources should go to what destinations.
+          and explicitly reflects which objects should go to what destinations.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -42,7 +42,7 @@ spec:
             properties:
               destinations:
                 description: '`destinations` is a list of cluster-identifiers that
-                  the resources should be propagated to.'
+                  the objects should be propagated to.'
                 items:
                   description: Destination wraps the identifiers required to uniquely
                     identify a destination cluster.
@@ -52,9 +52,9 @@ spec:
                   type: object
                 type: array
               workload:
-                description: '`Workload` is a collection of namespaced-scoped resources
-                  and a collection of cluster-scoped resources to be propagated to
-                  destination clusters.'
+                description: '`Workload` is a collection of namespaced-scoped objects
+                  and a collection of cluster-scoped objects to be propagated to destination
+                  clusters.'
                 properties:
                   clusterScope:
                     description: '`clusterScope` holds a list of individual cluster-scoped
@@ -65,9 +65,9 @@ spec:
                       properties:
                         group:
                           type: string
-                        objects:
-                          description: '`objects` holds the names of the objects of
-                            this kind to downsync. Empty list means none of them.'
+                        objectNames:
+                          description: '`objectNames` holds the names of the objects
+                            of this kind to downsync. Empty list means none of them.'
                           items:
                             type: string
                           type: array
@@ -86,13 +86,8 @@ spec:
                       one member matches.'
                     items:
                       description: NamespaceScopeDownsyncObjects matches some objects
-                        of one particular namespaced resource.
+                        of one particular namespaced object.
                       properties:
-                        apiVersion:
-                          description: '`apiVeresion` holds just the version, not
-                            the group too. This is the version to use both upstream
-                            and downstream.'
-                          type: string
                         group:
                           type: string
                         objectsByNamespace:
@@ -120,10 +115,12 @@ spec:
                           type: array
                         resource:
                           type: string
+                        version:
+                          type: string
                       required:
-                      - apiVersion
                       - group
                       - resource
+                      - version
                       type: object
                     type: array
                 type: object
@@ -134,7 +131,7 @@ spec:
             properties:
               propagatedWorkloadsCount:
                 description: '`propagatedWorkloadsCount` is the number of destinations
-                  that received all the resources in the `spec.workload`.'
+                  that received all the objects in the `spec.workload`.'
                 type: integer
               specGeneration:
                 description: '`specGeneration` identifies the generation of the spec
