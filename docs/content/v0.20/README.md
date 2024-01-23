@@ -40,6 +40,6 @@ See [Architecture](architecture.md).
 
 See [Packaging and Delivery](packaging.md)
 
-## Usage examples
+## Usage examples, and testing
 
 See [Examples](examples.md).
