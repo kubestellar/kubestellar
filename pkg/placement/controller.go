@@ -398,7 +398,8 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		if err != nil {
 			// The resource no longer exist, which means it has been deleted.
 			if errors.IsNotFound(err) {
-				utilruntime.HandleError(fmt.Errorf("object %#v for lister '%s' in work queue no longer exists", key.NamespacedName, key.GvkKey))
+				utilruntime.HandleError(fmt.Errorf("object %#v for lister '%s' in work queue no longer exists",
+					key.NamespacedName, key.GvkKey()))
 				return nil
 			}
 			return err
