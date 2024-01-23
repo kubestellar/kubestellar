@@ -21,3 +21,7 @@ package v1alpha1
 // PlacementListerExpansion allows custom methods to be added to
 // PlacementLister.
 type PlacementListerExpansion interface{}
+
+// PlacementDecisionListerExpansion allows custom methods to be added to
+// PlacementDecisionLister.
+type PlacementDecisionListerExpansion interface{}

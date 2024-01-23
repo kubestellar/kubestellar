@@ -30,6 +30,7 @@ import (
 type EdgeV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	PlacementsGetter
+	PlacementDecisionsGetter
 }
 
 // EdgeV1alpha1Client is used to interact with features provided by the edge.kubestellar.io group.
@@ -39,6 +40,10 @@ type EdgeV1alpha1Client struct {
 
 func (c *EdgeV1alpha1Client) Placements() PlacementInterface {
 	return newPlacements(c)
+}
+
+func (c *EdgeV1alpha1Client) PlacementDecisions() PlacementDecisionInterface {
+	return newPlacementDecisions(c)
 }
 
 // NewForConfig creates a new EdgeV1alpha1Client for the given config.

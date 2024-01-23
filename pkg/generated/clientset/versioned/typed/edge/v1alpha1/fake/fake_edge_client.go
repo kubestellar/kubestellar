@@ -33,6 +33,10 @@ func (c *FakeEdgeV1alpha1) Placements() v1alpha1.PlacementInterface {
 	return &FakePlacements{c}
 }
 
+func (c *FakeEdgeV1alpha1) PlacementDecisions() v1alpha1.PlacementDecisionInterface {
+	return &FakePlacementDecisions{c}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeEdgeV1alpha1) RESTClient() rest.Interface {

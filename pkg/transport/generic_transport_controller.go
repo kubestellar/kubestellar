@@ -41,10 +41,10 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	"github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
-	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
-	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
+	"github.com/kubestellar/kubestellar/api/edge/v1alpha1"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
+	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/edge/v1alpha1"
+	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/edge/v1alpha1"
 )
 
 const (
@@ -57,7 +57,7 @@ const (
 )
 
 // NewTransportController returns a new transport controller
-func NewTransportController(ctx context.Context, placementDecisionInformer edgev2alpha1informers.PlacementDecisionInformer, transport Transport,
+func NewTransportController(ctx context.Context, placementDecisionInformer edgev1alpha1informers.PlacementDecisionInformer, transport Transport,
 	wdsClientset *edgeclientset.Clientset, wdsDynamicClient *dynamic.DynamicClient, transportRestConfig *rest.Config, wdsName string) (*genericTransportController, error) {
 	transportDynamicClient, err := dynamic.NewForConfig(transportRestConfig)
 	if err != nil {
@@ -140,7 +140,7 @@ func getGvrFromWrappedObject(restConfig *rest.Config, wrappedObject runtime.Obje
 type genericTransportController struct {
 	logger logr.Logger
 
-	placementDecisionLister         edgev2alpha1listers.PlacementDecisionLister
+	placementDecisionLister         edgev1alpha1listers.PlacementDecisionLister
 	placementDecisionInformerSynced cache.InformerSynced
 	wrappedObjectInformerSynced     cache.InformerSynced
 
@@ -315,7 +315,7 @@ func isObjectBeingDeleted(object metav1.Object) bool {
 	return !object.GetDeletionTimestamp().IsZero()
 }
 
-func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v2alpha1.PlacementDecision) error {
+func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) error {
 	for _, destination := range placementDecision.Spec.Destinations { // TODO need to revisit the destination struct and see how to use it properly
 		if err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(destination.Namespace).Delete(ctx, fmt.Sprintf("%s-%s", placementDecision.GetName(), c.wdsName),
 			metav1.DeleteOptions{}); err != nil { // wrapped object name is in the format (PlacementDecision.GetName()-WdsName). see updateWrappedObject func for explanation.
@@ -333,19 +333,19 @@ func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx contex
 	return nil
 }
 
-func (c *genericTransportController) removeFinalizerFromPlacementDecision(ctx context.Context, placementDecision *v2alpha1.PlacementDecision) error {
-	return c.updatePlacementDecision(ctx, placementDecision, func(placementDecision *v2alpha1.PlacementDecision) bool {
+func (c *genericTransportController) removeFinalizerFromPlacementDecision(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) error {
+	return c.updatePlacementDecision(ctx, placementDecision, func(placementDecision *v1alpha1.PlacementDecision) bool {
 		return removeFinalizer(placementDecision, transportFinalizer)
 	})
 }
 
-func (c *genericTransportController) addFinalizerToPlacementDecision(ctx context.Context, placementDecision *v2alpha1.PlacementDecision) error {
-	return c.updatePlacementDecision(ctx, placementDecision, func(placementDecision *v2alpha1.PlacementDecision) bool {
+func (c *genericTransportController) addFinalizerToPlacementDecision(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) error {
+	return c.updatePlacementDecision(ctx, placementDecision, func(placementDecision *v1alpha1.PlacementDecision) bool {
 		return addFinalizer(placementDecision, transportFinalizer)
 	})
 }
 
-func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v2alpha1.PlacementDecision) error {
+func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) error {
 	if err := c.addFinalizerToPlacementDecision(ctx, placementDecision); err != nil {
 		return fmt.Errorf("failed to add finalizer to PlacementDecision object '%s' - %w", placementDecision.GetName(), err)
 	}
@@ -376,7 +376,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	return nil
 }
 
-func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, placementDecision *v2alpha1.PlacementDecision) ([]*unstructured.Unstructured, error) {
+func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) ([]*unstructured.Unstructured, error) {
 	objectsToPropagate := make([]*unstructured.Unstructured, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clusterScopedObject := range placementDecision.Spec.Workload.ClusterScope {
@@ -429,14 +429,14 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 }
 
 // updateObjectFunc is a function that updates the given object. returns true if object was updated, otherwise false.
-type updateObjectFunc func(*v2alpha1.PlacementDecision) bool
+type updateObjectFunc func(*v1alpha1.PlacementDecision) bool
 
-func (c *genericTransportController) updatePlacementDecision(ctx context.Context, placementDecision *v2alpha1.PlacementDecision, updateObjectFunc updateObjectFunc) error {
+func (c *genericTransportController) updatePlacementDecision(ctx context.Context, placementDecision *v1alpha1.PlacementDecision, updateObjectFunc updateObjectFunc) error {
 	if !updateObjectFunc(placementDecision) { // returns an indication if object was updated or not.
 		return nil // if object was not updated, no need to update in API server, return.
 	}
 
-	_, err := c.wdsClientset.EdgeV2alpha1().PlacementDecisions().Update(ctx, placementDecision, metav1.UpdateOptions{})
+	_, err := c.wdsClientset.EdgeV1alpha1().PlacementDecisions().Update(ctx, placementDecision, metav1.UpdateOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to update PlacementDecision object in WDS - %w", err)
 	}

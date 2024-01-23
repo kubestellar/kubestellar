@@ -30,8 +30,8 @@ import (
 	"k8s.io/klog/v2"
 
 	transportoptions "github.com/kubestellar/kubestellar/cmd/transport/options"
-	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
+	edgeinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/transport"
 )
 
@@ -82,7 +82,7 @@ func Run(transportImplementation transport.Transport) {
 	}
 
 	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeClientset, defaultResyncPeriod)
-	edgePlacementDecisionInformer := edgeSharedInformerFactory.Edge().V2alpha1().PlacementDecisions()
+	edgePlacementDecisionInformer := edgeSharedInformerFactory.Edge().V1alpha1().PlacementDecisions()
 
 	transportController, err := transport.NewTransportController(ctx, edgePlacementDecisionInformer, transportImplementation, edgeClientset, wdsDynamicClient, transportRestConfig, options.WdsName)
 
