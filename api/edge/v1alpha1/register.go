@@ -17,8 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	mygroup "github.com/kubestellar/kubestellar/api/edge"
@@ -37,12 +35,4 @@ func Resource(resource string) schema.GroupResource {
 	return SchemeGroupVersion.WithResource(resource).GroupResource()
 }
 
-// Adds the list of known types to Scheme.
-func addKnownTypes(scheme *runtime.Scheme) error {
-	scheme.AddKnownTypes(SchemeGroupVersion,
-		&Placement{},
-		&PlacementList{},
-	)
-	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
-	return nil
-}
+// TODO: Add https://github.com/kubernetes/sample-controller/blob/v0.28.2/pkg/apis/samplecontroller/v1alpha1/register.go#L47-L55 ?

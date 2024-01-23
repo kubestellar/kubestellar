@@ -29,7 +29,8 @@ var (
 	// GroupVersion is group version used to register these objects
 	GroupVersion = schema.GroupVersion{Group: "edge.kubestellar.io", Version: "v1alpha1"}
 
-	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
+	// SchemeBuilder is used to add go types to the GroupVersionKind scheme.
+	// TODO: Is it problematic that https://github.com/kubernetes/sample-controller/blob/v0.28.2/pkg/apis/samplecontroller/v1alpha1/register.go#L42 does this a little differently?
 	SchemeBuilder = &scheme.Builder{GroupVersion: GroupVersion}
 
 	// AddToScheme adds the types in this group-version to the given scheme.
