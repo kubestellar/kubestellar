@@ -65,9 +65,9 @@ spec:
                       properties:
                         group:
                           type: string
-                        objects:
-                          description: '`objects` holds the names of the objects of
-                            this kind to downsync. Empty list means none of them.'
+                        objectNames:
+                          description: '`objectNames` holds the names of the objects
+                            of this kind to downsync. Empty list means none of them.'
                           items:
                             type: string
                           type: array

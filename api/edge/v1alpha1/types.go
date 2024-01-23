@@ -256,10 +256,10 @@ type ClusterScopeDownsyncObject struct {
 	// GroupVersionResource holds the API group, API version and resource name.
 	metav1.GroupVersionResource `json:",inline"`
 
-	// `objects` holds the names of the objects of this kind to downsync.
+	// `objectNames` holds the names of the objects of this kind to downsync.
 	// Empty list means none of them.
 	// +optional
-	Objects []string `json:"objects,omitempty"`
+	ObjectNames []string `json:"objectNames,omitempty"`
 }
 
 // Destination wraps the identifiers required to uniquely identify a destination cluster.

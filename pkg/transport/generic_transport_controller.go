@@ -380,11 +380,11 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 	objectsToPropagate := make([]*unstructured.Unstructured, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clusterScopedObject := range placementDecision.Spec.Workload.ClusterScope {
-		if clusterScopedObject.Objects == nil {
+		if clusterScopedObject.ObjectNames == nil {
 			continue // no objects from this gvr, skip
 		}
 		gvr := schema.GroupVersionResource{Group: clusterScopedObject.Group, Version: clusterScopedObject.Version, Resource: clusterScopedObject.Resource}
-		for _, objectName := range clusterScopedObject.Objects {
+		for _, objectName := range clusterScopedObject.ObjectNames {
 			object, err := c.wdsDynamicClient.Resource(gvr).Get(ctx, objectName, metav1.GetOptions{})
 			if err != nil {
 				return nil, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", objectName, gvr, err)

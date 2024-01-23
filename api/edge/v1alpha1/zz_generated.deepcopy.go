@@ -30,8 +30,8 @@ import (
 func (in *ClusterScopeDownsyncObject) DeepCopyInto(out *ClusterScopeDownsyncObject) {
 	*out = *in
 	out.GroupVersionResource = in.GroupVersionResource
-	if in.Objects != nil {
-		in, out := &in.Objects, &out.Objects
+	if in.ObjectNames != nil {
+		in, out := &in.ObjectNames, &out.ObjectNames
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
