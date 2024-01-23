@@ -317,11 +317,11 @@ func isObjectBeingDeleted(object metav1.Object) bool {
 
 func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) error {
 	for _, destination := range placementDecision.Spec.Destinations { // TODO need to revisit the destination struct and see how to use it properly
-		if err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(destination.Namespace).Delete(ctx, fmt.Sprintf("%s-%s", placementDecision.GetName(), c.wdsName),
+		if err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(destination.ClusterId).Delete(ctx, fmt.Sprintf("%s-%s", placementDecision.GetName(), c.wdsName),
 			metav1.DeleteOptions{}); err != nil { // wrapped object name is in the format (PlacementDecision.GetName()-WdsName). see updateWrappedObject func for explanation.
 			if !strings.HasSuffix(err.Error(), notFoundErrorSuffix) { // if object is already not there, we do not report an error cause desired state was achieved.
 				return fmt.Errorf("failed to delete wrapped object '%s' in destination WEC with namespace '%s' - %w", fmt.Sprintf("%s-%s", placementDecision.GetName(),
-					c.wdsName), destination.Namespace, err)
+					c.wdsName), destination.ClusterId, err)
 			}
 		}
 	}
@@ -368,7 +368,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	setAnnotation(wrappedObject, originWdsAnnotation, c.wdsName)
 
 	for _, destination := range placementDecision.Spec.Destinations { // TODO need to revisit the destination struct and see how to use it properly
-		if err := c.createOrUpdateWrappedObject(ctx, destination.Namespace, wrappedObject); err != nil {
+		if err := c.createOrUpdateWrappedObject(ctx, destination.ClusterId, wrappedObject); err != nil {
 			return fmt.Errorf("failed to propagate wrapped object '%s' to all required WECs - %w", wrappedObject.GetName(), err)
 		}
 	}
@@ -383,7 +383,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 		if clusterScopedObject.Objects == nil {
 			continue // no objects from this gvr, skip
 		}
-		gvr := schema.GroupVersionResource{Group: clusterScopedObject.Group, Version: clusterScopedObject.APIVersion, Resource: clusterScopedObject.Resource}
+		gvr := schema.GroupVersionResource{Group: clusterScopedObject.Group, Version: clusterScopedObject.Version, Resource: clusterScopedObject.Resource}
 		for _, objectName := range clusterScopedObject.Objects {
 			object, err := c.wdsDynamicClient.Resource(gvr).Get(ctx, objectName, metav1.GetOptions{})
 			if err != nil {

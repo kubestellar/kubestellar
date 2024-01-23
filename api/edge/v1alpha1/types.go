@@ -257,12 +257,8 @@ type NamespaceAndNames struct {
 }
 
 type ClusterScopeDownsyncResource struct {
-	// GroupResource holds the API group and resource name.
-	metav1.GroupResource `json:",inline"`
-
-	// `apiVeresion` holds just the version, not the group too.
-	// This is the version to use both upstream and downstream.
-	APIVersion string `json:"apiVersion"`
+	// GroupVersionResource holds the API group, API version and resource name.
+	metav1.GroupVersionResource `json:",inline"`
 
 	// `objects` holds the names of the objects of this kind to downsync.
 	// Empty list means none of them.
@@ -272,7 +268,7 @@ type ClusterScopeDownsyncResource struct {
 
 // Destination wraps the identifiers required to uniquely identify a destination cluster.
 type Destination struct {
-	Namespace string `json:"namespace,omitempty"`
+	ClusterId string `json:"clusterId,omitempty"`
 }
 
 type PlacementDecisionStatus struct {

@@ -47,7 +47,7 @@ spec:
                   description: Destination wraps the identifiers required to uniquely
                     identify a destination cluster.
                   properties:
-                    namespace:
+                    clusterId:
                       type: string
                   type: object
                 type: array
@@ -63,11 +63,6 @@ spec:
                       object.'
                     items:
                       properties:
-                        apiVersion:
-                          description: '`apiVeresion` holds just the version, not
-                            the group too. This is the version to use both upstream
-                            and downstream.'
-                          type: string
                         group:
                           type: string
                         objects:
@@ -78,10 +73,12 @@ spec:
                           type: array
                         resource:
                           type: string
+                        version:
+                          type: string
                       required:
-                      - apiVersion
                       - group
                       - resource
+                      - version
                       type: object
                     type: array
                   namespaceScope:
