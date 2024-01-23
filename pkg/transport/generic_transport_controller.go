@@ -394,7 +394,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, namespaceScopedObject := range placementDecision.Spec.Workload.NamespaceScope {
-		gvr := schema.GroupVersionResource{Group: namespaceScopedObject.Group, Version: namespaceScopedObject.APIVersion, Resource: namespaceScopedObject.Resource}
+		gvr := schema.GroupVersionResource{Group: namespaceScopedObject.Group, Version: namespaceScopedObject.Version, Resource: namespaceScopedObject.Resource}
 		for _, objectsByNamespace := range namespaceScopedObject.ObjectsByNamespace {
 			if objectsByNamespace.Names == nil {
 				continue // no objects from this namespace, skip
@@ -496,7 +496,10 @@ func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	object.SetSelfLink("")
 	object.SetResourceVersion("")
 	object.SetUID("")
-	delete(object.GetAnnotations(), "kubectl.kubernetes.io/last-applied-configuration")
+
+	annotations := object.GetAnnotations()
+	delete(annotations, "kubectl.kubernetes.io/last-applied-configuration")
+	object.SetAnnotations(annotations)
 
 	return object
 
