@@ -206,22 +206,22 @@ type PlacementDecision struct {
 // All objects present in this spec are propagated to all destinations present.
 type PlacementDecisionSpec struct {
 	// `Workload` is a collection of namespaced-scoped objects and a collection of cluster-scoped objects to be propagated to destination clusters.
-	Workload DownsyncObjectsReferences `json:"workload,omitempty"`
+	Workload DownsyncObjectReferences `json:"workload,omitempty"`
 
 	// `destinations` is a list of cluster-identifiers that the objects should be propagated to.
 	Destinations []Destination `json:"destinations,omitempty"`
 }
 
-// DownsyncObjectsReferences explicitly defines the objects to be down-synced.
+// DownsyncObjectReferences explicitly defines the objects to be down-synced.
 // The ClusterScope list defines the cluster-scope objects, while NamespacedObjects packs individual objects
 // identifiable by namespace & name.
-type DownsyncObjectsReferences struct {
+type DownsyncObjectReferences struct {
 	// `clusterScope` holds a list of individual cluster-scoped objects
 	// to downsync, organized by resource.
 	// Remember that a "resource" is a kind/type/sort of objects,
 	// not an individual object.
 	// +optional
-	ClusterScope []ClusterScopeDownsyncObject `json:"clusterScope,omitempty"`
+	ClusterScope []ClusterScopeDownsyncObjects `json:"clusterScope,omitempty"`
 
 	// `NamespaceScope` matches if and only if at least one member matches.
 	// +optional
@@ -252,7 +252,7 @@ type NamespaceAndNames struct {
 	Names []string `json:"names,omitempty"`
 }
 
-type ClusterScopeDownsyncObject struct {
+type ClusterScopeDownsyncObjects struct {
 	// GroupVersionResource holds the API group, API version and resource name.
 	metav1.GroupVersionResource `json:",inline"`
 
@@ -268,13 +268,17 @@ type Destination struct {
 }
 
 type PlacementDecisionStatus struct {
-	// `specGeneration` identifies the generation of the spec that this is the status for.
+	// observedGeneration represents the .metadata.generation that the status is based upon.
+	// For instance, if .metadata.generation is currently 12, but the .status.observedGeneration is 9, the status is out of date
+	// with respect to the current state of the PlacementDecision instance.
 	// Zero means that no status has yet been written here.
 	// +optional
-	SpecGeneration int32 `json:"specGeneration,omitempty"`
+	// +kubebuilder:validation:Minimum=0
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 
-	// `propagatedWorkloadsCount` is the number of destinations that received all the objects in the `spec.workload`.
-	PropagatedWorkloadsCount int `json:"propagatedWorkloadsCount,omitempty"`
+	// `propagatedWorkloadsCount` represents the number of different destinations that got a copy of the wrapped object
+	// that contains all the objects in the `spec.workload` into their dedicated mailbox namespace.
+	PropagatedWorkloadsCount uint `json:"propagatedWorkloadsCount,omitempty"`
 }
 
 // PlacementDecisionList is the API type for a list of PlacementDecision

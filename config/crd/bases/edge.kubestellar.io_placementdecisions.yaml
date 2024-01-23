@@ -129,15 +129,20 @@ spec:
             description: '`status` describes the status of the process of binding
               workloads to Locations.'
             properties:
-              propagatedWorkloadsCount:
-                description: '`propagatedWorkloadsCount` is the number of destinations
-                  that received all the objects in the `spec.workload`.'
+              observedGeneration:
+                description: observedGeneration represents the .metadata.generation
+                  that the status is based upon. For instance, if .metadata.generation
+                  is currently 12, but the .status.observedGeneration is 9, the status
+                  is out of date with respect to the current state of the PlacementDecision
+                  instance. Zero means that no status has yet been written here.
+                format: int64
+                minimum: 0
                 type: integer
-              specGeneration:
-                description: '`specGeneration` identifies the generation of the spec
-                  that this is the status for. Zero means that no status has yet been
-                  written here.'
-                format: int32
+              propagatedWorkloadsCount:
+                description: '`propagatedWorkloadsCount` represents the number of
+                  different destinations that got a copy of the wrapped object that
+                  contains all the objects in the `spec.workload` into their dedicated
+                  mailbox namespace.'
                 type: integer
             type: object
         type: object
