@@ -20,8 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-/******************** Start Placement Type *********************/
-
 // PlacementSpec defines the desired state of Placement
 type PlacementSpec struct {
 	// `clusterSelectors` identifies the relevant Cluster objects in terms of their labels.
@@ -173,10 +171,6 @@ type PlacementList struct {
 	Items           []Placement `json:"items"`
 }
 
-/******************** End Placement Type *********************/
-
-/******************** Start PlacementDecision Type *********************/
-
 // PlacementDecision is mapped 1:1 to a single Placement object.
 // The decision resource reflects the resolution of the Placement's selectors,
 // and explicitly reflects which objects should go to what destinations.
@@ -292,8 +286,6 @@ type PlacementDecisionList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []PlacementDecision `json:"items"`
 }
-
-/******************** End PlacementDecision Type *********************/
 
 func init() {
 	SchemeBuilder.Register(&Placement{}, &PlacementList{})
