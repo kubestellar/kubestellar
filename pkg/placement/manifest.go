@@ -28,6 +28,7 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/ocm"
 )
 
+// TODO (maroon): this file should be deleted when transport is ready
 func deleteObjectOnManagedClusters(logger logr.Logger, cl client.Client, obj runtime.Object, managedClusters []string) {
 	for _, managedCluster := range managedClusters {
 		err := deleteManifestForObject(cl, obj, managedCluster)

@@ -75,17 +75,20 @@ var excludedResourceNames = map[string]bool{
 type Controller struct {
 	ctx              context.Context
 	logger           logr.Logger
-	ocmClient        client.Client
+	ocmClient        client.Client // TODO (maroon): this should be deleted when transport is ready
 	dynamicClient    *dynamic.DynamicClient
 	kubernetesClient *kubernetes.Clientset
 	extClient        *apiextensionsclientset.Clientset
 	listers          map[string]*cache.GenericLister
-	gvksMap          map[string]*schema.GroupVersionResource
+	gvkGvrMapper     GvkGvrMapper
 	informers        map[string]*cache.SharedIndexInformer
 	stoppers         map[string]chan struct{}
-	workqueue        workqueue.RateLimitingInterface
-	initializedTs    time.Time
-	wdsName          string
+
+	placementDecisionResolver PlacementDecisionResolver
+
+	workqueue     workqueue.RateLimitingInterface
+	initializedTs time.Time
+	wdsName       string
 }
 
 // Create a new placement controller
@@ -122,7 +125,7 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 		listers:          make(map[string]*cache.GenericLister),
 		informers:        make(map[string]*cache.SharedIndexInformer),
 		stoppers:         make(map[string]chan struct{}),
-		gvksMap:          make(map[string]*schema.GroupVersionResource),
+		gvkGvrMapper:     NewGvkGvrMapper(),
 		workqueue:        workqueue.NewRateLimitingQueue(ratelimiter),
 	}
 
@@ -212,7 +215,9 @@ func (c *Controller) run(workers int) error {
 				// create and index the lister
 				lister := cache.NewGenericLister(informer.GetIndexer(), schema.ParseGroupResource(resource.Group))
 				c.listers[key] = &lister
-				c.gvksMap[key] = &schema.GroupVersionResource{Group: resource.Group, Version: resource.Version, Resource: resource.Name}
+
+				c.gvkGvrMapper.Add(schema.GroupVersionKind{Group: gv.Group, Version: gv.Version, Kind: resource.Kind},
+					schema.GroupVersionResource{Group: resource.Group, Version: resource.Version, Resource: resource.Name})
 
 				// run the informer
 				// we need to be able to stop informers for APIs (CRDs) that are removed
@@ -293,6 +298,7 @@ func (c *Controller) handleObject(obj any) {
 	rObj := obj.(runtime.Object)
 	ok := rObj.GetObjectKind()
 	gvk := ok.GroupVersionKind()
+
 	c.logger.V(2).Info("Got object event", gvk.GroupVersion().String(), gvk.Kind, mObj.GetNamespace(), mObj.GetName())
 	c.enqueueObject(obj, false)
 }
@@ -413,6 +419,10 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		if err := c.handleCRD(obj); err != nil {
 			return err
 		}
+	} else if util.IsPlacementDecision(obj) {
+		if err := c.handlePlacementDecision(obj); err != nil {
+			return err
+		}
 	}
 
 	// avoid further processing for keys of objects being deleted that do not have a deleted object
@@ -420,6 +430,12 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		return nil
 	}
 
+	if err := c.updateDecisions(obj); err != nil {
+		utilruntime.HandleError(fmt.Errorf("error reconciling object: %s", err))
+		return nil
+	}
+
+	//TODO (maroon): everything below this line should be deleted when transport is ready
 	clusters, managedByPlacements, singletonStatus, err := c.matchSelectors(obj)
 	if err != nil {
 		utilruntime.HandleError(fmt.Errorf("error matching selectors: %s", err))
@@ -446,9 +462,9 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 }
 
 func (c *Controller) getObjectFromKey(key util.Key) (runtime.Object, error) {
-	pLister := c.listers[key.GvkKey]
+	pLister := c.listers[key.GvkKey()]
 	if pLister == nil {
-		utilruntime.HandleError(fmt.Errorf("could not get lister for key: %s", key.GvkKey))
+		utilruntime.HandleError(fmt.Errorf("could not get lister for key: %s", key.GvkKey()))
 		return nil, nil
 	}
 	lister := *pLister

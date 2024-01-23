@@ -37,6 +37,8 @@ const (
 	ServiceKind                          = "Service"
 	PlacementKind                        = "Placement"
 	PlacementResource                    = "placements"
+	PlacementDecisionKind                = "PlacementDecision"
+	PlacementDecisionResource            = "placementdecisions"
 	WorkStatusGroup                      = "edge.kubestellar.io"
 	WorkStatusVersion                    = "v1alpha1"
 	WorkStatusResource                   = "workstatuses"
@@ -64,6 +66,11 @@ func IsCRD(o interface{}) bool {
 
 func IsPlacement(o interface{}) bool {
 	return matchesGVK(o, v1alpha1.GroupVersion.Group, v1alpha1.GroupVersion.Version, PlacementKind)
+}
+
+func IsPlacementDecision(o interface{}) bool {
+	return matchesGVK(o, v1alpha1.SchemeGroupVersion.Group, v1alpha1.SchemeGroupVersion.Version,
+		PlacementDecisionKind)
 }
 
 func IsService(o interface{}) bool {
