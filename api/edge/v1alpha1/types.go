@@ -268,13 +268,17 @@ type Destination struct {
 }
 
 type PlacementDecisionStatus struct {
-	// `specGeneration` identifies the generation of the spec that this is the status for.
+	// observedGeneration represents the .metadata.generation that the status is based upon.
+	// For instance, if .metadata.generation is currently 12, but the .status.observedGeneration is 9, the status is out of date
+	// with respect to the current state of the PlacementDecision instance.
 	// Zero means that no status has yet been written here.
 	// +optional
-	SpecGeneration int32 `json:"specGeneration,omitempty"`
+	// +kubebuilder:validation:Minimum=0
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 
-	// `propagatedWorkloadsCount` is the number of destinations that received all the objects in the `spec.workload`.
-	PropagatedWorkloadsCount int `json:"propagatedWorkloadsCount,omitempty"`
+	// `propagatedWorkloadsCount` represents the number of different destinations that got a copy of the wrapped object
+	// that contains all the objects in the `spec.workload` into their dedicated mailbox namespace.
+	PropagatedWorkloadsCount uint `json:"propagatedWorkloadsCount,omitempty"`
 }
 
 // PlacementDecisionList is the API type for a list of PlacementDecision
