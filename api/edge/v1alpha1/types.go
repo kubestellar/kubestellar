@@ -189,10 +189,6 @@ type PlacementDecision struct {
 	// `spec` explicitly describes a desired binding between workloads and Locations.
 	// It reflects the resolution of a Placement's selectors.
 	Spec PlacementDecisionSpec `json:"spec,omitempty"`
-
-	// `status` describes the status of the process of binding workloads to Locations.
-	// +optional
-	Status PlacementDecisionStatus `json:"status,omitempty"`
 }
 
 // PlacementDecisionSpec holds a list of objects and a list of destinations which are the resolution
@@ -259,20 +255,6 @@ type ClusterScopeDownsyncObjects struct {
 // Destination wraps the identifiers required to uniquely identify a destination cluster.
 type Destination struct {
 	ClusterId string `json:"clusterId,omitempty"`
-}
-
-type PlacementDecisionStatus struct {
-	// observedGeneration represents the .metadata.generation that the status is based upon.
-	// For instance, if .metadata.generation is currently 12, but the .status.observedGeneration is 9, the status is out of date
-	// with respect to the current state of the PlacementDecision instance.
-	// Zero means that no status has yet been written here.
-	// +optional
-	// +kubebuilder:validation:Minimum=0
-	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
-
-	// `propagatedWorkloadsCount` represents the number of different destinations that got a copy of the wrapped object
-	// that contains all the objects in the `spec.workload` into their dedicated mailbox namespace.
-	PropagatedWorkloadsCount uint `json:"propagatedWorkloadsCount,omitempty"`
 }
 
 // PlacementDecisionList is the API type for a list of PlacementDecision
