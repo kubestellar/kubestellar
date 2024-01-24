@@ -139,8 +139,6 @@ func placementDecisionSpecToUnstructuredObject(placementDecision *v1alpha1.Place
 	spec *v1alpha1.PlacementDecisionSpec) (*unstructured.Unstructured, error) {
 	// replace spec
 	placementDecision.Spec = *spec
-	// wipe status
-	placementDecision.Status = v1alpha1.PlacementDecisionStatus{}
 
 	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(placementDecision)
 	if err != nil {
