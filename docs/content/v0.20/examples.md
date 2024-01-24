@@ -58,7 +58,9 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 6. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
 
 
-7. (optional) Check all deployments and statefulsets running in the hosting cluster:
+7. (optional) Check all deployments and statefulsets running in the hosting cluster. Expect to 
+see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the imbs1 
+statefulset created in the imbs1-system namespace.
 
    ```shell
    kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces
