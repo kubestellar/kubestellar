@@ -51,7 +51,6 @@ const (
 	ControllerName                 = "transport-controller"
 	transportFinalizer             = "transport.kubestellar.io/object-cleanup"
 	notFoundErrorSuffix            = "not found"
-	alreadyExistsErrorSuffix       = "already exists"
 	originOwnerReferenceAnnotation = "transport.kubestellar.io/originOwnerReferencePlacementDecisionKey"
 	originWdsAnnotation            = "transport.kubestellar.io/originWdsName"
 )
@@ -413,16 +412,23 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 }
 
 func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Context, namespace string, wrappedObject *unstructured.Unstructured) error {
-	_, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Create(ctx, wrappedObject, metav1.CreateOptions{})
+	existingWrappedObject, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Get(ctx, wrappedObject.GetName(), metav1.GetOptions{})
 	if err != nil {
-		if !strings.HasSuffix(err.Error(), alreadyExistsErrorSuffix) { // if object is already there, we need to use update. otherwise report an error.
+		if !strings.HasSuffix(err.Error(), notFoundErrorSuffix) { // if object is not there, we need to create it. otherwise report an error.
 			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC with namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 		}
-		// if we reached here, create had an error that object already exists. try update object instead.
-		_, err = c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{})
+		// object not found when using get, create it
+		_, err = c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Create(ctx, wrappedObject, metav1.CreateOptions{})
 		if err != nil {
-			return fmt.Errorf("failed to update wrapped object '%s' in destination WEC with namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
+			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 		}
+		return nil
+	}
+	// // if we reached here object already exists, try update object
+	wrappedObject.SetResourceVersion(existingWrappedObject.GetResourceVersion())
+	_, err = c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to update wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 	}
 
 	return nil

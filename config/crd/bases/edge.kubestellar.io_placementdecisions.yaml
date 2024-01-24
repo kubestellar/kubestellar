@@ -125,26 +125,6 @@ spec:
                     type: array
                 type: object
             type: object
-          status:
-            description: '`status` describes the status of the process of binding
-              workloads to Locations.'
-            properties:
-              observedGeneration:
-                description: observedGeneration represents the .metadata.generation
-                  that the status is based upon. For instance, if .metadata.generation
-                  is currently 12, but the .status.observedGeneration is 9, the status
-                  is out of date with respect to the current state of the PlacementDecision
-                  instance. Zero means that no status has yet been written here.
-                format: int64
-                minimum: 0
-                type: integer
-              propagatedWorkloadsCount:
-                description: '`propagatedWorkloadsCount` represents the number of
-                  different destinations that got a copy of the wrapped object that
-                  contains all the objects in the `spec.workload` into their dedicated
-                  mailbox namespace.'
-                type: integer
-            type: object
         type: object
     served: true
     storage: true

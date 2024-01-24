@@ -41,7 +41,6 @@ type PlacementDecisionsGetter interface {
 type PlacementDecisionInterface interface {
 	Create(ctx context.Context, placementDecision *v1alpha1.PlacementDecision, opts v1.CreateOptions) (*v1alpha1.PlacementDecision, error)
 	Update(ctx context.Context, placementDecision *v1alpha1.PlacementDecision, opts v1.UpdateOptions) (*v1alpha1.PlacementDecision, error)
-	UpdateStatus(ctx context.Context, placementDecision *v1alpha1.PlacementDecision, opts v1.UpdateOptions) (*v1alpha1.PlacementDecision, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
 	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.PlacementDecision, error)
@@ -123,21 +122,6 @@ func (c *placementDecisions) Update(ctx context.Context, placementDecision *v1al
 	err = c.client.Put().
 		Resource("placementdecisions").
 		Name(placementDecision.Name).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(placementDecision).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *placementDecisions) UpdateStatus(ctx context.Context, placementDecision *v1alpha1.PlacementDecision, opts v1.UpdateOptions) (result *v1alpha1.PlacementDecision, err error) {
-	result = &v1alpha1.PlacementDecision{}
-	err = c.client.Put().
-		Resource("placementdecisions").
-		Name(placementDecision.Name).
-		SubResource("status").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(placementDecision).
 		Do(ctx).
