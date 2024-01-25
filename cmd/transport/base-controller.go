@@ -82,12 +82,12 @@ func Run(transportImplementation transport.Transport) {
 	}
 
 	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeClientset, defaultResyncPeriod)
-	edgePlacementDecisionInformer := edgeSharedInformerFactory.Edge().V1alpha1().PlacementDecisions()
 
-	transportController, err := transport.NewTransportController(ctx, edgePlacementDecisionInformer, transportImplementation, edgeClientset, wdsDynamicClient, transportRestConfig, options.WdsName)
+	transportController, err := transport.NewTransportController(ctx, edgeSharedInformerFactory.Edge().V1alpha1().PlacementDecisions(),
+		transportImplementation, edgeClientset, wdsDynamicClient, transportRestConfig, options.WdsName)
 
 	// notice that there is no need to run Start method in a separate goroutine.
-	// Start method is non-blocking and runs all registered informers in a dedicated goroutine.
+	// Start method is non-blocking and runs each of the factory's informers in its own dedicated goroutine.
 	edgeSharedInformerFactory.Start(ctx.Done())
 
 	if err := transportController.Run(ctx, options.Concurrency); err != nil {
