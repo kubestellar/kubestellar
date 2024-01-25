@@ -54,8 +54,8 @@ const (
 
 // NewTransportController returns a new transport controller
 func NewTransportController(ctx context.Context, placementDecisionInformer edgev1alpha1informers.PlacementDecisionInformer, transport Transport,
-	wdsClientset *edgeclientset.Clientset, wdsDynamicClient *dynamic.DynamicClient, transportClientset *kubernetes.Clientset,
-	transportDynamicClient *dynamic.DynamicClient, wdsName string) (*genericTransportController, error) {
+	wdsClientset edgeclientset.Interface, wdsDynamicClient dynamic.Interface, transportClientset kubernetes.Interface,
+	transportDynamicClient dynamic.Interface, wdsName string) (*genericTransportController, error) {
 	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
 	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
@@ -108,7 +108,7 @@ func convertObjectToUnstructured(object runtime.Object) (*unstructured.Unstructu
 	return &unstructured.Unstructured{Object: unstructuredObject}, nil
 }
 
-func getGvrFromWrappedObject(clientset *kubernetes.Clientset, wrappedObject runtime.Object) (schema.GroupVersionResource, error) {
+func getGvrFromWrappedObject(clientset kubernetes.Interface, wrappedObject runtime.Object) (schema.GroupVersionResource, error) {
 	unstructuredWrappedObject, err := convertObjectToUnstructured(wrappedObject)
 	if err != nil {
 		return schema.GroupVersionResource{}, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
@@ -142,8 +142,8 @@ type genericTransportController struct {
 	transportClient  dynamic.Interface // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
-	wdsClientset     *edgeclientset.Clientset
-	wdsDynamicClient *dynamic.DynamicClient
+	wdsClientset     edgeclientset.Interface
+	wdsDynamicClient dynamic.Interface
 	wdsName          string
 }
 
