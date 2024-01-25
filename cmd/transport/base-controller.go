@@ -44,7 +44,7 @@ import (
 // cmd.Run(YourTransportSpecificImplementation())
 
 // Example for this can be seen here:
-// https://github.com/kubestellar/ocm_transport_plugin/blob/main/cmd/main.go
+// https://github.com/kubestellar/ocm-transport-plugin/blob/main/cmd/main.go
 
 const (
 	defaultResyncPeriod = time.Duration(0)
