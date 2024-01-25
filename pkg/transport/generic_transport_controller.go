@@ -430,13 +430,16 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 type updateObjectFunc func(*v1alpha1.PlacementDecision) bool
 
 func (c *genericTransportController) updatePlacementDecision(ctx context.Context, placementDecision *v1alpha1.PlacementDecision, updateObjectFunc updateObjectFunc) error {
-	if !updateObjectFunc(placementDecision) { // returns an indication if object was updated or not.
+	// objects returned from a PlacementDecisionLister must be treated as read-only.
+	// Therefore, create a deep copy before updating the object.
+	newPlacementDecision := placementDecision.DeepCopy()
+	if !updateObjectFunc(newPlacementDecision) { // returns an indication if object was updated or not.
 		return nil // if object was not updated, no need to update in API server, return.
 	}
 
-	_, err := c.wdsClientset.EdgeV1alpha1().PlacementDecisions().Update(ctx, placementDecision, metav1.UpdateOptions{})
+	_, err := c.wdsClientset.EdgeV1alpha1().PlacementDecisions().Update(ctx, newPlacementDecision, metav1.UpdateOptions{})
 	if err != nil {
-		return fmt.Errorf("failed to update PlacementDecision object in WDS - %w", err)
+		return fmt.Errorf("failed to update PlacementDecision object '%s' in WDS - %w", placementDecision.GetName(), err)
 	}
 
 	return nil
