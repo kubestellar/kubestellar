@@ -1942,7 +1942,9 @@ manager which connects to the <code>wds1</code> front-end and the <code>imbs1</c
 <p>Follow the steps to <a href="../example-wecs/">create and register two clusters with OCM</a>.</p>
 </li>
 <li>
-<p>(optional) Check all deployments and statefulsets running in the hosting cluster:</p>
+<p>(optional) Check all deployments and statefulsets running in the hosting cluster. Expect to 
+see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the imbs1 
+statefulset created in the imbs1-system namespace.</p>
 </li>
 </ol>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>get<span class="w"> </span>deployments,statefulsets<span class="w"> </span>--all-namespaces
