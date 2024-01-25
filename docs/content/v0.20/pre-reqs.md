@@ -16,7 +16,7 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
     mkdir -p ocm
     export INSTALL_DIR="$PWD/ocm"
     curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
-    export PATH=%PWD/ocm:$PATH
+    export PATH=$PWD/ocm:$PATH
     ```
     At the end of the install make sure that the OCM CLI, clusteradm, is in your path.
 
