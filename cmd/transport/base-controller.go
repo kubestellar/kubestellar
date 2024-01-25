@@ -19,7 +19,6 @@ package cmd
 import (
 	"context"
 	"flag"
-	"fmt"
 	"os"
 	"time"
 
@@ -62,7 +61,7 @@ func Run(transportImplementation transport.Transport) {
 	fs.Parse(os.Args[1:])
 
 	fs.VisitAll(func(flg *pflag.Flag) {
-		logger.Info(fmt.Sprintf("Command line flag '%s' - value '%s'", flg.Name, flg.Value)) // log all arguments
+		logger.Info("Command line flag", "name", flg.Name, "value", flg.Value) // log all arguments
 	})
 
 	// get the config for WDS
