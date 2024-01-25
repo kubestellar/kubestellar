@@ -14,16 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package util
+package transport
 
 import (
-	"math/rand"
-	"time"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func SleepForRandomDuration(maxDurationSeconds int) {
-	s := rand.NewSource(time.Now().UnixNano())
-	r := rand.New(s)
-	randomNumber := r.Intn(maxDurationSeconds)
-	time.Sleep(time.Duration(randomNumber) * time.Second)
+type Transport interface {
+	// WrapObjects gets slice of objects and wraps them into a single wrapped object.
+	// In case slice is empty, the function should return an empty wrapped object.
+	WrapObjects(objects []*unstructured.Unstructured) runtime.Object
 }
