@@ -19,7 +19,18 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
-SCRIPT_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+SCRIPT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+
+if [ "$SCRIPT_ROOT" = "${SCRIPT_ROOT%/github.com/kubestellar/kubestellar}" ]; then
+    cat >&2 <<EOF
+Your local copy of the kubestellar repository needs to be elsewhere.
+It is currently at '$SCRIPT_ROOT'.
+Due to a restriction in k8s.io/code-generator (its Issue 165),
+your local copy needs to be in a directory whose pathname
+ends in '/github.com/kubestellar/kubestellar'.
+EOF
+    exit 1
+fi
 
 source "${CODE_GEN_DIR}/kube_codegen.sh"
 

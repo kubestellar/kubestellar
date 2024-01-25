@@ -1,13 +1,5 @@
 # Packaging and Delivery
 
-## Local copy of KubeStellar git repo
-
-Because of [a restriction in one of the code generators that we
-use](https://github.com/kubernetes/code-generator/blob/v0.28.2/kube_codegen.sh#L394-L395),
-a contributor who works on API changes needs to have their local copy
-of the git repo in a directory whose name ends with the Go package
-name --- that is, ends with `github.com/kubestellar/kubestellar/`.
-
 ## status-addon
 
 The [status-addon](https://github.ibm.com/dettori/status-addon) repo is the source of a RedHat-style operator. 
@@ -17,6 +9,14 @@ The operator is delivered by a Helm chart at `quay.io/pdettori/status-addon-char
 There is also a container image involved.
 
 ## KubeStellar
+
+### Local copy of KubeStellar git repo
+
+Because of [a restriction in one of the code generators that we
+use](https://github.com/kubernetes/code-generator/blob/v0.28.2/kube_codegen.sh#L394-L395),
+a contributor who works on API changes needs to have their local copy
+of the git repo in a directory whose name ends with the Go package
+name --- that is, ends with `github.com/kubestellar/kubestellar/`.
 
 ### Derived files
 
