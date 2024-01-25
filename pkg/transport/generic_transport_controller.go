@@ -34,7 +34,6 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
@@ -55,14 +54,10 @@ const (
 
 // NewTransportController returns a new transport controller
 func NewTransportController(ctx context.Context, placementDecisionInformer edgev1alpha1informers.PlacementDecisionInformer, transport Transport,
-	wdsClientset *edgeclientset.Clientset, wdsDynamicClient *dynamic.DynamicClient, transportRestConfig *rest.Config, wdsName string) (*genericTransportController, error) {
-	transportDynamicClient, err := dynamic.NewForConfig(transportRestConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create dynamic k8s clientset for transport space - %w", err)
-	}
-
+	wdsClientset *edgeclientset.Clientset, wdsDynamicClient *dynamic.DynamicClient, transportClientset *kubernetes.Clientset,
+	transportDynamicClient *dynamic.DynamicClient, wdsName string) (*genericTransportController, error) {
 	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
-	wrappedObjectGVR, err := getGvrFromWrappedObject(transportRestConfig, emptyWrappedObject)
+	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get transport wrapped object GVR - %w", err)
 	}
@@ -113,17 +108,13 @@ func convertObjectToUnstructured(object runtime.Object) (*unstructured.Unstructu
 	return &unstructured.Unstructured{Object: unstructuredObject}, nil
 }
 
-func getGvrFromWrappedObject(restConfig *rest.Config, wrappedObject runtime.Object) (schema.GroupVersionResource, error) {
+func getGvrFromWrappedObject(clientset *kubernetes.Clientset, wrappedObject runtime.Object) (schema.GroupVersionResource, error) {
 	unstructuredWrappedObject, err := convertObjectToUnstructured(wrappedObject)
 	if err != nil {
 		return schema.GroupVersionResource{}, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 	}
 
 	gvk := unstructuredWrappedObject.GroupVersionKind()
-	clientset, err := kubernetes.NewForConfig(restConfig)
-	if err != nil {
-		return schema.GroupVersionResource{}, fmt.Errorf("failed to create k8s clientset for given config - %w", err)
-	}
 	mapper := restmapper.NewDeferredDiscoveryRESTMapper(cacheddiscovery.NewMemCacheClient(clientset.Discovery()))
 
 	restMapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
@@ -354,7 +345,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 
 	wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(objectsToPropagate))
 	if err != nil {
-		return fmt.Errorf("failed to wrap objects to a single wrapped object - %w", err)
+		return fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 	}
 	// wrapped object name is (PlacementDecision.GetName()-WdsName).
 	// pay attention - we cannot use the PlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
