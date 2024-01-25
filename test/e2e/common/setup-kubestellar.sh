@@ -79,9 +79,15 @@ kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=c
 
 :
 : -------------------------------------------------------------------------
-: Get all deployments and statefulsets running in the hosting cluster
+: Get all deployments and statefulsets running in the hosting cluster.
+: Expect to see the wds1 kubestellar-controller-manager created in the wds1-system 
+: namespace and the imbs1 statefulset created in the imbs1-system namespace.
 :
-kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces
+if ! expect-cmd-output 'kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces' 'grep -e wds1 -e imbs1 | wc -l | grep -wq 4'
+then
+    echo "Failed to see wds1 deployment and imbs1 statefulset."
+    exit 1
+fi
 
 :
 : -------------------------------------------------------------------------
