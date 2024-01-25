@@ -18,6 +18,8 @@ package options
 
 import (
 	"github.com/spf13/pflag"
+
+	clientopts "github.com/kubestellar/kubestellar/cmd/client-options"
 )
 
 const (
@@ -25,31 +27,23 @@ const (
 )
 
 type TransportOptions struct {
-	Concurrency         int
-	WdsKubeConfig       string
-	WdsName             string
-	TransportKubeConfig string
+	Concurrency            int
+	WdsClientOptions       *clientopts.ClientOpts
+	TransportClientOptions *clientopts.ClientOpts
+	WdsName                string
 }
 
 func NewTransportOptions() *TransportOptions {
 	return &TransportOptions{
-		Concurrency:         defaultConcurrency,
-		WdsKubeConfig:       "",
-		TransportKubeConfig: "",
+		Concurrency:            defaultConcurrency,
+		WdsClientOptions:       clientopts.NewClientOpts("wds", "access the wds"),
+		TransportClientOptions: clientopts.NewClientOpts("transport", "access the transport space"),
 	}
 }
 
 func (options *TransportOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.IntVar(&options.Concurrency, "concurrency", options.Concurrency, "number of concurrent workers to run in parallel")
-	fs.StringVar(&options.WdsKubeConfig, "wds-kubeconfig", options.WdsKubeConfig, "kubeconfig of the wds to connect to")
+	options.WdsClientOptions.AddFlags(fs)
+	options.TransportClientOptions.AddFlags(fs)
 	fs.StringVar(&options.WdsName, "wds-name", options.WdsName, "name of the wds to connect to. name should be unique")
-	fs.StringVar(&options.TransportKubeConfig, "transport-kubeconfig", options.TransportKubeConfig, "kubeconfig of the transport space to connect to")
 }
-
-// func (options *TransportOptions) Complete() error {
-// 	return nil
-// }
-
-// func (options *TransportOptions) Validate() error {
-// 	return nil
-// }
