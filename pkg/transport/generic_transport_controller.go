@@ -153,7 +153,7 @@ type genericTransportController struct {
 func (c *genericTransportController) enqueuePlacementDecision(obj interface{}) {
 	var key string
 	var err error
-	if key, err = cache.MetaNamespaceKeyFunc(obj); err != nil {
+	if key, err = cache.DeletionHandlingMetaNamespaceKeyFunc(obj); err != nil {
 		c.logger.Error(err, "failed to enqueue PlacementDecision object")
 		return
 	}
