@@ -19,7 +19,6 @@ package transport
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -35,7 +34,6 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
@@ -50,27 +48,22 @@ import (
 const (
 	ControllerName                 = "transport-controller"
 	transportFinalizer             = "transport.kubestellar.io/object-cleanup"
-	notFoundErrorSuffix            = "not found"
 	originOwnerReferenceAnnotation = "transport.kubestellar.io/originOwnerReferencePlacementDecisionKey"
 	originWdsAnnotation            = "transport.kubestellar.io/originWdsName"
 )
 
 // NewTransportController returns a new transport controller
 func NewTransportController(ctx context.Context, placementDecisionInformer edgev1alpha1informers.PlacementDecisionInformer, transport Transport,
-	wdsClientset *edgeclientset.Clientset, wdsDynamicClient *dynamic.DynamicClient, transportRestConfig *rest.Config, wdsName string) (*genericTransportController, error) {
-	transportDynamicClient, err := dynamic.NewForConfig(transportRestConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create dynamic k8s clientset for transport space - %w", err)
-	}
-
+	wdsClientset *edgeclientset.Clientset, wdsDynamicClient *dynamic.DynamicClient, transportClientset *kubernetes.Clientset,
+	transportDynamicClient *dynamic.DynamicClient, wdsName string) (*genericTransportController, error) {
 	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
-	wrappedObjectGVR, err := getGvrFromWrappedObject(transportRestConfig, emptyWrappedObject)
+	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get transport wrapped object GVR - %w", err)
 	}
 
-	dynamicInformer := dynamicinformer.NewDynamicSharedInformerFactory(transportDynamicClient, 0)
-	wrappedObjectGenericInformer := dynamicInformer.ForResource(*wrappedObjectGVR)
+	dynamicInformerFactory := dynamicinformer.NewDynamicSharedInformerFactory(transportDynamicClient, 0)
+	wrappedObjectGenericInformer := dynamicInformerFactory.ForResource(wrappedObjectGVR)
 
 	transportController := &genericTransportController{
 		logger:                          klog.FromContext(ctx).WithName(ControllerName),
@@ -80,7 +73,7 @@ func NewTransportController(ctx context.Context, placementDecisionInformer edgev
 		workqueue:                       workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
 		transport:                       transport,
 		transportClient:                 transportDynamicClient,
-		wrappedObjectGVR:                *wrappedObjectGVR,
+		wrappedObjectGVR:                wrappedObjectGVR,
 		wdsClientset:                    wdsClientset,
 		wdsDynamicClient:                wdsDynamicClient,
 		wdsName:                         wdsName,
@@ -102,7 +95,7 @@ func NewTransportController(ctx context.Context, placementDecisionInformer edgev
 		UpdateFunc: func(_, new interface{}) { transportController.handleWrappedObject(new) },
 		DeleteFunc: transportController.handleWrappedObject,
 	})
-	dynamicInformer.Start(ctx.Done())
+	dynamicInformerFactory.Start(ctx.Done())
 
 	return transportController, nil
 }
@@ -115,25 +108,21 @@ func convertObjectToUnstructured(object runtime.Object) (*unstructured.Unstructu
 	return &unstructured.Unstructured{Object: unstructuredObject}, nil
 }
 
-func getGvrFromWrappedObject(restConfig *rest.Config, wrappedObject runtime.Object) (*schema.GroupVersionResource, error) {
+func getGvrFromWrappedObject(clientset *kubernetes.Clientset, wrappedObject runtime.Object) (schema.GroupVersionResource, error) {
 	unstructuredWrappedObject, err := convertObjectToUnstructured(wrappedObject)
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
+		return schema.GroupVersionResource{}, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 	}
 
 	gvk := unstructuredWrappedObject.GroupVersionKind()
-	clientset, err := kubernetes.NewForConfig(restConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create k8s clientset for given config - %w", err)
-	}
 	mapper := restmapper.NewDeferredDiscoveryRESTMapper(cacheddiscovery.NewMemCacheClient(clientset.Discovery()))
 
 	restMapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
 	if err != nil {
-		return nil, fmt.Errorf("failed to discover GroupVersionResource from given GroupVersionKind - %w", err)
+		return schema.GroupVersionResource{}, fmt.Errorf("failed to discover GroupVersionResource from given GroupVersionKind - %w", err)
 	}
 
-	return &(restMapping.Resource), nil
+	return restMapping.Resource, nil
 }
 
 type genericTransportController struct {
@@ -149,8 +138,7 @@ type genericTransportController struct {
 	// easy to ensure we are never processing the same item simultaneously in two different workers.
 	workqueue workqueue.RateLimitingInterface
 
-	//transport is a specific implementation for the transport interface.
-	transport        Transport
+	transport        Transport         //transport is a specific implementation for the transport interface.
 	transportClient  dynamic.Interface // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
@@ -183,7 +171,8 @@ func (c *genericTransportController) handleWrappedObject(obj interface{}) {
 	wrappedObject := obj.(metav1.Object)
 	ownerPlacementDecisionKey, found := wrappedObject.GetAnnotations()[originOwnerReferenceAnnotation] // safe if GetAnnotations() returns nil
 	if !found {
-		c.logger.Info("failed to extract placementdecision key from transport wrapped object", "WrappedObjectName", wrappedObject.GetName())
+		c.logger.Info("failed to extract placementdecision key from transport wrapped object", "Name", wrappedObject.GetName(),
+			"Namespace", wrappedObject.GetNamespace())
 		return
 	}
 
@@ -318,7 +307,7 @@ func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx contex
 	for _, destination := range placementDecision.Spec.Destinations { // TODO need to revisit the destination struct and see how to use it properly
 		if err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(destination.ClusterId).Delete(ctx, fmt.Sprintf("%s-%s", placementDecision.GetName(), c.wdsName),
 			metav1.DeleteOptions{}); err != nil { // wrapped object name is in the format (PlacementDecision.GetName()-WdsName). see updateWrappedObject func for explanation.
-			if !strings.HasSuffix(err.Error(), notFoundErrorSuffix) { // if object is already not there, we do not report an error cause desired state was achieved.
+			if !errors.IsNotFound(err) { // if object is already not there, we do not report an error cause desired state was achieved.
 				return fmt.Errorf("failed to delete wrapped object '%s' in destination WEC with namespace '%s' - %w", fmt.Sprintf("%s-%s", placementDecision.GetName(),
 					c.wdsName), destination.ClusterId, err)
 			}
@@ -356,7 +345,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 
 	wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(objectsToPropagate))
 	if err != nil {
-		return fmt.Errorf("failed to wrap objects to a single wrapped object - %w", err)
+		return fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 	}
 	// wrapped object name is (PlacementDecision.GetName()-WdsName).
 	// pay attention - we cannot use the PlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
@@ -383,8 +372,9 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 			continue // no objects from this gvr, skip
 		}
 		gvr := schema.GroupVersionResource{Group: clusterScopedObject.Group, Version: clusterScopedObject.Version, Resource: clusterScopedObject.Resource}
+		dynamicClientGvrInterface := c.wdsDynamicClient.Resource(gvr)
 		for _, objectName := range clusterScopedObject.ObjectNames {
-			object, err := c.wdsDynamicClient.Resource(gvr).Get(ctx, objectName, metav1.GetOptions{})
+			object, err := dynamicClientGvrInterface.Get(ctx, objectName, metav1.GetOptions{})
 			if err != nil {
 				return nil, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", objectName, gvr, err)
 			}
@@ -394,14 +384,16 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, namespaceScopedObject := range placementDecision.Spec.Workload.NamespaceScope {
 		gvr := schema.GroupVersionResource{Group: namespaceScopedObject.Group, Version: namespaceScopedObject.Version, Resource: namespaceScopedObject.Resource}
+		dynamicClientGvrInterface := c.wdsDynamicClient.Resource(gvr)
 		for _, objectsByNamespace := range namespaceScopedObject.ObjectsByNamespace {
 			if objectsByNamespace.Names == nil {
 				continue // no objects from this namespace, skip
 			}
 			for _, objectName := range objectsByNamespace.Names {
-				object, err := c.wdsDynamicClient.Resource(gvr).Namespace(objectsByNamespace.Namespace).Get(ctx, objectName, metav1.GetOptions{})
+				object, err := dynamicClientGvrInterface.Namespace(objectsByNamespace.Namespace).Get(ctx, objectName, metav1.GetOptions{})
 				if err != nil {
-					return nil, fmt.Errorf("failed to get required namespace-scoped object '%s' with gvr '%s' from WDS - %w", objectName, gvr, err)
+					return nil, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", objectName,
+						objectsByNamespace.Namespace, gvr, err)
 				}
 				objectsToPropagate = append(objectsToPropagate, cleanObject(object))
 			}
@@ -414,7 +406,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Context, namespace string, wrappedObject *unstructured.Unstructured) error {
 	existingWrappedObject, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Get(ctx, wrappedObject.GetName(), metav1.GetOptions{})
 	if err != nil {
-		if !strings.HasSuffix(err.Error(), notFoundErrorSuffix) { // if object is not there, we need to create it. otherwise report an error.
+		if !errors.IsNotFound(err) { // if object is not there, we need to create it. otherwise report an error.
 			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC with namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 		}
 		// object not found when using get, create it
