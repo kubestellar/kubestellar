@@ -348,11 +348,6 @@ func (in *PlacementSpec) DeepCopyInto(out *PlacementSpec) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
-	if in.NumberOfClusters != nil {
-		in, out := &in.NumberOfClusters, &out.NumberOfClusters
-		*out = new(int32)
-		**out = **in
-	}
 	if in.Downsync != nil {
 		in, out := &in.Downsync, &out.Downsync
 		*out = make([]ObjectTest, len(*in))
