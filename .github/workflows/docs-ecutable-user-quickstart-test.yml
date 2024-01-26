@@ -8,16 +8,14 @@ on:
   # To confirm any changes to docs build successfully, without deploying them
   pull_request:
     branches:
-      - "release-*"
-      - "main"
+      - "release-0.1*"
       - space-mgt
   push:
     branches:
-      - "release-*"
-      - "main"
+      - "release-0.1*"
       - space-mgt
     tags:
-      - 'v*'
+      - 'v0.1*'
       
 env:
   docs-ecutable-filename: user-quickstart-test
