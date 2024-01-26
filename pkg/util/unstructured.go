@@ -88,8 +88,6 @@ func getObjectGVK(o interface{}) (schema.GroupVersionKind, error) {
 	switch obj := o.(type) {
 	case runtime.Object:
 		return obj.GetObjectKind().GroupVersionKind(), nil
-	case unstructured.Unstructured:
-		return obj.GetObjectKind().GroupVersionKind(), nil
 	}
 
 	return schema.GroupVersionKind{}, fmt.Errorf("object is of wrong type: %#v", o)
