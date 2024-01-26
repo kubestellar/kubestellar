@@ -1,9 +1,11 @@
 The following pre-requisites are required.
 
+See also [check_pre_req](contributor.md#check-key-pre-requisites-for-kubestellar) script.
+
 ## For Using KubeStellar
 
 - kubeflex version 0.4.1 or higher
-    To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). To upgrade from an existing installation, 
+    To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). To upgrade from an existing installation,
 follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex). At the end of the install make sure that the kubeflex CLI, kflex, is in your path.
 
 - OCM CLI (clusteradm)
@@ -24,14 +26,42 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 - kubectl - to access the kubernetes clusters
 - docker (or compatible docker engine that works with kind)
 
+Quickly check the above pre-requistes by running the command:
+
+```shell
+$ hack/check_pre_req.sh kflex ocm helm kubectl docker
+✔ KubeFlex
+✔ OCM CLI
+✔ Helm
+✔ kubectl
+✔ Docker
+```
+
 ## For running the examples
 
 - kind - to create a few small kubernetes clusters
 - argocd - for the examples that use it
 
+Quickly check the above pre-requistes by running the command:
+
+```shell
+$ hack/check_pre_req.sh kind argo
+✔ Kind
+✔ ArgoCD CLI
+```
+
 ## For Building KubeStellar
 
 - go version 1.20 or higher - to build kubestellar
-- make - to build kubestellar and create the kubestellar image 
+- make - to build kubestellar and create the kubestellar image
 - ko - to create the kubestellar image
+
+Quickly check the above pre-requistes by running the command:
+
+```shell
+$ hack/check_pre_req.sh go make ko
+✔ Go
+✔ GNU Make
+✔ KO
+```
 

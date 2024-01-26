@@ -7,6 +7,8 @@
 
 See [pre-reqs](pre-reqs.md).
 
+See also [check_pre_req](contributor.md#check-key-pre-requisites-for-kubestellar) script.
+
 ## Common Setup
 
 The following steps establish an initial state used in the examples below.
@@ -25,7 +27,7 @@ The following steps establish an initial state used in the examples below.
    ```
 
 3. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
-in KubeFlex. Note that `-p ocm` runs a post-create hook on the *vcluster* control plane 
+in KubeFlex. Note that `-p ocm` runs a post-create hook on the *vcluster* control plane
 which installs OCM on it.
 
    ```shell
@@ -37,7 +39,7 @@ which installs OCM on it.
    Wait until the `managedclusteraddons` resource shows up on `imbs1`. You can check on that with the command:
 
    ```shell
-   kubectl --context imbs1 api-resources | grep managedclusteraddons 
+   kubectl --context imbs1 api-resources | grep managedclusteraddons
    ```
    and then install the status add-on:
 
@@ -47,7 +49,7 @@ which installs OCM on it.
 
    see [here](https://github.ibm.com/dettori/status-addon) for more details on the add-on.
 
-5. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar` 
+5. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar`
 runs a post-create hook on the *k8s* control plane that starts an instance of a KubeStellar controller
 manager which connects to the `wds1` front-end and the `imbs1` OCM control plane back-end.
 
@@ -58,8 +60,8 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 6. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
 
 
-7. (optional) Check all deployments and statefulsets running in the hosting cluster. Expect to 
-see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the imbs1 
+7. (optional) Check all deployments and statefulsets running in the hosting cluster. Expect to
+see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the imbs1
 statefulset created in the imbs1-system namespace.
 
    ```shell
@@ -93,15 +95,15 @@ spec:
 EOF
 ```
 
-This placement configuration determines **where** to deploy the workload by using 
-the label selector expressions found in *clusterSelectors*. It also specifies **what** 
-to deploy through the downsync.labelSelectors expressions. 
-Each matchLabels expression is a criterion for selecting a set of objects based on 
-their labels. Other criteria can be added to filter objects based on their namespace, 
-api group, resource, and name. If these criteria are not specified, all objects with 
-the matching labels are selected. If an object has multiple labels, it is selected 
-only if it matches all the labels in the matchLabels expression. 
-If there are multiple objectSelectors, an object is selected if it matches any of them. 
+This placement configuration determines **where** to deploy the workload by using
+the label selector expressions found in *clusterSelectors*. It also specifies **what**
+to deploy through the downsync.labelSelectors expressions.
+Each matchLabels expression is a criterion for selecting a set of objects based on
+their labels. Other criteria can be added to filter objects based on their namespace,
+api group, resource, and name. If these criteria are not specified, all objects with
+the matching labels are selected. If an object has multiple labels, it is selected
+only if it matches all the labels in the matchLabels expression.
+If there are multiple objectSelectors, an object is selected if it matches any of them.
 
 Now deploy the app:
 
@@ -133,13 +135,13 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: public.ecr.aws/nginx/nginx:latest 
+        image: public.ecr.aws/nginx/nginx:latest
         ports:
         - containerPort: 80
 EOF
 ```
 
-Verify that *manifestworks* wrapping the objects have been created in the mailbox 
+Verify that *manifestworks* wrapping the objects have been created in the mailbox
 namespaces:
 
 ```shell
@@ -154,10 +156,10 @@ kubectl --context cluster1 get deployments -n nginx
 kubectl --context cluster2 get deployments -n nginx
 ```
 
-Please note, in line with Kubernetes’ best practices, the order in which you apply 
-a placement and the objects doesn’t affect the outcome. You can apply the placement 
-first followed by the objects, or vice versa. The result remains consistent because 
-the placement controller identifies any changes in either the placement or the objects, 
+Please note, in line with Kubernetes’ best practices, the order in which you apply
+a placement and the objects doesn’t affect the outcome. You can apply the placement
+first followed by the objects, or vice versa. The result remains consistent because
+the placement controller identifies any changes in either the placement or the objects,
 triggering the start of the reconciliation loop.
 
 
@@ -165,16 +167,16 @@ triggering the start of the reconciliation loop.
 
 This scenario follows on from the state established by scenario 1.
 
-The hosting cluster can act as a Workload Description Space (WDS) to 
-distribute your workloads to multiple clusters. This feature works 
-well for Custom Resources, but not for standard Kubernetes resources 
-(deployments, pods, replicasets, etc.). The reason is that the hosting 
-cluster’s controller manager creates pods for those resources on the hosting 
-cluster itself, while the Kubestellar controller copies them to the Workload 
-Execution Clusters (WECs). You can use any Custom Resource to wrap any 
-Kubernetes object you want to send to the WECs. But if you have operators 
-or controllers on the hosting cluster that work on the Custom Resource 
-you want to send, make sure they don’t create workloads on the hosting 
+The hosting cluster can act as a Workload Description Space (WDS) to
+distribute your workloads to multiple clusters. This feature works
+well for Custom Resources, but not for standard Kubernetes resources
+(deployments, pods, replicasets, etc.). The reason is that the hosting
+cluster’s controller manager creates pods for those resources on the hosting
+cluster itself, while the Kubestellar controller copies them to the Workload
+Execution Clusters (WECs). You can use any Custom Resource to wrap any
+Kubernetes object you want to send to the WECs. But if you have operators
+or controllers on the hosting cluster that work on the Custom Resource
+you want to send, make sure they don’t create workloads on the hosting
 cluster that you did not intend to create there.
 
 In order to run this scenario using the post-create-hook method you need
@@ -194,7 +196,7 @@ subjects:
 - kind: ServiceAccount
   name: kubeflex-controller-manager
   namespace: kubeflex-system
-EOF  
+EOF
 ```
 
 To create a second WDS based on the hosting cluster, run the command:
@@ -203,7 +205,7 @@ To create a second WDS based on the hosting cluster, run the command:
 kflex create wds2 -t host -p kubestellar
 ```
 
-where the `-t host` option specifies a control plane of type `host`. 
+where the `-t host` option specifies a control plane of type `host`.
 You can only create on control plane of type `host`.
 
 Check that the kubestellar controller for wds2 is started:
@@ -212,11 +214,11 @@ Check that the kubestellar controller for wds2 is started:
 kubectl get deployments.apps -n wds2-system kubestellar-controller-manager
 ```
 
-If desired, you may remove the `kubeflex-manager-cluster-admin-rolebinding` after 
-the kubestellar-controller-manager is started, with the command 
+If desired, you may remove the `kubeflex-manager-cluster-admin-rolebinding` after
+the kubestellar-controller-manager is started, with the command
 `kubectl --context kind-kubeflex delete clusterrolebinding kubeflex-manager-cluster-admin-rolebinding`
 
-For this example, we use the `AppWrapper` custom resource defined in the 
+For this example, we use the `AppWrapper` custom resource defined in the
 [multi cluster app dispatcher](https://github.com/project-codeflare/multi-cluster-app-dispatcher)
 project.
 
@@ -343,12 +345,12 @@ kubectl --context cluster2 get statefulsets -n postgres-system
 Run "helm list" on the wds1:
 
 ```shell
-$ helm --kube-context wds1 list -n postgres-system 
+$ helm --kube-context wds1 list -n postgres-system
 NAME            NAMESPACE       REVISION        UPDATED                                 STATUS       CHART                    APP VERSION
-postgres        postgres-system 1               2023-10-31 13:39:52.550071 -0400 EDT    deployed     postgresql-13.2.0        16.0.0    
+postgres        postgres-system 1               2023-10-31 13:39:52.550071 -0400 EDT    deployed     postgresql-13.2.0        16.0.0
 ```
 
-And try that on the managed clusters 
+And try that on the managed clusters
 
 ```shell
 $ helm list --kube-context cluster1 -n postgres-system
@@ -372,7 +374,7 @@ helm list --kube-context cluster2 -n postgres-system
 Implementing this in a controller for automated propagation of
 helm metadata is tracked in this [issue](https://github.com/kubestellar/kubestellar/issues/1543).
 
-## Scenario 4 - Singleton status 
+## Scenario 4 - Singleton status
 
 This scenario proceeds from the state established by the [common setup](#common-setup).
 
@@ -418,7 +420,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: public.ecr.aws/nginx/nginx:latest 
+        image: public.ecr.aws/nginx/nginx:latest
         ports:
         - containerPort: 80
 EOF
@@ -448,7 +450,7 @@ This is a test that you can do after finishing Scenario 1.
 
 TODO: rewrite this so that it makes sense after Scenario 4.
 
-Bring down the control plane: stop and restart wds1 and imbs1 API servers, 
+Bring down the control plane: stop and restart wds1 and imbs1 API servers,
 KubeFlex and KubeStellar controllers:
 
 First stop all:
@@ -516,7 +518,7 @@ spec:
     spec:
       containers:
       - name: nginx-res
-        image: public.ecr.aws/nginx/nginx:latest 
+        image: public.ecr.aws/nginx/nginx:latest
         ports:
         - containerPort: 80
 EOF
@@ -529,11 +531,11 @@ kubectl --context cluster1 get deployments -n nginx-res
 kubectl --context cluster2 get deployments -n nginx-res
 ```
 
-## Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD 
+## Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD
 
 This scenario is something you can do after the [common setup](#common-setup).
 
-Before running this scenario, install ArgoCD on the hosting cluster and configure it 
+Before running this scenario, install ArgoCD on the hosting cluster and configure it
 work with the WDS as outlined [here](./thirdparties.md#install-and-configure-argocd).
 
 Including a ServiceAccount tests whether there will be a controller fight over a token Secret for that ServiceAccount, which was observed in some situations with older code.
@@ -554,7 +556,7 @@ spec:
     - matchLabels: {"argocd.argoproj.io/instance":"nginx-sa"}
 EOF
 ```
-Switch context to hosting cluster and argocd namespace (this is required by argo to 
+Switch context to hosting cluster and argocd namespace (this is required by argo to
 create an app with the CLI)
 
 ```shell
@@ -589,7 +591,7 @@ kubectl --context cluster1 -n nginx-sa get deployments,sa,secrets
 kubectl --context cluster2 -n nginx-sa get deployments,sa,secrets
 ```
 
-Repeat multiple syncing on Argo and verify that extra secrets for the service acccount 
+Repeat multiple syncing on Argo and verify that extra secrets for the service acccount
 are not created both wds1 and clusters:
 
 ```shell
