@@ -35,8 +35,10 @@ type GvkGvrMapper interface {
 	// The key format is that outputted by utils.KeyForGroupVersionResource.
 	DeleteByGvrKey(string)
 	// GetGvr returns the GVR associated with the given GVK if it exists.
+	// The returned boolean indicates whether it exists or not.
 	GetGvr(gvk schema.GroupVersionKind) (*schema.GroupVersionResource, bool)
 	// GetGvk returns the GVK associated with the given GVR if it exists.
+	// The returned boolean indicates whether it exists or not.
 	GetGvk(gvr schema.GroupVersionResource) (*schema.GroupVersionKind, bool)
 }
 
