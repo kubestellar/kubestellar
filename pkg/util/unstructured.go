@@ -32,7 +32,7 @@ import (
 const (
 	CRDKind                              = "CustomResourceDefinition"
 	CRDGroup                             = "apiextensions.k8s.io"
-	CRDVersion                           = "v1"
+	AnyVersion                           = "*"
 	ServiceVersion                       = "v1"
 	ServiceKind                          = "Service"
 	PlacementKind                        = "Placement"
@@ -58,8 +58,8 @@ type SourceRef struct {
 	Namespace string `json:"namespace,omitempty"`
 }
 
-func IsCRD(o interface{}) bool {
-	return matchesGVK(o, CRDGroup, CRDVersion, CRDKind)
+func IsCRD(o interface{}) bool { // CRDs might have different versions. therefore, using "any" in CRD version
+	return matchesGVK(o, CRDGroup, AnyVersion, CRDKind)
 }
 
 func IsPlacement(o interface{}) bool {
@@ -77,7 +77,7 @@ func matchesGVK(o interface{}, group, version, kind string) bool {
 	}
 
 	if gvk.Group == group &&
-		gvk.Version == version &&
+		(version == AnyVersion || gvk.Version == version) &&
 		gvk.Kind == kind {
 		return true
 	}
@@ -85,20 +85,12 @@ func matchesGVK(o interface{}, group, version, kind string) bool {
 }
 
 func getObjectGVK(o interface{}) (schema.GroupVersionKind, error) {
-	gvk := schema.GroupVersionKind{}
 	switch obj := o.(type) {
 	case runtime.Object:
-		gvk.Group = obj.GetObjectKind().GroupVersionKind().Group
-		gvk.Version = obj.GetObjectKind().GroupVersionKind().Version
-		gvk.Kind = obj.GetObjectKind().GroupVersionKind().Kind
-	case unstructured.Unstructured:
-		gvk.Group = obj.GetObjectKind().GroupVersionKind().Group
-		gvk.Version = obj.GetObjectKind().GroupVersionKind().Version
-		gvk.Kind = obj.GetObjectKind().GroupVersionKind().Kind
-	default:
-		return gvk, fmt.Errorf("object is of wrong type: %#v", obj)
+		return obj.GetObjectKind().GroupVersionKind(), nil
 	}
-	return gvk, nil
+
+	return schema.GroupVersionKind{}, fmt.Errorf("object is of wrong type: %#v", o)
 }
 
 func ToService(obj *unstructured.Unstructured) (*corev1.Service, error) {
