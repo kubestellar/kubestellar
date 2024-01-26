@@ -2352,7 +2352,7 @@
 </code></pre></div></p>
 <p>Be sure to create an ingress control with SSL passthrough to <strong>ks-core</strong>. This is a special requirement for Kind that allows access to the KubeStellar core running on <strong>ks-core</strong>.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>create<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>create<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.14/example/kind-nginx-ingress-with-SSL-passthrough.yaml
 </code></pre></div>
 <strong>Wait about 20 seconds</strong> and then check if the ingress control is ready on <strong>ks-core</strong>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sleep<span class="w"> </span><span class="m">20</span>
