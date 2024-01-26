@@ -22,7 +22,7 @@ EOF
 Be sure to create an ingress control with SSL passthrough to **ks-core**. This is a special requirement for Kind that allows access to the KubeStellar core running on **ks-core**.
 ```shell
 KUBECONFIG=~/.kube/config kubectl \
-  create -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
+  create -f https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.14/example/kind-nginx-ingress-with-SSL-passthrough.yaml
 ```
 **Wait about 20 seconds** and then check if the ingress control is ready on **ks-core**:
 ```shell
