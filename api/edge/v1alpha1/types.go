@@ -26,6 +26,8 @@ type PlacementSpec struct {
 	// A Cluster is relevant if and only if it passes any of the LabelSelectors in this field.
 	ClusterSelectors []metav1.LabelSelector `json:"clusterSelectors,omitempty"`
 
+	// We agreed not to expose NumberOfClusters in release 0.20, to avoid confusions.
+	// We may or may not support it in later releases per future discussions.
 	// NumberOfClusters represents the desired number of ManagedClusters to be selected which meet the
 	// placement requirements.
 	// 1) If not specified, all Clusters which meet the placement requirements will be selected;
@@ -37,7 +39,7 @@ type PlacementSpec struct {
 	//    all of them will be selected, and the status of condition `PlacementConditionSatisfied` will be
 	//    set to false;
 	// +optional
-	NumberOfClusters *int32 `json:"numberOfClusters,omitempty"`
+	// NumberOfClusters *int32 `json:"numberOfClusters,omitempty"`
 
 	// `downsync` selects the objects to bind with the selected Locations for downsync.
 	// An object is selected if it matches at least one member of this list.

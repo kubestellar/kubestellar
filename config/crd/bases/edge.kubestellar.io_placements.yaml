@@ -267,20 +267,6 @@ spec:
                       type: array
                   type: object
                 type: array
-              numberOfClusters:
-                description: NumberOfClusters represents the desired number of ManagedClusters
-                  to be selected which meet the placement requirements. 1) If not
-                  specified, all Clusters which meet the placement requirements will
-                  be selected; 2) Otherwise if the number of Clusters meet the placement
-                  requirements is larger than NumberOfClusters, a random subset with
-                  desired number of ManagedClusters will be selected; 3) If the number
-                  of Clusters meet the placement requirements is equal to NumberOfClusters,
-                  all of them will be selected; 4) If the number of Clusters meet
-                  the placement requirements is less than NumberOfClusters, all of
-                  them will be selected, and the status of condition `PlacementConditionSatisfied`
-                  will be set to false;
-                format: int32
-                type: integer
               upsync:
                 description: '`upsync` identifies objects to upsync. An object matches
                   `upsync` if and only if it matches at least one member of `upsync`.'
