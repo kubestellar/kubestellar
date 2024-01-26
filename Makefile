@@ -306,7 +306,7 @@ verify-boilerplate: $(TOOLS_DIR)/verify_boilerplate.py
 # this stub is mainly to pass the CI
 .PHONY: verify-codegen
 verify-codegen:
-	@echo ""
+	./hack/verify-codegen.sh
 
 $(OPENSHIFT_GOIMPORTS):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/openshift-eng/openshift-goimports $(OPENSHIFT_GOIMPORTS_BIN) $(OPENSHIFT_GOIMPORTS_VER)

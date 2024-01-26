@@ -21,15 +21,24 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-"$( dirname "${BASH_SOURCE[0]}")/update-codegen-clients.sh"
-if ! git diff --quiet --exit-code -- pkg/client; then
+if [[ "$(git status --porcelain=1 -- api config/crd/bases pkg/crd/files pkg/generated)" != "" ]]; then
+    echo "Sorry, some relevant files are not in the current git commit."
+    echo "Correct checking can not be done."
+    git status -- api config/crd/bases pkg/crd/files pkg/generated
+    exit 1
+fi
+
+pwd
+make all-generated
+if [[ "$(git status --porcelain=1 -- api config/crd/bases pkg/crd/files pkg/generated)" != "" ]]; then
 	cat << EOF
-ERROR: This check enforces that the client code is generated correctly.
-ERROR: The client code is out of date. Run the following command to re-
-ERROR: generate the clients:
-ERROR: $ hack/update-generated-clients.sh
+ERROR: This check enforces that all the derived files have been derived correctly.
+ERROR: At least one is not. Run the following command to re-
+ERROR: generate the derived files:
+ERROR: $ make all-generated
 ERROR: The following differences were found:
 EOF
+	git status -- api config/crd/bases pkg/crd/files pkg/generated
 	git diff
 	exit 1
 fi

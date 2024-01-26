@@ -1,7 +1,7 @@
 # KubeStellar Usage Examples
 
 **NOTE**: This is unmaintained material that has only been observed to work for the commit tagged as
-`v0.20.0-alpha.1`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0-alpha.1`); see [the e2e tests](../../../test/e2e).
+`v0.20.0-alpha.1`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0-alpha.1`), and contributors can run these tests too; see [the e2e tests](../../../test/e2e).
 
 ## Prereqs
 
@@ -58,7 +58,9 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 6. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
 
 
-7. (optional) Check all deployments and statefulsets running in the hosting cluster:
+7. (optional) Check all deployments and statefulsets running in the hosting cluster. Expect to 
+see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the imbs1 
+statefulset created in the imbs1-system namespace.
 
    ```shell
    kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces

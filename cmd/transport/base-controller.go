@@ -19,7 +19,6 @@ package cmd
 import (
 	"context"
 	"flag"
-	"fmt"
 	"os"
 	"time"
 
@@ -27,7 +26,6 @@ import (
 
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 
 	transportoptions "github.com/kubestellar/kubestellar/cmd/transport/options"
@@ -45,7 +43,7 @@ import (
 // cmd.Run(YourTransportSpecificImplementation())
 
 // Example for this can be seen here:
-// https://github.com/kubestellar/ocm_transport/blob/main/cmd/main.go
+// https://github.com/kubestellar/ocm-transport-plugin/blob/main/cmd/main.go
 
 const (
 	defaultResyncPeriod = time.Duration(0)
@@ -63,11 +61,11 @@ func Run(transportImplementation transport.Transport) {
 	fs.Parse(os.Args[1:])
 
 	fs.VisitAll(func(flg *pflag.Flag) {
-		logger.Info(fmt.Sprintf("Command line flag '%s' - value '%s'", flg.Name, flg.Value)) // log all arguments
+		logger.Info("Command line flag", "name", flg.Name, "value", flg.Value) // log all arguments
 	})
 
 	// get the config for WDS
-	wdsRestConfig, err := clientcmd.BuildConfigFromFlags("", options.WdsKubeConfig)
+	wdsRestConfig, err := options.WdsClientOptions.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "unable to build WDS kubeconfig")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
@@ -75,7 +73,7 @@ func Run(transportImplementation transport.Transport) {
 	wdsRestConfig.UserAgent = transport.ControllerName
 
 	// get the config for Transport space
-	transportRestConfig, err := clientcmd.BuildConfigFromFlags("", options.TransportKubeConfig)
+	transportRestConfig, err := options.TransportClientOptions.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "unable to build transport kubeconfig")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
