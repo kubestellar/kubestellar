@@ -205,8 +205,9 @@ type PlacementDecisionSpec struct {
 }
 
 // DownsyncObjectReferences explicitly defines the objects to be down-synced.
-// The ClusterScope list defines the cluster-scope objects, while NamespacedObjects packs individual objects
-// identifiable by namespace & name.
+// The ClusterScope list defines the cluster-scope objects, NamespacedObjects packs individual objects
+// identifiable by namespace & name, and generation represents the internal spec generation of the listed
+// objects in the ClusterScope and NamespaceScope lists.
 type DownsyncObjectReferences struct {
 	// `clusterScope` holds a list of individual cluster-scoped objects
 	// to downsync, organized by resource.
@@ -218,6 +219,15 @@ type DownsyncObjectReferences struct {
 	// `NamespaceScope` matches if and only if at least one member matches.
 	// +optional
 	NamespaceScope []NamespaceScopeDownsyncObjects `json:"namespaceScope,omitempty"`
+
+	// `ObjectsInternalSpecGeneration` is a sequence number representing a specific generation of the downsync objects internal spec.
+	// For example, if ClusterScope and NamespaceScope lists haven't changed but the
+	// internal spec of at least one object has changed, this field should be incremented.
+	// ObjectsInternalSpecGeneration should be updated upon a change in the spec of one
+	// of the objects from ClusterScope and NamespaceScope in order to trigger the
+	// distribution of the updated object.
+	// +optional
+	ObjectsInternalSpecGeneration int64 `json:"generation,omitempty"`
 }
 
 // NamespaceScopeDownsyncObjects matches some objects of one particular namespaced object.
