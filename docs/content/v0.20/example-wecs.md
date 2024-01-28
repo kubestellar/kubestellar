@@ -34,6 +34,7 @@ OCM hub. This cluster will act as a workload cluster.
 
    and wait until the certificate signing requests (CSR) for both cluster1 and cluster2 are created, then
    ctrl+C.
+   Note that the CSRs condition is supposed to be `Pending` until you approve them in step 4.
 
 4. Once the CSRs are created approve the csrs to complete the cluster registration with the command:
 
