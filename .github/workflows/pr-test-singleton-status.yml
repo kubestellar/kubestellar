@@ -42,4 +42,5 @@ jobs:
 
       - name: Run test
         run: |
-          cd test/e2e/singleton-status && ./run-test.sh
+          cd test/e2e/singleton-status
+          KFLEX_DISABLE_CHATTY=true ./run-test.sh 

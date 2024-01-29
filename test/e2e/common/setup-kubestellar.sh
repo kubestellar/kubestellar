@@ -17,18 +17,23 @@ set -x # echo so users can understand what is happening
 set -e # exit on error
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 
+if [[ "$KFLEX_DISABLE_CHATTY" = true ]] ; then
+   disable_chatty_status="--chatty-status=false"
+   echo "disable_chatty_status = $disable_chatty_status"
+fi
+
 :
 : -------------------------------------------------------------------------
 : Create a Kind hosting cluster with nginx ingress controller and KubeFlex operator
 :
-kflex init --create-kind
+kflex init --create-kind $disable_chatty_status
 : Kubeflex kind cluster created.
 
 :
 : -------------------------------------------------------------------------
 : 'Create an inventory & mailbox space of type vcluster running OCM (Open Cluster Management) directly in KubeFlex. Note that -p ocm runs a post-create hook on the vcluster control plane which installs OCM on it.'
 :
-kflex create imbs1 --type vcluster -p ocm
+kflex create imbs1 --type vcluster -p ocm $disable_chatty_status
 : imbs1 created.
 
 :
@@ -43,7 +48,7 @@ helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-managem
 : -------------------------------------------------------------------------
 : Create a Workload Description Space wds1 directly in KubeFlex.
 :
-kflex create wds1
+kflex create wds1 $disable_chatty_status
 kubectl --context kind-kubeflex label cp wds1 kflex.kubestellar.io/cptype=wds
 
 cd "${SRC_DIR}/../../.."
