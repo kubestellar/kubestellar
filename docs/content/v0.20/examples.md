@@ -39,6 +39,7 @@ which installs OCM on it.
    ```shell
    kubectl --context imbs1 api-resources | grep managedclusteraddons
    ```
+
    and then install the status add-on:
 
    ```shell
@@ -56,7 +57,6 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
    ```
 
 6. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
-
 
 7. (optional) Check all deployments and statefulsets running in the hosting cluster. Expect to
 see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the imbs1
@@ -159,7 +159,6 @@ a placement and the objects doesn’t affect the outcome. You can apply the plac
 first followed by the objects, or vice versa. The result remains consistent because
 the placement controller identifies any changes in either the placement or the objects,
 triggering the start of the reconciliation loop.
-
 
 ## Scenario 2 - using the hosting cluster as WDS to deploy a custom resource
 
@@ -369,6 +368,7 @@ Verify that the chart shows up on the managed clusters:
 helm list --kube-context cluster1 -n postgres-system
 helm list --kube-context cluster2 -n postgres-system
 ```
+
 Implementing this in a controller for automated propagation of
 helm metadata is tracked in this [issue](https://github.com/kubestellar/kubestellar/issues/1543).
 
@@ -397,7 +397,8 @@ spec:
 EOF
 ```
 
-3. Apply a new deployment for the singleton placement:
+Apply a new deployment for the singleton placement:
+
 ```shell
 kubectl --context wds1 apply -f - <<EOF
 apiVersion: apps/v1
@@ -423,12 +424,14 @@ spec:
         - containerPort: 80
 EOF
 ```
+
 Verify that the status is available in wds1 for the deployment by
 running the command:
 
 ```shell
 kubectl --context wds1 get deployments nginx-singleton-deployment -o yaml
 ```
+
 Finally, scale the deployment from 1 to 2 replicas in wds1:
 
 ```shell
@@ -554,6 +557,7 @@ spec:
     - matchLabels: {"argocd.argoproj.io/instance":"nginx-sa"}
 EOF
 ```
+
 Switch context to hosting cluster and argocd namespace (this is required by argo to
 create an app with the CLI)
 
@@ -597,4 +601,3 @@ kubectl --context wds1 -n nginx-sa get secrets
 kubectl --context cluster1 -n nginx-sa get secrets
 kubectl --context cluster2 -n nginx-sa get secrets
 ```
-
