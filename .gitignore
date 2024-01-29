@@ -6,6 +6,7 @@ tools
 build
 .vscode
 docs/scripts/generated_script.sh
+.*.png.bkp
 
 # JetBrains IDE files
 .idea/
