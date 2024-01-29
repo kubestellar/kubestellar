@@ -205,9 +205,9 @@ type PlacementDecisionSpec struct {
 }
 
 // DownsyncObjectReferences explicitly defines the objects to be down-synced.
-// The ClusterScope list defines the cluster-scope objects, NamespacedObjects packs individual objects
-// identifiable by namespace & name, and generation represents the internal spec generation of the listed
-// objects in the ClusterScope and NamespaceScope lists.
+// The ClusterScope list defines the cluster-scope objects, NamespaceScope list
+// defines the namespace-scope objects and generation represents the internal spec
+// generation of the listed objects in the ClusterScope and NamespaceScope lists.
 type DownsyncObjectReferences struct {
 	// `clusterScope` holds a list of individual cluster-scoped objects
 	// to downsync, organized by resource.
