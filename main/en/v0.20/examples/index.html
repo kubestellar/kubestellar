@@ -1915,7 +1915,7 @@
 </code></pre></div>
 <ol>
 <li>Create an inventory &amp; mailbox space of type <code>vcluster</code> running <em>OCM</em> (Open Cluster Management)
-in KubeFlex. Note that <code>-p ocm</code> runs a post-create hook on the <em>vcluster</em> control plane 
+in KubeFlex. Note that <code>-p ocm</code> runs a post-create hook on the <em>vcluster</em> control plane
 which installs OCM on it.</li>
 </ol>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kflex<span class="w"> </span>create<span class="w"> </span>imbs1<span class="w"> </span>--type<span class="w"> </span>vcluster<span class="w"> </span>-p<span class="w"> </span>ocm
@@ -1924,14 +1924,14 @@ which installs OCM on it.</li>
 <li>Install status add-on on imbs1:</li>
 </ol>
 <p>Wait until the <code>managedclusteraddons</code> resource shows up on <code>imbs1</code>. You can check on that with the command:</p>
-<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>api-resources<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>managedclusteraddons<span class="w"> </span>
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>api-resources<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>managedclusteraddons
 </code></pre></div>
    and then install the status add-on:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>imbs1<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>status-addon<span class="w"> </span>-n<span class="w"> </span>open-cluster-management<span class="w"> </span>oci://quay.io/pdettori/status-addon-chart<span class="w"> </span>--version<span class="w"> </span><span class="m">0</span>.1.0
 </code></pre></div>
 <p>see <a href="https://github.ibm.com/dettori/status-addon">here</a> for more details on the add-on.</p>
 <ol>
-<li>Create a Workload Description Space <code>wds1</code> in KubeFlex. Similarly to before, <code>-p kubestellar</code> 
+<li>Create a Workload Description Space <code>wds1</code> in KubeFlex. Similarly to before, <code>-p kubestellar</code>
 runs a post-create hook on the <em>k8s</em> control plane that starts an instance of a KubeStellar controller
 manager which connects to the <code>wds1</code> front-end and the <code>imbs1</code> OCM control plane back-end.</li>
 </ol>
@@ -1942,8 +1942,8 @@ manager which connects to the <code>wds1</code> front-end and the <code>imbs1</c
 <p>Follow the steps to <a href="../example-wecs/">create and register two clusters with OCM</a>.</p>
 </li>
 <li>
-<p>(optional) Check all deployments and statefulsets running in the hosting cluster. Expect to 
-see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the imbs1 
+<p>(optional) Check all deployments and statefulsets running in the hosting cluster. Expect to
+see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the imbs1
 statefulset created in the imbs1-system namespace.</p>
 </li>
 </ol>
@@ -1968,15 +1968,15 @@ statefulset created in the imbs1-system namespace.</p>
 <a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/name&quot;:&quot;nginx&quot;}</span>
 <a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="s">EOF</span>
 </code></pre></div>
-<p>This placement configuration determines <strong>where</strong> to deploy the workload by using 
-the label selector expressions found in <em>clusterSelectors</em>. It also specifies <strong>what</strong> 
-to deploy through the downsync.labelSelectors expressions. 
-Each matchLabels expression is a criterion for selecting a set of objects based on 
-their labels. Other criteria can be added to filter objects based on their namespace, 
-api group, resource, and name. If these criteria are not specified, all objects with 
-the matching labels are selected. If an object has multiple labels, it is selected 
-only if it matches all the labels in the matchLabels expression. 
-If there are multiple objectSelectors, an object is selected if it matches any of them. </p>
+<p>This placement configuration determines <strong>where</strong> to deploy the workload by using
+the label selector expressions found in <em>clusterSelectors</em>. It also specifies <strong>what</strong>
+to deploy through the downsync.labelSelectors expressions.
+Each matchLabels expression is a criterion for selecting a set of objects based on
+their labels. Other criteria can be added to filter objects based on their namespace,
+api group, resource, and name. If these criteria are not specified, all objects with
+the matching labels are selected. If an object has multiple labels, it is selected
+only if it matches all the labels in the matchLabels expression.
+If there are multiple objectSelectors, an object is selected if it matches any of them.</p>
 <p>Now deploy the app:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="s">apiVersion: v1</span>
@@ -2005,12 +2005,12 @@ If there are multiple objectSelectors, an object is selected if it matches any o
 <a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="s">    spec:</span>
 <a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="s">      containers:</span>
 <a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="s">      - name: nginx</span>
-<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="s">        image: public.ecr.aws/nginx/nginx:latest </span>
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="s">        image: public.ecr.aws/nginx/nginx:latest</span>
 <a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="s">        ports:</span>
 <a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a><span class="s">        - containerPort: 80</span>
 <a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="s">EOF</span>
 </code></pre></div>
-<p>Verify that <em>manifestworks</em> wrapping the objects have been created in the mailbox 
+<p>Verify that <em>manifestworks</em> wrapping the objects have been created in the mailbox
 namespaces:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>get<span class="w"> </span>manifestworks<span class="w"> </span>-n<span class="w"> </span>cluster1
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>get<span class="w"> </span>manifestworks<span class="w"> </span>-n<span class="w"> </span>cluster2
@@ -2019,23 +2019,23 @@ namespaces:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>cluster1<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-n<span class="w"> </span>nginx
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>cluster2<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-n<span class="w"> </span>nginx
 </code></pre></div>
-<p>Please note, in line with Kubernetes’ best practices, the order in which you apply 
-a placement and the objects doesn’t affect the outcome. You can apply the placement 
-first followed by the objects, or vice versa. The result remains consistent because 
-the placement controller identifies any changes in either the placement or the objects, 
+<p>Please note, in line with Kubernetes’ best practices, the order in which you apply
+a placement and the objects doesn’t affect the outcome. You can apply the placement
+first followed by the objects, or vice versa. The result remains consistent because
+the placement controller identifies any changes in either the placement or the objects,
 triggering the start of the reconciliation loop.</p>
 <h2 id="scenario-2-using-the-hosting-cluster-as-wds-to-deploy-a-custom-resource">Scenario 2 - using the hosting cluster as WDS to deploy a custom resource<a class="headerlink" href="#scenario-2-using-the-hosting-cluster-as-wds-to-deploy-a-custom-resource" title="Permanent link">#</a></h2>
 <p>This scenario follows on from the state established by scenario 1.</p>
-<p>The hosting cluster can act as a Workload Description Space (WDS) to 
-distribute your workloads to multiple clusters. This feature works 
-well for Custom Resources, but not for standard Kubernetes resources 
-(deployments, pods, replicasets, etc.). The reason is that the hosting 
-cluster’s controller manager creates pods for those resources on the hosting 
-cluster itself, while the Kubestellar controller copies them to the Workload 
-Execution Clusters (WECs). You can use any Custom Resource to wrap any 
-Kubernetes object you want to send to the WECs. But if you have operators 
-or controllers on the hosting cluster that work on the Custom Resource 
-you want to send, make sure they don’t create workloads on the hosting 
+<p>The hosting cluster can act as a Workload Description Space (WDS) to
+distribute your workloads to multiple clusters. This feature works
+well for Custom Resources, but not for standard Kubernetes resources
+(deployments, pods, replicasets, etc.). The reason is that the hosting
+cluster’s controller manager creates pods for those resources on the hosting
+cluster itself, while the Kubestellar controller copies them to the Workload
+Execution Clusters (WECs). You can use any Custom Resource to wrap any
+Kubernetes object you want to send to the WECs. But if you have operators
+or controllers on the hosting cluster that work on the Custom Resource
+you want to send, make sure they don’t create workloads on the hosting
 cluster that you did not intend to create there.</p>
 <p>In order to run this scenario using the post-create-hook method you need
 the raise the permissions for the kubeflex controller manager:</p>
@@ -2052,20 +2052,20 @@ the raise the permissions for the kubeflex controller manager:</p>
 <a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="s">- kind: ServiceAccount</span>
 <a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="s">  name: kubeflex-controller-manager</span>
 <a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="s">  namespace: kubeflex-system</span>
-<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="s">EOF</span><span class="w">  </span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>To create a second WDS based on the hosting cluster, run the command:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kflex<span class="w"> </span>create<span class="w"> </span>wds2<span class="w"> </span>-t<span class="w"> </span>host<span class="w"> </span>-p<span class="w"> </span>kubestellar
 </code></pre></div>
-<p>where the <code>-t host</code> option specifies a control plane of type <code>host</code>. 
+<p>where the <code>-t host</code> option specifies a control plane of type <code>host</code>.
 You can only create on control plane of type <code>host</code>.</p>
 <p>Check that the kubestellar controller for wds2 is started:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deployments.apps<span class="w"> </span>-n<span class="w"> </span>wds2-system<span class="w"> </span>kubestellar-controller-manager
 </code></pre></div>
-<p>If desired, you may remove the <code>kubeflex-manager-cluster-admin-rolebinding</code> after 
-the kubestellar-controller-manager is started, with the command 
+<p>If desired, you may remove the <code>kubeflex-manager-cluster-admin-rolebinding</code> after
+the kubestellar-controller-manager is started, with the command
 <code>kubectl --context kind-kubeflex delete clusterrolebinding kubeflex-manager-cluster-admin-rolebinding</code></p>
-<p>For this example, we use the <code>AppWrapper</code> custom resource defined in the 
+<p>For this example, we use the <code>AppWrapper</code> custom resource defined in the
 <a href="https://github.com/project-codeflare/multi-cluster-app-dispatcher">multi cluster app dispatcher</a>
 project.</p>
 <p>Run the following comamand to give permission for the Klusterlet to
@@ -2157,11 +2157,11 @@ for more details.</p>
 </code></pre></div>
 <h3 id="optional-propagate-helm-metadata-secret-to-managed-clusters">[Optional] Propagate helm metadata Secret to managed clusters<a class="headerlink" href="#optional-propagate-helm-metadata-secret-to-managed-clusters" title="Permanent link">#</a></h3>
 <p>Run "helm list" on the wds1:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>$<span class="w"> </span>helm<span class="w"> </span>--kube-context<span class="w"> </span>wds1<span class="w"> </span>list<span class="w"> </span>-n<span class="w"> </span>postgres-system<span class="w"> </span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>$<span class="w"> </span>helm<span class="w"> </span>--kube-context<span class="w"> </span>wds1<span class="w"> </span>list<span class="w"> </span>-n<span class="w"> </span>postgres-system
 <a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>NAME<span class="w">            </span>NAMESPACE<span class="w">       </span>REVISION<span class="w">        </span>UPDATED<span class="w">                                 </span>STATUS<span class="w">       </span>CHART<span class="w">                    </span>APP<span class="w"> </span>VERSION
-<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>postgres<span class="w">        </span>postgres-system<span class="w"> </span><span class="m">1</span><span class="w">               </span><span class="m">2023</span>-10-31<span class="w"> </span><span class="m">13</span>:39:52.550071<span class="w"> </span>-0400<span class="w"> </span>EDT<span class="w">    </span>deployed<span class="w">     </span>postgresql-13.2.0<span class="w">        </span><span class="m">16</span>.0.0<span class="w">    </span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>postgres<span class="w">        </span>postgres-system<span class="w"> </span><span class="m">1</span><span class="w">               </span><span class="m">2023</span>-10-31<span class="w"> </span><span class="m">13</span>:39:52.550071<span class="w"> </span>-0400<span class="w"> </span>EDT<span class="w">    </span>deployed<span class="w">     </span>postgresql-13.2.0<span class="w">        </span><span class="m">16</span>.0.0
 </code></pre></div>
-<p>And try that on the managed clusters </p>
+<p>And try that on the managed clusters</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>$<span class="w"> </span>helm<span class="w"> </span>list<span class="w"> </span>--kube-context<span class="w"> </span>cluster1<span class="w"> </span>-n<span class="w"> </span>postgres-system
 <a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>:<span class="w"> </span>returns<span class="w"> </span>empty
 <a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>$<span class="w"> </span>helm<span class="w"> </span>list<span class="w"> </span>--kube-context<span class="w"> </span>cluster2<span class="w"> </span>-n<span class="w"> </span>postgres-system
@@ -2216,7 +2216,7 @@ in the placement. This still an experimental feature.</p>
 <a id="__codelineno-29-17" name="__codelineno-29-17" href="#__codelineno-29-17"></a><span class="s">    spec:</span>
 <a id="__codelineno-29-18" name="__codelineno-29-18" href="#__codelineno-29-18"></a><span class="s">      containers:</span>
 <a id="__codelineno-29-19" name="__codelineno-29-19" href="#__codelineno-29-19"></a><span class="s">      - name: nginx</span>
-<a id="__codelineno-29-20" name="__codelineno-29-20" href="#__codelineno-29-20"></a><span class="s">        image: public.ecr.aws/nginx/nginx:latest </span>
+<a id="__codelineno-29-20" name="__codelineno-29-20" href="#__codelineno-29-20"></a><span class="s">        image: public.ecr.aws/nginx/nginx:latest</span>
 <a id="__codelineno-29-21" name="__codelineno-29-21" href="#__codelineno-29-21"></a><span class="s">        ports:</span>
 <a id="__codelineno-29-22" name="__codelineno-29-22" href="#__codelineno-29-22"></a><span class="s">        - containerPort: 80</span>
 <a id="__codelineno-29-23" name="__codelineno-29-23" href="#__codelineno-29-23"></a><span class="s">EOF</span>
@@ -2236,7 +2236,7 @@ Finally, scale the deployment from 1 to 2 replicas in wds1:</p>
 <h2 id="scenario-5-resiliency-testing">Scenario 5 - Resiliency testing<a class="headerlink" href="#scenario-5-resiliency-testing" title="Permanent link">#</a></h2>
 <p>This is a test that you can do after finishing Scenario 1.</p>
 <p>TODO: rewrite this so that it makes sense after Scenario 4.</p>
-<p>Bring down the control plane: stop and restart wds1 and imbs1 API servers, 
+<p>Bring down the control plane: stop and restart wds1 and imbs1 API servers,
 KubeFlex and KubeStellar controllers:</p>
 <p>First stop all:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>wds1-system<span class="w"> </span>kube-apiserver<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
@@ -2292,7 +2292,7 @@ KubeFlex and KubeStellar controllers:</p>
 <a id="__codelineno-36-25" name="__codelineno-36-25" href="#__codelineno-36-25"></a><span class="s">    spec:</span>
 <a id="__codelineno-36-26" name="__codelineno-36-26" href="#__codelineno-36-26"></a><span class="s">      containers:</span>
 <a id="__codelineno-36-27" name="__codelineno-36-27" href="#__codelineno-36-27"></a><span class="s">      - name: nginx-res</span>
-<a id="__codelineno-36-28" name="__codelineno-36-28" href="#__codelineno-36-28"></a><span class="s">        image: public.ecr.aws/nginx/nginx:latest </span>
+<a id="__codelineno-36-28" name="__codelineno-36-28" href="#__codelineno-36-28"></a><span class="s">        image: public.ecr.aws/nginx/nginx:latest</span>
 <a id="__codelineno-36-29" name="__codelineno-36-29" href="#__codelineno-36-29"></a><span class="s">        ports:</span>
 <a id="__codelineno-36-30" name="__codelineno-36-30" href="#__codelineno-36-30"></a><span class="s">        - containerPort: 80</span>
 <a id="__codelineno-36-31" name="__codelineno-36-31" href="#__codelineno-36-31"></a><span class="s">EOF</span>
@@ -2303,7 +2303,7 @@ KubeFlex and KubeStellar controllers:</p>
 </code></pre></div>
 <h2 id="scenario-6-multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd">Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD<a class="headerlink" href="#scenario-6-multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd" title="Permanent link">#</a></h2>
 <p>This scenario is something you can do after the <a href="#common-setup">common setup</a>.</p>
-<p>Before running this scenario, install ArgoCD on the hosting cluster and configure it 
+<p>Before running this scenario, install ArgoCD on the hosting cluster and configure it
 work with the WDS as outlined <a href="../thirdparties/#install-and-configure-argocd">here</a>.</p>
 <p>Including a ServiceAccount tests whether there will be a controller fight over a token Secret for that ServiceAccount, which was observed in some situations with older code.</p>
 <p>Apply the following placement to wds1:</p>
@@ -2320,7 +2320,7 @@ work with the WDS as outlined <a href="../thirdparties/#install-and-configure-ar
 <a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a><span class="s">    - matchLabels: {&quot;argocd.argoproj.io/instance&quot;:&quot;nginx-sa&quot;}</span>
 <a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a><span class="s">EOF</span>
 </code></pre></div>
-Switch context to hosting cluster and argocd namespace (this is required by argo to 
+Switch context to hosting cluster and argocd namespace (this is required by argo to
 create an app with the CLI)</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>kind-kubeflex
 <a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>kubectl<span class="w"> </span>config<span class="w"> </span>set-context<span class="w"> </span>--current<span class="w"> </span>--namespace<span class="o">=</span>argocd
@@ -2339,7 +2339,7 @@ create an app with the CLI)</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>cluster1<span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>deployments,sa,secrets
 <a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>cluster2<span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>deployments,sa,secrets
 </code></pre></div>
-<p>Repeat multiple syncing on Argo and verify that extra secrets for the service acccount 
+<p>Repeat multiple syncing on Argo and verify that extra secrets for the service acccount
 are not created both wds1 and clusters:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>secrets
 <a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>cluster1<span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>secrets
