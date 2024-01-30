@@ -50,10 +50,10 @@ type Controller struct {
 	ctx                context.Context
 	logger             logr.Logger
 	wdsName            string
-	wdsDynClient       *dynamic.DynamicClient
-	wdsKubeClient      *kubernetes.Clientset
-	imbsDynClient      *dynamic.DynamicClient
-	imbsKubeClient     *kubernetes.Clientset
+	wdsDynClient       dynamic.Interface
+	wdsKubeClient      kubernetes.Interface
+	imbsDynClient      dynamic.Interface
+	imbsKubeClient     kubernetes.Interface
 	workStatusInformer cache.SharedIndexInformer
 	workStatusLister   cache.GenericLister
 	placementInformer  cache.SharedIndexInformer
@@ -61,14 +61,14 @@ type Controller struct {
 	workqueue          workqueue.RateLimitingInterface
 	// all wds listers/informers are required to retrieve objects and update status
 	// without having to re-create new caches for this coontroller
-	listers   map[string]*cache.GenericLister
-	informers map[string]*cache.SharedIndexInformer
+	listers   map[string]cache.GenericLister
+	informers map[string]cache.SharedIndexInformer
 }
 
 // Create a new  status controller
 func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
-	wdsName string, listers map[string]*cache.GenericLister,
-	informers map[string]*cache.SharedIndexInformer) (*Controller, error) {
+	wdsName string, listers map[string]cache.GenericLister,
+	informers map[string]cache.SharedIndexInformer) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
@@ -149,7 +149,7 @@ func (c *Controller) run(workers int) error {
 	// a safer approach here.
 	for _, informer := range c.informers {
 		wait.PollUntilContextCancel(ctx, time.Second, true, func(ctx context.Context) (bool, error) {
-			if informer != nil && (*informer).HasSynced() {
+			if informer != nil && informer.HasSynced() {
 				return true, nil
 			}
 			return false, nil
@@ -352,7 +352,7 @@ func (c *Controller) reconcile(ctx context.Context, ref cache.ObjectName) error 
 }
 
 func updateObjectStatus(objRef *util.SourceRef, status map[string]interface{},
-	listers map[string]*cache.GenericLister, wdsDynClient *dynamic.DynamicClient) error {
+	listers map[string]cache.GenericLister, wdsDynClient dynamic.Interface) error {
 
 	key := util.KeyForGroupVersionKind(objRef.Group, objRef.Version, objRef.Kind)
 
@@ -361,7 +361,7 @@ func updateObjectStatus(objRef *util.SourceRef, status map[string]interface{},
 		return fmt.Errorf("could not find lister for GVK key %s", key)
 	}
 
-	obj, err := getObject(*lister, objRef.Namespace, objRef.Name)
+	obj, err := getObject(lister, objRef.Namespace, objRef.Name)
 	if err != nil {
 		return err
 	}

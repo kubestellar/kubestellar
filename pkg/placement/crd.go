@@ -167,12 +167,12 @@ func (c *Controller) startInformersForNewAPIResources(toStartList []APIResource)
 		})
 		key := util.KeyForGroupVersionKind(toStart.groupVersion.Group,
 			toStart.groupVersion.Version, toStart.resource.Kind)
-		c.informers[key] = &informer
+		c.informers[key] = informer
 		c.gvksMap[key] = &gvr
 
 		// create and index the lister
 		lister := cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())
-		c.listers[key] = &lister
+		c.listers[key] = lister
 		stopper := make(chan struct{})
 		defer close(stopper)
 		c.stoppers[key] = stopper

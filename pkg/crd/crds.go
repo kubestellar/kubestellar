@@ -48,7 +48,7 @@ var embeddedFiles embed.FS
 
 const FieldManager = "kubestellar"
 
-func ApplyCRDs(dynamicClient *dynamic.DynamicClient, clientset *kubernetes.Clientset, clientsetExt *apiextensionsclientset.Clientset, logger logr.Logger) error {
+func ApplyCRDs(dynamicClient dynamic.Interface, clientset kubernetes.Interface, clientsetExt apiextensionsclientset.Interface, logger logr.Logger) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -128,7 +128,7 @@ func DecodeYAML(yamlBytes []byte) (*unstructured.Unstructured, error) {
 	return obj, nil
 }
 
-func waitForCRDAccepted(ctx context.Context, clientset *apiextensionsclientset.Clientset, crdName string) error {
+func waitForCRDAccepted(ctx context.Context, clientset apiextensionsclientset.Interface, crdName string) error {
 	return wait.PollUntilContextCancel(ctx, 1*time.Second, true, func(ctx context.Context) (bool, error) {
 		crd, err := clientset.ApiextensionsV1().CustomResourceDefinitions().Get(ctx, crdName, metav1.GetOptions{})
 		if err != nil {
