@@ -9,9 +9,13 @@ or bundling. The high-level architecture for KubeStellar is illustrated in Figur
   <figcaption align="center">Figure 1 - High Level Architecture </figcaption>
 </figure>
 
-KubeStellar relies on the concept of *spaces*, which are abstractions 
-that represent a Kubernetes API Server and its controllers. Users can use spaces to 
-perform these tasks:
+KubeStellar relies on the concept of *spaces*.  
+A Space is an abstraction to represent an API service that 
+behaves like a Kubernetes kube-apiserver (including the persistent storage behind it) 
+and the subset of controllers in the kube-controller-manager that are concerned with 
+API machinery generalities (not management of containerized workloads). 
+A KubeFlex `ControlPlane` is an example. A regular Kubernetes cluster is another example.
+Users can use spaces to perform these tasks:
 
 1. Create *Workload Definition Spaces* (WDSs) to store the definitions of their workloads.
 A Kubernetes workload is an application that runs on Kubernetes. A workload can be made by a 
@@ -55,7 +59,7 @@ ManifestWorks and unwraps and syncs the objects into the WEC.
 
 - *OCM Status Add-On Agent*: This module watches *AppliedManifestWorks* 
 to find objects that are synced by the OCM agent, gets their status 
-and updates *workstatuses* objects in the ITS namespace associated with the WEC.
+and updates *WorkStatus* objects in the ITS namespace associated with the WEC.
 
 <figure>
   <img src="./main-modules.png"  alt="Main Modules">
@@ -70,7 +74,8 @@ placement and workload objects on the Workload Definition Space
 Inventory and Transport Space (ITS). The status controller watches for `workstatuses` objects on the 
 ITS and updates the status of objects in the WDS when singleton status is requested 
 in the placement for those objects. There is one instance of a KubeStellar Controller 
-Manager for each WDS. Currently this controller-manager runs in the KubeFlex hosting cluster.
+Manager for each WDS. Currently this controller-manager runs in the KubeFlex hosting cluster and 
+is responsible of installing the required CRDs in the associated WDS.
 More details on the internals of this module are provided in [KubeStellar Controllers Architecture](#kubestellar-controllers-architecture)
 
 ## Space Manager
@@ -81,21 +86,12 @@ for space management. In KubeFlex, a space is named a `ControlPlane`, and we wil
 both terms in this document. KubeSteller currently prereqs KubeFlex to 
 provide one or more spaces. We plan to make this optional in the near future.
 
-KubeFlex is a flexible framework that supports various kinds of control planes, such as:
-
-- *k8s*: a basic Kubernetes API Server with a subset of kube controllers. 
-The control plane in this context does not execute workloads, such as pods, 
-because the controllers associated with these objects are not activated. 
-This environment is referred to as ‘denatured’ because it lacks the typical 
-characteristics and functionalities of a standard Kubernetes cluster
-It uses about 350 MB of memory per instance with a shared Postgres Database Backend.
-- *vcluster*: a virtual cluster that runs on the hosting cluster, 
-based on the  [vCluster Project](https://www.vcluster.com). This type control plane can run pods using worker nodes of the hosting cluster.
-- *host*: the KubeFlex hosting cluster, which is exposed as a control plane.
-- *external*: an external cluster that is imported as a control plane.
-- *ocm*: a control plane that uses the 
-[multicluster-controlplane project](https://github.com/open-cluster-management-io/multicluster-controlplane) 
-for managing multiple clusters.
+KubeFlex is a flexible framework that supports various kinds of control planes, such
+as *k8s*, a basic Kubernetes API Server with a subset of kube controllers, and 
+*vcluster*: a virtual cluster that runs on the hosting cluster based on the
+[vCluster Project](https://www.vcluster.com). More detailed information
+on the different types of control planes and architecture are described
+in the [KubeFlex Architecture](https://github.com/kubestellar/kubeflex/blob/main/docs/architecture.md).
 
 There are currently two roles for spaces managed by KubeFlex: Inventory and Transport Space 
 (ITS) and Workload Description Space (WDS). The former runs the [OCM Cluster Manager](#ocm-cluster-manager)
@@ -109,49 +105,6 @@ central KubeStellar controllers.
 A WDS holds user workload objects and the user's objects that form the interface to KubeStellar 
 control. Currently the only control objects are `Placement` objects. We plan to add `Customization`
 objects soon, and later objects to specify summarization.
-
-When using KubeStellar with KubeFlex, users interact with the API server 
-of the hosting cluster to create or delete control planes, and with the 
-hosted API servers to manage *Workloads* and *Placements* or *ManagedClusters*.
-KubeFlex defines a ControlPlane CRD that represents a Control Plane. When a user
-initiates the creation of a Control Plane Custom Resource (CR) by
-executing the `kflex create <cp>` command or the `kubectl apply -f mycontrolplane.yaml` 
-command, the KubeFlex controller creates a new namespace within the hosting cluster, 
-and then deploys the following
-artifacts in that namespace:
-
-1. **Deploys a Kubernetes API server** instance within a pod, which
-    serves the API for the control plane.
-
-    - For control planes designated as type `k8s`, the API server is
-      configured to use a **shared Postgres database** as a backend DB.
-      This database is located in the `kubeflex-system` namespace. KubeFlex takes advantage of
-      [**<u>kine</u>**](https://github.com/k3s-io/kine), a tool that
-      emulates the etcd interface for Postgres, allowing the API server
-      to interact with the database.
-
-    - For control planes designated as type `vcluster`, the API
-      server and an embedded etcd database run as a single process in
-      the pod, and mount a persistent volume for etcd.
-
-2.  **Deploys a Kubernetes controller manager** within a pod in the new
-    namespace. This controller manager operates a select group of
-    essential Kubernetes controllers, such as namespace, garbage
-    collection (gc), and service account controllers. The controller
-    manager is configured to connect to the hosted Kubernetes API
-    server.
-
-3.  Creates a **Service for the Kubernetes API server**
-
-4.  Creates either an **Ingress** or a **Route** for providing external
-    connectivity to the API server. The latter is adopted if the hosting
-    cluster is an OpenShift cluster.
-
-5.  Creates a **Secret** that contains the `kubeconfig` file required by
-    clients to access the Control Plane API server. The secret has
-    actually two Kubeconfigs, one for off-cluster access and one for
-    in-cluster access. The latter is used by clients running in the
-    hosting cluster, such as controllers.
 
 KubeFlex provides the ability to start controllers connected to a
 Control Plane API Server or to deploy Helm Charts into a Control Plane
@@ -192,7 +145,7 @@ the add-on, manage the distribution of the add-on to all clusters, and set
 up the RBAC permissions required by the add-on agent to interact with the mailbox 
 namespace associated with the managed cluster. More specifically, the status 
 add-on controller sets up RBAC permissions to allow the add-on agent to 
-list and get *manifestworks* and create and update *workstatuses* resource
+list and get *ManifestWork* objects and create and update *WorkStatus* objects.
 
 ## OCM Agent
 
@@ -234,10 +187,10 @@ by the work agent and report the full status of those objects back to the ITS.
 The KubeStellar controller can then use different user-defined summarization 
 policies to report status, such as the `wantSingletonReportedState` policy that reports 
 full status for each deployed object when the workload is delivered only to one 
-cluster. The controller watches *appliedmanifestworks* objects to determine which 
+cluster. The controller watches *AppliedManifestWork* objects to determine which 
 objects have been delivered through the work agent. It then starts dynamic informers 
 to watch those objects, collect their individual statuses, and report back the status 
-updating *workstatuses* objects in the namespace associated with the WEC in the ITS.
+updating *WorkStatus* objects in the namespace associated with the WEC in the ITS.
 
 ## KubeStellar Controllers Architecture
 
@@ -319,7 +272,7 @@ follows:
     events where the object content is not modified) and then creates a
     key to store a reference to the object in the work queue. The key
     contains the GVK key used to retrieve a reference to the informer
-    and lister for that kind of object, and a namespace/name key to
+    and lister for that kind of object, and a namespace + name key to
     retrieve the actual object. Storing the key in the work queue is a
     common pattern in client-go as the object may have changed in the
     cache (which is kept updated by the reflector) by the time a worker
@@ -335,14 +288,17 @@ follows:
        the object.
     -  Gets the lister for Placement objects and list all placements
     -  Iterates on all placements, and for each placement:
-        - evaluates the placement label selector vs. object labels to
-          check if there is a match.
-        - If there is a match, uses the lister for ManagedCluster and
+        - evaluates whether the object matches the downsync selection 
+          criteria in the Placement.
+        - If there is a match, list ManagedClusters and
           find the matching clusters using the label selector expression
           for clusters.
         - If there are matching clusters, add the names of the cluster
           to a hashmap setting the name of the cluster as a key. Cluster
           groups from different placements are merged together.
+        - If the one of the matched Placements has ` WantSingletonReportedState`
+          set to true, clusters are sorted in alphanumerical order and
+          only the first cluster is selected for delivery.  
     -  If there are no matching clusters, the worker returns without
         actions and is ready to process other events from the queue.
     -  If there are matching clusters:
@@ -360,17 +316,15 @@ follows:
               apply of the manifest into the namespace.
         - Worker returns and is ready to pick other keys from the queue.
 
-There are other event flows, based on the object GVK and type of event.
+There are other event flows, based on the object GVK and type of event. 
+Error conditions cause the re-enqueing of keys, resulting in retries.
 The following sections broadly describe these flows:
 
 #### Object Deleted 
 
 When an object is deleted from the WDS, the handler’s *DeleteFunc* is
-invoked. Since most objects do not have a finalizer (which prevents
-deletion from the API server until the controller that sets the
-finalizer does some cleanup and then removes the object), a shallow copy
-of the object is added to a field in the key before pushing it to the
-work queue. Then:
+invoked. A shallow copy of the object is added to a field in the key 
+before pushing it to the work queue. Then:
 
 - Worker pulls the key from the work queue
 
@@ -409,11 +363,11 @@ some additional complexity in the code.
 
 #### Placement Deleted
 
-When a new placement is created, the placement controller sets a finalizer
-on it. The Worker pulls a key from queue; if it is a placement and it has been
-deleted (deletion timestamp is set) it follows the flow below:
+When the placement controller first processes a new Placement, the placement 
+controller sets a finalizer on it. The Worker pulls a key from queue; if it is 
+a placement and it has been deleted (deletion timestamp is set) it follows the flow below:
 
-- Uses lister to list all ManifestWorks on all namespaces in ITS by
+- Lists all ManifestWorks on all namespaces in ITS by
   placement label.
 - Iterates on all matching ManifestWorks, for each one:
   - Deletes the ManifestWork (if no other placement labels) or the label
@@ -453,12 +407,12 @@ has been deleted:
 
 ### Status Controller
 
-The status controller watches for *workstatuses* objects on the ITS, and
+The status controller watches for *WorkStatus* objects on the ITS, and
 for WDS objects propagated by a placement with  the flag
 `wantSingletonReportedState` set to true, updates the status of those
 objects with the corresponding status found in the workstatus object.
 
-The *workstatuses* are created and updated on the ITS by the status add-on.
+The *WorkStatus* objects are created and updated on the ITS by the status add-on.
 The high-level flow for the singleton status update is described in Figure 4.
 
 <figure>
@@ -467,13 +421,13 @@ The high-level flow for the singleton status update is described in Figure 4.
 </figure>
 
 The status add-on tracks objects applied by the work agent by watching 
-*appliedmanifestworks* objects. These objects list the GVR, name
+*AppliedManifestWork* objects. These objects list the GVR, name
 and namespace (the latter for namespaced objects) of each object applied
 by the related *ManifestWork*. The status add-on then uses this information 
 to ensure that a singleton informer is started for each GVR, 
 and to track status updates of each tracked object. The status add-on
-then creates/updates *workstatuses* objects in the ITS with the status
-of tracked objects. A `WorkStatus` object contains status for exactly one
-object, so that status updates for one object do not require updates of a whole
-bundle. 
+then creates/updates *WorkStatus* objects in the ITS with the status
+of tracked objects in the namespace associated with the WEC cluster.
+A `WorkStatus` object contains status for exactly one object, so that 
+status updates for one object do not require updates of a whole bundle. 
 
