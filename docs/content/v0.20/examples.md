@@ -7,8 +7,6 @@
 
 See [pre-reqs](pre-reqs.md).
 
-See also [check_pre_req](contributor.md#check-key-pre-requisites-for-kubestellar) script.
-
 ## Common Setup
 
 The following steps establish an initial state used in the examples below.

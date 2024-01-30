@@ -4,7 +4,7 @@
 
 ## Check pre-requisites for KubeStellar
 
-The [check_pre_req](../../../hack/check_pre_req.sh) script offers a convenient way to check for pre-requisites, including the ones needed for [KubeStellar](./pre-reqs.md) deployment and [use case scenarios](./examples.md).
+The [check_pre_req](../../../hack/check_pre_req.sh) script offers a convenient way to check for pre-requisites, needed for [KubeStellar](./pre-reqs.md) deployment and [use case scenarios](./examples.md).
 
 The [check_pre_req](../../../hack/check_pre_req.sh) script check for a pre-requisite presence in the path, by using the `which` command, and it can optionally provide version and path information for pre-requisites that are present, or installation information for missing pre-requisites.
 
@@ -25,27 +25,26 @@ The [check_pre_req](../../../hack/check_pre_req.sh) script accepts a list of spe
 
 ```shell
 $ check_pre_req.sh --list
-argo brew docker go helm jq kcp kflex kind ko kubectl make ocm yq
+argo brew docker go helm jq kflex kind ko kubectl make ocm yq
 ```
 
-For example, the complete list of pre-requisites could be checked with the command below:
+For example, list of pre-requisites required by Kubestellar can be checked with the command below (add the `-V` flag to get the version of each program na dusggestions on how to install missing pre-requisites):
 
 ```shell
-$ check_pre_req.sh
-X ArgoCD CLI
-✔ Home Brew
+$ hack/check_pre_req.sh
+Checking pre-requisites for using KubeStellar:
 ✔ Docker
-✔ Go
-✔ Helm
-✔ jq
-X kcp
-✔ KubeFlex
-✔ Kind
-✔ KO
 ✔ kubectl
-✔ GNU Make
+✔ KubeFlex
 ✔ OCM CLI
-✔ yq
+✔ Helm
+Checking additional pre-requisites for running the examples:
+✔ Kind
+X ArgoCD CLI
+Checking pre-requisites for building KubeStellar:
+✔ GNU Make
+✔ Go
+✔ KO
 ```
 
 In another example, a specific list of pre-requisites could be asserted by an higher-level script, while providing some installation information, with the command below (note that the script will terminate upon finding a missing pre-requisite):

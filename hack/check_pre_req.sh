@@ -141,7 +141,7 @@ is_installed_yq() {
 
 
 # Global constants
-PROGRAMS="@(argo|brew|docker|go|helm|jq|kcp|kflex|kind|ko|kubectl|make|ocm|yq)"
+PROGRAMS="@(argo|brew|docker|go|helm|jq|kflex|kind|ko|kubectl|make|ocm|yq)"
 
 # Global parameters
 assert="false"  # true => exit on missing program
@@ -183,19 +183,30 @@ else
     echov() { :; }
 fi
 
-# Parse the default list of programs
-if [ ${#programs[@]} -eq 0 ]; then
-    IFS='@|()' read -r -a programs <<< "$(echo "$PROGRAMS" | sed -e "s/^@(//" -e "s/)//")"
-fi
-
 # Dsiplay the list of programs, if requested
 if [ "$list" == "true" ]; then
+    IFS='@|()' read -r -a programs <<< "$(echo "$PROGRAMS" | sed -e "s/^@(//" -e "s/)//")"
     echo "${programs[@]}"
     exit 0
 fi
 
-# Check the list of programs
-echov "Checking KubeStellar pre-requisites:"
-for p in ${programs[@]} ; do
-    eval "is_installed_$p"
-done
+if [ ${#programs[@]} -eq 0 ]; then
+    echo "Checking pre-requisites for using KubeStellar:"
+    is_installed_docker
+    is_installed_kubectl
+    is_installed_kflex
+    is_installed_ocm
+    is_installed_helm
+    echo "Checking additional pre-requisites for running the examples:"
+    is_installed_kind
+    is_installed_argo
+    echo "Checking pre-requisites for building KubeStellar:"
+    is_installed_make
+    is_installed_go
+    is_installed_ko
+else
+    echov "Checking pre-requisites for KubeStellar:"
+    for p in ${programs[@]} ; do
+        eval "is_installed_$p"
+    done
+fi
