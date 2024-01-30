@@ -17,7 +17,7 @@
     
     
       
-        <title>Pre reqs - KubeStellar</title>
+        <title>KubeStellar prerequisites - KubeStellar</title>
       
     
     
@@ -74,7 +74,7 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - Pre reqs" />
+  <meta property="og:title" content="KubeStellar - KubeStellar prerequisites" />
   <meta property="og:description" content="None" />
   <meta property="og:url" content="https://docs.kubestellar.io/main/v0.20/pre-reqs/" />
   <meta property="og:image" content="https://docs.kubestellar.io/mainassets/images/illustrations/banner.png" />
@@ -109,7 +109,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#for-using-kubestellar" class="md-skip">
+        <a href="#kubestellar-prerequisites" class="md-skip">
           Skip to content
         </a>
       
@@ -188,7 +188,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Pre reqs
+              KubeStellar prerequisites
             
           </span>
         </div>
@@ -1786,6 +1786,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1845,28 +1847,27 @@
   
 
 
-  <h1>Pre reqs</h1>
-
-<p>The following pre-requisites are required.</p>
+<h1 id="kubestellar-prerequisites">KubeStellar prerequisites<a class="headerlink" href="#kubestellar-prerequisites" title="Permanent link">#</a></h1>
+<p>The following prerequisites are required.</p>
 <h2 id="for-using-kubestellar">For Using KubeStellar<a class="headerlink" href="#for-using-kubestellar" title="Permanent link">#</a></h2>
 <ul>
 <li>
 <p>kubeflex version 0.4.1 or higher
-    To install kubeflex go to <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation">https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation</a>. To upgrade from an existing installation, 
+    To install kubeflex go to <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation">https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation</a>. To upgrade from an existing installation,
 follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex">these instructions</a>. At the end of the install make sure that the kubeflex CLI, kflex, is in your path.</p>
 </li>
 <li>
 <p>OCM CLI (clusteradm)
-    To install OCM CLI use:
-    <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+    To install OCM CLI use:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </code></pre></div>
-    Note that the default installation of clusteradm will install in /usr/local/bin which will require root access. If you prefer to avoid root, you can specify an alternative installation path using the INSTALL_DIR environment variable, as follows:
-    <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>mkdir -p ocm
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>export INSTALL_DIR=&quot;$PWD/ocm&quot;
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>export PATH=$PWD/ocm:$PATH
+<p>Note that the default installation of clusteradm will install in /usr/local/bin which will require root access. If you prefer to avoid root, you can specify an alternative installation path using the INSTALL_DIR environment variable, as follows:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>ocm
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">/ocm&quot;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PWD</span>/ocm:<span class="nv">$PATH</span>
 </code></pre></div>
-    At the end of the install make sure that the OCM CLI, clusteradm, is in your path.</p>
+<p>At the end of the install make sure that the OCM CLI, clusteradm, is in your path.</p>
 </li>
 <li>
 <p>helm - to deploy the kubestellar and kubeflex charts</p>
@@ -1882,7 +1883,7 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 <h2 id="for-building-kubestellar">For Building KubeStellar<a class="headerlink" href="#for-building-kubestellar" title="Permanent link">#</a></h2>
 <ul>
 <li>go version 1.20 or higher - to build kubestellar</li>
-<li>make - to build kubestellar and create the kubestellar image </li>
+<li>make - to build kubestellar and create the kubestellar image</li>
 <li>ko - to create the kubestellar image</li>
 </ul>
 

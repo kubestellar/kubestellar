@@ -1924,9 +1924,9 @@ which installs OCM on it.</li>
 <li>Install status add-on on imbs1:</li>
 </ol>
 <p>Wait until the <code>managedclusteraddons</code> resource shows up on <code>imbs1</code>. You can check on that with the command:</p>
-<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>api-resources<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>managedclusteraddons
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>api-resources<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>managedclusteraddons
 </code></pre></div>
-   and then install the status add-on:</p>
+<p>and then install the status add-on:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>imbs1<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>status-addon<span class="w"> </span>-n<span class="w"> </span>open-cluster-management<span class="w"> </span>oci://quay.io/pdettori/status-addon-chart<span class="w"> </span>--version<span class="w"> </span><span class="m">0</span>.1.0
 </code></pre></div>
 <p>see <a href="https://github.ibm.com/dettori/status-addon">here</a> for more details on the add-on.</p>
@@ -2171,10 +2171,10 @@ for more details.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>label<span class="w"> </span>secret<span class="w"> </span>-n<span class="w"> </span>postgres-system<span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>get<span class="w"> </span>secrets<span class="w"> </span>-n<span class="w"> </span>postgres-system<span class="w"> </span>-l<span class="w"> </span><span class="nv">name</span><span class="o">=</span>postgres<span class="w"> </span>-l<span class="w"> </span><span class="nv">owner</span><span class="o">=</span>helm<span class="w">  </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="k">)</span><span class="w"> </span>app.kubernetes.io/managed-by<span class="o">=</span>Helm<span class="w"> </span>app.kubernetes.io/instance<span class="o">=</span>postgres
 </code></pre></div>
 <p>Verify that the chart shows up on the managed clusters:</p>
-<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>helm<span class="w"> </span>list<span class="w"> </span>--kube-context<span class="w"> </span>cluster1<span class="w"> </span>-n<span class="w"> </span>postgres-system
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>helm<span class="w"> </span>list<span class="w"> </span>--kube-context<span class="w"> </span>cluster1<span class="w"> </span>-n<span class="w"> </span>postgres-system
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>helm<span class="w"> </span>list<span class="w"> </span>--kube-context<span class="w"> </span>cluster2<span class="w"> </span>-n<span class="w"> </span>postgres-system
 </code></pre></div>
-Implementing this in a controller for automated propagation of
+<p>Implementing this in a controller for automated propagation of
 helm metadata is tracked in this <a href="https://github.com/kubestellar/kubestellar/issues/1543">issue</a>.</p>
 <h2 id="scenario-4-singleton-status">Scenario 4 - Singleton status<a class="headerlink" href="#scenario-4-singleton-status" title="Permanent link">#</a></h2>
 <p>This scenario proceeds from the state established by the <a href="#common-setup">common setup</a>.</p>
@@ -2195,8 +2195,7 @@ in the placement. This still an experimental feature.</p>
 <a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/name&quot;:&quot;nginx-singleton&quot;}</span>
 <a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="s">EOF</span>
 </code></pre></div>
-<ol>
-<li>Apply a new deployment for the singleton placement:
+<p>Apply a new deployment for the singleton placement:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="s">apiVersion: apps/v1</span>
 <a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="s">kind: Deployment</span>
@@ -2221,12 +2220,11 @@ in the placement. This still an experimental feature.</p>
 <a id="__codelineno-29-22" name="__codelineno-29-22" href="#__codelineno-29-22"></a><span class="s">        - containerPort: 80</span>
 <a id="__codelineno-29-23" name="__codelineno-29-23" href="#__codelineno-29-23"></a><span class="s">EOF</span>
 </code></pre></div>
-Verify that the status is available in wds1 for the deployment by
-running the command:</li>
-</ol>
-<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>nginx-singleton-deployment<span class="w"> </span>-o<span class="w"> </span>yaml
+<p>Verify that the status is available in wds1 for the deployment by
+running the command:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>nginx-singleton-deployment<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-Finally, scale the deployment from 1 to 2 replicas in wds1:</p>
+<p>Finally, scale the deployment from 1 to 2 replicas in wds1:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>nginx-singleton-deployment<span class="w"> </span>--replicas<span class="o">=</span><span class="m">2</span>
 </code></pre></div>
 <p>and verify that replicas has been updated in cluster1 and wds1:</p>
@@ -2307,7 +2305,7 @@ KubeFlex and KubeStellar controllers:</p>
 work with the WDS as outlined <a href="../thirdparties/#install-and-configure-argocd">here</a>.</p>
 <p>Including a ServiceAccount tests whether there will be a controller fight over a token Secret for that ServiceAccount, which was observed in some situations with older code.</p>
 <p>Apply the following placement to wds1:</p>
-<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
 <a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="s">kind: Placement</span>
 <a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="s">metadata:</span>
@@ -2320,7 +2318,7 @@ work with the WDS as outlined <a href="../thirdparties/#install-and-configure-ar
 <a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a><span class="s">    - matchLabels: {&quot;argocd.argoproj.io/instance&quot;:&quot;nginx-sa&quot;}</span>
 <a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a><span class="s">EOF</span>
 </code></pre></div>
-Switch context to hosting cluster and argocd namespace (this is required by argo to
+<p>Switch context to hosting cluster and argocd namespace (this is required by argo to
 create an app with the CLI)</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>kind-kubeflex
 <a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>kubectl<span class="w"> </span>config<span class="w"> </span>set-context<span class="w"> </span>--current<span class="w"> </span>--namespace<span class="o">=</span>argocd
