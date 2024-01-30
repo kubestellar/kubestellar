@@ -6,6 +6,8 @@ tools
 build
 .vscode
 docs/scripts/generated_script.sh
+
+# Draw.io backup files
 .*.png.bkp
 
 # JetBrains IDE files

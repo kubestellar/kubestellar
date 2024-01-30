@@ -5,34 +5,35 @@ placement policy, where Kubernetes objects are expressed in their native format 
 or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.
 
 <figure>
-  <img src="assets/high-level-architecture.png"  alt="High Level Architecture">
+  <img src="./high-level-architecture.png"  alt="High Level Architecture">
   <figcaption align="center">Figure 1 - High Level Architecture </figcaption>
 </figure>
 
 KubeStellar relies on the concept of *spaces*, which are abstractions 
-that represent a Kubernetes API Server and its controllers. Users can use 
-spaces to perform these tasks:
+that represent a Kubernetes API Server and its controllers. Users can use spaces to 
+perform these tasks:
 
 1. Create *Workload Definition Spaces* (WDSs) to store the definitions of their workloads.
+A Kubernetes workload is an application that runs on Kubernetes. A workload can be made by a 
+single Kubernetes object or several objects that work together.
 2. Create *Inventory and Transport Spaces* (ITSs) to manage the inventory of clusters and 
 the transport of workloads.
 3. Register and label Workload Execution Clusters (WECs) with the Inventory and 
 Transport Space, to keep track of the available clusters and their characteristics.
-4. Define Placement Policies to specify *what" workloads and *where* should be 
+4. Define Placement Policies to specify *what" objects and *where* should be 
 deployed on the WECs.
-5. Submit Workload Definitions in the native Kubernetes format to the WDSs, 
+5. Submit objects in the native Kubernetes format to the WDSs, 
 and let the Placement Policies govern which WECs should receive them.
-6. Check the status of submitted workloads from the WDS.
+6. Check the status of submitted objects from the WDS.
 
-KubeStellar users can have different roles and responsibilities. 
-For example, a System Admin can set up a KubeStellar instance, 
-create WDSs and ITSs, and register WECs. An Application Owner can 
-define Placement Policies and submit Workload Definitions for deployment. 
-Other roles, such as CISO or DevOps Engineers, may also exist. However, 
-in this document, we will not make an explicit distinction between
-different user roles and will refer to a user that has all these roles.
-The user interaction with KubeStellar is described in the 
-[user interaction](./user-interaction.md) section.
+In KubeStellar, users can assume a variety of roles and responsibilities. 
+These roles could range from system administrators and application owners 
+to CISOs and DevOps Engineers. However, for the purpose of this document, 
+we will not differentiate between these roles. Instead, we will use the 
+term ‘user’ to collectively refer to any individual who encompasses all these roles.
+
+Examples of users interaction with KubeStellar are illustrated in the
+[KubeStellar Usage Examples](./examples.md) section.
 
 The KubeStellar architecture has these main modules:
 
@@ -57,7 +58,7 @@ to find objects that are synced by the OCM agent, gets their status
 and updates *workstatuses* objects in the ITS namespace associated with the WEC.
 
 <figure>
-  <img src="assets/main-modules.png"  alt="Main Modules">
+  <img src="./main-modules.png"  alt="Main Modules">
   <figcaption align="center">Figure 2 - Main Modules </figcaption>
 </figure>
 
@@ -83,8 +84,11 @@ provide one or more spaces. We plan to make this optional in the near future.
 KubeFlex is a flexible framework that supports various kinds of control planes, such as:
 
 - *k8s*: a basic Kubernetes API Server with a subset of kube controllers. 
-This control plane does not run workloads (e.g., pods), and 
-it uses about 350 MB of memory per instance with a shared Postgres Database Backend.
+The control plane in this context does not execute workloads, such as pods, 
+because the controllers associated with these objects are not activated. 
+This environment is referred to as ‘denatured’ because it lacks the typical 
+characteristics and functionalities of a standard Kubernetes cluster
+It uses about 350 MB of memory per instance with a shared Postgres Database Backend.
 - *vcluster*: a virtual cluster that runs on the hosting cluster, 
 based on the  [vCluster Project](https://www.vcluster.com). This type control plane can run pods using worker nodes of the hosting cluster.
 - *host*: the KubeFlex hosting cluster, which is exposed as a control plane.
@@ -257,7 +261,7 @@ pattern has been extended to provide the following features:
       event
     - Structured Name of the object 
     - For delete event: Shallow copy of the object being deleted. This
-      is required for objects w/o finalizers that need to be deleted
+      is required for objects that need to be deleted
       from the managed clusters (WECs)
 - Starting & stopping informers dynamically based on creation or
   deletion of CRDs (which add/remove APIs on the WDS).
@@ -283,7 +287,7 @@ illustrated in Figure 3 (some details might be omitted to make the flow easier
 to understand).
 
 <figure>
-  <img src="assets/placement-controller.png"  alt="Placement Controller">
+  <img src="./placement-controller.png"  alt="Placement Controller">
   <figcaption align="center">Figure 3 - Placement Controller</figcaption>
 </figure>
 
@@ -327,8 +331,8 @@ follows:
 
     -  Uses the GVK key to get the reference to the lister for the
         object
-    -  Gets the object from the lister cache using the key that was
-        generated with the MetaNamespaceKeyFunc.
+    -  Gets the object from the lister cache using the NamespacedName of 
+       the object.
     -  Gets the lister for Placement objects and list all placements
     -  Iterates on all placements, and for each placement:
         - evaluates the placement label selector vs. object labels to
@@ -343,15 +347,13 @@ follows:
         actions and is ready to process other events from the queue.
     -  If there are matching clusters:
         - Wraps the object into a ManifestWork
-        - Adds a label to the ManifestWork that is used to track the
-          placement that caused the object to be delivered to one or
-          more clusters. The label contains both the placement name
-          (note that placement is cluster-scoped) and the WDS name. A
-          label is attached for each placement whose selector matches
-          the object. This way, when a placement is deleted or
-          updated it is possible to locate the associated ManifestWorks
-          for deletion or label removal (if more than one label is
-          present, as other placements may “own” the object).
+        - Adds a label for each matched (Placement, WDS) to the ManifestWork that 
+          is used to track the placement that caused the object to be 
+          delivered to one or more clusters. The label contains both the 
+          placement name (note that placement is cluster-scoped) and the WDS name. 
+          This way, when a placement is deleted or updated it is possible to 
+          locate the associated ManifestWorks for deletion or label removal 
+          (if more than one label is present, as other placements may “own” the object).
         - For each cluster:
           -  Sets the manifest namespace == name of the cluster
           -  Uses the client connected to the ITS to do a server-side
@@ -389,18 +391,16 @@ work queue. Then:
 Worker pulls key from queue; if it is a placement and it has not been
 deleted (deletion timestamp not set) it follows the following flow:
 
-- Iterates all GVK-indexed listers
-- For each lister
-  - List objects
-    - For each object
-      - Checks object placement label
-      - Runs selector logic on that object:
-      - if it still matches that placement, no action.
-      - else removes object (if no other labels for other placements are
-        present) or label for that placement.
-      - if object was not removed:
-        - Generates \<GVK informer key\> + \<object key\>
-        - Enqueues Key
+- Re-enqueues all objects to force re-evaluation: this is done by 
+  iterating all GVK-indexed listers, listing objects for each lister
+  and re-enqueuing the key for each object.
+- Remove ManifestWorks from ITS for objects no longer matching: generate
+  the ManagedByPlacementLabelKey for the current (Placement, WDS) and use
+  that to retrieve all the manifestworks associated with the (Placement, WDS).
+  Then, for each manifestwork, extract the wrapped object, and re-evaluate the
+  object vs. the current placement. If no longer a match (either for the
+  "what" or the "where" part) check if each manifestwork has other (Placement, WDS)
+  labels. If yes, remove the label, if not, delete the manifestwork.
 
 Re-enqueuing all object keys forces the re-evaluation of all objects vs.
 all placements. This is a shortcut as it would be more efficient to
@@ -413,7 +413,7 @@ When a new placement is created, the placement controller sets a finalizer
 on it. The Worker pulls a key from queue; if it is a placement and it has been
 deleted (deletion timestamp is set) it follows the flow below:
 
-- Uses lister to list all ManifestWorks on all namespaces in OCM by
+- Uses lister to list all ManifestWorks on all namespaces in ITS by
   placement label.
 - Iterates on all matching ManifestWorks, for each one:
   - Deletes the ManifestWork (if no other placement labels) or the label
@@ -462,7 +462,7 @@ The *workstatuses* are created and updated on the ITS by the status add-on.
 The high-level flow for the singleton status update is described in Figure 4.
 
 <figure>
-  <img src="assets/status-controller.png"  alt="Status Controller">
+  <img src="./status-controller.png"  alt="Status Controller">
   <figcaption align="center">Figure 4 - Status Controller</figcaption>
 </figure>
 
