@@ -473,7 +473,9 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC with namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 		}
 		// object not found when using get, create it
-		_, err = c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Create(ctx, wrappedObject, metav1.CreateOptions{})
+		_, err = c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Create(ctx, wrappedObject, metav1.CreateOptions{
+			FieldManager: ControllerName,
+		})
 		if err != nil {
 			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 		}
@@ -481,7 +483,9 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 	}
 	// // if we reached here object already exists, try update object
 	wrappedObject.SetResourceVersion(existingWrappedObject.GetResourceVersion())
-	_, err = c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{})
+	_, err = c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{
+		FieldManager: ControllerName,
+	})
 	if err != nil {
 		return fmt.Errorf("failed to update wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 	}
@@ -499,7 +503,9 @@ func (c *genericTransportController) updatePlacementDecision(ctx context.Context
 		return nil // if object was not updated, no need to update in API server, return.
 	}
 
-	_, err := c.wdsClientset.EdgeV1alpha1().PlacementDecisions().Update(ctx, updatedPlacementDecision, metav1.UpdateOptions{})
+	_, err := c.wdsClientset.EdgeV1alpha1().PlacementDecisions().Update(ctx, updatedPlacementDecision, metav1.UpdateOptions{
+		FieldManager: ControllerName,
+	})
 	if err != nil {
 		return fmt.Errorf("failed to update PlacementDecision object '%s' in WDS - %w", placementDecision.GetName(), err)
 	}
