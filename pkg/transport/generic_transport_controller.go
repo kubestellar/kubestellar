@@ -67,7 +67,7 @@ func NewTransportController(ctx context.Context, placementDecisionInformer edgev
 	wrappedObjectGenericInformer := dynamicInformerFactory.ForResource(wrappedObjectGVR)
 
 	transportController := &genericTransportController{
-		logger:                          klog.FromContext(ctx).WithName(ControllerName),
+		logger:                          klog.FromContext(ctx),
 		placementDecisionLister:         placementDecisionInformer.Lister(),
 		placementDecisionInformerSynced: placementDecisionInformer.Informer().HasSynced,
 		wrappedObjectInformerSynced:     wrappedObjectGenericInformer.Informer().HasSynced,
