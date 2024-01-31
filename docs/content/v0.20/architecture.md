@@ -24,7 +24,7 @@ single Kubernetes object or several objects that work together.
 the transport of workloads.
 3. Register and label Workload Execution Clusters (WECs) with the Inventory and 
 Transport Space, to keep track of the available clusters and their characteristics.
-4. Define Placement Policies to specify *what" objects and *where* should be 
+4. Define Placement Policies to specify *what* objects and *where* should be 
 deployed on the WECs.
 5. Submit objects in the native Kubernetes format to the WDSs, 
 and let the Placement Policies govern which WECs should receive them.
@@ -33,8 +33,8 @@ and let the Placement Policies govern which WECs should receive them.
 In KubeStellar, users can assume a variety of roles and responsibilities. 
 These roles could range from system administrators and application owners 
 to CISOs and DevOps Engineers. However, for the purpose of this document, 
-we will not differentiate between these roles. Instead, we will use the 
-term ‘user’ to collectively refer to any individual who encompasses all these roles.
+we will not differentiate between these roles. Instead we will use the term 
+'user' broadly, without attempting to make distinctions among roles.
 
 Examples of users interaction with KubeStellar are illustrated in the
 [KubeStellar Usage Examples](./examples.md) section.
@@ -71,7 +71,7 @@ and updates *WorkStatus* objects in the ITS namespace associated with the WEC.
 This module manages the placement and status controllers. The placement controller watches 
 placement and workload objects on the Workload Definition Space 
 (WDS) and wraps workload objects into a manifest for delivery through the 
-Inventory and Transport Space (ITS). The status controller watches for `workstatuses` objects on the 
+Inventory and Transport Space (ITS). The status controller watches for *WorkStatus* objects on the 
 ITS and updates the status of objects in the WDS when singleton status is requested 
 in the placement for those objects. There is one instance of a KubeStellar Controller 
 Manager for each WDS. Currently this controller-manager runs in the KubeFlex hosting cluster and 
@@ -296,14 +296,14 @@ follows:
         - If there are matching clusters, add the names of the cluster
           to a hashmap setting the name of the cluster as a key. Cluster
           groups from different placements are merged together.
-        - If the one of the matched Placements has ` WantSingletonReportedState`
+        - If any of the matched Placements has ` WantSingletonReportedState`
           set to true, clusters are sorted in alphanumerical order and
           only the first cluster is selected for delivery.  
     -  If there are no matching clusters, the worker returns without
         actions and is ready to process other events from the queue.
     -  If there are matching clusters:
         - Wraps the object into a ManifestWork
-        - Adds a label for each matched (Placement, WDS) to the ManifestWork that 
+        - Adds a label for each matched Placement to the ManifestWork that 
           is used to track the placement that caused the object to be 
           delivered to one or more clusters. The label contains both the 
           placement name (note that placement is cluster-scoped) and the WDS name. 
