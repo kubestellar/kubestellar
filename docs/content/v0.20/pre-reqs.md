@@ -2,6 +2,25 @@
 
 The following prerequisites are required.
 
+Use the [check_pre_req](contributor.md#check-key-pre-requisites-for-kubestellar) script to quickly check which pre-requisites are already installed:
+
+```shell
+$ hack/check_pre_req.sh
+Checking pre-requisites for using KubeStellar:
+✔ Docker
+✔ kubectl
+✔ KubeFlex
+✔ OCM CLI
+✔ Helm
+Checking additional pre-requisites for running the examples:
+✔ Kind
+X ArgoCD CLI
+Checking pre-requisites for building KubeStellar:
+✔ GNU Make
+✔ Go
+✔ KO
+```
+
 ## For Using KubeStellar
 
 - kubeflex version 0.4.1 or higher
