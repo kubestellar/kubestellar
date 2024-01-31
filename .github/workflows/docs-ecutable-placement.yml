@@ -8,8 +8,7 @@ on:
   # To confirm any changes to docs build successfully, without deploying them
   pull_request:
     branches:
-      - main
-      - "release-*"
+      - "release-0.1*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator.md"
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
@@ -21,7 +20,7 @@ on:
   push:
     branches:
       - main
-      - "release-*"
+      - "release-0.1*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator.md"
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
@@ -31,7 +30,7 @@ on:
       - ".github/workflows/docs-ecutable-placement.yml"
       - "docs/scripts/docs-ecutable.sh"
     tags:
-      - 'v*'
+      - 'v0.1*'
 
 env:
   docs-ecutable-filename: placement
