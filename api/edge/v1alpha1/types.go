@@ -206,8 +206,10 @@ type PlacementDecisionSpec struct {
 
 // DownsyncObjectReferences explicitly defines the objects to be down-synced.
 // The ClusterScope list defines the cluster-scope objects, NamespaceScope list
-// defines the namespace-scope objects and generation represents the internal spec
-// generation of the listed objects in the ClusterScope and NamespaceScope lists.
+// defines the namespace-scope objects and WorkloadGeneration represents the
+// generation of the objects in the ClusterScope and NamespaceScope lists.
+// Upon a change in any of workload objects that should be distributed
+// (e.g., spec, annotations or labels) the workload generation field should be incremented.
 type DownsyncObjectReferences struct {
 	// `clusterScope` holds a list of individual cluster-scoped objects
 	// to downsync, organized by resource.
@@ -220,14 +222,15 @@ type DownsyncObjectReferences struct {
 	// +optional
 	NamespaceScope []NamespaceScopeDownsyncObjects `json:"namespaceScope,omitempty"`
 
-	// `ObjectsInternalSpecGeneration` is a sequence number representing a specific generation of the downsync objects internal spec.
-	// For example, if ClusterScope and NamespaceScope lists haven't changed but the
-	// internal spec of at least one object has changed, this field should be incremented.
-	// ObjectsInternalSpecGeneration should be updated upon a change in the spec of one
-	// of the objects from ClusterScope and NamespaceScope in order to trigger the
-	// distribution of the updated object.
+	// `WorkloadGeneration` is a sequence number representing a specific generation of
+	// the workload objects to be downsynced.
+	// For example, if ClusterScope and NamespaceScope lists haven't changed but at least
+	// one object has changed, this field should be incremented.
+	// Upon a change in any of workload objects that should be distributed
+	// (e.g., spec, annotations or labels) the workload generation field should be incremented.
+	// `WorkloadGeneration` field is monotonically increasing.
 	// +optional
-	ObjectsInternalSpecGeneration int64 `json:"generation,omitempty"`
+	WorkloadGeneration int64 `json:"workloadGeneration,omitempty"`
 }
 
 // NamespaceScopeDownsyncObjects matches some objects of one particular namespaced object.

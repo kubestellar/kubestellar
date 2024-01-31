@@ -81,17 +81,6 @@ spec:
                       - version
                       type: object
                     type: array
-                  generation:
-                    description: '`ObjectsInternalSpecGeneration` is a sequence number
-                      representing a specific generation of the downsync objects internal
-                      spec. For example, if ClusterScope and NamespaceScope lists
-                      haven''t changed but the internal spec of at least one object
-                      has changed, this field should be incremented. ObjectsInternalSpecGeneration
-                      should be updated upon a change in the spec of one of the objects
-                      from ClusterScope and NamespaceScope in order to trigger the
-                      distribution of the updated object.'
-                    format: int64
-                    type: integer
                   namespaceScope:
                     description: '`NamespaceScope` matches if and only if at least
                       one member matches.'
@@ -134,6 +123,17 @@ spec:
                       - version
                       type: object
                     type: array
+                  workloadGeneration:
+                    description: '`WorkloadGeneration` is a sequence number representing
+                      a specific generation of the workload objects to be downsynced.
+                      For example, if ClusterScope and NamespaceScope lists haven''t
+                      changed but at least one object has changed, this field should
+                      be incremented. Upon a change in any of workload objects that
+                      should be distributed (e.g., spec, annotations or labels) the
+                      workload generation field should be incremented. `WorkloadGeneration`
+                      field is monotonically increasing.'
+                    format: int64
+                    type: integer
                 type: object
             type: object
         type: object
