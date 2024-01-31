@@ -308,8 +308,7 @@ func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx contex
 	for _, destination := range placementDecision.Spec.Destinations {
 		if err := c.deleteWrappedObject(ctx, destination.ClusterId, fmt.Sprintf("%s-%s", placementDecision.GetName(), c.wdsName)); err != nil {
 			// wrapped object name is in the format (PlacementDecision.GetName()-WdsName). see updateWrappedObject func for explanation.
-			return fmt.Errorf("failed to delete wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", fmt.Sprintf("%s-%s", placementDecision.GetName(),
-				c.wdsName), destination.ClusterId, err)
+			return fmt.Errorf("failed to delete wrapped object from all destinations' - %w", err)
 		}
 	}
 
@@ -323,7 +322,7 @@ func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx contex
 func (c *genericTransportController) deleteWrappedObject(ctx context.Context, namespace string, objectName string) error {
 	err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Delete(ctx, objectName, metav1.DeleteOptions{})
 	if err != nil && !errors.IsNotFound(err) { // if object is already not there, we do not report an error cause desired state was achieved.
-		return fmt.Errorf("failed to delete wrapped object '%s' from namespace '%s' - %w", objectName, namespace, err)
+		return fmt.Errorf("failed to delete wrapped object '%s' from destination WEC mailbox namespace '%s' - %w", objectName, namespace, err)
 	}
 	return nil
 }
@@ -371,7 +370,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	// all objects that appear in the desired state were handled. need to remove wrapped objects that are not part of the desired state
 	for _, wrappedObject := range currentWrappedObjectList.Items { // objects left in currentWrappedObjectList.Items have to be deleted
 		if err := c.deleteWrappedObject(ctx, wrappedObject.GetNamespace(), wrappedObject.GetName()); err != nil {
-			return fmt.Errorf("failed to delete wrapped object '%s' from destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), wrappedObject.GetNamespace(), err)
+			return fmt.Errorf("failed to delete wrapped object from destinations that were removed from desired state - %w", err)
 		}
 	}
 
@@ -446,24 +445,17 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 // then the function removes the last object in the list and returns the object.
 // in worst case where object is not found, it will go over all items in the list.
 func (c *genericTransportController) popWrappedObjectByNamespace(list *unstructured.UnstructuredList, namespace string) *unstructured.Unstructured {
-	found := false
 	length := len(list.Items)
 	for i := 0; i < length; i++ {
 		if list.Items[i].GetNamespace() == namespace {
-			currentObject := list.Items[i]
+			requiredObject := list.Items[i]
 			list.Items[i] = list.Items[length-1]
-			list.Items[length-1] = currentObject
-			found = true
-			break
+			list.Items = list.Items[:length-1]
+			return &requiredObject
 		}
 	}
-	if !found {
-		return nil
-	}
-	// otherwise, object was found and was replaced with last object in the list
-	poppedObject := &list.Items[length-1]
-	list.Items = list.Items[:length-1]
-	return poppedObject
+
+	return nil
 }
 
 func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Context, namespace string, wrappedObject *unstructured.Unstructured) error {
