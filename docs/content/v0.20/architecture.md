@@ -191,6 +191,8 @@ cluster. The controller watches *AppliedManifestWork* objects to determine which
 objects have been delivered through the work agent. It then starts dynamic informers 
 to watch those objects, collect their individual statuses, and report back the status 
 updating *WorkStatus* objects in the namespace associated with the WEC in the ITS.
+Installing the status add-on cause status to be returned to `WorkStatus` 
+objects for all downsynced objects.
 
 ## KubeStellar Controllers Architecture
 
@@ -286,6 +288,10 @@ follows:
         object
     -  Gets the object from the lister cache using the NamespacedName of 
        the object.
+    -  If the object was not found (because it was deleted) after the
+       key was enqueued by the event handler, worker returns. But after that,
+       there is still a delete event for that object that is consumed by
+       the event handler which enqueue a key for [Object Deleted](#object-deleted).
     -  Gets the lister for Placement objects and list all placements
     -  Iterates on all placements, and for each placement:
         - evaluates whether the object matches the downsync selection 
@@ -298,7 +304,10 @@ follows:
           groups from different placements are merged together.
         - If any of the matched Placements has ` WantSingletonReportedState`
           set to true, clusters are sorted in alphanumerical order and
-          only the first cluster is selected for delivery.  
+          only the first cluster is selected for delivery. Note that setting 
+          `WantSingletonReportedState` in one of the placements that 
+          matches the object affects the behavior for all matching placements, 
+          those with matching clusters and those w/o matching clusters. 
     -  If there are no matching clusters, the worker returns without
         actions and is ready to process other events from the queue.
     -  If there are matching clusters:
@@ -313,12 +322,16 @@ follows:
         - For each cluster:
           -  Sets the manifest namespace == name of the cluster
           -  Uses the client connected to the ITS to do a server-side
-              apply of the manifest into the namespace.
+             apply patch of the manifest into the namespace.
+          - At this time there is only one field manager name for the server-side
+            apply (`kubestellar`) but the name should include also the WDS
+            name to allow detecting conflicts when two different field managers
+            try to patch a manifest with the same name.   
         - Worker returns and is ready to pick other keys from the queue.
 
 There are other event flows, based on the object GVK and type of event. 
-Error conditions cause the re-enqueing of keys, resulting in retries.
-The following sections broadly describe these flows:
+Error conditions may cause the re-enqueing of keys, resulting in retries.
+The following sections broadly describe these flows.
 
 #### Object Deleted 
 
