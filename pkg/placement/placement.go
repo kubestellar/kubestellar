@@ -86,11 +86,10 @@ func (c *Controller) requeueForPlacementChanges() error {
 }
 
 func (c *Controller) getPlacementByName(name string) (runtime.Object, error) {
-	pLister := c.listers["edge.kubestellar.io/v1alpha1/Placement"]
-	if pLister == nil {
+	lister := c.listers["edge.kubestellar.io/v1alpha1/Placement"]
+	if lister == nil {
 		return nil, fmt.Errorf("could not get lister for placememt")
 	}
-	lister := *pLister
 	got, err := lister.Get(name)
 	if err != nil {
 		return nil, err
@@ -99,11 +98,10 @@ func (c *Controller) getPlacementByName(name string) (runtime.Object, error) {
 }
 
 func (c *Controller) listPlacements() ([]runtime.Object, error) {
-	pLister := c.listers["edge.kubestellar.io/v1alpha1/Placement"]
-	if pLister == nil {
+	lister := c.listers["edge.kubestellar.io/v1alpha1/Placement"]
+	if lister == nil {
 		return nil, fmt.Errorf("could not get lister for placememt")
 	}
-	lister := *pLister
 	list, err := lister.List(labels.Everything())
 	if err != nil {
 		return nil, err
@@ -127,13 +125,12 @@ func runtimeObjectToPlacement(obj runtime.Object) (*v1alpha1.Placement, error) {
 // this is useful for when a new placement is added
 // or a placement is updated
 func (c *Controller) requeueAll() error {
-	for key, ptr := range c.listers {
+	for key, lister := range c.listers {
 		// do not requeue placement
 		if key == util.GetPlacementListerKey() {
 			fmt.Printf("Matched key %s\n", key)
 			continue
 		}
-		lister := *ptr
 		objs, err := lister.List(labels.Everything())
 		if err != nil {
 			return err
@@ -158,7 +155,7 @@ func (c *Controller) handlePlacementFinalizer(obj runtime.Object) error {
 				return err
 			}
 			controllerutil.RemoveFinalizer(cObj, KSFinalizer)
-			if err = updatePlacement(*c.dynamicClient, obj); err != nil {
+			if err = updatePlacement(c.dynamicClient, obj); err != nil {
 				return err
 			}
 		}
@@ -167,7 +164,7 @@ func (c *Controller) handlePlacementFinalizer(obj runtime.Object) error {
 
 	if !controllerutil.ContainsFinalizer(cObj, KSFinalizer) {
 		controllerutil.AddFinalizer(cObj, KSFinalizer)
-		if err = updatePlacement(*c.dynamicClient, obj); err != nil {
+		if err = updatePlacement(c.dynamicClient, obj); err != nil {
 			return err
 		}
 	}
@@ -182,7 +179,7 @@ func convertToClientObject(obj runtime.Object) (client.Object, error) {
 	return clientObj, nil
 }
 
-func updatePlacement(client dynamic.DynamicClient, obj runtime.Object) error {
+func updatePlacement(client dynamic.Interface, obj runtime.Object) error {
 	gvr := schema.GroupVersionResource{
 		Group:    v1alpha1.GroupVersion.Group,
 		Version:  obj.GetObjectKind().GroupVersionKind().Version,

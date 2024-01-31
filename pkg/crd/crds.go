@@ -20,8 +20,10 @@ import (
 	"bytes"
 	"context"
 	"embed"
+	"fmt"
 	"io"
 	"io/fs"
+	"strings"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -30,6 +32,7 @@ import (
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/dynamic"
@@ -46,9 +49,12 @@ var crdNames = map[string]bool{"placements.edge.kubestellar.io": true}
 //go:embed files/*
 var embeddedFiles embed.FS
 
-const FieldManager = "kubestellar"
+const (
+	FieldManager                         = "kubestellar"
+	UnableToRetrieveCompleteAPIListError = "unable to retrieve the complete list of server APIs"
+)
 
-func ApplyCRDs(dynamicClient *dynamic.DynamicClient, clientset *kubernetes.Clientset, clientsetExt *apiextensionsclientset.Clientset, logger logr.Logger) error {
+func ApplyCRDs(dynamicClient dynamic.Interface, clientset kubernetes.Interface, clientsetExt apiextensionsclientset.Interface, logger logr.Logger) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -61,7 +67,7 @@ func ApplyCRDs(dynamicClient *dynamic.DynamicClient, clientset *kubernetes.Clien
 
 	for _, crd := range crds {
 		gvk := kfutil.GetGroupVersionKindFromObject(crd)
-		gvr, err := kfutil.GroupVersionKindToResource(clientset, gvk)
+		gvr, err := groupVersionKindToResource(clientset, gvk)
 		if err != nil {
 			return err
 		}
@@ -79,6 +85,27 @@ func ApplyCRDs(dynamicClient *dynamic.DynamicClient, clientset *kubernetes.Clien
 		logger.Info("crd name accepted", "name", crd.GetName())
 	}
 	return nil
+}
+
+// Convert GroupVersionKind to GroupVersionResource
+func groupVersionKindToResource(clientset kubernetes.Interface, gvk schema.GroupVersionKind) (*schema.GroupVersionResource, error) {
+	resourceList, err := clientset.Discovery().ServerPreferredResources()
+	if err != nil {
+		// ignore the error caused by a stale API service
+		if !strings.Contains(err.Error(), UnableToRetrieveCompleteAPIListError) {
+			return nil, err
+		}
+	}
+
+	for _, resource := range resourceList {
+		for _, apiResource := range resource.APIResources {
+			if apiResource.Kind == gvk.Kind && resource.GroupVersion == gvk.GroupVersion().String() {
+				return &schema.GroupVersionResource{Group: gvk.Group, Version: gvk.Version, Resource: apiResource.Name}, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("GroupVersionResource not found for GroupVersionKind: %v", gvk)
 }
 
 func filterCRDsByNames(crds []*unstructured.Unstructured, names map[string]bool) []*unstructured.Unstructured {
@@ -128,7 +155,7 @@ func DecodeYAML(yamlBytes []byte) (*unstructured.Unstructured, error) {
 	return obj, nil
 }
 
-func waitForCRDAccepted(ctx context.Context, clientset *apiextensionsclientset.Clientset, crdName string) error {
+func waitForCRDAccepted(ctx context.Context, clientset apiextensionsclientset.Interface, crdName string) error {
 	return wait.PollUntilContextCancel(ctx, 1*time.Second, true, func(ctx context.Context) (bool, error) {
 		crd, err := clientset.ApiextensionsV1().CustomResourceDefinitions().Get(ctx, crdName, metav1.GetOptions{})
 		if err != nil {
