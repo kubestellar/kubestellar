@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"strings"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -50,8 +49,7 @@ var crdNames = map[string]bool{"placements.edge.kubestellar.io": true}
 var embeddedFiles embed.FS
 
 const (
-	FieldManager                         = "kubestellar"
-	UnableToRetrieveCompleteAPIListError = "unable to retrieve the complete list of server APIs"
+	FieldManager = "kubestellar"
 )
 
 func ApplyCRDs(dynamicClient dynamic.Interface, clientset kubernetes.Interface, clientsetExt apiextensionsclientset.Interface, logger logr.Logger) error {
@@ -67,7 +65,7 @@ func ApplyCRDs(dynamicClient dynamic.Interface, clientset kubernetes.Interface, 
 
 	for _, crd := range crds {
 		gvk := kfutil.GetGroupVersionKindFromObject(crd)
-		gvr, err := groupVersionKindToResource(clientset, gvk)
+		gvr, err := groupVersionKindToResource(clientset, gvk, logger)
 		if err != nil {
 			return err
 		}
@@ -88,13 +86,10 @@ func ApplyCRDs(dynamicClient dynamic.Interface, clientset kubernetes.Interface, 
 }
 
 // Convert GroupVersionKind to GroupVersionResource
-func groupVersionKindToResource(clientset kubernetes.Interface, gvk schema.GroupVersionKind) (*schema.GroupVersionResource, error) {
+func groupVersionKindToResource(clientset kubernetes.Interface, gvk schema.GroupVersionKind, logger logr.Logger) (*schema.GroupVersionResource, error) {
 	resourceList, err := clientset.Discovery().ServerPreferredResources()
 	if err != nil {
-		// ignore the error caused by a stale API service
-		if !strings.Contains(err.Error(), UnableToRetrieveCompleteAPIListError) {
-			return nil, err
-		}
+		logger.Info("Did not get all preferred resources", "error", err.Error())
 	}
 
 	for _, resource := range resourceList {
