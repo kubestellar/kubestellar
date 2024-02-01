@@ -205,8 +205,11 @@ type PlacementDecisionSpec struct {
 }
 
 // DownsyncObjectReferences explicitly defines the objects to be down-synced.
-// The ClusterScope list defines the cluster-scope objects, while NamespacedObjects packs individual objects
-// identifiable by namespace & name.
+// The ClusterScope list defines the cluster-scope objects, NamespaceScope list
+// defines the namespace-scope objects and WorkloadGeneration represents the
+// generation of the objects in the ClusterScope and NamespaceScope lists.
+// Upon a change in any of workload objects that should be distributed
+// (e.g., spec, annotations or labels) the workload generation field should be incremented.
 type DownsyncObjectReferences struct {
 	// `clusterScope` holds a list of individual cluster-scoped objects
 	// to downsync, organized by resource.
@@ -218,6 +221,16 @@ type DownsyncObjectReferences struct {
 	// `NamespaceScope` matches if and only if at least one member matches.
 	// +optional
 	NamespaceScope []NamespaceScopeDownsyncObjects `json:"namespaceScope,omitempty"`
+
+	// `WorkloadGeneration` is a sequence number representing a specific generation of
+	// the workload objects to be downsynced.
+	// For example, if ClusterScope and NamespaceScope lists haven't changed but at least
+	// one object has changed, this field should be incremented.
+	// Upon a change in any of workload objects that should be distributed
+	// (e.g., spec, annotations or labels) the workload generation field should be incremented.
+	// `WorkloadGeneration` field is monotonically increasing.
+	// +optional
+	WorkloadGeneration int64 `json:"workloadGeneration,omitempty"`
 }
 
 // NamespaceScopeDownsyncObjects matches some objects of one particular namespaced object.
