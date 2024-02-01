@@ -8,8 +8,7 @@ on:
   # To confirm any changes to docs build successfully, without deploying them
   pull_request:
     branches:
-      - main
-      - "release-*"
+      - "release-0.1*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/where-resolver.md"
       - "docs/content/Coding Milestones/PoC2023q1/where-resolver-subs/**"
@@ -18,8 +17,7 @@ on:
       - "docs/scripts/docs-ecutable.sh"
   push:
     branches:
-      - main
-      - "release-*"
+      - "release-0.1*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/where-resolver.md"
       - "docs/content/Coding Milestones/PoC2023q1/where-resolver-subs/**"
@@ -27,7 +25,7 @@ on:
       - ".github/workflows/docs-ecutable-where-resolver.yml"
       - "docs/scripts/docs-ecutable.sh"
     tags:
-      - 'v*'
+      - 'v0.1*'
       
 env:
   docs-ecutable-filename: where-resolver

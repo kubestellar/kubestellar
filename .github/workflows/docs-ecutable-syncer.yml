@@ -8,8 +8,8 @@ on:
   # To confirm any changes to docs build successfully, without deploying them
   pull_request:
     branches:
-      - main
-      - "release-*"
+      - "release-0.1*"
+      - space-mgt
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
@@ -19,9 +19,8 @@ on:
       - "docs/scripts/docs-ecutable.sh"
   push:
     branches:
-      - main
-      
-      - "release-*"
+      - space-mgt
+      - "release-0.1*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
@@ -30,7 +29,7 @@ on:
       - ".github/workflows/docs-ecutable-syncer.yml"
       - "docs/scripts/docs-ecutable.sh"
     tags:
-      - 'v*'
+      - 'v0.1*'
 
 env:
   docs-ecutable-filename: syncer

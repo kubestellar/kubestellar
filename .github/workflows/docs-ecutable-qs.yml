@@ -8,7 +8,7 @@ on:
   # To confirm any changes to docs build successfully, without deploying them
   pull_request:
     branches:
-      - "release-*"
+      - "release-0.1*"
     paths:
       - "docs/content/Getting-Started/quickstart.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
@@ -17,7 +17,7 @@ on:
       - "docs/scripts/docs-ecutable.sh"
   push:
     branches:
-      - "release-*"
+      - "release-0.1*"
     paths:
       - "docs/content/Getting-Started/quickstart.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
@@ -25,7 +25,7 @@ on:
       - ".github/workflows/docs-ecutable-qs.yml"
       - "docs/scripts/docs-ecutable.sh"
     tags:
-      - 'v*'
+      - 'v0.1*'
       
 env:
   docs-ecutable-filename: qs
