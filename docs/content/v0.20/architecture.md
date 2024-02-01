@@ -288,10 +288,9 @@ follows:
         object
     -  Gets the object from the lister cache using the NamespacedName of 
        the object.
-    -  If the object was not found (because it was deleted) after the
-       key was enqueued by the event handler, worker returns. But after that,
-       there is still a delete event for that object that is consumed by
-       the event handler which enqueue a key for [Object Deleted](#object-deleted).
+    -  If the object was not found (because it was deleted) worker returns. 
+       A delete event for that object consumed by the event handler enqueues 
+       a key for [Object Deleted](#object-deleted).
     -  Gets the lister for Placement objects and list all placements
     -  Iterates on all placements, and for each placement:
         - evaluates whether the object matches the downsync selection 
