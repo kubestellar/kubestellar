@@ -23,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
-	v1alpha1 "github.com/kubestellar/kubestellar/api/edge/v1alpha1"
+	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 // PlacementLister helps list Placements.

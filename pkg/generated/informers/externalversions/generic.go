@@ -24,7 +24,7 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 
-	v1alpha1 "github.com/kubestellar/kubestellar/api/edge/v1alpha1"
+	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 // GenericInformer is type of SharedIndexInformer which will locate and delegate to other
@@ -55,9 +55,9 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	switch resource {
 	// Group=control.kubestellar.io, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("placements"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().Placements().Informer()}, nil
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Control().V1alpha1().Placements().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("placementdecisions"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().PlacementDecisions().Informer()}, nil
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Control().V1alpha1().PlacementDecisions().Informer()}, nil
 
 	}
 

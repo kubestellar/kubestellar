@@ -27,10 +27,10 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/api/edge/v1alpha1"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	versioned "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	internalinterfaces "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/edge/v1alpha1"
+	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 )
 
 // PlacementDecisionInformer provides access to a shared informer and lister for
@@ -62,16 +62,16 @@ func NewFilteredPlacementDecisionInformer(client versioned.Interface, resyncPeri
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.EdgeV1alpha1().PlacementDecisions().List(context.TODO(), options)
+				return client.ControlV1alpha1().PlacementDecisions().List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.EdgeV1alpha1().PlacementDecisions().Watch(context.TODO(), options)
+				return client.ControlV1alpha1().PlacementDecisions().Watch(context.TODO(), options)
 			},
 		},
-		&edgev1alpha1.PlacementDecision{},
+		&controlv1alpha1.PlacementDecision{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,7 +82,7 @@ func (f *placementDecisionInformer) defaultInformer(client versioned.Interface, 
 }
 
 func (f *placementDecisionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&edgev1alpha1.PlacementDecision{}, f.defaultInformer)
+	return f.factory.InformerFor(&controlv1alpha1.PlacementDecision{}, f.defaultInformer)
 }
 
 func (f *placementDecisionInformer) Lister() v1alpha1.PlacementDecisionLister {

@@ -27,7 +27,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
 
-	v1alpha1 "github.com/kubestellar/kubestellar/api/edge/v1alpha1"
+	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	scheme "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/scheme"
 )
 
@@ -57,7 +57,7 @@ type placements struct {
 }
 
 // newPlacements returns a Placements
-func newPlacements(c *EdgeV1alpha1Client) *placements {
+func newPlacements(c *ControlV1alpha1Client) *placements {
 	return &placements{
 		client: c.RESTClient(),
 	}

@@ -27,10 +27,10 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/api/edge/v1alpha1"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	versioned "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	internalinterfaces "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/edge/v1alpha1"
+	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 )
 
 // PlacementInformer provides access to a shared informer and lister for
@@ -62,16 +62,16 @@ func NewFilteredPlacementInformer(client versioned.Interface, resyncPeriod time.
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.EdgeV1alpha1().Placements().List(context.TODO(), options)
+				return client.ControlV1alpha1().Placements().List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.EdgeV1alpha1().Placements().Watch(context.TODO(), options)
+				return client.ControlV1alpha1().Placements().Watch(context.TODO(), options)
 			},
 		},
-		&edgev1alpha1.Placement{},
+		&controlv1alpha1.Placement{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,7 +82,7 @@ func (f *placementInformer) defaultInformer(client versioned.Interface, resyncPe
 }
 
 func (f *placementInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&edgev1alpha1.Placement{}, f.defaultInformer)
+	return f.factory.InformerFor(&controlv1alpha1.Placement{}, f.defaultInformer)
 }
 
 func (f *placementInformer) Lister() v1alpha1.PlacementLister {

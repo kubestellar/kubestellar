@@ -26,8 +26,8 @@ import (
 	"k8s.io/client-go/testing"
 
 	clientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/edge/v1alpha1"
-	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/edge/v1alpha1/fake"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
+	fakecontrolv1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1/fake"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -80,7 +80,7 @@ var (
 	_ testing.FakeClient  = &Clientset{}
 )
 
-// EdgeV1alpha1 retrieves the EdgeV1alpha1Client
-func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
-	return &fakeedgev1alpha1.FakeEdgeV1alpha1{Fake: &c.Fake}
+// ControlV1alpha1 retrieves the ControlV1alpha1Client
+func (c *Clientset) ControlV1alpha1() controlv1alpha1.ControlV1alpha1Interface {
+	return &fakecontrolv1alpha1.FakeControlV1alpha1{Fake: &c.Fake}
 }

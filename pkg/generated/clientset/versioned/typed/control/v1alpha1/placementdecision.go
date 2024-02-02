@@ -27,7 +27,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
 
-	v1alpha1 "github.com/kubestellar/kubestellar/api/edge/v1alpha1"
+	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	scheme "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/scheme"
 )
 
@@ -56,7 +56,7 @@ type placementDecisions struct {
 }
 
 // newPlacementDecisions returns a PlacementDecisions
-func newPlacementDecisions(c *EdgeV1alpha1Client) *placementDecisions {
+func newPlacementDecisions(c *ControlV1alpha1Client) *placementDecisions {
 	return &placementDecisions{
 		client: c.RESTClient(),
 	}
