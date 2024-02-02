@@ -1796,8 +1796,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#outline-of-github-repositories" class="md-nav__link">
+    Outline of GitHub repositories
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubeflex" class="md-nav__link">
+    KubeFlex
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#status-addon" class="md-nav__link">
     status-addon
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-transport-plugin" class="md-nav__link">
+    OCM Transport Plugin
   </a>
   
 </li>
@@ -1809,6 +1830,13 @@
   
     <nav class="md-nav" aria-label="KubeStellar">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#outline-of-publishing" class="md-nav__link">
+    Outline of publishing
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#local-copy-of-kubestellar-git-repo" class="md-nav__link">
@@ -1845,15 +1873,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#central-container-image" class="md-nav__link">
-    Central container image
+  <a href="#kubestellar-controller-manager-container-image" class="md-nav__link">
+    KubeStellar controller-manager container image
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#kubestellar-operator-helm-chart" class="md-nav__link">
-    KubeStellar Operator Helm Chart
+  <a href="#kubestellar-controller-manager-helm-chart" class="md-nav__link">
+    KubeStellar controller-manager Helm Chart
   </a>
   
 </li>
@@ -1902,11 +1930,38 @@
 
 
 <h1 id="packaging-and-delivery">Packaging and Delivery<a class="headerlink" href="#packaging-and-delivery" title="Permanent link">#</a></h1>
+<h2 id="outline-of-github-repositories">Outline of GitHub repositories<a class="headerlink" href="#outline-of-github-repositories" title="Permanent link">#</a></h2>
+<p>The following is a graph of the GitHub repositories in the <code>kubestellar</code> GitHub organization and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow.</p>
+<p>Note that to <em>use</em> KubeStellar, all of the repos in this graph are involved.</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>flowchart LR
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    kubestellar --&gt; kubeflex
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    kubeflex    --&gt; kubestellar
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ocm-status-addon     --&gt; kubestellar
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    ocm-transport-plugin --&gt; kubestellar
+</code></pre></div>
+<p>Note: the <code>ocm-status-addon</code> repo is in the process of being moved
+into the kubestellar GitHub organization; the actual dependency right
+now is on <a href="#status-addon">a private repo</a>.</p>
+<h2 id="kubeflex">KubeFlex<a class="headerlink" href="#kubeflex" title="Permanent link">#</a></h2>
+<p>See <a href="https://github.com/kubestellar/kubeflex">the GitHub repo</a>.</p>
 <h2 id="status-addon">status-addon<a class="headerlink" href="#status-addon" title="Permanent link">#</a></h2>
 <p>The <a href="https://github.ibm.com/dettori/status-addon">status-addon</a> repo is the source of a RedHat-style operator.</p>
 <p>The operator is delivered by a Helm chart at <code>quay.io/pdettori/status-addon-chart</code>. Chart versioning? How is the chart built, pushed?</p>
 <p>There is also a container image involved.</p>
+<h2 id="ocm-transport-plugin">OCM Transport Plugin<a class="headerlink" href="#ocm-transport-plugin" title="Permanent link">#</a></h2>
+<p>.. to be written ...</p>
 <h2 id="kubestellar">KubeStellar<a class="headerlink" href="#kubestellar" title="Permanent link">#</a></h2>
+<h3 id="outline-of-publishing">Outline of publishing<a class="headerlink" href="#outline-of-publishing" title="Permanent link">#</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>flowchart LR
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    kcm_image[KCM container image] --&gt; github
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    hc_image[published KCM Helm Chart] --&gt; github
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    hc_image -.-&gt; kcm_image
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    PostCreateHook --&gt; github
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    PostCreateHook -.-&gt; hc_image
+</code></pre></div>
+<p>The dashed dependencies are at run time, not build time.</p>
+<p>"KCM" is the KubeStellar controller-manager.</p>
+<p><strong>NOTE</strong>: at the present level of development, all versions are hand coded and there is only one public version. This will obviously have to change.</p>
 <h3 id="local-copy-of-kubestellar-git-repo">Local copy of KubeStellar git repo<a class="headerlink" href="#local-copy-of-kubestellar-git-repo" title="Permanent link">#</a></h3>
 <p><strong>NOTE</strong>: Because of <a href="https://github.com/kubernetes/code-generator/blob/v0.28.2/kube_codegen.sh#L394-L395">a restriction in one of the code generators that
 we
@@ -1915,11 +1970,12 @@ a contributor needs to have their local copy of the git repo in a
 directory whose pathname ends with the Go package name --- that is,
 ends with <code>/github.com/kubestellar/kubestellar</code>.</p>
 <h3 id="derived-files">Derived files<a class="headerlink" href="#derived-files" title="Permanent link">#</a></h3>
-<p>Some files in the kubestellar repo are derived from other files there. These are all generated by contributors and kept in GitHub. A contributor can use the individual <code>make</code> commands mentioned below to update subsets, or use the following command to update them all.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>make<span class="w"> </span>all-generated
+<p>Some files in the kubestellar repo are derived from other files there. Contributors are responsible for invoking the commands to (re)derive the derived files as necessary.</p>
+<p>Some of these derived files are derived by standard generators from the Kubernetes milieu. A contributor can use the following command to make all of those, or use the individual <code>make</code> commands described in the following subsubsections to update particular subsets.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>all-generated
 </code></pre></div>
-<p>The following command, checked in CI, checks whether all the derived files have been correctly derived. It must be invoked in a state where the <code>git status</code> is clean, or at least the dirty files are irrelevant; the current commit is what is checked.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>hack/verify-codegen.sh
+<p>The following command, which we aspire to check in CI, checks whether all those derived files have been correctly derived. It must be invoked in a state where the <code>git status</code> is clean, or at least the dirty files are irrelevant; the current commit is what is checked. This command has side-effects on the filesystem like <code>make all-generated</code>.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>hack/verify-codegen.sh
 </code></pre></div>
 <h4 id="files-generated-by-controller-gen">Files generated by controller-gen<a class="headerlink" href="#files-generated-by-controller-gen" title="Permanent link">#</a></h4>
 <ul>
@@ -1936,11 +1992,12 @@ ends with <code>/github.com/kubestellar/kubestellar</code>.</p>
 </ul>
 <h4 id="files-generated-by-code-generator">Files generated by code-generator<a class="headerlink" href="#files-generated-by-code-generator" title="Permanent link">#</a></h4>
 <p>The files in <a href="../../../pkg/generated">pkg/generated</a> are generated by <a href="https://github.com/kubernetes/code-generator">k/code-generator</a>. This generation is done at development time by the command <code>make codegenclients</code>.</p>
-<h3 id="central-container-image">Central container image<a class="headerlink" href="#central-container-image" title="Permanent link">#</a></h3>
+<h3 id="kubestellar-controller-manager-container-image">KubeStellar controller-manager container image<a class="headerlink" href="#kubestellar-controller-manager-container-image" title="Permanent link">#</a></h3>
 <p>KubeStellar has one container image, for what is called the
-KubeStellar operator. This operator installs the needed custom
-resource <em>definition</em> objects if they are not already present, and is
-a controller-manager hosting the relevant central controllers.</p>
+KubeStellar controller-manager. For each WDS, KubeStellar has a pod
+running that image. It installs the needed custom resource
+<em>definition</em> objects if they are not already present, and is a
+controller-manager hosting the per-WDS controllers (<a href="../architecture/#placement-controller">placement controller</a>, <a href="../architecture/#status-controller">status controller</a>, and transport controller(TODO: link to doc)).</p>
 <p>The image repository is
 <code>ghcr.io/kubestellar/kubestellar/kubestellar-operator</code>. There is
 currently just one supported tag there, <code>0.20.0-alpha.1</code>. That was
@@ -1950,17 +2007,16 @@ the value of the <code>make</code> variable <code>IMAGE_TAG</code> (which defaul
 <code>0.20.0-alpha.1</code>).</p>
 <p><code>make ko-build-local</code> will make a local image for just the local
 platform. This is used in local testing.</p>
-<h3 id="kubestellar-operator-helm-chart">KubeStellar Operator Helm Chart<a class="headerlink" href="#kubestellar-operator-helm-chart" title="Permanent link">#</a></h3>
-<p>There is a Helm chart that is designed to be instantiated in a KubeFlex hosting cluster, once per WDS. The focus of the chart is getting the KubeStellar Operator installed.</p>
+<h3 id="kubestellar-controller-manager-helm-chart">KubeStellar controller-manager Helm Chart<a class="headerlink" href="#kubestellar-controller-manager-helm-chart" title="Permanent link">#</a></h3>
+<p>There is a Helm chart that is designed to be instantiated in a KubeFlex hosting cluster, once per WDS. The focus of the chart is getting the KubeStellar controller-manager installed.</p>
 <p>The source for the Helm chart is in
 <a href="../../../core-helm-chart">core-helm-chart</a>. <code>make chart</code> (re)derives
-it from local sources.</p>
+it from local sources. This is not included in <code>make all-generated</code>.</p>
 <p>This chart creates (among other things) a <code>Deployment</code> object that runs a container from the image <code>ghcr.io/kubestellar/kubestellar/kubestellar-operator:0.20.0-alpha.1</code>.</p>
 <p>The chart is published at the OCI repository
-<code>ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart</code>.  What
-stores the chart there?</p>
+<code>ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart</code>.  What stores the chart there?</p>
 <h3 id="kubeflex-postcreatehooks">KubeFlex PostCreateHooks<a class="headerlink" href="#kubeflex-postcreatehooks" title="Permanent link">#</a></h3>
-<p>There are two <code>PostCreateHook</code> objects defined in <a href="../../../config/postcreate-hooks">config/postcreate-hooks</a>.</p>
+<p>There are two <code>PostCreateHook</code> objects defined in <a href="../../../config/postcreate-hooks">config/postcreate-hooks</a>. What uses these copies of those hook definitions?</p>
 <ul>
 <li><code>ocm.yaml</code> adds <code>clusteradm</code> by running a container using the image <code>quay.io/kubestellar/clusteradm:0.7.2</code> which is built from <a href="https://github.com/open-cluster-management-io/clusteradm">the OCM source</a> using the script <a href="../../../hack/build-clusteradm-image.sh">build-clusteradm-image.sh</a>.</li>
 <li><code>kubestellar.yaml</code> runs container image <code>quay.io/kubestellar/helm:v3.14.0</code> (which is built from <a href="https://github.com/helm/helm/tree/v3.14.0">the Helm source</a> by a process that we need to document) to instantiate the chart from <code>oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart</code> with chart version <code>0.20.0-alpha.1</code>, which is built by (what?) from (what? probably answered above).</li>
