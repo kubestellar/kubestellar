@@ -17,7 +17,7 @@ limitations under the License.
 // Package v1alpha1 contains API Schema definitions for the placement v1alpha1 API group
 // +kubebuilder:object:generate=true
 // +k8s:openapi-gen=true
-// +groupName=edge.kubestellar.io
+// +groupName=control.kubestellar.io
 package v1alpha1
 
 import (
@@ -27,7 +27,7 @@ import (
 
 var (
 	// GroupVersion is group version used to register these objects
-	GroupVersion = schema.GroupVersion{Group: "edge.kubestellar.io", Version: "v1alpha1"}
+	GroupVersion = schema.GroupVersion{Group: "control.kubestellar.io", Version: "v1alpha1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme.
 	// TODO: Is it problematic that https://github.com/kubernetes/sample-controller/blob/v0.28.2/pkg/apis/samplecontroller/v1alpha1/register.go#L42 does this a little differently?

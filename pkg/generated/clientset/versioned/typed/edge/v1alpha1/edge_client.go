@@ -33,7 +33,7 @@ type EdgeV1alpha1Interface interface {
 	PlacementDecisionsGetter
 }
 
-// EdgeV1alpha1Client is used to interact with features provided by the edge.kubestellar.io group.
+// EdgeV1alpha1Client is used to interact with features provided by the control.kubestellar.io group.
 type EdgeV1alpha1Client struct {
 	restClient rest.Interface
 }

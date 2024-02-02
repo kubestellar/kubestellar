@@ -37,7 +37,7 @@ const (
 	ServiceKind                          = "Service"
 	PlacementKind                        = "Placement"
 	PlacementResource                    = "placements"
-	WorkStatusGroup                      = "edge.kubestellar.io"
+	WorkStatusGroup                      = "control.kubestellar.io"
 	WorkStatusVersion                    = "v1alpha1"
 	WorkStatusResource                   = "workstatuses"
 	AnnotationToPreserveValuesKey        = "annotations.kubestellar.io/preserve"
@@ -212,7 +212,7 @@ func CheckWorkStatusIPresent(config *rest.Config) bool {
 	}
 
 	gvr := schema.GroupVersionResource{
-		Group:    "edge.kubestellar.io",
+		Group:    "control.kubestellar.io",
 		Version:  "v1alpha1",
 		Resource: "workstatuses",
 	}

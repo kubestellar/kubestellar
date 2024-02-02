@@ -92,7 +92,7 @@ wait-for-cmd '(($(kubectl --context cluster2 get ns nginx | wc -l) == 0))'
 : Verify that by deleting one of the placements the object stays in the WEC
 :
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: control.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: nginx-placement
@@ -105,7 +105,7 @@ spec:
 EOF
 
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: control.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: nginx-placement-2

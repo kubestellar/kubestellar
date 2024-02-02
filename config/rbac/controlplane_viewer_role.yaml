@@ -12,7 +12,7 @@ metadata:
   name: placementpolicy-viewer-role
 rules:
 - apiGroups:
-  - edge.kubestellar.io
+  - control.kubestellar.io
   resources:
   - placementpolicies
   verbs:
@@ -20,7 +20,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - edge.kubestellar.io
+  - control.kubestellar.io
   resources:
   - placementpolicies/status
   verbs:
