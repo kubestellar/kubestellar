@@ -2,13 +2,15 @@
 
 ## Outline of GitHub repositories
 
-The following is a graph of the GitHub repositories and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow.
+The following is a graph of the GitHub repositories in the `kubestellar` GitHub organization and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow.
+
+Note that to _use_ KubeStellar, all of the repos in this graph are involved.
 
 ```mermaid
 flowchart LR
     kubestellar --> kubeflex
     kubeflex    --> kubestellar
-    kubestellar --> ocm-status-addon
+    ocm-status-addon     --> kubestellar
     ocm-transport-plugin --> kubestellar
 ```
 
