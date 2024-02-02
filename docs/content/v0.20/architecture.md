@@ -249,7 +249,8 @@ to understand).
 At startup, the controller code sets up the dynamic informers, the event
 handler and the work queue as follows:
 
-- lists all API resources
+- lists all API preferred resources (using discovery client's ServerPreferredResources()
+  to return only one preferred storage version for API group)
 - Filters out some resources
 - For each resource:
   - Creates GVK key
