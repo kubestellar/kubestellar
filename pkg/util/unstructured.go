@@ -37,7 +37,7 @@ const (
 	ServiceKind                          = "Service"
 	PlacementKind                        = "Placement"
 	PlacementResource                    = "placements"
-	WorkStatusGroup                      = "control.kubestellar.io"
+	WorkStatusGroup                      = "edge.kubestellar.io" // TODO: update/import after status-addon is rehomed and its api group for WorkStatus is updated
 	WorkStatusVersion                    = "v1alpha1"
 	WorkStatusResource                   = "workstatuses"
 	AnnotationToPreserveValuesKey        = "annotations.kubestellar.io/preserve"
@@ -212,7 +212,7 @@ func CheckWorkStatusIPresent(config *rest.Config) bool {
 	}
 
 	gvr := schema.GroupVersionResource{
-		Group:    "control.kubestellar.io",
+		Group:    "edge.kubestellar.io", // TODO: update/import after status-addon is rehomed and its api group for WorkStatus is updated
 		Version:  "v1alpha1",
 		Resource: "workstatuses",
 	}
