@@ -2019,17 +2019,12 @@ archives, the Kubernetes API group, and the space framework component.</p>
 <h2 id="kubernetes-api-group">Kubernetes API group<a class="headerlink" href="#kubernetes-api-group" title="Permanent link">#</a></h2>
 <p>KubeStellar defines a Kubernetes <a href="https://kubernetes.io/docs/reference/using-api/#api-groups">API
 group</a>,
-named <code>edge.kubestellar.io</code>. API groups are versioned; see <a href="https://kubernetes.io/docs/reference/using-api/#api-versioning">the
+named <code>control.kubestellar.io</code>. API groups are versioned; see <a href="https://kubernetes.io/docs/reference/using-api/#api-versioning">the
 Kubernetes documentation on API group
 versioning</a>. The
-Kubernetes API of KubeStellar is defined in <code>pkg/apis/edge</code>.</p>
+Kubernetes API of KubeStellar is defined in <code>api/control</code>.</p>
 <p>The API objects form the interface between users and the controllers
 that implement the semantics of those objects.</p>
-<p>Two versions of the <code>edge.kubestellar.io</code> API group have been defined.</p>
-<ul>
-<li><code>v1alpha1</code>, for the Kubernetes API of KubeStellar releases 0.7 and earlier.</li>
-<li><code>v2alpha1</code>, for the Kubernetes API of KubeStellar releases 0.8 and later.</li>
-</ul>
 <h2 id="syncer-container-image">Syncer container image<a class="headerlink" href="#syncer-container-image" title="Permanent link">#</a></h2>
 <p>The syncer is KubeStellar's agent in WECs, and is based on a
 Kubernetes Pod that uses a container image at
