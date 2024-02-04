@@ -1,4 +1,4 @@
-name: test multi-cluster distribution
+name: Test end to end 
 
 on:
   workflow_call:
@@ -53,13 +53,14 @@ jobs:
           tar -xvf kubeflex_0.4.2_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
           rm -fr bin kubeflex_0.4.2_linux_amd64.tar.gz
+          go install github.com/onsi/ginkgo/v2/ginkgo
 
       - name: Run test
         env:
           TEST_FLAGS: ${{ github.event.inputs.testFlags }}
         run: |
-          cd test/e2e/multi-cluster-deployment 
-          KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
+          cd test/e2e/ginkgo 
+          KFLEX_DISABLE_CHATTY=true KUBECONFIG=~/.kube/config ginkgo -v $TEST_FLAGS
 
       - name: show kubeconfig contexts
         if: always()
