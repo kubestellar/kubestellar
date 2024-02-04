@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package edge
+package control
 
 // GroupName is the group name used in this package
 const (
-	GroupName = "edge.kubestellar.io"
+	GroupName = "control.kubestellar.io"
 )

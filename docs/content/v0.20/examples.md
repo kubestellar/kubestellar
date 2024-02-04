@@ -80,7 +80,7 @@ Create a placement to deliver an app to all clusters in wds1:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: control.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: nginx-placement
@@ -277,7 +277,7 @@ Finally, apply the placement:
 
 ```shell
 kubectl --context wds2 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: control.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: aw-placement
@@ -305,7 +305,7 @@ Create a placement for the helm chart app:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: control.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: postgres-placement
@@ -383,7 +383,7 @@ Apply a placement with the `wantSingletonReportedState` flag set:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: control.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: nginx-singleton-placement
@@ -476,7 +476,7 @@ Wait for about a minute for all pods to restart, then apply a new placement:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: control.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: nginx-res-placement
@@ -545,7 +545,7 @@ Apply the following placement to wds1:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: control.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: argocd-sa-placement

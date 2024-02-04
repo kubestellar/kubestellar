@@ -29,8 +29,8 @@ import (
 	"k8s.io/klog/v2"
 
 	transportoptions "github.com/kubestellar/kubestellar/cmd/transport/options"
-	edgeclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
-	edgeinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
+	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
+	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/transport"
 )
 
@@ -80,7 +80,7 @@ func Run(transportImplementation transport.Transport) {
 	}
 	transportRestConfig.UserAgent = transport.ControllerName
 	// clients for WDS
-	edgeClientset, err := edgeclientset.NewForConfig(wdsRestConfig)
+	wdsClientset, err := ksclientset.NewForConfig(wdsRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create edge clientset for Workload Description Space (WDS)")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
@@ -102,14 +102,14 @@ func Run(transportImplementation transport.Transport) {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
-	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeClientset, defaultResyncPeriod)
+	factory := ksinformers.NewSharedInformerFactoryWithOptions(wdsClientset, defaultResyncPeriod)
 
-	transportController, err := transport.NewTransportController(ctx, edgeSharedInformerFactory.Edge().V1alpha1().PlacementDecisions(),
-		transportImplementation, edgeClientset, wdsDynamicClient, transportClientset, transportDynamicClient, options.WdsName)
+	transportController, err := transport.NewTransportController(ctx, factory.Control().V1alpha1().PlacementDecisions(),
+		transportImplementation, wdsClientset, wdsDynamicClient, transportClientset, transportDynamicClient, options.WdsName)
 
 	// notice that there is no need to run Start method in a separate goroutine.
 	// Start method is non-blocking and runs each of the factory's informers in its own dedicated goroutine.
-	edgeSharedInformerFactory.Start(ctx.Done())
+	factory.Start(ctx.Done())
 
 	if err := transportController.Run(ctx, options.Concurrency); err != nil {
 		logger.Error(err, "failed to run transport controller")

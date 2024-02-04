@@ -43,7 +43,7 @@ import (
 )
 
 // CRDs to apply
-var crdNames = map[string]bool{"placements.edge.kubestellar.io": true}
+var crdNames = map[string]bool{"placements.control.kubestellar.io": true}
 
 //go:embed files/*
 var embeddedFiles embed.FS

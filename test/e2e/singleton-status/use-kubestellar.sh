@@ -21,7 +21,7 @@ set -e # exit on error
 : "Create a placement in wds1 to deliver an app to one WEC."
 :
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: control.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: nginx-singleton-placement

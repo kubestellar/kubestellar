@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	mygroup "github.com/kubestellar/kubestellar/api/edge"
+	mygroup "github.com/kubestellar/kubestellar/api/control"
 )
 
 // SchemeGroupVersion is group version used to register these objects

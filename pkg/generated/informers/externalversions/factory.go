@@ -29,7 +29,7 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 
 	versioned "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
-	edge "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/edge"
+	control "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control"
 	internalinterfaces "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/internalinterfaces"
 )
 
@@ -244,9 +244,9 @@ type SharedInformerFactory interface {
 	// client.
 	InformerFor(obj runtime.Object, newFunc internalinterfaces.NewInformerFunc) cache.SharedIndexInformer
 
-	Edge() edge.Interface
+	Control() control.Interface
 }
 
-func (f *sharedInformerFactory) Edge() edge.Interface {
-	return edge.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Control() control.Interface {
+	return control.New(f, f.namespace, f.tweakListOptions)
 }

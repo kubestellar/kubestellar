@@ -15,18 +15,13 @@ archives, the Kubernetes API group, and the space framework component.
 
 KubeStellar defines a Kubernetes [API
 group](https://kubernetes.io/docs/reference/using-api/#api-groups),
-named `edge.kubestellar.io`. API groups are versioned; see [the
+named `control.kubestellar.io`. API groups are versioned; see [the
 Kubernetes documentation on API group
 versioning](https://kubernetes.io/docs/reference/using-api/#api-versioning). The
-Kubernetes API of KubeStellar is defined in `pkg/apis/edge`.
+Kubernetes API of KubeStellar is defined in `api/control`.
 
 The API objects form the interface between users and the controllers
 that implement the semantics of those objects.
-
-Two versions of the `edge.kubestellar.io` API group have been defined.
-
-- `v1alpha1`, for the Kubernetes API of KubeStellar releases 0.7 and earlier.
-- `v2alpha1`, for the Kubernetes API of KubeStellar releases 0.8 and later.
 
 ## Syncer container image
 

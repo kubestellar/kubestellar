@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.11.3
   creationTimestamp: null
-  name: placementdecisions.edge.kubestellar.io
+  name: placementdecisions.control.kubestellar.io
 spec:
-  group: edge.kubestellar.io
+  group: control.kubestellar.io
   names:
     kind: PlacementDecision
     listKind: PlacementDecisionList

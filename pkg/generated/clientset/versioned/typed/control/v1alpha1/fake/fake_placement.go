@@ -27,12 +27,12 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
 
-	v1alpha1 "github.com/kubestellar/kubestellar/api/edge/v1alpha1"
+	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 // FakePlacements implements PlacementInterface
 type FakePlacements struct {
-	Fake *FakeEdgeV1alpha1
+	Fake *FakeControlV1alpha1
 }
 
 var placementsResource = v1alpha1.SchemeGroupVersion.WithResource("placements")

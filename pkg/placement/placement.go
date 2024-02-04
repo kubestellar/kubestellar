@@ -36,7 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	"github.com/kubestellar/kubestellar/api/edge/v1alpha1"
+	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/ocm"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
@@ -86,7 +86,7 @@ func (c *Controller) requeueForPlacementChanges() error {
 }
 
 func (c *Controller) getPlacementByName(name string) (runtime.Object, error) {
-	lister := c.listers["edge.kubestellar.io/v1alpha1/Placement"]
+	lister := c.listers["control.kubestellar.io/v1alpha1/Placement"]
 	if lister == nil {
 		return nil, fmt.Errorf("could not get lister for placememt")
 	}
@@ -98,7 +98,7 @@ func (c *Controller) getPlacementByName(name string) (runtime.Object, error) {
 }
 
 func (c *Controller) listPlacements() ([]runtime.Object, error) {
-	lister := c.listers["edge.kubestellar.io/v1alpha1/Placement"]
+	lister := c.listers["control.kubestellar.io/v1alpha1/Placement"]
 	if lister == nil {
 		return nil, fmt.Errorf("could not get lister for placememt")
 	}

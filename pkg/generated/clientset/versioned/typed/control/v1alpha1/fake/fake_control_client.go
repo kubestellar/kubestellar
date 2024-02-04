@@ -22,24 +22,24 @@ import (
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 
-	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/edge/v1alpha1"
+	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
 )
 
-type FakeEdgeV1alpha1 struct {
+type FakeControlV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeEdgeV1alpha1) Placements() v1alpha1.PlacementInterface {
+func (c *FakeControlV1alpha1) Placements() v1alpha1.PlacementInterface {
 	return &FakePlacements{c}
 }
 
-func (c *FakeEdgeV1alpha1) PlacementDecisions() v1alpha1.PlacementDecisionInterface {
+func (c *FakeControlV1alpha1) PlacementDecisions() v1alpha1.PlacementDecisionInterface {
 	return &FakePlacementDecisions{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeEdgeV1alpha1) RESTClient() rest.Interface {
+func (c *FakeControlV1alpha1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

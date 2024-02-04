@@ -39,10 +39,10 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	"github.com/kubestellar/kubestellar/api/edge/v1alpha1"
-	edgeclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
-	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/edge/v1alpha1"
-	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/edge/v1alpha1"
+	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
+	controlv1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
+	controlv1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 )
 
 const (
@@ -54,8 +54,8 @@ const (
 )
 
 // NewTransportController returns a new transport controller
-func NewTransportController(ctx context.Context, placementDecisionInformer edgev1alpha1informers.PlacementDecisionInformer, transport Transport,
-	wdsClientset edgeclientset.Interface, wdsDynamicClient dynamic.Interface, transportClientset kubernetes.Interface,
+func NewTransportController(ctx context.Context, placementDecisionInformer controlv1alpha1informers.PlacementDecisionInformer, transport Transport,
+	wdsClientset ksclientset.Interface, wdsDynamicClient dynamic.Interface, transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface, wdsName string) (*genericTransportController, error) {
 	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
 	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
@@ -129,7 +129,7 @@ func getGvrFromWrappedObject(clientset kubernetes.Interface, wrappedObject runti
 type genericTransportController struct {
 	logger logr.Logger
 
-	placementDecisionLister         edgev1alpha1listers.PlacementDecisionLister
+	placementDecisionLister         controlv1alpha1listers.PlacementDecisionLister
 	placementDecisionInformerSynced cache.InformerSynced
 	wrappedObjectInformerSynced     cache.InformerSynced
 
@@ -143,7 +143,7 @@ type genericTransportController struct {
 	transportClient  dynamic.Interface // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
-	wdsClientset     edgeclientset.Interface
+	wdsClientset     ksclientset.Interface
 	wdsDynamicClient dynamic.Interface
 	wdsName          string
 }
@@ -495,7 +495,7 @@ func (c *genericTransportController) updatePlacementDecision(ctx context.Context
 		return nil // if object was not updated, no need to update in API server, return.
 	}
 
-	_, err := c.wdsClientset.EdgeV1alpha1().PlacementDecisions().Update(ctx, updatedPlacementDecision, metav1.UpdateOptions{
+	_, err := c.wdsClientset.ControlV1alpha1().PlacementDecisions().Update(ctx, updatedPlacementDecision, metav1.UpdateOptions{
 		FieldManager: ControllerName,
 	})
 	if err != nil {

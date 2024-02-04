@@ -35,7 +35,7 @@ import (
 
 	tenancyv1alpha1 "github.com/kubestellar/kubeflex/api/v1alpha1"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/api/edge/v1alpha1"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 func GetClientSet(kubeconfig string) *kubernetes.Clientset {
@@ -62,7 +62,7 @@ func GetClient() *client.Client {
 		fmt.Fprintf(os.Stderr, "Error creating NewDiscoveryRESTMapper: %v\n", err)
 		os.Exit(1)
 	}
-	if err := edgev1alpha1.AddToScheme(scheme); err != nil {
+	if err := controlv1alpha1.AddToScheme(scheme); err != nil {
 		fmt.Fprintf(os.Stderr, "Error adding to schema: %v\n", err)
 		os.Exit(1)
 	}

@@ -15,6 +15,6 @@ limitations under the License.
 */
 
 // not k8s:deepcopy-gen=package
-// +groupName=edge.kubestellar.io
+// +groupName=control.kubestellar.io
 
 package v1alpha1

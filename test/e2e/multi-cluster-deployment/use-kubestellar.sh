@@ -22,7 +22,7 @@ set -e # exit on error
 : "This placement configuration determines where to deploy the workload by using the label selector expressions found in clusterSelectors. It also specifies what to deploy through the downsync.objectSelectors expressions. When there are multiple matchLabels expressions, they are combined using a logical AND operation. Conversely, when there are multiple objectSelectors, they are combined using a logical OR operation."
 :
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: control.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: nginx-placement
