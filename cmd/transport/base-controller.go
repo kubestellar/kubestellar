@@ -82,7 +82,7 @@ func Run(transportImplementation transport.Transport) {
 	// clients for WDS
 	wdsClientset, err := ksclientset.NewForConfig(wdsRestConfig)
 	if err != nil {
-		logger.Error(err, "Failed to create edge clientset for Workload Description Space (WDS)")
+		logger.Error(err, "Failed to create KubeStellar clientset for Workload Description Space (WDS)")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 	wdsDynamicClient, err := dynamic.NewForConfig(wdsRestConfig)
