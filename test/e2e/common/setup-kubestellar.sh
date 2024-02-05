@@ -33,15 +33,15 @@ kflex init --create-kind $disable_chatty_status
 : -------------------------------------------------------------------------
 : 'Create an inventory & mailbox space of type vcluster running OCM (Open Cluster Management) directly in KubeFlex. Note that -p ocm runs a post-create hook on the vcluster control plane which installs OCM on it.'
 :
-kflex create imbs1 --type vcluster -p ocm $disable_chatty_status
-: imbs1 created.
+kflex create transport1 --type vcluster -p ocm $disable_chatty_status
+: transport1 created.
 
 :
 : -------------------------------------------------------------------------
-: Install singleton status return addon in IMBS1
+: Install singleton status return addon in transport1
 :
-wait-for-cmd kubectl --context imbs1 api-resources "|" grep managedclusteraddons
-helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://quay.io/pdettori/status-addon-chart --version 0.1.0
+wait-for-cmd kubectl --context transport1 api-resources "|" grep managedclusteraddons
+helm --kube-context transport1 upgrade --install status-addon -n open-cluster-management oci://quay.io/pdettori/status-addon-chart --version 0.1.0
 
 
 :
@@ -66,31 +66,31 @@ function create_cluster() {
   cluster=$1
   kind create cluster --name $cluster
   kubectl config rename-context kind-${cluster} $cluster
-  clusteradm --context imbs1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --force-internal-endpoint-lookup"}' | sh
+  clusteradm --context transport1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --force-internal-endpoint-lookup"}' | sh
 }
 
 create_cluster cluster1
 create_cluster cluster2
 
-: Wait for csrs in imbs1
-wait-for-cmd '(($(kubectl --context imbs1 get csr 2>/dev/null | grep -c Pending) >= 2))'
+: Wait for csrs in transport1
+wait-for-cmd '(($(kubectl --context transport1 get csr 2>/dev/null | grep -c Pending) >= 2))'
 
-clusteradm --context imbs1 accept --clusters cluster1
-clusteradm --context imbs1 accept --clusters cluster2
+clusteradm --context transport1 accept --clusters cluster1
+clusteradm --context transport1 accept --clusters cluster2
 
-kubectl --context imbs1 get managedclusters
-kubectl --context imbs1 label managedcluster cluster1 location-group=edge name=cluster1
-kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=cluster2
+kubectl --context transport1 get managedclusters
+kubectl --context transport1 label managedcluster cluster1 location-group=edge name=cluster1
+kubectl --context transport1 label managedcluster cluster2 location-group=edge name=cluster2
 
 :
 : -------------------------------------------------------------------------
 : Get all deployments and statefulsets running in the hosting cluster.
 : Expect to see the wds1 kubestellar-controller-manager created in the wds1-system 
-: namespace and the imbs1 statefulset created in the imbs1-system namespace.
+: namespace and the transport1 statefulset created in the transport1-system namespace.
 :
-if ! expect-cmd-output 'kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces' 'grep -e wds1 -e imbs1 | wc -l | grep -wq 4'
+if ! expect-cmd-output 'kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces' 'grep -e wds1 -e transport1 | wc -l | grep -wq 4'
 then
-    echo "Failed to see wds1 deployment and imbs1 statefulset."
+    echo "Failed to see wds1 deployment and transport1 statefulset."
     exit 1
 fi
 
@@ -98,7 +98,7 @@ fi
 : -------------------------------------------------------------------------
 : "Get available clusters with label location-group=edge and check there are two of them"
 :
-if ! expect-cmd-output 'kubectl --context imbs1 get managedclusters -l location-group=edge' 'wc -l | grep -wq 3'
+if ! expect-cmd-output 'kubectl --context transport1 get managedclusters -l location-group=edge' 'wc -l | grep -wq 3'
 then
     echo "Failed to see two clusters."
     exit 1

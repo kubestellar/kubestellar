@@ -47,18 +47,18 @@ import (
 // a placement that cuase an object to be delivered to a cluster has singleton statsus specified
 // the full status will be copied to the object.
 type Controller struct {
-	ctx                context.Context
-	logger             logr.Logger
-	wdsName            string
-	wdsDynClient       dynamic.Interface
-	wdsKubeClient      kubernetes.Interface
-	imbsDynClient      dynamic.Interface
-	imbsKubeClient     kubernetes.Interface
-	workStatusInformer cache.SharedIndexInformer
-	workStatusLister   cache.GenericLister
-	placementInformer  cache.SharedIndexInformer
-	placementLister    cache.GenericLister
-	workqueue          workqueue.RateLimitingInterface
+	ctx                 context.Context
+	logger              logr.Logger
+	wdsName             string
+	wdsDynClient        dynamic.Interface
+	wdsKubeClient       kubernetes.Interface
+	transportDynClient  dynamic.Interface
+	transportKubeClient kubernetes.Interface
+	workStatusInformer  cache.SharedIndexInformer
+	workStatusLister    cache.GenericLister
+	placementInformer   cache.SharedIndexInformer
+	placementLister     cache.GenericLister
+	workqueue           workqueue.RateLimitingInterface
 	// all wds listers/informers are required to retrieve objects and update status
 	// without having to re-create new caches for this coontroller
 	listers   map[string]cache.GenericLister
@@ -66,7 +66,7 @@ type Controller struct {
 }
 
 // Create a new  status controller
-func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
+func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, transportRestConfig *rest.Config,
 	wdsName string, listers map[string]cache.GenericLister,
 	informers map[string]cache.SharedIndexInformer) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
@@ -84,26 +84,26 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 		return nil, err
 	}
 
-	imbsDynClient, err := dynamic.NewForConfig(imbsRestConfig)
+	transportDynClient, err := dynamic.NewForConfig(transportRestConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	imbsKubeClient, err := kubernetes.NewForConfig(imbsRestConfig)
+	transportKubeClient, err := kubernetes.NewForConfig(transportRestConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	controller := &Controller{
-		wdsName:        wdsName,
-		logger:         mgr.GetLogger(),
-		wdsDynClient:   wdsDynClient,
-		wdsKubeClient:  wdsKubeClient,
-		imbsDynClient:  imbsDynClient,
-		imbsKubeClient: imbsKubeClient,
-		workqueue:      workqueue.NewRateLimitingQueue(ratelimiter),
-		listers:        listers,
-		informers:      informers,
+		wdsName:             wdsName,
+		logger:              mgr.GetLogger(),
+		wdsDynClient:        wdsDynClient,
+		wdsKubeClient:       wdsKubeClient,
+		transportDynClient:  transportDynClient,
+		transportKubeClient: transportKubeClient,
+		workqueue:           workqueue.NewRateLimitingQueue(ratelimiter),
+		listers:             listers,
+		informers:           informers,
 	}
 
 	return controller, nil
@@ -196,7 +196,7 @@ func (c *Controller) startPlacementInformer() {
 }
 
 func (c *Controller) startWorkStatusInformer() {
-	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.imbsDynClient, 0*time.Minute)
+	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.transportDynClient, 0*time.Minute)
 
 	gvr := schema.GroupVersionResource{Group: util.WorkStatusGroup,
 		Version:  util.WorkStatusVersion,

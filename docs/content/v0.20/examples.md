@@ -29,28 +29,28 @@ in KubeFlex. Note that `-p ocm` runs a post-create hook on the *vcluster* contro
 which installs OCM on it.
 
    ```shell
-   kflex create imbs1 --type vcluster -p ocm
+   kflex create transport1 --type vcluster -p ocm
    ```
 
-4. Install status add-on on imbs1:
+4. Install status add-on on transport1:
 
-   Wait until the `managedclusteraddons` resource shows up on `imbs1`. You can check on that with the command:
+   Wait until the `managedclusteraddons` resource shows up on `transport1`. You can check on that with the command:
 
    ```shell
-   kubectl --context imbs1 api-resources | grep managedclusteraddons
+   kubectl --context transport1 api-resources | grep managedclusteraddons
    ```
 
    and then install the status add-on:
 
    ```shell
-   helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://quay.io/pdettori/status-addon-chart --version 0.1.0
+   helm --kube-context transport1 upgrade --install status-addon -n open-cluster-management oci://quay.io/pdettori/status-addon-chart --version 0.1.0
    ```
 
    see [here](https://github.ibm.com/dettori/status-addon) for more details on the add-on.
 
 5. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar`
 runs a post-create hook on the *k8s* control plane that starts an instance of a KubeStellar controller
-manager which connects to the `wds1` front-end and the `imbs1` OCM control plane back-end.
+manager which connects to the `wds1` front-end and the `transport1` OCM control plane back-end.
 
    ```shell
    kflex create wds1 -p kubestellar
@@ -59,8 +59,8 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 6. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
 
 7. (optional) Check all deployments and statefulsets running in the hosting cluster. Expect to
-see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the imbs1
-statefulset created in the imbs1-system namespace.
+see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the transport1
+statefulset created in the transport1-system namespace.
 
    ```shell
    kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces
@@ -73,7 +73,7 @@ This scenario proceeds from the state established by the [common setup](#common-
 Check for available clusters with label `location-group=edge`
 
 ```shell
-kubectl --context imbs1 get managedclusters -l location-group=edge
+kubectl --context transport1 get managedclusters -l location-group=edge
 ```
 
 Create a placement to deliver an app to all clusters in wds1:
@@ -143,8 +143,8 @@ Verify that *manifestworks* wrapping the objects have been created in the mailbo
 namespaces:
 
 ```shell
-kubectl --context imbs1 get manifestworks -n cluster1
-kubectl --context imbs1 get manifestworks -n cluster2
+kubectl --context transport1 get manifestworks -n cluster1
+kubectl --context transport1 get manifestworks -n cluster2
 ```
 
 Verify that the deployment has been created in both clusters
@@ -451,14 +451,14 @@ This is a test that you can do after finishing Scenario 1.
 
 TODO: rewrite this so that it makes sense after Scenario 4.
 
-Bring down the control plane: stop and restart wds1 and imbs1 API servers,
+Bring down the control plane: stop and restart wds1 and transport1 API servers,
 KubeFlex and KubeStellar controllers:
 
 First stop all:
 
 ```shell
 kubectl --context kind-kubeflex scale deployment -n wds1-system kube-apiserver --replicas=0
-kubectl --context kind-kubeflex scale statefulset -n imbs1-system vcluster --replicas=0
+kubectl --context kind-kubeflex scale statefulset -n transport1-system vcluster --replicas=0
 kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-controller-manager --replicas=0
 kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=0
 ```
@@ -467,7 +467,7 @@ Then restart all:
 
 ```shell
 kubectl --context kind-kubeflex scale deployment -n wds1-system kube-apiserver --replicas=1
-kubectl --context kind-kubeflex scale statefulset -n imbs1-system vcluster --replicas=1
+kubectl --context kind-kubeflex scale statefulset -n transport1-system vcluster --replicas=1
 kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-controller-manager --replicas=1
 kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=1
 ```

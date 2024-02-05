@@ -119,17 +119,17 @@ func main() {
 	}
 	setupLog.Info("Got config for WDS", "name", wdsName)
 
-	// get the config for IMBS
-	setupLog.Info("Getting config for IMBS")
-	imbsRestConfig, imbsName, err := util.GetIMBSKubeconfig(setupLog)
+	// get the config for transport space
+	setupLog.Info("Getting config for transport space")
+	transportRestConfig, transportName, err := util.GetTransportKubeconfig(setupLog)
 	if err != nil {
-		setupLog.Error(err, "unable to get IMBS kubeconfig")
+		setupLog.Error(err, "unable to get transport space kubeconfig")
 		os.Exit(1)
 	}
-	setupLog.Info("Got config for IMBS", "name", imbsName)
+	setupLog.Info("Got config for transport space", "name", transportName)
 
 	// start the placement controller
-	placementController, err := placement.NewController(mgr, wdsRestConfig, imbsRestConfig, wdsName)
+	placementController, err := placement.NewController(mgr, wdsRestConfig, transportRestConfig, wdsName)
 	if err != nil {
 		setupLog.Error(err, "unable to create placement controller")
 		os.Exit(1)
@@ -141,10 +141,10 @@ func main() {
 	}
 
 	// check if status add-on present and if yes start the status controller
-	if util.CheckWorkStatusIPresent(imbsRestConfig) {
+	if util.CheckWorkStatusIPresent(transportRestConfig) {
 		listers := placementController.GetListers()
 		informers := placementController.GetInformers()
-		statusController, err := status.NewController(mgr, wdsRestConfig, imbsRestConfig, wdsName, listers, informers)
+		statusController, err := status.NewController(mgr, wdsRestConfig, transportRestConfig, wdsName, listers, informers)
 		if err != nil {
 			setupLog.Error(err, "unable to create status controller")
 			os.Exit(1)

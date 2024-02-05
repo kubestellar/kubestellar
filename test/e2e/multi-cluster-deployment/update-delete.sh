@@ -46,8 +46,8 @@ wait-for-cmd '[ "$(kubectl --context cluster2 get deployment -n nginx nginx-depl
 : Verify that the object is deleted from the WECs
 :
 kubectl --context wds1 patch placement nginx-placement --type=merge -p '{"spec": {"downsync": [{"objectSelectors": [{"matchLabels": {"app.kubernetes.io/name": "invalid"}}]}]}}'
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster1 | wc -l) == 2))'
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster2 | wc -l) == 2))'
+wait-for-cmd '(($(kubectl --context transport1 get manifestworks -n cluster1 | wc -l) == 2))'
+wait-for-cmd '(($(kubectl --context transport1 get manifestworks -n cluster2 | wc -l) == 2))'
 wait-for-cmd '(($(kubectl --context cluster1 get ns nginx | wc -l) == 0))'
 wait-for-cmd '(($(kubectl --context cluster2 get ns nginx | wc -l) == 0))'
 :
@@ -76,8 +76,8 @@ wait-for-cmd kubectl --context cluster2 get deployment -n nginx nginx-deployment
 : Verify that the object is deleted from the WECs
 :
 kubectl --context wds1 delete placement nginx-placement
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster1 | wc -l) == 2))'
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster2 | wc -l) == 2))'
+wait-for-cmd '(($(kubectl --context transport1 get manifestworks -n cluster1 | wc -l) == 2))'
+wait-for-cmd '(($(kubectl --context transport1 get manifestworks -n cluster2 | wc -l) == 2))'
 wait-for-cmd '(($(kubectl --context cluster1 get ns nginx | wc -l) == 0))'
 wait-for-cmd '(($(kubectl --context cluster2 get ns nginx | wc -l) == 0))'
 :
@@ -136,8 +136,8 @@ wait-for-cmd kubectl --context cluster2 get deployment -n nginx nginx-deployment
 : Verify that the object is deleted from the WECs
 :
 kubectl --context wds1 delete deployment -n nginx nginx-deployment
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster1 | wc -l) == 3))'
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster2 | wc -l) == 3))'
+wait-for-cmd '(($(kubectl --context transport1 get manifestworks -n cluster1 | wc -l) == 3))'
+wait-for-cmd '(($(kubectl --context transport1 get manifestworks -n cluster2 | wc -l) == 3))'
 wait-for-cmd '(($(kubectl --context cluster1 get deployment -n nginx nginx-deployment | wc -l) == 0))'
 wait-for-cmd '(($(kubectl --context cluster2 get deployment -n nginx nginx-deployment | wc -l) == 0))'
 :

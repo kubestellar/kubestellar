@@ -38,11 +38,11 @@ import (
 )
 
 const (
-	ControlPlaneTypeLabel = "kflex.kubestellar.io/cptype"
-	ControlPlaneTypeIMBS  = "imbs"
-	ControlPlaneTypeWDS   = "wds"
-	kcSecretKeyDefault    = "kubeconfig"
-	kcSecretKeyVCluster   = "config"
+	ControlPlaneTypeLabel     = "kflex.kubestellar.io/cptype"
+	ControlPlaneTypeTransport = "transport"
+	ControlPlaneTypeWDS       = "wds"
+	kcSecretKeyDefault        = "kubeconfig"
+	kcSecretKeyVCluster       = "config"
 	// errors
 	ErrNoControlPlane        = "no control plane found. At least one control plane labeled with %s=%s must be present"
 	ErrControlPlaneNotFound  = "control plane with label %s=%s and name %s was not found"
@@ -67,8 +67,8 @@ func GetWDSKubeconfig(logger logr.Logger, wdsName, wdsLabel string) (*rest.Confi
 	return getRestConfig(logger, wdsName, label.Key, label.Value)
 }
 
-func GetIMBSKubeconfig(logger logr.Logger) (*rest.Config, string, error) {
-	return getRestConfig(logger, "", ControlPlaneTypeLabel, ControlPlaneTypeIMBS)
+func GetTransportKubeconfig(logger logr.Logger) (*rest.Config, string, error) {
+	return getRestConfig(logger, "", ControlPlaneTypeLabel, ControlPlaneTypeTransport)
 }
 
 // get the rest config for a control plane based on labels and name
@@ -119,7 +119,7 @@ func getRestConfig(logger logr.Logger, cpName, labelKey, labelValue string) (*re
 		}
 	} else {
 		// TODO - we do not allow this case for a WDS as there is a 1:1 relashionship controller:cp for WDS
-		// Need to revisit for IMBS where we can have multiple shards
+		// Need to revisit for transport where we can have multiple shards
 		if len(list.Items) > 1 {
 			return nil, "", fmt.Errorf(ErrMultipleControlPlanes, labelKey, labelValue)
 		}

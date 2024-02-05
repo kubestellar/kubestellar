@@ -89,7 +89,7 @@ type Controller struct {
 }
 
 // Create a new placement controller
-func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config, wdsName string) (*Controller, error) {
+func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, transportRestConfig *rest.Config, wdsName string) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
@@ -110,7 +110,7 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 		return nil, err
 	}
 
-	ocmClient := *ocm.GetOCMClient(imbsRestConfig)
+	ocmClient := *ocm.GetOCMClient(transportRestConfig)
 
 	controller := &Controller{
 		wdsName:          wdsName,
