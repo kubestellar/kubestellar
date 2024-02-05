@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"sort"
 	"strings"
 	"time"
 
@@ -34,6 +33,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
@@ -44,6 +44,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	ctrlm "sigs.k8s.io/controller-runtime/pkg/manager"
 
+	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/crd"
 	"github.com/kubestellar/kubestellar/pkg/ocm"
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -70,6 +71,8 @@ var excludedResourceNames = map[string]bool{
 	"endpoints":            true,
 }
 
+const placementDecisionQueueingDelay = 2 * time.Second
+
 // Controller watches all objects, finds associated placements, when matched a placement wraps and
 // places objects into mailboxes
 type Controller struct {
@@ -80,12 +83,15 @@ type Controller struct {
 	kubernetesClient kubernetes.Interface
 	extClient        apiextensionsclientset.Interface
 	listers          map[string]cache.GenericLister
-	gvksMap          map[string]*schema.GroupVersionResource
+	gvkGvrMapper     util.GvkGvrMapper
 	informers        map[string]cache.SharedIndexInformer
 	stoppers         map[string]chan struct{}
-	workqueue        workqueue.RateLimitingInterface
-	initializedTs    time.Time
-	wdsName          string
+
+	placementResolver PlacementResolver
+
+	workqueue     workqueue.RateLimitingInterface
+	initializedTs time.Time
+	wdsName       string
 }
 
 // Create a new placement controller
@@ -112,18 +118,21 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 
 	ocmClient := *ocm.GetOCMClient(imbsRestConfig)
 
+	gvkGvrMapper := util.NewGvkGvrMapper()
+
 	controller := &Controller{
-		wdsName:          wdsName,
-		logger:           mgr.GetLogger(),
-		ocmClient:        ocmClient,
-		dynamicClient:    dynamicClient,
-		kubernetesClient: kubernetesClient,
-		extClient:        extClient,
-		listers:          make(map[string]cache.GenericLister),
-		informers:        make(map[string]cache.SharedIndexInformer),
-		stoppers:         make(map[string]chan struct{}),
-		gvksMap:          make(map[string]*schema.GroupVersionResource),
-		workqueue:        workqueue.NewRateLimitingQueue(ratelimiter),
+		wdsName:           wdsName,
+		logger:            mgr.GetLogger(),
+		ocmClient:         ocmClient,
+		dynamicClient:     dynamicClient,
+		kubernetesClient:  kubernetesClient,
+		extClient:         extClient,
+		listers:           make(map[string]cache.GenericLister),
+		informers:         make(map[string]cache.SharedIndexInformer),
+		stoppers:          make(map[string]chan struct{}),
+		placementResolver: NewPlacementResolver(gvkGvrMapper),
+		gvkGvrMapper:      gvkGvrMapper,
+		workqueue:         workqueue.NewRateLimitingQueue(ratelimiter),
 	}
 
 	return controller, nil
@@ -172,7 +181,6 @@ func (c *Controller) run(workers int) error {
 	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.dynamicClient, 0*time.Minute)
 
 	// Loop through the api resources and create informers and listers for each of them
-
 	for _, group := range apiResources {
 		if _, excluded := excludedGroupVersions[group.GroupVersion]; excluded {
 			continue
@@ -212,7 +220,9 @@ func (c *Controller) run(workers int) error {
 				// create and index the lister
 				lister := cache.NewGenericLister(informer.GetIndexer(), schema.GroupResource{Group: resource.Group, Resource: resource.Name})
 				c.listers[key] = lister
-				c.gvksMap[key] = &schema.GroupVersionResource{Group: resource.Group, Version: resource.Version, Resource: resource.Name}
+
+				c.gvkGvrMapper.Add(schema.GroupVersionKind{Group: gv.Group, Version: gv.Version, Kind: resource.Kind},
+					schema.GroupVersionResource{Group: gv.Group, Version: gv.Version, Resource: resource.Name})
 
 				// run the informer
 				// we need to be able to stop informers for APIs (CRDs) that are removed
@@ -236,6 +246,11 @@ func (c *Controller) run(workers int) error {
 		}
 	}
 	c.logger.Info("All caches synced")
+
+	// populate the PlacementResolver with entries for existing placements
+	if err := c.populatePlacementResolverWithExistingPlacements(); err != nil {
+		return fmt.Errorf("failed to populate the PlacementResolver for the existing placements")
+	}
 
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
@@ -293,6 +308,7 @@ func (c *Controller) handleObject(obj any) {
 	rObj := obj.(runtime.Object)
 	ok := rObj.GetObjectKind()
 	gvk := ok.GroupVersionKind()
+
 	c.logger.V(2).Info("Got object event", gvk.GroupVersion().String(), gvk.Kind, mObj.GetNamespace(), mObj.GetName())
 	c.enqueueObject(obj, false)
 }
@@ -323,6 +339,22 @@ func (c *Controller) enqueueObject(obj interface{}, skipCheckIsDeleted bool) {
 		}
 	}
 	c.workqueue.Add(key)
+}
+
+func (c *Controller) enqueuePlacementDecision(name string) {
+	c.workqueue.AddAfter(util.Key{
+		GVK: schema.GroupVersionKind{
+			Group:   v1alpha1.GroupVersion.Group,
+			Version: v1alpha1.GroupVersion.Version,
+			Kind:    util.PlacementDecisionKind},
+		NamespacedName: cache.ObjectName{
+			Namespace: metav1.NamespaceNone,
+			Name:      name,
+		},
+		DeletedObject: nil,
+	}, placementDecisionQueueingDelay) // this resource can have bursts of
+	// updates due to being updated by multiple workload-objects getting
+	// processed concurrently at a high rate.
 }
 
 // runWorker is a long-running function that will continually call the
@@ -387,12 +419,20 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 	var obj runtime.Object
 	var err error
+	// special handling for placement-decision resource as it is the only
+	// resource that is queued directly as key, without necessarily first
+	// existing as an object.
+	if util.KeyIsForPlacementDecision(key) {
+		return c.syncPlacementDecision(key) // this function logs through all its exits
+	}
+
 	if key.DeletedObject == nil {
 		obj, err = c.getObjectFromKey(key)
 		if err != nil {
 			// The resource no longer exist, which means it has been deleted.
 			if errors.IsNotFound(err) {
-				utilruntime.HandleError(fmt.Errorf("object %#v for lister '%s' in work queue no longer exists", key.NamespacedName, key.GvkKey))
+				c.logger.Info("object referenced from work queue no longer exists",
+					"object-name", key.NamespacedName, "object-gvk", key.GvkKey())
 				return nil
 			}
 			return err
@@ -406,13 +446,18 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 	// just use "switch obj.(type)"
 	if util.IsPlacement(obj) {
 		if err := c.handlePlacement(obj); err != nil {
-			return err
+			return fmt.Errorf("failed to handle placement: %w", err) // error logging after this call
+			// will add name.
 		}
+
+		c.logger.Info("handled placement", "object", util.GenerateObjectInfoString(obj))
 		return nil
 	} else if util.IsCRD(obj) {
 		if err := c.handleCRD(obj); err != nil {
-			return err
+			return fmt.Errorf("failed to handle CRD: %w", err) // error logging after this call
+			// will add name.
 		}
+		c.logger.Info("handled CRD", "object", util.GenerateObjectInfoString(obj))
 	}
 
 	// avoid further processing for keys of objects being deleted that do not have a deleted object
@@ -420,35 +465,44 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		return nil
 	}
 
-	clusters, managedByPlacements, singletonStatus, err := c.matchSelectors(obj)
+	if err := c.updateDecisions(obj); err != nil {
+		c.logger.Error(err, "failed to update placement resolutions for object",
+			"object", util.GenerateObjectInfoString(obj))
+		// return nil // not changing existing flow before transport is ready
+	}
+
+	//TODO (maroon): everything below this line should be deleted when transport is ready
+	clusterSet, managedByPlacements, singletonStatus, err := c.matchSelectors(obj)
 	if err != nil {
 		utilruntime.HandleError(fmt.Errorf("error matching selectors: %s", err))
 		return nil
 	}
 
 	// if no clusters
-	if len(clusters) == 0 {
+	if len(clusterSet) == 0 {
 		return nil
 	}
 
 	if singletonStatus {
-		clusters = pickSingleCluster(clusters)
+		clusterSet = pickSingleCluster(clusterSet)
 	}
 
 	if key.DeletedObject != nil {
-		c.logger.Info("Deleting", "object", util.GenerateObjectInfoString(obj), "from clusters", clusters)
-		deleteObjectOnManagedClusters(c.logger, c.ocmClient, *key.DeletedObject, clusters)
+		c.logger.Info("Deleting", "object", util.GenerateObjectInfoString(obj),
+			"from clusters", clusterSet)
+		deleteObjectOnManagedClusters(c.logger, c.ocmClient, *key.DeletedObject, clusterSet)
 		return nil
 	}
 
-	c.logger.Info("Delivering", "object", util.GenerateObjectInfoString(obj), "to clusters", clusters)
-	return c.deliverObjectToManagedClusters(obj, clusters, managedByPlacements, singletonStatus)
+	c.logger.Info("Delivering", "object", util.GenerateObjectInfoString(obj),
+		"to clusters", clusterSet)
+	return c.deliverObjectToManagedClusters(obj, clusterSet, managedByPlacements, singletonStatus)
 }
 
 func (c *Controller) getObjectFromKey(key util.Key) (runtime.Object, error) {
-	lister := c.listers[key.GvkKey]
+	lister := c.listers[key.GvkKey()]
 	if lister == nil {
-		utilruntime.HandleError(fmt.Errorf("could not get lister for key: %s", key.GvkKey))
+		utilruntime.HandleError(fmt.Errorf("could not get lister for key: %s", key.GvkKey()))
 		return nil, nil
 	}
 
@@ -495,17 +549,38 @@ func (c *Controller) GetInformers() map[string]cache.SharedIndexInformer {
 	return c.informers
 }
 
+// populatePlacementResolverWithExistingPlacements fills the PlacementResolver
+// with entries for existing Placement objects. Any placement-name that is not
+// associated with a resolution gets associated to an empty resolution.
+func (c *Controller) populatePlacementResolverWithExistingPlacements() error {
+	placements, err := c.listPlacements()
+	if err != nil {
+		return fmt.Errorf("failed to list Placements: %w", err)
+	}
+
+	for _, placementObject := range placements {
+		placement, err := runtimeObjectToPlacement(placementObject)
+		if err != nil {
+			return fmt.Errorf("failed to convert runtime.Object to Placement: %w", err)
+		}
+
+		c.placementResolver.NotePlacement(placement)
+	}
+
+	return nil
+}
+
 // sort by name and pick first cluster so that the choice is deterministic based on names
-func pickSingleCluster(clusters []string) []string {
-	sort.Strings(clusters)
-	return []string{clusters[0]}
+func pickSingleCluster(clusterSet sets.Set[string]) sets.Set[string] {
+	return sets.New(sets.List(clusterSet)[0])
 }
 
 func (c *Controller) deliverObjectToManagedClusters(
 	obj runtime.Object,
-	managedClusters, managedByPlacements []string,
+	managedClusters sets.Set[string],
+	managedByPlacements []string,
 	singletonStatus bool) error {
-	for _, clName := range managedClusters {
+	for clName := range managedClusters {
 		// find which placement(s) select this managedCluster
 		placementNames := []string{}
 		for _, plName := range managedByPlacements {

@@ -37,6 +37,8 @@ const (
 	ServiceKind                          = "Service"
 	PlacementKind                        = "Placement"
 	PlacementResource                    = "placements"
+	PlacementDecisionKind                = "PlacementDecision"
+	PlacementDecisionResource            = "placementdecisions"
 	WorkStatusGroup                      = "edge.kubestellar.io" // TODO: update/import after status-addon is rehomed and its api group for WorkStatus is updated
 	WorkStatusVersion                    = "v1alpha1"
 	WorkStatusResource                   = "workstatuses"

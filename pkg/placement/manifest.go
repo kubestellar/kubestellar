@@ -23,13 +23,16 @@ import (
 	workv1 "open-cluster-management.io/api/work/v1"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kubestellar/kubestellar/pkg/ocm"
 )
 
-func deleteObjectOnManagedClusters(logger logr.Logger, cl client.Client, obj runtime.Object, managedClusters []string) {
-	for _, managedCluster := range managedClusters {
+// TODO (maroon): this file should be deleted when transport is ready
+func deleteObjectOnManagedClusters(logger logr.Logger, cl client.Client, obj runtime.Object,
+	managedClusters sets.Set[string]) {
+	for managedCluster := range managedClusters {
 		err := deleteManifestForObject(cl, obj, managedCluster)
 		if err != nil {
 			logger.Error(err, "Error deleting object on mailbox")

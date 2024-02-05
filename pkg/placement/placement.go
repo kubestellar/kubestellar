@@ -43,34 +43,60 @@ import (
 
 const (
 	waitBeforeTrackingPlacements = 5 * time.Second
-	PlacementKind                = "Placement"
 	KSFinalizer                  = "placement.kubestellar.io/kscontroller"
 )
 
 // Handle placement as follows:
-//  1. requeue all objects to account for changes in placement
-//  2. handle finalizers and deletion of objects associated with the placement
+//
+//  1. if placement is not being deleted:
+//
+//     - update the (where) resolution of the placement and queue the
+//     associated placement decision for syncing.
+//
+//     - requeue workload objects to account for changes in placement
+//
+//     otherwise:
+//
+//     - delete the resolution of the placement.
+//
+//  2. handle finalizers and deletion of objects associated with the placement.
+//
 //  3. for updates on label selectors, re-evaluate if existing objects should be removed
 //     from clusters.
 func (c *Controller) handlePlacement(obj runtime.Object) error {
-	placement := obj.DeepCopyObject()
+	placement, err := runtimeObjectToPlacement(obj)
+	if err != nil {
+		return err
+	}
 
 	// handle requeing for changes in placement, excluding deletion
 	if !isBeingDeleted(obj) {
+		// update placement resolution destinations since placement was updated
+		clusterSet, err := ocm.FindClustersBySelectors(c.ocmClient, placement.Spec.ClusterSelectors)
+		if err != nil {
+			return err
+		}
+
+		// note placement decision in resolver in case it isn't associated with
+		// any resolution
+		c.placementResolver.NotePlacement(placement)
+		// set destinations and enqueue placement-decision for syncing
+		c.placementResolver.SetDestinations(placement.GetName(), clusterSet)
+		c.enqueuePlacementDecision(placement.GetName())
+
+		// requeue objects for re-evaluation
 		if err := c.requeueForPlacementChanges(); err != nil {
 			return err
 		}
+	} else {
+		c.placementResolver.DeleteResolution(placement.GetName())
 	}
 
 	if err := c.handlePlacementFinalizer(placement); err != nil {
 		return err
 	}
 
-	if err := c.cleanUpObjectsNoLongerMatching(placement); err != nil {
-		return err
-	}
-
-	return nil
+	return c.cleanUpObjectsNoLongerMatching(placement)
 }
 
 func (c *Controller) requeueForPlacementChanges() error {
@@ -79,10 +105,10 @@ func (c *Controller) requeueForPlacementChanges() error {
 	if now.Sub(c.initializedTs) < waitBeforeTrackingPlacements {
 		return nil
 	}
-	if err := c.requeueAll(); err != nil {
-		return err
-	}
-	return nil
+
+	// requeue all objects to account for changes in placement.
+	// this does not include placement/placement-decision objects.
+	return c.requeueWorkloadObjects()
 }
 
 func (c *Controller) getPlacementByName(name string) (runtime.Object, error) {
@@ -121,13 +147,13 @@ func runtimeObjectToPlacement(obj runtime.Object) (*v1alpha1.Placement, error) {
 	return placement, nil
 }
 
-// read objects from all listers and enqueue the keys
-// this is useful for when a new placement is added
-// or a placement is updated
-func (c *Controller) requeueAll() error {
+// read objects from all workload listers and enqueue
+// the keys this is useful for when a new placement is
+// added or a placement is updated
+func (c *Controller) requeueWorkloadObjects() error {
 	for key, lister := range c.listers {
-		// do not requeue placement
-		if key == util.GetPlacementListerKey() {
+		// do not requeue placement or placement-decisions
+		if key == util.GetPlacementListerKey() || key == util.GetPlacementDecisionListerKey() {
 			fmt.Printf("Matched key %s\n", key)
 			continue
 		}
@@ -143,28 +169,23 @@ func (c *Controller) requeueAll() error {
 }
 
 // finalizer logic
-func (c *Controller) handlePlacementFinalizer(obj runtime.Object) error {
-	mObj := obj.(metav1.Object)
-	cObj, err := convertToClientObject(obj)
-	if err != nil {
-		return err
-	}
-	if mObj.GetDeletionTimestamp() != nil {
-		if controllerutil.ContainsFinalizer(cObj, KSFinalizer) {
-			if err := c.deleteExternalResources(obj); err != nil {
+func (c *Controller) handlePlacementFinalizer(placement *v1alpha1.Placement) error {
+	if placement.GetDeletionTimestamp() != nil {
+		if controllerutil.ContainsFinalizer(placement, KSFinalizer) {
+			if err := c.deleteExternalResources(placement); err != nil {
 				return err
 			}
-			controllerutil.RemoveFinalizer(cObj, KSFinalizer)
-			if err = updatePlacement(c.dynamicClient, obj); err != nil {
+			controllerutil.RemoveFinalizer(placement, KSFinalizer)
+			if err := updatePlacement(c.dynamicClient, placement); err != nil {
 				return err
 			}
 		}
 		return nil
 	}
 
-	if !controllerutil.ContainsFinalizer(cObj, KSFinalizer) {
-		controllerutil.AddFinalizer(cObj, KSFinalizer)
-		if err = updatePlacement(c.dynamicClient, obj); err != nil {
+	if !controllerutil.ContainsFinalizer(placement, KSFinalizer) {
+		controllerutil.AddFinalizer(placement, KSFinalizer)
+		if err := updatePlacement(c.dynamicClient, placement); err != nil {
 			return err
 		}
 	}
@@ -179,29 +200,36 @@ func convertToClientObject(obj runtime.Object) (client.Object, error) {
 	return clientObj, nil
 }
 
-func updatePlacement(client dynamic.Interface, obj runtime.Object) error {
+func updatePlacement(client dynamic.Interface, placement *v1alpha1.Placement) error {
 	gvr := schema.GroupVersionResource{
 		Group:    v1alpha1.GroupVersion.Group,
-		Version:  obj.GetObjectKind().GroupVersionKind().Version,
-		Resource: "placements",
+		Version:  v1alpha1.GroupVersion.Version,
+		Resource: util.PlacementResource,
 	}
-	unstructuredObj, ok := obj.(*unstructured.Unstructured)
-	if !ok {
-		return fmt.Errorf("unexpected type for obj, expected *unstructured.Unstructured")
+
+	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(placement)
+	if err != nil {
+		return fmt.Errorf("failed to convert Placement to unstructured: %w", err)
 	}
+
+	unstructuredObj := &unstructured.Unstructured{
+		Object: innerObj,
+	}
+
 	client.Resource(gvr).Namespace("").Update(context.Background(), unstructuredObj, metav1.UpdateOptions{})
 	return nil
 }
 
-func (c *Controller) deleteExternalResources(obj runtime.Object) error {
-	list, err := listManifestsForPlacement(c.ocmClient, c.wdsName, obj)
+func (c *Controller) deleteExternalResources(placement *v1alpha1.Placement) error {
+	list, err := listManifestsForPlacement(c.ocmClient, c.wdsName, placement)
 	if err != nil {
 		return err
 	}
-	mObj := obj.(metav1.Object)
-	labelKey := util.GenerateManagedByPlacementLabelKey(c.wdsName, mObj.GetName())
+
+	labelKey := util.GenerateManagedByPlacementLabelKey(c.wdsName, placement.GetName())
 	for _, manifest := range list.Items {
-		c.logger.Info("Trying to delete manifest", "manifest name", manifest.Name, "namespace", manifest.Namespace, "for placement", mObj.GetName())
+		c.logger.Info("Trying to delete manifest", "manifest name", manifest.Name,
+			"namespace", manifest.Namespace, "for placement", placement.GetName())
 		if err := deleteManifestOrLabel(labelKey, manifest, c.ocmClient); err != nil {
 			return err
 		}
@@ -209,10 +237,9 @@ func (c *Controller) deleteExternalResources(obj runtime.Object) error {
 	return nil
 }
 
-func listManifestsForPlacement(ocmClient client.Client, wdsName string, obj runtime.Object) (*workv1.ManifestWorkList, error) {
-	mObj := obj.(metav1.Object)
+func listManifestsForPlacement(ocmClient client.Client, wdsName string, placement *v1alpha1.Placement) (*workv1.ManifestWorkList, error) {
 	list := &workv1.ManifestWorkList{}
-	labelKey := util.GenerateManagedByPlacementLabelKey(wdsName, mObj.GetName())
+	labelKey := util.GenerateManagedByPlacementLabelKey(wdsName, placement.GetName())
 
 	// TODO - the ocm client used this way is not using cache. Replace with informer/lister based
 	// on dynamic client to make sure to use the cache
@@ -265,7 +292,7 @@ func isAlsoManagedByOtherPlacements(labels map[string]string, managedByLabelKey 
 }
 
 // Handle removal of objects no longer matching cluster/selector
-func (c *Controller) cleanUpObjectsNoLongerMatching(placement runtime.Object) error {
+func (c *Controller) cleanUpObjectsNoLongerMatching(placement *v1alpha1.Placement) error {
 	// allow some time before checking to settle
 	now := time.Now()
 	if now.Sub(c.initializedTs) < waitBeforeTrackingPlacements {
@@ -314,13 +341,9 @@ func extractObjectFromManifest(manifest workv1.ManifestWork) (*runtime.Object, e
 	return &rObj, nil
 }
 
-func (c *Controller) checkObjectMatchesWhatAndWhere(placementObj, obj runtime.Object, manifest workv1.ManifestWork) (bool, error) {
+func (c *Controller) checkObjectMatchesWhatAndWhere(placement *v1alpha1.Placement, obj runtime.Object, manifest workv1.ManifestWork) (bool, error) {
 	// default is doing nothing, that is, return match ==true
 	match := true
-	placement, err := runtimeObjectToPlacement(placementObj)
-	if err != nil {
-		return match, err
-	}
 
 	// check the What matches
 	objMR := obj.(mrObject)
@@ -332,11 +355,11 @@ func (c *Controller) checkObjectMatchesWhatAndWhere(placementObj, obj runtime.Ob
 
 	// check the Where matches
 	clusterName := getClusterNameFromManifest(manifest)
-	matchedClusters, err := ocm.ListClustersBySelectors(c.ocmClient, placement.Spec.ClusterSelectors)
+	matchedClusters, err := ocm.FindClustersBySelectors(c.ocmClient, placement.Spec.ClusterSelectors)
 	if err != nil {
 		return match, err
 	}
-	if !util.StringInSlice(clusterName, matchedClusters) {
+	if !matchedClusters.Has(clusterName) {
 		c.logger.Info("The 'Where' no longer matches. Object marked for removal.", "object", util.GenerateObjectInfoString(obj), "for placement", placement.GetName(), "cluster", clusterName)
 		return false, nil
 	}
@@ -354,8 +377,8 @@ func (c *Controller) testObject(obj mrObject, tests []v1alpha1.ObjectTest) bool 
 	objName := obj.GetName()
 	objLabels := obj.GetLabels()
 	gvk := obj.GetObjectKind().GroupVersionKind()
-	gvkKey := util.KeyForGroupVersionKind(gvk.Group, gvk.Version, gvk.Kind)
-	objGVR, haveGVR := c.gvksMap[gvkKey]
+
+	objGVR, haveGVR := c.gvkGvrMapper.GetGvr(gvk)
 	if !haveGVR {
 		c.logger.Info("No GVR, assuming object does not match", "gvk", gvk, "objNS", objNSName, "objName", objName)
 		return false
