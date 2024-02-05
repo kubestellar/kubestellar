@@ -1,7 +1,5 @@
 # KubeStellar Usage Examples
 
-# WARNING !!! a renaming of API Group and Kind for KubeStellar APIs is in progress and these instructions are temporarly broken.  
-
 **NOTE**: This is unmaintained material that has only been observed to work for the commit tagged as
 `v0.20.0-alpha.1`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0-alpha.1`), and contributors can run these tests too; see [the e2e tests](../../../test/e2e).
 
@@ -82,7 +80,7 @@ Create a placement to deliver an app to all clusters in wds1:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: control.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: nginx-placement
@@ -279,7 +277,7 @@ Finally, apply the placement:
 
 ```shell
 kubectl --context wds2 apply -f - <<EOF
-apiVersion: control.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: aw-placement
@@ -307,7 +305,7 @@ Create a placement for the helm chart app:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: control.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: postgres-placement
@@ -385,7 +383,7 @@ Apply a placement with the `wantSingletonReportedState` flag set:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: control.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: nginx-singleton-placement
@@ -478,7 +476,7 @@ Wait for about a minute for all pods to restart, then apply a new placement:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: control.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: nginx-res-placement
@@ -547,7 +545,7 @@ Apply the following placement to wds1:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: control.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: Placement
 metadata:
   name: argocd-sa-placement
