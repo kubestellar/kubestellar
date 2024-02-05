@@ -37,6 +37,8 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
+	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	ctrlm "sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -94,9 +96,12 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 		return nil, err
 	}
 
+	zapLogger := zap.New(zap.UseDevMode(true))
+	log.SetLogger(zapLogger)
+
 	controller := &Controller{
 		wdsName:        wdsName,
-		logger:         mgr.GetLogger(),
+		logger:         log.Log.WithName("Status"),
 		wdsDynClient:   wdsDynClient,
 		wdsKubeClient:  wdsKubeClient,
 		imbsDynClient:  imbsDynClient,
@@ -156,14 +161,6 @@ func (c *Controller) run(workers int) error {
 		})
 	}
 
-	if ok := cache.WaitForCacheSync(ctx.Done(), (c.placementInformer).HasSynced); !ok {
-		return fmt.Errorf("failed to wait for placement caches to sync")
-	}
-
-	if ok := cache.WaitForCacheSync(ctx.Done(), (c.workStatusInformer).HasSynced); !ok {
-		return fmt.Errorf("failed to wait for workstatus caches to sync")
-	}
-
 	c.logger.Info("All caches synced")
 
 	c.logger.Info("Starting workers", "count", workers)
@@ -191,6 +188,14 @@ func (c *Controller) startPlacementInformer() {
 	stopper := make(chan struct{})
 	defer close(stopper)
 	informerFactory.Start(stopper)
+
+	c.logger.Info("waiting for placement cache to sync")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.placementInformer.HasSynced); !ok {
+		c.logger.Info("failed to wait for placement caches to sync")
+	}
+	c.logger.Info("placement cache synced")
 
 	<-stopper
 }
@@ -225,6 +230,14 @@ func (c *Controller) startWorkStatusInformer() {
 	stopper := make(chan struct{})
 	defer close(stopper)
 	informerFactory.Start(stopper)
+
+	c.logger.Info("waiting for workstatus cache to sync")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.workStatusInformer.HasSynced); !ok {
+		c.logger.Info("failed to wait for workstatus caches to sync")
+	}
+	c.logger.Info("workstatus cache synced")
 
 	<-stopper
 }

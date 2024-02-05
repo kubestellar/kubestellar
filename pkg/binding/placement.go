@@ -395,7 +395,7 @@ func (c *Controller) testObject(obj mrObject, tests []v1alpha1.DownsyncObjectTes
 		if len(test.NamespaceSelectors) > 0 {
 			if objNS == nil {
 				var err error
-				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(nil, objNSName, metav1.GetOptions{})
+				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(context.TODO(), objNSName, metav1.GetOptions{})
 				if err != nil {
 					c.logger.Info("Object namespace not found, assuming object does not match", "gvk", gvk, "objNS", objNSName, "objName", objName)
 					continue

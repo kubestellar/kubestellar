@@ -30,6 +30,7 @@ import (
 
 const (
 	CRDKind                              = "CustomResourceDefinition"
+	CRDResource                          = "customresourcedefinitions"
 	CRDGroup                             = "apiextensions.k8s.io"
 	AnyVersion                           = "*"
 	ServiceVersion                       = "v1"
