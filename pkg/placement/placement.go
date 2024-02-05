@@ -349,7 +349,7 @@ type mrObject interface {
 	runtime.Object
 }
 
-func (c *Controller) testObject(obj mrObject, tests []v1alpha1.ObjectTest) bool {
+func (c *Controller) testObject(obj mrObject, tests []v1alpha1.DownsyncObjectTest) bool {
 	objNSName := obj.GetNamespace()
 	objName := obj.GetName()
 	objLabels := obj.GetLabels()
