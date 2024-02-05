@@ -1,9 +1,6 @@
 # KubeStellar Usage Examples
 
-************* WARNING: a renaming of API Group and Kind for          *************************
-************* KubeStellar APIs is in progress and these instructions *************************
-************* are temporarly broken.                                 *************************
-
+# WARNING !!! a renaming of API Group and Kind for KubeStellar APIs is in progress and these instructions are temporarly broken.  
 
 **NOTE**: This is unmaintained material that has only been observed to work for the commit tagged as
 `v0.20.0-alpha.1`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0-alpha.1`), and contributors can run these tests too; see [the e2e tests](../../../test/e2e).
