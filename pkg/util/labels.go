@@ -40,6 +40,11 @@ func GetPlacementListerKey() string {
 		v1alpha1.GroupVersion.Version, PlacementKind)
 }
 
+func GetPlacementDecisionListerKey() string {
+	return KeyForGroupVersionKind(v1alpha1.GroupVersion.Group,
+		v1alpha1.GroupVersion.Version, PlacementDecisionKind)
+}
+
 func SetManagedByPlacementLabels(obj metav1.Object, wdsName string, managedByPlacements []string, singletonStatus bool) {
 	objLabels := obj.GetLabels()
 	if objLabels == nil {

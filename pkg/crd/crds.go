@@ -32,6 +32,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/dynamic"
@@ -43,7 +44,10 @@ import (
 )
 
 // CRDs to apply
-var crdNames = map[string]bool{"placements.control.kubestellar.io": true}
+var crdNames = sets.New(
+	"placementdecisions.control.kubestellar.io",
+	"placements.control.kubestellar.io",
+)
 
 //go:embed files/*
 var embeddedFiles embed.FS
@@ -103,13 +107,15 @@ func groupVersionKindToResource(clientset kubernetes.Interface, gvk schema.Group
 	return nil, fmt.Errorf("GroupVersionResource not found for GroupVersionKind: %v", gvk)
 }
 
-func filterCRDsByNames(crds []*unstructured.Unstructured, names map[string]bool) []*unstructured.Unstructured {
+func filterCRDsByNames(crds []*unstructured.Unstructured, names sets.Set[string]) []*unstructured.Unstructured {
 	out := make([]*unstructured.Unstructured, 0)
+
 	for _, o := range crds {
-		if _, ok := names[o.GetName()]; ok {
+		if names.Has(o.GetName()) {
 			out = append(out, o)
 		}
 	}
+
 	return out
 }
 
