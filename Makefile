@@ -170,7 +170,7 @@ run: manifests generate fmt vet ## Run a controller from your host.
 
 .PHONY: ko-build-local
 ko-build-local: test ## Build local container image with ko
-	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG}
+	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
 	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMG}
 
 .PHONY: docker-push
