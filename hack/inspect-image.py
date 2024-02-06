@@ -33,7 +33,9 @@ authorization.
 
 ghcr.io is particlarly puzzling to me. _sometimes_ the following bashery works,
 evem though the ghcr doc says to use a GitHub PAT,
-and sometimes it does not.
+and sometimes it does not. It seems to be a trimmed version of what the
+www-authenticate header in the error response suggests.
+Code has been revised to try what is suggested automatically.
 
 TOKEN="$(
   curl "https://ghcr.io/token?scope=repository:${ORG}/${PKG}:pull" |
@@ -63,25 +65,71 @@ def rfc5988_parse_next(link: str, url):
         return next_url
     return None
 
+def request_bearer_token(authclue: str) -> typing.Union[str,None]:
+    if not authclue.startswith('Bearer '):
+        return None
+    authclue = authclue.removeprefix('Bearer ')
+    parms_list = authclue.split(',')
+    parms_dict = dict()
+    for parm in parms_list:
+        parts = parm.partition('=')
+        parms_dict[parts[0]] = parts[2].strip('"')
+    if 'realm' not in parms_dict:
+        return None
+    req_url_str = parms_dict['realm']
+    sep = '?'
+    for key, val in parms_dict.items():
+        if key == 'realm':
+            continue
+        req_url_str += sep + key + '=' + val
+        sep = '&'
+    try:
+        with urllib.request.urlopen(req_url_str) as resp:
+            if resp.status == 200:
+                body_bytes = resp.read()
+                body_str = body_bytes.decode('utf-8')
+                body_parsed = json.loads(body_str)
+                if 'token' in body_parsed:
+                    token = body_parsed['token']
+                    print(f'Subsidiary request to {req_url_str} returned bearer token {token}', file=sys.stderr)
+                    return token
+                print(f'Subsidiary request to {req_url_str} returned junk: {body_str}', file=sys.stderr)
+                return None
+            print(f'Subsidiary request to {req_url_str} returned status {resp.status}!', file=sys.stderr)
+            return None
+    except Exception as err:
+        print(f'Subsidiary request {req_url_str} raised {type(err)} {err}!', file=sys.stderr)
+        return None
+
 def read_with_next(url, headers:dict[str,str], accept:typing.Optional[str]=None) -> list:
     url_str = urllib.parse.urlunparse(url)
-    all_headers = dict(**headers)
-    if accept:
-        all_headers['Accept'] = accept
-    req = urllib.request.Request(url_str, headers=all_headers)
-    
-    try:
-        with urllib.request.urlopen(req) as resp:
-            if resp.status != 200:
-                print(f'GET {url_str} returned status {resp.status}!', file=sys.stderr)
-                sys.exit(10)
-                return
-            body_bytes = resp.read()
-            body = body_bytes.decode('utf-8')
-            ans = [(resp.headers, body)]
-    except Exception as err:
-        print(f'GET {url_str} raised {type(err)} {err}!', file=sys.stderr)
-        return []
+    for retry in ('Authorization' not in headers, False):
+        all_headers = dict(**headers)
+        if accept:
+            all_headers['Accept'] = accept
+        req = urllib.request.Request(url_str, headers=all_headers)
+        try:
+            with urllib.request.urlopen(req) as resp:
+                if resp.status != 200:
+                    print(f'GET {url_str} returned status {resp.status}!', file=sys.stderr)
+                    sys.exit(10)
+                    return
+                body_bytes = resp.read()
+                body = body_bytes.decode('utf-8')
+                ans = [(resp.headers, body)]
+                break
+        except urllib.error.HTTPError as err:
+            print(f'GET {url_str} with headers {all_headers} raised HTTPError: code={err.code}, reason={err.reason}',
+                file=sys.stderr)
+            if retry and err.code == 401 and 'www-authenticate' in err.headers:
+                token = request_bearer_token(err.headers['www-authenticate'])
+                if token is not None:
+                    headers['Authorization'] = 'Bearer ' + token
+                    continue
+            return []
+        except Exception as err:
+            print(f'GET {url_str} raised {type(err)} {err}!', file=sys.stderr)
+            return []
     link = ans[0][0]['Link']
     if not link:
         return ans
