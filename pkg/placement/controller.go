@@ -249,7 +249,7 @@ func (c *Controller) run(workers int) error {
 
 	// populate the PlacementResolver with entries for existing placements
 	if err := c.populatePlacementResolverWithExistingPlacements(); err != nil {
-		return fmt.Errorf("failed to populate the PlacementResolver for the existing placements")
+		return fmt.Errorf("failed to populate the PlacementResolver for the existing placements: %w", err)
 	}
 
 	c.logger.Info("Starting workers", "count", workers)
