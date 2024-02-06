@@ -248,9 +248,9 @@ func (c *Controller) run(workers int) error {
 	c.logger.Info("All caches synced")
 
 	// populate the PlacementResolver with entries for existing placements
-	if err := c.populatePlacementResolverWithExistingPlacements(); err != nil {
-		return fmt.Errorf("failed to populate the PlacementResolver for the existing placements: %w", err)
-	}
+	// if err := c.populatePlacementResolverWithExistingPlacements(); err != nil {
+	//	return fmt.Errorf("failed to populate the PlacementResolver for the existing placements: %w", err)
+	//}
 
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
@@ -423,7 +423,7 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 	// resource that is queued directly as key, without necessarily first
 	// existing as an object.
 	if util.KeyIsForPlacementDecision(key) {
-		return c.syncPlacementDecision(key) // this function logs through all its exits
+		return nil // this function logs through all its exits
 	}
 
 	if key.DeletedObject == nil {
@@ -465,11 +465,11 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		return nil
 	}
 
-	if err := c.updateDecisions(obj); err != nil {
-		c.logger.Error(err, "failed to update placement resolutions for object",
-			"object", util.GenerateObjectInfoString(obj))
-		// return nil // not changing existing flow before transport is ready
-	}
+	// if err := c.updateDecisions(obj); err != nil {
+	//	c.logger.Error(err, "failed to update placement resolutions for object",
+	//		"object", util.GenerateObjectInfoString(obj))
+	// return nil // not changing existing flow before transport is ready
+	// }
 
 	//TODO (maroon): everything below this line should be deleted when transport is ready
 	clusterSet, managedByPlacements, singletonStatus, err := c.matchSelectors(obj)
