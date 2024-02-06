@@ -45,23 +45,34 @@ jobs:
           cd test/e2e/multi-cluster-deployment 
           KFLEX_DISABLE_CHATTY=true ./run-test.sh 
 
-      - name: Investigate the kubestellar container
+      - name: show kubeconfig contexts
         if: always()
-        run: |
-          echo kubectl contexts:
-          kubectl config get-contexts
-          echo
-          echo pods:
-          kubectl --context kind-kubeflex get pods -A
-          kpod=$(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
-          echo
-          echo kubestellar controller log:
-          kubectl --context kind-kubeflex logs -n wds1-system $kpod
-          echo
-          kubectl --context wds1 get placements -o yaml
-          echo
-          kubectl --context wds1 get placementdecisions -o yaml
-          echo
-          kubectl --context imbs1 get manifestworks -o yaml
-          echo
-          kubectl --context imbs1 get workstatuses -A -o yaml
+        run: kubectl config get-contexts
+
+      - name: show pods
+        if: always()
+        run: kubectl --context kind-kubeflex get pods -A
+
+      - name: show kubestellar controller manager log
+        if: always()
+        run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
+
+      - name: show placements
+        if: always()
+        run: kubectl --context wds1 get placements -o yaml
+
+      - name: show deployments
+        if: always()
+        run: kubectl --context wds1 get deployments -A -o yaml
+
+      - name: show placementdecisions
+        if: always()
+        run: kubectl --context wds1 get placementdecisions -o yaml
+
+      - name: show manifestworks
+        if: always()
+        run: kubectl --context imbs1 get manifestworks -A -o yaml
+
+      - name: show workstatuses
+        if: always()
+        run: kubectl --context imbs1 get workstatuses -A -o yaml
