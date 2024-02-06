@@ -44,7 +44,7 @@ type PlacementSpec struct {
 	// `downsync` selects the objects to bind with the selected Locations for downsync.
 	// An object is selected if it matches at least one member of this list.
 	// +optional
-	Downsync []ObjectTest `json:"downsync,omitempty"`
+	Downsync []DownsyncObjectTest `json:"downsync,omitempty"`
 
 	// WantSingletonReportedState indicates that (a) the number of selected locations is intended
 	// to be 1 and (b) the reported state of each downsynced object should be returned back to
@@ -53,11 +53,6 @@ type PlacementSpec struct {
 	// the OR of these booleans rules.
 	// +optional
 	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
-
-	// `upsync` identifies objects to upsync.
-	// An object matches `upsync` if and only if it matches at least one member of `upsync`.
-	// +optional
-	Upsync []ObjectTest `json:"upsync,omitempty"`
 }
 
 // PlacementStatus defines the observed state of Placement
@@ -121,7 +116,7 @@ const (
 // Validation might not be fully checked by apiservers until the Kubernetes dependency is release 1.25;
 // in the meantime validation error messages will appear
 // in annotations whose key is `validation-error.kubestellar.io/{number}`.
-type ObjectTest struct {
+type DownsyncObjectTest struct {
 	// `apiGroup` is the API group of the referenced object, empty string for the core API group.
 	// `nil` matches every API group.
 	// +optional
