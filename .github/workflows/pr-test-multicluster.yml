@@ -44,3 +44,24 @@ jobs:
         run: |
           cd test/e2e/multi-cluster-deployment 
           KFLEX_DISABLE_CHATTY=true ./run-test.sh 
+
+      - name: Investigate the kubestellar container
+        if: always()
+        run: |
+          echo kubectl contexts:
+          kubectl config get-contexts
+          echo
+          echo pods:
+          kubectl --context kind-kubeflex get pods -A
+          kpod=$(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
+          echo
+          echo kubestellar controller log:
+          kubectl --context kind-kubeflex logs -n wds1-system $kpod
+          echo
+          kubectl --context wds1 get placements -o yaml
+          echo
+          kubectl --context wds1 get placementdecisions -o yaml
+          echo
+          kubectl --context imbs1 get manifestworks -o yaml
+          echo
+          kubectl --context imbs1 get workstatuses -A -o yaml

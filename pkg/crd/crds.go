@@ -164,7 +164,7 @@ func waitForCRDAccepted(ctx context.Context, clientset apiextensionsclientset.In
 		}
 
 		for _, condition := range crd.Status.Conditions {
-			if condition.Type == apiextensionsv1.NamesAccepted && condition.Status == apiextensionsv1.ConditionTrue {
+			if condition.Type == apiextensionsv1.Established && condition.Status == apiextensionsv1.ConditionTrue {
 				return true, nil
 			}
 		}

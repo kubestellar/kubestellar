@@ -23,7 +23,7 @@ function wait-for-cmd() (
     cmd="$@"
     wait_counter=0
     while ! (eval "$cmd") ; do
-        if (($wait_counter > 200)); then
+        if (($wait_counter > 36)); then
             echo "Failed to ${cmd}."
             exit 1
         fi
