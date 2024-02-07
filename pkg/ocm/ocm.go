@@ -29,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
@@ -156,7 +157,7 @@ func GetClusterByName(ocmClient client.Client, clusterName string) (clusterv1.Ma
 	return cluster, nil
 }
 
-func ListClustersBySelectors(ocmClient client.Client, selectors []metav1.LabelSelector) ([]string, error) {
+func FindClustersBySelectors(ocmClient client.Client, selectors []metav1.LabelSelector) (sets.Set[string], error) {
 	clusters := &clusterv1.ManagedClusterList{}
 	labelSelectors := []labels.Selector{}
 	for _, s := range selectors {
@@ -176,10 +177,12 @@ func ListClustersBySelectors(ocmClient client.Client, selectors []metav1.LabelSe
 	if len(clusters.Items) == 0 {
 		return nil, nil
 	}
-	clusterNames := []string{}
+
+	clusterNames := sets.New[string]()
 	for _, cluster := range clusters.Items {
-		clusterNames = append(clusterNames, cluster.GetName())
+		clusterNames.Insert(cluster.GetName())
 	}
+
 	return clusterNames, nil
 }
 

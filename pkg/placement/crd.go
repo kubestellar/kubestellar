@@ -44,7 +44,6 @@ type APIResource struct {
 
 // Handle CRDs should account for CRDs being added or deleted to start/stop new informers as needed
 func (c *Controller) handleCRD(obj runtime.Object) error {
-
 	toStartList, toStopList, err := c.checkAPIResourcesForUpdates()
 	if err != nil {
 		return err
@@ -61,7 +60,7 @@ func (c *Controller) handleCRD(obj runtime.Object) error {
 		delete(c.informers, key)
 		delete(c.listers, key)
 		delete(c.stoppers, key)
-		delete(c.gvksMap, key)
+		c.gvkGvrMapper.DeleteByGvkKey(key)
 	}
 
 	return nil
@@ -168,7 +167,9 @@ func (c *Controller) startInformersForNewAPIResources(toStartList []APIResource)
 		key := util.KeyForGroupVersionKind(toStart.groupVersion.Group,
 			toStart.groupVersion.Version, toStart.resource.Kind)
 		c.informers[key] = informer
-		c.gvksMap[key] = &gvr
+
+		// add the mapping between GVK and GVR
+		c.gvkGvrMapper.Add(toStart.groupVersion.WithKind(toStart.resource.Kind), gvr)
 
 		// create and index the lister
 		lister := cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())

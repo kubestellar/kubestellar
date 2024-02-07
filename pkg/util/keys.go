@@ -21,8 +21,13 @@ import (
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/cache"
+
+	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 // Key struct used to add items to the workqueue. The key is used to identify
@@ -31,9 +36,21 @@ import (
 // since they are no longer in the cache, the key stores a shallow copy of the
 // deleted object.
 type Key struct {
-	GvkKey         string
+	GVK            schema.GroupVersionKind
 	NamespacedName cache.ObjectName
 	DeletedObject  *runtime.Object
+}
+
+func (k *Key) GvkKey() string {
+	if k.GVK.Group == "" {
+		return fmt.Sprintf("%s/%s", k.GVK.Version, k.GVK.Kind)
+	}
+
+	return fmt.Sprintf("%s/%s/%s", k.GVK.Group, k.GVK.Version, k.GVK.Kind)
+}
+
+func (k *Key) GvkNamespacedNameKey() string {
+	return fmt.Sprintf("%s/%s", k.GvkKey(), k.NamespacedName.String())
 }
 
 // Given an object that implements runtime.Object, create a key of type Key
@@ -42,14 +59,16 @@ func KeyForGroupVersionKindNamespaceName(obj any) (Key, error) {
 	rObj := obj.(runtime.Object)
 	ok := rObj.GetObjectKind()
 	gvk := ok.GroupVersionKind()
+
 	namespacedName, err := cache.ObjectToName(obj)
 	if err != nil {
 		return Key{}, err
 	}
 	key := Key{
-		GvkKey:         fmt.Sprintf("%s/%s", gvk.GroupVersion().String(), gvk.Kind),
+		GVK:            gvk,
 		NamespacedName: namespacedName,
 	}
+
 	return key, nil
 }
 
@@ -58,7 +77,33 @@ func KeyForGroupVersionKind(group, version, kind string) string {
 	if group == "" {
 		return fmt.Sprintf("%s/%s", version, kind)
 	}
+
 	return fmt.Sprintf("%s/%s/%s", group, version, kind)
+}
+
+// Create a string key in the form group/version/resource or version/resource if the group is empty
+func KeyForGroupVersionResource(group, version, resource string) string {
+	return KeyForGroupVersionKind(group, version, resource)
+}
+
+// KeyFromGVRandNS Creates a string key in the form
+// group/version/Kind/namespace or version/Kind/namespace if the group is empty.
+func KeyFromGVRandNS(gvr schema.GroupVersionResource, ns string) string {
+	if gvr.Group == "" {
+		return fmt.Sprintf("%s/%s/%s", gvr.Version, gvr.Resource, ns)
+	}
+
+	return fmt.Sprintf("%s/%s/%s/%s", gvr.Group, gvr.Version, gvr.Resource, ns)
+}
+
+// KeyFromGVKandNamespacedName Creates a string key in the form
+// group/version/Kind/{namespaced-name} or version/Kind/{namespaced-name} if the group is empty.
+func KeyFromGVKandNamespacedName(gvk schema.GroupVersionKind, name types.NamespacedName) string {
+	if gvk.Group == "" {
+		return fmt.Sprintf("%s/%s/%s", gvk.Version, gvk.Kind, name.String())
+	}
+
+	return fmt.Sprintf("%s/%s/%s/%s", gvk.Group, gvk.Version, gvk.Kind, name.String())
 }
 
 // Used for generating a single string unique representation of the object for logging info
@@ -74,4 +119,23 @@ func GenerateObjectInfoString(obj runtime.Object) string {
 	}
 
 	return fmt.Sprintf("[%s] %s/%s", mObj.GetNamespace(), prefix, mObj.GetName())
+}
+
+func EmptyUnstructuredObjectFromKey(key Key) *unstructured.Unstructured {
+	obj := &unstructured.Unstructured{}
+
+	obj.SetGroupVersionKind(key.GVK)
+	obj.SetNamespace(key.NamespacedName.Namespace)
+	obj.SetName(key.NamespacedName.Name)
+
+	return obj
+}
+
+func KeyIsForPlacementDecision(key Key) bool {
+	if key.GVK.Group == v1alpha1.SchemeGroupVersion.Group &&
+		key.GVK.Kind == PlacementDecisionKind {
+		return true
+	}
+
+	return false
 }
