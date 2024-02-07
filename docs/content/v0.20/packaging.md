@@ -9,30 +9,100 @@ Note that to _use_ KubeStellar, all of the repos in this graph are involved.
 ```mermaid
 flowchart LR
     kubestellar --> kubeflex
-    kubeflex    --> kubestellar
-    ocm-status-addon     --> kubestellar
+    ocm-status-addon
     ocm-transport-plugin --> kubestellar
 ```
-
-Note: the `ocm-status-addon` repo is in the process of being moved
-into the kubestellar GitHub organization; the actual dependency right
-now is on [a private repo](#status-addon).
 
 ## KubeFlex
 
 See [the GitHub repo](https://github.com/kubestellar/kubeflex).
 
-## status-addon
+## OCM Status Addon
 
-The [status-addon](https://github.ibm.com/dettori/status-addon) repo is the source of a RedHat-style operator.
+The [OCM Status Addon](https://github.com/kubestellar/ocm-status-addon) repo is the source of a RedHat-style operator.
 
-The operator is delivered by a Helm chart at `quay.io/pdettori/status-addon-chart`. Chart versioning? How is the chart built, pushed?
+### Outline of OCM status addon publishing
 
-There is also a container image involved.
+```mermaid
+flowchart LR
+    subgraph "ocm-status-addon@GitHub"
+    osa_code[OSA source code]
+    osa_hc_src[OSA Helm chart source]
+    end
+    osa_ctr_image[OSA container image] --> osa_code
+    osa_hc_repo[published OSA Helm Chart] --> osa_hc_src
+    osa_hc_src -.-> osa_ctr_image
+    osa_hc_repo -.-> osa_ctr_image
+```
+
+The dashed dependencies are at run time, not build time.
+
+"OSA" is OCM Status Addon
+
+### OCM status addon container image
+
+There is a container image at [ghcr.io/kubestellar/ocm-status-addon](https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon).
+
+The container image is built and published using `make`.  The
+following `make` variables are relevant.
+
+- `KO_DOCKER_REPO`, defaults to `ghcr.io/kubestellar`
+- `CMD_NAME`, defaults to `ocm-status-addon`
+- `IMAGE_TAG`, defaults to `0.2.0-alpha.1`
+- `IMG`, defaults to `${KO_DOCKER_REPO}/${CMD_NAME}:${IMAGE_TAG}`
+
+`make ko-build-push` will build and publish the container image at
+`${IMG}`. This will be a multi-platform manifest, referencing images
+for "platforms" `linux/amd64` and `linux/arm64`.
+
+`make ko-local-build` will build the same multi-platform manifest but
+not push it, only leave it among your Docker images. Note that if you
+have podman pretending to be Docker then it will only receive a
+single-platform image, not the multi-platform manifest.
+
+
+### OCM status addon Helm chart
+
+The operator is delivered by a Helm chart at [ghcr.io/kubestellar/ocm-status-addon-chart](https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon-chart).
+
+The chart is built and published using `make`. The following `make`
+variables are relevant.
+
+- `KO_DOCKER_REPO`, defaults to `ghcr.io/kubestellar`
+- `CMD_NAME`, defaults to `ocm-status-addon`
+- `IMAGE_TAG`, defaults to `0.2.0-alpha.1`
+- `IMG`, defaults to `${KO_DOCKER_REPO}/${CMD_NAME}:${IMAGE_TAG}`
+
+`make chart`: builds the local copy of the chart from local sources,
+using `kustomize`. When using the default values of the `make`
+variables, the built chart references the container image
+`ghcr.io/kubestellar/ocm-status-addon:0.2.0-alpha.1`. TODO: describe
+how the chart contents depend on the `make` variables.
+
+`make chart-push` (depends on the `make` target `chart`): pushes the
+local copy of the chart to the OCI repository and tag specified in
+`${IMG}`.
+
+The following versions exist.
+
+| OCI tag = version in chart | appVersion in chart | referenced container tag |
+| -------------------------- | ------------------- | ------------------------ |
+| 0.2.0-alpha.1              | 0.2.0-alpha.1       | 0.2.0-alpha.1 |
+
+Note: the Chart.yaml in github uses just "0.2.0" for the version and appVersion in the chart. TODO: bug?
 
 ## OCM Transport Plugin
 
-.. to be written ...
+**NOTE**: This is under development, not a part of the functioning
+  system yet.
+
+The source is the GitHub repo [github.com/kubestellar/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin)
+
+### OCM Transport Plugin container image
+
+This will aspirationally appear at [ghcr.io/kubestellar/ocm-transport-plugin](https://github.com/orgs/kubestellar/packages/container/package/ocm-transport-plugin). This level of development has not been reached yet.
+
+TODO: document how the image is built and published, including explain versioning.
 
 ## KubeStellar
 
@@ -40,16 +110,32 @@ There is also a container image involved.
 
 ```mermaid
 flowchart LR
-    kcm_image[KCM container image] --> github
-    hc_image[published KCM Helm Chart] --> github
-    hc_image -.-> kcm_image
-    PostCreateHook --> github
-    PostCreateHook -.-> hc_image
+    subgraph "kubestellar@GitHub"
+    kcm_code[KCM source code]
+    kcm_hc_src[KCM Helm chart source]
+    ks_pch[kubestellar PostCreateHook]
+    ocm_pch["ocm PostCreateHook"]
+    ks_scripts -.-> ocm_pch
+    ks_scripts -.-> ks_pch
+    end
+    kcm_ctr_image[KCM container image] --> kcm_code
+    kcm_hc_repo[published KCM Helm Chart] --> kcm_hc_src
+    kcm_hc_src -.-> kcm_ctr_image
+    kcm_hc_repo -.-> kcm_ctr_image
+    ks_pch  -.-> kcm_hc_repo
+    ks_scripts -.-> osa_hc_repo[published OSA Helm Chart]
+    ks_scripts -.-> otp_something["published OTP ??"]
+    ks_scripts -.-> KubeFlex
 ```
 
 The dashed dependencies are at run time, not build time.
 
 "KCM" is the KubeStellar controller-manager.
+
+"ks_scripts" are the user-facing instructions that use published
+images and so on. There are also e2e tests, but they test the copy of
+the repo that they are embedded in, not anything built and published
+earlier.
 
 **NOTE**: at the present level of development, all versions are hand coded and there is only one public version. This will obviously have to change.
 
@@ -131,3 +217,47 @@ There are two `PostCreateHook` objects defined in [config/postcreate-hooks](../.
 
 - `ocm.yaml` adds `clusteradm` by running a container using the image `quay.io/kubestellar/clusteradm:0.7.2` which is built from [the OCM source](https://github.com/open-cluster-management-io/clusteradm) using the script [build-clusteradm-image.sh](../../../hack/build-clusteradm-image.sh).
 - `kubestellar.yaml` runs container image `quay.io/kubestellar/helm:v3.14.0` (which is built from [the Helm source](https://github.com/helm/helm/tree/v3.14.0) by a process that we need to document) to instantiate the chart from `oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart` with chart version `0.20.0-alpha.1`, which is built by (what?) from (what? probably answered above).
+
+## Amalgamated graph
+
+Currently only showing kubestellar and ocm-status-addon.
+
+TODO: finish this
+
+```mermaid
+flowchart LR
+    subgraph "ocm-status-addon@GitHub"
+    osa_code[OSA source code]
+    osa_hc_src[OSA Helm chart source]
+    end
+    osa_ctr_image[OSA container image] --> osa_code
+    osa_hc_repo[published OSA Helm Chart] --> osa_hc_src
+    osa_hc_src -.-> osa_ctr_image
+    osa_hc_repo -.-> osa_ctr_image
+    subgraph "kubestellar@GitHub"
+    kcm_code[KCM source code]
+    kcm_hc_src[KCM Helm chart source]
+    ks_pch[kubestellar PostCreateHook]
+    ocm_pch["ocm PostCreateHook"]
+    ks_scripts -.-> ocm_pch
+    ks_scripts -.-> ks_pch
+    end
+    kcm_ctr_image[KCM container image] --> kcm_code
+    kcm_hc_repo[published KCM Helm Chart] --> kcm_hc_src
+    kcm_hc_src -.-> kcm_ctr_image
+    kcm_hc_repo -.-> kcm_ctr_image
+    ks_pch  -.-> kcm_hc_repo
+    ks_scripts -.-> osa_hc_repo
+    ks_scripts -.-> otp_something["published OTP ??"]
+    ks_scripts -.-> KubeFlex
+```
+
+Every dotted line is a reference that must be versioned. How do we
+keep all those versions right?
+
+Normally a git tag is an immutable reference to an immutable git
+commit. Let's not violate that.
+
+Can/should we say that an OCI image (or whatever) tag equals the tag
+of the commit that said image (or whatever) was built from? While
+keeping `main` always a working system?
