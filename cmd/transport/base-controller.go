@@ -104,7 +104,7 @@ func Run(transportImplementation transport.Transport) {
 
 	factory := ksinformers.NewSharedInformerFactoryWithOptions(wdsClientset, defaultResyncPeriod)
 
-	transportController, err := transport.NewTransportController(ctx, factory.Control().V1alpha1().PlacementDecisions(),
+	transportController, err := transport.NewTransportController(ctx, factory.Control().V1alpha1().Bindings(),
 		transportImplementation, wdsClientset, wdsDynamicClient, transportClientset, transportDynamicClient, options.WdsName)
 
 	// notice that there is no need to run Start method in a separate goroutine.

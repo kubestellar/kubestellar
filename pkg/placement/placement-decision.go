@@ -86,8 +86,8 @@ func (c *Controller) syncPlacementDecision(key util.Key) error {
 
 // updateOrCreatePlacementDecision updates or creates a placement-decision object in the cluster.
 // If the object already exists, it is updated. Otherwise, it is created.
-func (c *Controller) updateOrCreatePlacementDecision(pd *v1alpha1.PlacementDecision,
-	generatedPlacementDecisionSpec *v1alpha1.PlacementDecisionSpec) error {
+func (c *Controller) updateOrCreatePlacementDecision(pd *v1alpha1.Binding,
+	generatedPlacementDecisionSpec *v1alpha1.BindingSpec) error {
 	// use the passed placement decision and set its spec
 	pd.Spec = *generatedPlacementDecisionSpec
 
@@ -131,8 +131,8 @@ func (c *Controller) updateOrCreatePlacementDecision(pd *v1alpha1.PlacementDecis
 	return nil
 }
 
-func unstructuredObjectToPlacementDecision(unstructuredObj *unstructured.Unstructured) (*v1alpha1.PlacementDecision, error) {
-	var placementDecision *v1alpha1.PlacementDecision
+func unstructuredObjectToPlacementDecision(unstructuredObj *unstructured.Unstructured) (*v1alpha1.Binding, error) {
+	var placementDecision *v1alpha1.Binding
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredObj.UnstructuredContent(),
 		&placementDecision); err != nil {
 		return nil, fmt.Errorf("failed to convert Unstructured to PlacementDecision: %w", err)
@@ -141,7 +141,7 @@ func unstructuredObjectToPlacementDecision(unstructuredObj *unstructured.Unstruc
 	return placementDecision, nil
 }
 
-func placementDecisionToUnstructuredObject(placementDecision *v1alpha1.PlacementDecision) (*unstructured.Unstructured, error) {
+func placementDecisionToUnstructuredObject(placementDecision *v1alpha1.Binding) (*unstructured.Unstructured, error) {
 	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(placementDecision)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert PlacementDecision to map[string]interface{}: %w", err)

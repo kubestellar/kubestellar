@@ -18,10 +18,10 @@ limitations under the License.
 
 package v1alpha1
 
+// BindingListerExpansion allows custom methods to be added to
+// BindingLister.
+type BindingListerExpansion interface{}
+
 // PlacementListerExpansion allows custom methods to be added to
 // PlacementLister.
 type PlacementListerExpansion interface{}
-
-// PlacementDecisionListerExpansion allows custom methods to be added to
-// PlacementDecisionLister.
-type PlacementDecisionListerExpansion interface{}

@@ -29,8 +29,8 @@ import (
 
 type ControlV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	BindingsGetter
 	PlacementsGetter
-	PlacementDecisionsGetter
 }
 
 // ControlV1alpha1Client is used to interact with features provided by the control.kubestellar.io group.
@@ -38,12 +38,12 @@ type ControlV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *ControlV1alpha1Client) Placements() PlacementInterface {
-	return newPlacements(c)
+func (c *ControlV1alpha1Client) Bindings() BindingInterface {
+	return newBindings(c)
 }
 
-func (c *ControlV1alpha1Client) PlacementDecisions() PlacementDecisionInterface {
-	return newPlacementDecisions(c)
+func (c *ControlV1alpha1Client) Placements() PlacementInterface {
+	return newPlacements(c)
 }
 
 // NewForConfig creates a new ControlV1alpha1Client for the given config.

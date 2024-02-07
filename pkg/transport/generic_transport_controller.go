@@ -54,7 +54,7 @@ const (
 )
 
 // NewTransportController returns a new transport controller
-func NewTransportController(ctx context.Context, placementDecisionInformer controlv1alpha1informers.PlacementDecisionInformer, transport Transport,
+func NewTransportController(ctx context.Context, placementDecisionInformer controlv1alpha1informers.BindingInformer, transport Transport,
 	wdsClientset ksclientset.Interface, wdsDynamicClient dynamic.Interface, transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface, wdsName string) (*genericTransportController, error) {
 	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
@@ -68,7 +68,7 @@ func NewTransportController(ctx context.Context, placementDecisionInformer contr
 
 	transportController := &genericTransportController{
 		logger:                          klog.FromContext(ctx),
-		placementDecisionLister:         placementDecisionInformer.Lister(),
+		bindingLister:                   placementDecisionInformer.Lister(),
 		placementDecisionInformerSynced: placementDecisionInformer.Informer().HasSynced,
 		wrappedObjectInformerSynced:     wrappedObjectGenericInformer.Informer().HasSynced,
 		workqueue:                       workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
@@ -129,7 +129,7 @@ func getGvrFromWrappedObject(clientset kubernetes.Interface, wrappedObject runti
 type genericTransportController struct {
 	logger logr.Logger
 
-	placementDecisionLister         controlv1alpha1listers.PlacementDecisionLister
+	bindingLister                   controlv1alpha1listers.BindingLister
 	placementDecisionInformerSynced cache.InformerSynced
 	wrappedObjectInformerSynced     cache.InformerSynced
 
@@ -282,7 +282,7 @@ func (c *genericTransportController) process(ctx context.Context, obj interface{
 // therefore, if object shouldn't be requeued, don't return error.
 func (c *genericTransportController) syncHandler(ctx context.Context, objectName string) error {
 	// Get the PlacementDecision object with this name from WDS
-	placementDecision, err := c.placementDecisionLister.Get(objectName)
+	placementDecision, err := c.bindingLister.Get(objectName)
 
 	if errors.IsNotFound(err) { // the object was deleted and it had no finalizer on it. this means transport controller
 		// finished cleanup of wrapped objects from mailbox namespaces. no need to do anything in this state.
@@ -304,7 +304,7 @@ func isObjectBeingDeleted(object metav1.Object) bool {
 	return !object.GetDeletionTimestamp().IsZero()
 }
 
-func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) error {
+func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v1alpha1.Binding) error {
 	for _, destination := range placementDecision.Spec.Destinations {
 		if err := c.deleteWrappedObject(ctx, destination.ClusterId, fmt.Sprintf("%s-%s", placementDecision.GetName(), c.wdsName)); err != nil {
 			// wrapped object name is in the format (PlacementDecision.GetName()-WdsName). see updateWrappedObject func for explanation.
@@ -327,19 +327,19 @@ func (c *genericTransportController) deleteWrappedObject(ctx context.Context, na
 	return nil
 }
 
-func (c *genericTransportController) removeFinalizerFromPlacementDecision(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) error {
-	return c.updatePlacementDecision(ctx, placementDecision, func(placementDecision *v1alpha1.PlacementDecision) (*v1alpha1.PlacementDecision, bool) {
+func (c *genericTransportController) removeFinalizerFromPlacementDecision(ctx context.Context, placementDecision *v1alpha1.Binding) error {
+	return c.updatePlacementDecision(ctx, placementDecision, func(placementDecision *v1alpha1.Binding) (*v1alpha1.Binding, bool) {
 		return removeFinalizer(placementDecision, transportFinalizer)
 	})
 }
 
-func (c *genericTransportController) addFinalizerToPlacementDecision(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) error {
-	return c.updatePlacementDecision(ctx, placementDecision, func(placementDecision *v1alpha1.PlacementDecision) (*v1alpha1.PlacementDecision, bool) {
+func (c *genericTransportController) addFinalizerToPlacementDecision(ctx context.Context, placementDecision *v1alpha1.Binding) error {
+	return c.updatePlacementDecision(ctx, placementDecision, func(placementDecision *v1alpha1.Binding) (*v1alpha1.Binding, bool) {
 		return addFinalizer(placementDecision, transportFinalizer)
 	})
 }
 
-func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) error {
+func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v1alpha1.Binding) error {
 	if err := c.addFinalizerToPlacementDecision(ctx, placementDecision); err != nil {
 		return fmt.Errorf("failed to add finalizer to PlacementDecision object '%s' - %w", placementDecision.GetName(), err)
 	}
@@ -377,7 +377,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	return nil
 }
 
-func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) ([]*unstructured.Unstructured, error) {
+func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, placementDecision *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
 	objectsToPropagate := make([]*unstructured.Unstructured, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clusterScopedObject := range placementDecision.Spec.Workload.ClusterScope {
@@ -416,7 +416,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 	return objectsToPropagate, nil
 }
 
-func (c *genericTransportController) initializeWrappedObject(ctx context.Context, placementDecision *v1alpha1.PlacementDecision) (*unstructured.Unstructured, error) {
+func (c *genericTransportController) initializeWrappedObject(ctx context.Context, placementDecision *v1alpha1.Binding) (*unstructured.Unstructured, error) {
 	objectsToPropagate, err := c.getObjectsFromWDS(ctx, placementDecision)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get objects to propagate to WECs from PlacementDecision object '%s' - %w", placementDecision.GetName(), err)
@@ -487,15 +487,15 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 
 // updateObjectFunc is a function that updates the given object.
 // returns the updated object (if it was updated) or the object as is if it wasn't, and true if object was updated, or false otherwise.
-type updateObjectFunc func(*v1alpha1.PlacementDecision) (*v1alpha1.PlacementDecision, bool)
+type updateObjectFunc func(*v1alpha1.Binding) (*v1alpha1.Binding, bool)
 
-func (c *genericTransportController) updatePlacementDecision(ctx context.Context, placementDecision *v1alpha1.PlacementDecision, updateObjectFunc updateObjectFunc) error {
+func (c *genericTransportController) updatePlacementDecision(ctx context.Context, placementDecision *v1alpha1.Binding, updateObjectFunc updateObjectFunc) error {
 	updatedPlacementDecision, isUpdated := updateObjectFunc(placementDecision) // returns an indication if object was updated or not.
 	if !isUpdated {
 		return nil // if object was not updated, no need to update in API server, return.
 	}
 
-	_, err := c.wdsClientset.ControlV1alpha1().PlacementDecisions().Update(ctx, updatedPlacementDecision, metav1.UpdateOptions{
+	_, err := c.wdsClientset.ControlV1alpha1().Bindings().Update(ctx, updatedPlacementDecision, metav1.UpdateOptions{
 		FieldManager: ControllerName,
 	})
 	if err != nil {
@@ -507,7 +507,7 @@ func (c *genericTransportController) updatePlacementDecision(ctx context.Context
 
 // addFinalizer accepts PlacementDecision object and adds the provided finalizer if not present.
 // It returns the updated (or not) PlacementDecision and an indication of whether it updated the object's list of finalizers.
-func addFinalizer(placementDecision *v1alpha1.PlacementDecision, finalizer string) (*v1alpha1.PlacementDecision, bool) {
+func addFinalizer(placementDecision *v1alpha1.Binding, finalizer string) (*v1alpha1.Binding, bool) {
 	finalizers := placementDecision.GetFinalizers()
 	for _, item := range finalizers {
 		if item == finalizer { // finalizer already exists, no need to add
@@ -524,7 +524,7 @@ func addFinalizer(placementDecision *v1alpha1.PlacementDecision, finalizer strin
 
 // removeFinalizer accepts PlacementDecision object and removes the provided finalizer if present.
 // It returns the updated (or not) PlacementDecision and an indication of whether it updated the object's list of finalizers.
-func removeFinalizer(placementDecision *v1alpha1.PlacementDecision, finalizer string) (*v1alpha1.PlacementDecision, bool) {
+func removeFinalizer(placementDecision *v1alpha1.Binding, finalizer string) (*v1alpha1.Binding, bool) {
 	finalizersList := placementDecision.GetFinalizers()
 	length := len(finalizersList)
 

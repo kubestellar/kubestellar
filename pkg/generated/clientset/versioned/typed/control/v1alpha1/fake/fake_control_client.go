@@ -29,12 +29,12 @@ type FakeControlV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeControlV1alpha1) Placements() v1alpha1.PlacementInterface {
-	return &FakePlacements{c}
+func (c *FakeControlV1alpha1) Bindings() v1alpha1.BindingInterface {
+	return &FakeBindings{c}
 }
 
-func (c *FakeControlV1alpha1) PlacementDecisions() v1alpha1.PlacementDecisionInterface {
-	return &FakePlacementDecisions{c}
+func (c *FakeControlV1alpha1) Placements() v1alpha1.PlacementInterface {
+	return &FakePlacements{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

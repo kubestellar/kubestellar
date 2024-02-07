@@ -115,7 +115,7 @@ func (resolution *placementResolution) setDestinations(destinations sets.Set[str
 
 // toPlacementDecisionSpec converts the resolution to a placement decision
 // spec. This function is thread-safe.
-func (resolution *placementResolution) toPlacementDecisionSpec(gvkGvrMapper util.GvkGvrMapper) (*v1alpha1.PlacementDecisionSpec, error) {
+func (resolution *placementResolution) toPlacementDecisionSpec(gvkGvrMapper util.GvkGvrMapper) (*v1alpha1.BindingSpec, error) {
 	resolution.RLock()
 	defer resolution.RUnlock()
 
@@ -151,7 +151,7 @@ func (resolution *placementResolution) toPlacementDecisionSpec(gvkGvrMapper util
 		resolution.handleNamespacedObject(gvr, key, &workload, namespaceScopeDownsyncObjectsMap, nsObjectsLocationInSlice)
 	}
 
-	return &v1alpha1.PlacementDecisionSpec{
+	return &v1alpha1.BindingSpec{
 		Workload:     workload,
 		Destinations: destinationsStringSetToDestinations(resolution.destinations),
 	}, nil
@@ -234,7 +234,7 @@ func (resolution *placementResolution) handleNamespacedObject(gvr schema.GroupVe
 	nsObjectsLocationInSlice[gvrAndNSKey] = 0 // first entry
 }
 
-func (resolution *placementResolution) matchesPlacementDecisionSpec(placementDecisionSpec *v1alpha1.PlacementDecisionSpec,
+func (resolution *placementResolution) matchesPlacementDecisionSpec(placementDecisionSpec *v1alpha1.BindingSpec,
 	gvkGvrMapper util.GvkGvrMapper) bool {
 	resolution.RLock()
 	defer resolution.RUnlock()

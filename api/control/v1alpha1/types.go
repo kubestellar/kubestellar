@@ -168,15 +168,15 @@ type PlacementList struct {
 	Items           []Placement `json:"items"`
 }
 
-// PlacementDecision is mapped 1:1 to a single Placement object.
+// Binding is mapped 1:1 to a single Placement object.
 // The decision resource reflects the resolution of the Placement's selectors,
 // and explicitly reflects which objects should go to what destinations.
 //
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:scope=Cluster,shortName={pd}
-type PlacementDecision struct {
+// +kubebuilder:resource:scope=Cluster,shortName={bd}
+type Binding struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -185,13 +185,13 @@ type PlacementDecision struct {
 
 	// `spec` explicitly describes a desired binding between workloads and Locations.
 	// It reflects the resolution of a Placement's selectors.
-	Spec PlacementDecisionSpec `json:"spec,omitempty"`
+	Spec BindingSpec `json:"spec,omitempty"`
 }
 
-// PlacementDecisionSpec holds a list of objects and a list of destinations which are the resolution
+// BindingSpec holds a list of objects and a list of destinations which are the resolution
 // of a Placement's `what` and `where`: what objects to propagate and to where.
 // All objects present in this spec are propagated to all destinations present.
-type PlacementDecisionSpec struct {
+type BindingSpec struct {
 	// `Workload` is a collection of namespaced-scoped objects and a collection of cluster-scoped objects to be propagated to destination clusters.
 	Workload DownsyncObjectReferences `json:"workload,omitempty"`
 
@@ -267,19 +267,19 @@ type Destination struct {
 	ClusterId string `json:"clusterId,omitempty"`
 }
 
-// PlacementDecisionList is the API type for a list of PlacementDecision
+// BindingList is the API type for a list of Binding
 //
 // +kubebuilder:object:root=true
-type PlacementDecisionList struct {
+type BindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []PlacementDecision `json:"items"`
+	Items           []Binding `json:"items"`
 }
 
 func init() {
 	SchemeBuilder.Register(&Placement{}, &PlacementList{})
-	SchemeBuilder.Register(&PlacementDecision{}, &PlacementDecisionList{})
+	SchemeBuilder.Register(&Binding{}, &BindingList{})
 }

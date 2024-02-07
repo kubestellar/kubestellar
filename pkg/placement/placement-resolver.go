@@ -43,7 +43,7 @@ type PlacementResolver interface {
 	// out of sync.
 	//
 	// If no resolution is associated with the given key, an error is returned.
-	GeneratePlacementDecision(placementKey string) (*v1alpha1.PlacementDecisionSpec, error)
+	GeneratePlacementDecision(placementKey string) (*v1alpha1.BindingSpec, error)
 	// GetOwnerReference returns the owner reference for the given placement key.
 	// If no resolution is associated with the given key, an error is returned.
 	GetOwnerReference(placementKey string) (metav1.OwnerReference, error)
@@ -59,7 +59,7 @@ type PlacementResolver interface {
 	// It is possible to output a false negative due to a temporary state of
 	// internal caches being out of sync.
 	ComparePlacementDecision(placementKey string,
-		placementDecisionSpec *v1alpha1.PlacementDecisionSpec) bool
+		placementDecisionSpec *v1alpha1.BindingSpec) bool
 
 	// NotePlacement associates a new resolution with the given placement,
 	// if none is associated.
@@ -108,7 +108,7 @@ type placementResolver struct {
 // created. This function can fail due to internal caches temporarily being
 // out of sync.
 func (resolver *placementResolver) GeneratePlacementDecision(placementKey string) (
-	*v1alpha1.PlacementDecisionSpec, error) {
+	*v1alpha1.BindingSpec, error) {
 	placementResolution := resolver.getResolution(placementKey) // thread-safe
 
 	if placementResolution == nil {
@@ -149,7 +149,7 @@ func (resolver *placementResolver) GetOwnerReference(placementKey string) (metav
 // It is possible to output a false negative due to a temporary state of
 // internal caches being out of sync.
 func (resolver *placementResolver) ComparePlacementDecision(placementKey string,
-	placementDecisionSpec *v1alpha1.PlacementDecisionSpec) bool {
+	placementDecisionSpec *v1alpha1.BindingSpec) bool {
 	placementResolution := resolver.getResolution(placementKey) // thread-safe
 
 	if placementResolution == nil {
