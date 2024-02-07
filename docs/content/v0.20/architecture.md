@@ -68,7 +68,11 @@ and updates *WorkStatus* objects in the ITS namespace associated with the WEC.
 ## KubeStellar Controller Manager
 
 This module manages binding, transport and status controllers. The binding controller watches `BindingPolicy` and workload objects on the Workload Definition Space 
-(WDS) and creates from it a `Binding` object in the WDS that contains the concrete workload objects and concrete list of clusters that were selected by the `BindingPolicy`. The transport in KubeStellar is pluggable and transport controller is buily using one of the transport plugins options (currently KubeStellar supports OCM as transport plugin). transport controller watches `Binding` and gets from the API server the objects that are specified in the workload section. it then wraps all workload objects into a single manifest for delivery to the selected clusters through the Inventory and Transport Space (ITS). The status controller watches for *WorkStatus* objects on the ITS and updates the status of objects in the WDS when singleton status is requested in the `BindingPolicy` for those objects. 
+(WDS) and creates from it a `Binding` object in the WDS that contains the concrete workload objects and concrete list of clusters that were selected by the `BindingPolicy`. 
+The transport in KubeStellar is pluggable and transport controller is built using one of the transport plugin options (currently KubeStellar supports OCM as transport plugin). 
+The transport controller watches `Binding` and gets from the API server the objects that are specified in the workload section. It then wraps all workload objects into a single 
+manifest for delivery to the selected clusters through the Inventory and Transport Space (ITS). The status controller watches for *WorkStatus* objects on the ITS and updates the 
+status of objects in the WDS when singleton status is requested in the `BindingPolicy` for those objects. 
 There is one instance of a KubeStellar Controller Manager for each WDS. Currently this controller-manager runs in the KubeFlex hosting cluster and is responsible of installing the required CRDs in the associated WDS.
 More details on the internals of this module are provided in [KubeStellar Controllers Architecture](#kubestellar-controllers-architecture)
 
@@ -227,7 +231,9 @@ manager: the placement controller, the transport controller and the status contr
 
 The Placement controller is responsible for watching workload objects and 
 `BindingPolicy` objects in WDS and create from it a matching `Binding` objects in WDS.
-a `Binding` object is mapped 1:1 to `BindingPolicy` object and contains the concrete list of workload objects and concrete list of destinations that were selected by the policy and should get all the workload objects.
+a `Binding` object is mapped 1:1 to `BindingPolicy` object and contains the concrete list
+of workload objects and concrete list of destinations that were selected by the policy and
+should get all the workload objects.
 
 The architecture and the event flow for create/update object events is
 illustrated in Figure 3 (some details might be omitted to make the flow easier
@@ -284,42 +290,43 @@ follows:
     -  If the object was not found (because it was deleted) worker returns. 
        A delete event for that object consumed by the event handler enqueues 
        a key for [Object Deleted](#object-deleted).
-    -  Gets the lister for BindingPolicy objects and list all binding policies
-    -  Iterates on all binding policies, and for each of them:
-        - evaluates whether the object matches the downsync selection 
+    -  Gets the lister for BindingPolicy objects and list all binding-policies
+    -  Iterates on all binding-policies, and for each of them:
+        - Evaluates whether the object matches the downsync selection 
           criteria in the `BindingPolicy`.
-        - If there is a match, list ManagedClusters and
-          find the matching clusters using the label selector expression
-          for clusters.
-        - If there are matching clusters, add the names of the cluster
-          to a hashmap setting the name of the cluster as a key. Cluster
-          groups from different bindind policies are merged together.
-        - If any of the matched `BindingPolicy` has ` WantSingletonReportedState`
-          set to true, clusters are sorted in alphanumerical order and
-          only the first cluster is selected for delivery. Note that setting 
-          `WantSingletonReportedState` in one of the binding policies that 
-          matches the object affects the behavior for all matching binding policies, 
-          those with matching clusters and those w/o matching clusters. 
-    -  If there are no matching clusters, the worker returns without
-        actions and is ready to process other events from the queue.
-    -  If there are matching clusters:
-        - Wraps the object into a ManifestWork
-        - Adds a label for each matched Placement to the ManifestWork that 
-          is used to track the placement that caused the object to be 
-          delivered to one or more clusters. The label contains both the 
-          placement name (note that placement is cluster-scoped) and the WDS name. 
-          This way, when a placement is deleted or updated it is possible to 
-          locate the associated ManifestWorks for deletion or label removal 
-          (if more than one label is present, as other placements may “own” the object).
-        - For each cluster:
-          -  Sets the manifest namespace == name of the cluster
-          -  Uses the client connected to the ITS to do a server-side
-             apply patch of the manifest into the namespace.
-          - At this time there is only one field manager name for the server-side
-            apply (`kubestellar`) but the name should include also the WDS
-            name to allow detecting conflicts when two different field managers
-            try to patch a manifest with the same name.   
-        - Worker returns and is ready to pick other keys from the queue.
+        - If there is a match:
+          - Notes the object as a match for the in-memory representation of the relevant `Binding`.
+            - Enqueues the representation of the relevant `Binding` for syncing if changed. 
+          - Lists ManagedClusters and finds the matching clusters using the label selector expression for clusters.
+            - If there are matching clusters, adds the names of the cluster
+            to a hashmap setting the name of the cluster as a key. Cluster
+            groups from different bindind policies are merged together.
+          - If any of the matched `BindingPolicy` has ` WantSingletonReportedState`
+            set to true, clusters are sorted in alphanumerical order and
+            only the first cluster is selected for delivery. Note that setting 
+            `WantSingletonReportedState` in one of the binding-policies that 
+            matches the object affects the behavior for all matching binding-policies, 
+            those with matching clusters and those w/o matching clusters.
+        - If there are no matching clusters, the worker returns without 
+       actions and is ready to process other events from the queue. 
+        - If there are matching clusters:
+          - Wraps the object into a ManifestWork
+       - Adds a label for each matched `BindingPolicy` to the ManifestWork that 
+         is used to track the binding-policy that caused the object to be 
+         delivered to one or more clusters. The label contains both the 
+         binding-policy name (note that placement is cluster-scoped) and the WDS name. 
+         This way, when a binding-policy is deleted or updated it is possible to 
+         locate the associated ManifestWorks for deletion or label removal 
+         (if more than one label is present, as other binding-policies may “own” the object).
+       - For each cluster:
+         -  Sets the manifest namespace == name of the cluster
+         -  Uses the client connected to the ITS to do a server-side
+            apply patch of the manifest into the namespace.
+         - At this time there is only one field manager name for the server-side
+           apply (`kubestellar`) but the name should include also the WDS
+           name to allow detecting conflicts when two different field managers
+           try to patch a manifest with the same name.   
+    - Worker returns and is ready to pick other keys from the queue.
 
 There are other event flows, based on the object GVK and type of event. 
 Error conditions may cause the re-enqueing of keys, resulting in retries.
@@ -337,6 +344,9 @@ before pushing it to the work queue. Then:
   the deletedObject field in the key indicates that the object has been
   deleted and that it needs to be removed from all clusters.
 
+- In-memory representations of affected bindings are updated to remove the object.
+If any are indeed affected, they are enqueued for syncing.
+
 - Running the selectors matching logic as in the create/delete scenario
   once again produces a list of clusters.
 
@@ -345,39 +355,61 @@ before pushing it to the work queue. Then:
 
 - Worker returns and is ready to pick other keys from the queue.
 
-#### Placement Created or Updated 
+#### BindingPolicy Created or Updated 
 
-Worker pulls key from queue; if it is a placement and it has not been
+Worker pulls key from queue; if it is a binding-policy and it has not been
 deleted (deletion timestamp not set) it follows the following flow:
 
 - Re-enqueues all objects to force re-evaluation: this is done by 
   iterating all GVK-indexed listers, listing objects for each lister
   and re-enqueuing the key for each object.
+- Notes the BindingPolicy to create an empty in-memory representation for its Binding.
+- Lists ManagedClusters and finds the matching clusters using the label selector expression for clusters.
+  - If there are matching clusters, the in-memory binding representation is updated with the list of clusters.
+- Enqueues the representation of the relevant `Binding` for syncing.
 - Remove ManifestWorks from ITS for objects no longer matching: generate
-  the ManagedByPlacementLabelKey for the current (Placement, WDS) and use
-  that to retrieve all the manifestworks associated with the (Placement, WDS).
-  Then, for each manifestwork, extract the wrapped object, and re-evaluate the
-  object vs. the current placement. If no longer a match (either for the
-  "what" or the "where" part) check if each manifestwork has other (Placement, WDS)
-  labels. If yes, remove the label, if not, delete the manifestwork.
+ the ManagedByPlacementLabelKey for the current (BindingPolicy, WDS) and use
+ that to retrieve all the manifestworks associated with the (BindingPolicy, WDS).
+ Then, for each manifestwork, extract the wrapped object, and re-evaluate the
+ object vs. the current placement. If no longer a match (either for the
+ "what" or the "where" part) check if each manifestwork has other (BindingPolicy, WDS)
+ labels. If yes, remove the label, if not, delete the manifestwork.
 
 Re-enqueuing all object keys forces the re-evaluation of all objects vs.
-all placements. This is a shortcut as it would be more efficient to
-re-evaluate all objects vs. the changed placement only, but it saves
+all binding-policies. This is a shortcut as it would be more efficient to
+re-evaluate all objects vs. the changed binding-policy only, but it saves
 some additional complexity in the code.
 
-#### Placement Deleted
+#### BindingPolicy Deleted
 
-When the placement controller first processes a new Placement, the placement 
+When the binding-policy controller first processes a new Placement, the placement 
 controller sets a finalizer on it. The Worker pulls a key from queue; if it is 
 a placement and it has been deleted (deletion timestamp is set) it follows the flow below:
 
+- Deletes the in-memory representation of the binding. Note that the actual binding object
+is garbage collected due to the deletion of the placement and the latter being an owner of the former.
 - Lists all ManifestWorks on all namespaces in ITS by
   placement label.
 - Iterates on all matching ManifestWorks, for each one:
   - Deletes the ManifestWork (if no other placement labels) or the label
     (if other placement labels are present).
 - Deletes placement finalizer.
+
+
+#### Binding Syncing
+
+When a binding is enqueued for syncing, the worker pulls the key from the queue and
+follows the flow below:
+
+- If an in memory representation of the binding is not found, the worker returns.
+- The key is used to retrieve the object from the WDS.
+  - If the object is not found, then a `Binding` object should be created. For the convenience of the flow,
+  the worker sets the "retrived object" as an empty `Binding` object with the appropriate Meta fields,
+  including the `BindingPolicy` object as the single owner reference.
+- The worker compares the in-memory representation of the binding with the retrieved object.
+  - If the two are the same, the worker returns.
+  - If the two are different, the worker updates the binding object resource to reflect the state of the
+  in-memory representation.
 
 #### New CRD Added
 
