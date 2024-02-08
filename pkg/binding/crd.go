@@ -19,7 +19,6 @@ package binding
 import (
 	"context"
 	"strings"
-	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,20 +29,13 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-const (
-	waitBeforeTrackingCRDs = 5 * time.Second
-	CRDKind                = "CustomResourceDefinition"
-	CRDGroup               = "apiextensions.k8s.io"
-	CRDVersion             = "v1"
-)
-
 type APIResource struct {
 	groupVersion schema.GroupVersion
 	resource     metav1.APIResource
 }
 
 // Handle CRDs should account for CRDs being added or deleted to start/stop new informers as needed
-func (c *Controller) handleCRD(obj runtime.Object) error {
+func (c *Controller) handleCRD(_ runtime.Object) error {
 	toStartList, toStopList, err := c.checkAPIResourcesForUpdates()
 	if err != nil {
 		return err

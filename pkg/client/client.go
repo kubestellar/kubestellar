@@ -19,34 +19,17 @@ package client
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-
-	homedir "github.com/mitchellh/go-homedir"
 
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
-
-	"github.com/openshift/client-go/security/clientset/versioned"
 
 	tenancyv1alpha1 "github.com/kubestellar/kubeflex/api/v1alpha1"
 
 	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
-
-func GetClientSet(kubeconfig string) *kubernetes.Clientset {
-	config := GetConfig(kubeconfig)
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating clientset: %v\n", err)
-		os.Exit(1)
-	}
-	return clientset
-}
 
 func GetClient() *client.Client {
 	config := config.GetConfigOrDie()
@@ -76,30 +59,4 @@ func GetClient() *client.Client {
 		os.Exit(1)
 	}
 	return &c
-}
-
-func GetOpendShiftSecClient(kubeconfig string) (*versioned.Clientset, error) {
-	config := GetConfig(kubeconfig)
-	return versioned.NewForConfig(config)
-}
-
-func GetConfig(kubeconfig string) *rest.Config {
-	if kubeconfig == "" {
-		kubeconfig = os.Getenv("KUBECONFIG")
-		if kubeconfig == "" {
-			home, err := homedir.Dir()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error finding home directory: %v\n", err)
-				os.Exit(1)
-			}
-			kubeconfig = filepath.Join(home, ".kube", "config")
-		}
-	}
-
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error building kubeconfig: %v\n", err)
-		os.Exit(1)
-	}
-	return config
 }

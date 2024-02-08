@@ -19,7 +19,6 @@ package util
 import (
 	"fmt"
 
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -93,16 +92,6 @@ func getObjectGVK(o interface{}) (schema.GroupVersionKind, error) {
 	}
 
 	return schema.GroupVersionKind{}, fmt.Errorf("object is of wrong type: %#v", o)
-}
-
-func ToService(obj *unstructured.Unstructured) (*corev1.Service, error) {
-	// Convert unstructured.Unstructured to a Service object
-	service := &corev1.Service{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.UnstructuredContent(), service)
-	if err != nil {
-		return nil, err
-	}
-	return service, nil
 }
 
 func RemoveRuntimeGeneratedFieldsFromService(obj interface{}) error {
