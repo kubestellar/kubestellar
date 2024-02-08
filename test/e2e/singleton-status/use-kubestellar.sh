@@ -18,13 +18,13 @@ set -e # exit on error
 
 :
 : -------------------------------------------------------------------------
-: "Create a placement in wds1 to deliver an app to one WEC."
+: "Create a bindingpolicy in wds1 to deliver an app to one WEC."
 :
 kubectl --context wds1 apply -f - <<EOF
 apiVersion: control.kubestellar.io/v1alpha1
-kind: Placement
+kind: BindingPolicy
 metadata:
-  name: nginx-singleton-placement
+  name: nginx-singleton-bindingpolicy
 spec:
   wantSingletonReportedState: true
   clusterSelectors:

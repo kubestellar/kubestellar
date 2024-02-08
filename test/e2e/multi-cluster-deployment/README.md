@@ -4,10 +4,10 @@ This test is an executable variant of the "multi-cluster workload deployment wit
 
 In addition, the following test cases are executed on top of the setup created by the "multi-cluster workload deployment with kubectl" scenario:
 1. Update of the workload object on WDS should update the object on the WECs. Increase the number of replicas from 1 to 2, verify they are updated on the WECs.
-2. Changing the placement objectSelector to no longer match should delete the object from the WECs.
-3. Changing the placement objectSelector to match should create the object on the WECs.
-4. Delete of the placement object should delete the object on the WECs.
-5. Delete of the overlapping placement object should not delete the object on the WECs.
+2. Changing the bindingpolicy objectSelector to no longer match should delete the object from the WECs.
+3. Changing the bindingpolicy objectSelector to match should create the object on the WECs.
+4. Delete of the bindingpolicy object should delete the object on the WECs.
+5. Delete of the overlapping bindingpolicy object should not delete the object on the WECs.
 6. Delete of the workload object on WDS should delete the object on the WECs.
 7. Re-create of the workload object on WDS should re-create the object on the WECs.
 
