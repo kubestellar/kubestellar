@@ -19,47 +19,47 @@ package util
 import (
 	"strings"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
+	//"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
+
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
-// ParseResourcesString takes a comma separated string list of resources in the form of
-// <api-group1>, <api-group2> .. and returns a map[string]bool
-func ParseResourceGroupsString(resourceGroups string) map[string]bool {
-	if resourceGroups == "" {
+// ParseAPIGroupsString takes a comma separated string list of api groups in the form of
+// <api-group1>, <api-group2> .. and returns a sets.Set[string]
+func ParseAPIGroupsString(apiGroups string) sets.Set[string] {
+	if apiGroups == "" {
 		return nil
 	}
 
-	// trim single and double quotes to make this safe from
-	// user passing the resource option quoted in the container args
-	resourceGroups = strings.Trim(resourceGroups, `'"`)
-
-	groupsMap := map[string]bool{}
-	for _, g := range strings.Split(resourceGroups, ",") {
-		groupsMap[strings.Trim(g, " ")] = true
+	groupsSet := sets.Set[string]{}
+	for _, g := range strings.Split(apiGroups, ",") {
+		groupsSet.Insert(g)
 	}
 
-	return groupsMap
+	return groupsSet
 }
 
-// IsResourceGroupAllowed checks if an infomer for the resource is allowed to start.
+// IsResourceGroupAllowed checks if a API group is allowed
 // an empty or nil allowedResources slice is equivalent to allow all,
-func IsResourceGroupAllowed(resourceGroup string, allowedResourceGroups map[string]bool) bool {
-	if allowedResourceGroups == nil || allowedResourceGroups != nil && len(allowedResourceGroups) == 0 {
+func IsAPIGroupAllowed(apiGroup string, allowedAPIGroups sets.Set[string]) bool {
+	if len(allowedAPIGroups) == 0 {
 		return true
 	}
-	addRequiredResourceGroups(allowedResourceGroups)
+	addRequiredResourceGroups(allowedAPIGroups)
 
-	return allowedResourceGroups[resourceGroup]
+	return allowedAPIGroups.Has(apiGroup)
 }
 
 // append the minimal set of resources that are required to operate
-func addRequiredResourceGroups(allowedResourceGroups map[string]bool) {
-	// if resources are provided, we need to ensure that at least CRD and KS API
-	// resources are watched
+func addRequiredResourceGroups(allowedResourceGroups sets.Set[string]) {
+	// if groups are provided, we need to ensure that at least CRD and KS API
+	// groups are watched
 
-	allowedResourceGroups[v1alpha1.GroupVersion.Group] = true
+	allowedResourceGroups.Insert(v1alpha1.GroupVersion.Group)
 
 	// disabled until https://github.com/kubestellar/kubestellar/issues/1705 is resolved
 	// to avoid client-side throttling
-	// allowedResourceGroups[CRDGroup] = true
+	//allowedResourceGroups.Insert(apiextensions.GroupName)
 }

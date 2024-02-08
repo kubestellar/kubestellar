@@ -5,9 +5,9 @@
 # name of control plane to set as WDS
 ControlPlaneName: wds1
 
-# list of allowed resource groups, comma separated.
-# If not specified, all resources are allowed. 
+# list of allowed Kubernetes api groups, comma separated.
+# If not specified, all api groups are allowed. 
 # When set by --set with helm CLI, use the format
 # "<group1>\, <group2>\, <groupN>" with "" and escaped \,
-ResourceGroups:
+APIGroups:
 

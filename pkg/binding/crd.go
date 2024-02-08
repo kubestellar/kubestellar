@@ -93,7 +93,7 @@ func (c *Controller) checkAPIResourcesForUpdates() ([]APIResource, []string, err
 			if _, excluded := excludedResourceNames[resource.Name]; excluded {
 				continue
 			}
-			if !util.IsResourceGroupAllowed(gv.Group, c.allowedResources) {
+			if !util.IsAPIGroupAllowed(gv.Group, c.allowedGroupsSet) {
 				continue
 			}
 			informable := verbsSupportInformers(resource.Verbs)

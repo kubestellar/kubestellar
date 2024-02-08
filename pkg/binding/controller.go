@@ -87,26 +87,15 @@ type Controller struct {
 	informers         map[string]cache.SharedIndexInformer
 	stoppers          map[string]chan struct{}
 	placementResolver PlacementResolver
-<<<<<<< HEAD:pkg/binding/controller.go
-
-	workqueue     workqueue.RateLimitingInterface
-	initializedTs time.Time
-	wdsName       string
-}
-
-// Create a new binding controller
-func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config, wdsName string) (*Controller, error) {
-=======
 	workqueue         workqueue.RateLimitingInterface
 	initializedTs     time.Time
 	wdsName           string
-	allowedResources  map[string]bool
+	allowedGroupsSet  sets.Set[string]
 }
 
 // Create a new placement controller
 func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
-	wdsName string, allowedResources map[string]bool) (*Controller, error) {
->>>>>>> 8a41ee7a4 (use api group only to filter resources):pkg/placement/controller.go
+	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
@@ -205,12 +194,9 @@ func (c *Controller) run(workers int) error {
 			if _, excluded := excludedResourceNames[resource.Name]; excluded {
 				continue
 			}
-<<<<<<< HEAD:pkg/binding/controller.go
-=======
-			if !util.IsResourceGroupAllowed(gv.Group, c.allowedResources) {
+			if !util.IsAPIGroupAllowed(gv.Group, c.allowedGroupsSet) {
 				continue
 			}
->>>>>>> 8a41ee7a4 (use api group only to filter resources):pkg/placement/controller.go
 			informable := verbsSupportInformers(resource.Verbs)
 			if informable {
 				key := util.KeyForGroupVersionKind(gv.Group, gv.Version, resource.Kind)

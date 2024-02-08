@@ -19,6 +19,7 @@ package util
 import (
 	"fmt"
 
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -31,7 +32,6 @@ import (
 const (
 	CRDKind                              = "CustomResourceDefinition"
 	CRDResource                          = "customresourcedefinitions"
-	CRDGroup                             = "apiextensions.k8s.io"
 	AnyVersion                           = "*"
 	ServiceVersion                       = "v1"
 	ServiceKind                          = "Service"
@@ -61,7 +61,7 @@ type SourceRef struct {
 }
 
 func IsCRD(o interface{}) bool { // CRDs might have different versions. therefore, using "any" in CRD version
-	return matchesGVK(o, CRDGroup, AnyVersion, CRDKind)
+	return matchesGVK(o, apiextensions.GroupName, AnyVersion, CRDKind)
 }
 
 func IsPlacement(o interface{}) bool {

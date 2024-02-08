@@ -19,33 +19,27 @@ package util
 import (
 	"reflect"
 	"testing"
+
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
-// TestParseResourceGroupsString tests the TestParseResourceGroupsString function
-func TestParseResourceGroupsString(t *testing.T) {
+// TestParseAPIGroupsString tests the TestParseAPIGroupsString function
+func TestParseAPIGroupsString(t *testing.T) {
 	// Define some test cases with inputs and expected outputs
 	testCases := []struct {
 		name     string
 		input    string
-		expected map[string]bool
+		expected sets.Set[string]
 	}{
 		{
-			name:  "valid input with api group",
-			input: "apps, networking.k8s.io, policy",
-			expected: map[string]bool{
-				"apps":              true,
-				"networking.k8s.io": true,
-				"policy":            true,
-			},
+			name:     "valid input with api group",
+			input:    "apps, networking.k8s.io, policy",
+			expected: sets.New("apps", "networking.k8s.io", "policy"),
 		},
 		{
-			name:  "valid input with empty api group",
-			input: "apps, ,policy",
-			expected: map[string]bool{
-				"apps":   true,
-				"":       true,
-				"policy": true,
-			},
+			name:     "valid input with empty api group",
+			input:    "apps, ,policy",
+			expected: sets.New("apps", "", "policy"),
 		},
 		{
 			name:     "empty input",
@@ -57,7 +51,7 @@ func TestParseResourceGroupsString(t *testing.T) {
 	// Iterate over the test cases, run the function with the input and compare expected vs. returned
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			actual := ParseResourceGroupsString(tc.input)
+			actual := ParseAPIGroupsString(tc.input)
 
 			// Check if the output matches the expected output
 			if !reflect.DeepEqual(actual, tc.expected) {
@@ -67,47 +61,39 @@ func TestParseResourceGroupsString(t *testing.T) {
 	}
 }
 
-// TestIsResourceGroupAllowed tests the IsResourceGroupAllowed function
-func TestIsResourceGroupAllowed(t *testing.T) {
+// TestIsAPIGroupAllowed tests the IsAPIGroupAllowed function
+func TestIsAPIGroupAllowed(t *testing.T) {
 	// Define some test cases with inputs and expected outputs
 	testCases := []struct {
-		name                  string
-		resourceGroup         string
-		allowedResourceGroups map[string]bool
-		expected              bool
+		name             string
+		resourceGroup    string
+		allowedAPIGroups sets.Set[string]
+		expected         bool
 	}{
 		{
-			name:          "resource group is allowed by non-empty map",
-			resourceGroup: "apps",
-			allowedResourceGroups: map[string]bool{
-				"apps":              true,
-				"networking.k8s.io": true,
-				"policy":            true,
-			},
-			expected: true,
+			name:             "api group is allowed by non-empty map",
+			resourceGroup:    "apps",
+			allowedAPIGroups: sets.New("apps", "networking.k8s.io", "policy"),
+			expected:         true,
 		},
 		{
-			name:                  "resource group is allowed by nil map",
-			resourceGroup:         "apps",
-			allowedResourceGroups: nil,
-			expected:              true,
+			name:             "api group is allowed by nil map",
+			resourceGroup:    "apps",
+			allowedAPIGroups: nil,
+			expected:         true,
 		},
 		{
-			name:          "kubestellar resource group is always allowed",
-			resourceGroup: "control.kubestellar.io",
-			allowedResourceGroups: map[string]bool{
-				"apps":              true,
-				"networking.k8s.io": true,
-				"policy":            true,
-			},
-			expected: true,
+			name:             "kubestellar resource group is always allowed",
+			resourceGroup:    "control.kubestellar.io",
+			allowedAPIGroups: sets.New("apps", "networking.k8s.io", "policy"),
+			expected:         true,
 		},
 	}
 
 	// Iterate over the test cases and run the function with the input
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			actual := IsResourceGroupAllowed(tc.resourceGroup, tc.allowedResourceGroups)
+			actual := IsAPIGroupAllowed(tc.resourceGroup, tc.allowedAPIGroups)
 
 			// Check if the output matches the expected output
 			if actual != tc.expected {
