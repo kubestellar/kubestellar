@@ -41,8 +41,6 @@ const (
 	ControlPlaneTypeLabel = "kflex.kubestellar.io/cptype"
 	ControlPlaneTypeIMBS  = "imbs"
 	ControlPlaneTypeWDS   = "wds"
-	kcSecretKeyDefault    = "kubeconfig"
-	kcSecretKeyVCluster   = "config"
 	// errors
 	ErrNoControlPlane        = "no control plane found. At least one control plane labeled with %s=%s must be present"
 	ErrControlPlaneNotFound  = "control plane with label %s=%s and name %s was not found"

@@ -416,7 +416,7 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 	return true
 }
 
-func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
+func (c *Controller) reconcile(_ context.Context, key util.Key) error {
 	var obj runtime.Object
 	var err error
 	// special handling for placement-decision resource as it is the only

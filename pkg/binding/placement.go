@@ -192,14 +192,6 @@ func (c *Controller) handlePlacementFinalizer(placement *v1alpha1.BindingPolicy)
 	return nil
 }
 
-func convertToClientObject(obj runtime.Object) (client.Object, error) {
-	clientObj, ok := obj.(client.Object)
-	if !ok {
-		return nil, fmt.Errorf("object is not a client.Object: %v", obj)
-	}
-	return clientObj, nil
-}
-
 func updatePlacement(client dynamic.Interface, placement *v1alpha1.BindingPolicy) error {
 	gvr := schema.GroupVersionResource{
 		Group:    v1alpha1.GroupVersion.Group,

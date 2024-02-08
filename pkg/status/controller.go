@@ -236,7 +236,7 @@ func shouldSkipUpdate(old, new interface{}) bool {
 	return newMObj.GetResourceVersion() == oldMObj.GetResourceVersion()
 }
 
-func shouldSkipDelete(obj interface{}) bool {
+func shouldSkipDelete(_ interface{}) bool {
 	return false
 }
 
@@ -320,7 +320,7 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 	return true
 }
 
-func (c *Controller) reconcile(ctx context.Context, ref cache.ObjectName) error {
+func (c *Controller) reconcile(_ context.Context, ref cache.ObjectName) error {
 	obj, err := getObject(c.workStatusLister, ref.Namespace, ref.Name)
 	if err != nil {
 		// The resource no longer exist, which means it has been deleted.

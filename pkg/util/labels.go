@@ -71,15 +71,6 @@ func GenerateManagedByPlacementLabelKey(wdsName, placementName string) string {
 	return fmt.Sprintf("%s/%s.%s", PlacementLabelKeyBase, wdsName, placementName)
 }
 
-func StringInSlice(str string, list []string) bool {
-	for _, v := range list {
-		if v == str {
-			return true
-		}
-	}
-	return false
-}
-
 type Label struct {
 	Key   string
 	Value string
