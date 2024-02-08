@@ -1,5 +1,7 @@
-**NOTE**: It was decided by the community to rename `Placement` -> `BindingPolicy`.  
-This document uses the new terminology `BindingPolicy` for the resource that was called previously `Placement`, so on every place `BindingPolicy` is mentioned in this doc, we mean `Placement` as it was used up until today.
+**NOTE**: Current code is in a transition to a new design that decouples transport from placement (more about this below). As part of this transition, a new resource was added to KubeStellar called `PlacementDecision`. This resource matches the `Placement` object (1:1 relationship) in the WDS and contains references to the concrete workload objects and references to the concrete list of clusters that were selected by the placement selectors. 
+
+**NOTE2**: It was decided by the community to rename `Placement` -> `BindingPolicy` and `PlacementDecision` -> `Binding`.  
+This document uses the new terminology `BindingPolicy` for the resource that was called previously `Placement`, so on every place `BindingPolicy` is mentioned in this doc, we mean `Placement` as it was used up until today. We also use `Binding` when we mean `PlacementDecision` as described in previous note.
 
 # KubeStellar Architecture
 
@@ -69,7 +71,7 @@ and updates *WorkStatus* objects in the ITS namespace associated with the WEC.
 
 ## KubeStellar Controller Manager
 
-This module manages binding controller (a.k.a placement controller before the rename mentioned at the very beginning of this doc) and status controller. The binding controller watches `BindingPolicy` and workload objects on the Workload Definition Space (WDS) and wraps workload objects into a manifest for delivery through the Inventory and Transport Space (ITS). The status controller watches for *WorkStatus* objects on the ITS and updates the 
+This module manages binding controller (a.k.a placement controller before the rename mentioned at the very beginning of this doc) and status controller. The binding controller watches `BindingPolicy` and workload objects on the Workload Definition Space (WDS) and and maintains in the Inventory and Transport Space (ITS) a wrapped object per workload object to be delivered. The status controller watches for *WorkStatus* objects on the ITS and updates the 
 status of objects in the WDS when singleton status is requested in the `BindingPolicy` for those objects. 
 There is one instance of a KubeStellar Controller Manager for each WDS. Currently this controller-manager runs in the KubeFlex hosting cluster and is responsible of installing the required CRDs in the associated WDS.
 More details on the internals of this module are provided in [KubeStellar Controllers Architecture](#kubestellar-controllers-architecture).
@@ -77,7 +79,7 @@ More details on the internals of this module are provided in [KubeStellar Contro
 ### Planned changes
 
 As a step towards a broader change we're currently working on, we plan to decouple the transport handling from the binding controller and to separate them into two different controllers (binding controller & transport controller).
-As part of this change, current binding controller also creates from the `BindingPolicy` a matching `Binding` object in the WDS which contains the concrete workload objects and concrete list of clusters that were selected by the `BindingPolicy`. The future transport controller should watch `Binding` and get from the WDS api server the objects that are specified in the workload section, wrap them into a wrapped object and deliver the wrapped object through the ITS to the WECs specifid in the `Binding` destinations. 
+As part of this change, current binding controller also creates from the `BindingPolicy` a matching `Binding` object in the WDS which contains references to the concrete workload objects and references to the concrete list of clusters that were selected by the `BindingPolicy`. The future transport controller should watch `Binding` and get from the WDS api server(s) the objects that are specified in the workload section, wrap them into a wrapped object and deliver the wrapped object from the ITS to the WECs specifid in the `Binding` destinations. 
 
 ## Space Manager
 
@@ -230,7 +232,7 @@ manager: the binding controller and the status controllor.
 ### Planned changes to the above:
 
 as part of the decoupling of transport from binding as described above, the following changes are included:
-- Binding Controller - one client connected to the WDS space and 
+- Binding Controller - one client connected to the WDS space and one
   (or more in the future) to connect to one or more ITS shards.
   - The WDS-connected client is used to start the dynamic
     informers/listers for most API resources in the WDS.
@@ -248,13 +250,12 @@ manager: the binding controller, the transport controller and the status control
 
 The Binding controller is responsible for watching workload objects and 
 `BindingPolicy` objects, and wrapping and delivering objects to the ITS
-based on binding policies. as a step towards the planned change that is describe in this document, Binding Controller also creates for each `BindingPolicy` a matching `Binding` object in WDS. a `Binding` object is mapped 1:1 to a `BindingPolicy` object and contains the concrete list of workload objects and concrete list of destinations that were selected by the policy and
-should get all the workload objects.
-Until the planned change is completed, the `Binding` objects are not used. 
+based on binding policies. As a step towards the planned change that is described in this document, Binding controller also creates for each `BindingPolicy` a matching `Binding` object in the WDS. A `Binding` object is mapped 1:1 to a `BindingPolicy` object and contains references to the concrete list of workload objects and references to the concrete list of destinations that were selected by the policy and should get all the workload objects.
+Until the planned change is completed, nothing besides this controller touches the `Binding` objects. 
 
 The architecture and the event flow for **CURRENT** code for create/update object events is
 illustrated in Figure 3 (some details might be omitted to make the flow easier
-to understand). once the planned change that is describe in this document is integrated we will update this figure accordingly.
+to understand). Once the planned change that is describe in this document is integrated we will update this figure accordingly.
 
 <figure>
   <img src="./images/placement-controller.png"  alt="Placement Controller">
@@ -316,8 +317,8 @@ follows:
             - Enqueues the representation of the relevant `Binding` for syncing if changed. 
           - Lists ManagedClusters and finds the matching clusters using the label selector expression for clusters.
             - If there are matching clusters, adds the names of the cluster
-            to a hashmap setting the name of the cluster as a key. Cluster
-            groups from different bindind policies are merged together.
+              to a hashmap setting the name of the cluster as a key. Cluster
+              groups from different bindind policies are merged together.
           - If any of the matched `BindingPolicy` has ` WantSingletonReportedState`
             set to true, clusters are sorted in alphanumerical order and
             only the first cluster is selected for delivery. Note that setting 
@@ -404,7 +405,7 @@ controller sets a finalizer on it. The Worker pulls a key from queue; if it is
 a `BindingPolicy` and it has been deleted (deletion timestamp is set) it follows the flow below:
 
 - Deletes the in-memory representation of the `Binding`. Note that the actual `Binding` object
-is garbage collected due to the deletion of the `BindingPolicy` and the latter being an owner of the former (using `OwnerReference`).
+  is garbage collected due to the deletion of the `BindingPolicy` and the latter being an owner of the former (using `OwnerReference`).
 - Lists all ManifestWorks on all namespaces in ITS by `BindingPolicy` label.
 - Iterates on all matching ManifestWorks, for each one:
   - Deletes the ManifestWork (if no other `BindingPolicy` labels) or the label
@@ -489,14 +490,14 @@ status updates for one object do not require updates of a whole bundle.
 
 The transport controller is pluggable and allows the option to plug different
 implementations of the transport interface. In order to implement transport plugin, the plugin should supply the following:
-- upon registration of a new WEC, plugin should create a namespace per WEC in ITS (mailbox namespace per WEC);
-- plugin must be able to wrap multiple objects into a single wrapped object;
-- have an agent that runs on the WEC and watches the wrapped object in the corresponding namespace in the central hub and is able to unwrap it and apply the objects to the WEC;
-- have inventory representation for the clusters.
+- Upon registration of a new WEC, plugin should create a namespace for the WEC in the ITS and delete the namespace once the WEC registration goes away (mailbox namespace per WEC);
+- Plugin must be able to wrap any number of objects into a single wrapped object;
+- Have an agent that can be used to pull the wrapped objects from the mailbox namespace and apply them to the WEC. A single example for such an agent is an agent that runs on the WEC and watches the wrapped object in the corresponding namespace in the central hub and is able to unwrap it and apply the objects to the WEC. 
+- Have inventory representation for the clusters.
 
 The above list is required in order to comply with [<u>SIG Multi-Cluster Work API</u>](https://multicluster.sigs.k8s.io/concepts/work-api/).
 
-KubeStellar currently have one transport plugin implementation that is based on [Open Cluster Management](https://open-cluster-management.io) which is also a CNCF Sandbox project. we expect to have more transport plugin options in the future.
+KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project [Open Cluster Management](https://open-cluster-management.io). We expect to have more transport plugin options in the future.
 
 The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.
 
@@ -505,4 +506,5 @@ The following section describes how transport controller works, while the descri
   <figcaption align="center">Figure 5 - Transport Controller</figcaption>
 </figure>
 
-The transport controller watches for `Binding` objects on the WDS. `Binding` objects are mapped 1:1 to `BindingPolicy` and contain the list of concrete objects that were selected for distribution by the policy, and the concrete list of destination that were selected by the policy. upon a new `Binding` event (add/update), the transport controller gets from the WDS api-server the objects listed in the `Binding` workload section. it then wraps all objects into a single wrapped object and puts a copy of the wrapped object in every matching cluster mailbox namespace in the ITS. once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/remove the workload objects. 
+The transport controller watches for `Binding` objects on the WDS. `Binding` objects are mapped 1:1 to `BindingPolicy` and contain references to the list of concrete objects that were selected for distribution by the policy and references to the concrete list of destination that were selected by the policy. Upon a new `Binding` event (add/update/delete), the transport controller gets from the WDS api server(s) the objects listed in the `Binding` workload section. It then wraps all objects into wrapped object(s) and puts a copy of the wrapped object(s) in every matching cluster mailbox namespace in the ITS. Once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/delete the workload objects.  
+Transport controller is based on the controller design patten and aims to bring the current state to the desired state. That is, if a WEC was removed from the `Binding`, the transport controller will also make sure to remove the matching wrapped object(s) from the WEC's mailbox namespace. Additionally, if a `Binding` is removed, transport controller will remove the matching wrapped object(s) from all mailbox namespaces.
