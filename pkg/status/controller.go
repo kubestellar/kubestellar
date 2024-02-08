@@ -144,7 +144,7 @@ func (c *Controller) run(workers int) error {
 	// wait for all informers caches to be synced
 	c.logger.Info("waiting for caches to sync")
 
-	// we can't use cache.WaitForCacheSync here because informers are started by the placement controllers
+	// we can't use cache.WaitForCacheSync here because informers are started by the binding controller
 	// and may not be started yet, thus WaitForCacheSync throws an exception. PollUntilContextCancel is
 	// a safer approach here.
 	for _, informer := range c.informers {

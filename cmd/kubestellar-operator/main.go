@@ -32,7 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
-	"github.com/kubestellar/kubestellar/pkg/placement"
+	"github.com/kubestellar/kubestellar/pkg/binding"
 	"github.com/kubestellar/kubestellar/pkg/status"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
@@ -128,22 +128,22 @@ func main() {
 	}
 	setupLog.Info("Got config for IMBS", "name", imbsName)
 
-	// start the placement controller
-	placementController, err := placement.NewController(mgr, wdsRestConfig, imbsRestConfig, wdsName)
+	// start the binding controller
+	bindingController, err := binding.NewController(mgr, wdsRestConfig, imbsRestConfig, wdsName)
 	if err != nil {
-		setupLog.Error(err, "unable to create placement controller")
+		setupLog.Error(err, "unable to create binding controller")
 		os.Exit(1)
 	}
 
-	if err := placementController.Start(workers); err != nil {
-		setupLog.Error(err, "error starting the placement controller")
+	if err := bindingController.Start(workers); err != nil {
+		setupLog.Error(err, "error starting the binding controller")
 		os.Exit(1)
 	}
 
 	// check if status add-on present and if yes start the status controller
 	if util.CheckWorkStatusIPresent(imbsRestConfig) {
-		listers := placementController.GetListers()
-		informers := placementController.GetInformers()
+		listers := bindingController.GetListers()
+		informers := bindingController.GetInformers()
 		statusController, err := status.NewController(mgr, wdsRestConfig, imbsRestConfig, wdsName, listers, informers)
 		if err != nil {
 			setupLog.Error(err, "unable to create status controller")
