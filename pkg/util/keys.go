@@ -133,7 +133,7 @@ func EmptyUnstructuredObjectFromKey(key Key) *unstructured.Unstructured {
 
 func KeyIsForPlacementDecision(key Key) bool {
 	if key.GVK.Group == v1alpha1.SchemeGroupVersion.Group &&
-		key.GVK.Kind == PlacementDecisionKind {
+		key.GVK.Kind == BindingKind {
 		return true
 	}
 

@@ -112,7 +112,7 @@ func (c *Controller) requeueForPlacementChanges() error {
 }
 
 func (c *Controller) getPlacementByName(name string) (runtime.Object, error) {
-	lister := c.listers["control.kubestellar.io/v1alpha1/Placement"]
+	lister := c.listers["control.kubestellar.io/v1alpha1/BindingPolicy"]
 	if lister == nil {
 		return nil, fmt.Errorf("could not get lister for placememt")
 	}
@@ -124,7 +124,7 @@ func (c *Controller) getPlacementByName(name string) (runtime.Object, error) {
 }
 
 func (c *Controller) listPlacements() ([]runtime.Object, error) {
-	lister := c.listers["control.kubestellar.io/v1alpha1/Placement"]
+	lister := c.listers["control.kubestellar.io/v1alpha1/BindingPolicy"]
 	if lister == nil {
 		return nil, fmt.Errorf("could not get lister for placememt")
 	}
@@ -153,7 +153,7 @@ func runtimeObjectToPlacement(obj runtime.Object) (*v1alpha1.BindingPolicy, erro
 func (c *Controller) requeueWorkloadObjects() error {
 	for key, lister := range c.listers {
 		// do not requeue placement or placement-decisions
-		if key == util.GetPlacementListerKey() || key == util.GetPlacementDecisionListerKey() {
+		if key == util.GetBindingPolicyListerKey() || key == util.GetBindingListerKey() {
 			fmt.Printf("Matched key %s\n", key)
 			continue
 		}
@@ -204,7 +204,7 @@ func updatePlacement(client dynamic.Interface, placement *v1alpha1.BindingPolicy
 	gvr := schema.GroupVersionResource{
 		Group:    v1alpha1.GroupVersion.Group,
 		Version:  v1alpha1.GroupVersion.Version,
-		Resource: util.PlacementResource,
+		Resource: util.BindingPolicyResource,
 	}
 
 	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(placement)

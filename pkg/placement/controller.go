@@ -346,7 +346,7 @@ func (c *Controller) enqueuePlacementDecision(name string) {
 		GVK: schema.GroupVersionKind{
 			Group:   v1alpha1.GroupVersion.Group,
 			Version: v1alpha1.GroupVersion.Version,
-			Kind:    util.PlacementDecisionKind},
+			Kind:    util.BindingKind},
 		NamespacedName: cache.ObjectName{
 			Namespace: metav1.NamespaceNone,
 			Name:      name,

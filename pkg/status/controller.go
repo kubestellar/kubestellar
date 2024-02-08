@@ -183,7 +183,7 @@ func (c *Controller) startPlacementInformer() {
 
 	gvr := schema.GroupVersionResource{Group: v1alpha1.GroupVersion.Group,
 		Version:  v1alpha1.GroupVersion.Version,
-		Resource: util.PlacementResource}
+		Resource: util.BindingPolicyResource}
 
 	c.placementInformer = informerFactory.ForResource(gvr).Informer()
 	c.placementLister = cache.NewGenericLister(c.placementInformer.GetIndexer(), gvr.GroupResource())

@@ -107,14 +107,14 @@ func (c *Controller) updateOrCreatePlacementDecision(pd *v1alpha1.Binding,
 	_, err = c.dynamicClient.Resource(schema.GroupVersionResource{
 		Group:    v1alpha1.SchemeGroupVersion.Group,
 		Version:  pd.GetObjectKind().GroupVersionKind().Version,
-		Resource: util.PlacementDecisionResource,
+		Resource: util.BindingResource,
 	}).Update(context.Background(), unstructuredPlacementDecision, metav1.UpdateOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
 			_, err = c.dynamicClient.Resource(schema.GroupVersionResource{
 				Group:    v1alpha1.SchemeGroupVersion.Group,
 				Version:  pd.GetObjectKind().GroupVersionKind().Version,
-				Resource: util.PlacementDecisionResource,
+				Resource: util.BindingResource,
 			}).Create(context.Background(), unstructuredPlacementDecision, metav1.CreateOptions{})
 			if err != nil {
 				return fmt.Errorf("failed to create placement decision: %w", err)

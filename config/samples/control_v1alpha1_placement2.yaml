@@ -1,12 +1,12 @@
 apiVersion: control.kubestellar.io/v1alpha1
-kind: Placement
+kind: BindingPolicy
 metadata:
-  name: placement1
+  name: bindingpolicy1
 spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
   downsync:
-  - labelSelectors:
+  - objectSelectors:
     - matchLabels: {"app.kubernetes.io/managed-by":"Helm"}
     - matchLabels: {"app.kubernetes.io/instance":"postgres"}
 

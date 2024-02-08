@@ -45,8 +45,8 @@ import (
 
 // CRDs to apply
 var crdNames = sets.New(
-	"placementdecisions.control.kubestellar.io",
-	"placements.control.kubestellar.io",
+	"bindings.control.kubestellar.io",
+	"bindingpolicies.control.kubestellar.io",
 )
 
 //go:embed files/*
