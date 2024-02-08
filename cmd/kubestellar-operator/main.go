@@ -60,12 +60,12 @@ func main() {
 	var probeAddr string
 	var wdsName string
 	var wdsLabel string
-	var resources string
+	var resourceGroups string
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.StringVar(&wdsName, "wds-name", "", "name of the workload description space to connect to")
 	flag.StringVar(&wdsLabel, "wds-label", "", "label of the workload description space to connect to")
-	flag.StringVar(&resources, "resources", "", "list of allowed resources, in the form <resource>.<api group>/version, comma separated. If not specified, all resources are allowed.")
+	flag.StringVar(&resourceGroups, "resource-groups", "", "list of allowed resource groups, comma separated. If not specified, all resources are allowed.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -79,11 +79,7 @@ func main() {
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
 	// parse allowed resources string
-	allowedResources, err := util.ParseResourcesString(resources)
-	if err != nil {
-		setupLog.Error(err, "error parsing allowed resources")
-		os.Exit(1)
-	}
+	allowedResources := util.ParseResourceGroupsString(resourceGroups)
 
 	// setup manager
 	// manager here is mainly used for leader election and health checks

@@ -17,108 +17,49 @@ limitations under the License.
 package util
 
 import (
-	"fmt"
 	"strings"
-
-	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 // ParseResourcesString takes a comma separated string list of resources in the form of
-// <resource>.<api group>/<version> or <resource>/<version> and returns a slice of schema.GroupVersionResource
-func ParseResourcesString(resources string) ([]schema.GroupVersionResource, error) {
-	if resources == "" {
-		return nil, nil
+// <api-group1>, <api-group2> .. and returns a map[string]bool
+func ParseResourceGroupsString(resourceGroups string) map[string]bool {
+	if resourceGroups == "" {
+		return nil
 	}
-
-	var result []schema.GroupVersionResource
 
 	// trim single and double quotes to make this safe from
 	// user passing the resource option quoted in the container args
-	resources = strings.Trim(resources, `'"`)
+	resourceGroups = strings.Trim(resourceGroups, `'"`)
 
-	parts := strings.Split(resources, ",")
-	for _, part := range parts {
-		part = strings.TrimSpace(part)
-		subparts := strings.SplitN(part, "/", 2)
-		if len(subparts) != 2 {
-			return nil, fmt.Errorf("invalid resource format: %s", part)
-		}
-		resourceGroup := subparts[0]
-		version := subparts[1]
-		if version == "" {
-			return nil, fmt.Errorf("no version found: %s", part)
-		}
-
-		subparts = strings.SplitN(resourceGroup, ".", 2)
-		var resource, group string
-		if len(subparts) == 2 {
-			// The part has the form of <resource>.<api group>
-			resource = subparts[0]
-			group = subparts[1]
-		} else if len(subparts) == 1 {
-			// The part has the form of <resource>
-			resource = subparts[0]
-			group = "" // The api group is empty
-		} else {
-			return nil, fmt.Errorf("invalid resource/group format: %s", resourceGroup)
-		}
-
-		gvr := schema.GroupVersionResource{
-			Group:    group,
-			Version:  version,
-			Resource: resource,
-		}
-		result = append(result, gvr)
+	groupsMap := map[string]bool{}
+	for _, g := range strings.Split(resourceGroups, ",") {
+		groupsMap[strings.Trim(g, " ")] = true
 	}
 
-	return result, nil
+	return groupsMap
 }
 
-// IsResourceAllowed checks if an infomer for the resource is allowed to start.
+// IsResourceGroupAllowed checks if an infomer for the resource is allowed to start.
 // an empty or nil allowedResources slice is equivalent to allow all,
-func IsResourceAllowed(gvr schema.GroupVersionResource, allowedResources []schema.GroupVersionResource) bool {
-	if allowedResources == nil || allowedResources != nil && len(allowedResources) == 0 {
+func IsResourceGroupAllowed(resourceGroup string, allowedResourceGroups map[string]bool) bool {
+	if allowedResourceGroups == nil || allowedResourceGroups != nil && len(allowedResourceGroups) == 0 {
 		return true
 	}
+	addRequiredResourceGroups(allowedResourceGroups)
 
-	allowedResources = appendRequiredResources(allowedResources)
-
-	for _, allowedResource := range allowedResources {
-		if gvr.Group == allowedResource.Group &&
-			(allowedResource.Version == AnyVersion || gvr.Version == allowedResource.Version) &&
-			gvr.Resource == allowedResource.Resource {
-			return true
-		}
-	}
-
-	return false
+	return allowedResourceGroups[resourceGroup]
 }
 
 // append the minimal set of resources that are required to operate
-func appendRequiredResources(allowedResources []schema.GroupVersionResource) []schema.GroupVersionResource {
-	// if resources are provided, we need to ensure that at least CRD and Placement
+func addRequiredResourceGroups(allowedResourceGroups map[string]bool) {
+	// if resources are provided, we need to ensure that at least CRD and KS API
 	// resources are watched
 
-	slice := []schema.GroupVersionResource{}
-	slice = append(slice, allowedResources...)
-
-	gvr := schema.GroupVersionResource{
-		Group:    v1alpha1.GroupVersion.Group,
-		Version:  v1alpha1.GroupVersion.Version,
-		Resource: PlacementResource,
-	}
-	slice = append(slice, gvr)
+	allowedResourceGroups[v1alpha1.GroupVersion.Group] = true
 
 	// disabled until https://github.com/kubestellar/kubestellar/issues/1705 is resolved
 	// to avoid client-side throttling
-	// gvr = schema.GroupVersionResource{
-	// 	Group:    CRDGroup,
-	// 	Version:  AnyVersion,
-	// 	Resource: CRDResource,
-	// }
-	// slice = append(slice, gvr)
-
-	return slice
+	// allowedResourceGroups[CRDGroup] = true
 }

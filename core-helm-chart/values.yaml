@@ -2,5 +2,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# name of control plane to set as WDS
 ControlPlaneName: wds1
+
+# list of allowed resource groups, comma separated.
+# If not specified, all resources are allowed. 
+# When set by --set with helm CLI, use the format
+# "<group1>\, <group2>\, <groupN>" with "" and escaped \,
+ResourceGroups:
 
