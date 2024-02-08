@@ -20,8 +20,8 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Binding is mapped 1:1 to a single Placement object. The decision
-          resource reflects the resolution of the Placement's selectors, and explicitly
+        description: Binding is mapped 1:1 to a single BindingPolicy object. The decision
+          resource reflects the resolution of the BindingPolicy's selectors, and explicitly
           reflects which objects should go to what destinations.
         properties:
           apiVersion:
@@ -38,7 +38,7 @@ spec:
             type: object
           spec:
             description: '`spec` explicitly describes a desired binding between workloads
-              and Locations. It reflects the resolution of a Placement''s selectors.'
+              and Locations. It reflects the resolution of a BindingPolicy''s selectors.'
             properties:
               destinations:
                 description: '`destinations` is a list of cluster-identifiers that

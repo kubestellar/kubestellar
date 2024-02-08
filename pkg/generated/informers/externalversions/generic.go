@@ -56,8 +56,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	// Group=control.kubestellar.io, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("bindings"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Control().V1alpha1().Bindings().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("placements"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Control().V1alpha1().Placements().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("bindingpolicies"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Control().V1alpha1().BindingPolicies().Informer()}, nil
 
 	}
 

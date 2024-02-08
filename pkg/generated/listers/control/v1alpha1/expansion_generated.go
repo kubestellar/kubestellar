@@ -22,6 +22,6 @@ package v1alpha1
 // BindingLister.
 type BindingListerExpansion interface{}
 
-// PlacementListerExpansion allows custom methods to be added to
-// PlacementLister.
-type PlacementListerExpansion interface{}
+// BindingPolicyListerExpansion allows custom methods to be added to
+// BindingPolicyLister.
+type BindingPolicyListerExpansion interface{}

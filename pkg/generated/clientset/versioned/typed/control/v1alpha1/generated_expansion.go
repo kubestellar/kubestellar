@@ -20,4 +20,4 @@ package v1alpha1
 
 type BindingExpansion interface{}
 
-type PlacementExpansion interface{}
+type BindingPolicyExpansion interface{}

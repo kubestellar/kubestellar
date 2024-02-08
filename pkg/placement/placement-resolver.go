@@ -63,7 +63,7 @@ type PlacementResolver interface {
 
 	// NotePlacement associates a new resolution with the given placement,
 	// if none is associated.
-	NotePlacement(placement *v1alpha1.Placement)
+	NotePlacement(placement *v1alpha1.BindingPolicy)
 
 	// NoteObject updates the maintained placement's objects resolution for the
 	// given placement key. If the object is being deleted, it is removed from
@@ -161,7 +161,7 @@ func (resolver *placementResolver) ComparePlacementDecision(placementKey string,
 
 // NotePlacement associates a new resolution with the given placement,
 // if none is associated.
-func (resolver *placementResolver) NotePlacement(placement *v1alpha1.Placement) {
+func (resolver *placementResolver) NotePlacement(placement *v1alpha1.BindingPolicy) {
 	if resolution := resolver.getResolution(placement.GetName()); resolution != nil {
 		return
 	}
@@ -250,7 +250,7 @@ func (resolver *placementResolver) getResolution(placementKey string) *placement
 	return resolver.placementToResolution[placementKey]
 }
 
-func (resolver *placementResolver) createResolution(placement *v1alpha1.Placement) *placementResolution {
+func (resolver *placementResolver) createResolution(placement *v1alpha1.BindingPolicy) *placementResolution {
 	resolver.Lock() // lock for modifying map
 	defer resolver.Unlock()
 

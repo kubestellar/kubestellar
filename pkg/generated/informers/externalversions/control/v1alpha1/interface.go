@@ -26,8 +26,8 @@ import (
 type Interface interface {
 	// Bindings returns a BindingInformer.
 	Bindings() BindingInformer
-	// Placements returns a PlacementInformer.
-	Placements() PlacementInformer
+	// BindingPolicies returns a BindingPolicyInformer.
+	BindingPolicies() BindingPolicyInformer
 }
 
 type version struct {
@@ -46,7 +46,7 @@ func (v *version) Bindings() BindingInformer {
 	return &bindingInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// Placements returns a PlacementInformer.
-func (v *version) Placements() PlacementInformer {
-	return &placementInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+// BindingPolicies returns a BindingPolicyInformer.
+func (v *version) BindingPolicies() BindingPolicyInformer {
+	return &bindingPolicyInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

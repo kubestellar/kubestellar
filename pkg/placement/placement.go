@@ -135,12 +135,12 @@ func (c *Controller) listPlacements() ([]runtime.Object, error) {
 	return list, nil
 }
 
-func runtimeObjectToPlacement(obj runtime.Object) (*v1alpha1.Placement, error) {
+func runtimeObjectToPlacement(obj runtime.Object) (*v1alpha1.BindingPolicy, error) {
 	unstructuredObj, ok := obj.(*unstructured.Unstructured)
 	if !ok {
 		return nil, fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
 	}
-	var placement *v1alpha1.Placement
+	var placement *v1alpha1.BindingPolicy
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredObj.UnstructuredContent(), &placement); err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (c *Controller) requeueWorkloadObjects() error {
 }
 
 // finalizer logic
-func (c *Controller) handlePlacementFinalizer(placement *v1alpha1.Placement) error {
+func (c *Controller) handlePlacementFinalizer(placement *v1alpha1.BindingPolicy) error {
 	if placement.GetDeletionTimestamp() != nil {
 		if controllerutil.ContainsFinalizer(placement, KSFinalizer) {
 			if err := c.deleteExternalResources(placement); err != nil {
@@ -200,7 +200,7 @@ func convertToClientObject(obj runtime.Object) (client.Object, error) {
 	return clientObj, nil
 }
 
-func updatePlacement(client dynamic.Interface, placement *v1alpha1.Placement) error {
+func updatePlacement(client dynamic.Interface, placement *v1alpha1.BindingPolicy) error {
 	gvr := schema.GroupVersionResource{
 		Group:    v1alpha1.GroupVersion.Group,
 		Version:  v1alpha1.GroupVersion.Version,
@@ -220,7 +220,7 @@ func updatePlacement(client dynamic.Interface, placement *v1alpha1.Placement) er
 	return nil
 }
 
-func (c *Controller) deleteExternalResources(placement *v1alpha1.Placement) error {
+func (c *Controller) deleteExternalResources(placement *v1alpha1.BindingPolicy) error {
 	list, err := listManifestsForPlacement(c.ocmClient, c.wdsName, placement)
 	if err != nil {
 		return err
@@ -237,7 +237,7 @@ func (c *Controller) deleteExternalResources(placement *v1alpha1.Placement) erro
 	return nil
 }
 
-func listManifestsForPlacement(ocmClient client.Client, wdsName string, placement *v1alpha1.Placement) (*workv1.ManifestWorkList, error) {
+func listManifestsForPlacement(ocmClient client.Client, wdsName string, placement *v1alpha1.BindingPolicy) (*workv1.ManifestWorkList, error) {
 	list := &workv1.ManifestWorkList{}
 	labelKey := util.GenerateManagedByPlacementLabelKey(wdsName, placement.GetName())
 
@@ -292,7 +292,7 @@ func isAlsoManagedByOtherPlacements(labels map[string]string, managedByLabelKey 
 }
 
 // Handle removal of objects no longer matching cluster/selector
-func (c *Controller) cleanUpObjectsNoLongerMatching(placement *v1alpha1.Placement) error {
+func (c *Controller) cleanUpObjectsNoLongerMatching(placement *v1alpha1.BindingPolicy) error {
 	// allow some time before checking to settle
 	now := time.Now()
 	if now.Sub(c.initializedTs) < waitBeforeTrackingPlacements {
@@ -341,7 +341,7 @@ func extractObjectFromManifest(manifest workv1.ManifestWork) (*runtime.Object, e
 	return &rObj, nil
 }
 
-func (c *Controller) checkObjectMatchesWhatAndWhere(placement *v1alpha1.Placement, obj runtime.Object, manifest workv1.ManifestWork) (bool, error) {
+func (c *Controller) checkObjectMatchesWhatAndWhere(placement *v1alpha1.BindingPolicy, obj runtime.Object, manifest workv1.ManifestWork) (bool, error) {
 	// default is doing nothing, that is, return match ==true
 	match := true
 

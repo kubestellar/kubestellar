@@ -26,44 +26,44 @@ import (
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
-// PlacementLister helps list Placements.
+// BindingPolicyLister helps list BindingPolicies.
 // All objects returned here must be treated as read-only.
-type PlacementLister interface {
-	// List lists all Placements in the indexer.
+type BindingPolicyLister interface {
+	// List lists all BindingPolicies in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Placement, err error)
-	// Get retrieves the Placement from the index for a given name.
+	List(selector labels.Selector) (ret []*v1alpha1.BindingPolicy, err error)
+	// Get retrieves the BindingPolicy from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.Placement, error)
-	PlacementListerExpansion
+	Get(name string) (*v1alpha1.BindingPolicy, error)
+	BindingPolicyListerExpansion
 }
 
-// placementLister implements the PlacementLister interface.
-type placementLister struct {
+// bindingPolicyLister implements the BindingPolicyLister interface.
+type bindingPolicyLister struct {
 	indexer cache.Indexer
 }
 
-// NewPlacementLister returns a new PlacementLister.
-func NewPlacementLister(indexer cache.Indexer) PlacementLister {
-	return &placementLister{indexer: indexer}
+// NewBindingPolicyLister returns a new BindingPolicyLister.
+func NewBindingPolicyLister(indexer cache.Indexer) BindingPolicyLister {
+	return &bindingPolicyLister{indexer: indexer}
 }
 
-// List lists all Placements in the indexer.
-func (s *placementLister) List(selector labels.Selector) (ret []*v1alpha1.Placement, err error) {
+// List lists all BindingPolicies in the indexer.
+func (s *bindingPolicyLister) List(selector labels.Selector) (ret []*v1alpha1.BindingPolicy, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Placement))
+		ret = append(ret, m.(*v1alpha1.BindingPolicy))
 	})
 	return ret, err
 }
 
-// Get retrieves the Placement from the index for a given name.
-func (s *placementLister) Get(name string) (*v1alpha1.Placement, error) {
+// Get retrieves the BindingPolicy from the index for a given name.
+func (s *bindingPolicyLister) Get(name string) (*v1alpha1.BindingPolicy, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("placement"), name)
+		return nil, errors.NewNotFound(v1alpha1.Resource("bindingpolicy"), name)
 	}
-	return obj.(*v1alpha1.Placement), nil
+	return obj.(*v1alpha1.BindingPolicy), nil
 }

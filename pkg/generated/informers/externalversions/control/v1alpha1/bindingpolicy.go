@@ -33,58 +33,58 @@ import (
 	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 )
 
-// PlacementInformer provides access to a shared informer and lister for
-// Placements.
-type PlacementInformer interface {
+// BindingPolicyInformer provides access to a shared informer and lister for
+// BindingPolicies.
+type BindingPolicyInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.PlacementLister
+	Lister() v1alpha1.BindingPolicyLister
 }
 
-type placementInformer struct {
+type bindingPolicyInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 }
 
-// NewPlacementInformer constructs a new informer for Placement type.
+// NewBindingPolicyInformer constructs a new informer for BindingPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewPlacementInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredPlacementInformer(client, resyncPeriod, indexers, nil)
+func NewBindingPolicyInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredBindingPolicyInformer(client, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredPlacementInformer constructs a new informer for Placement type.
+// NewFilteredBindingPolicyInformer constructs a new informer for BindingPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredPlacementInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredBindingPolicyInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ControlV1alpha1().Placements().List(context.TODO(), options)
+				return client.ControlV1alpha1().BindingPolicies().List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ControlV1alpha1().Placements().Watch(context.TODO(), options)
+				return client.ControlV1alpha1().BindingPolicies().Watch(context.TODO(), options)
 			},
 		},
-		&controlv1alpha1.Placement{},
+		&controlv1alpha1.BindingPolicy{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *placementInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredPlacementInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *bindingPolicyInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredBindingPolicyInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *placementInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&controlv1alpha1.Placement{}, f.defaultInformer)
+func (f *bindingPolicyInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&controlv1alpha1.BindingPolicy{}, f.defaultInformer)
 }
 
-func (f *placementInformer) Lister() v1alpha1.PlacementLister {
-	return v1alpha1.NewPlacementLister(f.Informer().GetIndexer())
+func (f *bindingPolicyInformer) Lister() v1alpha1.BindingPolicyLister {
+	return v1alpha1.NewBindingPolicyLister(f.Informer().GetIndexer())
 }

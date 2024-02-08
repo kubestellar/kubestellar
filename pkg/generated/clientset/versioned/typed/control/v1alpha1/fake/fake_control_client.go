@@ -33,8 +33,8 @@ func (c *FakeControlV1alpha1) Bindings() v1alpha1.BindingInterface {
 	return &FakeBindings{c}
 }
 
-func (c *FakeControlV1alpha1) Placements() v1alpha1.PlacementInterface {
-	return &FakePlacements{c}
+func (c *FakeControlV1alpha1) BindingPolicies() v1alpha1.BindingPolicyInterface {
+	return &FakeBindingPolicies{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

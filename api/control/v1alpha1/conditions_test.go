@@ -44,7 +44,7 @@ func TestAreConditionsEqual(t *testing.T) {
 
 func TestSetCondition(t *testing.T) {
 	// Create a slice of conditions and set a new condition
-	conditions1 := []PlacementCondition{
+	conditions1 := []BindingPolicyCondition{
 		generateCondition("ConditionTypeA", "ReasonA", "MessageA",
 			corev1.ConditionFalse, metav1.Now(), metav1.Now()),
 		generateCondition("ConditionTypeB", "ReasonB", "MessageB",
@@ -54,7 +54,7 @@ func TestSetCondition(t *testing.T) {
 	newCondition := generateCondition("ConditionTypeA", "ReasonAUpdated", "MessageAUpdated",
 		corev1.ConditionTrue, addTime(4), addTime(5))
 
-	expectedConditions := []PlacementCondition{
+	expectedConditions := []BindingPolicyCondition{
 		newCondition,
 		generateCondition("ConditionTypeB", "ReasonB", "MessageB",
 			corev1.ConditionTrue, metav1.Now(), addTime(2)),
@@ -69,13 +69,13 @@ func TestSetCondition(t *testing.T) {
 
 func TestAreConditionSlicesSame(t *testing.T) {
 	// Create two slices of conditions with the same elements in different orders
-	c1 := []PlacementCondition{
+	c1 := []BindingPolicyCondition{
 		generateCondition("ConditionTypeA", "ReasonA", "MessageA",
 			corev1.ConditionFalse, metav1.Now(), metav1.Now()),
 		generateCondition("ConditionTypeB", "ReasonB", "MessageB",
 			corev1.ConditionFalse, metav1.Now(), addTime(2)),
 	}
-	c2 := []PlacementCondition{
+	c2 := []BindingPolicyCondition{
 		generateCondition("ConditionTypeB", "ReasonB", "MessageB",
 			corev1.ConditionFalse, metav1.Now(), addTime(3)),
 		generateCondition("ConditionTypeA", "ReasonA", "MessageA",
@@ -87,13 +87,13 @@ func TestAreConditionSlicesSame(t *testing.T) {
 	}
 
 	// Create two slices of conditions with different elements
-	c3 := []PlacementCondition{
+	c3 := []BindingPolicyCondition{
 		generateCondition("ConditionTypeA", "ReasonA", "MessageA",
 			corev1.ConditionFalse, metav1.Now(), metav1.Now()),
 		generateCondition("ConditionTypeB", "ReasonB", "MessageB",
 			corev1.ConditionTrue, metav1.Now(), addTime(2)),
 	}
-	c4 := []PlacementCondition{
+	c4 := []BindingPolicyCondition{
 		generateCondition("ConditionTypeC", "ReasonC", "MessageC",
 			corev1.ConditionFalse, metav1.Now(), metav1.Now()),
 	}
@@ -103,8 +103,8 @@ func TestAreConditionSlicesSame(t *testing.T) {
 	}
 }
 
-func generateCondition(ctype ConditionType, reason ConditionReason, message string, status corev1.ConditionStatus, ltt, ltu metav1.Time) PlacementCondition {
-	return PlacementCondition{
+func generateCondition(ctype ConditionType, reason ConditionReason, message string, status corev1.ConditionStatus, ltt, ltu metav1.Time) BindingPolicyCondition {
+	return BindingPolicyCondition{
 		Type:               ctype,
 		Status:             status,
 		LastTransitionTime: ltt,
