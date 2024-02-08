@@ -65,7 +65,7 @@ func main() {
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.StringVar(&wdsName, "wds-name", "", "name of the workload description space to connect to")
 	flag.StringVar(&wdsLabel, "wds-label", "", "label of the workload description space to connect to")
-	flag.StringVar(&allowedGroupsString, "api-groups", "", "list of allowed api groups, comma separated. If not specified, all api groups are allowed.")
+	flag.StringVar(&allowedGroupsString, "api-groups", "", "list of allowed api groups, comma separated. Empty string means all API groups are allowed")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")

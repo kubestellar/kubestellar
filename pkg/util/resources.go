@@ -37,6 +37,7 @@ func ParseAPIGroupsString(apiGroups string) sets.Set[string] {
 	for _, g := range strings.Split(apiGroups, ",") {
 		groupsSet.Insert(g)
 	}
+	addRequiredResourceGroups(groupsSet)
 
 	return groupsSet
 }
@@ -47,8 +48,6 @@ func IsAPIGroupAllowed(apiGroup string, allowedAPIGroups sets.Set[string]) bool 
 	if len(allowedAPIGroups) == 0 {
 		return true
 	}
-	addRequiredResourceGroups(allowedAPIGroups)
-
 	return allowedAPIGroups.Has(apiGroup)
 }
 

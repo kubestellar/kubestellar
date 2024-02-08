@@ -17,7 +17,6 @@ limitations under the License.
 package util
 
 import (
-	"reflect"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -33,13 +32,13 @@ func TestParseAPIGroupsString(t *testing.T) {
 	}{
 		{
 			name:     "valid input with api group",
-			input:    "apps, networking.k8s.io, policy",
-			expected: sets.New("apps", "networking.k8s.io", "policy"),
+			input:    "apps,networking.k8s.io,policy",
+			expected: sets.New("apps", "networking.k8s.io", "policy", "control.kubestellar.io"),
 		},
 		{
 			name:     "valid input with empty api group",
-			input:    "apps, ,policy",
-			expected: sets.New("apps", "", "policy"),
+			input:    "apps,,policy",
+			expected: sets.New("apps", "", "policy", "control.kubestellar.io"),
 		},
 		{
 			name:     "empty input",
@@ -54,7 +53,7 @@ func TestParseAPIGroupsString(t *testing.T) {
 			actual := ParseAPIGroupsString(tc.input)
 
 			// Check if the output matches the expected output
-			if !reflect.DeepEqual(actual, tc.expected) {
+			if !actual.Equal(tc.expected) {
 				t.Errorf("expected: %v, got: %v", tc.expected, actual)
 			}
 		})
@@ -80,12 +79,6 @@ func TestIsAPIGroupAllowed(t *testing.T) {
 			name:             "api group is allowed by nil map",
 			resourceGroup:    "apps",
 			allowedAPIGroups: nil,
-			expected:         true,
-		},
-		{
-			name:             "kubestellar resource group is always allowed",
-			resourceGroup:    "control.kubestellar.io",
-			allowedAPIGroups: sets.New("apps", "networking.k8s.io", "policy"),
 			expected:         true,
 		},
 	}
