@@ -43,8 +43,8 @@ const (
 	ReasonReconcilePaused  ConditionReason = "ReconcilePaused"
 )
 
-// PlacementCondition describes the state of a control plane at a certain point.
-type PlacementCondition struct {
+// BindingPolicyCondition describes the state of a bindingpolicy at a certain point.
+type BindingPolicyCondition struct {
 	Type               ConditionType          `json:"type"`
 	Status             corev1.ConditionStatus `json:"status"`
 	LastUpdateTime     metav1.Time            `json:"lastUpdateTime"`
@@ -53,20 +53,20 @@ type PlacementCondition struct {
 	Message            string                 `json:"message"`
 }
 
-// areConditionsEqual compares two PlacementCondition structs and
+// areConditionsEqual compares two BindingPolicyCondition structs and
 // returns true if they are equal (excluding LastTransitionTime and LastUpdateTime),
 // false otherwise.
-func AreConditionsEqual(c1, c2 PlacementCondition) bool {
+func AreConditionsEqual(c1, c2 BindingPolicyCondition) bool {
 	if c1.Type != c2.Type || c1.Status != c2.Status || c1.Reason != c2.Reason || c1.Message != c2.Message {
 		return false
 	}
 	return true
 }
 
-// setCondition sets the supplied PlacementCondition in
+// setCondition sets the supplied BindingPolicyCondition in
 // the given slice of conditions, replacing any existing conditions of
 // the same type. Returns the updated slice of conditions.
-func SetCondition(conditions []PlacementCondition, newCondition PlacementCondition) []PlacementCondition {
+func SetCondition(conditions []BindingPolicyCondition, newCondition BindingPolicyCondition) []BindingPolicyCondition {
 	for i, condition := range conditions {
 		if condition.Type == newCondition.Type {
 			conditions[i] = newCondition
@@ -77,18 +77,18 @@ func SetCondition(conditions []PlacementCondition, newCondition PlacementConditi
 	return conditions
 }
 
-// areConditionSlicesSame compares two slices of PlacementCondition structs and returns true if they are the same (ignoring order and LastTransitionTime and LastUpdateTime), false otherwise.
-func AreConditionSlicesSame(c1, c2 []PlacementCondition) bool {
+// areConditionSlicesSame compares two slices of BindingPolicyCondition structs and returns true if they are the same (ignoring order and LastTransitionTime and LastUpdateTime), false otherwise.
+func AreConditionSlicesSame(c1, c2 []BindingPolicyCondition) bool {
 	if len(c1) != len(c2) {
 		return false
 	}
 
 	// Create maps for the conditions (keyed by Type) in both slices, ignoring LastTransitionTime and LastUpdateTime
-	c1Map := make(map[ConditionType]PlacementCondition)
-	c2Map := make(map[ConditionType]PlacementCondition)
+	c1Map := make(map[ConditionType]BindingPolicyCondition)
+	c2Map := make(map[ConditionType]BindingPolicyCondition)
 
 	for _, condition := range c1 {
-		withoutTimes := PlacementCondition{
+		withoutTimes := BindingPolicyCondition{
 			Type:    condition.Type,
 			Status:  condition.Status,
 			Reason:  condition.Reason,
@@ -98,7 +98,7 @@ func AreConditionSlicesSame(c1, c2 []PlacementCondition) bool {
 	}
 
 	for _, condition := range c2 {
-		withoutTimes := PlacementCondition{
+		withoutTimes := BindingPolicyCondition{
 			Type:    condition.Type,
 			Status:  condition.Status,
 			Reason:  condition.Reason,
@@ -117,17 +117,17 @@ func AreConditionSlicesSame(c1, c2 []PlacementCondition) bool {
 	return true
 }
 
-func EnsureCondition(cp *Placement, newCondition PlacementCondition) {
+func EnsureCondition(cp *BindingPolicy, newCondition BindingPolicyCondition) {
 	if cp.Status.Conditions == nil {
-		cp.Status.Conditions = []PlacementCondition{}
+		cp.Status.Conditions = []BindingPolicyCondition{}
 	}
 	cp.Status.Conditions = SetCondition(cp.Status.Conditions, newCondition)
 }
 
 // Creating returns a condition that indicates the cp is currently
 // being created.
-func ConditionCreating() PlacementCondition {
-	return PlacementCondition{
+func ConditionCreating() BindingPolicyCondition {
+	return BindingPolicyCondition{
 		Type:               TypeReady,
 		Status:             corev1.ConditionFalse,
 		LastTransitionTime: metav1.Now(),
@@ -138,8 +138,8 @@ func ConditionCreating() PlacementCondition {
 
 // Deleting returns a condition that indicates the cp is currently
 // being deleted.
-func ConditionDeleting() PlacementCondition {
-	return PlacementCondition{
+func ConditionDeleting() BindingPolicyCondition {
+	return BindingPolicyCondition{
 		Type:               TypeReady,
 		Status:             corev1.ConditionFalse,
 		LastTransitionTime: metav1.Now(),
@@ -150,8 +150,8 @@ func ConditionDeleting() PlacementCondition {
 
 // Available returns a condition that indicates the resource is
 // currently observed to be available for use.
-func ConditionAvailable() PlacementCondition {
-	return PlacementCondition{
+func ConditionAvailable() BindingPolicyCondition {
+	return BindingPolicyCondition{
 		Type:               TypeReady,
 		Status:             corev1.ConditionTrue,
 		LastTransitionTime: metav1.Now(),
@@ -162,8 +162,8 @@ func ConditionAvailable() PlacementCondition {
 
 // Unavailable returns a condition that indicates the resource is not
 // currently available for use.
-func ConditionUnavailable() PlacementCondition {
-	return PlacementCondition{
+func ConditionUnavailable() BindingPolicyCondition {
+	return BindingPolicyCondition{
 		Type:               TypeReady,
 		Status:             corev1.ConditionFalse,
 		LastTransitionTime: metav1.Now(),
@@ -173,8 +173,8 @@ func ConditionUnavailable() PlacementCondition {
 }
 
 // ReconcileSuccess returns a condition indicating that KubeFlex reconciled the resource
-func ConditionReconcileSuccess() PlacementCondition {
-	return PlacementCondition{
+func ConditionReconcileSuccess() BindingPolicyCondition {
+	return BindingPolicyCondition{
 		Type:               TypeSynced,
 		Status:             corev1.ConditionTrue,
 		LastTransitionTime: metav1.Now(),
@@ -185,8 +185,8 @@ func ConditionReconcileSuccess() PlacementCondition {
 
 // ReconcileError returns a condition indicating that KubeFlex encountered an
 // error while reconciling the resource.
-func ConditionReconcileError(err error) PlacementCondition {
-	return PlacementCondition{
+func ConditionReconcileError(err error) BindingPolicyCondition {
+	return BindingPolicyCondition{
 		Type:               TypeSynced,
 		Status:             corev1.ConditionFalse,
 		LastTransitionTime: metav1.Now(),

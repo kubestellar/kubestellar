@@ -24,10 +24,10 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// Placements returns a PlacementInformer.
-	Placements() PlacementInformer
-	// PlacementDecisions returns a PlacementDecisionInformer.
-	PlacementDecisions() PlacementDecisionInformer
+	// Bindings returns a BindingInformer.
+	Bindings() BindingInformer
+	// BindingPolicies returns a BindingPolicyInformer.
+	BindingPolicies() BindingPolicyInformer
 }
 
 type version struct {
@@ -41,12 +41,12 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// Placements returns a PlacementInformer.
-func (v *version) Placements() PlacementInformer {
-	return &placementInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+// Bindings returns a BindingInformer.
+func (v *version) Bindings() BindingInformer {
+	return &bindingInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// PlacementDecisions returns a PlacementDecisionInformer.
-func (v *version) PlacementDecisions() PlacementDecisionInformer {
-	return &placementDecisionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+// BindingPolicies returns a BindingPolicyInformer.
+func (v *version) BindingPolicies() BindingPolicyInformer {
+	return &bindingPolicyInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

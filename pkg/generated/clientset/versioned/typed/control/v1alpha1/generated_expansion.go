@@ -18,6 +18,6 @@ limitations under the License.
 
 package v1alpha1
 
-type PlacementExpansion interface{}
+type BindingExpansion interface{}
 
-type PlacementDecisionExpansion interface{}
+type BindingPolicyExpansion interface{}

@@ -33,58 +33,58 @@ import (
 	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 )
 
-// PlacementDecisionInformer provides access to a shared informer and lister for
-// PlacementDecisions.
-type PlacementDecisionInformer interface {
+// BindingInformer provides access to a shared informer and lister for
+// Bindings.
+type BindingInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.PlacementDecisionLister
+	Lister() v1alpha1.BindingLister
 }
 
-type placementDecisionInformer struct {
+type bindingInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 }
 
-// NewPlacementDecisionInformer constructs a new informer for PlacementDecision type.
+// NewBindingInformer constructs a new informer for Binding type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewPlacementDecisionInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredPlacementDecisionInformer(client, resyncPeriod, indexers, nil)
+func NewBindingInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredBindingInformer(client, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredPlacementDecisionInformer constructs a new informer for PlacementDecision type.
+// NewFilteredBindingInformer constructs a new informer for Binding type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredPlacementDecisionInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredBindingInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ControlV1alpha1().PlacementDecisions().List(context.TODO(), options)
+				return client.ControlV1alpha1().Bindings().List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ControlV1alpha1().PlacementDecisions().Watch(context.TODO(), options)
+				return client.ControlV1alpha1().Bindings().Watch(context.TODO(), options)
 			},
 		},
-		&controlv1alpha1.PlacementDecision{},
+		&controlv1alpha1.Binding{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *placementDecisionInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredPlacementDecisionInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *bindingInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredBindingInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *placementDecisionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&controlv1alpha1.PlacementDecision{}, f.defaultInformer)
+func (f *bindingInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&controlv1alpha1.Binding{}, f.defaultInformer)
 }
 
-func (f *placementDecisionInformer) Lister() v1alpha1.PlacementDecisionLister {
-	return v1alpha1.NewPlacementDecisionLister(f.Informer().GetIndexer())
+func (f *bindingInformer) Lister() v1alpha1.BindingLister {
+	return v1alpha1.NewBindingLister(f.Informer().GetIndexer())
 }

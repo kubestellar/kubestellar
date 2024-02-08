@@ -5,24 +5,24 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.11.3
   creationTimestamp: null
-  name: placementdecisions.control.kubestellar.io
+  name: bindings.control.kubestellar.io
 spec:
   group: control.kubestellar.io
   names:
-    kind: PlacementDecision
-    listKind: PlacementDecisionList
-    plural: placementdecisions
+    kind: Binding
+    listKind: BindingList
+    plural: bindings
     shortNames:
-    - pd
-    singular: placementdecision
+    - bdg
+    singular: binding
   scope: Cluster
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: PlacementDecision is mapped 1:1 to a single Placement object.
-          The decision resource reflects the resolution of the Placement's selectors,
-          and explicitly reflects which objects should go to what destinations.
+        description: Binding is mapped 1:1 to a single BindingPolicy object. The decision
+          resource reflects the resolution of the BindingPolicy's selectors, and explicitly
+          reflects which objects should go to what destinations.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -38,7 +38,7 @@ spec:
             type: object
           spec:
             description: '`spec` explicitly describes a desired binding between workloads
-              and Locations. It reflects the resolution of a Placement''s selectors.'
+              and Locations. It reflects the resolution of a BindingPolicy''s selectors.'
             properties:
               destinations:
                 description: '`destinations` is a list of cluster-identifiers that

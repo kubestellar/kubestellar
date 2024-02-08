@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package placement
+package binding
 
 import (
 	"context"
@@ -94,7 +94,7 @@ type Controller struct {
 	wdsName       string
 }
 
-// Create a new placement controller
+// Create a new binding controller
 func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config, wdsName string) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
@@ -346,7 +346,7 @@ func (c *Controller) enqueuePlacementDecision(name string) {
 		GVK: schema.GroupVersionKind{
 			Group:   v1alpha1.GroupVersion.Group,
 			Version: v1alpha1.GroupVersion.Version,
-			Kind:    util.PlacementDecisionKind},
+			Kind:    util.BindingKind},
 		NamespacedName: cache.ObjectName{
 			Namespace: metav1.NamespaceNone,
 			Name:      name,

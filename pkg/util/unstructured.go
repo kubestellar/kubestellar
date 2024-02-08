@@ -35,10 +35,10 @@ const (
 	AnyVersion                           = "*"
 	ServiceVersion                       = "v1"
 	ServiceKind                          = "Service"
-	PlacementKind                        = "Placement"
-	PlacementResource                    = "placements"
-	PlacementDecisionKind                = "PlacementDecision"
-	PlacementDecisionResource            = "placementdecisions"
+	BindingPolicyKind                    = "BindingPolicy"
+	BindingPolicyResource                = "bindingpolicies"
+	BindingKind                          = "Binding"
+	BindingResource                      = "bindings"
 	WorkStatusGroup                      = "edge.kubestellar.io" // TODO: update/import after status-addon is rehomed and its api group for WorkStatus is updated
 	WorkStatusVersion                    = "v1alpha1"
 	WorkStatusResource                   = "workstatuses"
@@ -65,7 +65,7 @@ func IsCRD(o interface{}) bool { // CRDs might have different versions. therefor
 }
 
 func IsPlacement(o interface{}) bool {
-	return matchesGVK(o, v1alpha1.GroupVersion.Group, v1alpha1.GroupVersion.Version, PlacementKind)
+	return matchesGVK(o, v1alpha1.GroupVersion.Group, v1alpha1.GroupVersion.Version, BindingPolicyKind)
 }
 
 func IsService(o interface{}) bool {

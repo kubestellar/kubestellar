@@ -26,44 +26,44 @@ import (
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
-// PlacementLister helps list Placements.
+// BindingLister helps list Bindings.
 // All objects returned here must be treated as read-only.
-type PlacementLister interface {
-	// List lists all Placements in the indexer.
+type BindingLister interface {
+	// List lists all Bindings in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Placement, err error)
-	// Get retrieves the Placement from the index for a given name.
+	List(selector labels.Selector) (ret []*v1alpha1.Binding, err error)
+	// Get retrieves the Binding from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.Placement, error)
-	PlacementListerExpansion
+	Get(name string) (*v1alpha1.Binding, error)
+	BindingListerExpansion
 }
 
-// placementLister implements the PlacementLister interface.
-type placementLister struct {
+// bindingLister implements the BindingLister interface.
+type bindingLister struct {
 	indexer cache.Indexer
 }
 
-// NewPlacementLister returns a new PlacementLister.
-func NewPlacementLister(indexer cache.Indexer) PlacementLister {
-	return &placementLister{indexer: indexer}
+// NewBindingLister returns a new BindingLister.
+func NewBindingLister(indexer cache.Indexer) BindingLister {
+	return &bindingLister{indexer: indexer}
 }
 
-// List lists all Placements in the indexer.
-func (s *placementLister) List(selector labels.Selector) (ret []*v1alpha1.Placement, err error) {
+// List lists all Bindings in the indexer.
+func (s *bindingLister) List(selector labels.Selector) (ret []*v1alpha1.Binding, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Placement))
+		ret = append(ret, m.(*v1alpha1.Binding))
 	})
 	return ret, err
 }
 
-// Get retrieves the Placement from the index for a given name.
-func (s *placementLister) Get(name string) (*v1alpha1.Placement, error) {
+// Get retrieves the Binding from the index for a given name.
+func (s *bindingLister) Get(name string) (*v1alpha1.Binding, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("placement"), name)
+		return nil, errors.NewNotFound(v1alpha1.Resource("binding"), name)
 	}
-	return obj.(*v1alpha1.Placement), nil
+	return obj.(*v1alpha1.Binding), nil
 }

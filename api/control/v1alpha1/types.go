@@ -20,8 +20,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// PlacementSpec defines the desired state of Placement
-type PlacementSpec struct {
+// BindingPolicySpec defines the desired state of BindingPolicy
+type BindingPolicySpec struct {
 	// `clusterSelectors` identifies the relevant Cluster objects in terms of their labels.
 	// A Cluster is relevant if and only if it passes any of the LabelSelectors in this field.
 	ClusterSelectors []metav1.LabelSelector `json:"clusterSelectors,omitempty"`
@@ -29,14 +29,14 @@ type PlacementSpec struct {
 	// We agreed not to expose NumberOfClusters in release 0.20, to avoid confusions.
 	// We may or may not support it in later releases per future discussions.
 	// NumberOfClusters represents the desired number of ManagedClusters to be selected which meet the
-	// placement requirements.
-	// 1) If not specified, all Clusters which meet the placement requirements will be selected;
-	// 2) Otherwise if the number of Clusters meet the placement requirements is larger than
+	// BindingPolicy's requirements.
+	// 1) If not specified, all Clusters which meet the BindingPolicy's requirements will be selected;
+	// 2) Otherwise if the number of Clusters meet the BindingPolicy's requirements is larger than
 	//    NumberOfClusters, a random subset with desired number of ManagedClusters will be selected;
-	// 3) If the number of Clusters meet the placement requirements is equal to NumberOfClusters,
+	// 3) If the number of Clusters meet the BindingPolicy's requirements is equal to NumberOfClusters,
 	//    all of them will be selected;
-	// 4) If the number of Clusters meet the placement requirements is less than NumberOfClusters,
-	//    all of them will be selected, and the status of condition `PlacementConditionSatisfied` will be
+	// 4) If the number of Clusters meet the BindingPolicy's requirements is less than NumberOfClusters,
+	//    all of them will be selected, and the status of condition `BindingPolicyConditionSatisfied` will be
 	//    set to false;
 	// +optional
 	// NumberOfClusters *int32 `json:"numberOfClusters,omitempty"`
@@ -49,19 +49,19 @@ type PlacementSpec struct {
 	// WantSingletonReportedState indicates that (a) the number of selected locations is intended
 	// to be 1 and (b) the reported state of each downsynced object should be returned back to
 	// the object in this space.
-	// When multiple Placement objects match the same workload object,
+	// When multiple BindingPolicy objects match the same workload object,
 	// the OR of these booleans rules.
 	// +optional
 	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
-// PlacementStatus defines the observed state of Placement
-type PlacementStatus struct {
-	Conditions         []PlacementCondition `json:"conditions"`
-	ObservedGeneration int64                `json:"observedGeneration"`
+// BindingPolicyStatus defines the observed state of BindingPolicy
+type BindingPolicyStatus struct {
+	Conditions         []BindingPolicyCondition `json:"conditions"`
+	ObservedGeneration int64                    `json:"observedGeneration"`
 }
 
-// Placement is the Schema for the placementpolicies API
+// BindingPolicy defines in which ways the workload objects ('what') and the destinations ('where') are bound together.
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:object:root=true
@@ -70,13 +70,13 @@ type PlacementStatus struct {
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="TYPE",type="string",JSONPath=".spec.type"
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
-// +kubebuilder:resource:scope=Cluster,shortName={pl,pls}
-type Placement struct {
+// +kubebuilder:resource:scope=Cluster,shortName={bp}
+type BindingPolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   PlacementSpec   `json:"spec,omitempty"`
-	Status PlacementStatus `json:"status,omitempty"`
+	Spec   BindingPolicySpec   `json:"spec,omitempty"`
+	Status BindingPolicyStatus `json:"status,omitempty"`
 }
 
 const (
@@ -95,12 +95,12 @@ const (
 
 	ValidationErrorKeyPrefix string = "validation-error.kubestellar.io/"
 
-	// PlacementConditionSatisfied means Placement requirements are satisfied.
-	// A placement is not satisfied only if the set of selected clusters is empty
-	PlacementConditionSatisfied string = "PlacementSatisfied"
+	// BindingPolicyConditionSatisfied means BindingPolicy requirements are satisfied.
+	// A BindingPolicy is not satisfied only if the set of selected clusters is empty
+	BindingPolicyConditionSatisfied string = "BindingPolicySatisfied"
 
-	// PlacementConditionMisconfigured means Placement configuration is incorrect.
-	PlacementConditionMisconfigured string = "PlacementMisconfigured"
+	// BindingPolicyConditionMisconfigured means BindingPolicy configuration is incorrect.
+	BindingPolicyConditionMisconfigured string = "BindingPolicyMisconfigured"
 )
 
 // DownsyncObjectTest is a set of criteria that characterize matching objects.
@@ -161,22 +161,22 @@ type DownsyncObjectTest struct {
 
 // +kubebuilder:object:root=true
 
-// PlacementList contains a list of Placement
-type PlacementList struct {
+// BindingPolicyList contains a list of BindingPolicies
+type BindingPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Placement `json:"items"`
+	Items           []BindingPolicy `json:"items"`
 }
 
-// PlacementDecision is mapped 1:1 to a single Placement object.
-// The decision resource reflects the resolution of the Placement's selectors,
+// Binding is mapped 1:1 to a single BindingPolicy object.
+// The decision resource reflects the resolution of the BindingPolicy's selectors,
 // and explicitly reflects which objects should go to what destinations.
 //
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:scope=Cluster,shortName={pd}
-type PlacementDecision struct {
+// +kubebuilder:resource:scope=Cluster,shortName={bdg}
+type Binding struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -184,14 +184,14 @@ type PlacementDecision struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// `spec` explicitly describes a desired binding between workloads and Locations.
-	// It reflects the resolution of a Placement's selectors.
-	Spec PlacementDecisionSpec `json:"spec,omitempty"`
+	// It reflects the resolution of a BindingPolicy's selectors.
+	Spec BindingSpec `json:"spec,omitempty"`
 }
 
-// PlacementDecisionSpec holds a list of objects and a list of destinations which are the resolution
-// of a Placement's `what` and `where`: what objects to propagate and to where.
+// BindingSpec holds a list of objects and a list of destinations which are the resolution
+// of a BindingPolicy's `what` and `where`: what objects to propagate and to where.
 // All objects present in this spec are propagated to all destinations present.
-type PlacementDecisionSpec struct {
+type BindingSpec struct {
 	// `Workload` is a collection of namespaced-scoped objects and a collection of cluster-scoped objects to be propagated to destination clusters.
 	Workload DownsyncObjectReferences `json:"workload,omitempty"`
 
@@ -267,19 +267,19 @@ type Destination struct {
 	ClusterId string `json:"clusterId,omitempty"`
 }
 
-// PlacementDecisionList is the API type for a list of PlacementDecision
+// BindingList is the API type for a list of Binding
 //
 // +kubebuilder:object:root=true
-type PlacementDecisionList struct {
+type BindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []PlacementDecision `json:"items"`
+	Items           []Binding `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Placement{}, &PlacementList{})
-	SchemeBuilder.Register(&PlacementDecision{}, &PlacementDecisionList{})
+	SchemeBuilder.Register(&BindingPolicy{}, &BindingPolicyList{})
+	SchemeBuilder.Register(&Binding{}, &BindingList{})
 }

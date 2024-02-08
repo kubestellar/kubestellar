@@ -5,17 +5,16 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.11.3
   creationTimestamp: null
-  name: placements.control.kubestellar.io
+  name: bindingpolicies.control.kubestellar.io
 spec:
   group: control.kubestellar.io
   names:
-    kind: Placement
-    listKind: PlacementList
-    plural: placements
+    kind: BindingPolicy
+    listKind: BindingPolicyList
+    plural: bindingpolicies
     shortNames:
-    - pl
-    - pls
-    singular: placement
+    - bp
+    singular: bindingpolicy
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -34,7 +33,8 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Placement is the Schema for the placementpolicies API
+        description: BindingPolicy defines in which ways the workload objects ('what')
+          and the destinations ('where') are bound together.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -49,7 +49,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: PlacementSpec defines the desired state of Placement
+            description: BindingPolicySpec defines the desired state of BindingPolicy
             properties:
               clusterSelectors:
                 description: '`clusterSelectors` identifies the relevant Cluster objects
@@ -271,17 +271,17 @@ spec:
                 description: WantSingletonReportedState indicates that (a) the number
                   of selected locations is intended to be 1 and (b) the reported state
                   of each downsynced object should be returned back to the object
-                  in this space. When multiple Placement objects match the same workload
-                  object, the OR of these booleans rules.
+                  in this space. When multiple BindingPolicy objects match the same
+                  workload object, the OR of these booleans rules.
                 type: boolean
             type: object
           status:
-            description: PlacementStatus defines the observed state of Placement
+            description: BindingPolicyStatus defines the observed state of BindingPolicy
             properties:
               conditions:
                 items:
-                  description: PlacementCondition describes the state of a control
-                    plane at a certain point.
+                  description: BindingPolicyCondition describes the state of a bindingpolicy
+                    at a certain point.
                   properties:
                     lastTransitionTime:
                       format: date-time

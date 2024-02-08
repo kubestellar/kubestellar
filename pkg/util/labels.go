@@ -35,14 +35,14 @@ const (
 	PlacementLabelSingletonStatus = "managed-by.kubestellar.io/singletonstatus"
 )
 
-func GetPlacementListerKey() string {
+func GetBindingPolicyListerKey() string {
 	return KeyForGroupVersionKind(v1alpha1.GroupVersion.Group,
-		v1alpha1.GroupVersion.Version, PlacementKind)
+		v1alpha1.GroupVersion.Version, BindingPolicyKind)
 }
 
-func GetPlacementDecisionListerKey() string {
+func GetBindingListerKey() string {
 	return KeyForGroupVersionKind(v1alpha1.GroupVersion.Group,
-		v1alpha1.GroupVersion.Version, PlacementDecisionKind)
+		v1alpha1.GroupVersion.Version, BindingKind)
 }
 
 func SetManagedByPlacementLabels(obj metav1.Object, wdsName string, managedByPlacements []string, singletonStatus bool) {

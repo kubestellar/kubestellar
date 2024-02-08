@@ -57,17 +57,17 @@ jobs:
         if: always()
         run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
 
-      - name: show placements
+      - name: show bindingpolicies
         if: always()
-        run: kubectl --context wds1 get placements -o yaml
+        run: kubectl --context wds1 get bindingpolicies.control.kubestellar.io -o yaml
 
       - name: show deployments
         if: always()
         run: kubectl --context wds1 get deployments -A -o yaml
 
-      - name: show placementdecisions
+      - name: show bindings
         if: always()
-        run: kubectl --context wds1 get placementdecisions -o yaml
+        run: kubectl --context wds1 get bindings.control.kubestellar.io -o yaml
 
       - name: show manifestworks
         if: always()
