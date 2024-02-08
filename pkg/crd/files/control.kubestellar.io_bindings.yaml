@@ -13,7 +13,7 @@ spec:
     listKind: BindingList
     plural: bindings
     shortNames:
-    - bd
+    - bdg
     singular: binding
   scope: Cluster
   versions:

@@ -43,7 +43,7 @@ const (
 	ReasonReconcilePaused  ConditionReason = "ReconcilePaused"
 )
 
-// BindingPolicyCondition describes the state of a control plane at a certain point.
+// BindingPolicyCondition describes the state of a bindingpolicy at a certain point.
 type BindingPolicyCondition struct {
 	Type               ConditionType          `json:"type"`
 	Status             corev1.ConditionStatus `json:"status"`

@@ -61,7 +61,7 @@ type BindingPolicyStatus struct {
 	ObservedGeneration int64                    `json:"observedGeneration"`
 }
 
-// BindingPolicy defines in which ways the workloads ('what') and the destinations ('where') are bound together.
+// BindingPolicy defines in which ways the workload objects ('what') and the destinations ('where') are bound together.
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:object:root=true
@@ -175,7 +175,7 @@ type BindingPolicyList struct {
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:scope=Cluster,shortName={bd}
+// +kubebuilder:resource:scope=Cluster,shortName={bdg}
 type Binding struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata.

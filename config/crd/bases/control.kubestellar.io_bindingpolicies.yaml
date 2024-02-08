@@ -33,8 +33,8 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: BindingPolicy defines in which ways the workloads ('what') and
-          the destinations ('where') are bound together.
+        description: BindingPolicy defines in which ways the workload objects ('what')
+          and the destinations ('where') are bound together.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -280,8 +280,8 @@ spec:
             properties:
               conditions:
                 items:
-                  description: BindingPolicyCondition describes the state of a control
-                    plane at a certain point.
+                  description: BindingPolicyCondition describes the state of a bindingpolicy
+                    at a certain point.
                   properties:
                     lastTransitionTime:
                       format: date-time
