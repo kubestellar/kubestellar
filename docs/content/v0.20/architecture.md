@@ -498,7 +498,7 @@ implementations of the transport interface. In order to implement transport plug
 The above list is required in order to comply with [<u>SIG Multi-Cluster Work API</u>](https://multicluster.sigs.k8s.io/concepts/work-api/).
 
 In order to implement a KubeStellar transport plugin, one has to implement code that supplies a function to wrap any number of objects into a single wrapped objects. 
-The transport tnterface that should be implemented can be seen [here](https://github.com/kubestellar/kubestellar/blob/main/pkg/transport/transport.go).  
+The transport interface that should be implemented can be seen [here](https://github.com/kubestellar/kubestellar/blob/main/pkg/transport/transport.go).  
 KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project [Open Cluster Management](https://open-cluster-management.io). OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available [here](https://github.com/kubestellar/ocm-transport-plugin).  
 We expect to have more transport plugin options in the future.
 
