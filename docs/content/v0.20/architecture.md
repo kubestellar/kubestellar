@@ -1,8 +1,5 @@
 **NOTE**: Current code is in a transition to a new design that decouples transport from placement (more about this below). As part of this transition, a new resource was added to KubeStellar called `PlacementDecision`. This resource matches the `Placement` object (1:1 relationship) in the WDS and contains references to the concrete workload objects and references to the concrete list of clusters that were selected by the placement selectors. 
 
-**NOTE2**: It was decided by the community to rename `Placement` -> `BindingPolicy` and `PlacementDecision` -> `Binding`.  
-This document uses the new terminology `BindingPolicy` for the resource that was called previously `Placement`, so on every place `BindingPolicy` is mentioned in this doc, we mean `Placement` as it was used up until today. We also use `Binding` when we mean `PlacementDecision` as described in previous note.
-
 # KubeStellar Architecture
 
 KubeStellar provides multi-cluster deployment of Kubernetes objects, controlled by simple `BindingPolicy` objects, where Kubernetes objects are expressed in their native format with no wrapping or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.
@@ -71,7 +68,7 @@ and updates *WorkStatus* objects in the ITS namespace associated with the WEC.
 
 ## KubeStellar Controller Manager
 
-This module manages binding controller (a.k.a placement controller before the rename mentioned at the very beginning of this doc) and status controller. The binding controller watches `BindingPolicy` and workload objects on the Workload Definition Space (WDS) and and maintains in the Inventory and Transport Space (ITS) a wrapped object per workload object to be delivered. The status controller watches for *WorkStatus* objects on the ITS and updates the 
+This module manages binding controller and status controller. The binding controller watches `BindingPolicy` and workload objects on the Workload Definition Space (WDS) and and maintains in the Inventory and Transport Space (ITS) a wrapped object per workload object to be delivered. The status controller watches for *WorkStatus* objects on the ITS and updates the
 status of objects in the WDS when singleton status is requested in the `BindingPolicy` for those objects. 
 There is one instance of a KubeStellar Controller Manager for each WDS. Currently this controller-manager runs in the KubeFlex hosting cluster and is responsible of installing the required CRDs in the associated WDS.
 More details on the internals of this module are provided in [KubeStellar Controllers Architecture](#kubestellar-controllers-architecture).
@@ -246,7 +243,7 @@ as part of the decoupling of transport from binding as described above, the foll
 so after the described change, we will have three controllers in the KubeStellar controller
 manager: the binding controller, the transport controller and the status controllor.
 
-### Binding Controller (a.k.a. Placement Controller)
+### Binding Controller
 
 The Binding controller is responsible for watching workload objects and 
 `BindingPolicy` objects, and wrapping and delivering objects to the ITS
@@ -258,8 +255,8 @@ illustrated in Figure 3 (some details might be omitted to make the flow easier
 to understand). Once the planned change that is describe in this document is integrated we will update this figure accordingly.
 
 <figure>
-  <img src="./images/placement-controller.png"  alt="Placement Controller">
-  <figcaption align="center">Figure 3 - Placement Controller</figcaption>
+  <img src="./images/binding-controller.png"  alt="Binding Controller">
+  <figcaption align="center">Figure 3 - Binding Controller</figcaption>
 </figure>
 
 At startup, the controller code sets up the dynamic informers, the event
