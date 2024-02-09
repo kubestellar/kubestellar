@@ -31,6 +31,14 @@ kflex init --create-kind $disable_chatty_status
 
 :
 : -------------------------------------------------------------------------
+: Install the post-create-hooks for ocm and kubstellar controller manager
+:
+kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/ocm.yaml
+kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/kubestellar.yaml
+: Kubestellar post-create-hooks applied.
+
+:
+: -------------------------------------------------------------------------
 : 'Create an inventory & mailbox space of type vcluster running OCM (Open Cluster Management) directly in KubeFlex. Note that -p ocm runs a post-create hook on the vcluster control plane which installs OCM on it.'
 :
 kflex create imbs1 --type vcluster -p ocm $disable_chatty_status
