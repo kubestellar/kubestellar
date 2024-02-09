@@ -74,7 +74,7 @@ var excludedResourceNames = map[string]bool{
 	"endpoints":            true,
 }
 
-const placementDecisionQueueingDelay = 2 * time.Second
+const bindingQueueingDelay = 2 * time.Second
 
 // Controller watches all objects, finds associated placements, when matched a placement wraps and
 // places objects into mailboxes
@@ -338,7 +338,7 @@ func (c *Controller) enqueueObject(obj interface{}, skipCheckIsDeleted bool) {
 	c.workqueue.Add(key)
 }
 
-func (c *Controller) enqueuePlacementDecision(name string) {
+func (c *Controller) enqueueBinding(name string) {
 	c.workqueue.AddAfter(util.Key{
 		GVK: schema.GroupVersionKind{
 			Group:   v1alpha1.GroupVersion.Group,
@@ -349,7 +349,7 @@ func (c *Controller) enqueuePlacementDecision(name string) {
 			Name:      name,
 		},
 		DeletedObject: nil,
-	}, placementDecisionQueueingDelay) // this resource can have bursts of
+	}, bindingQueueingDelay) // this resource can have bursts of
 	// updates due to being updated by multiple workload-objects getting
 	// processed concurrently at a high rate.
 }
@@ -416,11 +416,11 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 	var obj runtime.Object
 	var err error
-	// special handling for placement-decision resource as it is the only
+	// special handling for binding resource as it is the only
 	// resource that is queued directly as key, without necessarily first
 	// existing as an object.
-	if util.KeyIsForPlacementDecision(key) {
-		return c.syncPlacementDecision(ctx, key) // this function logs through all its exits
+	if util.KeyIsForBinding(key) {
+		return c.syncBinding(ctx, key) // this function logs through all its exits
 	}
 
 	if key.DeletedObject == nil {

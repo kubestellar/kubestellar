@@ -51,7 +51,7 @@ const (
 //  1. if placement is not being deleted:
 //
 //     - update the (where) resolution of the placement and queue the
-//     associated placement decision for syncing.
+//     associated binding for syncing.
 //
 //     - requeue workload objects to account for changes in placement
 //
@@ -77,13 +77,13 @@ func (c *Controller) handlePlacement(ctx context.Context, obj runtime.Object) er
 			return err
 		}
 
-		// note placement decision in resolver in case it isn't associated with
+		// note placement in resolver in case it isn't associated with
 		// any resolution
 		c.placementResolver.NotePlacement(placement)
-		// set destinations and enqueue placement-decision for syncing
+		// set destinations and enqueue binding for syncing
 		c.placementResolver.SetDestinations(placement.GetName(), clusterSet)
 		c.logger.V(4).Info("enqueued Binding for syncing, while handling BindingPolicy", "name", placement.Name)
-		c.enqueuePlacementDecision(placement.GetName())
+		c.enqueueBinding(placement.GetName())
 
 		// requeue objects for re-evaluation
 		if err := c.requeueForPlacementChanges(); err != nil {
@@ -108,7 +108,7 @@ func (c *Controller) requeueForPlacementChanges() error {
 	}
 
 	// requeue all objects to account for changes in placement.
-	// this does not include placement/placement-decision objects.
+	// this does not include bindingpolicy/binding objects.
 	return c.requeueWorkloadObjects()
 }
 
@@ -153,7 +153,7 @@ func runtimeObjectToPlacement(obj runtime.Object) (*v1alpha1.BindingPolicy, erro
 // added or a placement is updated
 func (c *Controller) requeueWorkloadObjects() error {
 	for key, lister := range c.listers {
-		// do not requeue placement or placement-decisions
+		// do not requeue bindingpolicies or bindings
 		if key == util.GetBindingPolicyListerKey() || key == util.GetBindingListerKey() {
 			fmt.Printf("Matched key %s\n", key)
 			continue

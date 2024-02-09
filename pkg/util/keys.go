@@ -138,7 +138,7 @@ func EmptyUnstructuredObjectFromKey(key Key) *unstructured.Unstructured {
 	return obj
 }
 
-func KeyIsForPlacementDecision(key Key) bool {
+func KeyIsForBinding(key Key) bool {
 	if key.GVK.Group == v1alpha1.SchemeGroupVersion.Group &&
 		key.GVK.Kind == BindingKind {
 		return true

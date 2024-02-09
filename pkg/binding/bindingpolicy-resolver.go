@@ -34,32 +34,32 @@ const placementResolutionNotFoundErrorPrefix = "placement resolution is not foun
 // A PlacementResolver holds a collection of placement resolutions.
 // The collection is indexed by placementKey string, the resolver does not
 // care what the strings are. The resolution for a given key can be updated,
-// exported and compared to the PlacementDecision representation.
+// exported and compared to the Binding representation.
 // All functions in this interface are thread-safe, and nothing mutates any
 // method-parameter during a call to one of them.
 type PlacementResolver interface {
-	// GeneratePlacementDecision returns the placement decision for the given
+	// GenerateBinding returns the binding for the given
 	// placement key. This function can fail due to internal caches temporarily being
 	// out of sync.
 	//
 	// If no resolution is associated with the given key, an error is returned.
-	GeneratePlacementDecision(placementKey string) (*v1alpha1.BindingSpec, error)
+	GenerateBinding(placementKey string) (*v1alpha1.BindingSpec, error)
 	// GetOwnerReference returns the owner reference for the given placement key.
 	// If no resolution is associated with the given key, an error is returned.
 	GetOwnerReference(placementKey string) (metav1.OwnerReference, error)
-	// ComparePlacementDecision compares the given placement decision spec
-	// with the maintained placement decision for the given placement key.
+	// CompareBinding compares the given binding spec
+	// with the maintained binding for the given placement key.
 	// The returned value is true only if:
 	//
-	// - The destinations in the PlacementDecisionSpec are an exact match
+	// - The destinations in the BindingSpec are an exact match
 	//of those in the resolution.
 	//
 	// - The same is true for every selected object.
 	//
 	// It is possible to output a false negative due to a temporary state of
 	// internal caches being out of sync.
-	ComparePlacementDecision(placementKey string,
-		placementDecisionSpec *v1alpha1.BindingSpec) bool
+	CompareBinding(placementKey string,
+		bindingSpec *v1alpha1.BindingSpec) bool
 
 	// NotePlacement associates a new resolution with the given placement,
 	// if none is associated.
@@ -103,11 +103,11 @@ type placementResolver struct {
 	placementToResolution map[string]*placementResolution
 }
 
-// GeneratePlacementDecision returns the placement decision for the given
+// GenerateBinding returns the binding for the given
 // placement key. If a key is not associated to a resolution, the latter is
 // created. This function can fail due to internal caches temporarily being
 // out of sync.
-func (resolver *placementResolver) GeneratePlacementDecision(placementKey string) (
+func (resolver *placementResolver) GenerateBinding(placementKey string) (
 	*v1alpha1.BindingSpec, error) {
 	placementResolution := resolver.getResolution(placementKey) // thread-safe
 
@@ -115,14 +115,14 @@ func (resolver *placementResolver) GeneratePlacementDecision(placementKey string
 		return nil, fmt.Errorf("%s - placement-key: %s", placementResolutionNotFoundErrorPrefix, placementKey)
 	}
 
-	placementDecisionSpec, err := placementResolution.toPlacementDecisionSpec(resolver.gvkGvrMapper)
+	bindingSpec, err := placementResolution.toBindingSpec(resolver.gvkGvrMapper)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to create PlacementDecisionSpec for placement %v: %w",
+		return nil, fmt.Errorf("failed to create BindingSpec for placement %v: %w",
 			placementKey, err)
 	}
 
-	return placementDecisionSpec, nil
+	return bindingSpec, nil
 }
 
 // GetOwnerReference returns the owner reference for the given placement key.
@@ -137,26 +137,26 @@ func (resolver *placementResolver) GetOwnerReference(placementKey string) (metav
 	return *placementResolution.ownerReference, nil
 }
 
-// ComparePlacementDecision compares the given placement decision spec
-// with the maintained placement decision for the given placement key.
+// CompareBinding compares the given binding spec
+// with the maintained binding for the given placement key.
 // The returned value is true only if:
 //
-// - The destinations in the PlacementDecisionSpec are an exact match
+// - The destinations in the BindingSpec are an exact match
 // of those in the resolution.
 //
 // - The same is true for every selected object.
 //
 // It is possible to output a false negative due to a temporary state of
 // internal caches being out of sync.
-func (resolver *placementResolver) ComparePlacementDecision(placementKey string,
-	placementDecisionSpec *v1alpha1.BindingSpec) bool {
+func (resolver *placementResolver) CompareBinding(placementKey string,
+	bindingSpec *v1alpha1.BindingSpec) bool {
 	placementResolution := resolver.getResolution(placementKey) // thread-safe
 
 	if placementResolution == nil {
 		return false
 	}
 
-	return placementResolution.matchesPlacementDecisionSpec(placementDecisionSpec, resolver.gvkGvrMapper)
+	return placementResolution.matchesBindingSpec(bindingSpec, resolver.gvkGvrMapper)
 }
 
 // NotePlacement associates a new resolution with the given placement,

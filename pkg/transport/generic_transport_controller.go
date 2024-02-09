@@ -48,13 +48,13 @@ import (
 const (
 	ControllerName                  = "transport-controller"
 	transportFinalizer              = "transport.kubestellar.io/object-cleanup"
-	originOwnerReferenceLabel       = "transport.kubestellar.io/originOwnerReferencePlacementDecisionKey"
+	originOwnerReferenceLabel       = "transport.kubestellar.io/originOwnerReferenceBindingKey"
 	originWdsLabel                  = "transport.kubestellar.io/originWdsName"
-	originOwnerGenerationAnnotation = "transport.kubestellar.io/originOwnerReferencePlacementDecisionGeneration"
+	originOwnerGenerationAnnotation = "transport.kubestellar.io/originOwnerReferenceBindingGeneration"
 )
 
 // NewTransportController returns a new transport controller
-func NewTransportController(ctx context.Context, placementDecisionInformer controlv1alpha1informers.BindingInformer, transport Transport,
+func NewTransportController(ctx context.Context, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
 	wdsClientset ksclientset.Interface, wdsDynamicClient dynamic.Interface, transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface, wdsName string) (*genericTransportController, error) {
 	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
@@ -67,28 +67,28 @@ func NewTransportController(ctx context.Context, placementDecisionInformer contr
 	wrappedObjectGenericInformer := dynamicInformerFactory.ForResource(wrappedObjectGVR)
 
 	transportController := &genericTransportController{
-		logger:                          klog.FromContext(ctx),
-		bindingLister:                   placementDecisionInformer.Lister(),
-		placementDecisionInformerSynced: placementDecisionInformer.Informer().HasSynced,
-		wrappedObjectInformerSynced:     wrappedObjectGenericInformer.Informer().HasSynced,
-		workqueue:                       workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
-		transport:                       transport,
-		transportClient:                 transportDynamicClient,
-		wrappedObjectGVR:                wrappedObjectGVR,
-		wdsClientset:                    wdsClientset,
-		wdsDynamicClient:                wdsDynamicClient,
-		wdsName:                         wdsName,
+		logger:                      klog.FromContext(ctx),
+		bindingLister:               bindingInformer.Lister(),
+		bindingInformerSynced:       bindingInformer.Informer().HasSynced,
+		wrappedObjectInformerSynced: wrappedObjectGenericInformer.Informer().HasSynced,
+		workqueue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
+		transport:                   transport,
+		transportClient:             transportDynamicClient,
+		wrappedObjectGVR:            wrappedObjectGVR,
+		wdsClientset:                wdsClientset,
+		wdsDynamicClient:            wdsDynamicClient,
+		wdsName:                     wdsName,
 	}
 
 	transportController.logger.Info("Setting up event handlers")
-	// Set up an event handler for when PlacementDecision resources change
-	placementDecisionInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    transportController.enqueuePlacementDecision,
-		UpdateFunc: func(_, new interface{}) { transportController.enqueuePlacementDecision(new) },
-		DeleteFunc: transportController.enqueuePlacementDecision,
+	// Set up an event handler for when Binding resources change
+	bindingInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    transportController.enqueueBinding,
+		UpdateFunc: func(_, new interface{}) { transportController.enqueueBinding(new) },
+		DeleteFunc: transportController.enqueueBinding,
 	})
-	// Set up event handlers for when WrappedObject resources change. The handlers will lookup the origin PlacementDecision
-	// of the given WrappedObject and enqueue that PlacementDecision object for processing.
+	// Set up event handlers for when WrappedObject resources change. The handlers will lookup the origin Binding
+	// of the given WrappedObject and enqueue that Binding object for processing.
 	// This way, we don't need to implement custom logic for handling WrappedObject resources. More info on this pattern:
 	// https://github.com/kubernetes/community/blob/8cafef897a22026d42f5e5bb3f104febe7e29830/contributors/devel/controllers.md
 	wrappedObjectGenericInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -129,9 +129,9 @@ func getGvrFromWrappedObject(clientset kubernetes.Interface, wrappedObject runti
 type genericTransportController struct {
 	logger logr.Logger
 
-	bindingLister                   controlv1alpha1listers.BindingLister
-	placementDecisionInformerSynced cache.InformerSynced
-	wrappedObjectInformerSynced     cache.InformerSynced
+	bindingLister               controlv1alpha1listers.BindingLister
+	bindingInformerSynced       cache.InformerSynced
+	wrappedObjectInformerSynced cache.InformerSynced
 
 	// workqueue is a rate limited work queue.
 	// This is used to queue work to be processed instead of performing it as soon as a change happens.
@@ -148,14 +148,14 @@ type genericTransportController struct {
 	wdsName          string
 }
 
-// enqueuePlacementDecision takes an PlacementDecision resource and
+// enqueueBinding takes an Binding resource and
 // converts it into a namespace/name string which is put onto the workqueue.
-// This func *shouldn't* handle any resource other than PlacementDecision.
-func (c *genericTransportController) enqueuePlacementDecision(obj interface{}) {
+// This func *shouldn't* handle any resource other than Binding.
+func (c *genericTransportController) enqueueBinding(obj interface{}) {
 	var key string
 	var err error
 	if key, err = cache.DeletionHandlingMetaNamespaceKeyFunc(obj); err != nil {
-		c.logger.Error(err, "failed to enqueue PlacementDecision object")
+		c.logger.Error(err, "failed to enqueue Binding object")
 		return
 	}
 
@@ -163,24 +163,24 @@ func (c *genericTransportController) enqueuePlacementDecision(obj interface{}) {
 }
 
 // handleWrappedObject takes transport-specific wrapped object resource,
-// extracts the origin PlacementDecision of the given wrapped object and
-// enqueue that PlacementDecision object for processing. This way, we
+// extracts the origin Binding of the given wrapped object and
+// enqueue that Binding object for processing. This way, we
 // don't need to implement custom logic for handling WrappedObject resources.
 // More info on this pattern here:
 // https://github.com/kubernetes/community/blob/8cafef897a22026d42f5e5bb3f104febe7e29830/contributors/devel/controllers.md
 func (c *genericTransportController) handleWrappedObject(obj interface{}) {
 	wrappedObject := obj.(metav1.Object)
-	ownerPlacementDecisionKey, found := wrappedObject.GetLabels()[originOwnerReferenceLabel] // safe if GetLabels() returns nil
+	ownerBindingKey, found := wrappedObject.GetLabels()[originOwnerReferenceLabel] // safe if GetLabels() returns nil
 	if !found {
-		c.logger.Info("failed to extract placementdecision key from wrapped object", "Name", wrappedObject.GetName(),
+		c.logger.Info("failed to extract binding key from wrapped object", "Name", wrappedObject.GetName(),
 			"Namespace", wrappedObject.GetNamespace())
 		return
 	}
 
-	// enqueue PlacementDecision key to trigger reconciliation.
-	// if wrapped object was created not as a result of PlacementDecision,
+	// enqueue Binding key to trigger reconciliation.
+	// if wrapped object was created not as a result of Binding,
 	// the required annotation won't be found and nothing will happen.
-	c.workqueue.Add(ownerPlacementDecisionKey)
+	c.workqueue.Add(ownerBindingKey)
 }
 
 // Run will set up the event handlers for types we are interested in, as well
@@ -196,12 +196,12 @@ func (c *genericTransportController) Run(ctx context.Context, workersCount int) 
 	// Wait for the caches to be synced before starting workers
 	c.logger.Info("waiting for informer caches to sync")
 
-	if ok := cache.WaitForCacheSync(ctx.Done(), c.placementDecisionInformerSynced, c.wrappedObjectInformerSynced); !ok {
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.bindingInformerSynced, c.wrappedObjectInformerSynced); !ok {
 		return fmt.Errorf("failed to wait for caches to sync")
 	}
 
 	c.logger.Info("starting workers", "count", workersCount)
-	// Launch workers to process PlacementDecision
+	// Launch workers to process Binding
 	for i := 1; i <= workersCount; i++ {
 		go wait.UntilWithContext(ctx, func(ctx context.Context) { c.runWorker(ctx, i) }, time.Second)
 	}
@@ -230,9 +230,9 @@ func (c *genericTransportController) processNextWorkItem(ctx context.Context, wo
 	}
 
 	if err := c.process(ctx, obj); err != nil {
-		c.logger.Error(err, "failed to process PlacementDecision object", "objectKey", obj, "workerID", workerID)
+		c.logger.Error(err, "failed to process Binding object", "objectKey", obj, "workerID", workerID)
 	} else {
-		c.logger.Info("synced PlacementDecision object successfully.", "objectKey", obj, "workerID", workerID)
+		c.logger.Info("synced Binding object successfully.", "objectKey", obj, "workerID", workerID)
 	}
 
 	return true
@@ -264,7 +264,7 @@ func (c *genericTransportController) process(ctx context.Context, obj interface{
 		return fmt.Errorf("invalid object key '%s' - %w", key, err)
 	}
 
-	// Run the syncHandler, passing it the PlacementDecision object name to be synced.
+	// Run the syncHandler, passing it the Binding object name to be synced.
 	if err := c.syncHandler(ctx, objectName); err != nil {
 		// Put the item back on the workqueue to handle any transient errors.
 		c.workqueue.AddRateLimited(key)
@@ -281,22 +281,22 @@ func (c *genericTransportController) process(ctx context.Context, obj interface{
 // returning an error from this function will result in a requeue of the given object key.
 // therefore, if object shouldn't be requeued, don't return error.
 func (c *genericTransportController) syncHandler(ctx context.Context, objectName string) error {
-	// Get the PlacementDecision object with this name from WDS
-	placementDecision, err := c.bindingLister.Get(objectName)
+	// Get the Binding object with this name from WDS
+	binding, err := c.bindingLister.Get(objectName)
 
 	if errors.IsNotFound(err) { // the object was deleted and it had no finalizer on it. this means transport controller
 		// finished cleanup of wrapped objects from mailbox namespaces. no need to do anything in this state.
 		return nil
 	}
 	if err != nil { // in case of a different error, log it and retry.
-		return fmt.Errorf("failed to get PlacementDecision object '%s' - %w", objectName, err)
+		return fmt.Errorf("failed to get Binding object '%s' - %w", objectName, err)
 	}
 
-	if isObjectBeingDeleted(placementDecision) {
-		return c.deleteWrappedObjectsAndFinalizer(ctx, placementDecision)
+	if isObjectBeingDeleted(binding) {
+		return c.deleteWrappedObjectsAndFinalizer(ctx, binding)
 	}
 	// otherwise, object was not deleted and no error occurered while reading the object.
-	return c.updateWrappedObjectsAndFinalizer(ctx, placementDecision)
+	return c.updateWrappedObjectsAndFinalizer(ctx, binding)
 }
 
 // isObjectBeingDeleted is a helper function to check if object is being deleted.
@@ -304,16 +304,16 @@ func isObjectBeingDeleted(object metav1.Object) bool {
 	return !object.GetDeletionTimestamp().IsZero()
 }
 
-func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v1alpha1.Binding) error {
-	for _, destination := range placementDecision.Spec.Destinations {
-		if err := c.deleteWrappedObject(ctx, destination.ClusterId, fmt.Sprintf("%s-%s", placementDecision.GetName(), c.wdsName)); err != nil {
-			// wrapped object name is in the format (PlacementDecision.GetName()-WdsName). see updateWrappedObject func for explanation.
+func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, binding *v1alpha1.Binding) error {
+	for _, destination := range binding.Spec.Destinations {
+		if err := c.deleteWrappedObject(ctx, destination.ClusterId, fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName)); err != nil {
+			// wrapped object name is in the format (Binding.GetName()-WdsName). see updateWrappedObject func for explanation.
 			return fmt.Errorf("failed to delete wrapped object from all destinations' - %w", err)
 		}
 	}
 
-	if err := c.removeFinalizerFromPlacementDecision(ctx, placementDecision); err != nil {
-		return fmt.Errorf("failed to remove finalizer from PlacementDecision object '%s' - %w", placementDecision.GetName(), err)
+	if err := c.removeFinalizerFromBinding(ctx, binding); err != nil {
+		return fmt.Errorf("failed to remove finalizer from Binding object '%s' - %w", binding.GetName(), err)
 	}
 
 	return nil
@@ -327,36 +327,36 @@ func (c *genericTransportController) deleteWrappedObject(ctx context.Context, na
 	return nil
 }
 
-func (c *genericTransportController) removeFinalizerFromPlacementDecision(ctx context.Context, placementDecision *v1alpha1.Binding) error {
-	return c.updatePlacementDecision(ctx, placementDecision, func(placementDecision *v1alpha1.Binding) (*v1alpha1.Binding, bool) {
-		return removeFinalizer(placementDecision, transportFinalizer)
+func (c *genericTransportController) removeFinalizerFromBinding(ctx context.Context, binding *v1alpha1.Binding) error {
+	return c.updateBinding(ctx, binding, func(binding *v1alpha1.Binding) (*v1alpha1.Binding, bool) {
+		return removeFinalizer(binding, transportFinalizer)
 	})
 }
 
-func (c *genericTransportController) addFinalizerToPlacementDecision(ctx context.Context, placementDecision *v1alpha1.Binding) error {
-	return c.updatePlacementDecision(ctx, placementDecision, func(placementDecision *v1alpha1.Binding) (*v1alpha1.Binding, bool) {
-		return addFinalizer(placementDecision, transportFinalizer)
+func (c *genericTransportController) addFinalizerToBinding(ctx context.Context, binding *v1alpha1.Binding) error {
+	return c.updateBinding(ctx, binding, func(binding *v1alpha1.Binding) (*v1alpha1.Binding, bool) {
+		return addFinalizer(binding, transportFinalizer)
 	})
 }
 
-func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx context.Context, placementDecision *v1alpha1.Binding) error {
-	if err := c.addFinalizerToPlacementDecision(ctx, placementDecision); err != nil {
-		return fmt.Errorf("failed to add finalizer to PlacementDecision object '%s' - %w", placementDecision.GetName(), err)
+func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx context.Context, binding *v1alpha1.Binding) error {
+	if err := c.addFinalizerToBinding(ctx, binding); err != nil {
+		return fmt.Errorf("failed to add finalizer to Binding object '%s' - %w", binding.GetName(), err)
 	}
 	// get current state
 	currentWrappedObjectList, err := c.transportClient.Resource(c.wrappedObjectGVR).List(ctx, metav1.ListOptions{
-		LabelSelector: fmt.Sprintf("%s=%s,%s=%s", originOwnerReferenceLabel, placementDecision.GetName(), originWdsLabel, c.wdsName),
+		LabelSelector: fmt.Sprintf("%s=%s,%s=%s", originOwnerReferenceLabel, binding.GetName(), originWdsLabel, c.wdsName),
 	})
 	if err != nil {
-		return fmt.Errorf("failed to get current wrapped objects that are owned by PlacementDecision '%s' - %w", placementDecision.GetName(), err)
+		return fmt.Errorf("failed to get current wrapped objects that are owned by Binding '%s' - %w", binding.GetName(), err)
 	}
 	// calculate desired state
-	desiredWrappedObject, err := c.initializeWrappedObject(ctx, placementDecision)
+	desiredWrappedObject, err := c.initializeWrappedObject(ctx, binding)
 	if err != nil {
-		return fmt.Errorf("failed to build wrapped object from PlacementDecision '%s' - %w", placementDecision.GetName(), err)
+		return fmt.Errorf("failed to build wrapped object from Binding '%s' - %w", binding.GetName(), err)
 	}
 	// converge actual state to the desired state
-	if err := c.propagateWrappedObjectToClusters(ctx, desiredWrappedObject, currentWrappedObjectList, placementDecision.Spec.Destinations); err != nil {
+	if err := c.propagateWrappedObjectToClusters(ctx, desiredWrappedObject, currentWrappedObjectList, binding.Spec.Destinations); err != nil {
 		return fmt.Errorf("failed to propagate wrapped object '%s' to all required WECs - %w", desiredWrappedObject.GetName(), err)
 	}
 
@@ -370,10 +370,10 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	return nil
 }
 
-func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, placementDecision *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
+func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
 	objectsToPropagate := make([]*unstructured.Unstructured, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
-	for _, clusterScopedObject := range placementDecision.Spec.Workload.ClusterScope {
+	for _, clusterScopedObject := range binding.Spec.Workload.ClusterScope {
 		if clusterScopedObject.ObjectNames == nil {
 			continue // no objects from this gvr, skip
 		}
@@ -388,7 +388,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 		}
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
-	for _, namespaceScopedObject := range placementDecision.Spec.Workload.NamespaceScope {
+	for _, namespaceScopedObject := range binding.Spec.Workload.NamespaceScope {
 		gvr := schema.GroupVersionResource{Group: namespaceScopedObject.Group, Version: namespaceScopedObject.Version, Resource: namespaceScopedObject.Resource}
 		gvrDynamicClient := c.wdsDynamicClient.Resource(gvr)
 		for _, objectsByNamespace := range namespaceScopedObject.ObjectsByNamespace {
@@ -409,10 +409,10 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, plac
 	return objectsToPropagate, nil
 }
 
-func (c *genericTransportController) initializeWrappedObject(ctx context.Context, placementDecision *v1alpha1.Binding) (*unstructured.Unstructured, error) {
-	objectsToPropagate, err := c.getObjectsFromWDS(ctx, placementDecision)
+func (c *genericTransportController) initializeWrappedObject(ctx context.Context, binding *v1alpha1.Binding) (*unstructured.Unstructured, error) {
+	objectsToPropagate, err := c.getObjectsFromWDS(ctx, binding)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get objects to propagate to WECs from PlacementDecision object '%s' - %w", placementDecision.GetName(), err)
+		return nil, fmt.Errorf("failed to get objects to propagate to WECs from Binding object '%s' - %w", binding.GetName(), err)
 	}
 
 	if len(objectsToPropagate) == 0 {
@@ -423,14 +423,14 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 	}
-	// wrapped object name is (PlacementDecision.GetName()-WdsName).
-	// pay attention - we cannot use the PlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
+	// wrapped object name is (Binding.GetName()-WdsName).
+	// pay attention - we cannot use the Binding object name, cause we might have duplicate names coming from different WDS spaces.
 	// we add WdsName to the object name to assure name uniqueness,
-	// in order to easily get the origin PlacementDecision object name and wds, we add it as an annotations.
-	wrappedObject.SetName(fmt.Sprintf("%s-%s", placementDecision.GetName(), c.wdsName))
-	setLabel(wrappedObject, originOwnerReferenceLabel, placementDecision.GetName())
+	// in order to easily get the origin Binding object name and wds, we add it as an annotations.
+	wrappedObject.SetName(fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName))
+	setLabel(wrappedObject, originOwnerReferenceLabel, binding.GetName())
 	setLabel(wrappedObject, originWdsLabel, c.wdsName)
-	setAnnotation(wrappedObject, originOwnerGenerationAnnotation, placementDecision.GetGeneration())
+	setAnnotation(wrappedObject, originOwnerGenerationAnnotation, binding.GetGeneration())
 
 	return wrappedObject, nil
 }
@@ -511,43 +511,43 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 // returns the updated object (if it was updated) or the object as is if it wasn't, and true if object was updated, or false otherwise.
 type updateObjectFunc func(*v1alpha1.Binding) (*v1alpha1.Binding, bool)
 
-func (c *genericTransportController) updatePlacementDecision(ctx context.Context, placementDecision *v1alpha1.Binding, updateObjectFunc updateObjectFunc) error {
-	updatedPlacementDecision, isUpdated := updateObjectFunc(placementDecision) // returns an indication if object was updated or not.
+func (c *genericTransportController) updateBinding(ctx context.Context, binding *v1alpha1.Binding, updateObjectFunc updateObjectFunc) error {
+	updatedBinding, isUpdated := updateObjectFunc(binding) // returns an indication if object was updated or not.
 	if !isUpdated {
 		return nil // if object was not updated, no need to update in API server, return.
 	}
 
-	_, err := c.wdsClientset.ControlV1alpha1().Bindings().Update(ctx, updatedPlacementDecision, metav1.UpdateOptions{
+	_, err := c.wdsClientset.ControlV1alpha1().Bindings().Update(ctx, updatedBinding, metav1.UpdateOptions{
 		FieldManager: ControllerName,
 	})
 	if err != nil {
-		return fmt.Errorf("failed to update PlacementDecision object '%s' in WDS - %w", placementDecision.GetName(), err)
+		return fmt.Errorf("failed to update Binding object '%s' in WDS - %w", binding.GetName(), err)
 	}
 
 	return nil
 }
 
-// addFinalizer accepts PlacementDecision object and adds the provided finalizer if not present.
-// It returns the updated (or not) PlacementDecision and an indication of whether it updated the object's list of finalizers.
-func addFinalizer(placementDecision *v1alpha1.Binding, finalizer string) (*v1alpha1.Binding, bool) {
-	finalizers := placementDecision.GetFinalizers()
+// addFinalizer accepts Binding object and adds the provided finalizer if not present.
+// It returns the updated (or not) Binding and an indication of whether it updated the object's list of finalizers.
+func addFinalizer(binding *v1alpha1.Binding, finalizer string) (*v1alpha1.Binding, bool) {
+	finalizers := binding.GetFinalizers()
 	for _, item := range finalizers {
 		if item == finalizer { // finalizer already exists, no need to add
-			return placementDecision, false
+			return binding, false
 		}
 	}
-	// if we reached here, finalizer has to be added to the placement decision object.
-	// objects returned from a PlacementDecisionLister must be treated as read-only.
+	// if we reached here, finalizer has to be added to the Binding object.
+	// objects returned from a BindingLister must be treated as read-only.
 	// Therefore, create a deep copy before updating the object.
-	updatedPlacementDecision := placementDecision.DeepCopy()
-	updatedPlacementDecision.SetFinalizers(append(finalizers, finalizer))
-	return updatedPlacementDecision, true
+	updatedBinding := binding.DeepCopy()
+	updatedBinding.SetFinalizers(append(finalizers, finalizer))
+	return updatedBinding, true
 }
 
-// removeFinalizer accepts PlacementDecision object and removes the provided finalizer if present.
-// It returns the updated (or not) PlacementDecision and an indication of whether it updated the object's list of finalizers.
-func removeFinalizer(placementDecision *v1alpha1.Binding, finalizer string) (*v1alpha1.Binding, bool) {
-	finalizersList := placementDecision.GetFinalizers()
+// removeFinalizer accepts Binding object and removes the provided finalizer if present.
+// It returns the updated (or not) Binding and an indication of whether it updated the object's list of finalizers.
+func removeFinalizer(binding *v1alpha1.Binding, finalizer string) (*v1alpha1.Binding, bool) {
+	finalizersList := binding.GetFinalizers()
 	length := len(finalizersList)
 
 	index := 0
@@ -559,14 +559,14 @@ func removeFinalizer(placementDecision *v1alpha1.Binding, finalizer string) (*v1
 		index++
 	}
 	if length == index { // finalizer wasn't found, no need to remove
-		return placementDecision, false
+		return binding, false
 	}
 	// otherwise, finalizer was found and has to be removed.
-	// objects returned from a PlacementDecisionLister must be treated as read-only.
+	// objects returned from a BindingLister must be treated as read-only.
 	// Therefore, create a deep copy before updating the object.
-	updatedPlacementDecision := placementDecision.DeepCopy()
-	updatedPlacementDecision.SetFinalizers(finalizersList[:index])
-	return updatedPlacementDecision, true
+	updatedBinding := binding.DeepCopy()
+	updatedBinding.SetFinalizers(finalizersList[:index])
+	return updatedBinding, true
 }
 
 // setAnnotation sets metadata annotation on the given object.

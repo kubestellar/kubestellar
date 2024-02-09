@@ -30,12 +30,12 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-// syncPlacementDecision syncs a placement-decision object with what is resolved by the placement-resolver.
-func (c *Controller) syncPlacementDecision(ctx context.Context, key util.Key) error {
+// syncBinding syncs a binding object with what is resolved by the placement-resolver.
+func (c *Controller) syncBinding(ctx context.Context, key util.Key) error {
 	var unstructuredObj *unstructured.Unstructured
 	if !c.placementResolver.ResolutionExists(key.NamespacedName.Name) {
-		// if a resolution is not associated to the placement-decision's name
-		// then the placement has been deleted, and the placement-decision
+		// if a resolution is not associated to the binding's name
+		// then the placement has been deleted, and the binding
 		// will eventually be garbage collected. We can safely ignore this.
 
 		return nil
@@ -56,95 +56,95 @@ func (c *Controller) syncPlacementDecision(ctx context.Context, key util.Key) er
 		}
 	}
 
-	placementDecision, err := unstructuredObjectToPlacementDecision(unstructuredObj)
+	binding, err := unstructuredObjectToBinding(unstructuredObj)
 	if err != nil {
-		return fmt.Errorf("failed to convert from Unstructured to PlacementDecision: %w", err)
+		return fmt.Errorf("failed to convert from Unstructured to Binding: %w", err)
 	}
 
-	// placement decision name matches that of the placement 1:1, therefore its NamespacedName is the same.
-	placementIdentifier := placementDecision.GetName()
+	// binding name matches that of the placement 1:1, therefore its NamespacedName is the same.
+	placementIdentifier := binding.GetName()
 
-	// generate placement decision spec from resolver
-	generatedPlacementDecisionSpec, err := c.placementResolver.GeneratePlacementDecision(placementIdentifier)
+	// generate binding spec from resolver
+	generatedBindingSpec, err := c.placementResolver.GenerateBinding(placementIdentifier)
 	if err != nil {
-		return fmt.Errorf("failed to generate PlacementDecisionSpec: %w", err)
+		return fmt.Errorf("failed to generate BindingSpec: %w", err)
 	}
 
 	// calculate if the resolved decision is different from the current one
-	if !c.placementResolver.ComparePlacementDecision(placementIdentifier, &placementDecision.Spec) {
-		// update the placement decision object in the cluster by updating spec
-		if err = c.updateOrCreatePlacementDecision(ctx, placementDecision, generatedPlacementDecisionSpec); err != nil {
-			return fmt.Errorf("failed to update or create placement decision: %w", err)
+	if !c.placementResolver.CompareBinding(placementIdentifier, &binding.Spec) {
+		// update the binding object in the cluster by updating spec
+		if err = c.updateOrCreateBinding(ctx, binding, generatedBindingSpec); err != nil {
+			return fmt.Errorf("failed to update or create binding: %w", err)
 		}
 
 		return nil
 	}
 
-	c.logger.Info("placement decision is up to date", "name", placementDecision.GetName())
+	c.logger.Info("binding is up to date", "name", binding.GetName())
 	return nil
 }
 
-// updateOrCreatePlacementDecision updates or creates a placement-decision object in the cluster.
+// updateOrCreateBinding updates or creates a binding object in the cluster.
 // If the object already exists, it is updated. Otherwise, it is created.
-func (c *Controller) updateOrCreatePlacementDecision(ctx context.Context, pd *v1alpha1.Binding,
-	generatedPlacementDecisionSpec *v1alpha1.BindingSpec) error {
-	// use the passed placement decision and set its spec
-	pd.Spec = *generatedPlacementDecisionSpec
+func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Binding,
+	generatedBindingSpec *v1alpha1.BindingSpec) error {
+	// use the passed binding and set its spec
+	bdg.Spec = *generatedBindingSpec
 
 	// set owner reference
-	ownerReference, err := c.placementResolver.GetOwnerReference(pd.GetName())
+	ownerReference, err := c.placementResolver.GetOwnerReference(bdg.GetName())
 	if err != nil {
 		return fmt.Errorf("failed to get OwnerReference: %w", err)
 	}
-	pd.SetOwnerReferences([]metav1.OwnerReference{ownerReference})
+	bdg.SetOwnerReferences([]metav1.OwnerReference{ownerReference})
 
-	// update or create placement decision
-	unstructuredPlacementDecision, err := placementDecisionToUnstructuredObject(pd)
+	// update or create binding
+	unstructuredBinding, err := bindingToUnstructuredObject(bdg)
 	if err != nil {
-		return fmt.Errorf("failed to convert PlacementDecision to Unstructured: %w", err)
+		return fmt.Errorf("failed to convert Binding to Unstructured: %w", err)
 	}
 
 	_, err = c.dynamicClient.Resource(schema.GroupVersionResource{
 		Group:    v1alpha1.SchemeGroupVersion.Group,
-		Version:  pd.GetObjectKind().GroupVersionKind().Version,
+		Version:  bdg.GetObjectKind().GroupVersionKind().Version,
 		Resource: util.BindingResource,
-	}).Update(ctx, unstructuredPlacementDecision, metav1.UpdateOptions{})
+	}).Update(ctx, unstructuredBinding, metav1.UpdateOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
 			_, err = c.dynamicClient.Resource(schema.GroupVersionResource{
 				Group:    v1alpha1.SchemeGroupVersion.Group,
-				Version:  pd.GetObjectKind().GroupVersionKind().Version,
+				Version:  bdg.GetObjectKind().GroupVersionKind().Version,
 				Resource: util.BindingResource,
-			}).Create(ctx, unstructuredPlacementDecision, metav1.CreateOptions{})
+			}).Create(ctx, unstructuredBinding, metav1.CreateOptions{})
 			if err != nil {
-				return fmt.Errorf("failed to create placement decision: %w", err)
+				return fmt.Errorf("failed to create binding: %w", err)
 			}
 
-			c.logger.Info("created placement decision", "name", pd.GetName())
+			c.logger.Info("created binding", "name", bdg.GetName())
 			return nil
 		} else {
-			return fmt.Errorf("failed to update placement decision: %w", err)
+			return fmt.Errorf("failed to update binding: %w", err)
 		}
 	}
 
-	c.logger.Info("updated placement decision", "name", pd.GetName())
+	c.logger.Info("updated binding", "name", bdg.GetName())
 	return nil
 }
 
-func unstructuredObjectToPlacementDecision(unstructuredObj *unstructured.Unstructured) (*v1alpha1.Binding, error) {
-	var placementDecision *v1alpha1.Binding
+func unstructuredObjectToBinding(unstructuredObj *unstructured.Unstructured) (*v1alpha1.Binding, error) {
+	var binding *v1alpha1.Binding
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredObj.UnstructuredContent(),
-		&placementDecision); err != nil {
-		return nil, fmt.Errorf("failed to convert Unstructured to PlacementDecision: %w", err)
+		&binding); err != nil {
+		return nil, fmt.Errorf("failed to convert Unstructured to Binding: %w", err)
 	}
 
-	return placementDecision, nil
+	return binding, nil
 }
 
-func placementDecisionToUnstructuredObject(placementDecision *v1alpha1.Binding) (*unstructured.Unstructured, error) {
-	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(placementDecision)
+func bindingToUnstructuredObject(binding *v1alpha1.Binding) (*unstructured.Unstructured, error) {
+	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(binding)
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert PlacementDecision to map[string]interface{}: %w", err)
+		return nil, fmt.Errorf("failed to convert Binding to map[string]interface{}: %w", err)
 	}
 
 	return &unstructured.Unstructured{

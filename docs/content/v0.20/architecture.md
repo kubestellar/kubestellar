@@ -1,4 +1,4 @@
-**NOTE**: Current code is in a transition to a new design that decouples transport from placement (more about this below). As part of this transition, a new resource was added to KubeStellar called `PlacementDecision`. This resource matches the `Placement` object (1:1 relationship) in the WDS and contains references to the concrete workload objects and references to the concrete list of clusters that were selected by the placement selectors. 
+**NOTE**: Current code is in a transition to a new design that decouples transport from binding (more about this below). As part of this transition, a new resource was added to KubeStellar called `Binding`. This resource matches the `BindingPolicy` object (1:1 relationship) in the WDS and contains references to the concrete workload objects and references to the concrete list of clusters that were selected by the `BindingPolicy` selectors. 
 
 # KubeStellar Architecture
 

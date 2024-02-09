@@ -75,7 +75,7 @@ func (c *Controller) matchSelectors(obj runtime.Object) (sets.Set[string], []str
 }
 
 // when an object is updated, we iterate over all placements and update placement-resolutions that
-// are affected by the update. Every affected placement decision is then queued to be synced.
+// are affected by the update. Every affected binding is then queued to be synced.
 func (c *Controller) updateDecisions(obj runtime.Object) error {
 	placements, err := c.listPlacements()
 	if err != nil {
@@ -95,16 +95,16 @@ func (c *Controller) updateDecisions(obj runtime.Object) error {
 			// if previously selected, remove
 			// TODO: optimize
 			if resolutionUpdated := c.placementResolver.RemoveObject(placement.GetName(), obj); resolutionUpdated {
-				// enqueue placement-decision to be synced since object was removed from its placement's resolution
-				c.logger.V(4).Info("enqueued PlacementDecision for syncing due to the removal of an "+
-					"object from its resolution", "placement-decision", placement.GetName(),
+				// enqueue binding to be synced since object was removed from its bindingpolicy's resolution
+				c.logger.V(4).Info("enqueued Binding for syncing due to the removal of an "+
+					"object from its resolution", "binding", placement.GetName(),
 					"object", util.RefToRuntimeObj(obj))
-				c.enqueuePlacementDecision(placement.GetName())
+				c.enqueueBinding(placement.GetName())
 			}
 			continue
 		}
 
-		// obj is selected by placement, update the placement decision resolver
+		// obj is selected by placement, update the bindingpolicy resolver
 		resolutionUpdated, err := c.placementResolver.NoteObject(placement.GetName(), obj)
 		if err != nil {
 			if errorIsPlacementResolutionNotFound(err) {
@@ -122,10 +122,10 @@ func (c *Controller) updateDecisions(obj runtime.Object) error {
 
 		if resolutionUpdated {
 			// enqueue placement-decision to be synced since an object was added to its placement's resolution
-			c.logger.V(4).Info("enqueued PlacementDecision for syncing due to a noting of an "+
-				"object in its resolution", "placement-decision", placement.GetName(),
+			c.logger.V(4).Info("enqueued Binding for syncing due to a noting of an "+
+				"object in its resolution", "binding", placement.GetName(),
 				"object", util.RefToRuntimeObj(obj))
-			c.enqueuePlacementDecision(placement.GetName())
+			c.enqueueBinding(placement.GetName())
 		}
 	}
 

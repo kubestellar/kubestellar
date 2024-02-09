@@ -38,7 +38,7 @@ import (
 // implementation and contains the base functionality.
 // Run function gets the transport-specific implementation and uses it to initialize
 // the generic transport controller which is responsible for processing the
-// PlacementDecision added/updated/deleted events.
+// Binding added/updated/deleted events.
 // In order to use Run function, one has to call it in the following format:
 // cmd.Run(YourTransportSpecificImplementation())
 
