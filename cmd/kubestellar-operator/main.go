@@ -60,10 +60,12 @@ func main() {
 	var probeAddr string
 	var wdsName string
 	var wdsLabel string
+	var allowedGroupsString string
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.StringVar(&wdsName, "wds-name", "", "name of the workload description space to connect to")
 	flag.StringVar(&wdsLabel, "wds-label", "", "label of the workload description space to connect to")
+	flag.StringVar(&allowedGroupsString, "api-groups", "", "list of allowed api groups, comma separated. Empty string means all API groups are allowed")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -75,6 +77,9 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
+	// parse allowed resources string
+	allowedGroupsSet := util.ParseAPIGroupsString(allowedGroupsString)
 
 	// setup manager
 	// manager here is mainly used for leader election and health checks
@@ -129,7 +134,7 @@ func main() {
 	setupLog.Info("Got config for IMBS", "name", imbsName)
 
 	// start the binding controller
-	bindingController, err := binding.NewController(mgr, wdsRestConfig, imbsRestConfig, wdsName)
+	bindingController, err := binding.NewController(mgr, wdsRestConfig, imbsRestConfig, wdsName, allowedGroupsSet)
 	if err != nil {
 		setupLog.Error(err, "unable to create binding controller")
 		os.Exit(1)
@@ -161,4 +166,5 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+	select {}
 }

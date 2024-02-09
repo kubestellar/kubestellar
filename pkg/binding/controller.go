@@ -76,26 +76,26 @@ const placementDecisionQueueingDelay = 2 * time.Second
 // Controller watches all objects, finds associated placements, when matched a placement wraps and
 // places objects into mailboxes
 type Controller struct {
-	ctx              context.Context
-	logger           logr.Logger
-	ocmClient        client.Client
-	dynamicClient    dynamic.Interface
-	kubernetesClient kubernetes.Interface
-	extClient        apiextensionsclientset.Interface
-	listers          map[string]cache.GenericLister
-	gvkGvrMapper     util.GvkGvrMapper
-	informers        map[string]cache.SharedIndexInformer
-	stoppers         map[string]chan struct{}
-
+	ctx               context.Context
+	logger            logr.Logger
+	ocmClient         client.Client
+	dynamicClient     dynamic.Interface
+	kubernetesClient  kubernetes.Interface
+	extClient         apiextensionsclientset.Interface
+	listers           map[string]cache.GenericLister
+	gvkGvrMapper      util.GvkGvrMapper
+	informers         map[string]cache.SharedIndexInformer
+	stoppers          map[string]chan struct{}
 	placementResolver PlacementResolver
-
-	workqueue     workqueue.RateLimitingInterface
-	initializedTs time.Time
-	wdsName       string
+	workqueue         workqueue.RateLimitingInterface
+	initializedTs     time.Time
+	wdsName           string
+	allowedGroupsSet  sets.Set[string]
 }
 
-// Create a new binding controller
-func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config, wdsName string) (*Controller, error) {
+// Create a new placement controller
+func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
+	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
@@ -192,6 +192,9 @@ func (c *Controller) run(workers int) error {
 		}
 		for _, resource := range group.APIResources {
 			if _, excluded := excludedResourceNames[resource.Name]; excluded {
+				continue
+			}
+			if !util.IsAPIGroupAllowed(gv.Group, c.allowedGroupsSet) {
 				continue
 			}
 			informable := verbsSupportInformers(resource.Verbs)
