@@ -497,7 +497,10 @@ implementations of the transport interface. In order to implement transport plug
 
 The above list is required in order to comply with [<u>SIG Multi-Cluster Work API</u>](https://multicluster.sigs.k8s.io/concepts/work-api/).
 
-KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project [Open Cluster Management](https://open-cluster-management.io). We expect to have more transport plugin options in the future.
+In order to implement a KubeStellar transport plugin, one has to implement code that supplies a function to wrap any number of objects into a single wrapped objects. 
+The transport tnterface that should be implemented can be seen [here](https://github.com/kubestellar/kubestellar/blob/main/pkg/transport/transport.go).  
+KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project [Open Cluster Management](https://open-cluster-management.io). OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available [here](https://github.com/kubestellar/ocm-transport-plugin).  
+We expect to have more transport plugin options in the future.
 
 The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.
 
@@ -506,5 +509,5 @@ The following section describes how transport controller works, while the descri
   <figcaption align="center">Figure 5 - Transport Controller</figcaption>
 </figure>
 
-The transport controller watches for `Binding` objects on the WDS. `Binding` objects are mapped 1:1 to `BindingPolicy` and contain references to the list of concrete objects that were selected for distribution by the policy and references to the concrete list of destination that were selected by the policy. Upon a new `Binding` event (add/update/delete), the transport controller gets from the WDS api server(s) the objects listed in the `Binding` workload section. It then wraps all objects into wrapped object(s) and puts a copy of the wrapped object(s) in every matching cluster mailbox namespace in the ITS. Once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/delete the workload objects.  
+The transport controller watches for `Binding` objects on the WDS. `Binding` objects are mapped 1:1 to `BindingPolicy` and contain references to the list of concrete objects that were selected for distribution by the policy and references to the concrete list of destination that were selected by the policy. Upon a new `Binding` event (add/update/delete), the transport controller gets from the WDS api server(s) the objects listed in the `Binding` workload section. It then wraps all objects into a single wrapped object and puts a copy of the wrapped object in every matching cluster mailbox namespace in the ITS. Once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/delete the workload objects on the WEC.  
 Transport controller is based on the controller design patten and aims to bring the current state to the desired state. That is, if a WEC was removed from the `Binding`, the transport controller will also make sure to remove the matching wrapped object(s) from the WEC's mailbox namespace. Additionally, if a `Binding` is removed, transport controller will remove the matching wrapped object(s) from all mailbox namespaces.
