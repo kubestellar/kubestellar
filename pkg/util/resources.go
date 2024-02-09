@@ -21,9 +21,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	//"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
-
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	//"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 )
 
 // ParseAPIGroupsString takes a comma separated string list of api groups in the form of
