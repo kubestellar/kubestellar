@@ -33,10 +33,8 @@ func ParseAPIGroupsString(apiGroups string) sets.Set[string] {
 		return nil
 	}
 
-	groupsSet := sets.Set[string]{}
-	for _, g := range strings.Split(apiGroups, ",") {
-		groupsSet.Insert(g)
-	}
+	groupsSet := sets.New(strings.Split(apiGroups, ",")...)
+
 	addRequiredResourceGroups(groupsSet)
 
 	return groupsSet
