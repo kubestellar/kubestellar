@@ -1927,7 +1927,7 @@ which installs OCM on it.</li>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>api-resources<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>managedclusteraddons
 </code></pre></div>
 <p>and then install the status add-on:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>imbs1<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>status-addon<span class="w"> </span>-n<span class="w"> </span>open-cluster-management<span class="w"> </span>oci://quay.io/pdettori/status-addon-chart<span class="w"> </span>--version<span class="w"> </span><span class="m">0</span>.1.0
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>imbs1<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>status-addon<span class="w"> </span>-n<span class="w"> </span>open-cluster-management<span class="w"> </span>oci://ghcr.io/kubestellar/ocm-status-addon-chart<span class="w"> </span>--version<span class="w"> </span><span class="m">0</span>.2.0-alpha.1
 </code></pre></div>
 <p>see <a href="https://github.ibm.com/dettori/status-addon">here</a> for more details on the add-on.</p>
 <ol>
