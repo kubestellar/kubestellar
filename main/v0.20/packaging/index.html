@@ -1810,9 +1810,36 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#status-addon" class="md-nav__link">
-    status-addon
+  <a href="#ocm-status-addon" class="md-nav__link">
+    OCM Status Addon
   </a>
+  
+    <nav class="md-nav" aria-label="OCM Status Addon">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#outline-of-ocm-status-addon-publishing" class="md-nav__link">
+    Outline of OCM status addon publishing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ocm-status-addon-container-image" class="md-nav__link">
+    OCM status addon container image
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ocm-status-addon-helm-chart" class="md-nav__link">
+    OCM status addon Helm chart
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1820,6 +1847,19 @@
   <a href="#ocm-transport-plugin" class="md-nav__link">
     OCM Transport Plugin
   </a>
+  
+    <nav class="md-nav" aria-label="OCM Transport Plugin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ocm-transport-plugin-container-image" class="md-nav__link">
+    OCM Transport Plugin container image
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1898,6 +1938,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#amalgamated-graph" class="md-nav__link">
+    Amalgamated graph
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1935,32 +1982,112 @@
 <p>Note that to <em>use</em> KubeStellar, all of the repos in this graph are involved.</p>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>flowchart LR
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    kubestellar --&gt; kubeflex
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    kubeflex    --&gt; kubestellar
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ocm-status-addon     --&gt; kubestellar
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    ocm-transport-plugin --&gt; kubestellar
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    ocm-status-addon
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ocm-transport-plugin --&gt; kubestellar
 </code></pre></div>
-<p>Note: the <code>ocm-status-addon</code> repo is in the process of being moved
-into the kubestellar GitHub organization; the actual dependency right
-now is on <a href="#status-addon">a private repo</a>.</p>
 <h2 id="kubeflex">KubeFlex<a class="headerlink" href="#kubeflex" title="Permanent link">#</a></h2>
 <p>See <a href="https://github.com/kubestellar/kubeflex">the GitHub repo</a>.</p>
-<h2 id="status-addon">status-addon<a class="headerlink" href="#status-addon" title="Permanent link">#</a></h2>
-<p>The <a href="https://github.ibm.com/dettori/status-addon">status-addon</a> repo is the source of a RedHat-style operator.</p>
-<p>The operator is delivered by a Helm chart at <code>quay.io/pdettori/status-addon-chart</code>. Chart versioning? How is the chart built, pushed?</p>
-<p>There is also a container image involved.</p>
+<h2 id="ocm-status-addon">OCM Status Addon<a class="headerlink" href="#ocm-status-addon" title="Permanent link">#</a></h2>
+<p>The <a href="https://github.com/kubestellar/ocm-status-addon">OCM Status Addon</a> repo is the source of a RedHat-style operator.</p>
+<h3 id="outline-of-ocm-status-addon-publishing">Outline of OCM status addon publishing<a class="headerlink" href="#outline-of-ocm-status-addon-publishing" title="Permanent link">#</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>flowchart LR
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    subgraph &quot;ocm-status-addon@GitHub&quot;
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    osa_code[OSA source code]
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    osa_hc_src[OSA Helm chart source]
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    end
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    osa_ctr_image[OSA container image] --&gt; osa_code
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    osa_hc_repo[published OSA Helm Chart] --&gt; osa_hc_src
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    osa_hc_src -.-&gt; osa_ctr_image
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    osa_hc_repo -.-&gt; osa_ctr_image
+</code></pre></div>
+<p>The dashed dependencies are at run time, not build time.</p>
+<p>"OSA" is OCM Status Addon</p>
+<h3 id="ocm-status-addon-container-image">OCM status addon container image<a class="headerlink" href="#ocm-status-addon-container-image" title="Permanent link">#</a></h3>
+<p>There is a container image at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon">ghcr.io/kubestellar/ocm-status-addon</a>.</p>
+<p>The container image is built and published using <code>make</code>.  The
+following <code>make</code> variables are relevant.</p>
+<ul>
+<li><code>KO_DOCKER_REPO</code>, defaults to <code>ghcr.io/kubestellar</code></li>
+<li><code>CMD_NAME</code>, defaults to <code>ocm-status-addon</code></li>
+<li><code>IMAGE_TAG</code>, defaults to <code>0.2.0-alpha.1</code></li>
+<li><code>IMG</code>, defaults to <code>${KO_DOCKER_REPO}/${CMD_NAME}:${IMAGE_TAG}</code></li>
+</ul>
+<p><code>make ko-build-push</code> will build and publish the container image at
+<code>${IMG}</code>. This will be a multi-platform manifest, referencing images
+for "platforms" <code>linux/amd64</code> and <code>linux/arm64</code>.</p>
+<p><code>make ko-local-build</code> will build the same multi-platform manifest but
+not push it, only leave it among your Docker images. Note that if you
+have podman pretending to be Docker then it will only receive a
+single-platform image, not the multi-platform manifest.</p>
+<h3 id="ocm-status-addon-helm-chart">OCM status addon Helm chart<a class="headerlink" href="#ocm-status-addon-helm-chart" title="Permanent link">#</a></h3>
+<p>The operator is delivered by a Helm chart at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon-chart">ghcr.io/kubestellar/ocm-status-addon-chart</a>.</p>
+<p>The chart is built and published using <code>make</code>. The following <code>make</code>
+variables are relevant.</p>
+<ul>
+<li><code>KO_DOCKER_REPO</code>, defaults to <code>ghcr.io/kubestellar</code></li>
+<li><code>CMD_NAME</code>, defaults to <code>ocm-status-addon</code></li>
+<li><code>IMAGE_TAG</code>, defaults to <code>0.2.0-alpha.1</code></li>
+<li><code>IMG</code>, defaults to <code>${KO_DOCKER_REPO}/${CMD_NAME}:${IMAGE_TAG}</code></li>
+</ul>
+<p><code>make chart</code>: builds the local copy of the chart from local sources,
+using <code>kustomize</code>. When using the default values of the <code>make</code>
+variables, the built chart references the container image
+<code>ghcr.io/kubestellar/ocm-status-addon:0.2.0-alpha.1</code>. TODO: describe
+how the chart contents depend on the <code>make</code> variables.</p>
+<p><code>make chart-push</code> (depends on the <code>make</code> target <code>chart</code>): pushes the
+local copy of the chart to the OCI repository and tag specified in
+<code>${IMG}</code>.</p>
+<p>The following versions exist.</p>
+<table>
+<thead>
+<tr>
+<th>OCI tag = version in chart</th>
+<th>appVersion in chart</th>
+<th>referenced container tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.2.0-alpha.1</td>
+<td>0.2.0-alpha.1</td>
+<td>0.2.0-alpha.1</td>
+</tr>
+</tbody>
+</table>
+<p>Note: the Chart.yaml in github uses just "0.2.0" for the version and appVersion in the chart. TODO: bug?</p>
 <h2 id="ocm-transport-plugin">OCM Transport Plugin<a class="headerlink" href="#ocm-transport-plugin" title="Permanent link">#</a></h2>
-<p>.. to be written ...</p>
+<p><strong>NOTE</strong>: This is under development, not a part of the functioning
+  system yet.</p>
+<p>The source is the GitHub repo <a href="https://github.com/kubestellar/ocm-transport-plugin">github.com/kubestellar/ocm-transport-plugin</a></p>
+<h3 id="ocm-transport-plugin-container-image">OCM Transport Plugin container image<a class="headerlink" href="#ocm-transport-plugin-container-image" title="Permanent link">#</a></h3>
+<p>This will aspirationally appear at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-transport-plugin">ghcr.io/kubestellar/ocm-transport-plugin</a>. This level of development has not been reached yet.</p>
+<p>TODO: document how the image is built and published, including explain versioning.</p>
 <h2 id="kubestellar">KubeStellar<a class="headerlink" href="#kubestellar" title="Permanent link">#</a></h2>
 <h3 id="outline-of-publishing">Outline of publishing<a class="headerlink" href="#outline-of-publishing" title="Permanent link">#</a></h3>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>flowchart LR
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    kcm_image[KCM container image] --&gt; github
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    hc_image[published KCM Helm Chart] --&gt; github
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    hc_image -.-&gt; kcm_image
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    PostCreateHook --&gt; github
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    PostCreateHook -.-&gt; hc_image
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>flowchart LR
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    subgraph &quot;kubestellar@GitHub&quot;
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    kcm_code[KCM source code]
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    kcm_hc_src[KCM Helm chart source]
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    ks_pch[kubestellar PostCreateHook]
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    ocm_pch[&quot;ocm PostCreateHook&quot;]
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    ks_scripts -.-&gt; ocm_pch
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    ks_scripts -.-&gt; ks_pch
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    end
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    kcm_ctr_image[KCM container image] --&gt; kcm_code
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    kcm_hc_repo[published KCM Helm Chart] --&gt; kcm_hc_src
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    kcm_hc_src -.-&gt; kcm_ctr_image
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    kcm_hc_repo -.-&gt; kcm_ctr_image
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    ks_pch  -.-&gt; kcm_hc_repo
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    ks_scripts -.-&gt; osa_hc_repo[published OSA Helm Chart]
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    ks_scripts -.-&gt; otp_something[&quot;published OTP ??&quot;]
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>    ks_scripts -.-&gt; KubeFlex
 </code></pre></div>
 <p>The dashed dependencies are at run time, not build time.</p>
 <p>"KCM" is the KubeStellar controller-manager.</p>
+<p>"ks_scripts" are the user-facing instructions that use published
+images and so on. There are also e2e tests, but they test the copy of
+the repo that they are embedded in, not anything built and published
+earlier.</p>
 <p><strong>NOTE</strong>: at the present level of development, all versions are hand coded and there is only one public version. This will obviously have to change.</p>
 <h3 id="local-copy-of-kubestellar-git-repo">Local copy of KubeStellar git repo<a class="headerlink" href="#local-copy-of-kubestellar-git-repo" title="Permanent link">#</a></h3>
 <p><strong>NOTE</strong>: Because of <a href="https://github.com/kubernetes/code-generator/blob/v0.28.2/kube_codegen.sh#L394-L395">a restriction in one of the code generators that
@@ -1972,10 +2099,10 @@ ends with <code>/github.com/kubestellar/kubestellar</code>.</p>
 <h3 id="derived-files">Derived files<a class="headerlink" href="#derived-files" title="Permanent link">#</a></h3>
 <p>Some files in the kubestellar repo are derived from other files there. Contributors are responsible for invoking the commands to (re)derive the derived files as necessary.</p>
 <p>Some of these derived files are derived by standard generators from the Kubernetes milieu. A contributor can use the following command to make all of those, or use the individual <code>make</code> commands described in the following subsubsections to update particular subsets.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>all-generated
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span>all-generated
 </code></pre></div>
 <p>The following command, which we aspire to check in CI, checks whether all those derived files have been correctly derived. It must be invoked in a state where the <code>git status</code> is clean, or at least the dirty files are irrelevant; the current commit is what is checked. This command has side-effects on the filesystem like <code>make all-generated</code>.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>hack/verify-codegen.sh
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>hack/verify-codegen.sh
 </code></pre></div>
 <h4 id="files-generated-by-controller-gen">Files generated by controller-gen<a class="headerlink" href="#files-generated-by-controller-gen" title="Permanent link">#</a></h4>
 <ul>
@@ -2021,6 +2148,42 @@ it from local sources. This is not included in <code>make all-generated</code>.<
 <li><code>ocm.yaml</code> adds <code>clusteradm</code> by running a container using the image <code>quay.io/kubestellar/clusteradm:0.7.2</code> which is built from <a href="https://github.com/open-cluster-management-io/clusteradm">the OCM source</a> using the script <a href="../../../hack/build-clusteradm-image.sh">build-clusteradm-image.sh</a>.</li>
 <li><code>kubestellar.yaml</code> runs container image <code>quay.io/kubestellar/helm:v3.14.0</code> (which is built from <a href="https://github.com/helm/helm/tree/v3.14.0">the Helm source</a> by a process that we need to document) to instantiate the chart from <code>oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart</code> with chart version <code>0.20.0-alpha.1</code>, which is built by (what?) from (what? probably answered above).</li>
 </ul>
+<h2 id="amalgamated-graph">Amalgamated graph<a class="headerlink" href="#amalgamated-graph" title="Permanent link">#</a></h2>
+<p>Currently only showing kubestellar and ocm-status-addon.</p>
+<p>TODO: finish this</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>flowchart LR
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    subgraph &quot;ocm-status-addon@GitHub&quot;
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    osa_code[OSA source code]
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    osa_hc_src[OSA Helm chart source]
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    end
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    osa_ctr_image[OSA container image] --&gt; osa_code
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    osa_hc_repo[published OSA Helm Chart] --&gt; osa_hc_src
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    osa_hc_src -.-&gt; osa_ctr_image
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    osa_hc_repo -.-&gt; osa_ctr_image
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    subgraph &quot;kubestellar@GitHub&quot;
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    kcm_code[KCM source code]
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    kcm_hc_src[KCM Helm chart source]
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    ks_pch[kubestellar PostCreateHook]
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    ocm_pch[&quot;ocm PostCreateHook&quot;]
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    ks_scripts -.-&gt; ocm_pch
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    ks_scripts -.-&gt; ks_pch
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    end
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    kcm_ctr_image[KCM container image] --&gt; kcm_code
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    kcm_hc_repo[published KCM Helm Chart] --&gt; kcm_hc_src
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    kcm_hc_src -.-&gt; kcm_ctr_image
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>    kcm_hc_repo -.-&gt; kcm_ctr_image
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>    ks_pch  -.-&gt; kcm_hc_repo
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    ks_scripts -.-&gt; osa_hc_repo
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>    ks_scripts -.-&gt; otp_something[&quot;published OTP ??&quot;]
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>    ks_scripts -.-&gt; KubeFlex
+</code></pre></div>
+<p>Every dotted line is a reference that must be versioned. How do we
+keep all those versions right?</p>
+<p>Normally a git tag is an immutable reference to an immutable git
+commit. Let's not violate that.</p>
+<p>Can/should we say that an OCI image (or whatever) tag equals the tag
+of the commit that said image (or whatever) was built from? While
+keeping <code>main</code> always a working system?</p>
 
 
   
