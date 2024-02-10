@@ -37,6 +37,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	ctrlm "sigs.k8s.io/controller-runtime/pkg/manager"
@@ -45,11 +46,12 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
+const controllerName = "Status"
+
 // Status controller watches workstatues and checks associated placements for singleton status. If
 // a placement that cuase an object to be delivered to a cluster has singleton statsus specified
 // the full status will be copied to the object.
 type Controller struct {
-	ctx                context.Context
 	logger             logr.Logger
 	wdsName            string
 	wdsDynClient       dynamic.Interface
@@ -101,7 +103,7 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 
 	controller := &Controller{
 		wdsName:        wdsName,
-		logger:         log.Log.WithName("Status"),
+		logger:         log.Log.WithName(controllerName),
 		wdsDynClient:   wdsDynClient,
 		wdsKubeClient:  wdsKubeClient,
 		imbsDynClient:  imbsDynClient,
@@ -115,14 +117,12 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 }
 
 // Start the status controller
-func (c *Controller) Start(workers int) error {
-	ctx, cancel := context.WithCancel(context.Background())
-	c.ctx = ctx
-	defer cancel()
-
+func (c *Controller) Start(parentCtx context.Context, workers int) error {
+	logger := klog.FromContext(parentCtx).WithName(controllerName)
+	ctx := klog.NewContext(parentCtx, logger)
 	errChan := make(chan error, 1)
 	go func() {
-		errChan <- c.run(workers)
+		errChan <- c.run(ctx, workers)
 	}()
 
 	// check for errors at startup, after all started we let it continue
@@ -136,15 +136,12 @@ func (c *Controller) Start(workers int) error {
 }
 
 // Invoked by Start() to run the translator
-func (c *Controller) run(workers int) error {
+func (c *Controller) run(ctx context.Context, workers int) error {
 	defer c.workqueue.ShutDown()
 
 	// start informers
-	go c.startPlacementInformer()
-	go c.startWorkStatusInformer()
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	go c.runPlacementInformer(ctx)
+	go c.runWorkStatusInformer(ctx)
 
 	// wait for all informers caches to be synced
 	c.logger.Info("waiting for caches to sync")
@@ -175,7 +172,7 @@ func (c *Controller) run(workers int) error {
 	return nil
 }
 
-func (c *Controller) startPlacementInformer() {
+func (c *Controller) runPlacementInformer(ctx context.Context) {
 	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.wdsDynClient, 0*time.Minute)
 
 	gvr := schema.GroupVersionResource{Group: v1alpha1.GroupVersion.Group,
@@ -185,22 +182,18 @@ func (c *Controller) startPlacementInformer() {
 	c.placementInformer = informerFactory.ForResource(gvr).Informer()
 	c.placementLister = cache.NewGenericLister(c.placementInformer.GetIndexer(), gvr.GroupResource())
 
-	stopper := make(chan struct{})
-	defer close(stopper)
-	informerFactory.Start(stopper)
+	informerFactory.Start(ctx.Done())
 
 	c.logger.Info("waiting for placement cache to sync")
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	if ok := cache.WaitForCacheSync(ctx.Done(), c.placementInformer.HasSynced); !ok {
 		c.logger.Info("failed to wait for placement caches to sync")
 	}
 	c.logger.Info("placement cache synced")
 
-	<-stopper
+	<-ctx.Done()
 }
 
-func (c *Controller) startWorkStatusInformer() {
+func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.imbsDynClient, 0*time.Minute)
 
 	gvr := schema.GroupVersionResource{Group: util.WorkStatusGroup,
@@ -227,19 +220,15 @@ func (c *Controller) startWorkStatusInformer() {
 		},
 	})
 
-	stopper := make(chan struct{})
-	defer close(stopper)
-	informerFactory.Start(stopper)
+	informerFactory.Start(ctx.Done())
 
 	c.logger.Info("waiting for workstatus cache to sync")
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	if ok := cache.WaitForCacheSync(ctx.Done(), c.workStatusInformer.HasSynced); !ok {
 		c.logger.Info("failed to wait for workstatus caches to sync")
 	}
 	c.logger.Info("workstatus cache synced")
 
-	<-stopper
+	<-ctx.Done()
 }
 
 func shouldSkipUpdate(old, new interface{}) bool {
@@ -256,11 +245,8 @@ func shouldSkipDelete(_ interface{}) bool {
 // Event handler: enqueues the objects to be processed
 // At this time it is very simple, more complex processing might be required here
 func (c *Controller) handleObject(obj any) {
-	mObj := obj.(metav1.Object)
 	rObj := obj.(runtime.Object)
-	ok := rObj.GetObjectKind()
-	gvk := ok.GroupVersionKind()
-	c.logger.V(2).Info("Got object event", gvk.GroupVersion().String(), gvk.Kind, mObj.GetNamespace(), mObj.GetName())
+	c.logger.V(2).Info("Got object event", "obj", util.RefToRuntimeObj(rObj))
 	c.enqueueObject(obj)
 }
 
@@ -333,7 +319,7 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 	return true
 }
 
-func (c *Controller) reconcile(_ context.Context, ref cache.ObjectName) error {
+func (c *Controller) reconcile(ctx context.Context, ref cache.ObjectName) error {
 	obj, err := getObject(c.workStatusLister, ref.Namespace, ref.Name)
 	if err != nil {
 		// The resource no longer exist, which means it has been deleted.
@@ -361,10 +347,10 @@ func (c *Controller) reconcile(_ context.Context, ref cache.ObjectName) error {
 	}
 
 	c.logger.Info("updating singleton status", "kind", sourceRef.Kind, "name", sourceRef.Name, "namespace", sourceRef.Namespace)
-	return updateObjectStatus(sourceRef, status, c.listers, c.wdsDynClient)
+	return updateObjectStatus(ctx, sourceRef, status, c.listers, c.wdsDynClient)
 }
 
-func updateObjectStatus(objRef *util.SourceRef, status map[string]interface{},
+func updateObjectStatus(ctx context.Context, objRef *util.SourceRef, status map[string]interface{},
 	listers map[string]cache.GenericLister, wdsDynClient dynamic.Interface) error {
 
 	key := util.KeyForGroupVersionKind(objRef.Group, objRef.Version, objRef.Kind)
@@ -381,7 +367,7 @@ func updateObjectStatus(objRef *util.SourceRef, status map[string]interface{},
 
 	unstrObj, ok := obj.(*unstructured.Unstructured)
 	if !ok {
-		return fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s", util.GenerateObjectInfoString(obj))
+		return fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s", util.RefToRuntimeObj(obj))
 	}
 
 	// set the status and update the object
@@ -389,9 +375,9 @@ func updateObjectStatus(objRef *util.SourceRef, status map[string]interface{},
 
 	gvr := schema.GroupVersionResource{Group: objRef.Group, Version: objRef.Version, Resource: objRef.Resource}
 	if objRef.Namespace == "" {
-		_, err = wdsDynClient.Resource(gvr).UpdateStatus(context.Background(), unstrObj, metav1.UpdateOptions{})
+		_, err = wdsDynClient.Resource(gvr).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{})
 	} else {
-		_, err = wdsDynClient.Resource(gvr).Namespace(objRef.Namespace).UpdateStatus(context.Background(), unstrObj, metav1.UpdateOptions{})
+		_, err = wdsDynClient.Resource(gvr).Namespace(objRef.Namespace).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{})
 	}
 	if err != nil {
 		return fmt.Errorf("failed to update status: %w", err)

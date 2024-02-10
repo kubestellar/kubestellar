@@ -41,6 +41,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	ctrlm "sigs.k8s.io/controller-runtime/pkg/manager"
 
@@ -49,6 +50,8 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/ocm"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
+
+const controllerName = "Binding"
 
 // Resources group versions to exclude for watchers as they should not delivered to other clusters
 var excludedGroupVersions = map[string]bool{
@@ -76,7 +79,6 @@ const placementDecisionQueueingDelay = 2 * time.Second
 // Controller watches all objects, finds associated placements, when matched a placement wraps and
 // places objects into mailboxes
 type Controller struct {
-	ctx               context.Context
 	logger            logr.Logger
 	ocmClient         client.Client
 	dynamicClient     dynamic.Interface
@@ -122,7 +124,7 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 
 	controller := &Controller{
 		wdsName:           wdsName,
-		logger:            mgr.GetLogger(),
+		logger:            mgr.GetLogger().WithName(controllerName),
 		ocmClient:         ocmClient,
 		dynamicClient:     dynamicClient,
 		kubernetesClient:  kubernetesClient,
@@ -139,14 +141,12 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 }
 
 // Start the controller
-func (c *Controller) Start(workers int) error {
-	ctx, cancel := context.WithCancel(context.Background())
-	c.ctx = ctx
-	defer cancel()
-
+func (c *Controller) Start(parentCtx context.Context, workers int) error {
+	logger := klog.FromContext(parentCtx).WithName(controllerName)
+	ctx := klog.NewContext(parentCtx, logger)
 	errChan := make(chan error, 1)
 	go func() {
-		errChan <- c.run(workers)
+		errChan <- c.run(ctx, workers)
 	}()
 
 	// check for errors at startup, after all started we let it continue
@@ -160,11 +160,11 @@ func (c *Controller) Start(workers int) error {
 }
 
 // Invoked by Start() to run the controller
-func (c *Controller) run(workers int) error {
+func (c *Controller) run(ctx context.Context, workers int) error {
 	defer c.workqueue.ShutDown()
 
 	// ensure CRDs are installed before starting up
-	if err := crd.ApplyCRDs(c.dynamicClient, c.kubernetesClient, c.extClient, c.logger); err != nil {
+	if err := crd.ApplyCRDs(ctx, c.dynamicClient, c.kubernetesClient, c.extClient, c.logger); err != nil {
 		return err
 	}
 
@@ -239,9 +239,6 @@ func (c *Controller) run(workers int) error {
 		}
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	// wait for all informers caches to be synced
 	for _, informer := range c.informers {
 		if ok := cache.WaitForCacheSync(ctx.Done(), informer.HasSynced); !ok {
@@ -307,12 +304,8 @@ func verbsSupportInformers(verbs []string) bool {
 // Event handler: enqueues the objects to be processed
 // At this time it is very simple, more complex processing might be required here
 func (c *Controller) handleObject(obj any) {
-	mObj := obj.(metav1.Object)
 	rObj := obj.(runtime.Object)
-	ok := rObj.GetObjectKind()
-	gvk := ok.GroupVersionKind()
-
-	c.logger.V(2).Info("Got object event", gvk.GroupVersion().String(), gvk.Kind, mObj.GetNamespace(), mObj.GetName())
+	c.logger.V(2).Info("Got object event", "obj", util.RefToRuntimeObj(rObj))
 	c.enqueueObject(obj, false)
 }
 
@@ -419,14 +412,14 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 	return true
 }
 
-func (c *Controller) reconcile(_ context.Context, key util.Key) error {
+func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 	var obj runtime.Object
 	var err error
 	// special handling for placement-decision resource as it is the only
 	// resource that is queued directly as key, without necessarily first
 	// existing as an object.
 	if util.KeyIsForPlacementDecision(key) {
-		return c.syncPlacementDecision(key) // this function logs through all its exits
+		return c.syncPlacementDecision(ctx, key) // this function logs through all its exits
 	}
 
 	if key.DeletedObject == nil {
@@ -448,19 +441,19 @@ func (c *Controller) reconcile(_ context.Context, key util.Key) error {
 	// note that object is *unstructured.Unstructured so we cannot
 	// just use "switch obj.(type)"
 	if util.IsPlacement(obj) {
-		if err := c.handlePlacement(obj); err != nil {
+		if err := c.handlePlacement(ctx, obj); err != nil {
 			return fmt.Errorf("failed to handle placement: %w", err) // error logging after this call
 			// will add name.
 		}
 
-		c.logger.Info("handled placement", "object", util.GenerateObjectInfoString(obj))
+		c.logger.Info("handled placement", "object", util.RefToRuntimeObj(obj))
 		return nil
 	} else if util.IsCRD(obj) {
 		if err := c.handleCRD(obj); err != nil {
 			return fmt.Errorf("failed to handle CRD: %w", err) // error logging after this call
 			// will add name.
 		}
-		c.logger.Info("handled CRD", "object", util.GenerateObjectInfoString(obj))
+		c.logger.Info("handled CRD", "object", util.RefToRuntimeObj(obj))
 	}
 
 	// avoid further processing for keys of objects being deleted that do not have a deleted object
@@ -470,7 +463,7 @@ func (c *Controller) reconcile(_ context.Context, key util.Key) error {
 
 	if err := c.updateDecisions(obj); err != nil {
 		c.logger.Error(err, "failed to update placement resolutions for object",
-			"object", util.GenerateObjectInfoString(obj))
+			"object", util.RefToRuntimeObj(obj))
 		// return nil // not changing existing flow before transport is ready
 	}
 
@@ -491,13 +484,13 @@ func (c *Controller) reconcile(_ context.Context, key util.Key) error {
 	}
 
 	if key.DeletedObject != nil {
-		c.logger.Info("Deleting", "object", util.GenerateObjectInfoString(obj),
+		c.logger.Info("Deleting", "object", util.RefToRuntimeObj(obj),
 			"from clusters", clusterSet)
 		deleteObjectOnManagedClusters(c.logger, c.ocmClient, *key.DeletedObject, clusterSet)
 		return nil
 	}
 
-	c.logger.Info("Delivering", "object", util.GenerateObjectInfoString(obj),
+	c.logger.Info("Delivering", "object", util.RefToRuntimeObj(obj),
 		"to clusters", clusterSet)
 	return c.deliverObjectToManagedClusters(obj, clusterSet, managedByPlacements, singletonStatus)
 }

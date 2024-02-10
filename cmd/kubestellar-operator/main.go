@@ -20,6 +20,7 @@ package main
 // to ensure that exec-entrypoint and run can make use of them.
 
 import (
+	"context"
 	"flag"
 	"os"
 
@@ -27,9 +28,9 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/binding"
@@ -38,8 +39,7 @@ import (
 )
 
 var (
-	scheme   = runtime.NewScheme()
-	setupLog = ctrl.Log.WithName("setup")
+	scheme = runtime.NewScheme()
 )
 
 const (
@@ -70,13 +70,16 @@ func main() {
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 
-	opts := zap.Options{
-		Development: true,
-	}
-	opts.BindFlags(flag.CommandLine)
+	klog.InitFlags(nil)
 	flag.Parse()
+	ctx := context.Background()
+	logger := klog.FromContext(ctx)
+	ctrl.SetLogger(logger)
+	setupLog := ctrl.Log.WithName("setup")
 
-	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+	flag.VisitAll(func(flg *flag.Flag) {
+		setupLog.Info("Command line flag", "name", flg.Name, "value", flg.Value)
+	})
 
 	// parse allowed resources string
 	allowedGroupsSet := util.ParseAPIGroupsString(allowedGroupsString)
@@ -140,7 +143,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := bindingController.Start(workers); err != nil {
+	if err := bindingController.Start(ctx, workers); err != nil {
 		setupLog.Error(err, "error starting the binding controller")
 		os.Exit(1)
 	}
@@ -155,7 +158,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		if err := statusController.Start(workers); err != nil {
+		if err := statusController.Start(ctx, workers); err != nil {
 			setupLog.Error(err, "error starting the status controller")
 			os.Exit(1)
 		}
