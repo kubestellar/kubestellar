@@ -18,7 +18,6 @@ package util
 
 import (
 	"fmt"
-	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -105,23 +104,6 @@ func KeyFromGVKandNamespacedName(gvk schema.GroupVersionKind, name types.Namespa
 	}
 
 	return fmt.Sprintf("%s/%s/%s/%s", gvk.Group, gvk.Version, gvk.Kind, name.String())
-}
-
-// Used for generating a single string unique representation of the object for logging info.
-//
-// Deprecated: use RefToRuntimeObj instead.
-func GenerateObjectInfoString(obj runtime.Object) string {
-	group := obj.GetObjectKind().GroupVersionKind().Group
-	kind := strings.ToLower(obj.GetObjectKind().GroupVersionKind().Kind)
-	mObj := obj.(metav1.Object)
-
-	prefix := kind
-	if group != "" {
-		prefix = fmt.Sprintf("%s.%s", kind, group)
-
-	}
-
-	return fmt.Sprintf("[%s] %s/%s", mObj.GetNamespace(), prefix, mObj.GetName())
 }
 
 func RefToRuntimeObj(obj runtime.Object) GVKObjRef {
