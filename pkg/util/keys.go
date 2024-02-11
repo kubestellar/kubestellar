@@ -18,7 +18,6 @@ package util
 
 import (
 	"fmt"
-	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -26,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
@@ -106,19 +106,26 @@ func KeyFromGVKandNamespacedName(gvk schema.GroupVersionKind, name types.Namespa
 	return fmt.Sprintf("%s/%s/%s/%s", gvk.Group, gvk.Version, gvk.Kind, name.String())
 }
 
-// Used for generating a single string unique representation of the object for logging info
-func GenerateObjectInfoString(obj runtime.Object) string {
-	group := obj.GetObjectKind().GroupVersionKind().Group
-	kind := strings.ToLower(obj.GetObjectKind().GroupVersionKind().Kind)
+func RefToRuntimeObj(obj runtime.Object) GVKObjRef {
+	gvk := obj.GetObjectKind().GroupVersionKind()
 	mObj := obj.(metav1.Object)
-
-	prefix := kind
-	if group != "" {
-		prefix = fmt.Sprintf("%s.%s", kind, group)
-
+	ans := GVKObjRef{
+		GK: gvk.GroupKind(),
+		OR: klog.ObjectRef{
+			Namespace: mObj.GetNamespace(),
+			Name:      mObj.GetName(),
+		},
 	}
+	return ans
+}
 
-	return fmt.Sprintf("[%s] %s/%s", mObj.GetNamespace(), prefix, mObj.GetName())
+type GVKObjRef struct {
+	GK schema.GroupKind
+	OR klog.ObjectRef
+}
+
+func (ref GVKObjRef) String() string {
+	return ref.GK.String() + "(" + ref.OR.String() + ")"
 }
 
 func EmptyUnstructuredObjectFromKey(key Key) *unstructured.Unstructured {

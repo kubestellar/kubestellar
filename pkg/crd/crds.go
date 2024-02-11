@@ -56,8 +56,8 @@ const (
 	FieldManager = "kubestellar"
 )
 
-func ApplyCRDs(dynamicClient dynamic.Interface, clientset kubernetes.Interface, clientsetExt apiextensionsclientset.Interface, logger logr.Logger) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+func ApplyCRDs(ctx context.Context, dynamicClient dynamic.Interface, clientset kubernetes.Interface, clientsetExt apiextensionsclientset.Interface, logger logr.Logger) error {
+	ctxLimited, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	crds, err := readCRDs()
@@ -80,7 +80,7 @@ func ApplyCRDs(dynamicClient dynamic.Interface, clientset kubernetes.Interface, 
 		}
 
 		// wait until name accepted
-		err = waitForCRDAccepted(ctx, clientsetExt, crd.GetName())
+		err = waitForCRDAccepted(ctxLimited, clientsetExt, crd.GetName())
 		if err != nil {
 			return err
 		}

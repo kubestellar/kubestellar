@@ -57,7 +57,7 @@ func (c *Controller) matchSelectors(obj runtime.Object) (sets.Set[string], []str
 		}
 
 		managedByPlacementList = append(managedByPlacementList, placement.GetName())
-		c.logger.Info("Matched", "object", util.GenerateObjectInfoString(obj), "for placement", placement.GetName())
+		c.logger.Info("Matched", "object", util.RefToRuntimeObj(obj), "for placement", placement.GetName())
 
 		clusters, err := ocm.FindClustersBySelectors(c.ocmClient, placement.Spec.ClusterSelectors)
 		if err != nil {
@@ -98,7 +98,7 @@ func (c *Controller) updateDecisions(obj runtime.Object) error {
 				// enqueue placement-decision to be synced since object was removed from its placement's resolution
 				c.logger.V(4).Info("enqueued PlacementDecision for syncing due to the removal of an "+
 					"object from its resolution", "placement-decision", placement.GetName(),
-					"object", util.GenerateObjectInfoString(obj))
+					"object", util.RefToRuntimeObj(obj))
 				c.enqueuePlacementDecision(placement.GetName())
 			}
 			continue
@@ -112,19 +112,19 @@ func (c *Controller) updateDecisions(obj runtime.Object) error {
 				// starting this iteration and BEFORE getting to the NoteObject function,
 				// which occurs if a placement was deleted in this time-window.
 				utilruntime.HandleError(fmt.Errorf("failed to note object (%s) - %w",
-					util.GenerateObjectInfoString(obj), err))
+					util.RefToRuntimeObj(obj), err))
 				continue
 			}
 
 			return fmt.Errorf("failed to update resolution for placement %s for object %v: %v",
-				placement.GetName(), util.GenerateObjectInfoString(obj), err)
+				placement.GetName(), util.RefToRuntimeObj(obj), err)
 		}
 
 		if resolutionUpdated {
 			// enqueue placement-decision to be synced since an object was added to its placement's resolution
 			c.logger.V(4).Info("enqueued PlacementDecision for syncing due to a noting of an "+
 				"object in its resolution", "placement-decision", placement.GetName(),
-				"object", util.GenerateObjectInfoString(obj))
+				"object", util.RefToRuntimeObj(obj))
 			c.enqueuePlacementDecision(placement.GetName())
 		}
 	}

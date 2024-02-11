@@ -63,7 +63,7 @@ const (
 //
 //  3. for updates on label selectors, re-evaluate if existing objects should be removed
 //     from clusters.
-func (c *Controller) handlePlacement(obj runtime.Object) error {
+func (c *Controller) handlePlacement(ctx context.Context, obj runtime.Object) error {
 	placement, err := runtimeObjectToPlacement(obj)
 	if err != nil {
 		return err
@@ -82,6 +82,7 @@ func (c *Controller) handlePlacement(obj runtime.Object) error {
 		c.placementResolver.NotePlacement(placement)
 		// set destinations and enqueue placement-decision for syncing
 		c.placementResolver.SetDestinations(placement.GetName(), clusterSet)
+		c.logger.V(4).Info("enqueued Binding for syncing, while handling BindingPolicy", "name", placement.Name)
 		c.enqueuePlacementDecision(placement.GetName())
 
 		// requeue objects for re-evaluation
@@ -92,7 +93,7 @@ func (c *Controller) handlePlacement(obj runtime.Object) error {
 		c.placementResolver.DeleteResolution(placement.GetName())
 	}
 
-	if err := c.handlePlacementFinalizer(placement); err != nil {
+	if err := c.handlePlacementFinalizer(ctx, placement); err != nil {
 		return err
 	}
 
@@ -169,14 +170,14 @@ func (c *Controller) requeueWorkloadObjects() error {
 }
 
 // finalizer logic
-func (c *Controller) handlePlacementFinalizer(placement *v1alpha1.BindingPolicy) error {
+func (c *Controller) handlePlacementFinalizer(ctx context.Context, placement *v1alpha1.BindingPolicy) error {
 	if placement.GetDeletionTimestamp() != nil {
 		if controllerutil.ContainsFinalizer(placement, KSFinalizer) {
 			if err := c.deleteExternalResources(placement); err != nil {
 				return err
 			}
 			controllerutil.RemoveFinalizer(placement, KSFinalizer)
-			if err := updatePlacement(c.dynamicClient, placement); err != nil {
+			if err := updatePlacement(ctx, c.dynamicClient, placement); err != nil {
 				return err
 			}
 		}
@@ -185,14 +186,14 @@ func (c *Controller) handlePlacementFinalizer(placement *v1alpha1.BindingPolicy)
 
 	if !controllerutil.ContainsFinalizer(placement, KSFinalizer) {
 		controllerutil.AddFinalizer(placement, KSFinalizer)
-		if err := updatePlacement(c.dynamicClient, placement); err != nil {
+		if err := updatePlacement(ctx, c.dynamicClient, placement); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func updatePlacement(client dynamic.Interface, placement *v1alpha1.BindingPolicy) error {
+func updatePlacement(ctx context.Context, client dynamic.Interface, placement *v1alpha1.BindingPolicy) error {
 	gvr := schema.GroupVersionResource{
 		Group:    v1alpha1.GroupVersion.Group,
 		Version:  v1alpha1.GroupVersion.Version,
@@ -208,7 +209,7 @@ func updatePlacement(client dynamic.Interface, placement *v1alpha1.BindingPolicy
 		Object: innerObj,
 	}
 
-	client.Resource(gvr).Namespace("").Update(context.Background(), unstructuredObj, metav1.UpdateOptions{})
+	client.Resource(gvr).Namespace("").Update(ctx, unstructuredObj, metav1.UpdateOptions{})
 	return nil
 }
 
@@ -341,7 +342,7 @@ func (c *Controller) checkObjectMatchesWhatAndWhere(placement *v1alpha1.BindingP
 	objMR := obj.(mrObject)
 	matchedSome := c.testObject(objMR, placement.Spec.Downsync)
 	if !matchedSome {
-		c.logger.Info("The 'What' no longer matches. Object marked for removal.", "object", util.GenerateObjectInfoString(obj), "for placement", placement.GetName())
+		c.logger.Info("The 'What' no longer matches. Object marked for removal.", "object", util.RefToRuntimeObj(obj), "for placement", placement.GetName())
 		return false, nil
 	}
 
@@ -352,7 +353,7 @@ func (c *Controller) checkObjectMatchesWhatAndWhere(placement *v1alpha1.BindingP
 		return match, err
 	}
 	if !matchedClusters.Has(clusterName) {
-		c.logger.Info("The 'Where' no longer matches. Object marked for removal.", "object", util.GenerateObjectInfoString(obj), "for placement", placement.GetName(), "cluster", clusterName)
+		c.logger.Info("The 'Where' no longer matches. Object marked for removal.", "object", util.RefToRuntimeObj(obj), "for placement", placement.GetName(), "cluster", clusterName)
 		return false, nil
 	}
 

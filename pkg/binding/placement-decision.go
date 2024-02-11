@@ -31,7 +31,7 @@ import (
 )
 
 // syncPlacementDecision syncs a placement-decision object with what is resolved by the placement-resolver.
-func (c *Controller) syncPlacementDecision(key util.Key) error {
+func (c *Controller) syncPlacementDecision(ctx context.Context, key util.Key) error {
 	var unstructuredObj *unstructured.Unstructured
 	if !c.placementResolver.ResolutionExists(key.NamespacedName.Name) {
 		// if a resolution is not associated to the placement-decision's name
@@ -73,7 +73,7 @@ func (c *Controller) syncPlacementDecision(key util.Key) error {
 	// calculate if the resolved decision is different from the current one
 	if !c.placementResolver.ComparePlacementDecision(placementIdentifier, &placementDecision.Spec) {
 		// update the placement decision object in the cluster by updating spec
-		if err = c.updateOrCreatePlacementDecision(placementDecision, generatedPlacementDecisionSpec); err != nil {
+		if err = c.updateOrCreatePlacementDecision(ctx, placementDecision, generatedPlacementDecisionSpec); err != nil {
 			return fmt.Errorf("failed to update or create placement decision: %w", err)
 		}
 
@@ -86,7 +86,7 @@ func (c *Controller) syncPlacementDecision(key util.Key) error {
 
 // updateOrCreatePlacementDecision updates or creates a placement-decision object in the cluster.
 // If the object already exists, it is updated. Otherwise, it is created.
-func (c *Controller) updateOrCreatePlacementDecision(pd *v1alpha1.Binding,
+func (c *Controller) updateOrCreatePlacementDecision(ctx context.Context, pd *v1alpha1.Binding,
 	generatedPlacementDecisionSpec *v1alpha1.BindingSpec) error {
 	// use the passed placement decision and set its spec
 	pd.Spec = *generatedPlacementDecisionSpec
@@ -108,14 +108,14 @@ func (c *Controller) updateOrCreatePlacementDecision(pd *v1alpha1.Binding,
 		Group:    v1alpha1.SchemeGroupVersion.Group,
 		Version:  pd.GetObjectKind().GroupVersionKind().Version,
 		Resource: util.BindingResource,
-	}).Update(context.Background(), unstructuredPlacementDecision, metav1.UpdateOptions{})
+	}).Update(ctx, unstructuredPlacementDecision, metav1.UpdateOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
 			_, err = c.dynamicClient.Resource(schema.GroupVersionResource{
 				Group:    v1alpha1.SchemeGroupVersion.Group,
 				Version:  pd.GetObjectKind().GroupVersionKind().Version,
 				Resource: util.BindingResource,
-			}).Create(context.Background(), unstructuredPlacementDecision, metav1.CreateOptions{})
+			}).Create(ctx, unstructuredPlacementDecision, metav1.CreateOptions{})
 			if err != nil {
 				return fmt.Errorf("failed to create placement decision: %w", err)
 			}
