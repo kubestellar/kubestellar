@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # Copyright 2024 The KubeStellar Authors.
 #
