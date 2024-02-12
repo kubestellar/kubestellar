@@ -356,17 +356,10 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 		return fmt.Errorf("failed to build wrapped object from PlacementDecision '%s' - %w", placementDecision.GetName(), err)
 	}
 	// converge actual state to the desired state
-	for _, destination := range placementDecision.Spec.Destinations {
-		currentWrappedObject := c.popWrappedObjectByNamespace(currentWrappedObjectList, destination.ClusterId)
-		if currentWrappedObject != nil && currentWrappedObject.GetAnnotations() != nil &&
-			currentWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] == desiredWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] {
-			continue // current wrapped object is already in the desired state
-		}
-		// othereise, need to create or update the wrapped object
-		if err := c.createOrUpdateWrappedObject(ctx, destination.ClusterId, desiredWrappedObject); err != nil {
-			return fmt.Errorf("failed to propagate wrapped object '%s' to all required WECs - %w", desiredWrappedObject.GetName(), err)
-		}
+	if err := c.propagateWrappedObjectToClusters(ctx, desiredWrappedObject, currentWrappedObjectList, placementDecision.Spec.Destinations); err != nil {
+		return fmt.Errorf("failed to propagate wrapped object '%s' to all required WECs - %w", desiredWrappedObject.GetName(), err)
 	}
+
 	// all objects that appear in the desired state were handled. need to remove wrapped objects that are not part of the desired state
 	for _, wrappedObject := range currentWrappedObjectList.Items { // objects left in currentWrappedObjectList.Items have to be deleted
 		if err := c.deleteWrappedObject(ctx, wrappedObject.GetNamespace(), wrappedObject.GetName()); err != nil {
@@ -422,6 +415,10 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 		return nil, fmt.Errorf("failed to get objects to propagate to WECs from PlacementDecision object '%s' - %w", placementDecision.GetName(), err)
 	}
 
+	if len(objectsToPropagate) == 0 {
+		return nil, nil // if no objects were found in the workload section, return nil so that we don't distribute an empty wrapped object.
+	}
+
 	wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(objectsToPropagate))
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
@@ -436,6 +433,31 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	setAnnotation(wrappedObject, originOwnerGenerationAnnotation, placementDecision.GetGeneration())
 
 	return wrappedObject, nil
+}
+
+func (c *genericTransportController) propagateWrappedObjectToClusters(ctx context.Context, desiredWrappedObject *unstructured.Unstructured,
+	currentWrappedObjectList *unstructured.UnstructuredList, destinations []v1alpha1.Destination) error {
+	// if the desired wrapped object is nil, that means we should not propagate this object.
+	// this may happen when the workload section is empty.
+	// this is not an error state but a valid scenario.
+	// return without propagating, the delete section will remove existing instances of the wrapped object from all current destinations.
+	if desiredWrappedObject == nil {
+		return nil // this is not considered an error.
+	}
+
+	for _, destination := range destinations {
+		currentWrappedObject := c.popWrappedObjectByNamespace(currentWrappedObjectList, destination.ClusterId)
+		if currentWrappedObject != nil && currentWrappedObject.GetAnnotations() != nil &&
+			currentWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] == desiredWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] {
+			continue // current wrapped object is already in the desired state
+		}
+		// othereise, need to create or update the wrapped object
+		if err := c.createOrUpdateWrappedObject(ctx, destination.ClusterId, desiredWrappedObject); err != nil {
+			return fmt.Errorf("failed to propagate wrapped object to cluster mailbox namespace '%s' - %w", destination.ClusterId, err)
+		}
+	}
+
+	return nil
 }
 
 // pops wrapped object by namespace from the list and returns the requested wrapped object.
