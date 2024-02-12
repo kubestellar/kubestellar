@@ -135,6 +135,7 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 		placementResolver: NewPlacementResolver(gvkGvrMapper),
 		gvkGvrMapper:      gvkGvrMapper,
 		workqueue:         workqueue.NewRateLimitingQueue(ratelimiter),
+		allowedGroupsSet:  allowedGroupsSet,
 	}
 
 	return controller, nil
