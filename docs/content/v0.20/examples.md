@@ -43,7 +43,7 @@ which installs OCM on it.
    and then install the status add-on:
 
    ```shell
-   helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version 0.2.0-alpha.1
+   helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-alpha.1
    ```
 
    see [here](https://github.ibm.com/dettori/status-addon) for more details on the add-on.
