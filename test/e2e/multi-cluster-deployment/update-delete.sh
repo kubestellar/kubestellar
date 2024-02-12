@@ -23,7 +23,22 @@ source "${COMMON_SRCS}/setup-shell.sh"
 # Test cases for the update/delete of the bindingpolicy and the workload objects.
 # This test script should be executed after a successful execution of the use-kubestellar.sh script, located in the current directory.
 
+#
+#  Update of the managedcluster object in the OCM hub should update the bindings
+#
+: -------------------------------------------------------------------------
+: Test update of the managedcluster:
+: Change the location-group label on one of the managed cluster and verify the Binding objects 
+: are properly updated.
 :
+kubectl --context imbs1 label managedcluster cluster2 location-group=blah name=cluster2 --overwrite
+wait-for-cmd '[ "$(kubectl --context wds1 get bindings.control -o yaml | grep clusterId  | wc -l)" == 1 ]'
+kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=cluster2 --overwrite
+wait-for-cmd '[ "$(kubectl --context wds1 get bindings.control -o yaml | grep clusterId  | wc -l)" == 2 ]'
+:
+: Test passed
+
+
 #
 #  Update of the workload object on WDS should update the object on the WECs
 #

@@ -25,6 +25,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"golang.org/x/time/rate"
+	ocmclientset "open-cluster-management.io/api/client/cluster/clientset/versioned"
 
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -80,6 +81,7 @@ const bindingQueueingDelay = 2 * time.Second
 // places objects into mailboxes
 type Controller struct {
 	logger                logr.Logger
+	ocmClientset          ocmclientset.Interface
 	ocmClient             client.Client
 	dynamicClient         dynamic.Interface
 	kubernetesClient      kubernetes.Interface
@@ -118,6 +120,11 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 		return nil, err
 	}
 
+	ocmClientset, err := ocmclientset.NewForConfig(imbsRestConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	ocmClient := *ocm.GetOCMClient(imbsRestConfig)
 
 	gvkGvrMapper := util.NewGvkGvrMapper()
@@ -125,6 +132,7 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 	controller := &Controller{
 		wdsName:               wdsName,
 		logger:                mgr.GetLogger().WithName(controllerName),
+		ocmClientset:          ocmClientset,
 		ocmClient:             ocmClient,
 		dynamicClient:         dynamicClient,
 		kubernetesClient:      kubernetesClient,
@@ -248,6 +256,13 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 	}
 	c.logger.Info("All caches synced")
 
+	// Create informer on managedclusters so we can re-evaluate BindingPolicies.
+	// This informer differ from the previous informers in that it listens on the ocm hub.
+	err = c.createManagedClustersInformer(ctx)
+	if err != nil {
+		return err
+	}
+
 	// populate the BindingPolicyResolver with entries for existing bindingpolicies
 	if err := c.populateBindingPolicyResolverWithExistingBindingPolicies(); err != nil {
 		return fmt.Errorf("failed to populate the BindingPolicyResolver for the existing bindingpolicies: %w", err)
@@ -264,6 +279,38 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 	<-ctx.Done()
 	c.logger.Info("Shutting down workers")
 
+	return nil
+}
+
+func (c *Controller) createManagedClustersInformer(ctx context.Context) error {
+	informerFactory := ocm.GetOCMInformerFactory(c.ocmClientset)
+	informer := informerFactory.Cluster().V1().ManagedClusters().Informer()
+	_, err := informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			labels := obj.(metav1.Object).GetLabels()
+			c.evaluateBindingPolicies(ctx, labels)
+		},
+		UpdateFunc: func(old, new interface{}) {
+			// Re-evaluateBindingPolicies iff labels have changed.
+			oldLabels := old.(metav1.Object).GetLabels()
+			newLabels := new.(metav1.Object).GetLabels()
+			if !reflect.DeepEqual(oldLabels, newLabels) {
+				c.evaluateBindingPoliciesForUpdate(ctx, oldLabels, newLabels)
+			}
+		},
+		DeleteFunc: func(obj interface{}) {
+			labels := obj.(metav1.Object).GetLabels()
+			c.evaluateBindingPolicies(ctx, labels)
+		},
+	})
+	if err != nil {
+		c.logger.Error(err, "failed to add managedclusters informer event handler")
+		return err
+	}
+	informerFactory.Start(ctx.Done())
+	if ok := cache.WaitForCacheSync(ctx.Done(), informer.HasSynced); !ok {
+		return fmt.Errorf("failed to wait for caches to sync")
+	}
 	return nil
 }
 
@@ -595,16 +642,9 @@ func (c *Controller) deliverObjectToManagedClusters(
 			}
 			// a bindingpolicy selects a managedCluster iff the managedCluster is selected by every single selector
 			// i.e. selectors are ANDed
-			matches := true
-			for _, s := range pl.Spec.ClusterSelectors {
-				selector, err := metav1.LabelSelectorAsSelector(&s)
-				if err != nil {
-					return err
-				}
-				if !selector.Matches(labels.Set(cl.Labels)) {
-					matches = false
-					break
-				}
+			matches, err := util.SelectorsMatchLabels(pl.Spec.ClusterSelectors, labels.Set(cl.Labels))
+			if err != nil {
+				return err
 			}
 			if matches {
 				bindingPolicyNames = append(bindingPolicyNames, plName)
