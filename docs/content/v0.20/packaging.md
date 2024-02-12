@@ -110,7 +110,10 @@ TODO: document how the image is built and published, including explain versionin
 
 ```mermaid
 flowchart LR
-    subgraph "kubestellar@GitHub"
+    subgraph cladm_repo["ocm/clusteradm@GitHub"]
+    cladm_src["clusteradm source"]
+    end
+    subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
     kcm_hc_src[KCM Helm chart source]
     ks_pch[kubestellar PostCreateHook]
@@ -118,6 +121,8 @@ flowchart LR
     ks_scripts -.-> ocm_pch
     ks_scripts -.-> ks_pch
     end
+    cladm_image["ks/clusteradm image"] --> cladm_src
+    ocm_pch -.-> cladm_image
     kcm_ctr_image[KCM container image] --> kcm_code
     kcm_hc_repo[published KCM Helm Chart] --> kcm_hc_src
     kcm_hc_src -.-> kcm_ctr_image
@@ -211,11 +216,24 @@ This chart creates (among other things) a `Deployment` object that runs a contai
 The chart is published at the OCI repository
 `ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart`.  What stores the chart there?
 
+### clusteradm container image
+
+The kubestellar GitHub repository has a script,
+`hack/build-clusteradm-image.sh`, that creates and publishes a
+container image holding the `clusteradm` command from OCM. The source
+of the container image is read from the latest release of
+[github.com/open-cluster-management-io/clusteradm](https://github.com/open-cluster-management-io/clusteradm),
+unless a command line flag says to use a specific version. This script
+also pushes the built container image to
+[quay.io/kubestellar/clusteradm](https://quay.io/repository/kubestellar/clusteradm)
+using a tag that equals the ocm/clusteradm version that the image was
+built from.
+
 ### KubeFlex PostCreateHooks
 
 There are two `PostCreateHook` objects defined in [config/postcreate-hooks](../../../config/postcreate-hooks). What uses these copies of those hook definitions?
 
-- `ocm.yaml` adds `clusteradm` by running a container using the image `quay.io/kubestellar/clusteradm:0.7.2` which is built from [the OCM source](https://github.com/open-cluster-management-io/clusteradm) using the script [build-clusteradm-image.sh](../../../hack/build-clusteradm-image.sh).
+- `ocm.yaml` adds `clusteradm` by running a container using the image `quay.io/kubestellar/clusteradm:0.7.2`; see [above](#clusteradm-container-image) about the source of that.
 - `kubestellar.yaml` runs container image `quay.io/kubestellar/helm:v3.14.0` (which is built from [the Helm source](https://github.com/helm/helm/tree/v3.14.0) by a process that we need to document) to instantiate the chart from `oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart` with chart version `0.20.0-alpha.1`, which is built by (what?) from (what? probably answered above).
 
 ## Amalgamated graph
@@ -234,7 +252,11 @@ flowchart LR
     osa_hc_repo[published OSA Helm Chart] --> osa_hc_src
     osa_hc_src -.-> osa_ctr_image
     osa_hc_repo -.-> osa_ctr_image
-    subgraph "kubestellar@GitHub"
+
+    subgraph cladm_repo["ocm/clusteradm@GitHub"]
+    cladm_src["clusteradm source"]
+    end
+    subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
     kcm_hc_src[KCM Helm chart source]
     ks_pch[kubestellar PostCreateHook]
@@ -242,12 +264,14 @@ flowchart LR
     ks_scripts -.-> ocm_pch
     ks_scripts -.-> ks_pch
     end
+    cladm_image["ks/clusteradm image"] --> cladm_src
+    ocm_pch -.-> cladm_image
     kcm_ctr_image[KCM container image] --> kcm_code
     kcm_hc_repo[published KCM Helm Chart] --> kcm_hc_src
     kcm_hc_src -.-> kcm_ctr_image
     kcm_hc_repo -.-> kcm_ctr_image
     ks_pch  -.-> kcm_hc_repo
-    ks_scripts -.-> osa_hc_repo
+    ks_scripts -.-> osa_hc_repo[published OSA Helm Chart]
     ks_scripts -.-> otp_something["published OTP ??"]
     ks_scripts -.-> KubeFlex
 ```
