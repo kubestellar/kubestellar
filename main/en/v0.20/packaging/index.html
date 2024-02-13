@@ -1927,6 +1927,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#clusteradm-container-image" class="md-nav__link">
+    clusteradm container image
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#kubeflex-postcreatehooks" class="md-nav__link">
     KubeFlex PostCreateHooks
   </a>
@@ -2065,22 +2072,27 @@ local copy of the chart to the OCI repository and tag specified in
 <h2 id="kubestellar">KubeStellar<a class="headerlink" href="#kubestellar" title="Permanent link">#</a></h2>
 <h3 id="outline-of-publishing">Outline of publishing<a class="headerlink" href="#outline-of-publishing" title="Permanent link">#</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>flowchart LR
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    subgraph &quot;kubestellar@GitHub&quot;
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    kcm_code[KCM source code]
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    kcm_hc_src[KCM Helm chart source]
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    ks_pch[kubestellar PostCreateHook]
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    ocm_pch[&quot;ocm PostCreateHook&quot;]
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    ks_scripts -.-&gt; ocm_pch
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    ks_scripts -.-&gt; ks_pch
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    end
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    kcm_ctr_image[KCM container image] --&gt; kcm_code
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    kcm_hc_repo[published KCM Helm Chart] --&gt; kcm_hc_src
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    kcm_hc_src -.-&gt; kcm_ctr_image
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    kcm_hc_repo -.-&gt; kcm_ctr_image
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    ks_pch  -.-&gt; kcm_hc_repo
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    ks_scripts -.-&gt; osa_hc_repo[published OSA Helm Chart]
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    ks_scripts -.-&gt; otp_something[&quot;published OTP ??&quot;]
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>    ks_scripts -.-&gt; KubeFlex
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    subgraph cladm_repo[&quot;ocm/clusteradm@GitHub&quot;]
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    cladm_src[&quot;clusteradm source&quot;]
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    end
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    subgraph ks_repo[&quot;kubestellar@GitHub&quot;]
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    kcm_code[KCM source code]
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    kcm_hc_src[KCM Helm chart source]
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    ks_pch[kubestellar PostCreateHook]
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    ocm_pch[&quot;ocm PostCreateHook&quot;]
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    ks_scripts -.-&gt; ocm_pch
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    ks_scripts -.-&gt; ks_pch
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    end
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    cladm_image[&quot;ks/clusteradm image&quot;] --&gt; cladm_src
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    ocm_pch -.-&gt; cladm_image
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    kcm_ctr_image[KCM container image] --&gt; kcm_code
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    kcm_hc_repo[published KCM Helm Chart] --&gt; kcm_hc_src
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>    kcm_hc_src -.-&gt; kcm_ctr_image
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    kcm_hc_repo -.-&gt; kcm_ctr_image
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>    ks_pch  -.-&gt; kcm_hc_repo
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>    ks_scripts -.-&gt; osa_hc_repo[published OSA Helm Chart]
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>    ks_scripts -.-&gt; otp_something[&quot;published OTP ??&quot;]
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>    ks_scripts -.-&gt; KubeFlex
 </code></pre></div>
 <p>The dashed dependencies are at run time, not build time.</p>
 <p>"KCM" is the KubeStellar controller-manager.</p>
@@ -2142,10 +2154,21 @@ it from local sources. This is not included in <code>make all-generated</code>.<
 <p>This chart creates (among other things) a <code>Deployment</code> object that runs a container from the image <code>ghcr.io/kubestellar/kubestellar/kubestellar-operator:0.20.0-alpha.1</code>.</p>
 <p>The chart is published at the OCI repository
 <code>ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart</code>.  What stores the chart there?</p>
+<h3 id="clusteradm-container-image">clusteradm container image<a class="headerlink" href="#clusteradm-container-image" title="Permanent link">#</a></h3>
+<p>The kubestellar GitHub repository has a script,
+<code>hack/build-clusteradm-image.sh</code>, that creates and publishes a
+container image holding the <code>clusteradm</code> command from OCM. The source
+of the container image is read from the latest release of
+<a href="https://github.com/open-cluster-management-io/clusteradm">github.com/open-cluster-management-io/clusteradm</a>,
+unless a command line flag says to use a specific version. This script
+also pushes the built container image to
+<a href="https://quay.io/repository/kubestellar/clusteradm">quay.io/kubestellar/clusteradm</a>
+using a tag that equals the ocm/clusteradm version that the image was
+built from.</p>
 <h3 id="kubeflex-postcreatehooks">KubeFlex PostCreateHooks<a class="headerlink" href="#kubeflex-postcreatehooks" title="Permanent link">#</a></h3>
 <p>There are two <code>PostCreateHook</code> objects defined in <a href="../../../config/postcreate-hooks">config/postcreate-hooks</a>. What uses these copies of those hook definitions?</p>
 <ul>
-<li><code>ocm.yaml</code> adds <code>clusteradm</code> by running a container using the image <code>quay.io/kubestellar/clusteradm:0.7.2</code> which is built from <a href="https://github.com/open-cluster-management-io/clusteradm">the OCM source</a> using the script <a href="../../../hack/build-clusteradm-image.sh">build-clusteradm-image.sh</a>.</li>
+<li><code>ocm.yaml</code> adds <code>clusteradm</code> by running a container using the image <code>quay.io/kubestellar/clusteradm:0.7.2</code>; see <a href="#clusteradm-container-image">above</a> about the source of that.</li>
 <li><code>kubestellar.yaml</code> runs container image <code>quay.io/kubestellar/helm:v3.14.0</code> (which is built from <a href="https://github.com/helm/helm/tree/v3.14.0">the Helm source</a> by a process that we need to document) to instantiate the chart from <code>oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart</code> with chart version <code>0.20.0-alpha.1</code>, which is built by (what?) from (what? probably answered above).</li>
 </ul>
 <h2 id="amalgamated-graph">Amalgamated graph<a class="headerlink" href="#amalgamated-graph" title="Permanent link">#</a></h2>
@@ -2160,22 +2183,28 @@ it from local sources. This is not included in <code>make all-generated</code>.<
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    osa_hc_repo[published OSA Helm Chart] --&gt; osa_hc_src
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    osa_hc_src -.-&gt; osa_ctr_image
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    osa_hc_repo -.-&gt; osa_ctr_image
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    subgraph &quot;kubestellar@GitHub&quot;
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    kcm_code[KCM source code]
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    kcm_hc_src[KCM Helm chart source]
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    ks_pch[kubestellar PostCreateHook]
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    ocm_pch[&quot;ocm PostCreateHook&quot;]
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    ks_scripts -.-&gt; ocm_pch
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    ks_scripts -.-&gt; ks_pch
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    end
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    kcm_ctr_image[KCM container image] --&gt; kcm_code
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    kcm_hc_repo[published KCM Helm Chart] --&gt; kcm_hc_src
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    kcm_hc_src -.-&gt; kcm_ctr_image
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>    kcm_hc_repo -.-&gt; kcm_ctr_image
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>    ks_pch  -.-&gt; kcm_hc_repo
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    ks_scripts -.-&gt; osa_hc_repo
-<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>    ks_scripts -.-&gt; otp_something[&quot;published OTP ??&quot;]
-<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>    ks_scripts -.-&gt; KubeFlex
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    subgraph cladm_repo[&quot;ocm/clusteradm@GitHub&quot;]
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    cladm_src[&quot;clusteradm source&quot;]
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    end
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    subgraph ks_repo[&quot;kubestellar@GitHub&quot;]
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    kcm_code[KCM source code]
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    kcm_hc_src[KCM Helm chart source]
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    ks_pch[kubestellar PostCreateHook]
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    ocm_pch[&quot;ocm PostCreateHook&quot;]
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    ks_scripts -.-&gt; ocm_pch
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    ks_scripts -.-&gt; ks_pch
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>    end
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>    cladm_image[&quot;ks/clusteradm image&quot;] --&gt; cladm_src
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    ocm_pch -.-&gt; cladm_image
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>    kcm_ctr_image[KCM container image] --&gt; kcm_code
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>    kcm_hc_repo[published KCM Helm Chart] --&gt; kcm_hc_src
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>    kcm_hc_src -.-&gt; kcm_ctr_image
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>    kcm_hc_repo -.-&gt; kcm_ctr_image
+<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>    ks_pch  -.-&gt; kcm_hc_repo
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>    ks_scripts -.-&gt; osa_hc_repo[published OSA Helm Chart]
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>    ks_scripts -.-&gt; otp_something[&quot;published OTP ??&quot;]
+<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>    ks_scripts -.-&gt; KubeFlex
 </code></pre></div>
 <p>Every dotted line is a reference that must be versioned. How do we
 keep all those versions right?</p>
