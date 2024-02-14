@@ -16,20 +16,13 @@ limitations under the License.
 
 package abstract
 
-// SliceDelete removes an entry, identified by position, from a slice.
-// The given position must be valid.
-func SliceDelete[Elt any](slice *[]Elt, index int) {
-	lastIndex := len(*slice) - 1
-	if index != lastIndex {
-		(*slice)[index] = (*slice)[lastIndex]
-	}
-	*slice = (*slice)[:lastIndex]
+// Iterable2 is something that can iterate over some collection of key,value pairs
+type Iterable2[Key, Val any] interface {
+	Iterator2() Iterator2[Key, Val]
 }
 
-// SliceCopy copies a given slice into new storage
-func SliceCopy[Elt any](input []Elt) []Elt {
-	if input == nil {
-		return nil
-	}
-	return append(make([]Elt, 0, len(input)), input...)
-}
+// Iterator2 is a function for iterating over some collection of key,value pairs.
+// It calls yield on the pairs in some sequence,
+// stopping early if yield returns `false`.
+// This is intended to align with what I see now in https://go.dev/wiki/RangefuncExperiment .
+type Iterator2[Key, Val any] func(yield func(Key, Val) bool)
