@@ -23,6 +23,8 @@ import (
 	"time"
 
 	"github.com/spf13/pflag"
+	clusterclient "open-cluster-management.io/api/client/cluster/clientset/versioned"
+	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -100,15 +102,30 @@ func GenericMain(transportImplementation transport.Transport) {
 		logger.Error(err, "failed to create dynamic k8s clientset for transport space")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
+	ocmClientset, err := clusterclient.NewForConfig(transportRestConfig)
+	if err != nil {
+		logger.Error(err, "failed to create OCM clientset for transport space")
+		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
+	}
 
-	factory := ksinformers.NewSharedInformerFactoryWithOptions(wdsClientset, defaultResyncPeriod)
+	wdsKsInformerFactory := ksinformers.NewSharedInformerFactoryWithOptions(wdsClientset, defaultResyncPeriod)
 
-	transportController, err := transport.NewTransportController(ctx, factory.Control().V1alpha1().Bindings(),
+	ocmInformerFactory := clusterinformers.NewSharedInformerFactory(ocmClientset, defaultResyncPeriod)
+
+	inventoryPreInformer := ocmInformerFactory.Cluster().V1().ManagedClusters()
+
+	transportController, err := transport.NewTransportController(ctx, inventoryPreInformer, wdsKsInformerFactory.Control().V1alpha1().Bindings(),
 		transportImplementation, wdsClientset, wdsDynamicClient, transportClientset, transportDynamicClient, options.WdsName)
+	if err != nil {
+		logger.Error(err, "failed to construct transport controller")
+		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
+	}
+
+	ocmInformerFactory.Start(ctx.Done())
 
 	// notice that there is no need to run Start method in a separate goroutine.
 	// Start method is non-blocking and runs each of the factory's informers in its own dedicated goroutine.
-	factory.Start(ctx.Done())
+	wdsKsInformerFactory.Start(ctx.Done())
 
 	if err := transportController.Run(ctx, options.Concurrency); err != nil {
 		logger.Error(err, "failed to run transport controller")

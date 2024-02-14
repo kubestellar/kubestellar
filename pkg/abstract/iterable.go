@@ -16,24 +16,12 @@ limitations under the License.
 
 package abstract
 
-// SliceDelete removes an entry, identified by position, from a slice.
-// The given position must be valid.
-func SliceDelete[Elt any](slice *[]Elt, index int) {
-	lastIndex := len(*slice) - 1
-	if index != lastIndex {
-		(*slice)[index] = (*slice)[lastIndex]
-	}
-	*slice = (*slice)[:lastIndex]
+// Iterable is something that can iterate over some collection of values
+type Iterable[Elt any] interface {
+	Iterator() Iterator[Elt]
 }
 
-// SliceCopy copies a given slice into new storage
-func SliceCopy[Elt any](input []Elt) []Elt {
-	if input == nil {
-		return nil
-	}
-	output := make([]Elt, len(input))
-	for idx, elt := range input {
-		output[idx] = elt
-	}
-	return output
-}
+// Iterator is a function for iterating over some collection of values.
+// It calls yield on the values in some sequence,
+// stopping early if yield returns `false`.
+type Iterator[Elt any] func(yield func(Elt) bool)

@@ -51,6 +51,9 @@ kind: Deployment
 metadata:
   name: nginx-deployment
   namespace: nginx
+  annotations:
+    control.kubestellar.io/expand-parameters: "true"
+    customization-test: "cluster %(name) is my home"
   labels:
     app.kubernetes.io/name: nginx
 spec:
@@ -79,3 +82,9 @@ wait-for-cmd 'kubectl --context cluster1 get deployments -n nginx nginx-deployme
 : "Waiting for deployment on cluster2"
 wait-for-cmd 'kubectl --context cluster2 get deployments -n nginx nginx-deployment'
 : "SUCCESS: confirmed deployments on both cluster1 and cluster2."
+
+:
+: -------------------------------------------------------------------------
+: "Verify that the customization has been done"
+[ "$(kubectl --context cluster1 get deploy -n nginx nginx-deployment -o 'jsonpath={.metadata.annotations.customization-test}')" = "cluster cluster1 is my home" ]
+[ "$(kubectl --context cluster2 get deploy -n nginx nginx-deployment -o 'jsonpath={.metadata.annotations.customization-test}')" = "cluster cluster2 is my home" ]
