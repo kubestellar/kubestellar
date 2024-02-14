@@ -19,7 +19,7 @@ package options
 import (
 	"github.com/spf13/pflag"
 
-	clientopts "github.com/kubestellar/kubestellar/cmd/client-options"
+	clientopts "github.com/kubestellar/kubestellar/options"
 )
 
 const (
@@ -28,16 +28,16 @@ const (
 
 type TransportOptions struct {
 	Concurrency            int
-	WdsClientOptions       *clientopts.ClientOpts
-	TransportClientOptions *clientopts.ClientOpts
+	WdsClientOptions       *clientopts.ClientOptions
+	TransportClientOptions *clientopts.ClientOptions
 	WdsName                string
 }
 
 func NewTransportOptions() *TransportOptions {
 	return &TransportOptions{
 		Concurrency:            defaultConcurrency,
-		WdsClientOptions:       clientopts.NewClientOpts("wds", "access the wds"),
-		TransportClientOptions: clientopts.NewClientOpts("transport", "access the transport space"),
+		WdsClientOptions:       clientopts.NewClientOptions("wds", "access the wds"),
+		TransportClientOptions: clientopts.NewClientOptions("transport", "access the transport space"),
 	}
 }
 

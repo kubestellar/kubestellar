@@ -23,15 +23,15 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-type ClientOpts struct {
+type ClientOptions struct {
 	name         string
 	description  string
 	loadingRules *clientcmd.ClientConfigLoadingRules
 	overrides    clientcmd.ConfigOverrides
 }
 
-func NewClientOpts(name string, description string) *ClientOpts {
-	return &ClientOpts{
+func NewClientOptions(name string, description string) *ClientOptions {
+	return &ClientOptions{
 		name:         name,
 		description:  description,
 		loadingRules: clientcmd.NewDefaultClientConfigLoadingRules(),
@@ -39,7 +39,7 @@ func NewClientOpts(name string, description string) *ClientOpts {
 	}
 }
 
-func (opts *ClientOpts) AddFlags(flags *pflag.FlagSet) {
+func (opts *ClientOptions) AddFlags(flags *pflag.FlagSet) {
 	flags.StringVar(&opts.loadingRules.ExplicitPath, opts.name+"-kubeconfig", opts.loadingRules.ExplicitPath, "Path to the kubeconfig file to use for "+opts.description)
 	flags.StringVar(&opts.overrides.CurrentContext, opts.name+"-context", opts.overrides.CurrentContext, "The name of the kubeconfig context to use for "+opts.description)
 	flags.StringVar(&opts.overrides.Context.AuthInfo, opts.name+"-user", opts.overrides.Context.AuthInfo, "The name of the kubeconfig user to use for "+opts.description)
@@ -47,7 +47,7 @@ func (opts *ClientOpts) AddFlags(flags *pflag.FlagSet) {
 
 }
 
-func (opts *ClientOpts) ToRESTConfig() (*rest.Config, error) {
+func (opts *ClientOptions) ToRESTConfig() (*rest.Config, error) {
 	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(opts.loadingRules, &opts.overrides)
 	return clientConfig.ClientConfig()
 }
