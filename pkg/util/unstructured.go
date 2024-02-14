@@ -64,7 +64,7 @@ func IsCRD(o interface{}) bool { // CRDs might have different versions. therefor
 	return matchesGVK(o, apiextensions.GroupName, AnyVersion, CRDKind)
 }
 
-func IsPlacement(o interface{}) bool {
+func IsBindingPolicy(o interface{}) bool {
 	return matchesGVK(o, v1alpha1.GroupVersion.Group, v1alpha1.GroupVersion.Version, BindingPolicyKind)
 }
 

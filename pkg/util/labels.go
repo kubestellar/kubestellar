@@ -27,12 +27,12 @@ import (
 )
 
 const (
-	// placement key has the form managed-by.kubestellar.io/<wds-name>.<placement-name>
+	// BindingPolicy key has the form managed-by.kubestellar.io/<wds-name>.<bindingpolicy-name>
 	// this is because key must be unique per wds and we need to identify the wds for
 	// multi-wds environments.
-	PlacementLabelKeyBase         = "managed-by.kubestellar.io"
-	PlacementLabelValueEnabled    = "true"
-	PlacementLabelSingletonStatus = "managed-by.kubestellar.io/singletonstatus"
+	BindingPolicyLabelKeyBase         = "managed-by.kubestellar.io"
+	BindingPolicyLabelValueEnabled    = "true"
+	BindingPolicyLabelSingletonStatus = "managed-by.kubestellar.io/singletonstatus"
 )
 
 func GetBindingPolicyListerKey() string {
@@ -45,30 +45,30 @@ func GetBindingListerKey() string {
 		v1alpha1.GroupVersion.Version, BindingKind)
 }
 
-func SetManagedByPlacementLabels(obj metav1.Object, wdsName string, managedByPlacements []string, singletonStatus bool) {
+func SetManagedByBindingPolicyLabels(obj metav1.Object, wdsName string, managedByBindingPolicies []string, singletonStatus bool) {
 	objLabels := obj.GetLabels()
 	if objLabels == nil {
 		objLabels = make(labels.Set)
 	}
-	for _, placement := range managedByPlacements {
-		objLabels = mergeManagedByPlacementLabel(objLabels, wdsName, placement)
+	for _, bindingpolicy := range managedByBindingPolicies {
+		objLabels = mergeManagedByBindingPolicyLabel(objLabels, wdsName, bindingpolicy)
 	}
 	// label manifest requiring simgleton status so that status controller can evaluate
 	if singletonStatus {
-		objLabels[PlacementLabelSingletonStatus] = PlacementLabelValueEnabled
+		objLabels[BindingPolicyLabelSingletonStatus] = BindingPolicyLabelValueEnabled
 	}
 	obj.SetLabels(objLabels)
 }
 
-func mergeManagedByPlacementLabel(l labels.Set, wdsName, placementName string) labels.Set {
+func mergeManagedByBindingPolicyLabel(l labels.Set, wdsName, bindingPolicyName string) labels.Set {
 	plLabel := make(labels.Set)
-	key := GenerateManagedByPlacementLabelKey(wdsName, placementName)
-	plLabel[key] = PlacementLabelValueEnabled
+	key := GenerateManagedByBindingPolicyLabelKey(wdsName, bindingPolicyName)
+	plLabel[key] = BindingPolicyLabelValueEnabled
 	return labels.Merge(l, plLabel)
 }
 
-func GenerateManagedByPlacementLabelKey(wdsName, placementName string) string {
-	return fmt.Sprintf("%s/%s.%s", PlacementLabelKeyBase, wdsName, placementName)
+func GenerateManagedByBindingPolicyLabelKey(wdsName, bindingPolicyName string) string {
+	return fmt.Sprintf("%s/%s.%s", BindingPolicyLabelKeyBase, wdsName, bindingPolicyName)
 }
 
 type Label struct {

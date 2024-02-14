@@ -169,7 +169,7 @@ type BindingPolicyList struct {
 }
 
 // Binding is mapped 1:1 to a single BindingPolicy object.
-// The decision resource reflects the resolution of the BindingPolicy's selectors,
+// It reflects the resolution of the BindingPolicy's selectors,
 // and explicitly reflects which objects should go to what destinations.
 //
 // +genclient

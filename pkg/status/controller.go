@@ -48,21 +48,21 @@ import (
 
 const controllerName = "Status"
 
-// Status controller watches workstatues and checks associated placements for singleton status. If
-// a placement that cuase an object to be delivered to a cluster has singleton statsus specified
+// Status controller watches workstatues and checks associated bindingpolicies for singleton status. If
+// a bindingpolicy that cause an object to be delivered to a cluster has singleton statsus specified
 // the full status will be copied to the object.
 type Controller struct {
-	logger             logr.Logger
-	wdsName            string
-	wdsDynClient       dynamic.Interface
-	wdsKubeClient      kubernetes.Interface
-	imbsDynClient      dynamic.Interface
-	imbsKubeClient     kubernetes.Interface
-	workStatusInformer cache.SharedIndexInformer
-	workStatusLister   cache.GenericLister
-	placementInformer  cache.SharedIndexInformer
-	placementLister    cache.GenericLister
-	workqueue          workqueue.RateLimitingInterface
+	logger                logr.Logger
+	wdsName               string
+	wdsDynClient          dynamic.Interface
+	wdsKubeClient         kubernetes.Interface
+	imbsDynClient         dynamic.Interface
+	imbsKubeClient        kubernetes.Interface
+	workStatusInformer    cache.SharedIndexInformer
+	workStatusLister      cache.GenericLister
+	bindingPolicyInformer cache.SharedIndexInformer
+	bindingPolicyLister   cache.GenericLister
+	workqueue             workqueue.RateLimitingInterface
 	// all wds listers/informers are required to retrieve objects and update status
 	// without having to re-create new caches for this coontroller
 	listers   map[string]cache.GenericLister
@@ -140,7 +140,7 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 	defer c.workqueue.ShutDown()
 
 	// start informers
-	go c.runPlacementInformer(ctx)
+	go c.runBindingPolicyInformer(ctx)
 	go c.runWorkStatusInformer(ctx)
 
 	// wait for all informers caches to be synced
@@ -172,23 +172,23 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 	return nil
 }
 
-func (c *Controller) runPlacementInformer(ctx context.Context) {
+func (c *Controller) runBindingPolicyInformer(ctx context.Context) {
 	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.wdsDynClient, 0*time.Minute)
 
 	gvr := schema.GroupVersionResource{Group: v1alpha1.GroupVersion.Group,
 		Version:  v1alpha1.GroupVersion.Version,
 		Resource: util.BindingPolicyResource}
 
-	c.placementInformer = informerFactory.ForResource(gvr).Informer()
-	c.placementLister = cache.NewGenericLister(c.placementInformer.GetIndexer(), gvr.GroupResource())
+	c.bindingPolicyInformer = informerFactory.ForResource(gvr).Informer()
+	c.bindingPolicyLister = cache.NewGenericLister(c.bindingPolicyInformer.GetIndexer(), gvr.GroupResource())
 
 	informerFactory.Start(ctx.Done())
 
-	c.logger.Info("waiting for placement cache to sync")
-	if ok := cache.WaitForCacheSync(ctx.Done(), c.placementInformer.HasSynced); !ok {
-		c.logger.Info("failed to wait for placement caches to sync")
+	c.logger.Info("waiting for bindingpolicy cache to sync")
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.bindingPolicyInformer.HasSynced); !ok {
+		c.logger.Info("failed to wait for bindingpolicy caches to sync")
 	}
-	c.logger.Info("placement cache synced")
+	c.logger.Info("bindingpolicy cache synced")
 
 	<-ctx.Done()
 }
@@ -331,7 +331,7 @@ func (c *Controller) reconcile(ctx context.Context, ref cache.ObjectName) error 
 	}
 
 	// only process workstatues with the label for single reported status
-	if _, ok := obj.(metav1.Object).GetLabels()[util.PlacementLabelSingletonStatus]; !ok {
+	if _, ok := obj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatus]; !ok {
 		return nil
 	}
 

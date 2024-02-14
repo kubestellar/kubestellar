@@ -74,28 +74,28 @@ var excludedResourceNames = map[string]bool{
 	"endpoints":            true,
 }
 
-const placementDecisionQueueingDelay = 2 * time.Second
+const bindingQueueingDelay = 2 * time.Second
 
-// Controller watches all objects, finds associated placements, when matched a placement wraps and
+// Controller watches all objects, finds associated bindingpolicies, when matched a bindingpolicy wraps and
 // places objects into mailboxes
 type Controller struct {
-	logger            logr.Logger
-	ocmClient         client.Client
-	dynamicClient     dynamic.Interface
-	kubernetesClient  kubernetes.Interface
-	extClient         apiextensionsclientset.Interface
-	listers           map[string]cache.GenericLister
-	gvkGvrMapper      util.GvkGvrMapper
-	informers         map[string]cache.SharedIndexInformer
-	stoppers          map[string]chan struct{}
-	placementResolver PlacementResolver
-	workqueue         workqueue.RateLimitingInterface
-	initializedTs     time.Time
-	wdsName           string
-	allowedGroupsSet  sets.Set[string]
+	logger                logr.Logger
+	ocmClient             client.Client
+	dynamicClient         dynamic.Interface
+	kubernetesClient      kubernetes.Interface
+	extClient             apiextensionsclientset.Interface
+	listers               map[string]cache.GenericLister
+	gvkGvrMapper          util.GvkGvrMapper
+	informers             map[string]cache.SharedIndexInformer
+	stoppers              map[string]chan struct{}
+	bindingPolicyResolver BindingPolicyResolver
+	workqueue             workqueue.RateLimitingInterface
+	initializedTs         time.Time
+	wdsName               string
+	allowedGroupsSet      sets.Set[string]
 }
 
-// Create a new placement controller
+// Create a new binding controller
 func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
 	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
@@ -123,19 +123,19 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 	gvkGvrMapper := util.NewGvkGvrMapper()
 
 	controller := &Controller{
-		wdsName:           wdsName,
-		logger:            mgr.GetLogger().WithName(controllerName),
-		ocmClient:         ocmClient,
-		dynamicClient:     dynamicClient,
-		kubernetesClient:  kubernetesClient,
-		extClient:         extClient,
-		listers:           make(map[string]cache.GenericLister),
-		informers:         make(map[string]cache.SharedIndexInformer),
-		stoppers:          make(map[string]chan struct{}),
-		placementResolver: NewPlacementResolver(gvkGvrMapper),
-		gvkGvrMapper:      gvkGvrMapper,
-		workqueue:         workqueue.NewRateLimitingQueue(ratelimiter),
-		allowedGroupsSet:  allowedGroupsSet,
+		wdsName:               wdsName,
+		logger:                mgr.GetLogger().WithName(controllerName),
+		ocmClient:             ocmClient,
+		dynamicClient:         dynamicClient,
+		kubernetesClient:      kubernetesClient,
+		extClient:             extClient,
+		listers:               make(map[string]cache.GenericLister),
+		informers:             make(map[string]cache.SharedIndexInformer),
+		stoppers:              make(map[string]chan struct{}),
+		bindingPolicyResolver: NewBindingPolicyResolver(gvkGvrMapper),
+		gvkGvrMapper:          gvkGvrMapper,
+		workqueue:             workqueue.NewRateLimitingQueue(ratelimiter),
+		allowedGroupsSet:      allowedGroupsSet,
 	}
 
 	return controller, nil
@@ -248,9 +248,9 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 	}
 	c.logger.Info("All caches synced")
 
-	// populate the PlacementResolver with entries for existing placements
-	if err := c.populatePlacementResolverWithExistingPlacements(); err != nil {
-		return fmt.Errorf("failed to populate the PlacementResolver for the existing placements: %w", err)
+	// populate the BindingPolicyResolver with entries for existing bindingpolicies
+	if err := c.populateBindingPolicyResolverWithExistingBindingPolicies(); err != nil {
+		return fmt.Errorf("failed to populate the BindingPolicyResolver for the existing bindingpolicies: %w", err)
 	}
 
 	c.logger.Info("Starting workers", "count", workers)
@@ -274,18 +274,18 @@ func shouldSkipUpdate(old, new interface{}) bool {
 	if newMObj.GetResourceVersion() == oldMObj.GetResourceVersion() {
 		return true
 	}
-	// avoid enqueing events when adding finalizers to placement
-	if util.IsPlacement(new) && (len(newMObj.GetFinalizers()) > len(oldMObj.GetFinalizers())) {
+	// avoid enqueing events when adding finalizers to bindingpolicy
+	if util.IsBindingPolicy(new) && (len(newMObj.GetFinalizers()) > len(oldMObj.GetFinalizers())) {
 		return true
 	}
 	return false
 }
 
 func shouldSkipDelete(obj interface{}) bool {
-	// since delete for placement is handled by the finalizer logic
-	// no need to handle delete for placement to minimize events in the
+	// since delete for bindingpolicy is handled by the finalizer logic
+	// no need to handle delete for bindingpolicy to minimize events in the
 	// delete manifests
-	return util.IsPlacement(obj)
+	return util.IsBindingPolicy(obj)
 }
 
 // We only start informers on resources that support both watch and list
@@ -338,7 +338,7 @@ func (c *Controller) enqueueObject(obj interface{}, skipCheckIsDeleted bool) {
 	c.workqueue.Add(key)
 }
 
-func (c *Controller) enqueuePlacementDecision(name string) {
+func (c *Controller) enqueueBinding(name string) {
 	c.workqueue.AddAfter(util.Key{
 		GVK: schema.GroupVersionKind{
 			Group:   v1alpha1.GroupVersion.Group,
@@ -349,7 +349,7 @@ func (c *Controller) enqueuePlacementDecision(name string) {
 			Name:      name,
 		},
 		DeletedObject: nil,
-	}, placementDecisionQueueingDelay) // this resource can have bursts of
+	}, bindingQueueingDelay) // this resource can have bursts of
 	// updates due to being updated by multiple workload-objects getting
 	// processed concurrently at a high rate.
 }
@@ -416,11 +416,11 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 	var obj runtime.Object
 	var err error
-	// special handling for placement-decision resource as it is the only
+	// special handling for binding resource as it is the only
 	// resource that is queued directly as key, without necessarily first
 	// existing as an object.
-	if util.KeyIsForPlacementDecision(key) {
-		return c.syncPlacementDecision(ctx, key) // this function logs through all its exits
+	if util.KeyIsForBinding(key) {
+		return c.syncBinding(ctx, key) // this function logs through all its exits
 	}
 
 	if key.DeletedObject == nil {
@@ -441,13 +441,13 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 	// special handling for selected API resources
 	// note that object is *unstructured.Unstructured so we cannot
 	// just use "switch obj.(type)"
-	if util.IsPlacement(obj) {
-		if err := c.handlePlacement(ctx, obj); err != nil {
-			return fmt.Errorf("failed to handle placement: %w", err) // error logging after this call
+	if util.IsBindingPolicy(obj) {
+		if err := c.handleBindingPolicy(ctx, obj); err != nil {
+			return fmt.Errorf("failed to handle bindingpolicy: %w", err) // error logging after this call
 			// will add name.
 		}
 
-		c.logger.Info("handled placement", "object", util.RefToRuntimeObj(obj))
+		c.logger.Info("handled bindingpolicy", "object", util.RefToRuntimeObj(obj))
 		return nil
 	} else if util.IsCRD(obj) {
 		if err := c.handleCRD(obj); err != nil {
@@ -463,13 +463,13 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 	}
 
 	if err := c.updateDecisions(obj); err != nil {
-		c.logger.Error(err, "failed to update placement resolutions for object",
+		c.logger.Error(err, "failed to update bindingpolicy resolutions for object",
 			"object", util.RefToRuntimeObj(obj))
 		// return nil // not changing existing flow before transport is ready
 	}
 
 	//TODO (maroon): everything below this line should be deleted when transport is ready
-	clusterSet, managedByPlacements, singletonStatus, err := c.matchSelectors(obj)
+	clusterSet, managedByBindingPolicies, singletonStatus, err := c.matchSelectors(obj)
 	if err != nil {
 		utilruntime.HandleError(fmt.Errorf("error matching selectors: %s", err))
 		return nil
@@ -493,7 +493,7 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 
 	c.logger.Info("Delivering", "object", util.RefToRuntimeObj(obj),
 		"to clusters", clusterSet)
-	return c.deliverObjectToManagedClusters(obj, clusterSet, managedByPlacements, singletonStatus)
+	return c.deliverObjectToManagedClusters(obj, clusterSet, managedByBindingPolicies, singletonStatus)
 }
 
 func (c *Controller) getObjectFromKey(key util.Key) (runtime.Object, error) {
@@ -546,22 +546,22 @@ func (c *Controller) GetInformers() map[string]cache.SharedIndexInformer {
 	return c.informers
 }
 
-// populatePlacementResolverWithExistingPlacements fills the PlacementResolver
-// with entries for existing Placement objects. Any placement-name that is not
+// populateBindingPolicyResolverWithExistingBindingPolicies fills the BindingPolicyResolver
+// with entries for existing BindingPolicy objects. Any bindingpolicy name that is not
 // associated with a resolution gets associated to an empty resolution.
-func (c *Controller) populatePlacementResolverWithExistingPlacements() error {
-	placements, err := c.listPlacements()
+func (c *Controller) populateBindingPolicyResolverWithExistingBindingPolicies() error {
+	bindingpolicies, err := c.listBindingPolicies()
 	if err != nil {
-		return fmt.Errorf("failed to list Placements: %w", err)
+		return fmt.Errorf("failed to list BindingPolicies: %w", err)
 	}
 
-	for _, placementObject := range placements {
-		placement, err := runtimeObjectToPlacement(placementObject)
+	for _, bindingPolicyObject := range bindingpolicies {
+		bindingpolicy, err := runtimeObjectToBindingPolicy(bindingPolicyObject)
 		if err != nil {
-			return fmt.Errorf("failed to convert runtime.Object to Placement: %w", err)
+			return fmt.Errorf("failed to convert runtime.Object to BindingPolicy: %w", err)
 		}
 
-		c.placementResolver.NotePlacement(placement)
+		c.bindingPolicyResolver.NoteBindingPolicy(bindingpolicy)
 	}
 
 	return nil
@@ -575,17 +575,17 @@ func pickSingleCluster(clusterSet sets.Set[string]) sets.Set[string] {
 func (c *Controller) deliverObjectToManagedClusters(
 	obj runtime.Object,
 	managedClusters sets.Set[string],
-	managedByPlacements []string,
+	managedByBindingPolices []string,
 	singletonStatus bool) error {
 	for clName := range managedClusters {
-		// find which placement(s) select this managedCluster
-		placementNames := []string{}
-		for _, plName := range managedByPlacements {
-			plObj, err := c.getPlacementByName(plName)
+		// find which bindingpolicies select this managedCluster
+		bindingPolicyNames := []string{}
+		for _, plName := range managedByBindingPolices {
+			plObj, err := c.getBindingPolicyByName(plName)
 			if err != nil {
 				return err
 			}
-			pl, err := runtimeObjectToPlacement(plObj)
+			pl, err := runtimeObjectToBindingPolicy(plObj)
 			if err != nil {
 				return err
 			}
@@ -593,7 +593,7 @@ func (c *Controller) deliverObjectToManagedClusters(
 			if err != nil {
 				return err
 			}
-			// a placement selects a managedCluster iff the managedCluster is selected by every single selector
+			// a bindingpolicy selects a managedCluster iff the managedCluster is selected by every single selector
 			// i.e. selectors are ANDed
 			matches := true
 			for _, s := range pl.Spec.ClusterSelectors {
@@ -607,14 +607,14 @@ func (c *Controller) deliverObjectToManagedClusters(
 				}
 			}
 			if matches {
-				placementNames = append(placementNames, plName)
+				bindingPolicyNames = append(bindingPolicyNames, plName)
 			}
 		}
-		if len(placementNames) == 0 {
+		if len(bindingPolicyNames) == 0 {
 			return nil
 		}
 		manifest := ocm.WrapObject(obj)
-		util.SetManagedByPlacementLabels(manifest, c.wdsName, placementNames, singletonStatus)
+		util.SetManagedByBindingPolicyLabels(manifest, c.wdsName, bindingPolicyNames, singletonStatus)
 		err := reconcileManifest(c.ocmClient, manifest, clName)
 		if err != nil {
 			c.logger.Error(err, "Error delivering object to mailbox")

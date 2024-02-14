@@ -30,9 +30,9 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-// placementResolution stores the selected objects and destinations for a single placement.
+// bindingPolicyResolution stores the selected objects and destinations for a single bindingpolicy.
 // The mutex should be read locked before reading, and write locked before writing to any field.
-type placementResolution struct {
+type bindingPolicyResolution struct {
 	sync.RWMutex
 
 	// map key is GVK/namespace/name as outputted by util.key.GvkNamespacedNameKey()
@@ -45,15 +45,15 @@ type placementResolution struct {
 	// object is called for noting again.
 	workloadGeneration int64
 
-	// ownerReference identifies the placement that this resolution is
+	// ownerReference identifies the bindingpolicy that this resolution is
 	// associated with as an owning object.
 	ownerReference *metav1.OwnerReference
 }
 
 // noteObject adds/deletes an object to/from the resolution.
-// The return bool indicates whether the placement resolution was changed.
+// The return bool indicates whether the bindingpolicy resolution was changed.
 // This function is thread-safe.
-func (resolution *placementResolution) noteObject(obj runtime.Object) (bool, error) {
+func (resolution *bindingPolicyResolution) noteObject(obj runtime.Object) (bool, error) {
 	resolution.Lock()
 	defer resolution.Unlock()
 
@@ -85,9 +85,9 @@ func (resolution *placementResolution) noteObject(obj runtime.Object) (bool, err
 }
 
 // removeObject deletes an object from the resolution if it exists.
-// The return bool indicates whether the placement resolution was changed.
+// The return bool indicates whether the bindingpolicy resolution was changed.
 // This function is thread-safe.
-func (resolution *placementResolution) removeObject(obj runtime.Object) bool {
+func (resolution *bindingPolicyResolution) removeObject(obj runtime.Object) bool {
 	resolution.Lock()
 	defer resolution.Unlock()
 
@@ -106,16 +106,16 @@ func (resolution *placementResolution) removeObject(obj runtime.Object) bool {
 
 // setDestinations updates the destinations list in the resolution.
 // The given destinations set is expected not to be mutated after this call.
-func (resolution *placementResolution) setDestinations(destinations sets.Set[string]) {
+func (resolution *bindingPolicyResolution) setDestinations(destinations sets.Set[string]) {
 	resolution.Lock()
 	defer resolution.Unlock()
 
 	resolution.destinations = destinations
 }
 
-// toPlacementDecisionSpec converts the resolution to a placement decision
+// toBindingSpec converts the resolution to a binding
 // spec. This function is thread-safe.
-func (resolution *placementResolution) toPlacementDecisionSpec(gvkGvrMapper util.GvkGvrMapper) (*v1alpha1.BindingSpec, error) {
+func (resolution *bindingPolicyResolution) toBindingSpec(gvkGvrMapper util.GvkGvrMapper) (*v1alpha1.BindingSpec, error) {
 	resolution.RLock()
 	defer resolution.RUnlock()
 
@@ -159,7 +159,7 @@ func (resolution *placementResolution) toPlacementDecisionSpec(gvkGvrMapper util
 
 // handleClusterScopedObject handles a cluster-scoped object by adding it to the workload.
 // ClusterScopeDownsyncObjectsMap is used to efficiently locate the object in the workload.
-func (resolution *placementResolution) handleClusterScopedObject(gvr schema.GroupVersionResource,
+func (resolution *bindingPolicyResolution) handleClusterScopedObject(gvr schema.GroupVersionResource,
 	key *util.Key,
 	workload *v1alpha1.DownsyncObjectReferences,
 	clusterScopeDownsyncObjectsMap map[schema.GroupVersionResource]*v1alpha1.ClusterScopeDownsyncObjects) {
@@ -186,7 +186,7 @@ func (resolution *placementResolution) handleClusterScopedObject(gvr schema.Grou
 
 // handleNamespacedObject handles a namespaced object by adding it to the workload.
 // namespaceScopeDownsyncObjectsMap and nsObjectsLocationInSlice are used to efficiently locate the object in the workload.
-func (resolution *placementResolution) handleNamespacedObject(gvr schema.GroupVersionResource,
+func (resolution *bindingPolicyResolution) handleNamespacedObject(gvr schema.GroupVersionResource,
 	key *util.Key,
 	workload *v1alpha1.DownsyncObjectReferences,
 	namespaceScopeDownsyncObjectsMap map[schema.GroupVersionResource]*v1alpha1.NamespaceScopeDownsyncObjects,
@@ -234,33 +234,33 @@ func (resolution *placementResolution) handleNamespacedObject(gvr schema.GroupVe
 	nsObjectsLocationInSlice[gvrAndNSKey] = 0 // first entry
 }
 
-func (resolution *placementResolution) matchesPlacementDecisionSpec(placementDecisionSpec *v1alpha1.BindingSpec,
+func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alpha1.BindingSpec,
 	gvkGvrMapper util.GvkGvrMapper) bool {
 	resolution.RLock()
 	defer resolution.RUnlock()
 
 	// check workloadGeneration
-	if resolution.workloadGeneration != placementDecisionSpec.Workload.WorkloadGeneration {
+	if resolution.workloadGeneration != bindingSpec.Workload.WorkloadGeneration {
 		return false
 	}
 
 	// check destinations
-	if !destinationsMatch(resolution.destinations, placementDecisionSpec.Destinations) {
+	if !destinationsMatch(resolution.destinations, bindingSpec.Destinations) {
 		return false
 	}
 
 	// check workload
-	return workloadMatchesPlacementDecisionSpec(&placementDecisionSpec.Workload, resolution.objectIdentifierToKey, gvkGvrMapper)
+	return workloadMatchesBindingSpec(&bindingSpec.Workload, resolution.objectIdentifierToKey, gvkGvrMapper)
 }
 
 // destinationsMatch returns true if the destinations in the resolution
-// match the destinations in the placement decision spec.
-func destinationsMatch(resolvedDestinations sets.Set[string], placementDecisionDestinations []v1alpha1.Destination) bool {
-	if len(resolvedDestinations) != len(placementDecisionDestinations) {
+// match the destinations in the binding spec.
+func destinationsMatch(resolvedDestinations sets.Set[string], bindingDestinations []v1alpha1.Destination) bool {
+	if len(resolvedDestinations) != len(bindingDestinations) {
 		return false
 	}
 
-	for _, destination := range placementDecisionDestinations {
+	for _, destination := range bindingDestinations {
 		if !resolvedDestinations.Has(destination.ClusterId) {
 			return false
 		}
@@ -269,18 +269,18 @@ func destinationsMatch(resolvedDestinations sets.Set[string], placementDecisionD
 	return true
 }
 
-// workloadMatchesPlacementDecisionSpec returns true if the workload in the
-// resolution matches the workload in the placement decision spec.
-func workloadMatchesPlacementDecisionSpec(placementDecisionSpecWorkload *v1alpha1.DownsyncObjectReferences,
+// workloadMatchesBindingSpec returns true if the workload in the
+// resolution matches the workload in the binding spec.
+func workloadMatchesBindingSpec(bindingSpecWorkload *v1alpha1.DownsyncObjectReferences,
 	objectIdentifierToKeyMap map[string]*util.Key, gvkGvrMapper util.GvkGvrMapper) bool {
 	// check lengths
 	clusterScopedObjectsCount := 0
-	for _, clusterScopeDownsyncObjects := range placementDecisionSpecWorkload.ClusterScope {
+	for _, clusterScopeDownsyncObjects := range bindingSpecWorkload.ClusterScope {
 		clusterScopedObjectsCount += len(clusterScopeDownsyncObjects.ObjectNames)
 	}
 
 	namespacedObjectsCount := 0
-	for _, namespaceScopeDownsyncObjects := range placementDecisionSpecWorkload.NamespaceScope {
+	for _, namespaceScopeDownsyncObjects := range bindingSpecWorkload.NamespaceScope {
 		for _, objectsByNamespace := range namespaceScopeDownsyncObjects.ObjectsByNamespace {
 			namespacedObjectsCount += len(objectsByNamespace.Names)
 		}
@@ -292,21 +292,21 @@ func workloadMatchesPlacementDecisionSpec(placementDecisionSpecWorkload *v1alpha
 
 	// again we can check match by making sure all objects are mapped, since entries are unique and the length is equal.
 	// check cluster-scoped all exist
-	if !placementDecisionClusterScopeIsMapped(placementDecisionSpecWorkload.ClusterScope, objectIdentifierToKeyMap,
+	if !bindingClusterScopeIsMapped(bindingSpecWorkload.ClusterScope, objectIdentifierToKeyMap,
 		gvkGvrMapper) {
 		return false
 	}
 
 	// check namespace-scoped all exist
-	return namespaceScopeMatchesPlacementDecisionSpec(placementDecisionSpecWorkload.NamespaceScope, objectIdentifierToKeyMap,
+	return namespaceScopeMatchesBindingSpec(bindingSpecWorkload.NamespaceScope, objectIdentifierToKeyMap,
 		gvkGvrMapper)
 }
 
-// clusterScopeMatchesPlacementDecisionSpec returns true if the cluster-scope
-// section in the placement decision spec all exist in the resolution.
-func placementDecisionClusterScopeIsMapped(placementDecisionSpecClusterScope []v1alpha1.ClusterScopeDownsyncObjects,
+// bindingClusterScopeIsMapped returns true if the cluster-scope
+// section in the binding spec all exist in the resolution.
+func bindingClusterScopeIsMapped(bindingSpecClusterScope []v1alpha1.ClusterScopeDownsyncObjects,
 	objectIdentifierToKeyMap map[string]*util.Key, gvkGvrMapper util.GvkGvrMapper) bool {
-	for _, clusterScopeDownsyncObjects := range placementDecisionSpecClusterScope {
+	for _, clusterScopeDownsyncObjects := range bindingSpecClusterScope {
 		gvr := schema.GroupVersionResource(clusterScopeDownsyncObjects.GroupVersionResource)
 		gvk, found := gvkGvrMapper.GetGvk(gvr)
 
@@ -329,11 +329,11 @@ func placementDecisionClusterScopeIsMapped(placementDecisionSpecClusterScope []v
 	return true
 }
 
-// namespaceScopeMatchesPlacementDecisionSpec returns true if the namespace-scope
-// section in the placement decision spec all exist in the resolution.
-func namespaceScopeMatchesPlacementDecisionSpec(placementDecisionSpecNamespaceScope []v1alpha1.NamespaceScopeDownsyncObjects,
+// namespaceScopeMatchesBindingSpec returns true if the namespace-scope
+// section in the binding spec all exist in the resolution.
+func namespaceScopeMatchesBindingSpec(bindingSpecNamespaceScope []v1alpha1.NamespaceScopeDownsyncObjects,
 	objectIdentifierToKeyMap map[string]*util.Key, gvkGvrMapper util.GvkGvrMapper) bool {
-	for _, namespaceScopeDownsyncObjects := range placementDecisionSpecNamespaceScope {
+	for _, namespaceScopeDownsyncObjects := range bindingSpecNamespaceScope {
 		gvr := schema.GroupVersionResource(namespaceScopeDownsyncObjects.GroupVersionResource)
 		gvk, found := gvkGvrMapper.GetGvk(gvr)
 

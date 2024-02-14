@@ -42,77 +42,77 @@ import (
 )
 
 const (
-	waitBeforeTrackingPlacements = 5 * time.Second
-	KSFinalizer                  = "placement.kubestellar.io/kscontroller"
+	waitBeforeTrackingBindingPolicies = 5 * time.Second
+	KSFinalizer                       = "bindingpolicy.kubestellar.io/kscontroller"
 )
 
-// Handle placement as follows:
+// Handle bindingpolicy as follows:
 //
-//  1. if placement is not being deleted:
+//  1. if bindingpolicy is not being deleted:
 //
-//     - update the (where) resolution of the placement and queue the
-//     associated placement decision for syncing.
+//     - update the (where) resolution of the bindingpolicy and queue the
+//     associated binding for syncing.
 //
-//     - requeue workload objects to account for changes in placement
+//     - requeue workload objects to account for changes in bindingpolicy
 //
 //     otherwise:
 //
-//     - delete the resolution of the placement.
+//     - delete the resolution of the bindingpolicy.
 //
-//  2. handle finalizers and deletion of objects associated with the placement.
+//  2. handle finalizers and deletion of objects associated with the bindingpolicy.
 //
 //  3. for updates on label selectors, re-evaluate if existing objects should be removed
 //     from clusters.
-func (c *Controller) handlePlacement(ctx context.Context, obj runtime.Object) error {
-	placement, err := runtimeObjectToPlacement(obj)
+func (c *Controller) handleBindingPolicy(ctx context.Context, obj runtime.Object) error {
+	bindingPolicy, err := runtimeObjectToBindingPolicy(obj)
 	if err != nil {
 		return err
 	}
 
-	// handle requeing for changes in placement, excluding deletion
+	// handle requeing for changes in bindingpolicy, excluding deletion
 	if !isBeingDeleted(obj) {
-		// update placement resolution destinations since placement was updated
-		clusterSet, err := ocm.FindClustersBySelectors(c.ocmClient, placement.Spec.ClusterSelectors)
+		// update bindingpolicy resolution destinations since bindingpolicy was updated
+		clusterSet, err := ocm.FindClustersBySelectors(c.ocmClient, bindingPolicy.Spec.ClusterSelectors)
 		if err != nil {
 			return err
 		}
 
-		// note placement decision in resolver in case it isn't associated with
+		// note bindingpolicy in resolver in case it isn't associated with
 		// any resolution
-		c.placementResolver.NotePlacement(placement)
-		// set destinations and enqueue placement-decision for syncing
-		c.placementResolver.SetDestinations(placement.GetName(), clusterSet)
-		c.logger.V(4).Info("enqueued Binding for syncing, while handling BindingPolicy", "name", placement.Name)
-		c.enqueuePlacementDecision(placement.GetName())
+		c.bindingPolicyResolver.NoteBindingPolicy(bindingPolicy)
+		// set destinations and enqueue binding for syncing
+		c.bindingPolicyResolver.SetDestinations(bindingPolicy.GetName(), clusterSet)
+		c.logger.V(4).Info("enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
+		c.enqueueBinding(bindingPolicy.GetName())
 
 		// requeue objects for re-evaluation
-		if err := c.requeueForPlacementChanges(); err != nil {
+		if err := c.requeueForBindingPolicyChanges(); err != nil {
 			return err
 		}
 	} else {
-		c.placementResolver.DeleteResolution(placement.GetName())
+		c.bindingPolicyResolver.DeleteResolution(bindingPolicy.GetName())
 	}
 
-	if err := c.handlePlacementFinalizer(ctx, placement); err != nil {
+	if err := c.handleBindingPolicyFinalizer(ctx, bindingPolicy); err != nil {
 		return err
 	}
 
-	return c.cleanUpObjectsNoLongerMatching(placement)
+	return c.cleanUpObjectsNoLongerMatching(bindingPolicy)
 }
 
-func (c *Controller) requeueForPlacementChanges() error {
+func (c *Controller) requeueForBindingPolicyChanges() error {
 	// allow some time before checking to settle
 	now := time.Now()
-	if now.Sub(c.initializedTs) < waitBeforeTrackingPlacements {
+	if now.Sub(c.initializedTs) < waitBeforeTrackingBindingPolicies {
 		return nil
 	}
 
-	// requeue all objects to account for changes in placement.
-	// this does not include placement/placement-decision objects.
+	// requeue all objects to account for changes in bindingpolicy.
+	// this does not include bindingpolicy/binding objects.
 	return c.requeueWorkloadObjects()
 }
 
-func (c *Controller) getPlacementByName(name string) (runtime.Object, error) {
+func (c *Controller) getBindingPolicyByName(name string) (runtime.Object, error) {
 	lister := c.listers["control.kubestellar.io/v1alpha1/BindingPolicy"]
 	if lister == nil {
 		return nil, fmt.Errorf("could not get lister for placememt")
@@ -124,7 +124,7 @@ func (c *Controller) getPlacementByName(name string) (runtime.Object, error) {
 	return got, nil
 }
 
-func (c *Controller) listPlacements() ([]runtime.Object, error) {
+func (c *Controller) listBindingPolicies() ([]runtime.Object, error) {
 	lister := c.listers["control.kubestellar.io/v1alpha1/BindingPolicy"]
 	if lister == nil {
 		return nil, fmt.Errorf("could not get lister for placememt")
@@ -136,24 +136,24 @@ func (c *Controller) listPlacements() ([]runtime.Object, error) {
 	return list, nil
 }
 
-func runtimeObjectToPlacement(obj runtime.Object) (*v1alpha1.BindingPolicy, error) {
+func runtimeObjectToBindingPolicy(obj runtime.Object) (*v1alpha1.BindingPolicy, error) {
 	unstructuredObj, ok := obj.(*unstructured.Unstructured)
 	if !ok {
 		return nil, fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
 	}
-	var placement *v1alpha1.BindingPolicy
-	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredObj.UnstructuredContent(), &placement); err != nil {
+	var bindingPolicy *v1alpha1.BindingPolicy
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredObj.UnstructuredContent(), &bindingPolicy); err != nil {
 		return nil, err
 	}
-	return placement, nil
+	return bindingPolicy, nil
 }
 
 // read objects from all workload listers and enqueue
-// the keys this is useful for when a new placement is
-// added or a placement is updated
+// the keys this is useful for when a new bindingpolicy is
+// added or a bindingpolicy is updated
 func (c *Controller) requeueWorkloadObjects() error {
 	for key, lister := range c.listers {
-		// do not requeue placement or placement-decisions
+		// do not requeue bindingpolicies or bindings
 		if key == util.GetBindingPolicyListerKey() || key == util.GetBindingListerKey() {
 			fmt.Printf("Matched key %s\n", key)
 			continue
@@ -170,39 +170,39 @@ func (c *Controller) requeueWorkloadObjects() error {
 }
 
 // finalizer logic
-func (c *Controller) handlePlacementFinalizer(ctx context.Context, placement *v1alpha1.BindingPolicy) error {
-	if placement.GetDeletionTimestamp() != nil {
-		if controllerutil.ContainsFinalizer(placement, KSFinalizer) {
-			if err := c.deleteExternalResources(placement); err != nil {
+func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPolicy *v1alpha1.BindingPolicy) error {
+	if bindingPolicy.GetDeletionTimestamp() != nil {
+		if controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
+			if err := c.deleteExternalResources(bindingPolicy); err != nil {
 				return err
 			}
-			controllerutil.RemoveFinalizer(placement, KSFinalizer)
-			if err := updatePlacement(ctx, c.dynamicClient, placement); err != nil {
+			controllerutil.RemoveFinalizer(bindingPolicy, KSFinalizer)
+			if err := updateBindingPolicy(ctx, c.dynamicClient, bindingPolicy); err != nil {
 				return err
 			}
 		}
 		return nil
 	}
 
-	if !controllerutil.ContainsFinalizer(placement, KSFinalizer) {
-		controllerutil.AddFinalizer(placement, KSFinalizer)
-		if err := updatePlacement(ctx, c.dynamicClient, placement); err != nil {
+	if !controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
+		controllerutil.AddFinalizer(bindingPolicy, KSFinalizer)
+		if err := updateBindingPolicy(ctx, c.dynamicClient, bindingPolicy); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func updatePlacement(ctx context.Context, client dynamic.Interface, placement *v1alpha1.BindingPolicy) error {
+func updateBindingPolicy(ctx context.Context, client dynamic.Interface, bindingPolicy *v1alpha1.BindingPolicy) error {
 	gvr := schema.GroupVersionResource{
 		Group:    v1alpha1.GroupVersion.Group,
 		Version:  v1alpha1.GroupVersion.Version,
 		Resource: util.BindingPolicyResource,
 	}
 
-	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(placement)
+	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(bindingPolicy)
 	if err != nil {
-		return fmt.Errorf("failed to convert Placement to unstructured: %w", err)
+		return fmt.Errorf("failed to convert BindingPolicy to unstructured: %w", err)
 	}
 
 	unstructuredObj := &unstructured.Unstructured{
@@ -213,16 +213,16 @@ func updatePlacement(ctx context.Context, client dynamic.Interface, placement *v
 	return nil
 }
 
-func (c *Controller) deleteExternalResources(placement *v1alpha1.BindingPolicy) error {
-	list, err := listManifestsForPlacement(c.ocmClient, c.wdsName, placement)
+func (c *Controller) deleteExternalResources(bindingPolicy *v1alpha1.BindingPolicy) error {
+	list, err := listManifestsForBindingPolicy(c.ocmClient, c.wdsName, bindingPolicy)
 	if err != nil {
 		return err
 	}
 
-	labelKey := util.GenerateManagedByPlacementLabelKey(c.wdsName, placement.GetName())
+	labelKey := util.GenerateManagedByBindingPolicyLabelKey(c.wdsName, bindingPolicy.GetName())
 	for _, manifest := range list.Items {
 		c.logger.Info("Trying to delete manifest", "manifest name", manifest.Name,
-			"namespace", manifest.Namespace, "for placement", placement.GetName())
+			"namespace", manifest.Namespace, "for bindingpolicy", bindingPolicy.GetName())
 		if err := deleteManifestOrLabel(labelKey, manifest, c.ocmClient); err != nil {
 			return err
 		}
@@ -230,14 +230,14 @@ func (c *Controller) deleteExternalResources(placement *v1alpha1.BindingPolicy) 
 	return nil
 }
 
-func listManifestsForPlacement(ocmClient client.Client, wdsName string, placement *v1alpha1.BindingPolicy) (*workv1.ManifestWorkList, error) {
+func listManifestsForBindingPolicy(ocmClient client.Client, wdsName string, bindingPolicy *v1alpha1.BindingPolicy) (*workv1.ManifestWorkList, error) {
 	list := &workv1.ManifestWorkList{}
-	labelKey := util.GenerateManagedByPlacementLabelKey(wdsName, placement.GetName())
+	labelKey := util.GenerateManagedByBindingPolicyLabelKey(wdsName, bindingPolicy.GetName())
 
 	// TODO - the ocm client used this way is not using cache. Replace with informer/lister based
 	// on dynamic client to make sure to use the cache
 	if err := ocmClient.List(context.TODO(), list, client.InNamespace(""),
-		client.MatchingLabels(map[string]string{labelKey: util.PlacementLabelValueEnabled})); err != nil {
+		client.MatchingLabels(map[string]string{labelKey: util.BindingPolicyLabelValueEnabled})); err != nil {
 		return nil, err
 	}
 	return list, nil
@@ -246,7 +246,7 @@ func listManifestsForPlacement(ocmClient client.Client, wdsName string, placemen
 func deleteManifestOrLabel(managedByLabelKey string, manifest workv1.ManifestWork, ocmClient client.Client) error {
 	labels := manifest.GetLabels()
 
-	if isAlsoManagedByOtherPlacements(labels, managedByLabelKey) {
+	if isAlsoManagedByOtherBindingPolicies(labels, managedByLabelKey) {
 		delete(labels, managedByLabelKey)
 		if err := ocmClient.Update(context.TODO(), &manifest, &client.UpdateOptions{}); err != nil {
 			return err
@@ -265,18 +265,18 @@ func deleteManifestOrLabel(managedByLabelKey string, manifest workv1.ManifestWor
 	return nil
 }
 
-func isAlsoManagedByOtherPlacements(labels map[string]string, managedByLabelKey string) bool {
+func isAlsoManagedByOtherBindingPolicies(labels map[string]string, managedByLabelKey string) bool {
 	for key := range labels {
 		if key == managedByLabelKey {
-			// This is the key for the Placement we know about
+			// This is the key for the BindingPolicy we know about
 			continue
 		}
-		if key == util.PlacementLabelSingletonStatus {
+		if key == util.BindingPolicyLabelSingletonStatus {
 			// This is a singleton marker, ignore it...
 			continue
 		}
-		if strings.HasPrefix(key, util.PlacementLabelKeyBase) {
-			// This is a key managed by Kubestellar, but not for the Placement
+		if strings.HasPrefix(key, util.BindingPolicyLabelKeyBase) {
+			// This is a key managed by Kubestellar, but not for the BindingPolicy
 			// we already know about
 			return true
 		}
@@ -285,14 +285,14 @@ func isAlsoManagedByOtherPlacements(labels map[string]string, managedByLabelKey 
 }
 
 // Handle removal of objects no longer matching cluster/selector
-func (c *Controller) cleanUpObjectsNoLongerMatching(placement *v1alpha1.BindingPolicy) error {
+func (c *Controller) cleanUpObjectsNoLongerMatching(bindingPolicy *v1alpha1.BindingPolicy) error {
 	// allow some time before checking to settle
 	now := time.Now()
-	if now.Sub(c.initializedTs) < waitBeforeTrackingPlacements {
+	if now.Sub(c.initializedTs) < waitBeforeTrackingBindingPolicies {
 		return nil
 	}
 
-	list, err := listManifestsForPlacement(c.ocmClient, c.wdsName, placement)
+	list, err := listManifestsForBindingPolicy(c.ocmClient, c.wdsName, bindingPolicy)
 	if err != nil {
 		return err
 	}
@@ -302,7 +302,7 @@ func (c *Controller) cleanUpObjectsNoLongerMatching(placement *v1alpha1.BindingP
 		if err != nil {
 			return err
 		}
-		matches, err := c.checkObjectMatchesWhatAndWhere(placement, *obj, manifest)
+		matches, err := c.checkObjectMatchesWhatAndWhere(bindingPolicy, *obj, manifest)
 		if err != nil {
 			return err
 		}
@@ -334,26 +334,26 @@ func extractObjectFromManifest(manifest workv1.ManifestWork) (*runtime.Object, e
 	return &rObj, nil
 }
 
-func (c *Controller) checkObjectMatchesWhatAndWhere(placement *v1alpha1.BindingPolicy, obj runtime.Object, manifest workv1.ManifestWork) (bool, error) {
+func (c *Controller) checkObjectMatchesWhatAndWhere(bindingPolicy *v1alpha1.BindingPolicy, obj runtime.Object, manifest workv1.ManifestWork) (bool, error) {
 	// default is doing nothing, that is, return match ==true
 	match := true
 
 	// check the What matches
 	objMR := obj.(mrObject)
-	matchedSome := c.testObject(objMR, placement.Spec.Downsync)
+	matchedSome := c.testObject(objMR, bindingPolicy.Spec.Downsync)
 	if !matchedSome {
-		c.logger.Info("The 'What' no longer matches. Object marked for removal.", "object", util.RefToRuntimeObj(obj), "for placement", placement.GetName())
+		c.logger.Info("The 'What' no longer matches. Object marked for removal.", "object", util.RefToRuntimeObj(obj), "for bindingpolicy", bindingPolicy.GetName())
 		return false, nil
 	}
 
 	// check the Where matches
 	clusterName := getClusterNameFromManifest(manifest)
-	matchedClusters, err := ocm.FindClustersBySelectors(c.ocmClient, placement.Spec.ClusterSelectors)
+	matchedClusters, err := ocm.FindClustersBySelectors(c.ocmClient, bindingPolicy.Spec.ClusterSelectors)
 	if err != nil {
 		return match, err
 	}
 	if !matchedClusters.Has(clusterName) {
-		c.logger.Info("The 'Where' no longer matches. Object marked for removal.", "object", util.RefToRuntimeObj(obj), "for placement", placement.GetName(), "cluster", clusterName)
+		c.logger.Info("The 'Where' no longer matches. Object marked for removal.", "object", util.RefToRuntimeObj(obj), "for bindingpolicy", bindingPolicy.GetName(), "cluster", clusterName)
 		return false, nil
 	}
 
