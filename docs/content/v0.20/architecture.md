@@ -327,9 +327,9 @@ follows:
         - If there are matching clusters:
           - Wraps the object into a ManifestWork
        - Adds a label for each matched `BindingPolicy` to the ManifestWork that 
-         is used to track the binding-policy that caused the object to be 
+         is used to track the `BindingPolicy` that caused the object to be
          delivered to one or more clusters. The label contains both the 
-         binding-policy name (note that placement is cluster-scoped) and the WDS name. 
+         `BindingPolicy` name (note that `BindingPolicy` is cluster-scoped) and the WDS name.
          This way, when a binding-policy is deleted or updated it is possible to 
          locate the associated ManifestWorks for deletion or label removal 
          (if more than one label is present, as other binding-policies may “own” the object).
@@ -383,10 +383,10 @@ deleted (deletion timestamp not set) it follows the following flow:
   - If there are matching clusters, the in-memory `Binding` representation is updated with the list of clusters.
 - Enqueues the representation of the relevant `Binding` for syncing.
 - Remove ManifestWorks from ITS for objects no longer matching: generate
- the ManagedByPlacementLabelKey for the current (`BindingPolicy`, WDS) and use
+ the ManagedByBindingPolicyLabelKey for the current (`BindingPolicy`, WDS) and use
  that to retrieve all the manifestworks associated with the (`BindingPolicy`, WDS).
  Then, for each manifestwork, extract the wrapped object, and re-evaluate the
- object vs. the current placement. If no longer a match (either for the
+ object vs. the current `BindingPolicy`. If no longer a match (either for the
  "what" or the "where" part) check if each manifestwork has other (`BindingPolicy`, WDS)
  labels. If yes, remove the label, if not, delete the manifestwork.
 

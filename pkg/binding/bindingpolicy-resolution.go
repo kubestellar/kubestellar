@@ -30,9 +30,9 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-// placementResolution stores the selected objects and destinations for a single placement.
+// bindingPolicyResolution stores the selected objects and destinations for a single bindingpolicy.
 // The mutex should be read locked before reading, and write locked before writing to any field.
-type placementResolution struct {
+type bindingPolicyResolution struct {
 	sync.RWMutex
 
 	// map key is GVK/namespace/name as outputted by util.key.GvkNamespacedNameKey()
@@ -45,15 +45,15 @@ type placementResolution struct {
 	// object is called for noting again.
 	workloadGeneration int64
 
-	// ownerReference identifies the placement that this resolution is
+	// ownerReference identifies the bindingpolicy that this resolution is
 	// associated with as an owning object.
 	ownerReference *metav1.OwnerReference
 }
 
 // noteObject adds/deletes an object to/from the resolution.
-// The return bool indicates whether the placement resolution was changed.
+// The return bool indicates whether the bindingpolicy resolution was changed.
 // This function is thread-safe.
-func (resolution *placementResolution) noteObject(obj runtime.Object) (bool, error) {
+func (resolution *bindingPolicyResolution) noteObject(obj runtime.Object) (bool, error) {
 	resolution.Lock()
 	defer resolution.Unlock()
 
@@ -85,9 +85,9 @@ func (resolution *placementResolution) noteObject(obj runtime.Object) (bool, err
 }
 
 // removeObject deletes an object from the resolution if it exists.
-// The return bool indicates whether the placement resolution was changed.
+// The return bool indicates whether the bindingpolicy resolution was changed.
 // This function is thread-safe.
-func (resolution *placementResolution) removeObject(obj runtime.Object) bool {
+func (resolution *bindingPolicyResolution) removeObject(obj runtime.Object) bool {
 	resolution.Lock()
 	defer resolution.Unlock()
 
@@ -106,7 +106,7 @@ func (resolution *placementResolution) removeObject(obj runtime.Object) bool {
 
 // setDestinations updates the destinations list in the resolution.
 // The given destinations set is expected not to be mutated after this call.
-func (resolution *placementResolution) setDestinations(destinations sets.Set[string]) {
+func (resolution *bindingPolicyResolution) setDestinations(destinations sets.Set[string]) {
 	resolution.Lock()
 	defer resolution.Unlock()
 
@@ -115,7 +115,7 @@ func (resolution *placementResolution) setDestinations(destinations sets.Set[str
 
 // toBindingSpec converts the resolution to a binding
 // spec. This function is thread-safe.
-func (resolution *placementResolution) toBindingSpec(gvkGvrMapper util.GvkGvrMapper) (*v1alpha1.BindingSpec, error) {
+func (resolution *bindingPolicyResolution) toBindingSpec(gvkGvrMapper util.GvkGvrMapper) (*v1alpha1.BindingSpec, error) {
 	resolution.RLock()
 	defer resolution.RUnlock()
 
@@ -159,7 +159,7 @@ func (resolution *placementResolution) toBindingSpec(gvkGvrMapper util.GvkGvrMap
 
 // handleClusterScopedObject handles a cluster-scoped object by adding it to the workload.
 // ClusterScopeDownsyncObjectsMap is used to efficiently locate the object in the workload.
-func (resolution *placementResolution) handleClusterScopedObject(gvr schema.GroupVersionResource,
+func (resolution *bindingPolicyResolution) handleClusterScopedObject(gvr schema.GroupVersionResource,
 	key *util.Key,
 	workload *v1alpha1.DownsyncObjectReferences,
 	clusterScopeDownsyncObjectsMap map[schema.GroupVersionResource]*v1alpha1.ClusterScopeDownsyncObjects) {
@@ -186,7 +186,7 @@ func (resolution *placementResolution) handleClusterScopedObject(gvr schema.Grou
 
 // handleNamespacedObject handles a namespaced object by adding it to the workload.
 // namespaceScopeDownsyncObjectsMap and nsObjectsLocationInSlice are used to efficiently locate the object in the workload.
-func (resolution *placementResolution) handleNamespacedObject(gvr schema.GroupVersionResource,
+func (resolution *bindingPolicyResolution) handleNamespacedObject(gvr schema.GroupVersionResource,
 	key *util.Key,
 	workload *v1alpha1.DownsyncObjectReferences,
 	namespaceScopeDownsyncObjectsMap map[schema.GroupVersionResource]*v1alpha1.NamespaceScopeDownsyncObjects,
@@ -234,7 +234,7 @@ func (resolution *placementResolution) handleNamespacedObject(gvr schema.GroupVe
 	nsObjectsLocationInSlice[gvrAndNSKey] = 0 // first entry
 }
 
-func (resolution *placementResolution) matchesBindingSpec(bindingSpec *v1alpha1.BindingSpec,
+func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alpha1.BindingSpec,
 	gvkGvrMapper util.GvkGvrMapper) bool {
 	resolution.RLock()
 	defer resolution.RUnlock()

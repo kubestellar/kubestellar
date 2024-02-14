@@ -30,12 +30,12 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-// syncBinding syncs a binding object with what is resolved by the placement-resolver.
+// syncBinding syncs a binding object with what is resolved by the bindingpolicy resolver.
 func (c *Controller) syncBinding(ctx context.Context, key util.Key) error {
 	var unstructuredObj *unstructured.Unstructured
-	if !c.placementResolver.ResolutionExists(key.NamespacedName.Name) {
+	if !c.bindingPolicyResolver.ResolutionExists(key.NamespacedName.Name) {
 		// if a resolution is not associated to the binding's name
-		// then the placement has been deleted, and the binding
+		// then the bindingpolicy has been deleted, and the binding
 		// will eventually be garbage collected. We can safely ignore this.
 
 		return nil
@@ -61,17 +61,17 @@ func (c *Controller) syncBinding(ctx context.Context, key util.Key) error {
 		return fmt.Errorf("failed to convert from Unstructured to Binding: %w", err)
 	}
 
-	// binding name matches that of the placement 1:1, therefore its NamespacedName is the same.
-	placementIdentifier := binding.GetName()
+	// binding name matches that of the bindingpolicy 1:1, therefore its NamespacedName is the same.
+	bindingPolicyIdentifier := binding.GetName()
 
 	// generate binding spec from resolver
-	generatedBindingSpec, err := c.placementResolver.GenerateBinding(placementIdentifier)
+	generatedBindingSpec, err := c.bindingPolicyResolver.GenerateBinding(bindingPolicyIdentifier)
 	if err != nil {
 		return fmt.Errorf("failed to generate BindingSpec: %w", err)
 	}
 
 	// calculate if the resolved decision is different from the current one
-	if !c.placementResolver.CompareBinding(placementIdentifier, &binding.Spec) {
+	if !c.bindingPolicyResolver.CompareBinding(bindingPolicyIdentifier, &binding.Spec) {
 		// update the binding object in the cluster by updating spec
 		if err = c.updateOrCreateBinding(ctx, binding, generatedBindingSpec); err != nil {
 			return fmt.Errorf("failed to update or create binding: %w", err)
@@ -92,7 +92,7 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 	bdg.Spec = *generatedBindingSpec
 
 	// set owner reference
-	ownerReference, err := c.placementResolver.GetOwnerReference(bdg.GetName())
+	ownerReference, err := c.bindingPolicyResolver.GetOwnerReference(bdg.GetName())
 	if err != nil {
 		return fmt.Errorf("failed to get OwnerReference: %w", err)
 	}

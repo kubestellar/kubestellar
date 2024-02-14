@@ -29,26 +29,26 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-const placementResolutionNotFoundErrorPrefix = "placement resolution is not found"
+const bindingPolicyResolutionNotFoundErrorPrefix = "bindingpolicy resolution is not found"
 
-// A PlacementResolver holds a collection of placement resolutions.
-// The collection is indexed by placementKey string, the resolver does not
+// A BindingPolicyResolver holds a collection of bindingpolicy resolutions.
+// The collection is indexed by bindingPolicyKey string, the resolver does not
 // care what the strings are. The resolution for a given key can be updated,
 // exported and compared to the Binding representation.
 // All functions in this interface are thread-safe, and nothing mutates any
 // method-parameter during a call to one of them.
-type PlacementResolver interface {
+type BindingPolicyResolver interface {
 	// GenerateBinding returns the binding for the given
-	// placement key. This function can fail due to internal caches temporarily being
+	// bindingpolicy key. This function can fail due to internal caches temporarily being
 	// out of sync.
 	//
 	// If no resolution is associated with the given key, an error is returned.
-	GenerateBinding(placementKey string) (*v1alpha1.BindingSpec, error)
-	// GetOwnerReference returns the owner reference for the given placement key.
+	GenerateBinding(bindingPolicyKey string) (*v1alpha1.BindingSpec, error)
+	// GetOwnerReference returns the owner reference for the given bindingpolicy key.
 	// If no resolution is associated with the given key, an error is returned.
-	GetOwnerReference(placementKey string) (metav1.OwnerReference, error)
+	GetOwnerReference(bindingPolicyKey string) (metav1.OwnerReference, error)
 	// CompareBinding compares the given binding spec
-	// with the maintained binding for the given placement key.
+	// with the maintained binding for the given bindingpolicy key.
 	// The returned value is true only if:
 	//
 	// - The destinations in the BindingSpec are an exact match
@@ -58,87 +58,87 @@ type PlacementResolver interface {
 	//
 	// It is possible to output a false negative due to a temporary state of
 	// internal caches being out of sync.
-	CompareBinding(placementKey string,
+	CompareBinding(bindingPolicyKey string,
 		bindingSpec *v1alpha1.BindingSpec) bool
 
-	// NotePlacement associates a new resolution with the given placement,
+	// NoteBindingPolicy associates a new resolution with the given bindingpolicy,
 	// if none is associated.
-	NotePlacement(placement *v1alpha1.BindingPolicy)
+	NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy)
 
-	// NoteObject updates the maintained placement's objects resolution for the
-	// given placement key. If the object is being deleted, it is removed from
+	// NoteObject updates the maintained bindingpolicy's objects resolution for the
+	// given bindingpolicy key. If the object is being deleted, it is removed from
 	// the resolution if exists.
 	//
-	// The returned bool indicates whether the placement resolution was changed.
+	// The returned bool indicates whether the bindingpolicy resolution was changed.
 	// If no resolution is associated with the given key, an error is returned.
-	NoteObject(placementKey string, obj runtime.Object) (bool, error)
-	// RemoveObject removes the given object from the maintained placement's
-	// objects resolution for the given placement key.
+	NoteObject(bindingPolicyKey string, obj runtime.Object) (bool, error)
+	// RemoveObject removes the given object from the maintained bindingpolicy's
+	// objects resolution for the given bindingpolicy key.
 	//
-	// The returned bool indicates whether the placement resolution was changed.
-	RemoveObject(placementKey string, obj runtime.Object) bool
-	// SetDestinations updates the maintained placement's
-	// destinations resolution for the given placement key.
+	// The returned bool indicates whether the bindingpolicy resolution was changed.
+	RemoveObject(bindingPolicyKey string, obj runtime.Object) bool
+	// SetDestinations updates the maintained bindingpolicy's
+	// destinations resolution for the given bindingpolicy key.
 	// The given destinations set is expected not to be mutated after this call.
-	SetDestinations(placementKey string, destinations sets.Set[string])
+	SetDestinations(bindingPolicyKey string, destinations sets.Set[string])
 
 	// ResolutionExists returns true if a resolution is associated with the
-	// given placement key.
-	ResolutionExists(placementKey string) bool
+	// given bindingpolicy key.
+	ResolutionExists(bindingPolicyKey string) bool
 	// DeleteResolution deletes the resolution associated with the given key,
 	// if it exists.
-	DeleteResolution(placementKey string)
+	DeleteResolution(bindingPolicyKey string)
 }
 
-func NewPlacementResolver(gvkGvrMapper util.GvkGvrMapper) PlacementResolver {
-	return &placementResolver{
-		gvkGvrMapper:          gvkGvrMapper,
-		placementToResolution: make(map[string]*placementResolution),
+func NewBindingPolicyResolver(gvkGvrMapper util.GvkGvrMapper) BindingPolicyResolver {
+	return &bindingPolicyResolver{
+		gvkGvrMapper:              gvkGvrMapper,
+		bindingPolicyToResolution: make(map[string]*bindingPolicyResolution),
 	}
 }
 
-type placementResolver struct {
+type bindingPolicyResolver struct {
 	sync.RWMutex
-	gvkGvrMapper          util.GvkGvrMapper
-	placementToResolution map[string]*placementResolution
+	gvkGvrMapper              util.GvkGvrMapper
+	bindingPolicyToResolution map[string]*bindingPolicyResolution
 }
 
 // GenerateBinding returns the binding for the given
-// placement key. If a key is not associated to a resolution, the latter is
+// bindingpolicy key. If a key is not associated to a resolution, the latter is
 // created. This function can fail due to internal caches temporarily being
 // out of sync.
-func (resolver *placementResolver) GenerateBinding(placementKey string) (
+func (resolver *bindingPolicyResolver) GenerateBinding(bindingPolicyKey string) (
 	*v1alpha1.BindingSpec, error) {
-	placementResolution := resolver.getResolution(placementKey) // thread-safe
+	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
-	if placementResolution == nil {
-		return nil, fmt.Errorf("%s - placement-key: %s", placementResolutionNotFoundErrorPrefix, placementKey)
+	if bindingPolicyResolution == nil {
+		return nil, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix, bindingPolicyKey)
 	}
 
-	bindingSpec, err := placementResolution.toBindingSpec(resolver.gvkGvrMapper)
+	bindingSpec, err := bindingPolicyResolution.toBindingSpec(resolver.gvkGvrMapper)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to create BindingSpec for placement %v: %w",
-			placementKey, err)
+		return nil, fmt.Errorf("failed to create BindingSpec for bindingpolicy %v: %w",
+			bindingPolicyKey, err)
 	}
 
 	return bindingSpec, nil
 }
 
-// GetOwnerReference returns the owner reference for the given placement key.
+// GetOwnerReference returns the owner reference for the given bindingpolicy key.
 // If no resolution is associated with the given key, an error is returned.
-func (resolver *placementResolver) GetOwnerReference(placementKey string) (metav1.OwnerReference, error) {
-	placementResolution := resolver.getResolution(placementKey) // thread-safe
+func (resolver *bindingPolicyResolver) GetOwnerReference(bindingPolicyKey string) (metav1.OwnerReference, error) {
+	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
-	if placementResolution == nil {
-		return metav1.OwnerReference{}, fmt.Errorf("%s - placement-key: %s", placementResolutionNotFoundErrorPrefix, placementKey)
+	if bindingPolicyResolution == nil {
+		return metav1.OwnerReference{}, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix, bindingPolicyKey)
 	}
 
-	return *placementResolution.ownerReference, nil
+	return *bindingPolicyResolution.ownerReference, nil
 }
 
 // CompareBinding compares the given binding spec
-// with the maintained binding for the given placement key.
+// with the maintained binding for the given bindingpolicy key.
 // The returned value is true only if:
 //
 // - The destinations in the BindingSpec are an exact match
@@ -148,84 +148,84 @@ func (resolver *placementResolver) GetOwnerReference(placementKey string) (metav
 //
 // It is possible to output a false negative due to a temporary state of
 // internal caches being out of sync.
-func (resolver *placementResolver) CompareBinding(placementKey string,
+func (resolver *bindingPolicyResolver) CompareBinding(bindingPolicyKey string,
 	bindingSpec *v1alpha1.BindingSpec) bool {
-	placementResolution := resolver.getResolution(placementKey) // thread-safe
+	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
-	if placementResolution == nil {
+	if bindingPolicyResolution == nil {
 		return false
 	}
 
-	return placementResolution.matchesBindingSpec(bindingSpec, resolver.gvkGvrMapper)
+	return bindingPolicyResolution.matchesBindingSpec(bindingSpec, resolver.gvkGvrMapper)
 }
 
-// NotePlacement associates a new resolution with the given placement,
+// NoteBindingPolicy associates a new resolution with the given bindingpolicy,
 // if none is associated.
-func (resolver *placementResolver) NotePlacement(placement *v1alpha1.BindingPolicy) {
-	if resolution := resolver.getResolution(placement.GetName()); resolution != nil {
+func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy) {
+	if resolution := resolver.getResolution(bindingpolicy.GetName()); resolution != nil {
 		return
 	}
 
-	resolver.createResolution(placement)
+	resolver.createResolution(bindingpolicy)
 }
 
-// NoteObject updates the maintained placement's objects resolution for the
-// given placement key. If the object is being deleted, it is removed from
+// NoteObject updates the maintained bindingpolicy's objects resolution for the
+// given bindingpolicy key. If the object is being deleted, it is removed from
 // the resolution if exists.
 //
-// The returned bool indicates whether the placement resolution was changed.
-func (resolver *placementResolver) NoteObject(placementKey string,
+// The returned bool indicates whether the bindingpolicy resolution was changed.
+func (resolver *bindingPolicyResolver) NoteObject(bindingPolicyKey string,
 	obj runtime.Object) (bool, error) {
-	placementResolution := resolver.getResolution(placementKey) // thread-safe
+	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
-	if placementResolution == nil {
-		// placementKey is not associated with any resolution
-		return false, fmt.Errorf("%s - placement-key: %s", placementResolutionNotFoundErrorPrefix, placementKey)
+	if bindingPolicyResolution == nil {
+		// bindingPolicyKey is not associated with any resolution
+		return false, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix, bindingPolicyKey)
 	}
 
 	// noteObject is thread-safe
-	changed, err := placementResolution.noteObject(obj)
+	changed, err := bindingPolicyResolution.noteObject(obj)
 	if err != nil {
-		return false, fmt.Errorf("failed to update resolution for placement %v: %w", placementKey, err)
+		return false, fmt.Errorf("failed to update resolution for bindingpolicy %v: %w", bindingPolicyKey, err)
 	}
 
 	return changed, nil
 }
 
-// RemoveObject removes the given object from the maintained placement's
-// objects resolution for the given placement key.
+// RemoveObject removes the given object from the maintained bindingpolicy's
+// objects resolution for the given bindingpolicy key.
 //
-// The returned bool indicates whether the placement resolution was changed.
-func (resolver *placementResolver) RemoveObject(placementKey string,
+// The returned bool indicates whether the bindingpolicy resolution was changed.
+func (resolver *bindingPolicyResolver) RemoveObject(bindingPolicyKey string,
 	obj runtime.Object) bool {
-	placementResolution := resolver.getResolution(placementKey) // thread-safe
+	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
-	if placementResolution == nil {
+	if bindingPolicyResolution == nil {
 		return false
 	}
 
 	// removeObject is thread-safe
-	return placementResolution.removeObject(obj)
+	return bindingPolicyResolution.removeObject(obj)
 }
 
-// SetDestinations updates the maintained placement's
-// destinations resolution for the given placement key.
+// SetDestinations updates the maintained bindingpolicy's
+// destinations resolution for the given bindingpolicy key.
 // The given destinations set is expected not to be mutated after this call.
-func (resolver *placementResolver) SetDestinations(placementKey string,
+func (resolver *bindingPolicyResolver) SetDestinations(bindingPolicyKey string,
 	destinations sets.Set[string]) {
-	placementResolution := resolver.getResolution(placementKey) // thread-safe
+	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
-	if placementResolution == nil {
+	if bindingPolicyResolution == nil {
 		return
 	}
 
-	placementResolution.setDestinations(destinations)
+	bindingPolicyResolution.setDestinations(destinations)
 }
 
 // ResolutionExists returns true if a resolution is associated with the
-// given placement key.
-func (resolver *placementResolver) ResolutionExists(placementKey string) bool {
-	if resolver.getResolution(placementKey) == nil {
+// given bindingpolicy key.
+func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string) bool {
+	if resolver.getResolution(bindingPolicyKey) == nil {
 		return false
 	}
 
@@ -234,45 +234,45 @@ func (resolver *placementResolver) ResolutionExists(placementKey string) bool {
 
 // DeleteResolution deletes the resolution associated with the given key,
 // if it exists.
-func (resolver *placementResolver) DeleteResolution(placementKey string) {
+func (resolver *bindingPolicyResolver) DeleteResolution(bindingPolicyKey string) {
 	resolver.Lock() // lock for modifying map
 	defer resolver.Unlock()
 
-	delete(resolver.placementToResolution, placementKey)
+	delete(resolver.bindingPolicyToResolution, bindingPolicyKey)
 }
 
 // getResolution retrieves the resolution associated with the given key.
 // If the resolution does not exist, nil is returned.
-func (resolver *placementResolver) getResolution(placementKey string) *placementResolution {
+func (resolver *bindingPolicyResolver) getResolution(bindingPolicyKey string) *bindingPolicyResolution {
 	resolver.RLock()         // lock for reading map
 	defer resolver.RUnlock() // unlock after accessing map
 
-	return resolver.placementToResolution[placementKey]
+	return resolver.bindingPolicyToResolution[bindingPolicyKey]
 }
 
-func (resolver *placementResolver) createResolution(placement *v1alpha1.BindingPolicy) *placementResolution {
+func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.BindingPolicy) *bindingPolicyResolution {
 	resolver.Lock() // lock for modifying map
 	defer resolver.Unlock()
 
 	// double-check existence to handle race conditions (common pattern)
-	if placementResolution, exists := resolver.placementToResolution[placement.GetName()]; exists {
-		return placementResolution
+	if bindingPolicyResolution, exists := resolver.bindingPolicyToResolution[bindingpolicy.GetName()]; exists {
+		return bindingPolicyResolution
 	}
 
-	ownerReference := metav1.NewControllerRef(placement, placement.GroupVersionKind())
+	ownerReference := metav1.NewControllerRef(bindingpolicy, bindingpolicy.GroupVersionKind())
 	ownerReference.BlockOwnerDeletion = &[]bool{false}[0]
 
-	placementResolution := &placementResolution{
+	bindingPolicyResolution := &bindingPolicyResolution{
 		objectIdentifierToKey: make(map[string]*util.Key),
 		destinations:          sets.New[string](),
 		workloadGeneration:    1,
 		ownerReference:        ownerReference,
 	}
-	resolver.placementToResolution[placement.GetName()] = placementResolution
+	resolver.bindingPolicyToResolution[bindingpolicy.GetName()] = bindingPolicyResolution
 
-	return placementResolution
+	return bindingPolicyResolution
 }
 
-func errorIsPlacementResolutionNotFound(err error) bool {
-	return strings.HasPrefix(err.Error(), placementResolutionNotFoundErrorPrefix)
+func errorIsBindingPolicyResolutionNotFound(err error) bool {
+	return strings.HasPrefix(err.Error(), bindingPolicyResolutionNotFoundErrorPrefix)
 }

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package v1alpha1 contains API Schema definitions for the placement v1alpha1 API group
+// Package v1alpha1 contains API Schema definitions for the API group of version v1alpha1
 // +kubebuilder:object:generate=true
 // +k8s:openapi-gen=true
 // +groupName=control.kubestellar.io

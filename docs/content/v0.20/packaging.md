@@ -37,7 +37,7 @@ flowchart LR
 
 The dashed dependencies are at run time, not build time.
 
-"OSA" is OCM Status Addon
+"OSA" is OCM Status Addon.
 
 ### OCM status addon container image
 
@@ -189,7 +189,7 @@ KubeStellar has one container image, for what is called the
 KubeStellar controller-manager. For each WDS, KubeStellar has a pod
 running that image. It installs the needed custom resource
 _definition_ objects if they are not already present, and is a
-controller-manager hosting the per-WDS controllers ([placement controller](architecture.md#placement-controller), [status controller](architecture.md#status-controller), and transport controller(TODO: link to doc)).
+controller-manager hosting the per-WDS controllers ([binding controller](architecture.md#binding-controller), [status controller](architecture.md#status-controller), and transport controller(TODO: link to doc)).
 
 The image repository is
 `ghcr.io/kubestellar/kubestellar/kubestellar-operator`. There is
