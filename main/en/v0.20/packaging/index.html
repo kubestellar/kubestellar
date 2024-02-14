@@ -2008,7 +2008,7 @@
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    osa_hc_repo -.-&gt; osa_ctr_image
 </code></pre></div>
 <p>The dashed dependencies are at run time, not build time.</p>
-<p>"OSA" is OCM Status Addon</p>
+<p>"OSA" is OCM Status Addon.</p>
 <h3 id="ocm-status-addon-container-image">OCM status addon container image<a class="headerlink" href="#ocm-status-addon-container-image" title="Permanent link">#</a></h3>
 <p>There is a container image at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon">ghcr.io/kubestellar/ocm-status-addon</a>.</p>
 <p>The container image is built and published using <code>make</code>.  The
@@ -2136,7 +2136,7 @@ ends with <code>/github.com/kubestellar/kubestellar</code>.</p>
 KubeStellar controller-manager. For each WDS, KubeStellar has a pod
 running that image. It installs the needed custom resource
 <em>definition</em> objects if they are not already present, and is a
-controller-manager hosting the per-WDS controllers (<a href="../architecture/#placement-controller">placement controller</a>, <a href="../architecture/#status-controller">status controller</a>, and transport controller(TODO: link to doc)).</p>
+controller-manager hosting the per-WDS controllers (<a href="../architecture/#binding-controller">binding controller</a>, <a href="../architecture/#status-controller">status controller</a>, and transport controller(TODO: link to doc)).</p>
 <p>The image repository is
 <code>ghcr.io/kubestellar/kubestellar/kubestellar-operator</code>. There is
 currently just one supported tag there, <code>0.20.0-alpha.1</code>. That was

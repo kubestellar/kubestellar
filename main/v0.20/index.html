@@ -1863,20 +1863,20 @@
 
 <h1 id="kubestellar-020">KubeStellar 0.20<a class="headerlink" href="#kubestellar-020" title="Permanent link">#</a></h1>
 <p>KubeStellar 0.20  supports multi-cluster deployment of Kubernetes objects, controlled by a 
-simple placement policy and deploying Kubernetes objects in their native format.  It uses OCM as 
+simple binding policy and deploying Kubernetes objects in their native format.  It uses OCM as 
 transport, with standard OCM agents (Klusterlet). We show examples of deploying workloads to 
-multi-cluster with kubectl, helm and ArgoCD using a simple label-selectors-based placement policy.</p>
+multi-cluster with kubectl, helm and ArgoCD using a simple label-selectors-based binding policy.</p>
 <h2 id="supported-features">Supported Features:<a class="headerlink" href="#supported-features" title="Permanent link">#</a></h2>
 <ol>
 <li><em>Multi-cluster Deployment:</em> Kubernetes objects are deployed across multiple clusters, controlled by a 
-straightforward placement policy.</li>
+straightforward binding policy.</li>
 <li><em>Pure-Kube User Experience:</em> Deployment of non-wrapped objects is handled in a pure Kubernetes manner.</li>
 <li><em>Object Management via WDS:</em> Creation, update, and deletion of objects in managed clusters are performed from WDS.</li>
 <li><em>OCM as Transport:</em> The Open Cluster Management (OCM) is used as transport, with standard OCM agents (Klusterlet).</li>
 <li><em>Multi-WDS and single OCM Shard:</em> Multiple WDSs and a single OCM shard are supported.</li>
 <li><em>Resiliency:</em> All components are running in Kubernetes, ensuring continued operation even after restarts of any component.</li>
-<li><em>Re-evaluation of Objects:</em> Existing objects are re-evaluated when a new placement is added or updated.</li>
-<li><em>Object Removal:</em> Objects are removed from clusters when the placement that led to their deployment on
+<li><em>Re-evaluation of Objects:</em> Existing objects are re-evaluated when a new binding policy is added or updated.</li>
+<li><em>Object Removal:</em> Objects are removed from clusters when the binding policy that led to their deployment on
  those clusters is deleted or updated and the what or where no longer match.</li>
 <li><em>Dynamic Handling of APIs:</em> Dynamically start/stop informers when adding/removing CRDs.</li>
 <li><em>Simplified setup:</em> Just 3 commands to get a fully functional setup (<code>kflex init</code>, <code>kflex create imbs</code>, <code>kflex create wds</code>)</li>

@@ -1866,11 +1866,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#binding-controller-aka-placement-controller" class="md-nav__link">
-    Binding Controller (a.k.a. Placement Controller)
+  <a href="#binding-controller" class="md-nav__link">
+    Binding Controller
   </a>
   
-    <nav class="md-nav" aria-label="Binding Controller (a.k.a. Placement Controller)">
+    <nav class="md-nav" aria-label="Binding Controller">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1970,9 +1970,7 @@
   
 
 
-<p><strong>NOTE</strong>: Current code is in a transition to a new design that decouples transport from placement (more about this below). As part of this transition, a new resource was added to KubeStellar called <code>PlacementDecision</code>. This resource matches the <code>Placement</code> object (1:1 relationship) in the WDS and contains references to the concrete workload objects and references to the concrete list of clusters that were selected by the placement selectors. </p>
-<p><strong>NOTE2</strong>: It was decided by the community to rename <code>Placement</code> -&gt; <code>BindingPolicy</code> and <code>PlacementDecision</code> -&gt; <code>Binding</code>.<br />
-This document uses the new terminology <code>BindingPolicy</code> for the resource that was called previously <code>Placement</code>, so on every place <code>BindingPolicy</code> is mentioned in this doc, we mean <code>Placement</code> as it was used up until today. We also use <code>Binding</code> when we mean <code>PlacementDecision</code> as described in previous note.</p>
+<p><strong>NOTE</strong>: Current code is in a transition to a new design that decouples transport from binding (more about this below). As part of this transition, a new resource was added to KubeStellar called <code>Binding</code>. This resource matches the <code>BindingPolicy</code> object (1:1 relationship) in the WDS and contains references to the concrete workload objects and references to the concrete list of clusters that were selected by the <code>BindingPolicy</code> selectors. </p>
 <h1 id="kubestellar-architecture">KubeStellar Architecture<a class="headerlink" href="#kubestellar-architecture" title="Permanent link">#</a></h1>
 <p>KubeStellar provides multi-cluster deployment of Kubernetes objects, controlled by simple <code>BindingPolicy</code> objects, where Kubernetes objects are expressed in their native format with no wrapping or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.</p>
 <figure>
@@ -2043,7 +2041,7 @@ and updates <em>WorkStatus</em> objects in the ITS namespace associated with the
 </figure>
 
 <h2 id="kubestellar-controller-manager">KubeStellar Controller Manager<a class="headerlink" href="#kubestellar-controller-manager" title="Permanent link">#</a></h2>
-<p>This module manages binding controller (a.k.a placement controller before the rename mentioned at the very beginning of this doc) and status controller. The binding controller watches <code>BindingPolicy</code> and workload objects on the Workload Definition Space (WDS) and and maintains in the Inventory and Transport Space (ITS) a wrapped object per workload object to be delivered. The status controller watches for <em>WorkStatus</em> objects on the ITS and updates the 
+<p>This module manages binding controller and status controller. The binding controller watches <code>BindingPolicy</code> and workload objects on the Workload Definition Space (WDS) and and maintains in the Inventory and Transport Space (ITS) a wrapped object per workload object to be delivered. The status controller watches for <em>WorkStatus</em> objects on the ITS and updates the
 status of objects in the WDS when singleton status is requested in the <code>BindingPolicy</code> for those objects. 
 There is one instance of a KubeStellar Controller Manager for each WDS. Currently this controller-manager runs in the KubeFlex hosting cluster and is responsible of installing the required CRDs in the associated WDS.
 More details on the internals of this module are provided in <a href="#kubestellar-controllers-architecture">KubeStellar Controllers Architecture</a>.</p>
@@ -2195,7 +2193,7 @@ manager: the binding controller and the status controllor.</p>
     into/from the OCM mailbox namespaces.</p>
 <p>so after the described change, we will have three controllers in the KubeStellar controller
 manager: the binding controller, the transport controller and the status controllor.</p>
-<h3 id="binding-controller-aka-placement-controller">Binding Controller (a.k.a. Placement Controller)<a class="headerlink" href="#binding-controller-aka-placement-controller" title="Permanent link">#</a></h3>
+<h3 id="binding-controller">Binding Controller<a class="headerlink" href="#binding-controller" title="Permanent link">#</a></h3>
 <p>The Binding controller is responsible for watching workload objects and 
 <code>BindingPolicy</code> objects, and wrapping and delivering objects to the ITS
 based on binding policies. As a step towards the planned change that is described in this document, Binding controller also creates for each <code>BindingPolicy</code> a matching <code>Binding</code> object in the WDS. A <code>Binding</code> object is mapped 1:1 to a <code>BindingPolicy</code> object and contains references to the concrete list of workload objects and references to the concrete list of destinations that were selected by the policy and should get all the workload objects.
@@ -2204,8 +2202,8 @@ Until the planned change is completed, nothing besides this controller touches t
 illustrated in Figure 3 (some details might be omitted to make the flow easier
 to understand). Once the planned change that is describe in this document is integrated we will update this figure accordingly.</p>
 <figure>
-  <img src="./images/placement-controller.png"  alt="Placement Controller">
-  <figcaption align="center">Figure 3 - Placement Controller</figcaption>
+  <img src="./images/binding-controller.png"  alt="Binding Controller">
+  <figcaption align="center">Figure 3 - Binding Controller</figcaption>
 </figure>
 
 <p>At startup, the controller code sets up the dynamic informers, the event
@@ -2284,9 +2282,9 @@ follows:</p>
 </ul>
 </li>
 <li>Adds a label for each matched <code>BindingPolicy</code> to the ManifestWork that 
-     is used to track the binding-policy that caused the object to be 
+     is used to track the <code>BindingPolicy</code> that caused the object to be
      delivered to one or more clusters. The label contains both the 
-     binding-policy name (note that placement is cluster-scoped) and the WDS name. 
+     <code>BindingPolicy</code> name (note that <code>BindingPolicy</code> is cluster-scoped) and the WDS name.
      This way, when a binding-policy is deleted or updated it is possible to 
      locate the associated ManifestWorks for deletion or label removal 
      (if more than one label is present, as other binding-policies may “own” the object).</li>
@@ -2348,10 +2346,10 @@ deleted (deletion timestamp not set) it follows the following flow:</p>
 <li>If there are matching clusters, the in-memory <code>Binding</code> representation is updated with the list of clusters.</li>
 <li>Enqueues the representation of the relevant <code>Binding</code> for syncing.</li>
 <li>Remove ManifestWorks from ITS for objects no longer matching: generate
- the ManagedByPlacementLabelKey for the current (<code>BindingPolicy</code>, WDS) and use
+ the ManagedByBindingPolicyLabelKey for the current (<code>BindingPolicy</code>, WDS) and use
  that to retrieve all the manifestworks associated with the (<code>BindingPolicy</code>, WDS).
  Then, for each manifestwork, extract the wrapped object, and re-evaluate the
- object vs. the current placement. If no longer a match (either for the
+ object vs. the current <code>BindingPolicy</code>. If no longer a match (either for the
  "what" or the "where" part) check if each manifestwork has other (<code>BindingPolicy</code>, WDS)
  labels. If yes, remove the label, if not, delete the manifestwork.</li>
 </ul>
