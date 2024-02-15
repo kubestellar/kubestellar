@@ -30,7 +30,6 @@ import (
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -238,9 +237,6 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 						c.handleObject(new)
 					},
 					DeleteFunc: func(obj interface{}) {
-						if shouldSkipDelete(obj) {
-							return
-						}
 						c.handleObject(obj)
 					},
 				})
@@ -344,13 +340,6 @@ func shouldSkipUpdate(old, new interface{}) bool {
 		return true
 	}
 	return false
-}
-
-func shouldSkipDelete(obj interface{}) bool {
-	// since delete for bindingpolicy is handled by the finalizer logic
-	// no need to handle delete for bindingpolicy to minimize events in the
-	// delete manifests
-	return util.IsBindingPolicy(obj)
 }
 
 // We only start informers on resources that support both watch and list
@@ -532,38 +521,7 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		return nil
 	}
 
-	if err := c.updateDecisions(obj); err != nil {
-		c.logger.Error(err, "failed to update bindingpolicy resolutions for object",
-			"object", util.RefToRuntimeObj(obj))
-		// return nil // not changing existing flow before transport is ready
-	}
-
-	//TODO (maroon): everything below this line should be deleted when transport is ready
-	clusterSet, managedByBindingPolicies, singletonStatus, err := c.matchSelectors(obj)
-	if err != nil {
-		utilruntime.HandleError(fmt.Errorf("error matching selectors: %s", err))
-		return nil
-	}
-
-	// if no clusters
-	if len(clusterSet) == 0 {
-		return nil
-	}
-
-	if singletonStatus {
-		clusterSet = pickSingleCluster(clusterSet)
-	}
-
-	if key.DeletedObject != nil {
-		c.logger.Info("Deleting", "object", util.RefToRuntimeObj(obj),
-			"from clusters", clusterSet)
-		deleteObjectOnManagedClusters(c.logger, c.ocmClient, *key.DeletedObject, clusterSet)
-		return nil
-	}
-
-	c.logger.Info("Delivering", "object", util.RefToRuntimeObj(obj),
-		"to clusters", clusterSet)
-	return c.deliverObjectToManagedClusters(obj, clusterSet, managedByBindingPolicies, singletonStatus)
+	return c.updateResolutions(ctx, obj)
 }
 
 func (c *Controller) getObjectFromKey(key util.Key) (runtime.Object, error) {
@@ -634,54 +592,5 @@ func (c *Controller) populateBindingPolicyResolverWithExistingBindingPolicies() 
 		c.bindingPolicyResolver.NoteBindingPolicy(bindingpolicy)
 	}
 
-	return nil
-}
-
-// sort by name and pick first cluster so that the choice is deterministic based on names
-func pickSingleCluster(clusterSet sets.Set[string]) sets.Set[string] {
-	return sets.New(sets.List(clusterSet)[0])
-}
-
-func (c *Controller) deliverObjectToManagedClusters(
-	obj runtime.Object,
-	managedClusters sets.Set[string],
-	managedByBindingPolices []string,
-	singletonStatus bool) error {
-	for clName := range managedClusters {
-		// find which bindingpolicies select this managedCluster
-		bindingPolicyNames := []string{}
-		for _, plName := range managedByBindingPolices {
-			plObj, err := c.getBindingPolicyByName(plName)
-			if err != nil {
-				return err
-			}
-			pl, err := runtimeObjectToBindingPolicy(plObj)
-			if err != nil {
-				return err
-			}
-			cl, err := ocm.GetClusterByName(c.ocmClient, clName)
-			if err != nil {
-				return err
-			}
-			// a bindingpolicy selects a managedCluster iff the managedCluster is selected by every single selector
-			// i.e. selectors are ANDed
-			matches, err := util.SelectorsMatchLabels(pl.Spec.ClusterSelectors, labels.Set(cl.Labels))
-			if err != nil {
-				return err
-			}
-			if matches {
-				bindingPolicyNames = append(bindingPolicyNames, plName)
-			}
-		}
-		if len(bindingPolicyNames) == 0 {
-			return nil
-		}
-		manifest := ocm.WrapObject(obj)
-		util.SetManagedByBindingPolicyLabels(manifest, c.wdsName, bindingPolicyNames, singletonStatus)
-		err := reconcileManifest(c.ocmClient, manifest, clName)
-		if err != nil {
-			c.logger.Error(err, "Error delivering object to mailbox")
-		}
-	}
 	return nil
 }

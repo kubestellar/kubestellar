@@ -331,7 +331,7 @@ func (c *Controller) reconcile(ctx context.Context, ref cache.ObjectName) error 
 	}
 
 	// only process workstatues with the label for single reported status
-	if _, ok := obj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatus]; !ok {
+	if _, ok := obj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]; !ok {
 		return nil
 	}
 

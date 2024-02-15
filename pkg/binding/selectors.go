@@ -17,95 +17,52 @@ limitations under the License.
 package binding
 
 import (
+	"context"
 	"fmt"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/kubestellar/kubestellar/pkg/ocm"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-// matches an object to each bindingpolicy and returns the list of matching clusters (if any)
-// the list of bindingpolicies that manage the object and if singleton status required
-// (the latter forces the selection  of only one cluster)
-// TODO (maroon): this should be deleted when transport is ready
-func (c *Controller) matchSelectors(obj runtime.Object) (sets.Set[string], []string, bool, error) {
-	managedByBindingPolicyList := []string{}
-	objMR := obj.(mrObject)
-	bindingpolicies, err := c.listBindingPolicies()
-	if err != nil {
-		return nil, nil, false, err
-	}
-
-	clusterSet := sets.New[string]()
-	// if a bindingpolicy wants single reported status we force to select only one cluster
-	wantSingletonStatus := false
-	for _, item := range bindingpolicies {
-		bindingpolicy, err := runtimeObjectToBindingPolicy(item)
-		if err != nil {
-			return nil, nil, false, err
-		}
-		matchedSome := c.testObject(objMR, bindingpolicy.Spec.Downsync)
-		if !matchedSome {
-			continue
-		}
-		// WantSingletonReportedState for multiple bindingpolicies are OR'd
-		if bindingpolicy.Spec.WantSingletonReportedState {
-			wantSingletonStatus = true
-		}
-
-		managedByBindingPolicyList = append(managedByBindingPolicyList, bindingpolicy.GetName())
-		c.logger.Info("Matched", "object", util.RefToRuntimeObj(obj), "for bindingpolicy", bindingpolicy.GetName())
-
-		clusters, err := ocm.FindClustersBySelectors(c.ocmClient, bindingpolicy.Spec.ClusterSelectors)
-		if err != nil {
-			return nil, nil, false, err
-		}
-
-		if clusters == nil {
-			continue
-		}
-
-		clusterSet = clusterSet.Union(clusters)
-	}
-
-	return clusterSet, managedByBindingPolicyList, wantSingletonStatus, nil
-}
-
-// when an object is updated, we iterate over all bindingpolices and update bindingpolicy resolutions that
-// are affected by the update. Every affected binding is then queued to be synced.
-func (c *Controller) updateDecisions(obj runtime.Object) error {
-	bindingpolices, err := c.listBindingPolicies()
+// when an object is updated, we iterate over all bindingpolicies and update
+// resolutions that are affected by the update. Every changed resolution leads
+// to queueing its relevant binding for syncing.
+func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) error {
+	bindingPolicies, err := c.listBindingPolicies()
 	if err != nil {
 		return err
 	}
 
 	objMR := obj.(mrObject)
 
-	for _, item := range bindingpolices {
-		bindingpolicy, err := runtimeObjectToBindingPolicy(item)
+	isSelectedBySingletonBinding := false
+
+	for _, item := range bindingPolicies {
+		bindingPolicy, err := runtimeObjectToBindingPolicy(item)
 		if err != nil {
 			return err
 		}
 
-		matchedSome := c.testObject(objMR, bindingpolicy.Spec.Downsync)
+		matchedSome := c.testObject(objMR, bindingPolicy.Spec.Downsync)
 		if !matchedSome {
 			// if previously selected, remove
 			// TODO: optimize
-			if resolutionUpdated := c.bindingPolicyResolver.RemoveObject(bindingpolicy.GetName(), obj); resolutionUpdated {
+			if resolutionUpdated := c.bindingPolicyResolver.RemoveObject(bindingPolicy.GetName(), obj); resolutionUpdated {
 				// enqueue binding to be synced since object was removed from its bindingpolicy's resolution
 				c.logger.V(4).Info("enqueued Binding for syncing due to the removal of an "+
-					"object from its resolution", "binding", bindingpolicy.GetName(),
+					"object from its resolution", "binding", bindingPolicy.GetName(),
 					"object", util.RefToRuntimeObj(obj))
-				c.enqueueBinding(bindingpolicy.GetName())
+				c.enqueueBinding(bindingPolicy.GetName())
 			}
 			continue
 		}
 
 		// obj is selected by bindingpolicy, update the bindingpolicy resolver
-		resolutionUpdated, err := c.bindingPolicyResolver.NoteObject(bindingpolicy.GetName(), obj)
+		resolutionUpdated, err := c.bindingPolicyResolver.NoteObject(bindingPolicy.GetName(), obj)
 		if err != nil {
 			if errorIsBindingPolicyResolutionNotFound(err) {
 				// this case can occur if a bindingpolicy resolution was deleted AFTER
@@ -117,17 +74,104 @@ func (c *Controller) updateDecisions(obj runtime.Object) error {
 			}
 
 			return fmt.Errorf("failed to update resolution for bindingpolicy %s for object %v: %v",
-				bindingpolicy.GetName(), util.RefToRuntimeObj(obj), err)
+				bindingPolicy.GetName(), util.RefToRuntimeObj(obj), err)
 		}
 
 		if resolutionUpdated {
 			// enqueue binding to be synced since an object was added to its bindingpolicy's resolution
 			c.logger.V(4).Info("enqueued Binding for syncing due to a noting of an "+
-				"object in its resolution", "binding", bindingpolicy.GetName(),
+				"object in its resolution", "binding", bindingPolicy.GetName(),
 				"object", util.RefToRuntimeObj(obj))
-			c.enqueueBinding(bindingpolicy.GetName())
+			c.enqueueBinding(bindingPolicy.GetName())
+		}
+
+		// make sure object has singleton status if needed
+		if !isBeingDeleted(obj) &&
+			c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicy.GetName()) {
+			if err := c.addSingletonLabel(ctx, obj, bindingPolicy.GetName()); err != nil {
+				return fmt.Errorf("failed to add singleton label to object: %w", err)
+			}
+
+			isSelectedBySingletonBinding = true
+		}
+	}
+
+	// if the binding-policies matching cycles end and the object is not selected by a singleton binding,
+	// we need to remove the singleton label from the object if it exists.
+	// NOTE that this takes care of the case where the object was previously selected by a singleton binding
+	// and is no longer selected by any binding.
+	if !isSelectedBySingletonBinding {
+		if err := c.removeSingletonLabel(ctx, obj); err != nil {
+			return fmt.Errorf("failed to remove singleton label from object: %w", err)
 		}
 	}
 
 	return nil
+}
+
+func (c *Controller) removeSingletonLabel(ctx context.Context, obj runtime.Object) error {
+	unstructuredObj, ok := obj.(*unstructured.Unstructured)
+	if !ok {
+		return fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
+	}
+
+	labels := unstructuredObj.GetLabels()
+	if labels == nil {
+		labels = make(map[string]string)
+	}
+
+	// skip if label does not exist
+	if _, found := labels[util.BindingPolicyLabelSingletonStatusKey]; !found {
+		return nil
+	}
+
+	// label found, should delete it and update object
+	delete(labels, util.BindingPolicyLabelSingletonStatusKey)
+	unstructuredObj.SetLabels(labels)
+
+	gvr, found := c.gvkGvrMapper.GetGvr(unstructuredObj.GetObjectKind().GroupVersionKind())
+	if !found {
+		return fmt.Errorf("failed to get GVR for object %v", util.RefToRuntimeObj(obj))
+	}
+
+	if unstructuredObj.GetNamespace() == metav1.NamespaceNone {
+		_, err := c.dynamicClient.Resource(gvr).Update(ctx, unstructuredObj, metav1.UpdateOptions{})
+		return err
+	}
+
+	_, err := c.dynamicClient.Resource(gvr).Namespace(unstructuredObj.GetNamespace()).Update(ctx, unstructuredObj, metav1.UpdateOptions{})
+	return err
+}
+
+func (c *Controller) addSingletonLabel(ctx context.Context, obj runtime.Object, bindingPolicyName string) error {
+	unstructuredObj, ok := obj.(*unstructured.Unstructured)
+	if !ok {
+		return fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
+	}
+
+	labels := unstructuredObj.GetLabels()
+	if labels == nil {
+		labels = make(map[string]string)
+	}
+
+	// skip if label already exists
+	if _, found := labels[util.BindingPolicyLabelSingletonStatusKey]; found {
+		return nil
+	}
+
+	labels[util.BindingPolicyLabelSingletonStatusKey] = bindingPolicyName
+	unstructuredObj.SetLabels(labels)
+
+	gvr, found := c.gvkGvrMapper.GetGvr(unstructuredObj.GetObjectKind().GroupVersionKind())
+	if !found {
+		return fmt.Errorf("failed to get GVR for object %v", util.RefToRuntimeObj(obj))
+	}
+
+	if unstructuredObj.GetNamespace() == metav1.NamespaceNone {
+		_, err := c.dynamicClient.Resource(gvr).Update(ctx, unstructuredObj, metav1.UpdateOptions{})
+		return err
+	}
+
+	_, err := c.dynamicClient.Resource(gvr).Namespace(unstructuredObj.GetNamespace()).Update(ctx, unstructuredObj, metav1.UpdateOptions{})
+	return err
 }
