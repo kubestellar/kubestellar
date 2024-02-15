@@ -39,7 +39,7 @@ const (
 	BindingPolicyResource                = "bindingpolicies"
 	BindingKind                          = "Binding"
 	BindingResource                      = "bindings"
-	WorkStatusGroup                      = "edge.kubestellar.io" // TODO: update/import after status-addon is rehomed and its api group for WorkStatus is updated
+	WorkStatusGroup                      = "control.kubestellar.io"
 	WorkStatusVersion                    = "v1alpha1"
 	WorkStatusResource                   = "workstatuses"
 	AnnotationToPreserveValuesKey        = "annotations.kubestellar.io/preserve"
@@ -204,7 +204,7 @@ func CheckWorkStatusIPresent(config *rest.Config) bool {
 	}
 
 	gvr := schema.GroupVersionResource{
-		Group:    "edge.kubestellar.io", // TODO: update/import after status-addon is rehomed and its api group for WorkStatus is updated
+		Group:    "control.kubestellar.io",
 		Version:  "v1alpha1",
 		Resource: "workstatuses",
 	}
