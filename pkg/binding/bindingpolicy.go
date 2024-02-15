@@ -32,6 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/dynamic"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -122,6 +123,59 @@ func (c *Controller) getBindingPolicyByName(name string) (runtime.Object, error)
 		return nil, err
 	}
 	return got, nil
+}
+
+func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, oldLabels labels.Set, newLabels labels.Set) {
+	c.logger.Info("evaluating BindingPolicies")
+	bindingPolicies, err := c.listBindingPolicies()
+	if err != nil {
+		utilruntime.HandleError(err)
+		return
+	}
+	for _, obj := range bindingPolicies {
+		bindingPolicy, err := runtimeObjectToBindingPolicy(obj)
+		if err != nil {
+			utilruntime.HandleError(err)
+			return
+		}
+		match1, err := util.SelectorsMatchLabels(bindingPolicy.Spec.ClusterSelectors, oldLabels)
+		if err != nil {
+			utilruntime.HandleError(err)
+			return
+		}
+		match2, err := util.SelectorsMatchLabels(bindingPolicy.Spec.ClusterSelectors, newLabels)
+		if err != nil {
+			utilruntime.HandleError(err)
+			return
+		}
+		if match1 || match2 {
+			c.enqueueObject(bindingPolicy, true)
+		}
+	}
+}
+
+func (c *Controller) evaluateBindingPolicies(ctx context.Context, labelsSet labels.Set) {
+	c.logger.Info("evaluating BindingPolicies")
+	bindingPolicies, err := c.listBindingPolicies()
+	if err != nil {
+		utilruntime.HandleError(err)
+		return
+	}
+	for _, obj := range bindingPolicies {
+		bindingPolicy, err := runtimeObjectToBindingPolicy(obj)
+		if err != nil {
+			utilruntime.HandleError(err)
+			return
+		}
+		match, err := util.SelectorsMatchLabels(bindingPolicy.Spec.ClusterSelectors, labelsSet)
+		if err != nil {
+			utilruntime.HandleError(err)
+			return
+		}
+		if match {
+			c.enqueueObject(bindingPolicy, true)
+		}
+	}
 }
 
 func (c *Controller) listBindingPolicies() ([]runtime.Object, error) {

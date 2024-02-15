@@ -21,7 +21,10 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
+	clientset "open-cluster-management.io/api/client/cluster/clientset/versioned"
+	informers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 	clusterv1 "open-cluster-management.io/api/cluster/v1"
 	workv1 "open-cluster-management.io/api/work/v1"
 
@@ -35,6 +38,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 
 	"github.com/kubestellar/kubestellar/pkg/util"
+)
+
+const (
+	defaultResyncPeriod = time.Duration(0)
 )
 
 // wrapObject creates a ManifestWork with a single manifest containing the given object
@@ -91,6 +98,10 @@ func ZeroFields(obj runtime.Object) runtime.Object {
 		util.RemoveRuntimeGeneratedFieldsFromService(zeroed)
 	}
 	return zeroed
+}
+
+func GetOCMInformerFactory(clientset clientset.Interface) informers.SharedInformerFactory {
+	return informers.NewSharedInformerFactory(clientset, defaultResyncPeriod)
 }
 
 func GetOCMClient(kubeconfig *rest.Config) *client.Client {
