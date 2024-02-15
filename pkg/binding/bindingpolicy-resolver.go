@@ -308,10 +308,11 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 	ownerReference.BlockOwnerDeletion = &[]bool{false}[0]
 
 	bindingPolicyResolution := &bindingPolicyResolution{
-		objectIdentifierToKey: make(map[string]*util.Key),
-		destinations:          sets.New[string](),
-		workloadGeneration:    1,
-		ownerReference:        ownerReference,
+		objectIdentifierToKey:          make(map[string]*util.Key),
+		destinations:                   sets.New[string](),
+		workloadGeneration:             1,
+		ownerReference:                 ownerReference,
+		requiresSingletonReportedState: bindingpolicy.Spec.WantSingletonReportedState,
 	}
 	resolver.bindingPolicyToResolution[bindingpolicy.GetName()] = bindingPolicyResolution
 
