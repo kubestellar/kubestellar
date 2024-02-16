@@ -100,10 +100,6 @@ type Controller struct {
 // Create a new binding controller
 func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
 	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
-	ratelimiter := workqueue.NewMaxOfRateLimiter(
-		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
-		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
-	)
 
 	dynamicClient, err := dynamic.NewForConfig(wdsRestConfig)
 	if err != nil {
@@ -126,6 +122,22 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 	}
 
 	ocmClient := *ocm.GetOCMClient(imbsRestConfig)
+
+	return makeController(parentLogger, dynamicClient, kubernetesClient, extClient, ocmClientset, ocmClient, wdsName, allowedGroupsSet)
+}
+
+func makeController(parentLogger logr.Logger,
+	dynamicClient dynamic.Interface, // used for CRD, Binding[Policy], workload
+	kubernetesClient kubernetes.Interface, // used for Namespaces, and Discovery
+	extClient apiextensionsclientset.Interface, // used for CRD
+	ocmClientset ocmclientset.Interface, // used for ManagedCluster in ITS
+	ocmClient client.Client, // used for ManagedCluster, ManifestWork in ITS
+	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
+
+	ratelimiter := workqueue.NewMaxOfRateLimiter(
+		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
+		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
+	)
 
 	gvkGvrMapper := util.NewGvkGvrMapper()
 
