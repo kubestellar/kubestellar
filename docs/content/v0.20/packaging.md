@@ -251,7 +251,7 @@ The PostCreateHook defined in `ocm.yaml` gets used on an ITS and adds the hub si
 
 #### kubestellar PostCreateHook
 
-The PostCreateHook defined in `kubestellar.yaml` is intended to be used in the hosting cluster, once per WDS, and runs container image `quay.io/kubestellar/helm:v3.14.0` (which is built from [the Helm source](https://github.com/helm/helm/tree/v3.14.0) by a process that we need to document) to instantiate the chart from `oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart` with chart version `0.20.0-alpha.1`. Currently nothing uses this PostCreateHook (the [examples doc](examples.md) reports on a past use of a previous build of this PostCreateHook).
+The PostCreateHook defined in `kubestellar.yaml` is intended to be used in the hosting cluster, once per WDS, and runs container image `quay.io/kubestellar/helm:v3.14.0` (which is built from [the Helm source](https://github.com/helm/helm/tree/v3.14.0) by a process that we need to document) to instantiate the chart from `oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart` with chart version `0.20.0-alpha.1`. Currently the only reference to any copy of this PostCreateHook is from the [examples doc](examples.md), which references the copy in the Git commit tagged `v0.20.0-alpha.1`.
 
 ## Amalgamated graph
 
