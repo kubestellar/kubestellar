@@ -24,7 +24,7 @@ fi
 
 :
 : -------------------------------------------------------------------------
-: Create a Kind hosting cluster with nginx ingress controller and KubeFlex operator
+: Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager
 :
 kflex init --create-kind $disable_chatty_status
 : Kubeflex kind cluster created.

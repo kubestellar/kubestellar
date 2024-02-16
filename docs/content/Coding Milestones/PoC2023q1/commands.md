@@ -382,7 +382,7 @@ start](#kubestellar-start) command above.
 ### Fetch a log from a KubeStellar runtime container
 
 {%
-   include-markdown "../../../../core-helm-chart/README.md"
+   include-markdown "../../../../chart/README.md"
    start="<!--check-log-start-->"
    end="<!--check-log-end-->"
 %}

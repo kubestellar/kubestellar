@@ -77,22 +77,22 @@ This Helm chart describes a deployment of the KubeStellar core
 components (a space provider, KubeStellar controllers, initialization) as
 workload for a Kubernetes cluster.
 
-The source of this Helm chart is in the `core-helm-chart` subdirectory
+The source of this Helm chart is in the `chart` subdirectory
 of the [kubestellar GitHub repo](#kubestellarkubestellar).
 
 The `kubectl kubestellar deploy` command uses the adjacent copy of
 this Helm chart. That is: (1) in the case of working with a local copy
 of the kubestellar/kubestellar GitHub repo, the copy in the
-`core-helm-chart` directory, and (2) in the case of using an unpacked
-release archive --- which contains `core-helm-chart` as well as `bin`
---- that unpacked copy of `core-helm-chart`.
+`chart` directory, and (2) in the case of using an unpacked
+release archive --- which contains `chart` as well as `bin`
+--- that unpacked copy of `chart`.
 
 Alternatively, users can use the Helm repository at
 `https://helm.kubestellar.io/`, which is served via GitHub pages from
 the `main` branch of [the kubestellar/helm GitHub
 repo](#kubestellarhelm). This repository holds tar archives of
 released versions of the chart, created manually from the sources in
-the `core-helm-chart` subdirectory of the [kubestellar GitHub
+the `chart` subdirectory of the [kubestellar GitHub
 repo](#kubestellarkubestellar).
 
 A Helm chart has both a version number for the chart itself and a
@@ -121,7 +121,7 @@ interesting.
 
 The [helm](https://GitHub.com/kubestellar/helm) GitHub repo hosts
 distributions of archived versions of the chart, as discussed
-[above](#kubestellar-core-helm-chart).
+[above](#kubestellar-chart).
 
 ### kubestellar/homebrew-kubestellar
 

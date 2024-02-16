@@ -55,7 +55,7 @@ make ${scope_part}build OS="$target_os" ARCH="$target_arch"
 echo $'#!/usr/bin/env bash\necho' ${kcpe_version} > bin/kubestellar-release
 chmod a+x bin/kubestellar-release
 mkdir -p build/release
-tar czf "build/release/$archname" --exclude bin/.gitignore bin config core-helm-chart README.md LICENSE
+tar czf "build/release/$archname" --exclude bin/.gitignore bin config chart README.md LICENSE
 cd build/release
 touch checksums256.txt
 grep -vw "$archname" checksums256.txt > /tmp/$$.txt || true

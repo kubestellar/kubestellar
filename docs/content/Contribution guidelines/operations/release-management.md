@@ -30,9 +30,9 @@ change the version in the following line:
 syncer_image="quay.io/kubestellar/syncer:{{ config.ks_next_tag }}"
 ```
 
-### Update the core-helm-chart 'Chart.yaml' and 'values.yaml' files with a reference to the new version of the KubeStellar Helm chart version
+### Update the chart 'Chart.yaml' and 'values.yaml' files with a reference to the new version of the KubeStellar Helm chart version
 ```shell
-vi core-helm-chart/Chart.yaml
+vi chart/Chart.yaml
 ```
 
 change the versions in the 'Chart.yaml' file in the following lines:
@@ -46,7 +46,7 @@ appVersion: {{ config.ks_next_tag }}
 
 then in 'values.yaml'
 ```shell 
-vi core-helm-chart/values.yaml
+vi chart/values.yaml
 ```
 
 change the version in the 'values.yaml' file in the following line:
@@ -290,7 +290,7 @@ brew install gnu-tar
 
 then, from root of local copy of [https://github.com/kubestellar/kubestellar](https://github.com/kubestellar/kubestellar) repo:
 ```
-gtar -zcf kubestellar-core-{{config.ks_next_helm_version}}.tar.gz core-helm-chart/ --transform s/core-helm-chart/kubestellar-core/
+gtar -zcf kubestellar-core-{{config.ks_next_helm_version}}.tar.gz chart/ --transform s/chart/kubestellar-core/
 mv kubestellar-core-{{config.ks_next_helm_version}}.tar.gz ~
 shasum -a 256 ~/kubestellar-core-{{config.ks_next_helm_version}}.tar.gz
 ```

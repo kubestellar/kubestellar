@@ -202,8 +202,7 @@ spec:
         - --leader-elect
         - --wds-name={{.Values.ControlPlaneName}}
         - --api-groups={{.Values.APIGroups}}
-        - -v=2
-        image: ghcr.io/kubestellar/kubestellar/kubestellar-operator:0.20.0-alpha.1
+        image: ghcr.io/kubestellar/kubestellar/controller-manager:0.20.0-alpha.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:

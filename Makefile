@@ -15,7 +15,7 @@
 # Image repo/tag to use all building/pushing image targets
 DOCKER_REGISTRY ?= ghcr.io/kubestellar/kubestellar
 IMAGE_TAG ?= 0.20.0-alpha.1
-CMD_NAME ?= kubestellar-operator
+CMD_NAME ?= controller-manager
 IMG ?= ${DOCKER_REGISTRY}/${CMD_NAME}:${IMAGE_TAG}
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
@@ -166,7 +166,7 @@ test: manifests generate fmt vet envtest ## Run tests.
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
-	go run ./cmd/kubestellar-operator/main.go $(ARGS)
+	go run ./cmd/controller-manager/main.go $(ARGS)
 
 .PHONY: ko-build-local
 ko-build-local: test ## Build local container image with ko
@@ -189,12 +189,12 @@ kind-load-image:
 .PHONY: chart
 chart: manifests kustomize
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
-	$(KUSTOMIZE) build config/default > core-helm-chart/templates/operator.yaml
+	$(KUSTOMIZE) build config/default > chart/templates/controller-manager.yaml
 	scripts/add-helm-code.sh add
 
 .PHONY: chart-push
 chart-push: chart ## push helm chart
-	helm package ./core-helm-chart --destination . --version ${IMAGE_TAG}
+	helm package ./chart --destination . --version ${IMAGE_TAG}
 	helm push ./*.tgz oci://${DOCKER_REGISTRY}
 	rm ./*.tgz
 
@@ -221,12 +221,12 @@ deploy: manifests kustomize ## Deploy manager to the K8s cluster specified in ~/
 undeploy: ## Undeploy manager from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
 
-# installs the chart from ./core-helm-chart for local dev/testing a WDS using image loaded in kind.
+# installs the chart from ./chart for local dev/testing a WDS using image loaded in kind.
 # The Helm chart should be instantiated into the KubeFlex hosting cluster.
 # If $(KUBE_CONTEXT) is set then that indicates where to install the chart; otherwise it goes to the current kubeconfig context.
 .PHONY: install-local-chart
 install-local-chart: kind-load-image
-	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./core-helm-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME}
+	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./chart  --set ControlPlaneName=${DEFAULT_WDS_NAME}
 
 ##@ Build Dependencies
 
