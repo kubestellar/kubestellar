@@ -214,7 +214,19 @@ it from local sources. This is not included in `make all-generated`.
 This chart creates (among other things) a `Deployment` object that runs a container from the image `ghcr.io/kubestellar/kubestellar/kubestellar-operator:0.20.0-alpha.1`.
 
 The chart is published at the OCI repository
-`ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart`.  What stores the chart there?
+`ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart`.  The
+`make` target `chart-push` depends on target `chart` and publishes the
+chart to
+`${DOCKER_REGISTRY}/kubestellar-operator-chart:${IMAGE_TAG}`. Make
+variable `DOCKER_REGISTRY` defaults to
+`ghcr.io/kubestellar/kubestellar` and `IMAGE_TAG` defaults to
+`0.20.0-alpha.1` (red flag here).
+
+The following versions exist.
+
+| OCI tag = version in chart | appVersion in chart | referenced container tag |
+| -------------------------- | ------------------- | ------------------------ |
+| 0.20.0-alpha.1             | 0.1.0               | 0.20.0-alpha.1 |
 
 ### clusteradm container image
 
@@ -231,10 +243,15 @@ built from.
 
 ### KubeFlex PostCreateHooks
 
-There are two `PostCreateHook` objects defined in [config/postcreate-hooks](../../../config/postcreate-hooks). What uses these copies of those hook definitions?
+There are two `PostCreateHook` objects defined in [config/postcreate-hooks](../../../config/postcreate-hooks).
 
-- `ocm.yaml` adds `clusteradm` by running a container using the image `quay.io/kubestellar/clusteradm:0.7.2`; see [above](#clusteradm-container-image) about the source of that.
-- `kubestellar.yaml` runs container image `quay.io/kubestellar/helm:v3.14.0` (which is built from [the Helm source](https://github.com/helm/helm/tree/v3.14.0) by a process that we need to document) to instantiate the chart from `oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart` with chart version `0.20.0-alpha.1`, which is built by (what?) from (what? probably answered above).
+#### ocm PostCreateHook
+
+The PostCreateHook defined in `ocm.yaml` gets used on an ITS and adds the hub side of OCM there, using the image `quay.io/kubestellar/clusteradm:0.7.2`. See [above](#clusteradm-container-image) about the source of that. Currently this PostCreateHook is used in the E2E tests but this is a problem because of its fixed reference to container image previously built from sources in this same Git repository.
+
+#### kubestellar PostCreateHook
+
+The PostCreateHook defined in `kubestellar.yaml` is intended to be used in the hosting cluster, once per WDS, and runs container image `quay.io/kubestellar/helm:v3.14.0` (which is built from [the Helm source](https://github.com/helm/helm/tree/v3.14.0) by a process that we need to document) to instantiate the chart from `oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart` with chart version `0.20.0-alpha.1`. Currently the only reference to any copy of this PostCreateHook is from the [examples doc](examples.md), which references the copy in the Git commit tagged `v0.20.0-alpha.1`.
 
 ## Amalgamated graph
 
