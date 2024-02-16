@@ -28,19 +28,18 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
 
-	transportoptions "github.com/kubestellar/kubestellar/cmd/transport/options"
 	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/transport"
 )
 
-// The following code is responsible for running transport controller with pluggable
-// implementation and contains the base functionality.
-// Run function gets the transport-specific implementation and uses it to initialize
+// The following code is responsible for running a transport controller with a given
+// transport plugin and contains the base or generic functionality.
+// The GenericMain function gets the transport-specific implementation and uses it to initialize
 // the generic transport controller which is responsible for processing the
 // Binding added/updated/deleted events.
-// In order to use Run function, one has to call it in the following format:
-// cmd.Run(YourTransportSpecificImplementation())
+// In order to use the GenericMain function, one has to call it in the following format:
+// GenericMain(YourTransportSpecificImplementation())
 
 // Example for this can be seen here:
 // https://github.com/kubestellar/ocm-transport-plugin/blob/main/cmd/main.go
@@ -49,11 +48,11 @@ const (
 	defaultResyncPeriod = time.Duration(0)
 )
 
-func Run(transportImplementation transport.Transport) {
+func GenericMain(transportImplementation transport.Transport) {
 	logger := klog.Background().WithName(transport.ControllerName)
 	ctx := klog.NewContext(context.Background(), logger)
 
-	options := transportoptions.NewTransportOptions()
+	options := NewTransportOptions()
 	fs := pflag.NewFlagSet(transport.ControllerName, pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
