@@ -32,9 +32,9 @@ source "${COMMON_SRCS}/setup-shell.sh"
 : are properly updated.
 :
 kubectl --context imbs1 label managedcluster cluster2 location-group=blah name=cluster2 --overwrite
-wait-for-cmd '[ "$(kubectl --context wds1 get bindings.control -o yaml | grep clusterId  | wc -l)" == 1 ]'
+wait-for-cmd '[ $(kubectl --context wds1 get bindings.control -o yaml | grep clusterId  | wc -l) == 1 ]'
 kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=cluster2 --overwrite
-wait-for-cmd '[ "$(kubectl --context wds1 get bindings.control -o yaml | grep clusterId  | wc -l)" == 2 ]'
+wait-for-cmd '[ $(kubectl --context wds1 get bindings.control -o yaml | grep clusterId  | wc -l) == 2 ]'
 :
 : Test passed
 
