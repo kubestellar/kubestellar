@@ -2435,15 +2435,14 @@ A <code>WorkStatus</code> object contains status for exactly one object, so that
 status updates for one object do not require updates of a whole bundle. </p>
 <h3 id="transport-controller-planned-to-be-added">Transport Controller - PLANNED TO BE ADDED<a class="headerlink" href="#transport-controller-planned-to-be-added" title="Permanent link">#</a></h3>
 <p>The transport controller is pluggable and allows the option to plug different
-implementations of the transport interface. In order to implement transport plugin, the plugin should supply the following:
+implementations of the transport interface. The interface between the plugin and the generic code is <a href="../../pkg/transport/transport.go">a Go language interface</a> that the plugin has to implement. This interface requires the following from the plugin.
 - Upon registration of a new WEC, plugin should create a namespace for the WEC in the ITS and delete the namespace once the WEC registration goes away (mailbox namespace per WEC);
 - Plugin must be able to wrap any number of objects into a single wrapped object;
 - Have an agent that can be used to pull the wrapped objects from the mailbox namespace and apply them to the WEC. A single example for such an agent is an agent that runs on the WEC and watches the wrapped object in the corresponding namespace in the central hub and is able to unwrap it and apply the objects to the WEC. 
 - Have inventory representation for the clusters.</p>
 <p>The above list is required in order to comply with <a href="https://multicluster.sigs.k8s.io/concepts/work-api/"><u>SIG Multi-Cluster Work API</u></a>.</p>
-<p>In order to implement a KubeStellar transport plugin, one has to implement code that supplies a function to wrap any number of objects into a single wrapped objects. 
-The transport interface that should be implemented can be seen <a href="https://github.com/kubestellar/kubestellar/blob/main/pkg/transport/transport.go">here</a>.<br />
-KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project <a href="https://open-cluster-management.io">Open Cluster Management</a>. OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available <a href="https://github.com/kubestellar/ocm-transport-plugin">here</a>.<br />
+<p>Each plugin has an executable with a <code>main</code> func that calls <a href="../../pkg/transport/cmd/generic-main.go">the generic code</a>, passing the plugin object that implements the plugin interface.</p>
+<p>KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project <a href="https://open-cluster-management.io">Open Cluster Management</a>. OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available <a href="https://github.com/kubestellar/ocm-transport-plugin">here</a>.<br />
 We expect to have more transport plugin options in the future.</p>
 <p>The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.</p>
 <figure>
