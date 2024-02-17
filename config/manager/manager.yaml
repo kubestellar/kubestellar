@@ -26,7 +26,7 @@ spec:
         runAsNonRoot: true
       containers:
       - args:
-        - --leader-elect
+        - will be set by ../default/manager_auth_proxy_patch.yaml
         image: controller:latest
         imagePullPolicy: IfNotPresent
         name: manager
