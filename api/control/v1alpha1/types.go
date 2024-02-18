@@ -278,8 +278,3 @@ type BindingList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Binding `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&BindingPolicy{}, &BindingPolicyList{})
-	SchemeBuilder.Register(&Binding{}, &BindingList{})
-}
