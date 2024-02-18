@@ -21,8 +21,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sigs.k8s.io/controller-runtime/pkg/scheme"
 )
 
 var (
@@ -30,8 +30,7 @@ var (
 	GroupVersion = schema.GroupVersion{Group: "control.kubestellar.io", Version: "v1alpha1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme.
-	// TODO: Is it problematic that https://github.com/kubernetes/sample-controller/blob/v0.28.2/pkg/apis/samplecontroller/v1alpha1/register.go#L42 does this a little differently?
-	SchemeBuilder = &scheme.Builder{GroupVersion: GroupVersion}
+	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
 
 	// AddToScheme adds the types in this group-version to the given scheme.
 	AddToScheme = SchemeBuilder.AddToScheme
