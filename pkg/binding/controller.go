@@ -44,7 +44,6 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	ctrlm "sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/crd"
@@ -80,12 +79,13 @@ const bindingQueueingDelay = 2 * time.Second
 // Controller watches all objects, finds associated bindingpolicies, when matched a bindingpolicy wraps and
 // places objects into mailboxes
 type Controller struct {
-	logger                logr.Logger
-	ocmClientset          ocmclientset.Interface
-	ocmClient             client.Client
-	dynamicClient         dynamic.Interface
-	kubernetesClient      kubernetes.Interface
-	extClient             apiextensionsclientset.Interface
+	logger           logr.Logger
+	ocmClientset     ocmclientset.Interface // used for ManagedCluster in ITS
+	ocmClient        client.Client          // used for ManagedCluster, ManifestWork in ITS
+	dynamicClient    dynamic.Interface      // used for CRD, Binding[Policy], workload
+	kubernetesClient kubernetes.Interface   // used for Namespaces, and Discovery
+
+	extClient             apiextensionsclientset.Interface // used for CRD
 	listers               map[string]cache.GenericLister
 	gvkGvrMapper          util.GvkGvrMapper
 	informers             map[string]cache.SharedIndexInformer
@@ -98,7 +98,7 @@ type Controller struct {
 }
 
 // Create a new binding controller
-func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
+func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
 	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
@@ -131,7 +131,7 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 
 	controller := &Controller{
 		wdsName:               wdsName,
-		logger:                mgr.GetLogger().WithName(controllerName),
+		logger:                parentLogger.WithName(controllerName),
 		ocmClientset:          ocmClientset,
 		ocmClient:             ocmClient,
 		dynamicClient:         dynamicClient,
@@ -147,6 +147,12 @@ func NewController(mgr ctrlm.Manager, wdsRestConfig *rest.Config, imbsRestConfig
 	}
 
 	return controller, nil
+}
+
+// EnsureCRDs will ensure that the CRDs are installed.
+// Call this before Start.
+func (c *Controller) EnsureCRDs(ctx context.Context) error {
+	return crd.ApplyCRDs(ctx, c.dynamicClient, c.kubernetesClient, c.extClient, c.logger)
 }
 
 // Start the controller
@@ -171,11 +177,6 @@ func (c *Controller) Start(parentCtx context.Context, workers int) error {
 // Invoked by Start() to run the controller
 func (c *Controller) run(ctx context.Context, workers int) error {
 	defer c.workqueue.ShutDown()
-
-	// ensure CRDs are installed before starting up
-	if err := crd.ApplyCRDs(ctx, c.dynamicClient, c.kubernetesClient, c.extClient, c.logger); err != nil {
-		return err
-	}
 
 	// Get all the api resources in the cluster
 	apiResources, err := c.kubernetesClient.Discovery().ServerPreferredResources()

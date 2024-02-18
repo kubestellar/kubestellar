@@ -137,9 +137,14 @@ func main() {
 	setupLog.Info("Got config for IMBS", "name", imbsName)
 
 	// start the binding controller
-	bindingController, err := binding.NewController(mgr, wdsRestConfig, imbsRestConfig, wdsName, allowedGroupsSet)
+	bindingController, err := binding.NewController(mgr.GetLogger(), wdsRestConfig, imbsRestConfig, wdsName, allowedGroupsSet)
 	if err != nil {
 		setupLog.Error(err, "unable to create binding controller")
+		os.Exit(1)
+	}
+
+	if err := bindingController.EnsureCRDs(ctx); err != nil {
+		setupLog.Error(err, "error installing the CRDs")
 		os.Exit(1)
 	}
 
