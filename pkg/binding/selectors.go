@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -27,6 +28,8 @@ import (
 
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
+
+const emptyBindingPolicyName = ""
 
 // when an object is updated, we iterate over all bindingpolicies and update
 // resolutions that are affected by the update. Every changed resolution leads
@@ -88,7 +91,7 @@ func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) 
 		// make sure object has singleton status if needed
 		if !isBeingDeleted(obj) &&
 			c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicy.GetName()) {
-			if err := c.addSingletonLabel(ctx, obj, bindingPolicy.GetName()); err != nil {
+			if err := c.handleSingletonLabel(ctx, obj, bindingPolicy.GetName()); err != nil {
 				return fmt.Errorf("failed to add singleton label to object: %w", err)
 			}
 
@@ -100,8 +103,8 @@ func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) 
 	// we need to remove the singleton label from the object if it exists.
 	// NOTE that this takes care of the case where the object was previously selected by a singleton binding
 	// and is no longer selected by any binding.
-	if !isSelectedBySingletonBinding {
-		if err := c.removeSingletonLabel(ctx, obj); err != nil {
+	if !isBeingDeleted(obj) && !isSelectedBySingletonBinding {
+		if err := c.handleSingletonLabel(ctx, obj, emptyBindingPolicyName); err != nil {
 			return fmt.Errorf("failed to remove singleton label from object: %w", err)
 		}
 	}
@@ -109,7 +112,9 @@ func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) 
 	return nil
 }
 
-func (c *Controller) removeSingletonLabel(ctx context.Context, obj runtime.Object) error {
+// handleSingletonLabel adds or removes the singleton label from the object. If a bindingPolicyName is provided,
+// the singleton label is added to the object. If the bindingPolicyName is empty, the singleton label is removed.
+func (c *Controller) handleSingletonLabel(ctx context.Context, obj runtime.Object, bindingPolicyName string) error {
 	unstructuredObj, ok := obj.(*unstructured.Unstructured)
 	if !ok {
 		return fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
@@ -120,58 +125,41 @@ func (c *Controller) removeSingletonLabel(ctx context.Context, obj runtime.Objec
 		labels = make(map[string]string)
 	}
 
-	// skip if label does not exist
-	if _, found := labels[util.BindingPolicyLabelSingletonStatusKey]; !found {
-		return nil
+	_, found := labels[util.BindingPolicyLabelSingletonStatusKey]
+
+	if bindingPolicyName == emptyBindingPolicyName {
+		if !found {
+			return nil
+		}
+		delete(labels, util.BindingPolicyLabelSingletonStatusKey)
+	} else {
+		if found {
+			return nil
+		}
+		labels[util.BindingPolicyLabelSingletonStatusKey] = bindingPolicyName
 	}
 
-	// label found, should delete it and update object
-	delete(labels, util.BindingPolicyLabelSingletonStatusKey)
 	unstructuredObj.SetLabels(labels)
 
 	gvr, found := c.gvkGvrMapper.GetGvr(unstructuredObj.GetObjectKind().GroupVersionKind())
 	if !found {
-		return fmt.Errorf("failed to get GVR for object %v", util.RefToRuntimeObj(obj))
-	}
-
-	if unstructuredObj.GetNamespace() == metav1.NamespaceNone {
-		_, err := c.dynamicClient.Resource(gvr).Update(ctx, unstructuredObj, metav1.UpdateOptions{})
-		return err
-	}
-
-	_, err := c.dynamicClient.Resource(gvr).Namespace(unstructuredObj.GetNamespace()).Update(ctx, unstructuredObj, metav1.UpdateOptions{})
-	return err
-}
-
-func (c *Controller) addSingletonLabel(ctx context.Context, obj runtime.Object, bindingPolicyName string) error {
-	unstructuredObj, ok := obj.(*unstructured.Unstructured)
-	if !ok {
-		return fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
-	}
-
-	labels := unstructuredObj.GetLabels()
-	if labels == nil {
-		labels = make(map[string]string)
-	}
-
-	// skip if label already exists
-	if _, found := labels[util.BindingPolicyLabelSingletonStatusKey]; found {
+		// if we got here, an API object deletion handling caused this object's GVR to be removed.
+		// this is not an error.
 		return nil
 	}
 
-	labels[util.BindingPolicyLabelSingletonStatusKey] = bindingPolicyName
-	unstructuredObj.SetLabels(labels)
-
-	gvr, found := c.gvkGvrMapper.GetGvr(unstructuredObj.GetObjectKind().GroupVersionKind())
-	if !found {
-		return fmt.Errorf("failed to get GVR for object %v", util.RefToRuntimeObj(obj))
-	}
-
 	if unstructuredObj.GetNamespace() == metav1.NamespaceNone {
 		_, err := c.dynamicClient.Resource(gvr).Update(ctx, unstructuredObj, metav1.UpdateOptions{})
+		if errors.IsNotFound(err) {
+			return nil // object was deleted after getting into this function. This is not an error.
+		}
 		return err
 	}
 
 	_, err := c.dynamicClient.Resource(gvr).Namespace(unstructuredObj.GetNamespace()).Update(ctx, unstructuredObj, metav1.UpdateOptions{})
+	if errors.IsNotFound(err) {
+		return nil // object was deleted after getting into this function. This is not an error.
+	}
+
 	return err
 }

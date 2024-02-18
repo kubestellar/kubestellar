@@ -144,7 +144,7 @@ func (c *Controller) requeueSelectedWorkloadObjects(bindingPolicyName string) er
 	objs := make([]runtime.Object, 0, len(objectKeys))
 	for _, key := range objectKeys {
 		obj, err := c.getObjectFromKey(*key)
-		if err != nil {
+		if err != nil || obj == nil {
 			return fmt.Errorf("failed to get object from key: %w", err)
 		}
 

@@ -271,9 +271,8 @@ spec:
                 description: WantSingletonReportedState indicates that (a) the number
                   of selected locations is intended to be 1 and (b) the reported state
                   of each downsynced object should be returned back to the object
-                  in this space. For this field to take effect, it is required that
-                  no other binding policy with this field set to true selects a shared
-                  object.
+                  in this space. When this field is true, there should be no other
+                  BindingPolicy that matches any of the same workload objects.
                 type: boolean
             type: object
           status:

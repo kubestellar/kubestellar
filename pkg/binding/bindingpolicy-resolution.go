@@ -51,10 +51,6 @@ type bindingPolicyResolution struct {
 
 	// requiresSingletonReportedState indicates whether the bindingpolicy
 	// that this resolution is associated with requires singleton status.
-	// If true:
-	// 	- The bindingpolicy is expected to select only one destination.
-	// 	- The bindingpolicy is expected not to share objects with other bindingpolicies
-	// 	  that require singleton status.
 	requiresSingletonReportedState bool
 }
 
