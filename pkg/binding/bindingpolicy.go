@@ -116,7 +116,7 @@ func (c *Controller) requeueForBindingPolicyChanges() error {
 func (c *Controller) getBindingPolicyByName(name string) (runtime.Object, error) {
 	lister := c.listers["control.kubestellar.io/v1alpha1/BindingPolicy"]
 	if lister == nil {
-		return nil, fmt.Errorf("could not get lister for placememt")
+		return nil, fmt.Errorf("could not get lister for BindingPolicy")
 	}
 	got, err := lister.Get(name)
 	if err != nil {
@@ -181,7 +181,7 @@ func (c *Controller) evaluateBindingPolicies(ctx context.Context, labelsSet labe
 func (c *Controller) listBindingPolicies() ([]runtime.Object, error) {
 	lister := c.listers["control.kubestellar.io/v1alpha1/BindingPolicy"]
 	if lister == nil {
-		return nil, fmt.Errorf("could not get lister for placememt")
+		return nil, fmt.Errorf("could not get lister for BindingPolicy")
 	}
 	list, err := lister.List(labels.Everything())
 	if err != nil {
