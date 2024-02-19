@@ -192,7 +192,7 @@ _definition_ objects if they are not already present, and is a
 controller-manager hosting the per-WDS controllers ([binding controller](architecture.md#binding-controller), [status controller](architecture.md#status-controller), and transport controller(TODO: link to doc)).
 
 The image repository is
-`ghcr.io/kubestellar/kubestellar/kubestellar-operator`. There is
+`ghcr.io/kubestellar/kubestellar/controller-manager`. There is
 currently just one supported tag there, `0.20.0-alpha.1`. That was
 built from the git repo contents with the tag `v0.20.0-alpha.1`.
 
@@ -208,10 +208,10 @@ platform. This is used in local testing.
 There is a Helm chart that is designed to be instantiated in a KubeFlex hosting cluster, once per WDS. The focus of the chart is getting the KubeStellar controller-manager installed.
 
 The source for the Helm chart is in
-[core-helm-chart](../../../core-helm-chart). `make chart` (re)derives
+[chart](../../../chart). `make chart` (re)derives
 it from local sources. This is not included in `make all-generated`.
 
-This chart creates (among other things) a `Deployment` object that runs a container from the image `ghcr.io/kubestellar/kubestellar/kubestellar-operator:0.20.0-alpha.1`.
+This chart creates (among other things) a `Deployment` object that runs a container from the image `ghcr.io/kubestellar/kubestellar/controller-manager:0.20.0-alpha.1`.
 
 The chart is published at the OCI repository
 `ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart`.  The

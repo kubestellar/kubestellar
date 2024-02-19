@@ -37,10 +37,10 @@ cleanup_helm_tags() {
 
 
 # Directory containing the yaml file
-dir=${HOME_DIR}/core-helm-chart/templates
+dir=${HOME_DIR}/chart/templates
 
 # file to process
-op_file=${dir}/operator.yaml
+op_file=${dir}/controller-manager.yaml
 
 cleanup_helm_tags $op_file
 

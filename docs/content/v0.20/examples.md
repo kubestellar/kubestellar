@@ -11,7 +11,7 @@ See [pre-reqs](pre-reqs.md).
 
 The following steps establish an initial state used in the examples below.
 
-1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex operator installed:
+1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
 
    ```shell
    kflex init --create-kind
