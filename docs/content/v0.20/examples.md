@@ -1,7 +1,7 @@
 # KubeStellar Usage Examples
 
 **NOTE**: This is unmaintained material that has only been observed to work for the commit tagged as
-`v0.20.0-alpha.1`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0-alpha.1`), and contributors can run these tests too; see [the e2e tests](../../../test/e2e).
+`v0.20.0-rc1`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0-rc1`), and contributors can run these tests too; see [the e2e tests](../../../test/e2e).
 
 ## Prereqs
 
@@ -17,11 +17,11 @@ The following steps establish an initial state used in the examples below.
    kflex init --create-kind
    ```
 
-2. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0-alpha.1 images:
+2. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0-rc1 images:
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-alpha.1/config/postcreate-hooks/kubestellar.yaml
-   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-alpha.1/config/postcreate-hooks/ocm.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-rc1/config/postcreate-hooks/kubestellar.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-rc1/config/postcreate-hooks/ocm.yaml
    ```
 
 3. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
@@ -43,7 +43,7 @@ which installs OCM on it.
    and then install the status add-on:
 
    ```shell
-   helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc1
+   helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc2
    ```
 
    see [here](https://github.ibm.com/dettori/status-addon) for more details on the add-on.
@@ -76,14 +76,14 @@ Check for available clusters with label `location-group=edge`
 kubectl --context imbs1 get managedclusters -l location-group=edge
 ```
 
-Create a placement to deliver an app to all clusters in wds1:
+Create a BindingPolicy to deliver an app to all clusters in wds1:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
 metadata:
-  name: nginx-placement
+  name: nginx-bpolicy
 spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
@@ -93,7 +93,7 @@ spec:
 EOF
 ```
 
-This placement configuration determines **where** to deploy the workload by using
+This BindingPolicy configuration determines **where** to deploy the workload by using
 the label selector expressions found in *clusterSelectors*. It also specifies **what**
 to deploy through the downsync.labelSelectors expressions.
 Each matchLabels expression is a criterion for selecting a set of objects based on
@@ -155,9 +155,9 @@ kubectl --context cluster2 get deployments -n nginx
 ```
 
 Please note, in line with Kubernetes’ best practices, the order in which you apply
-a placement and the objects doesn’t affect the outcome. You can apply the placement
+a BindingPolicy and the objects doesn’t affect the outcome. You can apply the BindingPolicy
 first followed by the objects, or vice versa. The result remains consistent because
-the placement controller identifies any changes in either the placement or the objects,
+the binding controller identifies any changes in either the BindingPolicy or the objects,
 triggering the start of the reconciliation loop.
 
 ## Scenario 2 - using the hosting cluster as WDS to deploy a custom resource
@@ -273,14 +273,14 @@ kubectl --context wds2 label crd appwrappers.mcad.ibm.com app.kubernetes.io/part
 kubectl --context wds2 label appwrappers 0001-aw-generic-deployment-3 app.kubernetes.io/part-of=my-appwrapper-app
 ```
 
-Finally, apply the placement:
+Finally, apply the BindingPolicy:
 
 ```shell
 kubectl --context wds2 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
 metadata:
-  name: aw-placement
+  name: aw-BindingPolicy
 spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
@@ -301,14 +301,14 @@ kubectl --context cluster2 get appwrappers
 
 This scenario proceeds from the state established by the [common setup](#common-setup).
 
-Create a placement for the helm chart app:
+Create a BindingPolicy for the helm chart app:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
 metadata:
-  name: postgres-placement
+  name: postgres-bpolicy
 spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
@@ -356,7 +356,7 @@ $ helm list --kube-context cluster2 -n postgres-system
 : returns empty
 ```
 
-This is because Helm creates a `Secret` object to hold its metadata about a "release" (chart instance) but Helm does not apply the usual labels to that object, so it is not selected by the `Placement` above and thus does not get delivered. The workload is functioning in the WECs, but `helm list` does not recognize its handiwork there. That labeling could be done for example with:
+This is because Helm creates a `Secret` object to hold its metadata about a "release" (chart instance) but Helm does not apply the usual labels to that object, so it is not selected by the `BindingPolicy` above and thus does not get delivered. The workload is functioning in the WECs, but `helm list` does not recognize its handiwork there. That labeling could be done for example with:
 
 ```shell
 kubectl --context wds1 label secret -n postgres-system $(kubectl --context wds1 get secrets -n postgres-system -l name=postgres -l owner=helm  -o jsonpath='{.items[0].metadata.name}') app.kubernetes.io/managed-by=Helm app.kubernetes.io/instance=postgres
@@ -377,16 +377,16 @@ helm metadata is tracked in this [issue](https://github.com/kubestellar/kubestel
 This scenario proceeds from the state established by the [common setup](#common-setup).
 
 This scenario shows how to get the full status updated when setting `wantSingletonReportedState`
-in the placement. This still an experimental feature.
+in the BindingPolicy. This still an experimental feature.
 
-Apply a placement with the `wantSingletonReportedState` flag set:
+Apply a BindingPolicy with the `wantSingletonReportedState` flag set:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
 metadata:
-  name: nginx-singleton-placement
+  name: nginx-singleton-bpolicy
 spec:
   wantSingletonReportedState: true
   clusterSelectors:
@@ -397,7 +397,7 @@ spec:
 EOF
 ```
 
-Apply a new deployment for the singleton placement:
+Apply a new deployment for the singleton BindingPolicy:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
@@ -472,14 +472,14 @@ kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-con
 kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=1
 ```
 
-Wait for about a minute for all pods to restart, then apply a new placement:
+Wait for about a minute for all pods to restart, then apply a new BindingPolicy:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
 metadata:
-  name: nginx-res-placement
+  name: nginx-res-bpolicy
 spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
@@ -541,14 +541,14 @@ work with the WDS as outlined [here](./thirdparties.md#install-and-configure-arg
 
 Including a ServiceAccount tests whether there will be a controller fight over a token Secret for that ServiceAccount, which was observed in some situations with older code.
 
-Apply the following placement to wds1:
+Apply the following BindingPolicy to wds1:
 
 ```shell
 kubectl --context wds1 apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
-kind: Placement
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
 metadata:
-  name: argocd-sa-placement
+  name: argocd-sa-bpolicy
 spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
