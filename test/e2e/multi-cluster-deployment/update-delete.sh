@@ -28,13 +28,15 @@ source "${COMMON_SRCS}/setup-shell.sh"
 #
 : -------------------------------------------------------------------------
 : Test update of the managedcluster:
-: Change the location-group label on one of the managed cluster and verify the Binding objects 
-: are properly updated.
+: Change the location-group label on one of the managed cluster and verify the downsynced
+: objects are properly updated 
 :
 kubectl --context imbs1 label managedcluster cluster2 location-group=blah name=cluster2 --overwrite
-wait-for-cmd '[ $(kubectl --context wds1 get bindings.control -o yaml | grep clusterId  | wc -l) == 1 ]'
+wait-for-cmd '(($(kubectl --context cluster1 get ns nginx | wc -l) == 2))'
+wait-for-cmd '(($(kubectl --context cluster2 get ns nginx | wc -l) == 0))'
 kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=cluster2 --overwrite
-wait-for-cmd '[ $(kubectl --context wds1 get bindings.control -o yaml | grep clusterId  | wc -l) == 2 ]'
+wait-for-cmd '(($(kubectl --context cluster1 get ns nginx | wc -l) == 2))'
+wait-for-cmd '(($(kubectl --context cluster2 get ns nginx | wc -l) == 2))'
 :
 : Test passed
 
@@ -61,8 +63,6 @@ wait-for-cmd '[ "$(kubectl --context cluster2 get deployment -n nginx nginx-depl
 : Verify that the object is deleted from the WECs
 :
 kubectl --context wds1 patch bindingpolicy nginx-bindingpolicy --type=merge -p '{"spec": {"downsync": [{"objectSelectors": [{"matchLabels": {"app.kubernetes.io/name": "invalid"}}]}]}}'
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster1 | wc -l) == 2))'
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster2 | wc -l) == 2))'
 wait-for-cmd '(($(kubectl --context cluster1 get ns nginx | wc -l) == 0))'
 wait-for-cmd '(($(kubectl --context cluster2 get ns nginx | wc -l) == 0))'
 :
@@ -91,8 +91,6 @@ wait-for-cmd kubectl --context cluster2 get deployment -n nginx nginx-deployment
 : Verify that the object is deleted from the WECs
 :
 kubectl --context wds1 delete bindingpolicy nginx-bindingpolicy
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster1 | wc -l) == 2))'
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster2 | wc -l) == 2))'
 wait-for-cmd '(($(kubectl --context cluster1 get ns nginx | wc -l) == 0))'
 wait-for-cmd '(($(kubectl --context cluster2 get ns nginx | wc -l) == 0))'
 :
@@ -151,8 +149,6 @@ wait-for-cmd kubectl --context cluster2 get deployment -n nginx nginx-deployment
 : Verify that the object is deleted from the WECs
 :
 kubectl --context wds1 delete deployment -n nginx nginx-deployment
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster1 | wc -l) == 3))'
-wait-for-cmd '(($(kubectl --context imbs1 get manifestworks -n cluster2 | wc -l) == 3))'
 wait-for-cmd '(($(kubectl --context cluster1 get deployment -n nginx nginx-deployment | wc -l) == 0))'
 wait-for-cmd '(($(kubectl --context cluster2 get deployment -n nginx nginx-deployment | wc -l) == 0))'
 :
