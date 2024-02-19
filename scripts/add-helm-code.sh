@@ -21,13 +21,28 @@
 # Working directory does not matter.
 
 HOME_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+# Directory containing the yaml file
+dir=${HOME_DIR}/chart/templates
 
-if [ "$#" -lt 1 ]; then
-    echo "adds/remove helm tags to cluster scoped files such as ClusterRole and CLusterRoleBinding"
-    echo "Usage: $(basename $0) add | remove"
-    exit
-fi
-CMD=$1
+while (( $# > 0 )); do
+	case "$1" in
+	(-h|--help)
+		echo "adds/remove helm tags to cluster scoped files such as ClusterRole and CLusterRoleBinding"
+		echo "Usage: $(basename $0) [--dir chart_directory] add | remove"
+		exit 0;;
+	(--dir)
+		if (( $# >1 ))
+		then dir="${2}/templates"; shift
+		else echo "$0: missing chart_ directory" >&2; exit 1
+		fi;;
+	(-*)
+		echo "$0: flag syntax error" >&2
+		exit 1;;
+	(*)
+		CMD=$1
+	esac
+	shift
+done
 
 cleanup_helm_tags() {
   file=$1
@@ -36,8 +51,6 @@ cleanup_helm_tags() {
 }
 
 
-# Directory containing the yaml file
-dir=${HOME_DIR}/chart/templates
 
 # file to process
 op_file=${dir}/controller-manager.yaml
