@@ -46,7 +46,7 @@ cleanup_helm_tags $op_file
 
 if [[ $CMD == "add" ]]; then
   # Split the file into separate YAML files based on the separator
-  TMP_DIR=$(mktemp -d -t kubestellar)
+  TMP_DIR=$(mktemp -d -t ks-XXX)
   c=1
   IFS=''
   while read line; do

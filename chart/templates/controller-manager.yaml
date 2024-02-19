@@ -203,7 +203,7 @@ spec:
         - --wds-name={{.Values.ControlPlaneName}}
         - --api-groups={{.Values.APIGroups}}
         - -v=2
-        image: ghcr.io/kubestellar/kubestellar/controller-manager:0.20.0-alpha.1
+        image: ghcr.io/kubestellar/kubestellar/controller-manager:0.20.0-rc1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
