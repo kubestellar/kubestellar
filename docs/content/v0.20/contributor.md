@@ -61,7 +61,7 @@ X ArgoCD CLI
 
 ## Integration testing
 
-There is currently one integration test. Contributors can run it. It is not (yet) run in CI.
+There is currently one integration test. Contributors can run it. There is also a Prow job that runs this test.
 
 This test requires you to already have `etcd` on your `$PATH`.
 See https://github.com/kubernetes/kubernetes/blob/v1.28.2/hack/install-etcd.sh for an example of how to do that.
@@ -73,6 +73,6 @@ CONTROLLER_TEST_NUM_OBJECTS=24 go test -v ./test/integration/controller-manager 
 ```
 
 If `CONTROLLER_TEST_NUM_OBJECTS` is not set then the number of objects
-will be 30. This parameterization by an environment variable is only a
+will be 18. This parameterization by an environment variable is only a
 point-in-time hack, it is expected to go away once we have a test that
 runs reliably on a large number of objects.

@@ -52,3 +52,22 @@ presubmits:
             requests:
               memory: 4Gi
               cpu: 2
+
+  - name: pull-kubestellar-test-integration
+    always_run: true
+    decorate: true
+    clone_uri: "https://github.com/kubestellar/kubestellar"
+    labels:
+      preset-goproxy: "true"
+    spec:
+      containers:
+        - image: ghcr.io/kcp-dev/infra/build:1.20.13-1
+          command:
+            - hack/run-integration-tests.sh
+          env:
+            - name: USE_GOTESTSUM
+              value: '1'
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: 2
