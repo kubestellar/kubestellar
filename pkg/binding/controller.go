@@ -178,8 +178,10 @@ func (c *Controller) Start(parentCtx context.Context, workers int) error {
 func (c *Controller) run(ctx context.Context, workers int) error {
 	defer c.workqueue.ShutDown()
 
+	logger := klog.FromContext(ctx)
 	// Get all the api resources in the cluster
 	apiResources, err := c.kubernetesClient.Discovery().ServerPreferredResources()
+	logger.Info("Discovery", "numGroups", len(apiResources), "err", err)
 	if err != nil {
 		// ignore the error caused by a stale API service
 		if !strings.Contains(err.Error(), util.UnableToRetrieveCompleteAPIListError) {
@@ -193,6 +195,7 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 	// Loop through the api resources and create informers and listers for each of them
 	for _, group := range apiResources {
 		if _, excluded := excludedGroupVersions[group.GroupVersion]; excluded {
+			logger.V(1).Info("Ignoring excluded APIGroup", "groupVersion", group.GroupVersion)
 			continue
 		}
 		gv, err := schema.ParseGroupVersion(group.GroupVersion)
@@ -200,6 +203,7 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 			c.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", group.GroupVersion)
 			continue
 		}
+		logger.V(1).Info("Working on API Group", "groupVersion", group.GroupVersion, "numResources", len(group.APIResources))
 		for _, resource := range group.APIResources {
 			if _, excluded := excludedResourceNames[resource.Name]; excluded {
 				continue
@@ -271,7 +275,9 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
-		go wait.UntilWithContext(ctx, c.runWorker, time.Second)
+		logger := c.logger.WithName(fmt.Sprintf("%s-worker-%d", controllerName, i))
+		workerCtx := klog.NewContext(ctx, logger)
+		go wait.UntilWithContext(workerCtx, c.runWorker, time.Second)
 	}
 
 	c.logger.Info("Started workers")
