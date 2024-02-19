@@ -2158,7 +2158,7 @@ running that image. It installs the needed custom resource
 <em>definition</em> objects if they are not already present, and is a
 controller-manager hosting the per-WDS controllers (<a href="../architecture/#binding-controller">binding controller</a>, <a href="../architecture/#status-controller">status controller</a>, and transport controller(TODO: link to doc)).</p>
 <p>The image repository is
-<code>ghcr.io/kubestellar/kubestellar/kubestellar-operator</code>. There is
+<code>ghcr.io/kubestellar/kubestellar/controller-manager</code>. There is
 currently just one supported tag there, <code>0.20.0-alpha.1</code>. That was
 built from the git repo contents with the tag <code>v0.20.0-alpha.1</code>.</p>
 <p><code>make ko-build-push</code> will build and push that image, tagging it with
@@ -2169,9 +2169,9 @@ platform. This is used in local testing.</p>
 <h3 id="kubestellar-controller-manager-helm-chart">KubeStellar controller-manager Helm Chart<a class="headerlink" href="#kubestellar-controller-manager-helm-chart" title="Permanent link">#</a></h3>
 <p>There is a Helm chart that is designed to be instantiated in a KubeFlex hosting cluster, once per WDS. The focus of the chart is getting the KubeStellar controller-manager installed.</p>
 <p>The source for the Helm chart is in
-<a href="../../../core-helm-chart">core-helm-chart</a>. <code>make chart</code> (re)derives
+<a href="../../../chart">chart</a>. <code>make chart</code> (re)derives
 it from local sources. This is not included in <code>make all-generated</code>.</p>
-<p>This chart creates (among other things) a <code>Deployment</code> object that runs a container from the image <code>ghcr.io/kubestellar/kubestellar/kubestellar-operator:0.20.0-alpha.1</code>.</p>
+<p>This chart creates (among other things) a <code>Deployment</code> object that runs a container from the image <code>ghcr.io/kubestellar/kubestellar/controller-manager:0.20.0-alpha.1</code>.</p>
 <p>The chart is published at the OCI repository
 <code>ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart</code>.  The
 <code>make</code> target <code>chart-push</code> depends on target <code>chart</code> and publishes the
