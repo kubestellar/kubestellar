@@ -238,7 +238,7 @@ project.
 
 Install the AppWrapper CRD in the WDS and the WECs. Note that due to 
 [this issue](https://github.com/kubestellar/kubestellar/issues/1705) CRDs must be pre-installed 
-on the WDS and on the WECs when using API group filtering. For KubeStellar `0.20.0-rc2` this is required 
+on the WDS and on the WECs when using API group filtering. For KubeStellar `0.20.0-rc1` this is required 
 when using a hosting cluster as WDS with a large number of API resources such as OpenShift.
 
 ```shell
