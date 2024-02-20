@@ -2,16 +2,23 @@
 
 ## Outline of GitHub repositories
 
-The following is a graph of the GitHub repositories in the `kubestellar` GitHub organization and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow.
+The following is a graph of the GitHub repositories in the `kubestellar` GitHub organization and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow. These are not just build-time dependencies but any reference from one repo to another.
 
-Note that to _use_ KubeStellar, all of the repos in this graph are involved.
+Note that the ocm-transport-plugin is under development and not involved yet in using KubeStellar.
 
 ```mermaid
 flowchart LR
     kubestellar --> kubeflex
-    ocm-status-addon
+    kubestellar --> ocm-status-addon
+    ocm-status-addon --> kubestellar
     ocm-transport-plugin --> kubestellar
+    style ocm-transport-plugin stroke-dasharray: 5 5
+    kubestellar --> ocm-transport-plugin
+    linkStyle 3 stroke-dasharray: 5 5
+    linkStyle 4 stroke-dasharray: 5 5
 ```
+
+The references from ocm-status-addon to kubestellar are only in documentation and are in the process of being removed (no big difficulty is anticipated).
 
 ## KubeFlex
 
@@ -98,9 +105,9 @@ Note: the Chart.yaml in github uses just "0.2.0" for the version and appVersion 
 
 The source is the GitHub repo [github.com/kubestellar/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin)
 
-### OCM Transport Plugin container image
+### OCM Transport container image
 
-This will aspirationally appear at [ghcr.io/kubestellar/ocm-transport-plugin](https://github.com/orgs/kubestellar/packages/container/package/ocm-transport-plugin). This level of development has not been reached yet.
+This appears at [ghcr.io/kubestellar/ocm-transport-plugin/transport-controller](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller).
 
 TODO: document how the image is built and published, including explain versioning.
 
