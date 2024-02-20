@@ -17,6 +17,8 @@ The following steps establish an initial state used in the examples below.
    kflex init --create-kind
    ```
 
+  If you are installing KubeStellar on an existing OpenShift cluster, just use the command `kflex init`.
+
 2. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0-rc1 images:
 
    ```shell
@@ -65,6 +67,22 @@ statefulset created in the imbs1-system namespace.
    ```shell
    kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces
    ```
+The output should looks something like the following:
+
+```shell
+NAMESPACE            NAME                                             READY   UP-TO-DATE   AVAILABLE   AGE
+ingress-nginx        deployment.apps/ingress-nginx-controller         1/1     1            1           22h
+kube-system          deployment.apps/coredns                          2/2     2            2           22h
+kubeflex-system      deployment.apps/kubeflex-controller-manager      1/1     1            1           22h
+local-path-storage   deployment.apps/local-path-provisioner           1/1     1            1           22h
+wds1-system          deployment.apps/kube-apiserver                   1/1     1            1           22m
+wds1-system          deployment.apps/kube-controller-manager          1/1     1            1           22m
+wds1-system          deployment.apps/kubestellar-controller-manager   1/1     1            1           21m
+
+NAMESPACE         NAME                                   READY   AGE
+imbs1-system      statefulset.apps/vcluster              1/1     11h
+kubeflex-system   statefulset.apps/postgres-postgresql   1/1     22h
+```
 
 ## Scenario 1 - multi-cluster workload deployment with kubectl
 
@@ -199,11 +217,42 @@ EOF
 To create a second WDS based on the hosting cluster, run the command:
 
 ```shell
-kflex create wds2 -t host -p kubestellar
+kflex create wds2 -t host
 ```
 
 where the `-t host` option specifies a control plane of type `host`.
 You can only create on control plane of type `host`.
+
+In this example, we use the helm chart method to install the kubestellat controller manager for the
+hosting cluster so that we can pass additional startup options.
+
+Label the `wds2` control plane as type `wds`:
+
+```shell 
+kubectl label cp wds2 kflex.kubestellar.io/cptype=wds
+```
+
+For this example, we use the `AppWrapper` custom resource defined in the
+[multi cluster app dispatcher](https://github.com/project-codeflare/multi-cluster-app-dispatcher)
+project.
+
+Install the AppWrapper CRD in the WDS and the WECs. Note that due to 
+[this issue](https://github.com/kubestellar/kubestellar/issues/1705) CRDs must be pre-installed 
+on the WDS and on the WECs when using API group filtering. For KubeStellar `0.20.0-rc2` this is required 
+when using a hosting cluster as WDS with a large number of API resources such as OpenShift.
+
+```shell
+clusters=(wds2 cluster1 cluster2);
+  for cluster in "${clusters[@]}"; do
+  kubectl --context ${cluster} apply -f https://raw.githubusercontent.com/project-codeflare/multi-cluster-app-dispatcher/v1.39.0/config/crd/bases/workload.codeflare.dev_appwrappers.yaml
+done
+```
+
+Apply the kubestellar controller-manager helm chart with the option to allow only delivery of objects with api group `workload.codeflare.dev`
+
+```shell
+helm upgrade --install -n wds2-system kubestellar oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart --version v0.20.0-rc1 --set ControlPlaneName=wds2 --set APIGroups=workload.codeflare.dev
+```
 
 Check that the kubestellar controller for wds2 is started:
 
@@ -215,12 +264,8 @@ If desired, you may remove the `kubeflex-manager-cluster-admin-rolebinding` afte
 the kubestellar-controller-manager is started, with the command
 `kubectl --context kind-kubeflex delete clusterrolebinding kubeflex-manager-cluster-admin-rolebinding`
 
-For this example, we use the `AppWrapper` custom resource defined in the
-[multi cluster app dispatcher](https://github.com/project-codeflare/multi-cluster-app-dispatcher)
-project.
-
 Run the following comamand to give permission for the Klusterlet to
-operate on your cluster resource.
+operate on the appwrapper cluster resource.
 
 ```shell
 clusters=(cluster1 cluster2);
@@ -231,7 +276,7 @@ kind: ClusterRole
 metadata:
   name: appwrappers-access
 rules:
-- apiGroups: ["mcad.ibm.com"]
+- apiGroups: ["workload.codeflare.dev"]
   resources: ["appwrappers"]
   verbs: ["get", "list", "watch", "create", "update", "patch"]
 ---
@@ -254,23 +299,16 @@ done
 This step will be eventually automated, see [this issue](https://github.com/kubestellar/kubestellar/issues/1542)
 for more details.
 
-Apply the appwrapper CRD to wds2:
+Next, apply an appwrapper object to wds2:
 
 ```shell
-kubectl --context wds2 apply -f https://raw.githubusercontent.com/project-codeflare/multi-cluster-app-dispatcher/v1.33.0/config/crd/bases/mcad.ibm.com_appwrappers.yaml
+kubectl --context wds2 apply -f  https://raw.githubusercontent.com/project-codeflare/multi-cluster-app-dispatcher/v1.39.0/test/yaml/0008-aw-default.yaml
 ```
 
-Now apply an appwrapper CR to wds2:
+Label the appwrapper to match the binding policy:
 
 ```shell
-kubectl --context wds2 apply -f  https://raw.githubusercontent.com/project-codeflare/multi-cluster-app-dispatcher/v1.33.0/test/yaml/0001-aw-generic-deployment-3.yaml
-```
-
-Label the CRD and the CR:
-
-```shell
-kubectl --context wds2 label crd appwrappers.mcad.ibm.com app.kubernetes.io/part-of=my-appwrapper-app
-kubectl --context wds2 label appwrappers 0001-aw-generic-deployment-3 app.kubernetes.io/part-of=my-appwrapper-app
+kubectl --context wds2 label appwrappers.workload.codeflare.dev defaultaw-schd-spec-with-timeout-1 app.kubernetes.io/part-of=my-appwrapper-app
 ```
 
 Finally, apply the BindingPolicy:
@@ -280,7 +318,7 @@ kubectl --context wds2 apply -f - <<EOF
 apiVersion: control.kubestellar.io/v1alpha1
 kind: BindingPolicy
 metadata:
-  name: aw-BindingPolicy
+  name: aw-bpolicy
 spec:
   clusterSelectors:
   - matchLabels: {"location-group":"edge"}
