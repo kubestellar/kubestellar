@@ -24,7 +24,7 @@ We have the following limitations.
 - Thus, it is necessary to keep users clearly appraised of the quality (or status of evaluating the quality) of each release.
 - Because of the lack of self references, most user instructions (e.g., examples) and tests do not have concrete release identifiers in them; instead, the user has to chose and supply the release identifier. There can also be documentation of a specific past release (e.g., the latest stable release) that uses the literal identifier for that past release.
 - **PAY ATTENTION TO THIS ONE**: Because of the prohibition of self references, **Git will not contain the exact bytes of our Helm chart definitions**. Where a Helm chart states its own version or has a container image reference to an image built from the same release, the bytes in Git have a placeholder for that image's tag and the process of creating the published release artifacts fills in that placeholder. Think of this as being analogous to the linking done when building a binary executable file.
-- The design below fails to completely meet the goal of not putting self-references in files under Git control. The failure is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears.
+- The design below **fails** to completely meet the goal of not putting self-references in files under Git control. The failure is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears.
 
 ## Technology
 
@@ -78,6 +78,10 @@ artifacts for that release, as discussed [above](#technology).
 We intend to get rid of the self-reference in the KCM PCH, as follows. Define a Helm chart for installing the PCH. Update the release workflow to specialize that Helm chart, similarly to the specialization done for the KCM Helm chart.
 
 ## Open questions
+
+What to do about the dependency cycle between ks/ks and ks/ocm-transport-plugin?
+
+Exactly when does a new release branch diverge from `main`? What about cherry-picking between `main` and the latest (or also earlier?) release branch?
 
 What about the clusteradm container image?
 
