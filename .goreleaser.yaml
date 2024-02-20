@@ -9,9 +9,6 @@ builds:
   goarch:
   - amd64
   - arm64
-  ignore:
-  - goos: darwin
-    goarch: ppc64le
   env:
   - CGO_ENABLED=0
 kos:           
@@ -20,7 +17,6 @@ kos:
     build: controller-manager
     tags:
     - '{{.Version}}'
-    - latest
     bare: true
     preserve_import_paths: false
     ldflags:
@@ -28,10 +24,7 @@ kos:
     platforms:
     - linux/amd64
     - linux/arm64
-    env:
-    - CGO_ENABLED=0
 release:
-  disable: true # disable release while testing publishing 
   draft: false
   prerelease: auto
   mode: keep-existing

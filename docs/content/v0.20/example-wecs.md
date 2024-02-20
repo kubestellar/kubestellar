@@ -4,7 +4,7 @@ The following steps show how to create new clusters and
 register them with the hub as descibed in the
 [official open cluster management docs](https://open-cluster-management.io/getting-started/installation/start-the-control-plane/).
 
-1. Run the following set of commands for creating two kind clusters with name `cluster1` and `cluster2` and registering it with the
+1. Run the following set of commands for creating two kind clusters named `cluster1` and `cluster2` and registering them with the
 OCM hub. This cluster will act as a workload cluster.
 
    ```shell
@@ -17,7 +17,7 @@ OCM hub. This cluster will act as a workload cluster.
    done   
    ```
 
-   The last line grabs a token from the hub (`imbs1` context), and constructs the command to apply on each cluster
+   The `clusteradm` command grabs a token from the hub (`imbs1` context), and constructs the command to apply the new cluster
    to be registered as a managed cluster on the OCM hub.
 
 2. Issue the command:
