@@ -45,6 +45,10 @@ jobs:
           cd test/e2e/singleton-status
           KFLEX_DISABLE_CHATTY=true ./run-test.sh 
 
+      - name: show transport controller logs ## temp solution until we get transport controller to run as pod
+        if: always()
+        run: cat transport.log
+
       - name: show kubeconfig contexts
         if: always()
         run: kubectl config get-contexts
