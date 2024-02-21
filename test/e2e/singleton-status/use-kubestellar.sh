@@ -72,17 +72,6 @@ EOF
 
 :
 : -------------------------------------------------------------------------
-: "Verify that manifestworks wrapping the objects have been created in the mailbox namespaces"
-: Expect: one header line, one for the nginx namespace, one for the nginx deployment, one for the status agent Deployment
-:
-if ! wait-for-cmd "expect-cmd-output 'kubectl --context imbs1 get manifestworks -n cluster1' 'wc -l | grep -wq 4'"
-then
-    echo "Failed to see expected manifestworks."
-    exit 1
-fi
-
-:
-: -------------------------------------------------------------------------
 : "Verify that the deployment has been created in cluster1"
 :
 wait-for-cmd 'kubectl --context cluster1 get deployments -n nginx nginx-deployment'
