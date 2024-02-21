@@ -1,7 +1,7 @@
 # KubeStellar Usage Examples
 
 **NOTE**: This is unmaintained material that has only been observed to work for the commit tagged as
-`v0.20.0-alpha.1`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0-alpha.1`), and contributors can run these tests too; see [the e2e tests](../../../test/e2e). Those E2E tests can alternatively test a certain release.
+`v0.20.0-alpha.1`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0-alpha.1`), and contributors can run these tests too; see [the e2e tests](../../../test/e2e). Those E2E tests and those GitHub workflows can alternatively test a certain release.
 
 ## Prereqs
 
