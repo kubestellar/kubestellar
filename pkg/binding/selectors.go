@@ -118,12 +118,12 @@ func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) 
 //
 // The method parameter `obj` is not mutated by this function.
 func (c *Controller) handleSingletonLabel(ctx context.Context, obj runtime.Object, bindingPolicyName string) error {
-	unstructuredObj, ok := obj.DeepCopyObject().(*unstructured.Unstructured)
+	unstructuredObj, ok := obj.(*unstructured.Unstructured)
 	if !ok {
 		return fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
 	}
 
-	labels := unstructuredObj.GetLabels()
+	labels := unstructuredObj.GetLabels() // gets a copy of the labels
 	if labels == nil {
 		labels = make(map[string]string)
 	}
@@ -142,6 +142,7 @@ func (c *Controller) handleSingletonLabel(ctx context.Context, obj runtime.Objec
 		labels[util.BindingPolicyLabelSingletonStatusKey] = bindingPolicyName
 	}
 
+	unstructuredObj = unstructuredObj.DeepCopy() // avoid mutating the original object
 	unstructuredObj.SetLabels(labels)
 
 	gvr, found := c.gvkGvrMapper.GetGvr(unstructuredObj.GetObjectKind().GroupVersionKind())
