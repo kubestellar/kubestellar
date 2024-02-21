@@ -17,6 +17,17 @@
 # For readable instructions, please visit ../../../docs/content/v0.20
 
 set -x # so users can see what is going on
+
+if [ "$1" == "--released" ]; then
+    setup_flags="$1"
+    shift
+fi
+
+if [ "$#" != 0 ]; then
+    echo "Usage: $0 [--released]" >& 2
+    exit 1
+fi
+
 set -e # exit on error
 
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
@@ -24,6 +35,6 @@ COMMON_SRCS="${SRC_DIR}/../common"
 
 "${COMMON_SRCS}/cleanup.sh"
 source "${COMMON_SRCS}/setup-shell.sh"
-"${COMMON_SRCS}/setup-kubestellar.sh"
+"${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags
 "${SRC_DIR}/use-kubestellar.sh"
 "${SRC_DIR}/update-delete.sh"

@@ -14,7 +14,22 @@
 # limitations under the License.
 
 set -x # echo so users can understand what is happening
+
+if [ "$1" == "--released" ]; then
+    use_release=true
+    wds_extra="-p kubestellar"
+    shift
+else
+    use_release=false
+fi
+
+if [ "$#" != 0 ]; then
+    echo "Usage: $0 [--released]" >& 2
+    exit 1
+fi
+
 set -e # exit on error
+
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 
 if [[ "$KFLEX_DISABLE_CHATTY" = true ]] ; then
@@ -34,8 +49,10 @@ kflex init --create-kind $disable_chatty_status
 : Install the post-create-hooks for ocm and kubstellar controller manager
 :
 kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/ocm.yaml
-kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/kubestellar.yaml
-: Kubestellar post-create-hooks applied.
+if [ "$use_release" == true ]
+then kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/kubestellar.yaml
+fi
+: 'Kubestellar post-create-hook(s) applied.'
 
 :
 : -------------------------------------------------------------------------
@@ -55,14 +72,16 @@ helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-managem
 : -------------------------------------------------------------------------
 : Create a Workload Description Space wds1 directly in KubeFlex.
 :
-kflex create wds1 $disable_chatty_status
+kflex create wds1 $wds_extra $disable_chatty_status
 kubectl --context kind-kubeflex label cp wds1 kflex.kubestellar.io/cptype=wds
 
-cd "${SRC_DIR}/../../.."
-pwd
-make ko-build-local
-make install-local-chart KUBE_CONTEXT=kind-kubeflex
-cd -
+if [ "$use_release" != true ]; then
+    cd "${SRC_DIR}/../../.."
+    pwd
+    make ko-build-local
+    make install-local-chart KUBE_CONTEXT=kind-kubeflex
+    cd -
+fi
 echo "wds1 created."
 
 :
