@@ -173,14 +173,6 @@ ko-build-local: test ## Build local container image with ko
 	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
 	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMG}
 
-.PHONY: docker-push
-docker-push: ## Push docker image 
-	docker push ${IMG}
-
-.PHONY: ko-build-push
-ko-build-push: test ## Build and push container image with ko
-	KO_DOCKER_REPO=${DOCKER_REGISTRY} ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/amd64,linux/arm64
-
 # this is used for local testing 
 .PHONY: kind-load-image
 kind-load-image: 
@@ -191,12 +183,6 @@ chart: manifests kustomize
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
 	$(KUSTOMIZE) build config/default > chart/templates/controller-manager.yaml
 	scripts/add-helm-code.sh add
-
-.PHONY: chart-push
-chart-push: chart ## push helm chart
-	helm package ./chart --destination . --version ${IMAGE_TAG}
-	helm push ./*.tgz oci://${DOCKER_REGISTRY}
-	rm ./*.tgz
 
 ##@ Deployment
 

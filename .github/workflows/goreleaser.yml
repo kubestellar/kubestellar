@@ -11,42 +11,27 @@ permissions:
  
 env:
   REGISTRY: ghcr.io
-  ARCHS: linux/amd64,linux/arm64,linux/s390x
-#   OPERATOR_IMAGE: kubestellar/kubeflex/manager
-#   IMAGE_NAME: ${{ github.repository }}/chart
-#   CHART_PATH: ./chart
+  CONTROLLER_MANAGER_IMAGE: kubestellar/kubestellar/controller-manager
+  CHART_PATH: ./chart
 
 jobs:
   goreleaser:
-    if: github.repository_owner == 'kubestellar'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
-        persist-credentials: 'false'
         fetch-depth: 0
 
     - uses: actions/setup-go@v5
       with:
         go-version: v1.19
 
-    - name: Set env
-      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
     - name: Delete non-semver tags
       run: 'git tag -d $(git tag -l | grep -v "^v")'
 
     - name: Set LDFLAGS
       run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
-
-    - name: Login to quay.io registry
-      uses: docker/login-action@v3
-      with:
-        registry: quay.io
-        username: ${{ secrets.QUAY_USERNAME }}
-        password: ${{ secrets.QUAY_PASSWORD }}
 
     - name: Run GoReleaser on tag
       uses: goreleaser/goreleaser-action@v5
@@ -55,29 +40,26 @@ jobs:
         version: latest
         args: release --timeout 60m --clean
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         USER: ${{ github.actor }}
         EMAIL: ${{ github.actor}}@users.noreply.github.com
 
-    # - name: Set up Helm
-    #   uses: azure/setup-helm@v3
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Set up Helm
+      uses: azure/setup-helm@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Login to registry
       uses: docker/login-action@v3
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
-        password: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      
+    - name: Package and push chart
+      run: |
+        chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
+        make chart IMG=${{ env.REGISTRY }}/${{ env.CONTROLLER_MANAGER_IMAGE }}:${{github.ref_name}}
+        helm package ${{ env.CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion}
+        helm push ./*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar    
 
-    # - name: Package and push chart
-    #   run: |
-    #       make build-kubestellar-syncer-image \ 
-    #       DOCKER_REPO=${{ env.REGISTRY }}/${{ github.actor }}/kubestellar/syncer \
-    #       IMAGE_TAG=${{ env.RELEASE_VERSION }} \
-    #       ARCHS=${{ env.ARCHS }}
-    
-    # make chart IMG=${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE }}:${{github.ref_name}}
-    # helm package ${{ env.CHART_PATH }} --destination . --version ${{github.ref_name}}
-    # helm push ./*.tgz oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}    
