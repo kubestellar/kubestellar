@@ -395,7 +395,12 @@ func (c *Controller) enqueueObject(obj interface{}, skipCheckIsDeleted bool) {
 			// The resource no longer exist, which means it has been deleted.
 			if errors.IsNotFound(err) {
 				deletedObj := copyObjectMetaAndType(obj.(runtime.Object))
+				// set deletion timestamp for this object to still be detected as being deleted
+				metaDeletedObj := deletedObj.(metav1.Object)
+				metaDeletedObj.SetDeletionTimestamp(&metav1.Time{Time: time.Now()})
+
 				key.DeletedObject = &deletedObj
+
 				c.workqueue.Add(key)
 			}
 			return
