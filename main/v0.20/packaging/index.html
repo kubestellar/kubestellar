@@ -1852,8 +1852,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ocm-transport-plugin-container-image" class="md-nav__link">
-    OCM Transport Plugin container image
+  <a href="#ocm-transport-container-image" class="md-nav__link">
+    OCM Transport container image
   </a>
   
 </li>
@@ -2005,13 +2005,19 @@
 
 <h1 id="packaging-and-delivery">Packaging and Delivery<a class="headerlink" href="#packaging-and-delivery" title="Permanent link">#</a></h1>
 <h2 id="outline-of-github-repositories">Outline of GitHub repositories<a class="headerlink" href="#outline-of-github-repositories" title="Permanent link">#</a></h2>
-<p>The following is a graph of the GitHub repositories in the <code>kubestellar</code> GitHub organization and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow.</p>
-<p>Note that to <em>use</em> KubeStellar, all of the repos in this graph are involved.</p>
+<p>The following is a graph of the GitHub repositories in the <code>kubestellar</code> GitHub organization and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow. These are not just build-time dependencies but any reference from one repo to another.</p>
+<p>Note that the ocm-transport-plugin is under development and not involved yet in using KubeStellar.</p>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>flowchart LR
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    kubestellar --&gt; kubeflex
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    ocm-status-addon
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ocm-transport-plugin --&gt; kubestellar
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    kubestellar --&gt; ocm-status-addon
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ocm-status-addon --&gt; kubestellar
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    ocm-transport-plugin --&gt; kubestellar
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    style ocm-transport-plugin stroke-dasharray: 5 5
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    kubestellar --&gt; ocm-transport-plugin
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    linkStyle 3 stroke-dasharray: 5 5
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    linkStyle 4 stroke-dasharray: 5 5
 </code></pre></div>
+<p>The references from ocm-status-addon to kubestellar are only in documentation and are in the process of being removed (no big difficulty is anticipated).</p>
 <h2 id="kubeflex">KubeFlex<a class="headerlink" href="#kubeflex" title="Permanent link">#</a></h2>
 <p>See <a href="https://github.com/kubestellar/kubeflex">the GitHub repo</a>.</p>
 <h2 id="ocm-status-addon">OCM Status Addon<a class="headerlink" href="#ocm-status-addon" title="Permanent link">#</a></h2>
@@ -2086,8 +2092,8 @@ local copy of the chart to the OCI repository and tag specified in
 <p><strong>NOTE</strong>: This is under development, not a part of the functioning
   system yet.</p>
 <p>The source is the GitHub repo <a href="https://github.com/kubestellar/ocm-transport-plugin">github.com/kubestellar/ocm-transport-plugin</a></p>
-<h3 id="ocm-transport-plugin-container-image">OCM Transport Plugin container image<a class="headerlink" href="#ocm-transport-plugin-container-image" title="Permanent link">#</a></h3>
-<p>This will aspirationally appear at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-transport-plugin">ghcr.io/kubestellar/ocm-transport-plugin</a>. This level of development has not been reached yet.</p>
+<h3 id="ocm-transport-container-image">OCM Transport container image<a class="headerlink" href="#ocm-transport-container-image" title="Permanent link">#</a></h3>
+<p>This appears at <a href="https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller">ghcr.io/kubestellar/ocm-transport-plugin/transport-controller</a>.</p>
 <p>TODO: document how the image is built and published, including explain versioning.</p>
 <h2 id="kubestellar">KubeStellar<a class="headerlink" href="#kubestellar" title="Permanent link">#</a></h2>
 <h3 id="outline-of-publishing">Outline of publishing<a class="headerlink" href="#outline-of-publishing" title="Permanent link">#</a></h3>
