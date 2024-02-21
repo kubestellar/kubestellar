@@ -55,10 +55,11 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-
+      
     - name: Package and push chart
       run: |
+        chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
         make chart IMG=${{ env.REGISTRY }}/${{ env.CONTROLLER_MANAGER_IMAGE }}:${{github.ref_name}}
-        helm package ${{ env.CHART_PATH }} --destination . --version ${{github.ref_name}} --app-version ${{github.ref_name}}
+        helm package ${{ env.CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion}
         helm push ./*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar    
 
