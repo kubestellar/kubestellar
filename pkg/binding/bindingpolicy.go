@@ -67,7 +67,7 @@ const (
 func (c *Controller) handleBindingPolicy(ctx context.Context, obj runtime.Object) error {
 	bindingPolicy, err := runtimeObjectToBindingPolicy(obj)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to convert runtime.Object to BindingPolicy: %w", err)
 	}
 
 	// handle requeing for changes in bindingpolicy, excluding deletion
@@ -75,7 +75,7 @@ func (c *Controller) handleBindingPolicy(ctx context.Context, obj runtime.Object
 		// update bindingpolicy resolution destinations since bindingpolicy was updated
 		clusterSet, err := ocm.FindClustersBySelectors(c.ocmClient, bindingPolicy.Spec.ClusterSelectors)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to ocm.FindClustersBySelectors: %w", err)
 		}
 
 		// note bindingpolicy in resolver in case it isn't associated with
@@ -88,17 +88,21 @@ func (c *Controller) handleBindingPolicy(ctx context.Context, obj runtime.Object
 
 		// requeue objects for re-evaluation
 		if err := c.requeueForBindingPolicyChanges(); err != nil {
-			return err
+			return fmt.Errorf("failed to c.requeueForBindingPolicyChanges: %w", err)
 		}
 	} else {
 		c.bindingPolicyResolver.DeleteResolution(bindingPolicy.GetName())
 	}
 
 	if err := c.handleBindingPolicyFinalizer(ctx, bindingPolicy); err != nil {
-		return err
+		return fmt.Errorf("failed to c.handleBindingPolicyFinalizer: %w", err)
 	}
 
-	return c.cleanUpObjectsNoLongerMatching(bindingPolicy)
+	err = c.cleanUpObjectsNoLongerMatching(bindingPolicy)
+	if err != nil {
+		return fmt.Errorf("failed to c.cleanUpObjectsNoLongerMatching: %w", err)
+	}
+	return nil
 }
 
 func (c *Controller) requeueForBindingPolicyChanges() error {
@@ -292,7 +296,7 @@ func listManifestsForBindingPolicy(ocmClient client.Client, wdsName string, bind
 	// on dynamic client to make sure to use the cache
 	if err := ocmClient.List(context.TODO(), list, client.InNamespace(""),
 		client.MatchingLabels(map[string]string{labelKey: util.BindingPolicyLabelValueEnabled})); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get list of ITS objects with label %q: %w", labelKey, err)
 	}
 	return list, nil
 }
@@ -358,11 +362,11 @@ func (c *Controller) cleanUpObjectsNoLongerMatching(bindingPolicy *v1alpha1.Bind
 		}
 		matches, err := c.checkObjectMatchesWhatAndWhere(bindingPolicy, *obj, manifest)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to c.checkObjectMatchesWhatAndWhere on ManifestWork %s/%s: %w", manifest.Namespace, manifest.Name, err)
 		}
 		if !matches {
 			if err := c.ocmClient.Delete(context.TODO(), &manifest, &client.DeleteOptions{}); err != nil {
-				return err
+				return fmt.Errorf("failed to delete ManifestWork %q in namespace %q: %w", manifest.Name, manifest.Namespace, err)
 			}
 		}
 	}
