@@ -19,6 +19,7 @@ package binding
 import (
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -262,6 +263,11 @@ func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPo
 		if controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
 			controllerutil.RemoveFinalizer(bindingPolicy, KSFinalizer)
 			if err := updateBindingPolicy(ctx, c.dynamicClient, bindingPolicy); err != nil {
+				if errors.IsNotFound(err) {
+					// object was deleted after getting into this function. This is not an error.
+					return nil
+				}
+
 				return err
 			}
 		}
