@@ -112,10 +112,13 @@ func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) 
 	return nil
 }
 
-// handleSingletonLabel adds or removes the singleton label from the object. If a bindingPolicyName is provided,
-// the singleton label is added to the object. If the bindingPolicyName is empty, the singleton label is removed.
+// handleSingletonLabel adds or removes the singleton label from the object in the cluster.
+// If a bindingPolicyName is provided, the singleton label is added to the object. If the bindingPolicyName is empty,
+// the singleton label is removed.
+//
+// The method parameter `obj` is not mutated by this function.
 func (c *Controller) handleSingletonLabel(ctx context.Context, obj runtime.Object, bindingPolicyName string) error {
-	unstructuredObj, ok := obj.(*unstructured.Unstructured)
+	unstructuredObj, ok := obj.DeepCopyObject().(*unstructured.Unstructured)
 	if !ok {
 		return fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
 	}

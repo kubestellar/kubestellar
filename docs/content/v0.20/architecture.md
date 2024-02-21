@@ -246,7 +246,7 @@ There are three controllers in the KubeStellar controller manager:
 ### Binding Controller
 
 The Binding controller is responsible for watching workload objects and 
-`BindingPolicy` objects, and creates for each of the latter a matching `Binding` object in the WDS. 
+`BindingPolicy` objects, and maintains for each of the latter a matching `Binding` object in the WDS. 
 A `Binding` object is mapped 1:1 to a `BindingPolicy` object and contains references to the concrete list of workload 
 objects and references to the concrete list of destinations that were selected by the policy.
 
@@ -310,7 +310,7 @@ follows:
     -  Iterates on all binding-policies, and for each of them:
         - Evaluates whether the object matches the downsync selection 
           criteria in the `BindingPolicy`.
-        - Whether the object is a match or not, the worker notes the object as a match for the in-memory representation 
+        - Whether the object is a match or not, the worker notes it through the in-memory representation 
        of the relevant `Binding`. If the noting of an object results in a change in the in-memory representation of the
          `Binding`, the worker enqueues the latter for syncing.
         - If a matched `BindingPolicy` has `WantSingletonReportedState` set to true (**see note below), the object is 
@@ -452,7 +452,7 @@ status updates for one object do not require updates of a whole bundle.
 ### Transport Controller
 
 The transport controller is pluggable and allows the option to plug different
-implementations of the transport interface. The interface between the plugin and the generic code is [a Go language interface](../../pkg/transport/transport.go) that the plugin has to implement. This interface requires the following from the plugin.
+implementations of the transport interface. The interface between the plugin and the generic code is [a Go language interface](../../../pkg/transport/transport.go) that the plugin has to implement. This interface requires the following from the plugin.
 - Upon registration of a new WEC, plugin should create a namespace for the WEC in the ITS and delete the namespace once the WEC registration goes away (mailbox namespace per WEC);
 - Plugin must be able to wrap any number of objects into a single wrapped object;
 - Have an agent that can be used to pull the wrapped objects from the mailbox namespace and apply them to the WEC. A single example for such an agent is an agent that runs on the WEC and watches the wrapped object in the corresponding namespace in the central hub and is able to unwrap it and apply the objects to the WEC. 
@@ -460,7 +460,7 @@ implementations of the transport interface. The interface between the plugin and
 
 The above list is required in order to comply with [<u>SIG Multi-Cluster Work API</u>](https://multicluster.sigs.k8s.io/concepts/work-api/).
 
-Each plugin has an executable with a `main` func that calls [the generic code](../../pkg/transport/cmd/generic-main.go), passing the plugin object that implements the plugin interface.
+Each plugin has an executable with a `main` func that calls [the generic code](../../../pkg/transport/cmd/generic-main.go), passing the plugin object that implements the plugin interface.
 
 KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project [Open Cluster Management](https://open-cluster-management.io). OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available [here](https://github.com/kubestellar/ocm-transport-plugin).  
 We expect to have more transport plugin options in the future.
