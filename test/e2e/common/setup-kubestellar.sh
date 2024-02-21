@@ -67,6 +67,30 @@ echo "wds1 created."
 
 :
 : -------------------------------------------------------------------------
+: Run OCM transport controller executable
+:
+cd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
+KUBESTELLAR_DIR="$(pwd)"
+## this is a temp solution - run as executble process. this should be replaced to run as pod, ideally using helm
+wget https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v0.1.0-rc1.tar.gz
+tar -xf v0.1.0-rc1.tar.gz
+rm -rf v0.1.0-rc1.tar.gz
+cd ocm-transport-plugin-0.1.0-rc1
+OCM_TRANSPORT_PLUGIN_DIR="$(pwd)"
+pwd
+echo "replace github.com/kubestellar/kubestellar => ${KUBESTELLAR_DIR}/" >> go.mod
+make build
+mv ./bin/ocm-transport-plugin ${KUBESTELLAR_DIR}/ocm-transport-plugin
+cd "${KUBESTELLAR_DIR}"
+pwd
+rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
+echo "running ocm transport plugin..."
+./ocm-transport-plugin --transport-context imbs1 --wds-context wds1 --wds-name wds1 &> transport.log &
+
+echo "transport controller is running as background process."
+
+:
+: -------------------------------------------------------------------------
 : Create clusters and register with OCM
 :
 function create_cluster() {
