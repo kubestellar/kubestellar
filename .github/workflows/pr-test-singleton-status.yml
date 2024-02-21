@@ -4,7 +4,15 @@ on:
   workflow_call:
   # So we can trigger manually if needed
   workflow_dispatch:
-  # To confirm any changes to docs build successfully, without deploying them
+    inputs:
+      testFlags:
+        description: 'Command line flags for run-test.sh'
+        required: false
+        default: ''
+        type: choice
+        options:
+        - ''
+        - '--released'
   pull_request:
     branches:
       - main
@@ -16,7 +24,7 @@ on:
 
 jobs:
   test-singleton:
-    name: Test singleton status return
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
@@ -41,9 +49,11 @@ jobs:
           rm -fr bin kubeflex_0.4.2_linux_amd64.tar.gz 
 
       - name: Run test
+        env:
+          TEST_FLAGS: ${{ github.event.inputs.testFlags }}
         run: |
           cd test/e2e/singleton-status
-          KFLEX_DISABLE_CHATTY=true ./run-test.sh 
+          KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
 
       - name: show kubeconfig contexts
         if: always()
