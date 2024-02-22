@@ -184,7 +184,7 @@ spec:
               - kubestellar
               - oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart
               - --version
-              - "0.20.0-rc2"
+              - "0.20.0"
               - --set
               - "ControlPlaneName={{.ControlPlaneName}}"
             env:
