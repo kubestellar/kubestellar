@@ -848,6 +848,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/v0.20/release/</loc>
+         <lastmod>2024-02-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/v0.20/release/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/v0.20/thirdparties/</loc>
          <lastmod>2024-02-22</lastmod>
          <changefreq>daily</changefreq>
