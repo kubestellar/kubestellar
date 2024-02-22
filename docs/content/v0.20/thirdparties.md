@@ -25,6 +25,9 @@ sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
 rm argocd-linux-amd64
 ```
 
+Check the [ArgoCD releases](https://github.com/argoproj/argo-cd/releases) page for the obtaining the latest 
+stable release for other architectures and operating systems.
+
 Configure Argo to work with the ingress installed in the hosting cluster:
 
 ```shell
@@ -91,7 +94,7 @@ CONTEXT=wds1
 kubectl config view --minify --context=${CONTEXT} --flatten > /tmp/${CONTEXT}.kubeconfig
 kubectl config --kubeconfig=/tmp/${CONTEXT}.kubeconfig set-cluster ${CONTEXT}-cluster --server=https://${CONTEXT}.${CONTEXT}-system 2>/dev/null
 kubectl config use-context kind-kubeflex
-ARGO_SERVER_POD=$(kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o jsonpath={.items[0].metadata.name})
+ARGO_SERVER_POD=$(kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o 'jsonpath={.items[0].metadata.name}')
 kubectl cp /tmp/${CONTEXT}.kubeconfig -n argocd ${ARGO_SERVER_POD}:/tmp
 PASSWORD=$(argocd admin initial-password -n argocd | cut -d " " -f 1)
 kubectl exec -it -n argocd $ARGO_SERVER_POD -- argocd login argocd-server.argocd --username admin --password $PASSWORD --insecure
