@@ -25,8 +25,6 @@ The following steps establish an initial state used in the examples below.
    kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0/config/postcreate-hooks/kubestellar.yaml
    kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0/config/postcreate-hooks/ocm.yaml
    ```
-Note: PCH needs to be fixed for v0.20.0
-
 
 3. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
 in KubeFlex. Note that `-p ocm` runs a post-create hook on the *vcluster* control plane
@@ -50,7 +48,7 @@ which installs OCM on it.
    helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc2
    ```
 
-   see [here](https://github.ibm.com/dettori/status-addon) for more details on the add-on.
+   see [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
 
 5. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar`
 runs a post-create hook on the *k8s* control plane that starts an instance of a KubeStellar controller
