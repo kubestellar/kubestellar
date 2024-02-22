@@ -4,8 +4,7 @@ The following steps show how to create new clusters and
 register them with the hub as descibed in the
 [official open cluster management docs](https://open-cluster-management.io/getting-started/installation/start-the-control-plane/).
 
-1. Run the following set of commands for creating two kind clusters named `cluster1` and `cluster2` and registering them with the
-OCM hub. This cluster will act as a workload cluster.
+1. Execute the following commands to create two kind clusters, named `cluster1` and `cluster2`, and register them with the OCM hub. These clusters will serve as workload clusters. If you have previously executed these commands, you might already have contexts named `cluster1` and `cluster2`. If so, you can remove these contexts using the commands `kubectl config delete-context cluster1` and `kubectl config delete-context cluster2`.
 
    ```shell
    : set flags to "" if you have installed KubeStellar on an OpenShift cluster
