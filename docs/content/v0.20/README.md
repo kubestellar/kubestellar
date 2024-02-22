@@ -35,7 +35,7 @@ including OCM Klusterlet for the WECs.
 ## Latest stable release
 
 We do not have one that is proven very good yet.
-The latest release is [0.20.0-rc2](../../../../v0.20.0-rc2).
+The latest release is [0.20.0](../../../../v0.20.0).
 See also [the release notes](release-notes.md).
 
 ## Architecture
