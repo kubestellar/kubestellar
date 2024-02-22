@@ -32,6 +32,12 @@ including OCM Klusterlet for the WECs.
 4. Upsync
 5. "Pluggable Transport" 
 
+## Latest stable release
+
+We do not have one that is proven very good yet.
+The latest release is [0.20.0-rc2](../../../../v0.20.0-rc2).
+See also [the release notes](release-notes.md).
+
 ## Architecture
 
 See [Architecture](architecture.md).
@@ -42,7 +48,7 @@ See [Packaging and Delivery](packaging.md)
 
 ## Usage examples, and testing
 
-See [Examples](examples.md).
+See [Examples](examples.md) for _this_ release, after reviewing [above](#latest-stable-release).
 
 ## User Guide
 
