@@ -43,3 +43,7 @@ See [Packaging and Delivery](packaging.md)
 ## Usage examples, and testing
 
 See [Examples](examples.md).
+
+## User Guide
+
+See [the User Guide](user-guide.md), which is only the barest start of a stub.
