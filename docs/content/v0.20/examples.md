@@ -1,7 +1,8 @@
 # KubeStellar Usage Examples
 
-**NOTE**: This is unmaintained material that has only been observed to work for the commit tagged as
-`v0.20.0-rc2`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0-rc2`), and contributors can run these tests too; see [the e2e tests](../../../test/e2e).
+This document shows some simple examples of using the release that contains this version of this document. See also [the start of a user guide](user-guide.md) for considerations for different scenarios.
+
+There are also end-to-end (E2E) tests that are based on scenario 4 and an extended variant of scenario 1. These tests normally exercise the copy of the repo containing them (rather than a release). They can alternatively test a release. See [the e2e tests](../../../test/e2e). Contributors can run these tests, and CI includes checking that these E2E tests pass. These tests are written in `bash`, so that contributors can easily follow them.
 
 See also [the user guide](user-guide.md).
 
@@ -20,11 +21,11 @@ The following steps establish an initial state used in the examples below.
    ```
    If you are installing KubeStellar on an existing Kubernetes or OpenShift cluster, just use the command `kflex init`.
 
-2. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0-rc2 images:
+2. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0 images:
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-rc2/config/postcreate-hooks/kubestellar.yaml
-   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-rc2/config/postcreate-hooks/ocm.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0/config/postcreate-hooks/kubestellar.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0/config/postcreate-hooks/ocm.yaml
    ```
 
 3. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
@@ -239,8 +240,8 @@ project.
 
 Install the AppWrapper CRD in the WDS and the WECs. Note that due to 
 [this issue](https://github.com/kubestellar/kubestellar/issues/1705) CRDs must be pre-installed 
-on the WDS and on the WECs when using API group filtering. For KubeStellar `0.20.0-rc1` this is required 
-when using a hosting cluster as WDS with a large number of API resources such as OpenShift.
+on the WDS and on the WECs when using API group filtering. For this release of KubeStellar, that pre-installation is required 
+when a WDS has a large number of API resources (such as would be found in a hosting cluster that is OpenShift).
 
 ```shell
 clusters=(wds2 cluster1 cluster2);
@@ -252,7 +253,7 @@ done
 Apply the kubestellar controller-manager helm chart with the option to allow only delivery of objects with api group `workload.codeflare.dev`
 
 ```shell
-helm --kube-context kind-kubeflex upgrade --install -n wds2-system kubestellar oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart --version 0.20.0-rc1 --set ControlPlaneName=wds2 --set APIGroups=workload.codeflare.dev
+helm --kube-context kind-kubeflex upgrade --install -n wds2-system kubestellar oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart --version 0.20.0 --set ControlPlaneName=wds2 --set APIGroups=workload.codeflare.dev
 ```
 
 Check that the kubestellar controller for wds2 is started:
