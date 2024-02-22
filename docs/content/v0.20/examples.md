@@ -61,7 +61,7 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 
 7. (optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
 see the `kubestellar-controller-manager` in the `wds1-system` namespace and the 
-statefulset `vcluster` in the `imbs1-system` namespace, both in a `READY` state.
+statefulset `vcluster` in the `imbs1-system` namespace, both fully ready.
 
    ```shell
    kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces
