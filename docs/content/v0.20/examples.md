@@ -59,29 +59,29 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 
 6. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
 
-7. (optional) Check all deployments and statefulsets running in the hosting cluster. Expect to
-see the wds1 kubestellar-controller-manager created in the wds1-system namespace and the imbs1
-statefulset created in the imbs1-system namespace.
+7. (optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
+see the `kubestellar-controller-manager` in the `wds1-system` namespace and the 
+statefulset `vcluster` in the `imbs1-system` namespace, both in a `READY` state.
 
    ```shell
    kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces
    ```
-The output should looks something like the following:
+   The output should look something like the following:
 
-```shell
-NAMESPACE            NAME                                             READY   UP-TO-DATE   AVAILABLE   AGE
-ingress-nginx        deployment.apps/ingress-nginx-controller         1/1     1            1           22h
-kube-system          deployment.apps/coredns                          2/2     2            2           22h
-kubeflex-system      deployment.apps/kubeflex-controller-manager      1/1     1            1           22h
-local-path-storage   deployment.apps/local-path-provisioner           1/1     1            1           22h
-wds1-system          deployment.apps/kube-apiserver                   1/1     1            1           22m
-wds1-system          deployment.apps/kube-controller-manager          1/1     1            1           22m
-wds1-system          deployment.apps/kubestellar-controller-manager   1/1     1            1           21m
+   ```shell
+   NAMESPACE            NAME                                             READY   UP-TO-DATE   AVAILABLE   AGE
+   ingress-nginx        deployment.apps/ingress-nginx-controller         1/1     1            1           22h
+   kube-system          deployment.apps/coredns                          2/2     2            2           22h
+   kubeflex-system      deployment.apps/kubeflex-controller-manager      1/1     1            1           22h
+   local-path-storage   deployment.apps/local-path-provisioner           1/1     1            1           22h
+   wds1-system          deployment.apps/kube-apiserver                   1/1     1            1           22m
+   wds1-system          deployment.apps/kube-controller-manager          1/1     1            1           22m
+   wds1-system          deployment.apps/kubestellar-controller-manager   1/1     1            1           21m
 
-NAMESPACE         NAME                                   READY   AGE
-imbs1-system      statefulset.apps/vcluster              1/1     11h
-kubeflex-system   statefulset.apps/postgres-postgresql   1/1     22h
-```
+   NAMESPACE         NAME                                   READY   AGE
+   imbs1-system      statefulset.apps/vcluster              1/1     11h
+   kubeflex-system   statefulset.apps/postgres-postgresql   1/1     22h
+   ```
 
 ## Scenario 1 - multi-cluster workload deployment with kubectl
 
@@ -250,7 +250,7 @@ done
 Apply the kubestellar controller-manager helm chart with the option to allow only delivery of objects with api group `workload.codeflare.dev`
 
 ```shell
-helm upgrade --install -n wds2-system kubestellar oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart --version 0.20.0-rc1 --set ControlPlaneName=wds2 --set APIGroups=workload.codeflare.dev
+helm --kube-context kind-kubeflex upgrade --install -n wds2-system kubestellar oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart --version 0.20.0-rc1 --set ControlPlaneName=wds2 --set APIGroups=workload.codeflare.dev
 ```
 
 Check that the kubestellar controller for wds2 is started:

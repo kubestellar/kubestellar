@@ -8,7 +8,8 @@ register them with the hub as descibed in the
 OCM hub. This cluster will act as a workload cluster.
 
    ```shell
-   flags="--force-internal-endpoint-lookup" # set this to "" if you have installed KubeStellar on an OpenShift cluster
+   # set flags to "" if you have installed KubeStellar on an OpenShift cluster
+   flags="--force-internal-endpoint-lookup"
    clusters=(cluster1 cluster2);
    for cluster in "${clusters[@]}"; do
       kind create cluster --name ${cluster}
