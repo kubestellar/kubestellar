@@ -15,7 +15,8 @@ The following steps establish an initial state used in the examples below.
 
    ```shell
    kflex init --create-kind
-   ```If you are installing KubeStellar on an existing Kubernetes or OpenShift cluster, just use the command `kflex init`.
+   ```
+   If you are installing KubeStellar on an existing Kubernetes or OpenShift cluster, just use the command `kflex init`.
 
 2. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0-rc2 images:
 
