@@ -1,7 +1,7 @@
 # KubeStellar Usage Examples
 
 **NOTE**: This is unmaintained material that has only been observed to work for the commit tagged as
-`v0.20.0`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0`), and contributors can run these tests too; see [the e2e tests](../../../test/e2e).
+`v0.20.0-rc2`. CI regularly tests variants of scenarios 1 and 4 that exercise the copy of the repo that they are embedded in (rather than the copy tagged `v0.20.0-rc2`), and contributors can run these tests too; see [the e2e tests](../../../test/e2e).
 
 ## Prereqs
 
@@ -19,11 +19,11 @@ The following steps establish an initial state used in the examples below.
 
   If you are installing KubeStellar on an existing OpenShift cluster, just use the command `kflex init`.
 
-2. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0 images:
+2. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0-rc2 images:
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0/config/postcreate-hooks/kubestellar.yaml
-   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0/config/postcreate-hooks/ocm.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-rc2/config/postcreate-hooks/kubestellar.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0-rc2/config/postcreate-hooks/ocm.yaml
    ```
 
 3. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
