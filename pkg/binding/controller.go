@@ -53,14 +53,13 @@ import (
 
 const controllerName = "Binding"
 
-// Resources group versions to exclude for watchers as they should not delivered to other clusters
-var excludedGroupVersions = map[string]bool{
-	"flowcontrol.apiserver.k8s.io/v1beta3": true,
-	"flowcontrol.apiserver.k8s.io/v1beta2": true,
-	"scheduling.k8s.io/v1":                 true,
-	"discovery.k8s.io/v1":                  true,
-	"apiregistration.k8s.io/v1":            true,
-	"coordination.k8s.io/v1":               true,
+// Resource groups to exclude for watchers as they should not be delivered to other clusters
+var excludedGroups = map[string]bool{
+	"flowcontrol.apiserver.k8s.io": true,
+	"scheduling.k8s.io":            true,
+	"discovery.k8s.io":             true,
+	"apiregistration.k8s.io":       true,
+	"coordination.k8s.io":          true,
 }
 
 // Resource names to exclude for watchers as they should not delivered to other clusters
@@ -205,18 +204,18 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.dynamicClient, 0*time.Minute)
 
 	// Loop through the api resources and create informers and listers for each of them
-	for _, group := range apiResources {
-		if _, excluded := excludedGroupVersions[group.GroupVersion]; excluded {
-			logger.V(1).Info("Ignoring excluded APIGroup", "groupVersion", group.GroupVersion)
-			continue
-		}
-		gv, err := schema.ParseGroupVersion(group.GroupVersion)
+	for _, list := range apiResources {
+		gv, err := schema.ParseGroupVersion(list.GroupVersion)
 		if err != nil {
-			c.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", group.GroupVersion)
+			c.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", list.GroupVersion)
 			continue
 		}
-		logger.V(1).Info("Working on API Group", "groupVersion", group.GroupVersion, "numResources", len(group.APIResources))
-		for _, resource := range group.APIResources {
+		if _, excluded := excludedGroups[gv.Group]; excluded {
+			logger.V(1).Info("Ignoring APIResourceList", "groupVersion", list.GroupVersion)
+			continue
+		}
+		logger.V(1).Info("Working on APIResourceList", "groupVersion", list.GroupVersion, "numResources", len(list.APIResources))
+		for _, resource := range list.APIResources {
 			if _, excluded := excludedResourceNames[resource.Name]; excluded {
 				continue
 			}

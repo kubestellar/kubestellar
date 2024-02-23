@@ -80,16 +80,16 @@ func (c *Controller) checkAPIResourcesForUpdates() ([]APIResource, []string, err
 	}
 
 	// Loop through the api resources and create informers and listers for each of them
-	for _, group := range apiResources {
-		if _, excluded := excludedGroupVersions[group.GroupVersion]; excluded {
-			continue
-		}
-		gv, err := schema.ParseGroupVersion(group.GroupVersion)
+	for _, list := range apiResources {
+		gv, err := schema.ParseGroupVersion(list.GroupVersion)
 		if err != nil {
-			c.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", group.GroupVersion)
+			c.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", list.GroupVersion)
 			continue
 		}
-		for _, resource := range group.APIResources {
+		if _, excluded := excludedGroups[gv.Group]; excluded {
+			continue
+		}
+		for _, resource := range list.APIResources {
 			if _, excluded := excludedResourceNames[resource.Name]; excluded {
 				continue
 			}
