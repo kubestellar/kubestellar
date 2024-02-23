@@ -19,6 +19,7 @@ package transport
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -371,6 +372,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 }
 
 func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
+	logger := klog.FromContext(ctx)
 	objectsToPropagate := make([]*unstructured.Unstructured, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clusterScopedObject := range binding.Spec.Workload.ClusterScope {
@@ -384,7 +386,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 			if err != nil {
 				return nil, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", objectName, gvr, err)
 			}
-			objectsToPropagate = append(objectsToPropagate, cleanObject(object))
+			objectsToPropagate = append(objectsToPropagate, cleanObject(logger, object))
 		}
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
@@ -401,7 +403,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 					return nil, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", objectName,
 						objectsByNamespace.Namespace, gvr, err)
 				}
-				objectsToPropagate = append(objectsToPropagate, cleanObject(object))
+				objectsToPropagate = append(objectsToPropagate, cleanObject(logger, object))
 			}
 		}
 	}
@@ -594,7 +596,7 @@ func setLabel(object metav1.Object, key string, value any) {
 }
 
 // cleanObject is a function to clean object before adding it to a wrapped object. these fields shouldn't be propagated to WEC.
-func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
+func cleanObject(logger logr.Logger, object *unstructured.Unstructured) *unstructured.Unstructured {
 	objectCopy := object.DeepCopy() // don't modify object directly. create a copy before zeroing fields
 	objectCopy.SetManagedFields(nil)
 	objectCopy.SetFinalizers(nil)
@@ -608,6 +610,25 @@ func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	delete(annotations, "kubectl.kubernetes.io/last-applied-configuration")
 	objectCopy.SetAnnotations(annotations)
 
-	return objectCopy
+	gvk := objectCopy.GroupVersionKind()
+	if gvk.Group != "apps" || gvk.Kind != "Job" || !strings.HasPrefix(gvk.Version, "v1") {
+		return objectCopy
+	}
 
+	objectU := objectCopy.UnstructuredContent()
+	podLabels, found, err := unstructured.NestedMap(objectU, "spec", "template", "metadata", "labels")
+	if err != nil || !found {
+		logger.V(3).Error(nil, "Job lacks expected template labels", "namespace", objectCopy.GetNamespace(), "name", objectCopy.GetName(), "found", found, "err", err)
+		return objectCopy
+	}
+	delete(podLabels, "batch.kubernetes.io/controller-uid")
+	delete(podLabels, "batch.kubernetes.io/job-name")
+	delete(podLabels, "controller-uid")
+	delete(podLabels, "job-name")
+	err = unstructured.SetNestedMap(objectU, podLabels, "spec", "template", "metadata", "labels")
+	if err != nil {
+		logger.Error(err, "Inconceivable! Failed to update existing pod labels in Job", "namespace", objectCopy.GetNamespace(), "name", objectCopy.GetName())
+	}
+	objectCopy.SetUnstructuredContent(objectU)
+	return objectCopy
 }
