@@ -18,9 +18,12 @@ package binding
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
@@ -35,19 +38,45 @@ type APIResource struct {
 }
 
 // Handle CRDs should account for CRDs being added or deleted to start/stop new informers as needed
-func (c *Controller) handleCRD(_ runtime.Object) error {
-	toStartList, toStopList, err := c.checkAPIResourcesForUpdates()
-	if err != nil {
-		return err
+func (c *Controller) handleCRD(obj runtime.Object) error {
+	uObj := obj.(*unstructured.Unstructured)
+	var crdObj *apiextensionsv1.CustomResourceDefinition
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(uObj.UnstructuredContent(), &crdObj); err != nil {
+		return fmt.Errorf("failed to convert Unstructured to CRD: %w", err)
+	}
+
+	toStart := APIResource{
+		groupVersion: schema.GroupVersion{
+			Group:   crdObj.Spec.Group,
+			Version: crdObj.Spec.Versions[0].Name,
+		},
+		resource: metav1.APIResource{
+			Name: crdObj.Spec.Names.Plural,
+			Kind: crdObj.Spec.Names.Kind,
+		},
+	}
+
+	key := util.KeyForGroupVersionKind(toStart.groupVersion.Group, toStart.groupVersion.Version, toStart.resource.Kind)
+
+	// toStartList, toStopList, err := c.checkAPIResourcesForUpdates()
+	// if err != nil {
+	// 	return err
+	// }
+	toStartList, toStopList := []APIResource{}, []string{}
+	if isBeingDeleted(obj) {
+		toStopList = append(toStopList, key)
+	} else {
+		toStartList = append(toStartList, toStart)
 	}
 
 	go c.startInformersForNewAPIResources(toStartList)
 
 	for _, key := range toStopList {
 		c.logger.Info("API removed, stopping informer.", "key", key)
-		stopper := c.stoppers[key]
-		// close channel
-		close(stopper)
+		if stopper, ok := c.stoppers[key]; ok {
+			// close channel
+			close(stopper)
+		}
 		// remove entries for key
 		delete(c.informers, key)
 		delete(c.listers, key)
@@ -158,19 +187,32 @@ func (c *Controller) startInformersForNewAPIResources(toStartList []APIResource)
 		})
 		key := util.KeyForGroupVersionKind(toStart.groupVersion.Group,
 			toStart.groupVersion.Version, toStart.resource.Kind)
-		c.informers[key] = informer
 
 		// add the mapping between GVK and GVR
 		c.gvkGvrMapper.Add(toStart.groupVersion.WithKind(toStart.resource.Kind), gvr)
 
 		// create and index the lister
 		lister := cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())
-		c.listers[key] = lister
+		if _, ok := c.listers[key]; !ok {
+			c.listers[key] = lister
+		} else {
+			c.logger.V(3).Info("Lister already in place", "GVK", key)
+		}
+
 		stopper := make(chan struct{})
 		defer close(stopper)
-		c.stoppers[key] = stopper
+		if _, ok := c.stoppers[key]; !ok {
+			c.stoppers[key] = stopper
+		} else {
+			c.logger.V(3).Info("Stopper already in place", "GVK", key)
+		}
 
-		go informer.Run(stopper)
+		if _, ok := c.informers[key]; !ok {
+			c.informers[key] = informer
+			go informer.Run(stopper)
+		} else {
+			c.logger.V(3).Info("Informer already in place", "GVK", key)
+		}
 	}
 	// block
 	select {}
