@@ -1,5 +1,3 @@
-**NOTE**: Current code is in a transition to a new design that decouples transport from binding (more about this below). As part of this transition, a new resource was added to KubeStellar called `Binding`. This resource matches the `BindingPolicy` object (1:1 relationship) in the WDS and contains references to the concrete workload objects and references to the concrete list of clusters that were selected by the `BindingPolicy` selectors. 
-
 # KubeStellar Architecture
 
 KubeStellar provides multi-cluster deployment of Kubernetes objects, controlled by simple `BindingPolicy` objects, where Kubernetes objects are expressed in their native format with no wrapping or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.
@@ -41,9 +39,9 @@ Examples of users interaction with KubeStellar are illustrated in the
 
 The KubeStellar architecture has these main modules:
 
-- *KubeStellar Controller Manager*: this module is responsible for delivering workload
-objects from the WDS to the ITS according to BindingPolicy, and 
-updating the status of objects in the WDS.
+- *KubeStellar Controller Manager*: this module is responsible for watching `BindingPolicy` objects and create from it a matching `Binding` object that contains list of references to the concrete objects and list of references to the concrete clusters, and for updating the status of objects in the WDS.
+
+- *Pluggable Transport Controller*: this module is responsible for delivering workload objects from the WDS to the ITS according to `Binding` objects.
 
 - *Space Manager*: This module manages the lifecycle of spaces.
 
@@ -68,19 +66,27 @@ and updates *WorkStatus* objects in the ITS namespace associated with the WEC.
 
 ## KubeStellar Controller Manager
 
-This module manages binding controller, transport controller, and status controller. 
+This module manages binding controller, and status controller. 
 * The binding controller watches `BindingPolicy` and workload objects on the Workload Definition Space (WDS), and maintains
 a `Binding` object for each `BindingPolicy` in the WDS. The `Binding` object contains references to the concrete list of
 workload objects and references to the concrete list of clusters that were selected by the `BindingPolicy` selectors.
-* The transport controller watches `Binding` objects on the WDS, and maintains in the Inventory and Transport Space (ITS) 
-a wrapped object per `Binding` to be delivered.
+
 * The status controller watches for *WorkStatus* objects on the ITS and updates the
 status of objects in the WDS when singleton status is requested in the `BindingPolicy` for those objects. 
-
 
 There is one instance of a KubeStellar Controller Manager for each WDS. 
 Currently this controller-manager runs in the KubeFlex hosting cluster and is responsible for installing the required 
 CRDs in the associated WDS.
+More details on the internals of this module are provided in [KubeStellar Controllers Architecture](#kubestellar-controllers-architecture).
+
+## Pluggable Transport Controller
+
+* The pluggable transport controller watches `Binding` objects on the WDS, and maintains in the Inventory and Transport Space (ITS) 
+a wrapped object per `Binding` to be delivered.
+* This controller is pluggable and can potentially be implemented using different options. Currently the only option we support is based on the [Open Cluster Management Project](https://open-cluster-management.io) 
+
+There is one instance of the pluggable transport controller for each WDS. 
+Currently this controller runs in an executable process. This is a work in progress and we're working on running this controller in a dedicated pod.
 More details on the internals of this module are provided in [KubeStellar Controllers Architecture](#kubestellar-controllers-architecture).
 
 ## Space Manager
@@ -321,7 +327,7 @@ follows:
 
 **WantSingletonReportedState**:
 currently it is the user's responsibility to make sure that a binding-policy that sets `WantSingletonReportedState` to
-true is not in conflict with other binding-policies, and that the binding-policy selects only a single
+true is not in conflict with other binding-policies that do the same, and that the binding-policy selects only a single
 cluster.
 
 There are other event flows, based on the object GVK and type of event. 
