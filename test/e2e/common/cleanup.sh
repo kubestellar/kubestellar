@@ -15,6 +15,7 @@
 
 set -x # echo so that users can understand what is happening
 set -e # exit on error
+SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 
 :
 : -------------------------------------------------------------------------
@@ -25,3 +26,13 @@ kind delete cluster --name cluster2
 kind delete cluster --name kubeflex
 kubectl config delete-context cluster1 || true
 kubectl config delete-context cluster2 || true
+
+## as temp solution transport runs as executable. cleanup of the created artifacts.
+cd ${SRC_DIR}/../../.. ## go up KubeStellar directory
+rm -f transport.log
+ocm_transport_plugin_process="$(pgrep ocm-transport-plugin || true)"
+if [[ ! -z "$ocm_transport_plugin_process" ]]; 
+then 
+    kill ${ocm_transport_plugin_process}
+fi
+rm -f ocm-transport-plugin

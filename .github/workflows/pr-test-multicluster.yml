@@ -46,7 +46,7 @@ jobs:
           wget https://github.com/kubestellar/kubeflex/releases/download/v0.4.2/kubeflex_0.4.2_linux_amd64.tar.gz
           tar -xvf kubeflex_0.4.2_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.4.2_linux_amd64.tar.gz 
+          rm -fr bin kubeflex_0.4.2_linux_amd64.tar.gz
 
       - name: Run test
         env:
@@ -54,6 +54,10 @@ jobs:
         run: |
           cd test/e2e/multi-cluster-deployment 
           KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
+
+      - name: show transport controller logs ## temp solution until we get transport controller to run as pod
+        if: always()
+        run: cat transport.log
 
       - name: show kubeconfig contexts
         if: always()
