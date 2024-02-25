@@ -66,7 +66,7 @@ kflex create imbs1 --type vcluster -p ocm $disable_chatty_status
 : Install singleton status return addon in IMBS1
 :
 wait-for-cmd kubectl --context imbs1 api-resources "|" grep managedclusteraddons
-helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc2
+helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc3
 
 :
 : -------------------------------------------------------------------------
