@@ -47,7 +47,7 @@ which installs OCM on it.
    and then install the status add-on:
 
    ```shell
-   helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc2
+   helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc3
    ```
 
    see [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
