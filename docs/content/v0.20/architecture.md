@@ -321,7 +321,7 @@ follows:
 
 **WantSingletonReportedState**:
 currently it is the user's responsibility to make sure that a binding-policy that sets `WantSingletonReportedState` to
-true is not in conflict with other binding-policies that do the same, and that the binding-policy selects only a single
+true is not in conflict with other binding-policies, and that the binding-policy selects only a single
 cluster.
 
 There are other event flows, based on the object GVK and type of event. 
