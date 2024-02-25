@@ -72,10 +72,11 @@ echo "wds1 created."
 cd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
 KUBESTELLAR_DIR="$(pwd)"
 ## this is a temp solution - run as executble process. this should be replaced to run as pod, ideally using helm
-wget https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v0.1.0-rc1.tar.gz
-tar -xf v0.1.0-rc1.tar.gz
-rm -rf v0.1.0-rc1.tar.gz
-cd ocm-transport-plugin-0.1.0-rc1
+OCM_TRANSPORT_PLUGIN_RELEASE="0.1.0-rc2"
+wget https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz
+tar -xf v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz
+rm -rf v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz
+cd ocm-transport-plugin-${OCM_TRANSPORT_PLUGIN_RELEASE}
 OCM_TRANSPORT_PLUGIN_DIR="$(pwd)"
 pwd
 echo "replace github.com/kubestellar/kubestellar => ${KUBESTELLAR_DIR}/" >> go.mod
