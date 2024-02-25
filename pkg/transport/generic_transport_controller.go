@@ -53,7 +53,10 @@ const (
 	originOwnerGenerationAnnotation = "transport.kubestellar.io/originOwnerReferenceBindingGeneration"
 )
 
-// NewTransportController returns a new transport controller
+// NewTransportController returns a new transport controller.
+// This func is like NewTransportControllerForWrappedObjectGVR but first uses
+// the given transport and transportClientset to discover the GVR of wrapped objects.
+// The given transportDynamicClient is used to access the ITS.
 func NewTransportController(ctx context.Context, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
 	wdsClientset ksclientset.Interface, wdsDynamicClient dynamic.Interface, transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface, wdsName string) (*genericTransportController, error) {
@@ -62,7 +65,14 @@ func NewTransportController(ctx context.Context, bindingInformer controlv1alpha1
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
 	}
+	return NewTransportControllerForWrappedObjectGVR(ctx, bindingInformer, transport, wdsClientset, wdsDynamicClient, transportDynamicClient, wdsName, wrappedObjectGVR), nil
+}
 
+// NewTransportControllerForWrappedObjectGVR returns a new transport controller.
+// The given transportDynamicClient is used to access the ITS.
+func NewTransportControllerForWrappedObjectGVR(ctx context.Context, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
+	wdsClientset ksclientset.Interface, wdsDynamicClient dynamic.Interface,
+	transportDynamicClient dynamic.Interface, wdsName string, wrappedObjectGVR schema.GroupVersionResource) *genericTransportController {
 	dynamicInformerFactory := dynamicinformer.NewDynamicSharedInformerFactory(transportDynamicClient, 0)
 	wrappedObjectGenericInformer := dynamicInformerFactory.ForResource(wrappedObjectGVR)
 
@@ -98,7 +108,7 @@ func NewTransportController(ctx context.Context, bindingInformer controlv1alpha1
 	})
 	dynamicInformerFactory.Start(ctx.Done())
 
-	return transportController, nil
+	return transportController
 }
 
 func convertObjectToUnstructured(object runtime.Object) (*unstructured.Unstructured, error) {
@@ -203,7 +213,8 @@ func (c *genericTransportController) Run(ctx context.Context, workersCount int) 
 	c.logger.Info("starting workers", "count", workersCount)
 	// Launch workers to process Binding
 	for i := 1; i <= workersCount; i++ {
-		go wait.UntilWithContext(ctx, func(ctx context.Context) { c.runWorker(ctx, i) }, time.Second)
+		workerId := i // in go, there is one `i` variable that gets different values in different iterations of the loop
+		go wait.UntilWithContext(ctx, func(ctx context.Context) { c.runWorker(ctx, workerId) }, time.Second)
 	}
 
 	c.logger.Info("started workers")
