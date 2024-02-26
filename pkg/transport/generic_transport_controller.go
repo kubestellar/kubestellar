@@ -43,6 +43,7 @@ import (
 	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	controlv1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
 	controlv1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/transport/denaturing"
 )
 
 const (
@@ -88,6 +89,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context, bindingInfor
 		wdsClientset:                wdsClientset,
 		wdsDynamicClient:            wdsDynamicClient,
 		wdsName:                     wdsName,
+		objectDenaturingMap:         denaturing.NewObjectDenaturingMap(),
 	}
 
 	transportController.logger.Info("Setting up event handlers")
@@ -156,6 +158,8 @@ type genericTransportController struct {
 	wdsClientset     ksclientset.Interface
 	wdsDynamicClient dynamic.Interface
 	wdsName          string
+
+	objectDenaturingMap *denaturing.ObjectDenaturingMap
 }
 
 // enqueueBinding takes an Binding resource and
@@ -395,7 +399,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 			if err != nil {
 				return nil, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", objectName, gvr, err)
 			}
-			objectsToPropagate = append(objectsToPropagate, cleanObject(object))
+			objectsToPropagate = append(objectsToPropagate, c.cleanObject(object))
 		}
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
@@ -412,7 +416,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 					return nil, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", objectName,
 						objectsByNamespace.Namespace, gvr, err)
 				}
-				objectsToPropagate = append(objectsToPropagate, cleanObject(object))
+				objectsToPropagate = append(objectsToPropagate, c.cleanObject(object))
 			}
 		}
 	}
@@ -605,7 +609,7 @@ func setLabel(object metav1.Object, key string, value any) {
 }
 
 // cleanObject is a function to clean object before adding it to a wrapped object. these fields shouldn't be propagated to WEC.
-func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
+func (c *genericTransportController) cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	objectCopy := object.DeepCopy() // don't modify object directly. create a copy before zeroing fields
 	objectCopy.SetManagedFields(nil)
 	objectCopy.SetFinalizers(nil)
@@ -614,11 +618,14 @@ func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	objectCopy.SetSelfLink("")
 	objectCopy.SetResourceVersion("")
 	objectCopy.SetUID("")
+	objectCopy.SetCreationTimestamp(metav1.Time{})
 
 	annotations := objectCopy.GetAnnotations()
 	delete(annotations, "kubectl.kubernetes.io/last-applied-configuration")
 	objectCopy.SetAnnotations(annotations)
 
-	return objectCopy
+	// clean fields specific to the concrete object.
+	c.objectDenaturingMap.CleanObjectSpecifics(objectCopy)
 
+	return objectCopy
 }
