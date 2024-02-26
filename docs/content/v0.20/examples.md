@@ -21,14 +21,14 @@ The following steps establish an initial state used in the examples below.
    ```
    If you are installing KubeStellar on an existing Kubernetes or OpenShift cluster, just use the command `kflex init`.
 
-2. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0 images:
+1. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0 images:
 
    ```shell
    kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0/config/postcreate-hooks/kubestellar.yaml
    kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0/config/postcreate-hooks/ocm.yaml
    ```
 
-3. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
+1. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
 in KubeFlex. Note that `-p ocm` runs a post-create hook on the *vcluster* control plane
 which installs OCM on it.
 
@@ -36,7 +36,7 @@ which installs OCM on it.
    kflex create imbs1 --type vcluster -p ocm
    ```
 
-4. Install status add-on on imbs1:
+1. Install status add-on on imbs1:
 
    Wait until the `managedclusteraddons` resource shows up on `imbs1`. You can check on that with the command:
 
@@ -52,7 +52,7 @@ which installs OCM on it.
 
    see [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
 
-5. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar`
+1. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar`
 runs a post-create hook on the *k8s* control plane that starts an instance of a KubeStellar controller
 manager which connects to the `wds1` front-end and the `imbs1` OCM control plane back-end.
 
@@ -60,9 +60,26 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
    kflex create wds1 -p kubestellar
    ```
 
-6. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
+1. Build and run the OCM based transport controller as executable process.  
+**NOTE**: This is work in progress, in the future the controller will be deployed through a Pod and optionally a Helm chart.
 
-7. (optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
+   OCM based transport controller is built in a different package, so we need to download the package and run the executable as background process.
+
+   ```shell
+   OS=$(go env GOOS)
+   ARCH=$(go env GOARCH)
+   OCM_TRANSPORT_PLUGIN_RELEASE="0.1.0-rc2"
+   OCM_TRANSPORT_PLUGIN_TAR=ocm-transport-plugin_${OCM_TRANSPORT_PLUGIN_RELEASE}_${OS}_${ARCH}.tar.gz
+   wget https://github.com/kubestellar/ocm-transport-plugin/releases/download/v${OCM_TRANSPORT_PLUGIN_RELEASE}/${OCM_TRANSPORT_PLUGIN_TAR}
+   tar -xvf ${OCM_TRANSPORT_PLUGIN_TAR} transport-controller ## this was a typo in goreleaser in ocm-plugin repo. after the next release of plugin repo, the executable name should be fixed to 'ocm-transport-plugin', so we won't need the below 'mv' command (already fixed in ocm-plugin repo main branch)
+   mv transport-controller ocm-transport-plugin
+   rm -fr bin ${OCM_TRANSPORT_PLUGIN_TAR}
+   ./ocm-transport-plugin --transport-context imbs1 --wds-context wds1 --wds-name wds1 &> transport.log &
+   ```
+
+1. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
+
+1. (optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
 see the `kubestellar-controller-manager` in the `wds1-system` namespace and the 
 statefulset `vcluster` in the `imbs1-system` namespace, both fully ready.
 
