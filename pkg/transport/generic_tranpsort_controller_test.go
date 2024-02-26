@@ -228,6 +228,35 @@ type testTransport struct {
 	extra   []any
 }
 
+var APIObjectEquality = apiequality.Semantic.Copy()
+
+func init() {
+	APIObjectEquality.AddFunc(func(left, right metav1.ObjectMeta) bool {
+		if left.Name != right.Name || left.GenerateName != right.GenerateName {
+			return false
+		}
+		if left.Namespace != right.Namespace {
+			return false
+		}
+		if !apiequality.Semantic.DeepEqual(left.DeletionTimestamp, right.DeletionTimestamp) {
+			return false
+		}
+		if !apiequality.Semantic.DeepEqual(left.Labels, right.Labels) {
+			return false
+		}
+		if !apiequality.Semantic.DeepEqual(left.Annotations, right.Annotations) {
+			return false
+		}
+		if !apiequality.Semantic.DeepEqual(left.Finalizers, right.Finalizers) {
+			return false
+		}
+		if !apiequality.Semantic.DeepEqual(left.OwnerReferences, right.OwnerReferences) {
+			return false
+		}
+		return true
+	})
+}
+
 func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.Object {
 	tt.Lock()
 	defer tt.Unlock()
@@ -243,7 +272,7 @@ func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.
 		delete(tt.missed, key.String())
 		if expectedObj, found := tt.expect[key]; found {
 			objM := obj.UnstructuredContent()
-			equal := apiequality.Semantic.DeepEqual(objM, expectedObj)
+			equal := APIObjectEquality.DeepEqual(objM, expectedObj)
 			if !equal {
 				tt.wrong[key.String()] = obj
 			}
