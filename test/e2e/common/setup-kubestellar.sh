@@ -105,7 +105,7 @@ cd "${KUBESTELLAR_DIR}"
 pwd
 rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
 echo "running ocm transport plugin..."
-./ocm-transport-plugin --transport-context imbs1 --wds-context wds1 --wds-name wds1 &> transport.log &
+./ocm-transport-plugin --transport-context imbs1 --wds-context wds1 --wds-name wds1 -v=4 &> transport.log &
 
 echo "transport controller is running as background process."
 
