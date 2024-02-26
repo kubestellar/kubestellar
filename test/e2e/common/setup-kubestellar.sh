@@ -99,6 +99,7 @@ cd ocm-transport-plugin-${OCM_TRANSPORT_PLUGIN_RELEASE}
 OCM_TRANSPORT_PLUGIN_DIR="$(pwd)"
 pwd
 echo "replace github.com/kubestellar/kubestellar => ${KUBESTELLAR_DIR}/" >> go.mod
+go mod tidy
 make build
 mv ./bin/ocm-transport-plugin ${KUBESTELLAR_DIR}/ocm-transport-plugin
 cd "${KUBESTELLAR_DIR}"
