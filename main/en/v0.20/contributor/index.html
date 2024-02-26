@@ -1802,6 +1802,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#integration-testing" class="md-nav__link">
+    Integration testing
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1877,6 +1884,17 @@
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>X<span class="w"> </span>ArgoCD<span class="w"> </span>CLI
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span>how<span class="w"> </span>to<span class="w"> </span>install:<span class="w"> </span>https://argo-cd.readthedocs.io/en/stable/cli_installation/
 </code></pre></div>
+<h2 id="integration-testing">Integration testing<a class="headerlink" href="#integration-testing" title="Permanent link">#</a></h2>
+<p>There is currently one integration test. Contributors can run it. It is not (yet) run in CI.</p>
+<p>This test requires you to already have <code>etcd</code> on your <code>$PATH</code>.
+See https://github.com/kubernetes/kubernetes/blob/v1.28.2/hack/install-etcd.sh for an example of how to do that.</p>
+<p>To run the test, issue a command like the following.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">CONTROLLER_TEST_NUM_OBJECTS</span><span class="o">=</span><span class="m">24</span><span class="w"> </span>go<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-v<span class="w"> </span>./test/integration/controller-manager<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/test.log
+</code></pre></div>
+<p>If <code>CONTROLLER_TEST_NUM_OBJECTS</code> is not set then the number of objects
+will be 30. This parameterization by an environment variable is only a
+point-in-time hack, it is expected to go away once we have a test that
+runs reliably on a large number of objects.</p>
 
 
   
