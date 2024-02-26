@@ -202,66 +202,33 @@ type BindingSpec struct {
 }
 
 // DownsyncObjectReferences explicitly defines the objects to be down-synced.
-// The ClusterScope list defines the cluster-scope objects, NamespaceScope list
-// defines the namespace-scope objects and WorkloadGeneration represents the
-// generation of the objects in the ClusterScope and NamespaceScope lists.
-// Upon a change in any of workload objects that should be distributed
-// (e.g., spec, annotations or labels) the workload generation field should be incremented.
+// The ClusterScope list defines the cluster-scope objects and NamespaceScope list
+// defines the namespace-scope objects.
 type DownsyncObjectReferences struct {
-	// `clusterScope` holds a list of individual cluster-scoped objects
-	// to downsync, organized by resource.
-	// Remember that a "resource" is a kind/type/sort of objects,
-	// not an individual object.
+	// `clusterScope` holds a list of individual cluster-scoped objects to downsync.
 	// +optional
-	ClusterScope []ClusterScopeDownsyncObjects `json:"clusterScope,omitempty"`
+	ClusterScope []ClusterScopeDownsyncObject `json:"clusterScope,omitempty"`
 
-	// `NamespaceScope` matches if and only if at least one member matches.
+	// `NamespaceScope` holds a list of individual namespace-scoped objects to downsync.
 	// +optional
-	NamespaceScope []NamespaceScopeDownsyncObjects `json:"namespaceScope,omitempty"`
-
-	// `WorkloadGeneration` is a sequence number representing a specific generation of
-	// the workload objects to be downsynced.
-	// For example, if ClusterScope and NamespaceScope lists haven't changed but at least
-	// one object has changed, this field should be incremented.
-	// Upon a change in any of workload objects that should be distributed
-	// (e.g., spec, annotations or labels) the workload generation field should be incremented.
-	// `WorkloadGeneration` field is monotonically increasing.
-	// +optional
-	WorkloadGeneration int64 `json:"workloadGeneration,omitempty"`
+	NamespaceScope []NamespaceScopeDownsyncObject `json:"namespaceScope,omitempty"`
 }
 
-// NamespaceScopeDownsyncObjects matches some objects of one particular namespaced object.
-type NamespaceScopeDownsyncObjects struct {
+// NamespaceScopeDownsyncObject matches one particular namespace scoped object.
+type NamespaceScopeDownsyncObject struct {
 	// GroupVersionResource holds the API group, API version and resource name.
 	metav1.GroupVersionResource `json:",inline"`
-
-	// `objectsByNamespace` matches by namespace and name.
-	// An object matches the list if and only if the object matches at least one member of the list.
-	// Thus, no object matches the empty list.
-	// +optional
-	ObjectsByNamespace []NamespaceAndNames `json:"objectsByNamespace,omitempty"`
+	Namespace                   string `json:"namespace"`
+	Name                        string `json:"name"`
+	ResourceVersion             string `json:"resourceVersion"` // the version of the resource that should be distributed
 }
 
-// NamespaceAndNames identifies some objects of an implied resource that is namespaced.
-// The objects are all in the same namespace.
-type NamespaceAndNames struct {
-	// `namespace` identifies the namespace
-	Namespace string `json:"namespace"`
-
-	// `names` holds the names of the objects that match.
-	// Empty list means none of them.
-	// +optional
-	Names []string `json:"names,omitempty"`
-}
-
-type ClusterScopeDownsyncObjects struct {
+// ClusterScopeDownsyncObject matches one particular cluster scoped object.
+type ClusterScopeDownsyncObject struct {
 	// GroupVersionResource holds the API group, API version and resource name.
 	metav1.GroupVersionResource `json:",inline"`
-
-	// `objectNames` holds the names of the objects of this kind to downsync.
-	// Empty list means none of them.
-	// +optional
-	ObjectNames []string `json:"objectNames,omitempty"`
+	Name                        string `json:"name"`
+	ResourceVersion             string `json:"resourceVersion"` // the version of the resource that should be distributed
 }
 
 // Destination wraps the identifiers required to uniquely identify a destination cluster.
