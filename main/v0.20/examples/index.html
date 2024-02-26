@@ -1940,7 +1940,7 @@ manager which connects to the <code>wds1</code> front-end and the <code>imbs1</c
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kflex<span class="w"> </span>create<span class="w"> </span>wds1<span class="w"> </span>-p<span class="w"> </span>kubestellar
 </code></pre></div>
 <ol>
-<li>Build and run the OCM based transport controller as executable process.<br />
+<li>Run the OCM based transport controller as executable process.<br />
 <strong>NOTE</strong>: This is work in progress, in the future the controller will be deployed through a Pod and optionally a Helm chart.</li>
 </ol>
 <p>OCM based transport controller is built in a different package, so we need to download the package and run the executable as background process.</p>
@@ -1949,10 +1949,9 @@ manager which connects to the <code>wds1</code> front-end and the <code>imbs1</c
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nv">OCM_TRANSPORT_PLUGIN_RELEASE</span><span class="o">=</span><span class="s2">&quot;0.1.0-rc2&quot;</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nv">OCM_TRANSPORT_PLUGIN_TAR</span><span class="o">=</span>ocm-transport-plugin_<span class="si">${</span><span class="nv">OCM_TRANSPORT_PLUGIN_RELEASE</span><span class="si">}</span>_<span class="si">${</span><span class="nv">OS</span><span class="si">}</span>_<span class="si">${</span><span class="nv">ARCH</span><span class="si">}</span>.tar.gz
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>wget<span class="w"> </span>https://github.com/kubestellar/ocm-transport-plugin/releases/download/v<span class="si">${</span><span class="nv">OCM_TRANSPORT_PLUGIN_RELEASE</span><span class="si">}</span>/<span class="si">${</span><span class="nv">OCM_TRANSPORT_PLUGIN_TAR</span><span class="si">}</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>tar<span class="w"> </span>-xvf<span class="w"> </span><span class="si">${</span><span class="nv">OCM_TRANSPORT_PLUGIN_TAR</span><span class="si">}</span><span class="w"> </span>transport-controller<span class="w"> </span><span class="c1">## this was a typo in goreleaser in ocm-plugin repo. after the next release of plugin repo, the executable name should be fixed to &#39;ocm-transport-plugin&#39;, so we won&#39;t need the below &#39;mv&#39; command (already fixed in ocm-plugin repo main branch)</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>mv<span class="w"> </span>transport-controller<span class="w"> </span>ocm-transport-plugin
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>rm<span class="w"> </span>-fr<span class="w"> </span>bin<span class="w"> </span><span class="si">${</span><span class="nv">OCM_TRANSPORT_PLUGIN_TAR</span><span class="si">}</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>./ocm-transport-plugin<span class="w"> </span>--transport-context<span class="w"> </span>imbs1<span class="w"> </span>--wds-context<span class="w"> </span>wds1<span class="w"> </span>--wds-name<span class="w"> </span>wds1<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>transport.log<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>tar<span class="w"> </span>-xvf<span class="w"> </span><span class="si">${</span><span class="nv">OCM_TRANSPORT_PLUGIN_TAR</span><span class="si">}</span><span class="w"> </span>transport-controller
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>rm<span class="w"> </span>-fr<span class="w"> </span>bin<span class="w"> </span><span class="si">${</span><span class="nv">OCM_TRANSPORT_PLUGIN_TAR</span><span class="si">}</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>./transport-controller<span class="w"> </span>--transport-context<span class="w"> </span>imbs1<span class="w"> </span>--wds-context<span class="w"> </span>wds1<span class="w"> </span>--wds-name<span class="w"> </span>wds1<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>transport.log<span class="w"> </span><span class="p">&amp;</span>
 </code></pre></div>
 <ol>
 <li>
