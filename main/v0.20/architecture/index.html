@@ -17,7 +17,7 @@
     
     
       
-        <title>Architecture - KubeStellar</title>
+        <title>KubeStellar Architecture - KubeStellar</title>
       
     
     
@@ -74,7 +74,7 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - Architecture" />
+  <meta property="og:title" content="KubeStellar - KubeStellar Architecture" />
   <meta property="og:description" content="None" />
   <meta property="og:url" content="https://docs.kubestellar.io/main/v0.20/architecture/" />
   <meta property="og:image" content="https://docs.kubestellar.io/mainassets/images/illustrations/banner.png" />
@@ -188,7 +188,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Architecture
+              KubeStellar Architecture
             
           </span>
         </div>
@@ -1800,18 +1800,12 @@
     KubeStellar Controller Manager
   </a>
   
-    <nav class="md-nav" aria-label="KubeStellar Controller Manager">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#planned-changes" class="md-nav__link">
-    Planned changes
-  </a>
-  
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#pluggable-transport-controller" class="md-nav__link">
+    Pluggable Transport Controller
+  </a>
   
 </li>
       
@@ -1857,13 +1851,6 @@
   
     <nav class="md-nav" aria-label="KubeStellar Controllers Architecture">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#planned-changes-to-the-above" class="md-nav__link">
-    Planned changes to the above:
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#binding-controller" class="md-nav__link">
@@ -1928,8 +1915,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#transport-controller-planned-to-be-added" class="md-nav__link">
-    Transport Controller - PLANNED TO BE ADDED
+  <a href="#transport-controller" class="md-nav__link">
+    Transport Controller
   </a>
   
 </li>
@@ -1970,7 +1957,6 @@
   
 
 
-<p><strong>NOTE</strong>: Current code is in a transition to a new design that decouples transport from binding (more about this below). As part of this transition, a new resource was added to KubeStellar called <code>Binding</code>. This resource matches the <code>BindingPolicy</code> object (1:1 relationship) in the WDS and contains references to the concrete workload objects and references to the concrete list of clusters that were selected by the <code>BindingPolicy</code> selectors. </p>
 <h1 id="kubestellar-architecture">KubeStellar Architecture<a class="headerlink" href="#kubestellar-architecture" title="Permanent link">#</a></h1>
 <p>KubeStellar provides multi-cluster deployment of Kubernetes objects, controlled by simple <code>BindingPolicy</code> objects, where Kubernetes objects are expressed in their native format with no wrapping or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.</p>
 <figure>
@@ -2009,9 +1995,10 @@ we will not differentiate between these roles. Instead we will use the term
 <p>The KubeStellar architecture has these main modules:</p>
 <ul>
 <li>
-<p><em>KubeStellar Controller Manager</em>: this module is responsible of delivering workload
-objects from the WDS to the ITS according to BindingPolicy, and 
-updating the status of objects in the WDS.</p>
+<p><em>KubeStellar Controller Manager</em>: this module is responsible for watching <code>BindingPolicy</code> objects and create from it a matching <code>Binding</code> object that contains list of references to the concrete objects and list of references to the concrete clusters, and for updating the status of objects in the WDS.</p>
+</li>
+<li>
+<p><em>Pluggable Transport Controller</em>: this module is responsible for delivering workload objects from the WDS to the ITS according to <code>Binding</code> objects.</p>
 </li>
 <li>
 <p><em>Space Manager</em>: This module manages the lifecycle of spaces.</p>
@@ -2041,13 +2028,27 @@ and updates <em>WorkStatus</em> objects in the ITS namespace associated with the
 </figure>
 
 <h2 id="kubestellar-controller-manager">KubeStellar Controller Manager<a class="headerlink" href="#kubestellar-controller-manager" title="Permanent link">#</a></h2>
-<p>This module manages binding controller and status controller. The binding controller watches <code>BindingPolicy</code> and workload objects on the Workload Definition Space (WDS) and and maintains in the Inventory and Transport Space (ITS) a wrapped object per workload object to be delivered. The status controller watches for <em>WorkStatus</em> objects on the ITS and updates the
-status of objects in the WDS when singleton status is requested in the <code>BindingPolicy</code> for those objects. 
-There is one instance of a KubeStellar Controller Manager for each WDS. Currently this controller-manager runs in the KubeFlex hosting cluster and is responsible of installing the required CRDs in the associated WDS.
+<p>This module manages binding controller, and status controller. 
+* The binding controller watches <code>BindingPolicy</code> and workload objects on the Workload Definition Space (WDS), and maintains
+a <code>Binding</code> object for each <code>BindingPolicy</code> in the WDS. The <code>Binding</code> object contains references to the concrete list of
+workload objects and references to the concrete list of clusters that were selected by the <code>BindingPolicy</code> selectors.</p>
+<ul>
+<li>The status controller watches for <em>WorkStatus</em> objects on the ITS and updates the
+status of objects in the WDS when singleton status is requested in the <code>BindingPolicy</code> for those objects. </li>
+</ul>
+<p>There is one instance of a KubeStellar Controller Manager for each WDS. 
+Currently this controller-manager runs in the KubeFlex hosting cluster and is responsible for installing the required 
+CRDs in the associated WDS.
 More details on the internals of this module are provided in <a href="#kubestellar-controllers-architecture">KubeStellar Controllers Architecture</a>.</p>
-<h3 id="planned-changes">Planned changes<a class="headerlink" href="#planned-changes" title="Permanent link">#</a></h3>
-<p>As a step towards a broader change we're currently working on, we plan to decouple the transport handling from the binding controller and to separate them into two different controllers (binding controller &amp; transport controller).
-As part of this change, current binding controller also creates from the <code>BindingPolicy</code> a matching <code>Binding</code> object in the WDS which contains references to the concrete workload objects and references to the concrete list of clusters that were selected by the <code>BindingPolicy</code>. The future transport controller should watch <code>Binding</code> and get from the WDS api server(s) the objects that are specified in the workload section, wrap them into a wrapped object and deliver the wrapped object from the ITS to the WECs specifid in the <code>Binding</code> destinations. </p>
+<h2 id="pluggable-transport-controller">Pluggable Transport Controller<a class="headerlink" href="#pluggable-transport-controller" title="Permanent link">#</a></h2>
+<ul>
+<li>The pluggable transport controller watches <code>Binding</code> objects on the WDS, and maintains in the Inventory and Transport Space (ITS) 
+a wrapped object per <code>Binding</code> to be delivered.</li>
+<li>This controller is pluggable and can potentially be implemented using different options. Currently the only option we support is based on the <a href="https://open-cluster-management.io">Open Cluster Management Project</a> </li>
+</ul>
+<p>There is one instance of the pluggable transport controller for each WDS. 
+Currently this controller runs in an executable process. This is a work in progress and we're working on running this controller in a dedicated pod.
+More details on the internals of this module are provided in <a href="#kubestellar-controllers-architecture">KubeStellar Controllers Architecture</a>.</p>
 <h2 id="space-manager">Space Manager<a class="headerlink" href="#space-manager" title="Permanent link">#</a></h2>
 <p>The Space Manager handles the lifecycle of spaces. 
 KubeStellar uses the <a href="https://github.com/kubestellar/kubeflex">KubeFlex project</a>
@@ -2063,8 +2064,9 @@ in the <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/architect
 <p>There are currently two roles for spaces managed by KubeFlex: Inventory and Transport Space 
 (ITS) and Workload Description Space (WDS). The former runs the <a href="#ocm-cluster-manager">OCM Cluster Manager</a> on a vcluster-type control plane, and the latter runs on a k8s-type control plane.</p>
 <p>An ITS holds the OCM inventory (<code>ManagedCluster</code>) objects and mailbox namespaces. The mailbox namespaces and their contents are implementation details that users do not deal with. Each mailbox namespace corresponds 1:1 with a WEC and holds <code>ManifestWork</code> objects managed by the central KubeStellar controllers.</p>
-<p>A WDS holds user workload objects and the user's objects that form the interface to KubeStellar control. Currently the only control objects are <code>BindingPolicy</code> objects. 
-We plan to add <code>Binding</code> soon as explain in previous section, and later add objects to specify customization and summarization.</p>
+<p>A WDS holds user workload objects and the user's objects that form the interface to KubeStellar control. 
+Currently, the user control objects are <code>BindingPolicy</code> and <code>Binding</code> objects.
+We plan to later add objects to specify customization and summarization.</p>
 <p>KubeFlex provides the ability to start controllers connected to a
 Control Plane API Server or to deploy Helm Charts into a Control Plane
 API server with <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#post-create-hooks"><u>post-create
@@ -2177,10 +2179,7 @@ pattern has been extended to provide the following features:</p>
     ManagedClusters and to copy/update/remove the wrapped objects
     into/from the OCM mailbox namespaces.</li>
 </ul>
-<p>Currently there are two controllers in the KubeStellar controller
-manager: the binding controller and the status controllor.</p>
-<h3 id="planned-changes-to-the-above">Planned changes to the above:<a class="headerlink" href="#planned-changes-to-the-above" title="Permanent link">#</a></h3>
-<p>as part of the decoupling of transport from binding as described above, the following changes are included:
+<p>There are three controllers in the KubeStellar controller manager:
 - Binding Controller - one client connected to the WDS space and one
   (or more in the future) to connect to one or more ITS shards.
   - The WDS-connected client is used to start the dynamic
@@ -2190,17 +2189,16 @@ manager: the binding controller and the status controllor.</p>
 - Transport controller - one client connected to the WDS space 
   and one client (or more in the future) to connect to one or more ITS shards.
   - The OCM-connected client is used to copy/update/remove the wrapped objects
-    into/from the OCM mailbox namespaces.</p>
-<p>so after the described change, we will have three controllers in the KubeStellar controller
-manager: the binding controller, the transport controller and the status controllor.</p>
+    into/from the OCM mailbox namespaces.
+- Status controller - TODO </p>
 <h3 id="binding-controller">Binding Controller<a class="headerlink" href="#binding-controller" title="Permanent link">#</a></h3>
 <p>The Binding controller is responsible for watching workload objects and 
-<code>BindingPolicy</code> objects, and wrapping and delivering objects to the ITS
-based on binding policies. As a step towards the planned change that is described in this document, Binding controller also creates for each <code>BindingPolicy</code> a matching <code>Binding</code> object in the WDS. A <code>Binding</code> object is mapped 1:1 to a <code>BindingPolicy</code> object and contains references to the concrete list of workload objects and references to the concrete list of destinations that were selected by the policy and should get all the workload objects.
-Until the planned change is completed, nothing besides this controller touches the <code>Binding</code> objects. </p>
-<p>The architecture and the event flow for <strong>CURRENT</strong> code for create/update object events is
+<code>BindingPolicy</code> objects, and maintains for each of the latter a matching <code>Binding</code> object in the WDS. 
+A <code>Binding</code> object is mapped 1:1 to a <code>BindingPolicy</code> object and contains references to the concrete list of workload 
+objects and references to the concrete list of destinations that were selected by the policy.</p>
+<p>The architecture and the event flow of the code for create/update object events is
 illustrated in Figure 3 (some details might be omitted to make the flow easier
-to understand). Once the planned change that is describe in this document is integrated we will update this figure accordingly.</p>
+to understand). </p>
 <figure>
   <img src="./images/binding-controller.png"  alt="Binding Controller">
   <figcaption align="center">Figure 3 - Binding Controller</figcaption>
@@ -2258,50 +2256,23 @@ follows:</p>
 <li>Iterates on all binding-policies, and for each of them:<ul>
 <li>Evaluates whether the object matches the downsync selection 
   criteria in the <code>BindingPolicy</code>.</li>
-<li>If there is a match:</li>
-<li>Notes the object as a match for the in-memory representation of the relevant <code>Binding</code>.<ul>
-<li>Enqueues the representation of the relevant <code>Binding</code> for syncing if changed. </li>
-</ul>
-</li>
-<li>Lists ManagedClusters and finds the matching clusters using the label selector expression for clusters.<ul>
-<li>If there are matching clusters, adds the names of the cluster
-  to a hashmap setting the name of the cluster as a key. Cluster
-  groups from different bindind policies are merged together.</li>
-</ul>
-</li>
-<li>If any of the matched <code>BindingPolicy</code> has <code>WantSingletonReportedState</code>
-    set to true, clusters are sorted in alphanumerical order and
-    only the first cluster is selected for delivery. Note that setting 
-    <code>WantSingletonReportedState</code> in one of the binding-policies that 
-    matches the object affects the behavior for all matching binding-policies, 
-    those with matching clusters and those w/o matching clusters.</li>
-<li>If there are no matching clusters, the worker returns without 
-   actions and is ready to process other events from the queue. </li>
-<li>If there are matching clusters:</li>
-<li>Wraps the object into a ManifestWork</li>
-</ul>
-</li>
-<li>Adds a label for each matched <code>BindingPolicy</code> to the ManifestWork that 
-     is used to track the <code>BindingPolicy</code> that caused the object to be
-     delivered to one or more clusters. The label contains both the 
-     <code>BindingPolicy</code> name (note that <code>BindingPolicy</code> is cluster-scoped) and the WDS name.
-     This way, when a binding-policy is deleted or updated it is possible to 
-     locate the associated ManifestWorks for deletion or label removal 
-     (if more than one label is present, as other binding-policies may “own” the object).</li>
-<li>For each cluster:<ul>
-<li>Sets the manifest namespace == name of the cluster</li>
-<li>Uses the client connected to the ITS to do a server-side
-    apply patch of the manifest into the namespace.</li>
-<li>At this time there is only one field manager name for the server-side
-   apply (<code>kubestellar</code>) but the name should include also the WDS
-   name to allow detecting conflicts when two different field managers
-   try to patch a manifest with the same name.   </li>
+<li>Whether the object is a match or not, the worker notes it through the in-memory representation 
+   of the relevant <code>Binding</code>. If the noting of an object results in a change in the in-memory representation of the
+ <code>Binding</code>, the worker enqueues the latter for syncing.</li>
+<li>If a matched <code>BindingPolicy</code> has <code>WantSingletonReportedState</code> set to true (**see note below), the object is 
+   labeled with a special label in order to be able to track it for status reporting.</li>
+<li>If no matching <code>BindingPolicy</code> has <code>WantSingletonReportedState</code> set to true, the worker removes the label if
+   exists.</li>
 </ul>
 </li>
 <li>Worker returns and is ready to pick other keys from the queue.</li>
 </ul>
 </li>
 </ol>
+<p><strong>WantSingletonReportedState</strong>:
+currently it is the user's responsibility to make sure that a binding-policy that sets <code>WantSingletonReportedState</code> to
+true is not in conflict with other binding-policies that do the same, and that the binding-policy selects only a single
+cluster.</p>
 <p>There are other event flows, based on the object GVK and type of event. 
 Error conditions may cause the re-enqueing of keys, resulting in retries.
 The following sections broadly describe these flows.</p>
@@ -2323,14 +2294,6 @@ before pushing it to the work queue. Then:</p>
 If any are indeed affected, they are enqueued for syncing.</p>
 </li>
 <li>
-<p>Running the selectors matching logic as in the create/delete scenario
-  once again produces a list of clusters.</p>
-</li>
-<li>
-<p>Worker iterates over the list of clusters and deletes the manifest
-  work for the object from each namespace associated with the cluster.</p>
-</li>
-<li>
 <p>Worker returns and is ready to pick other keys from the queue.</p>
 </li>
 </ul>
@@ -2345,13 +2308,6 @@ deleted (deletion timestamp not set) it follows the following flow:</p>
 <li>Lists ManagedClusters and finds the matching clusters using the label selector expression for clusters.</li>
 <li>If there are matching clusters, the in-memory <code>Binding</code> representation is updated with the list of clusters.</li>
 <li>Enqueues the representation of the relevant <code>Binding</code> for syncing.</li>
-<li>Remove ManifestWorks from ITS for objects no longer matching: generate
- the ManagedByBindingPolicyLabelKey for the current (<code>BindingPolicy</code>, WDS) and use
- that to retrieve all the manifestworks associated with the (<code>BindingPolicy</code>, WDS).
- Then, for each manifestwork, extract the wrapped object, and re-evaluate the
- object vs. the current <code>BindingPolicy</code>. If no longer a match (either for the
- "what" or the "where" part) check if each manifestwork has other (<code>BindingPolicy</code>, WDS)
- labels. If yes, remove the label, if not, delete the manifestwork.</li>
 </ul>
 <p>Re-enqueuing all object keys forces the re-evaluation of all objects vs.
 all binding-policies. This is a shortcut as it would be more efficient to
@@ -2364,10 +2320,8 @@ a <code>BindingPolicy</code> and it has been deleted (deletion timestamp is set)
 <ul>
 <li>Deletes the in-memory representation of the <code>Binding</code>. Note that the actual <code>Binding</code> object
   is garbage collected due to the deletion of the <code>BindingPolicy</code> and the latter being an owner of the former (using <code>OwnerReference</code>).</li>
-<li>Lists all ManifestWorks on all namespaces in ITS by <code>BindingPolicy</code> label.</li>
-<li>Iterates on all matching ManifestWorks, for each one:</li>
-<li>Deletes the ManifestWork (if no other <code>BindingPolicy</code> labels) or the label
-    (if other <code>BindingPolicy</code> labels are present).</li>
+<li>If the <code>BindingPolicy</code> had <code>WantSingletonReportedState</code> set to true, the worker enqueues all objects selected by the
+<code>BindingPolicy</code> for re-evaluation of the label.</li>
 <li>Deletes <code>BindingPolicy</code> finalizer.</li>
 </ul>
 <h4 id="binding-syncing">Binding Syncing<a class="headerlink" href="#binding-syncing" title="Permanent link">#</a></h4>
@@ -2433,15 +2387,15 @@ then creates/updates <em>WorkStatus</em> objects in the ITS with the status
 of tracked objects in the namespace associated with the WEC cluster.
 A <code>WorkStatus</code> object contains status for exactly one object, so that 
 status updates for one object do not require updates of a whole bundle. </p>
-<h3 id="transport-controller-planned-to-be-added">Transport Controller - PLANNED TO BE ADDED<a class="headerlink" href="#transport-controller-planned-to-be-added" title="Permanent link">#</a></h3>
+<h3 id="transport-controller">Transport Controller<a class="headerlink" href="#transport-controller" title="Permanent link">#</a></h3>
 <p>The transport controller is pluggable and allows the option to plug different
-implementations of the transport interface. The interface between the plugin and the generic code is <a href="../../pkg/transport/transport.go">a Go language interface</a> that the plugin has to implement. This interface requires the following from the plugin.
+implementations of the transport interface. The interface between the plugin and the generic code is <a href="../../../pkg/transport/transport.go">a Go language interface</a> that the plugin has to implement. This interface requires the following from the plugin.
 - Upon registration of a new WEC, plugin should create a namespace for the WEC in the ITS and delete the namespace once the WEC registration goes away (mailbox namespace per WEC);
 - Plugin must be able to wrap any number of objects into a single wrapped object;
 - Have an agent that can be used to pull the wrapped objects from the mailbox namespace and apply them to the WEC. A single example for such an agent is an agent that runs on the WEC and watches the wrapped object in the corresponding namespace in the central hub and is able to unwrap it and apply the objects to the WEC. 
 - Have inventory representation for the clusters.</p>
 <p>The above list is required in order to comply with <a href="https://multicluster.sigs.k8s.io/concepts/work-api/"><u>SIG Multi-Cluster Work API</u></a>.</p>
-<p>Each plugin has an executable with a <code>main</code> func that calls <a href="../../pkg/transport/cmd/generic-main.go">the generic code</a>, passing the plugin object that implements the plugin interface.</p>
+<p>Each plugin has an executable with a <code>main</code> func that calls <a href="../../../pkg/transport/cmd/generic-main.go">the generic code</a>, passing the plugin object that implements the plugin interface.</p>
 <p>KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project <a href="https://open-cluster-management.io">Open Cluster Management</a>. OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available <a href="https://github.com/kubestellar/ocm-transport-plugin">here</a>.<br />
 We expect to have more transport plugin options in the future.</p>
 <p>The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.</p>
