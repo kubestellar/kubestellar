@@ -140,8 +140,8 @@ func typeMeta(kind string, groupVersion k8sschema.GroupVersion) metav1.TypeMeta 
 
 type bindingCase struct {
 	Binding      *ksapi.Binding
-	expect       map[util.GVKObjRef]jsonMap
-	ExpectedKeys []any // JSON equivalent of keys of expect, for logging
+	expect       map[util.GVKObjRef]*unstructured.Unstructured // cleaned
+	ExpectedKeys []any                                         // JSON equivalent of keys of expect, for logging
 }
 
 func clusterScopeKey(elts ksapi.ClusterScopeDownsyncObjects) metav1.GroupVersionResource {
@@ -173,10 +173,6 @@ func (bc *bindingCase) Add(obj mrObjRsc) {
 	gvr := metav1.GroupVersionResource{Group: key.GK.Group, Version: obj.MRObject.GetObjectKind().GroupVersionKind().Version, Resource: obj.Resource}
 	objNS := obj.MRObject.GetNamespace()
 	objName := obj.MRObject.GetName()
-	jm, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj.MRObject)
-	if err != nil {
-		panic(err)
-	}
 	if objNS == "" {
 		objs := SliceFindOrCreate(clusterScopeKey, newClusterScope, &bc.Binding.Spec.Workload.ClusterScope, gvr)
 		objs.ObjectNames = append(objs.ObjectNames, objName)
@@ -185,7 +181,12 @@ func (bc *bindingCase) Add(obj mrObjRsc) {
 		nsObjs := SliceFindOrCreate(namespaceAndNamesKey, newNamespaceAndNames, &nses.ObjectsByNamespace, objNS)
 		nsObjs.Names = append(nsObjs.Names, objName)
 	}
-	bc.expect[key] = jm
+	jm, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj.MRObject)
+	if err != nil {
+		panic(err)
+	}
+	objU := &unstructured.Unstructured{Object: jm}
+	bc.expect[key] = cleanObject(objU)
 	bc.ExpectedKeys = append(bc.ExpectedKeys, key.String())
 }
 
@@ -207,7 +208,7 @@ func (rg *generator) generateBindingCase(name string, objs []mrObjRsc) bindingCa
 			ObjectMeta: rg.generateObjectMeta(name, nil),
 			Spec:       ksapi.BindingSpec{},
 		},
-		expect: map[util.GVKObjRef]jsonMap{},
+		expect: map[util.GVKObjRef]*unstructured.Unstructured{},
 	}
 	for _, obj := range objs {
 		if rg.Intn(10) < 7 {
@@ -217,10 +218,8 @@ func (rg *generator) generateBindingCase(name string, objs []mrObjRsc) bindingCa
 	return bc
 }
 
-type jsonMap = map[string]any
-
 type testTransport struct {
-	expect map[util.GVKObjRef]jsonMap
+	expect map[util.GVKObjRef]*unstructured.Unstructured // cleaned
 	sync.Mutex
 	wrapped bool
 	missed  map[string]any
@@ -242,8 +241,7 @@ func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.
 		key := util.RefToRuntimeObj(obj)
 		delete(tt.missed, key.String())
 		if expectedObj, found := tt.expect[key]; found {
-			objM := obj.UnstructuredContent()
-			equal := apiequality.Semantic.DeepEqual(objM, expectedObj)
+			equal := apiequality.Semantic.DeepEqual(obj, expectedObj)
 			if !equal {
 				tt.wrong[key.String()] = obj
 			}
