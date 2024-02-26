@@ -61,17 +61,19 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
    ```
 
 1. Build and run the OCM based transport controller as executable process.  
-**NOTE**: This is work in progress and we're working on running this controller in a pod.
+**NOTE**: This is work in progress, in the future the controller will be deployed through a Pod and optionally a Helm chart.
 
    OCM based transport controller is built in a different package, so we need to download the package and run the executable as background process.
 
    ```shell
+   OS=$(go env GOOS)
+   ARCH=$(go env GOARCH)
    OCM_TRANSPORT_PLUGIN_RELEASE="0.1.0-rc2"
-   wget https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz
-   tar -xf v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz
-   rm -rf v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz
-   cd ocm-transport-plugin-${OCM_TRANSPORT_PLUGIN_RELEASE}
-   make build
+   OCM_TRANSPORT_PLUGIN_TAR=ocm-transport-plugin_${OCM_TRANSPORT_PLUGIN_RELEASE}_${OS}_${ARCH}.tar.gz
+   wget https://github.com/kubestellar/ocm-transport-plugin/releases/download/v${OCM_TRANSPORT_PLUGIN_RELEASE}/${OCM_TRANSPORT_PLUGIN_TAR}
+   tar -xvf ${OCM_TRANSPORT_PLUGIN_TAR} transport-controller ## this was a typo in goreleaser in ocm-plugin repo. after the next release of plugin repo, the executable name should be fixed to 'ocm-transport-plugin', so we won't need the below 'mv' command (already fixed in ocm-plugin repo main branch)
+   mv transport-controller ocm-transport-plugin
+   rm -fr bin ${OCM_TRANSPORT_PLUGIN_TAR}
    ./ocm-transport-plugin --transport-context imbs1 --wds-context wds1 --wds-name wds1 &> transport.log &
    ```
 
