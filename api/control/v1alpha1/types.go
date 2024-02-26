@@ -49,8 +49,10 @@ type BindingPolicySpec struct {
 	// WantSingletonReportedState indicates that (a) the number of selected locations is intended
 	// to be 1 and (b) the reported state of each downsynced object should be returned back to
 	// the object in this space.
-	// When multiple BindingPolicy objects match the same workload object,
-	// the OR of these booleans rules.
+	// When this field is true, there should be no other BindingPolicy that matches any of the
+	// same workload objects.
+	//
+	// At the moment, it is the user's responsibility to comply to the above.
 	// +optional
 	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }

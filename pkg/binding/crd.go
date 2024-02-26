@@ -153,9 +153,6 @@ func (c *Controller) startInformersForNewAPIResources(toStartList []APIResource)
 				c.handleObject(new)
 			},
 			DeleteFunc: func(obj interface{}) {
-				if shouldSkipDelete(obj) {
-					return
-				}
 				c.handleObject(obj)
 			},
 		})

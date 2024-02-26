@@ -48,6 +48,10 @@ type bindingPolicyResolution struct {
 	// ownerReference identifies the bindingpolicy that this resolution is
 	// associated with as an owning object.
 	ownerReference *metav1.OwnerReference
+
+	// requiresSingletonReportedState indicates whether the bindingpolicy
+	// that this resolution is associated with requires singleton status.
+	requiresSingletonReportedState bool
 }
 
 // noteObject adds/deletes an object to/from the resolution.
@@ -111,6 +115,19 @@ func (resolution *bindingPolicyResolution) setDestinations(destinations sets.Set
 	defer resolution.Unlock()
 
 	resolution.destinations = destinations
+}
+
+// getObjectKeys returns the Keys of the objects in the resolution.
+func (resolution *bindingPolicyResolution) getObjectKeys() []*util.Key {
+	resolution.RLock()
+	defer resolution.RUnlock()
+
+	keys := make([]*util.Key, 0, len(resolution.objectIdentifierToKey))
+	for _, key := range resolution.objectIdentifierToKey {
+		keys = append(keys, key)
+	}
+
+	return keys
 }
 
 // toBindingSpec converts the resolution to a binding

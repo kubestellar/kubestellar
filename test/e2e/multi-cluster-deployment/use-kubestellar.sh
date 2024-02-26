@@ -69,7 +69,7 @@ spec:
         ports:
         - containerPort: 80
 EOF
- 
+
 :
 : -------------------------------------------------------------------------
 : "Verify that the deployment has been created in both clusters"

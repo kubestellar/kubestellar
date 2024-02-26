@@ -31,7 +31,6 @@ import (
 
 const (
 	CRDKind                              = "CustomResourceDefinition"
-	CRDResource                          = "customresourcedefinitions"
 	AnyVersion                           = "*"
 	ServiceVersion                       = "v1"
 	ServiceKind                          = "Service"

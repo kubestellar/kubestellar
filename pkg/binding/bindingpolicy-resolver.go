@@ -81,10 +81,21 @@ type BindingPolicyResolver interface {
 	// destinations resolution for the given bindingpolicy key.
 	// The given destinations set is expected not to be mutated after this call.
 	SetDestinations(bindingPolicyKey string, destinations sets.Set[string])
+	// GetObjectKeys returns the objects associated with the given
+	// bindingpolicy key.
+	// If no resolution is associated with the given key, an error is returned.
+	GetObjectKeys(bindingPolicyKey string) ([]*util.Key, error)
 
 	// ResolutionExists returns true if a resolution is associated with the
 	// given bindingpolicy key.
 	ResolutionExists(bindingPolicyKey string) bool
+	// ResolutionRequiresSingletonReportedState returns true if the
+	// bindingpolicy associated with the given key requires a singleton
+	// reported state, and it satisfies the conditions on this requirement.
+	//
+	// This means that if true is returned, then the singleton status reporting
+	// requirement is effective.
+	ResolutionRequiresSingletonReportedState(bindingPolicyKey string) bool
 	// DeleteResolution deletes the resolution associated with the given key,
 	// if it exists.
 	DeleteResolution(bindingPolicyKey string)
@@ -112,7 +123,8 @@ func (resolver *bindingPolicyResolver) GenerateBinding(bindingPolicyKey string) 
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
-		return nil, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix, bindingPolicyKey)
+		return nil, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix,
+			bindingPolicyKey)
 	}
 
 	bindingSpec, err := bindingPolicyResolution.toBindingSpec(resolver.gvkGvrMapper)
@@ -131,7 +143,8 @@ func (resolver *bindingPolicyResolver) GetOwnerReference(bindingPolicyKey string
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
-		return metav1.OwnerReference{}, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix, bindingPolicyKey)
+		return metav1.OwnerReference{}, fmt.Errorf("%s - bindingpolicy-key: %s",
+			bindingPolicyResolutionNotFoundErrorPrefix, bindingPolicyKey)
 	}
 
 	return *bindingPolicyResolution.ownerReference, nil
@@ -180,7 +193,8 @@ func (resolver *bindingPolicyResolver) NoteObject(bindingPolicyKey string,
 
 	if bindingPolicyResolution == nil {
 		// bindingPolicyKey is not associated with any resolution
-		return false, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix, bindingPolicyKey)
+		return false, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix,
+			bindingPolicyKey)
 	}
 
 	// noteObject is thread-safe
@@ -222,6 +236,21 @@ func (resolver *bindingPolicyResolver) SetDestinations(bindingPolicyKey string,
 	bindingPolicyResolution.setDestinations(destinations)
 }
 
+// GetObjectKeys returns the objects associated with the given
+// bindingpolicy key.
+// If no resolution is associated with the given key, an error is returned.
+func (resolver *bindingPolicyResolver) GetObjectKeys(bindingPolicyKey string) ([]*util.Key, error) {
+	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
+
+	if bindingPolicyResolution == nil {
+		return nil, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix,
+			bindingPolicyKey)
+	}
+
+	// getObjectKeys is thread-safe
+	return bindingPolicyResolution.getObjectKeys(), nil
+}
+
 // ResolutionExists returns true if a resolution is associated with the
 // given bindingpolicy key.
 func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string) bool {
@@ -230,6 +259,22 @@ func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string)
 	}
 
 	return true
+}
+
+// ResolutionRequiresSingletonReportedState returns true if the
+// bindingpolicy associated with the given key requires a singleton
+// reported state, and it satisfies the conditions on this requirement.
+//
+// This means that if true is returned, then the singleton status reporting
+// requirement is effective.
+func (resolver *bindingPolicyResolver) ResolutionRequiresSingletonReportedState(bindingPolicyKey string) bool {
+	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
+
+	if bindingPolicyResolution == nil {
+		return false
+	}
+
+	return bindingPolicyResolution.requiresSingletonReportedState
 }
 
 // DeleteResolution deletes the resolution associated with the given key,
@@ -263,10 +308,11 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 	ownerReference.BlockOwnerDeletion = &[]bool{false}[0]
 
 	bindingPolicyResolution := &bindingPolicyResolution{
-		objectIdentifierToKey: make(map[string]*util.Key),
-		destinations:          sets.New[string](),
-		workloadGeneration:    1,
-		ownerReference:        ownerReference,
+		objectIdentifierToKey:          make(map[string]*util.Key),
+		destinations:                   sets.New[string](),
+		workloadGeneration:             1,
+		ownerReference:                 ownerReference,
+		requiresSingletonReportedState: bindingpolicy.Spec.WantSingletonReportedState,
 	}
 	resolver.bindingPolicyToResolution[bindingpolicy.GetName()] = bindingPolicyResolution
 
