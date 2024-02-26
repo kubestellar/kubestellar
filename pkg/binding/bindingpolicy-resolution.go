@@ -36,14 +36,11 @@ type bindingPolicyResolution struct {
 	sync.RWMutex
 
 	// map key is GVK/namespace/name as outputted by util.key.GvkNamespacedNameKey()
-	objectIdentifierToKey map[string]*util.Key
-	destinations          sets.Set[string]
+	objectIdentifierToKey     map[string]*util.Key
+	objectIdentifierToVersion map[string]string // hold resource version for each entry in the above map
+	// TODO: unify maps through reworking the key
 
-	// workloadGeneration is a local counter that reflects that internal
-	// changes occurred to the objects referenced in the objectIdentifierToKey
-	// map. That means, this field is incremented whenever an already noted
-	// object is called for noting again.
-	workloadGeneration int64
+	destinations sets.Set[string]
 
 	// ownerReference identifies the bindingpolicy that this resolution is
 	// associated with as an owning object.
@@ -73,17 +70,15 @@ func (resolution *bindingPolicyResolution) noteObject(obj runtime.Object) (bool,
 	// avoid further processing for keys of objects being deleted that do not have a deleted object
 	if isBeingDeleted(obj) {
 		delete(resolution.objectIdentifierToKey, formattedKey)
+		delete(resolution.objectIdentifierToVersion, formattedKey)
 
 		return exists, nil
 	}
 
-	if exists {
-		// the object is already in the resolution but the object content changed
-		resolution.workloadGeneration++
-	}
-
 	// add object to map
 	resolution.objectIdentifierToKey[formattedKey] = &key
+	resolution.objectIdentifierToVersion[formattedKey] = obj.(metav1.Object).GetResourceVersion()
+
 	// Internal changes to noted objects are also changes to the resolution.
 	return true, nil
 }
@@ -105,6 +100,8 @@ func (resolution *bindingPolicyResolution) removeObject(obj runtime.Object) bool
 	_, exists := resolution.objectIdentifierToKey[formattedKey]
 
 	delete(resolution.objectIdentifierToKey, formattedKey)
+	delete(resolution.objectIdentifierToVersion, formattedKey)
+
 	return exists
 }
 
@@ -136,20 +133,12 @@ func (resolution *bindingPolicyResolution) toBindingSpec(gvkGvrMapper util.GvkGv
 	resolution.RLock()
 	defer resolution.RUnlock()
 
-	workload := v1alpha1.DownsyncObjectReferences{
-		WorkloadGeneration: resolution.workloadGeneration,
-		// rest of fields calculated below
-	}
-
-	// The following optimize the building of the workload by indexing the slices.
-	clusterScopeGVRToPosition := map[schema.GroupVersionResource]int{}
-	namespaceScopeGVRToPosition := map[schema.GroupVersionResource]int{}
-	nsObjectsLocationInSlice := map[string]int{} // key is GVR/ns to avoid 2D maps
+	workload := v1alpha1.DownsyncObjectReferences{}
 
 	// iterate over all objects and build workload efficiently. No (GVR, namespace, name) tuple is
 	// duplicated in the objectIdentifierToKey map, due to the uniqueness of the Key. Therefore, whenever an object is about to
 	// be appended to an objects slice, we simply append.
-	for _, key := range resolution.objectIdentifierToKey {
+	for identifier, key := range resolution.objectIdentifierToKey {
 		gvr, found := gvkGvrMapper.GetGvr(key.GVK)
 		if !found {
 			return nil, fmt.Errorf("failed to get GVR for GVK %s", key.GvkKey())
@@ -157,11 +146,28 @@ func (resolution *bindingPolicyResolution) toBindingSpec(gvkGvrMapper util.GvkGv
 
 		// check if object is cluster-scoped or namespaced by checking namespace
 		if key.NamespacedName.Namespace == metav1.NamespaceNone {
-			handleClusterScopedObject(gvr, key, &workload, clusterScopeGVRToPosition)
+			workload.ClusterScope = append(workload.ClusterScope, v1alpha1.ClusterScopeDownsyncObject{
+				GroupVersionResource: metav1.GroupVersionResource{
+					Group:    gvr.Group,
+					Version:  gvr.Version,
+					Resource: gvr.Resource,
+				},
+				Name:            key.NamespacedName.Name,
+				ResourceVersion: resolution.objectIdentifierToVersion[identifier], // necessarily exists
+			})
 			continue
 		}
 
-		handleNamespacedObject(gvr, key, &workload, namespaceScopeGVRToPosition, nsObjectsLocationInSlice)
+		workload.NamespaceScope = append(workload.NamespaceScope, v1alpha1.NamespaceScopeDownsyncObject{
+			GroupVersionResource: metav1.GroupVersionResource{
+				Group:    gvr.Group,
+				Version:  gvr.Version,
+				Resource: gvr.Resource,
+			},
+			Namespace:       key.NamespacedName.Namespace,
+			Name:            key.NamespacedName.Name,
+			ResourceVersion: resolution.objectIdentifierToVersion[identifier], // necessarily exists
+		})
 	}
 
 	return &v1alpha1.BindingSpec{
@@ -170,90 +176,10 @@ func (resolution *bindingPolicyResolution) toBindingSpec(gvkGvrMapper util.GvkGv
 	}, nil
 }
 
-// handleClusterScopedObject handles a cluster-scoped object by adding it to the workload.
-// clusterScopeGVRToPosition is used to efficiently locate the object in the workload.
-func handleClusterScopedObject(gvr schema.GroupVersionResource,
-	key *util.Key,
-	workload *v1alpha1.DownsyncObjectReferences,
-	clusterScopeGVRToPosition map[schema.GroupVersionResource]int) {
-	// check if obj GVR already exists in map
-	if gvrIndex, found := clusterScopeGVRToPosition[gvr]; found {
-		// GVR exists, append cluster-scope object
-		workload.ClusterScope[gvrIndex].ObjectNames = append(workload.ClusterScope[gvrIndex].ObjectNames, key.NamespacedName.Name)
-		return
-	}
-	// GVR doesn't exist, this is the first time
-	// add ClusterScopeDownsyncResource to the workload
-	clusterScopeGVRToPosition[gvr] = len(workload.ClusterScope)
-	workload.ClusterScope = append(workload.ClusterScope, v1alpha1.ClusterScopeDownsyncObjects{
-		GroupVersionResource: metav1.GroupVersionResource{
-			Group:    gvr.Group,
-			Version:  gvr.Version,
-			Resource: gvr.Resource,
-		},
-		ObjectNames: []string{key.NamespacedName.Name},
-	})
-}
-
-// handleNamespacedObject handles a namespaced object by adding it to the workload.
-// namespaceScopeGVRToPosition and nsObjectsLocationInSlice are used to efficiently locate the object in the workload.
-func handleNamespacedObject(gvr schema.GroupVersionResource,
-	key *util.Key,
-	workload *v1alpha1.DownsyncObjectReferences,
-	namespaceScopeGVRToPosition map[schema.GroupVersionResource]int,
-	nsObjectsLocationInSlice map[string]int) {
-	gvrAndNSKey := util.KeyFromGVRandNS(gvr, key.NamespacedName.Namespace)
-	if gvrIndex, found := namespaceScopeGVRToPosition[gvr]; found {
-		// GVR mapping is found, check NS mapping
-		if nsIdx, found := nsObjectsLocationInSlice[gvrAndNSKey]; found {
-			// NS mapping is found, append name
-			workload.NamespaceScope[gvrIndex].ObjectsByNamespace[nsIdx].Names = append(workload.NamespaceScope[gvrIndex].ObjectsByNamespace[nsIdx].Names,
-				key.NamespacedName.Name)
-			return
-		}
-
-		// namespace mapping is not found, create new (ns, names) entry for object
-		workload.NamespaceScope[gvrIndex].ObjectsByNamespace = append(workload.NamespaceScope[gvrIndex].ObjectsByNamespace, v1alpha1.NamespaceAndNames{
-			Namespace: key.NamespacedName.Namespace,
-			Names:     []string{key.NamespacedName.Name},
-		})
-
-		// update index mapping
-		nsObjectsLocationInSlice[gvrAndNSKey] = len(workload.NamespaceScope[gvrIndex].ObjectsByNamespace) - 1
-		return
-	}
-
-	// GVR mapping isn't found, create new entry for this obj (and NS map)
-	// add namespaceScopeDownsyncObjectsMap to the workload
-	workload.NamespaceScope = append(workload.NamespaceScope, v1alpha1.NamespaceScopeDownsyncObjects{
-		GroupVersionResource: metav1.GroupVersionResource{
-			Group:    gvr.Group,
-			Version:  gvr.Version,
-			Resource: gvr.Resource,
-		},
-		ObjectsByNamespace: []v1alpha1.NamespaceAndNames{
-			{
-				Namespace: key.NamespacedName.Namespace,
-				Names:     []string{key.NamespacedName.Name},
-			},
-		},
-	})
-
-	// retain a pointer to the added namespaceScopeDownsyncObjectsMap for efficiency
-	namespaceScopeGVRToPosition[gvr] = len(workload.NamespaceScope) - 1
-	// update ns mapping
-	nsObjectsLocationInSlice[gvrAndNSKey] = 0 // first entry
-}
-
 func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alpha1.BindingSpec,
 	gvkGvrMapper util.GvkGvrMapper) bool {
 	resolution.RLock()
 	defer resolution.RUnlock()
-
-	// check workloadGeneration
-	if resolution.workloadGeneration != bindingSpec.Workload.WorkloadGeneration {
-		return false
-	}
 
 	// check destinations
 	if !destinationsMatch(resolution.destinations, bindingSpec.Destinations) {
@@ -261,7 +187,8 @@ func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alp
 	}
 
 	// check workload
-	return workloadMatchesBindingSpec(&bindingSpec.Workload, resolution.objectIdentifierToKey, gvkGvrMapper)
+	return workloadMatchesBindingSpec(&bindingSpec.Workload, resolution.objectIdentifierToKey,
+		resolution.objectIdentifierToVersion, gvkGvrMapper)
 }
 
 // destinationsMatch returns true if the destinations in the resolution
@@ -283,57 +210,50 @@ func destinationsMatch(resolvedDestinations sets.Set[string], bindingDestination
 // workloadMatchesBindingSpec returns true if the workload in the
 // resolution matches the workload in the binding spec.
 func workloadMatchesBindingSpec(bindingSpecWorkload *v1alpha1.DownsyncObjectReferences,
-	objectIdentifierToKeyMap map[string]*util.Key, gvkGvrMapper util.GvkGvrMapper) bool {
+	objectIdentifierToKeyMap map[string]*util.Key, objectIdentifierToVersionMap map[string]string,
+	gvkGvrMapper util.GvkGvrMapper) bool {
 	// check lengths
-	clusterScopedObjectsCount := 0
-	for _, clusterScopeDownsyncObjects := range bindingSpecWorkload.ClusterScope {
-		clusterScopedObjectsCount += len(clusterScopeDownsyncObjects.ObjectNames)
-	}
-
-	namespacedObjectsCount := 0
-	for _, namespaceScopeDownsyncObjects := range bindingSpecWorkload.NamespaceScope {
-		for _, objectsByNamespace := range namespaceScopeDownsyncObjects.ObjectsByNamespace {
-			namespacedObjectsCount += len(objectsByNamespace.Names)
-		}
-	}
-
-	if len(objectIdentifierToKeyMap) != clusterScopedObjectsCount+namespacedObjectsCount {
+	if len(objectIdentifierToKeyMap) != len(bindingSpecWorkload.ClusterScope)+len(bindingSpecWorkload.NamespaceScope) {
 		return false
 	}
 
 	// again we can check match by making sure all objects are mapped, since entries are unique and the length is equal.
 	// check cluster-scoped all exist
 	if !bindingClusterScopeIsMapped(bindingSpecWorkload.ClusterScope, objectIdentifierToKeyMap,
-		gvkGvrMapper) {
+		objectIdentifierToVersionMap, gvkGvrMapper) {
 		return false
 	}
 
 	// check namespace-scoped all exist
 	return namespaceScopeMatchesBindingSpec(bindingSpecWorkload.NamespaceScope, objectIdentifierToKeyMap,
-		gvkGvrMapper)
+		objectIdentifierToVersionMap, gvkGvrMapper)
 }
 
 // bindingClusterScopeIsMapped returns true if the cluster-scope
 // section in the binding spec all exist in the resolution.
-func bindingClusterScopeIsMapped(bindingSpecClusterScope []v1alpha1.ClusterScopeDownsyncObjects,
-	objectIdentifierToKeyMap map[string]*util.Key, gvkGvrMapper util.GvkGvrMapper) bool {
-	for _, clusterScopeDownsyncObjects := range bindingSpecClusterScope {
-		gvr := schema.GroupVersionResource(clusterScopeDownsyncObjects.GroupVersionResource)
+func bindingClusterScopeIsMapped(bindingSpecClusterScope []v1alpha1.ClusterScopeDownsyncObject,
+	objectIdentifierToKeyMap map[string]*util.Key, objectIdentifierToVersionMap map[string]string,
+	gvkGvrMapper util.GvkGvrMapper) bool {
+	for _, clusterScopeDownsyncObject := range bindingSpecClusterScope {
+		gvr := schema.GroupVersionResource(clusterScopeDownsyncObject.GroupVersionResource)
 		gvk, found := gvkGvrMapper.GetGvk(gvr)
 
 		if !found {
 			return false // if not found then not mapped and not in resolution
 		}
 
-		for _, objName := range clusterScopeDownsyncObjects.ObjectNames {
-			formattedKey := util.KeyFromGVKandNamespacedName(gvk, types.NamespacedName{
-				Namespace: metav1.NamespaceNone,
-				Name:      objName,
-			})
+		formattedKey := util.KeyFromGVKandNamespacedName(gvk, types.NamespacedName{
+			Namespace: metav1.NamespaceNone,
+			Name:      clusterScopeDownsyncObject.Name,
+		})
 
-			if _, found := objectIdentifierToKeyMap[formattedKey]; !found {
-				return false
-			}
+		if _, found := objectIdentifierToKeyMap[formattedKey]; !found {
+			return false
+		}
+
+		// check if version matches (if the key is mapped above, then the version should also be mapped)
+		if objectIdentifierToVersionMap[formattedKey] != clusterScopeDownsyncObject.ResourceVersion {
+			return false
 		}
 	}
 
@@ -342,10 +262,11 @@ func bindingClusterScopeIsMapped(bindingSpecClusterScope []v1alpha1.ClusterScope
 
 // namespaceScopeMatchesBindingSpec returns true if the namespace-scope
 // section in the binding spec all exist in the resolution.
-func namespaceScopeMatchesBindingSpec(bindingSpecNamespaceScope []v1alpha1.NamespaceScopeDownsyncObjects,
-	objectIdentifierToKeyMap map[string]*util.Key, gvkGvrMapper util.GvkGvrMapper) bool {
-	for _, namespaceScopeDownsyncObjects := range bindingSpecNamespaceScope {
-		gvr := schema.GroupVersionResource(namespaceScopeDownsyncObjects.GroupVersionResource)
+func namespaceScopeMatchesBindingSpec(bindingSpecNamespaceScope []v1alpha1.NamespaceScopeDownsyncObject,
+	objectIdentifierToKeyMap map[string]*util.Key, objectIdentifierToVersionMap map[string]string,
+	gvkGvrMapper util.GvkGvrMapper) bool {
+	for _, namespaceScopeDownsyncObject := range bindingSpecNamespaceScope {
+		gvr := schema.GroupVersionResource(namespaceScopeDownsyncObject.GroupVersionResource)
 		gvk, found := gvkGvrMapper.GetGvk(gvr)
 
 		if !found {
@@ -353,18 +274,18 @@ func namespaceScopeMatchesBindingSpec(bindingSpecNamespaceScope []v1alpha1.Names
 			// mapped or not, therefore returning false is the safe (and correct) option
 		}
 
-		// iterate over namespaced objects and check if they are mapped
-		for _, nsAndNames := range namespaceScopeDownsyncObjects.ObjectsByNamespace {
-			for _, objName := range nsAndNames.Names {
-				formattedKey := util.KeyFromGVKandNamespacedName(gvk, types.NamespacedName{
-					Namespace: nsAndNames.Namespace,
-					Name:      objName,
-				})
+		formattedKey := util.KeyFromGVKandNamespacedName(gvk, types.NamespacedName{
+			Namespace: namespaceScopeDownsyncObject.Namespace,
+			Name:      namespaceScopeDownsyncObject.Name,
+		})
 
-				if _, found := objectIdentifierToKeyMap[formattedKey]; !found {
-					return false
-				}
-			}
+		if _, found := objectIdentifierToKeyMap[formattedKey]; !found {
+			return false
+		}
+
+		// check if version matches (if the key is mapped above, then the version should also be mapped)
+		if objectIdentifierToVersionMap[formattedKey] != namespaceScopeDownsyncObject.ResourceVersion {
+			return false
 		}
 	}
 
