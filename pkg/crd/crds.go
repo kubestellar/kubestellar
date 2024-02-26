@@ -84,7 +84,7 @@ func ApplyCRDs(ctx context.Context, dynamicClient dynamic.Interface, clientset k
 		if err != nil {
 			return err
 		}
-		logger.Info("crd name accepted", "name", crd.GetName())
+		logger.Info("crd established", "name", crd.GetName())
 	}
 	return nil
 }

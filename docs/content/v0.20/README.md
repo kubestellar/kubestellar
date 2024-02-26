@@ -48,7 +48,7 @@ See [Packaging and Delivery](packaging.md)
 
 ## Usage examples, and testing
 
-See [Examples](examples.md) for _this_ release, after reviewing [above](#latest-stable-release).
+See [Examples](examples.md) and [integration testing](contributor.md#integration-testing) for _this_ release, after reviewing [above](#latest-stable-release).
 
 ## User Guide
 
