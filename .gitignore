@@ -7,6 +7,9 @@ build
 .vscode
 docs/scripts/generated_script.sh
 
+# etc distributions
+/etcd-v*
+
 # Draw.io backup files
 .*.png.bkp
 

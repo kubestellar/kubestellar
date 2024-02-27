@@ -41,6 +41,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	k8sclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
 	kastesting "k8s.io/kubernetes/cmd/kube-apiserver/app/testing"
 	"k8s.io/kubernetes/test/integration/framework"
@@ -136,7 +137,6 @@ func TestMatching(t *testing.T) {
 		generateNamespace(t, ctx, rg, "ns2", k8sClient),
 		generateNamespace(t, ctx, rg, "ns3", k8sClient),
 	}
-	logger.V(1).Info("Generated Namespaces", "namespaces", namespaces)
 	nObjStr := os.Getenv(NumObjEnvar)
 	nObj := 18
 	if len(nObjStr) > 0 {
@@ -160,7 +160,6 @@ func TestMatching(t *testing.T) {
 			objsCreated = append(objsCreated, objs[i])
 		}
 	}
-	logger.Info("Generated mrObjRscs", "objs", objs)
 	objsToTests := objs[nObj/3:] // extract tests from the last 2/3
 	tests := []ksapi.DownsyncObjectTest{}
 	for _, obj := range objsToTests {
@@ -412,6 +411,7 @@ func generateNamespace(t *testing.T, ctx context.Context, rg *rand.Rand, name st
 	if err != nil {
 		t.Fatalf("Failed to create Namespace %#v: %s", ans, err)
 	}
+	klog.FromContext(ctx).V(1).Info("Generated", "namespace", ans)
 	return ans
 }
 
@@ -482,6 +482,7 @@ func generateObject(t *testing.T, ctx context.Context, rg *rand.Rand, counts *co
 	if err != nil {
 		t.Fatalf("Failed to create object %#v: %s", ans.MRObject, err)
 	}
+	klog.FromContext(ctx).V(1).Info("Generated", "obj", ans)
 	return ans
 }
 
