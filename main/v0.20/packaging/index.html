@@ -2006,16 +2006,12 @@
 <h1 id="packaging-and-delivery">Packaging and Delivery<a class="headerlink" href="#packaging-and-delivery" title="Permanent link">#</a></h1>
 <h2 id="outline-of-github-repositories">Outline of GitHub repositories<a class="headerlink" href="#outline-of-github-repositories" title="Permanent link">#</a></h2>
 <p>The following is a graph of the GitHub repositories in the <code>kubestellar</code> GitHub organization and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow. These are not just build-time dependencies but any reference from one repo to another.</p>
-<p>Note that the ocm-transport-plugin is under development and not involved yet in using KubeStellar.</p>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>flowchart LR
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    kubestellar --&gt; kubeflex
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    kubestellar --&gt; ocm-status-addon
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ocm-status-addon --&gt; kubestellar
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    ocm-transport-plugin --&gt; kubestellar
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    style ocm-transport-plugin stroke-dasharray: 5 5
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    kubestellar --&gt; ocm-transport-plugin
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    linkStyle 3 stroke-dasharray: 5 5
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    linkStyle 4 stroke-dasharray: 5 5
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    kubestellar --&gt; ocm-transport-plugin
 </code></pre></div>
 <p>The references from ocm-status-addon to kubestellar are only in documentation and are in the process of being removed (no big difficulty is anticipated).</p>
 <h2 id="kubeflex">KubeFlex<a class="headerlink" href="#kubeflex" title="Permanent link">#</a></h2>
@@ -2089,8 +2085,6 @@ local copy of the chart to the OCI repository and tag specified in
 </table>
 <p>Note: the Chart.yaml in github uses just "0.2.0" for the version and appVersion in the chart. TODO: bug?</p>
 <h2 id="ocm-transport-plugin">OCM Transport Plugin<a class="headerlink" href="#ocm-transport-plugin" title="Permanent link">#</a></h2>
-<p><strong>NOTE</strong>: This is under development, not a part of the functioning
-  system yet.</p>
 <p>The source is the GitHub repo <a href="https://github.com/kubestellar/ocm-transport-plugin">github.com/kubestellar/ocm-transport-plugin</a></p>
 <h3 id="ocm-transport-container-image">OCM Transport container image<a class="headerlink" href="#ocm-transport-container-image" title="Permanent link">#</a></h3>
 <p>This appears at <a href="https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller">ghcr.io/kubestellar/ocm-transport-plugin/transport-controller</a>.</p>
@@ -2122,11 +2116,16 @@ local copy of the chart to the OCI repository and tag specified in
 </code></pre></div>
 <p>The dashed dependencies are at run time, not build time.</p>
 <p>"KCM" is the KubeStellar controller-manager.</p>
-<p>"ks_scripts" are the user-facing instructions that use published
-images and so on. There are also e2e tests, but they test the copy of
-the repo that they are embedded in, not anything built and published
-earlier.</p>
-<p><strong>NOTE</strong>: at the present level of development, all versions are hand coded and there is only one public version. This will obviously have to change.</p>
+<p>"ks_scripts" are the user-facing instructions and the end-to-end tests
+that use published artifacts (container images, Helm charts). (There
+are also e2e tests that do not use previously published artifacts,
+their temporary local artifacts are beyond the scope of this
+document.)</p>
+<p><strong>NOTE</strong>: among the references to published artifacts, some have a
+  version that is maintained in Git while others have a placeholder in
+  Git that is replaced in the publishing process. See <a href="../release/">the release
+  document</a> for more details. This is an on-going matter
+  of development.</p>
 <h3 id="local-copy-of-kubestellar-git-repo">Local copy of KubeStellar git repo<a class="headerlink" href="#local-copy-of-kubestellar-git-repo" title="Permanent link">#</a></h3>
 <p><strong>NOTE</strong>: Because of <a href="https://github.com/kubernetes/code-generator/blob/v0.28.2/kube_codegen.sh#L394-L395">a restriction in one of the code generators that
 we
@@ -2162,7 +2161,7 @@ ends with <code>/github.com/kubestellar/kubestellar</code>.</p>
 KubeStellar controller-manager. For each WDS, KubeStellar has a pod
 running that image. It installs the needed custom resource
 <em>definition</em> objects if they are not already present, and is a
-controller-manager hosting the per-WDS controllers (<a href="../architecture/#binding-controller">binding controller</a>, <a href="../architecture/#status-controller">status controller</a>, and transport controller(TODO: link to doc)).</p>
+controller-manager hosting the per-WDS controllers (<a href="../architecture/#binding-controller">binding controller</a> and <a href="../architecture/#status-controller">status controller</a>) from the kubestellar repo.</p>
 <p>The image repository is
 <code>ghcr.io/kubestellar/kubestellar/controller-manager</code>. There is
 currently just one supported tag there, <code>0.20.0-alpha.1</code>. That was
@@ -2232,28 +2231,27 @@ built from.</p>
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    osa_hc_repo[published OSA Helm Chart] --&gt; osa_hc_src
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    osa_hc_src -.-&gt; osa_ctr_image
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    osa_hc_repo -.-&gt; osa_ctr_image
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    subgraph cladm_repo[&quot;ocm/clusteradm@GitHub&quot;]
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    cladm_src[&quot;clusteradm source&quot;]
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    end
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    subgraph ks_repo[&quot;kubestellar@GitHub&quot;]
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    kcm_code[KCM source code]
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    kcm_hc_src[KCM Helm chart source]
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    ks_pch[kubestellar PostCreateHook]
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    ocm_pch[&quot;ocm PostCreateHook&quot;]
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    ks_scripts -.-&gt; ocm_pch
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    ks_scripts -.-&gt; ks_pch
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>    end
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>    cladm_image[&quot;ks/clusteradm image&quot;] --&gt; cladm_src
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    ocm_pch -.-&gt; cladm_image
-<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>    kcm_ctr_image[KCM container image] --&gt; kcm_code
-<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>    kcm_hc_repo[published KCM Helm Chart] --&gt; kcm_hc_src
-<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>    kcm_hc_src -.-&gt; kcm_ctr_image
-<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>    kcm_hc_repo -.-&gt; kcm_ctr_image
-<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>    ks_pch  -.-&gt; kcm_hc_repo
-<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>    ks_scripts -.-&gt; osa_hc_repo[published OSA Helm Chart]
-<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>    ks_scripts -.-&gt; otp_something[&quot;published OTP ??&quot;]
-<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>    ks_scripts -.-&gt; KubeFlex
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    subgraph cladm_repo[&quot;ocm/clusteradm@GitHub&quot;]
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    cladm_src[&quot;clusteradm source&quot;]
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    end
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    subgraph ks_repo[&quot;kubestellar@GitHub&quot;]
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    kcm_code[KCM source code]
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    kcm_hc_src[KCM Helm chart source]
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    ks_pch[kubestellar PostCreateHook]
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    ocm_pch[&quot;ocm PostCreateHook&quot;]
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    ks_scripts -.-&gt; ocm_pch
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    ks_scripts -.-&gt; ks_pch
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    end
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>    cladm_image[&quot;ks/clusteradm image&quot;] --&gt; cladm_src
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>    ocm_pch -.-&gt; cladm_image
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    kcm_ctr_image[KCM container image] --&gt; kcm_code
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>    kcm_hc_repo[published KCM Helm Chart] --&gt; kcm_hc_src
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>    kcm_hc_src -.-&gt; kcm_ctr_image
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>    kcm_hc_repo -.-&gt; kcm_ctr_image
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>    ks_pch  -.-&gt; kcm_hc_repo
+<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>    ks_scripts -.-&gt; osa_hc_repo[published OSA Helm Chart]
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>    ks_scripts -.-&gt; otp_something[&quot;published OTP ??&quot;]
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>    ks_scripts -.-&gt; KubeFlex
 </code></pre></div>
 <p>Every dotted line is a reference that must be versioned. How do we
 keep all those versions right?</p>
