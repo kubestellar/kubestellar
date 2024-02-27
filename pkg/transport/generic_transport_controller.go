@@ -43,7 +43,7 @@ import (
 	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	controlv1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
 	controlv1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
-	filtering "github.com/kubestellar/kubestellar/pkg/transport/object-filtering"
+	"github.com/kubestellar/kubestellar/pkg/transport/filtering"
 )
 
 const (
@@ -53,6 +53,9 @@ const (
 	originWdsLabel                  = "transport.kubestellar.io/originWdsName"
 	originOwnerGenerationAnnotation = "transport.kubestellar.io/originOwnerReferenceBindingGeneration"
 )
+
+// objectsFilter map from gvk to a filter function to clean specific fields from objects before adding them to a wrapped object.
+var objectsFilter = filtering.NewObjectFilteringMap()
 
 // NewTransportController returns a new transport controller.
 // This func is like NewTransportControllerForWrappedObjectGVR but first uses
@@ -89,7 +92,6 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context, bindingInfor
 		wdsClientset:                wdsClientset,
 		wdsDynamicClient:            wdsDynamicClient,
 		wdsName:                     wdsName,
-		objectDenaturingMap:         filtering.NewObjectFilteringMap(),
 	}
 
 	transportController.logger.Info("Setting up event handlers")
@@ -158,8 +160,6 @@ type genericTransportController struct {
 	wdsClientset     ksclientset.Interface
 	wdsDynamicClient dynamic.Interface
 	wdsName          string
-
-	objectDenaturingMap *filtering.ObjectFilteringMap
 }
 
 // enqueueBinding takes an Binding resource and
@@ -399,7 +399,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 			if err != nil {
 				return nil, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", objectName, gvr, err)
 			}
-			objectsToPropagate = append(objectsToPropagate, c.cleanObject(object))
+			objectsToPropagate = append(objectsToPropagate, cleanObject(object))
 		}
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
@@ -416,7 +416,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 					return nil, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", objectName,
 						objectsByNamespace.Namespace, gvr, err)
 				}
-				objectsToPropagate = append(objectsToPropagate, c.cleanObject(object))
+				objectsToPropagate = append(objectsToPropagate, cleanObject(object))
 			}
 		}
 	}
@@ -609,7 +609,7 @@ func setLabel(object metav1.Object, key string, value any) {
 }
 
 // cleanObject is a function to clean object before adding it to a wrapped object. these fields shouldn't be propagated to WEC.
-func (c *genericTransportController) cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
+func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	objectCopy := object.DeepCopy() // don't modify object directly. create a copy before zeroing fields
 	objectCopy.SetManagedFields(nil)
 	objectCopy.SetFinalizers(nil)
@@ -624,7 +624,7 @@ func (c *genericTransportController) cleanObject(object *unstructured.Unstructur
 	objectCopy.SetAnnotations(annotations)
 
 	// clean fields specific to the concrete object.
-	c.objectDenaturingMap.CleanObjectSpecifics(objectCopy)
+	objectsFilter.CleanObjectSpecifics(objectCopy)
 
 	return objectCopy
 }
