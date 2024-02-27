@@ -61,7 +61,7 @@ X ArgoCD CLI
 
 ## Integration testing
 
-There is currently one integration test. Contributors can run it. There is also a Prow job that runs this test.
+There is currently one integration test. Contributors can run it. There is also [a GitHub workflow](../../../.github/workflows/pr-test-integration.yml) that runs this test.
 
 This test requires you to already have `etcd` on your `$PATH`.
 See https://github.com/kubernetes/kubernetes/blob/v1.28.2/hack/install-etcd.sh for an example of how to do that.
