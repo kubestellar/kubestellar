@@ -14,11 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package denaturing
+package objectfiltering
 
 import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // cleanObjectSpecificsFunction is a function for cleaning fields from a specific object.
@@ -27,28 +28,27 @@ import (
 // to do a DeepCopy before calling this function.
 type cleanObjectSpecificsFunction func(object *unstructured.Unstructured)
 
-func NewObjectDenaturingMap() *ObjectDenaturingMap {
+func NewObjectFilteringMap() *ObjectFilteringMap {
 	serviceTypeMeta := v1.TypeMeta{Kind: "Service", APIVersion: "v1"}
 
-	denaturingMap := map[string]cleanObjectSpecificsFunction{
-		serviceTypeMeta.GroupVersionKind().String(): cleanServiceFields,
+	filteringMap := map[schema.GroupVersionKind]cleanObjectSpecificsFunction{
+		serviceTypeMeta.GroupVersionKind(): cleanServiceFields,
 	}
 
-	return &ObjectDenaturingMap{
-		gvkToDenaturingFunc: denaturingMap,
+	return &ObjectFilteringMap{
+		gvkToFilteringFunc: filteringMap,
 	}
 }
 
-type ObjectDenaturingMap struct {
-	gvkToDenaturingFunc map[string]cleanObjectSpecificsFunction // map from GVK as string to clean object function
+type ObjectFilteringMap struct {
+	gvkToFilteringFunc map[schema.GroupVersionKind]cleanObjectSpecificsFunction // map from GVK to clean object function
 }
 
-func (denaturingMap *ObjectDenaturingMap) CleanObjectSpecifics(object *unstructured.Unstructured) {
-	gvkAsString := object.GetObjectKind().GroupVersionKind().String()
-	denaturingFunction, found := denaturingMap.gvkToDenaturingFunc[gvkAsString]
+func (filteringMap *ObjectFilteringMap) CleanObjectSpecifics(object *unstructured.Unstructured) {
+	filteringFunction, found := filteringMap.gvkToFilteringFunc[object.GetObjectKind().GroupVersionKind()]
 	if !found {
-		return // if no denaturing function was defined for this gvk, do not clean any field
+		return // if no filtering function was defined for this gvk, do not clean any field
 	}
 	// otherwise, need to clean specific fields from this object
-	denaturingFunction(object)
+	filteringFunction(object)
 }

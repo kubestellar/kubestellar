@@ -43,7 +43,7 @@ import (
 	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	controlv1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
 	controlv1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
-	"github.com/kubestellar/kubestellar/pkg/transport/denaturing"
+	filtering "github.com/kubestellar/kubestellar/pkg/transport/object-filtering"
 )
 
 const (
@@ -89,7 +89,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context, bindingInfor
 		wdsClientset:                wdsClientset,
 		wdsDynamicClient:            wdsDynamicClient,
 		wdsName:                     wdsName,
-		objectDenaturingMap:         denaturing.NewObjectDenaturingMap(),
+		objectDenaturingMap:         filtering.NewObjectFilteringMap(),
 	}
 
 	transportController.logger.Info("Setting up event handlers")
@@ -159,7 +159,7 @@ type genericTransportController struct {
 	wdsDynamicClient dynamic.Interface
 	wdsName          string
 
-	objectDenaturingMap *denaturing.ObjectDenaturingMap
+	objectDenaturingMap *filtering.ObjectFilteringMap
 }
 
 // enqueueBinding takes an Binding resource and
