@@ -19,7 +19,6 @@ package binding
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -58,15 +57,13 @@ func (c *Controller) handleCRD(obj runtime.Object) error {
 
 	key := util.KeyForGroupVersionKind(toStart.groupVersion.Group, toStart.groupVersion.Version, toStart.resource.Kind)
 
-	// toStartList, toStopList, err := c.checkAPIResourcesForUpdates()
-	// if err != nil {
-	// 	return err
-	// }
 	toStartList, toStopList := []APIResource{}, []string{}
 	if isBeingDeleted(obj) {
 		toStopList = append(toStopList, key)
 	} else {
-		toStartList = append(toStartList, toStart)
+		if c.shouldWatch(toStart) {
+			toStartList = append(toStartList, toStart)
+		}
 	}
 
 	go c.startInformersForNewAPIResources(toStartList)
@@ -87,69 +84,22 @@ func (c *Controller) handleCRD(obj runtime.Object) error {
 	return nil
 }
 
-// checks what APIs need starting new informers or stopping informers.
-// Returns a list of APIResources for informers to start and a list of keys for infomers to stop
-func (c *Controller) checkAPIResourcesForUpdates() ([]APIResource, []string, error) {
-	toStart := []APIResource{}
-	toStop := []string{}
-
-	// tracking keys are used to detect what API resources have been removed
-	trackingKeys := map[string]bool{}
-	for k := range c.informers {
-		trackingKeys[k] = true
+func (c *Controller) shouldWatch(r APIResource) bool {
+	if _, excluded := excludedGroups[r.groupVersion.Group]; excluded {
+		return false
 	}
-
-	// Get all the api resources in the cluster
-	apiResources, err := c.kubernetesClient.Discovery().ServerPreferredResources()
-	if err != nil {
-		// ignore the error caused by a stale API service
-		if !strings.Contains(err.Error(), util.UnableToRetrieveCompleteAPIListError) {
-			return nil, nil, err
-		}
+	if !util.IsAPIGroupAllowed(r.groupVersion.Group, c.allowedGroupsSet) {
+		return false
 	}
-
-	// Loop through the api resources and create informers and listers for each of them
-	for _, list := range apiResources {
-		gv, err := schema.ParseGroupVersion(list.GroupVersion)
-		if err != nil {
-			c.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", list.GroupVersion)
-			continue
-		}
-		if _, excluded := excludedGroups[gv.Group]; excluded {
-			continue
-		}
-		for _, resource := range list.APIResources {
-			if _, excluded := excludedResourceNames[resource.Name]; excluded {
-				continue
-			}
-			if !util.IsAPIGroupAllowed(gv.Group, c.allowedGroupsSet) {
-				continue
-			}
-			informable := verbsSupportInformers(resource.Verbs)
-			if informable {
-				key := util.KeyForGroupVersionKind(gv.Group, gv.Version, resource.Kind)
-				if _, ok := c.informers[key]; !ok {
-					toStart = append(toStart, APIResource{
-						groupVersion: gv,
-						resource:     resource,
-					})
-				}
-				// remove the key from tracking keys, what is left in the map at the end are
-				// keys to the informers that need to be stopped.
-				delete(trackingKeys, key)
-			}
-		}
+	if _, excluded := excludedResourceNames[r.resource.Name]; excluded {
+		return false
 	}
-
-	for k := range trackingKeys {
-		toStop = append(toStop, k)
-	}
-	return toStart, toStop, nil
+	return true
 }
 
 func (c *Controller) startInformersForNewAPIResources(toStartList []APIResource) {
 	for _, toStart := range toStartList {
-		c.logger.Info("New API added. Starting informer for:", "group", toStart.groupVersion.Group,
+		c.logger.Info("Ensuring informer for:", "group", toStart.groupVersion.Group,
 			"version", toStart.groupVersion, "kind", toStart.resource.Kind)
 
 		gvr := schema.GroupVersionResource{
@@ -191,29 +141,31 @@ func (c *Controller) startInformersForNewAPIResources(toStartList []APIResource)
 		// add the mapping between GVK and GVR
 		c.gvkGvrMapper.Add(toStart.groupVersion.WithKind(toStart.resource.Kind), gvr)
 
-		// create and index the lister
+		// ensure the lister
 		lister := cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())
 		if _, ok := c.listers[key]; !ok {
+			c.logger.V(3).Info("Setting lister", "GVK", key)
 			c.listers[key] = lister
 		} else {
 			c.logger.V(3).Info("Lister already in place", "GVK", key)
 		}
 
+		// ensure the stopper
 		stopper := make(chan struct{})
-		defer close(stopper)
 		if _, ok := c.stoppers[key]; !ok {
+			c.logger.V(3).Info("Setting stopper", "GVK", key)
 			c.stoppers[key] = stopper
 		} else {
 			c.logger.V(3).Info("Stopper already in place", "GVK", key)
 		}
 
+		// ensure the informer
 		if _, ok := c.informers[key]; !ok {
+			c.logger.V(3).Info("Setting and running informer", "GVK", key)
 			c.informers[key] = informer
 			go informer.Run(stopper)
 		} else {
 			c.logger.V(3).Info("Informer already in place", "GVK", key)
 		}
 	}
-	// block
-	select {}
 }

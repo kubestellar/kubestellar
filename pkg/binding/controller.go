@@ -35,6 +35,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/kubernetes"
@@ -109,12 +110,13 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 		return nil, err
 	}
 
-	burst, err := countGVRsViaAggregatedDiscovery(wdsRestConfig) // use # of GVRs as burst is tested to be working well
+	nGVRs, err := countGVRsViaAggregatedDiscovery(kubernetesClient)
 	if err != nil {
 		parentLogger.Error(err, "Not able to count GVRs via aggregated discovery") // but we can still continue
 	}
-	wdsRestConfig.Burst = adjustBurstIfNecessary(burst)
-	wdsRestConfig.QPS = adjustQPSIfNecessary(float32(burst) / 4)
+	// tuning the rate limiter based on the number of GVRs is tested to be working well
+	wdsRestConfig.Burst = computeBurstFromNumGVRs(nGVRs)
+	wdsRestConfig.QPS = computeQPSFromNumGVRs(nGVRs)
 	parentLogger.V(1).Info("Parameters of the client's token bucket rate limiter", "burst", wdsRestConfig.Burst, "qps", wdsRestConfig.QPS)
 
 	// dynamicClient needs higher rate than its default because dynamicClient is repeatedly used by the
@@ -134,15 +136,12 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 	return makeController(parentLogger, dynamicClient, kubernetesClient, extClient, ocmClientset, ocmClient, wdsName, allowedGroupsSet)
 }
 
-func countGVRsViaAggregatedDiscovery(config *rest.Config) (int, error) {
-	countClient, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return 0, fmt.Errorf("error creating client to count number of GVRs: %w", err)
+func countGVRsViaAggregatedDiscovery(countClient kubernetes.Interface) (int, error) {
+	dc := countClient.Discovery().(*discovery.DiscoveryClient)
+	if dc.UseLegacyDiscovery { // by default it should be false already, just double check
+		dc.UseLegacyDiscovery = false
 	}
-	if countClient.DiscoveryClient.UseLegacyDiscovery {
-		return 0, fmt.Errorf("client using aggregated discovery")
-	}
-	apiResourceLists, err := countClient.Discovery().ServerPreferredResources()
+	apiResourceLists, err := dc.ServerPreferredResources()
 	if err != nil {
 		return 0, fmt.Errorf("error listing server perferred resources: %w", err)
 	}
@@ -153,12 +152,13 @@ func countGVRsViaAggregatedDiscovery(config *rest.Config) (int, error) {
 	return n, nil
 }
 
-func adjustBurstIfNecessary(burst int) int {
-	// in case too small
+func computeBurstFromNumGVRs(nGVRs int) int {
+	burst := nGVRs
+	// in case too small, fall back to default
 	if burst < rest.DefaultBurst {
 		return rest.DefaultBurst
 	}
-	// in case too large
+	// in case too large, look at some value for reference
 	// https://github.com/kubernetes/kubernetes/blob/5d527dcf1265d7fcd0e6c8ec511ce16cc6a40699/staging/src/k8s.io/cli-runtime/pkg/genericclioptions/config_flags.go#L477
 	if burst > 300 {
 		return 300
@@ -166,12 +166,13 @@ func adjustBurstIfNecessary(burst int) int {
 	return burst
 }
 
-func adjustQPSIfNecessary(qps float32) float32 {
-	// in case too small
+func computeQPSFromNumGVRs(nGVRs int) float32 {
+	qps := float32(nGVRs) / 4
+	// in case too small, fall back to default
 	if qps < rest.DefaultQPS {
 		return rest.DefaultQPS
 	}
-	// in case too large
+	// in case too large, look at some value for reference
 	// https://github.com/kubernetes/kubernetes/pull/105520/files
 	if qps > 50.0 {
 		return 50.0
@@ -268,12 +269,13 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 			logger.V(1).Info("Ignoring APIResourceList", "groupVersion", list.GroupVersion)
 			continue
 		}
+		if !util.IsAPIGroupAllowed(gv.Group, c.allowedGroupsSet) {
+			logger.V(1).Info("No need to watch per user input", "groupVersion", list.GroupVersion)
+			continue
+		}
 		logger.V(1).Info("Working on APIResourceList", "groupVersion", list.GroupVersion, "numResources", len(list.APIResources))
 		for _, resource := range list.APIResources {
 			if _, excluded := excludedResourceNames[resource.Name]; excluded {
-				continue
-			}
-			if !util.IsAPIGroupAllowed(gv.Group, c.allowedGroupsSet) {
 				continue
 			}
 			informable := verbsSupportInformers(resource.Verbs)

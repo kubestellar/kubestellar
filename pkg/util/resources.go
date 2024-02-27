@@ -39,8 +39,8 @@ func ParseAPIGroupsString(apiGroups string) sets.Set[string] {
 	return groupsSet
 }
 
-// IsResourceGroupAllowed checks if a API group is allowed
-// an empty or nil allowedResources slice is equivalent to allow all,
+// IsResourceGroupAllowed checks if a API group is explicitly allowed by user,
+// an empty or nil allowedResources slice is equivalent to allow all.
 func IsAPIGroupAllowed(apiGroup string, allowedAPIGroups sets.Set[string]) bool {
 	if len(allowedAPIGroups) == 0 {
 		return true
