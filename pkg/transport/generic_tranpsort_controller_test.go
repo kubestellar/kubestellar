@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -38,6 +39,7 @@ import (
 	k8sschema "k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 	dynamicfake "k8s.io/client-go/dynamic/fake"
+	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -45,6 +47,11 @@ import (
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
+
+func TestMain(m *testing.M) {
+	klog.InitFlags(nil)
+	os.Exit(m.Run())
+}
 
 type generator struct {
 	t   *testing.T
