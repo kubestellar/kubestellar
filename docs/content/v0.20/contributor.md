@@ -59,6 +59,14 @@ X ArgoCD CLI
   how to install: https://argo-cd.readthedocs.io/en/stable/cli_installation/
 ```
 
+## Unit testing
+
+The Makefile has a target for running all the unit tests.
+
+```shell
+make test
+```
+
 ## Integration testing
 
 There is currently one integration test. Contributors can run it. It is not (yet) run in CI.
@@ -76,3 +84,7 @@ If `CONTROLLER_TEST_NUM_OBJECTS` is not set then the number of objects
 will be 30. This parameterization by an environment variable is only a
 point-in-time hack, it is expected to go away once we have a test that
 runs reliably on a large number of objects.
+
+## Making releases
+
+See [the release process document](release.md).

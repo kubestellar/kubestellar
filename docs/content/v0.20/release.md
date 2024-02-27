@@ -1,6 +1,6 @@
 # Making KubeStellar Releases
 
-This document defines how releases of the KubeStellar repository are made.
+This document defines how releases of the KubeStellar repository are made. This document is a work-in-progress. In particular, the dependency cycle between the `kubestellar` and `ocm-tansport-plugin` repos is not well documented and it is still not clear how to test and release in the presence of this cycle.
 
 See the associated [packaging and delivery doc](packaging.md) for some
 clues about the problem.
