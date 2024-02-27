@@ -1903,14 +1903,14 @@
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span><span class="nb">test</span>
 </code></pre></div>
 <h2 id="integration-testing">Integration testing<a class="headerlink" href="#integration-testing" title="Permanent link">#</a></h2>
-<p>There is currently one integration test. Contributors can run it. It is not (yet) run in CI.</p>
+<p>There is currently one integration test. Contributors can run it. There is also <a href="../../../.github/workflows/pr-test-integration.yml">a GitHub workflow</a> that runs this test.</p>
 <p>This test requires you to already have <code>etcd</code> on your <code>$PATH</code>.
 See https://github.com/kubernetes/kubernetes/blob/v1.28.2/hack/install-etcd.sh for an example of how to do that.</p>
 <p>To run the test, issue a command like the following.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">CONTROLLER_TEST_NUM_OBJECTS</span><span class="o">=</span><span class="m">24</span><span class="w"> </span>go<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-v<span class="w"> </span>./test/integration/controller-manager<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/test.log
 </code></pre></div>
 <p>If <code>CONTROLLER_TEST_NUM_OBJECTS</code> is not set then the number of objects
-will be 30. This parameterization by an environment variable is only a
+will be 18. This parameterization by an environment variable is only a
 point-in-time hack, it is expected to go away once we have a test that
 runs reliably on a large number of objects.</p>
 <h2 id="making-releases">Making releases<a class="headerlink" href="#making-releases" title="Permanent link">#</a></h2>
