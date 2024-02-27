@@ -618,7 +618,6 @@ func (c *genericTransportController) cleanObject(object *unstructured.Unstructur
 	objectCopy.SetSelfLink("")
 	objectCopy.SetResourceVersion("")
 	objectCopy.SetUID("")
-	objectCopy.SetCreationTimestamp(metav1.Time{})
 
 	annotations := objectCopy.GetAnnotations()
 	delete(annotations, "kubectl.kubernetes.io/last-applied-configuration")
