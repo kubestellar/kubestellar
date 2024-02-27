@@ -30,7 +30,6 @@ including OCM Klusterlet for the WECs.
 2. Customization
 3. OCM sharding
 4. Upsync
-5. "Pluggable Transport" 
 
 ## Latest stable release
 
@@ -48,8 +47,18 @@ See [Packaging and Delivery](packaging.md)
 
 ## Usage examples, and testing
 
-See [Examples](examples.md) and [integration testing](contributor.md#integration-testing) for _this_ release, after reviewing [above](#latest-stable-release).
+[Examples](examples.md) shows a few examples of how to deploy and use a release of KubeStellar.
+
+[The test/e2e directory](../../../test/e2e) holds end-to-end tests.
+
+The contributor guide has a setion on [integration testing](contributor.md#integration-testing).
+
+The contributor guide has a setion on [unit testing](contributor.md#unit-testing).
 
 ## User Guide
 
 See [the User Guide](user-guide.md), which is only the barest start of a stub.
+
+## Contributor Guide
+
+See [the contributor guide](contributor.md), which is also just beginning to be written.

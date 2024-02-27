@@ -4,18 +4,13 @@
 
 The following is a graph of the GitHub repositories in the `kubestellar` GitHub organization and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow. These are not just build-time dependencies but any reference from one repo to another.
 
-Note that the ocm-transport-plugin is under development and not involved yet in using KubeStellar.
-
 ```mermaid
 flowchart LR
     kubestellar --> kubeflex
     kubestellar --> ocm-status-addon
     ocm-status-addon --> kubestellar
     ocm-transport-plugin --> kubestellar
-    style ocm-transport-plugin stroke-dasharray: 5 5
     kubestellar --> ocm-transport-plugin
-    linkStyle 3 stroke-dasharray: 5 5
-    linkStyle 4 stroke-dasharray: 5 5
 ```
 
 The references from ocm-status-addon to kubestellar are only in documentation and are in the process of being removed (no big difficulty is anticipated).
@@ -100,9 +95,6 @@ Note: the Chart.yaml in github uses just "0.2.0" for the version and appVersion 
 
 ## OCM Transport Plugin
 
-**NOTE**: This is under development, not a part of the functioning
-  system yet.
-
 The source is the GitHub repo [github.com/kubestellar/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin)
 
 ### OCM Transport container image
@@ -144,12 +136,17 @@ The dashed dependencies are at run time, not build time.
 
 "KCM" is the KubeStellar controller-manager.
 
-"ks_scripts" are the user-facing instructions that use published
-images and so on. There are also e2e tests, but they test the copy of
-the repo that they are embedded in, not anything built and published
-earlier.
+"ks_scripts" are the user-facing instructions and the end-to-end tests
+that use published artifacts (container images, Helm charts). (There
+are also e2e tests that do not use previously published artifacts,
+their temporary local artifacts are beyond the scope of this
+document.)
 
-**NOTE**: at the present level of development, all versions are hand coded and there is only one public version. This will obviously have to change.
+**NOTE**: among the references to published artifacts, some have a
+  version that is maintained in Git while others have a placeholder in
+  Git that is replaced in the publishing process. See [the release
+  document](release.md) for more details. This is an on-going matter
+  of development.
 
 ### Local copy of KubeStellar git repo
 
@@ -196,7 +193,7 @@ KubeStellar has one container image, for what is called the
 KubeStellar controller-manager. For each WDS, KubeStellar has a pod
 running that image. It installs the needed custom resource
 _definition_ objects if they are not already present, and is a
-controller-manager hosting the per-WDS controllers ([binding controller](architecture.md#binding-controller), [status controller](architecture.md#status-controller), and transport controller(TODO: link to doc)).
+controller-manager hosting the per-WDS controllers ([binding controller](architecture.md#binding-controller) and [status controller](architecture.md#status-controller)) from the kubestellar repo.
 
 The image repository is
 `ghcr.io/kubestellar/kubestellar/controller-manager`. There is
@@ -276,7 +273,6 @@ flowchart LR
     osa_hc_repo[published OSA Helm Chart] --> osa_hc_src
     osa_hc_src -.-> osa_ctr_image
     osa_hc_repo -.-> osa_ctr_image
-
     subgraph cladm_repo["ocm/clusteradm@GitHub"]
     cladm_src["clusteradm source"]
     end
