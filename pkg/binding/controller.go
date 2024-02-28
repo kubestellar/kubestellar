@@ -114,10 +114,11 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 		parentLogger.Error(err, "Not able to count GVRs via aggregated discovery") // but we can still continue
 	}
 	wdsRestConfig.Burst = adjustBurstIfNecessary(burst)
+	wdsRestConfig.QPS = adjustQPSIfNecessary(float32(burst) / 4)
+	parentLogger.V(1).Info("Parameters of the client's token bucket rate limiter", "burst", wdsRestConfig.Burst, "qps", wdsRestConfig.QPS)
 
-	// dynamicClient needs higher burst because dynamicClient is repeatedly used to create informers
-	// for each of the GVRs, all at the beginning of the controller run
-	parentLogger.V(3).Info("Setting parameter of the client's token bucket rate limiter", "Burst", wdsRestConfig.Burst)
+	// dynamicClient needs higher rate than its default because dynamicClient is repeatedly used by the
+	// reflectors for each of the GVRs, all at the beginning of the controller run
 	dynamicClient, err := dynamic.NewForConfig(wdsRestConfig)
 	if err != nil {
 		return nil, err
@@ -158,12 +159,24 @@ func adjustBurstIfNecessary(burst int) int {
 		return rest.DefaultBurst
 	}
 	// in case too large
-	// https://github.com/kubernetes/kubernetes/pull/105520/files
 	// https://github.com/kubernetes/kubernetes/blob/5d527dcf1265d7fcd0e6c8ec511ce16cc6a40699/staging/src/k8s.io/cli-runtime/pkg/genericclioptions/config_flags.go#L477
 	if burst > 300 {
 		return 300
 	}
 	return burst
+}
+
+func adjustQPSIfNecessary(qps float32) float32 {
+	// in case too small
+	if qps < rest.DefaultQPS {
+		return rest.DefaultQPS
+	}
+	// in case too large
+	// https://github.com/kubernetes/kubernetes/pull/105520/files
+	if qps > 50.0 {
+		return 50.0
+	}
+	return qps
 }
 
 func makeController(parentLogger logr.Logger,
