@@ -89,7 +89,7 @@ func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) 
 
 		if resolutionUpdated {
 			// enqueue binding to be synced since an object was added to its bindingpolicy's resolution
-			logger.V(4).Info("enqueued Binding for syncing due to a noting of an "+
+			logger.V(4).Info("Enqueued Binding for syncing due to a noting of an "+
 				"object in its resolution", "binding", bindingPolicy.GetName(),
 				"object", util.RefToRuntimeObj(obj), "objBeingDeleted", objBeingDeleted)
 			c.enqueueBinding(bindingPolicy.GetName())

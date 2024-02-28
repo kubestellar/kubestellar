@@ -89,11 +89,12 @@ func (c *Controller) handleBindingPolicy(ctx context.Context, obj runtime.Object
 
 		// set destinations and enqueue binding for syncing
 		c.bindingPolicyResolver.SetDestinations(bindingPolicy.GetName(), clusterSet)
-		logger.V(4).Info("enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
+		logger.V(4).Info("Enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
 		c.enqueueBinding(bindingPolicy.GetName())
 
-		// requeue objects for re-evaluation
-		return c.requeueForBindingPolicyChanges(ctx, bindingPolicy.Name)
+		// requeue all objects to account for changes in bindingpolicy.
+		// this does not include bindingpolicy/binding objects.
+		return c.requeueWorkloadObjects(ctx, bindingPolicy.Name)
 	}
 
 	// handle deletion of bindingpolicy
@@ -119,20 +120,6 @@ func (c *Controller) handleBindingPolicyDeletion(ctx context.Context, bindingPol
 	logger.Info("Deleted resolution for bindingpolicy", "name", bindingPolicy.Name)
 
 	return nil
-}
-
-func (c *Controller) requeueForBindingPolicyChanges(ctx context.Context, bindingPolicyName string) error {
-	if false {
-		// allow some time before checking to settle
-		now := time.Now()
-		if now.Sub(c.initializedTs) < waitBeforeTrackingBindingPolicies {
-			return nil
-		}
-	}
-
-	// requeue all objects to account for changes in bindingpolicy.
-	// this does not include bindingpolicy/binding objects.
-	return c.requeueWorkloadObjects(ctx, bindingPolicyName)
 }
 
 func (c *Controller) requeueSelectedWorkloadObjects(ctx context.Context, bindingPolicyName string) error {
@@ -348,7 +335,7 @@ func (c *Controller) testObject(obj mrObject, tests []v1alpha1.DownsyncObjectTes
 		if len(test.ObjectSelectors) > 0 && !labelsMatchAny(c.logger, objLabels, test.ObjectSelectors) {
 			continue
 		}
-		if len(test.NamespaceSelectors) > 0 {
+		if len(test.NamespaceSelectors) > 0 && !ALabelSelectorIsEmpty(test.NamespaceSelectors...) {
 			if objNS == nil {
 				var err error
 				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(context.TODO(), objNSName, metav1.GetOptions{})
@@ -374,6 +361,15 @@ func labelsMatchAny(logger logr.Logger, labelSet map[string]string, selectors []
 			continue
 		}
 		if sel.Matches(labels.Set(labelSet)) {
+			return true
+		}
+	}
+	return false
+}
+
+func ALabelSelectorIsEmpty(selectors ...metav1.LabelSelector) bool {
+	for _, sel := range selectors {
+		if len(sel.MatchExpressions) == 0 && len(sel.MatchLabels) == 0 {
 			return true
 		}
 	}
