@@ -136,8 +136,8 @@ func (resolution *bindingPolicyResolution) toBindingSpec(gvkGvrMapper util.GvkGv
 	workload := v1alpha1.DownsyncObjectReferences{}
 
 	// iterate over all objects and build workload efficiently. No (GVR, namespace, name) tuple is
-	// duplicated in the objectIdentifierToKey map, due to the uniqueness of the Key. Therefore, whenever an object is about to
-	// be appended to an objects slice, we simply append.
+	// duplicated in the objectIdentifierToKey map, due to the uniqueness of the Key.
+	// Therefore, whenever an object is about to be appended to an objects slice, we simply append.
 	for identifier, key := range resolution.objectIdentifierToKey {
 		gvr, found := gvkGvrMapper.GetGvr(key.GVK)
 		if !found {
@@ -225,7 +225,7 @@ func workloadMatchesBindingSpec(bindingSpecWorkload *v1alpha1.DownsyncObjectRefe
 	}
 
 	// check namespace-scoped all exist
-	return namespaceScopeMatchesBindingSpec(bindingSpecWorkload.NamespaceScope, objectIdentifierToKeyMap,
+	return bindingNamespaceScopeIsMapped(bindingSpecWorkload.NamespaceScope, objectIdentifierToKeyMap,
 		objectIdentifierToVersionMap, gvkGvrMapper)
 }
 
@@ -262,7 +262,7 @@ func bindingClusterScopeIsMapped(bindingSpecClusterScope []v1alpha1.ClusterScope
 
 // namespaceScopeMatchesBindingSpec returns true if the namespace-scope
 // section in the binding spec all exist in the resolution.
-func namespaceScopeMatchesBindingSpec(bindingSpecNamespaceScope []v1alpha1.NamespaceScopeDownsyncObject,
+func bindingNamespaceScopeIsMapped(bindingSpecNamespaceScope []v1alpha1.NamespaceScopeDownsyncObject,
 	objectIdentifierToKeyMap map[string]*util.Key, objectIdentifierToVersionMap map[string]string,
 	gvkGvrMapper util.GvkGvrMapper) bool {
 	for _, namespaceScopeDownsyncObject := range bindingSpecNamespaceScope {
@@ -283,7 +283,7 @@ func namespaceScopeMatchesBindingSpec(bindingSpecNamespaceScope []v1alpha1.Names
 			return false
 		}
 
-		// check if version matches (if the key is mapped above, then the version should also be mapped)
+		// check if version matches (if the key is mapped above, then the version is also mapped)
 		if objectIdentifierToVersionMap[formattedKey] != namespaceScopeDownsyncObject.ResourceVersion {
 			return false
 		}
