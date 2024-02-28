@@ -10,7 +10,7 @@
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
 
-**NOTE**: the website kubestellar.io is temporarily out of order.
+**NOTE**: Some of our documentation is on the website [kubestellar.io](kubestellar.io), some is here.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/kubestellar/kubestellar)](https://goreportcard.com/report/github.com/kubestellar/kubestellar)
 [![Go Reference](https://pkg.go.dev/badge/github.com/kubestellar/kubestellar.svg)](https://pkg.go.dev/github.com/kubestellar/kubestellar)
@@ -43,30 +43,16 @@ __Don't change anything, just add KubeStellar!__
 - __Scale__ with 1:many and many:1 scenarios
 - __Remain compatible__ with cloud-native solutions
 
-## KubeStellar virtual clusters (Spaces) are our secret
-TODO: Need update!
-- KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
-- Standard Kubernetes clusters have __2-300__ api-resources, KubeStellar Spaces have only __40__
-- Fewer api-resources mean resources remain inactive (denatured) – they do not expand into other resources like replicasets, pods, etc.
-- Denaturing is the key to accepting native, unbundled Kubernetes resources as input without running them
-- Unbundled resources are the default and preferred output of most cloud-native tools making KubeStellar use and integration easy
+## Docs on plain GitHub
 
-## QuickStart
-
-TBD
-
-The supported documents are as follows.
-
-- [v0.20 start](docs/content/v0.20)
-- [the multi-cluster end-to-end test](test/e2e/multi-cluster-deployment/README.md)
-- [the singleton status return end-to-end test](test/e2e/singleton-status/README.md)
+Much of our documentation is made to be viewed on GitHub. See it [there](docs/content/direct). Release `X.Y.Z` is the commit with Git tag `vX.Y.Z`.
 
 ## Roadmap for the Project
 TBD
 
 ## Contributing
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://docs.kubestellar.io/stable/Contribution%20guidelines/CONTRIBUTING/) guide.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://docs.kubestellar.io/stable/Contribution%20guidelines/CONTRIBUTING/) guide and be sure to look at `main` or the release of interest to you.
 
 This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
 
