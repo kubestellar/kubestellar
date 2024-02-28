@@ -25,8 +25,11 @@ import (
 func cleanJob(logger logr.Logger, object *unstructured.Unstructured) {
 	objectU := object.UnstructuredContent()
 	podLabels, found, err := unstructured.NestedMap(objectU, "spec", "template", "metadata", "labels")
-	if err != nil || !found {
-		logger.V(3).Error(nil, "Job lacks expected template labels", "namespace", object.GetNamespace(), "name", object.GetName(), "found", found, "err", err)
+	if !found {
+		return
+	}
+	if err != nil {
+		logger.V(3).Error(nil, "Job object does not have expected struture, no spec.template.metadata.labels", "namespace", object.GetNamespace(), "name", object.GetName(), "err", err)
 		return
 	}
 	delete(podLabels, "batch.kubernetes.io/controller-uid")
@@ -34,8 +37,8 @@ func cleanJob(logger logr.Logger, object *unstructured.Unstructured) {
 	delete(podLabels, "controller-uid")
 	delete(podLabels, "job-name")
 	err = unstructured.SetNestedMap(objectU, podLabels, "spec", "template", "metadata", "labels")
-	if err != nil {
-		logger.Error(err, "Inconceivable! Failed to update existing pod labels in Job", "namespace", object.GetNamespace(), "name", object.GetName())
+	if err != nil { // that condition can never be true
+		panic(err)
 	}
 	object.SetUnstructuredContent(objectU)
 }
