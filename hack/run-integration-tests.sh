@@ -40,4 +40,4 @@ tar xzf etcd.tar.gz
 export PATH=${PATH}:${PWD}/etcd-v3.5.9-linux-amd64
 rm etcd.tar.gz
 
-CONTROLLER_TEST_NUM_OBJECTS=18 go test -v ./test/integration/controller-manager -args -v=5
+CONTROLLER_TEST_NUM_OBJECTS=100 go test -v ./test/integration/controller-manager -args -v=5

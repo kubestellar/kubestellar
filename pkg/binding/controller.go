@@ -478,6 +478,7 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 }
 
 func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
+	logger := klog.FromContext(ctx)
 	var obj runtime.Object
 	var err error
 	// special handling for binding resource as it is the only
@@ -492,7 +493,7 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		if err != nil {
 			// The resource no longer exist, which means it has been deleted.
 			if errors.IsNotFound(err) {
-				c.logger.Info("object referenced from work queue no longer exists",
+				logger.Info("object referenced from work queue no longer exists",
 					"object-name", key.NamespacedName, "object-gvk", key.GvkKey())
 				return nil
 			}
@@ -511,14 +512,14 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 			// will add name.
 		}
 
-		c.logger.Info("handled bindingpolicy", "object", util.RefToRuntimeObj(obj))
+		logger.Info("handled bindingpolicy", "object", util.RefToRuntimeObj(obj))
 		return nil
 	} else if util.IsCRD(obj) {
 		if err := c.handleCRD(obj); err != nil {
 			return fmt.Errorf("failed to handle CRD: %w", err) // error logging after this call
 			// will add name.
 		}
-		c.logger.Info("handled CRD", "object", util.RefToRuntimeObj(obj))
+		logger.Info("handled CRD", "object", util.RefToRuntimeObj(obj))
 	}
 
 	// avoid further processing for keys of objects being deleted that do not have a deleted object

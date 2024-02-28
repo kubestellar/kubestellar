@@ -307,7 +307,8 @@ func (mor mrObjRsc) MatchesAny(t *testing.T, tests []ksapi.DownsyncObjectTest) *
 		if len(test.ObjectNames) > 0 && !(binding.SliceContains(test.ObjectNames, mor.MRObject.GetName()) || binding.SliceContains(test.ObjectNames, "*")) {
 			continue
 		}
-		if len(test.NamespaceSelectors) > 0 && !LabelsMatchAny(t, mor.Namespace.Labels, test.NamespaceSelectors) {
+		if len(test.NamespaceSelectors) > 0 && !(mor.Namespace == nil && ALabelSelectorIsEmpty(test.NamespaceSelectors...) ||
+			mor.Namespace != nil && LabelsMatchAny(t, mor.Namespace.Labels, test.NamespaceSelectors)) {
 			continue
 		}
 		if len(test.ObjectSelectors) > 0 && !LabelsMatchAny(t, mor.MRObject.GetLabels(), test.ObjectSelectors) {
@@ -317,6 +318,15 @@ func (mor mrObjRsc) MatchesAny(t *testing.T, tests []ksapi.DownsyncObjectTest) *
 		return &thisTest
 	}
 	return nil
+}
+
+func ALabelSelectorIsEmpty(selectors ...metav1.LabelSelector) bool {
+	for _, sel := range selectors {
+		if len(sel.MatchExpressions) == 0 && len(sel.MatchLabels) == 0 {
+			return true
+		}
+	}
+	return false
 }
 
 func LabelsMatchAny(t *testing.T, labels map[string]string, selectors []metav1.LabelSelector) bool {
