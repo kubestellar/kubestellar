@@ -17,7 +17,7 @@ limitations under the License.
 package filtering
 
 import (
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -29,10 +29,8 @@ import (
 type cleanObjectSpecificsFunction func(object *unstructured.Unstructured)
 
 func NewObjectFilteringMap() *ObjectFilteringMap {
-	serviceTypeMeta := v1.TypeMeta{Kind: "Service", APIVersion: "v1"}
-
 	filteringMap := map[schema.GroupVersionKind]cleanObjectSpecificsFunction{
-		serviceTypeMeta.GroupVersionKind(): cleanServiceFields,
+		corev1.SchemeGroupVersion.WithKind("Service"): cleanServiceFields,
 	}
 
 	return &ObjectFilteringMap{
