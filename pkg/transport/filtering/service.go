@@ -17,8 +17,6 @@ limitations under the License.
 package filtering
 
 import (
-	"github.com/go-logr/logr"
-
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
@@ -27,7 +25,7 @@ const (
 	preserveNodePortValue   = "nodeport"
 )
 
-func cleanServiceFields(logger logr.Logger, object *unstructured.Unstructured) {
+func cleanServiceFields(object *unstructured.Unstructured) {
 	// Fields to remove
 	fieldsToDelete := []string{"clusterIP", "clusterIPs", "ipFamilies",
 		"externalTrafficPolicy", "internalTrafficPolicy", "ipFamilyPolicy", "sessionAffinity"}

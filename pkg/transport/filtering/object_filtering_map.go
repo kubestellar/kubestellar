@@ -17,8 +17,6 @@ limitations under the License.
 package filtering
 
 import (
-	"github.com/go-logr/logr"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -28,7 +26,7 @@ import (
 // The function cleans the specific fields in place (object is modified).
 // If the object was retrieved using a lister, it's the caller responsibility
 // to do a DeepCopy before calling this function.
-type cleanObjectSpecificsFunction func(logger logr.Logger, object *unstructured.Unstructured)
+type cleanObjectSpecificsFunction func(object *unstructured.Unstructured)
 
 func NewObjectFilteringMap() *ObjectFilteringMap {
 	filteringMap := map[schema.GroupVersionKind]cleanObjectSpecificsFunction{
@@ -45,11 +43,11 @@ type ObjectFilteringMap struct {
 	gvkToFilteringFunc map[schema.GroupVersionKind]cleanObjectSpecificsFunction // map from GVK to clean object function
 }
 
-func (filteringMap *ObjectFilteringMap) CleanObjectSpecifics(logger logr.Logger, object *unstructured.Unstructured) {
+func (filteringMap *ObjectFilteringMap) CleanObjectSpecifics(object *unstructured.Unstructured) {
 	filteringFunction, found := filteringMap.gvkToFilteringFunc[object.GetObjectKind().GroupVersionKind()]
 	if !found {
 		return // if no filtering function was defined for this gvk, do not clean any field
 	}
 	// otherwise, need to clean specific fields from this object
-	filteringFunction(logger, object)
+	filteringFunction(object)
 }

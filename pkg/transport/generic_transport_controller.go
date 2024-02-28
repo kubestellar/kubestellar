@@ -386,7 +386,6 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 }
 
 func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
-	logger := klog.FromContext(ctx)
 	objectsToPropagate := make([]*unstructured.Unstructured, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clusterScopedObject := range binding.Spec.Workload.ClusterScope {
@@ -400,7 +399,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 			if err != nil {
 				return nil, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", objectName, gvr, err)
 			}
-			objectsToPropagate = append(objectsToPropagate, cleanObject(logger, object))
+			objectsToPropagate = append(objectsToPropagate, cleanObject(object))
 		}
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
@@ -417,7 +416,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 					return nil, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", objectName,
 						objectsByNamespace.Namespace, gvr, err)
 				}
-				objectsToPropagate = append(objectsToPropagate, cleanObject(logger, object))
+				objectsToPropagate = append(objectsToPropagate, cleanObject(object))
 			}
 		}
 	}
@@ -610,7 +609,7 @@ func setLabel(object metav1.Object, key string, value any) {
 }
 
 // cleanObject is a function to clean object before adding it to a wrapped object. these fields shouldn't be propagated to WEC.
-func cleanObject(logger logr.Logger, object *unstructured.Unstructured) *unstructured.Unstructured {
+func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	objectCopy := object.DeepCopy() // don't modify object directly. create a copy before zeroing fields
 	objectCopy.SetManagedFields(nil)
 	objectCopy.SetFinalizers(nil)
@@ -625,7 +624,7 @@ func cleanObject(logger logr.Logger, object *unstructured.Unstructured) *unstruc
 	objectCopy.SetAnnotations(annotations)
 
 	// clean fields specific to the concrete object.
-	objectsFilter.CleanObjectSpecifics(logger, objectCopy)
+	objectsFilter.CleanObjectSpecifics(objectCopy)
 
 	return objectCopy
 }
