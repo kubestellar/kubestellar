@@ -61,8 +61,9 @@ type BindingPolicyResolver interface {
 	CompareBinding(bindingPolicyKey string,
 		bindingSpec *v1alpha1.BindingSpec) bool
 
-	// NoteBindingPolicy associates a new resolution with the given bindingpolicy,
-	// if none is associated.
+	// NoteBindingPolicy associates a new resolution with the given
+	// bindingpolicy, if none is associated. This method maintains the
+	// singleton status reporting requirement in the resolution.
 	NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy)
 
 	// NoteObject updates the maintained bindingpolicy's objects resolution for the
@@ -172,10 +173,12 @@ func (resolver *bindingPolicyResolver) CompareBinding(bindingPolicyKey string,
 	return bindingPolicyResolution.matchesBindingSpec(bindingSpec, resolver.gvkGvrMapper)
 }
 
-// NoteBindingPolicy associates a new resolution with the given bindingpolicy,
-// if none is associated.
+// NoteBindingPolicy associates a new resolution with the given
+// bindingpolicy, if none is associated. This method maintains the
+// singleton status reporting requirement in the resolution.
 func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy) {
 	if resolution := resolver.getResolution(bindingpolicy.GetName()); resolution != nil {
+		resolution.requiresSingletonReportedState = bindingpolicy.Spec.WantSingletonReportedState
 		return
 	}
 

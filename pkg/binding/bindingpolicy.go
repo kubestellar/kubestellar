@@ -68,15 +68,14 @@ func (c *Controller) handleBindingPolicy(ctx context.Context, obj runtime.Object
 			return fmt.Errorf("failed to handle finalizer for bindingPolicy %s: %w", bindingPolicy.Name, err)
 		}
 
+		// note bindingpolicy in resolver to create/update its resolution
+		c.bindingPolicyResolver.NoteBindingPolicy(bindingPolicy)
+
 		// update bindingpolicy resolution destinations since bindingpolicy was updated
 		clusterSet, err := ocm.FindClustersBySelectors(c.ocmClient, bindingPolicy.Spec.ClusterSelectors)
 		if err != nil {
 			return fmt.Errorf("failed to ocm.FindClustersBySelectors: %w", err)
 		}
-
-		// note bindingpolicy in resolver in case it isn't associated with
-		// any resolution
-		c.bindingPolicyResolver.NoteBindingPolicy(bindingPolicy)
 
 		if bindingPolicy.Spec.WantSingletonReportedState {
 			// if the bindingpolicy requires a singleton status, then we should only
