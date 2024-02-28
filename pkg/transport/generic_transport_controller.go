@@ -43,6 +43,7 @@ import (
 	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	controlv1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
 	controlv1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/transport/filtering"
 )
 
 const (
@@ -52,6 +53,9 @@ const (
 	originWdsLabel                  = "transport.kubestellar.io/originWdsName"
 	originOwnerGenerationAnnotation = "transport.kubestellar.io/originOwnerReferenceBindingGeneration"
 )
+
+// objectsFilter map from gvk to a filter function to clean specific fields from objects before adding them to a wrapped object.
+var objectsFilter = filtering.NewObjectFilteringMap()
 
 // NewTransportController returns a new transport controller.
 // This func is like NewTransportControllerForWrappedObjectGVR but first uses
@@ -619,6 +623,8 @@ func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	delete(annotations, "kubectl.kubernetes.io/last-applied-configuration")
 	objectCopy.SetAnnotations(annotations)
 
-	return objectCopy
+	// clean fields specific to the concrete object.
+	objectsFilter.CleanObjectSpecifics(objectCopy)
 
+	return objectCopy
 }
