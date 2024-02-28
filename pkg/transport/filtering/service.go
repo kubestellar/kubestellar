@@ -25,7 +25,7 @@ const (
 	preserveNodePortValue   = "nodeport"
 )
 
-func cleanServiceFields(object *unstructured.Unstructured) {
+func cleanService(object *unstructured.Unstructured) {
 	// Fields to remove
 	fieldsToDelete := []string{"clusterIP", "clusterIPs", "ipFamilies",
 		"externalTrafficPolicy", "internalTrafficPolicy", "ipFamilyPolicy", "sessionAffinity"}

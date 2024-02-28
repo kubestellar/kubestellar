@@ -18,7 +18,7 @@ set -e # exit on error
 
 :
 : -------------------------------------------------------------------------
-: "Create a bindingpolicy in wds1 to deliver a service to one WEC."
+: "Create a bindingpolicy in wds1 to deliver a Service and a Job object to one WEC."
 :
 kubectl --context wds1 apply -f - <<EOF
 apiVersion: control.kubestellar.io/v1alpha1
@@ -35,7 +35,7 @@ EOF
 
 :
 : -------------------------------------------------------------------------
-: "Deploy the service"
+: "Define the API objects in wds1"
 :
 kubectl --context wds1 apply -f - <<EOF
 apiVersion: v1
@@ -60,11 +60,34 @@ spec:
       port: 80
       targetPort: 80
   type: NodePort
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi
+  namespace: object-filtering
+  labels:
+    app.kubernetes.io/name: object-fields-filtering-test
+spec:
+  template:
+    spec:
+      containers:
+      - name: pi
+        image: perl:5.34.0
+        command: ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]
+      restartPolicy: Never
+  backoffLimit: 4
 EOF
 
 :
 : -------------------------------------------------------------------------
-: "Verify that the service has been created in cluster1"
+: "Verify that the Service object has been created in cluster1"
 :
 wait-for-cmd 'kubectl --context cluster1 get services -n object-filtering hello-world'
-: "SUCCESS: Confirmed service created on cluster1."
+:
+: -------------------------------------------------------------------------
+: "Verify that the Job object has been created in cluster1"
+:
+wait-for-cmd 'kubectl --context cluster1 get jobs -n object-filtering pi'
+:
+: "SUCCESS: Confirmed Service and Job created on cluster1."

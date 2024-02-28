@@ -17,6 +17,7 @@ limitations under the License.
 package filtering
 
 import (
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -30,8 +31,8 @@ type cleanObjectSpecificsFunction func(object *unstructured.Unstructured)
 
 func NewObjectFilteringMap() *ObjectFilteringMap {
 	filteringMap := map[schema.GroupVersionKind]cleanObjectSpecificsFunction{
-		corev1.SchemeGroupVersion.WithKind("Service"): cleanServiceFields,
-		corev1.SchemeGroupVersion.WithKind("Job"):     cleanJob,
+		corev1.SchemeGroupVersion.WithKind("Service"): cleanService,
+		batchv1.SchemeGroupVersion.WithKind("Job"):    cleanJob,
 	}
 
 	return &ObjectFilteringMap{
@@ -44,7 +45,8 @@ type ObjectFilteringMap struct {
 }
 
 func (filteringMap *ObjectFilteringMap) CleanObjectSpecifics(object *unstructured.Unstructured) {
-	filteringFunction, found := filteringMap.gvkToFilteringFunc[object.GetObjectKind().GroupVersionKind()]
+	gvk := object.GetObjectKind().GroupVersionKind()
+	filteringFunction, found := filteringMap.gvkToFilteringFunc[gvk]
 	if !found {
 		return // if no filtering function was defined for this gvk, do not clean any field
 	}
