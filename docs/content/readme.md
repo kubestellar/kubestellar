@@ -42,7 +42,7 @@ __Don't change anything, just add KubeStellar!__
 
 ## Use The Source, Luke
 
-To find most of our documentation, go directly to the README of [the KubeStellar GitHub repository](http://github.com/kubestellar/kubestellar). To read the documentation for release `X.Y.Z`, view the Git content tagged `vX.Y.Z`.
+**NOTE**: This website is still under construction, and not all of the documentation appears on this website. The rest, which is also still under construction, is designed to be viewed directly from the GitHub repository; see the README of [the KubeStellar GitHub repository](http://github.com/kubestellar/kubestellar). To read the documentation for release `X.Y.Z`, view the Git content tagged `vX.Y.Z`.
 
 ## Contributing
 
