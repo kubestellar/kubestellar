@@ -33,6 +33,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -57,6 +58,7 @@ const (
 //     workload objects to remove the singleton label.
 //   - delete the bindingpolicy's finalizer and remove its resolution.
 func (c *Controller) handleBindingPolicy(ctx context.Context, obj runtime.Object) error {
+	logger := klog.FromContext(ctx)
 	bindingPolicy, err := runtimeObjectToBindingPolicy(obj)
 	if err != nil {
 		return fmt.Errorf("failed to convert runtime.Object to BindingPolicy: %w", err)
@@ -87,11 +89,11 @@ func (c *Controller) handleBindingPolicy(ctx context.Context, obj runtime.Object
 
 		// set destinations and enqueue binding for syncing
 		c.bindingPolicyResolver.SetDestinations(bindingPolicy.GetName(), clusterSet)
-		c.logger.V(4).Info("enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
+		logger.V(4).Info("enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
 		c.enqueueBinding(bindingPolicy.GetName())
 
 		// requeue objects for re-evaluation
-		return c.requeueForBindingPolicyChanges()
+		return c.requeueForBindingPolicyChanges(ctx, bindingPolicy.Name)
 	}
 
 	// handle deletion of bindingpolicy
@@ -102,7 +104,7 @@ func (c *Controller) handleBindingPolicyDeletion(ctx context.Context, bindingPol
 	if c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicy.GetName()) {
 		// if the bindingpolicy required a singleton status, all selected objects should
 		// be requeued in order to remove the label
-		if err := c.requeueSelectedWorkloadObjects(bindingPolicy.GetName()); err != nil {
+		if err := c.requeueSelectedWorkloadObjects(ctx, bindingPolicy.GetName()); err != nil {
 			return fmt.Errorf("failed to c.requeueForBindingPolicyChanges: %w", err)
 		}
 	}
@@ -112,25 +114,28 @@ func (c *Controller) handleBindingPolicyDeletion(ctx context.Context, bindingPol
 		return fmt.Errorf("failed to c.handleBindingPolicyFinalizer: %w", err)
 	}
 
+	logger := klog.FromContext(ctx)
 	c.bindingPolicyResolver.DeleteResolution(bindingPolicy.GetName())
-	c.logger.Info("Deleted resolution for bindingpolicy", "name", bindingPolicy.Name)
+	logger.Info("Deleted resolution for bindingpolicy", "name", bindingPolicy.Name)
 
 	return nil
 }
 
-func (c *Controller) requeueForBindingPolicyChanges() error {
-	// allow some time before checking to settle
-	now := time.Now()
-	if now.Sub(c.initializedTs) < waitBeforeTrackingBindingPolicies {
-		return nil
+func (c *Controller) requeueForBindingPolicyChanges(ctx context.Context, bindingPolicyName string) error {
+	if false {
+		// allow some time before checking to settle
+		now := time.Now()
+		if now.Sub(c.initializedTs) < waitBeforeTrackingBindingPolicies {
+			return nil
+		}
 	}
 
 	// requeue all objects to account for changes in bindingpolicy.
 	// this does not include bindingpolicy/binding objects.
-	return c.requeueWorkloadObjects()
+	return c.requeueWorkloadObjects(ctx, bindingPolicyName)
 }
 
-func (c *Controller) requeueSelectedWorkloadObjects(bindingPolicyName string) error {
+func (c *Controller) requeueSelectedWorkloadObjects(ctx context.Context, bindingPolicyName string) error {
 	if !c.bindingPolicyResolver.ResolutionExists(bindingPolicyName) {
 		return nil
 	}
@@ -152,15 +157,17 @@ func (c *Controller) requeueSelectedWorkloadObjects(bindingPolicyName string) er
 		objs = append(objs, obj)
 	}
 
+	logger := klog.FromContext(ctx)
 	for _, obj := range objs {
+		logger.V(4).Info("Enqueuing workload object due to change in BindingPolicy", "bindingPolicyName", bindingPolicyName)
 		c.enqueueObject(obj, true)
 	}
 
 	return nil
 }
 
-func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, oldLabels labels.Set, newLabels labels.Set) {
-	c.logger.Info("evaluating BindingPolicies")
+func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clusterId string, oldLabels labels.Set, newLabels labels.Set) {
+	c.logger.Info("Evaluating BindingPolicies for cluster", "clusterId", clusterId)
 	bindingPolicies, err := c.listBindingPolicies()
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -183,12 +190,13 @@ func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, oldLa
 			return
 		}
 		if match1 || match2 {
+			c.logger.V(4).Info("Enqueuing workload object due to cluster and BindingPolicy", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
 			c.enqueueObject(bindingPolicy, true)
 		}
 	}
 }
 
-func (c *Controller) evaluateBindingPolicies(ctx context.Context, labelsSet labels.Set) {
+func (c *Controller) evaluateBindingPolicies(ctx context.Context, clusterId string, labelsSet labels.Set) {
 	c.logger.Info("evaluating BindingPolicies")
 	bindingPolicies, err := c.listBindingPolicies()
 	if err != nil {
@@ -207,6 +215,7 @@ func (c *Controller) evaluateBindingPolicies(ctx context.Context, labelsSet labe
 			return
 		}
 		if match {
+			c.logger.V(4).Info("Enqueuing BindingPolicy due to cluster notification", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
 			c.enqueueObject(bindingPolicy, true)
 		}
 	}
@@ -239,18 +248,21 @@ func runtimeObjectToBindingPolicy(obj runtime.Object) (*v1alpha1.BindingPolicy, 
 // read objects from all workload listers and enqueue
 // the keys this is useful for when a new bindingpolicy is
 // added or a bindingpolicy is updated
-func (c *Controller) requeueWorkloadObjects() error {
+func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyName string) error {
+	logger := klog.FromContext(ctx)
 	for key, lister := range c.listers {
 		// do not requeue bindingpolicies or bindings
 		if key == util.GetBindingPolicyListerKey() || key == util.GetBindingListerKey() {
-			fmt.Printf("Matched key %s\n", key)
+			logger.Info("Not enqueuing control object", "key", key)
 			continue
 		}
 		objs, err := lister.List(labels.Everything())
 		if err != nil {
+			logger.Info("Lister failed", "key", key, "err", err)
 			return err
 		}
 		for _, obj := range objs {
+			logger.V(4).Info("Enqueuing workload object due to BindingPolicy", "listerKey", key, "obj", util.RefToRuntimeObj(obj), "bindingPolicyName", bindingPolicyName)
 			c.enqueueObject(obj, true)
 		}
 	}
