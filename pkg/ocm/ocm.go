@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	clientset "open-cluster-management.io/api/client/cluster/clientset/versioned"
@@ -43,42 +42,6 @@ import (
 const (
 	defaultResyncPeriod = time.Duration(0)
 )
-
-// wrapObject creates a ManifestWork with a single manifest containing the given object
-func WrapObject(obj runtime.Object) *workv1.ManifestWork {
-	strippedObj := ZeroFields(obj)
-	return &workv1.ManifestWork{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "ManifestWork",
-			APIVersion: "work.open-cluster-management.io/v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name: buildManifestName(strippedObj),
-		},
-		Spec: workv1.ManifestWorkSpec{
-			Workload: workv1.ManifestsTemplate{
-				Manifests: []workv1.Manifest{
-					{
-						RawExtension: runtime.RawExtension{Object: strippedObj},
-					},
-				},
-			},
-		},
-	}
-}
-
-// BuildEmptyManifestFromObject creates an empty ManifestWork which can be used to delete
-func BuildEmptyManifestFromObject(obj runtime.Object) *workv1.ManifestWork {
-	return &workv1.ManifestWork{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "ManifestWork",
-			APIVersion: "work.open-cluster-management.io/v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name: buildManifestName(obj),
-		},
-	}
-}
 
 func ZeroFields(obj runtime.Object) runtime.Object {
 	zeroed := obj.DeepCopyObject()
@@ -132,28 +95,6 @@ func GetOCMClient(kubeconfig *rest.Config) *client.Client {
 		os.Exit(1)
 	}
 	return &c
-}
-
-func buildManifestName(obj any) string {
-	mObj := obj.(metav1.Object)
-	rObj := obj.(runtime.Object)
-	ok := rObj.GetObjectKind()
-	gvk := ok.GroupVersionKind()
-	gvStr := RemoveChar(gvk.GroupVersion().String(), '/')
-	return fmt.Sprintf("%s-%s-%s-%s",
-		strings.ToLower(gvStr),
-		strings.ToLower(gvk.Kind),
-		mObj.GetNamespace(),
-		mObj.GetName(),
-	)
-}
-
-func RemoveChar(s string, c rune) string {
-	i := strings.IndexRune(s, c)
-	if i == -1 {
-		return s
-	}
-	return s[:i] + s[i+1:]
 }
 
 func GetClusterByName(ocmClient client.Client, clusterName string) (clusterv1.ManagedCluster, error) {
