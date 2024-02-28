@@ -171,16 +171,16 @@ func TestMatching(t *testing.T) {
 	}
 	expectation := map[gvrnn]any{}
 	for _, obj := range append(nsORs, objsCreated...) {
-		key, err := util.KeyForGroupVersionKindNamespaceName(obj.MRObject)
+		identifier, err := util.IdentifierForObject(obj.MRObject, ctlr.GetGvkToGvrMapper())
 		if err != nil {
 			t.Fatalf("Failed to extract Key from %#v: %s", obj.MRObject, err)
 		}
-		k2 := k2r(key, obj.Resource)
+		id2 := id2r(identifier)
 		if test := obj.MatchesAny(t, tests); test != nil {
-			expectation[k2] = test
-			logger.Info("Added expectation", "key", k2, "test", *test)
+			expectation[id2] = test
+			logger.Info("Added expectation", "identifier", id2, "test", *test)
 		} else {
-			logger.Info("Not expected", "key", k2)
+			logger.Info("Not expected", "identifier", id2)
 		}
 	}
 	bp := &ksapi.BindingPolicy{
@@ -243,14 +243,10 @@ func (x gvrnn) String() string {
 	return x.GroupVersionResource.String() + "," + x.ObjectName.String()
 }
 
-func k2r(k util.Key, resource string) gvrnn {
+func id2r(objId util.ObjectIdentifier) gvrnn {
 	return gvrnn{
-		GroupVersionResource: metav1.GroupVersionResource{
-			Group:    k.GVK.Group,
-			Version:  k.GVK.Version,
-			Resource: resource,
-		},
-		ObjectName: k.NamespacedName,
+		GroupVersionResource: metav1.GroupVersionResource(objId.GVR()),
+		ObjectName:           objId.ObjectName,
 	}
 }
 
@@ -322,7 +318,6 @@ func LabelsMatchAny(t *testing.T, labels map[string]string, selectors []metav1.L
 		sel, err := metav1.LabelSelectorAsSelector(&ls)
 		if err != nil {
 			t.Fatalf("Failed to convert LabelSelector %#v to labels.Selector: %s", ls, err)
-			continue
 		}
 		if sel.Matches(k8slabels.Set(labels)) {
 			return true

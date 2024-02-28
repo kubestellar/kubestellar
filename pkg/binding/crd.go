@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -38,8 +39,17 @@ type APIResource struct {
 }
 
 // Handle CRDs should account for CRDs being added or deleted to start/stop new informers as needed
-func (c *Controller) handleCRD(ctx context.Context, obj runtime.Object) error {
+func (c *Controller) handleCRD(ctx context.Context, queueKey util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
+
+	obj, err := c.getObject(queueKey)
+	if errors.IsNotFound(err) {
+		logger.V(2).Info("Handling deleted CRD", "name", queueKey.NamespacedName.Name)
+		obj = nil
+	} else if err != nil {
+		return fmt.Errorf("failed to get runtime.Object from queue key (%v): %w", queueKey, err)
+	}
+
 	uObj := obj.(*unstructured.Unstructured)
 	var crdObj *apiextensionsv1.CustomResourceDefinition
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(uObj.UnstructuredContent(), &crdObj); err != nil {
@@ -90,10 +100,10 @@ func (c *Controller) handleCRD(ctx context.Context, obj runtime.Object) error {
 			close(stopper)
 		}
 		// remove entries for key
-		delete(c.informers, key)
-		delete(c.listers, key)
-		delete(c.stoppers, key)
-		c.gvkGvrMapper.DeleteByGvkKey(key)
+		delete(c.informers, gvk)
+		delete(c.listers, gvk)
+		delete(c.stoppers, gvk)
+		c.gvkToGvrMapper.Delete(gvk)
 	}
 
 	return nil
@@ -123,12 +133,12 @@ func crdEstablished(crd *apiextensionsv1.CustomResourceDefinition) bool {
 
 func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toStartList []APIResource) {
 	logger := klog.FromContext(ctx)
+
 	for _, toStart := range toStartList {
-		logger.Info("Ensuring informer for:", "group", toStart.groupVersion.Group,
+		logger.Info("New API added. Starting informer for:", "group", toStart.groupVersion.Group,
 			"version", toStart.groupVersion, "kind", toStart.resource.Kind)
 
-		key := util.KeyForGroupVersionKind(toStart.groupVersion.Group,
-			toStart.groupVersion.Version, toStart.resource.Kind)
+		key := toStart.groupVersion.WithKind(toStart.resource.Kind)
 
 		if _, ok := c.informers[key]; ok {
 			logger.V(3).Info("Informer already ensured.", "key", key)
@@ -168,9 +178,10 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 				c.handleObject(obj)
 			},
 		})
+		c.informers[key] = informer
 
 		// add the mapping between GVK and GVR
-		c.gvkGvrMapper.Add(toStart.groupVersion.WithKind(toStart.resource.Kind), gvr)
+		c.gvkToGvrMapper.Add(toStart.groupVersion.WithKind(toStart.resource.Kind), gvr)
 
 		// ensure the lister
 		lister := cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())

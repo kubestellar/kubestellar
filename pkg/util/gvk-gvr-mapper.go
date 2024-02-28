@@ -17,91 +17,65 @@ limitations under the License.
 package util
 
 import (
+	"fmt"
 	"sync"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-// GvkGvrMapper is a thread-safe mapping between GVKs and GVRs.
+// GVKToGVRMapper is a thread-safe mapping between GVKs -> GVRs.
 // This mapper is only for top-level resources and there is an expectation that
 // within this restricted scope, the relation between resource and Kind is 1:1.
-type GvkGvrMapper interface {
+type GVKToGVRMapper interface {
 	// Add adds a mapping between the given GVK and GVR.
-	// This overwrites the GVK <-> GVR mapping if pre-existing.
+	// This overwrites the mapping if exists.
 	Add(gvk schema.GroupVersionKind, gvr schema.GroupVersionResource)
-	// DeleteByGvkKey deletes the mapping associated with the given GVK.
-	// The key format is that outputted by utils.KeyForGroupVersionKind.
-	DeleteByGvkKey(string)
-	// DeleteByGvrKey deletes the mapping associated with the given GVR.
-	// The key format is that outputted by utils.KeyForGroupVersionResource.
-	DeleteByGvrKey(string)
+	// Delete deletes the mapping associated with the given GVK.
+	Delete(gvk schema.GroupVersionKind)
 	// GetGvr returns the GVR associated with the given GVK if it exists.
 	// The returned boolean indicates whether it exists or not.
 	GetGvr(gvk schema.GroupVersionKind) (schema.GroupVersionResource, bool)
-	// GetGvk returns the GVK associated with the given GVR if it exists.
-	// The returned boolean indicates whether it exists or not.
-	GetGvk(gvr schema.GroupVersionResource) (schema.GroupVersionKind, bool)
 }
 
-type gvkGvrMapper struct {
+type gvkToGvrMapper struct {
 	sync.RWMutex
-	gvkToGvr map[string]schema.GroupVersionResource
-	gvrToGvk map[string]schema.GroupVersionKind
+	gvkToGvr map[schema.GroupVersionKind]schema.GroupVersionResource
 }
 
-func NewGvkGvrMapper() GvkGvrMapper {
-	return &gvkGvrMapper{
-		gvkToGvr: make(map[string]schema.GroupVersionResource),
-		gvrToGvk: make(map[string]schema.GroupVersionKind),
+func NewGvkGvrMapper() GVKToGVRMapper {
+	return &gvkToGvrMapper{
+		gvkToGvr: make(map[schema.GroupVersionKind]schema.GroupVersionResource),
 	}
 }
 
-func (m *gvkGvrMapper) Add(gvk schema.GroupVersionKind, gvr schema.GroupVersionResource) {
+func (m *gvkToGvrMapper) Add(gvk schema.GroupVersionKind, gvr schema.GroupVersionResource) {
 	m.Lock()
 	defer m.Unlock()
 
-	m.gvkToGvr[KeyForGroupVersionKind(gvk.Group, gvk.Version, gvk.Kind)] = gvr
-	m.gvrToGvk[KeyForGroupVersionResource(gvr.Group, gvr.Version, gvr.Resource)] = gvk
+	m.gvkToGvr[gvk] = gvr
 }
 
-func (m *gvkGvrMapper) DeleteByGvkKey(gvkKey string) {
+func (m *gvkToGvrMapper) Delete(gvk schema.GroupVersionKind) {
 	m.Lock()
 	defer m.Unlock()
 
-	gvr, found := m.gvkToGvr[gvkKey]
-	if !found {
-		return
-	}
-
-	delete(m.gvkToGvr, gvkKey)
-	delete(m.gvrToGvk, KeyForGroupVersionResource(gvr.Group, gvr.Version, gvr.Resource))
+	delete(m.gvkToGvr, gvk)
 }
 
-func (m *gvkGvrMapper) DeleteByGvrKey(gvrKey string) {
-	m.Lock()
-	defer m.Unlock()
-
-	gvk, found := m.gvrToGvk[gvrKey]
-	if !found {
-		return
-	}
-
-	delete(m.gvrToGvk, gvrKey)
-	delete(m.gvkToGvr, KeyForGroupVersionKind(gvk.Group, gvk.Version, gvk.Kind))
-}
-
-func (m *gvkGvrMapper) GetGvr(gvk schema.GroupVersionKind) (schema.GroupVersionResource, bool) {
+func (m *gvkToGvrMapper) GetGvr(gvk schema.GroupVersionKind) (schema.GroupVersionResource, bool) {
 	m.RLock()
 	defer m.RUnlock()
 
-	gvr, ok := m.gvkToGvr[KeyForGroupVersionKind(gvk.Group, gvk.Version, gvk.Kind)]
+	gvr, ok := m.gvkToGvr[gvk]
 	return gvr, ok
 }
 
-func (m *gvkGvrMapper) GetGvk(gvr schema.GroupVersionResource) (schema.GroupVersionKind, bool) {
-	m.RLock()
-	defer m.RUnlock()
+// KeyForGroupVersionKind creates a string key in the form group/version/Kind
+// or version/Kind if the group is empty.
+func KeyForGroupVersionKind(group, version, kind string) string {
+	if group == "" {
+		return fmt.Sprintf("%s/%s", version, kind)
+	}
 
-	gvk, ok := m.gvrToGvk[KeyForGroupVersionResource(gvr.Group, gvr.Version, gvr.Resource)]
-	return gvk, ok
+	return fmt.Sprintf("%s/%s/%s", group, version, kind)
 }

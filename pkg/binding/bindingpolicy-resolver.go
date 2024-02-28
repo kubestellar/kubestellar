@@ -22,7 +22,6 @@ import (
 	"sync"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -66,26 +65,29 @@ type BindingPolicyResolver interface {
 	// singleton status reporting requirement in the resolution.
 	NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy)
 
-	// NoteObject updates the maintained bindingpolicy's objects resolution for the
-	// given bindingpolicy key. If the object is being deleted, it is removed from
-	// the resolution if exists.
+	// EnsureObjectIdentifierWithVersion ensures that an object's identifier is
+	// in the resolution for the given bindingpolicy key, and is associated
+	// with the given resourceVersion.
 	//
 	// The returned bool indicates whether the bindingpolicy resolution was changed.
 	// If no resolution is associated with the given key, an error is returned.
-	NoteObject(bindingPolicyKey string, obj runtime.Object) (bool, error)
-	// RemoveObject removes the given object from the maintained bindingpolicy's
-	// objects resolution for the given bindingpolicy key.
+	EnsureObjectIdentifierWithVersion(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
+		resourceVersion string) (bool, error)
+	// RemoveObjectIdentifier removes the given object identifier from the
+	// resolution for the given bindingpolicy key.
 	//
 	// The returned bool indicates whether the bindingpolicy resolution was changed.
-	RemoveObject(bindingPolicyKey string, obj runtime.Object) bool
+	// If no resolution is associated with the given key, false is returned.
+	RemoveObjectIdentifier(bindingPolicyKey string, objIdentifier util.ObjectIdentifier) bool
+	// GetObjectIdentifiers returns the object identifiers associated with the
+	// given bindingpolicy key.
+	// If no resolution is associated with the given key, an error is returned.
+	GetObjectIdentifiers(bindingPolicyKey string) (sets.Set[util.ObjectIdentifier], error)
+
 	// SetDestinations updates the maintained bindingpolicy's
 	// destinations resolution for the given bindingpolicy key.
 	// The given destinations set is expected not to be mutated after this call.
 	SetDestinations(bindingPolicyKey string, destinations sets.Set[string])
-	// GetObjectKeys returns the objects associated with the given
-	// bindingpolicy key.
-	// If no resolution is associated with the given key, an error is returned.
-	GetObjectKeys(bindingPolicyKey string) ([]*util.Key, error)
 
 	// ResolutionExists returns true if a resolution is associated with the
 	// given bindingpolicy key.
@@ -102,16 +104,14 @@ type BindingPolicyResolver interface {
 	DeleteResolution(bindingPolicyKey string)
 }
 
-func NewBindingPolicyResolver(gvkGvrMapper util.GvkGvrMapper) BindingPolicyResolver {
+func NewBindingPolicyResolver() BindingPolicyResolver {
 	return &bindingPolicyResolver{
-		gvkGvrMapper:              gvkGvrMapper,
 		bindingPolicyToResolution: make(map[string]*bindingPolicyResolution),
 	}
 }
 
 type bindingPolicyResolver struct {
 	sync.RWMutex
-	gvkGvrMapper              util.GvkGvrMapper
 	bindingPolicyToResolution map[string]*bindingPolicyResolution
 }
 
@@ -128,7 +128,7 @@ func (resolver *bindingPolicyResolver) GenerateBinding(bindingPolicyKey string) 
 			bindingPolicyKey)
 	}
 
-	bindingSpec, err := bindingPolicyResolution.toBindingSpec(resolver.gvkGvrMapper)
+	bindingSpec, err := bindingPolicyResolution.toBindingSpec()
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create BindingSpec for bindingpolicy %v: %w",
@@ -170,7 +170,7 @@ func (resolver *bindingPolicyResolver) CompareBinding(bindingPolicyKey string,
 		return false
 	}
 
-	return bindingPolicyResolution.matchesBindingSpec(bindingSpec, resolver.gvkGvrMapper)
+	return bindingPolicyResolution.matchesBindingSpec(bindingSpec)
 }
 
 // NoteBindingPolicy associates a new resolution with the given
@@ -185,13 +185,14 @@ func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1
 	resolver.createResolution(bindingpolicy)
 }
 
-// NoteObject updates the maintained bindingpolicy's objects resolution for the
-// given bindingpolicy key. If the object is being deleted, it is removed from
-// the resolution if exists.
+// EnsureObjectIdentifierWithVersion ensures that an object's identifier is
+// in the resolution for the given bindingpolicy key, and is associated
+// with the given resourceVersion.
 //
 // The returned bool indicates whether the bindingpolicy resolution was changed.
-func (resolver *bindingPolicyResolver) NoteObject(bindingPolicyKey string,
-	obj runtime.Object) (bool, error) {
+// If no resolution is associated with the given key, an error is returned.
+func (resolver *bindingPolicyResolver) EnsureObjectIdentifierWithVersion(bindingPolicyKey string,
+	objIdentifier util.ObjectIdentifier, resourceVersion string) (bool, error) {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
@@ -200,29 +201,41 @@ func (resolver *bindingPolicyResolver) NoteObject(bindingPolicyKey string,
 			bindingPolicyKey)
 	}
 
-	// noteObject is thread-safe
-	changed, err := bindingPolicyResolution.noteObject(obj)
-	if err != nil {
-		return false, fmt.Errorf("failed to update resolution for bindingpolicy %v: %w", bindingPolicyKey, err)
-	}
-
-	return changed, nil
+	// ensureObjectIdentifier is thread-safe
+	return bindingPolicyResolution.ensureObjectIdentifierWithVersion(objIdentifier, resourceVersion), nil
 }
 
-// RemoveObject removes the given object from the maintained bindingpolicy's
-// objects resolution for the given bindingpolicy key.
+// RemoveObjectIdentifier removes the given object identifier from the
+// resolution for the given bindingpolicy key.
 //
 // The returned bool indicates whether the bindingpolicy resolution was changed.
-func (resolver *bindingPolicyResolver) RemoveObject(bindingPolicyKey string,
-	obj runtime.Object) bool {
+// If no resolution is associated with the given key, false is returned.
+func (resolver *bindingPolicyResolver) RemoveObjectIdentifier(bindingPolicyKey string,
+	objIdentifier util.ObjectIdentifier) bool {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
 		return false
 	}
 
-	// removeObject is thread-safe
-	return bindingPolicyResolution.removeObject(obj)
+	// removeObjectIdentifier is thread-safe
+	return bindingPolicyResolution.removeObjectIdentifier(objIdentifier)
+}
+
+// GetObjectIdentifiers returns a copy of the object identifiers associated
+// with the given bindingpolicy key.
+// If no resolution is associated with the given key, an error is returned.
+func (resolver *bindingPolicyResolver) GetObjectIdentifiers(bindingPolicyKey string) (sets.Set[util.ObjectIdentifier],
+	error) {
+	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
+
+	if bindingPolicyResolution == nil {
+		return nil, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix,
+			bindingPolicyKey)
+	}
+
+	// getObjectKeys is thread-safe
+	return bindingPolicyResolution.getObjectIdentifiers(), nil
 }
 
 // SetDestinations updates the maintained bindingpolicy's
@@ -237,21 +250,6 @@ func (resolver *bindingPolicyResolver) SetDestinations(bindingPolicyKey string,
 	}
 
 	bindingPolicyResolution.setDestinations(destinations)
-}
-
-// GetObjectKeys returns the objects associated with the given
-// bindingpolicy key.
-// If no resolution is associated with the given key, an error is returned.
-func (resolver *bindingPolicyResolver) GetObjectKeys(bindingPolicyKey string) ([]*util.Key, error) {
-	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
-
-	if bindingPolicyResolution == nil {
-		return nil, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix,
-			bindingPolicyKey)
-	}
-
-	// getObjectKeys is thread-safe
-	return bindingPolicyResolution.getObjectKeys(), nil
 }
 
 // ResolutionExists returns true if a resolution is associated with the
@@ -311,11 +309,10 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 	ownerReference.BlockOwnerDeletion = &[]bool{false}[0]
 
 	bindingPolicyResolution := &bindingPolicyResolution{
-		objectIdentifierToKey:          make(map[string]*util.Key),
-		objectIdentifierToVersion:      make(map[string]string),
-		destinations:                   sets.New[string](),
-		ownerReference:                 ownerReference,
-		requiresSingletonReportedState: bindingpolicy.Spec.WantSingletonReportedState,
+		objectIdentifierToResourceVersion: make(map[util.ObjectIdentifier]string),
+		destinations:                      sets.New[string](),
+		ownerReference:                    ownerReference,
+		requiresSingletonReportedState:    bindingpolicy.Spec.WantSingletonReportedState,
 	}
 	resolver.bindingPolicyToResolution[bindingpolicy.GetName()] = bindingPolicyResolution
 

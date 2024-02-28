@@ -19,7 +19,6 @@ package binding
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/go-logr/logr"
 
@@ -42,8 +41,7 @@ import (
 )
 
 const (
-	waitBeforeTrackingBindingPolicies = 5 * time.Second
-	KSFinalizer                       = "bindingpolicy.kubestellar.io/kscontroller"
+	KSFinalizer = "bindingpolicy.kubestellar.io/kscontroller"
 )
 
 // Handle bindingpolicy as follows:
@@ -57,8 +55,17 @@ const (
 //   - if binding policy wants singleton-status reported, requeue all selected
 //     workload objects to remove the singleton label.
 //   - delete the bindingpolicy's finalizer and remove its resolution.
-func (c *Controller) handleBindingPolicy(ctx context.Context, obj runtime.Object) error {
+func (c *Controller) handleBindingPolicy(ctx context.Context, objIdentifier util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
+
+	obj, err := c.getObjectFromIdentifier(objIdentifier)
+	if errors.IsNotFound(err) {
+		// binding policy is deleted, update resolver.
+		return c.deleteResolutionForBindingPolicy(ctx, objIdentifier.ObjectName.Name)
+	} else if err != nil {
+		return fmt.Errorf("failed to get runtime.Object from object identifier (%v): %w", objIdentifier, err)
+	}
+
 	bindingPolicy, err := runtimeObjectToBindingPolicy(obj)
 	if err != nil {
 		return fmt.Errorf("failed to convert runtime.Object to BindingPolicy: %w", err)
@@ -96,27 +103,26 @@ func (c *Controller) handleBindingPolicy(ctx context.Context, obj runtime.Object
 		return c.requeueWorkloadObjects(ctx, bindingPolicy.Name)
 	}
 
-	// handle deletion of bindingpolicy
-	return c.handleBindingPolicyDeletion(ctx, bindingPolicy)
+	// we delete finalizer if the policy is being deleted (not yet deleted).
+	if err = c.handleBindingPolicyFinalizer(ctx, bindingPolicy); err != nil {
+		return fmt.Errorf("failed to handle finalizer for bindingPolicy %s: %w", bindingPolicy.Name, err)
+	}
+
+	return c.deleteResolutionForBindingPolicy(ctx, objIdentifier.ObjectName.Name)
 }
 
-func (c *Controller) handleBindingPolicyDeletion(ctx context.Context, bindingPolicy *v1alpha1.BindingPolicy) error {
-	if c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicy.GetName()) {
+func (c *Controller) deleteResolutionForBindingPolicy(ctx context.Context, bindingPolicyName string) error {
+	if c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicyName) {
 		// if the bindingpolicy required a singleton status, all selected objects should
 		// be requeued in order to remove the label
-		if err := c.requeueSelectedWorkloadObjects(ctx, bindingPolicy.GetName()); err != nil {
+		if err := c.requeueSelectedWorkloadObjects(ctx, bindingPolicyName); err != nil {
 			return fmt.Errorf("failed to c.requeueForBindingPolicyChanges: %w", err)
 		}
 	}
 
-	// we delete finalizer only after cleaning up in the case above
-	if err := c.handleBindingPolicyFinalizer(ctx, bindingPolicy); err != nil {
-		return fmt.Errorf("failed to c.handleBindingPolicyFinalizer: %w", err)
-	}
-
 	logger := klog.FromContext(ctx)
-	c.bindingPolicyResolver.DeleteResolution(bindingPolicy.GetName())
-	logger.Info("Deleted resolution for bindingpolicy", "name", bindingPolicy.Name)
+	c.bindingPolicyResolver.DeleteResolution(bindingPolicyName)
+	logger.Info("Deleted resolution for bindingpolicy", "name", bindingPolicyName)
 
 	return nil
 }
@@ -127,17 +133,17 @@ func (c *Controller) requeueSelectedWorkloadObjects(ctx context.Context, binding
 	}
 
 	// requeue all objects that are selected by the bindingpolicy (are in its resolution)
-	objectKeys, err := c.bindingPolicyResolver.GetObjectKeys(bindingPolicyName)
+	objectIdentifiers, err := c.bindingPolicyResolver.GetObjectIdentifiers(bindingPolicyName)
 	if err != nil {
-		return fmt.Errorf("failed to get object keys from bindingpolicy resolver for bindingpolicy %s: %w",
-			bindingPolicyName, err)
+		return fmt.Errorf("failed to get object identifiers from bindingpolicy resolver for "+
+			"bindingpolicy %s: %w", bindingPolicyName, err)
 	}
 
-	objs := make([]runtime.Object, 0, len(objectKeys))
-	for _, key := range objectKeys {
-		obj, err := c.getObjectFromKey(*key)
+	objs := make([]runtime.Object, 0, len(objectIdentifiers))
+	for objIdentifier := range objectIdentifiers {
+		obj, err := c.getObjectFromIdentifier(objIdentifier)
 		if err != nil || obj == nil {
-			return fmt.Errorf("failed to get object from key: %w", err)
+			return fmt.Errorf("failed to get object from identifier: %w", err)
 		}
 
 		objs = append(objs, obj)
@@ -146,14 +152,16 @@ func (c *Controller) requeueSelectedWorkloadObjects(ctx context.Context, binding
 	logger := klog.FromContext(ctx)
 	for _, obj := range objs {
 		logger.V(4).Info("Enqueuing workload object due to change in BindingPolicy", "bindingPolicyName", bindingPolicyName)
-		c.enqueueObject(obj, true)
+		c.enqueueObject(obj)
 	}
 
 	return nil
 }
 
 func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clusterId string, oldLabels labels.Set, newLabels labels.Set) {
-	c.logger.Info("Evaluating BindingPolicies for cluster", "clusterId", clusterId)
+	logger := klog.FromContext(ctx)
+
+	logger.Info("Evaluating BindingPolicies for cluster", "clusterId", clusterId)
 	bindingPolicies, err := c.listBindingPolicies()
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -176,14 +184,16 @@ func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clust
 			return
 		}
 		if match1 || match2 {
-			c.logger.V(4).Info("Enqueuing workload object due to cluster and BindingPolicy", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
-			c.enqueueObject(bindingPolicy, true)
+			logger.V(4).Info("Enqueuing workload object due to cluster and BindingPolicy", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
+			c.enqueueObject(bindingPolicy)
 		}
 	}
 }
 
 func (c *Controller) evaluateBindingPolicies(ctx context.Context, clusterId string, labelsSet labels.Set) {
-	c.logger.Info("evaluating BindingPolicies")
+	logger := klog.FromContext(ctx)
+
+	logger.Info("evaluating BindingPolicies")
 	bindingPolicies, err := c.listBindingPolicies()
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -201,14 +211,14 @@ func (c *Controller) evaluateBindingPolicies(ctx context.Context, clusterId stri
 			return
 		}
 		if match {
-			c.logger.V(4).Info("Enqueuing BindingPolicy due to cluster notification", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
-			c.enqueueObject(bindingPolicy, true)
+			logger.V(4).Info("Enqueuing BindingPolicy due to cluster notification", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
+			c.enqueueObject(bindingPolicy)
 		}
 	}
 }
 
 func (c *Controller) listBindingPolicies() ([]runtime.Object, error) {
-	lister := c.listers["control.kubestellar.io/v1alpha1/BindingPolicy"]
+	lister := c.listers[util.GetBindingPolicyGVK()]
 	if lister == nil {
 		return nil, fmt.Errorf("could not get lister for BindingPolicy")
 	}
@@ -238,7 +248,7 @@ func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyNa
 	logger := klog.FromContext(ctx)
 	for key, lister := range c.listers {
 		// do not requeue bindingpolicies or bindings
-		if key == util.GetBindingPolicyListerKey() || key == util.GetBindingListerKey() {
+		if key == util.GetBindingPolicyGVK() || key == util.GetBindingGVR() {
 			logger.Info("Not enqueuing control object", "key", key)
 			continue
 		}
@@ -248,8 +258,10 @@ func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyNa
 			return err
 		}
 		for _, obj := range objs {
-			logger.V(4).Info("Enqueuing workload object due to BindingPolicy", "listerKey", key, "obj", util.RefToRuntimeObj(obj), "bindingPolicyName", bindingPolicyName)
-			c.enqueueObject(obj, true)
+			logger.V(4).Info("Enqueuing workload object due to BindingPolicy",
+				"listerKey", key, "obj", util.RefToRuntimeObj(obj),
+				"bindingPolicyName", bindingPolicyName)
+			c.enqueueObject(obj)
 		}
 	}
 	return nil
@@ -306,29 +318,31 @@ type mrObject interface {
 	runtime.Object
 }
 
-func (c *Controller) testObject(obj mrObject, tests []v1alpha1.DownsyncObjectTest) bool {
-	objNSName := obj.GetNamespace()
-	objName := obj.GetName()
-	objLabels := obj.GetLabels()
-	gvk := obj.GetObjectKind().GroupVersionKind()
-
-	objGVR, haveGVR := c.gvkGvrMapper.GetGvr(gvk)
-	if !haveGVR {
-		c.logger.Info("No GVR, assuming object does not match", "gvk", gvk, "objNS", objNSName, "objName", objName)
-		return false
+func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
+	tests []v1alpha1.DownsyncObjectTest) bool {
+	gvr := schema.GroupVersionResource{
+		Group:    objIdentifier.GVK.Group,
+		Version:  objIdentifier.GVK.Version,
+		Resource: objIdentifier.Resource,
 	}
+
+	logger := klog.FromContext(ctx)
+
 	var objNS *corev1.Namespace
 	for _, test := range tests {
-		if test.APIGroup != nil && (*test.APIGroup) != gvk.Group {
+		if test.APIGroup != nil && (*test.APIGroup) != objIdentifier.GVK.Group {
 			continue
 		}
-		if len(test.Resources) > 0 && !(SliceContains(test.Resources, "*") || SliceContains(test.Resources, objGVR.Resource)) {
+		if len(test.Resources) > 0 && !(SliceContains(test.Resources, "*") ||
+			SliceContains(test.Resources, gvr.Resource)) {
 			continue
 		}
-		if len(test.Namespaces) > 0 && !(SliceContains(test.Namespaces, "*") || SliceContains(test.Namespaces, objNSName)) {
+		if len(test.Namespaces) > 0 && !(SliceContains(test.Namespaces, "*") ||
+			SliceContains(test.Namespaces, objIdentifier.ObjectName.Namespace)) {
 			continue
 		}
-		if len(test.ObjectNames) > 0 && !(SliceContains(test.ObjectNames, "*") || SliceContains(test.ObjectNames, objName)) {
+		if len(test.ObjectNames) > 0 && !(SliceContains(test.ObjectNames, "*") ||
+			SliceContains(test.ObjectNames, objIdentifier.ObjectName.Name)) {
 			continue
 		}
 		if len(test.ObjectSelectors) > 0 && !labelsMatchAny(c.logger, objLabels, test.ObjectSelectors) {
@@ -337,13 +351,15 @@ func (c *Controller) testObject(obj mrObject, tests []v1alpha1.DownsyncObjectTes
 		if len(test.NamespaceSelectors) > 0 && !ALabelSelectorIsEmpty(test.NamespaceSelectors...) {
 			if objNS == nil {
 				var err error
-				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(context.TODO(), objNSName, metav1.GetOptions{})
+				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(context.TODO(),
+					objIdentifier.ObjectName.Namespace, metav1.GetOptions{})
 				if err != nil {
-					c.logger.Info("Object namespace not found, assuming object does not match", "gvk", gvk, "objNS", objNSName, "objName", objName)
+					logger.Info("Object namespace not found, assuming object does not match",
+						"object identifier", objIdentifier)
 					continue
 				}
 			}
-			if !labelsMatchAny(c.logger, objNS.Labels, test.NamespaceSelectors) {
+			if !labelsMatchAny(logger, objNS.Labels, test.NamespaceSelectors) {
 				continue
 			}
 		}

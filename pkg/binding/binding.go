@@ -32,9 +32,11 @@ import (
 )
 
 // syncBinding syncs a binding object with what is resolved by the bindingpolicy resolver.
-func (c *Controller) syncBinding(ctx context.Context, key util.Key) error {
+func (c *Controller) syncBinding(ctx context.Context, objIdentifier util.ObjectIdentifier) error {
+	logger := klog.FromContext(ctx)
+
 	var unstructuredObj *unstructured.Unstructured
-	if !c.bindingPolicyResolver.ResolutionExists(key.NamespacedName.Name) {
+	if !c.bindingPolicyResolver.ResolutionExists(objIdentifier.ObjectName.Name) {
 		// if a resolution is not associated to the binding's name
 		// then the bindingpolicy has been deleted, and the binding
 		// will eventually be garbage collected. We can safely ignore this.
@@ -42,14 +44,14 @@ func (c *Controller) syncBinding(ctx context.Context, key util.Key) error {
 		return nil
 	}
 
-	obj, err := c.getObjectFromKey(key)
+	obj, err := c.getObjectFromIdentifier(objIdentifier)
 	if errors.IsNotFound(err) {
-		unstructuredObj = util.EmptyUnstructuredObjectFromKey(key)
+		// a resolution exists and the object is not found, therefore it is deleted and should be created
+		unstructuredObj = util.EmptyUnstructuredObjectFromIdentifier(objIdentifier)
 	} else if err != nil {
-		return fmt.Errorf("failed to get runtime.Object from key with gvk (%v) and namespaced-name (%v): %w",
-			key.GVK, key.NamespacedName, err)
+		return fmt.Errorf("failed to get runtime.Object from object identifier (%v): %w", objIdentifier, err)
 	} else {
-		// perform the type assertion only if getObjectFromKey did not fail
+		// perform the type assertion only if getObjectFromIdentifier did not fail
 		var ok bool
 		unstructuredObj, ok = obj.(*unstructured.Unstructured)
 		if !ok {
@@ -81,7 +83,7 @@ func (c *Controller) syncBinding(ctx context.Context, key util.Key) error {
 		return nil
 	}
 
-	c.logger.Info("binding is up to date", "name", binding.GetName())
+	logger.Info("binding is up to date", "name", binding.GetName())
 	return nil
 }
 
