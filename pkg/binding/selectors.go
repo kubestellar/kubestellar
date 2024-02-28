@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
@@ -39,8 +40,10 @@ func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) 
 	if err != nil {
 		return err
 	}
+	logger := klog.FromContext(ctx)
 
 	objMR := obj.(mrObject)
+	objBeingDeleted := isBeingDeleted(obj)
 
 	isSelectedBySingletonBinding := false
 
@@ -56,10 +59,14 @@ func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) 
 			// TODO: optimize
 			if resolutionUpdated := c.bindingPolicyResolver.RemoveObject(bindingPolicy.GetName(), obj); resolutionUpdated {
 				// enqueue binding to be synced since object was removed from its bindingpolicy's resolution
-				c.logger.V(4).Info("enqueued Binding for syncing due to the removal of an "+
+				logger.V(4).Info("Enqueuing Binding for syncing due to the removal of an "+
 					"object from its resolution", "binding", bindingPolicy.GetName(),
 					"object", util.RefToRuntimeObj(obj))
 				c.enqueueBinding(bindingPolicy.GetName())
+			} else {
+				logger.V(4).Info("Not enqueuing Binding for syncing due to the removal of an "+
+					"object from its resolution", "binding", bindingPolicy.GetName(),
+					"object", util.RefToRuntimeObj(obj))
 			}
 			continue
 		}
@@ -82,14 +89,14 @@ func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) 
 
 		if resolutionUpdated {
 			// enqueue binding to be synced since an object was added to its bindingpolicy's resolution
-			c.logger.V(4).Info("enqueued Binding for syncing due to a noting of an "+
+			logger.V(4).Info("Enqueued Binding for syncing due to a noting of an "+
 				"object in its resolution", "binding", bindingPolicy.GetName(),
-				"object", util.RefToRuntimeObj(obj))
+				"object", util.RefToRuntimeObj(obj), "objBeingDeleted", objBeingDeleted)
 			c.enqueueBinding(bindingPolicy.GetName())
 		}
 
 		// make sure object has singleton status if needed
-		if !isBeingDeleted(obj) &&
+		if !objBeingDeleted &&
 			c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicy.GetName()) {
 			if err := c.handleSingletonLabel(ctx, obj, bindingPolicy.GetName()); err != nil {
 				return fmt.Errorf("failed to add singleton label to object: %w", err)
@@ -103,7 +110,7 @@ func (c *Controller) updateResolutions(ctx context.Context, obj runtime.Object) 
 	// we need to remove the singleton label from the object if it exists.
 	// NOTE that this takes care of the case where the object was previously selected by a singleton binding
 	// and is no longer selected by any binding.
-	if !isBeingDeleted(obj) && !isSelectedBySingletonBinding {
+	if !objBeingDeleted && !isSelectedBySingletonBinding {
 		if err := c.handleSingletonLabel(ctx, obj, emptyBindingPolicyName); err != nil {
 			return fmt.Errorf("failed to remove singleton label from object: %w", err)
 		}

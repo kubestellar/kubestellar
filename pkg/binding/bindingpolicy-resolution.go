@@ -141,13 +141,9 @@ func (resolution *bindingPolicyResolution) toBindingSpec(gvkGvrMapper util.GvkGv
 		// rest of fields calculated below
 	}
 
-	// the following optimize the building of the workload by maintaining pointers to the object-wrapper structs
-	// that are keyed by GVR
-	clusterScopeDownsyncObjectsMap := map[schema.GroupVersionResource]*v1alpha1.ClusterScopeDownsyncObjects{}
-	// Since namespaceScopeDownsyncObjectsMap groups objects by NS, these maps are used to efficiently locate the
-	// * struct by GVR
-	// * objects slice by namespace (for GVR)
-	namespaceScopeDownsyncObjectsMap := map[schema.GroupVersionResource]*v1alpha1.NamespaceScopeDownsyncObjects{}
+	// The following optimize the building of the workload by indexing the slices.
+	clusterScopeGVRToPosition := map[schema.GroupVersionResource]int{}
+	namespaceScopeGVRToPosition := map[schema.GroupVersionResource]int{}
 	nsObjectsLocationInSlice := map[string]int{} // key is GVR/ns to avoid 2D maps
 
 	// iterate over all objects and build workload efficiently. No (GVR, namespace, name) tuple is
@@ -161,11 +157,11 @@ func (resolution *bindingPolicyResolution) toBindingSpec(gvkGvrMapper util.GvkGv
 
 		// check if object is cluster-scoped or namespaced by checking namespace
 		if key.NamespacedName.Namespace == metav1.NamespaceNone {
-			resolution.handleClusterScopedObject(gvr, key, &workload, clusterScopeDownsyncObjectsMap)
+			handleClusterScopedObject(gvr, key, &workload, clusterScopeGVRToPosition)
 			continue
 		}
 
-		resolution.handleNamespacedObject(gvr, key, &workload, namespaceScopeDownsyncObjectsMap, nsObjectsLocationInSlice)
+		handleNamespacedObject(gvr, key, &workload, namespaceScopeGVRToPosition, nsObjectsLocationInSlice)
 	}
 
 	return &v1alpha1.BindingSpec{
@@ -175,19 +171,20 @@ func (resolution *bindingPolicyResolution) toBindingSpec(gvkGvrMapper util.GvkGv
 }
 
 // handleClusterScopedObject handles a cluster-scoped object by adding it to the workload.
-// ClusterScopeDownsyncObjectsMap is used to efficiently locate the object in the workload.
-func (resolution *bindingPolicyResolution) handleClusterScopedObject(gvr schema.GroupVersionResource,
+// clusterScopeGVRToPosition is used to efficiently locate the object in the workload.
+func handleClusterScopedObject(gvr schema.GroupVersionResource,
 	key *util.Key,
 	workload *v1alpha1.DownsyncObjectReferences,
-	clusterScopeDownsyncObjectsMap map[schema.GroupVersionResource]*v1alpha1.ClusterScopeDownsyncObjects) {
+	clusterScopeGVRToPosition map[schema.GroupVersionResource]int) {
 	// check if obj GVR already exists in map
-	if csdObjects, found := clusterScopeDownsyncObjectsMap[gvr]; found {
+	if gvrIndex, found := clusterScopeGVRToPosition[gvr]; found {
 		// GVR exists, append cluster-scope object
-		csdObjects.ObjectNames = append(csdObjects.ObjectNames, key.NamespacedName.Name)
+		workload.ClusterScope[gvrIndex].ObjectNames = append(workload.ClusterScope[gvrIndex].ObjectNames, key.NamespacedName.Name)
 		return
 	}
 	// GVR doesn't exist, this is the first time
 	// add ClusterScopeDownsyncResource to the workload
+	clusterScopeGVRToPosition[gvr] = len(workload.ClusterScope)
 	workload.ClusterScope = append(workload.ClusterScope, v1alpha1.ClusterScopeDownsyncObjects{
 		GroupVersionResource: metav1.GroupVersionResource{
 			Group:    gvr.Group,
@@ -196,36 +193,33 @@ func (resolution *bindingPolicyResolution) handleClusterScopedObject(gvr schema.
 		},
 		ObjectNames: []string{key.NamespacedName.Name},
 	})
-
-	// retain a pointer to the added ClusterScopeDownsyncResource for efficiency
-	clusterScopeDownsyncObjectsMap[gvr] = &workload.ClusterScope[len(workload.ClusterScope)-1]
 }
 
 // handleNamespacedObject handles a namespaced object by adding it to the workload.
-// namespaceScopeDownsyncObjectsMap and nsObjectsLocationInSlice are used to efficiently locate the object in the workload.
-func (resolution *bindingPolicyResolution) handleNamespacedObject(gvr schema.GroupVersionResource,
+// namespaceScopeGVRToPosition and nsObjectsLocationInSlice are used to efficiently locate the object in the workload.
+func handleNamespacedObject(gvr schema.GroupVersionResource,
 	key *util.Key,
 	workload *v1alpha1.DownsyncObjectReferences,
-	namespaceScopeDownsyncObjectsMap map[schema.GroupVersionResource]*v1alpha1.NamespaceScopeDownsyncObjects,
+	namespaceScopeGVRToPosition map[schema.GroupVersionResource]int,
 	nsObjectsLocationInSlice map[string]int) {
 	gvrAndNSKey := util.KeyFromGVRandNS(gvr, key.NamespacedName.Namespace)
-	if nsdObjects, found := namespaceScopeDownsyncObjectsMap[gvr]; found {
+	if gvrIndex, found := namespaceScopeGVRToPosition[gvr]; found {
 		// GVR mapping is found, check NS mapping
 		if nsIdx, found := nsObjectsLocationInSlice[gvrAndNSKey]; found {
 			// NS mapping is found, append name
-			nsdObjects.ObjectsByNamespace[nsIdx].Names = append(nsdObjects.ObjectsByNamespace[nsIdx].Names,
+			workload.NamespaceScope[gvrIndex].ObjectsByNamespace[nsIdx].Names = append(workload.NamespaceScope[gvrIndex].ObjectsByNamespace[nsIdx].Names,
 				key.NamespacedName.Name)
 			return
 		}
 
 		// namespace mapping is not found, create new (ns, names) entry for object
-		nsdObjects.ObjectsByNamespace = append(nsdObjects.ObjectsByNamespace, v1alpha1.NamespaceAndNames{
+		workload.NamespaceScope[gvrIndex].ObjectsByNamespace = append(workload.NamespaceScope[gvrIndex].ObjectsByNamespace, v1alpha1.NamespaceAndNames{
 			Namespace: key.NamespacedName.Namespace,
 			Names:     []string{key.NamespacedName.Name},
 		})
 
 		// update index mapping
-		nsObjectsLocationInSlice[gvrAndNSKey] = len(nsdObjects.ObjectsByNamespace) - 1
+		nsObjectsLocationInSlice[gvrAndNSKey] = len(workload.NamespaceScope[gvrIndex].ObjectsByNamespace) - 1
 		return
 	}
 
@@ -246,7 +240,7 @@ func (resolution *bindingPolicyResolution) handleNamespacedObject(gvr schema.Gro
 	})
 
 	// retain a pointer to the added namespaceScopeDownsyncObjectsMap for efficiency
-	namespaceScopeDownsyncObjectsMap[gvr] = &workload.NamespaceScope[len(workload.NamespaceScope)-1]
+	namespaceScopeGVRToPosition[gvr] = len(workload.NamespaceScope) - 1
 	// update ns mapping
 	nsObjectsLocationInSlice[gvrAndNSKey] = 0 // first entry
 }

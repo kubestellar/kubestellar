@@ -59,4 +59,4 @@ $extract etcd.${fmt}
 export PATH=${PATH}:${PWD}/etcd-v${etcd_version}-${platform}
 rm etcd.${fmt}
 
-CONTROLLER_TEST_NUM_OBJECTS=12 go test -v ./test/integration/controller-manager -args -v=5
+CONTROLLER_TEST_NUM_OBJECTS=360 go test -v ./test/integration/controller-manager -args -v=5

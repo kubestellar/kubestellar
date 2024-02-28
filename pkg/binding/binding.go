@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -104,6 +105,8 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 		return fmt.Errorf("failed to convert Binding to Unstructured: %w", err)
 	}
 
+	logger := klog.FromContext(ctx)
+
 	_, err = c.dynamicClient.Resource(schema.GroupVersionResource{
 		Group:    v1alpha1.SchemeGroupVersion.Group,
 		Version:  bdg.GetObjectKind().GroupVersionKind().Version,
@@ -120,14 +123,14 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 				return fmt.Errorf("failed to create binding: %w", err)
 			}
 
-			c.logger.Info("created binding", "name", bdg.GetName())
+			logger.Info("created binding", "name", bdg.GetName())
 			return nil
 		} else {
 			return fmt.Errorf("failed to update binding: %w", err)
 		}
 	}
 
-	c.logger.Info("updated binding", "name", bdg.GetName())
+	logger.Info("updated binding", "name", bdg.GetName())
 	return nil
 }
 

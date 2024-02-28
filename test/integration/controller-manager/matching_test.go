@@ -132,10 +132,12 @@ func TestMatching(t *testing.T) {
 		t.Fatal(err)
 	}
 	time.Sleep(5 * time.Second)
-	namespaces := []*k8score.Namespace{
-		generateNamespace(t, ctx, rg, "ns1", k8sClient),
-		generateNamespace(t, ctx, rg, "ns2", k8sClient),
-		generateNamespace(t, ctx, rg, "ns3", k8sClient),
+	namespaces := []*k8score.Namespace{}
+	nsORs := []mrObjRsc{}
+	for i := 1; i <= 3; i++ {
+		ns := generateNamespace(t, ctx, rg, fmt.Sprintf("ns%d", i), k8sClient)
+		namespaces = append(namespaces, ns)
+		nsORs = append(nsORs, mrObjRsc{ns, "namespaces", nil})
 	}
 	nObjStr := os.Getenv(NumObjEnvar)
 	nObj := 18
@@ -168,7 +170,7 @@ func TestMatching(t *testing.T) {
 		tests = append(tests, test)
 	}
 	expectation := map[gvrnn]any{}
-	for _, obj := range objsCreated {
+	for _, obj := range append(nsORs, objsCreated...) {
 		key, err := util.KeyForGroupVersionKindNamespaceName(obj.MRObject)
 		if err != nil {
 			t.Fatalf("Failed to extract Key from %#v: %s", obj.MRObject, err)
@@ -307,7 +309,8 @@ func (mor mrObjRsc) MatchesAny(t *testing.T, tests []ksapi.DownsyncObjectTest) *
 		if len(test.ObjectNames) > 0 && !(binding.SliceContains(test.ObjectNames, mor.MRObject.GetName()) || binding.SliceContains(test.ObjectNames, "*")) {
 			continue
 		}
-		if len(test.NamespaceSelectors) > 0 && !LabelsMatchAny(t, mor.Namespace.Labels, test.NamespaceSelectors) {
+		if len(test.NamespaceSelectors) > 0 && !(mor.Namespace == nil && binding.ALabelSelectorIsEmpty(test.NamespaceSelectors...) ||
+			mor.Namespace != nil && LabelsMatchAny(t, mor.Namespace.Labels, test.NamespaceSelectors)) {
 			continue
 		}
 		if len(test.ObjectSelectors) > 0 && !LabelsMatchAny(t, mor.MRObject.GetLabels(), test.ObjectSelectors) {
@@ -340,41 +343,47 @@ func extractTest(rg *rand.Rand, object mrObjRsc) ksapi.DownsyncObjectTest {
 		group := object.MRObject.GetObjectKind().GroupVersionKind().Group
 		ans.APIGroup = &group
 	}
-	ans.Resources = extractStringTest(rg, object.Resource)
+	ans.Resources = extractStringTest(rg, object.Resource, false)
 	if object.Namespace != nil {
-		ans.Namespaces = extractStringTest(rg, object.MRObject.GetNamespace())
-		ans.NamespaceSelectors = extractLabelsTest(rg, object.Namespace.Labels)
+		ans.Namespaces = extractStringTest(rg, object.MRObject.GetNamespace(), false)
+		ans.NamespaceSelectors = extractLabelsTest(rg, object.Namespace.Labels, false)
 	}
-	ans.ObjectNames = extractStringTest(rg, object.MRObject.GetName())
-	ans.ObjectSelectors = extractLabelsTest(rg, object.MRObject.GetLabels())
+	// Ensure there is a name test that does not accept non-test objects
+	discBySel := rg.Intn(2) < 1
+	ans.ObjectNames = extractStringTest(rg, object.MRObject.GetName(), !discBySel)
+	ans.ObjectSelectors = extractLabelsTest(rg, object.MRObject.GetLabels(), discBySel)
 	return ans
 }
 
-func extractStringTest(rg *rand.Rand, good string) []string {
+func extractStringTest(rg *rand.Rand, good string, avoidAny bool) []string {
 	ans := []string{}
-	if rg.Intn(10) < 1 {
+	tail := []string{}
+	if rg.Intn(20) < 1 {
+		tail = append(tail, "bar")
+	}
+	if rg.Intn(20) < 1 {
 		ans = append(ans, "foo")
 	}
-	if rg.Intn(10) < 7 {
+	if rg.Intn(10) < 7 || avoidAny && len(ans) == 0 && len(tail) == 0 {
 		ans = append(ans, good)
 	}
-	if rg.Intn(10) < 1 {
-		ans = append(ans, "bar")
-	}
-	return ans
+	return append(ans, tail...)
 }
 
-func extractLabelsTest(rg *rand.Rand, goodLabels map[string]string) []metav1.LabelSelector {
+func extractLabelsTest(rg *rand.Rand, goodLabels map[string]string, avoidAny bool) []metav1.LabelSelector {
 	testLabels := map[string]string{}
-	if rg.Intn(10) < 1 {
+	if rg.Intn(15) < 1 {
 		testLabels["foo"] = "bar"
 	}
+	numGood := len(goodLabels)
+	iter := 0
 	for key, val := range goodLabels {
-		if rg.Intn(10) < 5 {
+		iter = iter + 1
+		if !(avoidAny && len(testLabels) == 0 && iter == numGood) && rg.Intn(10) < 5 {
 			continue
 		}
 		testVal := val
-		if rg.Intn(10) < 2 {
+		if rg.Intn(10) < 1 {
 			testVal = val + "not"
 		}
 		testLabels[key] = testVal

@@ -282,7 +282,7 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
-		logger := c.logger.WithName(fmt.Sprintf("%s-worker-%d", controllerName, i))
+		logger := c.logger.WithName(fmt.Sprintf("worker-%d", i))
 		workerCtx := klog.NewContext(ctx, logger)
 		go wait.UntilWithContext(workerCtx, c.runWorker, time.Second)
 	}
@@ -301,20 +301,22 @@ func (c *Controller) createManagedClustersInformer(ctx context.Context) error {
 	informer := informerFactory.Cluster().V1().ManagedClusters().Informer()
 	_, err := informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			labels := obj.(metav1.Object).GetLabels()
-			c.evaluateBindingPolicies(ctx, labels)
+			objM := obj.(metav1.Object)
+			c.evaluateBindingPolicies(ctx, objM.GetName(), objM.GetLabels())
 		},
 		UpdateFunc: func(old, new interface{}) {
+			oldM := old.(metav1.Object)
+			newM := new.(metav1.Object)
 			// Re-evaluateBindingPolicies iff labels have changed.
-			oldLabels := old.(metav1.Object).GetLabels()
-			newLabels := new.(metav1.Object).GetLabels()
+			oldLabels := oldM.GetLabels()
+			newLabels := newM.GetLabels()
 			if !reflect.DeepEqual(oldLabels, newLabels) {
-				c.evaluateBindingPoliciesForUpdate(ctx, oldLabels, newLabels)
+				c.evaluateBindingPoliciesForUpdate(ctx, newM.GetName(), oldLabels, newLabels)
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
-			labels := obj.(metav1.Object).GetLabels()
-			c.evaluateBindingPolicies(ctx, labels)
+			objM := obj.(metav1.Object)
+			c.evaluateBindingPolicies(ctx, objM.GetName(), objM.GetLabels())
 		},
 	})
 	if err != nil {
@@ -424,10 +426,13 @@ func (c *Controller) runWorker(ctx context.Context) {
 // processNextWorkItem reads a single work item off the workqueue and
 // attempt to process it by calling the reconcile.
 func (c *Controller) processNextWorkItem(ctx context.Context) bool {
+	logger := klog.FromContext(ctx)
 	obj, shutdown := c.workqueue.Get()
 	if shutdown {
+		logger.V(1).Info("Worker is done")
 		return false
 	}
+	logger.V(4).Info("Dequeued", "obj", obj)
 
 	// We wrap this block in a func so we can defer c.workqueue.Done.
 	err := func(obj interface{}) error {
@@ -460,7 +465,7 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
 		c.workqueue.Forget(obj)
-		c.logger.V(2).Info("Successfully synced", "object", obj)
+		logger.V(2).Info("Successfully synced", "object", obj)
 		return nil
 	}(obj)
 
@@ -473,6 +478,7 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 }
 
 func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
+	logger := klog.FromContext(ctx)
 	var obj runtime.Object
 	var err error
 	// special handling for binding resource as it is the only
@@ -487,7 +493,7 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		if err != nil {
 			// The resource no longer exist, which means it has been deleted.
 			if errors.IsNotFound(err) {
-				c.logger.Info("object referenced from work queue no longer exists",
+				logger.Info("Object referenced from work queue no longer exists",
 					"object-name", key.NamespacedName, "object-gvk", key.GvkKey())
 				return nil
 			}
@@ -506,14 +512,14 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 			// will add name.
 		}
 
-		c.logger.Info("handled bindingpolicy", "object", util.RefToRuntimeObj(obj))
+		logger.Info("Handled bindingpolicy", "object", util.RefToRuntimeObj(obj))
 		return nil
 	} else if util.IsCRD(obj) {
 		if err := c.handleCRD(obj); err != nil {
 			return fmt.Errorf("failed to handle CRD: %w", err) // error logging after this call
 			// will add name.
 		}
-		c.logger.Info("handled CRD", "object", util.RefToRuntimeObj(obj))
+		logger.Info("Handled CRD", "object", util.RefToRuntimeObj(obj))
 	}
 
 	// avoid further processing for keys of objects being deleted that do not have a deleted object
