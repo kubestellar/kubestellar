@@ -40,25 +40,9 @@ __Don't change anything, just add KubeStellar!__
 - __Scale__ with 1:many and many:1 scenarios
 - __Remain compatible__ with cloud-native solutions
 
-## KubeStellar virtual clusters (Spaces) are our secret
-- KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
-- Standard Kubernetes clusters have __2-300__ api-resources, KubeStellar Spaces have only __40__
-- Fewer api-resources mean resources remain inactive (denatured) – they do not expand into other resources like replicasets, pods, etc.
-- Denaturing is the key to accepting native, unbundled Kubernetes resources as input without running them
-- Unbundled resources are the default and preferred output of most cloud-native tools making KubeStellar use and integration easy
+## Use The Source, Luke
 
-## QuickStart
-
-Checkout our [QuickStart Guide]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/user-quickstart-kind/)
-
-
-## Roadmaps for the Project
-
-We have defined and largely completed the
-[PoC2023q1](../Coding%20Milestones/PoC2023q1/outline/).
-The current activity is refining the definition of, and producing, the
-[PoC2023q4](../Coding%20Milestones/PoC2023q4/outline/).
-Goals not addressed in that PoC are to be explored later.
+To find most of our documentation, go directly to the README of [the KubeStellar GitHub repository](http://github.com/kubestellar/kubestellar). To read the documentation for release `X.Y.Z`, view the Git content tagged `vX.Y.Z`.
 
 ## Contributing
 

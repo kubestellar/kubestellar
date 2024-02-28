@@ -1,6 +1,6 @@
-# KubeStellar 0.20
+# KubeStellar
 
-KubeStellar 0.20  supports multi-cluster deployment of Kubernetes objects, controlled by a 
+KubeStellar supports multi-cluster deployment of Kubernetes objects, controlled by a 
 simple binding policy and deploying Kubernetes objects in their native format.  It uses OCM as 
 transport, with standard OCM agents (Klusterlet). We show examples of deploying workloads to 
 multi-cluster with kubectl, helm and ArgoCD using a simple label-selectors-based binding policy.
@@ -22,7 +22,7 @@ straightforward binding policy.
 10. *Simplified setup:* Just 3 commands to get a fully functional setup (`kflex init`, `kflex create imbs`, `kflex create wds`)
 11. *OpenShift Support:* Same commands to set it up. All components have been tested in OpenShift, 
 including OCM Klusterlet for the WECs.
-12. *Singleton Status* Addressed by the status controller in KubeStellar 0.20 and the [Status Add-On for OCM](link to be added)
+12. *Singleton Status* Addressed by the status controller in KubeStellar and the [Status Add-On for OCM](https://github.com/kubestellar/ocm-status-addon).
 
 ## To be supported
 
