@@ -151,60 +151,48 @@ type bindingCase struct {
 	ExpectedKeys []any // JSON equivalent of keys of expect, for logging
 }
 
-func clusterScopeKey(elts ksapi.ClusterScopeDownsyncObjects) metav1.GroupVersionResource {
-	return elts.GroupVersionResource
+func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion string) ksapi.ClusterScopeDownsyncObject {
+	return ksapi.ClusterScopeDownsyncObject{
+		GroupVersionResource: gvr,
+		Name:                 name,
+		ResourceVersion:      resourceVersion,
+	}
 }
 
-func newClusterScope(gvr metav1.GroupVersionResource) ksapi.ClusterScopeDownsyncObjects {
-	return ksapi.ClusterScopeDownsyncObjects{GroupVersionResource: gvr}
-}
-
-func namespaceScopeKey(elts ksapi.NamespaceScopeDownsyncObjects) metav1.GroupVersionResource {
-	return elts.GroupVersionResource
-}
-
-func newNamespaceScope(gvr metav1.GroupVersionResource) ksapi.NamespaceScopeDownsyncObjects {
-	return ksapi.NamespaceScopeDownsyncObjects{GroupVersionResource: gvr}
-}
-
-func namespaceAndNamesKey(elts ksapi.NamespaceAndNames) string /*namespace*/ {
-	return elts.Namespace
-}
-
-func newNamespaceAndNames(nsName string) ksapi.NamespaceAndNames {
-	return ksapi.NamespaceAndNames{Namespace: nsName}
+func newNamespaceScope(gvr metav1.GroupVersionResource, namespace, name, resourceVersion string) ksapi.NamespaceScopeDownsyncObject {
+	return ksapi.NamespaceScopeDownsyncObject{
+		GroupVersionResource: gvr,
+		Namespace:            namespace,
+		Name:                 name,
+		ResourceVersion:      resourceVersion,
+	}
 }
 
 func (bc *bindingCase) Add(obj mrObjRsc) {
 	key := util.RefToRuntimeObj(obj.MRObject)
-	gvr := metav1.GroupVersionResource{Group: key.GK.Group, Version: obj.MRObject.GetObjectKind().GroupVersionKind().Version, Resource: obj.Resource}
+	gvr := metav1.GroupVersionResource{
+		Group:    key.GK.Group,
+		Version:  obj.MRObject.GetObjectKind().GroupVersionKind().Version,
+		Resource: obj.Resource,
+	}
 	objNS := obj.MRObject.GetNamespace()
 	objName := obj.MRObject.GetName()
+	objRV := obj.MRObject.GetResourceVersion()
 	jm, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj.MRObject)
 	if err != nil {
 		panic(err)
 	}
+
 	if objNS == "" {
-		objs := SliceFindOrCreate(clusterScopeKey, newClusterScope, &bc.Binding.Spec.Workload.ClusterScope, gvr)
-		objs.ObjectNames = append(objs.ObjectNames, objName)
+		clusterObj := newClusterScope(gvr, objName, objRV)
+		bc.Binding.Spec.Workload.ClusterScope = append(bc.Binding.Spec.Workload.ClusterScope, clusterObj)
 	} else {
-		nses := SliceFindOrCreate(namespaceScopeKey, newNamespaceScope, &bc.Binding.Spec.Workload.NamespaceScope, gvr)
-		nsObjs := SliceFindOrCreate(namespaceAndNamesKey, newNamespaceAndNames, &nses.ObjectsByNamespace, objNS)
-		nsObjs.Names = append(nsObjs.Names, objName)
+		namespaceObj := newNamespaceScope(gvr, objNS, objName, objRV)
+		bc.Binding.Spec.Workload.NamespaceScope = append(bc.Binding.Spec.Workload.NamespaceScope, namespaceObj)
 	}
+
 	bc.expect[key] = jm
 	bc.ExpectedKeys = append(bc.ExpectedKeys, key.String())
-}
-
-func SliceFindOrCreate[Elt any, Key comparable](extractKey func(Elt) Key, makeElt func(Key) Elt, slice *[]Elt, key Key) *Elt {
-	for idx, elt := range *slice {
-		if extractKey(elt) == key {
-			return &(*slice)[idx]
-		}
-	}
-	last := len(*slice)
-	(*slice) = append(*slice, makeElt(key))
-	return &(*slice)[last]
 }
 
 func (rg *generator) generateBindingCase(name string, objs []mrObjRsc) bindingCase {
