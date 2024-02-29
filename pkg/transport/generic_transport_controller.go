@@ -389,36 +389,22 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 	objectsToPropagate := make([]*unstructured.Unstructured, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clusterScopedObject := range binding.Spec.Workload.ClusterScope {
-		if clusterScopedObject.ObjectNames == nil {
-			continue // no objects from this gvr, skip
-		}
 		gvr := schema.GroupVersionResource{Group: clusterScopedObject.Group, Version: clusterScopedObject.Version, Resource: clusterScopedObject.Resource}
-		gvrDynamicClient := c.wdsDynamicClient.Resource(gvr)
-		for _, objectName := range clusterScopedObject.ObjectNames {
-			object, err := gvrDynamicClient.Get(ctx, objectName, metav1.GetOptions{})
-			if err != nil {
-				return nil, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", objectName, gvr, err)
-			}
-			objectsToPropagate = append(objectsToPropagate, cleanObject(object))
+		object, err := c.wdsDynamicClient.Resource(gvr).Get(ctx, clusterScopedObject.Name, metav1.GetOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", clusterScopedObject.Name, gvr, err)
 		}
+		objectsToPropagate = append(objectsToPropagate, cleanObject(object))
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, namespaceScopedObject := range binding.Spec.Workload.NamespaceScope {
 		gvr := schema.GroupVersionResource{Group: namespaceScopedObject.Group, Version: namespaceScopedObject.Version, Resource: namespaceScopedObject.Resource}
-		gvrDynamicClient := c.wdsDynamicClient.Resource(gvr)
-		for _, objectsByNamespace := range namespaceScopedObject.ObjectsByNamespace {
-			if objectsByNamespace.Names == nil {
-				continue // no objects from this namespace, skip
-			}
-			for _, objectName := range objectsByNamespace.Names {
-				object, err := gvrDynamicClient.Namespace(objectsByNamespace.Namespace).Get(ctx, objectName, metav1.GetOptions{})
-				if err != nil {
-					return nil, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", objectName,
-						objectsByNamespace.Namespace, gvr, err)
-				}
-				objectsToPropagate = append(objectsToPropagate, cleanObject(object))
-			}
+		object, err := c.wdsDynamicClient.Resource(gvr).Namespace(namespaceScopedObject.Namespace).Get(ctx, namespaceScopedObject.Name, metav1.GetOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", namespaceScopedObject.Name,
+				namespaceScopedObject.Namespace, gvr, err)
 		}
+		objectsToPropagate = append(objectsToPropagate, cleanObject(object))
 	}
 
 	return objectsToPropagate, nil
