@@ -32,7 +32,6 @@ import (
 	"k8s.io/kubernetes/test/integration/framework"
 
 	"github.com/kubestellar/kubestellar/pkg/binding"
-	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 // An integration test for the binding controller.
@@ -107,16 +106,17 @@ func TestCRDHandling(t *testing.T) {
 	}
 
 	crd, _ := createCRDFromLiteral(t, ctx, "CR1", crd1Literal, serializer, apiextClient)
-	crdKey := util.KeyForGroupVersionKind(crd.Spec.Group, crd.Spec.Versions[0].Name, crd.Spec.Names.Kind)
+	watched := "synthetic-crd.com/v2alpha1/CR1"
+	notWatched := "synthetic-crd.com/v3beta1/CR1"
 
 	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, time.Minute, false, func(ctx context.Context) (done bool, err error) {
 		informers, listers := ctlr.GetInformers(), ctlr.GetListers()
 		numInformers, numListers := len(informers), len(listers)
-		if numInformers != initNumInformers+1 {
+		if numInformers != initNumInformers+2 {
 			logger.Info("Doesn't increase", "numInformers", numInformers, "initNumInformers", initNumInformers)
 			return false, nil
 		}
-		if numListers != initNumListers+1 {
+		if numListers != initNumListers+2 {
 			logger.Info("Doesn't increase", "numListers", numListers, "initNumListers", initNumListers)
 			return false, nil
 		}
@@ -124,18 +124,26 @@ func TestCRDHandling(t *testing.T) {
 			logger.Info("Mismatch", "numInformers", numInformers, "numListers", numListers)
 			return false, nil
 		}
-		if _, ok := informers[crdKey]; !ok {
-			logger.Info("Informer is missing", "crdKey", crdKey)
+		if _, ok := informers[watched]; !ok {
+			logger.Info("Informer is missing", "gvk", watched)
 			return false, nil
 		}
-		if _, ok := listers[crdKey]; !ok {
-			logger.Info("Lister is missing", "crdKey", crdKey)
+		if _, ok := listers[watched]; !ok {
+			logger.Info("Lister is missing", "gvk", watched)
+			return false, nil
+		}
+		if _, ok := informers[notWatched]; ok {
+			logger.Info("Informer unexpectedly appears", "gvk", notWatched)
+			return false, nil
+		}
+		if _, ok := listers[notWatched]; ok {
+			logger.Info("Lister unexpectedly appears", "gvk", notWatched)
 			return false, nil
 		}
 		return true, nil
 	})
 	if err != nil {
-		t.Fatalf("Incorrect informers/listers for %s", crdKey)
+		t.Fatalf("Incorrect informers/listers for %s and/or %s", watched, notWatched)
 	}
 
 	apiextClient.ApiextensionsV1().CustomResourceDefinitions().Delete(ctx, crd.Name, metav1.DeleteOptions{})
@@ -155,18 +163,26 @@ func TestCRDHandling(t *testing.T) {
 			logger.Info("Mismatch", "numInformers", numInformers, "numListers", numListers)
 			return false, nil
 		}
-		if _, ok := informers[crdKey]; ok {
-			logger.Info("Informer still exists", "crdKey", crdKey)
+		if _, ok := informers[watched]; ok {
+			logger.Info("Informer still exists", "gvk", watched)
 			return false, nil
 		}
-		if _, ok := listers[crdKey]; ok {
-			logger.Info("Lister still exists", "crdKey", crdKey)
+		if _, ok := listers[watched]; ok {
+			logger.Info("Lister still exists", "gvk", watched)
+			return false, nil
+		}
+		if _, ok := informers[notWatched]; ok {
+			logger.Info("Informer still unexpectedly appears", "gvk", notWatched)
+			return false, nil
+		}
+		if _, ok := listers[notWatched]; ok {
+			logger.Info("Lister still unexpectedly appears", "gvk", notWatched)
 			return false, nil
 		}
 		return true, nil
 	})
 	if err != nil {
-		t.Fatalf("Incorrect informers/listers for %s", crdKey)
+		t.Fatalf("Incorrect informers/listers for %s and/or %s", watched, notWatched)
 	}
 
 	logger.Info("Success")
@@ -211,6 +227,56 @@ spec:
             type: object
             properties:
               tier:
+                type: string
+                enum:
+                - Dedicated
+                - Shared
+                default: Shared
+          status:
+            type: object
+            properties:
+              phase:
+                type: string
+        required:
+        - spec
+    subresources:
+      status: {}
+  - name: v2alpha1
+    served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              ownership:
+                type: string
+                enum:
+                - Dedicated
+                - Shared
+                default: Shared
+          status:
+            type: object
+            properties:
+              phase:
+                type: string
+        required:
+        - spec
+    subresources:
+      status: {}
+  - name: v3beta1
+    served: false
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              possession:
                 type: string
                 enum:
                 - Dedicated

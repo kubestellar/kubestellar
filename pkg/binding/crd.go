@@ -44,32 +44,39 @@ func (c *Controller) handleCRD(obj runtime.Object) error {
 		return fmt.Errorf("failed to convert Unstructured to CRD: %w", err)
 	}
 
-	toStart := APIResource{
-		groupVersion: schema.GroupVersion{
-			Group:   crdObj.Spec.Group,
-			Version: crdObj.Spec.Versions[0].Name,
-		},
-		resource: metav1.APIResource{
-			Name: crdObj.Spec.Names.Plural,
-			Kind: crdObj.Spec.Names.Kind,
-		},
-	}
-
-	key := util.KeyForGroupVersionKind(toStart.groupVersion.Group, toStart.groupVersion.Version, toStart.resource.Kind)
-
+	// for each CustomResourceDefinitionVersion, follow a decision tree to tell whether the corresponding gvr should be watched
 	toStartList, toStopList := []APIResource{}, []string{}
-	if isBeingDeleted(obj) {
-		toStopList = append(toStopList, key)
-	} else {
-		if c.shouldWatch(toStart) {
-			toStartList = append(toStartList, toStart)
+	for _, ver := range crdObj.Spec.Versions {
+		gvr := APIResource{
+			groupVersion: schema.GroupVersion{
+				Group:   crdObj.Spec.Group,
+				Version: ver.Name,
+			},
+			resource: metav1.APIResource{
+				Name: crdObj.Spec.Names.Plural,
+				Kind: crdObj.Spec.Names.Kind,
+			},
 		}
+		key := util.KeyForGroupVersionKind(gvr.groupVersion.Group, gvr.groupVersion.Version, gvr.resource.Kind)
+		if isBeingDeleted(obj) {
+			toStopList = append(toStopList, key)
+			continue
+		}
+		if !c.includedToWatch(gvr) {
+			toStopList = append(toStopList, key)
+			continue
+		}
+		if !ver.Served {
+			toStopList = append(toStopList, key)
+			continue
+		}
+		toStartList = append(toStartList, gvr)
 	}
 
 	go c.startInformersForNewAPIResources(toStartList)
 
 	for _, key := range toStopList {
-		c.logger.Info("API removed, stopping informer.", "key", key)
+		c.logger.Info("API should be removed, stopping informer.", "key", key)
 		if stopper, ok := c.stoppers[key]; ok {
 			// close channel
 			close(stopper)
@@ -84,7 +91,7 @@ func (c *Controller) handleCRD(obj runtime.Object) error {
 	return nil
 }
 
-func (c *Controller) shouldWatch(r APIResource) bool {
+func (c *Controller) includedToWatch(r APIResource) bool {
 	if _, excluded := excludedGroups[r.groupVersion.Group]; excluded {
 		return false
 	}
