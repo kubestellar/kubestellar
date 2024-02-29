@@ -65,7 +65,7 @@ func (resolution *bindingPolicyResolution) noteObject(obj runtime.Object) (bool,
 
 	// formatted-key to use for mapping
 	formattedKey := key.GvkNamespacedNameKey()
-	_, exists := resolution.objectIdentifierToKey[formattedKey]
+	oldResourceVersion, exists := resolution.objectIdentifierToVersion[formattedKey]
 
 	// avoid further processing for keys of objects being deleted that do not have a deleted object
 	if isBeingDeleted(obj) {
@@ -75,12 +75,14 @@ func (resolution *bindingPolicyResolution) noteObject(obj runtime.Object) (bool,
 		return exists, nil
 	}
 
+	newResourceVersion := obj.(metav1.Object).GetResourceVersion()
+
 	// add object to map
 	resolution.objectIdentifierToKey[formattedKey] = &key
-	resolution.objectIdentifierToVersion[formattedKey] = obj.(metav1.Object).GetResourceVersion()
+	resolution.objectIdentifierToVersion[formattedKey] = newResourceVersion
 
 	// Internal changes to noted objects are also changes to the resolution.
-	return true, nil
+	return oldResourceVersion != newResourceVersion, nil
 }
 
 // removeObject deletes an object from the resolution if it exists.

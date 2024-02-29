@@ -312,6 +312,7 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 
 	bindingPolicyResolution := &bindingPolicyResolution{
 		objectIdentifierToKey:          make(map[string]*util.Key),
+		objectIdentifierToVersion:      make(map[string]string),
 		destinations:                   sets.New[string](),
 		ownerReference:                 ownerReference,
 		requiresSingletonReportedState: bindingpolicy.Spec.WantSingletonReportedState,
