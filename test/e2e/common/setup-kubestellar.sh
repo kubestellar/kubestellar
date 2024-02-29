@@ -92,7 +92,7 @@ cd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
 KUBESTELLAR_DIR="$(pwd)"
 ## this is a temp solution - run as executble process. this should be replaced to run as pod, ideally using helm
 OCM_TRANSPORT_PLUGIN_RELEASE="0.1.0-rc2"
-wget https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz
+curl -s -O https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz
 tar -xf v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz
 rm -rf v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz
 cd ocm-transport-plugin-${OCM_TRANSPORT_PLUGIN_RELEASE}
