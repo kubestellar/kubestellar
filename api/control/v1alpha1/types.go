@@ -190,78 +190,54 @@ type Binding struct {
 	Spec BindingSpec `json:"spec,omitempty"`
 }
 
-// BindingSpec holds a list of objects and a list of destinations which are the resolution
-// of a BindingPolicy's `what` and `where`: what objects to propagate and to where.
-// All objects present in this spec are propagated to all destinations present.
+// BindingSpec holds a list of object references with their associated resource versions,
+// and a list of destinations which are the resolution of a BindingPolicy's `what` and `where`:
+// what objects to propagate and to where.
+// All objects referenced in this spec are propagated to all destinations present.
 type BindingSpec struct {
-	// `Workload` is a collection of namespaced-scoped objects and a collection of cluster-scoped objects to be propagated to destination clusters.
+	// `workload` is a collection of namespaced and cluster scoped object references and their associated
+	// resource versions, to be propagated to destination clusters.
 	Workload DownsyncObjectReferences `json:"workload,omitempty"`
 
 	// `destinations` is a list of cluster-identifiers that the objects should be propagated to.
 	Destinations []Destination `json:"destinations,omitempty"`
 }
 
-// DownsyncObjectReferences explicitly defines the objects to be down-synced.
-// The ClusterScope list defines the cluster-scope objects, NamespaceScope list
-// defines the namespace-scope objects and WorkloadGeneration represents the
-// generation of the objects in the ClusterScope and NamespaceScope lists.
-// Upon a change in any of workload objects that should be distributed
-// (e.g., spec, annotations or labels) the workload generation field should be incremented.
+// DownsyncObjectReferences defines the objects to be down-synced, grouping them by scope.
+// It specifies a set of object references with their associated resource versions, to be downsynced.
+// This effectively acts as a map from object reference to ResourceVersion.
 type DownsyncObjectReferences struct {
-	// `clusterScope` holds a list of individual cluster-scoped objects
-	// to downsync, organized by resource.
-	// Remember that a "resource" is a kind/type/sort of objects,
-	// not an individual object.
-	// +optional
-	ClusterScope []ClusterScopeDownsyncObjects `json:"clusterScope,omitempty"`
+	// `clusterScope` holds a list of cluster-scoped object references with their associated
+	// resource versions to downsync.
+	ClusterScope []ClusterScopeDownsyncObject `json:"clusterScope,omitempty"`
 
-	// `NamespaceScope` matches if and only if at least one member matches.
-	// +optional
-	NamespaceScope []NamespaceScopeDownsyncObjects `json:"namespaceScope,omitempty"`
-
-	// `WorkloadGeneration` is a sequence number representing a specific generation of
-	// the workload objects to be downsynced.
-	// For example, if ClusterScope and NamespaceScope lists haven't changed but at least
-	// one object has changed, this field should be incremented.
-	// Upon a change in any of workload objects that should be distributed
-	// (e.g., spec, annotations or labels) the workload generation field should be incremented.
-	// `WorkloadGeneration` field is monotonically increasing.
-	// +optional
-	WorkloadGeneration int64 `json:"workloadGeneration,omitempty"`
+	// `namespaceScope` holds a list of namespace-scoped object references with their associated
+	// resource versions to downsync.
+	NamespaceScope []NamespaceScopeDownsyncObject `json:"namespaceScope,omitempty"`
 }
 
-// NamespaceScopeDownsyncObjects matches some objects of one particular namespaced object.
-type NamespaceScopeDownsyncObjects struct {
-	// GroupVersionResource holds the API group, API version and resource name.
+// NamespaceScopeDownsyncObject represents a specific namespace-scoped object to downsync,
+// identified by its GroupVersionResource, namespace, and name. The ResourceVersion specifies
+// the exact version of the object to downsync.
+type NamespaceScopeDownsyncObject struct {
 	metav1.GroupVersionResource `json:",inline"`
-
-	// `objectsByNamespace` matches by namespace and name.
-	// An object matches the list if and only if the object matches at least one member of the list.
-	// Thus, no object matches the empty list.
-	// +optional
-	ObjectsByNamespace []NamespaceAndNames `json:"objectsByNamespace,omitempty"`
-}
-
-// NamespaceAndNames identifies some objects of an implied resource that is namespaced.
-// The objects are all in the same namespace.
-type NamespaceAndNames struct {
-	// `namespace` identifies the namespace
+	// `namespace` of the object to downsync.
 	Namespace string `json:"namespace"`
-
-	// `names` holds the names of the objects that match.
-	// Empty list means none of them.
-	// +optional
-	Names []string `json:"names,omitempty"`
+	// `name` of the object to downsync.
+	Name string `json:"name"`
+	// `resourceVersion` is the version of the resource to downsync.
+	ResourceVersion string `json:"resourceVersion"`
 }
 
-type ClusterScopeDownsyncObjects struct {
-	// GroupVersionResource holds the API group, API version and resource name.
+// ClusterScopeDownsyncObject represents a specific cluster-scoped object to downsync,
+// identified by its GroupVersionResource and name. The ResourceVersion specifies the
+// exact version of the object to downsync.
+type ClusterScopeDownsyncObject struct {
 	metav1.GroupVersionResource `json:",inline"`
-
-	// `objectNames` holds the names of the objects of this kind to downsync.
-	// Empty list means none of them.
-	// +optional
-	ObjectNames []string `json:"objectNames,omitempty"`
+	// `name` of the object to downsync.
+	Name string `json:"name"`
+	// `resourceVersion` is the version of the resource to downsync.
+	ResourceVersion string `json:"resourceVersion"`
 }
 
 // Destination wraps the identifiers required to uniquely identify a destination cluster.

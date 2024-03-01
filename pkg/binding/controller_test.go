@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math/rand"
 	"testing"
+	"time"
 
 	ocmfake "open-cluster-management.io/api/client/cluster/clientset/versioned/fake"
 	clusterapi "open-cluster-management.io/api/cluster/v1"
@@ -63,9 +64,9 @@ func TestMatching(t *testing.T) {
 		ksapi.AddToScheme(scheme)
 
 		namespaces := []*k8score.Namespace{
-			generateNamespace(t, ctx, rg, "ns1"),
-			generateNamespace(t, ctx, rg, "ns2"),
-			generateNamespace(t, ctx, rg, "ns3"),
+			generateNamespace(rg, "ns1"),
+			generateNamespace(rg, "ns2"),
+			generateNamespace(rg, "ns3"),
 		}
 		objs := make([]mrObjRsc, nObj)
 		expectedObjRefs := sets.New[util.Key]()
@@ -74,7 +75,7 @@ func TestMatching(t *testing.T) {
 			initialObjects = append(initialObjects, ns)
 		}
 		for i := 0; i < nObj; i++ {
-			objs[i] = generateObject(t, ctx, rg, 0, namespaces)
+			objs[i] = generateObject(rg, 0, namespaces)
 			if i*3 < nObj*2 {
 				initialObjects = append(initialObjects, objs[i].mrObject)
 			}
@@ -224,41 +225,6 @@ func extractLabelsTest(rg *rand.Rand, goodLabels map[string]string) []metav1.Lab
 	return []metav1.LabelSelector{{MatchLabels: testLabels}}
 }
 
-func getObjectTest(rg *rand.Rand, apiGroups []string, resources []string, namespaces []*k8score.Namespace, objects []mrObject) ksapi.DownsyncObjectTest {
-	ans := ksapi.DownsyncObjectTest{}
-	if rg.Intn(10) < 7 {
-		ans.APIGroup = &apiGroups[rg.Intn(len(apiGroups))]
-	}
-	ans.Resources = make([]string, rg.Intn(3))
-	baseJ := 0
-	for i := range ans.Resources {
-		// Leave room for len(ans.Resources) - (i+1) more
-		// pick an index in [baseJ, len(resources) + i+1 - len(ans.Resources))
-		j := baseJ + rg.Intn(len(resources)+i+1-len(ans.Resources)-baseJ)
-		ans.Resources[i] = resources[j]
-		baseJ = j + 1
-	}
-	ans.Namespaces = make([]string, rg.Intn(3))
-	baseJ = 0
-	for i := range ans.Namespaces {
-		j := baseJ + rg.Intn(len(namespaces)+i+1-len(ans.Namespaces)-baseJ)
-		ans.Namespaces[i] = namespaces[j].Name
-		baseJ = j + 1
-	}
-	if rg.Intn(2) == 0 {
-		i := rg.Intn(len(namespaces))
-		ans.NamespaceSelectors = []metav1.LabelSelector{{MatchLabels: namespaces[i].Labels}}
-	}
-	ans.ObjectNames = make([]string, rg.Intn(3))
-	baseJ = 0
-	for i := range ans.ObjectNames {
-		j := baseJ + rg.Intn(len(objects)+i+1-len(ans.ObjectNames)-baseJ)
-		ans.ObjectNames[i] = objects[j].GetName()
-		baseJ = j + 1
-	}
-	return ans
-}
-
 func generateLabels(rg *rand.Rand) map[string]string {
 	ans := map[string]string{}
 	n := 1 + rg.Intn(2)
@@ -268,10 +234,18 @@ func generateLabels(rg *rand.Rand) map[string]string {
 	return ans
 }
 
+func generateResourceVersion() string {
+	// using a timestamp to simulate a unique resource version.
+	// this is nowhere as complex as the real resourceVersion generation,
+	// but suffices for testing.
+	return fmt.Sprintf("%d", time.Now().UnixNano())
+}
+
 func generateObjectMeta(rg *rand.Rand, name string, namespace *k8score.Namespace) metav1.ObjectMeta {
 	ans := metav1.ObjectMeta{
-		Name:   name,
-		Labels: generateLabels(rg),
+		Name:            name,
+		Labels:          generateLabels(rg),
+		ResourceVersion: generateResourceVersion(),
 	}
 	if namespace != nil {
 		ans.Namespace = namespace.Name
@@ -279,7 +253,7 @@ func generateObjectMeta(rg *rand.Rand, name string, namespace *k8score.Namespace
 	return ans
 }
 
-func generateNamespace(t *testing.T, ctx context.Context, rg *rand.Rand, name string) *k8score.Namespace {
+func generateNamespace(rg *rand.Rand, name string) *k8score.Namespace {
 	ans := &k8score.Namespace{
 		TypeMeta:   metav1.TypeMeta{Kind: "Namespace", APIVersion: "v1"},
 		ObjectMeta: generateObjectMeta(rg, name, nil),
@@ -287,7 +261,7 @@ func generateNamespace(t *testing.T, ctx context.Context, rg *rand.Rand, name st
 	return ans
 }
 
-func generateObject(t *testing.T, ctx context.Context, rg *rand.Rand, index int, namespaces []*k8score.Namespace) mrObjRsc {
+func generateObject(rg *rand.Rand, index int, namespaces []*k8score.Namespace) mrObjRsc {
 	x := rg.Intn(40)
 	namespace := namespaces[rg.Intn(len(namespaces))]
 	switch {

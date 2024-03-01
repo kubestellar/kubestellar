@@ -261,28 +261,23 @@ func workloadIsExpected(workload ksapi.DownsyncObjectReferences, expectation map
 	for key, val := range expectation {
 		missed[key.String()] = val
 	}
-	for _, perResource := range workload.ClusterScope {
-		for _, objectName := range perResource.ObjectNames {
-			key := gvrnn{GroupVersionResource: perResource.GroupVersionResource,
-				ObjectName: cache.ObjectName{Name: objectName}}
-			if missed[key.String()] != nil {
-				delete(missed, key.String())
-			} else {
-				excess = append(excess, key)
-			}
+	for _, clusterScopeDownsyncObject := range workload.ClusterScope {
+		key := gvrnn{GroupVersionResource: clusterScopeDownsyncObject.GroupVersionResource,
+			ObjectName: cache.ObjectName{Name: clusterScopeDownsyncObject.Name}}
+		if missed[key.String()] != nil {
+			delete(missed, key.String())
+		} else {
+			excess = append(excess, key)
 		}
 	}
-	for _, perResource := range workload.NamespaceScope {
-		for _, perNamespace := range perResource.ObjectsByNamespace {
-			for _, objectName := range perNamespace.Names {
-				key := gvrnn{GroupVersionResource: perResource.GroupVersionResource,
-					ObjectName: cache.ObjectName{Namespace: perNamespace.Namespace, Name: objectName}}
-				if missed[key.String()] != nil {
-					delete(missed, key.String())
-				} else {
-					excess = append(excess, key)
-				}
-			}
+	for _, namespaceScopeDownsyncObject := range workload.NamespaceScope {
+		key := gvrnn{GroupVersionResource: namespaceScopeDownsyncObject.GroupVersionResource,
+			ObjectName: cache.ObjectName{Namespace: namespaceScopeDownsyncObject.Namespace,
+				Name: namespaceScopeDownsyncObject.Name}}
+		if missed[key.String()] != nil {
+			delete(missed, key.String())
+		} else {
+			excess = append(excess, key)
 		}
 	}
 	return

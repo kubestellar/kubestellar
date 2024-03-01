@@ -52,88 +52,75 @@ spec:
                   type: object
                 type: array
               workload:
-                description: '`Workload` is a collection of namespaced-scoped objects
-                  and a collection of cluster-scoped objects to be propagated to destination
-                  clusters.'
+                description: '`workload` is a collection of namespaced and cluster
+                  scoped object references and their associated resource versions,
+                  to be propagated to destination clusters.'
                 properties:
                   clusterScope:
-                    description: '`clusterScope` holds a list of individual cluster-scoped
-                      objects to downsync, organized by resource. Remember that a
-                      "resource" is a kind/type/sort of objects, not an individual
-                      object.'
+                    description: '`clusterScope` holds a list of cluster-scoped object
+                      references with their associated resource versions to downsync.'
                     items:
+                      description: ClusterScopeDownsyncObject represents a specific
+                        cluster-scoped object to downsync, identified by its GroupVersionResource
+                        and name. The ResourceVersion specifies the exact version
+                        of the object to downsync.
                       properties:
                         group:
                           type: string
-                        objectNames:
-                          description: '`objectNames` holds the names of the objects
-                            of this kind to downsync. Empty list means none of them.'
-                          items:
-                            type: string
-                          type: array
+                        name:
+                          description: '`name` of the object to downsync.'
+                          type: string
                         resource:
+                          type: string
+                        resourceVersion:
+                          description: '`resourceVersion` is the version of the resource
+                            to downsync.'
                           type: string
                         version:
                           type: string
                       required:
                       - group
+                      - name
                       - resource
+                      - resourceVersion
                       - version
                       type: object
                     type: array
                   namespaceScope:
-                    description: '`NamespaceScope` matches if and only if at least
-                      one member matches.'
+                    description: '`namespaceScope` holds a list of namespace-scoped
+                      object references with their associated resource versions to
+                      downsync.'
                     items:
-                      description: NamespaceScopeDownsyncObjects matches some objects
-                        of one particular namespaced object.
+                      description: NamespaceScopeDownsyncObject represents a specific
+                        namespace-scoped object to downsync, identified by its GroupVersionResource,
+                        namespace, and name. The ResourceVersion specifies the exact
+                        version of the object to downsync.
                       properties:
                         group:
                           type: string
-                        objectsByNamespace:
-                          description: '`objectsByNamespace` matches by namespace
-                            and name. An object matches the list if and only if the
-                            object matches at least one member of the list. Thus,
-                            no object matches the empty list.'
-                          items:
-                            description: NamespaceAndNames identifies some objects
-                              of an implied resource that is namespaced. The objects
-                              are all in the same namespace.
-                            properties:
-                              names:
-                                description: '`names` holds the names of the objects
-                                  that match. Empty list means none of them.'
-                                items:
-                                  type: string
-                                type: array
-                              namespace:
-                                description: '`namespace` identifies the namespace'
-                                type: string
-                            required:
-                            - namespace
-                            type: object
-                          type: array
+                        name:
+                          description: '`name` of the object to downsync.'
+                          type: string
+                        namespace:
+                          description: '`namespace` of the object to downsync.'
+                          type: string
                         resource:
+                          type: string
+                        resourceVersion:
+                          description: '`resourceVersion` is the version of the resource
+                            to downsync.'
                           type: string
                         version:
                           type: string
                       required:
                       - group
+                      - name
+                      - namespace
                       - resource
+                      - resourceVersion
                       - version
                       type: object
                     type: array
-                  workloadGeneration:
-                    description: '`WorkloadGeneration` is a sequence number representing
-                      a specific generation of the workload objects to be downsynced.
-                      For example, if ClusterScope and NamespaceScope lists haven''t
-                      changed but at least one object has changed, this field should
-                      be incremented. Upon a change in any of workload objects that
-                      should be distributed (e.g., spec, annotations or labels) the
-                      workload generation field should be incremented. `WorkloadGeneration`
-                      field is monotonically increasing.'
-                    format: int64
-                    type: integer
                 type: object
             type: object
         type: object
