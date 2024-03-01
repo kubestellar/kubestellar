@@ -389,7 +389,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 	objectsToPropagate := make([]*unstructured.Unstructured, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clusterScopedObject := range binding.Spec.Workload.ClusterScope {
-		gvr := schema.GroupVersionResource{Group: clusterScopedObject.Group, Version: clusterScopedObject.Version, Resource: clusterScopedObject.Resource}
+		gvr := schema.GroupVersionResource(clusterScopedObject.GroupVersionResource)
 		object, err := c.wdsDynamicClient.Resource(gvr).Get(ctx, clusterScopedObject.Name, metav1.GetOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", clusterScopedObject.Name, gvr, err)
@@ -398,7 +398,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, namespaceScopedObject := range binding.Spec.Workload.NamespaceScope {
-		gvr := schema.GroupVersionResource{Group: namespaceScopedObject.Group, Version: namespaceScopedObject.Version, Resource: namespaceScopedObject.Resource}
+		gvr := schema.GroupVersionResource(namespaceScopedObject.GroupVersionResource)
 		object, err := c.wdsDynamicClient.Resource(gvr).Namespace(namespaceScopedObject.Namespace).Get(ctx, namespaceScopedObject.Name, metav1.GetOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", namespaceScopedObject.Name,
