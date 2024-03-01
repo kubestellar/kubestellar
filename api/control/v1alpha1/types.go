@@ -190,12 +190,13 @@ type Binding struct {
 	Spec BindingSpec `json:"spec,omitempty"`
 }
 
-// BindingSpec holds a list of objects and a list of destinations which are the resolution
-// of a BindingPolicy's `what` and `where`: what objects to propagate and to where.
-// All objects present in this spec are propagated to all destinations present.
+// BindingSpec holds a list of object references with their associated resource versions,
+// and a list of destinations which are the resolution of a BindingPolicy's `what` and `where`:
+// what objects to propagate and to where.
+// All objects referenced in this spec are propagated to all destinations present.
 type BindingSpec struct {
-	// `workload` is a collection of namespaced-scoped objects and a collection of cluster-scoped objects to be
-	// propagated to destination clusters.
+	// `workload` is a collection of namespaced and cluster scoped object references and their associated
+	// resource versions, to be propagated to destination clusters.
 	Workload DownsyncObjectReferences `json:"workload,omitempty"`
 
 	// `destinations` is a list of cluster-identifiers that the objects should be propagated to.

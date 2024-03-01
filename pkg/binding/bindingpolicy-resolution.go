@@ -220,8 +220,7 @@ func workloadMatchesBindingSpec(bindingSpecWorkload *v1alpha1.DownsyncObjectRefe
 	}
 
 	// check namespace-scoped all exist
-	return bindingNamespaceScopeIsMapped(bindingSpecWorkload.NamespaceScope, objectIdentifierToKeyMap,
-		objectIdentifierToVersionMap, gvkGvrMapper)
+	return bindingNamespaceScopeIsMapped(bindingSpecWorkload.NamespaceScope, objectIdentifierToVersionMap, gvkGvrMapper)
 }
 
 // bindingClusterScopeIsMapped returns true if the cluster-scope
@@ -252,7 +251,7 @@ func bindingClusterScopeIsMapped(bindingSpecClusterScope []v1alpha1.ClusterScope
 // namespaceScopeMatchesBindingSpec returns true if the namespace-scope
 // section in the binding spec all exist in the resolution.
 func bindingNamespaceScopeIsMapped(bindingSpecNamespaceScope []v1alpha1.NamespaceScopeDownsyncObject,
-	objectIdentifierToKeyMap map[string]*util.Key, objectIdentifierToVersionMap map[string]string,
+	objectIdentifierToVersionMap map[string]string,
 	gvkGvrMapper util.GvkGvrMapper) bool {
 	for _, namespaceScopeDownsyncObject := range bindingSpecNamespaceScope {
 		gvr := schema.GroupVersionResource(namespaceScopeDownsyncObject.GroupVersionResource)
@@ -268,11 +267,6 @@ func bindingNamespaceScopeIsMapped(bindingSpecNamespaceScope []v1alpha1.Namespac
 			Name:      namespaceScopeDownsyncObject.Name,
 		})
 
-		if _, found := objectIdentifierToKeyMap[formattedKey]; !found {
-			return false
-		}
-
-		// check if version matches (if the key is mapped above, then the version is also mapped)
 		if objectIdentifierToVersionMap[formattedKey] != namespaceScopeDownsyncObject.ResourceVersion {
 			return false
 		}

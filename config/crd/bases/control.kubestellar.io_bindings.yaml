@@ -52,9 +52,9 @@ spec:
                   type: object
                 type: array
               workload:
-                description: '`workload` is a collection of namespaced-scoped objects
-                  and a collection of cluster-scoped objects to be propagated to destination
-                  clusters.'
+                description: '`workload` is a collection of namespaced and cluster
+                  scoped object references and their associated resource versions,
+                  to be propagated to destination clusters.'
                 properties:
                   clusterScope:
                     description: '`clusterScope` holds a list of cluster-scoped object
