@@ -35,6 +35,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/kubernetes"
@@ -99,17 +100,28 @@ type Controller struct {
 func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
 	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
 
-	dynamicClient, err := dynamic.NewForConfig(wdsRestConfig)
-	if err != nil {
-		return nil, err
-	}
-
 	kubernetesClient, err := kubernetes.NewForConfig(wdsRestConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	extClient, err := apiextensionsclientset.NewForConfig(wdsRestConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	nGVRs, err := countGVRsViaAggregatedDiscovery(kubernetesClient)
+	if err != nil {
+		parentLogger.Error(err, "Not able to count GVRs via aggregated discovery") // but we can still continue
+	}
+	// tuning the rate limiter based on the number of GVRs is tested to be working well
+	wdsRestConfig.Burst = computeBurstFromNumGVRs(nGVRs)
+	wdsRestConfig.QPS = computeQPSFromNumGVRs(nGVRs)
+	parentLogger.V(1).Info("Parameters of the client's token bucket rate limiter", "burst", wdsRestConfig.Burst, "qps", wdsRestConfig.QPS)
+
+	// dynamicClient needs higher rate than its default because dynamicClient is repeatedly used by the
+	// reflectors for each of the GVRs, all at the beginning of the controller run
+	dynamicClient, err := dynamic.NewForConfig(wdsRestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -122,6 +134,50 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 	ocmClient := *ocm.GetOCMClient(imbsRestConfig)
 
 	return makeController(parentLogger, dynamicClient, kubernetesClient, extClient, ocmClientset, ocmClient, wdsName, allowedGroupsSet)
+}
+
+func countGVRsViaAggregatedDiscovery(countClient kubernetes.Interface) (int, error) {
+	dc := countClient.Discovery().(*discovery.DiscoveryClient)
+	if dc.UseLegacyDiscovery { // by default it should be false already, just double check
+		dc.UseLegacyDiscovery = false
+	}
+	apiResourceLists, err := dc.ServerPreferredResources()
+	if err != nil {
+		return 0, fmt.Errorf("error listing server perferred resources: %w", err)
+	}
+	n := 0
+	for _, list := range apiResourceLists {
+		n += len(list.APIResources)
+	}
+	return n, nil
+}
+
+func computeBurstFromNumGVRs(nGVRs int) int {
+	burst := nGVRs
+	// in case too small, fall back to default
+	if burst < rest.DefaultBurst {
+		return rest.DefaultBurst
+	}
+	// in case too large, look at some value for reference
+	// https://github.com/kubernetes/kubernetes/blob/5d527dcf1265d7fcd0e6c8ec511ce16cc6a40699/staging/src/k8s.io/cli-runtime/pkg/genericclioptions/config_flags.go#L477
+	if burst > 300 {
+		return 300
+	}
+	return burst
+}
+
+func computeQPSFromNumGVRs(nGVRs int) float32 {
+	qps := float32(nGVRs) / 4
+	// in case too small, fall back to default
+	if qps < rest.DefaultQPS {
+		return rest.DefaultQPS
+	}
+	// in case too large, look at some value for reference
+	// https://github.com/kubernetes/kubernetes/pull/105520/files
+	if qps > 50.0 {
+		return 50.0
+	}
+	return qps
 }
 
 func makeController(parentLogger logr.Logger,
@@ -213,12 +269,13 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 			logger.V(1).Info("Ignoring APIResourceList", "groupVersion", list.GroupVersion)
 			continue
 		}
+		if !util.IsAPIGroupAllowed(gv.Group, c.allowedGroupsSet) {
+			logger.V(1).Info("No need to watch per user input", "groupVersion", list.GroupVersion)
+			continue
+		}
 		logger.V(1).Info("Working on APIResourceList", "groupVersion", list.GroupVersion, "numResources", len(list.APIResources))
 		for _, resource := range list.APIResources {
 			if _, excluded := excludedResourceNames[resource.Name]; excluded {
-				continue
-			}
-			if !util.IsAPIGroupAllowed(gv.Group, c.allowedGroupsSet) {
 				continue
 			}
 			informable := verbsSupportInformers(resource.Verbs)
@@ -515,7 +572,7 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		logger.Info("Handled bindingpolicy", "object", util.RefToRuntimeObj(obj))
 		return nil
 	} else if util.IsCRD(obj) {
-		if err := c.handleCRD(obj); err != nil {
+		if err := c.handleCRD(ctx, obj); err != nil {
 			return fmt.Errorf("failed to handle CRD: %w", err) // error logging after this call
 			// will add name.
 		}

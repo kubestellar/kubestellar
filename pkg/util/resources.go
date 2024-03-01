@@ -19,6 +19,7 @@ package util
 import (
 	"strings"
 
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -39,8 +40,8 @@ func ParseAPIGroupsString(apiGroups string) sets.Set[string] {
 	return groupsSet
 }
 
-// IsResourceGroupAllowed checks if a API group is allowed
-// an empty or nil allowedResources slice is equivalent to allow all,
+// IsResourceGroupAllowed checks if a API group is explicitly allowed by user,
+// an empty or nil allowedResources slice is equivalent to allow all.
 func IsAPIGroupAllowed(apiGroup string, allowedAPIGroups sets.Set[string]) bool {
 	if len(allowedAPIGroups) == 0 {
 		return true
@@ -54,8 +55,5 @@ func addRequiredResourceGroups(allowedResourceGroups sets.Set[string]) {
 	// groups are watched
 
 	allowedResourceGroups.Insert(v1alpha1.GroupVersion.Group)
-
-	// disabled until https://github.com/kubestellar/kubestellar/issues/1705 is resolved
-	// to avoid client-side throttling
-	//allowedResourceGroups.Insert(apiextensions.GroupName)
+	allowedResourceGroups.Insert(apiextensions.GroupName)
 }
