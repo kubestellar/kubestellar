@@ -39,26 +39,30 @@ type APIResource struct {
 }
 
 // Handle CRDs should account for CRDs being added or deleted to start/stop new informers as needed
-func (c *Controller) handleCRD(ctx context.Context, queueKey util.ObjectIdentifier) error {
+func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
-
-	obj, err := c.getObject(queueKey)
-	if errors.IsNotFound(err) {
-		logger.V(2).Info("Handling deleted CRD", "name", queueKey.NamespacedName.Name)
-		obj = nil
-	} else if err != nil {
-		return fmt.Errorf("failed to get runtime.Object from queue key (%v): %w", queueKey, err)
-	}
-
-	uObj := obj.(*unstructured.Unstructured)
 	var crdObj *apiextensionsv1.CustomResourceDefinition
-	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(uObj.UnstructuredContent(), &crdObj); err != nil {
-		return fmt.Errorf("failed to convert Unstructured to CRD: %w", err)
+	var specVersions []apiextensionsv1.CustomResourceDefinitionVersion
+
+	{
+		obj, err := c.getObjectFromIdentifier(objIdentifier)
+		if errors.IsNotFound(err) {
+			logger.V(2).Info("Handling deleted CRD", "name", objIdentifier.ObjectName.Name)
+			obj = nil
+		} else if err != nil {
+			return fmt.Errorf("failed to get runtime.Object from identifier (%v): %w", objIdentifier, err)
+		} else {
+			uObj := obj.(*unstructured.Unstructured)
+			if err := runtime.DefaultUnstructuredConverter.FromUnstructured(uObj.UnstructuredContent(), &crdObj); err != nil {
+				return fmt.Errorf("failed to convert Unstructured to CRD: %w", err)
+			}
+			specVersions = crdObj.Spec.Versions
+		}
 	}
 
 	// for each CustomResourceDefinitionVersion, follow a decision tree to tell whether the corresponding gvr should be watched
-	toStartList, toStopList := []APIResource{}, []string{}
-	for _, ver := range crdObj.Spec.Versions {
+	toStartList, toStopList := []APIResource{}, []schema.GroupVersionKind{}
+	for _, ver := range specVersions {
 		gvr := APIResource{
 			groupVersion: schema.GroupVersion{
 				Group:   crdObj.Spec.Group,
@@ -69,11 +73,11 @@ func (c *Controller) handleCRD(ctx context.Context, queueKey util.ObjectIdentifi
 				Kind: crdObj.Spec.Names.Kind,
 			},
 		}
-		key := util.KeyForGroupVersionKind(gvr.groupVersion.Group, gvr.groupVersion.Version, gvr.resource.Kind)
+		key := gvr.groupVersion.WithKind(gvr.resource.Kind)
 		if !c.includedToWatch(gvr) {
 			continue
 		}
-		if isBeingDeleted(obj) {
+		if isBeingDeleted(crdObj) {
 			toStopList = append(toStopList, key)
 			continue
 		}
@@ -90,11 +94,11 @@ func (c *Controller) handleCRD(ctx context.Context, queueKey util.ObjectIdentifi
 		go c.startInformersForNewAPIResources(ctx, toStartList)
 	}
 
-	for _, key := range toStopList {
-		logger.Info("API should not be watched, ensuring the informer's absence.", "key", key)
-		stopper, ok := c.stoppers[key]
+	for _, gvk := range toStopList {
+		logger.Info("API should not be watched, ensuring the informer's absence.", "gvk", gvk)
+		stopper, ok := c.stoppers[gvk]
 		if !ok {
-			logger.V(3).Info("Informer is already absent.", "key", key)
+			logger.V(3).Info("Informer is already absent.", "key", gvk)
 		} else {
 			// close channel
 			close(stopper)

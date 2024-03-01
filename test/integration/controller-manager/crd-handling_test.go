@@ -25,6 +25,7 @@ import (
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	k8sjson "k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2/ktesting"
@@ -106,8 +107,8 @@ func TestCRDHandling(t *testing.T) {
 	}
 
 	crd, _ := createCRDFromLiteral(t, ctx, "CR1", crd1Literal, serializer, apiextClient)
-	watched := "synthetic-crd.com/v2alpha1/CR1"
-	notWatched := "synthetic-crd.com/v3beta1/CR1"
+	watched := schema.GroupVersionKind{Group: "synthetic-crd.com", Version: "v2alpha1", Kind: "CR1"}
+	notWatched := schema.GroupVersionKind{Group: "synthetic-crd.com", Version: "v3beta1", Kind: "CR1"}
 
 	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, time.Minute, false, func(ctx context.Context) (done bool, err error) {
 		informers, listers := ctlr.GetInformers(), ctlr.GetListers()
