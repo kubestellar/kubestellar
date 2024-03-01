@@ -60,11 +60,10 @@ func (c *Controller) handleCRD(ctx context.Context, obj runtime.Object) error {
 			},
 		}
 		key := util.KeyForGroupVersionKind(gvr.groupVersion.Group, gvr.groupVersion.Version, gvr.resource.Kind)
-		if isBeingDeleted(obj) {
-			toStopList = append(toStopList, key)
+		if !c.includedToWatch(gvr) {
 			continue
 		}
-		if !c.includedToWatch(gvr) {
+		if isBeingDeleted(obj) {
 			toStopList = append(toStopList, key)
 			continue
 		}
@@ -72,7 +71,9 @@ func (c *Controller) handleCRD(ctx context.Context, obj runtime.Object) error {
 			toStopList = append(toStopList, key)
 			continue
 		}
-		toStartList = append(toStartList, gvr)
+		if crdEstablished(crdObj) {
+			toStartList = append(toStartList, gvr)
+		}
 	}
 
 	if len(toStartList) > 0 {
@@ -80,7 +81,7 @@ func (c *Controller) handleCRD(ctx context.Context, obj runtime.Object) error {
 	}
 
 	for _, key := range toStopList {
-		logger.Info("API should not be watched, stopping informer.", "key", key)
+		logger.Info("API should not be watched, ensuring the informer's absence.", "key", key)
 		if stopper, ok := c.stoppers[key]; ok {
 			// close channel
 			close(stopper)
@@ -106,6 +107,15 @@ func (c *Controller) includedToWatch(r APIResource) bool {
 		return false
 	}
 	return true
+}
+
+func crdEstablished(crd *apiextensionsv1.CustomResourceDefinition) bool {
+	for _, condition := range crd.Status.Conditions {
+		if condition.Type == apiextensionsv1.Established && condition.Status == apiextensionsv1.ConditionTrue {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toStartList []APIResource) {
