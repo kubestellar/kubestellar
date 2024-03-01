@@ -82,7 +82,10 @@ func (c *Controller) handleCRD(ctx context.Context, obj runtime.Object) error {
 
 	for _, key := range toStopList {
 		logger.Info("API should not be watched, ensuring the informer's absence.", "key", key)
-		if stopper, ok := c.stoppers[key]; ok {
+		stopper, ok := c.stoppers[key]
+		if !ok {
+			logger.V(3).Info("Informer is already absent.", "key", key)
+		} else {
 			// close channel
 			close(stopper)
 		}
@@ -124,6 +127,14 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 		logger.Info("Ensuring informer for:", "group", toStart.groupVersion.Group,
 			"version", toStart.groupVersion, "kind", toStart.resource.Kind)
 
+		key := util.KeyForGroupVersionKind(toStart.groupVersion.Group,
+			toStart.groupVersion.Version, toStart.resource.Kind)
+
+		if _, ok := c.informers[key]; ok {
+			logger.V(3).Info("Informer already ensured.", "key", key)
+			continue
+		}
+
 		gvr := schema.GroupVersionResource{
 			Group:    toStart.groupVersion.Group,
 			Version:  toStart.groupVersion.Version,
@@ -157,8 +168,6 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 				c.handleObject(obj)
 			},
 		})
-		key := util.KeyForGroupVersionKind(toStart.groupVersion.Group,
-			toStart.groupVersion.Version, toStart.resource.Kind)
 
 		// add the mapping between GVK and GVR
 		c.gvkGvrMapper.Add(toStart.groupVersion.WithKind(toStart.resource.Kind), gvr)
