@@ -52,24 +52,30 @@ spec:
                   type: object
                 type: array
               workload:
-                description: '`Workload` is a collection of namespaced-scoped objects
+                description: '`workload` is a collection of namespaced-scoped objects
                   and a collection of cluster-scoped objects to be propagated to destination
                   clusters.'
                 properties:
                   clusterScope:
-                    description: '`clusterScope` holds a list of individual cluster-scoped
-                      objects to downsync.'
+                    description: '`clusterScope` holds a list of cluster-scoped object
+                      references to downsync. Each object is associated with a ResourceVersion,
+                      specifying the exact version to downsync.'
                     items:
-                      description: ClusterScopeDownsyncObject matches one particular
-                        cluster scoped object.
+                      description: ClusterScopeDownsyncObject represents a specific
+                        cluster-scoped object to downsync, identified by its GroupVersionResource
+                        and name. The ResourceVersion specifies the exact version
+                        of the object to downsync.
                       properties:
                         group:
                           type: string
                         name:
+                          description: '`name` of the object to downsync.'
                           type: string
                         resource:
                           type: string
                         resourceVersion:
+                          description: '`resourceVersion` is the version of the resource
+                            to downsync.'
                           type: string
                         version:
                           type: string
@@ -82,21 +88,29 @@ spec:
                       type: object
                     type: array
                   namespaceScope:
-                    description: '`NamespaceScope` holds a list of individual namespace-scoped
-                      objects to downsync.'
+                    description: '`namespaceScope` holds a list of namespace-scoped
+                      object references to downsync. Similar to ClusterScope, each
+                      object is tied to a ResourceVersion to precisely identify the
+                      version to downsync.'
                     items:
-                      description: NamespaceScopeDownsyncObject matches one particular
-                        namespace scoped object.
+                      description: NamespaceScopeDownsyncObject represents a specific
+                        namespace-scoped object to downsync, identified by its GroupVersionResource,
+                        namespace, and name. The ResourceVersion specifies the exact
+                        version of the object to downsync.
                       properties:
                         group:
                           type: string
                         name:
+                          description: '`name` of the object to downsync.'
                           type: string
                         namespace:
+                          description: '`namespace` of the object to downsync.'
                           type: string
                         resource:
                           type: string
                         resourceVersion:
+                          description: '`resourceVersion` is the version of the resource
+                            to downsync.'
                           type: string
                         version:
                           type: string

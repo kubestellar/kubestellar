@@ -80,10 +80,18 @@ func (gen *generator) generateLabels() map[string]string {
 	return ans
 }
 
+func generateResourceVersion() string {
+	// using a timestamp to simulate a unique resource version.
+	// this is nowhere as complex as the real resourceVersion generation,
+	// but suffices for testing.
+	return fmt.Sprintf("%d", time.Now().UnixNano())
+}
+
 func (gen *generator) generateObjectMeta(name string, namespace *k8score.Namespace) metav1.ObjectMeta {
 	ans := metav1.ObjectMeta{
-		Name:   name,
-		Labels: gen.generateLabels(),
+		Name:            name,
+		Labels:          gen.generateLabels(),
+		ResourceVersion: generateResourceVersion(),
 	}
 	if namespace != nil {
 		ans.Namespace = namespace.Name
@@ -238,7 +246,10 @@ func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.
 		delete(tt.missed, key.String())
 		if expectedObj, found := tt.expect[key]; found {
 			objM := obj.UnstructuredContent()
-			equal := apiequality.Semantic.DeepEqual(objM, expectedObj)
+
+			// clean expected object since transport objects are cleaned
+			cleanedExpectedObj := cleanObject(&unstructured.Unstructured{Object: expectedObj}).Object
+			equal := apiequality.Semantic.DeepEqual(objM, cleanedExpectedObj)
 			if !equal {
 				tt.wrong[key.String()] = obj
 			}

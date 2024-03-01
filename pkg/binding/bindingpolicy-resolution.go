@@ -30,8 +30,10 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-// bindingPolicyResolution stores the selected objects and destinations for a single bindingpolicy.
-// The mutex should be read locked before reading, and write locked before writing to any field.
+// bindingPolicyResolution stores the selected objects with their resource
+// versions, and the selected destinations for a single bindingpolicy. The
+// mutex should be read locked before reading, and write locked before writing
+// to any field.
 type bindingPolicyResolution struct {
 	sync.RWMutex
 
@@ -149,26 +151,18 @@ func (resolution *bindingPolicyResolution) toBindingSpec(gvkGvrMapper util.GvkGv
 		// check if object is cluster-scoped or namespaced by checking namespace
 		if key.NamespacedName.Namespace == metav1.NamespaceNone {
 			workload.ClusterScope = append(workload.ClusterScope, v1alpha1.ClusterScopeDownsyncObject{
-				GroupVersionResource: metav1.GroupVersionResource{
-					Group:    gvr.Group,
-					Version:  gvr.Version,
-					Resource: gvr.Resource,
-				},
-				Name:            key.NamespacedName.Name,
-				ResourceVersion: resolution.objectIdentifierToVersion[identifier], // necessarily exists
+				GroupVersionResource: metav1.GroupVersionResource(gvr),
+				Name:                 key.NamespacedName.Name,
+				ResourceVersion:      resolution.objectIdentifierToVersion[identifier], // necessarily exists
 			})
 			continue
 		}
 
 		workload.NamespaceScope = append(workload.NamespaceScope, v1alpha1.NamespaceScopeDownsyncObject{
-			GroupVersionResource: metav1.GroupVersionResource{
-				Group:    gvr.Group,
-				Version:  gvr.Version,
-				Resource: gvr.Resource,
-			},
-			Namespace:       key.NamespacedName.Namespace,
-			Name:            key.NamespacedName.Name,
-			ResourceVersion: resolution.objectIdentifierToVersion[identifier], // necessarily exists
+			GroupVersionResource: metav1.GroupVersionResource(gvr),
+			Namespace:            key.NamespacedName.Namespace,
+			Name:                 key.NamespacedName.Name,
+			ResourceVersion:      resolution.objectIdentifierToVersion[identifier], // necessarily exists
 		})
 	}
 
@@ -221,8 +215,7 @@ func workloadMatchesBindingSpec(bindingSpecWorkload *v1alpha1.DownsyncObjectRefe
 
 	// again we can check match by making sure all objects are mapped, since entries are unique and the length is equal.
 	// check cluster-scoped all exist
-	if !bindingClusterScopeIsMapped(bindingSpecWorkload.ClusterScope, objectIdentifierToKeyMap,
-		objectIdentifierToVersionMap, gvkGvrMapper) {
+	if !bindingClusterScopeIsMapped(bindingSpecWorkload.ClusterScope, objectIdentifierToVersionMap, gvkGvrMapper) {
 		return false
 	}
 
@@ -234,8 +227,7 @@ func workloadMatchesBindingSpec(bindingSpecWorkload *v1alpha1.DownsyncObjectRefe
 // bindingClusterScopeIsMapped returns true if the cluster-scope
 // section in the binding spec all exist in the resolution.
 func bindingClusterScopeIsMapped(bindingSpecClusterScope []v1alpha1.ClusterScopeDownsyncObject,
-	objectIdentifierToKeyMap map[string]*util.Key, objectIdentifierToVersionMap map[string]string,
-	gvkGvrMapper util.GvkGvrMapper) bool {
+	objectIdentifierToVersionMap map[string]string, gvkGvrMapper util.GvkGvrMapper) bool {
 	for _, clusterScopeDownsyncObject := range bindingSpecClusterScope {
 		gvr := schema.GroupVersionResource(clusterScopeDownsyncObject.GroupVersionResource)
 		gvk, found := gvkGvrMapper.GetGvk(gvr)
@@ -249,11 +241,6 @@ func bindingClusterScopeIsMapped(bindingSpecClusterScope []v1alpha1.ClusterScope
 			Name:      clusterScopeDownsyncObject.Name,
 		})
 
-		if _, found := objectIdentifierToKeyMap[formattedKey]; !found {
-			return false
-		}
-
-		// check if version matches (if the key is mapped above, then the version should also be mapped)
 		if objectIdentifierToVersionMap[formattedKey] != clusterScopeDownsyncObject.ResourceVersion {
 			return false
 		}
