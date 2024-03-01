@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
@@ -37,7 +38,8 @@ type APIResource struct {
 }
 
 // Handle CRDs should account for CRDs being added or deleted to start/stop new informers as needed
-func (c *Controller) handleCRD(obj runtime.Object) error {
+func (c *Controller) handleCRD(ctx context.Context, obj runtime.Object) error {
+	logger := klog.FromContext(ctx)
 	uObj := obj.(*unstructured.Unstructured)
 	var crdObj *apiextensionsv1.CustomResourceDefinition
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(uObj.UnstructuredContent(), &crdObj); err != nil {
@@ -73,10 +75,12 @@ func (c *Controller) handleCRD(obj runtime.Object) error {
 		toStartList = append(toStartList, gvr)
 	}
 
-	go c.startInformersForNewAPIResources(toStartList)
+	if len(toStartList) > 0 {
+		go c.startInformersForNewAPIResources(ctx, toStartList)
+	}
 
 	for _, key := range toStopList {
-		c.logger.Info("API should be removed, stopping informer.", "key", key)
+		logger.Info("API should not be watched, stopping informer.", "key", key)
 		if stopper, ok := c.stoppers[key]; ok {
 			// close channel
 			close(stopper)
@@ -104,9 +108,10 @@ func (c *Controller) includedToWatch(r APIResource) bool {
 	return true
 }
 
-func (c *Controller) startInformersForNewAPIResources(toStartList []APIResource) {
+func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toStartList []APIResource) {
+	logger := klog.FromContext(ctx)
 	for _, toStart := range toStartList {
-		c.logger.Info("Ensuring informer for:", "group", toStart.groupVersion.Group,
+		logger.Info("Ensuring informer for:", "group", toStart.groupVersion.Group,
 			"version", toStart.groupVersion, "kind", toStart.resource.Kind)
 
 		gvr := schema.GroupVersionResource{
@@ -151,28 +156,28 @@ func (c *Controller) startInformersForNewAPIResources(toStartList []APIResource)
 		// ensure the lister
 		lister := cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())
 		if _, ok := c.listers[key]; !ok {
-			c.logger.V(3).Info("Setting lister", "GVK", key)
+			logger.V(3).Info("Setting lister", "GVK", key)
 			c.listers[key] = lister
 		} else {
-			c.logger.V(3).Info("Lister already in place", "GVK", key)
+			logger.V(3).Info("Lister already in place", "GVK", key)
 		}
 
 		// ensure the stopper
 		stopper := make(chan struct{})
 		if _, ok := c.stoppers[key]; !ok {
-			c.logger.V(3).Info("Setting stopper", "GVK", key)
+			logger.V(3).Info("Setting stopper", "GVK", key)
 			c.stoppers[key] = stopper
 		} else {
-			c.logger.V(3).Info("Stopper already in place", "GVK", key)
+			logger.V(3).Info("Stopper already in place", "GVK", key)
 		}
 
 		// ensure the informer
 		if _, ok := c.informers[key]; !ok {
-			c.logger.V(3).Info("Setting and running informer", "GVK", key)
+			logger.V(3).Info("Setting and running informer", "GVK", key)
 			c.informers[key] = informer
 			go informer.Run(stopper)
 		} else {
-			c.logger.V(3).Info("Informer already in place", "GVK", key)
+			logger.V(3).Info("Informer already in place", "GVK", key)
 		}
 	}
 }

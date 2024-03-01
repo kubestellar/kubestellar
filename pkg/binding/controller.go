@@ -572,7 +572,7 @@ func (c *Controller) reconcile(ctx context.Context, key util.Key) error {
 		logger.Info("Handled bindingpolicy", "object", util.RefToRuntimeObj(obj))
 		return nil
 	} else if util.IsCRD(obj) {
-		if err := c.handleCRD(obj); err != nil {
+		if err := c.handleCRD(ctx, obj); err != nil {
 			return fmt.Errorf("failed to handle CRD: %w", err) // error logging after this call
 			// will add name.
 		}
