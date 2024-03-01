@@ -58,8 +58,7 @@ spec:
                 properties:
                   clusterScope:
                     description: '`clusterScope` holds a list of cluster-scoped object
-                      references to downsync. Each object is associated with a ResourceVersion,
-                      specifying the exact version to downsync.'
+                      references with their associated resource versions to downsync.'
                     items:
                       description: ClusterScopeDownsyncObject represents a specific
                         cluster-scoped object to downsync, identified by its GroupVersionResource
@@ -89,9 +88,8 @@ spec:
                     type: array
                   namespaceScope:
                     description: '`namespaceScope` holds a list of namespace-scoped
-                      object references to downsync. Similar to ClusterScope, each
-                      object is tied to a ResourceVersion to precisely identify the
-                      version to downsync.'
+                      object references with their associated resource versions to
+                      downsync.'
                     items:
                       description: NamespaceScopeDownsyncObject represents a specific
                         namespace-scoped object to downsync, identified by its GroupVersionResource,

@@ -204,20 +204,15 @@ type BindingSpec struct {
 }
 
 // DownsyncObjectReferences defines the objects to be down-synced, grouping them by scope.
-// It specifies a set of object references, each associated with a ResourceVersion indicating
-// the specific version of the object to be downsynced. This effectively acts as a map from
-// object reference to ResourceVersion, ensuring that for each object, only a specific version
-// is considered for downsyncing.
+// It specifies a set of object references with their associated resource versions, to be downsynced.
+// This effectively acts as a map from object reference to ResourceVersion.
 type DownsyncObjectReferences struct {
-	// `clusterScope` holds a list of cluster-scoped object references to downsync.
-	// Each object is associated with a ResourceVersion, specifying the exact version to downsync.
-	// +optional
+	// `clusterScope` holds a list of cluster-scoped object references with their associated
+	// resource versions to downsync.
 	ClusterScope []ClusterScopeDownsyncObject `json:"clusterScope,omitempty"`
 
-	// `namespaceScope` holds a list of namespace-scoped object references to downsync.
-	// Similar to ClusterScope, each object is tied to a ResourceVersion to precisely identify
-	// the version to downsync.
-	// +optional
+	// `namespaceScope` holds a list of namespace-scoped object references with their associated
+	// resource versions to downsync.
 	NamespaceScope []NamespaceScopeDownsyncObject `json:"namespaceScope,omitempty"`
 }
 
