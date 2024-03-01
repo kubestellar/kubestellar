@@ -19,6 +19,7 @@ package util
 import (
 	"strings"
 
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -54,8 +55,5 @@ func addRequiredResourceGroups(allowedResourceGroups sets.Set[string]) {
 	// groups are watched
 
 	allowedResourceGroups.Insert(v1alpha1.GroupVersion.Group)
-
-	// disabled until https://github.com/kubestellar/kubestellar/issues/1705 is resolved
-	// to avoid client-side throttling
-	//allowedResourceGroups.Insert(apiextensions.GroupName)
+	allowedResourceGroups.Insert(apiextensions.GroupName)
 }
