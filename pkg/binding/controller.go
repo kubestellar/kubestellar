@@ -287,15 +287,17 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 
 				// add the event handler functions
 				informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-					AddFunc: c.handleObject,
+					AddFunc: func(obj interface{}) {
+						c.handleObject(obj, "add")
+					},
 					UpdateFunc: func(old, new interface{}) {
 						if shouldSkipUpdate(old, new) {
 							return
 						}
-						c.handleObject(new)
+						c.handleObject(new, "update")
 					},
 					DeleteFunc: func(obj interface{}) {
-						c.handleObject(obj)
+						c.handleObject(obj, "delete")
 					},
 				})
 
@@ -419,8 +421,14 @@ func verbsSupportInformers(verbs []string) bool {
 // Event handler: enqueues the objects to be processed
 // At this time it is very simple, more complex processing might be required
 // here.
-func (c *Controller) handleObject(obj any) {
-	c.logger.V(2).Info("Got object event", "obj", util.RefToRuntimeObj(obj.(runtime.Object)))
+func (c *Controller) handleObject(obj any, eventType string) {
+	wasDeletedFinalStateUnknown := false
+	switch typed := obj.(type) {
+	case cache.DeletedFinalStateUnknown:
+		obj = typed.Obj
+		wasDeletedFinalStateUnknown = true
+	}
+	c.logger.V(2).Info("Got object event", "eventType", eventType, "wasDeletedFinalStateUnknown", wasDeletedFinalStateUnknown, "obj", util.RefToRuntimeObj(obj.(runtime.Object)))
 	c.enqueueObject(obj)
 }
 

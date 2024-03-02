@@ -46,8 +46,9 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 
 	obj, err := c.getObjectFromIdentifier(objIdentifier)
 	if errors.IsNotFound(err) {
+		logger.V(3).Info("Removing non-existent object from resolutions", "object", objIdentifier, "numPolicies", len(bindingPolicyRuntimeObjects))
 		// object is deleted, delete from all resolutions it exists in (and enqueue Binding references for the latter)
-		return c.removeObjectFromBindingPolicies(objIdentifier, bindingPolicyRuntimeObjects)
+		return c.removeObjectFromBindingPolicies(ctx, objIdentifier, bindingPolicyRuntimeObjects)
 	} else if err != nil {
 		return fmt.Errorf("failed to get runtime.Object from object identifier (%v): %w", objIdentifier, err)
 	}
@@ -105,8 +106,15 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 			// enqueue binding to be synced since an object was added to its bindingpolicy's resolution
 			logger.V(4).Info("Enqueued Binding for syncing due to a noting of an "+
 				"object in its resolution", "binding", bindingPolicy.GetName(),
-				"objectIdentifier", objIdentifier, "objBeingDeleted", objBeingDeleted)
+				"objectIdentifier", objIdentifier, "objBeingDeleted", objBeingDeleted,
+				"resourceVersion", objMR.GetResourceVersion())
 			c.enqueueBinding(bindingPolicy.GetName())
+		} else {
+			logger.V(5).Info("Not enqueuing Binding due to no change in resolution",
+				"binding", bindingPolicy.GetName(),
+				"objectIdentifier", objIdentifier, "objBeingDeleted", objBeingDeleted,
+				"resourceVersion", objMR.GetResourceVersion())
+
 		}
 
 		// make sure object has singleton status if needed
@@ -184,8 +192,9 @@ func (c *Controller) handleSingletonLabel(ctx context.Context, obj runtime.Objec
 	return err
 }
 
-func (c *Controller) removeObjectFromBindingPolicies(objIdentifier util.ObjectIdentifier,
+func (c *Controller) removeObjectFromBindingPolicies(ctx context.Context, objIdentifier util.ObjectIdentifier,
 	bindingPolicyRuntimeObjects []runtime.Object) error {
+	logger := klog.FromContext(ctx)
 	for _, bindingPolicyRuntimeObject := range bindingPolicyRuntimeObjects {
 		bindingPolicy, err := runtimeObjectToBindingPolicy(bindingPolicyRuntimeObject)
 		if err != nil {
@@ -195,7 +204,10 @@ func (c *Controller) removeObjectFromBindingPolicies(objIdentifier util.ObjectId
 		if resolutionUpdated := c.bindingPolicyResolver.RemoveObjectIdentifier(bindingPolicy.GetName(),
 			objIdentifier); resolutionUpdated {
 			// enqueue binding to be synced since object was removed from its bindingpolicy's resolution
+			logger.V(4).Info("Enqueuing Binding due to deletion of matching object", "bindingPolicy", bindingPolicy.Name, "object", objIdentifier)
 			c.enqueueBinding(bindingPolicy.GetName())
+		} else {
+			logger.V(5).Info("Not enqueuing Binding due to deletion of non-matching object", "bindingPolicy", bindingPolicy.Name, "object", objIdentifier)
 		}
 	}
 

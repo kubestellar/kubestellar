@@ -171,15 +171,17 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 
 		// add the event handler functions (same as those used by the startup logic)
 		informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-			AddFunc: c.handleObject,
+			AddFunc: func(obj interface{}) {
+				c.handleObject(obj, "add")
+			},
 			UpdateFunc: func(old, new interface{}) {
 				if shouldSkipUpdate(old, new) {
 					return
 				}
-				c.handleObject(new)
+				c.handleObject(new, "update")
 			},
 			DeleteFunc: func(obj interface{}) {
-				c.handleObject(obj)
+				c.handleObject(obj, "delete")
 			},
 		})
 		c.informers[key] = informer
