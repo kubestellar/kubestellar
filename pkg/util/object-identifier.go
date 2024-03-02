@@ -33,8 +33,6 @@ type ObjectIdentifier struct {
 	GVK        schema.GroupVersionKind
 	Resource   string
 	ObjectName cache.ObjectName
-
-	ResourceVersion string
 }
 
 func (identifier *ObjectIdentifier) GVR() schema.GroupVersionResource {
@@ -55,10 +53,9 @@ func IdentifierForObject(mrObj MRObject, gvkToGvrMapper GVKToGVRMapper) (ObjectI
 	}
 
 	return ObjectIdentifier{
-		GVK:             gvk,
-		Resource:        gvr.Resource,
-		ObjectName:      namespacedName,
-		ResourceVersion: mrObj.GetResourceVersion(),
+		GVK:        gvk,
+		Resource:   gvr.Resource,
+		ObjectName: namespacedName,
 	}, nil
 }
 
