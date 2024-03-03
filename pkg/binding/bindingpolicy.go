@@ -142,7 +142,7 @@ func (c *Controller) requeueSelectedWorkloadObjects(ctx context.Context, binding
 	objs := make([]runtime.Object, 0, len(objectIdentifiers))
 	for objIdentifier := range objectIdentifiers {
 		obj, err := c.getObjectFromIdentifier(objIdentifier)
-		if err != nil || obj == nil {
+		if err != nil {
 			return fmt.Errorf("failed to get object from identifier: %w", err)
 		}
 

@@ -17,8 +17,9 @@ limitations under the License.
 package binding
 
 import (
-	"golang.org/x/exp/slices"
 	"sync"
+
+	"golang.org/x/exp/slices"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"

@@ -552,8 +552,7 @@ func (c *Controller) reconcile(ctx context.Context, objIdentifier util.ObjectIde
 func (c *Controller) getObjectFromIdentifier(objIdentifier util.ObjectIdentifier) (runtime.Object, error) {
 	lister := c.listers[objIdentifier.GVK]
 	if lister == nil {
-		utilruntime.HandleError(fmt.Errorf("could not get lister for GVR: %s", objIdentifier.GVR()))
-		return nil, nil
+		return nil, fmt.Errorf("could not get lister for GVR: %s", objIdentifier.GVR())
 	}
 
 	return getObject(lister, objIdentifier.ObjectName.Namespace, objIdentifier.ObjectName.Name)
