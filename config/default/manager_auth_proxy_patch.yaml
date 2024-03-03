@@ -54,4 +54,4 @@ spec:
         - "--leader-elect"
         - "--wds-name={{.Values.ControlPlaneName}}"
         - "--api-groups={{.Values.APIGroups}}"
-        - -v=5
+        - -v=2

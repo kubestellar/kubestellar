@@ -33,12 +33,12 @@ const (
 	BindingPolicyLabelSingletonStatusKey = "managed-by.kubestellar.io/singletonstatus"
 )
 
-func GetBindingPolicyGVK() schema.GroupVersionKind {
-	return v1alpha1.GroupVersion.WithKind(BindingPolicyKind)
+func GetBindingPolicyGVR() schema.GroupVersionResource {
+	return v1alpha1.GroupVersion.WithResource(BindingPolicyResource)
 }
 
-func GetBindingGVR() schema.GroupVersionKind {
-	return v1alpha1.GroupVersion.WithKind(BindingKind)
+func GetBindingGVR() schema.GroupVersionResource {
+	return v1alpha1.GroupVersion.WithResource(BindingResource)
 }
 
 type Label struct {

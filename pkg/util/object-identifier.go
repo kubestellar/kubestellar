@@ -17,8 +17,6 @@ limitations under the License.
 package util
 
 import (
-	"fmt"
-
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -40,23 +38,17 @@ func (identifier *ObjectIdentifier) GVR() schema.GroupVersionResource {
 }
 
 // IdentifierForObject creates an ObjectIdentifier given an object
-// that implements MRObject. The gvkGvrMapper is used to retrieve the
-// resource name for the given MRObject.
-func IdentifierForObject(mrObj MRObject, gvkToGvrMapper GVKToGVRMapper) (ObjectIdentifier, error) {
+// that implements MRObject.
+func IdentifierForObject(mrObj MRObject, objResourceName string) ObjectIdentifier {
 	gvk := mrObj.GetObjectKind().GroupVersionKind()
 
 	namespacedName := cache.MetaObjectToName(mrObj)
 
-	gvr, found := gvkToGvrMapper.GetGvr(gvk)
-	if !found {
-		return ObjectIdentifier{}, fmt.Errorf("failed to get gvr from gvk: %s", gvk.String())
-	}
-
 	return ObjectIdentifier{
 		GVK:        gvk,
-		Resource:   gvr.Resource,
+		Resource:   objResourceName,
 		ObjectName: namespacedName,
-	}, nil
+	}
 }
 
 func EmptyUnstructuredObjectFromIdentifier(objIdentifier ObjectIdentifier) *unstructured.Unstructured {

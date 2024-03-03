@@ -148,10 +148,7 @@ func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alp
 	}
 
 	// check workload
-	resolutionBindingObjectRefSet := bindingObjectRefSetFromResolution(resolution)
-	workloadBindingObjectRefSet := bindingObjectRefSetFromBindingWorkload(&bindingSpec.Workload)
-
-	return resolutionBindingObjectRefSet.Equal(workloadBindingObjectRefSet)
+	return resolution.toBindingObjectRefSet().Equal(bindingObjectRefSetFromWorkload(&bindingSpec.Workload))
 }
 
 // destinationsMatch returns true if the destinations in the resolution
@@ -176,7 +173,7 @@ type bindingObjectRef struct {
 	ResourceVersion string
 }
 
-func bindingObjectRefSetFromResolution(resolution *bindingPolicyResolution) sets.Set[bindingObjectRef] {
+func (resolution *bindingPolicyResolution) toBindingObjectRefSet() sets.Set[bindingObjectRef] {
 	bindingObjectRefSet := sets.New[bindingObjectRef]()
 
 	for objIdentifier, objResourceVersion := range resolution.objectIdentifierToResourceVersion {
@@ -190,7 +187,7 @@ func bindingObjectRefSetFromResolution(resolution *bindingPolicyResolution) sets
 	return bindingObjectRefSet
 }
 
-func bindingObjectRefSetFromBindingWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectReferences) sets.Set[bindingObjectRef] {
+func bindingObjectRefSetFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectReferences) sets.Set[bindingObjectRef] {
 	bindingObjectRefSet := sets.New[bindingObjectRef]()
 
 	for _, clusterScopeDownsyncObject := range bindingSpecWorkload.ClusterScope {
@@ -230,14 +227,8 @@ func destinationsStringSetToDestinations(destinations sets.Set[string]) []v1alph
 }
 
 func sortBindingWorkloadObjects(bindingWorkload *v1alpha1.DownsyncObjectReferences) {
-	sortClusterScope(bindingWorkload.ClusterScope)
-	sortNamespaceScope(bindingWorkload.NamespaceScope)
-}
-
-// sortClusterScope sorts a slice of ClusterScopeDownsyncObject based on
-// GroupVersionResource, Name, and ResourceVersion.
-func sortClusterScope(objects []v1alpha1.ClusterScopeDownsyncObject) {
-	slices.SortFunc(objects, func(a, b v1alpha1.ClusterScopeDownsyncObject) bool {
+	// sort clusterScopeDownsyncObjects
+	slices.SortFunc(bindingWorkload.ClusterScope, func(a, b v1alpha1.ClusterScopeDownsyncObject) bool {
 		if a.GroupVersionResource.String() != b.GroupVersionResource.String() {
 			return a.GroupVersionResource.String() < b.GroupVersionResource.String()
 		}
@@ -246,12 +237,8 @@ func sortClusterScope(objects []v1alpha1.ClusterScopeDownsyncObject) {
 		}
 		return a.ResourceVersion < b.ResourceVersion
 	})
-}
-
-// sortNamespaceScope sorts a slice of NamespaceScopeDownsyncObject based on
-// GroupVersionResource, ObjectName, and ResourceVersion.
-func sortNamespaceScope(objects []v1alpha1.NamespaceScopeDownsyncObject) {
-	slices.SortFunc(objects, func(a, b v1alpha1.NamespaceScopeDownsyncObject) bool {
+	// sort namespaceScopeDownsyncObjects
+	slices.SortFunc(bindingWorkload.NamespaceScope, func(a, b v1alpha1.NamespaceScopeDownsyncObject) bool {
 		if a.GroupVersionResource.String() != b.GroupVersionResource.String() {
 			return a.GroupVersionResource.String() < b.GroupVersionResource.String()
 		}

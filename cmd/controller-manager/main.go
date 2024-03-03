@@ -157,7 +157,7 @@ func main() {
 	if util.CheckWorkStatusIPresent(imbsRestConfig) {
 		listers := bindingController.GetListers()
 		informers := bindingController.GetInformers()
-		statusController, err := status.NewController(mgr, wdsRestConfig, imbsRestConfig, wdsName, listers, informers)
+		statusController, err := status.NewController(wdsRestConfig, imbsRestConfig, wdsName, listers, informers)
 		if err != nil {
 			setupLog.Error(err, "unable to create status controller")
 			os.Exit(1)

@@ -94,7 +94,9 @@ func (c *Controller) handleBindingPolicy(ctx context.Context, objIdentifier util
 		}
 
 		// set destinations and enqueue binding for syncing
-		c.bindingPolicyResolver.SetDestinations(bindingPolicy.GetName(), clusterSet)
+		// we can skip handling the error since the call to BindingPolicyResolver::NoteBindingPolicy above
+		// guarantees that an error won't be returned here
+		_ = c.bindingPolicyResolver.SetDestinations(bindingPolicy.GetName(), clusterSet)
 		logger.V(4).Info("Enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
 		c.enqueueBinding(bindingPolicy.GetName())
 
@@ -139,20 +141,11 @@ func (c *Controller) requeueSelectedWorkloadObjects(ctx context.Context, binding
 			"bindingpolicy %s: %w", bindingPolicyName, err)
 	}
 
-	objs := make([]runtime.Object, 0, len(objectIdentifiers))
-	for objIdentifier := range objectIdentifiers {
-		obj, err := c.getObjectFromIdentifier(objIdentifier)
-		if err != nil {
-			return fmt.Errorf("failed to get object from identifier: %w", err)
-		}
-
-		objs = append(objs, obj)
-	}
-
 	logger := klog.FromContext(ctx)
-	for _, obj := range objs {
-		logger.V(4).Info("Enqueuing workload object due to change in BindingPolicy", "bindingPolicyName", bindingPolicyName)
-		c.enqueueObject(obj)
+	for objIdentifier := range objectIdentifiers {
+		logger.V(4).Info("Enqueuing workload object due to change in BindingPolicy",
+			"objectIdentifier", objIdentifier, "bindingPolicyName", bindingPolicyName)
+		c.enqueueObjectIdentifier(objIdentifier)
 	}
 
 	return nil
@@ -185,7 +178,7 @@ func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clust
 		}
 		if match1 || match2 {
 			logger.V(4).Info("Enqueuing workload object due to cluster and BindingPolicy", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
-			c.enqueueObject(bindingPolicy)
+			c.enqueueObject(bindingPolicy, util.BindingPolicyResource)
 		}
 	}
 }
@@ -212,13 +205,13 @@ func (c *Controller) evaluateBindingPolicies(ctx context.Context, clusterId stri
 		}
 		if match {
 			logger.V(4).Info("Enqueuing BindingPolicy due to cluster notification", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
-			c.enqueueObject(bindingPolicy)
+			c.enqueueObject(bindingPolicy, util.BindingPolicyResource)
 		}
 	}
 }
 
 func (c *Controller) listBindingPolicies() ([]runtime.Object, error) {
-	lister := c.listers[util.GetBindingPolicyGVK()]
+	lister := c.listers[util.GetBindingPolicyGVR()]
 	if lister == nil {
 		return nil, fmt.Errorf("could not get lister for BindingPolicy")
 	}
@@ -248,7 +241,7 @@ func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyNa
 	logger := klog.FromContext(ctx)
 	for key, lister := range c.listers {
 		// do not requeue bindingpolicies or bindings
-		if key == util.GetBindingPolicyGVK() || key == util.GetBindingGVR() {
+		if key == util.GetBindingPolicyGVR() || key == util.GetBindingGVR() {
 			logger.Info("Not enqueuing control object", "key", key)
 			continue
 		}
@@ -261,7 +254,7 @@ func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyNa
 			logger.V(4).Info("Enqueuing workload object due to BindingPolicy",
 				"listerKey", key, "obj", util.RefToRuntimeObj(obj),
 				"bindingPolicyName", bindingPolicyName)
-			c.enqueueObject(obj)
+			c.enqueueObject(obj, key.GroupResource().Resource)
 		}
 	}
 	return nil

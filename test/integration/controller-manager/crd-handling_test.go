@@ -107,8 +107,8 @@ func TestCRDHandling(t *testing.T) {
 	}
 
 	crd, _ := createCRDFromLiteral(t, ctx, "CR1", crd1Literal, serializer, apiextClient)
-	watched := schema.GroupVersionKind{Group: "synthetic-crd.com", Version: "v2alpha1", Kind: "CR1"}
-	notWatched := schema.GroupVersionKind{Group: "synthetic-crd.com", Version: "v3beta1", Kind: "CR1"}
+	watched := schema.GroupVersionResource{Group: "synthetic-crd.com", Version: "v2alpha1", Resource: "cr1s"}
+	notWatched := schema.GroupVersionResource{Group: "synthetic-crd.com", Version: "v3beta1", Resource: "cr1s"}
 
 	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, time.Minute, false, func(ctx context.Context) (done bool, err error) {
 		informers, listers := ctlr.GetInformers(), ctlr.GetListers()
