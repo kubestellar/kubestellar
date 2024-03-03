@@ -22,6 +22,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
@@ -32,14 +33,12 @@ const (
 	BindingPolicyLabelSingletonStatusKey = "managed-by.kubestellar.io/singletonstatus"
 )
 
-func GetBindingPolicyListerKey() string {
-	return KeyForGroupVersionKind(v1alpha1.GroupVersion.Group,
-		v1alpha1.GroupVersion.Version, BindingPolicyKind)
+func GetBindingPolicyGVK() schema.GroupVersionKind {
+	return v1alpha1.GroupVersion.WithKind(BindingPolicyKind)
 }
 
-func GetBindingListerKey() string {
-	return KeyForGroupVersionKind(v1alpha1.GroupVersion.Group,
-		v1alpha1.GroupVersion.Version, BindingKind)
+func GetBindingGVR() schema.GroupVersionKind {
+	return v1alpha1.GroupVersion.WithKind(BindingKind)
 }
 
 type Label struct {

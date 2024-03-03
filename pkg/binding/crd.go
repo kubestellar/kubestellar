@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -38,17 +39,30 @@ type APIResource struct {
 }
 
 // Handle CRDs should account for CRDs being added or deleted to start/stop new informers as needed
-func (c *Controller) handleCRD(ctx context.Context, obj runtime.Object) error {
+func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
-	uObj := obj.(*unstructured.Unstructured)
 	var crdObj *apiextensionsv1.CustomResourceDefinition
-	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(uObj.UnstructuredContent(), &crdObj); err != nil {
-		return fmt.Errorf("failed to convert Unstructured to CRD: %w", err)
+	var specVersions []apiextensionsv1.CustomResourceDefinitionVersion
+
+	{
+		obj, err := c.getObjectFromIdentifier(objIdentifier)
+		if errors.IsNotFound(err) {
+			logger.V(2).Info("Handling deleted CRD", "name", objIdentifier.ObjectName.Name)
+			obj = nil
+		} else if err != nil {
+			return fmt.Errorf("failed to get runtime.Object from identifier (%v): %w", objIdentifier, err)
+		} else {
+			uObj := obj.(*unstructured.Unstructured)
+			if err := runtime.DefaultUnstructuredConverter.FromUnstructured(uObj.UnstructuredContent(), &crdObj); err != nil {
+				return fmt.Errorf("failed to convert Unstructured to CRD: %w", err)
+			}
+			specVersions = crdObj.Spec.Versions
+		}
 	}
 
 	// for each CustomResourceDefinitionVersion, follow a decision tree to tell whether the corresponding gvr should be watched
-	toStartList, toStopList := []APIResource{}, []string{}
-	for _, ver := range crdObj.Spec.Versions {
+	toStartList, toStopList := []APIResource{}, []schema.GroupVersionKind{}
+	for _, ver := range specVersions {
 		gvr := APIResource{
 			groupVersion: schema.GroupVersion{
 				Group:   crdObj.Spec.Group,
@@ -59,11 +73,11 @@ func (c *Controller) handleCRD(ctx context.Context, obj runtime.Object) error {
 				Kind: crdObj.Spec.Names.Kind,
 			},
 		}
-		key := util.KeyForGroupVersionKind(gvr.groupVersion.Group, gvr.groupVersion.Version, gvr.resource.Kind)
+		key := gvr.groupVersion.WithKind(gvr.resource.Kind)
 		if !c.includedToWatch(gvr) {
 			continue
 		}
-		if isBeingDeleted(obj) {
+		if isBeingDeleted(crdObj) {
 			toStopList = append(toStopList, key)
 			continue
 		}
@@ -80,20 +94,20 @@ func (c *Controller) handleCRD(ctx context.Context, obj runtime.Object) error {
 		go c.startInformersForNewAPIResources(ctx, toStartList)
 	}
 
-	for _, key := range toStopList {
-		logger.Info("API should not be watched, ensuring the informer's absence.", "key", key)
-		stopper, ok := c.stoppers[key]
+	for _, gvk := range toStopList {
+		logger.Info("API should not be watched, ensuring the informer's absence.", "gvk", gvk)
+		stopper, ok := c.stoppers[gvk]
 		if !ok {
-			logger.V(3).Info("Informer is already absent.", "key", key)
+			logger.V(3).Info("Informer is already absent.", "key", gvk)
 		} else {
 			// close channel
 			close(stopper)
 		}
 		// remove entries for key
-		delete(c.informers, key)
-		delete(c.listers, key)
-		delete(c.stoppers, key)
-		c.gvkGvrMapper.DeleteByGvkKey(key)
+		delete(c.informers, gvk)
+		delete(c.listers, gvk)
+		delete(c.stoppers, gvk)
+		c.gvkToGvrMapper.Delete(gvk)
 	}
 
 	return nil
@@ -123,12 +137,12 @@ func crdEstablished(crd *apiextensionsv1.CustomResourceDefinition) bool {
 
 func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toStartList []APIResource) {
 	logger := klog.FromContext(ctx)
+
 	for _, toStart := range toStartList {
-		logger.Info("Ensuring informer for:", "group", toStart.groupVersion.Group,
+		logger.Info("New API added. Starting informer for:", "group", toStart.groupVersion.Group,
 			"version", toStart.groupVersion, "kind", toStart.resource.Kind)
 
-		key := util.KeyForGroupVersionKind(toStart.groupVersion.Group,
-			toStart.groupVersion.Version, toStart.resource.Kind)
+		key := toStart.groupVersion.WithKind(toStart.resource.Kind)
 
 		if _, ok := c.informers[key]; ok {
 			logger.V(3).Info("Informer already ensured.", "key", key)
@@ -157,20 +171,23 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 
 		// add the event handler functions (same as those used by the startup logic)
 		informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-			AddFunc: c.handleObject,
+			AddFunc: func(obj interface{}) {
+				c.handleObject(obj, "add")
+			},
 			UpdateFunc: func(old, new interface{}) {
 				if shouldSkipUpdate(old, new) {
 					return
 				}
-				c.handleObject(new)
+				c.handleObject(new, "update")
 			},
 			DeleteFunc: func(obj interface{}) {
-				c.handleObject(obj)
+				c.handleObject(obj, "delete")
 			},
 		})
+		c.informers[key] = informer
 
 		// add the mapping between GVK and GVR
-		c.gvkGvrMapper.Add(toStart.groupVersion.WithKind(toStart.resource.Kind), gvr)
+		c.gvkToGvrMapper.Add(toStart.groupVersion.WithKind(toStart.resource.Kind), gvr)
 
 		// ensure the lister
 		lister := cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())

@@ -60,29 +60,24 @@ type SourceRef struct {
 }
 
 func IsCRD(o interface{}) bool { // CRDs might have different versions. therefore, using "any" in CRD version
-	return matchesGVK(o, apiextensions.GroupName, AnyVersion, CRDKind)
+	return objectMatchesGVK(o, apiextensions.GroupName, AnyVersion, CRDKind)
 }
 
 func IsBindingPolicy(o interface{}) bool {
-	return matchesGVK(o, v1alpha1.GroupVersion.Group, v1alpha1.GroupVersion.Version, BindingPolicyKind)
+	return objectMatchesGVK(o, v1alpha1.GroupVersion.Group, v1alpha1.GroupVersion.Version, BindingPolicyKind)
 }
 
 func IsService(o interface{}) bool {
-	return matchesGVK(o, "", ServiceVersion, ServiceKind)
+	return objectMatchesGVK(o, "", ServiceVersion, ServiceKind)
 }
 
-func matchesGVK(o interface{}, group, version, kind string) bool {
+func objectMatchesGVK(o interface{}, group, version, kind string) bool {
 	gvk, err := getObjectGVK(o)
 	if err != nil {
 		return false
 	}
 
-	if gvk.Group == group &&
-		(version == AnyVersion || gvk.Version == version) &&
-		gvk.Kind == kind {
-		return true
-	}
-	return false
+	return gvkMatches(gvk, group, version, kind)
 }
 
 func getObjectGVK(o interface{}) (schema.GroupVersionKind, error) {
