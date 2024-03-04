@@ -45,53 +45,32 @@ The dashed dependencies are at run time, not build time.
 
 There is a container image at [ghcr.io/kubestellar/ocm-status-addon](https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon).
 
-The container image is built and published using `make`.  The
-following `make` variables are relevant.
+The container image is built and published by that repo's release process, which is documented at [its `docs/release.md` file](https://github.com/kubestellar/ocm-status-addon/blob/main/docs/release.md).
 
-- `KO_DOCKER_REPO`, defaults to `ghcr.io/kubestellar`
-- `CMD_NAME`, defaults to `ocm-status-addon`
-- `IMAGE_TAG`, defaults to `0.2.0-alpha.1`
-- `IMG`, defaults to `${KO_DOCKER_REPO}/${CMD_NAME}:${IMAGE_TAG}`
+Following are notable images in that repo.
 
-`make ko-build-push` will build and publish the container image at
-`${IMG}`. This will be a multi-platform manifest, referencing images
-for "platforms" `linux/amd64` and `linux/arm64`.
+|         tag   |         git commit                       | SHA256 digest |
+| ------------- | ---------------------------------------- | ------------- |
+| 0.2.0-alpha.1 | 1c36248df2c4379ab4ce2a5945d5cce3145dc211 | b8ef1802a1d9f30dd65f16f94c86dc0218f2cf30bb34549a6248aeeb2b13eb4a |
+| 0.2.0-rc5     | 6753b9e169d47ff1592f9638d1b53c826f7ee1b9 | 35d97e4b523388ee28f537b176b3f8dbbc888e31a46bbd308d67cd5a0735c249 |
+| latest        | 6753b9e169d47ff1592f9638d1b53c826f7ee1b9 | 35d97e4b523388ee28f537b176b3f8dbbc888e31a46bbd308d67cd5a0735c249 |
 
-`make ko-local-build` will build the same multi-platform manifest but
-not push it, only leave it among your Docker images. Note that if you
-have podman pretending to be Docker then it will only receive a
-single-platform image, not the multi-platform manifest.
-
+To support testing, `make ko-local-build` will build a single-platform
+image and not push it, only leave it among your Docker images. The
+single platform's OS is Linux. The single platform's ISA is defined by
+the `make` variable `ARCH`, which defaults to what `go env GOARCH`
+prints.
 
 ### OCM status addon Helm chart
 
-The operator is delivered by a Helm chart at [ghcr.io/kubestellar/ocm-status-addon-chart](https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon-chart).
+The operator is delivered by a Helm chart at [ghcr.io/kubestellar/ocm-status-addon-chart](https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon-chart). The chart references the container image.
 
-The chart is built and published using `make`. The following `make`
-variables are relevant.
-
-- `KO_DOCKER_REPO`, defaults to `ghcr.io/kubestellar`
-- `CMD_NAME`, defaults to `ocm-status-addon`
-- `IMAGE_TAG`, defaults to `0.2.0-alpha.1`
-- `IMG`, defaults to `${KO_DOCKER_REPO}/${CMD_NAME}:${IMAGE_TAG}`
-
-`make chart`: builds the local copy of the chart from local sources,
-using `kustomize`. When using the default values of the `make`
-variables, the built chart references the container image
-`ghcr.io/kubestellar/ocm-status-addon:0.2.0-alpha.1`. TODO: describe
-how the chart contents depend on the `make` variables.
-
-`make chart-push` (depends on the `make` target `chart`): pushes the
-local copy of the chart to the OCI repository and tag specified in
-`${IMG}`.
-
-The following versions exist.
+The following notable versions exist.
 
 | OCI tag = version in chart | appVersion in chart | referenced container tag |
 | -------------------------- | ------------------- | ------------------------ |
-| 0.2.0-alpha.1              | 0.2.0-alpha.1       | 0.2.0-alpha.1 |
-
-Note: the Chart.yaml in github uses just "0.2.0" for the version and appVersion in the chart. TODO: bug?
+| v0.2.0-alpha.1             | v0.2.0-alpha.1      | 0.2.0-alpha.1 |
+| v0.2.0-rc5                 | v0.2.0-rc5          | 0.2.0-rc5     |
 
 ## OCM Transport Plugin
 
@@ -104,6 +83,10 @@ This appears at [ghcr.io/kubestellar/ocm-transport-plugin/transport-controller](
 TODO: document how the image is built and published, including explain versioning.
 
 ## KubeStellar
+
+### WARNING
+
+Literal KubeStellar release numbers appear here, and are historical. The version of this document in a given release does not mention that release. See [the release process](release.md) for more details on what self-references are and are not handled.
 
 ### Outline of publishing
 
@@ -196,13 +179,13 @@ _definition_ objects if they are not already present, and is a
 controller-manager hosting the per-WDS controllers ([binding controller](architecture.md#binding-controller) and [status controller](architecture.md#status-controller)) from the kubestellar repo.
 
 The image repository is
-`ghcr.io/kubestellar/kubestellar/controller-manager`. There is
-currently just one supported tag there, `0.20.0-alpha.1`. That was
-built from the git repo contents with the tag `v0.20.0-alpha.1`.
+`ghcr.io/kubestellar/kubestellar/controller-manager`. The following notable versions exist.
 
-`make ko-build-push` will build and push that image, tagging it with
-the value of the `make` variable `IMAGE_TAG` (which defaults to
-`0.20.0-alpha.1`).
+| image tag | git commit | SHA256 digest |
+| --------- | ---------- | ------------- |
+| 0.20.0    | a2bcaf75dc895dbef5f6cddcf203b0203423a08a | fac5b208a1f691eb5548a7699494bed2ee6b7502e739a2db840f39bbc05b2fd4 |
+
+The [release process](release.md) builds and publishes that container image.
 
 `make ko-build-local` will make a local image for just the local
 platform. This is used in local testing.
@@ -215,22 +198,16 @@ The source for the Helm chart is in
 [chart](../../../chart). `make chart` (re)derives
 it from local sources. This is not included in `make all-generated`.
 
-This chart creates (among other things) a `Deployment` object that runs a container from the image `ghcr.io/kubestellar/kubestellar/controller-manager:0.20.0-alpha.1`.
+This chart creates (among other things) a `Deployment` object that runs a container from the [KubeStellar controller-manager container image](#kubestellar-controller-manager-container-image).
 
 The chart is published at the OCI repository
-`ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart`.  The
-`make` target `chart-push` depends on target `chart` and publishes the
-chart to
-`${DOCKER_REGISTRY}/kubestellar-operator-chart:${IMAGE_TAG}`. Make
-variable `DOCKER_REGISTRY` defaults to
-`ghcr.io/kubestellar/kubestellar` and `IMAGE_TAG` defaults to
-`0.20.0-alpha.1` (red flag here).
+`ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart`. A [GitHub workflow](../../../.github/workflows/goreleaser.yml) specializes and publishes this chart as part of [the release process](release.md).
 
 The following versions exist.
 
 | OCI tag = version in chart | appVersion in chart | referenced container tag |
 | -------------------------- | ------------------- | ------------------------ |
-| 0.20.0-alpha.1             | 0.1.0               | 0.20.0-alpha.1 |
+| 0.20.0                     | 0.20.0              | 0.20.0 |
 
 ### clusteradm container image
 
@@ -255,7 +232,16 @@ The PostCreateHook defined in `ocm.yaml` gets used on an ITS and adds the hub si
 
 #### kubestellar PostCreateHook
 
-The PostCreateHook defined in `kubestellar.yaml` is intended to be used in the hosting cluster, once per WDS, and runs container image `quay.io/kubestellar/helm:v3.14.0` (which is built from [the Helm source](https://github.com/helm/helm/tree/v3.14.0) by a process that we need to document) to instantiate the chart from `oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart` with chart version `0.20.0-alpha.1`. Currently the only reference to any copy of this PostCreateHook is from the [examples doc](examples.md), which references the copy in the Git commit tagged `v0.20.0-alpha.1`.
+The PostCreateHook defined in `kubestellar.yaml` is intended to be
+used in the hosting cluster, once per WDS, and runs container image
+`quay.io/kubestellar/helm:v3.14.0` (which is built from [the Helm
+source](https://github.com/helm/helm/tree/v3.14.0) by a process that
+we need to document) to instantiate the chart from
+`oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart`;
+the chart version appears as a literal in the PostCreateHook,
+currently "0.20.0". Currently the only reference to any copy of this
+PostCreateHook is from the [examples doc](examples.md), which
+references the copy in the Git commit tagged `v0.20.0`.
 
 ## Amalgamated graph
 
