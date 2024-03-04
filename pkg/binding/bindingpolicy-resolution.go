@@ -219,13 +219,13 @@ func bindingObjectRefAndVersionSetFromWorkload(bindingSpecWorkload *v1alpha1.Dow
 }
 
 func destinationsStringSetToSortedDestinations(destinationsStringSet sets.Set[string]) []v1alpha1.Destination {
-	sortedDestiantions := make([]v1alpha1.Destination, 0, len(destinationsStringSet))
+	sortedDestinations := make([]v1alpha1.Destination, 0, len(destinationsStringSet))
 
 	for _, d := range sets.List(destinationsStringSet) {
-		sortedDestiantions = append(sortedDestiantions, v1alpha1.Destination{ClusterId: d})
+		sortedDestinations = append(sortedDestinations, v1alpha1.Destination{ClusterId: d})
 	}
 
-	return sortedDestiantions
+	return sortedDestinations
 }
 
 func sortBindingWorkloadObjects(bindingWorkload *v1alpha1.DownsyncObjectReferences) {
