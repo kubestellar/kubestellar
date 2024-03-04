@@ -139,9 +139,6 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 	logger := klog.FromContext(ctx)
 
 	for _, toStart := range toStartList {
-		logger.Info("New API added. Starting informer for:", "group", toStart.groupVersion.Group,
-			"version", toStart.groupVersion, "kind", toStart.resource.Kind, "resource", toStart.resource.Name)
-
 		gvr := toStart.groupVersion.WithResource(toStart.resource.Name)
 
 		if _, ok := c.informers[gvr]; ok {
@@ -149,6 +146,8 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 			continue
 		}
 		// from this point onwards, the gvr is guaranteed not to be mapped in the informers, listers and stoppers maps
+		logger.Info("New API added. Starting informer for:", "group", toStart.groupVersion.Group,
+			"version", toStart.groupVersion, "kind", toStart.resource.Kind, "resource", toStart.resource.Name)
 
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
