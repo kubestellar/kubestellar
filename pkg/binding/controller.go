@@ -297,8 +297,7 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 				})
 
 				// create and index the lister
-				c.listers[gvr] = cache.NewGenericLister(informer.GetIndexer(), schema.GroupResource{
-					Group: resource.Group, Resource: resource.Name})
+				c.listers[gvr] = cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())
 
 				// run the informer
 				// we need to be able to stop informers for APIs (CRDs) that are removed
@@ -413,7 +412,7 @@ func verbsSupportInformers(verbs []string) bool {
 // Event handler: enqueues the objects to be processed
 // At this time it is very simple, more complex processing might be required
 // here.
-func (c *Controller) handleObject(obj any, objResourceName string, eventType string) {
+func (c *Controller) handleObject(obj any, resource string, eventType string) {
 	wasDeletedFinalStateUnknown := false
 	switch typed := obj.(type) {
 	case cache.DeletedFinalStateUnknown:
@@ -422,15 +421,15 @@ func (c *Controller) handleObject(obj any, objResourceName string, eventType str
 	}
 	c.logger.Info("Got object event", "eventType", eventType,
 		"wasDeletedFinalStateUnknown", wasDeletedFinalStateUnknown, "obj", util.RefToRuntimeObj(obj.(runtime.Object)),
-		"objResourceName", objResourceName)
+		"resource", resource)
 
-	c.enqueueObject(obj, objResourceName)
+	c.enqueueObject(obj, resource)
 }
 
 // enqueueObject converts an object into an ObjectIdentifier struct which is
 // then put onto the work queue.
-func (c *Controller) enqueueObject(obj interface{}, objResourceName string) {
-	objIdentifier := util.IdentifierForObject(obj.(util.MRObject), objResourceName)
+func (c *Controller) enqueueObject(obj interface{}, resource string) {
+	objIdentifier := util.IdentifierForObject(obj.(util.MRObject), resource)
 	c.enqueueObjectIdentifier(objIdentifier)
 }
 

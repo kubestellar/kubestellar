@@ -36,15 +36,12 @@ const bindingPolicyResolutionNotFoundErrorPrefix = "bindingpolicy resolution is 
 // exported and compared to the binding representation.
 // All functions in this interface are thread-safe, and nothing mutates any
 // method-parameter during a call to one of them.
-// If a function declares that it expects a method-parameter to not be mutated
-// after it is called, then it may mutate it.
 type BindingPolicyResolver interface {
 	// GenerateBinding returns the binding for the given
-	// bindingpolicy key. This function can fail due to internal caches
-	// temporarily being out of sync.
+	// bindingpolicy key.
 	//
-	// If no resolution is associated with the given key, an error is returned.
-	GenerateBinding(bindingPolicyKey string) (*v1alpha1.BindingSpec, error)
+	// If no resolution is associated with the given key, nil is returned.
+	GenerateBinding(bindingPolicyKey string) *v1alpha1.BindingSpec
 	// GetOwnerReference returns the owner reference for the given
 	// bindingpolicy key. If no resolution is associated with the given key, an
 	// error is returned.
@@ -123,26 +120,18 @@ type bindingPolicyResolver struct {
 }
 
 // GenerateBinding returns the binding for the given
-// bindingpolicy key. If a key is not associated to a resolution, the latter is
-// created. This function can fail due to internal caches temporarily being
-// out of sync.
-func (resolver *bindingPolicyResolver) GenerateBinding(bindingPolicyKey string) (
-	*v1alpha1.BindingSpec, error) {
+// bindingpolicy key.
+//
+// If no resolution is associated with the given key, nil is returned.
+func (resolver *bindingPolicyResolver) GenerateBinding(bindingPolicyKey string) *v1alpha1.BindingSpec {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
-		return nil, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix,
-			bindingPolicyKey)
+		return nil
 	}
 
-	bindingSpec, err := bindingPolicyResolution.toBindingSpec()
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to create BindingSpec for bindingpolicy %v: %w",
-			bindingPolicyKey, err)
-	}
-
-	return bindingSpec, nil
+	// thread-safe
+	return bindingPolicyResolution.toBindingSpec()
 }
 
 // GetOwnerReference returns the owner reference for the given

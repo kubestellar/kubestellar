@@ -39,14 +39,14 @@ func (identifier *ObjectIdentifier) GVR() schema.GroupVersionResource {
 
 // IdentifierForObject creates an ObjectIdentifier given an object
 // that implements MRObject.
-func IdentifierForObject(mrObj MRObject, objResourceName string) ObjectIdentifier {
+func IdentifierForObject(mrObj MRObject, resource string) ObjectIdentifier {
 	gvk := mrObj.GetObjectKind().GroupVersionKind()
 
 	namespacedName := cache.MetaObjectToName(mrObj)
 
 	return ObjectIdentifier{
 		GVK:        gvk,
-		Resource:   objResourceName,
+		Resource:   resource,
 		ObjectName: namespacedName,
 	}
 }

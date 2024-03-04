@@ -94,10 +94,11 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 		if err != nil {
 			if errorIsBindingPolicyResolutionNotFound(err) {
 				// this case can occur if a bindingpolicy resolution was deleted AFTER
-				// starting this iteration and BEFORE getting to the NoteObject function,
+				// the BindingPolicyResolver::ResolutionExists call and BEFORE getting to the NoteObject function,
 				// which occurs if a bindingpolicy was deleted in this time-window.
-				logger.V(4).Info("skipped EnsureObjectIdentifierWithVersion for object-identifier (%v) and "+
-					"bindingpolicy %s because the latter was deleted", objIdentifier, bindingPolicy.GetName())
+				logger.V(4).Info("skipped EnsureObjectIdentifierWithVersion for object because "+
+					"bindingpolicy was deleted", "objectIdentifier", objIdentifier,
+					"bindingpolicy", bindingPolicy.GetName())
 				continue
 			}
 

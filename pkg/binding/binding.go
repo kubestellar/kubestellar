@@ -68,9 +68,9 @@ func (c *Controller) syncBinding(ctx context.Context, objIdentifier util.ObjectI
 	bindingPolicyIdentifier := binding.GetName()
 
 	// generate binding spec from resolver
-	generatedBindingSpec, err := c.bindingPolicyResolver.GenerateBinding(bindingPolicyIdentifier)
-	if err != nil {
-		return fmt.Errorf("failed to generate BindingSpec: %w", err)
+	generatedBindingSpec := c.bindingPolicyResolver.GenerateBinding(bindingPolicyIdentifier)
+	if generatedBindingSpec == nil { // resolution does not exist, abort syncing
+		return fmt.Errorf("syncing Binding was stopped because it has no counterpart resolution")
 	}
 
 	// calculate if the resolved decision is different from the current one

@@ -95,12 +95,12 @@ func (resolution *bindingPolicyResolution) getObjectIdentifiers() sets.Set[util.
 	resolution.RLock()
 	defer resolution.RUnlock()
 
-	return sets.KeySet[util.ObjectIdentifier](resolution.objectIdentifierToResourceVersion)
+	return sets.KeySet(resolution.objectIdentifierToResourceVersion)
 }
 
 // toBindingSpec converts the resolution to a binding
 // spec. This function is thread-safe.
-func (resolution *bindingPolicyResolution) toBindingSpec() (*v1alpha1.BindingSpec, error) {
+func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec {
 	resolution.RLock()
 	defer resolution.RUnlock()
 
@@ -134,8 +134,8 @@ func (resolution *bindingPolicyResolution) toBindingSpec() (*v1alpha1.BindingSpe
 
 	return &v1alpha1.BindingSpec{
 		Workload:     workload,
-		Destinations: destinationsStringSetToDestinations(resolution.destinations), // returns sorted
-	}, nil
+		Destinations: destinationsStringSetToSortedDestinations(resolution.destinations),
+	}
 }
 
 func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alpha1.BindingSpec) bool {
@@ -148,7 +148,24 @@ func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alp
 	}
 
 	// check workload
-	return resolution.toBindingObjectRefSet().Equal(bindingObjectRefSetFromWorkload(&bindingSpec.Workload))
+	if len(resolution.objectIdentifierToResourceVersion) != len(bindingSpec.Workload.ClusterScope)+
+		len(bindingSpec.Workload.NamespaceScope) {
+		return false
+	}
+
+	objectRefSetFromWorkload := bindingObjectRefAndVersionSetFromWorkload(&bindingSpec.Workload)
+
+	for objIdentifier, objResourceVersion := range resolution.objectIdentifierToResourceVersion {
+		if !objectRefSetFromWorkload.Has(objectRefAndVersion{
+			GroupVersionResource: objIdentifier.GVR(),
+			ObjectName:           objIdentifier.ObjectName,
+			ResourceVersion:      objResourceVersion,
+		}) {
+			return false
+		}
+	} // this check works because both groups have unique members and are of equal size
+
+	return true
 }
 
 // destinationsMatch returns true if the destinations in the resolution
@@ -167,31 +184,17 @@ func destinationsMatch(resolvedDestinations sets.Set[string], bindingDestination
 	return true
 }
 
-type bindingObjectRef struct {
+type objectRefAndVersion struct {
 	schema.GroupVersionResource
 	cache.ObjectName
 	ResourceVersion string
 }
 
-func (resolution *bindingPolicyResolution) toBindingObjectRefSet() sets.Set[bindingObjectRef] {
-	bindingObjectRefSet := sets.New[bindingObjectRef]()
-
-	for objIdentifier, objResourceVersion := range resolution.objectIdentifierToResourceVersion {
-		bindingObjectRefSet.Insert(bindingObjectRef{
-			GroupVersionResource: objIdentifier.GVR(),
-			ObjectName:           objIdentifier.ObjectName,
-			ResourceVersion:      objResourceVersion,
-		})
-	}
-
-	return bindingObjectRefSet
-}
-
-func bindingObjectRefSetFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectReferences) sets.Set[bindingObjectRef] {
-	bindingObjectRefSet := sets.New[bindingObjectRef]()
+func bindingObjectRefAndVersionSetFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectReferences) sets.Set[objectRefAndVersion] {
+	bindingObjectRefAndVersionSet := sets.New[objectRefAndVersion]()
 
 	for _, clusterScopeDownsyncObject := range bindingSpecWorkload.ClusterScope {
-		bindingObjectRefSet.Insert(bindingObjectRef{
+		bindingObjectRefAndVersionSet.Insert(objectRefAndVersion{
 			GroupVersionResource: schema.GroupVersionResource(clusterScopeDownsyncObject.GroupVersionResource),
 			ObjectName: cache.ObjectName{
 				Name:      clusterScopeDownsyncObject.Name,
@@ -202,7 +205,7 @@ func bindingObjectRefSetFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjec
 	}
 
 	for _, namespacedScopeDownsyncObject := range bindingSpecWorkload.NamespaceScope {
-		bindingObjectRefSet.Insert(bindingObjectRef{
+		bindingObjectRefAndVersionSet.Insert(objectRefAndVersion{
 			GroupVersionResource: schema.GroupVersionResource(namespacedScopeDownsyncObject.GroupVersionResource),
 			ObjectName: cache.ObjectName{
 				Name:      namespacedScopeDownsyncObject.Name,
@@ -212,18 +215,21 @@ func bindingObjectRefSetFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjec
 		})
 	}
 
-	return bindingObjectRefSet
+	return bindingObjectRefAndVersionSet
 }
 
-func destinationsStringSetToDestinations(destinations sets.Set[string]) []v1alpha1.Destination {
-	slices.Sort(destinations.UnsortedList())
+func destinationsStringSetToSortedDestinations(destinationsStringSet sets.Set[string]) []v1alpha1.Destination {
+	sortedDestiantions := make([]v1alpha1.Destination, 0, len(destinationsStringSet))
 
-	dests := make([]v1alpha1.Destination, 0, len(destinations))
-	for d := range destinations {
-		dests = append(dests, v1alpha1.Destination{ClusterId: d})
+	// sort destinations
+	sortedDestinationStrings := destinationsStringSet.UnsortedList()
+	slices.Sort(sortedDestinationStrings)
+
+	for _, d := range sortedDestinationStrings {
+		sortedDestiantions = append(sortedDestiantions, v1alpha1.Destination{ClusterId: d})
 	}
 
-	return dests
+	return sortedDestiantions
 }
 
 func sortBindingWorkloadObjects(bindingWorkload *v1alpha1.DownsyncObjectReferences) {
