@@ -116,7 +116,7 @@ function create_cluster() {
   cluster=$1
   kind create cluster --name $cluster
   kubectl config rename-context kind-${cluster} $cluster
-  clusteradm --context imbs1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --force-internal-endpoint-lookup"}' | sh
+  clusteradm --context imbs1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton --force-internal-endpoint-lookup"}' | sh
 }
 
 create_cluster cluster1
