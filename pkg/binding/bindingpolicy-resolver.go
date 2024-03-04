@@ -31,20 +31,20 @@ import (
 const bindingPolicyResolutionNotFoundErrorPrefix = "bindingpolicy resolution is not found"
 
 // A BindingPolicyResolver holds a collection of bindingpolicy resolutions.
-// The collection is indexed by bindingPolicyKey string, the resolver does not
-// care what the strings are. The resolution for a given key can be updated,
-// exported and compared to the Binding representation.
+// The collection is indexed by bindingPolicyKey strings, which are the names of
+// the bindingpolicy objects. The resolution for a given key can be updated,
+// exported and compared to the binding representation.
 // All functions in this interface are thread-safe, and nothing mutates any
 // method-parameter during a call to one of them.
 type BindingPolicyResolver interface {
 	// GenerateBinding returns the binding for the given
-	// bindingpolicy key. This function can fail due to internal caches temporarily being
-	// out of sync.
+	// bindingpolicy key.
 	//
-	// If no resolution is associated with the given key, an error is returned.
-	GenerateBinding(bindingPolicyKey string) (*v1alpha1.BindingSpec, error)
-	// GetOwnerReference returns the owner reference for the given bindingpolicy key.
-	// If no resolution is associated with the given key, an error is returned.
+	// If no resolution is associated with the given key, nil is returned.
+	GenerateBinding(bindingPolicyKey string) *v1alpha1.BindingSpec
+	// GetOwnerReference returns the owner reference for the given
+	// bindingpolicy key. If no resolution is associated with the given key, an
+	// error is returned.
 	GetOwnerReference(bindingPolicyKey string) (metav1.OwnerReference, error)
 	// CompareBinding compares the given binding spec
 	// with the maintained binding for the given bindingpolicy key.
@@ -69,15 +69,17 @@ type BindingPolicyResolver interface {
 	// in the resolution for the given bindingpolicy key, and is associated
 	// with the given resourceVersion.
 	//
-	// The returned bool indicates whether the bindingpolicy resolution was changed.
-	// If no resolution is associated with the given key, an error is returned.
+	// The returned bool indicates whether the bindingpolicy resolution was
+	// changed. If no resolution is associated with the given key, an error is
+	// returned.
 	EnsureObjectIdentifierWithVersion(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
 		resourceVersion string) (bool, error)
-	// RemoveObjectIdentifier removes the given object identifier from the
-	// resolution for the given bindingpolicy key.
+	// RemoveObjectIdentifier ensures the absence of the given object
+	// identifier from the resolution for the given bindingpolicy key.
 	//
-	// The returned bool indicates whether the bindingpolicy resolution was changed.
-	// If no resolution is associated with the given key, false is returned.
+	// The returned bool indicates whether the bindingpolicy resolution was
+	// changed. If no resolution is associated with the given key, false is
+	// returned.
 	RemoveObjectIdentifier(bindingPolicyKey string, objIdentifier util.ObjectIdentifier) bool
 	// GetObjectIdentifiers returns the object identifiers associated with the
 	// given bindingpolicy key.
@@ -86,8 +88,10 @@ type BindingPolicyResolver interface {
 
 	// SetDestinations updates the maintained bindingpolicy's
 	// destinations resolution for the given bindingpolicy key.
-	// The given destinations set is expected not to be mutated after this call.
-	SetDestinations(bindingPolicyKey string, destinations sets.Set[string])
+	// The given destinations set is expected not to be mutated during and
+	// after this call by the caller.
+	// If no resolution is associated with the given key, an error is returned.
+	SetDestinations(bindingPolicyKey string, destinations sets.Set[string]) error
 
 	// ResolutionExists returns true if a resolution is associated with the
 	// given bindingpolicy key.
@@ -116,30 +120,23 @@ type bindingPolicyResolver struct {
 }
 
 // GenerateBinding returns the binding for the given
-// bindingpolicy key. If a key is not associated to a resolution, the latter is
-// created. This function can fail due to internal caches temporarily being
-// out of sync.
-func (resolver *bindingPolicyResolver) GenerateBinding(bindingPolicyKey string) (
-	*v1alpha1.BindingSpec, error) {
+// bindingpolicy key.
+//
+// If no resolution is associated with the given key, nil is returned.
+func (resolver *bindingPolicyResolver) GenerateBinding(bindingPolicyKey string) *v1alpha1.BindingSpec {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
-		return nil, fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix,
-			bindingPolicyKey)
+		return nil
 	}
 
-	bindingSpec, err := bindingPolicyResolution.toBindingSpec()
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to create BindingSpec for bindingpolicy %v: %w",
-			bindingPolicyKey, err)
-	}
-
-	return bindingSpec, nil
+	// thread-safe
+	return bindingPolicyResolution.toBindingSpec()
 }
 
-// GetOwnerReference returns the owner reference for the given bindingpolicy key.
-// If no resolution is associated with the given key, an error is returned.
+// GetOwnerReference returns the owner reference for the given
+// bindingpolicy key. If no resolution is associated with the given key, an
+// error is returned.
 func (resolver *bindingPolicyResolver) GetOwnerReference(bindingPolicyKey string) (metav1.OwnerReference, error) {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
@@ -189,8 +186,9 @@ func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1
 // in the resolution for the given bindingpolicy key, and is associated
 // with the given resourceVersion.
 //
-// The returned bool indicates whether the bindingpolicy resolution was changed.
-// If no resolution is associated with the given key, an error is returned.
+// The returned bool indicates whether the bindingpolicy resolution was
+// changed. If no resolution is associated with the given key, an error is
+// returned.
 func (resolver *bindingPolicyResolver) EnsureObjectIdentifierWithVersion(bindingPolicyKey string,
 	objIdentifier util.ObjectIdentifier, resourceVersion string) (bool, error) {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
@@ -205,11 +203,12 @@ func (resolver *bindingPolicyResolver) EnsureObjectIdentifierWithVersion(binding
 	return bindingPolicyResolution.ensureObjectIdentifierWithVersion(objIdentifier, resourceVersion), nil
 }
 
-// RemoveObjectIdentifier removes the given object identifier from the
-// resolution for the given bindingpolicy key.
+// RemoveObjectIdentifier ensures the absence of the given object
+// identifier from the resolution for the given bindingpolicy key.
 //
-// The returned bool indicates whether the bindingpolicy resolution was changed.
-// If no resolution is associated with the given key, false is returned.
+// The returned bool indicates whether the bindingpolicy resolution was
+// changed. If no resolution is associated with the given key, false is
+// returned.
 func (resolver *bindingPolicyResolver) RemoveObjectIdentifier(bindingPolicyKey string,
 	objIdentifier util.ObjectIdentifier) bool {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
@@ -234,22 +233,26 @@ func (resolver *bindingPolicyResolver) GetObjectIdentifiers(bindingPolicyKey str
 			bindingPolicyKey)
 	}
 
-	// getObjectKeys is thread-safe
+	// getObjectIdentifiers is thread-safe
 	return bindingPolicyResolution.getObjectIdentifiers(), nil
 }
 
 // SetDestinations updates the maintained bindingpolicy's
 // destinations resolution for the given bindingpolicy key.
-// The given destinations set is expected not to be mutated after this call.
+// The given destinations set is expected not to be mutated during and
+// after this call by the caller.
+// If no resolution is associated with the given key, an error is returned.
 func (resolver *bindingPolicyResolver) SetDestinations(bindingPolicyKey string,
-	destinations sets.Set[string]) {
+	destinations sets.Set[string]) error {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
-		return
+		return fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix,
+			bindingPolicyKey)
 	}
 
 	bindingPolicyResolution.setDestinations(destinations)
+	return nil
 }
 
 // ResolutionExists returns true if a resolution is associated with the

@@ -25,7 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -67,6 +66,10 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 			return fmt.Errorf("failed to convert runtime.Object to BindingPolicy: %w", err)
 		}
 
+		if !c.bindingPolicyResolver.ResolutionExists(bindingPolicy.GetName()) {
+			continue // resolution does not exist, skip
+		}
+
 		matchedSome := c.testObject(ctx, objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
 		if !matchedSome {
 			// if previously selected, remove
@@ -91,10 +94,11 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 		if err != nil {
 			if errorIsBindingPolicyResolutionNotFound(err) {
 				// this case can occur if a bindingpolicy resolution was deleted AFTER
-				// starting this iteration and BEFORE getting to the NoteObject function,
+				// the BindingPolicyResolver::ResolutionExists call and BEFORE getting to the NoteObject function,
 				// which occurs if a bindingpolicy was deleted in this time-window.
-				utilruntime.HandleError(fmt.Errorf("failed to note object (identifier: %v) - %w",
-					objIdentifier, err))
+				logger.V(4).Info("skipped EnsureObjectIdentifierWithVersion for object because "+
+					"bindingpolicy was deleted", "objectIdentifier", objIdentifier,
+					"bindingpolicy", bindingPolicy.GetName())
 				continue
 			}
 

@@ -48,7 +48,6 @@ func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIde
 		obj, err := c.getObjectFromIdentifier(objIdentifier)
 		if errors.IsNotFound(err) {
 			logger.V(2).Info("Handling deleted CRD", "name", objIdentifier.ObjectName.Name)
-			obj = nil
 		} else if err != nil {
 			return fmt.Errorf("failed to get runtime.Object from identifier (%v): %w", objIdentifier, err)
 		} else {
@@ -61,9 +60,9 @@ func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIde
 	}
 
 	// for each CustomResourceDefinitionVersion, follow a decision tree to tell whether the corresponding gvr should be watched
-	toStartList, toStopList := []APIResource{}, []schema.GroupVersionKind{}
+	toStartList, toStopList := []APIResource{}, []schema.GroupVersionResource{}
 	for _, ver := range specVersions {
-		gvr := APIResource{
+		apiResource := APIResource{
 			groupVersion: schema.GroupVersion{
 				Group:   crdObj.Spec.Group,
 				Version: ver.Name,
@@ -73,20 +72,22 @@ func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIde
 				Kind: crdObj.Spec.Names.Kind,
 			},
 		}
-		key := gvr.groupVersion.WithKind(gvr.resource.Kind)
-		if !c.includedToWatch(gvr) {
+
+		gvr := apiResource.groupVersion.WithResource(apiResource.resource.Name)
+
+		if !c.includedToWatch(apiResource) {
 			continue
 		}
 		if isBeingDeleted(crdObj) {
-			toStopList = append(toStopList, key)
+			toStopList = append(toStopList, gvr)
 			continue
 		}
 		if !ver.Served {
-			toStopList = append(toStopList, key)
+			toStopList = append(toStopList, gvr)
 			continue
 		}
 		if crdEstablished(crdObj) {
-			toStartList = append(toStartList, gvr)
+			toStartList = append(toStartList, apiResource)
 		}
 	}
 
@@ -107,7 +108,6 @@ func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIde
 		delete(c.informers, gvk)
 		delete(c.listers, gvk)
 		delete(c.stoppers, gvk)
-		c.gvkToGvrMapper.Delete(gvk)
 	}
 
 	return nil
@@ -139,21 +139,15 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 	logger := klog.FromContext(ctx)
 
 	for _, toStart := range toStartList {
-		logger.Info("New API added. Starting informer for:", "group", toStart.groupVersion.Group,
-			"version", toStart.groupVersion, "kind", toStart.resource.Kind)
+		gvr := toStart.groupVersion.WithResource(toStart.resource.Name)
 
-		key := toStart.groupVersion.WithKind(toStart.resource.Kind)
-
-		if _, ok := c.informers[key]; ok {
-			logger.V(3).Info("Informer already ensured.", "key", key)
+		if _, ok := c.informers[gvr]; ok {
+			logger.V(3).Info("Informer already ensured.", "gvr", gvr)
 			continue
 		}
-
-		gvr := schema.GroupVersionResource{
-			Group:    toStart.groupVersion.Group,
-			Version:  toStart.groupVersion.Version,
-			Resource: toStart.resource.Name,
-		}
+		// from this point onwards, the gvr is guaranteed not to be mapped in the informers, listers and stoppers maps
+		logger.Info("New API added. Starting informer for:", "group", toStart.groupVersion.Group,
+			"version", toStart.groupVersion, "kind", toStart.resource.Kind, "resource", toStart.resource.Name)
 
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
@@ -172,48 +166,32 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 		// add the event handler functions (same as those used by the startup logic)
 		informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				c.handleObject(obj, "add")
+				c.handleObject(obj, toStart.resource.Name, "add")
 			},
 			UpdateFunc: func(old, new interface{}) {
 				if shouldSkipUpdate(old, new) {
 					return
 				}
-				c.handleObject(new, "update")
+				c.handleObject(new, toStart.resource.Name, "update")
 			},
 			DeleteFunc: func(obj interface{}) {
-				c.handleObject(obj, "delete")
+				c.handleObject(obj, toStart.resource.Name, "delete")
 			},
 		})
-		c.informers[key] = informer
+		c.informers[gvr] = informer
 
-		// add the mapping between GVK and GVR
-		c.gvkToGvrMapper.Add(toStart.groupVersion.WithKind(toStart.resource.Kind), gvr)
+		// add the lister since it necessarily does not exist
+		logger.V(3).Info("Setting lister", "gvr", gvr)
+		c.listers[gvr] = cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())
 
-		// ensure the lister
-		lister := cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())
-		if _, ok := c.listers[key]; !ok {
-			logger.V(3).Info("Setting lister", "GVK", key)
-			c.listers[key] = lister
-		} else {
-			logger.V(3).Info("Lister already in place", "GVK", key)
-		}
-
-		// ensure the stopper
+		// add the stopper since it necessarily does not exist
 		stopper := make(chan struct{})
-		if _, ok := c.stoppers[key]; !ok {
-			logger.V(3).Info("Setting stopper", "GVK", key)
-			c.stoppers[key] = stopper
-		} else {
-			logger.V(3).Info("Stopper already in place", "GVK", key)
-		}
+		logger.V(3).Info("Setting stopper", "gvr", gvr)
+		c.stoppers[gvr] = stopper
 
-		// ensure the informer
-		if _, ok := c.informers[key]; !ok {
-			logger.V(3).Info("Setting and running informer", "GVK", key)
-			c.informers[key] = informer
-			go informer.Run(stopper)
-		} else {
-			logger.V(3).Info("Informer already in place", "GVK", key)
-		}
+		// add the informer since it necessarily does not exist
+		logger.V(3).Info("Setting and running informer", "gvr", gvr)
+		c.informers[gvr] = informer
+		go informer.Run(stopper)
 	}
 }

@@ -84,10 +84,9 @@ type Controller struct {
 	kubernetesClient kubernetes.Interface   // used for Namespaces, and Discovery
 
 	extClient             apiextensionsclientset.Interface // used for CRD
-	listers               map[schema.GroupVersionKind]cache.GenericLister
-	gvkToGvrMapper        util.GVKToGVRMapper
-	informers             map[schema.GroupVersionKind]cache.SharedIndexInformer
-	stoppers              map[schema.GroupVersionKind]chan struct{}
+	listers               map[schema.GroupVersionResource]cache.GenericLister
+	informers             map[schema.GroupVersionResource]cache.SharedIndexInformer
+	stoppers              map[schema.GroupVersionResource]chan struct{}
 	bindingPolicyResolver BindingPolicyResolver
 	workqueue             workqueue.RateLimitingInterface
 	initializedTs         time.Time
@@ -200,20 +199,15 @@ func makeController(parentLogger logr.Logger,
 		dynamicClient:         dynamicClient,
 		kubernetesClient:      kubernetesClient,
 		extClient:             extClient,
-		listers:               make(map[schema.GroupVersionKind]cache.GenericLister),
-		informers:             make(map[schema.GroupVersionKind]cache.SharedIndexInformer),
-		stoppers:              make(map[schema.GroupVersionKind]chan struct{}),
+		listers:               make(map[schema.GroupVersionResource]cache.GenericLister),
+		informers:             make(map[schema.GroupVersionResource]cache.SharedIndexInformer),
+		stoppers:              make(map[schema.GroupVersionResource]chan struct{}),
 		bindingPolicyResolver: NewBindingPolicyResolver(),
-		gvkToGvrMapper:        util.NewGvkGvrMapper(),
 		workqueue:             workqueue.NewRateLimitingQueue(ratelimiter),
 		allowedGroupsSet:      allowedGroupsSet,
 	}
 
 	return controller, nil
-}
-
-func (c *Controller) GetGvkToGvrMapper() util.GVKToGVRMapper {
-	return c.gvkToGvrMapper
 }
 
 // EnsureCRDs will ensure that the CRDs are installed.
@@ -281,32 +275,29 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 			}
 			informable := verbsSupportInformers(resource.Verbs)
 			if informable {
-				gvk := gv.WithKind(resource.Kind)
-				informer := informerFactory.ForResource(gv.WithResource(resource.Name)).Informer()
-				c.informers[gvk] = informer
+				gvr := gv.WithResource(resource.Name)
+				informer := informerFactory.ForResource(gvr).Informer()
+				c.informers[gvr] = informer
 
 				// add the event handler functions
 				informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 					AddFunc: func(obj interface{}) {
-						c.handleObject(obj, "add")
+						// IMPORTANT: the resource loop variable cannot be used in these closures.
+						c.handleObject(obj, gvr.Resource, "add")
 					},
 					UpdateFunc: func(old, new interface{}) {
 						if shouldSkipUpdate(old, new) {
 							return
 						}
-						c.handleObject(new, "update")
+						c.handleObject(new, gvr.Resource, "update")
 					},
 					DeleteFunc: func(obj interface{}) {
-						c.handleObject(obj, "delete")
+						c.handleObject(obj, gvr.Resource, "delete")
 					},
 				})
 
 				// create and index the lister
-				lister := cache.NewGenericLister(informer.GetIndexer(), schema.GroupResource{Group: resource.Group, Resource: resource.Name})
-				c.listers[gvk] = lister
-
-				c.gvkToGvrMapper.Add(schema.GroupVersionKind{Group: gv.Group, Version: gv.Version, Kind: resource.Kind},
-					schema.GroupVersionResource{Group: gv.Group, Version: gv.Version, Resource: resource.Name})
+				c.listers[gvr] = cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())
 
 				// run the informer
 				// we need to be able to stop informers for APIs (CRDs) that are removed
@@ -314,7 +305,7 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 				// instead than informerFactory.Start(ctx.Done())
 				stopper := make(chan struct{})
 				defer close(stopper)
-				c.stoppers[gvk] = stopper
+				c.stoppers[gvr] = stopper
 				go informer.Run(stopper)
 			}
 		}
@@ -421,26 +412,28 @@ func verbsSupportInformers(verbs []string) bool {
 // Event handler: enqueues the objects to be processed
 // At this time it is very simple, more complex processing might be required
 // here.
-func (c *Controller) handleObject(obj any, eventType string) {
+func (c *Controller) handleObject(obj any, resource string, eventType string) {
 	wasDeletedFinalStateUnknown := false
 	switch typed := obj.(type) {
 	case cache.DeletedFinalStateUnknown:
 		obj = typed.Obj
 		wasDeletedFinalStateUnknown = true
 	}
-	c.logger.V(2).Info("Got object event", "eventType", eventType, "wasDeletedFinalStateUnknown", wasDeletedFinalStateUnknown, "obj", util.RefToRuntimeObj(obj.(runtime.Object)))
-	c.enqueueObject(obj)
+	c.logger.Info("Got object event", "eventType", eventType,
+		"wasDeletedFinalStateUnknown", wasDeletedFinalStateUnknown, "obj", util.RefToRuntimeObj(obj.(runtime.Object)),
+		"resource", resource)
+
+	c.enqueueObject(obj, resource)
 }
 
 // enqueueObject converts an object into an ObjectIdentifier struct which is
 // then put onto the work queue.
-func (c *Controller) enqueueObject(obj interface{}) {
-	objIdentifier, err := util.IdentifierForObject(obj.(util.MRObject), c.gvkToGvrMapper)
-	if err != nil {
-		utilruntime.HandleError(err)
-		return
-	}
+func (c *Controller) enqueueObject(obj interface{}, resource string) {
+	objIdentifier := util.IdentifierForObject(obj.(util.MRObject), resource)
+	c.enqueueObjectIdentifier(objIdentifier)
+}
 
+func (c *Controller) enqueueObjectIdentifier(objIdentifier util.ObjectIdentifier) {
 	c.workqueue.Add(objIdentifier)
 }
 
@@ -472,47 +465,48 @@ func (c *Controller) runWorker(ctx context.Context) {
 // attempt to process it by calling the reconcile.
 func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 	logger := klog.FromContext(ctx)
-	obj, shutdown := c.workqueue.Get()
+	item, shutdown := c.workqueue.Get()
 	if shutdown {
 		logger.V(1).Info("Worker is done")
 		return false
 	}
-	logger.V(4).Info("Dequeued", "obj", obj)
+	logger.V(4).Info("Dequeued", "item", item)
 
 	// We wrap this block in a func so we can defer c.workqueue.Done.
-	err := func(obj interface{}) error {
+	err := func(objIdentifierA any) error {
 		// We call Done here so the workqueue knows we have finished
 		// processing this item. We also must remember to call Forget if we
 		// do not want this work item being re-queued. For example, we do
 		// not call Forget if a transient error occurs, instead the item is
 		// put back on the workqueue and attempted again after a back-off
 		// period.
-		defer c.workqueue.Done(obj)
+		defer c.workqueue.Done(objIdentifierA)
 		var objIdentifier util.ObjectIdentifier
 		var ok bool
 		// We expect util.ObjectIdentifier to come off the workqueue. We do this as the
 		// delayed nature of the workqueue means the items in the informer
 		// cache may actually be more up to date that when the item was
 		// initially put onto the workqueue.
-		if objIdentifier, ok = obj.(util.ObjectIdentifier); !ok {
+		if objIdentifier, ok = objIdentifierA.(util.ObjectIdentifier); !ok {
 			// if the item in the workqueue is invalid, we call
 			// Forget here to avoid process a work item that is invalid.
-			c.workqueue.Forget(obj)
-			utilruntime.HandleError(fmt.Errorf("expected util.ObjectIdentifier in workqueue but got %#v", obj))
+			c.workqueue.Forget(objIdentifierA)
+			utilruntime.HandleError(fmt.Errorf("expected util.ObjectIdentifier in workqueue but got %#v",
+				objIdentifierA))
 			return nil
 		}
-		// Run the reconciler, passing it the full object identifier or the metav1 Object
+		// Run the reconciler, passing it the full object identifier
 		if err := c.reconcile(ctx, objIdentifier); err != nil {
 			// Put the item back on the workqueue to handle any transient errors.
-			c.workqueue.AddRateLimited(obj)
+			c.workqueue.AddRateLimited(objIdentifier)
 			return fmt.Errorf("error syncing object (identifier: %#v): %s, requeuing", objIdentifier, err.Error())
 		}
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
-		c.workqueue.Forget(obj)
+		c.workqueue.Forget(objIdentifier)
 		logger.V(2).Info("Successfully synced", "objectIdentifier", objIdentifier)
 		return nil
-	}(obj)
+	}(item)
 
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -550,10 +544,9 @@ func (c *Controller) reconcile(ctx context.Context, objIdentifier util.ObjectIde
 }
 
 func (c *Controller) getObjectFromIdentifier(objIdentifier util.ObjectIdentifier) (runtime.Object, error) {
-	lister := c.listers[objIdentifier.GVK]
+	lister := c.listers[objIdentifier.GVR()]
 	if lister == nil {
-		utilruntime.HandleError(fmt.Errorf("could not get lister for GVR: %s", objIdentifier.GVR()))
-		return nil, nil
+		return nil, fmt.Errorf("could not get lister for gvr: %s", objIdentifier.GVR())
 	}
 
 	return getObject(lister, objIdentifier.ObjectName.Namespace, objIdentifier.ObjectName.Name)
@@ -571,11 +564,11 @@ func isBeingDeleted(obj runtime.Object) bool {
 	return mObj.GetDeletionTimestamp() != nil
 }
 
-func (c *Controller) GetListers() map[schema.GroupVersionKind]cache.GenericLister {
+func (c *Controller) GetListers() map[schema.GroupVersionResource]cache.GenericLister {
 	return c.listers
 }
 
-func (c *Controller) GetInformers() map[schema.GroupVersionKind]cache.SharedIndexInformer {
+func (c *Controller) GetInformers() map[schema.GroupVersionResource]cache.SharedIndexInformer {
 	return c.informers
 }
 

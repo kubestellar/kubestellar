@@ -19,6 +19,8 @@ package binding
 import (
 	"sync"
 
+	"golang.org/x/exp/slices"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -93,17 +95,12 @@ func (resolution *bindingPolicyResolution) getObjectIdentifiers() sets.Set[util.
 	resolution.RLock()
 	defer resolution.RUnlock()
 
-	objIdentifiers := sets.New[util.ObjectIdentifier]()
-	for objIdentifier := range resolution.objectIdentifierToResourceVersion {
-		objIdentifiers.Insert(objIdentifier)
-	}
-
-	return objIdentifiers
+	return sets.KeySet(resolution.objectIdentifierToResourceVersion)
 }
 
 // toBindingSpec converts the resolution to a binding
 // spec. This function is thread-safe.
-func (resolution *bindingPolicyResolution) toBindingSpec() (*v1alpha1.BindingSpec, error) {
+func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec {
 	resolution.RLock()
 	defer resolution.RUnlock()
 
@@ -132,10 +129,13 @@ func (resolution *bindingPolicyResolution) toBindingSpec() (*v1alpha1.BindingSpe
 		})
 	}
 
+	// sort workload objects
+	sortBindingWorkloadObjects(&workload)
+
 	return &v1alpha1.BindingSpec{
 		Workload:     workload,
-		Destinations: destinationsStringSetToDestinations(resolution.destinations),
-	}, nil
+		Destinations: destinationsStringSetToSortedDestinations(resolution.destinations),
+	}
 }
 
 func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alpha1.BindingSpec) bool {
@@ -148,10 +148,24 @@ func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alp
 	}
 
 	// check workload
-	resolutionBindingObjectRefSet := bindingObjectRefSetFromResolution(resolution)
-	workloadBindingObjectRefSet := bindingObjectRefSetFromBindingWorkload(&bindingSpec.Workload)
+	if len(resolution.objectIdentifierToResourceVersion) != len(bindingSpec.Workload.ClusterScope)+
+		len(bindingSpec.Workload.NamespaceScope) {
+		return false
+	}
 
-	return resolutionBindingObjectRefSet.Equal(workloadBindingObjectRefSet)
+	objectRefSetFromWorkload := bindingObjectRefAndVersionSetFromWorkload(&bindingSpec.Workload)
+
+	for objIdentifier, objResourceVersion := range resolution.objectIdentifierToResourceVersion {
+		if !objectRefSetFromWorkload.Has(objectRefAndVersion{
+			GroupVersionResource: objIdentifier.GVR(),
+			ObjectName:           objIdentifier.ObjectName,
+			ResourceVersion:      objResourceVersion,
+		}) {
+			return false
+		}
+	} // this check works because both groups have unique members and are of equal size
+
+	return true
 }
 
 // destinationsMatch returns true if the destinations in the resolution
@@ -170,31 +184,17 @@ func destinationsMatch(resolvedDestinations sets.Set[string], bindingDestination
 	return true
 }
 
-type bindingObjectRef struct {
+type objectRefAndVersion struct {
 	schema.GroupVersionResource
 	cache.ObjectName
 	ResourceVersion string
 }
 
-func bindingObjectRefSetFromResolution(resolution *bindingPolicyResolution) sets.Set[bindingObjectRef] {
-	bindingObjectRefSet := sets.New[bindingObjectRef]()
-
-	for objIdentifier, objResourceVersion := range resolution.objectIdentifierToResourceVersion {
-		bindingObjectRefSet.Insert(bindingObjectRef{
-			GroupVersionResource: objIdentifier.GVR(),
-			ObjectName:           objIdentifier.ObjectName,
-			ResourceVersion:      objResourceVersion,
-		})
-	}
-
-	return bindingObjectRefSet
-}
-
-func bindingObjectRefSetFromBindingWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectReferences) sets.Set[bindingObjectRef] {
-	bindingObjectRefSet := sets.New[bindingObjectRef]()
+func bindingObjectRefAndVersionSetFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectReferences) sets.Set[objectRefAndVersion] {
+	bindingObjectRefAndVersionSet := sets.New[objectRefAndVersion]()
 
 	for _, clusterScopeDownsyncObject := range bindingSpecWorkload.ClusterScope {
-		bindingObjectRefSet.Insert(bindingObjectRef{
+		bindingObjectRefAndVersionSet.Insert(objectRefAndVersion{
 			GroupVersionResource: schema.GroupVersionResource(clusterScopeDownsyncObject.GroupVersionResource),
 			ObjectName: cache.ObjectName{
 				Name:      clusterScopeDownsyncObject.Name,
@@ -205,7 +205,7 @@ func bindingObjectRefSetFromBindingWorkload(bindingSpecWorkload *v1alpha1.Downsy
 	}
 
 	for _, namespacedScopeDownsyncObject := range bindingSpecWorkload.NamespaceScope {
-		bindingObjectRefSet.Insert(bindingObjectRef{
+		bindingObjectRefAndVersionSet.Insert(objectRefAndVersion{
 			GroupVersionResource: schema.GroupVersionResource(namespacedScopeDownsyncObject.GroupVersionResource),
 			ObjectName: cache.ObjectName{
 				Name:      namespacedScopeDownsyncObject.Name,
@@ -215,14 +215,40 @@ func bindingObjectRefSetFromBindingWorkload(bindingSpecWorkload *v1alpha1.Downsy
 		})
 	}
 
-	return bindingObjectRefSet
+	return bindingObjectRefAndVersionSet
 }
 
-func destinationsStringSetToDestinations(destinations sets.Set[string]) []v1alpha1.Destination {
-	dests := make([]v1alpha1.Destination, 0, len(destinations))
-	for d := range destinations {
-		dests = append(dests, v1alpha1.Destination{ClusterId: d})
+func destinationsStringSetToSortedDestinations(destinationsStringSet sets.Set[string]) []v1alpha1.Destination {
+	sortedDestinations := make([]v1alpha1.Destination, 0, len(destinationsStringSet))
+
+	for _, d := range sets.List(destinationsStringSet) {
+		sortedDestinations = append(sortedDestinations, v1alpha1.Destination{ClusterId: d})
 	}
 
-	return dests
+	return sortedDestinations
+}
+
+func sortBindingWorkloadObjects(bindingWorkload *v1alpha1.DownsyncObjectReferences) {
+	// sort clusterScopeDownsyncObjects
+	slices.SortFunc(bindingWorkload.ClusterScope, func(a, b v1alpha1.ClusterScopeDownsyncObject) bool {
+		if a.GroupVersionResource.String() != b.GroupVersionResource.String() {
+			return a.GroupVersionResource.String() < b.GroupVersionResource.String()
+		}
+		if a.Name != b.Name {
+			return a.Name < b.Name
+		}
+		return a.ResourceVersion < b.ResourceVersion
+	})
+	// sort namespaceScopeDownsyncObjects
+	slices.SortFunc(bindingWorkload.NamespaceScope, func(a, b v1alpha1.NamespaceScopeDownsyncObject) bool {
+		if a.GroupVersionResource.String() != b.GroupVersionResource.String() {
+			return a.GroupVersionResource.String() < b.GroupVersionResource.String()
+		}
+		objectNameA := cache.NewObjectName(a.Namespace, a.Name).String()
+		objectNameB := cache.NewObjectName(b.Namespace, b.Name).String()
+		if objectNameA != objectNameB {
+			return objectNameA < objectNameB
+		}
+		return a.ResourceVersion < b.ResourceVersion
+	})
 }

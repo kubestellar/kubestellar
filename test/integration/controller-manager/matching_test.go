@@ -171,10 +171,7 @@ func TestMatching(t *testing.T) {
 	}
 	expectation := map[gvrnn]any{}
 	for _, obj := range append(nsORs, objsCreated...) {
-		identifier, err := util.IdentifierForObject(obj.MRObject, ctlr.GetGvkToGvrMapper())
-		if err != nil {
-			t.Fatalf("Failed to extract Key from %#v: %s", obj.MRObject, err)
-		}
+		identifier := util.IdentifierForObject(obj.MRObject, obj.Resource)
 		id2 := id2r(identifier)
 		if test := obj.MatchesAny(t, tests); test != nil {
 			expectation[id2] = test
