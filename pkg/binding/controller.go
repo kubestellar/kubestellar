@@ -113,13 +113,14 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 		parentLogger.Error(err, "Not able to count GVRs via aggregated discovery") // but we can still continue
 	}
 	// tuning the rate limiter based on the number of GVRs is tested to be working well
-	wdsRestConfig.Burst = computeBurstFromNumGVRs(nGVRs)
-	wdsRestConfig.QPS = computeQPSFromNumGVRs(nGVRs)
-	parentLogger.V(1).Info("Parameters of the client's token bucket rate limiter", "burst", wdsRestConfig.Burst, "qps", wdsRestConfig.QPS)
+	wdsRestConfigTuned := rest.CopyConfig(wdsRestConfig)
+	wdsRestConfigTuned.Burst = computeBurstFromNumGVRs(nGVRs)
+	wdsRestConfigTuned.QPS = computeQPSFromNumGVRs(nGVRs)
+	parentLogger.V(1).Info("Parameters of the tuned client's token bucket rate limiter", "burst", wdsRestConfigTuned.Burst, "qps", wdsRestConfigTuned.QPS)
 
 	// dynamicClient needs higher rate than its default because dynamicClient is repeatedly used by the
 	// reflectors for each of the GVRs, all at the beginning of the controller run
-	dynamicClient, err := dynamic.NewForConfig(wdsRestConfig)
+	dynamicClient, err := dynamic.NewForConfig(wdsRestConfigTuned)
 	if err != nil {
 		return nil, err
 	}
