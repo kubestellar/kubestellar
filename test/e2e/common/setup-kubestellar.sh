@@ -98,15 +98,73 @@ OCM_TRANSPORT_PLUGIN_DIR="$(pwd)"
 pwd
 echo "replace github.com/kubestellar/kubestellar => ${KUBESTELLAR_DIR}/" >> go.mod
 go mod tidy
-make build
-mv ./bin/ocm-transport-plugin ${KUBESTELLAR_DIR}/ocm-transport-plugin
+(
+    if docker version | grep -qi podman
+    then export DOCKER_HOST=unix://$HOME/.local/share/containers/podman/machine/qemu/podman.sock
+    fi
+    KO_DOCKER_REPO=ko.local ko build -B ./cmd/transport-controller -t local --platform linux/$(go env GOARCH)
+)
+kind load --name kubeflex docker-image ko.local/transport-controller:local
+
 cd "${KUBESTELLAR_DIR}"
 pwd
-rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
-echo "running ocm transport plugin..."
-./ocm-transport-plugin --transport-context imbs1 --wds-context wds1 --wds-name wds1 -v=4 &> transport.log &
 
-echo "transport controller is running as background process."
+(
+    if [ -z "$KUBECONFIG" ]
+    then export KUBECONFIG="$HOME/.kube/config"
+    fi
+    kubectl --context kind-kubeflex -n wds1-system create secret generic kubestellar-kubeconfig --from-file=kubeconfig="$KUBECONFIG"
+)
+
+hostip=$(ifconfig | grep -w inet | awk '{ print $2 }' | grep -v 127.0.0.1 | head -1)
+
+kubectl --context kind-kubeflex -n wds1-system apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: ocm-transport-controller
+  name: ocm-transport-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: ocm-transport-controller
+  template:
+    metadata:
+      labels:
+        k8s-app: ocm-transport-controller
+    spec:
+      containers:
+      - args:
+        - --transport-kubeconfig=/etc/kubestellar/kubeconfig/kubeconfig
+        - --transport-context=imbs1
+        - --wds-kubeconfig=/etc/kubestellar/kubeconfig/kubeconfig
+        - --wds-context=wds1
+        - --wds-name=wds1
+        - -v=4
+        image: ko.local/transport-controller:local
+        imagePullPolicy: Never
+        name: controller
+        volumeMounts:
+        - mountPath: /etc/kubestellar/kubeconfig
+          name: kubeconfig
+          readOnly: true
+      hostAliases:
+      - ip: "$hostip"
+        hostnames: [ "wds1.localtest.me", "imbs1.localtest.me" ]
+      restartPolicy: Always
+      serviceAccountName: kubestellar-controller-manager
+      volumes:
+      - name: kubeconfig
+        secret:
+          secretName: kubestellar-kubeconfig
+EOF
+
+sleep 5
+kubectl --context kind-kubeflex -n wds1-system get deployments
+
+echo "transport controller Deployment has been created."
 
 :
 : -------------------------------------------------------------------------
@@ -138,7 +196,7 @@ kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=c
 : Expect to see the wds1 kubestellar-controller-manager created in the wds1-system 
 : namespace and the imbs1 statefulset created in the imbs1-system namespace.
 :
-if ! expect-cmd-output 'kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces' 'grep -e wds1 -e imbs1 | wc -l | grep -wq 4'
+if ! expect-cmd-output 'kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces' 'grep -e wds1 -e imbs1 | wc -l | grep -wq 5'
 then
     echo "Failed to see wds1 deployment and imbs1 statefulset."
     exit 1
