@@ -24,6 +24,8 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -189,7 +191,8 @@ func TestMatching(t *testing.T) {
 	createPolicy := true
 	minObjs := (nObj * 2) / 5
 	maxObjs := (nObj * 3) / 5
-	thrashObjs := func() {
+	serialThrash := func() {
+		logger.V(1).Info("Thrashing objects serially")
 		for i := 0; i < nObj/2; i++ {
 			nCreated := len(idxsCreated)
 			if minObjs <= nCreated && nCreated <= maxObjs && rg.Intn(3) == 0 { // replace
@@ -224,6 +227,60 @@ func TestMatching(t *testing.T) {
 			}
 		}
 	}
+	parallelThrash := func() {
+		logger.V(1).Info("Thrashing objects in parallel")
+		var wg sync.WaitGroup
+		var listsMutex sync.Mutex
+		var failed int32 = 0
+		newIdxsCreated := []int{}
+		newIdxsNotCreated := []int{}
+		thrashObj := func(j int) {
+			defer wg.Add(-1)
+			var idx int
+			var exists bool
+			if j < len(idxsCreated) {
+				idx = idxsCreated[j]
+				exists = true
+			} else {
+				idx = idxsNotCreated[j-len(idxsCreated)]
+			}
+			obj := objs[idx]
+			for k := 0; k <= rg.Intn(4); k++ {
+				if exists {
+					err := obj.delete()
+					if err != nil {
+						t.Errorf("Failed to delete; idx=%d, obj=%#v, err=%s", idx, obj, err.Error())
+						atomic.StoreInt32(&failed, 1)
+					}
+					exists = false
+				} else {
+					err := obj.create()
+					if err != nil {
+						t.Errorf("Failed to create; idx=%d, obj=%#v, err=%s", idx, obj, err.Error())
+						atomic.StoreInt32(&failed, 1)
+					}
+					exists = true
+				}
+			}
+			listsMutex.Lock()
+			defer listsMutex.Unlock()
+			if exists {
+				newIdxsCreated = append(newIdxsCreated, idx)
+			} else {
+				newIdxsNotCreated = append(newIdxsNotCreated, idx)
+			}
+		}
+		for j := 0; j < len(objs); j++ {
+			wg.Add(1)
+			go thrashObj(j)
+		}
+		wg.Wait()
+		if atomic.LoadInt32(&failed) != 0 {
+			t.FailNow()
+		}
+		idxsCreated = newIdxsCreated
+		idxsNotCreated = newIdxsNotCreated
+	}
 	tests := []ksapi.DownsyncObjectTest{}
 	bindingClient := ksClient.Bindings()
 	var roundType int = 7
@@ -231,7 +288,11 @@ func TestMatching(t *testing.T) {
 	for round := 1; round <= nRounds; round++ {
 		logger.Info("Starting round", "round", round, "roundType", roundType)
 		if roundType&1 == 1 {
-			thrashObjs()
+			if rg.Intn(2) == 0 {
+				serialThrash()
+			} else {
+				parallelThrash()
+			}
 		}
 		if roundType&2 == 2 {
 			idxsNotInTest := append([]int{}, allIdxs...)
@@ -271,7 +332,11 @@ func TestMatching(t *testing.T) {
 			}
 		}
 		if roundType&4 == 4 {
-			thrashObjs()
+			if rg.Intn(2) == 0 {
+				serialThrash()
+			} else {
+				parallelThrash()
+			}
 		}
 		expectation := map[gvrnn]any{}
 		consider := func(obj mrObjRsc, idx int) {
