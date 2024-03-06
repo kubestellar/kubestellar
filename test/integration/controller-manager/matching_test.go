@@ -33,11 +33,13 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	apiextensionsapi "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8slabels "k8s.io/apimachinery/pkg/labels"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	k8sschema "k8s.io/apimachinery/pkg/runtime/schema"
 	k8sjson "k8s.io/apimachinery/pkg/runtime/serializer/json"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	k8sclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
@@ -47,6 +49,7 @@ import (
 	"k8s.io/kubernetes/test/integration/framework"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	a "github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/binding"
 	ksclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -64,11 +67,30 @@ const NumObjEnvar = "CONTROLLER_TEST_NUM_OBJECTS"
 // YOU MUST HAVE THE ETCD BINARY ON YOUR `$PATH`.
 //
 // This test exercises the workload matching functionality.
-// This test generates a given number of objects randomly.
-// 2/3 of them are created in the apiserver.
-// DownsyncObjectTests are extracted from 2/3 of them, with random tweaks.
-// This test creates a BindingPolicy object with those DownsyncObjectTests.
-// This test then waits up to 1 minute for a Binding with expected matches to appear.
+// The test maintains a set of workload objects, which varies throughout the test.
+// The test maintains a set of DownsyncObjectTests, which varies throughout the test.
+// The DownsyncObjectTests are derived from, on average, 2/3 of the workload objects,
+// chosen uniformly at random. The derived test looks for the base object but with tweaks
+// to make it match more or fewer.
+// An average of 2/3 of the workload objects, chosen randomly, have been created in the apiserver
+// at any given moment; the rest have not been created or have also been deleted.
+//
+// The test proceeds through a series of rounds.
+// There are 7 types of rounds, identified by the numbers 1 through 7.
+// Each round's type is chosen uniformly at random, except the first round's type is 7.
+// Each round has three phases.
+// The first phase thrashes half of the workload objects randomly,
+// if the type number is odd, otherwise does nothing.
+// Thrashing means randomly deleting a workload object from the apiserver, or
+// creating a workload object in the apiserver, or replacing an object that is
+// neither in the apiserver nor the source of a test.
+// The second phase randomly generates a new set of tests from the workload objects
+// if the type number's 2's bit is set, otherwise does nothing.
+// The third phase randomly thrashes half of the worklod objects
+// if the type number is greater than 3, otherwise does nothing.
+// At the end of a round the expected "what resolution" is computed and the test
+// waits for a limited amount of time to observe that result, failing if the
+// expected result is not observed in time.
 func TestMatching(t *testing.T) {
 	rg := rand.New(rand.NewSource(42))
 	rg.Uint64()
@@ -137,7 +159,7 @@ func TestMatching(t *testing.T) {
 	for i := 1; i <= 3; i++ {
 		ns := generateNamespace(t, ctx, rg, fmt.Sprintf("ns%d", i), k8sClient)
 		namespaces = append(namespaces, ns)
-		nsORs = append(nsORs, mrObjRsc{ns, "namespaces", nil})
+		nsORs = append(nsORs, mrObjRsc{ns, "namespaces", nil, nil, nil})
 	}
 	nObjStr := os.Getenv(NumObjEnvar)
 	nObj := 18
@@ -150,66 +172,149 @@ func TestMatching(t *testing.T) {
 	}
 	logger.Info("Generating mrObjRscs", "count", nObj)
 	objs := make([]mrObjRsc, nObj)
-	objsCreated := make([]mrObjRsc, 0, nObj)
 	counts := counters{}
+	allIdxs := make([]int, nObj)
 	for i := 0; i < nObj; i++ {
-		var thisClient k8sclient.Interface = nil
-		if i*3 < nObj*2 { // create only the first 2/3 of the objects
-			thisClient = k8sClient
-		}
-		objs[i] = generateObject(t, ctx, rg, &counts, namespaces, thisClient)
-		if i*3 < nObj*2 {
-			objsCreated = append(objsCreated, objs[i])
-		}
+		objs[i] = generateObject(ctx, rg, &counts, namespaces, k8sClient)
+		allIdxs[i] = i
+		logger.V(1).Info("Generated", "idx", i, "obj", objs[i])
 	}
-	objsToTests := objs[nObj/3:] // extract tests from the last 2/3
-	tests := []ksapi.DownsyncObjectTest{}
-	for _, obj := range objsToTests {
-		test := extractTest(rg, obj)
-		logger.Info("Adding test", "test", test)
-		tests = append(tests, test)
-	}
-	expectation := map[gvrnn]any{}
-	for _, obj := range append(nsORs, objsCreated...) {
-		identifier := util.IdentifierForObject(obj.MRObject, obj.Resource)
-		id2 := id2r(identifier)
-		if test := obj.MatchesAny(t, tests); test != nil {
-			expectation[id2] = test
-			logger.Info("Added expectation", "identifier", id2, "test", *test)
-		} else {
-			logger.Info("Not expected", "identifier", id2)
-		}
-	}
+	idxsCreated := a.NewIndexedList[int]()
+	idxsNotCreated := a.NewIndexedList[int](allIdxs...)
 	bp := &ksapi.BindingPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "matching-tester",
 		},
-		Spec: ksapi.BindingPolicySpec{
-			Downsync: tests,
-		},
+		Spec: ksapi.BindingPolicySpec{},
 	}
-	_, err = ksClient.BindingPolicies().Create(ctx, bp, metav1.CreateOptions{})
-	if err != nil {
-		t.Fatalf("Failed to create BidingPolicy: %s", err)
+	createPolicy := true
+	minObjs := (nObj * 2) / 5
+	maxObjs := (nObj * 3) / 5
+	thrashObjs := func() {
+		for i := 0; i < nObj/2; i++ {
+			nCreated := idxsCreated.Len()
+			if minObjs <= nCreated && nCreated <= maxObjs && rg.Intn(3) == 0 { // replace
+				j := rg.Intn(idxsNotCreated.Len())
+				idx := idxsNotCreated.Ith(j)
+				oldObj := objs[idx]
+				newObj := generateObject(ctx, rg, &counts, namespaces, k8sClient)
+				objs[idx] = newObj
+				logger.V(1).Info("Replaced test object", "idx", idx, "oldObj", oldObj, "newObj", newObj)
+			} else if nCreated <= minObjs || nCreated < maxObjs && rg.Intn(2) == 0 { // create
+				j := rg.Intn(idxsNotCreated.Len())
+				idx := idxsNotCreated.Ith(j)
+				obj := objs[idx]
+				err := obj.create()
+				if err != nil {
+					t.Fatalf("Failed to create object %#v: %s", obj, err)
+				}
+				idxsCreated.Insert(idx)
+				idxsNotCreated.Delete(idx)
+				logger.V(1).Info("Created test object", "idx", idx, "obj", obj)
+			} else { // delete
+				j := rg.Intn(idxsCreated.Len())
+				idx := idxsCreated.Ith(j)
+				obj := objs[idx]
+				err := obj.delete()
+				if err != nil {
+					t.Fatalf("Failed to delete object %#v: %s", obj, err)
+				}
+				idxsCreated.Delete(idx)
+				idxsNotCreated.Insert(idx)
+				logger.V(1).Info("Deleted test object", "idx", idx, "obj", obj)
+			}
+		}
 	}
-	logger.Info("Created BindingPolicy", "name", bp.Name)
+	tests := []ksapi.DownsyncObjectTest{}
 	bindingClient := ksClient.Bindings()
-	err = wait.PollUntilContextTimeout(ctx, 5*time.Second, time.Minute, false, func(ctx context.Context) (done bool, err error) {
-		binding, err := bindingClient.Get(ctx, bp.Name, metav1.GetOptions{})
+	var roundType int = 7
+	nRounds := 10
+	for round := 1; round <= nRounds; round++ {
+		logger.Info("Starting round", "round", round, "roundType", roundType)
+		if roundType&1 == 1 {
+			thrashObjs()
+		}
+		if roundType&2 == 2 {
+			idxsNotInTest := a.NewIndexedList[int](allIdxs...)
+			idxsInTest := sets.New[int]()
+			tests = []ksapi.DownsyncObjectTest{}
+			for i := 0; i*3 < nObj*2; i++ {
+				j := rg.Intn(idxsNotInTest.Len())
+				idx := idxsNotInTest.Ith(j)
+				obj := objs[idx]
+				test := extractTest(rg, obj)
+				logger.Info("Adding test", "test", test)
+				tests = append(tests, test)
+				idxsInTest.Insert(idx)
+				idxsNotInTest.Delete(idx)
+			}
+			if createPolicy {
+				bp.Spec.Downsync = tests
+				bp, err = ksClient.BindingPolicies().Create(ctx, bp, metav1.CreateOptions{})
+				if err != nil {
+					t.Fatalf("Failed to create BidingPolicy: %s", err)
+				}
+				logger.Info("Created BindingPolicy", "name", bp.Name)
+				createPolicy = false
+			} else {
+				bp.Spec.Downsync = tests
+				bp, err = ksClient.BindingPolicies().Update(ctx, bp, metav1.UpdateOptions{})
+				if err != nil && errors.IsConflict(err) {
+					bp, err = ksClient.BindingPolicies().Get(ctx, "matching-tester", metav1.GetOptions{})
+					if err != nil {
+						t.Fatalf("Failed to Get updated BidingPolicy: %s", err)
+					}
+					bp.Spec.Downsync = tests
+					bp, err = ksClient.BindingPolicies().Update(ctx, bp, metav1.UpdateOptions{})
+				}
+				if err != nil {
+					t.Fatalf("Failed to update BidingPolicy: %s", err)
+				}
+				logger.Info("Updated BindingPolicy", "name", bp.Name, "round", round)
+			}
+		}
+		if roundType&4 == 4 {
+			thrashObjs()
+		}
+		expectation := map[gvrnn]any{}
+		consider := func(obj mrObjRsc, idx int) {
+			identifier := util.IdentifierForObject(obj.MRObject, obj.Resource)
+			id2 := id2r(identifier)
+			if test := obj.MatchesAny(t, tests); test != nil {
+				expectation[id2] = test
+				logger.Info("Added expectation", "idx", idx, "identifier", id2, "test", *test)
+			} else {
+				logger.Info("Not expected", "idx", idx, "identifier", id2)
+			}
+		}
+		for idx, obj := range nsORs {
+			consider(obj, idx)
+		}
+		for _, idx := range idxsCreated.List {
+			obj := objs[idx]
+			consider(obj, idx)
+		}
+		err = wait.PollUntilContextTimeout(ctx, 5*time.Second, time.Minute, false, func(ctx context.Context) (done bool, err error) {
+			binding, err := bindingClient.Get(ctx, bp.Name, metav1.GetOptions{})
+			if err != nil {
+				logger.Info("Failed to GET Binding", "err", err)
+				return false, nil
+			}
+			if excess, missed := workloadIsExpected(binding.Spec.Workload, expectation); len(excess)+len(missed) > 0 {
+				logger.Info("Wrong stuff matched", "excess", excess, "numMissed", len(missed), "missed", missed, "matched", binding.Spec.Workload)
+				return false, nil
+			}
+			return true, nil
+		})
 		if err != nil {
-			logger.Info("Failed to GET Binding", "err", err)
-			return false, nil
+			t.Fatalf("Round %d type %d never got expected matches; numTests=%d, numObjects=%d, numExpected=%d", round, roundType, len(tests), idxsCreated.Len(), len(expectation))
 		}
-		if excess, missed := workloadIsExpected(binding.Spec.Workload, expectation); len(excess)+len(missed) > 0 {
-			logger.Info("Wrong stuff matched", "excess", excess, "numMissed", len(missed), "missed", missed, "matched", binding.Spec.Workload)
-			return false, nil
-		}
-		return true, nil
-	})
-	if err != nil {
-		t.Fatalf("Never got expected matches; numTests=%d, numObjects=%d, numExpected=%d", len(tests), (nObj*2)/3, len(expectation))
+		logger.Info("Round success", "round", round, "roundType", roundType, "numTests", len(tests), "numObjects", idxsCreated.Len(), "numExpected", len(expectation))
+
+		roundType = 1 + rg.Intn(7)
 	}
-	logger.Info("Success", "numTests", len(tests), "numObjects", (nObj*2)/3, "numExpected", len(expectation))
+
+	logger.Info("Success", "rounds", nRounds, "nObj", nObj)
 }
 
 var crdGVK = apiextensionsapi.SchemeGroupVersion.WithKind("CustomResourceDefinition")
@@ -280,6 +385,8 @@ type mrObjRsc struct {
 	MRObject  util.MRObject
 	Resource  string
 	Namespace *k8score.Namespace
+	create    func() error
+	delete    func() error
 }
 
 func (mor mrObjRsc) MatchesAny(t *testing.T, tests []ksapi.DownsyncObjectTest) *ksapi.DownsyncObjectTest {
@@ -411,16 +518,12 @@ func generateNamespace(t *testing.T, ctx context.Context, rg *rand.Rand, name st
 	return ans
 }
 
-var noK8sClient *k8sclient.Clientset
-
 type counters = [4]int64
 
-func generateObject(t *testing.T, ctx context.Context, rg *rand.Rand, counts *counters, namespaces []*k8score.Namespace, client k8sclient.Interface) mrObjRsc {
+func generateObject(ctx context.Context, rg *rand.Rand, counts *counters, namespaces []*k8score.Namespace, client k8sclient.Interface) mrObjRsc {
 	x := rg.Intn(40)
 	namespace := namespaces[rg.Intn(len(namespaces))]
-	var err error
 	var ans mrObjRsc
-	var noK8sIfc k8sclient.Interface = noK8sClient
 	switch {
 	case x < 10:
 		counts[0]++
@@ -429,10 +532,14 @@ func generateObject(t *testing.T, ctx context.Context, rg *rand.Rand, counts *co
 			TypeMeta:   typeMeta("ConfigMap", k8score.SchemeGroupVersion),
 			ObjectMeta: generateObjectMeta(rg, name, namespace),
 		}
-		if client != nil && client != noK8sIfc {
-			_, err = client.CoreV1().ConfigMaps(obj.Namespace).Create(ctx, obj, metav1.CreateOptions{})
-		}
-		ans = mrObjRsc{obj, "configmaps", namespace}
+		ans = mrObjRsc{obj, "configmaps", namespace,
+			func() error {
+				_, err := client.CoreV1().ConfigMaps(obj.Namespace).Create(ctx, obj, metav1.CreateOptions{})
+				return err
+			},
+			func() error {
+				return client.CoreV1().ConfigMaps(obj.Namespace).Delete(ctx, obj.Name, metav1.DeleteOptions{})
+			}}
 	case x < 20:
 		counts[1]++
 		name := fmt.Sprintf("o%d", counts[1])
@@ -440,10 +547,14 @@ func generateObject(t *testing.T, ctx context.Context, rg *rand.Rand, counts *co
 			TypeMeta:   typeMeta("ClusterRole", rbacv1.SchemeGroupVersion),
 			ObjectMeta: generateObjectMeta(rg, name, nil),
 		}
-		if client != nil && client != noK8sIfc {
-			_, err = client.RbacV1().ClusterRoles().Create(ctx, obj, metav1.CreateOptions{})
-		}
-		ans = mrObjRsc{obj, "clusterroles", nil}
+		ans = mrObjRsc{obj, "clusterroles", nil,
+			func() error {
+				_, err := client.RbacV1().ClusterRoles().Create(ctx, obj, metav1.CreateOptions{})
+				return err
+			},
+			func() error {
+				return client.RbacV1().ClusterRoles().Delete(ctx, obj.Name, metav1.DeleteOptions{})
+			}}
 	case x < 30:
 		counts[2]++
 		name := fmt.Sprintf("o%d", counts[2])
@@ -451,10 +562,15 @@ func generateObject(t *testing.T, ctx context.Context, rg *rand.Rand, counts *co
 			TypeMeta:   typeMeta("NetworkPolicy", k8snetv1.SchemeGroupVersion),
 			ObjectMeta: generateObjectMeta(rg, name, namespace),
 		}
-		if client != nil && client != noK8sIfc {
-			_, err = client.NetworkingV1().NetworkPolicies(obj.Namespace).Create(ctx, obj, metav1.CreateOptions{})
-		}
-		ans = mrObjRsc{obj, "networkpolicies", namespace}
+		ans = mrObjRsc{obj, "networkpolicies", namespace,
+			func() error {
+				_, err := client.NetworkingV1().NetworkPolicies(obj.Namespace).Create(ctx, obj, metav1.CreateOptions{})
+				return err
+			},
+			func() error {
+				return client.NetworkingV1().NetworkPolicies(obj.Namespace).Delete(ctx, obj.Name, metav1.DeleteOptions{})
+			}}
+
 	default:
 		counts[3]++
 		name := fmt.Sprintf("o%d", counts[3])
@@ -470,15 +586,15 @@ func generateObject(t *testing.T, ctx context.Context, rg *rand.Rand, counts *co
 				MaxReplicas: 2,
 			},
 		}
-		if client != nil && client != noK8sIfc {
-			_, err = client.AutoscalingV2().HorizontalPodAutoscalers(obj.Namespace).Create(ctx, obj, metav1.CreateOptions{})
-		}
-		ans = mrObjRsc{obj, "horizontalpodautoscalers", namespace}
+		ans = mrObjRsc{obj, "horizontalpodautoscalers", namespace,
+			func() error {
+				_, err := client.AutoscalingV2().HorizontalPodAutoscalers(obj.Namespace).Create(ctx, obj, metav1.CreateOptions{})
+				return err
+			},
+			func() error {
+				return client.AutoscalingV2().HorizontalPodAutoscalers(obj.Namespace).Delete(ctx, obj.Name, metav1.DeleteOptions{})
+			}}
 	}
-	if err != nil {
-		t.Fatalf("Failed to create object %#v: %s", ans.MRObject, err)
-	}
-	klog.FromContext(ctx).V(1).Info("Generated", "obj", ans)
 	return ans
 }
 
