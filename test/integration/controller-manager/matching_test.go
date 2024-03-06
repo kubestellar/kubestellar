@@ -39,7 +39,6 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	k8sschema "k8s.io/apimachinery/pkg/runtime/schema"
 	k8sjson "k8s.io/apimachinery/pkg/runtime/serializer/json"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	k8sclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
@@ -179,8 +178,8 @@ func TestMatching(t *testing.T) {
 		allIdxs[i] = i
 		logger.V(1).Info("Generated", "idx", i, "obj", objs[i])
 	}
-	idxsCreated := a.NewIndexedList[int]()
-	idxsNotCreated := a.NewIndexedList[int](allIdxs...)
+	idxsCreated := []int{}
+	idxsNotCreated := append([]int{}, allIdxs...)
 	bp := &ksapi.BindingPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "matching-tester",
@@ -192,35 +191,35 @@ func TestMatching(t *testing.T) {
 	maxObjs := (nObj * 3) / 5
 	thrashObjs := func() {
 		for i := 0; i < nObj/2; i++ {
-			nCreated := idxsCreated.Len()
+			nCreated := len(idxsCreated)
 			if minObjs <= nCreated && nCreated <= maxObjs && rg.Intn(3) == 0 { // replace
-				j := rg.Intn(idxsNotCreated.Len())
-				idx := idxsNotCreated.Ith(j)
+				j := rg.Intn(len(idxsNotCreated))
+				idx := idxsNotCreated[j]
 				oldObj := objs[idx]
 				newObj := generateObject(ctx, rg, &counts, namespaces, k8sClient)
 				objs[idx] = newObj
 				logger.V(1).Info("Replaced test object", "idx", idx, "oldObj", oldObj, "newObj", newObj)
 			} else if nCreated <= minObjs || nCreated < maxObjs && rg.Intn(2) == 0 { // create
-				j := rg.Intn(idxsNotCreated.Len())
-				idx := idxsNotCreated.Ith(j)
+				j := rg.Intn(len(idxsNotCreated))
+				idx := idxsNotCreated[j]
 				obj := objs[idx]
 				err := obj.create()
 				if err != nil {
 					t.Fatalf("Failed to create object %#v: %s", obj, err)
 				}
-				idxsCreated.Insert(idx)
-				idxsNotCreated.Delete(idx)
+				idxsCreated = append(idxsCreated, idx)
+				a.SliceDelete(&idxsNotCreated, j)
 				logger.V(1).Info("Created test object", "idx", idx, "obj", obj)
 			} else { // delete
-				j := rg.Intn(idxsCreated.Len())
-				idx := idxsCreated.Ith(j)
+				j := rg.Intn(len(idxsCreated))
+				idx := idxsCreated[j]
 				obj := objs[idx]
 				err := obj.delete()
 				if err != nil {
 					t.Fatalf("Failed to delete object %#v: %s", obj, err)
 				}
-				idxsCreated.Delete(idx)
-				idxsNotCreated.Insert(idx)
+				a.SliceDelete(&idxsCreated, j)
+				idxsNotCreated = append(idxsNotCreated, idx)
 				logger.V(1).Info("Deleted test object", "idx", idx, "obj", obj)
 			}
 		}
@@ -235,18 +234,16 @@ func TestMatching(t *testing.T) {
 			thrashObjs()
 		}
 		if roundType&2 == 2 {
-			idxsNotInTest := a.NewIndexedList[int](allIdxs...)
-			idxsInTest := sets.New[int]()
+			idxsNotInTest := append([]int{}, allIdxs...)
 			tests = []ksapi.DownsyncObjectTest{}
 			for i := 0; i*3 < nObj*2; i++ {
-				j := rg.Intn(idxsNotInTest.Len())
-				idx := idxsNotInTest.Ith(j)
+				j := rg.Intn(len(idxsNotInTest))
+				idx := idxsNotInTest[j]
+				a.SliceDelete(&idxsNotInTest, j)
 				obj := objs[idx]
 				test := extractTest(rg, obj)
 				logger.Info("Adding test", "test", test)
 				tests = append(tests, test)
-				idxsInTest.Insert(idx)
-				idxsNotInTest.Delete(idx)
 			}
 			if createPolicy {
 				bp.Spec.Downsync = tests
@@ -290,7 +287,7 @@ func TestMatching(t *testing.T) {
 		for idx, obj := range nsORs {
 			consider(obj, idx)
 		}
-		for _, idx := range idxsCreated.List {
+		for _, idx := range idxsCreated {
 			obj := objs[idx]
 			consider(obj, idx)
 		}
@@ -307,9 +304,9 @@ func TestMatching(t *testing.T) {
 			return true, nil
 		})
 		if err != nil {
-			t.Fatalf("Round %d type %d never got expected matches; numTests=%d, numObjects=%d, numExpected=%d", round, roundType, len(tests), idxsCreated.Len(), len(expectation))
+			t.Fatalf("Round %d type %d never got expected matches; numTests=%d, numObjects=%d, numExpected=%d", round, roundType, len(tests), len(idxsCreated), len(expectation))
 		}
-		logger.Info("Round success", "round", round, "roundType", roundType, "numTests", len(tests), "numObjects", idxsCreated.Len(), "numExpected", len(expectation))
+		logger.Info("Round success", "round", round, "roundType", roundType, "numTests", len(tests), "numObjects", len(idxsCreated), "numExpected", len(expectation))
 
 		roundType = 1 + rg.Intn(7)
 	}
