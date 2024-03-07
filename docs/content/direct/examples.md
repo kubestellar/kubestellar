@@ -60,20 +60,14 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
    kflex create wds1 -p kubestellar
    ```
 
-1. Run the OCM based transport controller as executable process.  
-**NOTE**: This is work in progress, in the future the controller will be deployed through a Pod and optionally a Helm chart.
+1. Run the OCM based transport controller in a pod.  
+**NOTE**: This is work in progress, in the future the controller will be deployed through a Helm chart.
 
-   OCM based transport controller is built in a different package, so we need to download the package and run the executable as background process.
-
+   Run [transport deployment script](../../../hack/deploy-transport-controller.sh).  
+   This script expects to get three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.  
+   For example, one can deploy transport controller using the following command:
    ```shell
-   OS=$(go env GOOS)
-   ARCH=$(go env GOARCH)
-   OCM_TRANSPORT_PLUGIN_RELEASE="0.1.0-rc2"
-   OCM_TRANSPORT_PLUGIN_TAR=ocm-transport-plugin_${OCM_TRANSPORT_PLUGIN_RELEASE}_${OS}_${ARCH}.tar.gz
-   wget https://github.com/kubestellar/ocm-transport-plugin/releases/download/v${OCM_TRANSPORT_PLUGIN_RELEASE}/${OCM_TRANSPORT_PLUGIN_TAR}
-   tar -xvf ${OCM_TRANSPORT_PLUGIN_TAR} transport-controller
-   rm -fr bin ${OCM_TRANSPORT_PLUGIN_TAR}
-   ./transport-controller --transport-context imbs1 --wds-context wds1 --wds-name wds1 &> transport.log &
+   ./hack/deploy-transport-controller.sh wds1 imbs1 ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.0-rc4
    ```
 
 1. Follow the steps to [create and register two clusters with OCM](example-wecs.md).

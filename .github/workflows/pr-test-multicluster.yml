@@ -55,10 +55,6 @@ jobs:
           cd test/e2e/multi-cluster-deployment 
           KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
 
-      - name: show transport controller logs ## temp solution until we get transport controller to run as pod
-        if: always()
-        run: cat transport.log
-
       - name: show kubeconfig contexts
         if: always()
         run: kubectl config get-contexts
@@ -70,6 +66,10 @@ jobs:
       - name: show kubestellar controller manager log
         if: always()
         run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
+
+      - name: show transport controller log
+        if: always()
+        run: kubectl --context kind-kubeflex -n wds1-system logs $(kubectl --context kind-kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}')
 
       - name: show bindingpolicies
         if: always()
