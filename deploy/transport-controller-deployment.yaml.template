@@ -16,7 +16,7 @@ data:
     get_incluster_key="$2"
 
     key=""
-    if [[ $get_incluster_key == "true" ]]; then
+    if [[ "$get_incluster_key" == "true" ]]; then
       key=$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.inClusterKey}');
     else
       key=$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.key}');
@@ -59,7 +59,7 @@ spec:
       - name: setup-imbs-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
-        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh ${IMBS_NAME} false | base64 -d > /mnt/shared/transport-kubeconfig"]
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh ${IMBS_NAME} true | base64 -d > /mnt/shared/transport-kubeconfig"]
         volumeMounts:
         - name: config-volume
           mountPath: /mnt/config
