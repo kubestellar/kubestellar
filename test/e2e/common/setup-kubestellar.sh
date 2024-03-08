@@ -105,8 +105,7 @@ echo "running ocm transport plugin..."
 kubectl config use-context kind-kubeflex ## transport deployment script assumes it runs within kubeflex context
 IMAGE_PULL_POLICY=Never ./hack/deploy-transport-controller.sh wds1 imbs1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE}
 
-kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[*].metadata.name}')
-kubectl -n wds1-system get pods $(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[*].metadata.name}')
+wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[*].metadata.name}'))'
 
 echo "transport controller is running."
 
@@ -137,7 +136,7 @@ kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=c
 :
 : -------------------------------------------------------------------------
 : Get all deployments and statefulsets running in the hosting cluster.
-: Expect to see the wds1 kubestellar-controller-manager created in the wds1-system 
+: Expect to see the wds1 kubestellar-controller-manager and transport-controller created in the wds1-system
 : namespace and the imbs1 statefulset created in the imbs1-system namespace.
 :
 if ! expect-cmd-output 'kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces' 'grep -e wds1 -e imbs1 | wc -l | grep -wq 5'
