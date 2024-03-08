@@ -22,4 +22,4 @@ export HOST_IP=$(ifconfig | grep -w inet | awk '{ print $2 }' | grep -v 127.0.0.
 export IMAGE_PULL_POLICY="${IMAGE_PULL_POLICY:=Always}"
 
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
-cpname='$cpname' get_incluster_key='$get_incluster_key' secret_name='$secret_name' secret_namespace='$secret_namespace' key='$key' envsubst < "${SRC_DIR}/../deploy/transport-controller-deployment.yaml.template"  | kubectl apply -f -
+envsubst '$WDS_NAME $IMBS_NAME $TRANSPORT_CONTROLLER_IMAGE $HOST_IP $IMAGE_PULL_POLICY' < "${SRC_DIR}/../deploy/transport-controller-deployment.yaml.template"  | kubectl apply -f -
