@@ -283,18 +283,21 @@ func TestMatching(t *testing.T) {
 	}
 	tests := []ksapi.DownsyncObjectTest{}
 	bindingClient := ksClient.Bindings()
-	var roundType int = 7
+	const thrashBeforeBit int = 1
+	const changeTestsBit int = 2
+	const thrashAfterbit int = 4
+	var roundType int = thrashBeforeBit | changeTestsBit | thrashAfterbit
 	nRounds := 10
 	for round := 1; round <= nRounds; round++ {
 		logger.Info("Starting round", "round", round, "roundType", roundType)
-		if roundType&1 == 1 {
+		if roundType&thrashBeforeBit != 0 {
 			if rg.Intn(2) == 0 {
 				serialThrash()
 			} else {
 				parallelThrash()
 			}
 		}
-		if roundType&2 == 2 {
+		if roundType&changeTestsBit != 0 {
 			idxsNotInTest := append([]int{}, allIdxs...)
 			tests = []ksapi.DownsyncObjectTest{}
 			for i := 0; i*3 < nObj*2; i++ {
@@ -331,7 +334,7 @@ func TestMatching(t *testing.T) {
 				logger.Info("Updated BindingPolicy", "name", bp.Name, "round", round)
 			}
 		}
-		if roundType&4 == 4 {
+		if roundType&thrashAfterbit != 0 {
 			if rg.Intn(2) == 0 {
 				serialThrash()
 			} else {
