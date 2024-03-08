@@ -1083,6 +1083,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#warning" class="md-nav__link">
+    WARNING
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#outline-of-publishing" class="md-nav__link">
     Outline of publishing
   </a>
@@ -1244,40 +1251,42 @@
 <p>"OSA" is OCM Status Addon.</p>
 <h3 id="ocm-status-addon-container-image">OCM status addon container image<a class="headerlink" href="#ocm-status-addon-container-image" title="Permanent link">#</a></h3>
 <p>There is a container image at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon">ghcr.io/kubestellar/ocm-status-addon</a>.</p>
-<p>The container image is built and published using <code>make</code>.  The
-following <code>make</code> variables are relevant.</p>
-<ul>
-<li><code>KO_DOCKER_REPO</code>, defaults to <code>ghcr.io/kubestellar</code></li>
-<li><code>CMD_NAME</code>, defaults to <code>ocm-status-addon</code></li>
-<li><code>IMAGE_TAG</code>, defaults to <code>0.2.0-alpha.1</code></li>
-<li><code>IMG</code>, defaults to <code>${KO_DOCKER_REPO}/${CMD_NAME}:${IMAGE_TAG}</code></li>
-</ul>
-<p><code>make ko-build-push</code> will build and publish the container image at
-<code>${IMG}</code>. This will be a multi-platform manifest, referencing images
-for "platforms" <code>linux/amd64</code> and <code>linux/arm64</code>.</p>
-<p><code>make ko-local-build</code> will build the same multi-platform manifest but
-not push it, only leave it among your Docker images. Note that if you
-have podman pretending to be Docker then it will only receive a
-single-platform image, not the multi-platform manifest.</p>
+<p>The container image is built and published by that repo's release process, which is documented at <a href="https://github.com/kubestellar/ocm-status-addon/blob/main/docs/release.md">its <code>docs/release.md</code> file</a>.</p>
+<p>Following are notable images in that repo.</p>
+<table>
+<thead>
+<tr>
+<th>tag</th>
+<th>git commit</th>
+<th>SHA256 digest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.2.0-alpha.1</td>
+<td>1c36248df2c4379ab4ce2a5945d5cce3145dc211</td>
+<td>b8ef1802a1d9f30dd65f16f94c86dc0218f2cf30bb34549a6248aeeb2b13eb4a</td>
+</tr>
+<tr>
+<td>0.2.0-rc5</td>
+<td>6753b9e169d47ff1592f9638d1b53c826f7ee1b9</td>
+<td>35d97e4b523388ee28f537b176b3f8dbbc888e31a46bbd308d67cd5a0735c249</td>
+</tr>
+<tr>
+<td>latest</td>
+<td>6753b9e169d47ff1592f9638d1b53c826f7ee1b9</td>
+<td>35d97e4b523388ee28f537b176b3f8dbbc888e31a46bbd308d67cd5a0735c249</td>
+</tr>
+</tbody>
+</table>
+<p>To support testing, <code>make ko-local-build</code> will build a single-platform
+image and not push it, only leave it among your Docker images. The
+single platform's OS is Linux. The single platform's ISA is defined by
+the <code>make</code> variable <code>ARCH</code>, which defaults to what <code>go env GOARCH</code>
+prints.</p>
 <h3 id="ocm-status-addon-helm-chart">OCM status addon Helm chart<a class="headerlink" href="#ocm-status-addon-helm-chart" title="Permanent link">#</a></h3>
-<p>The operator is delivered by a Helm chart at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon-chart">ghcr.io/kubestellar/ocm-status-addon-chart</a>.</p>
-<p>The chart is built and published using <code>make</code>. The following <code>make</code>
-variables are relevant.</p>
-<ul>
-<li><code>KO_DOCKER_REPO</code>, defaults to <code>ghcr.io/kubestellar</code></li>
-<li><code>CMD_NAME</code>, defaults to <code>ocm-status-addon</code></li>
-<li><code>IMAGE_TAG</code>, defaults to <code>0.2.0-alpha.1</code></li>
-<li><code>IMG</code>, defaults to <code>${KO_DOCKER_REPO}/${CMD_NAME}:${IMAGE_TAG}</code></li>
-</ul>
-<p><code>make chart</code>: builds the local copy of the chart from local sources,
-using <code>kustomize</code>. When using the default values of the <code>make</code>
-variables, the built chart references the container image
-<code>ghcr.io/kubestellar/ocm-status-addon:0.2.0-alpha.1</code>. TODO: describe
-how the chart contents depend on the <code>make</code> variables.</p>
-<p><code>make chart-push</code> (depends on the <code>make</code> target <code>chart</code>): pushes the
-local copy of the chart to the OCI repository and tag specified in
-<code>${IMG}</code>.</p>
-<p>The following versions exist.</p>
+<p>The operator is delivered by a Helm chart at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon-chart">ghcr.io/kubestellar/ocm-status-addon-chart</a>. The chart references the container image.</p>
+<p>The following notable versions exist.</p>
 <table>
 <thead>
 <tr>
@@ -1288,19 +1297,25 @@ local copy of the chart to the OCI repository and tag specified in
 </thead>
 <tbody>
 <tr>
+<td>v0.2.0-alpha.1</td>
+<td>v0.2.0-alpha.1</td>
 <td>0.2.0-alpha.1</td>
-<td>0.2.0-alpha.1</td>
-<td>0.2.0-alpha.1</td>
+</tr>
+<tr>
+<td>v0.2.0-rc5</td>
+<td>v0.2.0-rc5</td>
+<td>0.2.0-rc5</td>
 </tr>
 </tbody>
 </table>
-<p>Note: the Chart.yaml in github uses just "0.2.0" for the version and appVersion in the chart. TODO: bug?</p>
 <h2 id="ocm-transport-plugin">OCM Transport Plugin<a class="headerlink" href="#ocm-transport-plugin" title="Permanent link">#</a></h2>
 <p>The source is the GitHub repo <a href="https://github.com/kubestellar/ocm-transport-plugin">github.com/kubestellar/ocm-transport-plugin</a></p>
 <h3 id="ocm-transport-container-image">OCM Transport container image<a class="headerlink" href="#ocm-transport-container-image" title="Permanent link">#</a></h3>
 <p>This appears at <a href="https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller">ghcr.io/kubestellar/ocm-transport-plugin/transport-controller</a>.</p>
 <p>TODO: document how the image is built and published, including explain versioning.</p>
 <h2 id="kubestellar">KubeStellar<a class="headerlink" href="#kubestellar" title="Permanent link">#</a></h2>
+<h3 id="warning">WARNING<a class="headerlink" href="#warning" title="Permanent link">#</a></h3>
+<p>Literal KubeStellar release numbers appear here, and are historical. The version of this document in a given release does not mention that release. See <a href="../release/">the release process</a> for more details on what self-references are and are not handled.</p>
 <h3 id="outline-of-publishing">Outline of publishing<a class="headerlink" href="#outline-of-publishing" title="Permanent link">#</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>flowchart LR
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    subgraph cladm_repo[&quot;ocm/clusteradm@GitHub&quot;]
@@ -1374,12 +1389,24 @@ running that image. It installs the needed custom resource
 <em>definition</em> objects if they are not already present, and is a
 controller-manager hosting the per-WDS controllers (<a href="../architecture/#binding-controller">binding controller</a> and <a href="../architecture/#status-controller">status controller</a>) from the kubestellar repo.</p>
 <p>The image repository is
-<code>ghcr.io/kubestellar/kubestellar/controller-manager</code>. There is
-currently just one supported tag there, <code>0.20.0-alpha.1</code>. That was
-built from the git repo contents with the tag <code>v0.20.0-alpha.1</code>.</p>
-<p><code>make ko-build-push</code> will build and push that image, tagging it with
-the value of the <code>make</code> variable <code>IMAGE_TAG</code> (which defaults to
-<code>0.20.0-alpha.1</code>).</p>
+<code>ghcr.io/kubestellar/kubestellar/controller-manager</code>. The following notable versions exist.</p>
+<table>
+<thead>
+<tr>
+<th>image tag</th>
+<th>git commit</th>
+<th>SHA256 digest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.20.0</td>
+<td>a2bcaf75dc895dbef5f6cddcf203b0203423a08a</td>
+<td>fac5b208a1f691eb5548a7699494bed2ee6b7502e739a2db840f39bbc05b2fd4</td>
+</tr>
+</tbody>
+</table>
+<p>The <a href="../release/">release process</a> builds and publishes that container image.</p>
 <p><code>make ko-build-local</code> will make a local image for just the local
 platform. This is used in local testing.</p>
 <h3 id="kubestellar-controller-manager-helm-chart">KubeStellar controller-manager Helm Chart<a class="headerlink" href="#kubestellar-controller-manager-helm-chart" title="Permanent link">#</a></h3>
@@ -1387,15 +1414,9 @@ platform. This is used in local testing.</p>
 <p>The source for the Helm chart is in
 <a href="../../../chart">chart</a>. <code>make chart</code> (re)derives
 it from local sources. This is not included in <code>make all-generated</code>.</p>
-<p>This chart creates (among other things) a <code>Deployment</code> object that runs a container from the image <code>ghcr.io/kubestellar/kubestellar/controller-manager:0.20.0-alpha.1</code>.</p>
+<p>This chart creates (among other things) a <code>Deployment</code> object that runs a container from the <a href="#kubestellar-controller-manager-container-image">KubeStellar controller-manager container image</a>.</p>
 <p>The chart is published at the OCI repository
-<code>ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart</code>.  The
-<code>make</code> target <code>chart-push</code> depends on target <code>chart</code> and publishes the
-chart to
-<code>${DOCKER_REGISTRY}/kubestellar-operator-chart:${IMAGE_TAG}</code>. Make
-variable <code>DOCKER_REGISTRY</code> defaults to
-<code>ghcr.io/kubestellar/kubestellar</code> and <code>IMAGE_TAG</code> defaults to
-<code>0.20.0-alpha.1</code> (red flag here).</p>
+<code>ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart</code>. A <a href="../../../.github/workflows/goreleaser.yml">GitHub workflow</a> specializes and publishes this chart as part of <a href="../release/">the release process</a>.</p>
 <p>The following versions exist.</p>
 <table>
 <thead>
@@ -1407,9 +1428,9 @@ variable <code>DOCKER_REGISTRY</code> defaults to
 </thead>
 <tbody>
 <tr>
-<td>0.20.0-alpha.1</td>
-<td>0.1.0</td>
-<td>0.20.0-alpha.1</td>
+<td>0.20.0</td>
+<td>0.20.0</td>
+<td>0.20.0</td>
 </tr>
 </tbody>
 </table>
@@ -1429,7 +1450,16 @@ built from.</p>
 <h4 id="ocm-postcreatehook">ocm PostCreateHook<a class="headerlink" href="#ocm-postcreatehook" title="Permanent link">#</a></h4>
 <p>The PostCreateHook defined in <code>ocm.yaml</code> gets used on an ITS and adds the hub side of OCM there, using the image <code>quay.io/kubestellar/clusteradm:0.7.2</code>. See <a href="#clusteradm-container-image">above</a> about the source of that. Currently this PostCreateHook is used in the E2E tests but this is a problem because of its fixed reference to container image previously built from sources in this same Git repository.</p>
 <h4 id="kubestellar-postcreatehook">kubestellar PostCreateHook<a class="headerlink" href="#kubestellar-postcreatehook" title="Permanent link">#</a></h4>
-<p>The PostCreateHook defined in <code>kubestellar.yaml</code> is intended to be used in the hosting cluster, once per WDS, and runs container image <code>quay.io/kubestellar/helm:v3.14.0</code> (which is built from <a href="https://github.com/helm/helm/tree/v3.14.0">the Helm source</a> by a process that we need to document) to instantiate the chart from <code>oci://ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart</code> with chart version <code>0.20.0-alpha.1</code>. Currently the only reference to any copy of this PostCreateHook is from the <a href="../examples/">examples doc</a>, which references the copy in the Git commit tagged <code>v0.20.0-alpha.1</code>.</p>
+<p>The PostCreateHook defined in <code>kubestellar.yaml</code> is intended to be
+used in the hosting cluster, once per WDS, and runs container image
+<code>quay.io/kubestellar/helm:v3.14.0</code> (which is built from <a href="https://github.com/helm/helm/tree/v3.14.0">the Helm
+source</a> by a process that
+we need to document) to instantiate the chart from
+<code>oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart</code>;
+the chart version appears as a literal in the PostCreateHook,
+currently "0.20.0". Currently the only reference to any copy of this
+PostCreateHook is from the <a href="../examples/">examples doc</a>, which
+references the copy in the Git commit tagged <code>v0.20.0</code>.</p>
 <h2 id="amalgamated-graph">Amalgamated graph<a class="headerlink" href="#amalgamated-graph" title="Permanent link">#</a></h2>
 <p>Currently only showing kubestellar and ocm-status-addon.</p>
 <p>TODO: finish this</p>
