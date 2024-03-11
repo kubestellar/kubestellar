@@ -17,16 +17,16 @@ on:
     branches:
       - main
     paths-ignore:
-      - "docs/**"
-      - "**/*.md"
+      - 'docs/**'
+      - '**/*.md'
   push:
     branches:
       - main
     tags:
       - 'v*'
     paths-ignore:
-      - "docs/**"
-      - "**/*.md"
+      - 'docs/**'
+      - '**/*.md'
 
 jobs:
   test-singleton:

@@ -16,6 +16,9 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'  
   push:
     branches:
       - main
@@ -23,7 +26,7 @@ on:
       - 'v*'
     paths-ignore:
       - 'docs/**'
-  
+      - '**/*.md'
 
 jobs:
   test-multicluster:
