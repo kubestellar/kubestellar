@@ -104,7 +104,7 @@ pwd
 rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
 echo "running ocm transport plugin..."
 kubectl config use-context kind-kubeflex ## transport deployment script assumes it runs within kubeflex context
-IMAGE_PULL_POLICY=Never ./hack/deploy-transport-controller.sh wds1 imbs1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE}
+IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 imbs1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE}
 
 wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))'
 
