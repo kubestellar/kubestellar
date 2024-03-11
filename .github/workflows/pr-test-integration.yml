@@ -25,7 +25,7 @@ jobs:
           cache: true
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@v3
+        uses: azure/setup-kubectl@v4
         id: install
 
       - uses: ko-build/setup-ko@v0.6
