@@ -56,10 +56,7 @@ ManifestWorks and unwraps and syncs the objects into the WEC.
 to find objects that are synced by the OCM agent, gets their status 
 and updates *WorkStatus* objects in the ITS namespace associated with the WEC.
 
-<figure markdown="span">
-  ![Main Modules](./images/main-modules.png)
-  <figcaption align="center">Figure 2 - Main Modules </figcaption>
-</figure>
+![Figure 2 - Main Modules](./images/main-modules.png)
 
 ## KubeStellar Controller Manager
 
@@ -258,10 +255,7 @@ The architecture and the event flow of the code for create/update object events 
 illustrated in Figure 3 (some details might be omitted to make the flow easier
 to understand). 
 
-<figure markdown="span">
-  ![Binding Controller](./images/binding-controller.png)
-  <figcaption align="center">Figure 3 - Binding Controller</figcaption>
-</figure>
+![Figure 3 - Binding Controller](./images/binding-controller.png)
 
 At startup, the controller code sets up the dynamic informers, the event
 handler and the work queue as follows:
@@ -435,10 +429,7 @@ objects with the corresponding status found in the workstatus object.
 The *WorkStatus* objects are created and updated on the ITS by the status add-on.
 The high-level flow for the singleton status update is described in Figure 4.
 
-<figure markdown="span">
-  ![Status Controller](./images/status-controller.png)
-  <figcaption align="center">Figure 4 - Status Controller</figcaption>
-</figure>
+![Figure 4 - Status Controller](./images/status-controller.png)
 
 The status add-on tracks objects applied by the work agent by watching 
 *AppliedManifestWork* objects. These objects list the GVR, name
@@ -471,10 +462,7 @@ We expect to have more transport plugin options in the future.
 
 The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.
 
-<figure markdown="span">
-  ![Transport Controller](./images/transport-controller.png)
-  <figcaption align="center">Figure 5 - Transport Controller</figcaption>
-</figure>
+![Figure 5 - Transport Controller](./images/transport-controller.png)
 
 The transport controller watches for `Binding` objects on the WDS. `Binding` objects are mapped 1:1 to `BindingPolicy` and contain references to the list of concrete objects that were selected for distribution by the policy and references to the concrete list of destination that were selected by the policy. Upon a new `Binding` event (add/update/delete), the transport controller gets from the WDS api server(s) the objects listed in the `Binding` workload section. It then wraps all objects into a single wrapped object and puts a copy of the wrapped object in every matching cluster mailbox namespace in the ITS. Once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/delete the workload objects on the WEC.  
 Transport controller is based on the controller design patten and aims to bring the current state to the desired state. That is, if a WEC was removed from the `Binding`, the transport controller will also make sure to remove the matching wrapped object(s) from the WEC's mailbox namespace. Additionally, if a `Binding` is removed, transport controller will remove the matching wrapped object(s) from all mailbox namespaces.
