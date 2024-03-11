@@ -2,10 +2,7 @@
 
 KubeStellar provides multi-cluster deployment of Kubernetes objects, controlled by simple `BindingPolicy` objects, where Kubernetes objects are expressed in their native format with no wrapping or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.
 
-<figure markdown="span">
-  ![High Level Architecture](./images/high-level-architecture.png)
-  <figcaption align="center">Figure 1 - High Level Architecture </figcaption>
-</figure>
+![Figure 1 - High Level Architecture](high-level-architecture.png)
 
 KubeStellar relies on the concept of *spaces*.  
 A Space is an abstraction to represent an API service that 

@@ -160,6 +160,7 @@ plugins:
   #           'some_file.md': 'http://external.url.com/foobar'
 
 markdown_extensions:
+  - markdown_captions
   - pymdownx.superfences
   - attr_list
   - md_in_html
