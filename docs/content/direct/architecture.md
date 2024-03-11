@@ -2,8 +2,8 @@
 
 KubeStellar provides multi-cluster deployment of Kubernetes objects, controlled by simple `BindingPolicy` objects, where Kubernetes objects are expressed in their native format with no wrapping or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.
 
-<figure>
-  <img src="./images/high-level-architecture.png"  alt="High Level Architecture">
+<figure markdown="span">
+  ![High Level Architecture](./images/high-level-architecture.png)
   <figcaption align="center">Figure 1 - High Level Architecture </figcaption>
 </figure>
 
@@ -59,8 +59,8 @@ ManifestWorks and unwraps and syncs the objects into the WEC.
 to find objects that are synced by the OCM agent, gets their status 
 and updates *WorkStatus* objects in the ITS namespace associated with the WEC.
 
-<figure>
-  <img src="./images/main-modules.png"  alt="Main Modules">
+<figure markdown="span">
+  ![Main Modules](./images/main-modules.png)
   <figcaption align="center">Figure 2 - Main Modules </figcaption>
 </figure>
 
@@ -261,8 +261,8 @@ The architecture and the event flow of the code for create/update object events 
 illustrated in Figure 3 (some details might be omitted to make the flow easier
 to understand). 
 
-<figure>
-  <img src="./images/binding-controller.png"  alt="Binding Controller">
+<figure markdown="span">
+  ![Binding Controller](./images/binding-controller.png)
   <figcaption align="center">Figure 3 - Binding Controller</figcaption>
 </figure>
 
@@ -438,8 +438,8 @@ objects with the corresponding status found in the workstatus object.
 The *WorkStatus* objects are created and updated on the ITS by the status add-on.
 The high-level flow for the singleton status update is described in Figure 4.
 
-<figure>
-  <img src="./images/status-controller.png"  alt="Status Controller">
+<figure markdown="span">
+  ![Status Controller](./images/status-controller.png)
   <figcaption align="center">Figure 4 - Status Controller</figcaption>
 </figure>
 
@@ -473,8 +473,8 @@ We expect to have more transport plugin options in the future.
 
 The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.
 
-<figure>
-  <img src="./images/transport-controller.png"  alt="Transport Controller">
+<figure markdown="span">
+  ![Transport Controller](./images/transport-controller.png)
   <figcaption align="center">Figure 5 - Transport Controller</figcaption>
 </figure>
 
