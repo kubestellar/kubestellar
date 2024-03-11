@@ -388,10 +388,7 @@ func shouldSkipUpdate(old, new interface{}) bool {
 	if newMObj.GetResourceVersion() == oldMObj.GetResourceVersion() {
 		return true
 	}
-	// avoid enqueing events when adding finalizers to bindingpolicy
-	if util.IsBindingPolicy(new) && (len(newMObj.GetFinalizers()) > len(oldMObj.GetFinalizers())) {
-		return true
-	}
+
 	return false
 }
 
