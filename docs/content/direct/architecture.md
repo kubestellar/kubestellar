@@ -459,6 +459,7 @@ status updates for one object do not require updates of a whole bundle.
 
 The transport controller is pluggable and allows the option to plug different
 implementations of the transport interface. The interface between the plugin and the generic code is [a Go language interface](../../../pkg/transport/transport.go) that the plugin has to implement. This interface requires the following from the plugin.
+
 - Upon registration of a new WEC, plugin should create a namespace for the WEC in the ITS and delete the namespace once the WEC registration goes away (mailbox namespace per WEC);
 - Plugin must be able to wrap any number of objects into a single wrapped object;
 - Have an agent that can be used to pull the wrapped objects from the mailbox namespace and apply them to the WEC. A single example for such an agent is an agent that runs on the WEC and watches the wrapped object in the corresponding namespace in the central hub and is able to unwrap it and apply the objects to the WEC. 
