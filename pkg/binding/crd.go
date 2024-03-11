@@ -44,19 +44,17 @@ func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIde
 	var crdObj *apiextensionsv1.CustomResourceDefinition
 	var specVersions []apiextensionsv1.CustomResourceDefinitionVersion
 
-	{
-		obj, err := c.getObjectFromIdentifier(objIdentifier)
-		if errors.IsNotFound(err) {
-			logger.V(2).Info("Handling deleted CRD", "name", objIdentifier.ObjectName.Name)
-		} else if err != nil {
-			return fmt.Errorf("failed to get runtime.Object from identifier (%v): %w", objIdentifier, err)
-		} else {
-			uObj := obj.(*unstructured.Unstructured)
-			if err := runtime.DefaultUnstructuredConverter.FromUnstructured(uObj.UnstructuredContent(), &crdObj); err != nil {
-				return fmt.Errorf("failed to convert Unstructured to CRD: %w", err)
-			}
-			specVersions = crdObj.Spec.Versions
+	obj, err := c.getObjectFromIdentifier(objIdentifier)
+	if errors.IsNotFound(err) {
+		logger.V(2).Info("Handling deleted CRD", "name", objIdentifier.ObjectName.Name)
+	} else if err != nil {
+		return fmt.Errorf("failed to get runtime.Object from identifier (%v): %w", objIdentifier, err)
+	} else {
+		uObj := obj.(*unstructured.Unstructured)
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(uObj.UnstructuredContent(), &crdObj); err != nil {
+			return fmt.Errorf("failed to convert Unstructured to CRD: %w", err)
 		}
+		specVersions = crdObj.Spec.Versions
 	}
 
 	// for each CustomResourceDefinitionVersion, follow a decision tree to tell whether the corresponding gvr should be watched
@@ -97,7 +95,7 @@ func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIde
 
 	for _, gvk := range toStopList {
 		logger.Info("API should not be watched, ensuring the informer's absence.", "gvk", gvk)
-		stopper, ok := c.stoppers[gvk]
+		stopper, ok := c.stoppers.Get(gvk)
 		if !ok {
 			logger.V(3).Info("Informer is already absent.", "key", gvk)
 		} else {
@@ -105,9 +103,9 @@ func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIde
 			close(stopper)
 		}
 		// remove entries for key
-		delete(c.informers, gvk)
-		delete(c.listers, gvk)
-		delete(c.stoppers, gvk)
+		c.informers.Remove(gvk)
+		c.listers.Remove(gvk)
+		c.stoppers.Remove(gvk)
 	}
 
 	return nil
@@ -141,7 +139,7 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 	for _, toStart := range toStartList {
 		gvr := toStart.groupVersion.WithResource(toStart.resource.Name)
 
-		if _, ok := c.informers[gvr]; ok {
+		if _, found := c.informers.Get(gvr); found {
 			logger.V(3).Info("Informer already ensured.", "gvr", gvr)
 			continue
 		}
@@ -178,20 +176,20 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 				c.handleObject(obj, toStart.resource.Name, "delete")
 			},
 		})
-		c.informers[gvr] = informer
+		c.informers.Set(gvr, informer)
 
 		// add the lister since it necessarily does not exist
 		logger.V(3).Info("Setting lister", "gvr", gvr)
-		c.listers[gvr] = cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())
+		c.listers.Set(gvr, cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource()))
 
 		// add the stopper since it necessarily does not exist
 		stopper := make(chan struct{})
 		logger.V(3).Info("Setting stopper", "gvr", gvr)
-		c.stoppers[gvr] = stopper
+		c.stoppers.Set(gvr, stopper)
 
 		// add the informer since it necessarily does not exist
 		logger.V(3).Info("Setting and running informer", "gvr", gvr)
-		c.informers[gvr] = informer
+		c.informers.Set(gvr, informer)
 		go informer.Run(stopper)
 	}
 }

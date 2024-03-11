@@ -211,10 +211,11 @@ func (c *Controller) evaluateBindingPolicies(ctx context.Context, clusterId stri
 }
 
 func (c *Controller) listBindingPolicies() ([]runtime.Object, error) {
-	lister := c.listers[util.GetBindingPolicyGVR()]
-	if lister == nil {
+	lister, found := c.listers.Get(util.GetBindingPolicyGVR())
+	if !found {
 		return nil, fmt.Errorf("could not get lister for BindingPolicy")
 	}
+
 	list, err := lister.List(labels.Everything())
 	if err != nil {
 		return nil, err
@@ -239,7 +240,13 @@ func runtimeObjectToBindingPolicy(obj runtime.Object) (*v1alpha1.BindingPolicy, 
 // added or a bindingpolicy is updated
 func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyName string) error {
 	logger := klog.FromContext(ctx)
-	for key, lister := range c.listers {
+	for key := range c.listers.Keys() {
+		lister, found := c.listers.Get(key)
+		if !found {
+			// lister was removed, skip
+			continue
+		}
+
 		// do not requeue bindingpolicies or bindings
 		if key == util.GetBindingPolicyGVR() || key == util.GetBindingGVR() {
 			logger.Info("Not enqueuing control object", "key", key)

@@ -61,7 +61,7 @@ type Controller struct {
 	workqueue          workqueue.RateLimitingInterface
 	// all wds listers are used to retrieve objects and update status
 	// without having to re-create new caches for this controller
-	listers map[schema.GroupVersionResource]cache.GenericLister
+	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
 }
 
 // Create a new  status controller
@@ -132,7 +132,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 
 	go c.runWorkStatusInformer(ctx)
 
-	c.listers = (<-cListers).(map[schema.GroupVersionResource]cache.GenericLister)
+	c.listers = (<-cListers).(util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister])
 	c.logger.Info("Received listers")
 
 	c.logger.Info("Starting workers", "count", workers)
@@ -305,11 +305,11 @@ func (c *Controller) reconcile(ctx context.Context, ref cache.ObjectName) error 
 }
 
 func updateObjectStatus(ctx context.Context, objRef *util.SourceRef, status map[string]interface{},
-	listers map[schema.GroupVersionResource]cache.GenericLister, wdsDynClient dynamic.Interface) error {
+	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister], wdsDynClient dynamic.Interface) error {
 
 	gvr := schema.GroupVersionResource{Group: objRef.Group, Version: objRef.Version, Resource: objRef.Resource}
-	lister, ok := listers[gvr]
-	if !ok {
+	lister, found := listers.Get(gvr)
+	if !found {
 		return fmt.Errorf("could not find lister for gvr %s", gvr)
 	}
 
