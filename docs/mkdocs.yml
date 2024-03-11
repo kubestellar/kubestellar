@@ -35,6 +35,7 @@ nav:
   - Home:
       - Overview: index.md 
       - Readme: readme.md
+      - Architecture: direct/architecture.md
 
   - Contributing: 
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
