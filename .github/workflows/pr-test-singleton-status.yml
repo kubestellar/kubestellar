@@ -16,13 +16,17 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
   push:
     branches:
       - main
     tags:
       - 'v*'
     paths-ignore:
-      - 'docs/**'
+      - "docs/**"
+      - "**/*.md"
 
 jobs:
   test-singleton:
