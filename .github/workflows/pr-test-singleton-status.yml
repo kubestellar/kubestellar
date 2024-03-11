@@ -21,6 +21,8 @@ on:
       - main
     tags:
       - 'v*'
+    paths-ignore:
+      - 'docs/**'
 
 jobs:
   test-singleton:
