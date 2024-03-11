@@ -63,7 +63,7 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 1. Run the OCM based transport controller in a pod.  
 **NOTE**: This is work in progress, in the future the controller will be deployed through a Helm chart.
 
-   Run [transport deployment script](../../../hack/deploy-transport-controller.sh).  
+   Run [transport deployment script](../../../scripts/deploy-transport-controller.sh).  
    This script expects to get three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.  
    For example, one can deploy transport controller using the following command:
    ```shell
