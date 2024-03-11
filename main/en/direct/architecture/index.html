@@ -11,13 +11,17 @@
         <link rel="canonical" href="https://docs.kubestellar.io/main/en/direct/architecture/">
       
       
+        <link rel="prev" href="../../readme/">
+      
+      
+        <link rel="next" href="../../Contribution%20guidelines/CONTRIBUTING/">
       
       <link rel="icon" href="../../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
     
     
       
-        <title>KubeStellar Architecture - KubeStellar</title>
+        <title>Architecture - KubeStellar</title>
       
     
     
@@ -74,7 +78,7 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - KubeStellar Architecture" />
+  <meta property="og:title" content="KubeStellar - Architecture" />
   <meta property="og:description" content="None" />
   <meta property="og:url" content="https://docs.kubestellar.io/main/en/direct/architecture/" />
   <meta property="og:image" content="https://docs.kubestellar.io/mainassets/images/illustrations/banner.png" />
@@ -188,7 +192,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              KubeStellar Architecture
+              Architecture
             
           </span>
         </div>
@@ -260,13 +264,15 @@
         
   
   
+    
+  
 
 
   
   
   
     <li class="md-tabs__item">
-      <a href="../../" class="md-tabs__link">
+      <a href="../../" class="md-tabs__link md-tabs__link--active">
         Home
       </a>
     </li>
@@ -366,19 +372,23 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
       
       
         
           
             
+          
+        
           
         
           
@@ -396,7 +406,7 @@
           
         </div>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_1">
           <span class="md-nav__icon md-icon"></span>
           Home
@@ -414,6 +424,185 @@
       <a href="../../readme/" class="md-nav__link">
         Readme
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Architecture
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Architecture
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-controller-manager" class="md-nav__link">
+    KubeStellar Controller Manager
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pluggable-transport-controller" class="md-nav__link">
+    Pluggable Transport Controller
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#space-manager" class="md-nav__link">
+    Space Manager
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-cluster-manager" class="md-nav__link">
+    OCM Cluster Manager
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#status-add-on-controller" class="md-nav__link">
+    Status Add-On Controller
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-agent" class="md-nav__link">
+    OCM Agent
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-status-add-on-agent" class="md-nav__link">
+    OCM Status Add-On Agent
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-controllers-architecture" class="md-nav__link">
+    KubeStellar Controllers Architecture
+  </a>
+  
+    <nav class="md-nav" aria-label="KubeStellar Controllers Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#binding-controller" class="md-nav__link">
+    Binding Controller
+  </a>
+  
+    <nav class="md-nav" aria-label="Binding Controller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#object-deleted" class="md-nav__link">
+    Object Deleted
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bindingpolicy-created-or-updated" class="md-nav__link">
+    BindingPolicy Created or Updated
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bindingpolicy-deleted" class="md-nav__link">
+    BindingPolicy Deleted
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#binding-syncing" class="md-nav__link">
+    Binding Syncing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-crd-added" class="md-nav__link">
+    New CRD Added
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#crd-deleted" class="md-nav__link">
+    CRD Deleted
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#status-controller" class="md-nav__link">
+    Status Controller
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transport-controller" class="md-nav__link">
+    Transport Controller
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1171,10 +1360,9 @@
 <h1 id="kubestellar-architecture">KubeStellar Architecture<a class="headerlink" href="#kubestellar-architecture" title="Permanent link">#</a></h1>
 <p>KubeStellar provides multi-cluster deployment of Kubernetes objects, controlled by simple <code>BindingPolicy</code> objects, where Kubernetes objects are expressed in their native format with no wrapping or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.</p>
 <figure>
-  <img src="./images/high-level-architecture.png"  alt="High Level Architecture">
+  <img alt="High Level Architecture" src="../images/high-level-architecture.png" />
   <figcaption align="center">Figure 1 - High Level Architecture </figcaption>
 </figure>
-
 <p>KubeStellar relies on the concept of <em>spaces</em>.<br />
 A Space is an abstraction to represent an API service that 
 behaves like a Kubernetes kube-apiserver (including the persistent storage behind it) 
@@ -1234,10 +1422,9 @@ and updates <em>WorkStatus</em> objects in the ITS namespace associated with the
 </li>
 </ul>
 <figure>
-  <img src="./images/main-modules.png"  alt="Main Modules">
+  <img alt="Main Modules" src="../images/main-modules.png" />
   <figcaption align="center">Figure 2 - Main Modules </figcaption>
 </figure>
-
 <h2 id="kubestellar-controller-manager">KubeStellar Controller Manager<a class="headerlink" href="#kubestellar-controller-manager" title="Permanent link">#</a></h2>
 <p>This module manages binding controller, and status controller. 
 * The binding controller watches <code>BindingPolicy</code> and workload objects on the Workload Definition Space (WDS), and maintains
@@ -1411,10 +1598,9 @@ objects and references to the concrete list of destinations that were selected b
 illustrated in Figure 3 (some details might be omitted to make the flow easier
 to understand). </p>
 <figure>
-  <img src="./images/binding-controller.png"  alt="Binding Controller">
+  <img alt="Binding Controller" src="../images/binding-controller.png" />
   <figcaption align="center">Figure 3 - Binding Controller</figcaption>
 </figure>
-
 <p>At startup, the controller code sets up the dynamic informers, the event
 handler and the work queue as follows:</p>
 <ul>
@@ -1584,10 +1770,9 @@ objects with the corresponding status found in the workstatus object.</p>
 <p>The <em>WorkStatus</em> objects are created and updated on the ITS by the status add-on.
 The high-level flow for the singleton status update is described in Figure 4.</p>
 <figure>
-  <img src="./images/status-controller.png"  alt="Status Controller">
+  <img alt="Status Controller" src="../images/status-controller.png" />
   <figcaption align="center">Figure 4 - Status Controller</figcaption>
 </figure>
-
 <p>The status add-on tracks objects applied by the work agent by watching 
 <em>AppliedManifestWork</em> objects. These objects list the GVR, name
 and namespace (the latter for namespaced objects) of each object applied
@@ -1611,10 +1796,9 @@ implementations of the transport interface. The interface between the plugin and
 We expect to have more transport plugin options in the future.</p>
 <p>The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.</p>
 <figure>
-  <img src="./images/transport-controller.png"  alt="Transport Controller">
+  <img alt="Transport Controller" src="../images/transport-controller.png" />
   <figcaption align="center">Figure 5 - Transport Controller</figcaption>
 </figure>
-
 <p>The transport controller watches for <code>Binding</code> objects on the WDS. <code>Binding</code> objects are mapped 1:1 to <code>BindingPolicy</code> and contain references to the list of concrete objects that were selected for distribution by the policy and references to the concrete list of destination that were selected by the policy. Upon a new <code>Binding</code> event (add/update/delete), the transport controller gets from the WDS api server(s) the objects listed in the <code>Binding</code> workload section. It then wraps all objects into a single wrapped object and puts a copy of the wrapped object in every matching cluster mailbox namespace in the ITS. Once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/delete the workload objects on the WEC.<br />
 Transport controller is based on the controller design patten and aims to bring the current state to the desired state. That is, if a WEC was removed from the <code>Binding</code>, the transport controller will also make sure to remove the matching wrapped object(s) from the WEC's mailbox namespace. Additionally, if a <code>Binding</code> is removed, transport controller will remove the matching wrapped object(s) from all mailbox namespaces.</p>
 
@@ -1675,6 +1859,42 @@ Transport controller is based on the controller design patten and aims to bring 
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../readme/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Readme" rel="prev">
+            <div class="md-footer__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <div class="md-ellipsis">
+                <span class="md-footer__direction">
+                  Previous
+                </span>
+                Readme
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../Contribution%20guidelines/CONTRIBUTING/" class="md-footer__link md-footer__link--next" aria-label="Next: Guidelines" rel="next">
+            <div class="md-footer__title">
+              <div class="md-ellipsis">
+                <span class="md-footer__direction">
+                  Next
+                </span>
+                Guidelines
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
