@@ -285,13 +285,20 @@ func (c *Controller) reconcile(ctx context.Context, ref cache.ObjectName) error 
 	}
 
 	// only process workstatues with the label for single reported status
-	if _, ok := obj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]; !ok {
+	statusLabelVal, ok := obj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]
+	if !ok {
 		return nil
 	}
 
 	sourceRef, err := util.GetWorkStatusSourceRef(obj)
 	if err != nil {
 		return err
+	}
+
+	// remove the status if singleton status label value is unset
+	if statusLabelVal == util.BindingPolicyLabelSingletonStatusValueUnset {
+		emptyStatus := make(map[string]interface{})
+		return updateObjectStatus(ctx, sourceRef, emptyStatus, c.listers, c.wdsDynClient)
 	}
 
 	status, err := util.GetWorkStatusStatus(obj)

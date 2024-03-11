@@ -30,8 +30,6 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-const emptyBindingPolicyName = ""
-
 // when an object is updated, we iterate over all bindingpolicies and update
 // resolutions that are affected by the update. Every changed resolution leads
 // to queueing its relevant binding for syncing.
@@ -122,9 +120,8 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 		}
 
 		// make sure object has singleton status if needed
-		if !objBeingDeleted &&
-			c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicy.GetName()) {
-			if err := c.handleSingletonLabel(ctx, obj, objGVR, bindingPolicy.GetName()); err != nil {
+		if !objBeingDeleted && c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicy.GetName()) {
+			if err := c.handleSingletonLabel(ctx, obj, objGVR, util.BindingPolicyLabelSingletonStatusValueSet); err != nil {
 				return fmt.Errorf("failed to add singleton label to object: %w", err)
 			}
 
@@ -137,7 +134,7 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 	// NOTE that this takes care of the case where the object was previously selected by a singleton binding
 	// and is no longer selected by any binding.
 	if !objBeingDeleted && !isSelectedBySingletonBinding {
-		if err := c.handleSingletonLabel(ctx, obj, objGVR, emptyBindingPolicyName); err != nil {
+		if err := c.handleSingletonLabel(ctx, obj, objGVR, util.BindingPolicyLabelSingletonStatusValueUnset); err != nil {
 			return fmt.Errorf("failed to remove singleton label from object: %w", err)
 		}
 	}
@@ -145,13 +142,12 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 	return nil
 }
 
-// handleSingletonLabel adds or removes the singleton label from the object in the cluster.
-// If a bindingPolicyName is provided, the singleton label is added to the object. If the bindingPolicyName is empty,
-// the singleton label is removed.
+// handleSingletonLabel adds the singleton label to the object in the cluster,
+// or matches the label value to the expectedLabelValue if needed.
 //
 // The method parameter `obj` is not mutated by this function.
 func (c *Controller) handleSingletonLabel(ctx context.Context, obj runtime.Object, objGVR schema.GroupVersionResource,
-	bindingPolicyName string) error {
+	expectedLabelValue string) error {
 	unstructuredObj, ok := obj.(*unstructured.Unstructured)
 	if !ok {
 		return fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
@@ -162,19 +158,15 @@ func (c *Controller) handleSingletonLabel(ctx context.Context, obj runtime.Objec
 		labels = make(map[string]string)
 	}
 
-	_, found := labels[util.BindingPolicyLabelSingletonStatusKey]
+	val, found := labels[util.BindingPolicyLabelSingletonStatusKey]
 
-	if bindingPolicyName == emptyBindingPolicyName {
-		if !found {
-			return nil
-		}
-		delete(labels, util.BindingPolicyLabelSingletonStatusKey)
-	} else {
-		if found {
-			return nil
-		}
-		labels[util.BindingPolicyLabelSingletonStatusKey] = bindingPolicyName
+	if !found && expectedLabelValue == util.BindingPolicyLabelSingletonStatusValueUnset {
+		return nil
 	}
+	if found && val == expectedLabelValue {
+		return nil
+	}
+	labels[util.BindingPolicyLabelSingletonStatusKey] = expectedLabelValue
 
 	unstructuredObj = unstructuredObj.DeepCopy() // avoid mutating the original object
 	unstructuredObj.SetLabels(labels)
