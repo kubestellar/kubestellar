@@ -28,9 +28,12 @@ import (
 )
 
 const (
-	// BindingPolicyLabelSingletonStatusKey is the key for the singleton status reporting
-	// requirement. The value should be the bindingpolicy that is selecting the labeled object.
+	// BindingPolicyLabelSingletonStatusKey is the key for the singleton status reporting requirement.
 	BindingPolicyLabelSingletonStatusKey = "managed-by.kubestellar.io/singletonstatus"
+	// BindingPolicyLabelSingletonStatusValueSet is the value when the status reporting is required.
+	BindingPolicyLabelSingletonStatusValueSet = "true"
+	// BindingPolicyLabelSingletonStatusValueUnset is the value when the status reporting is not required.
+	BindingPolicyLabelSingletonStatusValueUnset = "false"
 )
 
 func GetBindingPolicyGVR() schema.GroupVersionResource {
