@@ -96,6 +96,7 @@ cd ocm-transport-plugin-${OCM_TRANSPORT_PLUGIN_RELEASE}
 OCM_TRANSPORT_PLUGIN_DIR="$(pwd)"
 pwd
 echo "replace github.com/kubestellar/kubestellar => ${KUBESTELLAR_DIR}/" >> go.mod
+go mod tidy # TODO to be deleted next time we bump ocm transport release (done in ocm transport makefile)
 IMAGE_TAG=${OCM_TRANSPORT_PLUGIN_RELEASE} make ko-build-local
 kind load --name kubeflex docker-image ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
 cd "${KUBESTELLAR_DIR}"
@@ -105,7 +106,7 @@ echo "running ocm transport plugin..."
 kubectl config use-context kind-kubeflex ## transport deployment script assumes it runs within kubeflex context
 IMAGE_PULL_POLICY=Never ./hack/deploy-transport-controller.sh wds1 imbs1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE}
 
-wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[*].metadata.name}'))'
+wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))'
 
 echo "transport controller is running."
 
