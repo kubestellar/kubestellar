@@ -30,7 +30,7 @@ spec:
   clusterSelectors:
   - matchLabels: {"name":"cluster1"}
   - matchExpressions:
-    - { key: name, operator: In, values: [cluster2, cluster3] }
+    - { key: name, operator: In, values: [cluster2] }
   downsync:
   - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx"}
