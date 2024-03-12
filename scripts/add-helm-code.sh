@@ -20,6 +20,8 @@
 # Usage: $0 add
 # Working directory does not matter.
 
+set -e
+
 HOME_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 # Directory containing the yaml file
 dir=${HOME_DIR}/chart/templates
@@ -72,6 +74,7 @@ if [[ $CMD == "add" ]]; then
   done < "$op_file"
 
   # Loop over all yaml files in the directory
+  "${HOME_DIR}/hack/check_pre_req.sh" --assert --verbose yq
   for file in $TMP_DIR/*.yaml; do
     # Extract the kind and name from the yaml file
     kind=$(yq e '.kind' $file)
@@ -90,7 +93,7 @@ if [[ $CMD == "add" ]]; then
         echo $ref
         yq eval '.roleRef.name |= "{{.Values.ControlPlaneName}}-'${ref}'"' $file -i
       fi
-    fi  
+    fi
   done
 
   # Loop over all yaml files in the directory and append back to op_file
@@ -99,7 +102,7 @@ if [[ $CMD == "add" ]]; then
     echo "---" >> $op_file
     cat $file >> $op_file
   done
-fi  
+fi
 
 rm -rf $TEMP_DIR
 

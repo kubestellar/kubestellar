@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -x # echo so users can understand what is happening
+set -x -e # echo so users can understand what is happening
 
 if [ "$1" == "--released" ]; then
     use_release=true
@@ -120,6 +120,8 @@ function create_cluster() {
   kubectl config rename-context kind-${cluster} $cluster
   clusteradm --context imbs1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton --force-internal-endpoint-lookup"}' | sh
 }
+
+"${SRC_DIR}/../../../hack/check_pre_req.sh" --assert --verbose ocm
 
 create_cluster cluster1
 create_cluster cluster2
