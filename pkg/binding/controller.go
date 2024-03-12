@@ -26,6 +26,7 @@ import (
 	"github.com/go-logr/logr"
 	"golang.org/x/time/rate"
 	ocmclientset "open-cluster-management.io/api/client/cluster/clientset/versioned"
+	ocminformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -50,7 +51,10 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-const controllerName = "Binding"
+const (
+	controllerName      = "Binding"
+	defaultResyncPeriod = time.Duration(0)
+)
 
 // Resource groups to exclude for watchers as they should not be delivered to other clusters
 var excludedGroups = map[string]bool{
@@ -129,7 +133,7 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 		return nil, err
 	}
 
-	ocmClient := *ocm.GetOCMClient(imbsRestConfig)
+	ocmClient := ocm.GetOCMClient(imbsRestConfig)
 
 	return makeController(parentLogger, dynamicClient, kubernetesClient, extClient, ocmClientset, ocmClient, wdsName, allowedGroupsSet)
 }
@@ -348,7 +352,7 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 }
 
 func (c *Controller) createManagedClustersInformer(ctx context.Context) error {
-	informerFactory := ocm.GetOCMInformerFactory(c.ocmClientset)
+	informerFactory := ocminformers.NewSharedInformerFactory(c.ocmClientset, defaultResyncPeriod)
 	informer := informerFactory.Cluster().V1().ManagedClusters().Informer()
 	_, err := informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {

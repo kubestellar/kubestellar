@@ -20,56 +20,20 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"time"
 
-	clientset "open-cluster-management.io/api/client/cluster/clientset/versioned"
-	informers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 	clusterv1 "open-cluster-management.io/api/cluster/v1"
 	workv1 "open-cluster-management.io/api/work/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
-
-	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-const (
-	defaultResyncPeriod = time.Duration(0)
-)
-
-func ZeroFields(obj runtime.Object) runtime.Object {
-	zeroed := obj.DeepCopyObject()
-	mObj := zeroed.(metav1.Object)
-	mObj.SetManagedFields(nil)
-	mObj.SetCreationTimestamp(metav1.Time{})
-	mObj.SetGeneration(0)
-	mObj.SetResourceVersion("")
-	mObj.SetUID("")
-	annotations := mObj.GetAnnotations()
-	delete(annotations, "kubectl.kubernetes.io/last-applied-configuration")
-	mObj.SetAnnotations(annotations)
-
-	// service needs additional processing (see https://github.com/kubestellar/kubestellar/issues/4
-	// and https://github.com/kubestellar/kubestellar/issues/1451)
-	if util.IsService(zeroed) {
-		util.RemoveRuntimeGeneratedFieldsFromService(zeroed)
-	}
-	return zeroed
-}
-
-func GetOCMInformerFactory(clientset clientset.Interface) informers.SharedInformerFactory {
-	return informers.NewSharedInformerFactory(clientset, defaultResyncPeriod)
-}
-
-func GetOCMClient(kubeconfig *rest.Config) *client.Client {
-
+func GetOCMClient(kubeconfig *rest.Config) client.Client {
 	scheme := runtime.NewScheme()
-
 	httpClient, err := rest.HTTPClientFor(kubeconfig)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating HTTPClient: %v\n", err)
@@ -93,19 +57,7 @@ func GetOCMClient(kubeconfig *rest.Config) *client.Client {
 		fmt.Fprintf(os.Stderr, "Error creating client: %v\n", err)
 		os.Exit(1)
 	}
-	return &c
-}
-
-func GetClusterByName(ocmClient client.Client, clusterName string) (clusterv1.ManagedCluster, error) {
-	cluster := clusterv1.ManagedCluster{}
-	nn := types.NamespacedName{
-		Namespace: "",
-		Name:      clusterName,
-	}
-	if err := ocmClient.Get(context.TODO(), nn, &cluster); err != nil {
-		return cluster, err
-	}
-	return cluster, nil
+	return c
 }
 
 func FindClustersBySelectors(ocmClient client.Client, selectors []metav1.LabelSelector) (sets.Set[string], error) {
