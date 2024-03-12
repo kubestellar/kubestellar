@@ -153,7 +153,7 @@ func GetWorkStatusStatus(workStatus runtime.Object) (map[string]interface{}, err
 	return status, nil
 }
 
-func CheckWorkStatusIPresent(config *rest.Config) bool {
+func CheckWorkStatusPresence(config *rest.Config) bool {
 	discoveryClient, err := discovery.NewDiscoveryClientForConfig(config)
 	if err != nil {
 		return false

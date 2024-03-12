@@ -148,22 +148,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := bindingController.Start(ctx, workers); err != nil {
+	cListers := make(chan interface{}, 1)
+
+	if err := bindingController.Start(ctx, workers, cListers); err != nil {
 		setupLog.Error(err, "error starting the binding controller")
 		os.Exit(1)
 	}
 
 	// check if status add-on present and if yes start the status controller
-	if util.CheckWorkStatusIPresent(imbsRestConfig) {
-		listers := bindingController.GetListers()
-		informers := bindingController.GetInformers()
-		statusController, err := status.NewController(wdsRestConfig, imbsRestConfig, wdsName, listers, informers)
+	if util.CheckWorkStatusPresence(imbsRestConfig) {
+		statusController, err := status.NewController(wdsRestConfig, imbsRestConfig, wdsName)
 		if err != nil {
 			setupLog.Error(err, "unable to create status controller")
 			os.Exit(1)
 		}
 
-		if err := statusController.Start(ctx, workers); err != nil {
+		if err := statusController.Start(ctx, workers, cListers); err != nil {
 			setupLog.Error(err, "error starting the status controller")
 			os.Exit(1)
 		}

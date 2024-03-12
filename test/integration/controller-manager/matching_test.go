@@ -150,7 +150,7 @@ func TestMatching(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log("CRDs ensured")
-	err = ctlr.Start(ctx, 4)
+	err = ctlr.Start(ctx, 4, make(chan interface{}, 1))
 	if err != nil {
 		t.Fatal(err)
 	}
