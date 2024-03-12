@@ -4,7 +4,6 @@ The following sections list the known issues for each release. The issue list is
 
 ## Every release after 0.15.X
 
-* Dynamic changes to WECs are not supported. Existing placements will not be updated when new WECs are added or when labels are added/deleted on existing WECs
 * Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
 * Singleton: It's the user responsibility to make sure there are no shared objects in two different (singleton) placements that target two different WECs. Currently there is no enforcement on on that. 
 * Objects on two different WDSs shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
