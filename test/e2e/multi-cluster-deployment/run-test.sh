@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is an end to end test of multi cluster deployement.  
+# This is an end to end test of multi cluster deployement.
 # For readable instructions, please visit ../../../docs/content/v0.20
 
 set -x # so users can see what is going on
@@ -32,6 +32,9 @@ set -e # exit on error
 
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 COMMON_SRCS="${SRC_DIR}/../common"
+HACK_DIR="${SRC_DIR}/../../../hack"
+
+"${HACK_DIR}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
 
 "${COMMON_SRCS}/cleanup.sh"
 source "${COMMON_SRCS}/setup-shell.sh"
