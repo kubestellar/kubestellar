@@ -101,6 +101,7 @@ type Controller struct {
 // Create a new binding controller
 func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
 	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
+	logger := parentLogger.WithName(controllerName)
 
 	kubernetesClient, err := kubernetes.NewForConfig(wdsRestConfig)
 	if err != nil {
@@ -114,16 +115,17 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 
 	nGVRs, err := countGVRsViaAggregatedDiscovery(kubernetesClient)
 	if err != nil {
-		parentLogger.Error(err, "Not able to count GVRs via aggregated discovery") // but we can still continue
+		logger.Error(err, "Not able to count GVRs via aggregated discovery") // but we can still continue
 	}
 	// tuning the rate limiter based on the number of GVRs is tested to be working well
-	wdsRestConfig.Burst = computeBurstFromNumGVRs(nGVRs)
-	wdsRestConfig.QPS = computeQPSFromNumGVRs(nGVRs)
-	parentLogger.V(1).Info("Parameters of the client's token bucket rate limiter", "burst", wdsRestConfig.Burst, "qps", wdsRestConfig.QPS)
+	wdsRestConfigTuned := rest.CopyConfig(wdsRestConfig)
+	wdsRestConfigTuned.Burst = computeBurstFromNumGVRs(nGVRs)
+	wdsRestConfigTuned.QPS = computeQPSFromNumGVRs(nGVRs)
+	logger.V(1).Info("Parameters of the tuned client's token bucket rate limiter", "burst", wdsRestConfigTuned.Burst, "qps", wdsRestConfigTuned.QPS)
 
 	// dynamicClient needs higher rate than its default because dynamicClient is repeatedly used by the
 	// reflectors for each of the GVRs, all at the beginning of the controller run
-	dynamicClient, err := dynamic.NewForConfig(wdsRestConfig)
+	dynamicClient, err := dynamic.NewForConfig(wdsRestConfigTuned)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +137,7 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 
 	ocmClient := ocm.GetOCMClient(imbsRestConfig)
 
-	return makeController(parentLogger, dynamicClient, kubernetesClient, extClient, ocmClientset, ocmClient, wdsName, allowedGroupsSet)
+	return makeController(logger, dynamicClient, kubernetesClient, extClient, ocmClientset, ocmClient, wdsName, allowedGroupsSet)
 }
 
 func countGVRsViaAggregatedDiscovery(countClient kubernetes.Interface) (int, error) {
@@ -182,7 +184,7 @@ func computeQPSFromNumGVRs(nGVRs int) float32 {
 	return qps
 }
 
-func makeController(parentLogger logr.Logger,
+func makeController(logger logr.Logger,
 	dynamicClient dynamic.Interface, // used for CRD, Binding[Policy], workload
 	kubernetesClient kubernetes.Interface, // used for Namespaces, and Discovery
 	extClient apiextensionsclientset.Interface, // used for CRD
@@ -197,7 +199,7 @@ func makeController(parentLogger logr.Logger,
 
 	controller := &Controller{
 		wdsName:               wdsName,
-		logger:                parentLogger.WithName(controllerName),
+		logger:                logger,
 		ocmClientset:          ocmClientset,
 		ocmClient:             ocmClient,
 		dynamicClient:         dynamicClient,
