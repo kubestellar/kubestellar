@@ -86,27 +86,29 @@ echo "wds1 created."
 
 :
 : -------------------------------------------------------------------------
-: Run OCM transport controller executable
+: Run OCM transport controller in a pod
 :
 cd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
 KUBESTELLAR_DIR="$(pwd)"
-## this is a temp solution - run as executble process. this should be replaced to run as pod, ideally using helm
-OCM_TRANSPORT_PLUGIN_RELEASE="0.1.0-rc2"
+OCM_TRANSPORT_PLUGIN_RELEASE="0.1.0-rc4"
 curl -sL https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz | tar xz
 cd ocm-transport-plugin-${OCM_TRANSPORT_PLUGIN_RELEASE}
 OCM_TRANSPORT_PLUGIN_DIR="$(pwd)"
 pwd
 echo "replace github.com/kubestellar/kubestellar => ${KUBESTELLAR_DIR}/" >> go.mod
-go mod tidy
-make build
-mv ./bin/ocm-transport-plugin ${KUBESTELLAR_DIR}/ocm-transport-plugin
+go mod tidy # TODO to be deleted next time we bump ocm transport release (done in ocm transport makefile)
+IMAGE_TAG=${OCM_TRANSPORT_PLUGIN_RELEASE} make ko-build-local
+kind load --name kubeflex docker-image ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
 cd "${KUBESTELLAR_DIR}"
 pwd
 rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
 echo "running ocm transport plugin..."
-./ocm-transport-plugin --transport-context imbs1 --wds-context wds1 --wds-name wds1 -v=4 &> transport.log &
+kubectl config use-context kind-kubeflex ## transport deployment script assumes it runs within kubeflex context
+IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 imbs1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE}
 
-echo "transport controller is running as background process."
+wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))'
+
+echo "transport controller is running."
 
 :
 : -------------------------------------------------------------------------
@@ -135,10 +137,10 @@ kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=c
 :
 : -------------------------------------------------------------------------
 : Get all deployments and statefulsets running in the hosting cluster.
-: Expect to see the wds1 kubestellar-controller-manager created in the wds1-system 
+: Expect to see the wds1 kubestellar-controller-manager and transport-controller created in the wds1-system
 : namespace and the imbs1 statefulset created in the imbs1-system namespace.
 :
-if ! expect-cmd-output 'kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces' 'grep -e wds1 -e imbs1 | wc -l | grep -wq 4'
+if ! expect-cmd-output 'kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces' 'grep -e wds1 -e imbs1 | wc -l | grep -wq 5'
 then
     echo "Failed to see wds1 deployment and imbs1 statefulset."
     exit 1
