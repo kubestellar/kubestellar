@@ -65,9 +65,11 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 
    Run [transport deployment script](../../../scripts/deploy-transport-controller.sh).  
    This script expects to get three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.  
+   While the first and second arguments are mandatory, the third one is optional.
+   The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
    For example, one can deploy transport controller using the following command:
    ```shell
-   bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/0.21.0-rc1/scripts/deploy-transport-controller.sh) wds1 imbs1 ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.0-rc4
+   bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/0.21.0-rc1/scripts/deploy-transport-controller.sh) wds1 imbs1
    ```
 
 1. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
