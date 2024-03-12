@@ -12,3 +12,7 @@ The following sections list the known issues for each release. The issue list is
    * If a workload object is deleted, or changed to remove some Placements from the matching set, it will not be handled correctly.
    * A Placement update that (a) removes workload objects or clusters from their respective matching sets is not handled correctly.
 
+## Major changes from previous release
+
+* Starting from release v0.21.0-rc1, dynamic changes to WECs **are supported**. Existing placements will be updated when new WECs are added/updated/delete or when labels are added/updated/deleted on existing WECs (not working in previous releases).
+

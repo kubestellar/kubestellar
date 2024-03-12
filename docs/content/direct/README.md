@@ -34,7 +34,8 @@ including OCM Klusterlet for the WECs.
 ## Latest stable release
 
 We do not have one that is proven very good yet.
-The latest release is [0.21.0-rc1](../../../../v0.21.0-rc1).
+The first release using the new architecture is [0.20.0](../../../../v0.20.0); it is feture-incomplete.
+The latest release is [0.21.0-rc1](../../../../v0.21.0-rc1); it is also feature-incomplete.
 See also [the release notes](release-notes.md).
 
 ## Architecture
