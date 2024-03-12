@@ -25,8 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
-
-	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 const (
@@ -63,14 +61,6 @@ func IsCRD(o interface{}) bool { // CRDs might have different versions. therefor
 	return objectMatchesGVK(o, apiextensions.GroupName, AnyVersion, CRDKind)
 }
 
-func IsBindingPolicy(o interface{}) bool {
-	return objectMatchesGVK(o, v1alpha1.GroupVersion.Group, v1alpha1.GroupVersion.Version, BindingPolicyKind)
-}
-
-func IsService(o interface{}) bool {
-	return objectMatchesGVK(o, "", ServiceVersion, ServiceKind)
-}
-
 func objectMatchesGVK(o interface{}, group, version, kind string) bool {
 	gvk, err := getObjectGVK(o)
 	if err != nil {
@@ -87,34 +77,6 @@ func getObjectGVK(o interface{}) (schema.GroupVersionKind, error) {
 	}
 
 	return schema.GroupVersionKind{}, fmt.Errorf("object is of wrong type: %#v", o)
-}
-
-func RemoveRuntimeGeneratedFieldsFromService(obj interface{}) error {
-	uObj, ok := obj.(*unstructured.Unstructured)
-	if !ok {
-		return fmt.Errorf("object could not be cast to unstructured.Unstructured %#v", obj)
-	}
-	// Fields to remove
-	fieldsToDelete := []string{"clusterIP", "clusterIPs", "ipFamilies",
-		"externalTrafficPolicy", "internalTrafficPolicy"}
-
-	for _, field := range fieldsToDelete {
-		unstructured.RemoveNestedField(uObj.Object, "spec", field)
-	}
-
-	// Set the nodePort to an empty string unelss the annotation "kubestellar.io/annotations/preserve=nodeport" is present
-	if !(uObj.GetAnnotations() != nil && uObj.GetAnnotations()[AnnotationToPreserveValuesKey] == PreserveNodePortValue) {
-		if ports, found, _ := unstructured.NestedSlice(uObj.Object, "spec", "ports"); found {
-			for i, port := range ports {
-				if portMap, ok := port.(map[string]interface{}); ok {
-					portMap["nodePort"] = nil
-					ports[i] = portMap
-				}
-			}
-			unstructured.SetNestedSlice(uObj.Object, ports, "spec", "ports")
-		}
-	}
-	return nil
 }
 
 func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
