@@ -189,6 +189,55 @@ EOF
 
 wait-for-cmd kubectl --context cluster1 get deployment -n nginx nginx-deployment
 wait-for-cmd kubectl --context cluster2 get deployment -n nginx nginx-deployment
+
+#
+#  Use of several clusterSelectors should perform an OR operation between them,
+#  and the deployment should be downsynced to the clusters that match any of the selectors
+#
+: -------------------------------------------------------------------------
+: Update clusterSelectors to not select clusters first
+: Verify that the deployment is deleted from the WECs
+:
+
+kubectl --context wds1 apply -f - <<EOF
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: nginx-bindingpolicy
+spec:
+  clusterSelectors:
+  - matchLabels: {"location-group":"invalid"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name":"nginx"}
+EOF
+
+wait-for-cmd '(($(kubectl --context cluster1 get deployment -n nginx nginx-deployment | wc -l) == 0))'
+wait-for-cmd '(($(kubectl --context cluster2 get deployment -n nginx nginx-deployment | wc -l) == 0))'
+
+: -------------------------------------------------------------------------
+: Update clusterSelectors to select both clusters through two distinct selectors
+: Verify that the deployment is created in both clusters
+:
+
+kubectl --context wds1 apply -f - <<EOF
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: nginx-bindingpolicy
+spec:
+  clusterSelectors:
+  - matchLabels: {"name":"cluster1"}
+  - matchExpressions:
+    - { key: name, operator: In, values: [cluster2] }
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name":"nginx"}
+EOF
+
+wait-for-cmd kubectl --context cluster1 get deployment -n nginx nginx-deployment
+wait-for-cmd kubectl --context cluster2 get deployment -n nginx nginx-deployment
+
 :
 : Test passed
 : -------------------------------------------------------------------------

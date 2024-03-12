@@ -28,7 +28,6 @@ import (
 	workv1 "open-cluster-management.io/api/work/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -111,44 +110,25 @@ func GetClusterByName(ocmClient client.Client, clusterName string) (clusterv1.Ma
 
 func FindClustersBySelectors(ocmClient client.Client, selectors []metav1.LabelSelector) (sets.Set[string], error) {
 	clusters := &clusterv1.ManagedClusterList{}
-	labelSelectors := []labels.Selector{}
+	// in order to support OR between label selectors in a straightforward manner, we perform List for each selector.
+	// additionally, to support complex selectors (such as set selectors), we avoid conversion to maps.
+	clusterNames := sets.New[string]()
 	for _, s := range selectors {
 		selector, err := metav1.LabelSelectorAsSelector(&s)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error converting v1.LabelSelector to labels.Selector: %w", err)
 		}
-		labelSelectors = append(labelSelectors, selector)
-	}
-	labelsMap, err := convertLabelSelectorsToMap(labelSelectors)
-	if err != nil {
-		return nil, err
-	}
-	if err := ocmClient.List(context.TODO(), clusters, client.MatchingLabels(labelsMap)); err != nil {
-		return nil, err
-	}
-	if len(clusters.Items) == 0 {
-		return nil, nil
-	}
 
-	clusterNames := sets.New[string]()
-	for _, cluster := range clusters.Items {
-		clusterNames.Insert(cluster.GetName())
+		if err := ocmClient.List(context.TODO(), clusters, &client.ListOptions{
+			LabelSelector: selector,
+		}); err != nil {
+			return nil, fmt.Errorf("error listing clusters: %w", err)
+		}
+
+		for _, cluster := range clusters.Items {
+			clusterNames.Insert(cluster.GetName())
+		}
 	}
 
 	return clusterNames, nil
-}
-
-func convertLabelSelectorsToMap(labelSelectors []labels.Selector) (map[string]string, error) {
-	labelsMap := make(map[string]string)
-	for _, selector := range labelSelectors {
-		strSelector := selector.String()
-		labelSet, err := labels.ConvertSelectorToLabelsMap(strSelector)
-		if err != nil {
-			return nil, err
-		}
-		for key, value := range labelSet {
-			labelsMap[key] = value
-		}
-	}
-	return labelsMap, nil
 }
