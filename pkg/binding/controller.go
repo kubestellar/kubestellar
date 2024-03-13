@@ -223,12 +223,12 @@ func (c *Controller) EnsureCRDs(ctx context.Context) error {
 }
 
 // Start the controller
-func (c *Controller) Start(parentCtx context.Context, workers int) error {
+func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan interface{}) error {
 	logger := klog.FromContext(parentCtx).WithName(controllerName)
 	ctx := klog.NewContext(parentCtx, logger)
 	errChan := make(chan error, 1)
 	go func() {
-		errChan <- c.run(ctx, workers)
+		errChan <- c.run(ctx, workers, cListers)
 	}()
 
 	// check for errors at startup, after all started we let it continue
@@ -242,7 +242,7 @@ func (c *Controller) Start(parentCtx context.Context, workers int) error {
 }
 
 // Invoked by Start() to run the controller
-func (c *Controller) run(ctx context.Context, workers int) error {
+func (c *Controller) run(ctx context.Context, workers int, cListers chan interface{}) error {
 	defer c.workqueue.ShutDown()
 
 	logger := klog.FromContext(ctx)
@@ -318,12 +318,15 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 	}
 
 	// wait for all informers caches to be synced
+	// then send listers for the status controller to use
 	for _, informer := range c.informers {
 		if ok := cache.WaitForCacheSync(ctx.Done(), informer.HasSynced); !ok {
 			return fmt.Errorf("failed to wait for caches to sync")
 		}
 	}
 	c.logger.Info("All caches synced")
+	cListers <- c.listers
+	c.logger.Info("Sent listers")
 
 	// Create informer on managedclusters so we can re-evaluate BindingPolicies.
 	// This informer differ from the previous informers in that it listens on the ocm hub.

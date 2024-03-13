@@ -41,37 +41,31 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 const controllerName = "Status"
 
-// Status controller watches workstatues and checks associated bindingpolicies for singleton status. If
-// a bindingpolicy that cause an object to be delivered to a cluster has singleton statsus specified
-// the full status will be copied to the object.
+// Status controller watches workstatues and checks whether the corresponding
+// workload object asks for the singleton status returning. If yes,
+// the full status will be copied to the workload object in WDS.
 type Controller struct {
-	logger                logr.Logger
-	wdsName               string
-	wdsDynClient          dynamic.Interface
-	wdsKubeClient         kubernetes.Interface
-	imbsDynClient         dynamic.Interface
-	imbsKubeClient        kubernetes.Interface
-	workStatusInformer    cache.SharedIndexInformer
-	workStatusLister      cache.GenericLister
-	bindingPolicyInformer cache.SharedIndexInformer
-	bindingPolicyLister   cache.GenericLister
-	workqueue             workqueue.RateLimitingInterface
-	// all wds listers/informers are required to retrieve objects and update status
-	// without having to re-create new caches for this coontroller
-	listers   map[schema.GroupVersionResource]cache.GenericLister
-	informers map[schema.GroupVersionResource]cache.SharedIndexInformer
+	logger             logr.Logger
+	wdsName            string
+	wdsDynClient       dynamic.Interface
+	wdsKubeClient      kubernetes.Interface
+	imbsDynClient      dynamic.Interface
+	imbsKubeClient     kubernetes.Interface
+	workStatusInformer cache.SharedIndexInformer
+	workStatusLister   cache.GenericLister
+	workqueue          workqueue.RateLimitingInterface
+	// all wds listers are used to retrieve objects and update status
+	// without having to re-create new caches for this controller
+	listers map[schema.GroupVersionResource]cache.GenericLister
 }
 
 // Create a new  status controller
-func NewController(wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
-	wdsName string, listers map[schema.GroupVersionResource]cache.GenericLister,
-	informers map[schema.GroupVersionResource]cache.SharedIndexInformer) (*Controller, error) {
+func NewController(wdsRestConfig *rest.Config, imbsRestConfig *rest.Config, wdsName string) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
@@ -108,20 +102,18 @@ func NewController(wdsRestConfig *rest.Config, imbsRestConfig *rest.Config,
 		imbsDynClient:  imbsDynClient,
 		imbsKubeClient: imbsKubeClient,
 		workqueue:      workqueue.NewRateLimitingQueue(ratelimiter),
-		listers:        listers,
-		informers:      informers,
 	}
 
 	return controller, nil
 }
 
 // Start the status controller
-func (c *Controller) Start(parentCtx context.Context, workers int) error {
+func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan interface{}) error {
 	logger := klog.FromContext(parentCtx).WithName(controllerName)
 	ctx := klog.NewContext(parentCtx, logger)
 	errChan := make(chan error, 1)
 	go func() {
-		errChan <- c.run(ctx, workers)
+		errChan <- c.run(ctx, workers, cListers)
 	}()
 
 	// check for errors at startup, after all started we let it continue
@@ -135,29 +127,13 @@ func (c *Controller) Start(parentCtx context.Context, workers int) error {
 }
 
 // Invoked by Start() to run the translator
-func (c *Controller) run(ctx context.Context, workers int) error {
+func (c *Controller) run(ctx context.Context, workers int, cListers chan interface{}) error {
 	defer c.workqueue.ShutDown()
 
-	// start informers
-	go c.runBindingPolicyInformer(ctx)
 	go c.runWorkStatusInformer(ctx)
 
-	// wait for all informers caches to be synced
-	c.logger.Info("waiting for caches to sync")
-
-	// we can't use cache.WaitForCacheSync here because informers are started by the binding controller
-	// and may not be started yet, thus WaitForCacheSync throws an exception. PollUntilContextCancel is
-	// a safer approach here.
-	for _, informer := range c.informers {
-		wait.PollUntilContextCancel(ctx, time.Second, true, func(ctx context.Context) (bool, error) {
-			if informer != nil && informer.HasSynced() {
-				return true, nil
-			}
-			return false, nil
-		})
-	}
-
-	c.logger.Info("All caches synced")
+	c.listers = (<-cListers).(map[schema.GroupVersionResource]cache.GenericLister)
+	c.logger.Info("Received listers")
 
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
@@ -169,27 +145,6 @@ func (c *Controller) run(ctx context.Context, workers int) error {
 	c.logger.Info("Shutting down workers")
 
 	return nil
-}
-
-func (c *Controller) runBindingPolicyInformer(ctx context.Context) {
-	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.wdsDynClient, 0*time.Minute)
-
-	gvr := schema.GroupVersionResource{Group: v1alpha1.GroupVersion.Group,
-		Version:  v1alpha1.GroupVersion.Version,
-		Resource: util.BindingPolicyResource}
-
-	c.bindingPolicyInformer = informerFactory.ForResource(gvr).Informer()
-	c.bindingPolicyLister = cache.NewGenericLister(c.bindingPolicyInformer.GetIndexer(), gvr.GroupResource())
-
-	informerFactory.Start(ctx.Done())
-
-	c.logger.Info("waiting for bindingpolicy cache to sync")
-	if ok := cache.WaitForCacheSync(ctx.Done(), c.bindingPolicyInformer.HasSynced); !ok {
-		c.logger.Info("failed to wait for bindingpolicy caches to sync")
-	}
-	c.logger.Info("bindingpolicy cache synced")
-
-	<-ctx.Done()
 }
 
 func (c *Controller) runWorkStatusInformer(ctx context.Context) {
