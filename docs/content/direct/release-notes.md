@@ -2,14 +2,33 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
-## Every release after 0.15.X
+## 0.21.0-rc1
 
-* Dynamic changes to WECs are not supported. Existing placements will not be updated when new WECs are added or when labels are added/deleted on existing WECs
+### Major changes for 0.21.0-rc1
+
+* This release introduces pluggable transport. Currently the only plugin is [the OCM transport plugin](https://github.com/kubestellar/ocm-transport-plugin).
+
+### Bug fixes in 0.21.0-rc1
+
+* dynamic changes to WECs **are supported**. Existing Bindings and ManifestWorks will be updated when new WECs are added/updated/delete or when labels are added/updated/deleted on existing WECs
+* An update to a workload object that removes some BindingPolicies from the matching set _is_ handled correctly.
+* Changes that happen while a controller is down and are handled correctly:
+   * If a workload object is deleted, or changed to remove some BindingPolicies from the matching set;
+   * A BindingPolicy update that removes workload objects or clusters from their respective matching sets.
+
+### Remaining limitations in 0.21.0-rc1
+
 * Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
-* Singleton: It's the user responsibility to make sure there are no shared objects in two different (singleton) placements that target two different WECs. Currently there is no enforcement on on that. 
+* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
 * Objects on two different WDSs shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
-* An update to a workload object that removes some Placements from the matching set is not handled correctly.
-* Some operations are not handled correctly while the controller is down:
-   * If a workload object is deleted, or changed to remove some Placements from the matching set, it will not be handled correctly.
-   * A Placement update that (a) removes workload objects or clusters from their respective matching sets is not handled correctly.
 
+## 0.20.0 and its release candidates
+
+* Dynamic changes to WECs are not supported. Existing ManifestWorks will not be updated when new WECs are added or when labels are added/deleted on existing WECs
+* Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
+* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+* Objects on two different WDSs shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* An update to a workload object that removes some BindingPolicies from the matching set is not handled correctly.
+* Some operations are not handled correctly while the controller is down:
+   * If a workload object is deleted, or changed to remove some BindingPolicies from the matching set, it will not be handled correctly.
+   * A BindingPolicy update that removes workload objects or clusters from their respective matching sets is not handled correctly.

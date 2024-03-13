@@ -14,6 +14,13 @@ See [pre-reqs](pre-reqs.md).
 
 The following steps establish an initial state used in the examples below.
 
+1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
+
+   ```shell
+   export KUBESTELLAR_VERSION=0.21.0-rc1
+   export OCM_STATUS_ADDON_VERSION=0.2.0-rc3
+   ```
+
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
 
    ```shell
@@ -21,11 +28,11 @@ The following steps establish an initial state used in the examples below.
    ```
    If you are installing KubeStellar on an existing Kubernetes or OpenShift cluster, just use the command `kflex init`.
 
-1. Update the post-create-hooks in KubeFlex to install kubestellar with the v0.20.0 images:
+1. Update the post-create-hooks in KubeFlex to install kubestellar with the desired images:
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0/config/postcreate-hooks/kubestellar.yaml
-   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v0.20.0/config/postcreate-hooks/ocm.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/kubestellar.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/ocm.yaml
    ```
 
 1. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
@@ -47,7 +54,7 @@ which installs OCM on it.
    and then install the status add-on:
 
    ```shell
-   helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc3
+   helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v${OCM_STATUS_ADDON_VERSION}
    ```
 
    see [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
@@ -69,7 +76,7 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
    The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
    For example, one can deploy transport controller using the following command:
    ```shell
-   bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/0.21.0-rc1/scripts/deploy-transport-controller.sh) wds1 imbs1
+   bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds1 imbs1
    ```
 
 1. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
@@ -265,7 +272,7 @@ done
 Apply the kubestellar controller-manager helm chart with the option to allow only delivery of objects with api group `workload.codeflare.dev`
 
 ```shell
-helm --kube-context kind-kubeflex upgrade --install -n wds2-system kubestellar oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart --version 0.20.0 --set ControlPlaneName=wds2 --set APIGroups=workload.codeflare.dev
+helm --kube-context kind-kubeflex upgrade --install -n wds2-system kubestellar oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart --version ${KUBESTELLAR_VERSION} --set ControlPlaneName=wds2 --set APIGroups=workload.codeflare.dev
 ```
 
 Check that the kubestellar controller for wds2 is started:
