@@ -15,7 +15,7 @@ The release process has the following goals.
 - There is a concept of a release branch, with a name following the pattern `release-$major.$minor`. This allows contributors to do maintenance work on older release branches. This also allows a user to track work along such a line.
 - The contents of `main` always work. This includes passing CI tests. This includes documentation being accurate. We allow point-in-time specific documentation, such as a document that says "Here is how to use release 1.2.3" --- which would refer to a release made in the past. We do not require the documentation in `main` to document all releases.
 - A git tag is immutable. Once associated with a given Git commit, that association is not changed later.
-- We do not put self-references into Git. For example, making release `1.2.3` doe not require changing any file in Git to have the string `1.2.3` in it.
+- We do not put self-references into Git. For example, making release `1.2.3` does not require changing any file in Git to have the string `1.2.3` in it.
 
 We have the following limitations.
 
@@ -48,7 +48,7 @@ We have GitHub workflows that exercise the E2E tests, normally on the copy of th
 
 We will maintain a document that lists releases that pass our quality bar. The latest of those is thus the latest stable release. This document is updated in `main` as quality evaluations come in.
 
-In [docs/content/v0.20/README.md](README.md) we maintain a statement of what is the latest stable release.
+In [docs/content/direct/README.md](README.md) we maintain a statement of what is the latest stable release.
 
 We maintain an [examples document](examples.md) that tells users how to exercise the release that the document appears in. This requires a self-reference that is updated as part of the release process.
 

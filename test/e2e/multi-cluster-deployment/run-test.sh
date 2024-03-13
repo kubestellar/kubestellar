@@ -14,7 +14,7 @@
 # limitations under the License.
 
 # This is an end to end test of multi cluster deployement.
-# For readable instructions, please visit ../../../docs/content/v0.20
+# For readable instructions, please visit ../../../docs/content/direct
 
 set -x # so users can see what is going on
 
