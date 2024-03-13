@@ -2,13 +2,13 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
-## 0.21.0-rc1
+## 0.21.0 and its release candidates
 
-### Major changes for 0.21.0-rc1
+### Major changes for 0.21.0 and its release candidates
 
 * This release introduces pluggable transport. Currently the only plugin is [the OCM transport plugin](https://github.com/kubestellar/ocm-transport-plugin).
 
-### Bug fixes in 0.21.0-rc1
+### Bug fixes in 0.21.0 and its release candidates
 
 * dynamic changes to WECs **are supported**. Existing Bindings and ManifestWorks will be updated when new WECs are added/updated/delete or when labels are added/updated/deleted on existing WECs
 * An update to a workload object that removes some BindingPolicies from the matching set _is_ handled correctly.
@@ -16,7 +16,7 @@ The following sections list the known issues for each release. The issue list is
    * If a workload object is deleted, or changed to remove some BindingPolicies from the matching set;
    * A BindingPolicy update that removes workload objects or clusters from their respective matching sets.
 
-### Remaining limitations in 0.21.0-rc1
+### Remaining limitations in 0.21.0 and its release candidates
 
 * Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
