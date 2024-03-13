@@ -16,12 +16,13 @@ limitations under the License.
 
 package abstract
 
-// Iterable is something that can iterate over some collection of values
-type Iterable[Elt any] interface {
-	Iterator() Iterator[Elt]
+// Iterable2 is something that can iterate over some collection of key,value pairs
+type Iterable2[Key, Val any] interface {
+	Iterator2() Iterator2[Key, Val]
 }
 
-// Iterator is a function for iterating over some collection of values.
-// It calls yield on the values in some sequence,
+// Iterator2 is a function for iterating over some collection of key,value pairs.
+// It calls yield on the pairs in some sequence,
 // stopping early if yield returns `false`.
-type Iterator[Elt any] func(yield func(Elt) bool)
+// This is intended to align with what I see now in https://go.dev/wiki/RangefuncExperiment .
+type Iterator2[Key, Val any] func(yield func(Key, Val) bool)

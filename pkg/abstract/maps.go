@@ -30,9 +30,8 @@ import (
 // This view of the collection may or may not have a limited scope of validity.
 // This view may or may not have concurrency restrictions.
 type Map[Key, Val any] interface {
-	Iterable[Pair[Key, Val]]
+	Iterable2[Key, Val]
 	Getter[Key, Val]
-	IsEmpty() bool
 	Len() int
 }
 
@@ -54,14 +53,12 @@ func MapFromLang[Key comparable, Val any](base map[Key]Val) LangMap[Key, Val] {
 // LangMapCopyOf makes a new LangMap that holds a copy of the given Map
 func LangMapCopyOf[Key comparable, Val any](base Map[Key, Val]) LangMap[Key, Val] {
 	ans := NewLangMap[Key, Val]()
-	base.Iterator()(func(tup Pair[Key, Val]) bool {
-		ans[tup.First] = tup.Second
+	base.Iterator2()(func(key Key, val Val) bool {
+		ans[key] = val
 		return true
 	})
 	return ans
 }
-
-func (lm LangMap[Key, Val]) IsEmpty() bool { return len(lm) == 0 }
 
 func (lm LangMap[Key, Val]) Len() int { return len(lm) }
 
@@ -70,10 +67,10 @@ func (lm LangMap[Key, Val]) Get(key Key) (Val, bool) {
 	return ans, have
 }
 
-func (lm LangMap[Key, Val]) Iterator() Iterator[Pair[Key, Val]] {
-	return func(yield func(Pair[Key, Val]) bool) {
+func (lm LangMap[Key, Val]) Iterator2() Iterator2[Key, Val] {
+	return func(yield func(key Key, val Val) bool) {
 		for key, val := range lm {
-			if !yield(NewPair(key, val)) {
+			if !yield(key, val) {
 				return
 			}
 		}
@@ -103,8 +100,7 @@ func NewMapK8sSetToConstant[Key comparable, Val any](set sets.Set[Key], val Val)
 	return MapK8sSetToConstant[Key, Val]{set, val}
 }
 
-func (stc MapK8sSetToConstant[Key, Val]) IsEmpty() bool { return stc.Set.Len() == 0 }
-func (stc MapK8sSetToConstant[Key, Val]) Len() int      { return stc.Set.Len() }
+func (stc MapK8sSetToConstant[Key, Val]) Len() int { return stc.Set.Len() }
 
 func (stc MapK8sSetToConstant[Key, Val]) Get(key Key) (Val, bool) {
 	if stc.Set.Has(key) {
@@ -114,10 +110,10 @@ func (stc MapK8sSetToConstant[Key, Val]) Get(key Key) (Val, bool) {
 	return zero, false
 }
 
-func (stc MapK8sSetToConstant[Key, Val]) Iterator() Iterator[Pair[Key, Val]] {
-	return func(yield func(Pair[Key, Val]) bool) {
+func (stc MapK8sSetToConstant[Key, Val]) Iterator2() Iterator2[Key, Val] {
+	return func(yield func(key Key, val Val) bool) {
 		for key := range stc.Set {
-			if !yield(NewPair(key, stc.Val)) {
+			if !yield(key, stc.Val) {
 				return
 			}
 		}
