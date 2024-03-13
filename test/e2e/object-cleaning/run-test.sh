@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is an end to end test of object fields filtering.
+# This is an end to end test of object cleaning.
 # For readable instructions, please visit ../../../docs/content/direct
 
 set -x # so users can see what is going on

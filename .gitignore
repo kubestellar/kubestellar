@@ -7,6 +7,9 @@ build
 .vscode
 docs/scripts/generated_script.sh
 
+# local chart of the controller manager for dev/test
+local-chart/
+
 # etc distributions
 /etcd-v*
 

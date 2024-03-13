@@ -24,13 +24,13 @@ kubectl --context wds1 apply -f - <<EOF
 apiVersion: control.kubestellar.io/v1alpha1
 kind: BindingPolicy
 metadata:
-  name: object-filtering-bindingpolicy
+  name: object-cleaning-bindingpolicy
 spec:
   clusterSelectors:
   - matchLabels: {"name":"cluster1"}
   downsync:
   - objectSelectors:
-    - matchLabels: {"app.kubernetes.io/name":"object-fields-filtering-test"}
+    - matchLabels: {"app.kubernetes.io/name":"object-cleaning-test"}
 EOF
 
 :
@@ -42,16 +42,16 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    app.kubernetes.io/name: object-fields-filtering-test
-  name: object-filtering
+    app.kubernetes.io/name: object-cleaning-test
+  name: object-cleaning
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: hello-world
-  namespace: object-filtering
+  namespace: object-cleaning
   labels:
-    app.kubernetes.io/name: object-fields-filtering-test
+    app.kubernetes.io/name: object-cleaning-test
 spec:
   selector:
     app.kubernetes.io/name: hello-world
@@ -65,9 +65,9 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: pi
-  namespace: object-filtering
+  namespace: object-cleaning
   labels:
-    app.kubernetes.io/name: object-fields-filtering-test
+    app.kubernetes.io/name: object-cleaning-test
 spec:
   template:
     spec:
@@ -83,11 +83,11 @@ EOF
 : -------------------------------------------------------------------------
 : "Verify that the Service object has been created in cluster1"
 :
-wait-for-cmd 'kubectl --context cluster1 get services -n object-filtering hello-world'
+wait-for-cmd 'kubectl --context cluster1 get services -n object-cleaning hello-world'
 :
 : -------------------------------------------------------------------------
 : "Verify that the Job object has been created in cluster1"
 :
-wait-for-cmd 'kubectl --context cluster1 get jobs -n object-filtering pi'
+wait-for-cmd 'kubectl --context cluster1 get jobs -n object-cleaning pi'
 :
 : "SUCCESS: Confirmed Service and Job created on cluster1."
