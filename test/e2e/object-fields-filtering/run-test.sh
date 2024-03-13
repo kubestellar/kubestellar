@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is an end to end test of multi cluster deployement.  
-# For readable instructions, please visit ../../../docs/content/v0.20
+# This is an end to end test of object fields filtering.
+# For readable instructions, please visit ../../../docs/content/direct
 
 set -x # so users can see what is going on
 
