@@ -39,12 +39,18 @@ SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 COMMON_SRCS="${SRC_DIR}/../common"
 source "$COMMON_SRCS/setup-shell.sh"
 
+time (
+date
 :
 : -------------------------------------------------------------------------
 : Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager
 :
 kflex init --create-kind $disable_chatty_status
 : Kubeflex kind cluster created.
+
+)
+date
+time (
 
 :
 : -------------------------------------------------------------------------
@@ -56,12 +62,20 @@ then kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/kubestellar.ya
 fi
 : 'Kubestellar post-create-hook(s) applied.'
 
+)
+date
+time (
+
 :
 : -------------------------------------------------------------------------
 : 'Create an inventory & mailbox space of type vcluster running OCM (Open Cluster Management) directly in KubeFlex. Note that -p ocm runs a post-create hook on the vcluster control plane which installs OCM on it.'
 :
 kflex create imbs1 --type vcluster -p ocm $disable_chatty_status
 : imbs1 created.
+
+)
+date
+time (
 
 :
 : -------------------------------------------------------------------------
@@ -70,12 +84,20 @@ kflex create imbs1 --type vcluster -p ocm $disable_chatty_status
 wait-for-cmd kubectl --context imbs1 api-resources "|" grep managedclusteraddons
 helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc6
 
+)
+date
+time (
+
 :
 : -------------------------------------------------------------------------
 : Create a Workload Description Space wds1 directly in KubeFlex.
 :
 kflex create wds1 $wds_extra $disable_chatty_status
 kubectl --context kind-kubeflex label cp wds1 kflex.kubestellar.io/cptype=wds
+
+)
+date
+time (
 
 if [ "$use_release" != true ]; then
     cd "${SRC_DIR}/../../.."
@@ -85,6 +107,10 @@ if [ "$use_release" != true ]; then
     cd -
 fi
 echo "wds1 created."
+
+)
+date
+time (
 
 :
 : -------------------------------------------------------------------------
@@ -108,9 +134,17 @@ echo "running ocm transport plugin..."
 kubectl config use-context kind-kubeflex ## transport deployment script assumes it runs within kubeflex context
 IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 imbs1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE}
 
+)
+date
+time (
+
 wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))'
 
 echo "transport controller is running."
+
+)
+date
+time (
 
 :
 : -------------------------------------------------------------------------
@@ -128,6 +162,10 @@ function create_cluster() {
 create_cluster cluster1
 create_cluster cluster2
 
+)
+date
+time (
+
 : Wait for csrs in imbs1
 wait-for-cmd '(($(kubectl --context imbs1 get csr 2>/dev/null | grep -c Pending) >= 2))'
 
@@ -137,6 +175,10 @@ clusteradm --context imbs1 accept --clusters cluster2
 kubectl --context imbs1 get managedclusters
 kubectl --context imbs1 label managedcluster cluster1 location-group=edge name=cluster1
 kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=cluster2
+
+)
+date
+time (
 
 :
 : -------------------------------------------------------------------------
@@ -159,3 +201,7 @@ then
     echo "Failed to see two clusters."
     exit 1
 fi
+
+)
+date
+
