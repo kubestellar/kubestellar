@@ -19,7 +19,6 @@ package binding
 import (
 	"context"
 	"fmt"
-	"k8s.io/client-go/tools/cache"
 
 	"github.com/go-logr/logr"
 
@@ -33,6 +32,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
