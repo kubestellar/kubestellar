@@ -1023,30 +1023,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#0210-rc1" class="md-nav__link">
-    0.21.0-rc1
+  <a href="#0210-and-its-release-candidates" class="md-nav__link">
+    0.21.0 and its release candidates
   </a>
   
-    <nav class="md-nav" aria-label="0.21.0-rc1">
+    <nav class="md-nav" aria-label="0.21.0 and its release candidates">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#major-changes-for-0210-rc1" class="md-nav__link">
-    Major changes for 0.21.0-rc1
+  <a href="#major-changes-for-0210-and-its-release-candidates" class="md-nav__link">
+    Major changes for 0.21.0 and its release candidates
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#bug-fixes-in-0210-rc1" class="md-nav__link">
-    Bug fixes in 0.21.0-rc1
+  <a href="#bug-fixes-in-0210-and-its-release-candidates" class="md-nav__link">
+    Bug fixes in 0.21.0 and its release candidates
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#remaining-limitations-in-0210-rc1" class="md-nav__link">
-    Remaining limitations in 0.21.0-rc1
+  <a href="#remaining-limitations-in-0210-and-its-release-candidates" class="md-nav__link">
+    Remaining limitations in 0.21.0 and its release candidates
   </a>
   
 </li>
@@ -1096,12 +1096,12 @@
 
 <h1 id="release-notes">Release notes<a class="headerlink" href="#release-notes" title="Permanent link">#</a></h1>
 <p>The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. </p>
-<h2 id="0210-rc1">0.21.0-rc1<a class="headerlink" href="#0210-rc1" title="Permanent link">#</a></h2>
-<h3 id="major-changes-for-0210-rc1">Major changes for 0.21.0-rc1<a class="headerlink" href="#major-changes-for-0210-rc1" title="Permanent link">#</a></h3>
+<h2 id="0210-and-its-release-candidates">0.21.0 and its release candidates<a class="headerlink" href="#0210-and-its-release-candidates" title="Permanent link">#</a></h2>
+<h3 id="major-changes-for-0210-and-its-release-candidates">Major changes for 0.21.0 and its release candidates<a class="headerlink" href="#major-changes-for-0210-and-its-release-candidates" title="Permanent link">#</a></h3>
 <ul>
 <li>This release introduces pluggable transport. Currently the only plugin is <a href="https://github.com/kubestellar/ocm-transport-plugin">the OCM transport plugin</a>.</li>
 </ul>
-<h3 id="bug-fixes-in-0210-rc1">Bug fixes in 0.21.0-rc1<a class="headerlink" href="#bug-fixes-in-0210-rc1" title="Permanent link">#</a></h3>
+<h3 id="bug-fixes-in-0210-and-its-release-candidates">Bug fixes in 0.21.0 and its release candidates<a class="headerlink" href="#bug-fixes-in-0210-and-its-release-candidates" title="Permanent link">#</a></h3>
 <ul>
 <li>dynamic changes to WECs <strong>are supported</strong>. Existing Bindings and ManifestWorks will be updated when new WECs are added/updated/delete or when labels are added/updated/deleted on existing WECs</li>
 <li>An update to a workload object that removes some BindingPolicies from the matching set <em>is</em> handled correctly.</li>
@@ -1109,7 +1109,7 @@
 <li>If a workload object is deleted, or changed to remove some BindingPolicies from the matching set;</li>
 <li>A BindingPolicy update that removes workload objects or clusters from their respective matching sets.</li>
 </ul>
-<h3 id="remaining-limitations-in-0210-rc1">Remaining limitations in 0.21.0-rc1<a class="headerlink" href="#remaining-limitations-in-0210-rc1" title="Permanent link">#</a></h3>
+<h3 id="remaining-limitations-in-0210-and-its-release-candidates">Remaining limitations in 0.21.0 and its release candidates<a class="headerlink" href="#remaining-limitations-in-0210-and-its-release-candidates" title="Permanent link">#</a></h3>
 <ul>
 <li>Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object</li>
 <li>Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.</li>
