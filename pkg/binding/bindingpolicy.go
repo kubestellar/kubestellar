@@ -19,6 +19,7 @@ package binding
 import (
 	"context"
 	"fmt"
+	"k8s.io/client-go/tools/cache"
 
 	"github.com/go-logr/logr"
 
@@ -240,31 +241,29 @@ func runtimeObjectToBindingPolicy(obj runtime.Object) (*v1alpha1.BindingPolicy, 
 // added or a bindingpolicy is updated
 func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyName string) error {
 	logger := klog.FromContext(ctx)
-	for key := range c.listers.Keys() {
-		lister, found := c.listers.Get(key)
-		if !found {
-			// lister was removed, skip
-			continue
-		}
 
+	return c.listers.Iterator(func(key schema.GroupVersionResource, lister cache.GenericLister) (bool, error) {
 		// do not requeue bindingpolicies or bindings
 		if key == util.GetBindingPolicyGVR() || key == util.GetBindingGVR() {
 			logger.Info("Not enqueuing control object", "key", key)
-			continue
+			return true, nil // continue iterating
 		}
+
 		objs, err := lister.List(labels.Everything())
 		if err != nil {
 			logger.Info("Lister failed", "key", key, "err", err)
-			return err
+			return false, err
 		}
+
 		for _, obj := range objs {
 			logger.V(4).Info("Enqueuing workload object due to BindingPolicy",
 				"listerKey", key, "obj", util.RefToRuntimeObj(obj),
 				"bindingPolicyName", bindingPolicyName)
 			c.enqueueObject(obj, key.GroupResource().Resource)
 		}
-	}
-	return nil
+
+		return true, nil // continue iterating
+	})
 }
 
 // finalizer logic

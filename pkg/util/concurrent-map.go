@@ -18,8 +18,6 @@ package util
 
 import (
 	"sync"
-
-	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 // ConcurrentMap is a thread-safe map.
@@ -29,12 +27,18 @@ type ConcurrentMap[K comparable, V any] interface {
 	// Remove removes the value for the given key.
 	Remove(key K)
 	// Get gets the value for the given key.
-	// The second return value is true if the key exists in the map, otherwise false.
-	// Getting a key does not guarantee that no other goroutine will also work with it.
+	// The second return value is true if the key exists in the map, otherwise
+	// false. Getting a key does not guarantee that no other goroutine will
+	// also work with it.
 	Get(key K) (V, bool)
-	// Keys returns a copy of all keys in the map at the time of the call.
-	// Nothing guarantees that when used, these keys are still in the map.
-	Keys() sets.Set[K]
+	// Iterator iterates over the map and calls the given function for each
+	// key/value pair sequentially.
+	// If the given function returns false, the iteration is stopped.
+	// If the given function returns an error, the iteration is stopped and
+	// the error is returned.
+	// During the iteration, the map must not be mutated by the given function.
+	// If the map is mutated during the iteration, the behavior is undefined.
+	Iterator(yield func(K, V) (bool, error)) error
 	// Len returns the number of items in the map.
 	Len() int
 }
@@ -68,8 +72,9 @@ func (mm *rwMutexMap[K, V]) Remove(key K) {
 }
 
 // Get gets the value for the given key.
-// The second return value is true if the key exists in the map, otherwise false.
-// Getting a key does not guarantee that no other goroutine will also work with it.
+// The second return value is true if the key exists in the map, otherwise
+// false. Getting a key does not guarantee that no other goroutine will
+// also work with it.
 func (mm *rwMutexMap[K, V]) Get(key K) (V, bool) {
 	mm.RLock()
 	defer mm.RUnlock()
@@ -78,13 +83,24 @@ func (mm *rwMutexMap[K, V]) Get(key K) (V, bool) {
 	return value, ok
 }
 
-// Keys returns a copy of all keys in the map at the time of the call.
-// Nothing guarantees that when used, these keys are still in the map.
-func (mm *rwMutexMap[K, V]) Keys() sets.Set[K] {
+// Iterator iterates over the map and calls the given function for each
+// key/value pair sequentially.
+// If the given function returns false, the iteration is stopped.
+// If the given function returns an error, the iteration is stopped and
+// the error is returned.
+// During the iteration, the map must not be mutated by the given function.
+// If the map is mutated during the iteration, the behavior is undefined.
+func (mm *rwMutexMap[K, V]) Iterator(yield func(K, V) (bool, error)) error {
 	mm.RLock()
 	defer mm.RUnlock()
 
-	return sets.KeySet(mm.m)
+	for k, v := range mm.m {
+		if ok, err := yield(k, v); !ok || err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Len returns the number of items in the map.
