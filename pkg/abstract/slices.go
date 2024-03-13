@@ -31,9 +31,5 @@ func SliceCopy[Elt any](input []Elt) []Elt {
 	if input == nil {
 		return nil
 	}
-	output := make([]Elt, len(input))
-	for idx, elt := range input {
-		output[idx] = elt
-	}
-	return output
+	return append(make([]Elt, 0, len(input)), input...)
 }
