@@ -1128,7 +1128,7 @@ clues about the problem.</p>
 <li>There is a concept of a release branch, with a name following the pattern <code>release-$major.$minor</code>. This allows contributors to do maintenance work on older release branches. This also allows a user to track work along such a line.</li>
 <li>The contents of <code>main</code> always work. This includes passing CI tests. This includes documentation being accurate. We allow point-in-time specific documentation, such as a document that says "Here is how to use release 1.2.3" --- which would refer to a release made in the past. We do not require the documentation in <code>main</code> to document all releases.</li>
 <li>A git tag is immutable. Once associated with a given Git commit, that association is not changed later.</li>
-<li>We do not put self-references into Git. For example, making release <code>1.2.3</code> doe not require changing any file in Git to have the string <code>1.2.3</code> in it.</li>
+<li>We do not put self-references into Git. For example, making release <code>1.2.3</code> does not require changing any file in Git to have the string <code>1.2.3</code> in it.</li>
 </ul>
 <p>We have the following limitations.</p>
 <ul>
@@ -1153,7 +1153,7 @@ clues about the problem.</p>
 <p>We have another category of tests, <em>release tests</em>. These test a given release, using the published artifacts of that release. Currently all the release tests are a subset of the E2E tests --- those that can be told to test published artifacts. In particular, they can test the published artifacts reached through the kubestellar PostCreatHook, which contains an explicit reference to one particular release (as explained elsewhere in this document).</p>
 <p>We have GitHub workflows that exercise the E2E tests, normally on the copy of the repo that the workflow applies to. However, these workflows are parameterized and can be told to test the released artifacts instead.</p>
 <p>We will maintain a document that lists releases that pass our quality bar. The latest of those is thus the latest stable release. This document is updated in <code>main</code> as quality evaluations come in.</p>
-<p>In <a href="../">docs/content/v0.20/README.md</a> we maintain a statement of what is the latest stable release.</p>
+<p>In <a href="../">docs/content/direct/README.md</a> we maintain a statement of what is the latest stable release.</p>
 <p>We maintain an <a href="../examples/">examples document</a> that tells users how to exercise the release that the document appears in. This requires a self-reference that is updated as part of the release process.</p>
 <h2 id="policy">Policy<a class="headerlink" href="#policy" title="Permanent link">#</a></h2>
 <p>We aim for all regular releases to be working. In order to do that, we have to make test releases and test them. The widely recognized pattern for doing that is to make "release candidates" (i.e., releases for testing purposes) <code>1.2.3-rc0</code>, <code>1.2.3-rc1</code>, <code>1.2.3-rc2</code>, and so on, while trying to get to a quality release <code>1.2.3</code>. Once one of them is judged to be of passing quality, we make a release without the <code>-rc&lt;N&gt;</code> suffix. Due to the self-reference in the KCM PostCreateHook, this will involve making a new commit.</p>
