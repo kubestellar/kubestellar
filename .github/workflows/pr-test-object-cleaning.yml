@@ -1,4 +1,4 @@
-name: test object fields filtering
+name: test object cleaning
 
 on:
   workflow_call:
@@ -59,7 +59,7 @@ jobs:
         env:
           TEST_FLAGS: ${{ github.event.inputs.testFlags }}
         run: |
-          cd test/e2e/object-fields-filtering
+          cd test/e2e/object-cleaning
           KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
 
       - name: show kubeconfig contexts

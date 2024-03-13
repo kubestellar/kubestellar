@@ -1,4 +1,4 @@
-# Kubestellar object fields filtering
+# Kubestellar object cleaning
 
 In some objects, k8s api-server adds server managed fields to the object that have to be cleaned from the object before it's distributed to WECs.
 Not cleaning those fields may result in a failure on the WEC when the agent tries to apply the object.
@@ -16,6 +16,6 @@ This test can test either (a) the  local copy of the repo or (b) the release ide
 Starting from a local directory containing the git repo, do the following.
 
 ```
-cd test/e2e/object-fields-filtering
+cd test/e2e/object-cleaning
 ./run-test.sh
 ```
