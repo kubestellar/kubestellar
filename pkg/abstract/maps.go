@@ -20,6 +20,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/go-logr/logr"
+
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
@@ -39,6 +41,7 @@ type Map[Key, Val any] interface {
 type LangMap[Key comparable, Val any] map[Key]Val
 
 var _ Map[string, func()] = LangMap[string, func()]{}
+var _ logr.Marshaler = LangMap[string, func()]{}
 
 // NewLangMap makes a new empty LangMap
 func NewLangMap[Key comparable, Val any]() LangMap[Key, Val] {
@@ -77,25 +80,35 @@ func (lm LangMap[Key, Val]) Iterator2() Iterator2[Key, Val] {
 	}
 }
 
+// MarshalLog makes LangMap implement logr.Marshaler
 func (lm LangMap[Key, Val]) MarshalLog() any {
-	forLog := make(map[string]any, len(lm))
-	for key, val := range lm {
+	return MapMarshalLog[Key, Val](lm)
+}
+
+// MapMarshalLog converts the given Map to something that logr likes
+func MapMarshalLog[Key, Val any](input Map[Key, Val]) any {
+	forLog := make(map[string]any, input.Len())
+	input.Iterator2()(func(key Key, val Val) bool {
 		keyBytes, err := json.Marshal(key)
 		if err != nil {
 			keyBytes = []byte(fmt.Sprintf("%#v", key))
 		}
 		forLog[string(keyBytes)] = val
-	}
+		return true
+	})
 	return forLog
 }
 
+// MapK8sSetToConstant maps every member of a Set to the same value
 type MapK8sSetToConstant[Key comparable, Val any] struct {
 	Set sets.Set[Key]
 	Val Val
 }
 
 var _ Map[string, func()] = MapK8sSetToConstant[string, func()]{}
+var _ logr.Marshaler = MapK8sSetToConstant[string, func()]{}
 
+// NewMapK8sSetToConstant makes a Map that maps every member of the given set to the one same given value
 func NewMapK8sSetToConstant[Key comparable, Val any](set sets.Set[Key], val Val) MapK8sSetToConstant[Key, Val] {
 	return MapK8sSetToConstant[Key, Val]{set, val}
 }
@@ -118,4 +131,9 @@ func (stc MapK8sSetToConstant[Key, Val]) Iterator2() Iterator2[Key, Val] {
 			}
 		}
 	}
+}
+
+// MarshalLog makes MapK8sSetToConstant implement logr.Marshaler
+func (stc MapK8sSetToConstant[Key, Val]) MarshalLog() any {
+	return MapMarshalLog[Key, Val](stc)
 }
