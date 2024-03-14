@@ -52,9 +52,9 @@ See [Packaging and Delivery](packaging.md)
 
 [The test/e2e directory](../../../test/e2e) holds end-to-end tests.
 
-The contributor guide has a setion on [integration testing](contributor.md#integration-testing).
+The contributor guide has a section on [integration testing](contributor.md#integration-testing).
 
-The contributor guide has a setion on [unit testing](contributor.md#unit-testing).
+The contributor guide has a section on [unit testing](contributor.md#unit-testing).
 
 ## User Guide
 

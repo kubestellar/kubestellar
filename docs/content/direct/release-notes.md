@@ -12,7 +12,7 @@ The following sections list the known issues for each release. The issue list is
 
 * dynamic changes to WECs **are supported**. Existing Bindings and ManifestWorks will be updated when new WECs are added/updated/delete or when labels are added/updated/deleted on existing WECs
 * An update to a workload object that removes some BindingPolicies from the matching set _is_ handled correctly.
-* Changes that happen while a controller is down and are handled correctly:
+* These changes that happen while a controller is down are handled correctly:
    * If a workload object is deleted, or changed to remove some BindingPolicies from the matching set;
    * A BindingPolicy update that removes workload objects or clusters from their respective matching sets.
 

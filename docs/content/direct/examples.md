@@ -14,6 +14,10 @@ See [pre-reqs](pre-reqs.md).
 
 The following steps establish an initial state used in the examples below.
 
+1. You may want to `set -x` in your shell so that any failures in the setup or usage scenarios are not lost.
+
+1. If you ran through these scenarios previously then you will need to do a bit of cleanup first. See how it is done in [the cleanup script for our E2E tests](../../../test/e2e/common/cleanup.sh).
+
 1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
 
    ```shell
@@ -70,12 +74,14 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 1. Run the OCM based transport controller in a pod.  
 **NOTE**: This is work in progress, in the future the controller will be deployed through a Helm chart.
 
-   Run [transport deployment script](../../../scripts/deploy-transport-controller.sh).  
-   This script expects to get three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.  
+   Run [transport deployment script](../../../scripts/deploy-transport-controller.sh), as follows.
+   This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
+   This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.  
    While the first and second arguments are mandatory, the third one is optional.
    The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
-   For example, one can deploy transport controller using the following command:
+   For example, one can deploy transport controller using the following commands:
    ```shell
+   kflex ctx
    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds1 imbs1
    ```
 
