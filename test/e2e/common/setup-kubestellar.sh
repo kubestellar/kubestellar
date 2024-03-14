@@ -30,12 +30,14 @@ fi
 
 set -e # exit on error
 
-SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
-
 if [[ "$KFLEX_DISABLE_CHATTY" = true ]] ; then
    disable_chatty_status="--chatty-status=false"
    echo "disable_chatty_status = $disable_chatty_status"
 fi
+
+SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
+COMMON_SRCS="${SRC_DIR}/../common"
+source "$COMMON_SRCS/setup-shell.sh"
 
 :
 : -------------------------------------------------------------------------
