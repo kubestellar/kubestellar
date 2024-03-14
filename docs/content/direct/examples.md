@@ -22,7 +22,7 @@ The following steps establish an initial state used in the examples below.
 
    ```shell
    export KUBESTELLAR_VERSION=0.21.0-rc2
-   export OCM_STATUS_ADDON_VERSION=0.2.0-rc3
+   export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
    ```
 
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
