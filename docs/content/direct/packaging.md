@@ -53,7 +53,8 @@ Following are notable images in that repo.
 | ------------- | ---------------------------------------- | ------------- |
 | 0.2.0-alpha.1 | 1c36248df2c4379ab4ce2a5945d5cce3145dc211 | b8ef1802a1d9f30dd65f16f94c86dc0218f2cf30bb34549a6248aeeb2b13eb4a |
 | 0.2.0-rc5     | 6753b9e169d47ff1592f9638d1b53c826f7ee1b9 | 35d97e4b523388ee28f537b176b3f8dbbc888e31a46bbd308d67cd5a0735c249 |
-| latest        | 6753b9e169d47ff1592f9638d1b53c826f7ee1b9 | 35d97e4b523388ee28f537b176b3f8dbbc888e31a46bbd308d67cd5a0735c249 |
+| 0.2.0-rc6     | 25d27c0e5c7c70fdd578619b4e8381897cccd441 | 5b5eab49397984ee35cd431b4918f4584e2f56cf0596080e4ec560e46583d8b2 |
+|latest         | 25d27c0e5c7c70fdd578619b4e8381897cccd441 | 5b5eab49397984ee35cd431b4918f4584e2f56cf0596080e4ec560e46583d8b2 |
 
 To support testing, `make ko-local-build` will build a single-platform
 image and not push it, only leave it among your Docker images. The
@@ -71,6 +72,7 @@ The following notable versions exist.
 | -------------------------- | ------------------- | ------------------------ |
 | v0.2.0-alpha.1             | v0.2.0-alpha.1      | 0.2.0-alpha.1 |
 | v0.2.0-rc5                 | v0.2.0-rc5          | 0.2.0-rc5     |
+| v0.2.0-rc6                 | v0.2.0-rc6          | 0.2.0-rc6     |
 
 ## OCM Transport Plugin
 
