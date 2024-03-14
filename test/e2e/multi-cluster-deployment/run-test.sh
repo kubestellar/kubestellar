@@ -40,4 +40,3 @@ HACK_DIR="${SRC_DIR}/../../../hack"
 source "${COMMON_SRCS}/setup-shell.sh"
 "${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags
 "${SRC_DIR}/use-kubestellar.sh"
-"${SRC_DIR}/update-delete.sh"
