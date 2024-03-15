@@ -1132,7 +1132,7 @@
 <p>The following steps establish an initial state used in the examples below.</p>
 <ol>
 <li>
-<p>You may want to <code>set -x</code> in your shell so that any failures in the setup or usage scenarios are not lost.</p>
+<p>You may want to <code>set -e</code> in your shell so that any failures in the setup or usage scenarios are not lost.</p>
 </li>
 <li>
 <p>If you ran through these scenarios previously then you will need to do a bit of cleanup first. See how it is done in <a href="../../../test/e2e/common/cleanup.sh">the cleanup script for our E2E tests</a>.</p>
@@ -1214,10 +1214,11 @@ statefulset <code>vcluster</code> in the <code>imbs1-system</code> namespace, bo
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>wds1-system<span class="w">          </span>deployment.apps/kube-apiserver<span class="w">                   </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>22m
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>wds1-system<span class="w">          </span>deployment.apps/kube-controller-manager<span class="w">          </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>22m
 <a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>wds1-system<span class="w">          </span>deployment.apps/kubestellar-controller-manager<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>21m
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>NAMESPACE<span class="w">         </span>NAME<span class="w">                                   </span>READY<span class="w">   </span>AGE
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>imbs1-system<span class="w">      </span>statefulset.apps/vcluster<span class="w">              </span><span class="m">1</span>/1<span class="w">     </span>11h
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>kubeflex-system<span class="w">   </span>statefulset.apps/postgres-postgresql<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span>22h
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>wds1-system<span class="w">          </span>deployment.apps/transport-controller<span class="w">             </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>21m
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>NAMESPACE<span class="w">         </span>NAME<span class="w">                                   </span>READY<span class="w">   </span>AGE
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>imbs1-system<span class="w">      </span>statefulset.apps/vcluster<span class="w">              </span><span class="m">1</span>/1<span class="w">     </span>11h
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>kubeflex-system<span class="w">   </span>statefulset.apps/postgres-postgresql<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span>22h
 </code></pre></div>
 <h2 id="scenario-1-multi-cluster-workload-deployment-with-kubectl">Scenario 1 - multi-cluster workload deployment with kubectl<a class="headerlink" href="#scenario-1-multi-cluster-workload-deployment-with-kubectl" title="Permanent link">#</a></h2>
 <p>This scenario proceeds from the state established by the <a href="#common-setup">common setup</a>.</p>
@@ -1324,8 +1325,9 @@ the raise the permissions for the kubeflex controller manager:</p>
 <a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="s">  namespace: kubeflex-system</span>
 <a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="s">EOF</span>
 </code></pre></div>
-<p>To create a second WDS based on the hosting cluster, run the command:</p>
+<p>To create a second WDS based on the hosting cluster, run the commands:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kflex<span class="w"> </span>create<span class="w"> </span>wds2<span class="w"> </span>-t<span class="w"> </span>host
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="si">${</span><span class="nv">KUBESTELLAR_VERSION</span><span class="si">}</span>/scripts/deploy-transport-controller.sh<span class="o">)</span><span class="w"> </span>wds2<span class="w"> </span>imbs1
 </code></pre></div>
 <p>where the <code>-t host</code> option specifies a control plane of type <code>host</code>.
 You can only create on control plane of type <code>host</code>.</p>
@@ -1524,12 +1526,14 @@ KubeFlex and KubeStellar controllers:</p>
 <a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>scale<span class="w"> </span>statefulset<span class="w"> </span>-n<span class="w"> </span>imbs1-system<span class="w"> </span>vcluster<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
 <a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>kubeflex-system<span class="w"> </span>kubeflex-controller-manager<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
 <a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>wds1-system<span class="w"> </span>kubestellar-controller-manager<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>wds1-system<span class="w"> </span>transport-controller<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
 </code></pre></div>
 <p>Then restart all:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>wds1-system<span class="w"> </span>kube-apiserver<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
 <a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>scale<span class="w"> </span>statefulset<span class="w"> </span>-n<span class="w"> </span>imbs1-system<span class="w"> </span>vcluster<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
 <a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>kubeflex-system<span class="w"> </span>kubeflex-controller-manager<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
 <a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>wds1-system<span class="w"> </span>kubestellar-controller-manager<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>wds1-system<span class="w"> </span>transport-controller<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
 </code></pre></div>
 <p>Wait for about a minute for all pods to restart, then apply a new BindingPolicy:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
