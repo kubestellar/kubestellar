@@ -84,7 +84,6 @@ func (mm *rwMutexMap[K, V]) Get(key K) (V, bool) {
 
 // Iterator iterates over the map and calls the given function for each
 // key/value pair sequentially.
-// If the given function returns false, the iteration is stopped.
 // If the given function returns an error, the iteration is stopped and
 // the error is returned.
 // During the iteration, the map must not be mutated by the given function.
