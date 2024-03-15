@@ -10,7 +10,7 @@
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
 
-**NOTE**: Some of our documentation is on the website [kubestellar.io](kubestellar.io), some is here.
+**NOTE**: Most of our documentation is made to be viewed on GitHub. See it [there](docs/content/direct). Release `X.Y.Z` is the commit with Git tag `vX.Y.Z`. The remainder of our documentation is on the website [kubestellar.io](https://kubestellar.io), but beware that releases 0.20.0 and 0.21.0 are not documented there.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/kubestellar/kubestellar)](https://goreportcard.com/report/github.com/kubestellar/kubestellar)
 [![Go Reference](https://pkg.go.dev/badge/github.com/kubestellar/kubestellar.svg)](https://pkg.go.dev/github.com/kubestellar/kubestellar)
@@ -43,10 +43,6 @@ __Don't change anything, just add KubeStellar!__
 - __Scale__ with 1:many and many:1 scenarios
 - __Remain compatible__ with cloud-native solutions
 
-## Docs on plain GitHub
-
-Much of our documentation is made to be viewed on GitHub. See it [there](docs/content/direct). Release `X.Y.Z` is the commit with Git tag `vX.Y.Z`.
-
 ## Roadmap for the Project
 TBD
 
@@ -72,7 +68,6 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 - See [upcoming](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
     - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
-- There is an outdated website at [documentation](https://kubestellar.io); nothing there is valid now, some ideas are being re-used.
 - Follow us on:
    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
