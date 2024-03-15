@@ -33,12 +33,11 @@ type ConcurrentMap[K comparable, V any] interface {
 	Get(key K) (V, bool)
 	// Iterator iterates over the map and calls the given function for each
 	// key/value pair sequentially.
-	// If the given function returns false, the iteration is stopped.
 	// If the given function returns an error, the iteration is stopped and
 	// the error is returned.
 	// During the iteration, the map must not be mutated by the given function.
 	// If the map is mutated during the iteration, the behavior is undefined.
-	Iterator(yield func(K, V) (bool, error)) error
+	Iterator(yield func(K, V) error) error
 	// Len returns the number of items in the map.
 	Len() int
 }
@@ -90,12 +89,12 @@ func (mm *rwMutexMap[K, V]) Get(key K) (V, bool) {
 // the error is returned.
 // During the iteration, the map must not be mutated by the given function.
 // If the map is mutated during the iteration, the behavior is undefined.
-func (mm *rwMutexMap[K, V]) Iterator(yield func(K, V) (bool, error)) error {
+func (mm *rwMutexMap[K, V]) Iterator(yield func(K, V) error) error {
 	mm.RLock()
 	defer mm.RUnlock()
 
 	for k, v := range mm.m {
-		if ok, err := yield(k, v); !ok || err != nil {
+		if err := yield(k, v); err != nil {
 			return err
 		}
 	}

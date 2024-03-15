@@ -321,12 +321,12 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 
 	// wait for all informers caches to be synced
 	// then send listers for the status controller to use
-	if err := c.informers.Iterator(func(_ schema.GroupVersionResource, informer cache.SharedIndexInformer) (bool, error) {
+	if err := c.informers.Iterator(func(_ schema.GroupVersionResource, informer cache.SharedIndexInformer) error {
 		if ok := cache.WaitForCacheSync(ctx.Done(), informer.HasSynced); !ok {
-			return false, fmt.Errorf("failed to wait for caches to sync")
+			return fmt.Errorf("failed to wait for caches to sync")
 		}
 
-		return true, nil // continue iterating
+		return nil // continue iterating
 	}); err != nil {
 		return err // no need to wrap because it is already clear
 	}

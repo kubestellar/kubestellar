@@ -242,17 +242,16 @@ func runtimeObjectToBindingPolicy(obj runtime.Object) (*v1alpha1.BindingPolicy, 
 func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyName string) error {
 	logger := klog.FromContext(ctx)
 
-	return c.listers.Iterator(func(key schema.GroupVersionResource, lister cache.GenericLister) (bool, error) {
+	return c.listers.Iterator(func(key schema.GroupVersionResource, lister cache.GenericLister) error {
 		// do not requeue bindingpolicies or bindings
 		if key == util.GetBindingPolicyGVR() || key == util.GetBindingGVR() {
 			logger.Info("Not enqueuing control object", "key", key)
-			return true, nil // continue iterating
+			return nil // continue iterating
 		}
 
 		objs, err := lister.List(labels.Everything())
 		if err != nil {
-			logger.Info("Lister failed", "key", key, "err", err)
-			return false, err
+			return fmt.Errorf("failed to list objects for key %v: %w", key, err)
 		}
 
 		for _, obj := range objs {
@@ -262,7 +261,7 @@ func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyNa
 			c.enqueueObject(obj, key.GroupResource().Resource)
 		}
 
-		return true, nil // continue iterating
+		return nil // continue iterating
 	})
 }
 
