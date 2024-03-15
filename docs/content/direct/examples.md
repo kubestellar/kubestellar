@@ -14,7 +14,7 @@ See [pre-reqs](pre-reqs.md).
 
 The following steps establish an initial state used in the examples below.
 
-1. You may want to `set -x` in your shell so that any failures in the setup or usage scenarios are not lost.
+1. You may want to `set -e` in your shell so that any failures in the setup or usage scenarios are not lost.
 
 1. If you ran through these scenarios previously then you will need to do a bit of cleanup first. See how it is done in [the cleanup script for our E2E tests](../../../test/e2e/common/cleanup.sh).
 
@@ -105,6 +105,7 @@ statefulset `vcluster` in the `imbs1-system` namespace, both fully ready.
    wds1-system          deployment.apps/kube-apiserver                   1/1     1            1           22m
    wds1-system          deployment.apps/kube-controller-manager          1/1     1            1           22m
    wds1-system          deployment.apps/kubestellar-controller-manager   1/1     1            1           21m
+   wds1-system          deployment.apps/transport-controller             1/1     1            1           21m
 
    NAMESPACE         NAME                                   READY   AGE
    imbs1-system      statefulset.apps/vcluster              1/1     11h
@@ -241,10 +242,11 @@ subjects:
 EOF
 ```
 
-To create a second WDS based on the hosting cluster, run the command:
+To create a second WDS based on the hosting cluster, run the commands:
 
 ```shell
 kflex create wds2 -t host
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds2 imbs1
 ```
 
 where the `-t host` option specifies a control plane of type `host`.
@@ -526,6 +528,7 @@ kubectl --context kind-kubeflex scale deployment -n wds1-system kube-apiserver -
 kubectl --context kind-kubeflex scale statefulset -n imbs1-system vcluster --replicas=0
 kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-controller-manager --replicas=0
 kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=0
+kubectl --context kind-kubeflex scale deployment -n wds1-system transport-controller --replicas=0
 ```
 
 Then restart all:
@@ -535,6 +538,7 @@ kubectl --context kind-kubeflex scale deployment -n wds1-system kube-apiserver -
 kubectl --context kind-kubeflex scale statefulset -n imbs1-system vcluster --replicas=1
 kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-controller-manager --replicas=1
 kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=1
+kubectl --context kind-kubeflex scale deployment -n wds1-system transport-controller --replicas=1
 ```
 
 Wait for about a minute for all pods to restart, then apply a new BindingPolicy:
