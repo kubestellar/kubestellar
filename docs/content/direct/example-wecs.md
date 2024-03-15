@@ -20,14 +20,13 @@ register them with the hub as descibed in the
    The `clusteradm` command grabs a token from the hub (`imbs1` context), and constructs the command to apply the new cluster
    to be registered as a managed cluster on the OCM hub.
 
-2. Issue the command:
+2. Repeatedly issue the command:
 
    ```shell
-   watch kubectl --context imbs1 get csr
+   kubectl --context imbs1 get csr
    ```
 
-   and wait until the certificate signing requests (CSR) for both cluster1 and cluster2 are created, then
-   ctrl+C.
+   until you see that the certificate signing requests (CSR) for both cluster1 and cluster2 exist.
    Note that the CSRs condition is supposed to be `Pending` until you approve them in step 4.
 
 3. Once the CSRs are created approve the csrs to complete the cluster registration with the command:
