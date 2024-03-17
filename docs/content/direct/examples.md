@@ -21,7 +21,7 @@ The following steps establish an initial state used in the examples below.
 1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
 
    ```shell
-   export KUBESTELLAR_VERSION=0.21.0-rc3
+   export KUBESTELLAR_VERSION=0.21.0
    export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
    ```
 
