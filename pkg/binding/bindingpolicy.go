@@ -32,6 +32,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -211,10 +212,11 @@ func (c *Controller) evaluateBindingPolicies(ctx context.Context, clusterId stri
 }
 
 func (c *Controller) listBindingPolicies() ([]runtime.Object, error) {
-	lister := c.listers[util.GetBindingPolicyGVR()]
-	if lister == nil {
+	lister, found := c.listers.Get(util.GetBindingPolicyGVR())
+	if !found {
 		return nil, fmt.Errorf("could not get lister for BindingPolicy")
 	}
+
 	list, err := lister.List(labels.Everything())
 	if err != nil {
 		return nil, err
@@ -239,25 +241,28 @@ func runtimeObjectToBindingPolicy(obj runtime.Object) (*v1alpha1.BindingPolicy, 
 // added or a bindingpolicy is updated
 func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyName string) error {
 	logger := klog.FromContext(ctx)
-	for key, lister := range c.listers {
+
+	return c.listers.Iterator(func(key schema.GroupVersionResource, lister cache.GenericLister) error {
 		// do not requeue bindingpolicies or bindings
 		if key == util.GetBindingPolicyGVR() || key == util.GetBindingGVR() {
 			logger.Info("Not enqueuing control object", "key", key)
-			continue
+			return nil // continue iterating
 		}
+
 		objs, err := lister.List(labels.Everything())
 		if err != nil {
-			logger.Info("Lister failed", "key", key, "err", err)
-			return err
+			return fmt.Errorf("failed to list objects for key %v: %w", key, err)
 		}
+
 		for _, obj := range objs {
 			logger.V(4).Info("Enqueuing workload object due to BindingPolicy",
 				"listerKey", key, "obj", util.RefToRuntimeObj(obj),
 				"bindingPolicyName", bindingPolicyName)
 			c.enqueueObject(obj, key.GroupResource().Resource)
 		}
-	}
-	return nil
+
+		return nil // continue iterating
+	})
 }
 
 // finalizer logic

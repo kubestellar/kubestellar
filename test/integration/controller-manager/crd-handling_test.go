@@ -99,8 +99,8 @@ func TestCRDHandling(t *testing.T) {
 	}
 	time.Sleep(5 * time.Second)
 
-	initNumInformers := len(ctlr.GetInformers())
-	initNumListers := len(ctlr.GetListers())
+	initNumInformers := ctlr.GetInformers().Len()
+	initNumListers := ctlr.GetListers().Len()
 	logger.Info("Check controller's initial watch", "initNumInformers", initNumInformers, "initNumListers", initNumListers)
 	if initNumInformers != initNumListers {
 		t.Fatalf("Mismatch, initNumInformers=%d, initNumListers=%d", initNumInformers, initNumListers)
@@ -112,7 +112,7 @@ func TestCRDHandling(t *testing.T) {
 
 	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, time.Minute, false, func(ctx context.Context) (done bool, err error) {
 		informers, listers := ctlr.GetInformers(), ctlr.GetListers()
-		numInformers, numListers := len(informers), len(listers)
+		numInformers, numListers := informers.Len(), listers.Len()
 		if numInformers != initNumInformers+2 {
 			logger.Info("Doesn't increase", "numInformers", numInformers, "initNumInformers", initNumInformers)
 			return false, nil
@@ -125,19 +125,19 @@ func TestCRDHandling(t *testing.T) {
 			logger.Info("Mismatch", "numInformers", numInformers, "numListers", numListers)
 			return false, nil
 		}
-		if _, ok := informers[watched]; !ok {
+		if _, found := informers.Get(watched); !found {
 			logger.Info("Informer is missing", "gvk", watched)
 			return false, nil
 		}
-		if _, ok := listers[watched]; !ok {
+		if _, found := listers.Get(watched); !found {
 			logger.Info("Lister is missing", "gvk", watched)
 			return false, nil
 		}
-		if _, ok := informers[notWatched]; ok {
+		if _, found := informers.Get(notWatched); found {
 			logger.Info("Informer unexpectedly appears", "gvk", notWatched)
 			return false, nil
 		}
-		if _, ok := listers[notWatched]; ok {
+		if _, found := listers.Get(notWatched); found {
 			logger.Info("Lister unexpectedly appears", "gvk", notWatched)
 			return false, nil
 		}
@@ -151,7 +151,7 @@ func TestCRDHandling(t *testing.T) {
 
 	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, time.Minute, false, func(ctx context.Context) (done bool, err error) {
 		informers, listers := ctlr.GetInformers(), ctlr.GetListers()
-		numInformers, numListers := len(informers), len(listers)
+		numInformers, numListers := informers.Len(), listers.Len()
 		if numInformers != initNumInformers {
 			logger.Info("Doesn't reset", "numInformers", numInformers, "initNumInformers", initNumInformers)
 			return false, nil
@@ -164,19 +164,19 @@ func TestCRDHandling(t *testing.T) {
 			logger.Info("Mismatch", "numInformers", numInformers, "numListers", numListers)
 			return false, nil
 		}
-		if _, ok := informers[watched]; ok {
+		if _, found := informers.Get(watched); found {
 			logger.Info("Informer still exists", "gvk", watched)
 			return false, nil
 		}
-		if _, ok := listers[watched]; ok {
+		if _, found := listers.Get(watched); found {
 			logger.Info("Lister still exists", "gvk", watched)
 			return false, nil
 		}
-		if _, ok := informers[notWatched]; ok {
+		if _, found := informers.Get(notWatched); found {
 			logger.Info("Informer still unexpectedly appears", "gvk", notWatched)
 			return false, nil
 		}
-		if _, ok := listers[notWatched]; ok {
+		if _, found := listers.Get(notWatched); found {
 			logger.Info("Lister still unexpectedly appears", "gvk", notWatched)
 			return false, nil
 		}

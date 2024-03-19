@@ -87,10 +87,12 @@ type Controller struct {
 	dynamicClient    dynamic.Interface      // used for CRD, Binding[Policy], workload
 	kubernetesClient kubernetes.Interface   // used for Namespaces, and Discovery
 
-	extClient             apiextensionsclientset.Interface // used for CRD
-	listers               map[schema.GroupVersionResource]cache.GenericLister
-	informers             map[schema.GroupVersionResource]cache.SharedIndexInformer
-	stoppers              map[schema.GroupVersionResource]chan struct{}
+	extClient apiextensionsclientset.Interface // used for CRD
+
+	listers   util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
+	informers util.ConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer]
+	stoppers  util.ConcurrentMap[schema.GroupVersionResource, chan struct{}]
+
 	bindingPolicyResolver BindingPolicyResolver
 	workqueue             workqueue.RateLimitingInterface
 	initializedTs         time.Time
@@ -205,9 +207,9 @@ func makeController(logger logr.Logger,
 		dynamicClient:         dynamicClient,
 		kubernetesClient:      kubernetesClient,
 		extClient:             extClient,
-		listers:               make(map[schema.GroupVersionResource]cache.GenericLister),
-		informers:             make(map[schema.GroupVersionResource]cache.SharedIndexInformer),
-		stoppers:              make(map[schema.GroupVersionResource]chan struct{}),
+		listers:               util.NewConcurrentMap[schema.GroupVersionResource, cache.GenericLister](),
+		informers:             util.NewConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer](),
+		stoppers:              util.NewConcurrentMap[schema.GroupVersionResource, chan struct{}](),
 		bindingPolicyResolver: NewBindingPolicyResolver(),
 		workqueue:             workqueue.NewRateLimitingQueue(ratelimiter),
 		allowedGroupsSet:      allowedGroupsSet,
@@ -283,7 +285,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 			if informable {
 				gvr := gv.WithResource(resource.Name)
 				informer := informerFactory.ForResource(gvr).Informer()
-				c.informers[gvr] = informer
+				c.informers.Set(gvr, informer)
 
 				// add the event handler functions
 				informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -303,7 +305,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 				})
 
 				// create and index the lister
-				c.listers[gvr] = cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource())
+				c.listers.Set(gvr, cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource()))
 
 				// run the informer
 				// we need to be able to stop informers for APIs (CRDs) that are removed
@@ -311,7 +313,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 				// instead than informerFactory.Start(ctx.Done())
 				stopper := make(chan struct{})
 				defer close(stopper)
-				c.stoppers[gvr] = stopper
+				c.stoppers.Set(gvr, stopper)
 				go informer.Run(stopper)
 			}
 		}
@@ -319,11 +321,16 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 
 	// wait for all informers caches to be synced
 	// then send listers for the status controller to use
-	for _, informer := range c.informers {
+	if err := c.informers.Iterator(func(_ schema.GroupVersionResource, informer cache.SharedIndexInformer) error {
 		if ok := cache.WaitForCacheSync(ctx.Done(), informer.HasSynced); !ok {
 			return fmt.Errorf("failed to wait for caches to sync")
 		}
+
+		return nil // continue iterating
+	}); err != nil {
+		return err // no need to wrap because it is already clear
 	}
+
 	c.logger.Info("All caches synced")
 	cListers <- c.listers
 	c.logger.Info("Sent listers")
@@ -550,8 +557,8 @@ func (c *Controller) reconcile(ctx context.Context, objIdentifier util.ObjectIde
 }
 
 func (c *Controller) getObjectFromIdentifier(objIdentifier util.ObjectIdentifier) (runtime.Object, error) {
-	lister := c.listers[objIdentifier.GVR()]
-	if lister == nil {
+	lister, found := c.listers.Get(objIdentifier.GVR())
+	if !found {
 		return nil, fmt.Errorf("could not get lister for gvr: %s", objIdentifier.GVR())
 	}
 
@@ -570,11 +577,11 @@ func isBeingDeleted(obj runtime.Object) bool {
 	return mObj.GetDeletionTimestamp() != nil
 }
 
-func (c *Controller) GetListers() map[schema.GroupVersionResource]cache.GenericLister {
+func (c *Controller) GetListers() util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister] {
 	return c.listers
 }
 
-func (c *Controller) GetInformers() map[schema.GroupVersionResource]cache.SharedIndexInformer {
+func (c *Controller) GetInformers() util.ConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer] {
 	return c.informers
 }
 
