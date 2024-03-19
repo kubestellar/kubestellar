@@ -9,7 +9,7 @@ clues about the problem.
 
 The release process has the following goals.
 
-- A release is identified using [semantic versioning](semver.org). This means that the associated semantics are followed, in terms of what sort of changes to the repo require what sort of changes to the release identifier.
+- A release is identified using [semantic versioning](https://semver.org). This means that the associated semantics are followed, in terms of what sort of changes to the repo require what sort of changes to the release identifier.
 - A user can pick up and use a given existing release without being perturbed by on-going contributor work. A release is an immutable thing.
 - A release with a given semver identifier is built from a commit of this Git repository tagged with a tag whose name is "v" followed by the release identifier.
 - There is a concept of a release branch, with a name following the pattern `release-$major.$minor`. This allows contributors to do maintenance work on older release branches. This also allows a user to track work along such a line.
