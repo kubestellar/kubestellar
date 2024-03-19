@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.13.0
   name: bindings.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -19,32 +19,25 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: |-
-          Binding is mapped 1:1 to a single BindingPolicy object.
-          Binding reflects the resolution of the BindingPolicy's selectors,
-          and explicitly reflects which objects should go to what destinations.
+        description: Binding is mapped 1:1 to a single BindingPolicy object. Binding
+          reflects the resolution of the BindingPolicy's selectors, and explicitly
+          reflects which objects should go to what destinations.
         properties:
           apiVersion:
-            description: |-
-              APIVersion defines the versioned schema of this representation of an object.
-              Servers should convert recognized schemas to the latest internal value, and
-              may reject unrecognized values.
-              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: |-
-              Kind is a string value representing the REST resource this object represents.
-              Servers may infer this from the endpoint the client submits requests to.
-              Cannot be updated.
-              In CamelCase.
-              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
           spec:
-            description: |-
-              `spec` explicitly describes a desired binding between workloads and Locations.
-              It reflects the resolution of a BindingPolicy's selectors.
+            description: '`spec` explicitly describes a desired binding between workloads
+              and Locations. It reflects the resolution of a BindingPolicy''s selectors.'
             properties:
               destinations:
                 description: '`destinations` is a list of cluster-identifiers that
@@ -58,19 +51,18 @@ spec:
                   type: object
                 type: array
               workload:
-                description: |-
-                  `workload` is a collection of namespaced and cluster scoped object references and their associated
-                  resource versions, to be propagated to destination clusters.
+                description: '`workload` is a collection of namespaced and cluster
+                  scoped object references and their associated resource versions,
+                  to be propagated to destination clusters.'
                 properties:
                   clusterScope:
-                    description: |-
-                      `clusterScope` holds a list of cluster-scoped object references with their associated
-                      resource versions to downsync.
+                    description: '`clusterScope` holds a list of cluster-scoped object
+                      references with their associated resource versions to downsync.'
                     items:
-                      description: |-
-                        ClusterScopeDownsyncObject represents a specific cluster-scoped object to downsync,
-                        identified by its GroupVersionResource and name. The ResourceVersion specifies the
-                        exact version of the object to downsync.
+                      description: ClusterScopeDownsyncObject represents a specific
+                        cluster-scoped object to downsync, identified by its GroupVersionResource
+                        and name. The ResourceVersion specifies the exact version
+                        of the object to downsync.
                       properties:
                         group:
                           type: string
@@ -94,14 +86,14 @@ spec:
                       type: object
                     type: array
                   namespaceScope:
-                    description: |-
-                      `namespaceScope` holds a list of namespace-scoped object references with their associated
-                      resource versions to downsync.
+                    description: '`namespaceScope` holds a list of namespace-scoped
+                      object references with their associated resource versions to
+                      downsync.'
                     items:
-                      description: |-
-                        NamespaceScopeDownsyncObject represents a specific namespace-scoped object to downsync,
-                        identified by its GroupVersionResource, namespace, and name. The ResourceVersion specifies
-                        the exact version of the object to downsync.
+                      description: NamespaceScopeDownsyncObject represents a specific
+                        namespace-scoped object to downsync, identified by its GroupVersionResource,
+                        namespace, and name. The ResourceVersion specifies the exact
+                        version of the object to downsync.
                       properties:
                         group:
                           type: string
