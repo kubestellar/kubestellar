@@ -15,7 +15,7 @@
 # Image repo/tag to use all building/pushing image targets
 DOCKER_REGISTRY ?= ghcr.io/kubestellar/kubestellar
 CMD_NAME ?= controller-manager
-IMAGE_TAG ?= $(shell git rev-parse --short HEAD) 
+IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
 IMAGE_REPO ?= ${DOCKER_REGISTRY}/${CMD_NAME}
 IMG ?= ${IMAGE_REPO}:${IMAGE_TAG}
 
@@ -23,7 +23,7 @@ IMG ?= ${IMAGE_REPO}:${IMAGE_TAG}
 ENVTEST_K8S_VERSION = 1.26.1
 # Default Namespace to use for make deploy (mainly for local testing)
 DEFAULT_NAMESPACE=default
-# Default WDS name to use for make deploy (mainly for local testing) 
+# Default WDS name to use for make deploy (mainly for local testing)
 DEFAULT_WDS_NAME=wds1
 # default kind hosting cluster name
 KIND_HOSTING_CLUSTER ?= kubeflex
@@ -174,9 +174,9 @@ ko-build-local: test ## Build local container image with ko
 	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
 	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMAGE_REPO}:${IMAGE_TAG}
 
-# this is used for local testing 
+# this is used for local testing
 .PHONY: kind-load-image
-kind-load-image: 
+kind-load-image:
 	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${IMAGE_REPO}:${IMAGE_TAG}
 
 .PHONY: chart
@@ -184,6 +184,9 @@ chart: manifests kustomize
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
 	$(KUSTOMIZE) build config/default > chart/templates/controller-manager.yaml
 	scripts/add-helm-code.sh add
+	@mkdir -p chart/crds
+	@cp config/crd/bases/*.yaml chart/crds/
+
 
 .PHONY: local-chart
 local-chart: manifests kustomize
@@ -196,6 +199,8 @@ endif
 	$(KUSTOMIZE) build config/default > local-chart/templates/controller-manager.yaml
 	scripts/add-helm-code.sh --dir ${PWD}/local-chart add
 	git checkout -- config/manager/kustomization.yaml
+	@mkdir -p chart/crds
+	@cp config/crd/bases/*.yaml chart/crds/
 
 ##@ Deployment
 
@@ -225,7 +230,7 @@ undeploy: ## Undeploy manager from the K8s cluster specified in ~/.kube/config. 
 # If $(KUBE_CONTEXT) is set then that indicates where to install the chart; otherwise it goes to the current kubeconfig context.
 .PHONY: install-local-chart
 install-local-chart: local-chart kind-load-image
-	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./local-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME} 
+	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./local-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME}
 
 ##@ Build Dependencies
 
@@ -243,7 +248,7 @@ ENVTEST ?= $(LOCALBIN)/setup-envtest
 CONTROLLER_TOOLS_VERSION ?= v0.11.3
 
 .PHONY: kustomize
-kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary. 
+kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary.
 $(KUSTOMIZE): $(LOCALBIN)
 	test -s $(LOCALBIN)/kustomize || GOBIN=$(LOCALBIN) go install sigs.k8s.io/kustomize/kustomize/v5@latest
 
@@ -316,7 +321,7 @@ imports: $(OPENSHIFT_GOIMPORTS) verify-go-versions
 
 .PHONY: verify-imports
 verify-imports:
-	hack/verify-imports.sh	
+	hack/verify-imports.sh
 
 .PHONY: modules
 modules: ## Run go mod tidy to ensure modules are up to date
