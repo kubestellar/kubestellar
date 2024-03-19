@@ -32,20 +32,20 @@ docs_dir: 'content'
 site_dir: 'generated'
 
 nav:
-  - Home:
-      - Overview: index.md 
+  - Design:
+      - Landing: index.md 
       - Readme: readme.md
       - Architecture: direct/architecture.md
-      - Development:
-          - Contributors: direct/contributor.md
-          - Packaging: direct/packaging.md
-          - Pre-reqs: direct/pre-reqs.md
-          - Release Process: direct/release.md
       - Usage:
+          - Pre-reqs: direct/pre-reqs.md
           - User Guide: direct/user-guide.md
           - Examples: direct/examples.md
       - Release-notes: direct/release-notes.md
   - Contributing: 
+      - Overview of contributing: direct/contributor.md
+      - Pre-reqs: direct/pre-reqs.md
+      - Packaging: direct/packaging.md
+      - Release Process: direct/release.md
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
       - Code of Conduct: Contribution guidelines/coc.md
       - License: Contribution guidelines/LICENSE.md
