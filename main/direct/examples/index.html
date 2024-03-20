@@ -1418,33 +1418,31 @@
 </li>
 <li>
 <p>Set environment variables to hold KubeStellar and OCM-status-addon desired versions:</p>
-</li>
-</ol>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBESTELLAR_VERSION</span><span class="o">=</span><span class="m">0</span>.21.0
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OCM_STATUS_ADDON_VERSION</span><span class="o">=</span><span class="m">0</span>.2.0-rc6
 </code></pre></div>
-<ol>
-<li>Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:</li>
-</ol>
+</li>
+<li>
+<p>Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:</p>
 <p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kflex<span class="w"> </span>init<span class="w"> </span>--create-kind
 </code></pre></div>
    If you are installing KubeStellar on an existing Kubernetes or OpenShift cluster, just use the command <code>kflex init</code>.</p>
-<ol>
-<li>Update the post-create-hooks in KubeFlex to install kubestellar with the desired images:</li>
-</ol>
+</li>
+<li>
+<p>Update the post-create-hooks in KubeFlex to install kubestellar with the desired images:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="si">${</span><span class="nv">KUBESTELLAR_VERSION</span><span class="si">}</span>/config/postcreate-hooks/kubestellar.yaml
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="si">${</span><span class="nv">KUBESTELLAR_VERSION</span><span class="si">}</span>/config/postcreate-hooks/ocm.yaml
 </code></pre></div>
-<ol>
-<li>Create an inventory &amp; mailbox space of type <code>vcluster</code> running <em>OCM</em> (Open Cluster Management)
+</li>
+<li>
+<p>Create an inventory &amp; mailbox space of type <code>vcluster</code> running <em>OCM</em> (Open Cluster Management)
 in KubeFlex. Note that <code>-p ocm</code> runs a post-create hook on the <em>vcluster</em> control plane
-which installs OCM on it.</li>
-</ol>
+which installs OCM on it.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kflex<span class="w"> </span>create<span class="w"> </span>imbs1<span class="w"> </span>--type<span class="w"> </span>vcluster<span class="w"> </span>-p<span class="w"> </span>ocm
 </code></pre></div>
-<ol>
-<li>Install status add-on on imbs1:</li>
-</ol>
+</li>
+<li>
+<p>Install status add-on on imbs1:</p>
 <p>Wait until the <code>managedclusteraddons</code> resource shows up on <code>imbs1</code>. You can check on that with the command:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>api-resources<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>managedclusteraddons
 </code></pre></div>
@@ -1452,27 +1450,27 @@ which installs OCM on it.</li>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>imbs1<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>status-addon<span class="w"> </span>-n<span class="w"> </span>open-cluster-management<span class="w"> </span>oci://ghcr.io/kubestellar/ocm-status-addon-chart<span class="w"> </span>--version<span class="w"> </span>v<span class="si">${</span><span class="nv">OCM_STATUS_ADDON_VERSION</span><span class="si">}</span>
 </code></pre></div>
 <p>see <a href="../architecture/#ocm-status-add-on-agent">here</a> for more details on the add-on.</p>
-<ol>
-<li>Create a Workload Description Space <code>wds1</code> in KubeFlex. Similarly to before, <code>-p kubestellar</code>
+</li>
+<li>
+<p>Create a Workload Description Space <code>wds1</code> in KubeFlex. Similarly to before, <code>-p kubestellar</code>
 runs a post-create hook on the <em>k8s</em> control plane that starts an instance of a KubeStellar controller
-manager which connects to the <code>wds1</code> front-end and the <code>imbs1</code> OCM control plane back-end.</li>
-</ol>
+manager which connects to the <code>wds1</code> front-end and the <code>imbs1</code> OCM control plane back-end.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kflex<span class="w"> </span>create<span class="w"> </span>wds1<span class="w"> </span>-p<span class="w"> </span>kubestellar
 </code></pre></div>
-<ol>
-<li>Run the OCM based transport controller in a pod.<br />
-<strong>NOTE</strong>: This is work in progress, in the future the controller will be deployed through a Helm chart.</li>
-</ol>
+</li>
+<li>
+<p>Run the OCM based transport controller in a pod.<br />
+<strong>NOTE</strong>: This is work in progress, in the future the controller will be deployed through a Helm chart.</p>
 <p>Run <a href="../../../scripts/deploy-transport-controller.sh">transport deployment script</a>, as follows.
-   This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
-   This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.<br />
-   While the first and second arguments are mandatory, the third one is optional.
-   The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
-   For example, one can deploy transport controller using the following commands:
-   <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kflex<span class="w"> </span>ctx
+This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
+This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.<br />
+While the first and second arguments are mandatory, the third one is optional.
+The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
+For example, one can deploy transport controller using the following commands:
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kflex<span class="w"> </span>ctx
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="si">${</span><span class="nv">KUBESTELLAR_VERSION</span><span class="si">}</span>/scripts/deploy-transport-controller.sh<span class="o">)</span><span class="w"> </span>wds1<span class="w"> </span>imbs1
 </code></pre></div></p>
-<ol>
+</li>
 <li>
 <p>Follow the steps to <a href="../example-wecs/">create and register two clusters with OCM</a>.</p>
 </li>
@@ -1480,8 +1478,6 @@ manager which connects to the <code>wds1</code> front-end and the <code>imbs1</c
 <p>(optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
 see the <code>kubestellar-controller-manager</code> in the <code>wds1-system</code> namespace and the 
 statefulset <code>vcluster</code> in the <code>imbs1-system</code> namespace, both fully ready.</p>
-</li>
-</ol>
 <p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>get<span class="w"> </span>deployments,statefulsets<span class="w"> </span>--all-namespaces
 </code></pre></div>
    The output should look something like the following:</p>
@@ -1499,6 +1495,8 @@ statefulset <code>vcluster</code> in the <code>imbs1-system</code> namespace, bo
 <a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>imbs1-system<span class="w">      </span>statefulset.apps/vcluster<span class="w">              </span><span class="m">1</span>/1<span class="w">     </span>11h
 <a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>kubeflex-system<span class="w">   </span>statefulset.apps/postgres-postgresql<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span>22h
 </code></pre></div>
+</li>
+</ol>
 <h2 id="scenario-1-multi-cluster-workload-deployment-with-kubectl">Scenario 1 - multi-cluster workload deployment with kubectl<a class="headerlink" href="#scenario-1-multi-cluster-workload-deployment-with-kubectl" title="Permanent link">#</a></h2>
 <p>This scenario proceeds from the state established by the <a href="#common-setup">common setup</a>.</p>
 <p>Check for available clusters with label <code>location-group=edge</code></p>
