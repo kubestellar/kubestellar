@@ -461,17 +461,17 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 
 	// Look through the objects to propagate to see if any needs customization.
 	// If any needs customization then catch up destToCustomizedObjects and proceed from there.
-	var customizationWanted bool // determined at first destination
 	for objIdx, objToPropagate := range objectsToPropagate {
+		customizeThisObject := false
 		for destIdx, dest := range binding.Spec.Destinations {
 			var objC *unstructured.Unstructured
-			if destIdx == 0 || customizationWanted {
-				// customizationWanted does not vary with destination, for a given objToPropagate
-				objC, customizationWanted = c.customizeForDest(objToPropagate, dest)
+			if destIdx == 0 || customizeThisObject {
+				// customizeThisObject does not vary with destination, for a given objToPropagate
+				objC, customizeThisObject = c.customizeForDest(objToPropagate, dest)
 			} else {
 				objC = objToPropagate
 			}
-			if customizationWanted {
+			if customizeThisObject {
 				if destToCustomizedObjects == nil {
 					destToCustomizedObjects = a.NewLangMap[v1alpha1.Destination, []*unstructured.Unstructured]()
 					for _, dest := range binding.Spec.Destinations {
@@ -488,7 +488,7 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	}
 	// update the index in c.bindingCares
 	var cares sets.Set[v1alpha1.Destination]
-	if customizationWanted {
+	if destToCustomizedObjects != nil {
 		cares = sets.New(binding.Spec.Destinations...)
 	} else {
 		cares = sets.New[v1alpha1.Destination]()
