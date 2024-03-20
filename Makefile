@@ -198,9 +198,9 @@ endif
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
 	$(KUSTOMIZE) build config/default > local-chart/templates/controller-manager.yaml
 	scripts/add-helm-code.sh --dir ${PWD}/local-chart add
+	@mkdir -p local-chart/crds
+	@cp config/crd/bases/*.yaml local-chart/crds/
 	git checkout -- config/manager/kustomization.yaml
-	@mkdir -p chart/crds
-	@cp config/crd/bases/*.yaml chart/crds/
 
 ##@ Deployment
 
