@@ -46,6 +46,7 @@ func NewExpander(loadDefs func() a.Getter[string, string]) *Expander {
 	}
 }
 
+// WantedChange tells whether a paremeter reference was seen
 func (exp *Expander) WantedChange() bool {
 	return exp.ChangedSome || len(exp.Undefined) != 0
 }
