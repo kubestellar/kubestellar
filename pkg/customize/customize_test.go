@@ -17,6 +17,7 @@ limitations under the License.
 package customize
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -25,8 +26,6 @@ import (
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
-
-	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 func TestCustomize(t *testing.T) {
@@ -37,23 +36,35 @@ func TestCustomize(t *testing.T) {
 	for try := 1; try <= 100; try++ {
 		gen := &generator{rg: rg, defs: map[string]string{}, undefined: sets.New[string]()}
 		input, expected := gen.generateData()
-		exp := NewExpander(func() func(string) (string, bool) { return util.PrimitiveMapGet(gen.defs) })
+		exp := NewExpander(func() map[string]string { return gen.defs })
 		inputCopy := runtime.DeepCopyJSONValue(input)
 		actual := exp.ExpandParameters(inputCopy)
-		if !apiequality.Semantic.DeepEqual(expected, actual) {
-			t.Fatalf("Expected %#v, got %#v; input=%#v, defs=%v", expected, actual, input, gen.defs)
+		t.Logf("Tested input=%#v, defs=%#v", input, gen.defs)
+		fail := false
+		if len(gen.errors) == len(exp.Errors) {
+			t.Logf("Got expected number of errors; errors=%#v", exp.Errors)
+		} else {
+			t.Errorf("Expected errors=%v, got errors %v", gen.errors, exp.Errors)
+			fail = true
 		}
-		if gen.wantSome != exp.WantedChange() {
-			t.Fatalf("Expected WantedChange=%v, got %v; input=%#v", gen.wantSome, exp.WantedChange(), input)
+		if apiequality.Semantic.DeepEqual(expected, actual) {
+			t.Logf("Got expected output %#v", actual)
+		} else {
+			t.Errorf("Expected %#v, got %#v", expected, actual)
+			fail = true
+		}
+		if (gen.changeSome || len(gen.errors) > 0) != exp.WantedChange() {
+			t.Errorf("Expected WantedChange=%v, got %v", (gen.changeSome || len(gen.errors) > 0), exp.WantedChange())
+			fail = true
 		}
 		if gen.changeSome != exp.ChangedSome {
-			t.Fatalf("Expected ChangedSome=%v, got %v; input=%#v, defs=%v", gen.changeSome, exp.ChangedSome, input, gen.defs)
+			t.Errorf("Expected ChangedSome=%v, got %v", gen.changeSome, exp.ChangedSome)
+			fail = true
 		}
-		if !gen.undefined.Equal(exp.Undefined) {
-			t.Fatalf("Expected Undefined=%v, got %v; input=%#v, defs=%v", gen.undefined, exp.Undefined, input, gen.defs)
-
+		if fail {
+			t.FailNow()
 		}
-		t.Logf("Success expanding %#v to %#v, defs=%v", input, expected, gen.defs)
+		t.Log("Success")
 	}
 }
 
@@ -61,7 +72,7 @@ type generator struct {
 	rg         *rand.Rand
 	defs       map[string]string
 	undefined  sets.Set[string]
-	wantSome   bool
+	errors     []error
 	changeSome bool
 }
 
@@ -107,34 +118,58 @@ func (gen *generator) generateString(withParm bool) (string, string) {
 	size := gen.rg.Intn(4) + gen.rg.Intn(4)
 	var input strings.Builder
 	var expected strings.Builder
+	expectMore := true
+	var err error
+	expectSyntaxError := false
+	gendParm := false
 	for i := 0; i < size; i++ {
-		if withParm && gen.rg.Intn(5) == 0 { // generate a request for parameter expansion
+		if withParm && gen.rg.Intn(25) == 0 { // generate a syntax error
+			input.WriteString("{{ + }}")
+			expectMore = false
+			expectSyntaxError = true
+		} else if withParm && gen.rg.Intn(5) == 0 { // generate a request for parameter expansion
 			parmName := fmt.Sprintf("p%d", gen.rg.Intn(10))
-			call := "%(" + parmName + ")"
+			call := "{{." + parmName + "}}"
 			input.WriteString(call)
-			gen.wantSome = true
+			gendParm = true
 			var parmVal *string
 			if val, have := gen.defs[parmName]; have { // value already decided
 				parmVal = &val
 			} else if gen.undefined.Has(parmName) { // already decided to be undefined
+				if err == nil {
+					err = fmt.Errorf("Undefined: %q", parmName)
+				}
+				expectMore = false
 			} else if gen.rg.Intn(3) > 0 { // define a new parameter value
 				val, _ := gen.generateString(false)
 				parmVal = &val
 				gen.defs[parmName] = val
-			} else { // make thsi one undefined
+			} else { // make this one undefined
 				gen.undefined.Insert(parmName)
+				if err == nil {
+					err = fmt.Errorf("Undefined: %q", parmName)
+				}
+				expectMore = false
 			}
-			if parmVal != nil {
+			if expectMore {
 				expected.WriteString(*parmVal)
-				gen.changeSome = true
-			} else {
-				expected.WriteString(call)
 			}
 		} else {
 			chr := 'A' + gen.rg.Intn(26)
 			input.WriteByte(byte(chr))
-			expected.WriteByte(byte(chr))
+			if expectMore {
+				expected.WriteByte(byte(chr))
+			}
 		}
+	}
+	if expectSyntaxError {
+		gen.errors = append(gen.errors, errors.New("syntax error"))
+		return input.String(), ""
+
+	}
+	gen.changeSome = gen.changeSome || gendParm
+	if err != nil {
+		gen.errors = append(gen.errors, err)
 	}
 	return input.String(), expected.String()
 }

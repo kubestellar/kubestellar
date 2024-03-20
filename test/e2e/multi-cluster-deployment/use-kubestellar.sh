@@ -60,7 +60,7 @@ metadata:
   namespace: nginx
   annotations:
     control.kubestellar.io/expand-parameters: "true"
-    customization-test: "cluster %(name) is my home"
+    customization-test: "cluster {{ .name }} is my home"
   labels:
     app.kubernetes.io/name: nginx
 spec:

@@ -17,36 +17,35 @@ limitations under the License.
 package customize
 
 import (
-	"io"
+	"bytes"
 	"strings"
-
-	"k8s.io/apimachinery/pkg/util/sets"
+	"text/template"
 )
 
 // Expander is something that can do parameter expansion on unmarshaled JSON data.
 type Expander struct {
-	// Undefined is the set of parameters that were referenced but had no value
-	Undefined sets.Set[string]
+	// Errors is the set of errors encountered
+	Errors []error
 
 	// ChangedSome reports whether parameter expansion made any changes to the data.
 	// When the value of a parameter is not found, that expansion does not happen.
 	ChangedSome bool
 
-	loadDefs func() func(string) (string, bool)
+	loadDefs func() map[string]string
 
-	getParmValue func(string) (string, bool)
+	defs map[string]string
 }
 
-func NewExpander(loadDefs func() func(string) (string, bool)) *Expander {
+func NewExpander(loadDefs func() map[string]string) *Expander {
 	return &Expander{
-		Undefined: sets.New[string](),
-		loadDefs:  loadDefs,
+		Errors:   []error{},
+		loadDefs: loadDefs,
 	}
 }
 
 // WantedChange tells whether a paremeter reference was seen
 func (exp *Expander) WantedChange() bool {
-	return exp.ChangedSome || len(exp.Undefined) != 0
+	return exp.ChangedSome || len(exp.Errors) != 0
 }
 
 // ExpandParameters side-effects the given JSON data to expand parameters in leaf strings
@@ -73,58 +72,28 @@ func (exp *Expander) ExpandParameters(data any) any {
 
 // ExpandString does parameter expansion on one string
 func (exp *Expander) ExpandString(input string) string {
-	if !strings.ContainsRune(input, '%') {
-		return input
+	tmpl := template.New("").Option("missingkey=error")
+	tmpl, err := tmpl.Parse(input)
+	if err != nil {
+		exp.Errors = append(exp.Errors, peel(err))
+		return ""
 	}
-	var builder strings.Builder
-	inputReader := strings.NewReader(input)
-	for {
-		next, _, err := inputReader.ReadRune()
-		if err == io.EOF {
-			break
-		}
-		if next != '%' {
-			builder.WriteRune(next)
-			continue
-		}
-		next, _, err = inputReader.ReadRune()
-		if err == io.EOF {
-			builder.WriteRune('%')
-			break
-		}
-		if next != '(' {
-			builder.WriteRune('%')
-			builder.WriteRune(next)
-			continue
-		}
-		name := readNameToReplace(inputReader)
-		if exp.getParmValue == nil {
-			exp.getParmValue = exp.loadDefs()
-		}
-		replacement, found := exp.getParmValue(name)
-		if found {
-			builder.WriteString(replacement)
-			exp.ChangedSome = true
-		} else {
-			exp.Undefined.Insert(name)
-			builder.WriteString("%(")
-			builder.WriteString(name)
-			builder.WriteString(")")
-		}
+	if exp.defs == nil {
+		exp.defs = exp.loadDefs()
 	}
-	return builder.String()
+	var builder bytes.Buffer
+	err = tmpl.Execute(&builder, exp.defs)
+	ans := builder.String()
+	if err != nil {
+		exp.Errors = append(exp.Errors, peel(err))
+	}
+	exp.ChangedSome = exp.ChangedSome || strings.Contains(input, "{{")
+	return ans
 }
 
-func readNameToReplace(inputReader io.RuneReader) string {
-	var builder strings.Builder
-	for {
-		next, _, err := inputReader.ReadRune()
-		if err != nil {
-			return builder.String()
-		}
-		if next == ')' {
-			return builder.String()
-		}
-		builder.WriteRune(next)
+func peel(err error) error {
+	if templateErr, is := err.(*template.ExecError); is {
+		return templateErr.Err
 	}
+	return err
 }

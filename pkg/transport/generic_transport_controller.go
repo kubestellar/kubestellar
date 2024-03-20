@@ -18,6 +18,7 @@ package transport
 
 import (
 	"context"
+	goerrors "errors"
 	"fmt"
 	"sync"
 	"time"
@@ -419,24 +420,19 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	return nil
 }
 
-func (c *genericTransportController) valuesForDestination(dest v1alpha1.Destination) func(string) (string, bool) {
+func (c *genericTransportController) valuesForDestination(dest v1alpha1.Destination) map[string]string {
 	cluster, err := c.inventoryLister.Get(dest.ClusterId)
 	if err != nil {
 		// This should be a transient condition that is already going to be remedied,
 		// because this means that the caller is working on old information.
 		// Just return anything in this case.
-		return func(string) (string, bool) {
-			return fmt.Sprintf("failed to get cluster <%s>: %s", dest.ClusterId, err.Error()), true
-		}
+		c.logger.V(2).Info("Failed to get inventory object", "name", dest.ClusterId, "err", err)
+		return nil
 	}
-	return func(parmName string) (string, bool) {
-		val, has := cluster.Labels[parmName]
-		if has {
-			return val, true
-		}
-		val, has = cluster.Annotations[parmName]
-		return val, has
-	}
+	ans := map[string]string{}
+	MapCopyInto(ans, cluster.Annotations)
+	MapCopyInto(ans, cluster.Labels)
+	return ans
 }
 
 func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
@@ -474,7 +470,7 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 		return nil, nil // if no objects were found in the workload section, return nil so that we don't distribute an empty wrapped object.
 	}
 
-	destToDefs := map[v1alpha1.Destination]func(string) (string, bool){}
+	destToDefs := map[v1alpha1.Destination]map[string]string{}
 
 	// This will become non-nil if any object to propagate needs customization
 	var destToCustomizedObjects map[v1alpha1.Destination][]*unstructured.Unstructured
@@ -486,7 +482,7 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 		objRequestsExpansion := objAnnotations[v1alpha1.ParameterExpansionAnnotationKey] == "true"
 		customizeThisObject := false
 		for destIdx, dest := range binding.Spec.Destinations {
-			loadDefs := func() func(string) (string, bool) {
+			loadDefs := func() map[string]string {
 				defs := destToDefs[dest]
 				if defs == nil {
 					defs = c.valuesForDestination(dest)
@@ -587,14 +583,14 @@ func (c *genericTransportController) enqueueBindingsForCluster(clusterAny any) {
 // customizeForDest customizes the given object for the given destination,
 // if any customization is called for. The returned boolean indicates whether
 // any customization was called for.
-func (c *genericTransportController) customizeForDest(object *unstructured.Unstructured, dest v1alpha1.Destination, defsLoader func() func(string) (string, bool)) (*unstructured.Unstructured, bool) {
+func (c *genericTransportController) customizeForDest(object *unstructured.Unstructured, dest v1alpha1.Destination, defsLoader func() map[string]string) (*unstructured.Unstructured, bool) {
 	objectCopy := object.DeepCopy()
 	objectData := objectCopy.UnstructuredContent()
 	exp := customize.NewExpander(defsLoader)
 	objectDataExpanded := exp.ExpandParameters(objectData)
 	if exp.WantedChange() {
-		if exp.Undefined.Len() > 0 {
-			c.logger.Error(nil, "Workload object requested expansion of undefined parameters", "object", util.RefToRuntimeObj(object), "dest", dest, "undefined", exp.Undefined)
+		if len(exp.Errors) > 0 {
+			c.logger.Error(goerrors.Join(exp.Errors...), "Workload object had template expansion problems", "object", util.RefToRuntimeObj(object), "dest", dest)
 			// TODO: better job of reporting references to undefined parameters
 		}
 		objectData = objectDataExpanded.(map[string]any)
@@ -788,4 +784,10 @@ func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	objectsFilter.CleanObjectSpecifics(objectCopy)
 
 	return objectCopy
+}
+
+func MapCopyInto[Key comparable, Val any](dest, src map[Key]Val) {
+	for key, val := range src {
+		dest[key] = val
+	}
 }
