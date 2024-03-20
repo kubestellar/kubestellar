@@ -30,10 +30,6 @@ type Expander struct {
 	// Undefined is the set of parameters that were referenced but had no value
 	Undefined sets.Set[string]
 
-	// WantedChange indicates whether parameter expansion was called for,
-	// regardless of finding values for the parameters.
-	WantedChange bool
-
 	// ChangedSome reports whether parameter expansion made any changes to the data.
 	// When the value of a parameter is not found, that expansion does not happen.
 	ChangedSome bool
@@ -48,6 +44,10 @@ func NewExpander(loadDefs func() a.Getter[string, string]) *Expander {
 		Undefined: sets.New[string](),
 		loadDefs:  loadDefs,
 	}
+}
+
+func (exp *Expander) WantedChange() bool {
+	return exp.ChangedSome || len(exp.Undefined) != 0
 }
 
 // ExpandParameters side-effects the given JSON data to expand parameters in leaf strings
@@ -102,7 +102,6 @@ func (exp *Expander) ExpandString(input string) string {
 		if exp.defs == nil {
 			exp.defs = exp.loadDefs()
 		}
-		exp.WantedChange = true
 		replacement, found := exp.defs.Get(name)
 		if found {
 			builder.WriteString(replacement)
