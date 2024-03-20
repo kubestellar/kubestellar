@@ -20,70 +20,70 @@ The following steps establish an initial state used in the examples below.
 
 1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
 
-   ```shell
-   export KUBESTELLAR_VERSION=0.21.0
-   export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
-   ```
+    ```shell
+    export KUBESTELLAR_VERSION=0.21.0
+    export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
+    ```
 
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
 
-   ```shell
-   kflex init --create-kind
-   ```
+    ```shell
+    kflex init --create-kind
+    ```
    If you are installing KubeStellar on an existing Kubernetes or OpenShift cluster, just use the command `kflex init`.
 
 1. Update the post-create-hooks in KubeFlex to install kubestellar with the desired images:
 
-   ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/kubestellar.yaml
-   kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/ocm.yaml
-   ```
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/kubestellar.yaml
+    kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/ocm.yaml
+    ```
 
 1. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
 in KubeFlex. Note that `-p ocm` runs a post-create hook on the *vcluster* control plane
 which installs OCM on it.
 
-   ```shell
-   kflex create imbs1 --type vcluster -p ocm
-   ```
+    ```shell
+    kflex create imbs1 --type vcluster -p ocm
+    ```
 
 1. Install status add-on on imbs1:
 
-   Wait until the `managedclusteraddons` resource shows up on `imbs1`. You can check on that with the command:
+    Wait until the `managedclusteraddons` resource shows up on `imbs1`. You can check on that with the command:
 
-   ```shell
-   kubectl --context imbs1 api-resources | grep managedclusteraddons
-   ```
+    ```shell
+    kubectl --context imbs1 api-resources | grep managedclusteraddons
+    ```
 
-   and then install the status add-on:
+    and then install the status add-on:
 
-   ```shell
-   helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v${OCM_STATUS_ADDON_VERSION}
-   ```
+    ```shell
+    helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v${OCM_STATUS_ADDON_VERSION}
+    ```
 
-   see [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
+    see [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
 
 1. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar`
 runs a post-create hook on the *k8s* control plane that starts an instance of a KubeStellar controller
 manager which connects to the `wds1` front-end and the `imbs1` OCM control plane back-end.
 
-   ```shell
-   kflex create wds1 -p kubestellar
-   ```
+    ```shell
+    kflex create wds1 -p kubestellar
+    ```
 
 1. Run the OCM based transport controller in a pod.  
 **NOTE**: This is work in progress, in the future the controller will be deployed through a Helm chart.
 
-   Run [transport deployment script](../../../scripts/deploy-transport-controller.sh), as follows.
-   This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
-   This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.  
-   While the first and second arguments are mandatory, the third one is optional.
-   The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
-   For example, one can deploy transport controller using the following commands:
-   ```shell
-   kflex ctx
-   bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds1 imbs1
-   ```
+    Run [transport deployment script](../../../scripts/deploy-transport-controller.sh), as follows.
+    This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
+    This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.  
+    While the first and second arguments are mandatory, the third one is optional.
+    The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
+    For example, one can deploy transport controller using the following commands:
+    ```shell
+    kflex ctx
+    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds1 imbs1
+    ```
 
 1. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
 
@@ -91,26 +91,26 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 see the `kubestellar-controller-manager` in the `wds1-system` namespace and the 
 statefulset `vcluster` in the `imbs1-system` namespace, both fully ready.
 
-   ```shell
-   kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces
-   ```
+    ```shell
+    kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces
+    ```
    The output should look something like the following:
 
-   ```shell
-   NAMESPACE            NAME                                             READY   UP-TO-DATE   AVAILABLE   AGE
-   ingress-nginx        deployment.apps/ingress-nginx-controller         1/1     1            1           22h
-   kube-system          deployment.apps/coredns                          2/2     2            2           22h
-   kubeflex-system      deployment.apps/kubeflex-controller-manager      1/1     1            1           22h
-   local-path-storage   deployment.apps/local-path-provisioner           1/1     1            1           22h
-   wds1-system          deployment.apps/kube-apiserver                   1/1     1            1           22m
-   wds1-system          deployment.apps/kube-controller-manager          1/1     1            1           22m
-   wds1-system          deployment.apps/kubestellar-controller-manager   1/1     1            1           21m
-   wds1-system          deployment.apps/transport-controller             1/1     1            1           21m
+    ```shell
+    NAMESPACE            NAME                                             READY   UP-TO-DATE   AVAILABLE   AGE
+    ingress-nginx        deployment.apps/ingress-nginx-controller         1/1     1            1           22h
+    kube-system          deployment.apps/coredns                          2/2     2            2           22h
+    kubeflex-system      deployment.apps/kubeflex-controller-manager      1/1     1            1           22h
+    local-path-storage   deployment.apps/local-path-provisioner           1/1     1            1           22h
+    wds1-system          deployment.apps/kube-apiserver                   1/1     1            1           22m
+    wds1-system          deployment.apps/kube-controller-manager          1/1     1            1           22m
+    wds1-system          deployment.apps/kubestellar-controller-manager   1/1     1            1           21m
+    wds1-system          deployment.apps/transport-controller             1/1     1            1           21m
 
-   NAMESPACE         NAME                                   READY   AGE
-   imbs1-system      statefulset.apps/vcluster              1/1     11h
-   kubeflex-system   statefulset.apps/postgres-postgresql   1/1     22h
-   ```
+    NAMESPACE         NAME                                   READY   AGE
+    imbs1-system      statefulset.apps/vcluster              1/1     11h
+    kubeflex-system   statefulset.apps/postgres-postgresql   1/1     22h
+    ```
 
 ## Scenario 1 - multi-cluster workload deployment with kubectl
 
