@@ -251,6 +251,18 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					}}})
 			util.ValidateNumServices(ctx, wec1, ns, 1)
 		})
+		ginkgo.It("properly starts a job with metadata.generateName", func() {
+			util.CreateJob(ctx, wds, ns, "hello-job", "hello-job")
+			util.CreateBindingPolicy(ctx, ksWds, "hello-job",
+				[]metav1.LabelSelector{
+					{MatchLabels: map[string]string{"name": "cluster1"}},
+				},
+				[]ksapi.DownsyncObjectTest{
+					{ObjectSelectors: []metav1.LabelSelector{
+						{MatchLabels: map[string]string{"app.kubernetes.io/name": "hello-job"}},
+					}}})
+			util.ValidateNumJobs(ctx, wec1, ns, 1)
+		})
 	})
 
 	ginkgo.Context("resiliency testing", func() {

@@ -30,6 +30,7 @@ import (
 	ocmWorkClient "open-cluster-management.io/api/client/work/clientset/versioned"
 
 	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -245,6 +246,43 @@ func CreateService(ctx context.Context, wds *kubernetes.Clientset, ns string, na
 	}, timeout).Should(gomega.Succeed())
 }
 
+func CreateJob(ctx context.Context, wds *kubernetes.Clientset, ns string, name string, appName string) {
+	job := batchv1.Job{
+		ObjectMeta: metav1.ObjectMeta{
+			GenerateName: "pi-",
+			Labels: map[string]string{
+				"app.kubernetes.io/name": appName,
+			},
+		},
+		Spec: batchv1.JobSpec{
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "pi",
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  "pi",
+							Image: "perl",
+							Command: []string{
+								"perl",
+								"-Mbignum=bpi",
+								"-wle",
+								"print bpi(2000)",
+							},
+						},
+					},
+					RestartPolicy: "Never",
+				},
+			},
+		},
+	}
+	gomega.Eventually(func() error {
+		_, err := wds.BatchV1().Jobs(ns).Create(ctx, &job, metav1.CreateOptions{})
+		return err
+	}, timeout).Should(gomega.Succeed())
+}
+
 func ValidateNumDeployments(ctx context.Context, wec *kubernetes.Clientset, ns string, num int) {
 	gomega.Eventually(func() int {
 		deployments, err := wec.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
@@ -258,6 +296,14 @@ func ValidateNumServices(ctx context.Context, wec *kubernetes.Clientset, ns stri
 		services, err := wec.CoreV1().Services(ns).List(ctx, metav1.ListOptions{})
 		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
 		return len(services.Items)
+	}, timeout).Should(gomega.Equal(num))
+}
+
+func ValidateNumJobs(ctx context.Context, wec *kubernetes.Clientset, ns string, num int) {
+	gomega.Eventually(func() int {
+		jobs, err := wec.BatchV1().Jobs(ns).List(ctx, metav1.ListOptions{})
+		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		return len(jobs.Items)
 	}, timeout).Should(gomega.Equal(num))
 }
 
@@ -317,6 +363,17 @@ func CleanupWDS(ctx context.Context, wds *kubernetes.Clientset, ksWds *ksClient.
 		services, err = wds.CoreV1().Services(ns).List(ctx, metav1.ListOptions{})
 		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
 		return len(services.Items)
+	}).Should(gomega.Equal(0))
+
+	jobs, err := wds.BatchV1().Jobs(ns).List(ctx, metav1.ListOptions{})
+	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	for _, job := range jobs.Items {
+		wds.BatchV1().Jobs(ns).Delete(ctx, job.GetName(), metav1.DeleteOptions{})
+	}
+	gomega.Eventually(func() int {
+		jobs, err = wds.BatchV1().Jobs(ns).List(ctx, metav1.ListOptions{})
+		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		return len(jobs.Items)
 	}).Should(gomega.Equal(0))
 
 	bindingPolicies, err := ksWds.ControlV1alpha1().BindingPolicies().List(ctx, metav1.ListOptions{})
