@@ -43,8 +43,8 @@ func TestCustomize(t *testing.T) {
 		if !apiequality.Semantic.DeepEqual(expected, actual) {
 			t.Fatalf("Expected %#v, got %#v; input=%#v, defs=%v", expected, actual, input, gen.defs)
 		}
-		if gen.wantSome != exp.WantedChange {
-			t.Fatalf("Expected WantedChange=%v, got %v; input=%#v", gen.wantSome, exp.WantedChange, input)
+		if gen.wantSome != exp.WantedChange() {
+			t.Fatalf("Expected WantedChange=%v, got %v; input=%#v", gen.wantSome, exp.WantedChange(), input)
 		}
 		if gen.changeSome != exp.ChangedSome {
 			t.Fatalf("Expected ChangedSome=%v, got %v; input=%#v, defs=%v", gen.changeSome, exp.ChangedSome, input, gen.defs)

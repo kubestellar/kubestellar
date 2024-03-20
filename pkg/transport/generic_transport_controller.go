@@ -566,7 +566,7 @@ func (c *genericTransportController) customizeForDest(object *unstructured.Unstr
 		return c.valuesForDestination(dest)
 	})
 	objectDataExpanded := exp.ExpandParameters(objectData)
-	if exp.WantedChange {
+	if exp.WantedChange() {
 		if exp.Undefined.Len() > 0 {
 			c.logger.Error(nil, "Workload object requested expansion of undefined parameters", "object", util.RefToRuntimeObj(object), "dest", dest, "undefined", exp.Undefined)
 			// TODO: better job of reporting references to undefined parameters
