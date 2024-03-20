@@ -604,6 +604,7 @@ func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	objectCopy.SetSelfLink("")
 	objectCopy.SetResourceVersion("")
 	objectCopy.SetUID("")
+	objectCopy.SetGenerateName("")
 
 	annotations := objectCopy.GetAnnotations()
 	delete(annotations, "kubectl.kubernetes.io/last-applied-configuration")
