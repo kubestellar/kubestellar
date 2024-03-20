@@ -16,30 +16,30 @@ The following steps establish an initial state used in the examples below.
 
 1. You may want to `set -e` in your shell so that any failures in the setup or usage scenarios are not lost.
 
-1. If you ran through these scenarios previously then you will need to do a bit of cleanup first. See how it is done in [the cleanup script for our E2E tests](../../../test/e2e/common/cleanup.sh).
+2. If you ran through these scenarios previously then you will need to do a bit of cleanup first. See how it is done in [the cleanup script for our E2E tests](../../../test/e2e/common/cleanup.sh).
 
-1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
+3. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
 
    ```shell
    export KUBESTELLAR_VERSION=0.21.0
    export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
    ```
 
-1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
+4. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
 
    ```shell
    kflex init --create-kind
    ```
    If you are installing KubeStellar on an existing Kubernetes or OpenShift cluster, just use the command `kflex init`.
 
-1. Update the post-create-hooks in KubeFlex to install kubestellar with the desired images:
+5. Update the post-create-hooks in KubeFlex to install kubestellar with the desired images:
 
    ```shell
    kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/kubestellar.yaml
    kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/ocm.yaml
    ```
 
-1. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
+6. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
 in KubeFlex. Note that `-p ocm` runs a post-create hook on the *vcluster* control plane
 which installs OCM on it.
 
@@ -47,7 +47,7 @@ which installs OCM on it.
    kflex create imbs1 --type vcluster -p ocm
    ```
 
-1. Install status add-on on imbs1:
+7. Install status add-on on imbs1:
 
    Wait until the `managedclusteraddons` resource shows up on `imbs1`. You can check on that with the command:
 
@@ -63,7 +63,7 @@ which installs OCM on it.
 
    see [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
 
-1. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar`
+8. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar`
 runs a post-create hook on the *k8s* control plane that starts an instance of a KubeStellar controller
 manager which connects to the `wds1` front-end and the `imbs1` OCM control plane back-end.
 
@@ -71,7 +71,7 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
    kflex create wds1 -p kubestellar
    ```
 
-1. Run the OCM based transport controller in a pod.  
+9. Run the OCM based transport controller in a pod.  
 **NOTE**: This is work in progress, in the future the controller will be deployed through a Helm chart.
 
    Run [transport deployment script](../../../scripts/deploy-transport-controller.sh), as follows.
@@ -85,9 +85,9 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds1 imbs1
    ```
 
-1. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
+10. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
 
-1. (optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
+11. (optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
 see the `kubestellar-controller-manager` in the `wds1-system` namespace and the 
 statefulset `vcluster` in the `imbs1-system` namespace, both fully ready.
 
