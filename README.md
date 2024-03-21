@@ -10,7 +10,7 @@
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
 
-**NOTE**: Most of our documentation is made to be viewed on GitHub. See it [there](docs/content/direct). Release `X.Y.Z` is the commit with Git tag `vX.Y.Z`. The remainder of our documentation is on the website [kubestellar.io](https://kubestellar.io), but beware that releases 0.20.0 and 0.21.0 are not documented there.
+**NOTE**: Our documentation generally appears on the website [kubestellar.io](https://kubestellar.io), although release 0.20.0 is not documented there and release 0.21.0 is only slightly documented there. For releases 0.20.0 and later, the documentation is also made to be viewed directly on GitHub's view of the source documents; find them [there](docs/content/direct). Release `X.Y.Z` is the commit with Git tag `vX.Y.Z`.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/kubestellar/kubestellar)](https://goreportcard.com/report/github.com/kubestellar/kubestellar)
 [![Go Reference](https://pkg.go.dev/badge/github.com/kubestellar/kubestellar.svg)](https://pkg.go.dev/github.com/kubestellar/kubestellar)
