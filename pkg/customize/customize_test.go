@@ -26,7 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	a "github.com/kubestellar/kubestellar/pkg/abstract"
+	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 func TestCustomize(t *testing.T) {
@@ -37,7 +37,7 @@ func TestCustomize(t *testing.T) {
 	for try := 1; try <= 100; try++ {
 		gen := &generator{rg: rg, defs: map[string]string{}, undefined: sets.New[string]()}
 		input, expected := gen.generateData()
-		exp := NewExpander(func() a.Getter[string, string] { return a.MapFromLang(gen.defs) })
+		exp := NewExpander(func() func(string) (string, bool) { return util.PrimitiveMapGet(gen.defs) })
 		inputCopy := runtime.DeepCopyJSONValue(input)
 		actual := exp.ExpandParameters(inputCopy)
 		if !apiequality.Semantic.DeepEqual(expected, actual) {

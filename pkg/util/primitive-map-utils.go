@@ -14,15 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package abstract
+package util
 
-// Iterable2 is something that can iterate over some collection of key,value pairs
-type Iterable2[Key, Val any] interface {
-	Iterator2() Iterator2[Key, Val]
+// PrimitiveMapGet exposes the indexing functionality of a primitive map as a func
+func PrimitiveMapGet[Key comparable, Val any](rep map[Key]Val) func(Key) (Val, bool) {
+	return func(key Key) (Val, bool) {
+		val, has := rep[key]
+		return val, has
+	}
 }
-
-// Iterator2 is a function for iterating over some collection of key,value pairs.
-// It calls yield on the pairs in some sequence,
-// stopping early if yield returns `false`.
-// This is intended to align with what I see now in https://go.dev/wiki/RangefuncExperiment .
-type Iterator2[Key, Val any] func(yield func(Key, Val) bool)
