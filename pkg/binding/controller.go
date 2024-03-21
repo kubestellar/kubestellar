@@ -512,12 +512,12 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 		if err := c.reconcile(ctx, objIdentifier); err != nil {
 			// Put the item back on the workqueue to handle any transient errors.
 			c.workqueue.AddRateLimited(objIdentifier)
-			return fmt.Errorf("error syncing object (identifier: %#v): %s, requeuing", objIdentifier, err.Error())
+			return fmt.Errorf("error reconciling object (identifier: %#v): %s, requeuing", objIdentifier, err.Error())
 		}
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
 		c.workqueue.Forget(objIdentifier)
-		logger.V(2).Info("Successfully synced", "objectIdentifier", objIdentifier)
+		logger.V(4).Info("Successfully reconciled", "objectIdentifier", objIdentifier)
 		return nil
 	}(item)
 
