@@ -21,8 +21,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-
-	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 // Map is a finite set of (key,value) pairs
@@ -97,43 +95,4 @@ func MapMarshalLog[Key, Val any](input Map[Key, Val]) any {
 		return true
 	})
 	return forLog
-}
-
-// MapK8sSetToConstant maps every member of a Set to the same value
-type MapK8sSetToConstant[Key comparable, Val any] struct {
-	Set sets.Set[Key]
-	Val Val
-}
-
-var _ Map[string, func()] = MapK8sSetToConstant[string, func()]{}
-var _ logr.Marshaler = MapK8sSetToConstant[string, func()]{}
-
-// NewMapK8sSetToConstant makes a Map that maps every member of the given set to the one same given value
-func NewMapK8sSetToConstant[Key comparable, Val any](set sets.Set[Key], val Val) MapK8sSetToConstant[Key, Val] {
-	return MapK8sSetToConstant[Key, Val]{set, val}
-}
-
-func (stc MapK8sSetToConstant[Key, Val]) Len() int { return stc.Set.Len() }
-
-func (stc MapK8sSetToConstant[Key, Val]) Get(key Key) (Val, bool) {
-	if stc.Set.Has(key) {
-		return stc.Val, true
-	}
-	var zero Val
-	return zero, false
-}
-
-func (stc MapK8sSetToConstant[Key, Val]) Iterator2() Iterator2[Key, Val] {
-	return func(yield func(key Key, val Val) bool) {
-		for key := range stc.Set {
-			if !yield(key, stc.Val) {
-				return
-			}
-		}
-	}
-}
-
-// MarshalLog makes MapK8sSetToConstant implement logr.Marshaler
-func (stc MapK8sSetToConstant[Key, Val]) MarshalLog() any {
-	return MapMarshalLog[Key, Val](stc)
 }
