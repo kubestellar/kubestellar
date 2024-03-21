@@ -462,20 +462,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#kubestellar-treats-multiple-kubernetes-clusters-as-one-so-you-can" class="md-nav__link">
-    KubeStellar treats multiple Kubernetes clusters as one so you can:
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-the-source-luke" class="md-nav__link">
-    Use The Source, Luke
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#contributing" class="md-nav__link">
     Contributing
   </a>
@@ -1274,20 +1260,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#kubestellar-treats-multiple-kubernetes-clusters-as-one-so-you-can" class="md-nav__link">
-    KubeStellar treats multiple Kubernetes clusters as one so you can:
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-the-source-luke" class="md-nav__link">
-    Use The Source, Luke
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#contributing" class="md-nav__link">
     Contributing
   </a>
@@ -1355,21 +1327,24 @@
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a></p>
-<p>Imagine KubeStellar as a post office for your Kubernetes resources. When you drop packages at the post office, they don't open them; they deliver them to the right recipients. Similarly, KubeStellar works like this for your Kubernetes resources. Instead of running resources right away, KubeStellar safely stores and sends resources to selected clusters across the globe—whether they're in public clouds, private clouds, or on the edge of your network. It's a super useful tool for spreading your Kubernetes resources wherever you need them without disrupting your existing tools and workflows.</p>
-<p>How does KubeStellar resist the temptation to run your Kubernetes resources right away? KubeStellar accepts your applied resources in a special staging area (virtual cluster) where pods can't be created. Then, at your direction, KubeStellar transfers your applied resources to remote clusters where they can create pods and other required resource dependencies. KubeStellar does this using many different lightweight virtual cluster providers (Kind, KubeFlex, KCP, etc.) to create this special staging area. </p>
-<p>KubeStellar is an innovative way to stage inactive Kubernetes resources and then apply them to any cluster to run. KubeStellar introduces a native way to expand, optimize, and protect your Kubernetes resources from individual cluster misconfiguration, utilization, and failure. </p>
-<p><strong>Don't change anything, just add KubeStellar!</strong></p>
-<h2 id="kubestellar-treats-multiple-kubernetes-clusters-as-one-so-you-can">KubeStellar treats multiple Kubernetes clusters as one so you can:<a class="headerlink" href="#kubestellar-treats-multiple-kubernetes-clusters-as-one-so-you-can" title="Permanent link">#</a></h2>
+<p><strong>KubeStellar</strong> is a Cloud Native Computing Foundation (CNCF) Sandbox project that simplifies the deployment and configuration of applications across multiple Kubernetes clusters. It provides a seamless experience akin to using a single cluster, and it integrates with the tools you're already familiar with, eliminating the need to modify existing resources.</p>
+<p>KubeStellar is particularly beneficial if you're currently deploying in a single cluster and are looking to expand to multiple clusters, or if you're already using multiple clusters and are seeking a more streamlined developer experience.</p>
+<p>
+<figure><img src="../images/kubestellar-high-level.png" /><figcaption>KubeStellar High Level View</figcaption>
+</figure>
+</p>
+<p>The use of multiple clusters offers several advantages, including:</p>
 <ul>
-<li><strong>Centrally</strong> apply Kubernetes resources for selective deployment across multiple clusters </li>
-<li>Use <strong>standard Kubernetes native deployment tools</strong> (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required</li>
-<li><strong>Discover</strong> dynamically created objects created on remote clusters</li>
-<li>Make <strong>disconnected</strong> cluster operation possible</li>
-<li><strong>Scale</strong> with 1:many and many:1 scenarios</li>
-<li><strong>Remain compatible</strong> with cloud-native solutions</li>
+<li>Separation of environments (e.g., development, testing, staging)</li>
+<li>Isolation of groups, teams, or departments</li>
+<li>Compliance with enterprise security or data governance requirements</li>
+<li>Enhanced resiliency, including across different clouds</li>
+<li>Improved resource availability</li>
+<li>Access to heterogeneous resources</li>
+<li>Capability to run applications on the edge, including in disconnected environments</li>
 </ul>
-<h2 id="use-the-source-luke">Use The Source, Luke<a class="headerlink" href="#use-the-source-luke" title="Permanent link">#</a></h2>
-<p><strong>NOTE</strong>: This website is still under construction, and not all of the documentation appears on this website. The rest, which is also still under construction, is designed to be viewed directly from the GitHub repository; see the README of <a href="http://github.com/kubestellar/kubestellar">the KubeStellar GitHub repository</a>. To read the documentation for release <code>X.Y.Z</code>, view the Git content tagged <code>vX.Y.Z</code>.</p>
+<p>In a single-cluster setup, developers typically access the cluster and deploy Kubernetes objects directly. Without KubeStellar, multiple clusters are usually deployed and configured individually, which can be time-consuming and complex.</p>
+<p>KubeStellar simplifies this process by allowing developers to define a binding policy between clusters and Kubernetes objects. It then uses your regular single-cluster tooling to deploy and configure each cluster based on these binding policies, making multi-cluster operations as straightforward as managing a single cluster. This approach enhances productivity and efficiency, making KubeStellar a valuable tool in a multi-cluster Kubernetes environment.</p>
 <h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">#</a></h2>
 <p>We ❤️ our contributors! If you're interested in helping us out, please head over to our <a href="https://docs.kubestellar.io/main/Contribution%20guidelines/CONTRIBUTING/">Contributing</a> guide.</p>
 <h2 id="getting-in-touch">Getting in touch<a class="headerlink" href="#getting-in-touch" title="Permanent link">#</a></h2>
