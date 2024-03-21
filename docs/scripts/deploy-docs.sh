@@ -22,6 +22,8 @@ set -o xtrace
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT/docs"
 
+STABLE_RELEASE=release-0.21.1
+
 if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" || "${GITHUB_EVENT_NAME:-}" == "pull_request_target" ]]; then
   # For PRs, we don't want to use GITHUB_REF_NAME, which will be something like merge/1234; instead, we want to use
   # the branch the PR is targeting, such as main or release-0.11
@@ -60,7 +62,7 @@ if [[ -n "${CI:-}" ]]; then
     if [ $VERSION == "main" ]; then
       ALIAS_OPTIONS+=(--update-aliases "$VERSION" "unstable")
       ALIAS_OPTIONS_LATEST+=(--update-aliases "$VERSION" "latest")
-    elif [ $VERSION == "release-0.3" ]; then
+    elif [ $VERSION == "$STABLE_RELEASE" ]; then
       ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
     else
       ALIAS_OPTIONS+=(--update-aliases "$VERSION")
@@ -74,7 +76,7 @@ if [[ -n "${CI:-}" ]]; then
     if [ $VERSION == "main" ]; then
       ALIAS_OPTIONS+=(--update-aliases "$VERSION" "unstable")
       ALIAS_OPTIONS_LATEST+=(--update-aliases "$VERSION" "latest")
-    elif [ $VERSION == "release-0.3" ]; then
+    elif [ $VERSION == "$STABLE_RELEASE" ]; then
       ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
     else
       ALIAS_OPTIONS+=(--update-aliases "$VERSION")
