@@ -18,7 +18,8 @@ package customize
 
 import (
 	"bytes"
-	"html/template"
+	"strings"
+	"text/template"
 )
 
 // Expander is something that can do parameter expansion on unmarshaled JSON data.
@@ -74,7 +75,7 @@ func (exp *Expander) ExpandString(input string) string {
 	tmpl := template.New("").Option("missingkey=error")
 	tmpl, err := tmpl.Parse(input)
 	if err != nil {
-		exp.Errors = append(exp.Errors, err)
+		exp.Errors = append(exp.Errors, peel(err))
 		return ""
 	}
 	if exp.defs == nil {
@@ -84,8 +85,15 @@ func (exp *Expander) ExpandString(input string) string {
 	err = tmpl.Execute(&builder, exp.defs)
 	ans := builder.String()
 	if err != nil {
-		exp.Errors = append(exp.Errors, err)
+		exp.Errors = append(exp.Errors, peel(err))
 	}
-	exp.ChangedSome = exp.ChangedSome || (ans != input)
+	exp.ChangedSome = exp.ChangedSome || strings.Contains(input, "{{")
 	return ans
+}
+
+func peel(err error) error {
+	if templateErr, is := err.(*template.ExecError); is {
+		return templateErr.Err
+	}
+	return err
 }

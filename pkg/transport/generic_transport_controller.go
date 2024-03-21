@@ -18,6 +18,7 @@ package transport
 
 import (
 	"context"
+	goerrors "errors"
 	"fmt"
 	"sync"
 	"time"
@@ -580,7 +581,7 @@ func (c *genericTransportController) customizeForDest(object *unstructured.Unstr
 	objectDataExpanded := exp.ExpandParameters(objectData)
 	if exp.WantedChange() {
 		if len(exp.Errors) > 0 {
-			c.logger.Error(nil, "Workload object had template expansion problems", "object", util.RefToRuntimeObj(object), "dest", dest, "errors", exp.Errors)
+			c.logger.Error(goerrors.Join(exp.Errors...), "Workload object had template expansion problems", "object", util.RefToRuntimeObj(object), "dest", dest)
 			// TODO: better job of reporting references to undefined parameters
 		}
 		objectData = objectDataExpanded.(map[string]any)

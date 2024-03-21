@@ -17,6 +17,7 @@ limitations under the License.
 package customize
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -119,12 +120,18 @@ func (gen *generator) generateString(withParm bool) (string, string) {
 	var expected strings.Builder
 	expectMore := true
 	var err error
+	expectSyntaxError := false
+	gendParm := false
 	for i := 0; i < size; i++ {
-		if withParm && gen.rg.Intn(5) == 0 { // generate a request for parameter expansion
+		if withParm && gen.rg.Intn(25) == 0 { // generate a syntax error
+			input.WriteString("{{ + }}")
+			expectMore = false
+			expectSyntaxError = true
+		} else if withParm && gen.rg.Intn(5) == 0 { // generate a request for parameter expansion
 			parmName := fmt.Sprintf("p%d", gen.rg.Intn(10))
 			call := "{{." + parmName + "}}"
 			input.WriteString(call)
-			gen.changeSome = true
+			gendParm = true
 			var parmVal *string
 			if val, have := gen.defs[parmName]; have { // value already decided
 				parmVal = &val
@@ -155,6 +162,12 @@ func (gen *generator) generateString(withParm bool) (string, string) {
 			}
 		}
 	}
+	if expectSyntaxError {
+		gen.errors = append(gen.errors, errors.New("syntax error"))
+		return input.String(), ""
+
+	}
+	gen.changeSome = gen.changeSome || gendParm
 	if err != nil {
 		gen.errors = append(gen.errors, err)
 	}
