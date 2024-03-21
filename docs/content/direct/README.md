@@ -35,7 +35,7 @@ including OCM Klusterlet for the WECs.
 
 We do not have one that is proven very good yet.
 The first release using the new architecture is [0.20.0](../../../../v0.20.0); it is feture-incomplete.
-The latest release is [0.21.0](../../../../v0.21.0); it is also feature-incomplete.
+The latest release is [0.21.1](../../../../v0.21.1); it is also feature-incomplete.
 See also [the release notes](release-notes.md).
 
 ## Architecture
