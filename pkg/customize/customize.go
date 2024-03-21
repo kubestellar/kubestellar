@@ -21,8 +21,6 @@ import (
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
-
-	a "github.com/kubestellar/kubestellar/pkg/abstract"
 )
 
 // Expander is something that can do parameter expansion on unmarshaled JSON data.
@@ -34,12 +32,12 @@ type Expander struct {
 	// When the value of a parameter is not found, that expansion does not happen.
 	ChangedSome bool
 
-	loadDefs func() a.Getter[string, string]
+	loadDefs func() func(string) (string, bool)
 
-	defs a.Getter[string, string]
+	getParmValue func(string) (string, bool)
 }
 
-func NewExpander(loadDefs func() a.Getter[string, string]) *Expander {
+func NewExpander(loadDefs func() func(string) (string, bool)) *Expander {
 	return &Expander{
 		Undefined: sets.New[string](),
 		loadDefs:  loadDefs,
@@ -100,10 +98,10 @@ func (exp *Expander) ExpandString(input string) string {
 			continue
 		}
 		name := readNameToReplace(inputReader)
-		if exp.defs == nil {
-			exp.defs = exp.loadDefs()
+		if exp.getParmValue == nil {
+			exp.getParmValue = exp.loadDefs()
 		}
-		replacement, found := exp.defs.Get(name)
+		replacement, found := exp.getParmValue(name)
 		if found {
 			builder.WriteString(replacement)
 			exp.ChangedSome = true

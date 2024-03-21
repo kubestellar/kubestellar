@@ -419,15 +419,24 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	return nil
 }
 
-func (c *genericTransportController) valuesForDestination(dest v1alpha1.Destination) a.Getter[string, string] {
+func (c *genericTransportController) valuesForDestination(dest v1alpha1.Destination) func(string) (string, bool) {
 	cluster, err := c.inventoryLister.Get(dest.ClusterId)
 	if err != nil {
 		// This should be a transient condition that is already going to be remedied,
 		// because this means that the caller is working on old information.
 		// Just return anything in this case.
-		return a.NewConstGetter[string, string](fmt.Sprintf("failed to get cluster <%s>: %s", dest.ClusterId, err.Error()))
+		return func(string) (string, bool) {
+			return fmt.Sprintf("failed to get cluster <%s>: %s", dest.ClusterId, err.Error()), true
+		}
 	}
-	return a.NewGetterSeries[string, string](a.MapFromLang(cluster.Labels), a.MapFromLang(cluster.Annotations))
+	return func(parmName string) (string, bool) {
+		val, has := cluster.Labels[parmName]
+		if has {
+			return val, true
+		}
+		val, has = cluster.Annotations[parmName]
+		return val, has
+	}
 }
 
 func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
@@ -455,7 +464,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 	return objectsToPropagate, nil
 }
 
-func (c *genericTransportController) initializeWrappedObject(ctx context.Context, binding *v1alpha1.Binding) (a.Getter[v1alpha1.Destination, *unstructured.Unstructured], error) {
+func (c *genericTransportController) initializeWrappedObject(ctx context.Context, binding *v1alpha1.Binding) (func(v1alpha1.Destination) (*unstructured.Unstructured, bool), error) {
 	objectsToPropagate, err := c.getObjectsFromWDS(ctx, binding)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get objects to propagate to WECs from Binding object '%s' - %w", binding.GetName(), err)
@@ -465,17 +474,19 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 		return nil, nil // if no objects were found in the workload section, return nil so that we don't distribute an empty wrapped object.
 	}
 
-	destToDefs := map[v1alpha1.Destination]a.Getter[string, string]{}
+	destToDefs := map[v1alpha1.Destination]func(string) (string, bool){}
 
 	// This will become non-nil if any object to propagate needs customization
-	var destToCustomizedObjects a.LangMap[v1alpha1.Destination, []*unstructured.Unstructured]
+	var destToCustomizedObjects map[v1alpha1.Destination][]*unstructured.Unstructured
 
 	// Look through the objects to propagate to see if any needs customization.
 	// If any needs customization then catch up destToCustomizedObjects and proceed from there.
 	for objIdx, objToPropagate := range objectsToPropagate {
+		objAnnotations := objToPropagate.GetAnnotations()
+		objRequestsExpansion := objAnnotations[v1alpha1.ParameterExpansionAnnotationKey] == "true"
 		customizeThisObject := false
 		for destIdx, dest := range binding.Spec.Destinations {
-			loadDefs := func() a.Getter[string, string] {
+			loadDefs := func() func(string) (string, bool) {
 				defs := destToDefs[dest]
 				if defs == nil {
 					defs = c.valuesForDestination(dest)
@@ -484,22 +495,20 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 				return defs
 			}
 			var objC *unstructured.Unstructured
-			if destIdx == 0 || customizeThisObject {
+			if objRequestsExpansion && (destIdx == 0 || customizeThisObject) {
 				// customizeThisObject does not vary with destination, for a given objToPropagate
 				objC, customizeThisObject = c.customizeForDest(objToPropagate, dest, loadDefs)
 			} else {
 				objC = objToPropagate
 			}
-			if customizeThisObject {
-				if destToCustomizedObjects == nil {
-					destToCustomizedObjects = a.NewLangMap[v1alpha1.Destination, []*unstructured.Unstructured]()
-					for _, dest := range binding.Spec.Destinations {
-						destToCustomizedObjects[dest] = a.SliceCopy(objectsToPropagate[:objIdx])
-					}
+			if customizeThisObject && destToCustomizedObjects == nil {
+				destToCustomizedObjects = map[v1alpha1.Destination][]*unstructured.Unstructured{}
+				for _, dest := range binding.Spec.Destinations {
+					destToCustomizedObjects[dest] = a.SliceCopy(objectsToPropagate[:objIdx])
 				}
 			}
 			if destToCustomizedObjects != nil {
-				customizedObjectsSoFar, _ := destToCustomizedObjects.Get(dest)
+				customizedObjectsSoFar := destToCustomizedObjects[dest]
 				customizedObjectsSoFar = append(customizedObjectsSoFar, objC)
 				destToCustomizedObjects[dest] = customizedObjectsSoFar
 			}
@@ -514,8 +523,8 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	}
 	c.setBindingCares(binding.Name, cares)
 
-	// This will be constant if no object needed customization, otherwise a LangMap
-	var destToWrappedObject a.Getter[v1alpha1.Destination, *unstructured.Unstructured]
+	// This will be constant if no object needed customization, otherwise a map's get func
+	var destToWrappedObject func(v1alpha1.Destination) (*unstructured.Unstructured, bool)
 
 	wrap := func(objectsToPropagate []*unstructured.Unstructured) (*unstructured.Unstructured, error) {
 		wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(objectsToPropagate))
@@ -533,7 +542,7 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 		return wrappedObject, nil
 	}
 	if destToCustomizedObjects != nil {
-		asMap := a.NewLangMap[v1alpha1.Destination, *unstructured.Unstructured]()
+		asMap := map[v1alpha1.Destination]*unstructured.Unstructured{}
 		for dest, objects := range destToCustomizedObjects {
 			wrappedObject, err := wrap(objects)
 			if err != nil {
@@ -541,13 +550,13 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 			}
 			asMap[dest] = wrappedObject
 		}
-		destToWrappedObject = asMap
+		destToWrappedObject = util.PrimitiveMapGet(asMap)
 	} else {
 		wrappedObject, err := wrap(objectsToPropagate)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 		}
-		destToWrappedObject = a.NewConstGetter[v1alpha1.Destination, *unstructured.Unstructured](wrappedObject)
+		destToWrappedObject = func(v1alpha1.Destination) (*unstructured.Unstructured, bool) { return wrappedObject, true }
 	}
 
 	return destToWrappedObject, nil
@@ -578,7 +587,7 @@ func (c *genericTransportController) enqueueBindingsForCluster(clusterAny any) {
 // customizeForDest customizes the given object for the given destination,
 // if any customization is called for. The returned boolean indicates whether
 // any customization was called for.
-func (c *genericTransportController) customizeForDest(object *unstructured.Unstructured, dest v1alpha1.Destination, defsLoader func() a.Getter[string, string]) (*unstructured.Unstructured, bool) {
+func (c *genericTransportController) customizeForDest(object *unstructured.Unstructured, dest v1alpha1.Destination, defsLoader func() func(string) (string, bool)) (*unstructured.Unstructured, bool) {
 	objectCopy := object.DeepCopy()
 	objectData := objectCopy.UnstructuredContent()
 	exp := customize.NewExpander(defsLoader)
@@ -595,7 +604,7 @@ func (c *genericTransportController) customizeForDest(object *unstructured.Unstr
 	return object, false
 }
 
-func (c *genericTransportController) propagateWrappedObjectToClusters(ctx context.Context, destToDesiredWrappedObject a.Getter[v1alpha1.Destination, *unstructured.Unstructured],
+func (c *genericTransportController) propagateWrappedObjectToClusters(ctx context.Context, destToDesiredWrappedObject func(v1alpha1.Destination) (*unstructured.Unstructured, bool),
 	currentWrappedObjectList *unstructured.UnstructuredList, destinations []v1alpha1.Destination) error {
 	// if the desired wrapped object is nil, that means we should not propagate this object.
 	// this may happen when the workload section is empty.
@@ -607,7 +616,7 @@ func (c *genericTransportController) propagateWrappedObjectToClusters(ctx contex
 
 	for _, destination := range destinations {
 		currentWrappedObject := c.popWrappedObjectByNamespace(currentWrappedObjectList, destination.ClusterId)
-		desiredWrappedObject, _ := destToDesiredWrappedObject.Get(destination)
+		desiredWrappedObject, _ := destToDesiredWrappedObject(destination)
 		if currentWrappedObject != nil && currentWrappedObject.GetAnnotations() != nil &&
 			currentWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] == desiredWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] {
 			continue // current wrapped object is already in the desired state
