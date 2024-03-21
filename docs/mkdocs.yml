@@ -149,6 +149,8 @@ plugins:
   - awesome-pages
   # Docs site search
   - search
+  - mermaid2:
+      version: 10.0.2
   # Use Jinja macros in .md files
   - open-in-new-tab
   - include-markdown
@@ -169,7 +171,11 @@ plugins:
 
 markdown_extensions:
   - markdown_captions
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
   - attr_list
   - md_in_html
   - toc:               # Builds a table of contents 
