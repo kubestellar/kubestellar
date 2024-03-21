@@ -473,6 +473,8 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	// Look through the objects to propagate to see if any needs customization.
 	// If any needs customization then catch up destToCustomizedObjects and proceed from there.
 	for objIdx, objToPropagate := range objectsToPropagate {
+		objAnnotations := objToPropagate.GetAnnotations()
+		objRequestsExpansion := objAnnotations[v1alpha1.ParameterExpansionAnnotationKey] == "true"
 		customizeThisObject := false
 		for destIdx, dest := range binding.Spec.Destinations {
 			loadDefs := func() func(string) (string, bool) {
@@ -484,7 +486,7 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 				return defs
 			}
 			var objC *unstructured.Unstructured
-			if destIdx == 0 || customizeThisObject {
+			if objRequestsExpansion && (destIdx == 0 || customizeThisObject) {
 				// customizeThisObject does not vary with destination, for a given objToPropagate
 				objC, customizeThisObject = c.customizeForDest(objToPropagate, dest, loadDefs)
 			} else {
