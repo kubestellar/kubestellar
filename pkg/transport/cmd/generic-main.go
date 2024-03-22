@@ -27,6 +27,7 @@ import (
 	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 
 	"k8s.io/client-go/dynamic"
+	k8sinformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
 
@@ -108,20 +109,25 @@ func GenericMain(transportImplementation transport.Transport) {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
-	wdsKsInformerFactory := ksinformers.NewSharedInformerFactoryWithOptions(wdsClientset, defaultResyncPeriod)
-
 	ocmInformerFactory := clusterinformers.NewSharedInformerFactory(ocmClientset, defaultResyncPeriod)
 
 	inventoryPreInformer := ocmInformerFactory.Cluster().V1().ManagedClusters()
 
-	transportController, err := transport.NewTransportController(ctx, inventoryPreInformer, wdsKsInformerFactory.Control().V1alpha1().Bindings(),
-		transportImplementation, wdsClientset, wdsDynamicClient, transportClientset, transportDynamicClient, options.WdsName)
+	wdsKsInformerFactory := ksinformers.NewSharedInformerFactoryWithOptions(wdsClientset, defaultResyncPeriod)
+
+	itsK8sInformerFactory := k8sinformers.NewSharedInformerFactory(transportClientset, defaultResyncPeriod)
+
+	transportController, err := transport.NewTransportController(ctx, inventoryPreInformer,
+		wdsClientset.ControlV1alpha1().Bindings(), wdsKsInformerFactory.Control().V1alpha1().Bindings(),
+		transportImplementation, wdsDynamicClient, transportClientset.CoreV1().Namespaces(), itsK8sInformerFactory.Core().V1().ConfigMaps(),
+		transportClientset, transportDynamicClient, options.WdsName)
 	if err != nil {
 		logger.Error(err, "failed to construct transport controller")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
 	ocmInformerFactory.Start(ctx.Done())
+	itsK8sInformerFactory.Start(ctx.Done())
 
 	// notice that there is no need to run Start method in a separate goroutine.
 	// Start method is non-blocking and runs each of the factory's informers in its own dedicated goroutine.

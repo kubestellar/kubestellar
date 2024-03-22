@@ -20,24 +20,41 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ParameterExpansionAnnotationKey, when paired with the value "true" in an annotation of
-// an workload object in a WDS, indicates that parameter expansion should be
+// TemplateExpansionAnnotationKey, when paired with the value "true" in an annotation of
+// a workload object in a WDS, indicates that Go template expansion should be
 // bundled with propagation from core to WEC.
 //
-// Parameter expansion applies to every leaf string in the object, and involves
-// two substring replacements.
-// One is replacing "%%" with "%".
-// The other replaces every substring of the form "%(parameter_name)" with the destination's
-// value for the named parameter.  A parameter_name can be any label or annotation key.
+// Go template expansion means to (1) parse each leaf string of the object as a Go template
+// as defined in the Go standard package "text/template", and (2) for each WEC, replace that
+// leaf string with the string that results from expanding this template
+// (`Template.Execute`) using properties of the WEC.
 //
-// A destination is described by an inventory object in an Inventory and Transport Space,
-// and its labels and annotations provide parameter values (with labels taking priority over annotations).
+// The properties for a given WEC are collected from the following four sources, in order.
+// For a property defined by multiple sources, the first one in this order takes precedence.
+// The first source is a ConfigMap object, if it exists, that: (a) has the same name as the WEC's
+// inventory object, (b) is in the namespace named "customization-properties", and (c) is
+// in the Inventory and Transport Space (ITS). In particular, the string and binary data entries
+// whose name is valid as a Go language identifier provide properties.
+// The second source is the annotations of the WEC's inventory object,
+// when the name (AKA key) of that annotation is valid as a Go language identifier.
+// The third source is the labels of the WEC's inventory object,
+// when the name (AKA key) of that label is valid as a Go language identifier.
+// The fourth source is some built-in definitions, of which there is presently just one:
+// the value of the property named "clusterName" is the name of the WEC's inventory object.
+//
+// Any failure in any template expansion for a given Binding suppresses propagation of
+// desired state from that Binding; the previosly propagated desired state from that Binding,
+// if any, remains in place in the WEC.
 //
 // Note that this sort of customization has limited applicability.  It can only be used where
 // the un-expanded string passes the validation conditions of the relevant object type.
 // For more broadly applicable customization, see Customizer objects.
 
-const ParameterExpansionAnnotationKey string = "control.kubestellar.io/expand-parameters"
+const TemplateExpansionAnnotationKey string = "control.kubestellar.io/expand-templates"
+
+// PropertyConfigMapNamespace is the namespace in the ITS that holds ConfigMap objects that provide
+// WEC properties to be used in customization.
+const PropertyConfigMapNamespace = "customization-properties"
 
 // BindingPolicySpec defines the desired state of BindingPolicy
 type BindingPolicySpec struct {

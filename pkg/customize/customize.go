@@ -18,50 +18,56 @@ package customize
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"text/template"
 )
 
-// Expander is something that can do parameter expansion on unmarshaled JSON data.
-type Expander struct {
-	// Errors is the set of errors encountered
-	Errors []error
+// ExpandTemplates crawls over the input data structure and does
+// template expansion on every `string` except those that are map keys.
+// The input is made up of `map[string]any`, `[]any`, `string`, and other primitives.
+// This side-effects every map and slice in the input.
+// The template expansion treats an input `string` as a template
+// as in `text/template` and expands it using the given `templateData`,
+// which nothing mutates during this call.
+// The given path is whatever the caller wants, and is extended in
+// JSONPath style as the input data structure is traversed, ultimately being used
+// as input to `text/template` to identify the template --- hence appearing in
+// the resulting errors (if any).
+// The returned `wantedChange` indicates whether there was any template syntax
+// anywhere in the input.
+func ExpandTemplates(path string, input any, templateData map[string]string) (output any, wantedChange bool, errors []string) {
+	exp := expander{defs: templateData}
+	output = exp.expandAny(path, input)
+	return output, exp.wantedChange, exp.errors
+}
 
-	// ChangedSome reports whether parameter expansion made any changes to the data.
-	// When the value of a parameter is not found, that expansion does not happen.
-	ChangedSome bool
+// expander is something that can do template expansion on unmarshaled JSON data.
+type expander struct {
+	// errors is the `.Error()` of the errors encountered
+	errors []string
 
-	loadDefs func() map[string]string
+	// wantedChange reports whether there was any template syntax
+	// anywhere in the input
+	wantedChange bool
 
 	defs map[string]string
 }
 
-func NewExpander(loadDefs func() map[string]string) *Expander {
-	return &Expander{
-		Errors:   []error{},
-		loadDefs: loadDefs,
-	}
-}
-
-// WantedChange tells whether a paremeter reference was seen
-func (exp *Expander) WantedChange() bool {
-	return exp.ChangedSome || len(exp.Errors) != 0
-}
-
-// ExpandParameters side-effects the given JSON data to expand parameters in leaf strings
-func (exp *Expander) ExpandParameters(data any) any {
+// expandAny side-effects the given JSON data to expand templates in leaf strings
+func (exp *expander) expandAny(path string, data any) any {
 	switch typed := data.(type) {
 	case string:
-		return exp.ExpandString(typed)
+		return exp.expandString(path, typed)
 	case map[string]any:
 		for key, val := range typed {
-			newVal := exp.ExpandParameters(val)
+			newVal := exp.expandAny(path+"."+key, val)
 			typed[key] = newVal
 		}
 		return typed
 	case []any:
 		for idx, val := range typed {
-			newVal := exp.ExpandParameters(val)
+			newVal := exp.expandAny(fmt.Sprintf("%s[%d]", path, idx), val)
 			typed[idx] = newVal
 		}
 		return typed
@@ -70,24 +76,24 @@ func (exp *Expander) ExpandParameters(data any) any {
 	}
 }
 
-// ExpandString does parameter expansion on one string
-func (exp *Expander) ExpandString(input string) string {
-	tmpl := template.New("").Option("missingkey=error")
+// expandString does template expansion on one string
+func (exp *expander) expandString(path, input string) string {
+	if !strings.Contains(input, "{{") {
+		return input
+	}
+	exp.wantedChange = true
+	tmpl := template.New(path).Option("missingkey=error")
 	tmpl, err := tmpl.Parse(input)
 	if err != nil {
-		exp.Errors = append(exp.Errors, peel(err))
+		exp.errors = append(exp.errors, peel(err).Error())
 		return ""
-	}
-	if exp.defs == nil {
-		exp.defs = exp.loadDefs()
 	}
 	var builder bytes.Buffer
 	err = tmpl.Execute(&builder, exp.defs)
 	ans := builder.String()
 	if err != nil {
-		exp.Errors = append(exp.Errors, peel(err))
+		exp.errors = append(exp.errors, peel(err).Error())
 	}
-	exp.ChangedSome = exp.ChangedSome || strings.Contains(input, "{{")
 	return ans
 }
 

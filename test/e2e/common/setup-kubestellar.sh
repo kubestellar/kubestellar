@@ -138,6 +138,8 @@ wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -
 
 echo "transport controller is running."
 
+wait-for-cmd 'kubectl --context its1 get ns customization-properties'
+
 :
 : -------------------------------------------------------------------------
 : Create clusters and register with OCM
@@ -161,8 +163,10 @@ clusteradm --context its1 accept --clusters cluster1
 clusteradm --context its1 accept --clusters cluster2
 
 kubectl --context its1 get managedclusters
-kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
-kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
+kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1 region=east
+kubectl --context its1 create cm -n customization-properties cluster1 --from-literal clusterURL=https://my.clusters/1001-abcd
+kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2 region=west
+kubectl --context its1 create cm -n customization-properties cluster2 --from-literal clusterURL=https://my.clusters/2002-cdef
 
 :
 : -------------------------------------------------------------------------
