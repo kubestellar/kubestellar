@@ -114,7 +114,8 @@ func GenericMain(transportImplementation transport.Transport) {
 
 	inventoryPreInformer := ocmInformerFactory.Cluster().V1().ManagedClusters()
 
-	transportController, err := transport.NewTransportController(ctx, inventoryPreInformer, wdsKsInformerFactory.Control().V1alpha1().Bindings(),
+	transportController, err := transport.NewTransportController(ctx, inventoryPreInformer,
+		wdsClientset.ControlV1alpha1().Bindings(), wdsKsInformerFactory.Control().V1alpha1().Bindings(),
 		transportImplementation, wdsClientset, wdsDynamicClient, transportClientset, transportDynamicClient, options.WdsName)
 	if err != nil {
 		logger.Error(err, "failed to construct transport controller")

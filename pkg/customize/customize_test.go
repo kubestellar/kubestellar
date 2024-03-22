@@ -38,7 +38,7 @@ func TestCustomize(t *testing.T) {
 		input, expected := gen.generateData()
 		exp := NewExpander(func() map[string]string { return gen.defs })
 		inputCopy := runtime.DeepCopyJSONValue(input)
-		actual := exp.ExpandParameters(inputCopy)
+		actual := exp.ExpandParameters(fmt.Sprintf("try%d", try), inputCopy)
 		t.Logf("Tested input=%#v, defs=%#v", input, gen.defs)
 		fail := false
 		if len(gen.errors) == len(exp.Errors) {
@@ -123,8 +123,12 @@ func (gen *generator) generateString(withParm bool) (string, string) {
 	expectSyntaxError := false
 	gendParm := false
 	for i := 0; i < size; i++ {
-		if withParm && gen.rg.Intn(25) == 0 { // generate a syntax error
+		if withParm && gen.rg.Intn(60) == 0 { // generate a syntax error
 			input.WriteString("{{ + }}")
+			expectMore = false
+			expectSyntaxError = true
+		} else if withParm && gen.rg.Intn(60) == 0 { // generate a syntax error
+			input.WriteString("{{if true}}")
 			expectMore = false
 			expectSyntaxError = true
 		} else if withParm && gen.rg.Intn(5) == 0 { // generate a request for parameter expansion

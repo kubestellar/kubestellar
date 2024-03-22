@@ -18,14 +18,15 @@ package customize
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"text/template"
 )
 
 // Expander is something that can do parameter expansion on unmarshaled JSON data.
 type Expander struct {
-	// Errors is the set of errors encountered
-	Errors []error
+	// Errors is the `.Error()` of the errors encountered
+	Errors []string
 
 	// ChangedSome reports whether parameter expansion made any changes to the data.
 	// When the value of a parameter is not found, that expansion does not happen.
@@ -38,7 +39,7 @@ type Expander struct {
 
 func NewExpander(loadDefs func() map[string]string) *Expander {
 	return &Expander{
-		Errors:   []error{},
+		Errors:   []string{},
 		loadDefs: loadDefs,
 	}
 }
@@ -49,19 +50,19 @@ func (exp *Expander) WantedChange() bool {
 }
 
 // ExpandParameters side-effects the given JSON data to expand parameters in leaf strings
-func (exp *Expander) ExpandParameters(data any) any {
+func (exp *Expander) ExpandParameters(path string, data any) any {
 	switch typed := data.(type) {
 	case string:
-		return exp.ExpandString(typed)
+		return exp.ExpandString(path, typed)
 	case map[string]any:
 		for key, val := range typed {
-			newVal := exp.ExpandParameters(val)
+			newVal := exp.ExpandParameters(path+"."+key, val)
 			typed[key] = newVal
 		}
 		return typed
 	case []any:
 		for idx, val := range typed {
-			newVal := exp.ExpandParameters(val)
+			newVal := exp.ExpandParameters(fmt.Sprintf("%s[%d]", path, idx), val)
 			typed[idx] = newVal
 		}
 		return typed
@@ -71,11 +72,11 @@ func (exp *Expander) ExpandParameters(data any) any {
 }
 
 // ExpandString does parameter expansion on one string
-func (exp *Expander) ExpandString(input string) string {
-	tmpl := template.New("").Option("missingkey=error")
+func (exp *Expander) ExpandString(path, input string) string {
+	tmpl := template.New(path).Option("missingkey=error")
 	tmpl, err := tmpl.Parse(input)
 	if err != nil {
-		exp.Errors = append(exp.Errors, peel(err))
+		exp.Errors = append(exp.Errors, peel(err).Error())
 		return ""
 	}
 	if exp.defs == nil {
@@ -85,7 +86,7 @@ func (exp *Expander) ExpandString(input string) string {
 	err = tmpl.Execute(&builder, exp.defs)
 	ans := builder.String()
 	if err != nil {
-		exp.Errors = append(exp.Errors, peel(err))
+		exp.Errors = append(exp.Errors, peel(err).Error())
 	}
 	exp.ChangedSome = exp.ChangedSome || strings.Contains(input, "{{")
 	return ans

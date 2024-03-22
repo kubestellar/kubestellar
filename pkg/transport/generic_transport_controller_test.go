@@ -311,7 +311,7 @@ func TestGenericController(t *testing.T) {
 	inventoryClientFake := clusterclientfake.NewSimpleClientset()
 	inventoryInformerFactory := clusterinformers.NewSharedInformerFactory(inventoryClientFake, 0*time.Second)
 	inventoryPreInformer := inventoryInformerFactory.Cluster().V1().ManagedClusters()
-	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, inventoryPreInformer, wdsKsInformerFactory.Control().V1alpha1().Bindings(), transport, wdsKsClientFake, wdsDynamicClient, itsDynamicClient, "test-wds", wrapperGVR)
+	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, inventoryPreInformer, wdsKsClientFake.ControlV1alpha1().Bindings(), wdsKsInformerFactory.Control().V1alpha1().Bindings(), transport, wdsKsClientFake, wdsDynamicClient, itsDynamicClient, "test-wds", wrapperGVR)
 	wdsKsInformerFactory.Start(ctx.Done())
 	inventoryInformerFactory.Start(ctx.Done())
 
