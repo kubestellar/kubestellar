@@ -197,6 +197,7 @@ type BindingPolicyList struct {
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster,shortName={bdg}
 type Binding struct {
 	metav1.TypeMeta `json:",inline"`
@@ -208,6 +209,8 @@ type Binding struct {
 	// `spec` explicitly describes a desired binding between workloads and Locations.
 	// It reflects the resolution of a BindingPolicy's selectors.
 	Spec BindingSpec `json:"spec,omitempty"`
+
+	Status BindingStatus `json:"status,omitempty"`
 }
 
 // BindingSpec holds a list of object references with their associated resource versions,
@@ -263,6 +266,11 @@ type ClusterScopeDownsyncObject struct {
 // Destination wraps the identifiers required to uniquely identify a destination cluster.
 type Destination struct {
 	ClusterId string `json:"clusterId,omitempty"`
+}
+
+type BindingStatus struct {
+	ObservedGeneration int64    `json:"observedGeneration"`
+	Errors             []string `json:"errors,omitempty"`
 }
 
 // BindingList is the API type for a list of Binding
