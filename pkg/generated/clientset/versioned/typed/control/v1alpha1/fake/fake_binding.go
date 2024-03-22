@@ -96,6 +96,17 @@ func (c *FakeBindings) Update(ctx context.Context, binding *v1alpha1.Binding, op
 	return obj.(*v1alpha1.Binding), err
 }
 
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+func (c *FakeBindings) UpdateStatus(ctx context.Context, binding *v1alpha1.Binding, opts v1.UpdateOptions) (*v1alpha1.Binding, error) {
+	obj, err := c.Fake.
+		Invokes(testing.NewRootUpdateSubresourceAction(bindingsResource, "status", binding), &v1alpha1.Binding{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.Binding), err
+}
+
 // Delete takes name of the binding and deletes it. Returns an error if one occurs.
 func (c *FakeBindings) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
