@@ -38,7 +38,7 @@ func TestCustomize(t *testing.T) {
 		input, expected := gen.generateData()
 		exp := NewExpander(func() map[string]string { return gen.defs })
 		inputCopy := runtime.DeepCopyJSONValue(input)
-		actual := exp.ExpandParameters(fmt.Sprintf("try%d", try), inputCopy)
+		actual := exp.ExpandTemplates(fmt.Sprintf("try%d", try), inputCopy)
 		t.Logf("Tested input=%#v, defs=%#v", input, gen.defs)
 		fail := false
 		if len(gen.errors) == len(exp.Errors) {

@@ -52,7 +52,7 @@ metadata:
   name: nginx-deployment
   namespace: nginx
   annotations:
-    control.kubestellar.io/expand-parameters: "true"
+    control.kubestellar.io/expand-templates: "true"
     customization-test: "cluster {{ .name }} is my home"
   labels:
     app.kubernetes.io/name: nginx

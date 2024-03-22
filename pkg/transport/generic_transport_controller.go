@@ -405,7 +405,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 		ObservedGeneration: binding.Generation,
 		Errors:             bindingErrors,
 	}
-	_, err = c.bindingClient.UpdateStatus(ctx, bindingCopy, metav1.UpdateOptions{FieldManager: "transport-controller"})
+	_, err = c.bindingClient.UpdateStatus(ctx, bindingCopy, metav1.UpdateOptions{FieldManager: ControllerName})
 	if err != nil {
 		return err
 	}
@@ -484,7 +484,7 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	// If any needs customization then catch up destToCustomizedObjects and proceed from there.
 	for objIdx, objToPropagate := range objectsToPropagate {
 		objAnnotations := objToPropagate.GetAnnotations()
-		objRequestsExpansion := objAnnotations[v1alpha1.ParameterExpansionAnnotationKey] == "true"
+		objRequestsExpansion := objAnnotations[v1alpha1.TemplateExpansionAnnotationKey] == "true"
 		customizeThisObject := false
 		reportedSomeErrors := false
 		objRefStr := util.RefToRuntimeObj(objToPropagate).String()
@@ -600,7 +600,7 @@ func (c *genericTransportController) customizeForDest(object *unstructured.Unstr
 	objectCopy := object.DeepCopy()
 	objectData := objectCopy.UnstructuredContent()
 	exp := customize.NewExpander(defsLoader)
-	objectDataExpanded := exp.ExpandParameters(dest, objectData)
+	objectDataExpanded := exp.ExpandTemplates(dest, objectData)
 	if exp.WantedChange() {
 		objectData = objectDataExpanded.(map[string]any)
 		objectCopy.SetUnstructuredContent(objectData)

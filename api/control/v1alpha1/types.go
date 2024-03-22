@@ -20,24 +20,24 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ParameterExpansionAnnotationKey, when paired with the value "true" in an annotation of
-// an workload object in a WDS, indicates that parameter expansion should be
+// TemplateExpansionAnnotationKey, when paired with the value "true" in an annotation of
+// a workload object in a WDS, indicates that Go template expansion should be
 // bundled with propagation from core to WEC.
 //
-// Parameter expansion applies to every leaf string in the object, and involves
-// two substring replacements.
-// One is replacing "%%" with "%".
-// The other replaces every substring of the form "%(parameter_name)" with the destination's
-// value for the named parameter.  A parameter_name can be any label or annotation key.
+// Go template expansion means to (1) parse each leaf string of the object as a Go template
+// as defined in the Go standard package "text/template", and (2) for each WEC, replace that
+// leaf string with the string that results from expanding this template
+// (`Template.Execute`) using data about the WEC. This data is a map from parameter
+// name to parameter value.
 //
 // A destination is described by an inventory object in an Inventory and Transport Space,
-// and its labels and annotations provide parameter values (with labels taking priority over annotations).
+// and its labels and annotations provide parameter names and values (with labels taking priority over annotations).
 //
 // Note that this sort of customization has limited applicability.  It can only be used where
 // the un-expanded string passes the validation conditions of the relevant object type.
 // For more broadly applicable customization, see Customizer objects.
 
-const ParameterExpansionAnnotationKey string = "control.kubestellar.io/expand-parameters"
+const TemplateExpansionAnnotationKey string = "control.kubestellar.io/expand-templates"
 
 // BindingPolicySpec defines the desired state of BindingPolicy
 type BindingPolicySpec struct {

@@ -32,23 +32,21 @@ Thus far we can only say how to handle this when the hosting cluster is OpenShif
 
 ## Rule-based customization
 
-KubeStellar can distribute one workload object to multiple WECs, and it is not uncommon for users to need some customization to each WEC. By _rule based_ we mean that the customization is not expressed via one or more literal expressions but rather can refer to _properties_ of each WEC by property name. As KubeStellar distributes or transports a workload object from WDS to a WEC, those property references are replaced by the value that the WEC has for the referenced properties.
+KubeStellar can distribute one workload object to multiple WECs, and it is common for users to need some customization to each WEC. By _rule based_ we mean that the customization is not expressed via one or more literal expressions but rather can refer to _properties_ of each WEC by property name. As KubeStellar distributes or transports a workload object from WDS to a WEC, the object can be transformed in a way that depends on those properties.
 
-KubeStellar currently has a simple but limited way to specify rule-based customization, called "parameter expansion" (by analogy to parameter expansion in shells like bash). More expressive customization will be developed in the future.
+At its current level of development, KubeStellar has a simple but limited way to specify rule-based customization, called "template expansion".
 
-### Parameter Expansion
+### Template Expansion
 
-Parameter expansion is an optional feature that a user can request on an object-by-object basis. The way to request this feature on an object is to put the following annotation on the object.
+Template expansion is an optional feature that a user can request on an object-by-object basis. The way to request this feature on an object is to put the following annotation on the object.
 
 ```yaml
-    control.kubestellar.io/expand-parameters: "true"
+    control.kubestellar.io/expand-templates: "true"
 ```
 
-The customization that parameter expansion does when distributing an object from WDS to a WEC is look at each leaf string in the object and replace every substring of the form `%(parameter_name)` with the value of the relevant parameter for the WEC. For the purposes of parameter expansion, the "properties" of a WEC are defined by the labels and annotations of the inventory object (`ManagedCluster`) representing that WEC in the inventory. Labels take precedence over annotations. If the WEC does not define a value for the requested property then the replacement is not done and the transport controller logs an error; we plan to develop a better way for reporting these errors in the future. Parameter expansion also replaces `%%` with `%`.
+The customization that template expansion does when distributing an object from a WDS to a WEC is applied independently to each leaf string of the object and is based on the "text/template" standard pacakge of Go. The string is parsed as a template and then replaced with the result of expanding the template with data supplied by the inventory object (the `ManagedCluster`) describing the WEC. The data is supplied by the object labels and annotations whose key is valid as a Go language identifier, with labels taking precedence over annotations. Errors from this process are reported in the status field of the Binding object involved.
 
-The design of parameter expansion is modeled on the parameter expansion done by shells such as [bash](https://www.gnu.org/software/bash/manual/bash.html). This behavior is also available in certain positions in Kubernetes API objects, such as [the command args of a container](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#container-v1-core). The syntax is deliberately distinct, to avoid introducing requirements to escape the KubeStellar syntax when used in conjunction with a shell or in a relevant Kubernetes object position.
-
-Parameter expansion can only be applied when and where the un-expanded leaf strings pass the validation that the WDS applies, and can only epxress substring replacements.
+Template expansion can only be applied when and where the un-expanded leaf strings pass the validation that the WDS applies, and can only epxress substring replacements.
 
 For example, consider the following example workload object.
 
@@ -59,12 +57,12 @@ metadata:
   name: instance
   namespace: openshift-logging
   annotations:
-    control.kubestellar.io/expand-parameters: "true"
+    control.kubestellar.io/expand-templates: "true"
 spec:
   outputs:
     - name: remote-loki
       type: loki
-      url: "https://my.loki.server.com/%(clustername)"
+      url: "https://my.loki.server.com/{{.clustername}}"
 ...
 ```
 

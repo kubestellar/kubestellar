@@ -23,13 +23,12 @@ import (
 	"text/template"
 )
 
-// Expander is something that can do parameter expansion on unmarshaled JSON data.
+// Expander is something that can do template expansion on unmarshaled JSON data.
 type Expander struct {
 	// Errors is the `.Error()` of the errors encountered
 	Errors []string
 
 	// ChangedSome reports whether parameter expansion made any changes to the data.
-	// When the value of a parameter is not found, that expansion does not happen.
 	ChangedSome bool
 
 	loadDefs func() map[string]string
@@ -49,20 +48,20 @@ func (exp *Expander) WantedChange() bool {
 	return exp.ChangedSome || len(exp.Errors) != 0
 }
 
-// ExpandParameters side-effects the given JSON data to expand parameters in leaf strings
-func (exp *Expander) ExpandParameters(path string, data any) any {
+// ExpandTemplates side-effects the given JSON data to expand templates in leaf strings
+func (exp *Expander) ExpandTemplates(path string, data any) any {
 	switch typed := data.(type) {
 	case string:
 		return exp.ExpandString(path, typed)
 	case map[string]any:
 		for key, val := range typed {
-			newVal := exp.ExpandParameters(path+"."+key, val)
+			newVal := exp.ExpandTemplates(path+"."+key, val)
 			typed[key] = newVal
 		}
 		return typed
 	case []any:
 		for idx, val := range typed {
-			newVal := exp.ExpandParameters(fmt.Sprintf("%s[%d]", path, idx), val)
+			newVal := exp.ExpandTemplates(fmt.Sprintf("%s[%d]", path, idx), val)
 			typed[idx] = newVal
 		}
 		return typed
@@ -73,6 +72,9 @@ func (exp *Expander) ExpandParameters(path string, data any) any {
 
 // ExpandString does parameter expansion on one string
 func (exp *Expander) ExpandString(path, input string) string {
+	if !strings.Contains(input, "{{") {
+		return input
+	}
 	tmpl := template.New(path).Option("missingkey=error")
 	tmpl, err := tmpl.Parse(input)
 	if err != nil {
@@ -88,7 +90,7 @@ func (exp *Expander) ExpandString(path, input string) string {
 	if err != nil {
 		exp.Errors = append(exp.Errors, peel(err).Error())
 	}
-	exp.ChangedSome = exp.ChangedSome || strings.Contains(input, "{{")
+	exp.ChangedSome = true
 	return ans
 }
 
