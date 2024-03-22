@@ -19,12 +19,29 @@ The end to end testing includes:
 ## Running the tests
 To install Ginkgo, follow the instructions in [Ginkgo's getting started](https://onsi.github.io/ginkgo/#getting-started).
 
-To execute these tests, issue `ginkgo -v`.  This will make a local image based and run the end to end tests.
+To execute these tests, issue the following command. This will make a local image and run the end to end tests. Omit the `--no-color` if you want pretty terminal output; omit the `KFLEX_DISABLE_CHATTY=true` to get progress logging from kubeflex.
 
-To test the latest release image, issue `ginkgo -v -- -released`
+```shell
+KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color
+```
 
-To test a specific test use ginkgo's --focus parameter.  For example, `ginkgo -v --focus "survives ITS vcluster coming down"`
+To test the latest release image, pass `--released` to the test. For example:
 
-To skip the cleanup and setup phase use the -skip-setup flag as follows: `ginkgo -v -- -skip-setup`
+```shell
+KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color -- -released
+```
+
+To test a specific test use ginkgo's `--focus` parameter.  For example:
+
+```shell
+KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color --focus "survives ITS vcluster coming down"
+```
+
+To skip the cleanup and setup phase, pass `-skip-setup` to the test. For example:
+
+```shell
+KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color -- -skip-setup
+```
+
 
 
