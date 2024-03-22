@@ -60,7 +60,7 @@ jobs:
           TEST_FLAGS: ${{ github.event.inputs.testFlags }}
         run: |
           cd test/e2e/ginkgo 
-          KFLEX_DISABLE_CHATTY=true KUBECONFIG=~/.kube/config ginkgo -v $TEST_FLAGS
+          KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color $TEST_FLAGS
 
       - name: show kubeconfig contexts
         if: always()
