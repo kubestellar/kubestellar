@@ -36,7 +36,7 @@ func TestCustomize(t *testing.T) {
 	for try := 1; try <= 100; try++ {
 		gen := &generator{rg: rg, defs: map[string]string{}, undefined: sets.New[string]()}
 		input, expected := gen.generateData()
-		exp := NewExpander(func() map[string]string { return gen.defs })
+		exp := NewExpander(gen.defs)
 		inputCopy := runtime.DeepCopyJSONValue(input)
 		actual := exp.ExpandTemplates(fmt.Sprintf("try%d", try), inputCopy)
 		t.Logf("Tested input=%#v, defs=%#v", input, gen.defs)

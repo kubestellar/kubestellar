@@ -186,8 +186,8 @@ type genericTransportController struct {
 
 	sync.RWMutex
 	// bindingCares maps Binding name to the set of destinations whose properties the Binding is senstive to.
-	// Access controlled by the RWMutex.
-	// Every set in here is immutable from the time it appears here.
+	// Access to both the map and the Sets it holds is controlled by the RWMutex.
+	// The sets are mutable with the RWMutex held.
 	bindingCares map[string]sets.Set[v1alpha1.Destination]
 }
 
@@ -424,7 +424,8 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	return nil
 }
 
-func (c *genericTransportController) valuesForDestination(dest v1alpha1.Destination) map[string]string {
+func (c *genericTransportController) valuesForDestination(bindingName string, dest v1alpha1.Destination) map[string]string {
+	c.addBindingCare(bindingName, dest) // ensure any change notification received after this causes reconsideration
 	cluster, err := c.inventoryLister.Get(dest.ClusterId)
 	if err != nil {
 		// This should be a transient condition that is already going to be remedied,
@@ -489,26 +490,24 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 		reportedSomeErrors := false
 		objRefStr := util.RefToRuntimeObj(objToPropagate).String()
 		for destIdx, dest := range binding.Spec.Destinations {
-			loadDefs := func() map[string]string {
-				defs := destToDefs[dest]
-				if defs == nil {
-					defs = c.valuesForDestination(dest)
-					destToDefs[dest] = defs
-				}
-				return defs
-			}
-			var objC *unstructured.Unstructured
+			objC := objToPropagate
 			var customizationErrors []string
 			if objRequestsExpansion && (destIdx == 0 || customizeThisObject) {
+				defs := destToDefs[dest]
+				if defs == nil {
+					defs = c.valuesForDestination(binding.Name, dest)
+					destToDefs[dest] = defs
+				}
 				// customizeThisObject does not vary with destination, for a given objToPropagate
-				objC, customizationErrors, customizeThisObject = c.customizeForDest(objToPropagate, dest.ClusterId+"/"+objRefStr, loadDefs)
-				if !reportedSomeErrors {
+				objC, customizationErrors, customizeThisObject = c.customizeForDest(objToPropagate, dest.ClusterId+"/"+objRefStr, defs)
+				if len(customizationErrors) != 0 && !reportedSomeErrors {
 					// Let's not overwhelm the user, only report errors from the first troubled destination
 					reportedSomeErrors = true
 					bindingErrors = append(bindingErrors, customizationErrors...)
 				}
-			} else {
-				objC = objToPropagate
+				if !customizeThisObject {
+					objC = objToPropagate
+				}
 			}
 			if customizeThisObject && destToCustomizedObjects == nil {
 				destToCustomizedObjects = map[v1alpha1.Destination][]*unstructured.Unstructured{}
@@ -530,7 +529,7 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	} else {
 		cares = sets.New[v1alpha1.Destination]()
 	}
-	c.setBindingCares(binding.Name, cares)
+	c.setBindingCares(binding.Name, cares) // forget about now-irrelevant destinations
 
 	// This will be constant if no object needed customization, otherwise a map's get func
 	var destToWrappedObject func(v1alpha1.Destination) (*unstructured.Unstructured, bool)
@@ -571,6 +570,18 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	return destToWrappedObject, bindingErrors, nil
 }
 
+func (c *genericTransportController) addBindingCare(bindingName string, dest v1alpha1.Destination) {
+	c.Lock()
+	defer c.Unlock()
+	cares := c.bindingCares[bindingName]
+	if cares == nil {
+		cares = sets.New[v1alpha1.Destination](dest)
+		c.bindingCares[bindingName] = cares
+	} else {
+		cares.Insert(dest)
+	}
+}
+
 func (c *genericTransportController) setBindingCares(bindingName string, cares sets.Set[v1alpha1.Destination]) {
 	c.Lock()
 	defer c.Unlock()
@@ -596,10 +607,10 @@ func (c *genericTransportController) enqueueBindingsForCluster(clusterAny any) {
 // customizeForDest customizes the given object for the given destination,
 // if any customization is called for. The returned boolean indicates whether
 // any customization was called for.
-func (c *genericTransportController) customizeForDest(object *unstructured.Unstructured, dest string, defsLoader func() map[string]string) (*unstructured.Unstructured, []string, bool) {
+func (c *genericTransportController) customizeForDest(object *unstructured.Unstructured, dest string, defs map[string]string) (*unstructured.Unstructured, []string, bool) {
 	objectCopy := object.DeepCopy()
 	objectData := objectCopy.UnstructuredContent()
-	exp := customize.NewExpander(defsLoader)
+	exp := customize.NewExpander(defs)
 	objectDataExpanded := exp.ExpandTemplates(dest, objectData)
 	if exp.WantedChange() {
 		objectData = objectDataExpanded.(map[string]any)

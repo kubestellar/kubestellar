@@ -31,15 +31,14 @@ type Expander struct {
 	// ChangedSome reports whether parameter expansion made any changes to the data.
 	ChangedSome bool
 
-	loadDefs func() map[string]string
-
 	defs map[string]string
 }
 
-func NewExpander(loadDefs func() map[string]string) *Expander {
+// NewExpander makes a new one. Nobody mutates `defs` during a call on ExpandTemplates.
+func NewExpander(defs map[string]string) *Expander {
 	return &Expander{
-		Errors:   []string{},
-		loadDefs: loadDefs,
+		Errors: []string{},
+		defs:   defs,
 	}
 }
 
@@ -80,9 +79,6 @@ func (exp *Expander) ExpandString(path, input string) string {
 	if err != nil {
 		exp.Errors = append(exp.Errors, peel(err).Error())
 		return ""
-	}
-	if exp.defs == nil {
-		exp.defs = exp.loadDefs()
 	}
 	var builder bytes.Buffer
 	err = tmpl.Execute(&builder, exp.defs)
