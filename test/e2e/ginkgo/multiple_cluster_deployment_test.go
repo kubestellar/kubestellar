@@ -267,15 +267,17 @@ var _ = ginkgo.Describe("end to end testing", func() {
 
 	ginkgo.Context("resiliency testing", func() {
 		ginkgo.It("survives WDS coming down", func() {
-			util.DeletePod(ctx, coreCluster, "wds1-system", "kubestellar")
+			util.DeletePods(ctx, coreCluster, "wds1-system", "kubestellar")
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
+			util.Expect1PodOfEach(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager")
 		})
 
 		ginkgo.It("survives kubeflex coming down", func() {
-			util.DeletePod(ctx, coreCluster, "kubeflex-system", "")
+			util.DeletePods(ctx, coreCluster, "kubeflex-system", "")
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
+			util.Expect1PodOfEach(ctx, coreCluster, "kubeflex-system", "kubeflex-controller-manager", "postgres-postgresql-0")
 		})
 
 		// The following test unit actually fails. Issue #1850 has been opened.
@@ -287,8 +289,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 
 		ginkgo.It("survives everything coming down", func() {
 			ginkgo.By("kill as many pods as possible")
-			util.DeletePod(ctx, coreCluster, "wds1-system", "kubestellar")
-			util.DeletePod(ctx, coreCluster, "kubeflex-system", "")
+			util.DeletePods(ctx, coreCluster, "wds1-system", "kubestellar")
+			util.DeletePods(ctx, coreCluster, "kubeflex-system", "")
 			// util.DeletePod(ctx, coreCluster, "imbs1-system", "vcluster")
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
@@ -300,6 +302,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				})
 			util.ValidateNumDeployments(ctx, wec1, ns, 2)
 			util.ValidateNumDeployments(ctx, wec2, ns, 2)
+			util.Expect1PodOfEach(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager")
+			util.Expect1PodOfEach(ctx, coreCluster, "kubeflex-system", "kubeflex-controller-manager", "postgres-postgresql-0")
 		})
 	})
 
