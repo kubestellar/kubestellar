@@ -130,12 +130,12 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 	}
 
 	// if the binding-policies matching cycles end and the object is not selected by a singleton binding,
-	// we need to remove the singleton label from the object if it exists.
+	// we need to update the singleton label value for the object.
 	// NOTE that this takes care of the case where the object was previously selected by a singleton binding
 	// and is no longer selected by any binding.
 	if !objBeingDeleted && !isSelectedBySingletonBinding {
 		if err := c.handleSingletonLabel(ctx, obj, objGVR, util.BindingPolicyLabelSingletonStatusValueUnset); err != nil {
-			return fmt.Errorf("failed to remove singleton label from object: %w", err)
+			return fmt.Errorf("failed to update singleton label for object: %w", err)
 		}
 	}
 
