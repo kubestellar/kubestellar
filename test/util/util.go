@@ -33,6 +33,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -285,7 +286,9 @@ func CreateJob(ctx context.Context, wds *kubernetes.Clientset, ns string, name s
 func ValidateNumDeployments(ctx context.Context, wec *kubernetes.Clientset, ns string, num int) {
 	gomega.Eventually(func() int {
 		deployments, err := wec.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		if err != nil {
+			return -1
+		}
 		return len(deployments.Items)
 	}, timeout).Should(gomega.Equal(num))
 }
@@ -387,15 +390,70 @@ func CleanupWDS(ctx context.Context, wds *kubernetes.Clientset, ksWds *ksClient.
 	}, timeout).Should(gomega.Equal(0))
 }
 
-func DeletePod(ctx context.Context, client *kubernetes.Clientset, ns string, name string) {
-	ginkgo.By("DeletePod")
-	pods, err := client.CoreV1().Pods(ns).List(ctx, metav1.ListOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+func DeletePods(ctx context.Context, client *kubernetes.Clientset, ns string, namePrefix string) {
+	ginkgo.By(fmt.Sprintf("Enumerating Pods in namespace %q with names starting with %q", ns, namePrefix))
+	var pods *corev1.PodList
+	gomega.EventuallyWithOffset(1, func() error {
+		var err error
+		pods, err = client.CoreV1().Pods(ns).List(ctx, metav1.ListOptions{})
+		return err
+	}, timeout).Should(gomega.Succeed())
+	goners := map[string]types.UID{}
+	stillNeedsDelete := map[string]types.UID{}
 	for _, pod := range pods.Items {
-		podName := pod.GetName()
-		if strings.HasPrefix(podName, name) {
-			err = client.CoreV1().Pods(ns).Delete(ctx, podName, metav1.DeleteOptions{})
-			gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		if strings.HasPrefix(pod.Name, namePrefix) {
+			goners[pod.Name] = pod.UID
+			stillNeedsDelete[pod.Name] = pod.UID
 		}
 	}
+	gomega.EventuallyWithOffset(1, func() map[string]error {
+		problems := map[string]error{}
+		for podName := range stillNeedsDelete {
+			err := client.CoreV1().Pods(ns).Delete(ctx, podName, metav1.DeleteOptions{})
+			if err == nil || errors.IsNotFound(err) {
+				delete(stillNeedsDelete, podName)
+			} else {
+				problems[podName] = err
+			}
+		}
+		return problems
+	}, timeout).Should(gomega.BeEmpty())
+	ginkgo.By(fmt.Sprintf("Deleted pods %v", goners))
+	gomega.EventuallyWithOffset(1, func() map[string]types.UID {
+		remaining := map[string]types.UID{}
+		for podName, podUID := range goners {
+			pod, err := client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
+			if err == nil && pod.UID == podUID || err != nil && !errors.IsNotFound(err) {
+				remaining[pod.Name] = pod.UID
+			}
+		}
+		return remaining
+	}, timeout).Should(gomega.BeEmpty())
+}
+
+func Expect1PodOfEach(ctx context.Context, client *kubernetes.Clientset, ns string, namePrefixes ...string) {
+	gomega.EventuallyWithOffset(1, func() map[string]int {
+		pods, err := client.CoreV1().Pods(ns).List(ctx, metav1.ListOptions{})
+		if err != nil {
+			return map[string]int{err.Error(): 1}
+		}
+		problems := map[string]int{}
+		for _, namePrefix := range namePrefixes {
+			count := 0
+			for _, pod := range pods.Items {
+				if strings.HasPrefix(pod.Name, namePrefix) {
+					for _, cond := range pod.Status.Conditions {
+						if cond.Type == corev1.PodReady && cond.Status == corev1.ConditionTrue {
+							count += 1
+						}
+					}
+				}
+			}
+			if count != 1 {
+				problems[namePrefix] = count
+			}
+		}
+		return problems
+	}, timeout).Should(gomega.BeEmpty())
+	ginkgo.By(fmt.Sprintf("Waited for ready pods in namespace %q with name prefixes %v", ns, namePrefixes))
 }
