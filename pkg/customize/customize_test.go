@@ -36,15 +36,14 @@ func TestCustomize(t *testing.T) {
 	for try := 1; try <= 100; try++ {
 		gen := &generator{rg: rg, defs: map[string]string{}, undefined: sets.New[string]()}
 		input, expected := gen.generateData()
-		exp := NewExpander(gen.defs)
 		inputCopy := runtime.DeepCopyJSONValue(input)
-		actual := exp.ExpandTemplates(fmt.Sprintf("try%d", try), inputCopy)
+		actual, wantedChange, errs := ExpandTemplates(fmt.Sprintf("try%d", try), inputCopy, gen.defs)
 		t.Logf("Tested input=%#v, defs=%#v", input, gen.defs)
 		fail := false
-		if len(gen.errors) == len(exp.Errors) {
-			t.Logf("Got expected number of errors; errors=%#v", exp.Errors)
+		if len(gen.errors) == len(errs) {
+			t.Logf("Got expected number of errors; errors=%#v", errs)
 		} else {
-			t.Errorf("Expected errors=%v, got errors %v", gen.errors, exp.Errors)
+			t.Errorf("Expected errors=%v, got errors %v", gen.errors, errs)
 			fail = true
 		}
 		if apiequality.Semantic.DeepEqual(expected, actual) {
@@ -53,12 +52,8 @@ func TestCustomize(t *testing.T) {
 			t.Errorf("Expected %#v, got %#v", expected, actual)
 			fail = true
 		}
-		if (gen.changeSome || len(gen.errors) > 0) != exp.WantedChange() {
-			t.Errorf("Expected WantedChange=%v, got %v", (gen.changeSome || len(gen.errors) > 0), exp.WantedChange())
-			fail = true
-		}
-		if gen.changeSome != exp.ChangedSome {
-			t.Errorf("Expected ChangedSome=%v, got %v", gen.changeSome, exp.ChangedSome)
+		if (gen.changeSome || len(gen.errors) > 0) != wantedChange {
+			t.Errorf("Expected WantedChange=%v, got %v", (gen.changeSome || len(gen.errors) > 0), wantedChange)
 			fail = true
 		}
 		if fail {

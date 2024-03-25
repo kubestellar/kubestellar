@@ -19,13 +19,13 @@ package transport
 import (
 	"context"
 	"fmt"
+	"go/token"
 	"sync"
 	"time"
 
 	"github.com/go-logr/logr"
 	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions/cluster/v1"
 	clusterlisters "open-cluster-management.io/api/client/cluster/listers/cluster/v1"
-	clusterapi "open-cluster-management.io/api/cluster/v1"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -47,7 +47,6 @@ import (
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	a "github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/customize"
-	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	controlclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
 	controlv1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
 	controlv1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
@@ -72,41 +71,41 @@ var objectsFilter = filtering.NewObjectFilteringMap()
 // The given transportDynamicClient is used to access the ITS.
 func NewTransportController(ctx context.Context, inventoryPreInformer clusterinformers.ManagedClusterInformer,
 	bindingClient controlclient.BindingInterface, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
-	wdsClientset ksclientset.Interface, wdsDynamicClient dynamic.Interface, transportClientset kubernetes.Interface,
+	wdsDynamicClient dynamic.Interface, transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface, wdsName string) (*genericTransportController, error) {
 	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
 	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
 	}
-	return NewTransportControllerForWrappedObjectGVR(ctx, inventoryPreInformer, bindingClient, bindingInformer, transport, wdsClientset, wdsDynamicClient, transportDynamicClient, wdsName, wrappedObjectGVR), nil
+	return NewTransportControllerForWrappedObjectGVR(ctx, inventoryPreInformer, bindingClient, bindingInformer, transport, wdsDynamicClient, transportDynamicClient, wdsName, wrappedObjectGVR), nil
 }
 
 // NewTransportControllerForWrappedObjectGVR returns a new transport controller.
 // The given transportDynamicClient is used to access the ITS.
 func NewTransportControllerForWrappedObjectGVR(ctx context.Context, inventoryPreInformer clusterinformers.ManagedClusterInformer,
 	bindingClient controlclient.BindingInterface, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
-	wdsClientset ksclientset.Interface, wdsDynamicClient dynamic.Interface,
+	wdsDynamicClient dynamic.Interface,
 	transportDynamicClient dynamic.Interface, wdsName string, wrappedObjectGVR schema.GroupVersionResource) *genericTransportController {
 	dynamicInformerFactory := dynamicinformer.NewDynamicSharedInformerFactory(transportDynamicClient, 0)
 	wrappedObjectGenericInformer := dynamicInformerFactory.ForResource(wrappedObjectGVR)
 
 	transportController := &genericTransportController{
-		logger:                      klog.FromContext(ctx),
-		inventoryInformerSynced:     inventoryPreInformer.Informer().HasSynced,
-		inventoryLister:             inventoryPreInformer.Lister(),
-		bindingClient:               bindingClient,
-		bindingLister:               bindingInformer.Lister(),
-		bindingInformerSynced:       bindingInformer.Informer().HasSynced,
-		wrappedObjectInformerSynced: wrappedObjectGenericInformer.Informer().HasSynced,
-		workqueue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
-		transport:                   transport,
-		transportClient:             transportDynamicClient,
-		wrappedObjectGVR:            wrappedObjectGVR,
-		wdsClientset:                wdsClientset,
-		wdsDynamicClient:            wdsDynamicClient,
-		wdsName:                     wdsName,
-		bindingCares:                make(map[string]sets.Set[v1alpha1.Destination]),
+		logger:                       klog.FromContext(ctx),
+		inventoryInformerSynced:      inventoryPreInformer.Informer().HasSynced,
+		inventoryLister:              inventoryPreInformer.Lister(),
+		bindingClient:                bindingClient,
+		bindingLister:                bindingInformer.Lister(),
+		bindingInformerSynced:        bindingInformer.Informer().HasSynced,
+		wrappedObjectInformerSynced:  wrappedObjectGenericInformer.Informer().HasSynced,
+		workqueue:                    workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
+		transport:                    transport,
+		transportClient:              transportDynamicClient,
+		wrappedObjectGVR:             wrappedObjectGVR,
+		wdsDynamicClient:             wdsDynamicClient,
+		wdsName:                      wdsName,
+		bindingSensitiveDestinations: make(map[string]sets.Set[v1alpha1.Destination]),
+		destinationProperties:        make(map[v1alpha1.Destination]map[string]string),
 	}
 
 	transportController.logger.Info("Setting up event handlers")
@@ -126,9 +125,21 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context, inventoryPre
 		DeleteFunc: transportController.handleWrappedObject,
 	})
 	inventoryPreInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    transportController.enqueueBindingsForCluster,
-		UpdateFunc: func(_, new interface{}) { transportController.enqueueBindingsForCluster(new) },
-		DeleteFunc: transportController.enqueueBindingsForCluster,
+		AddFunc: func(obj any) {
+			inv := obj.(metav1.Object)
+			transportController.invalidatePropertiesForCluster(inv, true, "add")
+		},
+		UpdateFunc: func(old, new interface{}) {
+			newInv := old.(metav1.Object)
+			transportController.invalidatePropertiesForCluster(newInv, true, "update")
+		},
+		DeleteFunc: func(obj any) {
+			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
+				obj = dfsu.Obj
+			}
+			inv := obj.(metav1.Object)
+			transportController.invalidatePropertiesForCluster(inv, false, "delete")
+		},
 	})
 	dynamicInformerFactory.Start(ctx.Done())
 
@@ -180,15 +191,20 @@ type genericTransportController struct {
 	transportClient  dynamic.Interface // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
-	wdsClientset     ksclientset.Interface
 	wdsDynamicClient dynamic.Interface
 	wdsName          string
 
 	sync.RWMutex
-	// bindingCares maps Binding name to the set of destinations whose properties the Binding is senstive to.
+
+	// bindingSensitiveDestinations maps Binding name to the set of destinations whose properties the Binding is senstive to.
 	// Access to both the map and the Sets it holds is controlled by the RWMutex.
 	// The sets are mutable with the RWMutex held.
-	bindingCares map[string]sets.Set[v1alpha1.Destination]
+	bindingSensitiveDestinations map[string]sets.Set[v1alpha1.Destination]
+
+	// destinationProperties maps a destination to the properties to use for it in template expansion.
+	// Access only while holding RWMutex and keep consistent with bindingSensitiveDestinations.
+	// Every `map[string]string` that appears here is immutable from the time that it arrived.
+	destinationProperties map[v1alpha1.Destination]map[string]string
 }
 
 // enqueueBinding takes an Binding resource and
@@ -337,7 +353,7 @@ func (c *genericTransportController) syncHandler(ctx context.Context, objectName
 	}
 
 	if isObjectBeingDeleted(binding) {
-		c.setBindingCares(binding.Name, nil)
+		c.setBindingSensitivities(binding.Name, nil)
 		return c.deleteWrappedObjectsAndFinalizer(ctx, binding)
 	}
 	// otherwise, object was not deleted and no error occurered while reading the object.
@@ -407,7 +423,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	}
 	_, err = c.bindingClient.UpdateStatus(ctx, bindingCopy, metav1.UpdateOptions{FieldManager: ControllerName})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to update status of Binding '%s' - %w", binding.Name, err)
 	}
 	// converge actual state to the desired state
 	if err := c.propagateWrappedObjectToClusters(ctx, destToDesiredWrappedObject, currentWrappedObjectList, binding.Spec.Destinations); err != nil {
@@ -422,22 +438,6 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	}
 
 	return nil
-}
-
-func (c *genericTransportController) valuesForDestination(bindingName string, dest v1alpha1.Destination) map[string]string {
-	c.addBindingCare(bindingName, dest) // ensure any change notification received after this causes reconsideration
-	cluster, err := c.inventoryLister.Get(dest.ClusterId)
-	if err != nil {
-		// This should be a transient condition that is already going to be remedied,
-		// because this means that the caller is working on old information.
-		// Just return anything in this case.
-		c.logger.V(2).Info("Failed to get inventory object", "name", dest.ClusterId, "err", err)
-		return nil
-	}
-	ans := map[string]string{}
-	MapCopyInto(ans, cluster.Annotations)
-	MapCopyInto(ans, cluster.Labels)
-	return ans
 }
 
 func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
@@ -476,7 +476,6 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	}
 
 	bindingErrors := []string{}
-	destToDefs := map[v1alpha1.Destination]map[string]string{}
 
 	// This will become non-nil if any object to propagate needs customization
 	var destToCustomizedObjects map[v1alpha1.Destination][]*unstructured.Unstructured
@@ -493,11 +492,7 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 			objC := objToPropagate
 			var customizationErrors []string
 			if objRequestsExpansion && (destIdx == 0 || customizeThisObject) {
-				defs := destToDefs[dest]
-				if defs == nil {
-					defs = c.valuesForDestination(binding.Name, dest)
-					destToDefs[dest] = defs
-				}
+				defs := c.getPropertiesForDestination(binding.Name, dest)
 				// customizeThisObject does not vary with destination, for a given objToPropagate
 				objC, customizationErrors, customizeThisObject = c.customizeForDest(objToPropagate, dest.ClusterId+"/"+objRefStr, defs)
 				if len(customizationErrors) != 0 && !reportedSomeErrors {
@@ -529,7 +524,7 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	} else {
 		cares = sets.New[v1alpha1.Destination]()
 	}
-	c.setBindingCares(binding.Name, cares) // forget about now-irrelevant destinations
+	c.setBindingSensitivities(binding.Name, cares) // forget about now-irrelevant destinations
 
 	// This will be constant if no object needed customization, otherwise a map's get func
 	var destToWrappedObject func(v1alpha1.Destination) (*unstructured.Unstructured, bool)
@@ -570,38 +565,95 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	return destToWrappedObject, bindingErrors, nil
 }
 
-func (c *genericTransportController) addBindingCare(bindingName string, dest v1alpha1.Destination) {
+// getPropertiesForDestination returns the properties to use for the given destination and notes
+// that the given binding is sensitive to the fact that the destination has those properties.
+func (c *genericTransportController) getPropertiesForDestination(bindingName string, dest v1alpha1.Destination) map[string]string {
 	c.Lock()
 	defer c.Unlock()
-	cares := c.bindingCares[bindingName]
-	if cares == nil {
-		cares = sets.New[v1alpha1.Destination](dest)
-		c.bindingCares[bindingName] = cares
+	dests := c.bindingSensitiveDestinations[bindingName]
+	if dests == nil {
+		dests = sets.New[v1alpha1.Destination](dest)
+		c.bindingSensitiveDestinations[bindingName] = dests
 	} else {
-		cares.Insert(dest)
+		dests.Insert(dest)
+	}
+	props, have := c.destinationProperties[dest]
+	if have {
+		return props
+	}
+	props = map[string]string{}
+	cluster, err := c.inventoryLister.Get(dest.ClusterId)
+	if err != nil {
+		// This should be a transient condition that is already going to be remedied:
+		// the caller is concerned with a destination that has been deleted,
+		// thus there are already events in the pipeline that will eventually cause the caller's
+		// work to be overwritten by work that does not try to use a deleted destination.
+		// Just use any map in this case.
+		c.logger.V(2).Info("Failed to get inventory object", "name", dest.ClusterId, "err", err)
+	} else {
+		MapCopyIntoFiltered(props, cluster.Annotations, token.IsIdentifier)
+		MapCopyIntoFiltered(props, cluster.Labels, token.IsIdentifier)
+	}
+	c.destinationProperties[dest] = props
+	return props
+}
+
+func (c *genericTransportController) setBindingSensitivities(bindingName string, dests sets.Set[v1alpha1.Destination]) {
+	c.Lock()
+	defer c.Unlock()
+	if dests == nil {
+		delete(c.bindingSensitiveDestinations, bindingName)
+	} else {
+		c.bindingSensitiveDestinations[bindingName] = dests
 	}
 }
 
-func (c *genericTransportController) setBindingCares(bindingName string, cares sets.Set[v1alpha1.Destination]) {
-	c.Lock()
-	defer c.Unlock()
-	if cares == nil {
-		delete(c.bindingCares, bindingName)
-	} else {
-		c.bindingCares[bindingName] = cares
+func (c *genericTransportController) invalidatePropertiesForCluster(inv metav1.Object, present bool, event string) {
+	dest := v1alpha1.Destination{ClusterId: inv.GetName()}
+	var newLabels, newAnnotations map[string]string
+	if present {
+		newLabels = inv.GetLabels()
+		newAnnotations = inv.GetAnnotations()
 	}
-}
-
-func (c *genericTransportController) enqueueBindingsForCluster(clusterAny any) {
-	cluster := clusterAny.(*clusterapi.ManagedCluster)
 	c.RLock()
 	defer c.RUnlock()
-	dest := v1alpha1.Destination{ClusterId: cluster.Name}
-	for bindingName, cares := range c.bindingCares {
-		if cares.Has(dest) {
+	if equalProperties(c.destinationProperties[dest], newLabels, newAnnotations) {
+		return
+	}
+	delete(c.destinationProperties, dest)
+	for bindingName, dests := range c.bindingSensitiveDestinations {
+		if dests.Has(dest) {
+			c.logger.V(5).Info("Enqueuing reference to Binding that depends on destination properties", "binding", bindingName, "destination", dest, "event", event)
 			c.workqueue.Add(bindingName)
 		}
 	}
+}
+
+// equalProperties reveals whether the new labels and annotations amount to the same properties as the old ones
+func equalProperties(oldProps, newLabels, newAnnotations map[string]string) bool {
+	var newNumProperties int
+	for key, newVal := range newLabels {
+		if !token.IsIdentifier(key) {
+			continue
+		}
+		newNumProperties++
+		if oldVal, had := oldProps[key]; !(had && oldVal == newVal) {
+			return false
+		}
+	}
+	for key, newVal := range newAnnotations {
+		if !token.IsIdentifier(key) {
+			continue
+		}
+		if _, isAlsoLabel := newLabels[key]; isAlsoLabel {
+			continue
+		}
+		newNumProperties++
+		if oldVal, had := oldProps[key]; !(had && oldVal == newVal) {
+			return false
+		}
+	}
+	return newNumProperties == len(oldProps)
 }
 
 // customizeForDest customizes the given object for the given destination,
@@ -610,12 +662,11 @@ func (c *genericTransportController) enqueueBindingsForCluster(clusterAny any) {
 func (c *genericTransportController) customizeForDest(object *unstructured.Unstructured, dest string, defs map[string]string) (*unstructured.Unstructured, []string, bool) {
 	objectCopy := object.DeepCopy()
 	objectData := objectCopy.UnstructuredContent()
-	exp := customize.NewExpander(defs)
-	objectDataExpanded := exp.ExpandTemplates(dest, objectData)
-	if exp.WantedChange() {
+	objectDataExpanded, wantedChange, errs := customize.ExpandTemplates(dest, objectData, defs)
+	if wantedChange {
 		objectData = objectDataExpanded.(map[string]any)
 		objectCopy.SetUnstructuredContent(objectData)
-		return objectCopy, exp.Errors, true
+		return objectCopy, errs, true
 	}
 	return object, nil, false
 }
@@ -679,7 +730,7 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 		if err != nil {
 			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 		}
-		klog.FromContext(ctx).V(3).Info("Created wrapped object to ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject)
+		klog.FromContext(ctx).V(5).Info("Created wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject)
 		return nil
 	}
 	// // if we reached here object already exists, try update object
@@ -690,7 +741,7 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 	if err != nil {
 		return fmt.Errorf("failed to update wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 	}
-	klog.FromContext(ctx).V(3).Info("Updated wrapped object to ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject)
+	klog.FromContext(ctx).V(5).Info("Updated wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject)
 
 	return nil
 }
@@ -705,7 +756,7 @@ func (c *genericTransportController) updateBinding(ctx context.Context, binding 
 		return nil // if object was not updated, no need to update in API server, return.
 	}
 
-	_, err := c.wdsClientset.ControlV1alpha1().Bindings().Update(ctx, updatedBinding, metav1.UpdateOptions{
+	_, err := c.bindingClient.Update(ctx, updatedBinding, metav1.UpdateOptions{
 		FieldManager: ControllerName,
 	})
 	if err != nil {
@@ -806,8 +857,23 @@ func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	return objectCopy
 }
 
-func MapCopyInto[Key comparable, Val any](dest, src map[Key]Val) {
+func MapCopyIntoFiltered[Key comparable, Val any](dest, src map[Key]Val, pass func(Key) bool) {
 	for key, val := range src {
-		dest[key] = val
+		if pass(key) {
+			dest[key] = val
+		}
 	}
+}
+
+func MapEqual[Key, Val comparable](map1, map2 map[Key]Val) bool {
+	if len(map1) != len(map2) {
+		return false
+	}
+	for key, val1 := range map1 {
+		val2, have := map2[key]
+		if val1 != val2 || !have {
+			return false
+		}
+	}
+	return true
 }
