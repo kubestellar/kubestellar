@@ -1,6 +1,6 @@
 # Deploy KubeStellar on K3D
 
-This document shows how to deploy kubestellar v0.21.0 and a managed cluster on K3D
+This document shows how to deploy kubestellar on K3D hub and wec clusters
 
 ## Prereqs
 
@@ -32,7 +32,7 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
     kubectl config rename-context k3d-kubeflex kubeflex
     ```
 
-1. [Paolo says] when we use kind, the name of the container is kubeflex-control-plane and that is what we use 
+1. When we use kind, the name of the container is kubeflex-control-plane and that is what we use 
    in the internal URL for `--force-internal-endpoint-lookup`.
    Here the name of the container created by K3D is `k3d-kubeflex-server-0` so we rename it:
     ```shell
@@ -47,7 +47,7 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
     ```
 
 1. Install kubestellar controller and OCM space:
-   [Paolo says] we are using nginx ingress with tls passthru.
+   We are using nginx ingress with tls passthru.
    The current install for kubeflex installs also nginx ingress but specifically for kind.
    To specify passthru for K3D, edit the ingress placement controller with the following command and add `--enable-ssl-passthrough` to the list of args for the container
     ```shell
