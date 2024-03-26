@@ -57,7 +57,7 @@ const (
 )
 
 func ApplyCRDs(ctx context.Context, dynamicClient dynamic.Interface, clientset kubernetes.Interface, clientsetExt apiextensionsclientset.Interface, logger logr.Logger) error {
-	ctxLimited, cancel := context.WithTimeout(ctx, 30*time.Second)
+	ctxLimited, cancel := context.WithTimeout(ctx, time.Minute)
 	defer cancel()
 
 	crds, err := readCRDs()
