@@ -1,8 +1,6 @@
-# User Guide
+# Using existing Kubernetes cluster to host KubeStellar
 
 Status of this document: it is the barest of a start. Much more needs to be written.
-
-This document is for users of a release. Examples of using the latest stable release are in [the examples document](examples.md). This document adds information to support other usage scenarios.
 
 ## Using an existing Kind cluster as the hosting cluster
 
@@ -28,6 +26,6 @@ This is similar to using an existing Kind cluster but requires an additional mod
 
 Additionally, the recipe for registering a WEC with the ITS needs to be modified. In the `clusteradm` command, omit the `--force-internal-endpoint-lookup` flag. If following the example commands literally, this means to define `flags=""` rather than `flags="--force-internal-endpoint-lookup"`.
 
-## When everythig is not on the same machine
+## When everything is not on the same machine
 
 Thus far we can only say how to handle this when the hosting cluster is OpenShift. The problem is getting URLs that work from everywhere. OpenShift is a hosted product, your clusters have domain names that are resolvable from everywhere. In other words, if you use an OpenShift cluster as your hosting cluster then this problem is already solved.
