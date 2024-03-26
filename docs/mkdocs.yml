@@ -39,16 +39,15 @@ nav:
       - Architecture: direct/architecture.md
       - Release-notes: direct/release-notes.md
   - Getting Started: 
+          - Pre-reqs: direct/pre-reqs.md
           - Setting up KubeStellar:
               - Using existing hosting cluster: direct/hosting-cluster.md
               - KubeStellar on KIND: direct/ks-on-kind.md
               - KubeStellar on K3D: direct/ks-on-k3d.md
               - KubeStellar on OCP: direct/ks-on-ocp.md
           - Examples: direct/examples.md
-          - Pre-reqs: direct/pre-reqs.md
   - Contributing: 
       - Overview of contributing: direct/contributor.md
-      - Pre-reqs: direct/pre-reqs.md
       - Packaging: direct/packaging.md
       - Release Process: direct/release.md
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
