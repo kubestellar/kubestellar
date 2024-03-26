@@ -455,7 +455,7 @@ implementations of the transport interface. The interface between the plugin and
 
 The above list is required in order to comply with [<u>SIG Multi-Cluster Work API</u>](https://multicluster.sigs.k8s.io/concepts/work-api/).
 
-Each plugin has an executable with a `main` func that calls [the generic code](../../../pkg/transport/cmd/generic-main.go), passing the plugin object that implements the plugin interface.
+Each plugin has an executable with a `main` func that calls [the generic code](../../../pkg/transport/cmd/generic-main.go), passing the plugin object that implements the plugin interface. The generic code does the rule-based customization; the plugin is given customized objects.
 
 KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project [Open Cluster Management](https://open-cluster-management.io). OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available [here](https://github.com/kubestellar/ocm-transport-plugin).  
 We expect to have more transport plugin options in the future.

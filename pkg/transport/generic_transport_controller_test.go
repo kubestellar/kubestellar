@@ -25,6 +25,8 @@ import (
 	"testing"
 	"time"
 
+	clusterclientfake "open-cluster-management.io/api/client/cluster/clientset/versioned/fake"
+	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 	clusterapi "open-cluster-management.io/api/cluster/v1"
 	workapi "open-cluster-management.io/api/work/v1"
 
@@ -306,8 +308,13 @@ func TestGenericController(t *testing.T) {
 	itsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme)
 	transport := &testTransport{expect: bindingCase.expect}
 	wrapperGVR := workapi.GroupVersion.WithResource("manifestworks")
-	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, wdsKsInformerFactory.Control().V1alpha1().Bindings(), transport, wdsKsClientFake, wdsDynamicClient, itsDynamicClient, "test-wds", wrapperGVR)
+	inventoryClientFake := clusterclientfake.NewSimpleClientset()
+	inventoryInformerFactory := clusterinformers.NewSharedInformerFactory(inventoryClientFake, 0*time.Second)
+	inventoryPreInformer := inventoryInformerFactory.Cluster().V1().ManagedClusters()
+	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, inventoryPreInformer, wdsKsInformerFactory.Control().V1alpha1().Bindings(), transport, wdsKsClientFake, wdsDynamicClient, itsDynamicClient, "test-wds", wrapperGVR)
 	wdsKsInformerFactory.Start(ctx.Done())
+	inventoryInformerFactory.Start(ctx.Done())
+
 	go ctlr.Run(ctx, 4)
 	err := wait.PollUntilContextTimeout(ctx, 5*time.Second, time.Minute, false, func(ctx context.Context) (done bool, err error) {
 		transport.Lock()
