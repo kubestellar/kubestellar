@@ -68,7 +68,14 @@ jobs:
 
       - name: show pods in hosting cluster
         if: always()
-        run: kubectl --context kind-kubeflex get pods -A
+        run: |
+          date
+          kubectl --context kind-kubeflex get pods -A
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -p -n $ns $name || true; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+
+      - name: show Deployment objects in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get deployments -A
 
       - name: show kubestellar controller manager log
         if: always()
@@ -144,7 +151,14 @@ jobs:
 
       - name: show pods in hosting cluster
         if: always()
-        run: kubectl --context kind-kubeflex get pods -A
+        run: |
+          date
+          kubectl --context kind-kubeflex get pods -A
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -p -n $ns $name || true; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+
+      - name: show Deployment objects in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get deployments -A
 
       - name: show kubestellar controller manager log
         if: always()
