@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"strings"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -76,7 +75,13 @@ var excludedResourceNames = map[string]bool{
 	"endpoints":            true,
 }
 
-const bindingQueueingDelay = 2 * time.Second
+const (
+	bindingQueueingDelay = 2 * time.Second
+	// https://github.com/kubernetes/kubernetes/blob/5d527dcf1265d7fcd0e6c8ec511ce16cc6a40699/staging/src/k8s.io/cli-runtime/pkg/genericclioptions/config_flags.go#L477
+	referenceBurstUpperBound = 300
+	// https://github.com/kubernetes/kubernetes/pull/105520/files
+	referenceQPSUpperBound = 50.0
+)
 
 // Controller watches all objects, finds associated bindingpolicies, when matched a bindingpolicy wraps and
 // places objects into mailboxes
@@ -89,9 +94,10 @@ type Controller struct {
 
 	extClient apiextensionsclientset.Interface // used for CRD
 
-	listers   util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
-	informers util.ConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer]
-	stoppers  util.ConcurrentMap[schema.GroupVersionResource, chan struct{}]
+	apiResourceLists []*metav1.APIResourceList
+	listers          util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
+	informers        util.ConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer]
+	stoppers         util.ConcurrentMap[schema.GroupVersionResource, chan struct{}]
 
 	bindingPolicyResolver BindingPolicyResolver
 	workqueue             workqueue.RateLimitingInterface
@@ -115,10 +121,19 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 		return nil, err
 	}
 
-	nGVRs, err := countGVRsViaAggregatedDiscovery(kubernetesClient)
+	// do the discovery, save the results, then discard the 'depleted' client
+	disposableConfig := rest.CopyConfig(wdsRestConfig)
+	disposableConfig.Burst = referenceBurstUpperBound
+	disposableConfig.QPS = referenceQPSUpperBound
+	disposableClient, err := kubernetes.NewForConfig(disposableConfig)
 	if err != nil {
-		logger.Error(err, "Not able to count GVRs via aggregated discovery") // but we can still continue
+		return nil, err
 	}
+	apiResourceLists, nGVRs, err := doDiscovery(logger, disposableClient)
+	if err != nil && !discovery.IsGroupDiscoveryFailedError(err) {
+		return nil, err
+	}
+
 	// tuning the rate limiter based on the number of GVRs is tested to be working well
 	wdsRestConfigTuned := rest.CopyConfig(wdsRestConfig)
 	wdsRestConfigTuned.Burst = computeBurstFromNumGVRs(nGVRs)
@@ -139,23 +154,28 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, imbsRes
 
 	ocmClient := ocm.GetOCMClient(imbsRestConfig)
 
-	return makeController(logger, dynamicClient, kubernetesClient, extClient, ocmClientset, ocmClient, wdsName, allowedGroupsSet)
+	return makeController(logger, dynamicClient, kubernetesClient, extClient, ocmClientset, ocmClient, apiResourceLists, wdsName, allowedGroupsSet)
 }
 
-func countGVRsViaAggregatedDiscovery(countClient kubernetes.Interface) (int, error) {
-	dc := countClient.Discovery().(*discovery.DiscoveryClient)
+// doDiscovery contains the exact one occurence of ServerPreferredResources() in this repository.
+// doDiscovery is supposed to be invoked exactly one time during the lifecycle of a binding controller.
+// That is, full API discovery against the WDS is done exactly one time during the lifecycle of a binding controller.
+// doDiscovery also returns the number of successfully discovered GVRs.
+// We do these to optimize the performance of the binding controller, especially when it runs against a WDS which
+// (a) uses legacy discovery;
+// (b) has large number of api groups (e.g. because of large number of CRDs).
+func doDiscovery(logger logr.Logger, client kubernetes.Interface) ([]*metav1.APIResourceList, int, error) {
+	dc := client.Discovery().(*discovery.DiscoveryClient)
 	if dc.UseLegacyDiscovery { // by default it should be false already, just double check
 		dc.UseLegacyDiscovery = false
 	}
 	apiResourceLists, err := dc.ServerPreferredResources()
-	if err != nil {
-		return 0, fmt.Errorf("error listing server perferred resources: %w", err)
-	}
+	logger.Info("Discovery", "numAPIResourceLists", len(apiResourceLists), "err", err)
 	n := 0
 	for _, list := range apiResourceLists {
 		n += len(list.APIResources)
 	}
-	return n, nil
+	return apiResourceLists, n, err
 }
 
 func computeBurstFromNumGVRs(nGVRs int) int {
@@ -165,9 +185,8 @@ func computeBurstFromNumGVRs(nGVRs int) int {
 		return rest.DefaultBurst
 	}
 	// in case too large, look at some value for reference
-	// https://github.com/kubernetes/kubernetes/blob/5d527dcf1265d7fcd0e6c8ec511ce16cc6a40699/staging/src/k8s.io/cli-runtime/pkg/genericclioptions/config_flags.go#L477
-	if burst > 300 {
-		return 300
+	if burst > referenceBurstUpperBound {
+		return referenceBurstUpperBound
 	}
 	return burst
 }
@@ -179,9 +198,8 @@ func computeQPSFromNumGVRs(nGVRs int) float32 {
 		return rest.DefaultQPS
 	}
 	// in case too large, look at some value for reference
-	// https://github.com/kubernetes/kubernetes/pull/105520/files
-	if qps > 50.0 {
-		return 50.0
+	if qps > referenceQPSUpperBound {
+		return referenceQPSUpperBound
 	}
 	return qps
 }
@@ -192,6 +210,7 @@ func makeController(logger logr.Logger,
 	extClient apiextensionsclientset.Interface, // used for CRD
 	ocmClientset ocmclientset.Interface, // used for ManagedCluster in ITS
 	ocmClient client.Client, // used for ManagedCluster, ManifestWork in ITS
+	apiResourceLists []*metav1.APIResourceList,
 	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
 
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
@@ -207,6 +226,7 @@ func makeController(logger logr.Logger,
 		dynamicClient:         dynamicClient,
 		kubernetesClient:      kubernetesClient,
 		extClient:             extClient,
+		apiResourceLists:      apiResourceLists,
 		listers:               util.NewConcurrentMap[schema.GroupVersionResource, cache.GenericLister](),
 		informers:             util.NewConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer](),
 		stoppers:              util.NewConcurrentMap[schema.GroupVersionResource, chan struct{}](),
@@ -222,6 +242,18 @@ func makeController(logger logr.Logger,
 // Call this before Start.
 func (c *Controller) EnsureCRDs(ctx context.Context) error {
 	return crd.ApplyCRDs(ctx, c.dynamicClient, c.kubernetesClient, c.extClient, c.logger)
+}
+
+// AppendKSResources lets the controller know about the KS resources.
+// Call this after EnsureCRDs and before Start.
+func (c *Controller) AppendKSResources(ctx context.Context) error {
+	gv := v1alpha1.GroupVersion.String()
+	list, err := c.kubernetesClient.Discovery().ServerResourcesForGroupVersion(gv)
+	if err != nil {
+		return err
+	}
+	c.apiResourceLists = append(c.apiResourceLists, list)
+	return nil
 }
 
 // Start the controller
@@ -248,21 +280,12 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	defer c.workqueue.ShutDown()
 
 	logger := klog.FromContext(ctx)
-	// Get all the api resources in the cluster
-	apiResources, err := c.kubernetesClient.Discovery().ServerPreferredResources()
-	logger.Info("Discovery", "numGroups", len(apiResources), "err", err)
-	if err != nil {
-		// ignore the error caused by a stale API service
-		if !strings.Contains(err.Error(), util.UnableToRetrieveCompleteAPIListError) {
-			return err
-		}
-	}
 
 	// Create a dynamic shared informer factory
 	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.dynamicClient, 0*time.Minute)
 
 	// Loop through the api resources and create informers and listers for each of them
-	for _, list := range apiResources {
+	for _, list := range c.apiResourceLists {
 		gv, err := schema.ParseGroupVersion(list.GroupVersion)
 		if err != nil {
 			c.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", list.GroupVersion)
@@ -337,7 +360,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 
 	// Create informer on managedclusters so we can re-evaluate BindingPolicies.
 	// This informer differ from the previous informers in that it listens on the ocm hub.
-	err = c.createManagedClustersInformer(ctx)
+	err := c.createManagedClustersInformer(ctx)
 	if err != nil {
 		return err
 	}

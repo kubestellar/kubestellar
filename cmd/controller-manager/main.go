@@ -148,6 +148,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err := bindingController.AppendKSResources(ctx); err != nil {
+		setupLog.Error(err, "error appending KubeStellar resources to discovered lists")
+		os.Exit(1)
+	}
+
 	cListers := make(chan interface{}, 1)
 
 	if err := bindingController.Start(ctx, workers, cListers); err != nil {
