@@ -9,7 +9,6 @@
 
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 
-[![](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch={{ config.ks_branch }})](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
 [![](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml)
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
@@ -21,7 +20,7 @@
 KubeStellar is particularly beneficial if you're currently deploying in a single cluster and are looking to expand to multiple clusters, or if you're already using multiple clusters and are seeking a more streamlined developer experience.
 
 
-![KubeStellar High Level View](./images/kubestellar-high-level.png)
+![KubeStellar High Level View](docs/content/images/kubestellar-high-level.png)
 
 
 The use of multiple clusters offers several advantages, including:
@@ -84,9 +83,9 @@ Thanks go to these wonderful people:
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/fileppb"><img src="https://avatars.githubusercontent.com/u/124100147?v=4" width="100px;" alt=""/><br /><sub><b>Bob Filepp</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Afileppb+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/thinkahead"><img src="https://avatars.githubusercontent.com/u/7507482?v=4" width="100px;" alt=""/><br /><sub><b>Alexei Karve</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Athinkahead+" title="Contributed PRs">👀</a></td>
+    <td align="center"><a href="https://github.com/effi-ofer"><img src="https://avatars.githubusercontent.com/u/18140413?v=4" width="100px;" alt=""/><br /><sub><b>Effi Ofer</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Aeffi-ofer+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/mra-ruiz"><img src="https://avatars.githubusercontent.com/u/16118462?v=4" width="100px;" alt=""/><br /><sub><b>Maria Camila Ruiz Cardenas</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Amra-ruiz+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/aslom"><img src="https://avatars.githubusercontent.com/u/1648338?v=4" width="100px;" alt=""/><br /><sub><b>Aleksander Slominski</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Aaslom+" title="Contributed PRs">👀</a></td>
+    <td align="center"><a href="https://github.com/andreyod"><img src="https://avatars.githubusercontent.com/u/16204273?v=4" width="100px;" alt=""/><br /><sub><b>Andrey Odarenko</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Aandreyod+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/amanroa"><img src="https://avatars.githubusercontent.com/u/26678552?v=4" width="100px;" alt=""/><br /><sub><b>Aashni Manroa</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Aamanroa+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/KPRoche"><img src="https://avatars.githubusercontent.com/u/25445603?v=4" width="100px;" alt=""/><br /><sub><b>Kevin Roche</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3AKPRoche+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/namasl"><img src="https://avatars.githubusercontent.com/u/144150872?v=4" width="100px;" alt=""/><br /><sub><b>Nick Masluk</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Anamasl+" title="Contributed PRs">👀</a></td>
