@@ -335,18 +335,14 @@ func updateObjectStatus(ctx context.Context, objRef *util.SourceRef, status map[
 
 	if objRef.Namespace == "" {
 		_, err = wdsDynClient.Resource(gvr).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{})
-		// if resource not found it may mean no status subresource - try to update the whole resource
-		if errors.IsNotFound(err) {
-			_, err = wdsDynClient.Resource(gvr).Update(ctx, unstrObj, metav1.UpdateOptions{})
-		}
 	} else {
 		_, err = wdsDynClient.Resource(gvr).Namespace(objRef.Namespace).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{})
-		// if resource not found it may mean no status subresource - try to update the whole resource
-		if errors.IsNotFound(err) {
-			_, err = wdsDynClient.Resource(gvr).Namespace(objRef.Namespace).Update(ctx, unstrObj, metav1.UpdateOptions{})
-		}
 	}
 	if err != nil {
+		// if resource not found it may mean no status subresource - try to patch the status
+		if errors.IsNotFound(err) {
+			return util.PatchStatus(ctx, unstrObj, status, objRef.Namespace, gvr, wdsDynClient)
+		}
 		return fmt.Errorf("failed to update status: %w", err)
 	}
 

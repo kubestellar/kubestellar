@@ -17,13 +17,18 @@ limitations under the License.
 package util
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
 )
 
@@ -181,4 +186,33 @@ func CheckAPIisPresent(dc *discovery.DiscoveryClient, gvr schema.GroupVersionRes
 	}
 
 	return false
+}
+
+// CreateStatusPatch creates a status patch for unstructured object.
+func CreateStatusPatch(unstrObj *unstructured.Unstructured, status map[string]interface{}) *unstructured.Unstructured {
+	patchedObj := &unstructured.Unstructured{}
+	patchedObj.SetAPIVersion(unstrObj.GetAPIVersion())
+	patchedObj.SetKind(unstrObj.GetKind())
+	patchedObj.SetName(unstrObj.GetName())
+	patchedObj.SetNamespace(unstrObj.GetNamespace())
+	patchedObj.Object["status"] = status
+	return patchedObj
+}
+
+// PatchStatus updates the object status with Patch.
+func PatchStatus(ctx context.Context, unstrObj *unstructured.Unstructured, status map[string]interface{},
+	namespace string, gvr schema.GroupVersionResource, dynamicClient dynamic.Interface) error {
+
+	patchBytes, err := json.Marshal(CreateStatusPatch(unstrObj, status))
+	if err != nil {
+		return err
+	}
+
+	if namespace != "" {
+		_, err = dynamicClient.Resource(gvr).Namespace(namespace).Patch(ctx, unstrObj.GetName(), types.MergePatchType, patchBytes, metav1.PatchOptions{})
+	} else {
+		_, err = dynamicClient.Resource(gvr).Patch(ctx, unstrObj.GetName(), types.MergePatchType, patchBytes, metav1.PatchOptions{})
+	}
+
+	return err
 }
