@@ -610,6 +610,9 @@ func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	delete(annotations, "kubectl.kubernetes.io/last-applied-configuration")
 	objectCopy.SetAnnotations(annotations)
 
+	// remove the status field.
+	unstructured.RemoveNestedField(objectCopy.Object, "status")
+
 	// clean fields specific to the concrete object.
 	objectsFilter.CleanObjectSpecifics(objectCopy)
 
