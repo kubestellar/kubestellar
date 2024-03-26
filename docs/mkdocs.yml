@@ -32,15 +32,20 @@ docs_dir: 'content'
 site_dir: 'generated'
 
 nav:
-  - Design:
+  - Welcome:
       - Landing: index.md 
+  - Overview:
       - Readme: readme.md
       - Architecture: direct/architecture.md
-      - Usage:
-          - Pre-reqs: direct/pre-reqs.md
-          - User Guide: direct/user-guide.md
-          - Examples: direct/examples.md
       - Release-notes: direct/release-notes.md
+  - Getting Started: 
+          - Setting up KubeStellar:
+              - Using existing hosting cluster: direct/hosting-cluster.md
+              - KubeStellar on KIND: direct/ks-on-kind.md
+              - KubeStellar on K3D: direct/ks-on-k3d.md
+              - KubeStellar on OCP: direct/ks-on-ocp.md
+          - Examples: direct/examples.md
+          - Pre-reqs: direct/pre-reqs.md
   - Contributing: 
       - Overview of contributing: direct/contributor.md
       - Pre-reqs: direct/pre-reqs.md
