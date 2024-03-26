@@ -197,6 +197,34 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/direct/hosting-cluster/</loc>
+         <lastmod>2024-03-26</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/direct/hosting-cluster/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/direct/ks-on-k3d/</loc>
+         <lastmod>2024-03-26</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/direct/ks-on-k3d/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/direct/ks-on-kind/</loc>
+         <lastmod>2024-03-26</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/direct/ks-on-kind/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/direct/ks-on-ocp/</loc>
+         <lastmod>2024-03-26</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/direct/ks-on-ocp/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/direct/packaging/</loc>
          <lastmod>2024-03-26</lastmod>
          <changefreq>daily</changefreq>
@@ -229,13 +257,6 @@
          <lastmod>2024-03-26</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/direct/thirdparties/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/main/direct/user-guide/</loc>
-         <lastmod>2024-03-26</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/direct/user-guide/"/>
          
     </url>
     <url>

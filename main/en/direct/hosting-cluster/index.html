@@ -8,20 +8,20 @@
       
       
       
-        <link rel="canonical" href="https://docs.kubestellar.io/main/en/direct/user-guide/">
+        <link rel="canonical" href="https://docs.kubestellar.io/main/en/direct/hosting-cluster/">
       
       
         <link rel="prev" href="../pre-reqs/">
       
       
-        <link rel="next" href="../examples/">
+        <link rel="next" href="../ks-on-kind/">
       
       <link rel="icon" href="../../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
     
     
       
-        <title>User Guide - KubeStellar</title>
+        <title>Using existing hosting cluster - KubeStellar</title>
       
     
     
@@ -78,9 +78,9 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - User Guide" />
+  <meta property="og:title" content="KubeStellar - Using existing hosting cluster" />
   <meta property="og:description" content="None" />
-  <meta property="og:url" content="https://docs.kubestellar.io/main/en/direct/user-guide/" />
+  <meta property="og:url" content="https://docs.kubestellar.io/main/en/direct/hosting-cluster/" />
   <meta property="og:image" content="https://docs.kubestellar.io/mainassets/images/illustrations/banner.png" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1080" />
@@ -113,7 +113,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#user-guide" class="md-skip">
+        <a href="#using-existing-kubernetes-cluster-to-host-kubestellar" class="md-skip">
           Skip to content
         </a>
       
@@ -196,7 +196,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              User Guide
+              Using existing hosting cluster
             
           </span>
         </div>
@@ -268,6 +268,38 @@
         
   
   
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        Welcome
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../readme/" class="md-tabs__link">
+        Overview
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
     
   
 
@@ -276,8 +308,8 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../" class="md-tabs__link md-tabs__link--active">
-        Design
+      <a href="../pre-reqs/" class="md-tabs__link md-tabs__link--active">
+        Getting Started
       </a>
     </li>
   
@@ -376,29 +408,19 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
       
       
         
           
             
-          
-        
-          
-        
-          
-        
-          
-        
           
         
       
@@ -406,22 +428,61 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../../">Design</a>
-          
-            <label for="__nav_1">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
+          <a href="../../">Welcome</a>
           
         </div>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_1">
           <span class="md-nav__icon md-icon"></span>
-          Design
+          Welcome
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          Overview
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Overview
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
           
             
               
@@ -455,6 +516,28 @@
               
   
   
+  
+    <li class="md-nav__item">
+      <a href="../release-notes/" class="md-nav__link">
+        Release-notes
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -464,7 +547,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_4" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
       
       
         
@@ -476,15 +559,15 @@
         
       
       
-        <label class="md-nav__link" for="__nav_1_4" id="__nav_1_4_label" tabindex="0">
-          Usage
+        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          Getting Started
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_4_label" aria-expanded="true">
-        <label class="md-nav__title" for="__nav_1_4">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_3">
           <span class="md-nav__icon md-icon"></span>
-          Usage
+          Getting Started
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -509,6 +592,45 @@
     
   
   
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+          Setting up KubeStellar
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Setting up KubeStellar
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -518,12 +640,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          User Guide
+          Using existing hosting cluster
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        User Guide
+        Using existing hosting cluster
       </a>
       
         
@@ -556,8 +678,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#when-everythig-is-not-on-the-same-machine" class="md-nav__link">
-    When everythig is not on the same machine
+  <a href="#when-everything-is-not-on-the-same-machine" class="md-nav__link">
+    When everything is not on the same machine
   </a>
   
 </li>
@@ -577,8 +699,36 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/" class="md-nav__link">
-        Examples
+      <a href="../ks-on-kind/" class="md-nav__link">
+        KubeStellar on KIND
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ks-on-k3d/" class="md-nav__link">
+        KubeStellar on K3D
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ks-on-ocp/" class="md-nav__link">
+        KubeStellar on OCP
       </a>
     </li>
   
@@ -598,8 +748,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../release-notes/" class="md-nav__link">
-        Release-notes
+      <a href="../examples/" class="md-nav__link">
+        Examples
       </a>
     </li>
   
@@ -625,7 +775,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
       
       
         
@@ -647,17 +797,15 @@
         
           
         
-          
-        
       
       
-        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
           Contributing
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_2">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Contributing
         </label>
@@ -671,20 +819,6 @@
     <li class="md-nav__item">
       <a href="../contributor/" class="md-nav__link">
         Overview of contributing
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../pre-reqs/" class="md-nav__link">
-        Pre-reqs
       </a>
     </li>
   
@@ -800,7 +934,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
       
       
         
@@ -810,13 +944,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
           Security
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_2_10">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_9">
           <span class="md-nav__icon md-icon"></span>
           Security
         </label>
@@ -876,7 +1010,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
       
       
         
@@ -888,13 +1022,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
           Community
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_3">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           Community
         </label>
@@ -925,7 +1059,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
       
       
         
@@ -947,13 +1081,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
           Contact Us
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_3_2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2">
           <span class="md-nav__icon md-icon"></span>
           Contact Us
         </label>
@@ -1089,7 +1223,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
       
       
         
@@ -1107,13 +1241,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
           Partners
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_3_3">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_3">
           <span class="md-nav__icon md-icon"></span>
           Partners
         </label>
@@ -1272,8 +1406,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#when-everythig-is-not-on-the-same-machine" class="md-nav__link">
-    When everythig is not on the same machine
+  <a href="#when-everything-is-not-on-the-same-machine" class="md-nav__link">
+    When everything is not on the same machine
   </a>
   
 </li>
@@ -1293,7 +1427,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/user-guide.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/hosting-cluster.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -1302,16 +1436,15 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/user-guide.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/hosting-cluster.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
     </a>
   
 
 
-<h1 id="user-guide">User Guide<a class="headerlink" href="#user-guide" title="Permanent link">#</a></h1>
+<h1 id="using-existing-kubernetes-cluster-to-host-kubestellar">Using existing Kubernetes cluster to host KubeStellar<a class="headerlink" href="#using-existing-kubernetes-cluster-to-host-kubestellar" title="Permanent link">#</a></h1>
 <p>Status of this document: it is the barest of a start. Much more needs to be written.</p>
-<p>This document is for users of a release. Examples of using the latest stable release are in <a href="../examples/">the examples document</a>. This document adds information to support other usage scenarios.</p>
 <h2 id="using-an-existing-kind-cluster-as-the-hosting-cluster">Using an existing Kind cluster as the hosting cluster<a class="headerlink" href="#using-an-existing-kind-cluster-as-the-hosting-cluster" title="Permanent link">#</a></h2>
 <p>This requires a pre-existing Kind cluster that has an Ingress controller that is listening on host port 9443 and configured with TLS passthrough.</p>
 <p>The examples say to create a Kind cluster for hosting using the following command.</p>
@@ -1324,7 +1457,7 @@
 <h2 id="using-an-existing-openshift-cluster-as-the-hosting-cluster">Using an existing OpenShift cluster as the hosting cluster<a class="headerlink" href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" title="Permanent link">#</a></h2>
 <p>This is similar to using an existing Kind cluster but requires an additional modification. Modify the <code>kflex</code> init command and subsequent kubeconfig context references as in the existing-kind-cluster scenario.</p>
 <p>Additionally, the recipe for registering a WEC with the ITS needs to be modified. In the <code>clusteradm</code> command, omit the <code>--force-internal-endpoint-lookup</code> flag. If following the example commands literally, this means to define <code>flags=""</code> rather than <code>flags="--force-internal-endpoint-lookup"</code>.</p>
-<h2 id="when-everythig-is-not-on-the-same-machine">When everythig is not on the same machine<a class="headerlink" href="#when-everythig-is-not-on-the-same-machine" title="Permanent link">#</a></h2>
+<h2 id="when-everything-is-not-on-the-same-machine">When everything is not on the same machine<a class="headerlink" href="#when-everything-is-not-on-the-same-machine" title="Permanent link">#</a></h2>
 <p>Thus far we can only say how to handle this when the hosting cluster is OpenShift. The problem is getting URLs that work from everywhere. OpenShift is a hosted product, your clusters have domain names that are resolvable from everywhere. In other words, if you use an OpenShift cluster as your hosting cluster then this problem is already solved.</p>
 
 
@@ -1405,13 +1538,13 @@
         
         
           
-          <a href="../examples/" class="md-footer__link md-footer__link--next" aria-label="Next: Examples" rel="next">
+          <a href="../ks-on-kind/" class="md-footer__link md-footer__link--next" aria-label="Next: KubeStellar on KIND" rel="next">
             <div class="md-footer__title">
               <div class="md-ellipsis">
                 <span class="md-footer__direction">
                   Next
                 </span>
-                Examples
+                KubeStellar on KIND
               </div>
             </div>
             <div class="md-footer__button md-icon">
