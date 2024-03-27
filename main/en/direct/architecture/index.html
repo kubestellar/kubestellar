@@ -1962,8 +1962,8 @@ follows:</p>
  <code>Binding</code>, the worker enqueues the latter for syncing.</li>
 <li>If a matched <code>BindingPolicy</code> has <code>WantSingletonReportedState</code> set to true (**see note below), the object is 
    labeled with a special label in order to be able to track it for status reporting.</li>
-<li>If no matching <code>BindingPolicy</code> has <code>WantSingletonReportedState</code> set to true, the worker removes the label if
-   exists.</li>
+<li>If no matching <code>BindingPolicy</code> has <code>WantSingletonReportedState</code> set to true, the worker sets the label value
+   to false if the label exists.</li>
 </ul>
 </li>
 <li>Worker returns and is ready to pick other keys from the queue.</li>
