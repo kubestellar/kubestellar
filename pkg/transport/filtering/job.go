@@ -21,7 +21,8 @@ import (
 )
 
 func badJobKey(key string) bool {
-	return key == "controller-uid" || key == "batch.kubernetes.io/controller-uid"
+	return key == "controller-uid" ||
+		key == "batch.kubernetes.io/controller-uid"
 }
 
 func cleanJob(object *unstructured.Unstructured) {
