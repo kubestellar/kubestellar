@@ -93,19 +93,19 @@ func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIde
 		go c.startInformersForNewAPIResources(ctx, toStartList)
 	}
 
-	for _, gvk := range toStopList {
-		logger.Info("API should not be watched, ensuring the informer's absence.", "gvk", gvk)
-		stopper, ok := c.stoppers.Get(gvk)
+	for _, gvr := range toStopList {
+		logger.Info("API should not be watched, ensuring the informer's absence.", "gvr", gvr)
+		stopper, ok := c.stoppers.Get(gvr)
 		if !ok {
-			logger.V(3).Info("Informer is already absent.", "key", gvk)
+			logger.V(3).Info("Informer is already absent.", "gvr", gvr)
 		} else {
 			// close channel
 			close(stopper)
 		}
-		// remove entries for key
-		c.informers.Remove(gvk)
-		c.listers.Remove(gvk)
-		c.stoppers.Remove(gvk)
+		// remove entries for gvr
+		c.informers.Remove(gvr)
+		c.listers.Remove(gvr)
+		c.stoppers.Remove(gvr)
 	}
 
 	return nil
