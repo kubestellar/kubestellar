@@ -183,6 +183,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/direct/deploy-on-k3d/</loc>
+         <lastmod>2024-03-27</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/direct/deploy-on-k3d/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/direct/example-wecs/</loc>
          <lastmod>2024-03-27</lastmod>
          <changefreq>daily</changefreq>
