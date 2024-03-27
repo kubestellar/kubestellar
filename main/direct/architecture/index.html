@@ -1860,10 +1860,10 @@ pattern has been extended to provide the following features:</p>
 <li>Starting informers on all API Resources (except some that do not need
   watching)</li>
 <li>Informers and Listers references are maintained in a hash map and
-  indexed by GVK (Group, Version, Kind) of the watched objects.</li>
+  indexed by GVR (Group, Version, Resource) of the watched objects.</li>
 <li>Using a common work queue and set of workers, where the key is defined as follows:</li>
 <li>Key is a struct instead than a string, and contains the following:<ul>
-<li>GVK of the informer and lister for the object that generated the
+<li>GVR of the informer and lister for the object that generated the
   event</li>
 <li>Structured Name of the object </li>
 <li>For delete event: Shallow copy of the object being deleted. This
@@ -1912,10 +1912,10 @@ handler and the work queue as follows:</p>
   to return only one preferred storage version for API group)</li>
 <li>Filters out some resources</li>
 <li>For each resource:</li>
-<li>Creates GVK key</li>
+<li>Creates GVR key</li>
 <li>Registers Event Handler</li>
 <li>Starts Informer</li>
-<li>Indexes informer and lister in a map by GVK key</li>
+<li>Indexes informer and lister in a map by GVR key</li>
 <li>Waits for all caches to sync</li>
 <li>Starts N workers to process work queue</li>
 </ul>
@@ -1934,7 +1934,7 @@ follows:</p>
 <p>The event handler does some filtering (for example, to ignore update
     events where the object content is not modified) and then creates a
     key to store a reference to the object in the work queue. The key
-    contains the GVK key used to retrieve a reference to the informer
+    contains the GVR key used to retrieve a reference to the informer
     and lister for that kind of object, and a namespace + name key to
     retrieve the actual object. Storing the key in the work queue is a
     common pattern in client-go as the object may have changed in the
@@ -1946,7 +1946,7 @@ follows:</p>
 <p>A worker pulls a key from the work queue, and then does the
     following processing:</p>
 <ul>
-<li>Uses the GVK key to get the reference to the lister for the
+<li>Uses the GVR key to get the reference to the lister for the
     object</li>
 <li>Gets the object from the lister cache using the NamespacedName of 
    the object.</li>
@@ -2003,7 +2003,7 @@ If any are indeed affected, they are enqueued for syncing.</p>
 deleted (deletion timestamp not set) it follows the following flow:</p>
 <ul>
 <li>Re-enqueues all objects to force re-evaluation: this is done by 
-  iterating all GVK-indexed listers, listing objects for each lister
+  iterating all GVR-indexed listers, listing objects for each lister
   and re-enqueuing the key for each object.</li>
 <li>Notes the <code>BindingPolicy</code> to create an empty in-memory representation for its <code>Binding</code>.</li>
 <li>Lists ManagedClusters and finds the matching clusters using the label selector expression for clusters.</li>
@@ -2041,10 +2041,10 @@ follows the flow below:</p>
 </ul>
 <h4 id="new-crd-added">New CRD Added<a class="headerlink" href="#new-crd-added" title="Permanent link">#</a></h4>
 <p>When a new CRD is added, the binding controller needs to start a new informer to watch instances of the new CRD on the WDS.</p>
-<p>The worker pulls a key from queue and creates a GVK Key; if it is a CRD and
+<p>The worker pulls a key from queue and creates a GVR Key; if it is a CRD and
 not deleted:</p>
 <ul>
-<li>Checks if an informer for that GVK was already started, return if that
+<li>Checks if an informer for that GVR was already started, return if that
   is the case.</li>
 <li>If not, creates a new informer</li>
 <li>Registers the event handler for the informer (same one used for all
@@ -2052,19 +2052,19 @@ not deleted:</p>
 <li>Starts the new informer with a stopper channel, so that it can be
   stopped later on by closing the channel.</li>
 <li>adds informer, lister and stopper channel references to the hashmap
-  indexed by the GVK key.</li>
+  indexed by the GVR key.</li>
 </ul>
 <h4 id="crd-deleted">CRD Deleted<a class="headerlink" href="#crd-deleted" title="Permanent link">#</a></h4>
 <p>When a CRD is deleted, the controller needs to stop the informer that
 was used to watch instances of that CRD on the WDS. This is because
 informers on CRs will keep on throwing exceptions for missing CRDs.</p>
-<p>The worker pulls a key from queue and creates a GVK Key; if it is a CRD and it
+<p>The worker pulls a key from queue and creates a GVR Key; if it is a CRD and it
 has been deleted:</p>
 <ul>
-<li>Uses the GVK key to retrieve the stopper channel for the informer.</li>
+<li>Uses the GVR key to retrieve the stopper channel for the informer.</li>
 <li>Closes the stopper channel</li>
 <li>Removes informer, lister and stopper channel references from the
-  hashmap indexed by the GVK key.</li>
+  hashmap indexed by the GVR key.</li>
 </ul>
 <h3 id="status-controller">Status Controller<a class="headerlink" href="#status-controller" title="Permanent link">#</a></h3>
 <p>The status controller watches for <em>WorkStatus</em> objects on the ITS, and
