@@ -24,9 +24,8 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions/cluster/v1"
-	clusterlisters "open-cluster-management.io/api/client/cluster/listers/cluster/v1"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -38,7 +37,10 @@ import (
 	cacheddiscovery "k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
+	corev1informers "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/kubernetes"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
+	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
@@ -69,34 +71,38 @@ var objectsFilter = filtering.NewObjectFilteringMap()
 // This func is like NewTransportControllerForWrappedObjectGVR but first uses
 // the given transport and transportClientset to discover the GVR of wrapped objects.
 // The given transportDynamicClient is used to access the ITS.
-func NewTransportController(ctx context.Context, inventoryPreInformer clusterinformers.ManagedClusterInformer,
+func NewTransportController(ctx context.Context,
 	bindingClient controlclient.BindingInterface, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
-	wdsDynamicClient dynamic.Interface, transportClientset kubernetes.Interface,
+	wdsDynamicClient dynamic.Interface, itsNSClient corev1client.NamespaceInterface, parmCfgMapPreInformer corev1informers.ConfigMapInformer,
+	transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface, wdsName string) (*genericTransportController, error) {
 	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
 	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
 	}
-	return NewTransportControllerForWrappedObjectGVR(ctx, inventoryPreInformer, bindingClient, bindingInformer, transport, wdsDynamicClient, transportDynamicClient, wdsName, wrappedObjectGVR), nil
+	return NewTransportControllerForWrappedObjectGVR(ctx, bindingClient, bindingInformer, transport, wdsDynamicClient, itsNSClient, parmCfgMapPreInformer, transportDynamicClient, wdsName, wrappedObjectGVR), nil
 }
 
 // NewTransportControllerForWrappedObjectGVR returns a new transport controller.
 // The given transportDynamicClient is used to access the ITS.
-func NewTransportControllerForWrappedObjectGVR(ctx context.Context, inventoryPreInformer clusterinformers.ManagedClusterInformer,
+func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 	bindingClient controlclient.BindingInterface, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
 	wdsDynamicClient dynamic.Interface,
+	itsNSClient corev1client.NamespaceInterface,
+	parmCfgMapPreInformer corev1informers.ConfigMapInformer,
 	transportDynamicClient dynamic.Interface, wdsName string, wrappedObjectGVR schema.GroupVersionResource) *genericTransportController {
 	dynamicInformerFactory := dynamicinformer.NewDynamicSharedInformerFactory(transportDynamicClient, 0)
 	wrappedObjectGenericInformer := dynamicInformerFactory.ForResource(wrappedObjectGVR)
 
 	transportController := &genericTransportController{
 		logger:                       klog.FromContext(ctx),
-		inventoryInformerSynced:      inventoryPreInformer.Informer().HasSynced,
-		inventoryLister:              inventoryPreInformer.Lister(),
 		bindingClient:                bindingClient,
 		bindingLister:                bindingInformer.Lister(),
 		bindingInformerSynced:        bindingInformer.Informer().HasSynced,
+		itsNSClient:                  itsNSClient,
+		parmCfgMapLister:             parmCfgMapPreInformer.Lister().ConfigMaps(v1alpha1.ParameterConfigMapNamespace),
+		parmCfgMapInformerSynced:     parmCfgMapPreInformer.Informer().HasSynced,
 		wrappedObjectInformerSynced:  wrappedObjectGenericInformer.Informer().HasSynced,
 		workqueue:                    workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
 		transport:                    transport,
@@ -124,21 +130,21 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context, inventoryPre
 		UpdateFunc: func(_, new interface{}) { transportController.handleWrappedObject(new) },
 		DeleteFunc: transportController.handleWrappedObject,
 	})
-	inventoryPreInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	parmCfgMapPreInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
-			inv := obj.(metav1.Object)
-			transportController.invalidatePropertiesForCluster(inv, true, "add")
+			parmCfgMap := obj.(*corev1.ConfigMap)
+			transportController.handleParmCfgMapEvent(parmCfgMap.Name, parmCfgMap, "add")
 		},
 		UpdateFunc: func(old, new interface{}) {
-			newInv := old.(metav1.Object)
-			transportController.invalidatePropertiesForCluster(newInv, true, "update")
+			parmCfgMap := new.(*corev1.ConfigMap)
+			transportController.handleParmCfgMapEvent(parmCfgMap.Name, parmCfgMap, "update")
 		},
 		DeleteFunc: func(obj any) {
 			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
 				obj = dfsu.Obj
 			}
-			inv := obj.(metav1.Object)
-			transportController.invalidatePropertiesForCluster(inv, false, "delete")
+			parmCfgMap := obj.(*corev1.ConfigMap)
+			transportController.handleParmCfgMapEvent(parmCfgMap.Name, nil, "delete")
 		},
 	})
 	dynamicInformerFactory.Start(ctx.Done())
@@ -174,11 +180,12 @@ func getGvrFromWrappedObject(clientset kubernetes.Interface, wrappedObject runti
 type genericTransportController struct {
 	logger logr.Logger
 
-	inventoryInformerSynced     cache.InformerSynced
-	inventoryLister             clusterlisters.ManagedClusterLister
 	bindingClient               controlclient.BindingInterface
 	bindingLister               controlv1alpha1listers.BindingLister
 	bindingInformerSynced       cache.InformerSynced
+	itsNSClient                 corev1client.NamespaceInterface
+	parmCfgMapLister            corev1listers.ConfigMapNamespaceLister
+	parmCfgMapInformerSynced    cache.InformerSynced
 	wrappedObjectInformerSynced cache.InformerSynced
 
 	// workqueue is a rate limited work queue.
@@ -203,6 +210,8 @@ type genericTransportController struct {
 
 	// destinationProperties maps a destination to the properties to use for it in template expansion.
 	// Access only while holding RWMutex and keep consistent with bindingSensitiveDestinations.
+	// An entry is removed from this map when this controller is notified of
+	// deletion of the destination's parameter ConfigMap.
 	// Every `map[string]string` that appears here is immutable from the time that it arrived.
 	destinationProperties map[v1alpha1.Destination]map[string]string
 }
@@ -251,11 +260,12 @@ func (c *genericTransportController) Run(ctx context.Context, workersCount int) 
 	defer c.workqueue.ShutDown()
 
 	c.logger.Info("starting transport controller")
+	go c.ensureParameterNamespace(ctx)
 
 	// Wait for the caches to be synced before starting workers
 	c.logger.Info("waiting for informer caches to sync")
 
-	if ok := cache.WaitForCacheSync(ctx.Done(), c.bindingInformerSynced, c.wrappedObjectInformerSynced, c.inventoryInformerSynced); !ok {
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.bindingInformerSynced, c.wrappedObjectInformerSynced, c.parmCfgMapInformerSynced); !ok {
 		return fmt.Errorf("failed to wait for caches to sync")
 	}
 
@@ -271,6 +281,37 @@ func (c *genericTransportController) Run(ctx context.Context, workersCount int) 
 	c.logger.Info("shutting down workers")
 
 	return nil
+}
+
+func (c *genericTransportController) ensureParameterNamespace(ctx context.Context) {
+	logger := klog.FromContext(ctx)
+	for {
+		_, err := c.itsNSClient.Get(ctx, v1alpha1.ParameterConfigMapNamespace, metav1.GetOptions{})
+		if err == nil {
+			logger.Info("Found parameter namespace already exists")
+			return
+		}
+		if !errors.IsNotFound(err) {
+			logger.Info("Failed to Get the parameter namespace", "err", err)
+		} else {
+			ns := corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{Name: v1alpha1.ParameterConfigMapNamespace},
+			}
+			_, err = c.itsNSClient.Create(ctx, &ns, metav1.CreateOptions{FieldManager: ControllerName})
+			if err == nil {
+				logger.Info("Created parameter namespace")
+				return
+			} else {
+				logger.Info("Failed to create parameter namespace", "err", err)
+			}
+		}
+		select {
+		case <-ctx.Done():
+			logger.Info("Giving up on creating parameter namespace")
+			return
+		case <-time.After(10 * time.Second):
+		}
+	}
 }
 
 // runWorker is a long-running function that will continually call the
@@ -581,21 +622,36 @@ func (c *genericTransportController) getPropertiesForDestination(bindingName str
 	if have {
 		return props
 	}
-	props = map[string]string{}
-	cluster, err := c.inventoryLister.Get(dest.ClusterId)
-	if err != nil {
-		// This should be a transient condition that is already going to be remedied:
-		// the caller is concerned with a destination that has been deleted,
-		// thus there are already events in the pipeline that will eventually cause the caller's
-		// work to be overwritten by work that does not try to use a deleted destination.
-		// Just use any map in this case.
-		c.logger.V(2).Info("Failed to get inventory object", "name", dest.ClusterId, "err", err)
-	} else {
-		MapCopyIntoFiltered(props, cluster.Annotations, token.IsIdentifier)
-		MapCopyIntoFiltered(props, cluster.Labels, token.IsIdentifier)
+	props = map[string]string{"clusterName": dest.ClusterId}
+	parmCfgMap, err := c.parmCfgMapLister.Get(dest.ClusterId)
+	if err == nil {
+		enumerateParmsInConfigMap(parmCfgMap)(func(key, val string) bool {
+			props[key] = val
+			return true
+		})
+		c.destinationProperties[dest] = props
+	} else if !errors.IsNotFound(err) {
+		c.logger.Error(err, "Inconceivable failure to fetch parameter ConfigMap", "dest", dest, "forBinding", bindingName)
 	}
-	c.destinationProperties[dest] = props
 	return props
+}
+
+func enumerateParmsInConfigMap(parmCfgMap *corev1.ConfigMap) func(yield func(key, val string) bool) {
+	return func(yield func(key, val string) bool) {
+		if parmCfgMap == nil {
+			return
+		}
+		for key, val := range parmCfgMap.Data {
+			if token.IsIdentifier(key) && !yield(key, val) {
+				return
+			}
+		}
+		for key, val := range parmCfgMap.BinaryData {
+			if token.IsIdentifier(key) && !yield(key, string(val)) {
+				return
+			}
+		}
+	}
 }
 
 func (c *genericTransportController) setBindingSensitivities(bindingName string, dests sets.Set[v1alpha1.Destination]) {
@@ -608,19 +664,24 @@ func (c *genericTransportController) setBindingSensitivities(bindingName string,
 	}
 }
 
-func (c *genericTransportController) invalidatePropertiesForCluster(inv metav1.Object, present bool, event string) {
-	dest := v1alpha1.Destination{ClusterId: inv.GetName()}
-	var newLabels, newAnnotations map[string]string
-	if present {
-		newLabels = inv.GetLabels()
-		newAnnotations = inv.GetAnnotations()
-	}
+func (c *genericTransportController) handleParmCfgMapEvent(cmName string, parmCfgMap *corev1.ConfigMap, event string) {
+	dest := v1alpha1.Destination{ClusterId: cmName}
 	c.RLock()
 	defer c.RUnlock()
-	if equalProperties(c.destinationProperties[dest], newLabels, newAnnotations) {
-		return
+	sameProps := equalProperties(cmName, c.destinationProperties[dest], parmCfgMap)
+	if parmCfgMap != nil {
+		if sameProps {
+			return
+		}
+	} else {
+		if _, has := c.destinationProperties[dest]; !has {
+			return
+		}
 	}
 	delete(c.destinationProperties, dest)
+	if sameProps {
+		return
+	}
 	for bindingName, dests := range c.bindingSensitiveDestinations {
 		if dests.Has(dest) {
 			c.logger.V(5).Info("Enqueuing reference to Binding that depends on destination properties", "binding", bindingName, "destination", dest, "event", event)
@@ -629,31 +690,27 @@ func (c *genericTransportController) invalidatePropertiesForCluster(inv metav1.O
 	}
 }
 
-// equalProperties reveals whether the new labels and annotations amount to the same properties as the old ones
-func equalProperties(oldProps, newLabels, newAnnotations map[string]string) bool {
-	var newNumProperties int
-	for key, newVal := range newLabels {
-		if !token.IsIdentifier(key) {
-			continue
+// equalProperties reveals whether the new version of the parameter ConfigMap implies the same old customization parameters
+func equalProperties(destName string, oldProps map[string]string, newConfigMap *corev1.ConfigMap) bool {
+	var newNumProperties int = 1
+	visitedClusterName := false
+	mismatch := false
+	enumerateParmsInConfigMap(newConfigMap)(func(key, newVal string) bool {
+		if key == "clusterName" {
+			visitedClusterName = true
+		} else {
+			newNumProperties++
 		}
-		newNumProperties++
 		if oldVal, had := oldProps[key]; !(had && oldVal == newVal) {
+			mismatch = true
 			return false
 		}
+		return true
+	})
+	if !visitedClusterName && oldProps["clusterName"] != destName {
+		return false
 	}
-	for key, newVal := range newAnnotations {
-		if !token.IsIdentifier(key) {
-			continue
-		}
-		if _, isAlsoLabel := newLabels[key]; isAlsoLabel {
-			continue
-		}
-		newNumProperties++
-		if oldVal, had := oldProps[key]; !(had && oldVal == newVal) {
-			return false
-		}
-	}
-	return newNumProperties == len(oldProps)
+	return newNumProperties == len(oldProps) && !mismatch
 }
 
 // customizeForDest customizes the given object for the given destination,

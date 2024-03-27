@@ -25,8 +25,6 @@ import (
 	"testing"
 	"time"
 
-	clusterclientfake "open-cluster-management.io/api/client/cluster/clientset/versioned/fake"
-	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 	clusterapi "open-cluster-management.io/api/cluster/v1"
 	workapi "open-cluster-management.io/api/work/v1"
 
@@ -41,6 +39,8 @@ import (
 	k8sschema "k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 	dynamicfake "k8s.io/client-go/dynamic/fake"
+	k8sinformers "k8s.io/client-go/informers"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
 
@@ -308,12 +308,12 @@ func TestGenericController(t *testing.T) {
 	itsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme)
 	transport := &testTransport{expect: bindingCase.expect}
 	wrapperGVR := workapi.GroupVersion.WithResource("manifestworks")
-	inventoryClientFake := clusterclientfake.NewSimpleClientset()
-	inventoryInformerFactory := clusterinformers.NewSharedInformerFactory(inventoryClientFake, 0*time.Second)
-	inventoryPreInformer := inventoryInformerFactory.Cluster().V1().ManagedClusters()
-	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, inventoryPreInformer, wdsKsClientFake.ControlV1alpha1().Bindings(), wdsKsInformerFactory.Control().V1alpha1().Bindings(), transport, wdsDynamicClient, itsDynamicClient, "test-wds", wrapperGVR)
+	itsK8sClientFake := k8sfake.NewSimpleClientset()
+	itsK8sInformerFactory := k8sinformers.NewSharedInformerFactory(itsK8sClientFake, 0*time.Minute)
+	parmCfgMapPreInformer := itsK8sInformerFactory.Core().V1().ConfigMaps()
+	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, wdsKsClientFake.ControlV1alpha1().Bindings(), wdsKsInformerFactory.Control().V1alpha1().Bindings(), transport, wdsDynamicClient, itsK8sClientFake.CoreV1().Namespaces(), parmCfgMapPreInformer, itsDynamicClient, "test-wds", wrapperGVR)
 	wdsKsInformerFactory.Start(ctx.Done())
-	inventoryInformerFactory.Start(ctx.Done())
+	itsK8sInformerFactory.Start(ctx.Done())
 
 	go ctlr.Run(ctx, 4)
 	err := wait.PollUntilContextTimeout(ctx, 5*time.Second, time.Minute, false, func(ctx context.Context) (done bool, err error) {

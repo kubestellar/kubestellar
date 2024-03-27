@@ -30,14 +30,23 @@ import (
 // (`Template.Execute`) using data about the WEC. This data is a map from parameter
 // name to parameter value.
 //
-// A destination is described by an inventory object in an Inventory and Transport Space,
-// and its labels and annotations provide parameter names and values (with labels taking priority over annotations).
+// The parameters for a given WEC are collected from two sources.
+// One source is a ConfigMap object, if it exists, that: (a) has the same name as the WEC's
+// inventory object, (b) is in the namespace named "customization-parameters", and (c) is
+// in the Inventory and Transport Space (ITS). In particular, the string and binary data entries
+// whose name is valid as a Go language identifier provide parameters.
+// Also, if not defined that way, there is a parameter whose name is "clusterName" and
+// whose value is the name of the WEC's inventory object.
 //
 // Note that this sort of customization has limited applicability.  It can only be used where
 // the un-expanded string passes the validation conditions of the relevant object type.
 // For more broadly applicable customization, see Customizer objects.
 
 const TemplateExpansionAnnotationKey string = "control.kubestellar.io/expand-templates"
+
+// ParameterConfigMapNamespace is the namespace in the ITS that holds ConfigMap objects that provide
+// parameter values for template expansion.
+const ParameterConfigMapNamespace = "customization-parameters"
 
 // BindingPolicySpec defines the desired state of BindingPolicy
 type BindingPolicySpec struct {
