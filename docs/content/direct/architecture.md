@@ -312,8 +312,8 @@ follows:
          `Binding`, the worker enqueues the latter for syncing.
         - If a matched `BindingPolicy` has `WantSingletonReportedState` set to true (**see note below), the object is 
        labeled with a special label in order to be able to track it for status reporting.
-        - If no matching `BindingPolicy` has `WantSingletonReportedState` set to true, the worker removes the label if
-       exists.
+        - If no matching `BindingPolicy` has `WantSingletonReportedState` set to true, the worker sets the label value
+       to false if the label exists.
     - Worker returns and is ready to pick other keys from the queue.
 
 **WantSingletonReportedState**:
