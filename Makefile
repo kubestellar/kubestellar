@@ -170,7 +170,7 @@ run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./cmd/controller-manager/main.go $(ARGS)
 
 .PHONY: ko-build-local
-ko-build-local: ## Build local container image with ko 
+ko-build-local: ## Build local container image with ko
 	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
 	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMAGE_REPO}:${IMAGE_TAG}
 
@@ -184,8 +184,6 @@ chart: manifests kustomize
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
 	$(KUSTOMIZE) build config/default > chart/templates/controller-manager.yaml
 	scripts/add-helm-code.sh add
-	@mkdir -p chart/crds
-	@cp config/crd/bases/*.yaml chart/crds/
 
 
 .PHONY: local-chart
@@ -198,8 +196,6 @@ endif
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
 	$(KUSTOMIZE) build config/default > local-chart/templates/controller-manager.yaml
 	scripts/add-helm-code.sh --dir ${PWD}/local-chart add
-	@mkdir -p local-chart/crds
-	@cp config/crd/bases/*.yaml local-chart/crds/
 	git checkout -- config/manager/kustomization.yaml
 
 ##@ Deployment
