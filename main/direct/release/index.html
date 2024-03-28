@@ -836,6 +836,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#website" class="md-nav__link">
+    Website
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#testing-and-examples" class="md-nav__link">
     Testing and Examples
   </a>
@@ -853,6 +860,13 @@
           <li class="md-nav__item">
   <a href="#deliberately-feature-incomplete-releases" class="md-nav__link">
     Deliberately feature-incomplete releases
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#website_1" class="md-nav__link">
+    Website
   </a>
   
 </li>
@@ -1445,6 +1459,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#website" class="md-nav__link">
+    Website
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#testing-and-examples" class="md-nav__link">
     Testing and Examples
   </a>
@@ -1462,6 +1483,13 @@
           <li class="md-nav__item">
   <a href="#deliberately-feature-incomplete-releases" class="md-nav__link">
     Deliberately feature-incomplete releases
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#website_1" class="md-nav__link">
+    Website
   </a>
   
 </li>
@@ -1545,29 +1573,37 @@ clues about the problem.</p>
 <li>Thus, it is necessary to keep users clearly appraised of the quality (or status of evaluating the quality) of each release.</li>
 <li>Because of the lack of self references, most user instructions (e.g., examples) and tests do not have concrete release identifiers in them; instead, the user has to chose and supply the release identifier. There can also be documentation of a specific past release (e.g., the latest stable release) that uses the literal identifier for that past release.</li>
 <li><strong>PAY ATTENTION TO THIS ONE</strong>: Because of the prohibition of self references, <strong>Git will not contain the exact bytes of our Helm chart definitions</strong>. Where a Helm chart states its own version or has a container image reference to an image built from the same release, the bytes in Git have a placeholder for that image's tag and the process of creating the published release artifacts fills in that placeholder. Think of this as being analogous to the linking done when building a binary executable file.</li>
-<li>The design below <strong>fails</strong> to completely meet the goal of not putting self-references in files under Git control. One failure is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another failure is in the examples document, which also holds references to its own release.</li>
+<li>The design below falls short of the goal of not putting self-references in files under Git control. One way is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another is in the examples document, which also holds references to its own release. Another is in the examples.md file, and another is in the <code>docs/content/direct/README.md</code> file.</li>
 </ul>
 <h2 id="technology">Technology<a class="headerlink" href="#technology" title="Permanent link">#</a></h2>
-<p>There will be a GitHub workflow that creates the published artifacts for each Git tag whose name starts with "v". The rest of the tag name is required to be a semver release identifier. Note that this document does not (yet, anyway) specify <strong>how</strong> that GitHub workflow gets its job done.</p>
+<p>There is a GitHub workflow that creates the published artifacts for each Git tag whose name starts with "v". The rest of the tag name is required to be a semver release identifier. Note that this document does not (yet, anyway) specify <strong>how</strong> that GitHub workflow gets its job done. This workflow is confusingly named "goreleaser" and in a file named "goreleaser.yml" and has a job named "goreleaser" despite the fact that it does more than use goreleaser.</p>
 <p>For each tag <code>v$version</code> the following published artifacts will be created.</p>
 <ul>
 <li>The container image for the kubestellar-controller-manager (KCM), at <code>ghcr.io/kubestellar/kubestellar/controller-manager</code>. Image tag will be <code>$version</code>. This GitHub "package" will be connected to the ks/ks repo (this connection is something that an admin will do once, it will stick for all versions).</li>
 <li>The Helm chart (for installing the KCM for a WDS), at <code>ghcr.io/kubestellar/kubestellar/controller-manager-chart</code> with version <code>$version</code> and Helm "appVersion" <code>$version</code>. This GitHub "package" will also be connected to the ks/ks repo. The chart has a reference to container image for the KCM and that reference is <code>ghcr.io/kubestellar/kubestellar/controller-manager:$version</code>. <strong>In Git the chart has only placeholders in these places, <em>not</em> <code>$version</code>; the <code>$version</code> is inserted into a distinct copy by the GitHub workflow, which then publishes this specialized copy.</strong></li>
 <li>Note that there is no automation (yet) concerning the KubeFlex PostCreateHook that installs the KCM.</li>
 </ul>
+<h2 id="website">Website<a class="headerlink" href="#website" title="Permanent link">#</a></h2>
+<p>We use <code>mike</code> and <code>MkDocs</code> to derive and publish GitHub pages. See <code>docs/README.md</code> for details.</p>
+<p>The published GitHub pages are organized into "releases".  Each release in the GitHub pages corresponds to a git branch whose name begins with "release-" or is "main".</p>
+<p>Our documentation is, mostly, viewable in either of two ways. The source documents can be viewed directly through GitHub's web UI for files. The other way is through the website.</p>
 <h2 id="testing-and-examples">Testing and Examples<a class="headerlink" href="#testing-and-examples" title="Permanent link">#</a></h2>
-<p>The unit tests (of which we have almost none right now), integration tests (of which we have none yet), and end-to-end (E2E) tests in this repository are run in the context of a local copy of this repository and test that version of this repository --- not using any published release artifacts. Additionally, some E2E tests have the option to test published artifacts instead of the local copy of this repo.</p>
+<p>The unit tests (of which we have almost none right now), integration tests (of which we also have very few), and end-to-end (E2E) tests in this repository are run in the context of a local copy of this repository and test that version of this repository --- not using any published release artifacts. Additionally, some E2E tests have the option to test published artifacts instead of the local copy of this repo.</p>
 <p>The end-to-end tests include ones written in <code>bash</code>, and these are the only documentation telling a user how to use the present version of this repository. Again, these tests do not use any published artifacts from a release of this repo.</p>
 <p>We have another category of tests, <em>release tests</em>. These test a given release, using the published artifacts of that release. Currently all the release tests are a subset of the E2E tests --- those that can be told to test published artifacts. In particular, they can test the published artifacts reached through the kubestellar PostCreatHook, which contains an explicit reference to one particular release (as explained elsewhere in this document).</p>
 <p>We have GitHub workflows that exercise the E2E tests, normally on the copy of the repo that the workflow applies to. However, these workflows are parameterized and can be told to test the released artifacts instead.</p>
+<p>We also have a GitHub workflow, named "Test latest release" in <code>.github/workflows/test-latest-release.yml</code>, that invokes those E2E tests on the latest release. This workflow can be triggered manually, and is also configured to run after completion of the workflow ("goreleaser") that publishes release artifacts.</p>
 <p>We will maintain a document that lists releases that pass our quality bar. The latest of those is thus the latest stable release. This document is updated in <code>main</code> as quality evaluations come in.</p>
 <p>In <a href="../">docs/content/direct/README.md</a> we maintain a statement of what is the latest stable release.</p>
 <p>We maintain an <a href="../examples/">examples document</a> that tells users how to exercise the release that the document appears in. This requires a self-reference that is updated as part of the release process.</p>
 <h2 id="policy">Policy<a class="headerlink" href="#policy" title="Permanent link">#</a></h2>
 <p>We aim for all regular releases to be working. In order to do that, we have to make test releases and test them. The widely recognized pattern for doing that is to make "release candidates" (i.e., releases for testing purposes) <code>1.2.3-rc0</code>, <code>1.2.3-rc1</code>, <code>1.2.3-rc2</code>, and so on, while trying to get to a quality release <code>1.2.3</code>. Once one of them is judged to be of passing quality, we make a release without the <code>-rc&lt;N&gt;</code> suffix. Due to the self-reference in the KCM PostCreateHook, this will involve making a new commit.</p>
-<p>When reaching a new major or minor version, we make a release branch for it. That is, a branch named <code>release-$major.$minor</code>. At first this branch differs from <code>main</code> in one commit, the one that sets the self-reference in the KCM PostCreateHook. After that, the branches continue to evolve in the usual ways.</p>
+<p>Right after making a release we test it thoroughly.</p>
 <h3 id="deliberately-feature-incomplete-releases">Deliberately feature-incomplete releases<a class="headerlink" href="#deliberately-feature-incomplete-releases" title="Permanent link">#</a></h3>
 <p>We plan a few deliberately feature-incomplete releases. They will be regular releases as far as the technology here is concerned. They will be announced only to selected users who acknowledge that they are getting something that is incomplete. In GitHub, these will be marked as "pre-releases". The status of these releases will be made clear in their documentation (which currently appears in <a href="../release-notes/">the release notes</a>.</p>
+<h3 id="website_1">Website<a class="headerlink" href="#website_1" title="Permanent link">#</a></h3>
+<p>We aim to keep the documents viewable both through the website and GitHub's web UI for viewing files. We aim for all of the documentation to be reachable on the website and in the GitHub file UI starting from the repo's README.md.</p>
+<p>We create a release in the GitHub pages for every release. A patch release is a release. A test release is a release. Creating that GHP release is done by creating a git branch named <code>release-$version</code>.</p>
 <h2 id="step-by-step">Step-by-Step<a class="headerlink" href="#step-by-step" title="Permanent link">#</a></h2>
 <p>Making a new release requires a contributor to do the following things. Here <code>$version</code> is the semver identifier for the release (e.g., <code>1.2.3-rc2</code>).</p>
 <ul>
@@ -1587,18 +1623,24 @@ clues about the problem.</p>
 <p>Make a new Git commit with those changes and get it into the right branch in the shared repo (through the regular PR process if not authorized to cheat).</p>
 </li>
 <li>
-<p>Apply the Git tag <code>v$versin</code> to that new commit in the shared repo.</p>
+<p>Apply the Git tag <code>v$version</code> to that new commit in the shared repo.</p>
+</li>
+<li>
+<p>After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed <a href="#technology">above</a>) and then the "Test latest release" workflow will run the E2E tests using those artifacts.</p>
+</li>
+<li>
+<p>After the release artifacts have been published, create and push to the shared repo a branch named <code>release-$version</code>. This will also trigger the workflow that tests the latest release. Every push to a branch with such a name triggers that workflow, in case there has been a change in an E2E test for that release.</p>
+</li>
+<li>
+<p>Do additional testing: more scenarios, more platforms.</p>
 </li>
 </ul>
-<p>After that, the GitHub workflow then creates and publishes the
-artifacts for that release, as discussed <a href="#technology">above</a>.</p>
 <h2 id="future-process-development">Future Process Development<a class="headerlink" href="#future-process-development" title="Permanent link">#</a></h2>
 <p>We intend to get rid of the self-reference in the KCM PCH, as follows. Define a Helm chart for installing the PCH. Update the release workflow to specialize that Helm chart, similarly to the specialization done for the KCM Helm chart.</p>
 <h2 id="open-questions">Open questions<a class="headerlink" href="#open-questions" title="Permanent link">#</a></h2>
 <p>What to do about the dependency cycle between ks/ks and ks/ocm-transport-plugin?</p>
 <p>Exactly when does a new release branch diverge from <code>main</code>? What about cherry-picking between <code>main</code> and the latest (or also earlier?) release branch?</p>
 <p>What about the clusteradm container image?</p>
-<p>Playing nice with the website technology.</p>
 
 
   
