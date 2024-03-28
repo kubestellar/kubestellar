@@ -57,7 +57,7 @@ const (
 )
 
 func ApplyCRDs(ctx context.Context, dynamicClient dynamic.Interface, clientset kubernetes.Interface, clientsetExt apiextensionsclientset.Interface, logger logr.Logger) error {
-	ctxLimited, cancel := context.WithTimeout(ctx, 30*time.Second)
+	ctxLimited, cancel := context.WithTimeout(ctx, time.Minute)
 	defer cancel()
 
 	crds, err := readCRDs()
@@ -91,16 +91,15 @@ func ApplyCRDs(ctx context.Context, dynamicClient dynamic.Interface, clientset k
 
 // Convert GroupVersionKind to GroupVersionResource
 func groupVersionKindToResource(clientset kubernetes.Interface, gvk schema.GroupVersionKind, logger logr.Logger) (*schema.GroupVersionResource, error) {
-	resourceList, err := clientset.Discovery().ServerPreferredResources()
+	gv := gvk.GroupVersion().String()
+	list, err := clientset.Discovery().ServerResourcesForGroupVersion(gv)
 	if err != nil {
-		logger.Info("Did not get all preferred resources", "error", err.Error())
+		logger.Info("Error getting APIResourceList", "gv", gv, "error", err.Error())
 	}
 
-	for _, resource := range resourceList {
-		for _, apiResource := range resource.APIResources {
-			if apiResource.Kind == gvk.Kind && resource.GroupVersion == gvk.GroupVersion().String() {
-				return &schema.GroupVersionResource{Group: gvk.Group, Version: gvk.Version, Resource: apiResource.Name}, nil
-			}
+	for _, apiResource := range list.APIResources {
+		if apiResource.Kind == gvk.Kind {
+			return &schema.GroupVersionResource{Group: gvk.Group, Version: gvk.Version, Resource: apiResource.Name}, nil
 		}
 	}
 

@@ -21,9 +21,7 @@ import (
 	"os"
 
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
 	tenancyv1alpha1 "github.com/kubestellar/kubeflex/api/v1alpha1"
@@ -35,16 +33,6 @@ func GetClient() *client.Client {
 	config := config.GetConfigOrDie()
 	scheme := runtime.NewScheme()
 
-	httpClient, err := rest.HTTPClientFor(config)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating HTTPClient: %v\n", err)
-		os.Exit(1)
-	}
-	mapper, err := apiutil.NewDiscoveryRESTMapper(config, httpClient)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating NewDiscoveryRESTMapper: %v\n", err)
-		os.Exit(1)
-	}
 	if err := controlv1alpha1.AddToScheme(scheme); err != nil {
 		fmt.Fprintf(os.Stderr, "Error adding to schema: %v\n", err)
 		os.Exit(1)
@@ -53,7 +41,7 @@ func GetClient() *client.Client {
 		fmt.Fprintf(os.Stderr, "Error adding to schema: %v\n", err)
 		os.Exit(1)
 	}
-	c, err := client.New(config, client.Options{Scheme: scheme, Mapper: mapper})
+	c, err := client.New(config, client.Options{Scheme: scheme})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating client: %v\n", err)
 		os.Exit(1)
