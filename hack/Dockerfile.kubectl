@@ -1,0 +1,37 @@
+# Copyright 2024 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+FROM registry.access.redhat.com/ubi8/ubi-minimal
+
+ARG TARGETOS
+ARG TARGETARCH
+ARG VERSION
+
+RUN [ "$VERSION" == "" ] && VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt) ; \
+    curl \
+	-L https://storage.googleapis.com/kubernetes-release/release/v${VERSION#v}/bin/${TARGETOS}/${TARGETARCH}/kubectl \
+	-o /usr/bin/kubectl && chmod +x /usr/bin/kubectl && \
+    curl \
+	-L https://github.com/stedolan/jq/releases/latest/download/jq-${TARGETOS}-${TARGETARCH} \
+	-o /usr/bin/jq && \
+	chmod +x /usr/bin/jq && \
+    curl \
+	-L https://github.com/mikefarah/yq/releases/latest/download/yq_${TARGETOS}_${TARGETARCH} \
+	-o /usr/bin/yq && \
+	chmod +x /usr/bin/yq
+
+USER 1001
+
+ENTRYPOINT [ "kubectl" ]
+CMD [ "--help" ]
