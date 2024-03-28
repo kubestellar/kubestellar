@@ -78,6 +78,6 @@ docker buildx build . \
     --tag quay.io/kubestellar/kubectl:${version#v} \
     --build-arg version=${version#v} \
     --tag quay.io/kubestellar/kubectl:${version#v} \
-    -f /vagrant/Dockerfile.kubectl
+    -f "$(dirname "$0")/Dockerfile.kubectl"
 
 docker buildx rm kubestellar
