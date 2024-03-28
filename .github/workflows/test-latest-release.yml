@@ -4,14 +4,14 @@ on:
   workflow_call:
   # So we can trigger manually if needed
   workflow_dispatch:
+  workflow_run:
+    workflows: [goreleaser]
+    types: [completed]
   push:
     branches:
       - release-*
     tags:
       - 'v*'
-    paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
 
 jobs:
   ginkgo-test:
