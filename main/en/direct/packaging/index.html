@@ -882,9 +882,14 @@
 <td>5b5eab49397984ee35cd431b4918f4584e2f56cf0596080e4ec560e46583d8b2</td>
 </tr>
 <tr>
+<td>0.2.0-rc7</td>
+<td>ce5c42d51b389b0389aa3c2252371832eb0e7137</td>
+<td>070ac0600856deebd227a4ca0fe39ba1b685b0563274a182942af84e4218e502</td>
+</tr>
+<tr>
 <td>latest</td>
-<td>25d27c0e5c7c70fdd578619b4e8381897cccd441</td>
-<td>5b5eab49397984ee35cd431b4918f4584e2f56cf0596080e4ec560e46583d8b2</td>
+<td>ce5c42d51b389b0389aa3c2252371832eb0e7137</td>
+<td>070ac0600856deebd227a4ca0fe39ba1b685b0563274a182942af84e4218e502</td>
 </tr>
 </tbody>
 </table>
@@ -919,6 +924,11 @@ prints.</p>
 <td>v0.2.0-rc6</td>
 <td>v0.2.0-rc6</td>
 <td>0.2.0-rc6</td>
+</tr>
+<tr>
+<td>v0.2.0-rc7</td>
+<td>v0.2.0-rc7</td>
+<td>0.2.0-rc7</td>
 </tr>
 </tbody>
 </table>
@@ -1018,6 +1028,16 @@ controller-manager hosting the per-WDS controllers (<a href="../architecture/#bi
 <td>a2bcaf75dc895dbef5f6cddcf203b0203423a08a</td>
 <td>fac5b208a1f691eb5548a7699494bed2ee6b7502e739a2db840f39bbc05b2fd4</td>
 </tr>
+<tr>
+<td>0.21.0</td>
+<td>dcb232dbcfeb2e90d02315c38e26ba1a380d2cc6</td>
+<td>3f04a74698d0e59bfe941d6ab016ee438f6a6ea684c0f671c03db0f4d7ee5eee</td>
+</tr>
+<tr>
+<td>0.21.1</td>
+<td>13fcd6a1c10eb377b20e7b1a6c5162209f70a281</td>
+<td>0e0873088a2a78e578cf97e486ba5348b8728cdf0a270c6741710a241f12af8e</td>
+</tr>
 </tbody>
 </table>
 <p>The <a href="../release/">release process</a> builds and publishes that container image.</p>
@@ -1078,7 +1098,7 @@ references the copy in the Git commit tagged <code>v0.20.0</code>.</p>
 <p>Currently only showing kubestellar and ocm-status-addon.</p>
 <p>TODO: finish this</p>
 <div class="mermaid">flowchart LR
-    subgraph "ocm-status-addon@GitHub"
+    subgraph osa_repo["ocm-status-addon@GitHub"]
     osa_code[OSA source code]
     osa_hc_src[OSA Helm chart source]
     end
@@ -1097,6 +1117,7 @@ references the copy in the Git commit tagged <code>v0.20.0</code>.</p>
     ks_scripts -.-&gt; ocm_pch
     ks_scripts -.-&gt; ks_pch
     end
+    osa_repo -.-&gt; ks_repo
     cladm_image["ks/clusteradm image"] --&gt; cladm_src
     ocm_pch -.-&gt; cladm_image
     kcm_ctr_image[KCM container image] --&gt; kcm_code
