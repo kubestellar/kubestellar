@@ -118,13 +118,13 @@ func Cleanup() {
 func SetupKubestellar(releasedFlag bool) {
 	var cmd *exec.Cmd
 	var e, o bytes.Buffer
+	var args []string
 	if releasedFlag {
-		fmt.Fprintf(ginkgo.GinkgoWriter, "%s", "releasedFlag=true")
-		cmd = exec.Command("../common/setup-kubestellar.sh", "--released")
-	} else {
-		fmt.Fprintf(ginkgo.GinkgoWriter, "%s", "releasedFlag=false")
-		cmd = exec.Command("../common/setup-kubestellar.sh")
+		args = []string{"--released"}
 	}
+	commandName := "../common/setup-kubestellar.sh"
+	ginkgo.By(fmt.Sprintf("Execing command %v", append([]string{commandName}, args...)))
+	cmd = exec.Command(commandName, args...)
 	cmd.Stderr = &e
 	cmd.Stdout = &o
 	err := cmd.Run()
