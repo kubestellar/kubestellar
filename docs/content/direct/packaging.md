@@ -257,7 +257,7 @@ TODO: finish this
 
 ```mermaid
 flowchart LR
-    subgraph "ocm-status-addon@GitHub"
+    subgraph osa_repo["ocm-status-addon@GitHub"]
     osa_code[OSA source code]
     osa_hc_src[OSA Helm chart source]
     end
@@ -276,6 +276,7 @@ flowchart LR
     ks_scripts -.-> ocm_pch
     ks_scripts -.-> ks_pch
     end
+    osa_repo -.-> ks_repo
     cladm_image["ks/clusteradm image"] --> cladm_src
     ocm_pch -.-> cladm_image
     kcm_ctr_image[KCM container image] --> kcm_code
