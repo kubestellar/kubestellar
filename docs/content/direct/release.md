@@ -24,7 +24,7 @@ We have the following limitations.
 - Thus, it is necessary to keep users clearly appraised of the quality (or status of evaluating the quality) of each release.
 - Because of the lack of self references, most user instructions (e.g., examples) and tests do not have concrete release identifiers in them; instead, the user has to chose and supply the release identifier. There can also be documentation of a specific past release (e.g., the latest stable release) that uses the literal identifier for that past release.
 - **PAY ATTENTION TO THIS ONE**: Because of the prohibition of self references, **Git will not contain the exact bytes of our Helm chart definitions**. Where a Helm chart states its own version or has a container image reference to an image built from the same release, the bytes in Git have a placeholder for that image's tag and the process of creating the published release artifacts fills in that placeholder. Think of this as being analogous to the linking done when building a binary executable file.
-- The design below **fails** to completely meet the goal of not putting self-references in files under Git control. One failure is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another failure is in the examples document, which also holds references to its own release. Another failure is in the examples.md file, and another is in the `docs/content/direct/README.md` file.
+- The design below falls short of the goal of not putting self-references in files under Git control. One way is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another is in the examples document, which also holds references to its own release. Another is in the examples.md file, and another is in the `docs/content/direct/README.md` file.
 
 ## Technology
 
@@ -46,13 +46,15 @@ Our documentation is, mostly, viewable in either of two ways. The source documen
 
 ## Testing and Examples
 
-The unit tests (of which we have almost none right now), integration tests (of which we have none yet), and end-to-end (E2E) tests in this repository are run in the context of a local copy of this repository and test that version of this repository --- not using any published release artifacts. Additionally, some E2E tests have the option to test published artifacts instead of the local copy of this repo.
+The unit tests (of which we have almost none right now), integration tests (of which we also have very few), and end-to-end (E2E) tests in this repository are run in the context of a local copy of this repository and test that version of this repository --- not using any published release artifacts. Additionally, some E2E tests have the option to test published artifacts instead of the local copy of this repo.
 
 The end-to-end tests include ones written in `bash`, and these are the only documentation telling a user how to use the present version of this repository. Again, these tests do not use any published artifacts from a release of this repo.
 
 We have another category of tests, _release tests_. These test a given release, using the published artifacts of that release. Currently all the release tests are a subset of the E2E tests --- those that can be told to test published artifacts. In particular, they can test the published artifacts reached through the kubestellar PostCreatHook, which contains an explicit reference to one particular release (as explained elsewhere in this document).
 
 We have GitHub workflows that exercise the E2E tests, normally on the copy of the repo that the workflow applies to. However, these workflows are parameterized and can be told to test the released artifacts instead.
+
+We also have a GitHub workflow, named "Test latest release" in `.github/workflows/test-latest-release.yml`, that invokes those E2E tests on the latest release. This workflow can be triggered manually, and is also configured to run after completion of the workflow ("goreleaser") that publishes release artifacts.
 
 We will maintain a document that lists releases that pass our quality bar. The latest of those is thus the latest stable release. This document is updated in `main` as quality evaluations come in.
 
@@ -92,9 +94,11 @@ Making a new release requires a contributor to do the following things. Here `$v
 
 - Apply the Git tag `v$version` to that new commit in the shared repo.
 
-- After that, the GitHub workflow then creates and publishes the artifacts for that release, as discussed [above](#technology).
+- After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed [above](#technology)) and then the "Test latest release" workflow will run the E2E tests using those artifacts.
 
-- After that, create and push to the shared repo a branch named `release-$version`. This will trigger the workflow that tests the latest release. That is just the start of the testing to do.
+- After the release artifacts have been published, create and push to the shared repo a branch named `release-$version`. This will also trigger the workflow that tests the latest release. Every push to a branch with such a name triggers that workflow, in case there has been a change in an E2E test for that release.
+
+- Do additional testing: more scenarios, more platforms.
 
 ## Future Process Development
 
