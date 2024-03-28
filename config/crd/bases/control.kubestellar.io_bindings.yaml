@@ -122,6 +122,20 @@ spec:
                     type: array
                 type: object
             type: object
+          status:
+            properties:
+              errors:
+                items:
+                  type: string
+                type: array
+              observedGeneration:
+                format: int64
+                type: integer
+            required:
+            - observedGeneration
+            type: object
         type: object
     served: true
     storage: true
+    subresources:
+      status: {}

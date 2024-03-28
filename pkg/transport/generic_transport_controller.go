@@ -19,31 +19,41 @@ package transport
 import (
 	"context"
 	"fmt"
+	"go/token"
+	"sync"
 	"time"
 
 	"github.com/go-logr/logr"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	cacheddiscovery "k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
+	corev1informers "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/kubernetes"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
+	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
-	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
+	a "github.com/kubestellar/kubestellar/pkg/abstract"
+	"github.com/kubestellar/kubestellar/pkg/customize"
+	controlclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
 	controlv1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
 	controlv1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/transport/filtering"
+	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 const (
@@ -61,37 +71,47 @@ var objectsFilter = filtering.NewObjectFilteringMap()
 // This func is like NewTransportControllerForWrappedObjectGVR but first uses
 // the given transport and transportClientset to discover the GVR of wrapped objects.
 // The given transportDynamicClient is used to access the ITS.
-func NewTransportController(ctx context.Context, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
-	wdsClientset ksclientset.Interface, wdsDynamicClient dynamic.Interface, transportClientset kubernetes.Interface,
+func NewTransportController(ctx context.Context,
+	bindingClient controlclient.BindingInterface, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
+	wdsDynamicClient dynamic.Interface, itsNSClient corev1client.NamespaceInterface, parmCfgMapPreInformer corev1informers.ConfigMapInformer,
+	transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface, wdsName string) (*genericTransportController, error) {
 	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
 	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
 	}
-	return NewTransportControllerForWrappedObjectGVR(ctx, bindingInformer, transport, wdsClientset, wdsDynamicClient, transportDynamicClient, wdsName, wrappedObjectGVR), nil
+	return NewTransportControllerForWrappedObjectGVR(ctx, bindingClient, bindingInformer, transport, wdsDynamicClient, itsNSClient, parmCfgMapPreInformer, transportDynamicClient, wdsName, wrappedObjectGVR), nil
 }
 
 // NewTransportControllerForWrappedObjectGVR returns a new transport controller.
 // The given transportDynamicClient is used to access the ITS.
-func NewTransportControllerForWrappedObjectGVR(ctx context.Context, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
-	wdsClientset ksclientset.Interface, wdsDynamicClient dynamic.Interface,
+func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
+	bindingClient controlclient.BindingInterface, bindingInformer controlv1alpha1informers.BindingInformer, transport Transport,
+	wdsDynamicClient dynamic.Interface,
+	itsNSClient corev1client.NamespaceInterface,
+	parmCfgMapPreInformer corev1informers.ConfigMapInformer,
 	transportDynamicClient dynamic.Interface, wdsName string, wrappedObjectGVR schema.GroupVersionResource) *genericTransportController {
 	dynamicInformerFactory := dynamicinformer.NewDynamicSharedInformerFactory(transportDynamicClient, 0)
 	wrappedObjectGenericInformer := dynamicInformerFactory.ForResource(wrappedObjectGVR)
 
 	transportController := &genericTransportController{
-		logger:                      klog.FromContext(ctx),
-		bindingLister:               bindingInformer.Lister(),
-		bindingInformerSynced:       bindingInformer.Informer().HasSynced,
-		wrappedObjectInformerSynced: wrappedObjectGenericInformer.Informer().HasSynced,
-		workqueue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
-		transport:                   transport,
-		transportClient:             transportDynamicClient,
-		wrappedObjectGVR:            wrappedObjectGVR,
-		wdsClientset:                wdsClientset,
-		wdsDynamicClient:            wdsDynamicClient,
-		wdsName:                     wdsName,
+		logger:                       klog.FromContext(ctx),
+		bindingClient:                bindingClient,
+		bindingLister:                bindingInformer.Lister(),
+		bindingInformerSynced:        bindingInformer.Informer().HasSynced,
+		itsNSClient:                  itsNSClient,
+		parmCfgMapLister:             parmCfgMapPreInformer.Lister().ConfigMaps(v1alpha1.ParameterConfigMapNamespace),
+		parmCfgMapInformerSynced:     parmCfgMapPreInformer.Informer().HasSynced,
+		wrappedObjectInformerSynced:  wrappedObjectGenericInformer.Informer().HasSynced,
+		workqueue:                    workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
+		transport:                    transport,
+		transportClient:              transportDynamicClient,
+		wrappedObjectGVR:             wrappedObjectGVR,
+		wdsDynamicClient:             wdsDynamicClient,
+		wdsName:                      wdsName,
+		bindingSensitiveDestinations: make(map[string]sets.Set[v1alpha1.Destination]),
+		destinationProperties:        make(map[v1alpha1.Destination]map[string]string),
 	}
 
 	transportController.logger.Info("Setting up event handlers")
@@ -109,6 +129,23 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context, bindingInfor
 		AddFunc:    transportController.handleWrappedObject,
 		UpdateFunc: func(_, new interface{}) { transportController.handleWrappedObject(new) },
 		DeleteFunc: transportController.handleWrappedObject,
+	})
+	parmCfgMapPreInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj any) {
+			parmCfgMap := obj.(*corev1.ConfigMap)
+			transportController.handleParmCfgMapEvent(parmCfgMap.Name, parmCfgMap, "add")
+		},
+		UpdateFunc: func(old, new interface{}) {
+			parmCfgMap := new.(*corev1.ConfigMap)
+			transportController.handleParmCfgMapEvent(parmCfgMap.Name, parmCfgMap, "update")
+		},
+		DeleteFunc: func(obj any) {
+			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
+				obj = dfsu.Obj
+			}
+			parmCfgMap := obj.(*corev1.ConfigMap)
+			transportController.handleParmCfgMapEvent(parmCfgMap.Name, nil, "delete")
+		},
 	})
 	dynamicInformerFactory.Start(ctx.Done())
 
@@ -143,8 +180,12 @@ func getGvrFromWrappedObject(clientset kubernetes.Interface, wrappedObject runti
 type genericTransportController struct {
 	logger logr.Logger
 
+	bindingClient               controlclient.BindingInterface
 	bindingLister               controlv1alpha1listers.BindingLister
 	bindingInformerSynced       cache.InformerSynced
+	itsNSClient                 corev1client.NamespaceInterface
+	parmCfgMapLister            corev1listers.ConfigMapNamespaceLister
+	parmCfgMapInformerSynced    cache.InformerSynced
 	wrappedObjectInformerSynced cache.InformerSynced
 
 	// workqueue is a rate limited work queue.
@@ -157,9 +198,22 @@ type genericTransportController struct {
 	transportClient  dynamic.Interface // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
-	wdsClientset     ksclientset.Interface
 	wdsDynamicClient dynamic.Interface
 	wdsName          string
+
+	sync.RWMutex
+
+	// bindingSensitiveDestinations maps Binding name to the set of destinations whose properties the Binding is senstive to.
+	// Access to both the map and the Sets it holds is controlled by the RWMutex.
+	// The sets are mutable with the RWMutex held.
+	bindingSensitiveDestinations map[string]sets.Set[v1alpha1.Destination]
+
+	// destinationProperties maps a destination to the properties to use for it in template expansion.
+	// Access only while holding RWMutex and keep consistent with bindingSensitiveDestinations.
+	// An entry is removed from this map when this controller is notified of
+	// deletion of the destination's parameter ConfigMap.
+	// Every `map[string]string` that appears here is immutable from the time that it arrived.
+	destinationProperties map[v1alpha1.Destination]map[string]string
 }
 
 // enqueueBinding takes an Binding resource and
@@ -206,11 +260,12 @@ func (c *genericTransportController) Run(ctx context.Context, workersCount int) 
 	defer c.workqueue.ShutDown()
 
 	c.logger.Info("starting transport controller")
+	go c.ensureParameterNamespace(ctx)
 
 	// Wait for the caches to be synced before starting workers
 	c.logger.Info("waiting for informer caches to sync")
 
-	if ok := cache.WaitForCacheSync(ctx.Done(), c.bindingInformerSynced, c.wrappedObjectInformerSynced); !ok {
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.bindingInformerSynced, c.wrappedObjectInformerSynced, c.parmCfgMapInformerSynced); !ok {
 		return fmt.Errorf("failed to wait for caches to sync")
 	}
 
@@ -226,6 +281,37 @@ func (c *genericTransportController) Run(ctx context.Context, workersCount int) 
 	c.logger.Info("shutting down workers")
 
 	return nil
+}
+
+func (c *genericTransportController) ensureParameterNamespace(ctx context.Context) {
+	logger := klog.FromContext(ctx)
+	for {
+		_, err := c.itsNSClient.Get(ctx, v1alpha1.ParameterConfigMapNamespace, metav1.GetOptions{})
+		if err == nil {
+			logger.Info("Found parameter namespace already exists")
+			return
+		}
+		if !errors.IsNotFound(err) {
+			logger.Info("Failed to Get the parameter namespace", "err", err)
+		} else {
+			ns := corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{Name: v1alpha1.ParameterConfigMapNamespace},
+			}
+			_, err = c.itsNSClient.Create(ctx, &ns, metav1.CreateOptions{FieldManager: ControllerName})
+			if err == nil {
+				logger.Info("Created parameter namespace")
+				return
+			} else {
+				logger.Info("Failed to create parameter namespace", "err", err)
+			}
+		}
+		select {
+		case <-ctx.Done():
+			logger.Info("Giving up on creating parameter namespace")
+			return
+		case <-time.After(10 * time.Second):
+		}
+	}
 }
 
 // runWorker is a long-running function that will continually call the
@@ -308,6 +394,7 @@ func (c *genericTransportController) syncHandler(ctx context.Context, objectName
 	}
 
 	if isObjectBeingDeleted(binding) {
+		c.setBindingSensitivities(binding.Name, nil)
 		return c.deleteWrappedObjectsAndFinalizer(ctx, binding)
 	}
 	// otherwise, object was not deleted and no error occurered while reading the object.
@@ -366,13 +453,22 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 		return fmt.Errorf("failed to get current wrapped objects that are owned by Binding '%s' - %w", binding.GetName(), err)
 	}
 	// calculate desired state
-	desiredWrappedObject, err := c.initializeWrappedObject(ctx, binding)
+	destToDesiredWrappedObject, bindingErrors, err := c.initializeWrappedObject(ctx, binding)
 	if err != nil {
-		return fmt.Errorf("failed to build wrapped object from Binding '%s' - %w", binding.GetName(), err)
+		return fmt.Errorf("failed to build wrapped object(s) from Binding '%s' - %w", binding.GetName(), err)
+	}
+	bindingCopy := binding.DeepCopy()
+	bindingCopy.Status = v1alpha1.BindingStatus{
+		ObservedGeneration: binding.Generation,
+		Errors:             bindingErrors,
+	}
+	_, err = c.bindingClient.UpdateStatus(ctx, bindingCopy, metav1.UpdateOptions{FieldManager: ControllerName})
+	if err != nil {
+		return fmt.Errorf("failed to update status of Binding '%s' - %w", binding.Name, err)
 	}
 	// converge actual state to the desired state
-	if err := c.propagateWrappedObjectToClusters(ctx, desiredWrappedObject, currentWrappedObjectList, binding.Spec.Destinations); err != nil {
-		return fmt.Errorf("failed to propagate wrapped object '%s' to all required WECs - %w", desiredWrappedObject.GetName(), err)
+	if err := c.propagateWrappedObjectToClusters(ctx, destToDesiredWrappedObject, currentWrappedObjectList, binding.Spec.Destinations); err != nil {
+		return fmt.Errorf("failed to propagate wrapped object(s) for binding '%s' to all required WECs - %w", binding.GetName(), err)
 	}
 
 	// all objects that appear in the desired state were handled. need to remove wrapped objects that are not part of the desired state
@@ -410,44 +506,241 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 	return objectsToPropagate, nil
 }
 
-func (c *genericTransportController) initializeWrappedObject(ctx context.Context, binding *v1alpha1.Binding) (*unstructured.Unstructured, error) {
+func (c *genericTransportController) initializeWrappedObject(ctx context.Context, binding *v1alpha1.Binding) (func(v1alpha1.Destination) (*unstructured.Unstructured, bool), []string, error) {
 	objectsToPropagate, err := c.getObjectsFromWDS(ctx, binding)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get objects to propagate to WECs from Binding object '%s' - %w", binding.GetName(), err)
+		return nil, nil, fmt.Errorf("failed to get objects to propagate to WECs from Binding object '%s' - %w", binding.GetName(), err)
 	}
 
 	if len(objectsToPropagate) == 0 {
-		return nil, nil // if no objects were found in the workload section, return nil so that we don't distribute an empty wrapped object.
+		return nil, nil, nil // if no objects were found in the workload section, return nil so that we don't distribute an empty wrapped object.
 	}
 
-	wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(objectsToPropagate))
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
-	}
-	// wrapped object name is (Binding.GetName()-WdsName).
-	// pay attention - we cannot use the Binding object name, cause we might have duplicate names coming from different WDS spaces.
-	// we add WdsName to the object name to assure name uniqueness,
-	// in order to easily get the origin Binding object name and wds, we add it as an annotations.
-	wrappedObject.SetName(fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName))
-	setLabel(wrappedObject, originOwnerReferenceLabel, binding.GetName())
-	setLabel(wrappedObject, originWdsLabel, c.wdsName)
-	setAnnotation(wrappedObject, originOwnerGenerationAnnotation, binding.GetGeneration())
+	bindingErrors := []string{}
 
-	return wrappedObject, nil
+	// This will become non-nil if any object to propagate needs customization
+	var destToCustomizedObjects map[v1alpha1.Destination][]*unstructured.Unstructured
+
+	// Look through the objects to propagate to see if any needs customization.
+	// If any needs customization then catch up destToCustomizedObjects and proceed from there.
+	for objIdx, objToPropagate := range objectsToPropagate {
+		objAnnotations := objToPropagate.GetAnnotations()
+		objRequestsExpansion := objAnnotations[v1alpha1.TemplateExpansionAnnotationKey] == "true"
+		customizeThisObject := false
+		reportedSomeErrors := false
+		objRefStr := util.RefToRuntimeObj(objToPropagate).String()
+		for destIdx, dest := range binding.Spec.Destinations {
+			objC := objToPropagate
+			var customizationErrors []string
+			if objRequestsExpansion && (destIdx == 0 || customizeThisObject) {
+				defs := c.getPropertiesForDestination(binding.Name, dest)
+				// customizeThisObject does not vary with destination, for a given objToPropagate
+				objC, customizationErrors, customizeThisObject = c.customizeForDest(objToPropagate, dest.ClusterId+"/"+objRefStr, defs)
+				if len(customizationErrors) != 0 && !reportedSomeErrors {
+					// Let's not overwhelm the user, only report errors from the first troubled destination
+					reportedSomeErrors = true
+					bindingErrors = append(bindingErrors, customizationErrors...)
+				}
+				if !customizeThisObject {
+					objC = objToPropagate
+				}
+			}
+			if customizeThisObject && destToCustomizedObjects == nil {
+				destToCustomizedObjects = map[v1alpha1.Destination][]*unstructured.Unstructured{}
+				for _, dest := range binding.Spec.Destinations {
+					destToCustomizedObjects[dest] = a.SliceCopy(objectsToPropagate[:objIdx])
+				}
+			}
+			if destToCustomizedObjects != nil {
+				customizedObjectsSoFar := destToCustomizedObjects[dest]
+				customizedObjectsSoFar = append(customizedObjectsSoFar, objC)
+				destToCustomizedObjects[dest] = customizedObjectsSoFar
+			}
+		}
+	}
+	// update the index in c.bindingCares
+	var cares sets.Set[v1alpha1.Destination]
+	if destToCustomizedObjects != nil {
+		cares = sets.New(binding.Spec.Destinations...)
+	} else {
+		cares = sets.New[v1alpha1.Destination]()
+	}
+	c.setBindingSensitivities(binding.Name, cares) // forget about now-irrelevant destinations
+
+	// This will be constant if no object needed customization, otherwise a map's get func
+	var destToWrappedObject func(v1alpha1.Destination) (*unstructured.Unstructured, bool)
+
+	wrap := func(objectsToPropagate []*unstructured.Unstructured) (*unstructured.Unstructured, error) {
+		wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(objectsToPropagate))
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
+		}
+		// wrapped object name is (PlacementDecision.GetName()-WdsName).
+		// pay attention - we cannot use the PlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
+		// we add WdsName to the object name to assure name uniqueness,
+		// in order to easily get the origin PlacementDecision object name and wds, we add it as an annotations.
+		wrappedObject.SetName(fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName))
+		setLabel(wrappedObject, originOwnerReferenceLabel, binding.GetName())
+		setLabel(wrappedObject, originWdsLabel, c.wdsName)
+		setAnnotation(wrappedObject, originOwnerGenerationAnnotation, binding.GetGeneration())
+		return wrappedObject, nil
+	}
+	if destToCustomizedObjects != nil {
+		asMap := map[v1alpha1.Destination]*unstructured.Unstructured{}
+		for dest, objects := range destToCustomizedObjects {
+			wrappedObject, err := wrap(objects)
+			if err != nil {
+				return nil, nil, err
+			}
+			asMap[dest] = wrappedObject
+		}
+		destToWrappedObject = util.PrimitiveMapGet(asMap)
+	} else {
+		wrappedObject, err := wrap(objectsToPropagate)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
+		}
+		destToWrappedObject = func(v1alpha1.Destination) (*unstructured.Unstructured, bool) { return wrappedObject, true }
+	}
+
+	return destToWrappedObject, bindingErrors, nil
 }
 
-func (c *genericTransportController) propagateWrappedObjectToClusters(ctx context.Context, desiredWrappedObject *unstructured.Unstructured,
+// getPropertiesForDestination returns the properties to use for the given destination and notes
+// that the given binding is sensitive to the fact that the destination has those properties.
+func (c *genericTransportController) getPropertiesForDestination(bindingName string, dest v1alpha1.Destination) map[string]string {
+	c.Lock()
+	defer c.Unlock()
+	dests := c.bindingSensitiveDestinations[bindingName]
+	if dests == nil {
+		dests = sets.New[v1alpha1.Destination](dest)
+		c.bindingSensitiveDestinations[bindingName] = dests
+	} else {
+		dests.Insert(dest)
+	}
+	props, have := c.destinationProperties[dest]
+	if have {
+		return props
+	}
+	props = map[string]string{"clusterName": dest.ClusterId}
+	parmCfgMap, err := c.parmCfgMapLister.Get(dest.ClusterId)
+	if err == nil {
+		enumerateParmsInConfigMap(parmCfgMap)(func(key, val string) bool {
+			props[key] = val
+			return true
+		})
+		c.destinationProperties[dest] = props
+	} else if !errors.IsNotFound(err) {
+		c.logger.Error(err, "Inconceivable failure to fetch parameter ConfigMap", "dest", dest, "forBinding", bindingName)
+	}
+	return props
+}
+
+func enumerateParmsInConfigMap(parmCfgMap *corev1.ConfigMap) func(yield func(key, val string) bool) {
+	return func(yield func(key, val string) bool) {
+		if parmCfgMap == nil {
+			return
+		}
+		for key, val := range parmCfgMap.Data {
+			if token.IsIdentifier(key) && !yield(key, val) {
+				return
+			}
+		}
+		for key, val := range parmCfgMap.BinaryData {
+			if token.IsIdentifier(key) && !yield(key, string(val)) {
+				return
+			}
+		}
+	}
+}
+
+func (c *genericTransportController) setBindingSensitivities(bindingName string, dests sets.Set[v1alpha1.Destination]) {
+	c.Lock()
+	defer c.Unlock()
+	if dests == nil {
+		delete(c.bindingSensitiveDestinations, bindingName)
+	} else {
+		c.bindingSensitiveDestinations[bindingName] = dests
+	}
+}
+
+func (c *genericTransportController) handleParmCfgMapEvent(cmName string, parmCfgMap *corev1.ConfigMap, event string) {
+	dest := v1alpha1.Destination{ClusterId: cmName}
+	c.RLock()
+	defer c.RUnlock()
+	sameProps := equalProperties(cmName, c.destinationProperties[dest], parmCfgMap)
+	if parmCfgMap != nil {
+		if sameProps {
+			return
+		}
+	} else {
+		if _, has := c.destinationProperties[dest]; !has {
+			return
+		}
+	}
+	delete(c.destinationProperties, dest)
+	if sameProps {
+		return
+	}
+	for bindingName, dests := range c.bindingSensitiveDestinations {
+		if dests.Has(dest) {
+			c.logger.V(5).Info("Enqueuing reference to Binding that depends on destination properties", "binding", bindingName, "destination", dest, "event", event)
+			c.workqueue.Add(bindingName)
+		}
+	}
+}
+
+// equalProperties reveals whether the new version of the parameter ConfigMap implies the same old customization parameters
+func equalProperties(destName string, oldProps map[string]string, newConfigMap *corev1.ConfigMap) bool {
+	var newNumProperties int = 1
+	visitedClusterName := false
+	mismatch := false
+	enumerateParmsInConfigMap(newConfigMap)(func(key, newVal string) bool {
+		if key == "clusterName" {
+			visitedClusterName = true
+		} else {
+			newNumProperties++
+		}
+		if oldVal, had := oldProps[key]; !(had && oldVal == newVal) {
+			mismatch = true
+			return false
+		}
+		return true
+	})
+	if !visitedClusterName && oldProps["clusterName"] != destName {
+		return false
+	}
+	return newNumProperties == len(oldProps) && !mismatch
+}
+
+// customizeForDest customizes the given object for the given destination,
+// if any customization is called for. The returned boolean indicates whether
+// any customization was called for.
+func (c *genericTransportController) customizeForDest(object *unstructured.Unstructured, dest string, defs map[string]string) (*unstructured.Unstructured, []string, bool) {
+	objectCopy := object.DeepCopy()
+	objectData := objectCopy.UnstructuredContent()
+	objectDataExpanded, wantedChange, errs := customize.ExpandTemplates(dest, objectData, defs)
+	if wantedChange {
+		objectData = objectDataExpanded.(map[string]any)
+		objectCopy.SetUnstructuredContent(objectData)
+		return objectCopy, errs, true
+	}
+	return object, nil, false
+}
+
+func (c *genericTransportController) propagateWrappedObjectToClusters(ctx context.Context, destToDesiredWrappedObject func(v1alpha1.Destination) (*unstructured.Unstructured, bool),
 	currentWrappedObjectList *unstructured.UnstructuredList, destinations []v1alpha1.Destination) error {
 	// if the desired wrapped object is nil, that means we should not propagate this object.
 	// this may happen when the workload section is empty.
 	// this is not an error state but a valid scenario.
 	// return without propagating, the delete section will remove existing instances of the wrapped object from all current destinations.
-	if desiredWrappedObject == nil {
+	if destToDesiredWrappedObject == nil {
 		return nil // this is not considered an error.
 	}
 
 	for _, destination := range destinations {
 		currentWrappedObject := c.popWrappedObjectByNamespace(currentWrappedObjectList, destination.ClusterId)
+		desiredWrappedObject, _ := destToDesiredWrappedObject(destination)
 		if currentWrappedObject != nil && currentWrappedObject.GetAnnotations() != nil &&
 			currentWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] == desiredWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] {
 			continue // current wrapped object is already in the desired state
@@ -494,6 +787,7 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 		if err != nil {
 			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 		}
+		klog.FromContext(ctx).V(5).Info("Created wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject)
 		return nil
 	}
 	// // if we reached here object already exists, try update object
@@ -504,6 +798,7 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 	if err != nil {
 		return fmt.Errorf("failed to update wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 	}
+	klog.FromContext(ctx).V(5).Info("Updated wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject)
 
 	return nil
 }
@@ -518,7 +813,7 @@ func (c *genericTransportController) updateBinding(ctx context.Context, binding 
 		return nil // if object was not updated, no need to update in API server, return.
 	}
 
-	_, err := c.wdsClientset.ControlV1alpha1().Bindings().Update(ctx, updatedBinding, metav1.UpdateOptions{
+	_, err := c.bindingClient.Update(ctx, updatedBinding, metav1.UpdateOptions{
 		FieldManager: ControllerName,
 	})
 	if err != nil {
@@ -617,4 +912,25 @@ func cleanObject(object *unstructured.Unstructured) *unstructured.Unstructured {
 	objectsFilter.CleanObjectSpecifics(objectCopy)
 
 	return objectCopy
+}
+
+func MapCopyIntoFiltered[Key comparable, Val any](dest, src map[Key]Val, pass func(Key) bool) {
+	for key, val := range src {
+		if pass(key) {
+			dest[key] = val
+		}
+	}
+}
+
+func MapEqual[Key, Val comparable](map1, map2 map[Key]Val) bool {
+	if len(map1) != len(map2) {
+		return false
+	}
+	for key, val1 := range map1 {
+		val2, have := map2[key]
+		if val1 != val2 || !have {
+			return false
+		}
+	}
+	return true
 }

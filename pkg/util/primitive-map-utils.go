@@ -14,22 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package abstract
+package util
 
-// SliceDelete removes an entry, identified by position, from a slice.
-// The given position must be valid.
-func SliceDelete[Elt any](slice *[]Elt, index int) {
-	lastIndex := len(*slice) - 1
-	if index != lastIndex {
-		(*slice)[index] = (*slice)[lastIndex]
+// PrimitiveMapGet exposes the indexing functionality of a primitive map as a func
+func PrimitiveMapGet[Key comparable, Val any](rep map[Key]Val) func(Key) (Val, bool) {
+	return func(key Key) (Val, bool) {
+		val, has := rep[key]
+		return val, has
 	}
-	*slice = (*slice)[:lastIndex]
-}
-
-// SliceCopy copies a given slice into new storage
-func SliceCopy[Elt any](input []Elt) []Elt {
-	if input == nil {
-		return nil
-	}
-	return append(make([]Elt, 0, len(input)), input...)
 }

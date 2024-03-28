@@ -39,6 +39,8 @@ import (
 	k8sschema "k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 	dynamicfake "k8s.io/client-go/dynamic/fake"
+	k8sinformers "k8s.io/client-go/informers"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
 
@@ -306,8 +308,13 @@ func TestGenericController(t *testing.T) {
 	itsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme)
 	transport := &testTransport{expect: bindingCase.expect}
 	wrapperGVR := workapi.GroupVersion.WithResource("manifestworks")
-	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, wdsKsInformerFactory.Control().V1alpha1().Bindings(), transport, wdsKsClientFake, wdsDynamicClient, itsDynamicClient, "test-wds", wrapperGVR)
+	itsK8sClientFake := k8sfake.NewSimpleClientset()
+	itsK8sInformerFactory := k8sinformers.NewSharedInformerFactory(itsK8sClientFake, 0*time.Minute)
+	parmCfgMapPreInformer := itsK8sInformerFactory.Core().V1().ConfigMaps()
+	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, wdsKsClientFake.ControlV1alpha1().Bindings(), wdsKsInformerFactory.Control().V1alpha1().Bindings(), transport, wdsDynamicClient, itsK8sClientFake.CoreV1().Namespaces(), parmCfgMapPreInformer, itsDynamicClient, "test-wds", wrapperGVR)
 	wdsKsInformerFactory.Start(ctx.Done())
+	itsK8sInformerFactory.Start(ctx.Done())
+
 	go ctlr.Run(ctx, 4)
 	err := wait.PollUntilContextTimeout(ctx, 5*time.Second, time.Minute, false, func(ctx context.Context) (done bool, err error) {
 		transport.Lock()
