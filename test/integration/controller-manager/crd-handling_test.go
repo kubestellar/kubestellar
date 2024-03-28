@@ -93,6 +93,11 @@ func TestCRDHandling(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log("CRDs ensured")
+	err = ctlr.AppendKSResources(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("Appended KS resources to discovered lists")
 	err = ctlr.Start(ctx, 4, make(chan interface{}, 1))
 	if err != nil {
 		t.Fatal(err)

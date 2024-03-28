@@ -33,20 +33,19 @@ import (
 )
 
 const (
-	CRDKind                              = "CustomResourceDefinition"
-	AnyVersion                           = "*"
-	ServiceVersion                       = "v1"
-	ServiceKind                          = "Service"
-	BindingPolicyKind                    = "BindingPolicy"
-	BindingPolicyResource                = "bindingpolicies"
-	BindingKind                          = "Binding"
-	BindingResource                      = "bindings"
-	WorkStatusGroup                      = "control.kubestellar.io"
-	WorkStatusVersion                    = "v1alpha1"
-	WorkStatusResource                   = "workstatuses"
-	AnnotationToPreserveValuesKey        = "annotations.kubestellar.io/preserve"
-	PreserveNodePortValue                = "nodeport"
-	UnableToRetrieveCompleteAPIListError = "unable to retrieve the complete list of server APIs"
+	CRDKind                       = "CustomResourceDefinition"
+	AnyVersion                    = "*"
+	ServiceVersion                = "v1"
+	ServiceKind                   = "Service"
+	BindingPolicyKind             = "BindingPolicy"
+	BindingPolicyResource         = "bindingpolicies"
+	BindingKind                   = "Binding"
+	BindingResource               = "bindings"
+	WorkStatusGroup               = "control.kubestellar.io"
+	WorkStatusVersion             = "v1alpha1"
+	WorkStatusResource            = "workstatuses"
+	AnnotationToPreserveValuesKey = "annotations.kubestellar.io/preserve"
+	PreserveNodePortValue         = "nodeport"
 )
 
 // this type is used in status-addon, which we cannot import due to conflicting versions
