@@ -25,7 +25,7 @@ jobs:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           persist-credentials: 'false'
 
-      - uses: actions/add-to-project@v0.6.1 # This adds the issue to the project
+      - uses: actions/add-to-project@v1.0.0 # This adds the issue to the project
         with:
           project-url: https://github.com/orgs/kubestellar/projects/5
           github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
