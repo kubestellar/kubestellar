@@ -2,7 +2,11 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
-## 0.21.1 and its release candidates
+## 0.21.2 and its release candidates
+
+Changes since 0.21.1 are mainly bug fixes and doc work; see changelog for full details.
+
+## 0.21.1
 This release mainly updates the documentation exposed under kubestellar.io.
 
 ## 0.21.0 and its release candidates
