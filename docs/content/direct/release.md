@@ -24,17 +24,25 @@ We have the following limitations.
 - Thus, it is necessary to keep users clearly appraised of the quality (or status of evaluating the quality) of each release.
 - Because of the lack of self references, most user instructions (e.g., examples) and tests do not have concrete release identifiers in them; instead, the user has to chose and supply the release identifier. There can also be documentation of a specific past release (e.g., the latest stable release) that uses the literal identifier for that past release.
 - **PAY ATTENTION TO THIS ONE**: Because of the prohibition of self references, **Git will not contain the exact bytes of our Helm chart definitions**. Where a Helm chart states its own version or has a container image reference to an image built from the same release, the bytes in Git have a placeholder for that image's tag and the process of creating the published release artifacts fills in that placeholder. Think of this as being analogous to the linking done when building a binary executable file.
-- The design below **fails** to completely meet the goal of not putting self-references in files under Git control. One failure is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another failure is in the examples document, which also holds references to its own release.
+- The design below **fails** to completely meet the goal of not putting self-references in files under Git control. One failure is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another failure is in the examples document, which also holds references to its own release. Another failure is in the examples.md file, and another is in the `docs/content/direct/README.md` file.
 
 ## Technology
 
-There will be a GitHub workflow that creates the published artifacts for each Git tag whose name starts with "v". The rest of the tag name is required to be a semver release identifier. Note that this document does not (yet, anyway) specify **how** that GitHub workflow gets its job done.
+There is a GitHub workflow that creates the published artifacts for each Git tag whose name starts with "v". The rest of the tag name is required to be a semver release identifier. Note that this document does not (yet, anyway) specify **how** that GitHub workflow gets its job done. This workflow is confusingly named "goreleaser" and in a file named "goreleaser.yml" and has a job named "goreleaser" despite the fact that it does more than use goreleaser.
 
 For each tag `v$version` the following published artifacts will be created.
 
 - The container image for the kubestellar-controller-manager (KCM), at `ghcr.io/kubestellar/kubestellar/controller-manager`. Image tag will be `$version`. This GitHub "package" will be connected to the ks/ks repo (this connection is something that an admin will do once, it will stick for all versions).
 - The Helm chart (for installing the KCM for a WDS), at `ghcr.io/kubestellar/kubestellar/controller-manager-chart` with version `$version` and Helm "appVersion" `$version`. This GitHub "package" will also be connected to the ks/ks repo. The chart has a reference to container image for the KCM and that reference is `ghcr.io/kubestellar/kubestellar/controller-manager:$version`. **In Git the chart has only placeholders in these places, _not_ `$version`; the `$version` is inserted into a distinct copy by the GitHub workflow, which then publishes this specialized copy.**
 - Note that there is no automation (yet) concerning the KubeFlex PostCreateHook that installs the KCM.
+
+## Website
+
+We use `mike` and `MkDocs` to derive and publish GitHub pages. See `docs/README.md` for details.
+
+The published GitHub pages are organized into "releases".  Each release in the GitHub pages corresponds to a git branch whose name begins with "release-" or is "main".
+
+Our documentation is, mostly, viewable in either of two ways. The source documents can be viewed directly through GitHub's web UI for files. The other way is through the website.
 
 ## Testing and Examples
 
@@ -56,11 +64,17 @@ We maintain an [examples document](examples.md) that tells users how to exercise
 
 We aim for all regular releases to be working. In order to do that, we have to make test releases and test them. The widely recognized pattern for doing that is to make "release candidates" (i.e., releases for testing purposes) `1.2.3-rc0`, `1.2.3-rc1`, `1.2.3-rc2`, and so on, while trying to get to a quality release `1.2.3`. Once one of them is judged to be of passing quality, we make a release without the `-rc<N>` suffix. Due to the self-reference in the KCM PostCreateHook, this will involve making a new commit.
 
-When reaching a new major or minor version, we make a release branch for it. That is, a branch named `release-$major.$minor`. At first this branch differs from `main` in one commit, the one that sets the self-reference in the KCM PostCreateHook. After that, the branches continue to evolve in the usual ways.
+Right after making a release we test it thoroughly.
 
 ### Deliberately feature-incomplete releases
 
 We plan a few deliberately feature-incomplete releases. They will be regular releases as far as the technology here is concerned. They will be announced only to selected users who acknowledge that they are getting something that is incomplete. In GitHub, these will be marked as "pre-releases". The status of these releases will be made clear in their documentation (which currently appears in [the release notes](release-notes.md).
+
+### Website
+
+We aim to keep the documents viewable both through the website and GitHub's web UI for viewing files. We aim for all of the documentation to be reachable on the website and in the GitHub file UI starting from the repo's README.md.
+
+We create a release in the GitHub pages for every release. A patch release is a release. A test release is a release. Creating that GHP release is done by creating a git branch named `release-$version`.
 
 ## Step-by-Step
 
@@ -76,10 +90,11 @@ Making a new release requires a contributor to do the following things. Here `$v
 
 - Make a new Git commit with those changes and get it into the right branch in the shared repo (through the regular PR process if not authorized to cheat).
 
-- Apply the Git tag `v$versin` to that new commit in the shared repo.
+- Apply the Git tag `v$version` to that new commit in the shared repo.
 
-After that, the GitHub workflow then creates and publishes the
-artifacts for that release, as discussed [above](#technology).
+- After that, the GitHub workflow then creates and publishes the artifacts for that release, as discussed [above](#technology).
+
+- After that, create and push to the shared repo a branch named `release-$version`. This will trigger the workflow that tests the latest release. That is just the start of the testing to do.
 
 ## Future Process Development
 
@@ -92,5 +107,3 @@ What to do about the dependency cycle between ks/ks and ks/ocm-transport-plugin?
 Exactly when does a new release branch diverge from `main`? What about cherry-picking between `main` and the latest (or also earlier?) release branch?
 
 What about the clusteradm container image?
-
-Playing nice with the website technology.
