@@ -19,6 +19,7 @@ package util
 import (
 	"bytes"
 	"context"
+	goerrors "errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -117,13 +118,13 @@ func Cleanup() {
 func SetupKubestellar(releasedFlag bool) {
 	var cmd *exec.Cmd
 	var e, o bytes.Buffer
+	var args []string
 	if releasedFlag {
-		fmt.Fprintf(ginkgo.GinkgoWriter, "%s", "releasedFlag=true")
-		cmd = exec.Command("../common/setup-kubestellar.sh", "--released")
-	} else {
-		fmt.Fprintf(ginkgo.GinkgoWriter, "%s", "releasedFlag=false")
-		cmd = exec.Command("../common/setup-kubestellar.sh")
+		args = []string{"--released"}
 	}
+	commandName := "../common/setup-kubestellar.sh"
+	ginkgo.By(fmt.Sprintf("Execing command %v", append([]string{commandName}, args...)))
+	cmd = exec.Command(commandName, args...)
 	cmd.Stderr = &e
 	cmd.Stdout = &o
 	err := cmd.Run()
@@ -345,49 +346,75 @@ func DeleteWECDeployments(ctx context.Context, wec *kubernetes.Clientset, ns str
 
 // CleanupWDS: removes all deployments and services from ns and all bindingPolicies from cluster
 func CleanupWDS(ctx context.Context, wds *kubernetes.Clientset, ksWds *ksClient.Clientset, ns string) {
-	deployments, err := wds.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
-	for _, deployment := range deployments.Items {
-		wds.AppsV1().Deployments(ns).Delete(ctx, deployment.GetName(), metav1.DeleteOptions{})
-	}
-	gomega.Eventually(func() int {
-		deployments, err = wds.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
-		return len(deployments.Items)
-	}).Should(gomega.Equal(0))
+	DeleteAll[*appsv1.DeploymentList](ctx, wds.AppsV1().Deployments(ns), func(objList *appsv1.DeploymentList) []string {
+		return objectsToNames((*appsv1.Deployment).GetName, objList.Items)
+	})
+	Delete1By1[*corev1.ServiceList](ctx, wds.CoreV1().Services(ns), func(objList *corev1.ServiceList) []string {
+		return objectsToNames((*corev1.Service).GetName, objList.Items)
+	})
+	DeleteAll[*batchv1.JobList](ctx, wds.BatchV1().Jobs(ns), func(objList *batchv1.JobList) []string {
+		return objectsToNames((*batchv1.Job).GetName, objList.Items)
+	})
+	DeleteAll[*ksapi.BindingPolicyList](ctx, ksWds.ControlV1alpha1().BindingPolicies(), func(objList *ksapi.BindingPolicyList) []string {
+		return objectsToNames((*ksapi.BindingPolicy).GetName, objList.Items)
+	})
+}
 
-	services, err := wds.CoreV1().Services(ns).List(ctx, metav1.ListOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
-	for _, service := range services.Items {
-		wds.CoreV1().Services(ns).Delete(ctx, service.GetName(), metav1.DeleteOptions{})
-	}
-	gomega.Eventually(func() int {
-		services, err = wds.CoreV1().Services(ns).List(ctx, metav1.ListOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
-		return len(services.Items)
-	}).Should(gomega.Equal(0))
+type ResourceInterface[ObjectListType metav1.ListInterface] interface {
+	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
+	List(ctx context.Context, opts metav1.ListOptions) (ObjectListType, error)
+}
 
-	jobs, err := wds.BatchV1().Jobs(ns).List(ctx, metav1.ListOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
-	for _, job := range jobs.Items {
-		wds.BatchV1().Jobs(ns).Delete(ctx, job.GetName(), metav1.DeleteOptions{})
-	}
-	gomega.Eventually(func() int {
-		jobs, err = wds.BatchV1().Jobs(ns).List(ctx, metav1.ListOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
-		return len(jobs.Items)
-	}).Should(gomega.Equal(0))
+type ResourceCollectionInterface[ObjectListType metav1.ListInterface] interface {
+	DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error
+	List(ctx context.Context, opts metav1.ListOptions) (ObjectListType, error)
+}
 
-	bindingPolicies, err := ksWds.ControlV1alpha1().BindingPolicies().List(ctx, metav1.ListOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
-	for _, bp := range bindingPolicies.Items {
-		ksWds.ControlV1alpha1().BindingPolicies().Delete(ctx, bp.GetName(), metav1.DeleteOptions{})
+func Delete1By1[ObjectListType metav1.ListInterface](ctx context.Context, client ResourceInterface[ObjectListType], listNames func(ObjectListType) []string) {
+	gomega.Eventually(func() error {
+		list, err := client.List(ctx, metav1.ListOptions{})
+		if err != nil {
+			return err
+		}
+		remaining := listNames(list)
+		if len(remaining) == 0 {
+			return nil
+		}
+		errs := []error{fmt.Errorf("some objects remain; their names are: %v", remaining)}
+		for _, objName := range remaining {
+			err := client.Delete(ctx, objName, metav1.DeleteOptions{})
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}
+		return goerrors.Join(errs...)
+	}, timeout/3).Should(gomega.Succeed())
+}
+
+func DeleteAll[ObjectListType metav1.ListInterface](ctx context.Context, client ResourceCollectionInterface[ObjectListType], listNames func(ObjectListType) []string) {
+	gomega.Eventually(func() error {
+		err := client.DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{})
+		if err != nil {
+			return err
+		}
+		list, err := client.List(ctx, metav1.ListOptions{})
+		if err != nil {
+			return err
+		}
+		remaining := listNames(list)
+		if len(remaining) != 0 {
+			return fmt.Errorf("some objects remain; their names are: %v", remaining)
+		}
+		return nil
+	}, timeout/3).Should(gomega.Succeed())
+}
+
+func objectsToNames[ObjectType any](getName func(*ObjectType) string, objects []ObjectType) []string {
+	ans := make([]string, len(objects))
+	for idx := range objects {
+		ans[idx] = getName(&objects[idx])
 	}
-	gomega.Eventually(func() int {
-		bindingPolicies, err = ksWds.ControlV1alpha1().BindingPolicies().List(ctx, metav1.ListOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
-		return len(bindingPolicies.Items)
-	}, timeout).Should(gomega.Equal(0))
+	return ans
 }
 
 func DeletePods(ctx context.Context, client *kubernetes.Clientset, ns string, namePrefix string) {

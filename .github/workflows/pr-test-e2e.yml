@@ -71,7 +71,13 @@ jobs:
         run: |
           date
           kubectl --context kind-kubeflex get pods -A
-          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -p -n $ns $name || true; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+
+      - name: show previous logs in hosting cluster
+        if: always()
+        run: |
+          date
+          kubectl --context kind-kubeflex get pods -A | grep -v NAME | while read ns name ready status restarts rest; do if [ $restarts != 0 ]; then echo; echo For $ns/$name; kubectl --context kind-kubeflex logs -p -n $ns $name || true; fi; done;
 
       - name: show Deployment objects in hosting cluster
         if: always()
