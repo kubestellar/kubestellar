@@ -17,7 +17,7 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
     kubectl config delete-context kubeflex || true
     kubectl config delete-context wec1 || true
     ```
-   If previously running KS on Kind, clean that up with [the Kind cleanup script](../../../test/e2e/common/cleanup.sh).
+   If previously running KS on Kind, clean that up with the Kind cleanup script (in `test/e2e/common/cleanup.sh`).
 
 1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
     ```shell
@@ -79,7 +79,7 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
 1. Run the OCM based transport controller in a pod.  
 **NOTE**: This is work in progress, in the future the controller will be deployed through a Helm chart.
 
-    Run [transport deployment script](../../../scripts/deploy-transport-controller.sh), as follows.
+    Run transport deployment script (in `scripts/deploy-transport-controller.sh`), as follows.
     This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
     This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.  
     While the first and second arguments are mandatory, the third one is optional.

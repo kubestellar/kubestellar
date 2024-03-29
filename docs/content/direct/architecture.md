@@ -446,7 +446,7 @@ status updates for one object do not require updates of a whole bundle.
 ### Transport Controller
 
 The transport controller is pluggable and allows the option to plug different
-implementations of the transport interface. The interface between the plugin and the generic code is [a Go language interface](../../../pkg/transport/transport.go) that the plugin has to implement. This interface requires the following from the plugin.
+implementations of the transport interface. The interface between the plugin and the generic code is a Go language interface (in `pkg/transport/transport.go`) that the plugin has to implement. This interface requires the following from the plugin.
 
 - Upon registration of a new WEC, plugin should create a namespace for the WEC in the ITS and delete the namespace once the WEC registration goes away (mailbox namespace per WEC);
 - Plugin must be able to wrap any number of objects into a single wrapped object;
@@ -455,7 +455,7 @@ implementations of the transport interface. The interface between the plugin and
 
 The above list is required in order to comply with [<u>SIG Multi-Cluster Work API</u>](https://multicluster.sigs.k8s.io/concepts/work-api/).
 
-Each plugin has an executable with a `main` func that calls [the generic code](../../../pkg/transport/cmd/generic-main.go), passing the plugin object that implements the plugin interface.
+Each plugin has an executable with a `main` func that calls the generic code (in `pkg/transport/cmd/generic-main.go`), passing the plugin object that implements the plugin interface.
 
 KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project [Open Cluster Management](https://open-cluster-management.io). OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available [here](https://github.com/kubestellar/ocm-transport-plugin).  
 We expect to have more transport plugin options in the future.
