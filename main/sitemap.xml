@@ -8,6 +8,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/docs-readme/</loc>
+         <lastmod>2024-03-29</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/docs-readme/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/readme/</loc>
          <lastmod>2024-03-29</lastmod>
          <changefreq>daily</changefreq>

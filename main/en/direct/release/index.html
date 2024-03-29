@@ -740,6 +740,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
@@ -981,13 +983,27 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../docs-readme/" class="md-nav__link">
+        Website
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
       
       
         
@@ -997,13 +1013,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
           Security
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_9">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_10">
           <span class="md-nav__icon md-icon"></span>
           Security
         </label>
@@ -1608,7 +1624,7 @@ clues about the problem.</p>
 <p>Making a new release requires a contributor to do the following things. Here <code>$version</code> is the semver identifier for the release (e.g., <code>1.2.3-rc2</code>).</p>
 <ul>
 <li>
-<p>Edit <a href="../../../config/postcreate-hooks/kubestellar.yaml">the source for the KCM PCH</a> and update the tag in the reference to the KCM container image (it appears in the last object, a <code>Job</code>).</p>
+<p>Edit the source for the KCM PCH (in <code>config/postcreate-hooks/kubestellar.yaml</code>) and update the tag in the reference to the KCM container image (it appears in the last object, a <code>Job</code>).</p>
 </li>
 <li>
 <p>Edit <a href="../examples/">the examples document</a> to update the self-references for the coming release.</p>

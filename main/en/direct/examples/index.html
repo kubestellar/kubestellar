@@ -843,6 +843,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
@@ -974,13 +976,27 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../docs-readme/" class="md-nav__link">
+        Website
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
       
       
         
@@ -990,13 +1006,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
           Security
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_9">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_10">
           <span class="md-nav__icon md-icon"></span>
           Security
         </label>
@@ -1538,9 +1554,8 @@
 
 
 <h1 id="kubestellar-usage-examples">KubeStellar Usage Examples<a class="headerlink" href="#kubestellar-usage-examples" title="Permanent link">#</a></h1>
-<p>This document shows some simple examples of using the release that contains this version of this document. See also <a href="user-guide.md">the start of a user guide</a> for considerations for different scenarios. For historical examples, see <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST">our blog posts</a>.</p>
-<p>There are also end-to-end (E2E) tests that are based on scenario 4 and an extended variant of scenario 1. These tests normally exercise the copy of the repo containing them (rather than a release). They can alternatively test a release. See <a href="../../../test/e2e">the e2e tests</a>. Contributors can run these tests, and CI includes checking that these E2E tests pass. These tests are written in <code>bash</code>, so that contributors can easily follow them.</p>
-<p>See also <a href="user-guide.md">the user guide</a>.</p>
+<p>This document shows some simple examples of using the release that contains this version of this document. See also <a href="../hosting-cluster/">the doc about using an existing hosting cluster and multi-machine scenarios</a> for considerations for different scenarios. For historical examples, see <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST">our blog posts</a>.</p>
+<p>There are also end-to-end (E2E) tests that are based on scenario 4 and an extended variant of scenario 1. These tests normally exercise the copy of the repo containing them (rather than a release). They can alternatively test a release. See the e2e tests (in <code>test/e2e</code>). Contributors can run these tests, and CI includes checking that these E2E tests pass. These tests are written in <code>bash</code>, so that contributors can easily follow them.</p>
 <h2 id="prereqs">Prereqs<a class="headerlink" href="#prereqs" title="Permanent link">#</a></h2>
 <p>See <a href="../pre-reqs/">pre-reqs</a>.</p>
 <h2 id="common-setup">Common Setup<a class="headerlink" href="#common-setup" title="Permanent link">#</a></h2>
@@ -1550,7 +1565,7 @@
 <p>You may want to <code>set -e</code> in your shell so that any failures in the setup or usage scenarios are not lost.</p>
 </li>
 <li>
-<p>If you ran through these scenarios previously then you will need to do a bit of cleanup first. See how it is done in <a href="../../../test/e2e/common/cleanup.sh">the cleanup script for our E2E tests</a>.</p>
+<p>If you ran through these scenarios previously then you will need to do a bit of cleanup first. See how it is done in the cleanup script for our E2E tests (in <code>test/e2e/common/cleanup.sh</code>).</p>
 </li>
 <li>
 <p>Set environment variables to hold KubeStellar and OCM-status-addon desired versions:</p>
@@ -1597,7 +1612,7 @@ manager which connects to the <code>wds1</code> front-end and the <code>imbs1</c
 <li>
 <p>Run the OCM based transport controller in a pod.<br />
 <strong>NOTE</strong>: This is work in progress, in the future the controller will be deployed through a Helm chart.</p>
-<p>Run <a href="../../../scripts/deploy-transport-controller.sh">transport deployment script</a>, as follows.
+<p>Run the transport deployment script (in <code>scripts/deploy-transport-controller.sh</code>), as follows.
 This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
 This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.<br />
 While the first and second arguments are mandatory, the third one is optional.

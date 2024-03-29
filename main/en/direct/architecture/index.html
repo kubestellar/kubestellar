@@ -905,6 +905,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
@@ -1036,13 +1038,27 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../docs-readme/" class="md-nav__link">
+        Website
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
       
       
         
@@ -1052,13 +1068,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
           Security
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_9">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_10">
           <span class="md-nav__icon md-icon"></span>
           Security
         </label>
@@ -2089,7 +2105,7 @@ A <code>WorkStatus</code> object contains status for exactly one object, so that
 status updates for one object do not require updates of a whole bundle. </p>
 <h3 id="transport-controller">Transport Controller<a class="headerlink" href="#transport-controller" title="Permanent link">#</a></h3>
 <p>The transport controller is pluggable and allows the option to plug different
-implementations of the transport interface. The interface between the plugin and the generic code is <a href="../../../pkg/transport/transport.go">a Go language interface</a> that the plugin has to implement. This interface requires the following from the plugin.</p>
+implementations of the transport interface. The interface between the plugin and the generic code is a Go language interface (in <code>pkg/transport/transport.go</code>) that the plugin has to implement. This interface requires the following from the plugin.</p>
 <ul>
 <li>Upon registration of a new WEC, plugin should create a namespace for the WEC in the ITS and delete the namespace once the WEC registration goes away (mailbox namespace per WEC);</li>
 <li>Plugin must be able to wrap any number of objects into a single wrapped object;</li>
@@ -2097,7 +2113,7 @@ implementations of the transport interface. The interface between the plugin and
 <li>Have inventory representation for the clusters.</li>
 </ul>
 <p>The above list is required in order to comply with <a href="https://multicluster.sigs.k8s.io/concepts/work-api/"><u>SIG Multi-Cluster Work API</u></a>.</p>
-<p>Each plugin has an executable with a <code>main</code> func that calls <a href="../../../pkg/transport/cmd/generic-main.go">the generic code</a>, passing the plugin object that implements the plugin interface.</p>
+<p>Each plugin has an executable with a <code>main</code> func that calls the generic code (in <code>pkg/transport/cmd/generic-main.go</code>), passing the plugin object that implements the plugin interface.</p>
 <p>KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project <a href="https://open-cluster-management.io">Open Cluster Management</a>. OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available <a href="https://github.com/kubestellar/ocm-transport-plugin">here</a>.<br />
 We expect to have more transport plugin options in the future.</p>
 <p>The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.</p>
