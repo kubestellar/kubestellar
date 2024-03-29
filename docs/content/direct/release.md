@@ -82,7 +82,7 @@ We create a release in the GitHub pages for every release. A patch release is a 
 
 Making a new release requires a contributor to do the following things. Here `$version` is the semver identifier for the release (e.g., `1.2.3-rc2`).
 
-- Edit [the source for the KCM PCH](../../../config/postcreate-hooks/kubestellar.yaml) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
+- Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
 
 - Edit [the examples document](examples.md) to update the self-references for the coming release.
 
