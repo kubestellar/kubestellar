@@ -43,7 +43,7 @@ nav:
           - Setting up KubeStellar:
               - Using existing hosting cluster: direct/hosting-cluster.md
               - KubeStellar on KIND: direct/ks-on-kind.md
-              - KubeStellar on K3D: direct/ks-on-k3d.md
+              - KubeStellar on K3D: direct/deploy-on-k3d.md
               - KubeStellar on OCP: direct/ks-on-ocp.md
           - Examples: direct/examples.md
   - Contributing: 
