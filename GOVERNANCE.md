@@ -47,7 +47,7 @@ The KubeStellar and its leadership embrace the following values:
 
 KubeStellar Maintainers have write access to the [project GitHub repository](https://github.com/kubestellar/kubestellar).
 They can merge their own patches or patches from others. The current maintainers
-can be found as top-level approvers in [OWNERS](./OWNERS).  Maintainers collectively 
+can be found as top-level approvers in [OWNERS](https://github.com/kubestellar/kubestellar/blob/main/OWNERS).  Maintainers collectively 
 manage the project's resources and contributors.
 
 This privilege is granted with some expectation of responsibility: maintainers
