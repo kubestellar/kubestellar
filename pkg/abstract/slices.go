@@ -25,3 +25,5 @@ func SliceDelete[Elt any](slice *[]Elt, index int) {
 	}
 	*slice = (*slice)[:lastIndex]
 }
+
+// This is a test
