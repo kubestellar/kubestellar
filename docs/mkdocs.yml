@@ -55,7 +55,7 @@ nav:
       - License: Contribution guidelines/LICENSE.md
       - Governance: Contribution guidelines/governance.md
       - Onboarding: Contribution guidelines/onboarding.md
-      - Website: docs-readme.md
+      - Website: Contribution guidelines/operations/document-management.md
       - Security: 
           - Policy: Contribution guidelines/security/security.md
           - Contacts: Contribution guidelines/security/security_contacts.md
