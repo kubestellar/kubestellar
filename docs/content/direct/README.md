@@ -34,9 +34,9 @@ including OCM Klusterlet for the WECs.
 ## Latest stable release
 
 We do not have one that is proven very good yet.
-The first release using the new architecture is [0.20.0](../../../../v0.20.0); it is feture-incomplete.
+The first release using the new architecture is 0.20.0; it is feture-incomplete.
 Release 0.21.0 works but is feature-incomplete and is not well documented on the website; [view the missing information directly at GitHub](https://github.com/kubestellar/kubestellar/tree/release-0.21.0/docs/content/direct).
-The latest release is [0.21.2-rc1](../../../../v0.21.2-rc1); it is also feature-incomplete.
+The latest release is 0.21.2-rc1; it is also feature-incomplete.
 See also [the release notes](release-notes.md).
 
 ## Architecture
@@ -51,15 +51,15 @@ See [Packaging and Delivery](packaging.md)
 
 [Examples](examples.md) shows a few examples of how to deploy and use a release of KubeStellar.
 
-[The test/e2e directory](../../../test/e2e) holds end-to-end tests.
+The `test/e2e` directory holds end-to-end tests.
 
 The contributor guide has a section on [integration testing](contributor.md#integration-testing).
 
 The contributor guide has a section on [unit testing](contributor.md#unit-testing).
 
-## User Guide
+## Using an existing hosting cluster
 
-See [the User Guide](user-guide.md), which is only the barest start of a stub.
+See [the instructions for using an existing hosting cluster](hosting-cluster.md) for notes on that and coping with multi-machine scenarios.
 
 ## Contributor Guide
 

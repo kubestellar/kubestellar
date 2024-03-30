@@ -1,10 +1,8 @@
 # KubeStellar Usage Examples
 
-This document shows some simple examples of using the release that contains this version of this document. See also [the start of a user guide](user-guide.md) for considerations for different scenarios. For historical examples, see [our blog posts](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST).
+This document shows some simple examples of using the release that contains this version of this document. See also [the doc about using an existing hosting cluster and multi-machine scenarios](hosting-cluster.md) for considerations for different scenarios. For historical examples, see [our blog posts](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST).
 
-There are also end-to-end (E2E) tests that are based on scenario 4 and an extended variant of scenario 1. These tests normally exercise the copy of the repo containing them (rather than a release). They can alternatively test a release. See [the e2e tests](../../../test/e2e). Contributors can run these tests, and CI includes checking that these E2E tests pass. These tests are written in `bash`, so that contributors can easily follow them.
-
-See also [the user guide](user-guide.md).
+There are also end-to-end (E2E) tests that are based on scenario 4 and an extended variant of scenario 1. These tests normally exercise the copy of the repo containing them (rather than a release). They can alternatively test a release. See the e2e tests (in `test/e2e`). Contributors can run these tests, and CI includes checking that these E2E tests pass. These tests are written in `bash`, so that contributors can easily follow them.
 
 ## Prereqs
 
@@ -16,7 +14,7 @@ The following steps establish an initial state used in the examples below.
 
 1. You may want to `set -e` in your shell so that any failures in the setup or usage scenarios are not lost.
 
-1. If you ran through these scenarios previously then you will need to do a bit of cleanup first. See how it is done in [the cleanup script for our E2E tests](../../../test/e2e/common/cleanup.sh).
+1. If you ran through these scenarios previously then you will need to do a bit of cleanup first. See how it is done in the cleanup script for our E2E tests (in `test/e2e/common/cleanup.sh`).
 
 1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
 

@@ -15,7 +15,7 @@ make test
 
 ## Integration testing
 
-There are currently two integration tests. Contributors can run them. There is also [a GitHub workflow](../../../.github/workflows/pr-test-integration.yml) that runs these tests.
+There are currently two integration tests. Contributors can run them. There is also a GitHub Actions workflow (in `.github/workflows/pr-test-integration.yml`) that runs these tests.
 
 These tests require you to already have `etcd` on your `$PATH`.
 See https://github.com/kubernetes/kubernetes/blob/v1.28.2/hack/install-etcd.sh for an example of how to do that.
