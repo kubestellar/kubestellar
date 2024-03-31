@@ -10,8 +10,6 @@ on:
   push:
     branches:
       - release-*
-    tags:
-      - 'v*'
 
 jobs:
   ginkgo-test:
