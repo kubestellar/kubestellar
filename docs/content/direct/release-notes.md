@@ -4,7 +4,7 @@ The following sections list the known issues for each release. The issue list is
 
 ## 0.21.2 and its release candidates
 
-Changes since 0.21.1 are mainly bug fixes and doc work; see changelog for full details.
+The changes since 0.21.1 include efficiency improvements, reducing costs of running the kubestellar-controller-manager for a WDS that is an OpenShift cluster. There are also bug fixes and documentation improvements.
 
 ## 0.21.1
 This release mainly updates the documentation exposed under kubestellar.io.
