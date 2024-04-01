@@ -73,6 +73,7 @@ var excludedResourceNames = map[string]bool{
 	"csistoragecapacities": true,
 	"csinodes":             true,
 	"endpoints":            true,
+	"workstatuses":         true,
 }
 
 const (
@@ -455,7 +456,7 @@ func (c *Controller) handleObject(obj any, resource string, eventType string) {
 		obj = typed.Obj
 		wasDeletedFinalStateUnknown = true
 	}
-	c.logger.Info("Got object event", "eventType", eventType,
+	c.logger.V(4).Info("Got object event", "eventType", eventType,
 		"wasDeletedFinalStateUnknown", wasDeletedFinalStateUnknown, "obj", util.RefToRuntimeObj(obj.(runtime.Object)),
 		"resource", resource)
 
