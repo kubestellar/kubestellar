@@ -73,6 +73,7 @@ var excludedResourceNames = map[string]bool{
 	"csistoragecapacities": true,
 	"csinodes":             true,
 	"endpoints":            true,
+	"workstatuses":         true,
 }
 
 const (
