@@ -129,6 +129,9 @@ func getRestConfig(logger logr.Logger, cpName, labelKey, labelValue string) (*re
 		return nil, "", fmt.Errorf("error creating new clientset: %w", err)
 	}
 
+	if targetCP.Status.SecretRef == nil {
+		return nil, "", fmt.Errorf("access secret reference doesn't exist for %s", targetCP.Name)
+	}
 	namespace := targetCP.Status.SecretRef.Namespace
 	name := targetCP.Status.SecretRef.Name
 	key := targetCP.Status.SecretRef.InClusterKey
