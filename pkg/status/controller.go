@@ -200,7 +200,7 @@ func shouldSkipDelete(_ interface{}) bool {
 // At this time it is very simple, more complex processing might be required here
 func (c *Controller) handleObject(obj any) {
 	rObj := obj.(runtime.Object)
-	c.logger.V(2).Info("Got object event", "obj", util.RefToRuntimeObj(rObj))
+	c.logger.V(4).Info("Got object event", "obj", util.RefToRuntimeObj(rObj))
 	c.enqueueObject(obj)
 }
 
