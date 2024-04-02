@@ -1571,6 +1571,7 @@
 <p>Set environment variables to hold KubeStellar and OCM-status-addon desired versions:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBESTELLAR_VERSION</span><span class="o">=</span><span class="m">0</span>.21.2
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OCM_STATUS_ADDON_VERSION</span><span class="o">=</span><span class="m">0</span>.2.0-rc6
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OCM_TRANSPORT_PLUGIN</span><span class="o">=</span><span class="m">0</span>.1.2
 </code></pre></div>
 </li>
 <li>
@@ -1610,24 +1611,18 @@ manager which connects to the <code>wds1</code> front-end and the <code>imbs1</c
 </code></pre></div>
 </li>
 <li>
-<p>Run the OCM based transport controller in a pod.<br />
-<strong>NOTE</strong>: This is work in progress, in the future the controller will be deployed through a Helm chart.</p>
-<p>Run the transport deployment script (in <code>scripts/deploy-transport-controller.sh</code>), as follows.
-This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
-This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.<br />
-While the first and second arguments are mandatory, the third one is optional.
-The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
-For example, one can deploy transport controller using the following commands:
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kflex<span class="w"> </span>ctx
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="si">${</span><span class="nv">KUBESTELLAR_VERSION</span><span class="si">}</span>/scripts/deploy-transport-controller.sh<span class="o">)</span><span class="w"> </span>wds1<span class="w"> </span>imbs1
-</code></pre></div></p>
+<p>Deploy the OCM based transport controller</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>kind-kubeflex<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ocm-transport-plugin<span class="w"> </span>oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin<span class="w"> </span>--version<span class="w"> </span><span class="si">${</span><span class="nv">OCM_TRANSPORT_PLUGIN</span><span class="si">}</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w"> </span>--set<span class="w"> </span><span class="nv">transport_cp_name</span><span class="o">=</span>imbs1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w"> </span>--set<span class="w"> </span><span class="nv">wds_cp_name</span><span class="o">=</span>wds1
+</code></pre></div>
 </li>
 <li>
 <p>Follow the steps to <a href="../example-wecs/">create and register two clusters with OCM</a>.</p>
 </li>
 <li>
 <p>(optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
-see the <code>kubestellar-controller-manager</code> in the <code>wds1-system</code> namespace and the 
+see the <code>kubestellar-controller-manager</code> in the <code>wds1-system</code> namespace and the
 statefulset <code>vcluster</code> in the <code>imbs1-system</code> namespace, both fully ready.</p>
 <p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>get<span class="w"> </span>deployments,statefulsets<span class="w"> </span>--all-namespaces
 </code></pre></div>
@@ -1755,7 +1750,10 @@ the raise the permissions for the kubeflex controller manager:</p>
 </code></pre></div>
 <p>To create a second WDS based on the hosting cluster, run the commands:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kflex<span class="w"> </span>create<span class="w"> </span>wds2<span class="w"> </span>-t<span class="w"> </span>host
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="si">${</span><span class="nv">KUBESTELLAR_VERSION</span><span class="si">}</span>/scripts/deploy-transport-controller.sh<span class="o">)</span><span class="w"> </span>wds2<span class="w"> </span>imbs1
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>kind-kubeflex<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ocm-transport-plugin<span class="w"> </span>oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin<span class="w"> </span>--version<span class="w"> </span><span class="si">${</span><span class="nv">OCM_TRANSPORT_PLUGIN</span><span class="si">}</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>--set<span class="w"> </span><span class="nv">transport_cp_name</span><span class="o">=</span>imbs1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>--set<span class="w"> </span><span class="nv">wds_cp_name</span><span class="o">=</span>wds2
 </code></pre></div>
 <p>where the <code>-t host</code> option specifies a control plane of type <code>host</code>.
 You can only create on control plane of type <code>host</code>.</p>
@@ -1767,10 +1765,7 @@ hosting cluster so that we can pass additional startup options.</p>
 <p>For this example, we use the <code>AppWrapper</code> custom resource defined in the
 <a href="https://github.com/project-codeflare/multi-cluster-app-dispatcher">multi cluster app dispatcher</a>
 project.</p>
-<p>Install the AppWrapper CRD in the WDS and the WECs. Note that due to 
-<a href="https://github.com/kubestellar/kubestellar/issues/1705">this issue</a> CRDs must be pre-installed 
-on the WDS and on the WECs when using API group filtering. For this release of KubeStellar, that pre-installation is required 
-when a WDS has a large number of API resources (such as would be found in a hosting cluster that is OpenShift).</p>
+<p>Install the AppWrapper CRD in the WDS and the WECs.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nv">clusters</span><span class="o">=(</span>wds2<span class="w"> </span>cluster1<span class="w"> </span>cluster2<span class="o">)</span><span class="p">;</span>
 <a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span>cluster<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">clusters</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/project-codeflare/multi-cluster-app-dispatcher/v1.39.0/config/crd/bases/workload.codeflare.dev_appwrappers.yaml
