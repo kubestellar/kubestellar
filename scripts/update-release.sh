@@ -23,8 +23,8 @@
 # Input version should be X.Y.Z
 input_version="$1"
 
-if ! [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "Error: Invalid version format. Please provide a version in the format X.Y.Z (all numbers)." >&2
+if ! [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$ ]]; then
+    echo "Error: Invalid version format. Please provide a version in the format X.Y.Z[-RCn] (X, Y, Z, n are all numbers). " >&2
     exit 1
 fi
 
