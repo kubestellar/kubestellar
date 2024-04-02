@@ -35,8 +35,8 @@ including OCM Klusterlet for the WECs.
 
 We do not have one that is proven very good yet.
 The first release using the new architecture is 0.20.0; it is feture-incomplete.
-Release 0.21.0 works but is feature-incomplete and is not well documented on the website; [view the missing information directly at GitHub](https://github.com/kubestellar/kubestellar/tree/release-0.21.0/docs/content/direct).
-The latest release is 0.21.2-rc2; it is also feature-incomplete.
+Release 0.21.0 works but is not well documented on the website; [view the missing information directly at GitHub](https://github.com/kubestellar/kubestellar/tree/release-0.21.0/docs/content/direct).
+The latest release is 0.21.2.
 See also [the release notes](release-notes.md).
 
 ## Architecture
