@@ -21,6 +21,7 @@ The following steps establish an initial state used in the examples below.
     ```shell
     export KUBESTELLAR_VERSION=0.21.2
     export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
+    export OCM_TRANSPORT_PLUGIN=0.1.2
     ```
 
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
@@ -69,24 +70,18 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
     kflex create wds1 -p kubestellar
     ```
 
-1. Run the OCM based transport controller in a pod.  
-**NOTE**: This is work in progress, in the future the controller will be deployed through a Helm chart.
+1. Deploy the OCM based transport controller
 
-    Run the transport deployment script (in `scripts/deploy-transport-controller.sh`), as follows.
-    This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
-    This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.  
-    While the first and second arguments are mandatory, the third one is optional.
-    The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
-    For example, one can deploy transport controller using the following commands:
     ```shell
-    kflex ctx
-    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds1 imbs1
+    helm --kube-context kind-kubeflex upgrade --install ocm-transport-plugin oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin --version ${OCM_TRANSPORT_PLUGIN} \
+     --set transport_cp_name=imbs1 \
+     --set wds_cp_name=wds1
     ```
 
 1. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
 
 1. (optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
-see the `kubestellar-controller-manager` in the `wds1-system` namespace and the 
+see the `kubestellar-controller-manager` in the `wds1-system` namespace and the
 statefulset `vcluster` in the `imbs1-system` namespace, both fully ready.
 
     ```shell
@@ -244,7 +239,10 @@ To create a second WDS based on the hosting cluster, run the commands:
 
 ```shell
 kflex create wds2 -t host
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds2 imbs1
+
+helm --kube-context kind-kubeflex upgrade --install ocm-transport-plugin oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin --version ${OCM_TRANSPORT_PLUGIN} \
+--set transport_cp_name=imbs1 \
+--set wds_cp_name=wds2
 ```
 
 where the `-t host` option specifies a control plane of type `host`.
@@ -255,7 +253,7 @@ hosting cluster so that we can pass additional startup options.
 
 Label the `wds2` control plane as type `wds`:
 
-```shell 
+```shell
 kubectl label cp wds2 kflex.kubestellar.io/cptype=wds
 ```
 
@@ -263,10 +261,7 @@ For this example, we use the `AppWrapper` custom resource defined in the
 [multi cluster app dispatcher](https://github.com/project-codeflare/multi-cluster-app-dispatcher)
 project.
 
-Install the AppWrapper CRD in the WDS and the WECs. Note that due to 
-[this issue](https://github.com/kubestellar/kubestellar/issues/1705) CRDs must be pre-installed 
-on the WDS and on the WECs when using API group filtering. For this release of KubeStellar, that pre-installation is required 
-when a WDS has a large number of API resources (such as would be found in a hosting cluster that is OpenShift).
+Install the AppWrapper CRD in the WDS and the WECs.
 
 ```shell
 clusters=(wds2 cluster1 cluster2);
