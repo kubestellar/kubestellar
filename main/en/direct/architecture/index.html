@@ -1897,18 +1897,24 @@ pattern has been extended to provide the following features:</p>
     ManagedClusters and to copy/update/remove the wrapped objects
     into/from the OCM mailbox namespaces.</li>
 </ul>
-<p>There are three controllers in the KubeStellar controller manager:
-- Binding Controller - one client connected to the WDS space and one
-  (or more in the future) to connect to one or more ITS shards.
-  - The WDS-connected client is used to start the dynamic
-    informers/listers for most API resources in the WDS.
-  - The OCM-connected client is used to start informers/listers for OCM
-    ManagedClusters. This is a temporary state until cluster inventory abstraction is implemented and decoupled from OCM (and then this client should be removed and we would need to use client to inventory space). 
-- Transport controller - one client connected to the WDS space 
-  and one client (or more in the future) to connect to one or more ITS shards.
-  - The OCM-connected client is used to copy/update/remove the wrapped objects
-    into/from the OCM mailbox namespaces.
-- Status controller - TODO </p>
+<p>There are three controllers in the KubeStellar controller manager:</p>
+<ul>
+<li>Binding Controller - one client connected to the WDS space and one
+  (or more in the future) to connect to one or more ITS shards.<ul>
+<li>The WDS-connected client is used to start the dynamic
+  informers/listers for most API resources in the WDS.</li>
+<li>The OCM-connected client is used to start informers/listers for OCM
+  ManagedClusters. This is a temporary state until cluster inventory abstraction is implemented and decoupled from OCM (and then this client should be removed and we would need to use client to inventory space).</li>
+</ul>
+</li>
+<li>Transport controller - one client connected to the WDS space 
+  and one client (or more in the future) to connect to one or more ITS shards.<ul>
+<li>The OCM-connected client is used to copy/update/remove the wrapped objects
+  into/from the OCM mailbox namespaces.</li>
+</ul>
+</li>
+<li>Status controller - TODO </li>
+</ul>
 <h3 id="binding-controller">Binding Controller<a class="headerlink" href="#binding-controller" title="Permanent link">#</a></h3>
 <p>The Binding controller is responsible for watching workload objects and 
 <code>BindingPolicy</code> objects, and maintains for each of the latter a matching <code>Binding</code> object in the WDS. 
@@ -1927,11 +1933,13 @@ handler and the work queue as follows:</p>
 <li>lists all API preferred resources (using discovery client's ServerPreferredResources()
   to return only one preferred storage version for API group)</li>
 <li>Filters out some resources</li>
-<li>For each resource:</li>
+<li>For each resource:<ul>
 <li>Creates GVR key</li>
 <li>Registers Event Handler</li>
 <li>Starts Informer</li>
 <li>Indexes informer and lister in a map by GVR key</li>
+</ul>
+</li>
 <li>Waits for all caches to sync</li>
 <li>Starts N workers to process work queue</li>
 </ul>
@@ -2046,14 +2054,18 @@ a <code>BindingPolicy</code> and it has been deleted (deletion timestamp is set)
 follows the flow below:</p>
 <ul>
 <li>If an in memory representation of the binding is not found, the worker returns.</li>
-<li>The key is used to retrieve the object from the WDS.</li>
+<li>The key is used to retrieve the object from the WDS.<ul>
 <li>If the object is not found, then a <code>Binding</code> object should be created. For the convenience of the flow,
   the worker sets the "retrived object" as an empty <code>Binding</code> object with the appropriate Meta fields,
   including the <code>BindingPolicy</code> object as the single owner reference.</li>
-<li>The worker compares the in-memory representation of the binding with the retrieved object.</li>
+</ul>
+</li>
+<li>The worker compares the in-memory representation of the binding with the retrieved object.<ul>
 <li>If the two are the same, the worker returns.</li>
 <li>If the two are different, the worker updates the binding object resource to reflect the state of the
   in-memory representation.</li>
+</ul>
+</li>
 </ul>
 <h4 id="new-crd-added">New CRD Added<a class="headerlink" href="#new-crd-added" title="Permanent link">#</a></h4>
 <p>When a new CRD is added, the binding controller needs to start a new informer to watch instances of the new CRD on the WDS.</p>
