@@ -14,10 +14,17 @@ permissions:
   contents: write
 
 jobs:
+  debug-event:
+    name: debug-event-contents
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "event name is:" ${{ github.event_name }} 
+      - run: echo "event type is:" ${{ github.event.action }} 
+
   broken-links-crawler:
     name: broken-links-crawler
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: get workflow_dispatch branch name
         shell: bash
