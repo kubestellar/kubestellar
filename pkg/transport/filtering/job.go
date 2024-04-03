@@ -27,42 +27,51 @@ func badJobKey(key string) bool {
 func cleanJob(object *unstructured.Unstructured) {
 	objectU := object.UnstructuredContent()
 	changed := false
-	selector, foundSelector, _ := unstructured.NestedMap(objectU, "spec", "selector")
+	if jobAnnotations, found, _ := unstructured.NestedMap(objectU, "metadata", "annotations"); found {
+		if cleanJobAnnotations(jobAnnotations) {
+			_ = unstructured.SetNestedMap(objectU, jobAnnotations, "metadata", "annotations")
+			changed = true
+		}
+	}
+	if jobLabels, found, _ := unstructured.NestedMap(objectU, "metadata", "labels"); found {
+		if cleanJobLabels(jobLabels) {
+			_ = unstructured.SetNestedMap(objectU, jobLabels, "metadata", "labels")
+			changed = true
+		}
+	}
+	_, foundSelector, _ := unstructured.NestedFieldNoCopy(objectU, "spec", "selector")
 	if foundSelector {
-		if matchLabels, found, _ := unstructured.NestedMap(selector, "matchLabels"); found {
-			if cleanLabels(matchLabels) {
-				_ = unstructured.SetNestedMap(objectU, matchLabels, "spec", "selector", "matchLabels")
-				changed = true
-			}
-		}
-		if matchExpressions, found, _ := unstructured.NestedSlice(selector, "matchExpressions"); found {
-			cleanedExpressions := make([]any, 0, len(matchExpressions))
-			for _, expr := range matchExpressions {
-				exprM := expr.(map[string]any)
-				key, _, _ := unstructured.NestedString(exprM, "key")
-				if !badJobKey(key) {
-					cleanedExpressions = append(cleanedExpressions, expr)
-				}
-			}
-			if len(cleanedExpressions) != len(matchExpressions) {
-				unstructured.SetNestedSlice(objectU, cleanedExpressions, "spec", "selector", "matchExpressions")
-				changed = true
-			}
-		}
+		unstructured.RemoveNestedField(objectU, "spec", "selector")
+		changed = true
 	}
 	podLabels, foundlabels, _ := unstructured.NestedMap(objectU, "spec", "template", "metadata", "labels")
 	if foundlabels {
-		if cleanLabels(podLabels) {
+		if cleanJobLabels(podLabels) {
 			_ = unstructured.SetNestedMap(objectU, podLabels, "spec", "template", "metadata", "labels")
 			changed = true
 		}
+	}
+	if _, foundStatus, _ := unstructured.NestedFieldNoCopy(objectU, "status"); foundStatus {
+		unstructured.RemoveNestedField(objectU, "status")
+		changed = true
 	}
 	if changed {
 		object.SetUnstructuredContent(objectU)
 	}
 }
 
-func cleanLabels(labels map[string]any) bool {
+func cleanJobAnnotations(annotations map[string]any) bool {
+	changed := false
+	for key := range annotations {
+		if key == "batch.kubernetes.io/job-tracking" {
+			delete(annotations, key)
+			changed = true
+		}
+	}
+	return changed
+}
+
+func cleanJobLabels(labels map[string]any) bool {
 	changed := false
 	for key := range labels {
 		if badJobKey(key) {
