@@ -230,16 +230,17 @@ pattern has been extended to provide the following features:
     into/from the OCM mailbox namespaces.
 
 There are three controllers in the KubeStellar controller manager:
+
 - Binding Controller - one client connected to the WDS space and one
   (or more in the future) to connect to one or more ITS shards.
-  - The WDS-connected client is used to start the dynamic
-    informers/listers for most API resources in the WDS.
-  - The OCM-connected client is used to start informers/listers for OCM
-    ManagedClusters. This is a temporary state until cluster inventory abstraction is implemented and decoupled from OCM (and then this client should be removed and we would need to use client to inventory space). 
+    - The WDS-connected client is used to start the dynamic
+      informers/listers for most API resources in the WDS.
+    - The OCM-connected client is used to start informers/listers for OCM
+      ManagedClusters. This is a temporary state until cluster inventory abstraction is implemented and decoupled from OCM (and then this client should be removed and we would need to use client to inventory space).
 - Transport controller - one client connected to the WDS space 
   and one client (or more in the future) to connect to one or more ITS shards.
-  - The OCM-connected client is used to copy/update/remove the wrapped objects
-    into/from the OCM mailbox namespaces.
+    - The OCM-connected client is used to copy/update/remove the wrapped objects
+      into/from the OCM mailbox namespaces.
 - Status controller - TODO 
 
 
@@ -264,10 +265,10 @@ handler and the work queue as follows:
   to return only one preferred storage version for API group)
 - Filters out some resources
 - For each resource:
-  - Creates GVR key
-  - Registers Event Handler
-  - Starts Informer
-  - Indexes informer and lister in a map by GVR key
+    - Creates GVR key
+    - Registers Event Handler
+    - Starts Informer
+    - Indexes informer and lister in a map by GVR key
 - Waits for all caches to sync
 - Starts N workers to process work queue
 
@@ -380,13 +381,13 @@ follows the flow below:
 
 - If an in memory representation of the binding is not found, the worker returns.
 - The key is used to retrieve the object from the WDS.
-  - If the object is not found, then a `Binding` object should be created. For the convenience of the flow,
-  the worker sets the "retrived object" as an empty `Binding` object with the appropriate Meta fields,
-  including the `BindingPolicy` object as the single owner reference.
+    - If the object is not found, then a `Binding` object should be created. For the convenience of the flow,
+      the worker sets the "retrived object" as an empty `Binding` object with the appropriate Meta fields,
+      including the `BindingPolicy` object as the single owner reference.
 - The worker compares the in-memory representation of the binding with the retrieved object.
-  - If the two are the same, the worker returns.
-  - If the two are different, the worker updates the binding object resource to reflect the state of the
-  in-memory representation.
+    - If the two are the same, the worker returns.
+    - If the two are different, the worker updates the binding object resource to reflect the state of the
+      in-memory representation.
 
 #### New CRD Added
 
