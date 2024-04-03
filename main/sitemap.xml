@@ -176,6 +176,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/direct/best-practices/</loc>
+         <lastmod>2024-04-03</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/direct/best-practices/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/direct/contributor/</loc>
          <lastmod>2024-04-03</lastmod>
          <changefreq>daily</changefreq>
