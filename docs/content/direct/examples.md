@@ -51,7 +51,7 @@ which installs OCM on it.
     Wait until the `managedclusteraddons` resource shows up on `imbs1`. You can check on that with the command:
 
     ```shell
-    kubectl --context imbs1 api-resources | grep managedclusteraddons
+    kubectl --context imbs1 api-resources | grep managedclusteraddons || true
     ```
 
     and then install the status add-on:
@@ -198,6 +198,13 @@ a BindingPolicy and the objects doesn’t affect the outcome. You can apply the 
 first followed by the objects, or vice versa. The result remains consistent because
 the binding controller identifies any changes in either the BindingPolicy or the objects,
 triggering the start of the reconciliation loop.
+
+### [Optional] Teardown Scenario 1
+
+```shell
+kubectl --context wds1 delete ns nginx
+kubectl --context wds1 delete bindingpolicies nginx-bpolicy
+```
 
 ## Scenario 2 - using the hosting cluster as WDS to deploy a custom resource
 
@@ -357,6 +364,48 @@ kubectl --context cluster1 get appwrappers
 kubectl --context cluster2 get appwrappers
 ```
 
+### [Optional] Teardown Scenario 2
+
+```shell
+kubectl --context wds2 delete bindingpolicies aw-bpolicy
+kubectl --context wds2 delete appwrappers --all
+```
+
+Wait until the following commands show no appwrappers in cluster1 and cluster2.
+
+```shell
+kubectl --context cluster1 get appwrappers -A
+kubectl --context cluster2 get appwrappers -A
+```
+
+The continue.
+
+```shell
+for cluster in cluster1 cluster2; do
+  kubectl --context $cluster delete clusterroles appwrappers-access
+  kubectl --context $cluster delete clusterrolebindings klusterlet-appwrappers-access
+done
+```
+
+If you have not already done so, then do the following command.
+
+```shell
+kubectl --context kind-kubeflex delete clusterrolebinding kubeflex-manager-cluster-admin-rolebinding
+```
+
+Continue as follows.
+
+```shell
+helm --kube-context kind-kubeflex uninstall -n wds2-system kubestellar
+
+clusters=(wds2 cluster1 cluster2);
+  for cluster in "${clusters[@]}"; do
+  kubectl --context ${cluster} delete -f https://raw.githubusercontent.com/project-codeflare/multi-cluster-app-dispatcher/v1.39.0/config/crd/bases/workload.codeflare.dev_appwrappers.yaml
+done
+
+kflex delete wds2
+```
+
 ## Scenario 3 - multi-cluster workload deployment with helm
 
 This scenario proceeds from the state established by the [common setup](#common-setup).
@@ -432,6 +481,14 @@ helm list --kube-context cluster2 -n postgres-system
 Implementing this in a controller for automated propagation of
 helm metadata is tracked in this [issue](https://github.com/kubestellar/kubestellar/issues/1543).
 
+### [Optional] Teardown Scenario 3
+
+```shell
+helm --kube-context wds1 uninstall -n postgres-system postgres
+kubectl --context wds1 delete ns postgres-system
+kubectl --context wds1 delete bindingpolicies postgres-bpolicy
+```
+
 ## Scenario 4 - Singleton status
 
 This scenario proceeds from the state established by the [common setup](#common-setup).
@@ -503,6 +560,13 @@ and verify that replicas has been updated in cluster1 and wds1:
 ```shell
 kubectl --context cluster1 get deployment nginx-singleton-deployment
 kubectl --context wds1 get deployment nginx-singleton-deployment
+```
+
+### [Optional] Teardown Scenario 4
+
+```shell
+kubectl --context wds1 delete bindingpolicies nginx-singleton-bpolicy
+kubectl --context wds1 delete deployments nginx-singleton-deployment
 ```
 
 ## Scenario 5 - Resiliency testing
@@ -594,6 +658,15 @@ kubectl --context cluster1 get deployments -n nginx-res
 kubectl --context cluster2 get deployments -n nginx-res
 ```
 
+## [Optional] Teardown Scenario 5
+
+```shell
+kubectl --context wds1 delete ns nginx-res
+kubectl --context wds1 delete bindingpolicies nginx-res-bpolicy
+```
+
+Then continue with [teardown of scenario 1](#teardown-scenario-1).
+
 ## Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD
 
 This scenario is something you can do after the [common setup](#common-setup).
@@ -662,4 +735,13 @@ are not created both wds1 and clusters:
 kubectl --context wds1 -n nginx-sa get secrets
 kubectl --context cluster1 -n nginx-sa get secrets
 kubectl --context cluster2 -n nginx-sa get secrets
+```
+
+### [Optional] Teardown Scenario 6
+
+(Assuming that kubectl is still using context `kind-kubeflex` and namespace `argocd`.)
+
+```shell
+argocd app delete nginx-sa --cascade
+kubectl --context wds1 delete bindingpolicies argocd-sa-bpolicy
 ```
