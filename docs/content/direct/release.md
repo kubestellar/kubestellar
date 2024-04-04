@@ -1,9 +1,37 @@
 # Making KubeStellar Releases
 
-This document defines how releases of the KubeStellar repository are made. This document is a work-in-progress. In particular, the dependency cycle between the `kubestellar` and `ocm-tansport-plugin` repos is not well documented and it is still not clear how to test and release in the presence of this cycle.
+This document defines how releases of the KubeStellar repository are made. This document is a work-in-progress. In particular, the dependency cycle between the `kubestellar` and `ocm-tansport-plugin` repos is not well documented and we do not have a good way to deal with it.
+
+This document starts with step-by-step instructions for the current procedure, then proceeds with the thinking behind them.
 
 See the associated [packaging and delivery doc](packaging.md) for some
 clues about the problem.
+
+## Step-by-Step
+
+Making a new release requires a contributor to do the following things. Here `$version` is the semver identifier for the release (e.g., `1.2.3-rc2`).
+
+- Edit the tag in the default transport controller image setting (`export TRANSPORT_CONTROLLER_IMAGE...`) to the latest release of [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin). **NOTE** This step is not really part of making the next ks/ks release, it is part of making that ks/OTP release. As such, the timing is driven by that release, not the ks/ks release.
+
+- Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
+
+- Edit [the examples document](examples.md) to update the self-references for the coming release.
+
+- Until we have our first stable release, edit [the README](README.md#latest-stable-release) where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
+
+- Edit [the release notes](release-notes.md).
+
+- Make a new Git commit with those changes and get it into the right branch in the shared repo (through the regular PR process if not authorized to cheat).
+
+- Apply the Git tag `v$version` to that new commit in the shared repo.
+
+- After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed [above](#technology)) and then the "Test latest release" workflow will run the E2E tests using those artifacts.
+
+- After the release artifacts have been published, create and push to the shared repo a branch named `release-$version`. This will also trigger the workflow that tests the latest release. Every push to a branch with such a name triggers that workflow, in case there has been a change in an E2E test for that release.
+
+- Do additional testing: more scenarios, more platforms.
+
+- If the testing results are good, update [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin) to refer to the new ks/ks release and [make a new release of ks/OTP](https://github.com/kubestellar/ocm-transport-plugin/blob/main/docs/release.md).
 
 ## Goals and limitations
 
@@ -12,7 +40,6 @@ The release process has the following goals.
 - A release is identified using [semantic versioning](https://semver.org). This means that the associated semantics are followed, in terms of what sort of changes to the repo require what sort of changes to the release identifier.
 - A user can pick up and use a given existing release without being perturbed by on-going contributor work. A release is an immutable thing.
 - A release with a given semver identifier is built from a commit of this Git repository tagged with a tag whose name is "v" followed by the release identifier.
-- There is a concept of a release branch, with a name following the pattern `release-$major.$minor`. This allows contributors to do maintenance work on older release branches. This also allows a user to track work along such a line.
 - The contents of `main` always work. This includes passing CI tests. This includes documentation being accurate. We allow point-in-time specific documentation, such as a document that says "Here is how to use release 1.2.3" --- which would refer to a release made in the past. We do not require the documentation in `main` to document all releases.
 - A git tag is immutable. Once associated with a given Git commit, that association is not changed later.
 - We do not put self-references into Git. For example, making release `1.2.3` does not require changing any file in Git to have the string `1.2.3` in it.
@@ -25,6 +52,10 @@ We have the following limitations.
 - Because of the lack of self references, most user instructions (e.g., examples) and tests do not have concrete release identifiers in them; instead, the user has to chose and supply the release identifier. There can also be documentation of a specific past release (e.g., the latest stable release) that uses the literal identifier for that past release.
 - **PAY ATTENTION TO THIS ONE**: Because of the prohibition of self references, **Git will not contain the exact bytes of our Helm chart definitions**. Where a Helm chart states its own version or has a container image reference to an image built from the same release, the bytes in Git have a placeholder for that image's tag and the process of creating the published release artifacts fills in that placeholder. Think of this as being analogous to the linking done when building a binary executable file.
 - The design below falls short of the goal of not putting self-references in files under Git control. One way is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another is in the examples document, which also holds references to its own release. Another is in the examples.md file, and another is in the `docs/content/direct/README.md` file.
+
+## Dependency cycle with ks/OTP
+
+The [ks/ks repo](https://github.com/kubestellar/kubestellar) and the [ks/OTP repo](https://github.com/kubestellar/ocm-transport-plugin) reference each other. Thus, making consistent immutable recursive-self-reference-free releases is impossible. We have to compromise somehow. There is some discussion in [ks/ks Issue 1786](https://github.com/kubestellar/kubestellar/issues/1786). We currently seem to be following the staggered release approach.
 
 ## Technology
 
@@ -78,35 +109,11 @@ We aim to keep the documents viewable both through the website and GitHub's web 
 
 We create a release in the GitHub pages for every release. A patch release is a release. A test release is a release. Creating that GHP release is done by creating a git branch named `release-$version`.
 
-## Step-by-Step
-
-Making a new release requires a contributor to do the following things. Here `$version` is the semver identifier for the release (e.g., `1.2.3-rc2`).
-
-- Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
-
-- Edit [the examples document](examples.md) to update the self-references for the coming release.
-
-- Until we have our first stable release, edit [the README](README.md#latest-stable-release) where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
-
-- Edit [the release notes](release-notes.md).
-
-- Make a new Git commit with those changes and get it into the right branch in the shared repo (through the regular PR process if not authorized to cheat).
-
-- Apply the Git tag `v$version` to that new commit in the shared repo.
-
-- After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed [above](#technology)) and then the "Test latest release" workflow will run the E2E tests using those artifacts.
-
-- After the release artifacts have been published, create and push to the shared repo a branch named `release-$version`. This will also trigger the workflow that tests the latest release. Every push to a branch with such a name triggers that workflow, in case there has been a change in an E2E test for that release.
-
-- Do additional testing: more scenarios, more platforms.
-
 ## Future Process Development
 
 We intend to get rid of the self-reference in the KCM PCH, as follows. Define a Helm chart for installing the PCH. Update the release workflow to specialize that Helm chart, similarly to the specialization done for the KCM Helm chart.
 
 ## Open questions
-
-What to do about the dependency cycle between ks/ks and ks/ocm-transport-plugin?
 
 Exactly when does a new release branch diverge from `main`? What about cherry-picking between `main` and the latest (or also earlier?) release branch?
 
