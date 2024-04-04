@@ -840,8 +840,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#step-by-step" class="md-nav__link">
+    Step-by-Step
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#goals-and-limitations" class="md-nav__link">
     Goals and limitations
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-cycle-with-ksotp" class="md-nav__link">
+    Dependency cycle with ks/OTP
   </a>
   
 </li>
@@ -891,13 +905,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-by-step" class="md-nav__link">
-    Step-by-Step
-  </a>
   
 </li>
       
@@ -1477,8 +1484,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#step-by-step" class="md-nav__link">
+    Step-by-Step
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#goals-and-limitations" class="md-nav__link">
     Goals and limitations
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-cycle-with-ksotp" class="md-nav__link">
+    Dependency cycle with ks/OTP
   </a>
   
 </li>
@@ -1532,13 +1553,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-by-step" class="md-nav__link">
-    Step-by-Step
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#future-process-development" class="md-nav__link">
     Future Process Development
   </a>
@@ -1584,16 +1598,53 @@
 
 
 <h1 id="making-kubestellar-releases">Making KubeStellar Releases<a class="headerlink" href="#making-kubestellar-releases" title="Permanent link">#</a></h1>
-<p>This document defines how releases of the KubeStellar repository are made. This document is a work-in-progress. In particular, the dependency cycle between the <code>kubestellar</code> and <code>ocm-tansport-plugin</code> repos is not well documented and it is still not clear how to test and release in the presence of this cycle.</p>
+<p>This document defines how releases of the KubeStellar repository are made. This document is a work-in-progress. In particular, the dependency cycle between the <code>kubestellar</code> and <code>ocm-tansport-plugin</code> repos is not well documented and we do not have a good way to deal with it.</p>
+<p>This document starts with step-by-step instructions for the current procedure, then proceeds with the thinking behind them.</p>
 <p>See the associated <a href="../packaging/">packaging and delivery doc</a> for some
 clues about the problem.</p>
+<h2 id="step-by-step">Step-by-Step<a class="headerlink" href="#step-by-step" title="Permanent link">#</a></h2>
+<p>Making a new release requires a contributor to do the following things. Here <code>$version</code> is the semver identifier for the release (e.g., <code>1.2.3-rc2</code>).</p>
+<ul>
+<li>
+<p>Edit the tag in the default transport controller image setting (<code>export TRANSPORT_CONTROLLER_IMAGE...</code>) to the latest release of <a href="https://github.com/kubestellar/ocm-transport-plugin">ks/OTP</a>. <strong>NOTE</strong> This step is not really part of making the next ks/ks release, it is part of making that ks/OTP release. As such, the timing is driven by that release, not the ks/ks release.</p>
+</li>
+<li>
+<p>Edit the source for the KCM PCH (in <code>config/postcreate-hooks/kubestellar.yaml</code>) and update the tag in the reference to the KCM container image (it appears in the last object, a <code>Job</code>).</p>
+</li>
+<li>
+<p>Edit <a href="../examples/">the examples document</a> to update the self-references for the coming release.</p>
+</li>
+<li>
+<p>Until we have our first stable release, edit <a href="../#latest-stable-release">the README</a> where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.</p>
+</li>
+<li>
+<p>Edit <a href="../release-notes/">the release notes</a>.</p>
+</li>
+<li>
+<p>Make a new Git commit with those changes and get it into the right branch in the shared repo (through the regular PR process if not authorized to cheat).</p>
+</li>
+<li>
+<p>Apply the Git tag <code>v$version</code> to that new commit in the shared repo.</p>
+</li>
+<li>
+<p>After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed <a href="#technology">above</a>) and then the "Test latest release" workflow will run the E2E tests using those artifacts.</p>
+</li>
+<li>
+<p>After the release artifacts have been published, create and push to the shared repo a branch named <code>release-$version</code>. This will also trigger the workflow that tests the latest release. Every push to a branch with such a name triggers that workflow, in case there has been a change in an E2E test for that release.</p>
+</li>
+<li>
+<p>Do additional testing: more scenarios, more platforms.</p>
+</li>
+<li>
+<p>If the testing results are good, update <a href="https://github.com/kubestellar/ocm-transport-plugin">ks/OTP</a> to refer to the new ks/ks release and <a href="https://github.com/kubestellar/ocm-transport-plugin/blob/main/docs/release.md">make a new release of ks/OTP</a>.</p>
+</li>
+</ul>
 <h2 id="goals-and-limitations">Goals and limitations<a class="headerlink" href="#goals-and-limitations" title="Permanent link">#</a></h2>
 <p>The release process has the following goals.</p>
 <ul>
 <li>A release is identified using <a href="https://semver.org">semantic versioning</a>. This means that the associated semantics are followed, in terms of what sort of changes to the repo require what sort of changes to the release identifier.</li>
 <li>A user can pick up and use a given existing release without being perturbed by on-going contributor work. A release is an immutable thing.</li>
 <li>A release with a given semver identifier is built from a commit of this Git repository tagged with a tag whose name is "v" followed by the release identifier.</li>
-<li>There is a concept of a release branch, with a name following the pattern <code>release-$major.$minor</code>. This allows contributors to do maintenance work on older release branches. This also allows a user to track work along such a line.</li>
 <li>The contents of <code>main</code> always work. This includes passing CI tests. This includes documentation being accurate. We allow point-in-time specific documentation, such as a document that says "Here is how to use release 1.2.3" --- which would refer to a release made in the past. We do not require the documentation in <code>main</code> to document all releases.</li>
 <li>A git tag is immutable. Once associated with a given Git commit, that association is not changed later.</li>
 <li>We do not put self-references into Git. For example, making release <code>1.2.3</code> does not require changing any file in Git to have the string <code>1.2.3</code> in it.</li>
@@ -1607,6 +1658,8 @@ clues about the problem.</p>
 <li><strong>PAY ATTENTION TO THIS ONE</strong>: Because of the prohibition of self references, <strong>Git will not contain the exact bytes of our Helm chart definitions</strong>. Where a Helm chart states its own version or has a container image reference to an image built from the same release, the bytes in Git have a placeholder for that image's tag and the process of creating the published release artifacts fills in that placeholder. Think of this as being analogous to the linking done when building a binary executable file.</li>
 <li>The design below falls short of the goal of not putting self-references in files under Git control. One way is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another is in the examples document, which also holds references to its own release. Another is in the examples.md file, and another is in the <code>docs/content/direct/README.md</code> file.</li>
 </ul>
+<h2 id="dependency-cycle-with-ksotp">Dependency cycle with ks/OTP<a class="headerlink" href="#dependency-cycle-with-ksotp" title="Permanent link">#</a></h2>
+<p>The <a href="https://github.com/kubestellar/kubestellar">ks/ks repo</a> and the <a href="https://github.com/kubestellar/ocm-transport-plugin">ks/OTP repo</a> reference each other. Thus, making consistent immutable recursive-self-reference-free releases is impossible. We have to compromise somehow. There is some discussion in <a href="https://github.com/kubestellar/kubestellar/issues/1786">ks/ks Issue 1786</a>. We currently seem to be following the staggered release approach.</p>
 <h2 id="technology">Technology<a class="headerlink" href="#technology" title="Permanent link">#</a></h2>
 <p>There is a GitHub workflow that creates the published artifacts for each Git tag whose name starts with "v". The rest of the tag name is required to be a semver release identifier. Note that this document does not (yet, anyway) specify <strong>how</strong> that GitHub workflow gets its job done. This workflow is confusingly named "goreleaser" and in a file named "goreleaser.yml" and has a job named "goreleaser" despite the fact that it does more than use goreleaser.</p>
 <p>For each tag <code>v$version</code> the following published artifacts will be created.</p>
@@ -1636,41 +1689,9 @@ clues about the problem.</p>
 <h3 id="website_1">Website<a class="headerlink" href="#website_1" title="Permanent link">#</a></h3>
 <p>We aim to keep the documents viewable both through the website and GitHub's web UI for viewing files. We aim for all of the documentation to be reachable on the website and in the GitHub file UI starting from the repo's README.md.</p>
 <p>We create a release in the GitHub pages for every release. A patch release is a release. A test release is a release. Creating that GHP release is done by creating a git branch named <code>release-$version</code>.</p>
-<h2 id="step-by-step">Step-by-Step<a class="headerlink" href="#step-by-step" title="Permanent link">#</a></h2>
-<p>Making a new release requires a contributor to do the following things. Here <code>$version</code> is the semver identifier for the release (e.g., <code>1.2.3-rc2</code>).</p>
-<ul>
-<li>
-<p>Edit the source for the KCM PCH (in <code>config/postcreate-hooks/kubestellar.yaml</code>) and update the tag in the reference to the KCM container image (it appears in the last object, a <code>Job</code>).</p>
-</li>
-<li>
-<p>Edit <a href="../examples/">the examples document</a> to update the self-references for the coming release.</p>
-</li>
-<li>
-<p>Until we have our first stable release, edit <a href="../#latest-stable-release">the README</a> where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.</p>
-</li>
-<li>
-<p>Edit <a href="../release-notes/">the release notes</a>.</p>
-</li>
-<li>
-<p>Make a new Git commit with those changes and get it into the right branch in the shared repo (through the regular PR process if not authorized to cheat).</p>
-</li>
-<li>
-<p>Apply the Git tag <code>v$version</code> to that new commit in the shared repo.</p>
-</li>
-<li>
-<p>After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed <a href="#technology">above</a>) and then the "Test latest release" workflow will run the E2E tests using those artifacts.</p>
-</li>
-<li>
-<p>After the release artifacts have been published, create and push to the shared repo a branch named <code>release-$version</code>. This will also trigger the workflow that tests the latest release. Every push to a branch with such a name triggers that workflow, in case there has been a change in an E2E test for that release.</p>
-</li>
-<li>
-<p>Do additional testing: more scenarios, more platforms.</p>
-</li>
-</ul>
 <h2 id="future-process-development">Future Process Development<a class="headerlink" href="#future-process-development" title="Permanent link">#</a></h2>
 <p>We intend to get rid of the self-reference in the KCM PCH, as follows. Define a Helm chart for installing the PCH. Update the release workflow to specialize that Helm chart, similarly to the specialization done for the KCM Helm chart.</p>
 <h2 id="open-questions">Open questions<a class="headerlink" href="#open-questions" title="Permanent link">#</a></h2>
-<p>What to do about the dependency cycle between ks/ks and ks/ocm-transport-plugin?</p>
 <p>Exactly when does a new release branch diverge from <code>main</code>? What about cherry-picking between <code>main</code> and the latest (or also earlier?) release branch?</p>
 <p>What about the clusteradm container image?</p>
 
