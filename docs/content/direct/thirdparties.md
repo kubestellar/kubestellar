@@ -63,7 +63,7 @@ open https://argocd.localtest.me:9443
 ```
 
 Note: if you are working on a VM via SSH, just take the IP of the VM (VM_IP)
-and add the line '<VM_IP> argocd.localtest.me' to your '/etc/hosts' file, replacing
+and add the line `<VM_IP> argocd.localtest.me` to your '/etc/hosts' file, replacing
 <VM_IP> with the actual IP of your desktop.
 
 Get the password for Argo with:
