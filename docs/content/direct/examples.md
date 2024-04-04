@@ -2,6 +2,8 @@
 
 This document shows some simple examples of using the release that contains this version of this document. See also [the doc about using an existing hosting cluster and multi-machine scenarios](hosting-cluster.md) for considerations for different scenarios. For historical examples, see [our blog posts](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST).
 
+Each example scenario concludes with instructions on how to undo its effects, restoring the state established by [the common setup](#common-setup) so that it is easy to run through several scenarios without having to repeat the common setup.
+
 There are also end-to-end (E2E) tests that are based on scenario 4 and an extended variant of scenario 1. These tests normally exercise the copy of the repo containing them (rather than a release). They can alternatively test a release. See the e2e tests (in `test/e2e`). Contributors can run these tests, and CI includes checking that these E2E tests pass. These tests are written in `bash`, so that contributors can easily follow them.
 
 ## Prereqs
