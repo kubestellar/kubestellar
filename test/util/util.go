@@ -310,6 +310,14 @@ func ValidateNumJobs(ctx context.Context, wec *kubernetes.Clientset, ns string, 
 	}, timeout).Should(gomega.Equal(num))
 }
 
+func ValidateSingletonStatusZeroValue(ctx context.Context, wds *kubernetes.Clientset, ns string, name string) {
+	gomega.Eventually(func() []appsv1.DeploymentCondition {
+		deployment, err := wds.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
+		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		return deployment.Status.Conditions
+	}, timeout).Should(gomega.BeNil())
+}
+
 func ValidateSingletonStatus(ctx context.Context, wds *kubernetes.Clientset, ns string, name string) {
 	gomega.Eventually(func() int {
 		deployment, err := wds.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
