@@ -11,3 +11,7 @@ ControlPlaneName: wds1
 # "<group1>\,<group2>\,<groupN>" with "" and escaped \,
 APIGroups:
 
+# The name of the Inventory and Transport Space to use.
+# Empty string means that there must be only one and that
+# is the one to use.
+ITSName: ""

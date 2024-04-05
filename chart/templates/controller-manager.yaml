@@ -200,6 +200,7 @@ spec:
         - --health-probe-bind-address=:8081
         - --metrics-bind-address=127.0.0.1:8080
         - --leader-elect
+        - --its-name={{.Values.ITSName}}
         - --wds-name={{.Values.ControlPlaneName}}
         - --api-groups={{.Values.APIGroups}}
         - -v=2
