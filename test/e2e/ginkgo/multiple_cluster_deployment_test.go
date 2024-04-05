@@ -214,29 +214,6 @@ var _ = ginkgo.Describe("end to end testing", func() {
 	})
 
 	ginkgo.Context("singleton status testing", func() {
-		ginkgo.It("no singleton status when a singleton bindingpolicy/deployment is created but no matching WEC(s)", func() {
-			util.DeleteDeployment(ctx, wds, ns, "nginx")
-			util.CreateDeployment(ctx, wds, ns, "nginx-singleton",
-				map[string]string{
-					"app.kubernetes.io/name": "nginx-singleton",
-				})
-			util.CreateBindingPolicy(ctx, ksWds, "nginx-singleton",
-				[]metav1.LabelSelector{
-					{MatchLabels: map[string]string{"name": "CelestialNexus"}},
-				},
-				[]ksapi.DownsyncObjectTest{
-					{ObjectSelectors: []metav1.LabelSelector{
-						{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx-singleton"}},
-					}}})
-			patch := []byte(`{"spec":{"wantSingletonReportedState": true}}`)
-			_, err := ksWds.ControlV1alpha1().BindingPolicies().Patch(
-				ctx, "nginx-singleton", types.MergePatchType, patch, metav1.PatchOptions{})
-			gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
-			util.ValidateNumDeployments(ctx, wec1, ns, 0)
-			util.ValidateNumDeployments(ctx, wec2, ns, 0)
-			util.ValidateSingletonStatusZeroValue(ctx, wds, ns, "nginx-singleton")
-		})
-
 		ginkgo.It("sets singleton status when a singleton bindingpolicy/deployment is created", func() {
 			util.DeleteDeployment(ctx, wds, ns, "nginx") // we don't have to delete nginx
 			util.CreateDeployment(ctx, wds, ns, "nginx-singleton",
@@ -258,6 +235,39 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 			util.ValidateSingletonStatus(ctx, wds, ns, "nginx-singleton")
+		})
+
+		// This ginkgo subject node is currently written in an 'incorrect' way, in the sense that
+		// the Deployment's status always begins with zero value no matter there are matching WEC(s) or not, so
+		// this node doesn't test any behaviors of KubeStellar.
+		// The correct way to test is to merge this node with the previous node, to show that the Deployment's status:
+		// (1) is updated (with non-zero value) when there are matching WEC(s); then
+		// (2) is deleted (ends up with zero value) when there are no matching WEC(s) any more, due to changes of the bindingpolicy's ClusterSelectors or WEC(s)'s labels.
+		//
+		// But today there is a bug which prevents such a merged node from succeeding.
+		// We will complete the tests here by merging the two nodes after fixing that bug.
+		// We track this by https://github.com/kubestellar/kubestellar/issues/2020#issuecomment-2037539110
+		ginkgo.It("zeros singleton status when there is a singleton bindingpolicy/deployment but WEC(s) are not selected any more", func() {
+			util.DeleteDeployment(ctx, wds, ns, "nginx")
+			util.CreateDeployment(ctx, wds, ns, "nginx-singleton",
+				map[string]string{
+					"app.kubernetes.io/name": "nginx-singleton",
+				})
+			util.CreateBindingPolicy(ctx, ksWds, "nginx-singleton",
+				[]metav1.LabelSelector{
+					{MatchLabels: map[string]string{"name": "CelestialNexus"}},
+				},
+				[]ksapi.DownsyncObjectTest{
+					{ObjectSelectors: []metav1.LabelSelector{
+						{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx-singleton"}},
+					}}})
+			patch := []byte(`{"spec":{"wantSingletonReportedState": true}}`)
+			_, err := ksWds.ControlV1alpha1().BindingPolicies().Patch(
+				ctx, "nginx-singleton", types.MergePatchType, patch, metav1.PatchOptions{})
+			gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+			util.ValidateNumDeployments(ctx, wec1, ns, 0)
+			util.ValidateNumDeployments(ctx, wec2, ns, 0)
+			util.ValidateSingletonStatusZeroValue(ctx, wds, ns, "nginx-singleton")
 		})
 	})
 
