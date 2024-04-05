@@ -17,7 +17,7 @@
 
 export WDS_NAME="$1" ## first argument is WDS name
 export IMBS_NAME="$2" ## second argument is IMBS name
-export TRANSPORT_CONTROLLER_IMAGE="${3:-ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.0}" ## third argument is transport controller image
+export TRANSPORT_CONTROLLER_IMAGE="${3:-ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.3}" ## third argument is transport controller image
 export IMAGE_PULL_POLICY="${IMAGE_PULL_POLICY:=Always}"
 
 # generate from template and env vars and then apply a configmap and a deployment for transport-controller
