@@ -8,7 +8,7 @@ See the associated [packaging and delivery doc](packaging.md) for some
 clues about the problem.
 
 Every release should pass all release tests before it can be officially declare as a new stable release. Please see the details in [release-testing](release-testing.md).
- 
+
 ## Step-by-Step
 
 ### Reacting to a new ocm-transport-plugin release
@@ -37,11 +37,13 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Apply the Git tag `v$version` to that new commit in the shared repo.
 
-- After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed [above](#technology)) and then the "Test latest release" workflow will run the E2E tests using those artifacts.
+- After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed [above](#technology)) and then the "Test latest release" workflow will run the E2E tests using those artifacts. 
+
+- Verify that the automatic tests indeed executed and passed (see more details in [CICD release testing](release-testing.md#automatic-github-based-release-tests))
 
 - After the release artifacts have been published, create and push to the shared repo a branch named `release-$version`. This will also trigger the workflow that tests the latest release. Every push to a branch with such a name triggers that workflow, in case there has been a change in an E2E test for that release.
 
-- Do additional testing: more scenarios, more platforms.
+- Follow the procedure in [OCP testing](release-testing.md#e2e-release-tests-on-ocp), to verify that the release is functional on OCP.
 
 - If the testing results are good, update [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin) to refer to the new ks/ks release and [make a new release of ks/OTP](https://github.com/kubestellar/ocm-transport-plugin/blob/main/docs/release.md).
 
