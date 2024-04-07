@@ -105,6 +105,13 @@ is_installed_kind() {
         'https://kind.sigs.k8s.io/docs/user/quick-start/#installation'
 }
 
+is_installed_k3d() {
+    is_installed 'k3d' \
+        'k3d' \
+        'k3d version' \
+        'https://k3d.io/#installation'
+}
+
 is_installed_ko() {
     is_installed 'KO' \
         'ko' \
@@ -141,7 +148,7 @@ is_installed_yq() {
 
 
 # Global constants
-PROGRAMS="@(argo|brew|docker|go|helm|jq|kflex|kind|ko|kubectl|make|ocm|yq)"
+PROGRAMS="@(argo|brew|docker|go|helm|jq|kflex|kind|k3d|ko|kubectl|make|ocm|yq)"
 
 # Global parameters
 assert="false"  # true => exit on missing program
@@ -198,7 +205,11 @@ if [ ${#programs[@]} -eq 0 ]; then
     is_installed_ocm
     is_installed_helm
     echo "Checking additional pre-requisites for running the examples:"
-    is_installed_kind
+    if [ -z "$USE_K3D" ]; then
+       is_installed_kind
+    else
+       is_installed_k3d
+    fi
     is_installed_argo
     echo "Checking pre-requisites for building KubeStellar:"
     is_installed_make

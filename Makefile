@@ -177,7 +177,12 @@ ko-build-local: ## Build local container image with ko
 # this is used for local testing
 .PHONY: kind-load-image
 kind-load-image:
+ifeq (,$(USE_K3D))
 	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${IMAGE_REPO}:${IMAGE_TAG}
+else
+	@echo "using k3d"
+	k3d image import ${IMAGE_REPO}:${IMAGE_TAG} -c ${KIND_HOSTING_CLUSTER}
+endif
 
 .PHONY: chart
 chart: manifests kustomize
@@ -246,7 +251,7 @@ CONTROLLER_TOOLS_VERSION ?= v0.13.0
 .PHONY: kustomize
 kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary.
 $(KUSTOMIZE): $(LOCALBIN)
-	test -s $(LOCALBIN)/kustomize || GOBIN=$(LOCALBIN) go install sigs.k8s.io/kustomize/kustomize/v5@v5.3.0
+	test -s $(LOCALBIN)/kustomize || GOBIN=$(LOCALBIN) go install sigs.k8s.io/kustomize/kustomize/v5@latest
 
 .PHONY: controller-gen
 controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary. If wrong version is installed, it will be overwritten.
