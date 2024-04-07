@@ -34,7 +34,11 @@ SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 COMMON_SRCS="${SRC_DIR}/../common"
 HACK_DIR="${SRC_DIR}/../../../hack"
 
-"${HACK_DIR}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
+if [ -z "$USE_K3D" ]; then
+   "${HACK_DIR}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
+else
+   "${HACK_DIR}/check_pre_req.sh" --assert --verbose kubectl docker k3d make go ko yq helm kflex ocm
+fi
 
 "${COMMON_SRCS}/cleanup.sh"
 source "${COMMON_SRCS}/setup-shell.sh"

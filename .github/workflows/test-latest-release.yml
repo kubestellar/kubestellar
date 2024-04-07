@@ -49,15 +49,15 @@ jobs:
 
       - name: show pods in hosting cluster
         if: always()
-        run: kubectl --context kind-kubeflex get pods -A
+        run: kubectl --context kubeflex get pods -A
 
       - name: show kubestellar controller manager log
         if: always()
-        run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
+        run: kubectl --context kubeflex logs -n wds1-system $(kubectl --context kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
 
       - name: show transport controller log
         if: always()
-        run: kubectl --context kind-kubeflex -n wds1-system logs $(kubectl --context kind-kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}')
+        run: kubectl --context kubeflex -n wds1-system logs $(kubectl --context kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}')
 
       - name: show bindingpolicies
         if: always()
@@ -123,15 +123,15 @@ jobs:
 
       - name: show pods in hosting cluster
         if: always()
-        run: kubectl --context kind-kubeflex get pods -A
+        run: kubectl --context kubeflex get pods -A
 
       - name: show kubestellar controller manager log
         if: always()
-        run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
+        run: kubectl --context kubeflex logs -n wds1-system $(kubectl --context kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
 
       - name: show transport controller log
         if: always()
-        run: kubectl --context kind-kubeflex -n wds1-system logs $(kubectl --context kind-kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}')
+        run: kubectl --context kubeflex -n wds1-system logs $(kubectl --context kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}')
 
       - name: show bindingpolicies
         if: always()

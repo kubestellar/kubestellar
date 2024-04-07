@@ -62,7 +62,7 @@ var _ = ginkgo.BeforeSuite(func() {
 	}
 
 	ctx = context.Background()
-	configCore := util.GetConfig("kind-kubeflex")
+	configCore := util.GetConfig("kubeflex")
 	configWds := util.GetConfig("wds1")
 	configITS := util.GetConfig("imbs1")
 	configWec1 := util.GetConfig("cluster1")

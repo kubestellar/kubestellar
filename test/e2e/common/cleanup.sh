@@ -20,8 +20,17 @@ set -e # exit on error
 : -------------------------------------------------------------------------
 : "Cleaning up from previous run of an e2e test"
 
-kind delete cluster --name cluster1
-kind delete cluster --name cluster2
-kind delete cluster --name kubeflex
+if [ -z "$USE_K3D" ]; then
+   kind delete cluster --name cluster1
+   kind delete cluster --name cluster2
+   kind delete cluster --name kubeflex
+else
+   k3d cluster delete cluster1
+   k3d cluster delete cluster2
+   k3d cluster delete kubeflex
+fi
 kubectl config delete-context cluster1 || true
 kubectl config delete-context cluster2 || true
+kubectl config delete-context kubeflex || true
+kubectl config delete-context imbs1 || true
+kubectl config delete-context wds1 || true

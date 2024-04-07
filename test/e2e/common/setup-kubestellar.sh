@@ -41,10 +41,53 @@ source "$COMMON_SRCS/setup-shell.sh"
 
 :
 : -------------------------------------------------------------------------
-: Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager
+: Create a hosting cluster with nginx ingress controller and KubeFlex controller-manager
 :
-kflex init --create-kind $disable_chatty_status
-: Kubeflex kind cluster created.
+if [ -z "$USE_K3D" ]; then
+   kflex init --create-kind $disable_chatty_status
+   kubectl config rename-context kind-kubeflex kubeflex
+   : Kubeflex kind cluster created.
+else
+   k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
+   helm install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --version 4.6.1 --namespace ingress-nginx --create-namespace
+   kubectl config rename-context k3d-kubeflex kubeflex
+   :
+   : Kubeflex k3d cluster created. Rename docker container until kubeflex feature implemented
+   docker stop k3d-kubeflex-server-0
+   docker rename k3d-kubeflex-server-0 kubeflex-control-plane
+   docker start kubeflex-control-plane
+   :
+   : Wait 60 seconds for pods to restart
+   sleep 60
+   :
+   : modify ingress deployment and install kflex controller
+   tmpfile=$(mktemp)
+   cat > "tmpfile" <<EOF
+spec:
+  template:
+    spec:
+      containers:
+        - name: controller
+          args:
+            - /nginx-ingress-controller
+            - --election-id=ingress-nginx-leader
+            - --controller-class=k8s.io/ingress-nginx
+            - --ingress-class=nginx
+            - --configmap=$(POD_NAMESPACE)/ingress-nginx-controller
+            - --validating-webhook=:8443
+            - --validating-webhook-certificate=/usr/local/certificates/cert
+            - --validating-webhook-key=/usr/local/certificates/key
+            - --watch-ingress-without-class=true
+            - --publish-status-address=localhost
+            - --enable-ssl-passthrough
+EOF
+   kubectl --context kubeflex patch deployment ingress-nginx-controller -n ingress-nginx --patch-file "tmpfile"
+   rm "tmpfile"
+   :
+   : install kflex controller
+   kflex init
+   : Kubeflex cluster created.
+fi
 
 :
 : -------------------------------------------------------------------------
@@ -75,13 +118,13 @@ helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-managem
 : Create a Workload Description Space wds1 directly in KubeFlex.
 :
 kflex create wds1 $wds_extra $disable_chatty_status
-kubectl --context kind-kubeflex label cp wds1 kflex.kubestellar.io/cptype=wds
+kubectl --context kubeflex label cp wds1 kflex.kubestellar.io/cptype=wds
 
 if [ "$use_release" != true ]; then
     cd "${SRC_DIR}/../../.."
     pwd
     make ko-build-local
-    make install-local-chart KUBE_CONTEXT=kind-kubeflex
+    make install-local-chart KUBE_CONTEXT=kubeflex
     cd -
 fi
 echo "wds1 created."
@@ -100,12 +143,16 @@ pwd
 echo "replace github.com/kubestellar/kubestellar => ${KUBESTELLAR_DIR}/" >> go.mod
 go mod tidy # TODO to be deleted next time we bump ocm transport release (done in ocm transport makefile)
 IMAGE_TAG=${OCM_TRANSPORT_PLUGIN_RELEASE} make ko-build-local
-kind load --name kubeflex docker-image ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
+if [ -z "$USE_K3D" ]; then
+    kind load --name kubeflex docker-image ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
+else
+    k3d image import ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} -c kubeflex # load local image to kubeflex
+fi
 cd "${KUBESTELLAR_DIR}"
 pwd
 rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
 echo "running ocm transport plugin..."
-kubectl config use-context kind-kubeflex ## transport deployment script assumes it runs within kubeflex context
+kubectl config use-context kubeflex ## transport deployment script assumes it runs within kubeflex context
 IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 imbs1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE}
 
 wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))'
@@ -118,8 +165,13 @@ echo "transport controller is running."
 :
 function create_cluster() {
   cluster=$1
-  kind create cluster --name $cluster
-  kubectl config rename-context kind-${cluster} $cluster
+  if [ -z "$USE_K3D" ]; then
+     kind create cluster --name $cluster
+     kubectl config rename-context kind-${cluster} $cluster
+  else
+     k3d cluster create  --network k3d-kubeflex $cluster
+     kubectl config rename-context k3d-${cluster} $cluster
+  fi
   clusteradm --context imbs1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton --force-internal-endpoint-lookup"}' | sh
 }
 
@@ -132,6 +184,8 @@ create_cluster cluster2
 wait-for-cmd '(($(kubectl --context imbs1 get csr 2>/dev/null | grep -c Pending) >= 2))'
 
 clusteradm --context imbs1 accept --clusters cluster1
+: Wait a few seconds
+sleep 10
 clusteradm --context imbs1 accept --clusters cluster2
 
 kubectl --context imbs1 get managedclusters
@@ -144,7 +198,7 @@ kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=c
 : Expect to see the wds1 kubestellar-controller-manager and transport-controller created in the wds1-system
 : namespace and the imbs1 statefulset created in the imbs1-system namespace.
 :
-if ! expect-cmd-output 'kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces' 'grep -e wds1 -e imbs1 | wc -l | grep -wq 5'
+if ! expect-cmd-output 'kubectl --context kubeflex get deployments,statefulsets --all-namespaces' 'grep -e wds1 -e imbs1 | wc -l | grep -wq 5'
 then
     echo "Failed to see wds1 deployment and imbs1 statefulset."
     exit 1

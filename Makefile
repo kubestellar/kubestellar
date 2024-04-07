@@ -177,7 +177,12 @@ ko-build-local: ## Build local container image with ko
 # this is used for local testing
 .PHONY: kind-load-image
 kind-load-image:
+ifeq (,$(USE_K3D))
 	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${IMAGE_REPO}:${IMAGE_TAG}
+else
+	@echo "using k3d"
+	k3d image import ${IMAGE_REPO}:${IMAGE_TAG} -c ${KIND_HOSTING_CLUSTER}
+endif
 
 .PHONY: chart
 chart: manifests kustomize
