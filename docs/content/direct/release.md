@@ -7,6 +7,8 @@ This document starts with step-by-step instructions for the current procedure, t
 See the associated [packaging and delivery doc](packaging.md) for some
 clues about the problem.
 
+Every release should pass all release tests before it can be officially declare as a new stable release. Please see the details in [release-testing](release-testing.md).
+ 
 ## Step-by-Step
 
 ### Reacting to a new ocm-transport-plugin release
