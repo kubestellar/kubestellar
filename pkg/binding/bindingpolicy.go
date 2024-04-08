@@ -403,7 +403,8 @@ func SliceContains[Elt comparable](slice []Elt, seek Elt) bool {
 	return false
 }
 
-// sort by name and pick first cluster so that the choice is deterministic based on names
+// pickSingleDestination sorts clusters by name and picks first cluster so that the choice is deterministic based on names
+// pickSingleDestination expects a non-empty clusterSet
 func pickSingleDestination(clusterSet sets.Set[string]) sets.Set[string] {
 	return sets.New(sets.List(clusterSet)[0])
 }
