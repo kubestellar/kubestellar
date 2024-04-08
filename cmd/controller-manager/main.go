@@ -58,11 +58,13 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
+	var itsName string
 	var wdsName string
 	var wdsLabel string
 	var allowedGroupsString string
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
+	flag.StringVar(&itsName, "its-name", "", "name of the Inventory and Transport Space to connect to (empty string means to use the only one)")
 	flag.StringVar(&wdsName, "wds-name", "", "name of the workload description space to connect to")
 	flag.StringVar(&wdsLabel, "wds-label", "", "label of the workload description space to connect to")
 	flag.StringVar(&allowedGroupsString, "api-groups", "", "list of allowed api groups, comma separated. Empty string means all API groups are allowed")
@@ -129,7 +131,7 @@ func main() {
 
 	// get the config for IMBS
 	setupLog.Info("Getting config for IMBS")
-	imbsRestConfig, imbsName, err := util.GetIMBSKubeconfig(setupLog)
+	imbsRestConfig, imbsName, err := util.GetIMBSKubeconfig(setupLog, itsName)
 	if err != nil {
 		setupLog.Error(err, "unable to get IMBS kubeconfig")
 		os.Exit(1)
