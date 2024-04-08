@@ -65,8 +65,8 @@ func GetWDSKubeconfig(logger logr.Logger, wdsName, wdsLabel string) (*rest.Confi
 	return getRestConfig(logger, wdsName, label.Key, label.Value)
 }
 
-func GetIMBSKubeconfig(logger logr.Logger) (*rest.Config, string, error) {
-	return getRestConfig(logger, "", ControlPlaneTypeLabel, ControlPlaneTypeIMBS)
+func GetIMBSKubeconfig(logger logr.Logger, imbsName string) (*rest.Config, string, error) {
+	return getRestConfig(logger, imbsName, ControlPlaneTypeLabel, ControlPlaneTypeIMBS)
 }
 
 // get the rest config for a control plane based on labels and name
