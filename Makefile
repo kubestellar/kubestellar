@@ -182,9 +182,10 @@ kind-load-image:
 .PHONY: chart
 chart: manifests kustomize
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
-	$(KUSTOMIZE) build config/default > chart/templates/controller-manager.yaml
-	scripts/add-helm-code.sh add
-
+	$(KUSTOMIZE) build config/default \
+		| yq '. | select(.kind == "ClusterRole*").metadata.name |= "{{.Values.ControlPlaneName}}-" + .' \
+		| yq '. | select(.kind == "ClusterRoleBinding").roleRef.name |= "{{.Values.ControlPlaneName}}-" + .' \
+		> chart/templates/controller-manager.yaml
 
 .PHONY: local-chart
 local-chart: manifests kustomize
@@ -194,8 +195,10 @@ ifeq (1,$(shell (git status | grep "config/manager/kustomization.yaml" | wc -l))
 endif
 	cp -R chart local-chart
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
-	$(KUSTOMIZE) build config/default > local-chart/templates/controller-manager.yaml
-	scripts/add-helm-code.sh --dir ${PWD}/local-chart add
+	$(KUSTOMIZE) build config/default \
+		| yq '. | select(.kind == "ClusterRole*").metadata.name |= "{{.Values.ControlPlaneName}}-" + .' \
+		| yq '. | select(.kind == "ClusterRoleBinding").roleRef.name |= "{{.Values.ControlPlaneName}}-" + .' \
+		> local-chart/templates/controller-manager.yaml
 	git checkout -- config/manager/kustomization.yaml
 
 ##@ Deployment
