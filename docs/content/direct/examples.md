@@ -380,7 +380,7 @@ kubectl --context cluster1 get appwrappers -A
 kubectl --context cluster2 get appwrappers -A
 ```
 
-The continue.
+Then continue.
 
 ```shell
 for cluster in cluster1 cluster2; do
