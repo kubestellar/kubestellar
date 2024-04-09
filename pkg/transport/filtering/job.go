@@ -44,6 +44,10 @@ func cleanJob(object *unstructured.Unstructured) {
 		unstructured.RemoveNestedField(objectU, "spec", "selector")
 		changed = true
 	}
+	if _, found, _ := unstructured.NestedFieldNoCopy(objectU, "spec", "suspend"); found {
+		unstructured.RemoveNestedField(objectU, "spec", "suspend")
+		changed = true
+	}
 	podLabels, foundlabels, _ := unstructured.NestedMap(objectU, "spec", "template", "metadata", "labels")
 	if foundlabels {
 		if cleanJobLabels(podLabels) {
