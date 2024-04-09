@@ -1996,7 +1996,7 @@ for more details.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>cluster1<span class="w"> </span>get<span class="w"> </span>appwrappers<span class="w"> </span>-A
 <a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>cluster2<span class="w"> </span>get<span class="w"> </span>appwrappers<span class="w"> </span>-A
 </code></pre></div>
-<p>The continue.</p>
+<p>Then continue.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">for</span><span class="w"> </span>cluster<span class="w"> </span><span class="k">in</span><span class="w"> </span>cluster1<span class="w"> </span>cluster2<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">  </span>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="nv">$cluster</span><span class="w"> </span>delete<span class="w"> </span>clusterroles<span class="w"> </span>appwrappers-access
 <a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">  </span>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="nv">$cluster</span><span class="w"> </span>delete<span class="w"> </span>clusterrolebindings<span class="w"> </span>klusterlet-appwrappers-access
