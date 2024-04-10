@@ -15,17 +15,42 @@
 
 set -x -e # echo so users can understand what is happening
 
-if [ "$1" == "--released" ]; then
-    use_release=true
-    wds_extra="-p kubestellar"
-    shift
-else
-    use_release=false
-fi
+use_release=false
+KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=2
+TRANSPORT_CONTROLLER_VERBOSITY=4
 
-if [ "$#" != 0 ]; then
-    echo "Usage: $0 [--released]" >& 2
-    exit 1
+while [ $# != 0 ]; do
+    case "$1" in
+        (-h|--help) echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num)*"
+                    exit;;
+        (--released)
+            wds_extra="-p kubestellar"
+            use_release=true;;
+        (--kubestellar-controller-manager-verbosity)
+          if (( $# > 1 )); then
+            KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY="$2"
+            shift
+          else
+            echo "Missing kubestellar-controller-manager-verbosity value" >&2
+            exit 1;
+          fi;;
+        (--transport-controller-verbosity)
+          if (( $# > 1 )); then
+            TRANSPORT_CONTROLLER_VERBOSITY="$2"
+            shift
+          else
+            echo "Missing transport-controller-verbosity value" >&2
+            exit 1;
+          fi;;
+        (*) echo "$0: unrecognized argument/flag '$1'" >&2
+            exit 1
+    esac
+    shift
+done
+
+if [ "$use_release" = true ] && [ "$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY" != 2 ]
+then echo "$0: kubestellar-controller-manager-verbosity must be 2 when using --released" >&2
+     exit 1
 fi
 
 set -e # exit on error
@@ -81,7 +106,8 @@ if [ "$use_release" != true ]; then
     cd "${SRC_DIR}/../../.."
     pwd
     make ko-build-local
-    make install-local-chart KUBE_CONTEXT=kind-kubeflex
+    rm -rf local-chart
+    make install-local-chart KUBE_CONTEXT=kind-kubeflex "KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY"
     cd -
 fi
 echo "wds1 created."
@@ -106,7 +132,7 @@ pwd
 rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
 echo "running ocm transport plugin..."
 kubectl config use-context kind-kubeflex ## transport deployment script assumes it runs within kubeflex context
-IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 imbs1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE}
+IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 imbs1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} --controller-verbosity "$TRANSPORT_CONTROLLER_VERBOSITY"
 
 wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))'
 
