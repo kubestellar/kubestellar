@@ -307,6 +307,10 @@ spec:
                   - type
                   type: object
                 type: array
+              errors:
+                items:
+                  type: string
+                type: array
               observedGeneration:
                 format: int64
                 type: integer

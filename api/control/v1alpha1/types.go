@@ -61,6 +61,7 @@ type BindingPolicySpec struct {
 type BindingPolicyStatus struct {
 	Conditions         []BindingPolicyCondition `json:"conditions"`
 	ObservedGeneration int64                    `json:"observedGeneration"`
+	Errors             []string                 `json:"errors,omitempty"`
 }
 
 // BindingPolicy defines in which ways the workload objects ('what') and the destinations ('where') are bound together.
