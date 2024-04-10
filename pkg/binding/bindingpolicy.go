@@ -86,12 +86,17 @@ func (c *Controller) handleBindingPolicy(ctx context.Context, objIdentifier util
 		if err != nil {
 			return fmt.Errorf("failed to ocm.FindClustersBySelectors: %w", err)
 		}
+		if len(clusterSet) == 0 {
+			logger.Info("No clusters are selected by BindingPolicy", "name", bindingPolicy.Name)
+		}
 
 		if bindingPolicy.Spec.WantSingletonReportedState {
 			// if the bindingpolicy requires a singleton status, then we should only
 			// have one destination
 			// TODO: this should be removed once we have proper enforcement or error reporting for this
-			clusterSet = pickSingleDestination(clusterSet)
+			if len(clusterSet) > 1 {
+				clusterSet = pickSingleDestination(clusterSet)
+			}
 		}
 
 		// set destinations and enqueue binding for syncing
@@ -398,7 +403,8 @@ func SliceContains[Elt comparable](slice []Elt, seek Elt) bool {
 	return false
 }
 
-// sort by name and pick first cluster so that the choice is deterministic based on names
+// pickSingleDestination sorts clusters by name and picks first cluster so that the choice is deterministic based on names
+// pickSingleDestination expects a non-empty clusterSet
 func pickSingleDestination(clusterSet sets.Set[string]) sets.Set[string] {
 	return sets.New(sets.List(clusterSet)[0])
 }
