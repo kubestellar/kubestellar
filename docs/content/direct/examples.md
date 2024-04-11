@@ -23,7 +23,7 @@ The following steps establish an initial state used in the examples below.
     ```shell
     export KUBESTELLAR_VERSION=0.21.2
     export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
-    export OCM_TRANSPORT_PLUGIN=0.1.2
+    export OCM_TRANSPORT_PLUGIN=0.1.3
     ```
 
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
@@ -77,7 +77,8 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
     ```shell
     helm --kube-context kind-kubeflex upgrade --install ocm-transport-plugin oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin --version ${OCM_TRANSPORT_PLUGIN} \
      --set transport_cp_name=imbs1 \
-     --set wds_cp_name=wds1
+     --set wds_cp_name=wds1 \
+     -n wds1-system
     ```
 
 1. Follow the steps to [create and register two clusters with OCM](example-wecs.md).
@@ -250,8 +251,9 @@ To create a second WDS based on the hosting cluster, run the commands:
 kflex create wds2 -t host
 
 helm --kube-context kind-kubeflex upgrade --install ocm-transport-plugin oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin --version ${OCM_TRANSPORT_PLUGIN} \
---set transport_cp_name=imbs1 \
---set wds_cp_name=wds2
+    --set transport_cp_name=imbs1 \
+    --set wds_cp_name=wds2 \
+    -n wds2-system
 ```
 
 where the `-t host` option specifies a control plane of type `host`.

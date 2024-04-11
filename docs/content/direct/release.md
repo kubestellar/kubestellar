@@ -9,9 +9,19 @@ clues about the problem.
 
 ## Step-by-Step
 
-Making a new release requires a contributor to do the following things. Here `$version` is the semver identifier for the release (e.g., `1.2.3-rc2`).
+### Reacting to a new ocm-transport-plugin release
 
-- Edit the tag in the default transport controller image setting (`export TRANSPORT_CONTROLLER_IMAGE...`) to the latest release of [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin). **NOTE** This step is not really part of making the next ks/ks release, it is part of making that ks/OTP release. As such, the timing is driven by that release, not the ks/ks release.
+Between each release of [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin) and the next release of ks/ks, the following steps should be done in ks/ks.
+
+- Edit `scripts/deploy-transport-controller.sh`: update the tag in the default transport controller image setting (`export TRANSPORT_CONTROLLER_IMAGE...`) to the latest release of ks/OTP.
+
+- Edit `docs/content/direct/examples.md`: update the version in the `export OCM_TRANSPORT_PLUGIN=...` statement to the latest release of ks/OTP.
+
+- Edit `test/e2e/common/setup-kubestellar.sh`: update the setting of `OCM_TRANSPORT_PLUGIN_RELEASE` to the latest.
+
+### Making a new kubestellar release
+
+Making a new kubestellar release requires a contributor to do the following things. Here `$version` is the semver identifier for the release (e.g., `1.2.3-rc2`).
 
 - Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
 
