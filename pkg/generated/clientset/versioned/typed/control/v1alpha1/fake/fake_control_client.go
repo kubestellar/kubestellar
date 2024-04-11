@@ -37,6 +37,10 @@ func (c *FakeControlV1alpha1) BindingPolicies() v1alpha1.BindingPolicyInterface 
 	return &FakeBindingPolicies{c}
 }
 
+func (c *FakeControlV1alpha1) CustomTransforms() v1alpha1.CustomTransformInterface {
+	return &FakeCustomTransforms{c}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeControlV1alpha1) RESTClient() rest.Interface {
