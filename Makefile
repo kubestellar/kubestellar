@@ -136,10 +136,13 @@ $(CODE_GEN_DIR):
 
 ##@ Development
 
+## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects,
+## then make a copy for each CustomResourceDefinition object for the 'crd' package to use.
 .PHONY: manifests
-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+manifests: controller-gen kustomize
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./api/..." output:crd:artifacts:config=config/crd/bases
-	cp config/crd/bases/* pkg/crd/files
+	$(KUSTOMIZE) build config/crd/overlays/bindingpolicies > pkg/crd/files/control.kubestellar.io_bindingpolicies.yaml
+	$(KUSTOMIZE) build config/crd/overlays/bindings > pkg/crd/files/control.kubestellar.io_bindings.yaml
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
@@ -211,11 +214,11 @@ endif
 
 .PHONY: install
 install: manifests kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/config.
-	$(KUSTOMIZE) build config/crd | kubectl apply -f -
+	$(KUSTOMIZE) build config/crd/overlays/all | kubectl apply -f -
 
 .PHONY: uninstall
 uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
-	$(KUSTOMIZE) build config/crd | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
+	$(KUSTOMIZE) build config/crd/overlays/all | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
 
 .PHONY: deploy
 deploy: manifests kustomize ## Deploy manager to the K8s cluster specified in ~/.kube/config.
