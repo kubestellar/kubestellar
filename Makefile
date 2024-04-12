@@ -19,6 +19,8 @@ IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
 IMAGE_REPO ?= ${DOCKER_REGISTRY}/${CMD_NAME}
 IMG ?= ${IMAGE_REPO}:${IMAGE_TAG}
 
+KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY ?= 2
+
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.26.1
 # Default Namespace to use for make deploy (mainly for local testing)
@@ -229,7 +231,7 @@ undeploy: ## Undeploy manager from the K8s cluster specified in ~/.kube/config. 
 # If $(KUBE_CONTEXT) is set then that indicates where to install the chart; otherwise it goes to the current kubeconfig context.
 .PHONY: install-local-chart
 install-local-chart: local-chart kind-load-image
-	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./local-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME}
+	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./local-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME} --set ControllerManager.Verbosity=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY}
 
 ##@ Build Dependencies
 

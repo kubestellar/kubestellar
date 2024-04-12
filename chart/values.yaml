@@ -15,3 +15,7 @@ APIGroups:
 # Empty string means that there must be only one and that
 # is the one to use.
 ITSName: ""
+
+ControllerManager:
+  # The -v setting for the controller-manager
+  Verbosity: 2
