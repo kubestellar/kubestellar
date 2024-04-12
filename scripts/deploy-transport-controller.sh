@@ -15,10 +15,66 @@
 
 # Transport deployment script assumes it runs using the kubeflex hosting cluster context.
 
-export WDS_NAME="$1" ## first argument is WDS name
-export IMBS_NAME="$2" ## second argument is IMBS name
-export TRANSPORT_CONTROLLER_IMAGE="${3:-ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.3}" ## third argument is transport controller image
-export IMAGE_PULL_POLICY="${IMAGE_PULL_POLICY:=Always}"
+
+DEFAULT_TRANSPORT_CONTROLLER_IMAGE=ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.3
+
+args=()
+
+TRANSPORT_CONTROLLER_IMAGE=""
+
+while [ $# != 0 ]; do
+    case "$1" in
+        (-h|--help)
+            echo "$0 usage: \$WDS_name \$ITS_name [\$transport_controller_image_ref] (--image-pull-policy \$policy | --controller-verbosity \$number | --transport-controller-image \$image_ref)*"
+            exit;;
+        (--transport-controller-image)
+          if (( $# > 1 )); then
+            TRANSPORT_CONTROLLER_IMAGE="$2"
+            shift
+          else
+            echo "Missing transport-controller-image value" >&2
+            exit 1;
+          fi;;
+        (--image-pull-policy)
+          if (( $# > 1 )); then
+            IMAGE_PULL_POLICY="$2"
+            shift
+          else
+            echo "Missing image-pull-policy value" >&2
+            exit 1;
+          fi;;
+        (--controller-verbosity)
+          if (( $# > 1 )); then
+            CONTROLLER_VERBOSITY="$2"
+            shift
+          else
+            echo "Missing controller-verbosity value" >&2
+            exit 1;
+          fi;;
+        (-*) echo "$0: unrecognized flag '$1'" >&2
+            exit 1;;
+        (*) args[${#args[*]}]="$1"
+    esac
+    shift
+done
+
+if (( ${#args[*]} < 2 || ${#args[*]} > 3 )); then
+    echo "$0: expecting two or three positional arguments (use -h to see usage)" >&2
+    exit 1
+fi
+
+WDS_NAME="${args[0]}"
+ITS_NAME="${args[1]}"
+
+if [ -z "$TRANSPORT_CONTROLLER_IMAGE" ]; then
+    if [ -z "${args[2]}" ]
+    then TRANSPORT_CONTROLLER_IMAGE="$DEFAULT_TRANSPORT_CONTROLLER_IMAGE"
+    else TRANSPORT_CONTROLLER_IMAGE="${args[2]}"
+    fi
+elif [ -n "${args[2]}" ]; then
+    echo "$0: The transport controller image should be specified only one way" >&2
+    exit 1
+fi
 
 # generate from template and env vars and then apply a configmap and a deployment for transport-controller
 kubectl apply -f - <<EOF
@@ -80,10 +136,10 @@ spec:
           mountPath: /mnt/config
         - name: shared-volume
           mountPath: /mnt/shared
-      - name: setup-imbs-kubeconfig
+      - name: setup-its-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
-        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh ${IMBS_NAME} true | base64 -d > /mnt/shared/transport-kubeconfig"]
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh ${ITS_NAME} true | base64 -d > /mnt/shared/transport-kubeconfig"]
         volumeMounts:
         - name: config-volume
           mountPath: /mnt/config
@@ -92,12 +148,12 @@ spec:
       containers:
         - name: transport-controller
           image: ${TRANSPORT_CONTROLLER_IMAGE}
-          imagePullPolicy: ${IMAGE_PULL_POLICY}
+          imagePullPolicy: ${IMAGE_PULL_POLICY:-Always}
           args:
           - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
           - --wds-kubeconfig=/mnt/shared/wds-kubeconfig
           - --wds-name=${WDS_NAME}
-          - -v=4
+          - -v=${CONTROLLER_VERBOSITY:-4}
           volumeMounts:
           - name: shared-volume
             mountPath: /mnt/shared

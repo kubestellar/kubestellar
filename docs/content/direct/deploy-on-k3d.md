@@ -53,22 +53,22 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
     ```shell
     kubectl edit deployment ingress-nginx-controller -n ingress-nginx  
     ```
-   Then initialize kubeflex and create the imbs1 space with OCM running in it:
+   Then initialize kubeflex and create the its1 space with OCM running in it:
     ```shell
     kflex init
     kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/kubestellar.yaml
     kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/ocm.yaml
-    kflex create imbs1 --type vcluster -p ocm
+    kflex create its1 --type vcluster -p ocm
     ```
 
 1. Install OCM status addon
-   First wait until managedclusteraddons resource shows up on imbs1 using:
+   First wait until managedclusteraddons resource shows up on its1 using:
     ```shell
-   kubectl --context imbs1 api-resources | grep managedclusteraddons
+   kubectl --context its1 api-resources | grep managedclusteraddons
     ```
    then install status addon:
     ```shell
-    helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v${OCM_STATUS_ADDON_VERSION}
+    helm --kube-context its1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v${OCM_STATUS_ADDON_VERSION}
     ```
 
 1. Create a Workload Description Space `wds1` in KubeFlex.
@@ -81,13 +81,13 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
 
     Run transport deployment script (in `scripts/deploy-transport-controller.sh`), as follows.
     This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
-    This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.  
+    This script expects to get two or three arguments - (1) wds name; (2) ITS name; and (3) transport controller image.  
     While the first and second arguments are mandatory, the third one is optional.
     The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
     For example, one can deploy transport controller using the following commands:
     ```shell
     kflex ctx
-    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds1 imbs1
+    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds1 its1
     ```
 
 1. Create the Workload Execution Cluster `wec1` and register it
@@ -99,25 +99,25 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
    Register `wec1`:
     ```shell
     flags="--force-internal-endpoint-lookup"
-    clusteradm --context imbs1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/wec1/" | awk '{print $0 " --context 'wec1' '${flags}'"}' | sh
+    clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/wec1/" | awk '{print $0 " --context 'wec1' '${flags}'"}' | sh
     ```
    Wait for csr to be created:
     ```shell
-    kubectl --context imbs1 get csr --watch
+    kubectl --context its1 get csr --watch
     ```
     and then accept pending wec1 cluster
     ```shell
-    clusteradm --context imbs1 accept --clusters wec1
+    clusteradm --context its1 accept --clusters wec1
     ```
     Confirm wec1 is accepted and label it for the BindingPolicy:
     ```shell
-    kubectl --context imbs1 get managedclusters
-    kubectl --context imbs1 label managedcluster wec1 location-group=edge name=wec1
+    kubectl --context its1 get managedclusters
+    kubectl --context its1 label managedcluster wec1 location-group=edge name=wec1
     ```
 
 1. (optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
 see the `kubestellar-controller-manager` in the `wds1-system` namespace and the 
-statefulset `vcluster` in the `imbs1-system` namespace, both fully ready.
+statefulset `vcluster` in the `its1-system` namespace, both fully ready.
 
     ```shell
     kubectl --context kubeflex get deployments,statefulsets --all-namespaces
@@ -137,6 +137,6 @@ statefulset `vcluster` in the `imbs1-system` namespace, both fully ready.
 
     NAMESPACE         NAME                                   READY   AGE
     kubeflex-system   statefulset.apps/postgres-postgresql   1/1     6m12s
-    imbs1-system      statefulset.apps/vcluster              1/1     5m17s
+    its1-system       statefulset.apps/vcluster              1/1     5m17s
     ```
 

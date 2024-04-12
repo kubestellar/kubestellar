@@ -330,10 +330,10 @@ func ValidateSingletonStatus(ctx context.Context, wds *kubernetes.Clientset, ns 
 	}, timeout).Should(gomega.Equal(1))
 }
 
-func ValidateNumManifestworks(ctx context.Context, ocmWorkImbs *ocmWorkClient.Clientset, ns string, num int) {
+func ValidateNumManifestworks(ctx context.Context, ocmWorkIts *ocmWorkClient.Clientset, ns string, num int) {
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() int {
-		list, err := ocmWorkImbs.WorkV1().ManifestWorks(ns).List(ctx, metav1.ListOptions{})
+		list, err := ocmWorkIts.WorkV1().ManifestWorks(ns).List(ctx, metav1.ListOptions{})
 		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
 		return len(list.Items)
 	}, timeout).Should(gomega.Equal(num))

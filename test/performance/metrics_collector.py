@@ -117,10 +117,10 @@ if __name__=="__main__":
     method = "exp-RandomizedLoad"
 
     f1 = mypath + method + "-" + "freq-" + str(numPods) + "-pod-wds-kscore-stage-run" + run_ID + ".txt"
-    f2 = mypath + method + "-" + "freq-" + str(numPods) + "-manifestwork-imbs1-run" + run_ID + ".txt"
-    f3 = mypath + method + "-" + "freq-" + str(numPods) + "-workstatus-imbs1-run" + run_ID + ".txt"
+    f2 = mypath + method + "-" + "freq-" + str(numPods) + "-manifestwork-its1-run" + run_ID + ".txt"
+    f3 = mypath + method + "-" + "freq-" + str(numPods) + "-workstatus-its1-run" + run_ID + ".txt"
     f4 = mypath + method + "-" + "freq-" + str(numPods) + "-pod-wec1-run" + run_ID + ".txt"
     f5 = mypath + method + "-" + "freq-" + str(numPods) + "-appliedmanifestwork-wec1-run" + run_ID + ".txt"
 
-    c = DataParser(numPods, kubeconfig, 'wds1', 'imbs1', 'wec1', f1, f2, f3, f4, f5)
+    c = DataParser(numPods, kubeconfig, 'wds1', 'its1', 'wec1', f1, f2, f3, f4, f5)
     c.check_pod_status(ns, watch_interval)

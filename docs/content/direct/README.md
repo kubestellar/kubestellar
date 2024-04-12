@@ -19,7 +19,7 @@ straightforward binding policy.
 8. *Object Removal:* Objects are removed from clusters when the binding policy that led to their deployment on
  those clusters is deleted or updated and the what or where no longer match.
 9. *Dynamic Handling of APIs:* Dynamically start/stop informers when adding/removing CRDs.
-10. *Simplified setup:* Just 3 commands to get a fully functional setup (`kflex init`, `kflex create imbs`, `kflex create wds`)
+10. *Simplified setup:* Just 3 commands to get a fully functional setup (`kflex init`, `kflex create its`, `kflex create wds`)
 11. *OpenShift Support:* Same commands to set it up. All components have been tested in OpenShift, 
 including OCM Klusterlet for the WECs.
 12. *Singleton Status* Addressed by the status controller in KubeStellar and the [Status Add-On for OCM](https://github.com/kubestellar/ocm-status-addon).

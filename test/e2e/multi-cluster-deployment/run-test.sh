@@ -18,15 +18,24 @@
 
 set -x # so users can see what is going on
 
-if [ "$1" == "--released" ]; then
-    setup_flags="$1"
+while [ $# != 0 ]; do
+    case "$1" in
+        (-h|--help) echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num)*"
+                    exit;;
+        (--released) setup_flags="$setup_flags $1";;
+        (--kubestellar-controller-manager-verbosity|--transport-controller-verbosity)
+          if (( $# > 1 )); then
+            setup_flags="$setup_flags $1 $2"
+            shift
+          else
+            echo "Missing $1 value" >&2
+            exit 1;
+          fi;;
+        (*) echo "$0: unrecognized argument '$1'" >&2
+            exit 1
+    esac
     shift
-fi
-
-if [ "$#" != 0 ]; then
-    echo "Usage: $0 [--released]" >& 2
-    exit 1
-fi
+done
 
 set -e # exit on error
 
