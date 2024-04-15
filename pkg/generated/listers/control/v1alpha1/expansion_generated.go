@@ -25,3 +25,7 @@ type BindingListerExpansion interface{}
 // BindingPolicyListerExpansion allows custom methods to be added to
 // BindingPolicyLister.
 type BindingPolicyListerExpansion interface{}
+
+// CustomTransformListerExpansion allows custom methods to be added to
+// CustomTransformLister.
+type CustomTransformListerExpansion interface{}

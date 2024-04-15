@@ -257,3 +257,53 @@ type BindingList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Binding `json:"items"`
 }
+
+// CustomTransform describes how to select and transform some objects
+// on their way from WDS to WEC, without regard to the WEC (i.e.,
+// not changes that are specific to the individual WEC).
+// The transformation specified here is in addition to, and follows,
+// whatever is built into KubeStellar for that object.
+//
+// +genclient
+// +genclient:nonNamespaced
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:scope=Cluster,shortName={ct},categories={all}
+type CustomTransform struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec CustomTransformSpec `json:"spec,omitempty"`
+}
+
+// CustomTransformSpec selects some objects and describes how to transform them.
+// The selected objects are those that match the `apiGroup` and `resource` fields.
+type CustomTransformSpec struct {
+	// `apiGroup` holds just the group, not also the version
+	APIGroup string `json:"apiGroup"`
+
+	// `resource` is the lowercase plural way of identifying a sort of object.
+	// "subresources" can not be directly bound to, only whole (top-level) objects.
+	Resource string `json:"resource"`
+
+	// `remove` is a list of JSONPath expressions (https://goessner.net/articles/JsonPath/)
+	// that identify part of the object to remove if present.
+	// Only a subset of JSONPath is supported.
+	// The expression used in a filter must be a conjunction of field == literal tests.
+	// Examples:
+	// - "$.spec.resources.GenericItems[*].generictemplate.metadata.resourceVersion"
+	// - "$.store.book[?(@.author == 'Kilgore Trout' && @.category == 'fiction')].price"
+	// +optional
+	Remove []string `json:"remove,omitempty"`
+}
+
+// CustomTransformList is the API type for a list of CustomTransform
+//
+// +kubebuilder:object:root=true
+type CustomTransformList struct {
+	metav1.TypeMeta `json:",inline"`
+	// Standard list metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	// +optional
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []CustomTransform `json:"items"`
+}
