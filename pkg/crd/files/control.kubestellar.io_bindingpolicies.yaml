@@ -70,11 +70,13 @@ spec:
                           key:
                             description: key is the label key that the selector applies
                               to.
+                            pattern: ^([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$
                             type: string
                           operator:
                             description: operator represents a key's relationship
                               to a set of values. Valid operators are In, NotIn, Exists
                               and DoesNotExist.
+                            pattern: ^(In|NotIn|Exists|DoesNotExist)$
                             type: string
                           values:
                             description: values is an array of string values. If the
@@ -83,6 +85,7 @@ spec:
                               array must be empty. This array is replaced during a
                               strategic merge patch.
                             items:
+                              pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
                               type: string
                             type: array
                         required:
