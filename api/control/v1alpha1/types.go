@@ -41,18 +41,21 @@ type BindingPolicySpec struct {
 	// +optional
 	// NumberOfClusters *int32 `json:"numberOfClusters,omitempty"`
 
-	// `downsync` selects the objects to bind with the selected Locations for downsync.
+	// `downsync` selects the objects to bind with the selected WECs for downsync,
+	// and describes how to combine the status returned from those WECs for each of the
+	// selected objects.
 	// An object is selected if it matches at least one member of this list.
+	// All of the associated StatusReturns are applied to the object; they should
+	// have disjoint combiner names.
 	// +optional
-	Downsync []DownsyncObjectTest `json:"downsync,omitempty"`
+	Downsync []DownsyncObjectTestAndStatusReturn `json:"downsync,omitempty"`
 
-	// WantSingletonReportedState indicates that (a) the number of selected locations is intended
-	// to be 1 and (b) the reported state of each downsynced object should be returned back to
-	// the object in this space.
-	// When this field is true, there should be no other BindingPolicy that matches any of the
-	// same workload objects.
-	//
-	// At the moment, it is the user's responsibility to comply to the above.
+	// WantSingletonReportedState means that for objects that are distributed --- taking
+	// all BindingPolicies into account --- to exactly one WEC, the object's reported state
+	// from the WEC should be written to the object in its WDS.
+	// WantSingletonReportedState connotes an expectation that indeed the object will
+	// propagate to exactly one WEC, but there is no guaranteed reaction when this
+	// expetation is not met.
 	// +optional
 	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
@@ -62,6 +65,7 @@ type BindingPolicyStatus struct {
 	Conditions         []BindingPolicyCondition `json:"conditions"`
 	ObservedGeneration int64                    `json:"observedGeneration"`
 	Errors             []string                 `json:"errors,omitempty"`
+	Warnings           []string                 `json:"warnings,omitempty"`
 }
 
 // BindingPolicy defines in which ways the workload objects ('what') and the destinations ('where') are bound together.
@@ -105,6 +109,13 @@ const (
 	// BindingPolicyConditionMisconfigured means BindingPolicy configuration is incorrect.
 	BindingPolicyConditionMisconfigured string = "BindingPolicyMisconfigured"
 )
+
+// DownsyncObjectTestAndStatusReturn identifies some objects (by a predicate)
+// and asks for some combined status to be returned from those objects.
+type DownsyncObjectTestAndStatusReturn struct {
+	DownsyncObjectTest `json:",inline"`
+	StatusReturn       `json:",inline"`
+}
 
 // DownsyncObjectTest is a set of criteria that characterize matching objects.
 // An object matches if:
@@ -257,3 +268,216 @@ type BindingList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Binding `json:"items"`
 }
+
+// StatusReturn says how to combine status from the WECs.
+type StatusReturn struct {
+	// `stalenessThresholdSecs` is the threshold used to derive
+	// the `stale` bit in PropagationMeta values.
+	// Default value is 120.
+	StalenessThresholdSecs int32 `json:"stalenessThresholdSecs"`
+
+	// `infoAgeQuantumSeconds` is defines the rounding granularity
+	// for PropagationMeta.InfoAgeSeconds.
+	// Default value is `stalenessThresholdSecs`.
+	InfoAgeQuantumSeconds int64 `json:"infoAgeQuantumSeconds,omitempty"`
+
+	// `combiners` defines a named collection of ways to combine status from the WECs
+	Combiners []NamedStatusCombiner `json:"aggregators,omitempty"`
+}
+
+// NamedStatusCombiner defines one way to collect status about a given workload object from
+// the set of WECs that it propagates to.
+// This is modeled after an SQL SELECT statement that does aggregation.
+type NamedStatusCombiner struct {
+	Name string `json:"name"`
+
+	// `filter`, if given, is applied first.
+	// It must evaluate to a boolean or null (which is treated as false).
+	// This is like the WHERE clause in an SQL SELECT statement.
+	// +optional
+	Filter *Expression `json:"filter,omitempty"`
+
+	// `groupBy` says how to group workload objects for aggregation (if there is any).
+	// Each expression must evaluate to an atomic value.
+	// +optional
+	GroupBy []NamedExpression `json:"groupBy,omitempty"`
+
+	// `combinedFields` defines the aggregations to do, if any.
+	// `combinedFields` must be empty if `select` is not.
+	// +optional
+	CombinedFields []NamedAggregator `json:"combinedFields,omitempty"`
+
+	// `select` defines named values to extract from each object.
+	// `select` must be emtpy when `combinedFields` is not.
+	// +optional
+	Select []NamedExpression `json:"select,omitempty"`
+
+	// `limit` limits the number of rows returned.
+	// The default value is 20.
+	Limit int64 `json:"limit"`
+}
+
+// NamedExpression pairs a name with a way of extracting a value from a JSON object.
+type NamedExpression struct {
+	Name string     `json:"name"`
+	Def  Expression `json:"def"`
+}
+
+// NamedAggregator pairs a name with a way to aggregate over some objects.
+// For `type=="COUNT"`, `subject` is omitted and the aggregate is the count
+// of those objects that are not `null`.
+// For the other types, `subject` is required and SHOULD
+// evaluate to a numeric value; exceptions are handled as follows.
+// For a string value: if it parses as an int64 or float64 then that is used.
+// Otherwise this is an error condition: a value of 0 is used, and the error
+// is reported in the BindingPolicyStatus.Errors (not necessarily repeated for each WEC).
+type NamedAggregator struct {
+	Name string         `json:"name"`
+	Type AggregatorType `json:"type"`
+
+	// +optional
+	Subject *Expression `json:"subject,omitempty"`
+}
+
+// AggregatorType indicates what sort of aggregation is to be done.
+type AggregatorType string
+
+const (
+	AggregatorTypeCount AggregatorType = "COUNT"
+
+	AggregatorTypeSum AggregatorType = "SUM"
+
+	AggregatorTypeAvg AggregatorType = "AVG"
+
+	AggregatorTypeMin AggregatorType = "MIN"
+
+	AggregatorTypeMax AggregatorType = "MAX"
+)
+
+// Expression is some value to derive from an augmented workload object from a WEC.
+// The augmentation is inline addition of Augmentation.
+// An Expression is either a JSONPath identifying a value to extract
+// or a boolean combination of comparisons of atomic values.
+// While the expression here in the Go type system admits other values,
+// the controller will accept only the restricted set stated above.
+type Expression struct {
+	Op   ExpressionOperator `json:"op"`
+	Path string             `json:"path,omitempty"`
+	Args []Expression       `json:"args,omitempty"`
+}
+
+type ExpressionOperator string
+
+const (
+	OperatorPath  ExpressionOperator = "Path" // JSONPath string
+	OperatorOr    ExpressionOperator = "Or"
+	OperatorAnd   ExpressionOperator = "And"
+	OperatorNot   ExpressionOperator = "Not"
+	OperatorEqual ExpressionOperator = "Equal"
+)
+
+// Augmentation defines what is implicitly added to every workload object from a WEC,
+// for purposes of status collection.
+type Augmentation struct {
+	Inventory   InventoryObjectReference `json:"inventory"`
+	Propagation PropagationMeta          `json:"propagation"`
+}
+
+// InventoryObjectReference identifies an inventory object
+type InventoryObjectReference struct {
+	// `name` is the inventory object's name
+	Name string `json:"name"`
+}
+
+// PropagationMeta is the last reported metadata about one workload object at one WEC.
+// Some fields compare with the current state of the workload object in its WDS.
+type PropagationMeta struct {
+	// `infoAgeSeconds` is the age of this report, rounded up as specified in the StatusReturn
+	InfoAgeSeconds int64 `json:"infoAgeSeconds"`
+
+	// `stale` indicates whether `infoAgeSeconds > stalenessThresholdSecs`.
+	Stale bool `json:"stale"`
+
+	// `generationIsCurrent` tells whether the `metadata.Generation` in the WEC
+	// equals the generation in the WDS.
+	// This is `nil` when the `metadata.Generation` in the WEC is unknown.
+	// +optional
+	GenerationIsCurrent *bool `json:"generationIsCurrent,omitempty"`
+}
+
+// CombinedStatus holds the combined status from the WECs for one particular (workload object, BindingPolicy) pair.
+// The namespace of the CombinedStatus object = the namespace of the workload object,
+// or "kubestellar-report" if the workload object has no namespace.
+// The name of the CombinedStatus object is the concatenation of:
+// - the UID of the workload object
+// - the string ":"
+// - the UID of the BindingPolicy object.
+// The CombinedStatus object has the following labels:
+// - "status.kubestellar.io/api-group" holding the API Group (not verison) of the workload object;
+// - "status.kubestellar.io/resource" holding the resource (lowercase plural) of the workload object;
+// - "status.kubestellar.io/namespace" holding the namespace of the workload object;
+// - "status.kubestellar.io/name" holding the name of the workload object;
+// - "status.kubestellar.io/policy" holding the name of the BindingPolicy object.
+//
+// +genclient
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:shortName={cs}
+// +kubebuilder:printcolumn:name="WGROUP",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/api-group']"
+// +kubebuilder:printcolumn:name="WRSC",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/resource']"
+// +kubebuilder:printcolumn:name="WNS",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/namespace']"
+// +kubebuilder:printcolumn:name="WNAME",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/name']"
+// +kubebuilder:printcolumn:name="POLICY",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/policy']"
+type CombinedStatus struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	// `results` has an entry for every applicable NamedStatusCombiner.
+	// +optional
+	Results []NamedStatusCombination `json:"results,omitempty"`
+}
+
+// NamedStatusCombination holds the rows that come from evaluating one NamedStatusCombiner.
+type NamedStatusCombination struct {
+	Name string `json:"name"`
+
+	ColumnNames []string `json:"columnNames"`
+
+	// +optional
+	Rows []StatusCombinationRow `json:"rows,omitempty"`
+}
+
+type StatusCombinationRow struct {
+	Columns []Value `json:"columns"`
+}
+
+// Value holds a JSON value. This is a union type.
+type Value struct {
+	Type ValueType `json:"type"`
+
+	// +optional
+	String *string `json:"string,omitempty"`
+
+	// Integer or floating-point, in JavaScript Object Notation.
+	// +optional
+	Number *string `json:"float,omitempty"`
+
+	// +optional
+	Bool *bool `json:"bool,omitempty"`
+
+	// +optional
+	Object map[string]Value `json:"object,omitempty"`
+
+	// +optional
+	Array []Value `json:"array,omitempty"`
+}
+
+type ValueType string
+
+const (
+	TypeString ValueType = "String"
+	TypeNumber ValueType = "Number"
+	TypeBool   ValueType = "Bool"
+	TypeNull   ValueType = "Null"
+	TypeObject ValueType = "Object"
+	TypeArray  ValueType = "Array"
+)
