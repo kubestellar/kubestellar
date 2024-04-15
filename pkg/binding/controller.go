@@ -58,7 +58,6 @@ const (
 // Resource groups to exclude for watchers as they should not be delivered to other clusters
 var excludedGroups = map[string]bool{
 	"flowcontrol.apiserver.k8s.io": true,
-	"scheduling.k8s.io":            true,
 	"discovery.k8s.io":             true,
 	"apiregistration.k8s.io":       true,
 	"coordination.k8s.io":          true,
