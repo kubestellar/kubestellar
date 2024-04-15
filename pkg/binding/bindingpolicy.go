@@ -322,7 +322,7 @@ type mrObject interface {
 }
 
 func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
-	tests []v1alpha1.DownsyncObjectTest) bool {
+	tests []v1alpha1.DownsyncObjectTestAndStatusReturn) bool {
 	gvr := schema.GroupVersionResource{
 		Group:    objIdentifier.GVK.Group,
 		Version:  objIdentifier.GVK.Version,
