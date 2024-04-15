@@ -1512,20 +1512,20 @@
    To specify passthru for K3D, edit the ingress placement controller with the following command and add <code>--enable-ssl-passthrough</code> to the list of args for the container
     <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>edit<span class="w"> </span>deployment<span class="w"> </span>ingress-nginx-controller<span class="w"> </span>-n<span class="w"> </span>ingress-nginx<span class="w">  </span>
 </code></pre></div>
-   Then initialize kubeflex and create the imbs1 space with OCM running in it:
+   Then initialize kubeflex and create the its1 space with OCM running in it:
     <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kflex<span class="w"> </span>init
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="si">${</span><span class="nv">KUBESTELLAR_VERSION</span><span class="si">}</span>/config/postcreate-hooks/kubestellar.yaml
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="si">${</span><span class="nv">KUBESTELLAR_VERSION</span><span class="si">}</span>/config/postcreate-hooks/ocm.yaml
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>kflex<span class="w"> </span>create<span class="w"> </span>imbs1<span class="w"> </span>--type<span class="w"> </span>vcluster<span class="w"> </span>-p<span class="w"> </span>ocm
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>kflex<span class="w"> </span>create<span class="w"> </span>its1<span class="w"> </span>--type<span class="w"> </span>vcluster<span class="w"> </span>-p<span class="w"> </span>ocm
 </code></pre></div></p>
 </li>
 <li>
 <p>Install OCM status addon
-   First wait until managedclusteraddons resource shows up on imbs1 using:
+   First wait until managedclusteraddons resource shows up on its1 using:
     <code>shell
-   kubectl --context imbs1 api-resources | grep managedclusteraddons</code>
+   kubectl --context its1 api-resources | grep managedclusteraddons</code>
    then install status addon:
-    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>imbs1<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>status-addon<span class="w"> </span>-n<span class="w"> </span>open-cluster-management<span class="w"> </span>oci://ghcr.io/kubestellar/ocm-status-addon-chart<span class="w"> </span>--version<span class="w"> </span>v<span class="si">${</span><span class="nv">OCM_STATUS_ADDON_VERSION</span><span class="si">}</span>
+    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>its1<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>status-addon<span class="w"> </span>-n<span class="w"> </span>open-cluster-management<span class="w"> </span>oci://ghcr.io/kubestellar/ocm-status-addon-chart<span class="w"> </span>--version<span class="w"> </span>v<span class="si">${</span><span class="nv">OCM_STATUS_ADDON_VERSION</span><span class="si">}</span>
 </code></pre></div></p>
 </li>
 <li>
@@ -1538,12 +1538,12 @@
 <strong>NOTE</strong>: This is work in progress, in the future the controller will be deployed through a Helm chart.</p>
 <p>Run transport deployment script (in <code>scripts/deploy-transport-controller.sh</code>), as follows.
 This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
-This script expects to get two or three arguments - (1) wds name; (2) imbs name; and (3) transport controller image.<br />
+This script expects to get two or three arguments - (1) wds name; (2) ITS name; and (3) transport controller image.<br />
 While the first and second arguments are mandatory, the third one is optional.
 The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
 For example, one can deploy transport controller using the following commands:
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kflex<span class="w"> </span>ctx
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="si">${</span><span class="nv">KUBESTELLAR_VERSION</span><span class="si">}</span>/scripts/deploy-transport-controller.sh<span class="o">)</span><span class="w"> </span>wds1<span class="w"> </span>imbs1
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="si">${</span><span class="nv">KUBESTELLAR_VERSION</span><span class="si">}</span>/scripts/deploy-transport-controller.sh<span class="o">)</span><span class="w"> </span>wds1<span class="w"> </span>its1
 </code></pre></div></p>
 </li>
 <li>
@@ -1554,23 +1554,23 @@ For example, one can deploy transport controller using the following commands:
 </code></pre></div>
    Register <code>wec1</code>:
     <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">flags</span><span class="o">=</span><span class="s2">&quot;--force-internal-endpoint-lookup&quot;</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>get<span class="w"> </span>token<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;^clusteradm join&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s2">&quot;s/&lt;cluster_name&gt;/wec1/&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">&#39;{print $0 &quot; --context &#39;</span>wec1<span class="s1">&#39; &#39;</span><span class="si">${</span><span class="nv">flags</span><span class="si">}</span><span class="s1">&#39;&quot;}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>token<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;^clusteradm join&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s2">&quot;s/&lt;cluster_name&gt;/wec1/&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">&#39;{print $0 &quot; --context &#39;</span>wec1<span class="s1">&#39; &#39;</span><span class="si">${</span><span class="nv">flags</span><span class="si">}</span><span class="s1">&#39;&quot;}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
 </code></pre></div>
    Wait for csr to be created:
-    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>get<span class="w"> </span>csr<span class="w"> </span>--watch
+    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>csr<span class="w"> </span>--watch
 </code></pre></div>
     and then accept pending wec1 cluster
-    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>wec1
+    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>wec1
 </code></pre></div>
     Confirm wec1 is accepted and label it for the BindingPolicy:
-    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>get<span class="w"> </span>managedclusters
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>imbs1<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>wec1<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>wec1
+    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>managedclusters
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>wec1<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>wec1
 </code></pre></div></p>
 </li>
 <li>
 <p>(optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
 see the <code>kubestellar-controller-manager</code> in the <code>wds1-system</code> namespace and the 
-statefulset <code>vcluster</code> in the <code>imbs1-system</code> namespace, both fully ready.</p>
+statefulset <code>vcluster</code> in the <code>its1-system</code> namespace, both fully ready.</p>
 <p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kubeflex<span class="w"> </span>get<span class="w"> </span>deployments,statefulsets<span class="w"> </span>--all-namespaces
 </code></pre></div>
    The output should look something like the following:
@@ -1587,7 +1587,7 @@ statefulset <code>vcluster</code> in the <code>imbs1-system</code> namespace, bo
 <a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>
 <a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>NAMESPACE         NAME                                   READY   AGE
 <a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>kubeflex-system   statefulset.apps/postgres-postgresql   1/1     6m12s
-<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>imbs1-system      statefulset.apps/vcluster              1/1     5m17s
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>its1-system       statefulset.apps/vcluster              1/1     5m17s
 </code></pre></div></p>
 </li>
 </ol>
