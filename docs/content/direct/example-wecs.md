@@ -13,17 +13,17 @@ register them with the hub as descibed in the
     for cluster in "${clusters[@]}"; do
        kind create cluster --name ${cluster}
        kubectl config rename-context kind-${cluster} ${cluster}
-       clusteradm --context imbs1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${flags}'"}' | sh
+       clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${flags}'"}' | sh
     done
     ```
 
-    The `clusteradm` command grabs a token from the hub (`imbs1` context), and constructs the command to apply the new cluster
+    The `clusteradm` command grabs a token from the hub (`its1` context), and constructs the command to apply the new cluster
     to be registered as a managed cluster on the OCM hub.
 
 2. Repeatedly issue the command:
 
     ```shell
-    kubectl --context imbs1 get csr
+    kubectl --context its1 get csr
     ```
 
     until you see that the certificate signing requests (CSR) for both cluster1 and cluster2 exist.
@@ -32,14 +32,14 @@ register them with the hub as descibed in the
 3. Once the CSRs are created approve the csrs to complete the cluster registration with the command:
 
     ```shell
-    clusteradm --context imbs1 accept --clusters cluster1
-    clusteradm --context imbs1 accept --clusters cluster2
+    clusteradm --context its1 accept --clusters cluster1
+    clusteradm --context its1 accept --clusters cluster2
     ```
 
 4. Check the new clusters are in the OCM inventory and label them:
 
     ```shell
-    kubectl --context imbs1 get managedclusters
-    kubectl --context imbs1 label managedcluster cluster1 location-group=edge name=cluster1
-    kubectl --context imbs1 label managedcluster cluster2 location-group=edge name=cluster2
+    kubectl --context its1 get managedclusters
+    kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
+    kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
     ```

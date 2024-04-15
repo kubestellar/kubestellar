@@ -136,7 +136,7 @@ spec:
           mountPath: /mnt/config
         - name: shared-volume
           mountPath: /mnt/shared
-      - name: setup-imbs-kubeconfig
+      - name: setup-its-kubeconfig
         image: quay.io/kubestellar/kubectl:1.27.8
         imagePullPolicy: Always
         command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh ${ITS_NAME} true | base64 -d > /mnt/shared/transport-kubeconfig"]

@@ -59,14 +59,14 @@ $ go run cmd/clusterloader.go --testconfig=./testing/load/performance-test-confi
 
 To collect the creation and status update for a k8s object proceed as following:  
 
-1. Create a kubeconfig with contexts for the `wds1`, `imbs1` and `wec1`:
+1. Create a kubeconfig with contexts for the `wds1`, `its1` and `wec1`:
 
 For example: 
 
 ```bash
 $ kubectl config get-contexts
 CURRENT   NAME     CLUSTER                                          AUTHINFO                                                                 NAMESPACE
-          imbs1    imbs1-cluster                                    imbs1-admin                                                               default
+          its1     its1-cluster                                     its1-admin                                                                default
           wec1     <url>:port#                                      <defaul-value>                                                            default
 *         wds1     wds1-cluster                                     wds1-admin                                                                default
 ```
@@ -105,14 +105,14 @@ b) Start collecting metrics:
 $ python3 metrics_collector.py
 ```
 
-Metrics will be collected for pods in `wds1`, manifestworks & workstatuses in `imbs1` and pods & appliedmanifestworks in `wec1` - In total 5 files will be output, for example:
+Metrics will be collected for pods in `wds1`, manifestworks & workstatuses in `its1` and pods & appliedmanifestworks in `wec1` - In total 5 files will be output, for example:
 
 ```bash 
       20 exp-RandomizedLoad-freq-20-appliedmanifestwork-wec1-run1.txt
-      20 exp-RandomizedLoad-freq-20-manifestwork-imbs1-run1.txt
+      20 exp-RandomizedLoad-freq-20-manifestwork-its1-run1.txt
       20 exp-RandomizedLoad-freq-20-pod-wds-kscore-stage-run1.txt
       20 exp-RandomizedLoad-freq-20-pod-wec1-run1.txt
-      20 exp-RandomizedLoad-freq-20-workstatus-imbs1-run1.txt
+      20 exp-RandomizedLoad-freq-20-workstatus-its1-run1.txt
 ```
 
 The output is a file with the following structure:

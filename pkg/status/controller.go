@@ -54,8 +54,8 @@ type Controller struct {
 	wdsName            string
 	wdsDynClient       dynamic.Interface
 	wdsKubeClient      kubernetes.Interface
-	imbsDynClient      dynamic.Interface
-	imbsKubeClient     kubernetes.Interface
+	itsDynClient       dynamic.Interface
+	itsKubeClient      kubernetes.Interface
 	workStatusInformer cache.SharedIndexInformer
 	workStatusLister   cache.GenericLister
 	workqueue          workqueue.RateLimitingInterface
@@ -65,7 +65,7 @@ type Controller struct {
 }
 
 // Create a new  status controller
-func NewController(wdsRestConfig *rest.Config, imbsRestConfig *rest.Config, wdsName string) (*Controller, error) {
+func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsName string) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
@@ -81,12 +81,12 @@ func NewController(wdsRestConfig *rest.Config, imbsRestConfig *rest.Config, wdsN
 		return nil, err
 	}
 
-	imbsDynClient, err := dynamic.NewForConfig(imbsRestConfig)
+	itsDynClient, err := dynamic.NewForConfig(itsRestConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	imbsKubeClient, err := kubernetes.NewForConfig(imbsRestConfig)
+	itsKubeClient, err := kubernetes.NewForConfig(itsRestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -95,13 +95,13 @@ func NewController(wdsRestConfig *rest.Config, imbsRestConfig *rest.Config, wdsN
 	log.SetLogger(zapLogger)
 
 	controller := &Controller{
-		wdsName:        wdsName,
-		logger:         log.Log.WithName(controllerName),
-		wdsDynClient:   wdsDynClient,
-		wdsKubeClient:  wdsKubeClient,
-		imbsDynClient:  imbsDynClient,
-		imbsKubeClient: imbsKubeClient,
-		workqueue:      workqueue.NewRateLimitingQueue(ratelimiter),
+		wdsName:       wdsName,
+		logger:        log.Log.WithName(controllerName),
+		wdsDynClient:  wdsDynClient,
+		wdsKubeClient: wdsKubeClient,
+		itsDynClient:  itsDynClient,
+		itsKubeClient: itsKubeClient,
+		workqueue:     workqueue.NewRateLimitingQueue(ratelimiter),
 	}
 
 	return controller, nil
@@ -148,7 +148,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 }
 
 func (c *Controller) runWorkStatusInformer(ctx context.Context) {
-	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.imbsDynClient, 0*time.Minute)
+	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.itsDynClient, 0*time.Minute)
 
 	gvr := schema.GroupVersionResource{Group: util.WorkStatusGroup,
 		Version:  util.WorkStatusVersion,

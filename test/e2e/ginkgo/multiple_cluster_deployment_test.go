@@ -315,7 +315,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 
 		// The following test unit actually fails. Issue #1850 has been opened.
 		// ginkgo.It("survives ITS vcluster coming down", func() {
-		// 	util.DeletePod(ctx, coreCluster, "imbs1-system", "vcluster")
+		// 	util.DeletePod(ctx, coreCluster, "its1-system", "vcluster")
 		// 	util.ValidateNumDeployments(ctx, wec1, ns, 1)
 		// 	util.ValidateNumDeployments(ctx, wec2, ns, 1)
 		// })
@@ -324,7 +324,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			ginkgo.By("kill as many pods as possible")
 			util.DeletePods(ctx, coreCluster, "wds1-system", "kubestellar")
 			util.DeletePods(ctx, coreCluster, "kubeflex-system", "")
-			// util.DeletePod(ctx, coreCluster, "imbs1-system", "vcluster")
+			// util.DeletePod(ctx, coreCluster, "its1-system", "vcluster")
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
 

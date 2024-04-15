@@ -45,28 +45,28 @@ in KubeFlex. Note that `-p ocm` runs a post-create hook on the *vcluster* contro
 which installs OCM on it.
 
     ```shell
-    kflex create imbs1 --type vcluster -p ocm
+    kflex create its1 --type vcluster -p ocm
     ```
 
-1. Install status add-on on imbs1:
+1. Install status add-on on its1:
 
-    Wait until the `managedclusteraddons` resource shows up on `imbs1`. You can check on that with the command:
+    Wait until the `managedclusteraddons` resource shows up on `its1`. You can check on that with the command:
 
     ```shell
-    kubectl --context imbs1 api-resources | grep managedclusteraddons || true
+    kubectl --context its1 api-resources | grep managedclusteraddons || true
     ```
 
     and then install the status add-on:
 
     ```shell
-    helm --kube-context imbs1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v${OCM_STATUS_ADDON_VERSION}
+    helm --kube-context its1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v${OCM_STATUS_ADDON_VERSION}
     ```
 
     see [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
 
 1. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar`
 runs a post-create hook on the *k8s* control plane that starts an instance of a KubeStellar controller
-manager which connects to the `wds1` front-end and the `imbs1` OCM control plane back-end.
+manager which connects to the `wds1` front-end and the `its1` OCM control plane back-end.
 
     ```shell
     kflex create wds1 -p kubestellar
@@ -76,7 +76,7 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 
     ```shell
     helm --kube-context kind-kubeflex upgrade --install ocm-transport-plugin oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin --version ${OCM_TRANSPORT_PLUGIN} \
-     --set transport_cp_name=imbs1 \
+     --set transport_cp_name=its1 \
      --set wds_cp_name=wds1 \
      -n wds1-system
     ```
@@ -85,7 +85,7 @@ manager which connects to the `wds1` front-end and the `imbs1` OCM control plane
 
 1. (optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
 see the `kubestellar-controller-manager` in the `wds1-system` namespace and the
-statefulset `vcluster` in the `imbs1-system` namespace, both fully ready.
+statefulset `vcluster` in the `its1-system` namespace, both fully ready.
 
     ```shell
     kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces
@@ -104,7 +104,7 @@ statefulset `vcluster` in the `imbs1-system` namespace, both fully ready.
     wds1-system          deployment.apps/transport-controller             1/1     1            1           21m
 
     NAMESPACE         NAME                                   READY   AGE
-    imbs1-system      statefulset.apps/vcluster              1/1     11h
+    its1-system       statefulset.apps/vcluster              1/1     11h
     kubeflex-system   statefulset.apps/postgres-postgresql   1/1     22h
     ```
 
@@ -115,7 +115,7 @@ This scenario proceeds from the state established by the [common setup](#common-
 Check for available clusters with label `location-group=edge`
 
 ```shell
-kubectl --context imbs1 get managedclusters -l location-group=edge
+kubectl --context its1 get managedclusters -l location-group=edge
 ```
 
 Create a BindingPolicy to deliver an app to all clusters in wds1:
@@ -185,8 +185,8 @@ Verify that *manifestworks* wrapping the objects have been created in the mailbo
 namespaces:
 
 ```shell
-kubectl --context imbs1 get manifestworks -n cluster1
-kubectl --context imbs1 get manifestworks -n cluster2
+kubectl --context its1 get manifestworks -n cluster1
+kubectl --context its1 get manifestworks -n cluster2
 ```
 
 Verify that the deployment has been created in both clusters
@@ -251,7 +251,7 @@ To create a second WDS based on the hosting cluster, run the commands:
 kflex create wds2 -t host
 
 helm --kube-context kind-kubeflex upgrade --install ocm-transport-plugin oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin --version ${OCM_TRANSPORT_PLUGIN} \
-    --set transport_cp_name=imbs1 \
+    --set transport_cp_name=its1 \
     --set wds_cp_name=wds2 \
     -n wds2-system
 ```
@@ -579,14 +579,14 @@ This is a test that you can do after finishing Scenario 1.
 
 TODO: rewrite this so that it makes sense after Scenario 4.
 
-Bring down the control plane: stop and restart wds1 and imbs1 API servers,
+Bring down the control plane: stop and restart wds1 and its1 API servers,
 KubeFlex and KubeStellar controllers:
 
 First stop all:
 
 ```shell
 kubectl --context kind-kubeflex scale deployment -n wds1-system kube-apiserver --replicas=0
-kubectl --context kind-kubeflex scale statefulset -n imbs1-system vcluster --replicas=0
+kubectl --context kind-kubeflex scale statefulset -n its1-system vcluster --replicas=0
 kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-controller-manager --replicas=0
 kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=0
 kubectl --context kind-kubeflex scale deployment -n wds1-system transport-controller --replicas=0
@@ -596,7 +596,7 @@ Then restart all:
 
 ```shell
 kubectl --context kind-kubeflex scale deployment -n wds1-system kube-apiserver --replicas=1
-kubectl --context kind-kubeflex scale statefulset -n imbs1-system vcluster --replicas=1
+kubectl --context kind-kubeflex scale statefulset -n its1-system vcluster --replicas=1
 kubectl --context kind-kubeflex scale deployment -n kubeflex-system kubeflex-controller-manager --replicas=1
 kubectl --context kind-kubeflex scale deployment -n wds1-system kubestellar-controller-manager --replicas=1
 kubectl --context kind-kubeflex scale deployment -n wds1-system transport-controller --replicas=1

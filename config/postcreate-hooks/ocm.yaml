@@ -3,7 +3,7 @@ kind: PostCreateHook
 metadata:
   name: ocm
   labels:
-    kflex.kubestellar.io/cptype: imbs
+    kflex.kubestellar.io/cptype: its
 spec:
   templates:
   - apiVersion: batch/v1

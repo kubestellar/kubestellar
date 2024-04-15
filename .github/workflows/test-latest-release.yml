@@ -81,11 +81,11 @@ jobs:
 
       - name: show manifestworks
         if: always()
-        run: kubectl --context imbs1 get manifestworks -A -o yaml
+        run: kubectl --context its1 get manifestworks -A -o yaml
 
       - name: show workstatuses
         if: always()
-        run: kubectl --context imbs1 get workstatuses -A -o yaml
+        run: kubectl --context its1 get workstatuses -A -o yaml
 
   test-bash:
     name: Test in bash
@@ -155,8 +155,8 @@ jobs:
 
       - name: show manifestworks
         if: always()
-        run: kubectl --context imbs1 get manifestworks -A -o yaml
+        run: kubectl --context its1 get manifestworks -A -o yaml
 
       - name: show workstatuses
         if: always()
-        run: kubectl --context imbs1 get workstatuses -A -o yaml
+        run: kubectl --context its1 get workstatuses -A -o yaml
