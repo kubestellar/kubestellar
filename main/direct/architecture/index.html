@@ -1762,13 +1762,17 @@ and updates <em>WorkStatus</em> objects in the ITS namespace associated with the
 </figure>
 </p>
 <h2 id="kubestellar-controller-manager">KubeStellar Controller Manager<a class="headerlink" href="#kubestellar-controller-manager" title="Permanent link">#</a></h2>
-<p>This module manages binding controller, and status controller. 
-* The binding controller watches <code>BindingPolicy</code> and workload objects on the Workload Definition Space (WDS), and maintains
+<p>This module manages binding controller, and status controller. </p>
+<ul>
+<li>
+<p>The binding controller watches <code>BindingPolicy</code> and workload objects on the Workload Definition Space (WDS), and maintains
 a <code>Binding</code> object for each <code>BindingPolicy</code> in the WDS. The <code>Binding</code> object contains references to the concrete list of
 workload objects and references to the concrete list of clusters that were selected by the <code>BindingPolicy</code> selectors.</p>
-<ul>
-<li>The status controller watches for <em>WorkStatus</em> objects on the ITS and updates the
-status of objects in the WDS when singleton status is requested in the <code>BindingPolicy</code> for those objects. </li>
+</li>
+<li>
+<p>The status controller watches for <em>WorkStatus</em> objects on the ITS and updates the
+status of objects in the WDS when singleton status is requested in the <code>BindingPolicy</code> for those objects. </p>
+</li>
 </ul>
 <p>There is one instance of a KubeStellar Controller Manager for each WDS. 
 Currently this controller-manager runs in the KubeFlex hosting cluster and is responsible for installing the required 
@@ -1893,7 +1897,7 @@ pattern has been extended to provide the following features:</p>
   watching)</li>
 <li>Informers and Listers references are maintained in a hash map and
   indexed by GVR (Group, Version, Resource) of the watched objects.</li>
-<li>Using a common work queue and set of workers, where the key is defined as follows:</li>
+<li>Using a common work queue and set of workers, where the key is defined as follows:<ul>
 <li>Key is a struct instead than a string, and contains the following:<ul>
 <li>GVR of the informer and lister for the object that generated the
   event</li>
@@ -1903,15 +1907,19 @@ pattern has been extended to provide the following features:</p>
   from the managed clusters (WECs)</li>
 </ul>
 </li>
+</ul>
+</li>
 <li>Starting &amp; stopping informers dynamically based on creation or
   deletion of CRDs (which add/remove APIs on the WDS).</li>
 <li>One client connected to the WDS space and one (or more in the future)
-  to connect to one or more OCM shards.</li>
+  to connect to one or more OCM shards.<ul>
 <li>The WDS-connected client is used to start the dynamic
-    informers/listers for most API resources in the WDS</li>
+  informers/listers for most API resources in the WDS</li>
 <li>The OCM-connected client is used to start informers/listers for OCM
-    ManagedClusters and to copy/update/remove the wrapped objects
-    into/from the OCM mailbox namespaces.</li>
+  ManagedClusters and to copy/update/remove the wrapped objects
+  into/from the OCM mailbox namespaces.</li>
+</ul>
+</li>
 </ul>
 <p>There are three controllers in the KubeStellar controller manager:</p>
 <ul>
