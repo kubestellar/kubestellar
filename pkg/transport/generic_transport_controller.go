@@ -254,7 +254,7 @@ func (c *genericTransportController) processNextWorkItem(ctx context.Context, wo
 			c.logger.Info("Synced Binding object successfully.", "objectKey", obj, "workerID", workerID)
 		} else if retry {
 			c.workqueue.AddRateLimited(obj)
-			c.logger.Info("Encountered transient error while processing Binding object, will retry later", "objectKey", obj, "workerID", workerID, "err", err)
+			c.logger.V(5).Info("Encountered transient error while processing Binding object; do not be alarmed, this will be retried later", "objectKey", obj, "workerID", workerID, "err", err)
 		} else {
 			c.workqueue.Forget(obj)
 			c.logger.Error(err, "Failed to process Binding object", "objectKey", obj, "workerID", workerID)
