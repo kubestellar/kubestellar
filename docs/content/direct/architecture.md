@@ -61,6 +61,7 @@ and updates *WorkStatus* objects in the ITS namespace associated with the WEC.
 ## KubeStellar Controller Manager
 
 This module manages binding controller, and status controller. 
+
 * The binding controller watches `BindingPolicy` and workload objects on the Workload Definition Space (WDS), and maintains
 a `Binding` object for each `BindingPolicy` in the WDS. The `Binding` object contains references to the concrete list of
 workload objects and references to the concrete list of clusters that were selected by the `BindingPolicy` selectors.
@@ -212,22 +213,22 @@ pattern has been extended to provide the following features:
 - Informers and Listers references are maintained in a hash map and
   indexed by GVR (Group, Version, Resource) of the watched objects.
 - Using a common work queue and set of workers, where the key is defined as follows:
-  - Key is a struct instead than a string, and contains the following:
-    - GVR of the informer and lister for the object that generated the
-      event
-    - Structured Name of the object 
-    - For delete event: Shallow copy of the object being deleted. This
-      is required for objects that need to be deleted
-      from the managed clusters (WECs)
+    - Key is a struct instead than a string, and contains the following:
+        - GVR of the informer and lister for the object that generated the
+          event
+        - Structured Name of the object 
+        - For delete event: Shallow copy of the object being deleted. This
+          is required for objects that need to be deleted
+          from the managed clusters (WECs)
 - Starting & stopping informers dynamically based on creation or
   deletion of CRDs (which add/remove APIs on the WDS).
 - One client connected to the WDS space and one (or more in the future)
   to connect to one or more OCM shards.
-  - The WDS-connected client is used to start the dynamic
-    informers/listers for most API resources in the WDS
-  - The OCM-connected client is used to start informers/listers for OCM
-    ManagedClusters and to copy/update/remove the wrapped objects
-    into/from the OCM mailbox namespaces.
+    - The WDS-connected client is used to start the dynamic
+      informers/listers for most API resources in the WDS
+    - The OCM-connected client is used to start informers/listers for OCM
+      ManagedClusters and to copy/update/remove the wrapped objects
+      into/from the OCM mailbox namespaces.
 
 There are three controllers in the KubeStellar controller manager:
 
