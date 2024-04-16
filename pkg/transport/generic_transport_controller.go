@@ -244,16 +244,30 @@ func (c *genericTransportController) processNextWorkItem(ctx context.Context, wo
 		return false
 	}
 
-	if err := c.process(ctx, obj); err != nil {
-		c.logger.Error(err, "failed to process Binding object", "objectKey", obj, "workerID", workerID)
-	} else {
-		c.logger.Info("synced Binding object successfully.", "objectKey", obj, "workerID", workerID)
-	}
-
+	var err error
+	var retry bool
+	defer func() {
+		if err == nil {
+			// If no error occurs we Forget this item so it does not
+			// get queued again until another change happens.
+			c.workqueue.Forget(obj)
+			c.logger.Info("Synced Binding object successfully.", "objectKey", obj, "workerID", workerID)
+		} else if retry {
+			c.workqueue.AddRateLimited(obj)
+			c.logger.Info("Encountered transient error while processing Binding object, will retry later", "objectKey", obj, "workerID", workerID, "err", err)
+		} else {
+			c.workqueue.Forget(obj)
+			c.logger.Error(err, "Failed to process Binding object", "objectKey", obj, "workerID", workerID)
+		}
+	}()
+	err, retry = c.process(ctx, obj)
 	return true
 }
 
-func (c *genericTransportController) process(ctx context.Context, obj interface{}) error {
+// process works on one object reference from the work queue.
+// If the returned error is not nil then the returned boolean indicates
+// whether to retry.
+func (c *genericTransportController) process(ctx context.Context, obj interface{}) (error, bool) {
 	// We call Done here so the workqueue knows we have finished processing this item.
 	// We also must remember to call Forget if we do not want this work item being re-queued.
 	// For example, we do not call Forget if a transient error occurs, instead the item is
@@ -265,31 +279,20 @@ func (c *genericTransportController) process(ctx context.Context, obj interface{
 	// We do this as the delayed nature of the workqueue means the items in the informer cache
 	// may actually be more up to date that when the item was initially put onto the workqueue.
 	if key, ok = obj.(string); !ok {
-		// As the item in the workqueue is actually invalid, we call Forget here else we'd go
-		// into a loop of attempting to process a work item that is invalid.
-		c.workqueue.Forget(obj)
-		return fmt.Errorf("expected key from type string in workqueue but got %#v", obj)
+		return fmt.Errorf("expected key from type string in workqueue but got %#v", obj), false
 	}
 
 	_, objectName, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
-		// As the item in the workqueue is actually invalid, we call Forget here else we'd go
-		// into a loop of attempting to process a work item that is invalid.
-		c.workqueue.Forget(obj)
-		return fmt.Errorf("invalid object key '%s' - %w", key, err)
+		return fmt.Errorf("invalid object key '%s' - %w", key, err), false
 	}
 
 	// Run the syncHandler, passing it the Binding object name to be synced.
 	if err := c.syncHandler(ctx, objectName); err != nil {
-		// Put the item back on the workqueue to handle any transient errors.
-		c.workqueue.AddRateLimited(key)
-		return fmt.Errorf("failed to process object with key '%s' - %w", key, err)
+		return err, true
 	}
-	// Finally, if no error occurs we Forget this item so it does not
-	// get queued again until another change happens.
-	c.workqueue.Forget(obj)
 
-	return nil
+	return nil, false
 }
 
 // syncHandler compares the actual state with the desired, and attempts to converge actual state to the desired state.
