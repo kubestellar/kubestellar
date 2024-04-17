@@ -16,12 +16,57 @@
 set -x # echo so that users can understand what is happening
 set -e # exit on error
 
+
+env="kind"
+
+if [ "$1" == "--env" ]; then
+    env="$2"
+    shift 2
+fi
+
 :
 : -------------------------------------------------------------------------
 : "Cleaning up from previous run of an e2e test"
 
-kind delete cluster --name cluster1
-kind delete cluster --name cluster2
-kind delete cluster --name kubeflex
-kubectl config delete-context cluster1 || true
-kubectl config delete-context cluster2 || true
+if [ $env == "kind" ];then
+    kind delete cluster --name cluster1
+    kind delete cluster --name cluster2
+    kind delete cluster --name kubeflex
+    kubectl config delete-context cluster1 || true
+    kubectl config delete-context cluster2 || true
+
+elif [ $env == "ocp" ];then
+    # Unregister the managed clusters
+    function unregister_cluster() {
+        cluster=$1
+        kubectl --context $cluster delete ns nginx
+        clusteradm unjoin --cluster-name $cluster
+        kubectl --context $cluster delete ns open-cluster-management open-cluster-management-agent open-cluster-management-agent-addon
+    }
+
+    unregister_cluster cluster1
+    unregister_cluster cluster2
+
+    # To uninstall KubeFlex, first ensure you remove all you control planes:
+    kubectl config use-context kscore
+    kubectl delete cps --all
+    helm delete -n kubeflex-system kubeflex-operator
+    helm delete -n kubeflex-system postgres
+    kubectl -n kubeflex-system delete pvc data-postgres-postgresql-0
+    kubectl delete ns kubeflex-system
+
+    # Unset the kubeconfig contexts
+    kubectl config unset contexts.its1
+    kubectl config unset contexts.wds1
+    kubectl config unset contexts.wds2
+else
+   echo "$0: unknown flag option" >&2 ;
+   echo "Usage: $0 [--env kind | ocp]" >& 2
+   exit 1
+fi
+
+
+
+
+
+
