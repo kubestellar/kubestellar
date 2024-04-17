@@ -108,7 +108,13 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context, bindingInfor
 	wrappedObjectGenericInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    transportController.handleWrappedObject,
 		UpdateFunc: func(_, new interface{}) { transportController.handleWrappedObject(new) },
-		DeleteFunc: transportController.handleWrappedObject,
+		DeleteFunc: func(obj any) {
+			if deletedStateUnknown, ok := obj.(cache.DeletedFinalStateUnknown); ok {
+				transportController.logger.Info("Object is DeletedFinalStateUnknown")
+				obj = deletedStateUnknown.Obj
+			}
+			transportController.handleWrappedObject(obj)
+		},
 	})
 	dynamicInformerFactory.Start(ctx.Done())
 
