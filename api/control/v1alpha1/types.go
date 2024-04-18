@@ -268,11 +268,15 @@ type BindingList struct {
 // +genclient:nonNamespaced
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:scope=Cluster,shortName={ct},categories={all}
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="SUBJECT_GROUP",type="string",JSONPath=".spec.apiGroup"
+// +kubebuilder:printcolumn:name="SUBJECT_RESOURCE",type="string",JSONPath=".spec.resource"
 type CustomTransform struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec CustomTransformSpec `json:"spec,omitempty"`
+	Spec   CustomTransformSpec   `json:"spec,omitempty"`
+	Status CustomTransformStatus `json:"status,omitempty"`
 }
 
 // CustomTransformSpec selects some objects and describes how to transform them.
@@ -294,6 +298,13 @@ type CustomTransformSpec struct {
 	// - "$.store.book[?(@.author == 'Kilgore Trout' && @.category == 'fiction')].price"
 	// +optional
 	Remove []string `json:"remove,omitempty"`
+}
+
+type CustomTransformStatus struct {
+	ObservedGeneration int64 `json:"observedGeneration"`
+
+	// +optional
+	Errors []string `json:"errors,omitempty"`
 }
 
 // CustomTransformList is the API type for a list of CustomTransform
