@@ -34,11 +34,11 @@ type Query []string
 // A string must be enclosed with double-quotes (`"`).
 // No whitespace is allowed.
 func ParseQuery(queryS string) (Query, error) {
-	lexer, err := NewLexer(queryS)
+	lexer, err := NewLexer(queryS, 0)
 	if err != nil {
 		return nil, err
 	}
-	query, err := lexer.ParseQuery()
+	query, err := lexer.ScanQuery()
 	if err != nil {
 		return query, err
 	}
@@ -58,16 +58,27 @@ type Lexer struct {
 	eof     bool // no more to process
 }
 
-func NewLexer(source string) (*Lexer, error) {
+func NewLexer(source string, startPos int) (*Lexer, error) {
 	lxr := &Lexer{
-		source: source,
-		reader: strings.NewReader(source),
+		source:  source,
+		reader:  strings.NewReader(source),
+		chrPos:  startPos,
+		nextPos: startPos,
+		eof:     startPos >= len(source),
 	}
 	err := lxr.advance()
 	return lxr, err
 }
 
-func (lxr *Lexer) ParseQuery() (Query, error) {
+// GetPosition returns the postion of the character that the Lexer is currently looking at
+// and whether the Lexer is looking at EOF.
+func (lxr *Lexer) GetPosition() (int, bool) { return lxr.chrPos, lxr.eof }
+
+// ScanQuery consumes a Query from the Lexer.
+// As long a query as is available is consumed.
+// The Lexer is left looking at the first character after the Query
+// or EOF.
+func (lxr *Lexer) ScanQuery() (Query, error) {
 	query := Query{}
 	if lxr.chr != '$' {
 		return query, fmt.Errorf("syntax error at %d: missing root identifier (dollar sign)", lxr.chrPos)

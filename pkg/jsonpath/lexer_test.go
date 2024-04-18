@@ -27,6 +27,7 @@ CaseLoop:
 		results []string
 		goodEnd func(error) bool
 	}{
+		{"", nil, badEnd},
 		{`'xyz`,
 			nil,
 			badEnd},

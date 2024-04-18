@@ -54,6 +54,11 @@ func GetQuery(root Node, pathS string) []JSONValue {
 		panic(err)
 	}
 	ans := []JSONValue{}
-	QueryValue(query, root, func(node Node) { ans = append(ans, node.Get()) })
+	QueryValue(query, root, func(node Node) {
+		val, ok := node.Get()
+		if ok {
+			ans = append(ans, val)
+		}
+	})
 	return ans
 }

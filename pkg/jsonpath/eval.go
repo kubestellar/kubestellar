@@ -16,10 +16,8 @@ limitations under the License.
 
 package jsonpath
 
-// This file implements JSONPath querying almost as described in RFC 9535.
-// This file does not implement the function extensions.
-// The only comparisons implemented here are equality and inequality.
-// The order in which result nodes are produced is not consistent with the RFC.
+// This file implements JSONPath querying for the small subset
+// of JSONPath that this package currently supports.
 
 // JSONValue is something that can be produced by encoding/json.Unmarshal into a pointer
 // to a nil `any`.
@@ -28,9 +26,12 @@ package jsonpath
 type JSONValue = any
 
 // Node is a JSON document node.
-// The other methods MUST NOT be invoked after Remove is invoked.
 type Node interface {
-	Get() JSONValue
+	// Get returns (the current contents of the node, `true`) if the node is in the document,
+	// (`nil`, `false`) otherwise.
+	Get() (JSONValue, bool)
+
+	// Remove deletes the node from the JSON document.
 	Remove()
 }
 
@@ -43,8 +44,11 @@ type RootNode struct {
 
 var _ Node = &RootNode{}
 
-func (vn *RootNode) Get() JSONValue {
-	return *vn.Value
+func (vn *RootNode) Get() (JSONValue, bool) {
+	if vn.Value == nil {
+		return nil, false
+	}
+	return *vn.Value, true
 }
 
 func (vn *RootNode) Remove() {
@@ -59,8 +63,9 @@ type FieldNode struct {
 
 var _ Node = FieldNode{}
 
-func (fn FieldNode) Get() JSONValue {
-	return fn.Object[fn.Key]
+func (fn FieldNode) Get() (JSONValue, bool) {
+	val, have := fn.Object[fn.Key]
+	return val, have
 }
 
 func (fn FieldNode) Remove() {
@@ -72,11 +77,15 @@ func (fn FieldNode) Remove() {
 // root is `root`.
 func QueryValue(query Query, node Node, yield func(Node)) {
 	for _, fieldName := range query {
-		obj, ok := node.Get().(map[string]any)
+		objA, ok := node.Get()
 		if !ok {
 			return
 		}
-		node = FieldNode{obj, fieldName}
+		objM, ok := objA.(map[string]any)
+		if !ok {
+			return
+		}
+		node = FieldNode{objM, fieldName}
 	}
 	yield(node)
 }
