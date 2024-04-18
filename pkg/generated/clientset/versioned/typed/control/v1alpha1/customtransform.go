@@ -41,6 +41,7 @@ type CustomTransformsGetter interface {
 type CustomTransformInterface interface {
 	Create(ctx context.Context, customTransform *v1alpha1.CustomTransform, opts v1.CreateOptions) (*v1alpha1.CustomTransform, error)
 	Update(ctx context.Context, customTransform *v1alpha1.CustomTransform, opts v1.UpdateOptions) (*v1alpha1.CustomTransform, error)
+	UpdateStatus(ctx context.Context, customTransform *v1alpha1.CustomTransform, opts v1.UpdateOptions) (*v1alpha1.CustomTransform, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
 	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.CustomTransform, error)
@@ -122,6 +123,21 @@ func (c *customTransforms) Update(ctx context.Context, customTransform *v1alpha1
 	err = c.client.Put().
 		Resource("customtransforms").
 		Name(customTransform.Name).
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(customTransform).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+func (c *customTransforms) UpdateStatus(ctx context.Context, customTransform *v1alpha1.CustomTransform, opts v1.UpdateOptions) (result *v1alpha1.CustomTransform, err error) {
+	result = &v1alpha1.CustomTransform{}
+	err = c.client.Put().
+		Resource("customtransforms").
+		Name(customTransform.Name).
+		SubResource("status").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(customTransform).
 		Do(ctx).
