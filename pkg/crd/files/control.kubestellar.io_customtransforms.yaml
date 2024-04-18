@@ -18,7 +18,14 @@ spec:
     singular: customtransform
   scope: Cluster
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.apiGroup
+      name: SUBJECT_GROUP
+      type: string
+    - jsonPath: .spec.resource
+      name: SUBJECT_RESOURCE
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: CustomTransform describes how to select and transform some objects
@@ -66,6 +73,20 @@ spec:
             - apiGroup
             - resource
             type: object
+          status:
+            properties:
+              errors:
+                items:
+                  type: string
+                type: array
+              observedGeneration:
+                format: int64
+                type: integer
+            required:
+            - observedGeneration
+            type: object
         type: object
     served: true
     storage: true
+    subresources:
+      status: {}
