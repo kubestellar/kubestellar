@@ -1642,6 +1642,7 @@
 <p>This document starts with step-by-step instructions for the current procedure, then proceeds with the thinking behind them.</p>
 <p>See the associated <a href="../packaging/">packaging and delivery doc</a> for some
 clues about the problem.</p>
+<p>Every release should pass all release tests before it can be officially declare as a new stable release. Please see the details in <a href="../release-testing/">release-testing</a>.</p>
 <h2 id="step-by-step">Step-by-Step<a class="headerlink" href="#step-by-step" title="Permanent link">#</a></h2>
 <h3 id="reacting-to-a-new-ocm-transport-plugin-release">Reacting to a new ocm-transport-plugin release<a class="headerlink" href="#reacting-to-a-new-ocm-transport-plugin-release" title="Permanent link">#</a></h3>
 <p>Between each release of <a href="https://github.com/kubestellar/ocm-transport-plugin">ks/OTP</a> and the next release of ks/ks, the following steps should be done in ks/ks.</p>
@@ -1678,13 +1679,16 @@ clues about the problem.</p>
 <p>Apply the Git tag <code>v$version</code> to that new commit in the shared repo.</p>
 </li>
 <li>
-<p>After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed <a href="#technology">above</a>) and then the "Test latest release" workflow will run the E2E tests using those artifacts.</p>
+<p>After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed <a href="#technology">above</a>) and then the "Test latest release" workflow will run the E2E tests using those artifacts. </p>
+</li>
+<li>
+<p>Verify that the automatic tests indeed executed and passed (see more details in <a href="../release-testing/#automatic-github-based-release-tests">CICD release testing</a>)</p>
 </li>
 <li>
 <p>After the release artifacts have been published, create and push to the shared repo a branch named <code>release-$version</code>. This will also trigger the workflow that tests the latest release. Every push to a branch with such a name triggers that workflow, in case there has been a change in an E2E test for that release.</p>
 </li>
 <li>
-<p>Do additional testing: more scenarios, more platforms.</p>
+<p>Follow the procedure in <a href="../release-testing/#e2e-release-tests-on-ocp">OCP testing</a>, to verify that the release is functional on OCP.</p>
 </li>
 <li>
 <p>If the testing results are good, update <a href="https://github.com/kubestellar/ocm-transport-plugin">ks/OTP</a> to refer to the new ks/ks release and <a href="https://github.com/kubestellar/ocm-transport-plugin/blob/main/docs/release.md">make a new release of ks/OTP</a>.</p>
