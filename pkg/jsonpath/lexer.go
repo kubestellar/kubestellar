@@ -48,6 +48,8 @@ func ParseQuery(queryS string) (Query, error) {
 	return query, nil
 }
 
+// Lexer supports scanning through a string.
+// Lexer is intended ONLY for serialized usage, not concurrency.
 type Lexer struct {
 	source string
 	reader io.RuneReader

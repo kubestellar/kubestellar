@@ -19,6 +19,9 @@ package jsonpath
 // This file implements JSONPath querying for the small subset
 // of JSONPath that this package currently supports.
 
+// The algorithms and data structures in here are designed for serialized usage,
+// not concurrent usage.
+
 // JSONValue is something that can be produced by encoding/json.Unmarshal into a pointer
 // to a nil `any`.
 // That is: `bool`, `float64`, `string`, `nil`, `[]any`, or `map[string]any` --- where those
