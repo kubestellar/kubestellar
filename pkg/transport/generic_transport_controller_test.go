@@ -81,6 +81,13 @@ func (gen *generator) generateLabels() map[string]string {
 	for i := 1; i <= n; i++ {
 		ans[fmt.Sprintf("l%d", i*10+gen.Intn(2))] = fmt.Sprintf("v%d", i*10+gen.Intn(2))
 	}
+	switch gen.Intn(4) {
+	case 0:
+		ans["test.kubestellar.io/dont-delete-me"] = "thank"
+	case 1:
+		ans["test.kubestellar.io/delete-me"] = "you"
+	default:
+	}
 	return ans
 }
 
@@ -227,6 +234,12 @@ func (rg *generator) generateBindingCase(name string, objs []mrObjRsc) bindingCa
 type jsonMap = map[string]any
 
 type testTransport struct {
+	t              *testing.T
+	ctx            context.Context
+	bindingName    string
+	ctc            *customTransformCollection
+	kindToResource map[metav1.GroupKind]string
+
 	expect map[util.GVKObjRef]jsonMap
 	sync.Mutex
 	wrapped bool
@@ -250,9 +263,31 @@ func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.
 		delete(tt.missed, key.String())
 		if expectedObj, found := tt.expect[key]; found {
 			objM := obj.UnstructuredContent()
-
+			apiVersion := obj.GetAPIVersion()
+			groupVersion, err := k8sschema.ParseGroupVersion(apiVersion)
+			if err != nil {
+				panic(err)
+			}
+			groupKind := metav1.GroupKind{Group: groupVersion.Group, Kind: obj.GetKind()}
+			resource, ok := tt.kindToResource[groupKind]
+			if !ok {
+				panic(fmt.Errorf("No mapping for %v", groupKind))
+			}
+			groupResource := metav1.GroupResource{Group: groupKind.Group, Resource: resource}
 			// clean expected object since transport objects are cleaned
-			cleanedExpectedObj := cleanObject(&unstructured.Unstructured{Object: expectedObj}).Object
+			uncleanedExpectedObj := &unstructured.Unstructured{Object: expectedObj}
+			cleanedExpectedObjU := tt.ctc.cleanObject(tt.ctx, groupResource, uncleanedExpectedObj, tt.bindingName)
+			cleanedExpectedObj := cleanedExpectedObjU.Object
+			cleanable := obj.GetKind() == "ClusterRole"
+			hadLabel := uncleanedExpectedObj.GetLabels()["test.kubestellar.io/delete-me"] != ""
+			hasLabel := cleanedExpectedObjU.GetLabels()["test.kubestellar.io/delete-me"] != ""
+			expectRemoval := cleanable && hadLabel
+			actualRemoval := hadLabel && !hasLabel
+			if expectRemoval != actualRemoval {
+				tt.t.Errorf("Expected removal=%v, actual removal=%v, obj=%v", expectRemoval, actualRemoval, key)
+			} else if expectRemoval {
+				tt.t.Logf("Saw a removal, obj=%v", key)
+			}
 			equal := apiequality.Semantic.DeepEqual(objM, cleanedExpectedObj)
 			if !equal {
 				tt.wrong[key.String()] = obj
@@ -284,8 +319,15 @@ func TestGenericController(t *testing.T) {
 	workapi.AddToScheme(scheme)
 	ksapi.AddToScheme(scheme)
 	logger, ctx := ktesting.NewTestContext(t)
-	var _ ksapi.Binding
 	gen := &generator{t: t, ctx: ctx, Rand: rg}
+	ct := &ksapi.CustomTransform{
+		TypeMeta:   metav1.TypeMeta{APIVersion: ksapi.GroupVersion.String(), Kind: "CustomTransform"},
+		ObjectMeta: metav1.ObjectMeta{Name: "test-ct"},
+		Spec: ksapi.CustomTransformSpec{
+			APIGroup: rbacv1.SchemeGroupVersion.Group,
+			Resource: "clusterroles",
+			Remove:   []string{`$.metadata.labels["test.kubestellar.io/delete-me"]`},
+		}}
 	wdsK8sObjs := []runtime.Object{}
 	for i := 0; i < 3; i++ {
 		ns := gen.generateNamespace(fmt.Sprintf("ns%d", i))
@@ -303,12 +345,27 @@ func TestGenericController(t *testing.T) {
 	}
 	bindingCase := gen.generateBindingCase("b1", objs)
 	logger.V(3).Info("Generated bindingCase", "case", bindingCase)
-	wdsKsObjs := []runtime.Object{bindingCase.Binding}
+	wdsKsObjs := []runtime.Object{bindingCase.Binding, ct}
 	wdsKsClientFake := ksclientfake.NewSimpleClientset(wdsKsObjs...)
 	wdsKsInformerFactory := ksinformers.NewSharedInformerFactory(wdsKsClientFake, 0*time.Minute)
 	wdsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme, wdsK8sObjs...)
 	itsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme)
-	transport := &testTransport{expect: bindingCase.expect}
+	wdsControlInformers := wdsKsInformerFactory.Control().V1alpha1()
+	ctIndexer := wdsControlInformers.CustomTransforms().Informer().GetIndexer()
+	transport := &testTransport{
+		t:           t,
+		bindingName: bindingCase.Binding.Name,
+		ctx:         ctx,
+		ctc: newCustomTransformCollection(wdsKsClientFake.ControlV1alpha1().CustomTransforms(),
+			ctIndexer.ByIndex,
+			func(any) {}),
+		kindToResource: map[metav1.GroupKind]string{
+			{Group: "", Kind: "ConfigMap"}:                                          "configmaps",
+			{Group: rbacv1.GroupName, Kind: "ClusterRole"}:                          "clusterroles",
+			{Group: k8snetv1.GroupName, Kind: "NetworkPolicy"}:                      "networkpolicies",
+			{Group: k8sautoscalingapiv2.GroupName, Kind: "HorizontalPodAutoscaler"}: "horizontalpodautoscalers",
+		},
+		expect: bindingCase.expect}
 	wrapperGVR := workapi.GroupVersion.WithResource("manifestworks")
 	inventoryClientFake := clusterclientfake.NewSimpleClientset()
 	inventoryInformerFactory := clusterinformers.NewSharedInformerFactory(inventoryClientFake, 0*time.Second)
@@ -316,7 +373,14 @@ func TestGenericController(t *testing.T) {
 	itsK8sClientFake := k8sfake.NewSimpleClientset()
 	itsK8sInformerFactory := k8sinformers.NewSharedInformerFactory(itsK8sClientFake, 0*time.Minute)
 	parmCfgMapPreInformer := itsK8sInformerFactory.Core().V1().ConfigMaps()
-	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, inventoryPreInformer, wdsKsClientFake.ControlV1alpha1().Bindings(), wdsKsInformerFactory.Control().V1alpha1().Bindings(), transport, wdsDynamicClient, itsK8sClientFake.CoreV1().Namespaces(), parmCfgMapPreInformer, itsDynamicClient, "test-wds", wrapperGVR)
+	ctlr := NewTransportControllerForWrappedObjectGVR(ctx,
+		inventoryPreInformer, wdsKsClientFake.ControlV1alpha1().Bindings(),
+		wdsControlInformers.Bindings(), wdsControlInformers.CustomTransforms(),
+		transport,
+		wdsKsClientFake,
+		wdsDynamicClient,
+		itsK8sClientFake.CoreV1().Namespaces(), parmCfgMapPreInformer,
+		itsDynamicClient, "test-wds", wrapperGVR)
 	inventoryInformerFactory.Start(ctx.Done())
 	wdsKsInformerFactory.Start(ctx.Done())
 	itsK8sInformerFactory.Start(ctx.Done())
