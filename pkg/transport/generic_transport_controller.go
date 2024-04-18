@@ -528,7 +528,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 		return fmt.Errorf("failed to get current wrapped objects that are owned by Binding '%s' - %w", binding.GetName(), err)
 	}
 	// calculate desired state
-	destToDesiredWrappedObject, bindingErrors, err := c.initializeWrappedObject(ctx, binding)
+	destToDesiredWrappedObject, bindingErrors, err := c.computeDestToWrappedObjects(ctx, binding)
 	if err != nil {
 		return fmt.Errorf("failed to build wrapped object(s) from Binding '%s' - %w", binding.GetName(), err)
 	}
@@ -585,7 +585,13 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 	return objectsToPropagate, nil
 }
 
-func (c *genericTransportController) initializeWrappedObject(ctx context.Context, binding *v1alpha1.Binding) (func(v1alpha1.Destination) (*unstructured.Unstructured, bool), []string, error) {
+// computeDestToWrappedObjects returns the following three things.
+//   - the destToWrappedObject function. This maps a destination to the customized wrapped object
+//     that should go to that destination. This func also returns a `bool` that is false when
+//     the function has no answer for the given destination.
+//   - the slice of strings describing user errors in the Binding.
+//   - an error if something transient went wrong.
+func (c *genericTransportController) computeDestToWrappedObjects(ctx context.Context, binding *v1alpha1.Binding) (func(v1alpha1.Destination) (*unstructured.Unstructured, bool), []string, error) {
 	objectsToPropagate, err := c.getObjectsFromWDS(ctx, binding)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get objects to propagate to WECs from Binding object '%s' - %w", binding.GetName(), err)
@@ -595,10 +601,43 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 		return nil, nil, nil // if no objects were found in the workload section, return nil so that we don't distribute an empty wrapped object.
 	}
 
-	bindingErrors := []string{}
+	destToCustomizedObjects, bindingErrors := c.computeDestToCustomizedObjects(objectsToPropagate, binding)
 
+	// This will be constant if no object needed customization, otherwise a map's get func
+	var destToWrappedObject func(v1alpha1.Destination) (*unstructured.Unstructured, bool)
+
+	if destToCustomizedObjects != nil {
+		asMap := map[v1alpha1.Destination]*unstructured.Unstructured{}
+		for dest, objects := range destToCustomizedObjects {
+			wrappedObject, err := c.wrap(objects, binding)
+			if err != nil {
+				return nil, nil, fmt.Errorf("failure wrapping for destination %q: %w", binding.Name, err)
+			}
+			asMap[dest] = wrappedObject
+		}
+		destToWrappedObject = util.PrimitiveMapGet(asMap)
+	} else {
+		wrappedObject, err := c.wrap(objectsToPropagate, binding)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
+		}
+		destToWrappedObject = func(v1alpha1.Destination) (*unstructured.Unstructured, bool) { return wrappedObject, true }
+	}
+
+	return destToWrappedObject, bindingErrors, nil
+}
+
+// computeDestToCustomizedObjects returns the following two things.
+//   - a map from destination to slice of customized workload objects.
+//     This map will be nil if customization is not needed for the given slice of objects.
+//   - the slice of strings containing the user errors found in the given Binding.
+//
+// This func also updates c.bindingSensitiveDestinations for the given Binding.
+func (c *genericTransportController) computeDestToCustomizedObjects(objectsToPropagate []*unstructured.Unstructured, binding *v1alpha1.Binding) (map[v1alpha1.Destination][]*unstructured.Unstructured, []string) {
 	// This will become non-nil if any object to propagate needs customization
 	var destToCustomizedObjects map[v1alpha1.Destination][]*unstructured.Unstructured
+
+	bindingErrors := []string{}
 
 	// Look through the objects to propagate to see if any needs customization.
 	// If any needs customization then catch up destToCustomizedObjects and proceed from there.
@@ -637,7 +676,7 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 			}
 		}
 	}
-	// update the index in c.bindingCares
+	// update the index in c.bindingSensitiveDestinations
 	var cares sets.Set[v1alpha1.Destination]
 	if destToCustomizedObjects != nil {
 		cares = sets.New(binding.Spec.Destinations...)
@@ -646,43 +685,23 @@ func (c *genericTransportController) initializeWrappedObject(ctx context.Context
 	}
 	c.setBindingSensitivities(binding.Name, cares) // forget about now-irrelevant destinations
 
-	// This will be constant if no object needed customization, otherwise a map's get func
-	var destToWrappedObject func(v1alpha1.Destination) (*unstructured.Unstructured, bool)
+	return destToCustomizedObjects, bindingErrors
+}
 
-	wrap := func(objectsToPropagate []*unstructured.Unstructured) (*unstructured.Unstructured, error) {
-		wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(objectsToPropagate))
-		if err != nil {
-			return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
-		}
-		// wrapped object name is (PlacementDecision.GetName()-WdsName).
-		// pay attention - we cannot use the PlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
-		// we add WdsName to the object name to assure name uniqueness,
-		// in order to easily get the origin PlacementDecision object name and wds, we add it as an annotations.
-		wrappedObject.SetName(fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName))
-		setLabel(wrappedObject, originOwnerReferenceLabel, binding.GetName())
-		setLabel(wrappedObject, originWdsLabel, c.wdsName)
-		setAnnotation(wrappedObject, originOwnerGenerationAnnotation, binding.GetGeneration())
-		return wrappedObject, nil
+func (c *genericTransportController) wrap(objectsToPropagate []*unstructured.Unstructured, binding *v1alpha1.Binding) (*unstructured.Unstructured, error) {
+	wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(objectsToPropagate))
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 	}
-	if destToCustomizedObjects != nil {
-		asMap := map[v1alpha1.Destination]*unstructured.Unstructured{}
-		for dest, objects := range destToCustomizedObjects {
-			wrappedObject, err := wrap(objects)
-			if err != nil {
-				return nil, nil, err
-			}
-			asMap[dest] = wrappedObject
-		}
-		destToWrappedObject = util.PrimitiveMapGet(asMap)
-	} else {
-		wrappedObject, err := wrap(objectsToPropagate)
-		if err != nil {
-			return nil, nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
-		}
-		destToWrappedObject = func(v1alpha1.Destination) (*unstructured.Unstructured, bool) { return wrappedObject, true }
-	}
-
-	return destToWrappedObject, bindingErrors, nil
+	// wrapped object name is (PlacementDecision.GetName()-WdsName).
+	// pay attention - we cannot use the PlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
+	// we add WdsName to the object name to assure name uniqueness,
+	// in order to easily get the origin PlacementDecision object name and wds, we add it as an annotations.
+	wrappedObject.SetName(fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName))
+	setLabel(wrappedObject, originOwnerReferenceLabel, binding.GetName())
+	setLabel(wrappedObject, originWdsLabel, c.wdsName)
+	setAnnotation(wrappedObject, originOwnerGenerationAnnotation, binding.GetGeneration())
+	return wrappedObject, nil
 }
 
 // getPropertiesForDestination returns the properties to use for the given destination and notes
