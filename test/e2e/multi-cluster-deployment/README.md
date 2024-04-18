@@ -14,3 +14,32 @@ Starting from a local directory containing the git repo, do the following.
 cd test/e2e/multi-cluster-deployment
 ./run-test.sh
 ```
+
+## Running the test in OCP cluster
+
+
+1. Create a kubeconfig with contexts for the `kscore`, `cluster1` and `cluster2`:
+
+For example: 
+
+```bash
+$ kubectl config get-contexts
+CURRENT   NAME          CLUSTER                   AUTHINFO               NAMESPACE
+          kscore       <url>:port               <defaul-value>            default
+          cluster1     <url>:port               <defaul-value>            default
+*         cluster2     <url>:port               <defaul-value>            default
+```
+
+Use the following command to rename the default context name for `cluster1` workload execution cluster:
+
+```bash 
+$ kubectl config rename-context <default-wec1-context-name> kscore
+```
+
+2. Run e2e test in your ocp cluster:
+
+```
+ export KUBESTELLAR_VERSION=0.21.2
+ export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
+ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/multi-cluster-deployment/run-test.sh) --env ocp
+```

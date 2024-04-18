@@ -16,6 +16,13 @@
 set -x # echo so that users can understand what is happening
 set -e # exit on error
 
+env="kind"
+
+if [ "$1" == "--env" ]; then
+    env="$2"
+    shift 2
+fi
+
 :
 : -------------------------------------------------------------------------
 : "Create a bindingpolicy in wds1 to deliver an app to all clusters."
@@ -69,6 +76,22 @@ spec:
         ports:
         - containerPort: 80
 EOF
+
+
+if [ $env == "ocp" ];then
+    function add_permissions() {
+        cluster=$1
+        oc --context $cluster adm policy add-scc-to-user anyuid -z default -n nginx
+        kubectl --context $cluster -n nginx scale deploy nginx-deployment --replicas=0
+        kubectl --context $cluster -n nginx scale deploy nginx-deployment --replicas=1
+    }
+
+    wait-for-cmd '(($(kubectl --context cluster1 get ns nginx -o json | jq .status.phase -r 2>/dev/null | grep -c Active) >= 1))'
+    add_permissions cluster1
+
+    wait-for-cmd '(($(kubectl --context cluster2 get ns nginx -o json | jq .status.phase -r 2>/dev/null | grep -c Active) >= 1))'
+    add_permissions cluster2
+fi 
 
 :
 : -------------------------------------------------------------------------
