@@ -472,6 +472,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -494,6 +496,20 @@
     <li class="md-nav__item">
       <a href="../../readme/" class="md-nav__link">
         Readme
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide.md" class="md-nav__link">
+        User guide
       </a>
     </li>
   
@@ -2149,7 +2165,7 @@ implementations of the transport interface. The interface between the plugin and
 <li>Have inventory representation for the clusters.</li>
 </ul>
 <p>The above list is required in order to comply with <a href="https://multicluster.sigs.k8s.io/concepts/work-api/"><u>SIG Multi-Cluster Work API</u></a>.</p>
-<p>Each plugin has an executable with a <code>main</code> func that calls the generic code (in <code>pkg/transport/cmd/generic-main.go</code>), passing the plugin object that implements the plugin interface.</p>
+<p>Each plugin has an executable with a <code>main</code> func that calls the generic code (in <code>pkg/transport/cmd/generic-main.go</code>), passing the plugin object that implements the plugin interface. The generic code does the rule-based customization; the plugin is given customized objects. The generic code also ensures that the namespace named "customization-properties" exists in the ITS.</p>
 <p>KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project <a href="https://open-cluster-management.io">Open Cluster Management</a>. OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available <a href="https://github.com/kubestellar/ocm-transport-plugin">here</a>.<br />
 We expect to have more transport plugin options in the future.</p>
 <p>The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.</p>

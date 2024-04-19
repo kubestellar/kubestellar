@@ -470,6 +470,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -492,6 +494,20 @@
     <li class="md-nav__item">
       <a href="../../readme/" class="md-nav__link">
         Readme
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide.md" class="md-nav__link">
+        User guide
       </a>
     </li>
   
@@ -675,13 +691,6 @@
         <li class="md-nav__item">
   <a href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" class="md-nav__link">
     Using an existing OpenShift cluster as the hosting cluster
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-everything-is-not-on-the-same-machine" class="md-nav__link">
-    When everything is not on the same machine
   </a>
   
 </li>
@@ -1437,13 +1446,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#when-everything-is-not-on-the-same-machine" class="md-nav__link">
-    When everything is not on the same machine
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1489,8 +1491,6 @@
 <h2 id="using-an-existing-openshift-cluster-as-the-hosting-cluster">Using an existing OpenShift cluster as the hosting cluster<a class="headerlink" href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" title="Permanent link">#</a></h2>
 <p>This is similar to using an existing Kind cluster but requires an additional modification. Modify the <code>kflex</code> init command and subsequent kubeconfig context references as in the existing-kind-cluster scenario.</p>
 <p>Additionally, the recipe for registering a WEC with the ITS needs to be modified. In the <code>clusteradm</code> command, omit the <code>--force-internal-endpoint-lookup</code> flag. If following the example commands literally, this means to define <code>flags=""</code> rather than <code>flags="--force-internal-endpoint-lookup"</code>.</p>
-<h2 id="when-everything-is-not-on-the-same-machine">When everything is not on the same machine<a class="headerlink" href="#when-everything-is-not-on-the-same-machine" title="Permanent link">#</a></h2>
-<p>Thus far we can only say how to handle this when the hosting cluster is OpenShift. The problem is getting URLs that work from everywhere. OpenShift is a hosted product, your clusters have domain names that are resolvable from everywhere. In other words, if you use an OpenShift cluster as your hosting cluster then this problem is already solved.</p>
 
 
   
