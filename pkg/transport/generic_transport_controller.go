@@ -356,13 +356,13 @@ func (c *genericTransportController) ensurePropertyNamespace(ctx context.Context
 func (c *genericTransportController) runWorker(ctx context.Context, workerId int) {
 	logger := klog.FromContext(ctx).WithValues("workerID", workerId)
 	ctx = klog.NewContext(ctx, logger)
-	for c.processNextWorkItem(ctx, workerId) {
+	for c.processNextWorkItem(ctx) {
 	}
 }
 
 // processNextWorkItem will read a single work item off the workqueue and
 // attempt to process it, by calling the syncHandler.
-func (c *genericTransportController) processNextWorkItem(ctx context.Context, workerID int) bool {
+func (c *genericTransportController) processNextWorkItem(ctx context.Context) bool {
 	logger := klog.FromContext(ctx)
 	obj, shutdown := c.workqueue.Get()
 	if shutdown {
@@ -376,13 +376,13 @@ func (c *genericTransportController) processNextWorkItem(ctx context.Context, wo
 			// If no error occurs we Forget this item so it does not
 			// get queued again until another change happens.
 			c.workqueue.Forget(obj)
-			logger.Info("Processed workqueue item successfully.", "item", obj, "itemType", fmt.Sprintf("%T", obj), "workerID", workerID)
+			logger.Info("Processed workqueue item successfully.", "item", obj, "itemType", fmt.Sprintf("%T", obj))
 		} else if retry {
 			c.workqueue.AddRateLimited(obj)
-			logger.V(5).Info("Encountered transient error while processing workqueue item; do not be alarmed, this will be retried later", "item", obj, "itemType", fmt.Sprintf("%T", obj), "workerID", workerID)
+			logger.V(5).Info("Encountered transient error while processing workqueue item; do not be alarmed, this will be retried later", "item", obj, "itemType", fmt.Sprintf("%T", obj))
 		} else {
 			c.workqueue.Forget(obj)
-			logger.Error(err, "Failed to process workqueue item", "item", obj, "itemType", fmt.Sprintf("%T", obj), "workerID", workerID)
+			logger.Error(err, "Failed to process workqueue item", "item", obj, "itemType", fmt.Sprintf("%T", obj))
 		}
 	}()
 	err, retry = c.process(ctx, obj)
@@ -409,7 +409,6 @@ func (c *genericTransportController) process(ctx context.Context, obj interface{
 		if err != nil {
 			// As the item in the workqueue is actually invalid, we call Forget here else we'd go
 			// into a loop of attempting to process a work item that is invalid.
-			c.workqueue.Forget(obj)
 			return fmt.Errorf("invalid object key '%s' - %w", typed, err), false
 		}
 
@@ -440,14 +439,14 @@ func (c *genericTransportController) syncProperties(ctx context.Context, invName
 	if !have { // not cached, nobody cares
 		return
 	}
-	if util.PrimitiveMapEqual(oldProps, newProps) {
+	if a.PrimitiveMapEqual(oldProps, newProps) {
 		return
 	}
 	c.logger.V(4).Info("syncProperties", "dest", dest, "props", newProps)
 	c.destinationProperties[dest] = newProps
 	for bindingName, dests := range c.bindingSensitiveDestinations {
 		if dests.Has(dest) {
-			c.logger.V(4).Info("Enqueuing reference to Binding that depends on destination properties", "binding", bindingName, "destination", dest)
+			c.logger.V(4).Info("Enqueuing reference to Binding that depends on changed destination properties", "binding", bindingName, "destination", dest)
 			c.workqueue.Add(bindingName)
 		}
 	}
@@ -532,7 +531,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	if err != nil {
 		return fmt.Errorf("failed to build wrapped object(s) from Binding '%s' - %w", binding.GetName(), err)
 	}
-	if binding.Status.ObservedGeneration != binding.Generation || !util.SliceEqual(binding.Status.Errors, bindingErrors) {
+	if binding.Status.ObservedGeneration != binding.Generation || !a.SliceEqual(binding.Status.Errors, bindingErrors) {
 		bindingCopy := binding.DeepCopy()
 		bindingCopy.Status = v1alpha1.BindingStatus{
 			ObservedGeneration: binding.Generation,
@@ -615,7 +614,7 @@ func (c *genericTransportController) computeDestToWrappedObjects(ctx context.Con
 			}
 			asMap[dest] = wrappedObject
 		}
-		destToWrappedObject = util.PrimitiveMapGet(asMap)
+		destToWrappedObject = a.PrimitiveMapGet(asMap)
 	} else {
 		wrappedObject, err := c.wrap(objectsToPropagate, binding)
 		if err != nil {
@@ -693,10 +692,10 @@ func (c *genericTransportController) wrap(objectsToPropagate []*unstructured.Uns
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 	}
-	// wrapped object name is (PlacementDecision.GetName()-WdsName).
-	// pay attention - we cannot use the PlacementDecision object name, cause we might have duplicate names coming from different WDS spaces.
+	// wrapped object name is (Binding.GetName()-WdsName).
+	// pay attention - we cannot use the Binding object name, cause we might have duplicate names coming from different WDS spaces.
 	// we add WdsName to the object name to assure name uniqueness,
-	// in order to easily get the origin PlacementDecision object name and wds, we add it as an annotations.
+	// in order to easily get the origin Binding object name and wds, we add it as an annotations.
 	wrappedObject.SetName(fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName))
 	setLabel(wrappedObject, originOwnerReferenceLabel, binding.GetName())
 	setLabel(wrappedObject, originWdsLabel, c.wdsName)

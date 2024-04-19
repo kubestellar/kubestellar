@@ -33,3 +33,15 @@ func SliceCopy[Elt any](input []Elt) []Elt {
 	}
 	return append(make([]Elt, 0, len(input)), input...)
 }
+
+func SliceEqual[Elt comparable](slice1, slice2 []Elt) bool {
+	if len(slice1) != len(slice2) {
+		return false
+	}
+	for idx, elt1 := range slice1 {
+		if elt1 != slice2[idx] {
+			return false
+		}
+	}
+	return true
+}
