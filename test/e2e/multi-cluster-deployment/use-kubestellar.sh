@@ -58,6 +58,9 @@ kind: Deployment
 metadata:
   name: nginx-deployment
   namespace: nginx
+  annotations:
+    control.kubestellar.io/expand-templates: "true"
+    customization-test: "cluster {{ .clusterName }} URL is {{ .clusterURL }}, region is {{ .region }}"
   labels:
     app.kubernetes.io/name: nginx
 spec:
@@ -102,3 +105,10 @@ wait-for-cmd 'kubectl --context cluster1 get deployments -n nginx nginx-deployme
 : "Waiting for deployment on cluster2"
 wait-for-cmd 'kubectl --context cluster2 get deployments -n nginx nginx-deployment'
 : "SUCCESS: confirmed deployments on both cluster1 and cluster2."
+
+:
+: -------------------------------------------------------------------------
+: "Verify that the customization has been done"
+[ "$(kubectl --context cluster1 get deploy -n nginx nginx-deployment -o 'jsonpath={.metadata.annotations.customization-test}')" = "cluster cluster1 URL is https://my.clusters/1001-abcd, region is east" ]
+[ "$(kubectl --context cluster2 get deploy -n nginx nginx-deployment -o 'jsonpath={.metadata.annotations.customization-test}')" = "cluster cluster2 URL is https://my.clusters/2002-cdef, region is west" ]
+: "SUCCESS: confirmed template expansions"

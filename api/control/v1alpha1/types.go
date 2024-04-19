@@ -20,6 +20,42 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// TemplateExpansionAnnotationKey, when paired with the value "true" in an annotation of
+// a workload object in a WDS, indicates that Go template expansion should be
+// bundled with propagation from core to WEC.
+//
+// Go template expansion means to (1) parse each leaf string of the object as a Go template
+// as defined in the Go standard package "text/template", and (2) for each WEC, replace that
+// leaf string with the string that results from expanding this template
+// (`Template.Execute`) using properties of the WEC.
+//
+// The properties for a given WEC are collected from the following four sources, in order.
+// For a property defined by multiple sources, the first one in this order takes precedence.
+// The first source is a ConfigMap object, if it exists, that: (a) has the same name as the WEC's
+// inventory object, (b) is in the namespace named "customization-properties", and (c) is
+// in the Inventory and Transport Space (ITS). In particular, the string and binary data entries
+// whose name is valid as a Go language identifier provide properties.
+// The second source is the annotations of the WEC's inventory object,
+// when the name (AKA key) of that annotation is valid as a Go language identifier.
+// The third source is the labels of the WEC's inventory object,
+// when the name (AKA key) of that label is valid as a Go language identifier.
+// The fourth source is some built-in definitions, of which there is presently just one:
+// the value of the property named "clusterName" is the name of the WEC's inventory object.
+//
+// Any failure in any template expansion for a given Binding suppresses propagation of
+// desired state from that Binding; the previosly propagated desired state from that Binding,
+// if any, remains in place in the WEC.
+//
+// Note that this sort of customization has limited applicability.  It can only be used where
+// the un-expanded string passes the validation conditions of the relevant object type.
+// For more broadly applicable customization, see Customizer objects.
+
+const TemplateExpansionAnnotationKey string = "control.kubestellar.io/expand-templates"
+
+// PropertyConfigMapNamespace is the namespace in the ITS that holds ConfigMap objects that provide
+// WEC properties to be used in customization.
+const PropertyConfigMapNamespace = "customization-properties"
+
 // BindingPolicySpec defines the desired state of BindingPolicy
 type BindingPolicySpec struct {
 	// `clusterSelectors` identifies the relevant Cluster objects in terms of their labels.
@@ -178,6 +214,7 @@ type BindingPolicyList struct {
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster,shortName={bdg}
 type Binding struct {
 	metav1.TypeMeta `json:",inline"`
@@ -189,6 +226,8 @@ type Binding struct {
 	// `spec` explicitly describes a desired binding between workloads and Locations.
 	// It reflects the resolution of a BindingPolicy's selectors.
 	Spec BindingSpec `json:"spec,omitempty"`
+
+	Status BindingStatus `json:"status,omitempty"`
 }
 
 // BindingSpec holds a list of object references with their associated resource versions,
@@ -244,6 +283,11 @@ type ClusterScopeDownsyncObject struct {
 // Destination wraps the identifiers required to uniquely identify a destination cluster.
 type Destination struct {
 	ClusterId string `json:"clusterId,omitempty"`
+}
+
+type BindingStatus struct {
+	ObservedGeneration int64    `json:"observedGeneration"`
+	Errors             []string `json:"errors,omitempty"`
 }
 
 // BindingList is the API type for a list of Binding
