@@ -518,12 +518,8 @@ func (c *genericTransportController) syncCustomTransform(ctx context.Context, na
 		logger.Error(err, "Failed to Get from CustomTransformLister", "name", name)
 		ct = nil
 	}
-	c.customTransformCollection.noteCustomTransform(ctx, name, ct)
+	c.customTransformCollection.NoteCustomTransform(ctx, name, ct)
 	return nil
-}
-
-func ctSpecGroupResource(spec v1alpha1.CustomTransformSpec) metav1.GroupResource {
-	return metav1.GroupResource{Group: spec.APIGroup, Resource: spec.Resource}
 }
 
 // syncBinding compares the actual state with the desired, and attempts to converge actual state to the desired state.
@@ -555,7 +551,7 @@ func isObjectBeingDeleted(object metav1.Object) bool {
 }
 
 func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx context.Context, binding *v1alpha1.Binding) error {
-	c.customTransformCollection.setBindingGroupResources(binding.Name, sets.New[metav1.GroupResource]())
+	c.customTransformCollection.SetBindingGroupResources(binding.Name, sets.New[metav1.GroupResource]())
 	for _, destination := range binding.Spec.Destinations {
 		if err := c.deleteWrappedObject(ctx, destination.ClusterId, fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName)); err != nil {
 			// wrapped object name is in the format (Binding.GetName()-WdsName). see updateWrappedObject func for explanation.
@@ -619,7 +615,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 			klog.FromContext(ctx).V(3).Info("Updated BindingStatus", "bindingName", binding.Name, "resourceVersion", binding2.ResourceVersion)
 		}
 	}
-	c.customTransformCollection.setBindingGroupResources(binding.Name, groupResources)
+	c.customTransformCollection.SetBindingGroupResources(binding.Name, groupResources)
 	// converge actual state to the desired state
 	if err := c.propagateWrappedObjectToClusters(ctx, destToDesiredWrappedObject, currentWrappedObjectList, binding.Spec.Destinations, len(bindingErrors) != 0); err != nil {
 		return fmt.Errorf("failed to propagate wrapped object(s) for binding '%s' to all required WECs - %w", binding.GetName(), err)
@@ -647,7 +643,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 		}
 		gr := metav1.GroupResource{Group: clusterScopedObject.GroupVersionResource.Group, Resource: clusterScopedObject.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		objectsToPropagate = append(objectsToPropagate, c.customTransformCollection.cleanObject(ctx, gr, object, binding.Name))
+		objectsToPropagate = append(objectsToPropagate, c.customTransformCollection.TransformObject(ctx, gr, object, binding.Name))
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, namespaceScopedObject := range binding.Spec.Workload.NamespaceScope {
@@ -659,7 +655,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 		}
 		gr := metav1.GroupResource{Group: namespaceScopedObject.GroupVersionResource.Group, Resource: namespaceScopedObject.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		objectsToPropagate = append(objectsToPropagate, c.customTransformCollection.cleanObject(ctx, gr, object, binding.Name))
+		objectsToPropagate = append(objectsToPropagate, c.customTransformCollection.TransformObject(ctx, gr, object, binding.Name))
 	}
 
 	return objectsToPropagate, groupResources, nil
@@ -1055,8 +1051,14 @@ func setLabel(object metav1.Object, key string, value any) {
 	object.SetLabels(labels)
 }
 
-// cleanObject is a function to clean object before adding it to a wrapped object. these fields shouldn't be propagated to WEC.
-func (ctc *customTransformCollection) cleanObject(ctx context.Context, groupResource metav1.GroupResource, object *unstructured.Unstructured, bindingName string) *unstructured.Unstructured {
+// TransformObject does the WEC-independent transformation of a workload object.
+// This is done before customization and wrapping.
+// Currently the only transformations are removing content.
+// There are three sorts of content removal done here:
+// 1. Removal that is common for all API objects;
+// 2. Removal that is specific to a Kind of object and fixed in KubeStellar code;
+// 3. Removal that is specific to a Kind of object and configured by API object(s).
+func (ctc *customTransformCollection) TransformObject(ctx context.Context, groupResource metav1.GroupResource, object *unstructured.Unstructured, bindingName string) *unstructured.Unstructured {
 	objectCopy := object.DeepCopy() // don't modify object directly. create a copy before zeroing fields
 	objectCopy.SetManagedFields(nil)
 	objectCopy.SetFinalizers(nil)
@@ -1077,7 +1079,7 @@ func (ctc *customTransformCollection) cleanObject(ctx context.Context, groupReso
 	// clean fields specific to the concrete object.
 	objectsFilter.CleanObjectSpecifics(objectCopy)
 
-	ctd := ctc.getCustomTransformData(ctx, groupResource, bindingName)
+	ctd := ctc.GetCustomTransformData(ctx, groupResource, bindingName)
 
 	if len(ctd.removes) > 0 {
 		objectData := objectCopy.UnstructuredContent()

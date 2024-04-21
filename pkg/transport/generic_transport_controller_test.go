@@ -276,7 +276,7 @@ func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.
 			groupResource := metav1.GroupResource{Group: groupKind.Group, Resource: resource}
 			// clean expected object since transport objects are cleaned
 			uncleanedExpectedObj := &unstructured.Unstructured{Object: expectedObj}
-			cleanedExpectedObjU := tt.ctc.cleanObject(tt.ctx, groupResource, uncleanedExpectedObj, tt.bindingName)
+			cleanedExpectedObjU := tt.ctc.TransformObject(tt.ctx, groupResource, uncleanedExpectedObj, tt.bindingName)
 			cleanedExpectedObj := cleanedExpectedObjU.Object
 			cleanable := obj.GetKind() == "ClusterRole"
 			hadLabel := uncleanedExpectedObj.GetLabels()["test.kubestellar.io/delete-me"] != ""
