@@ -282,6 +282,8 @@ type genericTransportController struct {
 	wdsDynamicClient dynamic.Interface
 	wdsName          string
 
+	customTransformCollection *customTransformCollection
+
 	propsMutex sync.Mutex
 
 	// bindingSensitiveDestinations maps Binding name to the set of destinations whose properties the Binding is senstive to.
@@ -295,8 +297,6 @@ type genericTransportController struct {
 	// deletion of the destination's property ConfigMap.
 	// Every `clusterProperties` that appears here is immutable from the time that it arrived.
 	destinationProperties map[v1alpha1.Destination]clusterProperties
-
-	*customTransformCollection
 }
 
 // enqueueBinding takes an Binding resource and
