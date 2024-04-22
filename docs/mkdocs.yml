@@ -36,7 +36,7 @@ nav:
       - Landing: index.md 
   - Overview:
       - Readme: readme.md
-      - User guide: user-guide.md
+      - User guide: direct/user-guide.md
       - Architecture: direct/architecture.md
       - Release-notes: direct/release-notes.md
   - Getting Started: 
