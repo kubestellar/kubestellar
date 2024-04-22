@@ -30,8 +30,20 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/jsonpath"
 )
 
-// customTransformCollection digests CustomTransform objects and caches the results.
-type customTransformCollection struct {
+type customTransformCollection interface {
+	getCustomTransformChanges(ctx context.Context, groupResource metav1.GroupResource, bindingName string) customTransformChanges
+
+	noteCustomTransform(ctx context.Context, name string, ct *v1alpha1.CustomTransform)
+
+	setBindingGroupResources(bindingName string, newGroupResources sets.Set[metav1.GroupResource])
+}
+
+type customTransformChanges struct {
+	removes []jsonpath.Query // immutable
+}
+
+// customTransformCollectionImpl digests CustomTransform objects and caches the results.
+type customTransformCollectionImpl struct {
 	// client is here for updating the status of a CustomTransform
 	client controlclient.CustomTransformInterface
 
@@ -65,6 +77,8 @@ type customTransformCollection struct {
 	bindingNameToGroupResources map[string]sets.Set[metav1.GroupResource]
 }
 
+var _ customTransformCollection = &customTransformCollectionImpl{}
+
 // groupResourceTransformData is the ingested custom transforms for a given GroupResource
 type groupResourceTransformData struct {
 	bindingsThatCare sets.Set[string /*Binding name*/] // not empty
@@ -72,12 +86,8 @@ type groupResourceTransformData struct {
 	changes          customTransformChanges
 }
 
-type customTransformChanges struct {
-	removes []jsonpath.Query // immutable
-}
-
-func newCustomTransformCollection(client controlclient.CustomTransformInterface, getTransformObjects func(indexName, indexedValue string) ([]any, error), enqueue func(any)) *customTransformCollection {
-	return &customTransformCollection{
+func newCustomTransformCollection(client controlclient.CustomTransformInterface, getTransformObjects func(indexName, indexedValue string) ([]any, error), enqueue func(any)) customTransformCollection {
+	return &customTransformCollectionImpl{
 		client:                      client,
 		getTransformObjects:         getTransformObjects,
 		enqueue:                     enqueue,
@@ -92,7 +102,7 @@ func newCustomTransformCollection(client controlclient.CustomTransformInterface,
 // This method returns a cached answer if one is available, otherwise
 // digests the relevant CustomTransform object(s) and caches the result.
 // Always records the fact that the given binding depends on the answer.
-func (ctc *customTransformCollection) GetCustomTransformChanges(ctx context.Context, groupResource metav1.GroupResource, bindingName string) customTransformChanges {
+func (ctc *customTransformCollectionImpl) getCustomTransformChanges(ctx context.Context, groupResource metav1.GroupResource, bindingName string) customTransformChanges {
 	logger := klog.FromContext(ctx)
 	ctc.mutex.Lock()
 	defer ctc.mutex.Unlock()
@@ -132,7 +142,7 @@ func (ctc *customTransformCollection) GetCustomTransformChanges(ctx context.Cont
 // digestCustomTransformLocked digests one CustomTransform on behalf of one Binding.
 // Caller asserts that grToTransformData does not have an entry for this GroupResource.
 // Caller asserts that the ctc's mutex is locked.
-func (ctc *customTransformCollection) digestCustomTransformLocked(ctx context.Context, groupResource metav1.GroupResource, bindingName string, ct *v1alpha1.CustomTransform) []jsonpath.Query {
+func (ctc *customTransformCollectionImpl) digestCustomTransformLocked(ctx context.Context, groupResource metav1.GroupResource, bindingName string, ct *v1alpha1.CustomTransform) []jsonpath.Query {
 	removes := ctc.parseRemovesAndUpdateStatus(ctx, ct)
 	// Invalidate cache if ct.Spec changed its .Group or .Resource since last processed in this method
 	oldSpec, had := ctc.ctNameToSpec[ct.Name]
@@ -152,7 +162,7 @@ func ctSpecGroupResource(spec v1alpha1.CustomTransformSpec) metav1.GroupResource
 	return metav1.GroupResource{Group: spec.APIGroup, Resource: spec.Resource}
 }
 
-func (ctc *customTransformCollection) parseRemovesAndUpdateStatus(ctx context.Context, ct *v1alpha1.CustomTransform) (removes []jsonpath.Query) {
+func (ctc *customTransformCollectionImpl) parseRemovesAndUpdateStatus(ctx context.Context, ct *v1alpha1.CustomTransform) (removes []jsonpath.Query) {
 	logger := klog.FromContext(ctx)
 	ctCopy := ct.DeepCopy()
 	ctCopy.Status = v1alpha1.CustomTransformStatus{ObservedGeneration: ct.Generation}
@@ -181,7 +191,7 @@ func (ctc *customTransformCollection) parseRemovesAndUpdateStatus(ctx context.Co
 // triggerBindingName, if not empty, is the name of the Binding being processed when this change was noticed.
 // reason and extraLogArgs go into the debug log statements.
 // Caller asserts that the ctc's mutex is locked.
-func (ctc *customTransformCollection) invalidateCacheEntryLocked(ctx context.Context, shouldHave bool, ctName, triggerBindingName string, oldGroupResource metav1.GroupResource, reason string, extraLogArgs ...any) {
+func (ctc *customTransformCollectionImpl) invalidateCacheEntryLocked(ctx context.Context, shouldHave bool, ctName, triggerBindingName string, oldGroupResource metav1.GroupResource, reason string, extraLogArgs ...any) {
 	logger := klog.FromContext(ctx)
 	oldGRTransformData, had := ctc.grToTransformData[oldGroupResource]
 	if !had {
@@ -203,11 +213,11 @@ func (ctc *customTransformCollection) invalidateCacheEntryLocked(ctx context.Con
 	}
 }
 
-// NoteCustomTransform is the work that the customTransformCollection has to do
+// noteCustomTransform is the work that the customTransformCollection has to do
 // in order to react to a notification of a create/update/delete of a CustomTransform.
 // This method will invalidate the cache entry(s) for the given CustomTransform if
 // it changed since its contents contributed to that cache entry.
-func (ctc *customTransformCollection) NoteCustomTransform(ctx context.Context, name string, ct *v1alpha1.CustomTransform) {
+func (ctc *customTransformCollectionImpl) noteCustomTransform(ctx context.Context, name string, ct *v1alpha1.CustomTransform) {
 	ctc.mutex.Lock()
 	defer ctc.mutex.Unlock()
 	oldSpec, hadSpec := ctc.ctNameToSpec[name]
@@ -236,9 +246,9 @@ func (ctc *customTransformCollection) NoteCustomTransform(ctx context.Context, n
 	delete(ctc.ctNameToSpec, name)
 }
 
-// SetBindingGroupResources updates the customTransformCollection with the knowledge of the full set of GroupResources that
+// setBindingGroupResources updates the customTransformCollection with the knowledge of the full set of GroupResources that
 // a given Binding depends on.
-func (ctc *customTransformCollection) SetBindingGroupResources(bindingName string, newGroupResources sets.Set[metav1.GroupResource]) {
+func (ctc *customTransformCollectionImpl) setBindingGroupResources(bindingName string, newGroupResources sets.Set[metav1.GroupResource]) {
 	ctc.mutex.Lock()
 	defer ctc.mutex.Unlock()
 	oldGroupResources := ctc.bindingNameToGroupResources[bindingName]

@@ -237,7 +237,7 @@ type testTransport struct {
 	t              *testing.T
 	ctx            context.Context
 	bindingName    string
-	ctc            *customTransformCollection
+	ctc            customTransformCollection
 	kindToResource map[metav1.GroupKind]string
 
 	expect map[util.GVKObjRef]jsonMap
