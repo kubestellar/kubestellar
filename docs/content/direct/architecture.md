@@ -513,23 +513,23 @@ The cache maintains the following invariants on those relations. Note how these 
 
 Whenever it removes a row from INSTRUCTIONS due to loss of confidence in that row, the cache has the controller enqueue a reference to every related `Binding` from USES, so that eventually a revised row will be derived and applied to every dependent `Binding`.
 
-This cache is represented by the data structure in a `customTransformCollection`. This represents those relations as follows.
+The interface to the cache is `customTransformCollection` and the implementation is in a `*customTransformCollectionImpl`. This represents those relations as follows.
 
 1. USES is represented by two indices, each a map from one column value to the set of related other column values. The two indices are in `bindingNameToGroupResources` and `grToTransformData/bindingsThatCare`.
 1. INSTRUCTIONS is represented by `grToTransformData/removes`.
 1. SPECS is represented by `ctNameToSpec` and an index, `grToTransformData/ctNames`.
 
-The cache has the following entry points.
+The cache interface has the following methods.
 
-- `func (*customTransformCollection) GetCustomTransformChanges` ensures that the cache has an entry for a given usage (a (`Binding`, `GroupResource`) pair) and returns the corresponding instructions (i.e., set of JSONPath to remove) for that `GroupResource`. This method sets the status of each `CustomTransform` API object that it processes.
+- `getCustomTransformChanges` ensures that the cache has an entry for a given usage (a (`Binding`, `GroupResource`) pair) and returns the corresponding instructions (i.e., set of JSONPath to remove) for that `GroupResource`. This method sets the status of each `CustomTransform` API object that it processes.
 
     Of course this method maintains the cache's invariants. That means adding rows to SPECS as necessary. It also means removing a row from INSTRUCTIONS upon discovery that a `CustomTransform`'s Spec has changed its `GroupResource`. Note that the cache's invariants require this removal by this method, not relying on an eventual call to `NoteCustomTransform` (because the cache records at most the latest Spec for each `CustomTransform`, a later cache operation will not know about the previous `GroupResource`).
 
     Removing a row from INSTRUCTIONS also entails removing the corresponding rows from SPECs, to maintain the cache's invariants.
 
-- `func (ctc *customTransformCollection) NoteCustomTransform` reacts to a create/update/delete of a `CustomTransform` object. In the update case, if the `CustomResourceSpec` changed its `GroupResource` then this method removes two rows from INSTRUCTIONS (if they were present): the one for the old `GroupResource` and the one for the new. In case of create, delete, or other change in Spec, this method removes the one relevant row (if present) in INSTRUCTIONS.
+- `noteCustomTransform` reacts to a create/update/delete of a `CustomTransform` object. In the update case, if the `CustomResourceSpec` changed its `GroupResource` then this method removes two rows from INSTRUCTIONS (if they were present): the one for the old `GroupResource` and the one for the new. In case of create, delete, or other change in Spec, this method removes the one relevant row (if present) in INSTRUCTIONS.
 
-- `func (ctc *customTransformCollection) SetBindingGroupResources` reacts to knowing the full set of `GroupResource` that a given `Binding` uses. This removes outdated rows from USES (updates the two indices that represent it) and removes rows from INSTRUCTIONS that are no longer allowed.
+- `setBindingGroupResources` reacts to knowing the full set of `GroupResource` that a given `Binding` uses. This removes outdated rows from USES (updates the two indices that represent it) and removes rows from INSTRUCTIONS that are no longer allowed.
 
 #### Customization properties cache
 
