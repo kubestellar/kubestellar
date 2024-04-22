@@ -50,7 +50,7 @@ In a `Job` (API group `batch`) object, remove the following things.
 
 The user can configure additional transformations of workload objects by putting `CustomTransform` (in the `control.kubestellar.io` API group) objects in the WDS. Each `CustomTransform` object binds to certain workload objects and specifies certain transformations.
 
-Currently the binding is simply by naming the workload object's API group and "resource" name in the `Customtransform`'s `spec`. The transformations from all of the bound `CustomTransform` objects are applied to the workload object. There should be at most one `CustomTransform` object that specifies a given API group and resource.
+Currently the binding is simply by naming the workload object's API group and "resource" name in the `CustomTransform`'s `spec`. The transformations from all of the bound `CustomTransform` objects are applied to the workload object. There should be at most one `CustomTransform` object that specifies a given API group and resource.
 
 Currently the only available transformations are removals of specified content. The content to be removed is identified by a small subset of JSONPath. In this subset, the only available operators are `.someName` and `["some string"]`. The allowed names and strings are as specified in [RFC 9535](https://www.rfc-editor.org/rfc/rfc9535.html), except that only double-quoted strings are allowed.
 
