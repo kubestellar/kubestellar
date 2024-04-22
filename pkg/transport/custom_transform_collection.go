@@ -68,7 +68,11 @@ type customTransformCollection struct {
 // groupResourceTransformData is the ingested custom transforms for a given GroupResource
 type groupResourceTransformData struct {
 	bindingsThatCare sets.Set[string /*Binding name*/] // not empty
-	removes          []jsonpath.Query
+	changes          customTransformChanges
+}
+
+type customTransformChanges struct {
+	removes []jsonpath.Query // immutable
 }
 
 func newCustomTransformCollection(client controlclient.CustomTransformInterface, getTransformObjects func(indexName, indexedValue string) ([]any, error), enqueue func(any)) *customTransformCollection {
@@ -87,14 +91,14 @@ func newCustomTransformCollection(client controlclient.CustomTransformInterface,
 // This method returns a cached answer if one is available, otherwise
 // digests the relevant CustomTransform object(s) and caches the result.
 // Always records the fact that the given binding depends on the answer.
-func (ctc *customTransformCollection) GetCustomTransformData(ctx context.Context, groupResource metav1.GroupResource, bindingName string) *groupResourceTransformData {
+func (ctc *customTransformCollection) GetCustomTransformChanges(ctx context.Context, groupResource metav1.GroupResource, bindingName string) customTransformChanges {
 	logger := klog.FromContext(ctx)
 	ctc.mutex.Lock()
 	defer ctc.mutex.Unlock()
 	grTransformData, ok := ctc.grToTransformData[groupResource]
 	if ok {
 		grTransformData.bindingsThatCare.Insert(bindingName)
-		return grTransformData
+		return grTransformData.changes
 	}
 	grTransformData = &groupResourceTransformData{
 		bindingsThatCare: sets.New(bindingName),
@@ -114,14 +118,14 @@ func (ctc *customTransformCollection) GetCustomTransformData(ctx context.Context
 	for _, ctAny := range ctAnys {
 		ct := ctAny.(*v1alpha1.CustomTransform)
 		removes := ctc.digestCustomTransformLocked(ctx, groupResource, bindingName, ct)
-		grTransformData.removes = append(grTransformData.removes, removes...)
+		grTransformData.changes.removes = append(grTransformData.changes.removes, removes...)
 		ctNames = append(ctNames, ct.Name)
 	}
 	if len(ctAnys) > 1 { // This is not recommended
 		logger.Error(nil, "Multiple CustomTransform objects apply to one GroupResource", "groupResource", groupResource, "names", ctNames)
 	}
 	ctc.grToTransformData[groupResource] = grTransformData
-	return grTransformData
+	return grTransformData.changes
 }
 
 // digestCustomTransformLocked digests one CustomTransform on behalf of one Binding.

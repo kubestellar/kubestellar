@@ -643,7 +643,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 		}
 		gr := metav1.GroupResource{Group: clusterScopedObject.GroupVersionResource.Group, Resource: clusterScopedObject.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		objectsToPropagate = append(objectsToPropagate, c.customTransformCollection.TransformObject(ctx, gr, object, binding.Name))
+		objectsToPropagate = append(objectsToPropagate, TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name))
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, namespaceScopedObject := range binding.Spec.Workload.NamespaceScope {
@@ -655,7 +655,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 		}
 		gr := metav1.GroupResource{Group: namespaceScopedObject.GroupVersionResource.Group, Resource: namespaceScopedObject.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		objectsToPropagate = append(objectsToPropagate, c.customTransformCollection.TransformObject(ctx, gr, object, binding.Name))
+		objectsToPropagate = append(objectsToPropagate, TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name))
 	}
 
 	return objectsToPropagate, groupResources, nil
@@ -1058,7 +1058,7 @@ func setLabel(object metav1.Object, key string, value any) {
 // 1. Removal that is common for all API objects;
 // 2. Removal that is specific to a Kind of object and fixed in KubeStellar code;
 // 3. Removal that is specific to a Kind of object and configured by API object(s).
-func (ctc *customTransformCollection) TransformObject(ctx context.Context, groupResource metav1.GroupResource, object *unstructured.Unstructured, bindingName string) *unstructured.Unstructured {
+func TransformObject(ctx context.Context, ctc *customTransformCollection, groupResource metav1.GroupResource, object *unstructured.Unstructured, bindingName string) *unstructured.Unstructured {
 	objectCopy := object.DeepCopy() // don't modify object directly. create a copy before zeroing fields
 	objectCopy.SetManagedFields(nil)
 	objectCopy.SetFinalizers(nil)
@@ -1079,13 +1079,13 @@ func (ctc *customTransformCollection) TransformObject(ctx context.Context, group
 	// clean fields specific to the concrete object.
 	objectsFilter.CleanObjectSpecifics(objectCopy)
 
-	ctd := ctc.GetCustomTransformData(ctx, groupResource, bindingName)
+	customChanges := ctc.GetCustomTransformChanges(ctx, groupResource, bindingName)
 
-	if len(ctd.removes) > 0 {
+	if len(customChanges.removes) > 0 {
 		objectData := objectCopy.UnstructuredContent()
 		var objectDataAny any = objectData
 		rootNode := jsonpath.RootNode{Value: &objectDataAny}
-		for _, query := range ctd.removes {
+		for _, query := range customChanges.removes {
 			jsonpath.QueryValue(query, &rootNode, jsonpath.Node.Remove)
 		}
 		objectCopy.SetUnstructuredContent(objectData)
