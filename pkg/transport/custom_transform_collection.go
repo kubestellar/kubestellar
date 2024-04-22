@@ -68,6 +68,7 @@ type customTransformCollection struct {
 // groupResourceTransformData is the ingested custom transforms for a given GroupResource
 type groupResourceTransformData struct {
 	bindingsThatCare sets.Set[string /*Binding name*/] // not empty
+	ctNames          sets.Set[string /* CustomTransform name*/]
 	changes          customTransformChanges
 }
 
@@ -102,6 +103,7 @@ func (ctc *customTransformCollection) GetCustomTransformChanges(ctx context.Cont
 	}
 	grTransformData = &groupResourceTransformData{
 		bindingsThatCare: sets.New(bindingName),
+		ctNames:          sets.New[string](),
 	}
 	ctKey := customTransformDomainKey(groupResource.Group, groupResource.Resource)
 	ctAnys, err := ctc.getTransformObjects(customTransformDomainIndexName, ctKey)
@@ -111,7 +113,6 @@ func (ctc *customTransformCollection) GetCustomTransformChanges(ctx context.Cont
 		// If it does, retry will not help.
 		logger.Error(err, "Failed to get objects from CustomTransform domain index", "key", ctKey)
 	}
-	ctNames := []string{}
 
 	// Digest each relevant CustomTransform, accumulating remove instructions in groupResourceTransformData.removes.
 	// Invalidate cache entry for each CustomTransform that changed its Spec's .Group or .Resource.
@@ -119,10 +120,10 @@ func (ctc *customTransformCollection) GetCustomTransformChanges(ctx context.Cont
 		ct := ctAny.(*v1alpha1.CustomTransform)
 		removes := ctc.digestCustomTransformLocked(ctx, groupResource, bindingName, ct)
 		grTransformData.changes.removes = append(grTransformData.changes.removes, removes...)
-		ctNames = append(ctNames, ct.Name)
+		grTransformData.ctNames.Insert(ct.Name)
 	}
 	if len(ctAnys) > 1 { // This is not recommended
-		logger.Error(nil, "Multiple CustomTransform objects apply to one GroupResource", "groupResource", groupResource, "names", ctNames)
+		logger.Error(nil, "Multiple CustomTransform objects apply to one GroupResource", "groupResource", groupResource, "names", grTransformData.ctNames)
 	}
 	ctc.grToTransformData[groupResource] = grTransformData
 	return grTransformData.changes
@@ -196,6 +197,9 @@ func (ctc *customTransformCollection) invalidateCacheEntryLocked(ctx context.Con
 		}
 		logger.V(5).Info("Enqueuing reference to Binding because "+reason, append(extraLogArgs, "bindingName", bindingName, "customTransformName", ctName, "oldGroupResource", oldGroupResource))
 		ctc.enqueue(bindingName)
+	}
+	for ctName := range oldGRTransformData.ctNames {
+		delete(ctc.ctNameToSpec, ctName)
 	}
 }
 
