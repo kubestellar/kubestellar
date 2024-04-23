@@ -2,8 +2,10 @@ name: Greetings
 
 on:
   pull_request_target:
+    # No need on most types
     types: [opened, reopened]
   issues:
+    # No need on most types
     types: [opened, reopened]
 
 jobs:
