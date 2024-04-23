@@ -6,7 +6,7 @@ The kubestellar controller-manager will be invoked with `-v=2` unless otherwise 
 
 The transport controller will be invoked with `-v=4` unless othewise specified on the command line with `--transport-controller-verbosity $number`.
 
-## Running the test using a script
+## Running the test on three new Kind clusters
 
 Starting from a local directory containing the git repo, do the following.
 
@@ -15,12 +15,10 @@ cd test/e2e/multi-cluster-deployment
 ./run-test.sh
 ```
 
-## Running the test in OCP cluster
+## Running the test in three existing OCP clusters
 
 
-1. Create a kubeconfig with contexts for the `kscore`, `cluster1` and `cluster2`:
-
-For example: 
+1. Create a kubeconfig with contexts for the `kscore`, `cluster1` and `cluster2`. The following shows what the result should look like.
 
 ```bash
 $ kubectl config get-contexts
