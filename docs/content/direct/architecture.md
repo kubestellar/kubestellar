@@ -504,7 +504,7 @@ Relation "SPECS": remembers the specs of `CustomTransform` objects.
 | ----------- | ---- | ------ |
 | ctName | string | yes |
 | gr | metav1.GroupResource | no |
-| removes | SET(jsonpath.Query) | no |
+| removes | SET(string) | no |
 
 The cache maintains the following invariants on those relations. Note how these invariants require removal of data that is no longer interesting.
 
