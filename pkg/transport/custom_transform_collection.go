@@ -30,11 +30,17 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/jsonpath"
 )
 
+// customTransformCollection digests CustomTransform objects and caches the results.
 type customTransformCollection interface {
+	// getCustomTransformChanges notes the use of the given GroupResource by the named Binding and
+	// returns the customTransformChanges to use for that GroupResource.
 	getCustomTransformChanges(ctx context.Context, groupResource metav1.GroupResource, bindingName string) customTransformChanges
 
+	// noteCustomTransform reacts to a notification of a create/update/delete of a CustomTransform.
 	noteCustomTransform(ctx context.Context, name string, ct *v1alpha1.CustomTransform)
 
+	// setBindingGroupResources updates the customTransformCollection with the knowledge of the full set of GroupResources that
+	// a given Binding depends on.
 	setBindingGroupResources(bindingName string, newGroupResources sets.Set[metav1.GroupResource])
 }
 
@@ -42,7 +48,7 @@ type customTransformChanges struct {
 	removes []jsonpath.Query // immutable
 }
 
-// customTransformCollectionImpl digests CustomTransform objects and caches the results.
+// customTransformCollectionImpl implements customTransformCollection
 type customTransformCollectionImpl struct {
 	// client is here for updating the status of a CustomTransform
 	client controlclient.CustomTransformInterface
@@ -97,8 +103,8 @@ func newCustomTransformCollection(client controlclient.CustomTransformInterface,
 	}
 }
 
-// GetCustomTransformData returns the groupResourceTransformData to use
-// for the given GroupResource on behalf of the named Binding.
+// getCustomTransformData returns the customTransformChanges to use
+// for the given GroupResource and notes that the result is relevant to the named Binding.
 // This method returns a cached answer if one is available, otherwise
 // digests the relevant CustomTransform object(s) and caches the result.
 // Always records the fact that the given binding depends on the answer.
@@ -139,7 +145,8 @@ func (ctc *customTransformCollectionImpl) getCustomTransformChanges(ctx context.
 	return grTransformData.changes
 }
 
-// digestCustomTransformLocked digests one CustomTransform on behalf of one Binding.
+// digestCustomTransformLocked digests one CustomTransform.
+// This done in the context of processing a Binding, whose name is a parameter (for the sake of logging).
 // Caller asserts that grToTransformData does not have an entry for this GroupResource.
 // Caller asserts that the ctc's mutex is locked.
 func (ctc *customTransformCollectionImpl) digestCustomTransformLocked(ctx context.Context, groupResource metav1.GroupResource, bindingName string, ct *v1alpha1.CustomTransform) []jsonpath.Query {
