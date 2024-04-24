@@ -1765,12 +1765,12 @@ on all WECs and sets the RBAC permissions for it using the OCM add-on framework.
 </li>
 <li>
 <p><em>OCM Agent</em>: This module registers the WEC to the OCM Hub, watches for 
-ManifestWorks and unwraps and syncs the objects into the WEC.</p>
+<a href="https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L17">ManifestWork.v1.work.open-cluster-management.io</a> objects and unwraps and syncs the objects into the WEC.</p>
 </li>
 <li>
-<p><em>OCM Status Add-On Agent</em>: This module watches <em>AppliedManifestWorks</em> 
+<p><em>OCM Status Add-On Agent</em>: This module watches <a href="https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L528">AppliedManifestWork.v1.work.open-cluster-management.io</a> objects 
 to find objects that are synced by the OCM agent, gets their status 
-and updates <em>WorkStatus</em> objects in the ITS namespace associated with the WEC.</p>
+and updates <code>WorkStatus</code> objects in the ITS namespace associated with the WEC.</p>
 </li>
 </ul>
 <p>
@@ -1817,7 +1817,7 @@ on the different types of control planes and architecture are described
 in the <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/architecture.md">KubeFlex Architecture</a>.</p>
 <p>There are currently two roles for spaces managed by KubeFlex: Inventory and Transport Space 
 (ITS) and Workload Description Space (WDS). The former runs the <a href="#ocm-cluster-manager">OCM Cluster Manager</a> on a vcluster-type control plane, and the latter runs on a k8s-type control plane.</p>
-<p>An ITS holds the inventory and the mailbox namespaces. The inventory is anchored by <code>ManagedCluster</code> objects that describe the WECs. For each WEC there may also be a <code>ConfigMap</code> object (in the <code>customization-properties</code> namespace) that carries additional properties of that WEC; this <code>ConfigMap</code> is used in customizing the workload to the WEC. The mailbox namespaces and their contents are transport implementation details that users do not need to deal with. Each mailbox namespace corresponds 1:1 with a WEC and holds <code>ManifestWork</code> objects managed by the central KubeStellar controllers.</p>
+<p>An ITS holds the inventory and the mailbox namespaces. The inventory is anchored by <a href="https://github.com/open-cluster-management-io/api/blob/v0.12.0/cluster/v1/types.go#L33">ManagedCluster.v1.cluster.open-cluster-management.io</a> objects that describe the WECs. For each WEC there may also be a <code>ConfigMap</code> object (in the <code>customization-properties</code> namespace) that carries additional properties of that WEC; this <code>ConfigMap</code> is used in customizing the workload to the WEC. The mailbox namespaces and their contents are transport implementation details that users do not need to deal with. Each mailbox namespace corresponds 1:1 with a WEC and holds <code>ManifestWork</code> objects managed by the central KubeStellar controllers.</p>
 <p>A WDS holds user workload objects and the user's objects that form the interface to KubeStellar control. 
 Currently, the user control objects are <code>BindingPolicy</code> and <code>Binding</code> objects.
 Future development may define more kinds of control objects hosted in the WDS.</p>
@@ -1856,13 +1856,13 @@ the add-on, manage the distribution of the add-on to all clusters, and set
 up the RBAC permissions required by the add-on agent to interact with the mailbox 
 namespace associated with the managed cluster. More specifically, the status 
 add-on controller sets up RBAC permissions to allow the add-on agent to 
-list and get <em>ManifestWork</em> objects and create and update <em>WorkStatus</em> objects.</p>
+list and get <code>ManifestWork</code> objects and create and update <em>WorkStatus</em> objects.</p>
 <h2 id="ocm-agent">OCM Agent<a class="headerlink" href="#ocm-agent" title="Permanent link">#</a></h2>
 <p>The OCM Agent Module (a.k.a klusterlet) has two main controllers: the <em>registration agent</em>
 and the <em>work agent</em>. </p>
 <p>The <strong>registration agent</strong> is responsible for registering 
-a new cluster into OCM. The agent creates an unaccepted <em>ManagedCluster</em> into 
-the hub cluster along with a temporary <em>CertificateSigningRequest</em> (CSR) resource. 
+a new cluster into OCM. The agent creates an unaccepted <a href="https://github.com/open-cluster-management-io/api/blob/v0.12.0/cluster/v1/types.go#L33">ManagedCluster</a> into 
+the hub cluster along with a temporary <a href="https://github.com/kubernetes/api/blob/v0.26.1/certificates/v1/types.go#L41">CertificateSigningRequest.v1.certificates</a> (CSR) object. 
 The cluster will be accepted by the hub control plane if the CSR is approved and 
 signed by any certificate provider setting filling <code>.status.certificate</code> with legit 
 X.509 certificates, and the ManagedCluster resource is approved by setting 
@@ -1880,7 +1880,7 @@ tracks the status of each manifest in the ManifestWork, and <em>conditions</em> 
 status of the ManifestWork. The work agent checks whether a resource is <em>Available</em>, 
 meaning the resource exists on the managed cluster, and <em>Applied</em>, meaning the resource 
 defined in ManifestWork has been applied to the managed cluster. To ensure the resources 
-applied by ManifestWork are reliably recorded, the work agent creates an <em>AppliedManifestWork</em> 
+applied by ManifestWork are reliably recorded, the work agent creates an <code>AppliedManifestWork</code> 
 on the managed cluster for each ManifestWork as an anchor for resources relating to ManifestWork. 
 When ManifestWork is deleted, the work agent runs a <em>Foreground</em> deletion, and that ManifestWork 
 will stay in deleting state until all its related resources have been fully cleaned in the managed 
@@ -1889,15 +1889,8 @@ cluster.</p>
 <p>The OCM Status Add-On Agent is a controller that runs alongside the OCM Agent 
 in the managed cluster. Its primary function is to track objects delivered 
 by the work agent and report the full status of those objects back to the ITS. 
-The KubeStellar controller can then use different user-defined summarization 
-policies to report status, such as the <code>wantSingletonReportedState</code> policy that reports 
-full status for each deployed object when the workload is delivered only to one 
-cluster. The controller watches <em>AppliedManifestWork</em> objects to determine which 
-objects have been delivered through the work agent. It then starts dynamic informers 
-to watch those objects, collect their individual statuses, and report back the status 
-updating <em>WorkStatus</em> objects in the namespace associated with the WEC in the ITS.
-Installing the status add-on cause status to be returned to <code>WorkStatus</code> 
-objects for all downsynced objects.</p>
+Other KubeStellar controller(s) then propagate and/or summarize that status information into the WDS. The OCM Status Add-On Agent watches <a href="https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L528">AppliedManifestWork.v1.work.open-cluster-management.io</a> objects in the WEC to observe the status reported there by the OCM Agent. Each <code>AppliedManifestWork</code> object is specific to one workload object, and holds both the local (in the WEC) status from that object and a reference to that object. For each <code>AppliedManifest</code>, the OCM Status Add-On Agent maintains a corresponding <code>WorkStatus</code> object in the relevant mailbox namespace in the ITS. Such a <code>WorkStatus</code> object also is about exactly one workload object, so that status updates for one object do not require updates of a whole bundle. A <code>WorkStatus</code> object holds the status of a workload object and a reference to that object. </p>
+<p>Installing the Status Add-On Agent in the WEC causes status to be returned to <code>WorkStatus</code> objects for all downsynced objects.</p>
 <h2 id="kubestellar-controllers-architecture">KubeStellar Controllers Architecture<a class="headerlink" href="#kubestellar-controllers-architecture" title="Permanent link">#</a></h2>
 <p>The KubeStellar controllers architecture is based on common patterns and best 
 practices for Kubernetes controllers, such as the 
@@ -2135,26 +2128,16 @@ has been deleted:</p>
   hashmap indexed by the GVR key.</li>
 </ul>
 <h3 id="status-controller">Status Controller<a class="headerlink" href="#status-controller" title="Permanent link">#</a></h3>
-<p>The status controller watches for <em>WorkStatus</em> objects on the ITS, and
+<p>The status controller watches for <code>WorkStatus</code> objects on the ITS, and
 for WDS objects propagated by a <code>BindingPolicy</code> with  the flag
 <code>wantSingletonReportedState</code> set to true, updates the status of those
 objects with the corresponding status found in the workstatus object.</p>
-<p>The <em>WorkStatus</em> objects are created and updated on the ITS by the status add-on.
-The high-level flow for the singleton status update is described in Figure 4.</p>
+<p>The <code>WorkStatus</code> objects are created and updated on the ITS by the OCM Status Add-On Agent described <a href="#ocm-status-add-on-agent">above</a>.</p>
+<p>The high-level flow for the singleton status update is described in Figure 4.</p>
 <p>
 <figure><img src="../images/status-controller.png" /><figcaption>Figure 4 - Status Controller</figcaption>
 </figure>
 </p>
-<p>The status add-on tracks objects applied by the work agent by watching 
-<em>AppliedManifestWork</em> objects. These objects list the GVR, name
-and namespace (the latter for namespaced objects) of each object applied
-by the related <em>ManifestWork</em>. The status add-on then uses this information 
-to ensure that a singleton informer is started for each GVR, 
-and to track status updates of each tracked object. The status add-on
-then creates/updates <em>WorkStatus</em> objects in the ITS with the status
-of tracked objects in the namespace associated with the WEC cluster.
-A <code>WorkStatus</code> object contains status for exactly one object, so that 
-status updates for one object do not require updates of a whole bundle. </p>
 <h3 id="transport-controller">Transport Controller<a class="headerlink" href="#transport-controller" title="Permanent link">#</a></h3>
 <p>The transport controller is pluggable and allows the option to plug different
 implementations of the transport interface. The interface between the plugin and the generic code is a Go language interface (in <code>pkg/transport/transport.go</code>) that the plugin has to implement. This interface requires the following from the plugin.</p>
