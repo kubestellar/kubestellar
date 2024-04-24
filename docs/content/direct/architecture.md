@@ -50,11 +50,11 @@ that are put in a mailbox namespace are delivered to the matching WEC.
 on all WECs and sets the RBAC permissions for it using the OCM add-on framework.
 
 - *OCM Agent*: This module registers the WEC to the OCM Hub, watches for 
-ManifestWorks and unwraps and syncs the objects into the WEC.
+[ManifestWork.v1.work.open-cluster-management.io](https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L17) objects and unwraps and syncs the objects into the WEC.
 
-- *OCM Status Add-On Agent*: This module watches *AppliedManifestWorks* 
+- *OCM Status Add-On Agent*: This module watches [AppliedManifestWork.v1.work.open-cluster-management.io](https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L528) objects 
 to find objects that are synced by the OCM agent, gets their status 
-and updates *WorkStatus* objects in the ITS namespace associated with the WEC.
+and updates `WorkStatus` objects in the ITS namespace associated with the WEC.
 
 ![Figure 2 - Main Modules](./images/main-modules.png)
 
@@ -102,7 +102,7 @@ in the [KubeFlex Architecture](https://github.com/kubestellar/kubeflex/blob/main
 There are currently two roles for spaces managed by KubeFlex: Inventory and Transport Space 
 (ITS) and Workload Description Space (WDS). The former runs the [OCM Cluster Manager](#ocm-cluster-manager) on a vcluster-type control plane, and the latter runs on a k8s-type control plane.
 
-An ITS holds the inventory and the mailbox namespaces. The inventory is anchored by `ManagedCluster` objects that describe the WECs. For each WEC there may also be a `ConfigMap` object (in the `customization-properties` namespace) that carries additional properties of that WEC; this `ConfigMap` is used in customizing the workload to the WEC. The mailbox namespaces and their contents are transport implementation details that users do not need to deal with. Each mailbox namespace corresponds 1:1 with a WEC and holds `ManifestWork` objects managed by the central KubeStellar controllers.
+An ITS holds the inventory and the mailbox namespaces. The inventory is anchored by [ManagedCluster.v1.cluster.open-cluster-management.io](https://github.com/open-cluster-management-io/api/blob/v0.12.0/cluster/v1/types.go#L33) objects that describe the WECs. For each WEC there may also be a `ConfigMap` object (in the `customization-properties` namespace) that carries additional properties of that WEC; this `ConfigMap` is used in customizing the workload to the WEC. The mailbox namespaces and their contents are transport implementation details that users do not need to deal with. Each mailbox namespace corresponds 1:1 with a WEC and holds `ManifestWork` objects managed by the central KubeStellar controllers.
 
 A WDS holds user workload objects and the user's objects that form the interface to KubeStellar control. 
 Currently, the user control objects are `BindingPolicy` and `Binding` objects.
@@ -147,7 +147,7 @@ the add-on, manage the distribution of the add-on to all clusters, and set
 up the RBAC permissions required by the add-on agent to interact with the mailbox 
 namespace associated with the managed cluster. More specifically, the status 
 add-on controller sets up RBAC permissions to allow the add-on agent to 
-list and get *ManifestWork* objects and create and update *WorkStatus* objects.
+list and get `ManifestWork` objects and create and update *WorkStatus* objects.
 
 ## OCM Agent
 
@@ -155,8 +155,8 @@ The OCM Agent Module (a.k.a klusterlet) has two main controllers: the *registrat
 and the *work agent*. 
 
 The **registration agent** is responsible for registering 
-a new cluster into OCM. The agent creates an unaccepted *ManagedCluster* into 
-the hub cluster along with a temporary *CertificateSigningRequest* (CSR) resource. 
+a new cluster into OCM. The agent creates an unaccepted [ManagedCluster](https://github.com/open-cluster-management-io/api/blob/v0.12.0/cluster/v1/types.go#L33) into 
+the hub cluster along with a temporary [CertificateSigningRequest.v1.certificates](https://github.com/kubernetes/api/blob/v0.26.1/certificates/v1/types.go#L41) (CSR) object. 
 The cluster will be accepted by the hub control plane if the CSR is approved and 
 signed by any certificate provider setting filling `.status.certificate` with legit 
 X.509 certificates, and the ManagedCluster resource is approved by setting 
@@ -175,7 +175,7 @@ tracks the status of each manifest in the ManifestWork, and *conditions* reflect
 status of the ManifestWork. The work agent checks whether a resource is *Available*, 
 meaning the resource exists on the managed cluster, and *Applied*, meaning the resource 
 defined in ManifestWork has been applied to the managed cluster. To ensure the resources 
-applied by ManifestWork are reliably recorded, the work agent creates an *AppliedManifestWork* 
+applied by ManifestWork are reliably recorded, the work agent creates an `AppliedManifestWork` 
 on the managed cluster for each ManifestWork as an anchor for resources relating to ManifestWork. 
 When ManifestWork is deleted, the work agent runs a *Foreground* deletion, and that ManifestWork 
 will stay in deleting state until all its related resources have been fully cleaned in the managed 
@@ -186,15 +186,9 @@ cluster.
 The OCM Status Add-On Agent is a controller that runs alongside the OCM Agent 
 in the managed cluster. Its primary function is to track objects delivered 
 by the work agent and report the full status of those objects back to the ITS. 
-The KubeStellar controller can then use different user-defined summarization 
-policies to report status, such as the `wantSingletonReportedState` policy that reports 
-full status for each deployed object when the workload is delivered only to one 
-cluster. The controller watches *AppliedManifestWork* objects to determine which 
-objects have been delivered through the work agent. It then starts dynamic informers 
-to watch those objects, collect their individual statuses, and report back the status 
-updating *WorkStatus* objects in the namespace associated with the WEC in the ITS.
-Installing the status add-on cause status to be returned to `WorkStatus` 
-objects for all downsynced objects.
+Other KubeStellar controller(s) then propagate and/or summarize that status information into the WDS. The OCM Status Add-On Agent watches [AppliedManifestWork.v1.work.open-cluster-management.io](https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L528) objects in the WEC to observe the status reported there by the OCM Agent. Each `AppliedManifestWork` object is specific to one workload object, and holds both the local (in the WEC) status from that object and a reference to that object. For each `AppliedManifest`, the OCM Status Add-On Agent maintains a corresponding `WorkStatus` object in the relevant mailbox namespace in the ITS. Such a `WorkStatus` object also is about exactly one workload object, so that status updates for one object do not require updates of a whole bundle. A `WorkStatus` object holds the status of a workload object and a reference to that object. 
+
+Installing the Status Add-On Agent in the WEC causes status to be returned to `WorkStatus` objects for all downsynced objects.
 
 ## KubeStellar Controllers Architecture
 
@@ -423,26 +417,16 @@ has been deleted:
 
 ### Status Controller
 
-The status controller watches for *WorkStatus* objects on the ITS, and
+The status controller watches for `WorkStatus` objects on the ITS, and
 for WDS objects propagated by a `BindingPolicy` with  the flag
 `wantSingletonReportedState` set to true, updates the status of those
 objects with the corresponding status found in the workstatus object.
 
-The *WorkStatus* objects are created and updated on the ITS by the status add-on.
+The `WorkStatus` objects are created and updated on the ITS by the OCM Status Add-On Agent described [above](#ocm-status-add-on-agent).
+
 The high-level flow for the singleton status update is described in Figure 4.
 
 ![Figure 4 - Status Controller](./images/status-controller.png)
-
-The status add-on tracks objects applied by the work agent by watching 
-*AppliedManifestWork* objects. These objects list the GVR, name
-and namespace (the latter for namespaced objects) of each object applied
-by the related *ManifestWork*. The status add-on then uses this information 
-to ensure that a singleton informer is started for each GVR, 
-and to track status updates of each tracked object. The status add-on
-then creates/updates *WorkStatus* objects in the ITS with the status
-of tracked objects in the namespace associated with the WEC cluster.
-A `WorkStatus` object contains status for exactly one object, so that 
-status updates for one object do not require updates of a whole bundle. 
 
 
 ### Transport Controller
