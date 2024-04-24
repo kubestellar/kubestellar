@@ -43,6 +43,10 @@ See also [the release notes](release-notes.md).
 
 See [Architecture](architecture.md).
 
+## User Guide
+
+See [User Guide](user-guide.md).
+
 ## Packaging and Delivery
 
 See [Packaging and Delivery](packaging.md)
