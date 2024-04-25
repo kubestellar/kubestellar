@@ -679,6 +679,26 @@
     Transport Controller
   </a>
   
+    <nav class="md-nav" aria-label="Transport Controller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-transform-cache" class="md-nav__link">
+    Custom transform cache
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customization-properties-cache" class="md-nav__link">
+    Customization properties cache
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -1671,6 +1691,26 @@
     Transport Controller
   </a>
   
+    <nav class="md-nav" aria-label="Transport Controller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-transform-cache" class="md-nav__link">
+    Custom transform cache
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customization-properties-cache" class="md-nav__link">
+    Customization properties cache
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -2161,9 +2201,109 @@ We expect to have more transport plugin options in the future.</p>
 <p>The transport controller also maintains a finalizer on each Binding object. When processing a reference to a <code>Binding</code> object that no longer exists, the transport controller has nothing more to do (because it processes the deleetion before removing its finalizer).</p>
 <p>When processing a reference to a <code>Binding</code> object that still exists, the transport controller looks at whether that <code>Binding</code> is in the process of being deleted. If so then the controller ensures that the corresponding wrapped object (<code>ManifestWork</code>) in the ITS no longer exists and then removes the finalizer from the <code>Binding</code>.</p>
 <p>When processing a <code>Binding</code> object that is not being deleted, the transport controller first ensures that the finalizer is on that object. Then the controller constructs an internal function from destination to the customized wrapped object for that destionation. The controller then iterates over the <code>Binding</code>'s list of desinations and propagates the corresponding wrapped object (reported by the function just described) to the corresponding mailbox namespace.  Once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/delete the workload objects on the WEC.</p>
-<p>To construct the function from destination to customized wrapped object, the transport controller reads the <code>Binding</code>'s list of references to workload objects. The controller reads those objects from the WDS using a Kubernetes "dynamic" client. The controller goes through those objects one-by-one, applying template expansion for each destination if the object requests template expansion. If any of those objects requests template expansion and has a string that actually involves template expansion: the controller accumulates a map from destination to slice of customized objects and then invokes the transport plugin on each of those slices, to ultimately produce the function from destination to wrapped object. If none of the selected workload objects actually involved any template expansion then the controller wraps the slice of workload objects to get one wrapped object and produces a constant function from destination to that one wrapped object. </p>
+<p>To construct the function from destination to customized wrapped object, the transport controller reads the <code>Binding</code>'s list of references to workload objects. The controller reads those objects from the WDS using a Kubernetes "dynamic" client. Immediately upon reading each workload object, the controller applies the WEC-independent transforms (from the <code>CustomTransform</code> objects). After doing that for all the listed workload objects, the controller goes through those objects one-by-one and applies template expansion for each destination if the object requests template expansion. If any of those objects requests template expansion and has a string that actually involves template expansion: the controller accumulates a map from destination to slice of customized objects and then invokes the transport plugin on each of those slices, to ultimately produce the function from destination to wrapped object. If none of the selected workload objects actually involved any template expansion then the controller wraps the slice of workload objects to get one wrapped object and produces a constant function from destination to that one wrapped object. </p>
 <p>Transport controller is based on the controller design patten and aims to bring the current state to the desired state. If a WEC was removed from the <code>Binding</code>, the transport controller will also make sure to remove the matching wrapped object(s) from the WEC's mailbox namespace.</p>
-<p>The transport controller maintains a cached set of customization properties for each destination, and an association between <code>Binding</code> and the set of destinations that it references. When a relevant informer delivers an event that indicates a change in a destination's properties, the controller invalidates that destination's entry in the cache and enqueues a reference to every relevant <code>Binding</code>. The template expansion work described above has a side-effect of putting entries in the destination properties cache.</p>
+<h4 id="custom-transform-cache">Custom transform cache<a class="headerlink" href="#custom-transform-cache" title="Permanent link">#</a></h4>
+<p>To support efficient application of the <code>CustomTransform</code> objects, the transport controller maintains a cache of the results of internalizing what the users are asking for. In relational algebra terms, that cache consists of the following relations.</p>
+<p>Relation "USES": has a row whenever the <code>Binding</code>'s list of workload objects uses the <code>GroupResource</code>.</p>
+<table>
+<thead>
+<tr>
+<th>column name</th>
+<th>type</th>
+<th>in key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bindingName</td>
+<td>string</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>gr</td>
+<td>metav1.GroupResource</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p>Relation "INSTRUCTIONS": has a row saying what to do for each <code>GroupResource</code>.</p>
+<table>
+<thead>
+<tr>
+<th>column name</th>
+<th>type</th>
+<th>in key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gr</td>
+<td>metav1.GroupResource</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>removes</td>
+<td>SET(jsonpath.Query)</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>Relation "SPECS": remembers the specs of <code>CustomTransform</code> objects.</p>
+<table>
+<thead>
+<tr>
+<th>column name</th>
+<th>type</th>
+<th>in key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ctName</td>
+<td>string</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>gr</td>
+<td>metav1.GroupResource</td>
+<td>no</td>
+</tr>
+<tr>
+<td>removes</td>
+<td>SET(string)</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>The cache maintains the following invariants on those relations. Note how these invariants require removal of data that is no longer interesting.</p>
+<ol>
+<li>INSTRUCTIONS has a row for a given <code>GroupResource</code> if and only if USES has one or more rows for that <code>GroupResource</code>.</li>
+<li>SPECS has a row for a given <code>CustomTransform</code> name if and only if that <code>CustomTransform</code> contributed to an existing row in INSTRUCTIONS.</li>
+</ol>
+<p>Whenever it removes a row from INSTRUCTIONS due to loss of confidence in that row, the cache has the controller enqueue a reference to every related <code>Binding</code> from USES, so that eventually a revised row will be derived and applied to every dependent <code>Binding</code>.</p>
+<p>The interface to the cache is <code>customTransformCollection</code> and the implementation is in a <code>*customTransformCollectionImpl</code>. This represents those relations as follows.</p>
+<ol>
+<li>USES is represented by two indices, each a map from one column value to the set of related other column values. The two indices are in <code>bindingNameToGroupResources</code> and <code>grToTransformData/bindingsThatCare</code>.</li>
+<li>INSTRUCTIONS is represented by <code>grToTransformData/removes</code>.</li>
+<li>SPECS is represented by <code>ctNameToSpec</code> and an index, <code>grToTransformData/ctNames</code>.</li>
+</ol>
+<p>The cache interface has the following methods.</p>
+<ul>
+<li>
+<p><code>getCustomTransformChanges</code> ensures that the cache has an entry for a given usage (a (<code>Binding</code>, <code>GroupResource</code>) pair) and returns the corresponding instructions (i.e., set of JSONPath to remove) for that <code>GroupResource</code>. This method sets the status of each <code>CustomTransform</code> API object that it processes.</p>
+<p>Of course this method maintains the cache's invariants. That means adding rows to SPECS as necessary. It also means removing a row from INSTRUCTIONS upon discovery that a <code>CustomTransform</code>'s Spec has changed its <code>GroupResource</code>. Note that the cache's invariants require this removal by this method, not relying on an eventual call to <code>NoteCustomTransform</code> (because the cache records at most the latest Spec for each <code>CustomTransform</code>, a later cache operation will not know about the previous <code>GroupResource</code>).</p>
+<p>Removing a row from INSTRUCTIONS also entails removing the corresponding rows from SPECs, to maintain the cache's invariants.</p>
+</li>
+<li>
+<p><code>noteCustomTransform</code> reacts to a create/update/delete of a <code>CustomTransform</code> object. In the update case, if the <code>CustomResourceSpec</code> changed its <code>GroupResource</code> then this method removes two rows from INSTRUCTIONS (if they were present): the one for the old <code>GroupResource</code> and the one for the new. In case of create, delete, or other change in Spec, this method removes the one relevant row (if present) in INSTRUCTIONS.</p>
+</li>
+<li>
+<p><code>setBindingGroupResources</code> reacts to knowing the full set of <code>GroupResource</code> that a given <code>Binding</code> uses. This removes outdated rows from USES (updates the two indices that represent it) and removes rows from INSTRUCTIONS that are no longer allowed.</p>
+</li>
+</ul>
+<h4 id="customization-properties-cache">Customization properties cache<a class="headerlink" href="#customization-properties-cache" title="Permanent link">#</a></h4>
+<p>The transport controller maintains a cached set of customization properties for each destination, and an association between <code>Binding</code> and the set of destinations that it references. When a relevant informer delivers an event about an inventory object (either a <code>ManagedCluster</code> object or a <code>ConfigMap</code> object that adds properties for that destination) the controller enqueues a work item of type <code>recollectProperties</code>. This work item carries the name of the inventory object. Processing that work item starts by re-computing the full map of properties for that destination. If the cache has an entry for that destination and the cached properties differ from the ones freshly computed, the controller updates that cache entry and enqueues a reference to every <code>Binding</code> object that depends on the properties of that destination.</p>
 
 
   
