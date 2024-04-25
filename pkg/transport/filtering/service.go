@@ -41,7 +41,7 @@ func cleanService(object *unstructured.Unstructured) {
 		unstructured.RemoveNestedField(object.Object, "spec", "clusterIP")
 	}
 	if val, have, _ := unstructured.NestedStringSlice(object.Object, "spec", "clusterIPs"); have {
-		newVal := abstract.SliceFilter(val, func(ip string) bool { return ip == "None" })
+		newVal := abstract.NewSliceByFilter(val, func(ip string) bool { return ip == "None" })
 		if len(newVal) == 0 {
 			unstructured.RemoveNestedField(object.Object, "spec", "clusterIPs")
 		} else {

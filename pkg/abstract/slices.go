@@ -26,8 +26,8 @@ func SliceDelete[Elt any](slice *[]Elt, index int) {
 	*slice = (*slice)[:lastIndex]
 }
 
-// SliceFilter makes a new slice that contains the members of the given slice that pass the given filter
-func SliceFilter[Elt any](input []Elt, good func(Elt) bool) []Elt {
+// NewSliceByFilter makes a new slice that contains the members of the given slice that pass the given filter
+func NewSliceByFilter[Elt any](input []Elt, good func(Elt) bool) []Elt {
 	if input == nil {
 		return nil
 	}
