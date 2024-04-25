@@ -349,6 +349,9 @@ type CustomTransformStatus struct {
 
 	// +optional
 	Errors []string `json:"errors,omitempty"`
+
+	// +optional
+	Warnings []string `json:"warnings,omitempty"`
 }
 
 // CustomTransformList is the API type for a list of CustomTransform
