@@ -111,9 +111,11 @@ spec:
   outputs:
     - name: remote-loki
       type: loki
-      url: "https://my.loki.server.com/{{.clusterName}}-{{.clusterHash}}"
+      url: "https://my.loki.server.com/{\u007B config.site_name }}"
 ...
 ```
+
+(Note: "{\u007B" is JSON for two consecutive left curly brackets --- which mkdocs does not have a way to quote inside a fenced code block.)
 
 The following ConfigMap in the ITS provides a value for the `clusterHash` property.
 
