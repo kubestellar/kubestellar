@@ -114,12 +114,14 @@ func GenericMain(transportImplementation transport.Transport) {
 	inventoryPreInformer := ocmInformerFactory.Cluster().V1().ManagedClusters()
 
 	wdsKsInformerFactory := ksinformers.NewSharedInformerFactoryWithOptions(wdsClientset, defaultResyncPeriod)
+	wdsControlInformers := wdsKsInformerFactory.Control().V1alpha1()
 
 	itsK8sInformerFactory := k8sinformers.NewSharedInformerFactory(transportClientset, defaultResyncPeriod)
 
 	transportController, err := transport.NewTransportController(ctx, inventoryPreInformer,
-		wdsClientset.ControlV1alpha1().Bindings(), wdsKsInformerFactory.Control().V1alpha1().Bindings(),
-		transportImplementation, wdsDynamicClient, transportClientset.CoreV1().Namespaces(), itsK8sInformerFactory.Core().V1().ConfigMaps(),
+		wdsClientset.ControlV1alpha1().Bindings(), wdsControlInformers.Bindings(),
+		wdsControlInformers.CustomTransforms(),
+		transportImplementation, wdsClientset, wdsDynamicClient, transportClientset.CoreV1().Namespaces(), itsK8sInformerFactory.Core().V1().ConfigMaps(),
 		transportClientset, transportDynamicClient, options.WdsName)
 	if err != nil {
 		logger.Error(err, "failed to construct transport controller")
