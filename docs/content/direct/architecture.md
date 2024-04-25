@@ -460,8 +460,61 @@ When processing a reference to a `Binding` object that still exists, the transpo
 
 When processing a `Binding` object that is not being deleted, the transport controller first ensures that the finalizer is on that object. Then the controller constructs an internal function from destination to the customized wrapped object for that destionation. The controller then iterates over the `Binding`'s list of desinations and propagates the corresponding wrapped object (reported by the function just described) to the corresponding mailbox namespace.  Once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/delete the workload objects on the WEC.
 
-To construct the function from destination to customized wrapped object, the transport controller reads the `Binding`'s list of references to workload objects. The controller reads those objects from the WDS using a Kubernetes "dynamic" client. The controller goes through those objects one-by-one, applying template expansion for each destination if the object requests template expansion. If any of those objects requests template expansion and has a string that actually involves template expansion: the controller accumulates a map from destination to slice of customized objects and then invokes the transport plugin on each of those slices, to ultimately produce the function from destination to wrapped object. If none of the selected workload objects actually involved any template expansion then the controller wraps the slice of workload objects to get one wrapped object and produces a constant function from destination to that one wrapped object. 
+To construct the function from destination to customized wrapped object, the transport controller reads the `Binding`'s list of references to workload objects. The controller reads those objects from the WDS using a Kubernetes "dynamic" client. Immediately upon reading each workload object, the controller applies the WEC-independent transforms (from the `CustomTransform` objects). After doing that for all the listed workload objects, the controller goes through those objects one-by-one and applies template expansion for each destination if the object requests template expansion. If any of those objects requests template expansion and has a string that actually involves template expansion: the controller accumulates a map from destination to slice of customized objects and then invokes the transport plugin on each of those slices, to ultimately produce the function from destination to wrapped object. If none of the selected workload objects actually involved any template expansion then the controller wraps the slice of workload objects to get one wrapped object and produces a constant function from destination to that one wrapped object. 
 
 Transport controller is based on the controller design patten and aims to bring the current state to the desired state. If a WEC was removed from the `Binding`, the transport controller will also make sure to remove the matching wrapped object(s) from the WEC's mailbox namespace.
 
-The transport controller maintains a cached set of customization properties for each destination, and an association between `Binding` and the set of destinations that it references. When a relevant informer delivers an event that indicates a change in a destination's properties, the controller invalidates that destination's entry in the cache and enqueues a reference to every relevant `Binding`. The template expansion work described above has a side-effect of putting entries in the destination properties cache.
+#### Custom transform cache
+
+To support efficient application of the `CustomTransform` objects, the transport controller maintains a cache of the results of internalizing what the users are asking for. In relational algebra terms, that cache consists of the following relations.
+
+Relation "USES": has a row whenever the `Binding`'s list of workload objects uses the `GroupResource`.
+
+| column name | type | in key |
+| ----------- | ---- | ------ |
+| bindingName | string | yes |
+| gr | metav1.GroupResource | yes |
+
+Relation "INSTRUCTIONS": has a row saying what to do for each `GroupResource`.
+
+| column name | type | in key |
+| ----------- | ---- | ------ |
+| gr | metav1.GroupResource | yes |
+| removes | SET(jsonpath.Query) | no |
+
+Relation "SPECS": remembers the specs of `CustomTransform` objects.
+
+| column name | type | in key |
+| ----------- | ---- | ------ |
+| ctName | string | yes |
+| gr | metav1.GroupResource | no |
+| removes | SET(string) | no |
+
+The cache maintains the following invariants on those relations. Note how these invariants require removal of data that is no longer interesting.
+
+1. INSTRUCTIONS has a row for a given `GroupResource` if and only if USES has one or more rows for that `GroupResource`.
+1. SPECS has a row for a given `CustomTransform` name if and only if that `CustomTransform` contributed to an existing row in INSTRUCTIONS.
+
+Whenever it removes a row from INSTRUCTIONS due to loss of confidence in that row, the cache has the controller enqueue a reference to every related `Binding` from USES, so that eventually a revised row will be derived and applied to every dependent `Binding`.
+
+The interface to the cache is `customTransformCollection` and the implementation is in a `*customTransformCollectionImpl`. This represents those relations as follows.
+
+1. USES is represented by two indices, each a map from one column value to the set of related other column values. The two indices are in `bindingNameToGroupResources` and `grToTransformData/bindingsThatCare`.
+1. INSTRUCTIONS is represented by `grToTransformData/removes`.
+1. SPECS is represented by `ctNameToSpec` and an index, `grToTransformData/ctNames`.
+
+The cache interface has the following methods.
+
+- `getCustomTransformChanges` ensures that the cache has an entry for a given usage (a (`Binding`, `GroupResource`) pair) and returns the corresponding instructions (i.e., set of JSONPath to remove) for that `GroupResource`. This method sets the status of each `CustomTransform` API object that it processes.
+
+    Of course this method maintains the cache's invariants. That means adding rows to SPECS as necessary. It also means removing a row from INSTRUCTIONS upon discovery that a `CustomTransform`'s Spec has changed its `GroupResource`. Note that the cache's invariants require this removal by this method, not relying on an eventual call to `NoteCustomTransform` (because the cache records at most the latest Spec for each `CustomTransform`, a later cache operation will not know about the previous `GroupResource`).
+
+    Removing a row from INSTRUCTIONS also entails removing the corresponding rows from SPECs, to maintain the cache's invariants.
+
+- `noteCustomTransform` reacts to a create/update/delete of a `CustomTransform` object. In the update case, if the `CustomResourceSpec` changed its `GroupResource` then this method removes two rows from INSTRUCTIONS (if they were present): the one for the old `GroupResource` and the one for the new. In case of create, delete, or other change in Spec, this method removes the one relevant row (if present) in INSTRUCTIONS.
+
+- `setBindingGroupResources` reacts to knowing the full set of `GroupResource` that a given `Binding` uses. This removes outdated rows from USES (updates the two indices that represent it) and removes rows from INSTRUCTIONS that are no longer allowed.
+
+#### Customization properties cache
+
+The transport controller maintains a cached set of customization properties for each destination, and an association between `Binding` and the set of destinations that it references. When a relevant informer delivers an event about an inventory object (either a `ManagedCluster` object or a `ConfigMap` object that adds properties for that destination) the controller enqueues a work item of type `recollectProperties`. This work item carries the name of the inventory object. Processing that work item starts by re-computing the full map of properties for that destination. If the cache has an entry for that destination and the cached properties differ from the ones freshly computed, the controller updates that cache entry and enqueues a reference to every `Binding` object that depends on the properties of that destination.

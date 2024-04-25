@@ -12,6 +12,62 @@ See [Using an existing hosting cluster](./hosting-cluster.md)
 
 Thus far we can only say how to handle this when the hosting cluster is OpenShift. The problem is getting URLs that work from everywhere. OpenShift is a hosted product, your clusters have domain names that are resolvable from everywhere. In other words, if you use an OpenShift cluster as your hosting cluster then this problem is already solved.
 
+## WEC-independent workload object transformation
+
+KubeStellar does some transformation of workload objects on their way from WDS to WEC. First, there are transformations that are independent of the destination; these are described in this section. Second, there is customization to the WEC, described [later](#rule-based-customization).
+
+The WEC-independent transformations are removal of certain content.
+
+There are three categories of these transformations, as follows. They are applied in this order.
+
+1. Transformations that are built into KubeStellar and apply to all workload objects.
+1. Transformations that are built into KubeStellar and apply to specific kinds of workload objects.
+1. Transformations that are configured by control objects and apply to specific kinds of workload objects.
+
+### Transformations for all workload objects
+
+The following are applied to every workload object.
+
+1. Remove the following fields from `metadata`: `managedFields`, `finalizers`, `generation`, `ownerReferences`, `selfLink`, `resourceVersion`, `UID`, `generateName`.
+1. Remove the annotation named `kubectl.kubernetes.io/last-applied-configuration`.
+1. Remove the `status`.
+
+## Built-in transformations of specific kinds of workload object
+
+In a `Service` (core API group) object, remove the following fields from `spec`: `clusterIP`, `clusterIPs`, `ipFamilies`, `externalTrafficPolicy`, `internalTrafficPolicy`, `ipFamilyPolicy`, `sessionAffinity`. Also remove the `nodePort` field from every port unless the annotation `kubestellar.io/annotations/preserve=nodeport` is present.
+
+In a `Job` (API group `batch`) object, remove the following things.
+
+1. `spec.selector`
+
+1. `spec.suspended`
+
+1. In `metadata`, the annotation named `batch.kubernetes.io/job-tracking`
+
+1. In `metadata` _and_ in `spec.template.metadata`, the labels named `controller-uid` or `batch.kubernetes.io/controller-uid`.
+
+### Configured transformation of workload objects
+
+The user can configure additional transformations of workload objects by putting `CustomTransform` (in the `control.kubestellar.io` API group) objects in the WDS. Each `CustomTransform` object binds to certain workload objects and specifies certain transformations.
+
+Currently the binding is simply by naming the workload object's API group and "resource" name in the `CustomTransform`'s `spec`. The transformations from all of the bound `CustomTransform` objects are applied to the workload object. There should be at most one `CustomTransform` object that specifies a given API group and resource.
+
+Currently the only available transformations are removals of specified content. The content to be removed is identified by a small subset of JSONPath. In this subset, the only available operators are `.someName` and `["some string"]`. The allowed names and strings are as specified in [RFC 9535](https://www.rfc-editor.org/rfc/rfc9535.html), except that only double-quoted strings are allowed.
+
+For example, the following `CustomTransform` object says to remove the `spec` field named `suspend` from `Job` objects (in the API group `batch`).
+
+```yaml
+kind: CustomTransform
+metadata:
+  name: example
+spec:
+  apiGroup: batch
+  resource: jobs
+  remove:
+  - "$.spec.suspend"
+```
+
+
 ## Rule-based customization
 
 KubeStellar can distribute one workload object to multiple WECs, and it is common for users to need some customization to each WEC. By _rule based_ we mean that the customization is not expressed via one or more literal expressions but rather can refer to _properties_ of each WEC by property name. As KubeStellar distributes or transports a workload object from WDS to a WEC, the object can be transformed in a way that depends on those properties.
