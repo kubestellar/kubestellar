@@ -16,6 +16,10 @@ limitations under the License.
 
 package abstract
 
+import (
+	"k8s.io/apimachinery/pkg/util/sets"
+)
+
 // SliceDelete removes an entry, identified by position, from a slice.
 // The given position must be valid.
 func SliceDelete[Elt any](slice *[]Elt, index int) {
@@ -58,4 +62,26 @@ func SliceEqual[Elt comparable](slice1, slice2 []Elt) bool {
 		}
 	}
 	return true
+}
+
+func SliceMap[Domain, Range any](slice []Domain, fn func(Domain) Range) []Range {
+	if slice == nil {
+		return nil
+	}
+	ans := make([]Range, len(slice))
+	for idx, elt := range slice {
+		ans[idx] = fn(elt)
+	}
+	return ans
+}
+
+func SliceMapToK8sSet[Domain any, Range comparable](slice []Domain, fn func(Domain) Range) sets.Set[Range] {
+	if slice == nil {
+		return nil
+	}
+	ans := sets.New[Range]()
+	for _, elt := range slice {
+		ans.Insert(fn(elt))
+	}
+	return ans
 }
