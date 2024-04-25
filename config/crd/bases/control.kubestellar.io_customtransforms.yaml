@@ -82,6 +82,10 @@ spec:
               observedGeneration:
                 format: int64
                 type: integer
+              warnings:
+                items:
+                  type: string
+                type: array
             required:
             - observedGeneration
             type: object
