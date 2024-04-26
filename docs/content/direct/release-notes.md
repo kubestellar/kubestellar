@@ -2,6 +2,17 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.22.0 and its release candidates
+
+The changes include adding the following features.
+
+- Custom WEC-independent transformations of workload objects on their way from WDS to WEC.
+- WEC-dependent Go template expansion in the strings of a workload object on its way from WDS to WEC.
+
+Prominent bug fixes include more discerning cleaning of workload objects on their way from WDS to WEC.
+
+See [the changelogs on GitHub](https://github.com/kubestellar/kubestellar/releases) for full details.
+
 ## 0.21.2 and its release candidates
 
 The changes since 0.21.1 include efficiency improvements, reducing costs of running the kubestellar-controller-manager for a WDS that is an OpenShift cluster. There are also bug fixes and documentation improvements.
