@@ -1578,8 +1578,11 @@
 <ul>
 <li>Custom WEC-independent transformations of workload objects on their way from WDS to WEC.</li>
 <li>WEC-dependent Go template expansion in the strings of a workload object on its way from WDS to WEC.</li>
+<li><code>PriorityClass</code> objects (from API group <code>scheduling.k8s.io</code>) propagate now.</li>
+<li>Support multiple WDSes.</li>
+<li>Allow multiple ITSes.</li>
 </ul>
-<p>Prominent bug fixes include more discerning cleaning of workload objects on their way from WDS to WEC.</p>
+<p>Prominent bug fixes include more discerning cleaning of workload objects on their way from WDS to WEC. This includes keeping a "headless" <code>Service</code> headless and removing the <code>spec.suspend</code> field from a <code>Job</code>.</p>
 <p>See <a href="https://github.com/kubestellar/kubestellar/releases">the changelogs on GitHub</a> for full details.</p>
 <h2 id="0212-and-its-release-candidates">0.21.2 and its release candidates<a class="headerlink" href="#0212-and-its-release-candidates" title="Permanent link">#</a></h2>
 <p>The changes since 0.21.1 include efficiency improvements, reducing costs of running the kubestellar-controller-manager for a WDS that is an OpenShift cluster. There are also bug fixes and documentation improvements.</p>
