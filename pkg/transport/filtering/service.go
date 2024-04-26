@@ -18,6 +18,8 @@ package filtering
 
 import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+
+	"github.com/kubestellar/kubestellar/pkg/abstract"
 )
 
 const (
@@ -27,11 +29,24 @@ const (
 
 func cleanService(object *unstructured.Unstructured) {
 	// Fields to remove
-	fieldsToDelete := []string{"clusterIP", "clusterIPs", "ipFamilies",
+	fieldsToDelete := []string{"ipFamilies",
 		"externalTrafficPolicy", "internalTrafficPolicy", "ipFamilyPolicy", "sessionAffinity"}
 
 	for _, field := range fieldsToDelete {
 		unstructured.RemoveNestedField(object.Object, "spec", field)
+	}
+
+	// Keep headless Services headless, remove cluster IPs from others.
+	if val, have, _ := unstructured.NestedString(object.Object, "spec", "clusterIP"); have && val != "None" {
+		unstructured.RemoveNestedField(object.Object, "spec", "clusterIP")
+	}
+	if val, have, _ := unstructured.NestedStringSlice(object.Object, "spec", "clusterIPs"); have {
+		newVal := abstract.NewSliceByFilter(val, func(ip string) bool { return ip == "None" })
+		if len(newVal) == 0 {
+			unstructured.RemoveNestedField(object.Object, "spec", "clusterIPs")
+		} else {
+			unstructured.SetNestedStringSlice(object.Object, newVal, "spec", "clusterIPs")
+		}
 	}
 
 	// Set the nodePort to an empty string unelss the annotation "kubestellar.io/annotations/preserve=nodeport" is present

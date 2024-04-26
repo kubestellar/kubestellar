@@ -34,7 +34,13 @@ The following are applied to every workload object.
 
 ## Built-in transformations of specific kinds of workload object
 
-In a `Service` (core API group) object, remove the following fields from `spec`: `clusterIP`, `clusterIPs`, `ipFamilies`, `externalTrafficPolicy`, `internalTrafficPolicy`, `ipFamilyPolicy`, `sessionAffinity`. Also remove the `nodePort` field from every port unless the annotation `kubestellar.io/annotations/preserve=nodeport` is present.
+In a `Service` (core API group) object:
+
+1. remove the following fields from `spec`: `ipFamilies`, `externalTrafficPolicy`, `internalTrafficPolicy`, `ipFamilyPolicy`, `sessionAffinity`. Also remove the `nodePort` field from every port unless the annotation `kubestellar.io/annotations/preserve=nodeport` is present;
+
+1. in the `spec` remove the field `clusterIP` unless it is present with value "None".
+
+1. in the `spec`: if the field `clusterIPs` (which holds an array of strings) is present and those strings include "None" then keep it present holding only "None", otherwise remove that field if it is present.
 
 In a `Job` (API group `batch`) object, remove the following things.
 
