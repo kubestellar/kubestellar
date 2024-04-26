@@ -90,25 +90,18 @@ kflex create its1 --type vcluster -p ocm $disable_chatty_status
 
 :
 : -------------------------------------------------------------------------
-: Install singleton status return addon in ITS1
-:
-wait-for-cmd kubectl --context its1 api-resources "|" grep managedclusteraddons
-helm --kube-context its1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc8
-
-:
-: -------------------------------------------------------------------------
 : Create a Workload Description Space wds1 directly in KubeFlex.
 :
 kflex create wds1 $wds_extra $disable_chatty_status
 kubectl --context kind-kubeflex label cp wds1 kflex.kubestellar.io/cptype=wds
 
 if [ "$use_release" != true ]; then
-    cd "${SRC_DIR}/../../.."
-    pwd
-    make ko-build-local
-    rm -rf local-chart
-    make install-local-chart KUBE_CONTEXT=kind-kubeflex "KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY"
-    cd -
+  cd "${SRC_DIR}/../../.."
+  pwd
+  make ko-build-local
+  rm -rf local-chart
+  make install-local-chart KUBE_CONTEXT=kind-kubeflex "KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY"
+  cd -
 fi
 echo "wds1 created."
 
@@ -116,23 +109,27 @@ echo "wds1 created."
 : -------------------------------------------------------------------------
 : Run OCM transport controller in a pod
 :
-cd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
-KUBESTELLAR_DIR="$(pwd)"
-OCM_TRANSPORT_PLUGIN_RELEASE="0.1.7"
-curl -sL https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz | tar xz
-cd ocm-transport-plugin-${OCM_TRANSPORT_PLUGIN_RELEASE}
-OCM_TRANSPORT_PLUGIN_DIR="$(pwd)"
-pwd
-echo "replace github.com/kubestellar/kubestellar => ${KUBESTELLAR_DIR}/" >> go.mod
-go mod tidy # TODO to be deleted next time we bump ocm transport release (done in ocm transport makefile)
-IMAGE_TAG=${OCM_TRANSPORT_PLUGIN_RELEASE} make ko-build-local
-kind load --name kubeflex docker-image ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
-cd "${KUBESTELLAR_DIR}"
-pwd
-rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
-echo "running ocm transport plugin..."
-kubectl config use-context kind-kubeflex ## transport deployment script assumes it runs within kubeflex context
-IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 its1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} --controller-verbosity "$TRANSPORT_CONTROLLER_VERBOSITY"
+if [ "$use_release" != true ]; then
+  cd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
+  KUBESTELLAR_DIR="$(pwd)"
+  OCM_TRANSPORT_PLUGIN_RELEASE="0.1.7"
+  curl -sL https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz | tar xz
+  cd ocm-transport-plugin-${OCM_TRANSPORT_PLUGIN_RELEASE}
+  OCM_TRANSPORT_PLUGIN_DIR="$(pwd)"
+  pwd
+  echo "replace github.com/kubestellar/kubestellar => ${KUBESTELLAR_DIR}/" >> go.mod
+  go mod tidy # TODO to be deleted next time we bump ocm transport release (done in ocm transport makefile)
+  IMAGE_TAG=${OCM_TRANSPORT_PLUGIN_RELEASE} make ko-build-local
+  kind load --name kubeflex docker-image ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
+  cd "${KUBESTELLAR_DIR}"
+  pwd
+  rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
+  echo "running ocm transport plugin..."
+  kubectl config use-context kind-kubeflex ## transport deployment script assumes it runs within kubeflex context
+  IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 its1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} --controller-verbosity "$TRANSPORT_CONTROLLER_VERBOSITY"
+else
+  kubectl config use-context kind-kubeflex
+fi
 
 wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))'
 
