@@ -218,6 +218,23 @@ func CreateDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string,
 	}, timeout).Should(gomega.Succeed())
 }
 
+func CreateCustomTransform(ctx context.Context, wds *ksClient.Clientset, name, apiGroup, resource string, remove ...string) {
+	ct := ksapi.CustomTransform{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: name,
+		},
+		Spec: ksapi.CustomTransformSpec{
+			APIGroup: apiGroup,
+			Resource: resource,
+			Remove:   remove,
+		},
+	}
+	gomega.Eventually(func() error {
+		_, err := wds.ControlV1alpha1().CustomTransforms().Create(ctx, &ct, metav1.CreateOptions{})
+		return err
+	}, timeout).Should(gomega.Succeed())
+}
+
 func CreateService(ctx context.Context, wds *kubernetes.Clientset, ns string, name string, appName string) {
 	service := corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -284,15 +301,30 @@ func CreateJob(ctx context.Context, wds *kubernetes.Clientset, ns string, name s
 	}, timeout).Should(gomega.Succeed())
 }
 
-func ValidateNumDeployments(ctx context.Context, wec *kubernetes.Clientset, ns string, num int) {
+type countAndProblems struct {
+	count    int
+	problems []string
+}
+
+// ValidateNumDeployments waits a limited amount of time for the number of Deployjment objects to equal the given count and
+// all the problemFuncs to return the empty string for every Deployment.
+func ValidateNumDeployments(ctx context.Context, wec *kubernetes.Clientset, ns string, num int, problemFuncs ...func(*appsv1.Deployment) string) {
 	ginkgo.GinkgoHelper()
-	gomega.Eventually(func() int {
+	gomega.Eventually(func() countAndProblems {
 		deployments, err := wec.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
 		if err != nil {
-			return -1
+			return countAndProblems{-1, []string{err.Error()}}
 		}
-		return len(deployments.Items)
-	}, timeout).Should(gomega.Equal(num))
+		ans := countAndProblems{count: len(deployments.Items)}
+		for _, pf := range problemFuncs {
+			for _, deployment := range deployments.Items {
+				if problem := pf(&deployment); len(problem) > 0 {
+					ans.problems = append(ans.problems, fmt.Sprintf("deployment %q has a problem: %s", deployment.Name, problem))
+				}
+			}
+		}
+		return ans
+	}, timeout).Should(gomega.Equal(countAndProblems{count: num}))
 }
 
 func ValidateNumServices(ctx context.Context, wec *kubernetes.Clientset, ns string, num int) {

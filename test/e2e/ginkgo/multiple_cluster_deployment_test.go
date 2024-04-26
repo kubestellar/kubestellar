@@ -20,6 +20,7 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
+	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -37,7 +38,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		util.CleanupWDS(ctx, wds, ksWds, ns)
 		util.CreateDeployment(ctx, wds, ns, "nginx",
 			map[string]string{
-				"app.kubernetes.io/name": "nginx",
+				"app.kubernetes.io/name":         "nginx",
+				"test.kubestellar.io/test-label": "here",
 			})
 		util.CreateBindingPolicy(ctx, ksWds, "nginx",
 			[]metav1.LabelSelector{
@@ -50,9 +52,16 @@ var _ = ginkgo.Describe("end to end testing", func() {
 	})
 
 	ginkgo.Context("multiple WECs", func() {
-		ginkgo.It("propagates deployment to the WECs", func() {
-			util.ValidateNumDeployments(ctx, wec1, ns, 1)
-			util.ValidateNumDeployments(ctx, wec2, ns, 1)
+		ginkgo.It("propagates deployment to the WECs while applying CustomTransform", func() {
+			util.CreateCustomTransform(ctx, ksWds, "test", "apps", "deployments", `$.metadata.labels["test.kubestellar.io/test-label"]`)
+			testLabelAbsent := func(deployment *appsv1.Deployment) string {
+				if _, has := deployment.Labels["test.kubestellar.io/test-label"]; has {
+					return "it has the 'test.kubestellar.io/test-label' label"
+				}
+				return ""
+			}
+			util.ValidateNumDeployments(ctx, wec1, ns, 1, testLabelAbsent)
+			util.ValidateNumDeployments(ctx, wec2, ns, 1, testLabelAbsent)
 		})
 
 		ginkgo.It("updates objects on the WECs following an update on the WDS", func() {
