@@ -3,7 +3,7 @@
   value: "^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$"
 - op: add
   path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/clusterSelectors/items/properties/matchExpressions/items/properties/key/pattern
-  value: "^([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$"
+  value: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$
 - op: add
   path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/clusterSelectors/items/properties/matchExpressions/items/properties/operator/pattern
   value: "^(In|NotIn|Exists|DoesNotExist)$"

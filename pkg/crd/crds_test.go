@@ -83,8 +83,13 @@ func TestBindingPolicyAdditionalValidations(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name:     "BindingPolicy with invalid matchExpressions key",
-			manifest: bp_bad_matchExpressions_key,
+			name:     "BindingPolicy with invalid matchExpressions key prefix",
+			manifest: bp_bad_matchExpressions_key_prefix,
+			wantErr:  true,
+		},
+		{
+			name:     "BindingPolicy with invalid matchExpressions key name",
+			manifest: bp_bad_matchExpressions_key_name,
 			wantErr:  true,
 		},
 		{
@@ -158,7 +163,7 @@ spec:
   wantSingletonReportedState: true
 `
 
-var bp_bad_matchExpressions_key = `
+var bp_bad_matchExpressions_key_name = `
 apiVersion: control.kubestellar.io/v1alpha1
 kind: BindingPolicy
 metadata:
@@ -178,6 +183,25 @@ spec:
   wantSingletonReportedState: true
 `
 
+var bp_bad_matchExpressions_key_prefix = `
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: nvidia-gpu-placement
+spec:
+  clusterSelectors:
+  - matchExpressions:
+    - key: -kubestellar.io/model
+      operator: In
+      values:
+      - H200
+      - H100
+  downsync:
+  - objectSelectors:
+    - matchLabels:
+        app.kubernetes.io/part-of: wec-gpu
+  wantSingletonReportedState: true
+`
 var bp_bad_matchExpressions_op = `
 apiVersion: control.kubestellar.io/v1alpha1
 kind: BindingPolicy

@@ -17,8 +17,8 @@ resources:
 #+kubebuilder:scaffold:crdkustomizecainjectionpatch
 
 # the following config is for teaching kustomize how to do kustomization for CRDs.
-# configurations:
-# - kustomizeconfig.yaml
+configurations:
+- kustomizeconfig.yaml
 
 patches:
 - path: patches/more_validations_in_bindingpolicies.yaml
