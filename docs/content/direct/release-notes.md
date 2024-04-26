@@ -8,8 +8,11 @@ The changes include adding the following features.
 
 - Custom WEC-independent transformations of workload objects on their way from WDS to WEC.
 - WEC-dependent Go template expansion in the strings of a workload object on its way from WDS to WEC.
+- `PriorityClass` objects (from API group `scheduling.k8s.io`) propagate now.
+- Support multiple WDSes.
+- Allow multiple ITSes.
 
-Prominent bug fixes include more discerning cleaning of workload objects on their way from WDS to WEC.
+Prominent bug fixes include more discerning cleaning of workload objects on their way from WDS to WEC. This includes keeping a "headless" `Service` headless and removing the `spec.suspend` field from a `Job`.
 
 See [the changelogs on GitHub](https://github.com/kubestellar/kubestellar/releases) for full details.
 
