@@ -1619,7 +1619,18 @@
 <li>Remove the <code>status</code>.</li>
 </ol>
 <h2 id="built-in-transformations-of-specific-kinds-of-workload-object">Built-in transformations of specific kinds of workload object<a class="headerlink" href="#built-in-transformations-of-specific-kinds-of-workload-object" title="Permanent link">#</a></h2>
-<p>In a <code>Service</code> (core API group) object, remove the following fields from <code>spec</code>: <code>clusterIP</code>, <code>clusterIPs</code>, <code>ipFamilies</code>, <code>externalTrafficPolicy</code>, <code>internalTrafficPolicy</code>, <code>ipFamilyPolicy</code>, <code>sessionAffinity</code>. Also remove the <code>nodePort</code> field from every port unless the annotation <code>kubestellar.io/annotations/preserve=nodeport</code> is present.</p>
+<p>In a <code>Service</code> (core API group) object:</p>
+<ol>
+<li>
+<p>remove the following fields from <code>spec</code>: <code>ipFamilies</code>, <code>externalTrafficPolicy</code>, <code>internalTrafficPolicy</code>, <code>ipFamilyPolicy</code>, <code>sessionAffinity</code>. Also remove the <code>nodePort</code> field from every port unless the annotation <code>kubestellar.io/annotations/preserve=nodeport</code> is present;</p>
+</li>
+<li>
+<p>in the <code>spec</code> remove the field <code>clusterIP</code> unless it is present with value "None".</p>
+</li>
+<li>
+<p>in the <code>spec</code>: if the field <code>clusterIPs</code> (which holds an array of strings) is present and those strings include "None" then keep it present holding only "None", otherwise remove that field if it is present.</p>
+</li>
+</ol>
 <p>In a <code>Job</code> (API group <code>batch</code>) object, remove the following things.</p>
 <ol>
 <li>
