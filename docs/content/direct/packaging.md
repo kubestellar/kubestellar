@@ -55,7 +55,8 @@ Following are notable images in that repo.
 | 0.2.0-rc5     | 6753b9e169d47ff1592f9638d1b53c826f7ee1b9 | 35d97e4b523388ee28f537b176b3f8dbbc888e31a46bbd308d67cd5a0735c249 |
 | 0.2.0-rc6     | 25d27c0e5c7c70fdd578619b4e8381897cccd441 | 5b5eab49397984ee35cd431b4918f4584e2f56cf0596080e4ec560e46583d8b2 |
 | 0.2.0-rc7     | ce5c42d51b389b0389aa3c2252371832eb0e7137 | 070ac0600856deebd227a4ca0fe39ba1b685b0563274a182942af84e4218e502 |
-|    latest     | ce5c42d51b389b0389aa3c2252371832eb0e7137 | 070ac0600856deebd227a4ca0fe39ba1b685b0563274a182942af84e4218e502 |
+| 0.2.0-rc8     | 654ca7e2ee221cb42419d2e51199e47f57aaec9e | b39534bb3a0cad8f7d5645a9aca7ff567187dd64a22d003d74d2c2b98a662717 |
+|    latest     | 654ca7e2ee221cb42419d2e51199e47f57aaec9e | b39534bb3a0cad8f7d5645a9aca7ff567187dd64a22d003d74d2c2b98a662717 |
 
 To support testing, `make ko-local-build` will build a single-platform
 image and not push it, only leave it among your Docker images. The
@@ -75,6 +76,8 @@ The following notable versions exist.
 | v0.2.0-rc5                 | v0.2.0-rc5          | 0.2.0-rc5     |
 | v0.2.0-rc6                 | v0.2.0-rc6          | 0.2.0-rc6     |
 | v0.2.0-rc7                 | v0.2.0-rc7          | 0.2.0-rc7     |
+| v0.2.0-rc8                 | v0.2.0-rc8          | 0.2.0-rc8     |
+
 
 ## OCM Transport Plugin
 
@@ -187,9 +190,11 @@ The image repository is
 
 | image tag | git commit | SHA256 digest |
 | --------- | ---------- | ------------- |
-| 0.20.0    | a2bcaf75dc895dbef5f6cddcf203b0203423a08a | fac5b208a1f691eb5548a7699494bed2ee6b7502e739a2db840f39bbc05b2fd4 |
-| 0.21.0    | dcb232dbcfeb2e90d02315c38e26ba1a380d2cc6 | 3f04a74698d0e59bfe941d6ab016ee438f6a6ea684c0f671c03db0f4d7ee5eee |
-| 0.21.1    | 13fcd6a1c10eb377b20e7b1a6c5162209f70a281 | 0e0873088a2a78e578cf97e486ba5348b8728cdf0a270c6741710a241f12af8e |
+| 0.20.0     | a2bcaf75dc895dbef5f6cddcf203b0203423a08a | fac5b208a1f691eb5548a7699494bed2ee6b7502e739a2db840f39bbc05b2fd4 |
+| 0.21.0     | dcb232dbcfeb2e90d02315c38e26ba1a380d2cc6 | 3f04a74698d0e59bfe941d6ab016ee438f6a6ea684c0f671c03db0f4d7ee5eee |
+| 0.21.1     | 13fcd6a1c10eb377b20e7b1a6c5162209f70a281 | 0e0873088a2a78e578cf97e486ba5348b8728cdf0a270c6741710a241f12af8e |
+| 0.21.2     | 7d297a0d1ea500511612c920f7e241c17b866b72 | 76c475c64218cd69838eadf6a4e453d029ad01ff2bd6f9dc966a4f59ba15bd48 |
+| 0.22.0-rc1 | 3006e78fa523300d79e42bdc2913d905e3f9631c | 0b21f8b7cbd59cfa32199366f25d1c817b1d7cfe9d178678e92ba6500abfa841 |
 
 The [release process](release.md) builds and publishes that container image.
 
@@ -207,12 +212,15 @@ it from local sources. This is not included in `make all-generated`.
 This chart creates (among other things) a `Deployment` object that runs a container from the [KubeStellar controller-manager container image](#kubestellar-controller-manager-container-image).
 
 The chart is published at the OCI repository
-`ghcr.io/kubestellar/kubestellar/kubestellar-operator-chart`. A GitHub Actions workflow (in `.github/workflows/goreleaser.yml`) specializes and publishes this chart as part of [the release process](release.md).
+`ghcr.io/kubestellar/kubestellar/controller-manager-chart`. A GitHub Actions workflow (in `.github/workflows/goreleaser.yml`) specializes and publishes this chart as part of [the release process](release.md).
 
 The following versions exist.
 
 | OCI tag = version in chart | appVersion in chart | referenced container tag |
 | -------------------------- | ------------------- | ------------------------ |
+| 0.22.0-rc1                 | 0.22.0-rc1          | 0.22.0-rc1 |
+| 0.21.2                     | 0.21.2              | 0.21.2 |
+| 0.21.0                     | 0.21.0              | 0.21.0 |
 | 0.20.0                     | 0.20.0              | 0.20.0 |
 
 ### clusteradm container image
