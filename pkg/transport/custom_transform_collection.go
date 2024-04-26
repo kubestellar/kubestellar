@@ -104,10 +104,6 @@ func newCustomTransformCollection(client controlclient.CustomTransformInterface,
 	}
 }
 
-func getName[Named interface{ GetName() string }](input Named) string {
-	return input.GetName()
-}
-
 // getCustomTransformData returns the customTransformChanges to use
 // for the given GroupResource and notes that the result is relevant to the named Binding.
 // This method returns a cached answer if one is available, otherwise
@@ -134,7 +130,7 @@ func (ctc *customTransformCollectionImpl) getCustomTransformChanges(ctx context.
 	cts := abstract.SliceMap(ctAnys, func(ctAny any) *v1alpha1.CustomTransform { return ctAny.(*v1alpha1.CustomTransform) })
 	grTransformData = &groupResourceTransformData{
 		bindingsThatCare: sets.New(bindingName),
-		ctNames:          abstract.SliceMapToK8sSet(cts, getName[*v1alpha1.CustomTransform]),
+		ctNames:          abstract.SliceMapToK8sSet(cts, (*v1alpha1.CustomTransform).GetName),
 	}
 	var commonWarnings []string // warnings common to all the ct
 	if len(cts) > 1 {
