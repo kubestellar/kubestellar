@@ -21,6 +21,15 @@ Between each release of [ks/OTP](https://github.com/kubestellar/ocm-transport-pl
 
 - Edit `test/e2e/common/setup-kubestellar.sh`: update the setting of `OCM_TRANSPORT_PLUGIN_RELEASE` to the latest.
 
+### Reacting to a new ocm-status-addon release
+
+Update the references to the ocm-status-addon release in the following files.
+
+- `docs/content/direct/examples.md`
+- `docs/content/direct/deploy-on-k3d.md`
+- `test/e2e/multi-cluster-deployment/README.md`
+- `test/e2e/common/setup-kubestellar.sh`
+
 ### Making a new kubestellar release
 
 Making a new kubestellar release requires a contributor to do the following things. Here `$version` is the semver identifier for the release (e.g., `1.2.3-rc2`).
@@ -28,6 +37,8 @@ Making a new kubestellar release requires a contributor to do the following thin
 - Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
 
 - Edit [the examples document](examples.md) to update the self-references for the coming release.
+
+- Edit [the k3d deploy instructions](deploy-on-k3d.md) to update the self-reference.
 
 - Until we have our first stable release, edit [the README](README.md#latest-stable-release) where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
 
@@ -65,7 +76,7 @@ We have the following limitations.
 - Thus, it is necessary to keep users clearly appraised of the quality (or status of evaluating the quality) of each release.
 - Because of the lack of self references, most user instructions (e.g., examples) and tests do not have concrete release identifiers in them; instead, the user has to chose and supply the release identifier. There can also be documentation of a specific past release (e.g., the latest stable release) that uses the literal identifier for that past release.
 - **PAY ATTENTION TO THIS ONE**: Because of the prohibition of self references, **Git will not contain the exact bytes of our Helm chart definitions**. Where a Helm chart states its own version or has a container image reference to an image built from the same release, the bytes in Git have a placeholder for that image's tag and the process of creating the published release artifacts fills in that placeholder. Think of this as being analogous to the linking done when building a binary executable file.
-- The design below falls short of the goal of not putting self-references in files under Git control. One way is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another is in the examples document, which also holds references to its own release. Another is in the examples.md file, and another is in the `docs/content/direct/README.md` file.
+- The design below falls short of the goal of not putting self-references in files under Git control. One way is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another is in the examples document, which also holds references to its own release. Additional self-references are in the `docs/content/direct/README.md` and `docs/content/direct/deploy-on-k3d.md`.
 
 ## Dependency cycle with ks/OTP
 

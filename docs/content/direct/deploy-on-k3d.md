@@ -21,8 +21,8 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
 
 1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
     ```shell
-    export KUBESTELLAR_VERSION=0.21.0
-    export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
+    export KUBESTELLAR_VERSION=0.22.0-rc1
+    export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
     ```
 
 1. Create a K3D hosting cluster with nginx ingress controller:
