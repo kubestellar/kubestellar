@@ -26,6 +26,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/abstract"
 	controlclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/jsonpath"
 )
@@ -117,10 +118,6 @@ func (ctc *customTransformCollectionImpl) getCustomTransformChanges(ctx context.
 		grTransformData.bindingsThatCare.Insert(bindingName)
 		return grTransformData.changes
 	}
-	grTransformData = &groupResourceTransformData{
-		bindingsThatCare: sets.New(bindingName),
-		ctNames:          sets.New[string](),
-	}
 	ctKey := customTransformDomainKey(groupResource.Group, groupResource.Resource)
 	ctAnys, err := ctc.getTransformObjects(customTransformDomainIndexName, ctKey)
 	if err != nil {
@@ -130,16 +127,20 @@ func (ctc *customTransformCollectionImpl) getCustomTransformChanges(ctx context.
 		logger.Error(err, "Failed to get objects from CustomTransform domain index", "key", ctKey)
 	}
 
+	cts := abstract.SliceMap(ctAnys, func(ctAny any) *v1alpha1.CustomTransform { return ctAny.(*v1alpha1.CustomTransform) })
+	grTransformData = &groupResourceTransformData{
+		bindingsThatCare: sets.New(bindingName),
+		ctNames:          abstract.SliceMapToK8sSet(cts, (*v1alpha1.CustomTransform).GetName),
+	}
+	var commonWarnings []string // warnings common to all the ct
+	if len(cts) > 1 {
+		commonWarnings = []string{fmt.Sprintf("multiple CustomTransform objects specify the same GroupResource; their names are %v", grTransformData.ctNames)}
+	}
 	// Digest each relevant CustomTransform, accumulating remove instructions in groupResourceTransformData.removes.
 	// Invalidate cache entry for each CustomTransform that changed its Spec's .Group or .Resource.
-	for _, ctAny := range ctAnys {
-		ct := ctAny.(*v1alpha1.CustomTransform)
-		removes := ctc.digestCustomTransformLocked(ctx, groupResource, bindingName, ct)
+	for _, ct := range cts {
+		removes := ctc.digestCustomTransformLocked(ctx, groupResource, bindingName, ct, commonWarnings)
 		grTransformData.changes.removes = append(grTransformData.changes.removes, removes...)
-		grTransformData.ctNames.Insert(ct.Name)
-	}
-	if len(ctAnys) > 1 { // This is not recommended
-		logger.Error(nil, "Multiple CustomTransform objects apply to one GroupResource", "groupResource", groupResource, "names", grTransformData.ctNames)
 	}
 	ctc.grToTransformData[groupResource] = grTransformData
 	return grTransformData.changes
@@ -149,8 +150,8 @@ func (ctc *customTransformCollectionImpl) getCustomTransformChanges(ctx context.
 // This done in the context of processing a Binding, whose name is a parameter (for the sake of logging).
 // Caller asserts that grToTransformData does not have an entry for this GroupResource.
 // Caller asserts that the ctc's mutex is locked.
-func (ctc *customTransformCollectionImpl) digestCustomTransformLocked(ctx context.Context, groupResource metav1.GroupResource, bindingName string, ct *v1alpha1.CustomTransform) []jsonpath.Query {
-	removes := ctc.parseRemovesAndUpdateStatus(ctx, ct)
+func (ctc *customTransformCollectionImpl) digestCustomTransformLocked(ctx context.Context, groupResource metav1.GroupResource, bindingName string, ct *v1alpha1.CustomTransform, commonWarnings []string) []jsonpath.Query {
+	removes := ctc.parseRemovesAndUpdateStatus(ctx, ct, commonWarnings)
 	// Invalidate cache if ct.Spec changed its .Group or .Resource since last processed in this method
 	oldSpec, had := ctc.ctNameToSpec[ct.Name]
 	if had {
@@ -169,10 +170,10 @@ func ctSpecGroupResource(spec v1alpha1.CustomTransformSpec) metav1.GroupResource
 	return metav1.GroupResource{Group: spec.APIGroup, Resource: spec.Resource}
 }
 
-func (ctc *customTransformCollectionImpl) parseRemovesAndUpdateStatus(ctx context.Context, ct *v1alpha1.CustomTransform) (removes []jsonpath.Query) {
+func (ctc *customTransformCollectionImpl) parseRemovesAndUpdateStatus(ctx context.Context, ct *v1alpha1.CustomTransform, commonWarnings []string) (removes []jsonpath.Query) {
 	logger := klog.FromContext(ctx)
 	ctCopy := ct.DeepCopy()
-	ctCopy.Status = v1alpha1.CustomTransformStatus{ObservedGeneration: ct.Generation}
+	ctCopy.Status = v1alpha1.CustomTransformStatus{ObservedGeneration: ct.Generation, Warnings: commonWarnings}
 	for idx, queryS := range ct.Spec.Remove {
 		query, err := jsonpath.ParseQuery(queryS)
 		if err != nil {
