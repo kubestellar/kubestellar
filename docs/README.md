@@ -56,7 +56,7 @@ Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
 
 ## Jinja templating
 
-Our documentation stack includes [Jinja](https://jinja.palletsprojects.com/en/3.1.x/). The Jinja constructs --- \{\% ... \%\} for statements, \{\{ ... \}\} for expressions, and \{\# ... \#\} for comments --- can appear in the markdown sources.
+Our documentation stack includes [Jinja](https://jinja.palletsprojects.com/en/3.1.x/). The Jinja constructs --- \{\# comment \#\}, \{\{ expr \}\}, and {&#37; statment &#37;} --- can appear in the markdown sources.
 
 ## File structure
 
