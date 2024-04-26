@@ -17,6 +17,7 @@ limitations under the License.
 package crd
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"embed"
@@ -133,27 +134,43 @@ func readCRDs() ([]*unstructured.Unstructured, error) {
 		if err != nil {
 			return nil, err
 		}
-		obj, err := DecodeYAML(content)
+		objs, err := DecodeYAML(content)
 		if err != nil {
 			return nil, err
 		}
 
-		if util.IsCRD(obj) {
-			crds = append(crds, obj)
+		for _, obj := range objs {
+			if util.IsCRD(obj) {
+				crds = append(crds, obj)
+			}
 		}
 	}
 	return crds, nil
 }
 
-// Read the YAML into an unstructured object
-func DecodeYAML(yamlBytes []byte) (*unstructured.Unstructured, error) {
-	obj := &unstructured.Unstructured{}
-	dec := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(yamlBytes), 4096)
-	err := dec.Decode(obj)
-	if err != nil {
-		return nil, err
+// DecodeYAML decodes the content of a yaml file into a slice of unstructured objects.
+func DecodeYAML(yamlBytes []byte) ([]*unstructured.Unstructured, error) {
+	var objects []*unstructured.Unstructured
+	yamlReader := yaml.NewYAMLReader(bufio.NewReader(bytes.NewReader(yamlBytes)))
+	for {
+		yamlDoc, err := yamlReader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return nil, err
+		}
+
+		// Decode the YAML document into an unstructured object
+		obj := &unstructured.Unstructured{}
+		err = yaml.Unmarshal(yamlDoc, obj)
+		if err != nil {
+			return nil, err
+		}
+
+		objects = append(objects, obj)
 	}
-	return obj, nil
+	return objects, nil
 }
 
 func waitForCRDAccepted(ctx context.Context, clientset apiextensionsclientset.Interface, crdName string) error {
