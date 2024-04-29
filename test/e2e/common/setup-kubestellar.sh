@@ -93,7 +93,7 @@ kflex create its1 --type vcluster -p ocm $disable_chatty_status
 : Install singleton status return addon in ITS1
 :
 wait-for-cmd kubectl --context its1 api-resources "|" grep managedclusteraddons
-helm --kube-context its1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc6
+helm --kube-context its1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc8
 
 :
 : -------------------------------------------------------------------------

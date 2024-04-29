@@ -1,6 +1,8 @@
 # Deploy KubeStellar on K3D
 
-This document shows how to deploy kubestellar on K3D hub and wec clusters
+This document shows how to deploy kubestellar on K3D hub and wec clusters.
+
+This is a point-in-time statement that worked with KubeStellar release v0.22.0-rc1.
 
 ## Prereqs
 
@@ -13,23 +15,25 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
 1. If you previously installed KS on K3D:
     ```shell
     k3d cluster delete kubeflex
-    k3d cluster delete wec1
+    k3d cluster delete cluster1
+    k3d cluster delete cluster2
     kubectl config delete-context kubeflex || true
-    kubectl config delete-context wec1 || true
+    kubectl config delete-context cluster1 || true
+    kubectl config delete-context cluster2 || true
     ```
    If previously running KS on Kind, clean that up with the Kind cleanup script (in `test/e2e/common/cleanup.sh`).
 
 1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
     ```shell
-    export KUBESTELLAR_VERSION=0.21.0
-    export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
+    export KUBESTELLAR_VERSION=0.22.0-rc1
+    export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
+    export OCM_TRANSPORT_PLUGIN=0.1.3
     ```
 
 1. Create a K3D hosting cluster with nginx ingress controller:
     ```shell
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
     helm install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --version 4.6.1 --namespace ingress-nginx --create-namespace
-    kubectl config rename-context k3d-kubeflex kubeflex
     ```
 
 1. When we use kind, the name of the container is kubeflex-control-plane and that is what we use 
@@ -43,7 +47,7 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
     Wait 1-2 minutes for all pods to be restarted.
     Use the following command to confirm all are fully running:
     ```shell
-    kubectl --context kubeflex get po -A
+    kubectl --context k3d-kubeflex get po -A
     ```
 
 1. Install kubestellar controller and OCM space:
@@ -58,6 +62,7 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
     kflex init
     kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/kubestellar.yaml
     kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/config/postcreate-hooks/ocm.yaml
+    kubectl config rename-context k3d-kubeflex kind-kubeflex
     kflex create its1 --type vcluster -p ocm
     ```
 
@@ -76,43 +81,62 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
     kflex create wds1 -p kubestellar
     ```
 
-1. Run the OCM based transport controller in a pod.  
-**NOTE**: This is work in progress, in the future the controller will be deployed through a Helm chart.
+1. Deploy the OCM based transport controller.
 
-    Run transport deployment script (in `scripts/deploy-transport-controller.sh`), as follows.
-    This script requires that the user's current kubeconfig context be for the kubeflex hosting cluster.
-    This script expects to get two or three arguments - (1) wds name; (2) ITS name; and (3) transport controller image.  
-    While the first and second arguments are mandatory, the third one is optional.
-    The transport controller image argument can be specified to a specific image, or, if omitted, it defaults to the OCM transport plugin release that preceded the KubeStellar release being used.
-    For example, one can deploy transport controller using the following commands:
     ```shell
-    kflex ctx
-    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds1 its1
+    helm --kube-context kind-kubeflex upgrade --install ocm-transport-plugin oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin --version ${OCM_TRANSPORT_PLUGIN} \
+     --set transport_cp_name=its1 \
+     --set wds_cp_name=wds1 \
+     -n wds1-system
     ```
 
-1. Create the Workload Execution Cluster `wec1` and register it
-   Make sure `wec1` shares the same docker network as the `kubeflex` hosting cluster.
+1. Create the Workload Execution Cluster `cluster1` and register it
+   Make sure `cluster1` shares the same docker network as the `kubeflex` hosting cluster.
     ```shell
-    k3d cluster create -p "31080:80@loadbalancer"  --network k3d-kubeflex wec1
-    kubectl config rename-context k3d-wec1 wec1
+    k3d cluster create -p "31080:80@loadbalancer"  --network k3d-kubeflex cluster1
+    kubectl config rename-context k3d-cluster1 cluster1
     ```
-   Register `wec1`:
+   Register `cluster1`:
     ```shell
     flags="--force-internal-endpoint-lookup"
-    clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/wec1/" | awk '{print $0 " --context 'wec1' '${flags}'"}' | sh
+    clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/cluster1/" | awk '{print $0 " --context 'cluster1' '${flags}'"}' | sh
     ```
    Wait for csr to be created:
     ```shell
-    kubectl --context its1 get csr --watch
+    kubectl --context its1 get csr --watch || true
     ```
-    and then accept pending wec1 cluster
+    and then accept pending cluster1 cluster
     ```shell
-    clusteradm --context its1 accept --clusters wec1
+    clusteradm --context its1 accept --clusters cluster1
     ```
-    Confirm wec1 is accepted and label it for the BindingPolicy:
+    Confirm cluster1 is accepted and label it for the BindingPolicy:
     ```shell
     kubectl --context its1 get managedclusters
-    kubectl --context its1 label managedcluster wec1 location-group=edge name=wec1
+    kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
+    ```
+
+1. In the same way, make another WEC named "cluster2".
+    ```shell
+    k3d cluster create -p "31180:80@loadbalancer"  --network k3d-kubeflex cluster2
+    kubectl config rename-context k3d-cluster2 cluster2
+    ```
+   Register `cluster2`:
+    ```shell
+    flags="--force-internal-endpoint-lookup"
+    clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/cluster2/" | awk '{print $0 " --context 'cluster2' '${flags}'"}' | sh
+    ```
+   Wait for csr to be created:
+    ```shell
+    kubectl --context its1 get csr --watch || true
+    ```
+    and then accept pending cluster2 cluster
+    ```shell
+    clusteradm --context its1 accept --clusters cluster2
+    ```
+    Confirm cluster2 is accepted and label it for the BindingPolicy:
+    ```shell
+    kubectl --context its1 get managedclusters
+    kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
     ```
 
 1. (optional) Check relevant deployments and statefulsets running in the hosting cluster. Expect to
@@ -120,7 +144,7 @@ see the `kubestellar-controller-manager` in the `wds1-system` namespace and the
 statefulset `vcluster` in the `its1-system` namespace, both fully ready.
 
     ```shell
-    kubectl --context kubeflex get deployments,statefulsets --all-namespaces
+    kubectl --context kind-kubeflex get deployments,statefulsets --all-namespaces
     ```
    The output should look something like the following:
     ```
@@ -140,3 +164,4 @@ statefulset `vcluster` in the `its1-system` namespace, both fully ready.
     its1-system       statefulset.apps/vcluster              1/1     5m17s
     ```
 
+You may now proceed with Sceario 1 and others in [the examples](examples.md) (do not do the "Common Setup", that is written for `kind` rather than `k3d`).

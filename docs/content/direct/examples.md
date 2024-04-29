@@ -22,7 +22,7 @@ The following steps establish an initial state used in the examples below.
 
     ```shell
     export KUBESTELLAR_VERSION=0.22.0-rc1
-    export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
+    export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
     export OCM_TRANSPORT_PLUGIN=0.1.3
     ```
 

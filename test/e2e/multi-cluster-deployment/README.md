@@ -38,6 +38,6 @@ $ kubectl config rename-context <default-wec1-context-name> kscore
 
 ```
  export KUBESTELLAR_VERSION=0.21.2
- export OCM_STATUS_ADDON_VERSION=0.2.0-rc6
+ export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
  bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/multi-cluster-deployment/run-test.sh) --env ocp
 ```
