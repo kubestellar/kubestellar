@@ -871,6 +871,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#reacting-to-a-new-ocm-status-addon-release" class="md-nav__link">
+    Reacting to a new ocm-status-addon release
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#making-a-new-kubestellar-release" class="md-nav__link">
     Making a new kubestellar release
   </a>
@@ -1535,6 +1542,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#reacting-to-a-new-ocm-status-addon-release" class="md-nav__link">
+    Reacting to a new ocm-status-addon release
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#making-a-new-kubestellar-release" class="md-nav__link">
     Making a new kubestellar release
   </a>
@@ -1673,6 +1687,13 @@ clues about the problem.</p>
 <p>Edit <code>test/e2e/common/setup-kubestellar.sh</code>: update the setting of <code>OCM_TRANSPORT_PLUGIN_RELEASE</code> to the latest.</p>
 </li>
 </ul>
+<h3 id="reacting-to-a-new-ocm-status-addon-release">Reacting to a new ocm-status-addon release<a class="headerlink" href="#reacting-to-a-new-ocm-status-addon-release" title="Permanent link">#</a></h3>
+<p>Update the references to the ocm-status-addon release in the following files.</p>
+<ul>
+<li><code>docs/content/direct/examples.md</code></li>
+<li><code>test/e2e/multi-cluster-deployment/README.md</code></li>
+<li><code>test/e2e/common/setup-kubestellar.sh</code></li>
+</ul>
 <h3 id="making-a-new-kubestellar-release">Making a new kubestellar release<a class="headerlink" href="#making-a-new-kubestellar-release" title="Permanent link">#</a></h3>
 <p>Making a new kubestellar release requires a contributor to do the following things. Here <code>$version</code> is the semver identifier for the release (e.g., <code>1.2.3-rc2</code>).</p>
 <ul>
@@ -1727,7 +1748,7 @@ clues about the problem.</p>
 <li>Thus, it is necessary to keep users clearly appraised of the quality (or status of evaluating the quality) of each release.</li>
 <li>Because of the lack of self references, most user instructions (e.g., examples) and tests do not have concrete release identifiers in them; instead, the user has to chose and supply the release identifier. There can also be documentation of a specific past release (e.g., the latest stable release) that uses the literal identifier for that past release.</li>
 <li><strong>PAY ATTENTION TO THIS ONE</strong>: Because of the prohibition of self references, <strong>Git will not contain the exact bytes of our Helm chart definitions</strong>. Where a Helm chart states its own version or has a container image reference to an image built from the same release, the bytes in Git have a placeholder for that image's tag and the process of creating the published release artifacts fills in that placeholder. Think of this as being analogous to the linking done when building a binary executable file.</li>
-<li>The design below falls short of the goal of not putting self-references in files under Git control. One way is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another is in the examples document, which also holds references to its own release. Another is in the examples.md file, and another is in the <code>docs/content/direct/README.md</code> file.</li>
+<li>The design below falls short of the goal of not putting self-references in files under Git control. One way is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another is in the examples document, which also holds references to its own release. Additional self-references are in the <code>docs/content/direct/README.md</code> and <code>docs/content/direct/deploy-on-k3d.md</code>.</li>
 </ul>
 <h2 id="dependency-cycle-with-ksotp">Dependency cycle with ks/OTP<a class="headerlink" href="#dependency-cycle-with-ksotp" title="Permanent link">#</a></h2>
 <p>The <a href="https://github.com/kubestellar/kubestellar">ks/ks repo</a> and the <a href="https://github.com/kubestellar/ocm-transport-plugin">ks/OTP repo</a> reference each other. Thus, making consistent immutable recursive-self-reference-free releases is impossible. We have to compromise somehow. There is some discussion in <a href="https://github.com/kubestellar/kubestellar/issues/1786">ks/ks Issue 1786</a>. We currently seem to be following the staggered release approach.</p>
