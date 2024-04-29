@@ -26,7 +26,6 @@ Between each release of [ks/OTP](https://github.com/kubestellar/ocm-transport-pl
 Update the references to the ocm-status-addon release in the following files.
 
 - `docs/content/direct/examples.md`
-- `docs/content/direct/deploy-on-k3d.md`
 - `test/e2e/multi-cluster-deployment/README.md`
 - `test/e2e/common/setup-kubestellar.sh`
 
@@ -37,8 +36,6 @@ Making a new kubestellar release requires a contributor to do the following thin
 - Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
 
 - Edit [the examples document](examples.md) to update the self-references for the coming release.
-
-- Edit [the k3d deploy instructions](deploy-on-k3d.md) to update the self-reference.
 
 - Until we have our first stable release, edit [the README](README.md#latest-stable-release) where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
 
