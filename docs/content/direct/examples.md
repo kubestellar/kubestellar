@@ -21,9 +21,9 @@ The following steps establish an initial state used in the examples below.
 1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
 
     ```shell
-    export KUBESTELLAR_VERSION=0.22.0-rc1
+    export KUBESTELLAR_VERSION=0.22.0-rc2
     export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
-    export OCM_TRANSPORT_PLUGIN=0.1.3
+    export OCM_TRANSPORT_PLUGIN=0.1.5
     ```
 
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
