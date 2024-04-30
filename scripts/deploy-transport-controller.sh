@@ -16,7 +16,7 @@
 # Transport deployment script assumes it runs using the kubeflex hosting cluster context.
 
 
-DEFAULT_TRANSPORT_CONTROLLER_IMAGE=ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.3
+DEFAULT_TRANSPORT_CONTROLLER_IMAGE=ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.5
 
 args=()
 
