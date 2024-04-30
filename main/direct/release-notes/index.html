@@ -1581,6 +1581,7 @@
 <li><code>PriorityClass</code> objects (from API group <code>scheduling.k8s.io</code>) propagate now.</li>
 <li>Support multiple WDSes.</li>
 <li>Allow multiple ITSes.</li>
+<li>Use the new Helm chart from kubestellar/ocm-transport-plugin for deploying the transport controller.</li>
 </ul>
 <p>Prominent bug fixes include more discerning cleaning of workload objects on their way from WDS to WEC. This includes keeping a "headless" <code>Service</code> headless and removing the <code>spec.suspend</code> field from a <code>Job</code>.</p>
 <p>See <a href="https://github.com/kubestellar/kubestellar/releases">the changelogs on GitHub</a> for full details.</p>
