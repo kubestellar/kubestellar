@@ -1398,9 +1398,10 @@
 
 
 <h1 id="create-and-register-wecs-for-examples">Create and Register WECs for examples<a class="headerlink" href="#create-and-register-wecs-for-examples" title="Permanent link">#</a></h1>
-<p>The following steps show how to create new clusters and
+<p>The following steps show how to create two new <code>kind</code> clusters and
 register them with the hub as descibed in the
 <a href="https://open-cluster-management.io/getting-started/installation/start-the-control-plane/">official open cluster management docs</a>.</p>
+<p>Note that <code>kind</code> does not support three or more concurrent clusters unless you raise some limits as described in this <code>kind</code> "known issue": <a href="https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files">Pod errors due to “too many open files”</a>.</p>
 <ol>
 <li>
 <p>Execute the following commands to create two kind clusters, named <code>cluster1</code> and <code>cluster2</code>, and register them with the OCM hub. These clusters will serve as workload clusters. If you have previously executed these commands, you might already have contexts named <code>cluster1</code> and <code>cluster2</code>. If so, you can remove these contexts using the commands <code>kubectl config delete-context cluster1</code> and <code>kubectl config delete-context cluster2</code>.</p>
