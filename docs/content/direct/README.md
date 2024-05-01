@@ -37,7 +37,7 @@ We do not have one that is proven very good yet.
 The first release using the new architecture is 0.20.0; it is feture-incomplete.
 Release 0.21.0 works but is not well documented on the website; [view the missing information directly at GitHub](https://github.com/kubestellar/kubestellar/tree/release-0.21.0/docs/content/direct).
 Release 0.21.2 mostly works but references an outdated version (0.1.0) of the OCM transport plugin.
-The latest release is 0.22.0-rc2.
+The latest release is 0.22.0-rc3.
 See also [the release notes](release-notes.md).
 
 ## Architecture
