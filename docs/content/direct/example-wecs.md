@@ -1,8 +1,10 @@
 # Create and Register WECs for examples
 
-The following steps show how to create new clusters and
+The following steps show how to create two new `kind` clusters and
 register them with the hub as descibed in the
 [official open cluster management docs](https://open-cluster-management.io/getting-started/installation/start-the-control-plane/).
+
+Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
 
 1. Execute the following commands to create two kind clusters, named `cluster1` and `cluster2`, and register them with the OCM hub. These clusters will serve as workload clusters. If you have previously executed these commands, you might already have contexts named `cluster1` and `cluster2`. If so, you can remove these contexts using the commands `kubectl config delete-context cluster1` and `kubectl config delete-context cluster2`.
 
