@@ -1,6 +1,6 @@
 # KubeStellar Contributors
 
-![](./images/construction.png){: style="height:100px;width:100px"}
+![](./images/construction.png)
 
 
 Make sure all pre-requisites are installed as described in [pre-reqs](pre-reqs.md)
