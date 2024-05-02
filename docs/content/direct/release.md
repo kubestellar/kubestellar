@@ -37,6 +37,8 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Edit [the examples document](examples.md) to update the self-references for the coming release.
 
+- Update the kubestellar release number in `test/e2e/multi-cluster-deployment/README.md`.
+
 - Until we have our first stable release, edit [the README](README.md#latest-stable-release) where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
 
 - Edit [the release notes](release-notes.md).
