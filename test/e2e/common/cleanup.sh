@@ -39,9 +39,10 @@ elif [ $env == "ocp" ];then
     # Unregister the managed clusters
     function unregister_cluster() {
         cluster=$1
-        kubectl --context $cluster delete ns nginx
+
+        kubectl --context $cluster delete ns nginx --ignore-not-found
         clusteradm unjoin --cluster-name $cluster
-        kubectl --context $cluster delete ns open-cluster-management open-cluster-management-agent open-cluster-management-agent-addon
+        kubectl --context $cluster delete ns open-cluster-management open-cluster-management-agent open-cluster-management-agent-addon --ignore-not-found
     }
 
     unregister_cluster cluster1
@@ -49,11 +50,14 @@ elif [ $env == "ocp" ];then
 
     # To uninstall KubeFlex, first ensure you remove all you control planes:
     kubectl config use-context kscore
-    kubectl delete cps --all
-    helm delete -n kubeflex-system kubeflex-operator
-    helm delete -n kubeflex-system postgres
-    kubectl -n kubeflex-system delete pvc data-postgres-postgresql-0
-    kubectl delete ns kubeflex-system
+    if kubectl get cps; then
+       kubectl delete cps --all
+    fi
+
+    helm delete -n kubeflex-system kubeflex-operator --ignore-not-found
+    helm delete -n kubeflex-system postgres --ignore-not-found
+    kubectl -n kubeflex-system delete pvc data-postgres-postgresql-0 --ignore-not-found
+    kubectl delete ns kubeflex-system --ignore-not-found
 
     # Unset the kubeconfig contexts
     kubectl config unset contexts.its1

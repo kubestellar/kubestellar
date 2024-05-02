@@ -51,7 +51,7 @@ kflex create its1 --type vcluster -p ocm $disable_chatty_status
 
 :
 : -------------------------------------------------------------------------
-: Install singleton status return addon in IMBS1
+: Install singleton status return addon in ITS1
 :
 wait-for-cmd kubectl --context its1 api-resources "|" grep managedclusteraddons
 helm --kube-context its1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v${OCM_STATUS_ADDON_VERSION}
@@ -59,19 +59,24 @@ helm --kube-context its1 upgrade --install status-addon -n open-cluster-manageme
 : -------------------------------------------------------------------------
 : Create a Workload Description Space wds1 directly in KubeFlex.
 :
-kflex create wds1 -p kubestellar
+kflex create wds1 -p kubestellar $disable_chatty_status
+kubectl --context kscore label cp wds1 kflex.kubestellar.io/cptype=wds
+
 echo "wds1 created."
 
 :
 : -------------------------------------------------------------------------
 : Run OCM transport controller in a pod
 :
-kflex ctx
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/deploy-transport-controller.sh) wds1 its1
-wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))'
+helm --kube-context kscore upgrade --install ocm-transport-plugin oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin --version ${OCM_TRANSPORT_PLUGIN} \
+ --set transport_cp_name=its1 \
+ --set wds_cp_name=wds1 \
+ -n wds1-system
+
+wait-for-cmd '(kubectl --context kscore -n wds1-system wait --for=condition=Ready pod/$(kubectl --context kscore -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))'
 
 echo "transport controller is running."
-
+wait-for-cmd 'kubectl --context its1 get ns customization-properties'
 :
 : -------------------------------------------------------------------------
 
@@ -94,8 +99,11 @@ clusteradm --context its1 accept --clusters cluster1
 clusteradm --context its1 accept --clusters cluster2
 
 kubectl --context its1 get managedclusters
-kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
-kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
+kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1 region=east
+kubectl --context its1 create cm -n customization-properties cluster1 --from-literal clusterURL=https://my.clusters/1001-abcd
+kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2 region=west
+kubectl --context its1 create cm -n customization-properties cluster2 --from-literal clusterURL=https://my.clusters/2002-cdef
+
 
 :
 : -------------------------------------------------------------------------
@@ -103,11 +111,8 @@ kubectl --context its1 label managedcluster cluster2 location-group=edge name=cl
 : Expect to see the wds1 kubestellar-controller-manager and transport-controller created in the wds1-system
 : namespace and the its1 statefulset created in the its1-system namespace.
 :
-if ! kubectl --context kscore get deployments,statefulsets --all-namespaces $disable_chatty_status | grep -e wds1 -e its1 | wc -l | grep -wq 5
-then
-    echo "Failed to see wds1 deployment and its1 statefulset."
-    exit 1
-fi
+
+wait-for-cmd '(($(kubectl --context kscore get deployments,statefulsets --all-namespaces | grep -e wds1 -e its1 | wc -l) == 5))'
 
 :
 : -------------------------------------------------------------------------
