@@ -574,6 +574,19 @@
     0.22.0 and its release candidates
   </a>
   
+    <nav class="md-nav" aria-label="0.22.0 and its release candidates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remaining-limitations-in-0220-and-its-release-candidates" class="md-nav__link">
+    Remaining limitations in 0.22.0 and its release candidates
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1483,6 +1496,19 @@
     0.22.0 and its release candidates
   </a>
   
+    <nav class="md-nav" aria-label="0.22.0 and its release candidates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remaining-limitations-in-0220-and-its-release-candidates" class="md-nav__link">
+    Remaining limitations in 0.22.0 and its release candidates
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1585,6 +1611,12 @@
 </ul>
 <p>Prominent bug fixes include more discerning cleaning of workload objects on their way from WDS to WEC. This includes keeping a "headless" <code>Service</code> headless and removing the <code>spec.suspend</code> field from a <code>Job</code>.</p>
 <p>See <a href="https://github.com/kubestellar/kubestellar/releases">the changelogs on GitHub</a> for full details.</p>
+<h3 id="remaining-limitations-in-0220-and-its-release-candidates">Remaining limitations in 0.22.0 and its release candidates<a class="headerlink" href="#remaining-limitations-in-0220-and-its-release-candidates" title="Permanent link">#</a></h3>
+<ul>
+<li>Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object</li>
+<li>Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.</li>
+<li>Objects on two different WDSs shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.</li>
+</ul>
 <h2 id="0212-and-its-release-candidates">0.21.2 and its release candidates<a class="headerlink" href="#0212-and-its-release-candidates" title="Permanent link">#</a></h2>
 <p>The changes since 0.21.1 include efficiency improvements, reducing costs of running the kubestellar-controller-manager for a WDS that is an OpenShift cluster. There are also bug fixes and documentation improvements.</p>
 <h2 id="0211">0.21.1<a class="headerlink" href="#0211" title="Permanent link">#</a></h2>
