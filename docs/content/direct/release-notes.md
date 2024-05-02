@@ -17,6 +17,13 @@ Prominent bug fixes include more discerning cleaning of workload objects on thei
 
 See [the changelogs on GitHub](https://github.com/kubestellar/kubestellar/releases) for full details.
 
+### Remaining limitations in 0.22.0 and its release candidates
+
+* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+* Objects on two different WDSs shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+
+
 ## 0.21.2 and its release candidates
 
 The changes since 0.21.1 include efficiency improvements, reducing costs of running the kubestellar-controller-manager for a WDS that is an OpenShift cluster. There are also bug fixes and documentation improvements.
