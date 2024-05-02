@@ -1,0 +1,1133 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="https://docs.kubestellar.io/release-0.22.0/direct/packaging/" rel="canonical"/>
+<link href="../contributor/" rel="prev"/>
+<link href="../release/" rel="next"/>
+<link href="../../favicons/favicon.ico" rel="icon"/>
+<meta content="mkdocs-1.4.2, mkdocs-material-9.1.0" name="generator"/>
+<title>Packaging - KubeStellar</title>
+<link href="../../assets/stylesheets/main.402914a4.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.a0c5b2b5.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=SapceMono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"SapceMono";--md-code-font:"Roboto Mono"}</style>
+<link href="../../stylesheets/kubestellar.css" rel="stylesheet"/>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-SR5TD1CXY7"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-SR5TD1CXY7",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-SR5TD1CXY7",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+<script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+<meta content="QZFIkG95fMxODWgQDK2OUn73HUIu9fZmuTer-ZA4UwI" name="google-site-verification">
+<!-- Determine title -->
+<!-- The image needs to have an absolute URL -->
+<!-- Open graph meta tags -->
+<meta content="website" property="og:type">
+<meta content="KubeStellar - Packaging" property="og:title">
+<meta content="None" property="og:description"/>
+<meta content="https://docs.kubestellar.io/release-0.22.0/direct/packaging/" property="og:url"/>
+<meta content="https://docs.kubestellar.io/release-0.22.0assets/images/illustrations/banner.png" property="og:image"/>
+<meta content="image/png" property="og:image:type"/>
+<meta content="1080" property="og:image:width"/>
+<meta content="568" property="og:image:height"/>
+<!-- google-site-verification meta-tag -->
+<meta content="-Rj8YMCn9uu5IwOFdC-WfAzXp4ZOMJtYKxU40ZgcJIU" name="google-site-verification"/>
+<!-- Extra stylesheets -->
+<!--  <link
+    rel="stylesheet"
+    href="../../assets/stylesheets/overrides.css"
+  />-->
+</meta></meta></meta></head>
+<body data-md-color-accent="" data-md-color-primary="" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#packaging-and-delivery">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+<aside class="md-banner">
+<div class="md-banner__inner md-grid md-typeset">
+<!-- Extra stylesing -->
+<style>
+      .md-announce a,
+      .md-announce a:focus,
+      .md-announce a:hover{color:currentColor}.md-announce
+      strong{white-space:nowrap}.md-announce
+  </style>
+<!--   
+  <a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
+  <p style="color: #D5EE1C">For updates follow <strong style="color: #D5EE1C">@kubestellar</strong> on
+    <strong style="color: white">LinkedIn</strong>
+  </p>
+</a> 
+-->
+<a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
+<p style="color: #D5EE1C">KubeStellar is now a <strong style="color: #D5EE1C">Cloud Native Computing Foundation (CNCF) Sanbox Project</strong>. Follow us <strong style="color: #D5EE1C">@kubestellar</strong> on
+    <strong style="color: white">LinkedIn</strong>
+</p>
+</a>
+</div>
+</aside>
+</div>
+<div data-md-color-scheme="default" data-md-component="outdated" hidden="">
+<aside class="md-banner md-banner--warning">
+<div class="md-banner__inner md-grid md-typeset">
+              
+  You're not viewing the latest release.
+  <a href="../latest/../..">
+<strong>Click here to go to the latest release</strong>
+</a>
+  Also, FYI, 
+  <a href="../stable/../..">
+<strong>Click here to go to the latest stable release</strong>
+</a>
+</div>
+<script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+</aside>
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="KubeStellar" class="md-header__button md-logo" data-md-component="logo" href="../.." title="KubeStellar">
+<img alt="logo" src="../../logo.png"/>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            KubeStellar
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Packaging
+            
+          </span>
+</div>
+</div>
+</div>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/kubestellar/kubestellar" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../..">
+        Welcome
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../readme/">
+        Overview
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../pre-reqs/">
+        Getting Started
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link md-tabs__link--active" href="../contributor/">
+        Contributing
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../Community/_index/">
+        Community
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank">
+      Blog
+    </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="KubeStellar" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="KubeStellar">
+<img alt="logo" src="../../logo.png"/>
+</a>
+    KubeStellar
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/kubestellar/kubestellar" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_1" type="checkbox"/>
+<div class="md-nav__link md-nav__link--index">
+<a href="../..">Welcome</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_1_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_1">
+<span class="md-nav__icon md-icon"></span>
+          Welcome
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          Overview
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+          Overview
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../readme/">
+        Readme
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../user-guide/">
+        User guide
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../architecture/">
+        Architecture
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../release-notes/">
+        Release-notes
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          Getting Started
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+          Getting Started
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../pre-reqs/">
+        Pre-reqs
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+          Setting up KubeStellar
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_2">
+<span class="md-nav__icon md-icon"></span>
+          Setting up KubeStellar
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../hosting-cluster/">
+        Using existing hosting cluster
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ks-on-kind/">
+        KubeStellar on KIND
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../deploy-on-k3d/">
+        KubeStellar on K3D
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ks-on-ocp/">
+        KubeStellar on OCP
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../best-practices/">
+        Best practices
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../examples/">
+        Examples
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          Contributing
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+          Contributing
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../contributor/">
+        Overview of contributing
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+          Packaging
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+        Packaging
+      </a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#outline-of-github-repositories">
+    Outline of GitHub repositories
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubeflex">
+    KubeFlex
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-status-addon">
+    OCM Status Addon
+  </a>
+<nav aria-label="OCM Status Addon" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#outline-of-ocm-status-addon-publishing">
+    Outline of OCM status addon publishing
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-status-addon-container-image">
+    OCM status addon container image
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-status-addon-helm-chart">
+    OCM status addon Helm chart
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-transport-plugin">
+    OCM Transport Plugin
+  </a>
+<nav aria-label="OCM Transport Plugin" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-transport-container-image">
+    OCM Transport container image
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubestellar">
+    KubeStellar
+  </a>
+<nav aria-label="KubeStellar" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#warning">
+    WARNING
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#outline-of-publishing">
+    Outline of publishing
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#local-copy-of-kubestellar-git-repo">
+    Local copy of KubeStellar git repo
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#derived-files">
+    Derived files
+  </a>
+<nav aria-label="Derived files" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#files-generated-by-controller-gen">
+    Files generated by controller-gen
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#files-generated-by-code-generator">
+    Files generated by code-generator
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubestellar-controller-manager-container-image">
+    KubeStellar controller-manager container image
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubestellar-controller-manager-helm-chart">
+    KubeStellar controller-manager Helm Chart
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#clusteradm-container-image">
+    clusteradm container image
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubeflex-postcreatehooks">
+    KubeFlex PostCreateHooks
+  </a>
+<nav aria-label="KubeFlex PostCreateHooks" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-postcreatehook">
+    ocm PostCreateHook
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubestellar-postcreatehook">
+    kubestellar PostCreateHook
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#amalgamated-graph">
+    Amalgamated graph
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../release/">
+        Release Process
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Contribution%20guidelines/CONTRIBUTING/">
+        Guidelines
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Contribution%20guidelines/coc/">
+        Code of Conduct
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Contribution%20guidelines/LICENSE/">
+        License
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Contribution%20guidelines/governance/">
+        Governance
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Contribution%20guidelines/onboarding/">
+        Onboarding
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Contribution%20guidelines/operations/document-management/">
+        Website
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4_10" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          Security
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_10_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_10">
+<span class="md-nav__icon md-icon"></span>
+          Security
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Contribution%20guidelines/security/security/">
+        Policy
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Contribution%20guidelines/security/security_contacts/">
+        Contacts
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          Community
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+          Community
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Community/_index/">
+        Get Involved
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_5_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+          Contact Us
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_5_2">
+<span class="md-nav__icon md-icon"></span>
+          Contact Us
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://kubestellar.io/join_us">
+        Mailing List
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://kubestellar.io/agenda">
+        Community Meeting Agenda (join mailing list first)
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://kubestellar.io/slack">
+        Slack
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://kubestellar.io/blog">
+        Medium Blog
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://kubestellar.io/tv">
+        YouTube Channel
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://kubestellar.io/linkedin">
+        LinkedIn
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://www.reddit.com/r/kubestellar/">
+        Reddit
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS">
+        Google Drive
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_5_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+          Partners
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_5_3">
+<span class="md-nav__icon md-icon"></span>
+          Partners
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Community/partners/argocd/">
+        ArgoCD
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Community/partners/turbonomic/">
+        Turbonomic
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Community/partners/mvi/">
+        MVI
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Community/partners/fluxcd/">
+        FluxCD
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Community/partners/openziti/">
+        OpenZiti
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Community/partners/kyverno/">
+        Kyverno
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank">
+        Blog
+      </a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#outline-of-github-repositories">
+    Outline of GitHub repositories
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubeflex">
+    KubeFlex
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-status-addon">
+    OCM Status Addon
+  </a>
+<nav aria-label="OCM Status Addon" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#outline-of-ocm-status-addon-publishing">
+    Outline of OCM status addon publishing
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-status-addon-container-image">
+    OCM status addon container image
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-status-addon-helm-chart">
+    OCM status addon Helm chart
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-transport-plugin">
+    OCM Transport Plugin
+  </a>
+<nav aria-label="OCM Transport Plugin" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-transport-container-image">
+    OCM Transport container image
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubestellar">
+    KubeStellar
+  </a>
+<nav aria-label="KubeStellar" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#warning">
+    WARNING
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#outline-of-publishing">
+    Outline of publishing
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#local-copy-of-kubestellar-git-repo">
+    Local copy of KubeStellar git repo
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#derived-files">
+    Derived files
+  </a>
+<nav aria-label="Derived files" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#files-generated-by-controller-gen">
+    Files generated by controller-gen
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#files-generated-by-code-generator">
+    Files generated by code-generator
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubestellar-controller-manager-container-image">
+    KubeStellar controller-manager container image
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubestellar-controller-manager-helm-chart">
+    KubeStellar controller-manager Helm Chart
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#clusteradm-container-image">
+    clusteradm container image
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubeflex-postcreatehooks">
+    KubeFlex PostCreateHooks
+  </a>
+<nav aria-label="KubeFlex PostCreateHooks" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-postcreatehook">
+    ocm PostCreateHook
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kubestellar-postcreatehook">
+    kubestellar PostCreateHook
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#amalgamated-graph">
+    Amalgamated graph
+  </a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<a class="md-content__button md-icon" href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/packaging.md" title="Edit this page">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"></path></svg>
+</a>
+<a class="md-content__button md-icon" href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/packaging.md" title="View source of this page">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"></path></svg>
+</a>
+<h1 id="packaging-and-delivery">Packaging and Delivery<a class="headerlink" href="#packaging-and-delivery" title="Permanent link">#</a></h1>
+<h2 id="outline-of-github-repositories">Outline of GitHub repositories<a class="headerlink" href="#outline-of-github-repositories" title="Permanent link">#</a></h2>
+<p>The following is a graph of the GitHub repositories in the <code>kubestellar</code> GitHub organization and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow. These are not just build-time dependencies but any reference from one repo to another.</p>
+<div class="mermaid">flowchart LR
+    kubestellar --&gt; kubeflex
+    kubestellar --&gt; ocm-status-addon
+    ocm-status-addon --&gt; kubestellar
+    ocm-transport-plugin --&gt; kubestellar
+    kubestellar --&gt; ocm-transport-plugin
+</div>
+<p>The references from ocm-status-addon to kubestellar are only in documentation and are in the process of being removed (no big difficulty is anticipated).</p>
+<h2 id="kubeflex">KubeFlex<a class="headerlink" href="#kubeflex" title="Permanent link">#</a></h2>
+<p>See <a href="https://github.com/kubestellar/kubeflex">the GitHub repo</a>.</p>
+<h2 id="ocm-status-addon">OCM Status Addon<a class="headerlink" href="#ocm-status-addon" title="Permanent link">#</a></h2>
+<p>The <a href="https://github.com/kubestellar/ocm-status-addon">OCM Status Addon</a> repo is the source of a RedHat-style operator.</p>
+<h3 id="outline-of-ocm-status-addon-publishing">Outline of OCM status addon publishing<a class="headerlink" href="#outline-of-ocm-status-addon-publishing" title="Permanent link">#</a></h3>
+<div class="mermaid">flowchart LR
+    subgraph "ocm-status-addon@GitHub"
+    osa_code[OSA source code]
+    osa_hc_src[OSA Helm chart source]
+    end
+    osa_ctr_image[OSA container image] --&gt; osa_code
+    osa_hc_repo[published OSA Helm Chart] --&gt; osa_hc_src
+    osa_hc_src -.-&gt; osa_ctr_image
+    osa_hc_repo -.-&gt; osa_ctr_image
+</div>
+<p>The dashed dependencies are at run time, not build time.</p>
+<p>"OSA" is OCM Status Addon.</p>
+<h3 id="ocm-status-addon-container-image">OCM status addon container image<a class="headerlink" href="#ocm-status-addon-container-image" title="Permanent link">#</a></h3>
+<p>There is a container image at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon">ghcr.io/kubestellar/ocm-status-addon</a>.</p>
+<p>The container image is built and published by that repo's release process, which is documented at <a href="https://github.com/kubestellar/ocm-status-addon/blob/main/docs/release.md">its <code>docs/release.md</code> file</a>.</p>
+<p>By our development practices and not doing any manual hacks, we maintain the association that a container image tagged with <code>$VERSION</code> is built from the Git commit that has the Git tag <code>v$VERSION</code>.</p>
+<p>To support testing, <code>make ko-local-build</code> will build a single-platform
+image and not push it, only leave it among your Docker images. The
+single platform's OS is Linux. The single platform's ISA is defined by
+the <code>make</code> variable <code>ARCH</code>, which defaults to what <code>go env GOARCH</code>
+prints.</p>
+<h3 id="ocm-status-addon-helm-chart">OCM status addon Helm chart<a class="headerlink" href="#ocm-status-addon-helm-chart" title="Permanent link">#</a></h3>
+<p>The operator is delivered by a Helm chart at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon-chart">ghcr.io/kubestellar/ocm-status-addon-chart</a>. The chart references the container image.</p>
+<p>By our development practices and doing doing any manual hacks, we maintain the association that the OCI image tagged <code>v$VERSION</code> contains a Helm chart that declares its <code>version</code> and its <code>appVersion</code> to be <code>v$VERSION</code> and the templates in that chart include a Deployment for the OCM Status Add-On Agent using the container image <code>ghcr.io/kubestellar/ocm-status-addon:$VERSION</code>.</p>
+<h2 id="ocm-transport-plugin">OCM Transport Plugin<a class="headerlink" href="#ocm-transport-plugin" title="Permanent link">#</a></h2>
+<p>The source is the GitHub repo <a href="https://github.com/kubestellar/ocm-transport-plugin">github.com/kubestellar/ocm-transport-plugin</a></p>
+<h3 id="ocm-transport-container-image">OCM Transport container image<a class="headerlink" href="#ocm-transport-container-image" title="Permanent link">#</a></h3>
+<p>This appears at <a href="https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller">ghcr.io/kubestellar/ocm-transport-plugin/transport-controller</a>.</p>
+<p>TODO: document how the image is built and published, including explain versioning.</p>
+<h2 id="kubestellar">KubeStellar<a class="headerlink" href="#kubestellar" title="Permanent link">#</a></h2>
+<h3 id="warning">WARNING<a class="headerlink" href="#warning" title="Permanent link">#</a></h3>
+<p>Literal KubeStellar release numbers appear here, and are historical. The version of this document in a given release does not mention that release. See <a href="../release/">the release process</a> for more details on what self-references are and are not handled.</p>
+<h3 id="outline-of-publishing">Outline of publishing<a class="headerlink" href="#outline-of-publishing" title="Permanent link">#</a></h3>
+<div class="mermaid">flowchart LR
+    subgraph cladm_repo["ocm/clusteradm@GitHub"]
+    cladm_src["clusteradm source"]
+    end
+    subgraph ks_repo["kubestellar@GitHub"]
+    kcm_code[KCM source code]
+    kcm_hc_src[KCM Helm chart source]
+    ks_pch[kubestellar PostCreateHook]
+    ocm_pch["ocm PostCreateHook"]
+    ks_scripts -.-&gt; ocm_pch
+    ks_scripts -.-&gt; ks_pch
+    end
+    cladm_image["ks/clusteradm image"] --&gt; cladm_src
+    ocm_pch -.-&gt; cladm_image
+    kcm_ctr_image[KCM container image] --&gt; kcm_code
+    kcm_hc_repo[published KCM Helm Chart] --&gt; kcm_hc_src
+    kcm_hc_src -.-&gt; kcm_ctr_image
+    kcm_hc_repo -.-&gt; kcm_ctr_image
+    ks_pch  -.-&gt; kcm_hc_repo
+    ks_scripts -.-&gt; osa_hc_repo[published OSA Helm Chart]
+    ks_scripts -.-&gt; otp_something["published OTP ??"]
+    ks_scripts -.-&gt; KubeFlex
+</div>
+<p>The dashed dependencies are at run time, not build time.</p>
+<p>"KCM" is the KubeStellar controller-manager.</p>
+<p>"ks_scripts" are the user-facing instructions and the end-to-end tests
+that use published artifacts (container images, Helm charts). (There
+are also e2e tests that do not use previously published artifacts,
+their temporary local artifacts are beyond the scope of this
+document.)</p>
+<p><strong>NOTE</strong>: among the references to published artifacts, some have a
+  version that is maintained in Git while others have a placeholder in
+  Git that is replaced in the publishing process. See <a href="../release/">the release
+  document</a> for more details. This is an on-going matter
+  of development.</p>
+<h3 id="local-copy-of-kubestellar-git-repo">Local copy of KubeStellar git repo<a class="headerlink" href="#local-copy-of-kubestellar-git-repo" title="Permanent link">#</a></h3>
+<p><strong>NOTE</strong>: Because of <a href="https://github.com/kubernetes/code-generator/blob/v0.28.2/kube_codegen.sh#L394-L395">a restriction in one of the code generators that
+we
+use</a>,
+a contributor needs to have their local copy of the git repo in a
+directory whose pathname ends with the Go package name --- that is,
+ends with <code>/github.com/kubestellar/kubestellar</code>.</p>
+<h3 id="derived-files">Derived files<a class="headerlink" href="#derived-files" title="Permanent link">#</a></h3>
+<p>Some files in the kubestellar repo are derived from other files there. Contributors are responsible for invoking the commands to (re)derive the derived files as necessary.</p>
+<p>Some of these derived files are derived by standard generators from the Kubernetes milieu. A contributor can use the following command to make all of those, or use the individual <code>make</code> commands described in the following subsubsections to update particular subsets.</p>
+<div class="language-shell highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>make<span class="w"> </span>all-generated
+</code></pre></div>
+<p>The following command, which we aspire to check in CI, checks whether all those derived files have been correctly derived. It must be invoked in a state where the <code>git status</code> is clean, or at least the dirty files are irrelevant; the current commit is what is checked. This command has side-effects on the filesystem like <code>make all-generated</code>.</p>
+<div class="language-shell highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a>hack/verify-codegen.sh
+</code></pre></div>
+<h4 id="files-generated-by-controller-gen">Files generated by controller-gen<a class="headerlink" href="#files-generated-by-controller-gen" title="Permanent link">#</a></h4>
+<ul>
+<li>
+<p><code>make manifests</code> generates the CustomeResourceDefinition files,
+  which exist in two places:
+  <code>config/crd/bases</code> and
+  <code>pkg/crd/files</code>.</p>
+</li>
+<li>
+<p><code>make generate</code> generates the deep copy code, which exists in
+  <code>zz_generated.deepcopy.go</code> next to the API source.</p>
+</li>
+</ul>
+<h4 id="files-generated-by-code-generator">Files generated by code-generator<a class="headerlink" href="#files-generated-by-code-generator" title="Permanent link">#</a></h4>
+<p>The files in <code>pkg/generated</code> are generated by <a href="https://github.com/kubernetes/code-generator">k/code-generator</a>. This generation is done at development time by the command <code>make codegenclients</code>.</p>
+<h3 id="kubestellar-controller-manager-container-image">KubeStellar controller-manager container image<a class="headerlink" href="#kubestellar-controller-manager-container-image" title="Permanent link">#</a></h3>
+<p>KubeStellar has one container image, for what is called the
+KubeStellar controller-manager. For each WDS, KubeStellar has a pod
+running that image. It installs the needed custom resource
+<em>definition</em> objects if they are not already present, and is a
+controller-manager hosting the per-WDS controllers (<a href="../architecture/#binding-controller">binding controller</a> and <a href="../architecture/#status-controller">status controller</a>) from the kubestellar repo.</p>
+<p>The image repository is <code>ghcr.io/kubestellar/kubestellar/controller-manager</code>.</p>
+<p>By our development practices and not doing any manual hacking we maintain the association that the container image tagged <code>$VERSION</code> is built from the Git commit having the Git tag <code>v$VERSION</code>.</p>
+<p>The <a href="../release/">release process</a> builds and publishes that container image.</p>
+<p><code>make ko-build-local</code> will make a local image for just the local
+platform. This is used in local testing.</p>
+<h3 id="kubestellar-controller-manager-helm-chart">KubeStellar controller-manager Helm Chart<a class="headerlink" href="#kubestellar-controller-manager-helm-chart" title="Permanent link">#</a></h3>
+<p>There is a Helm chart that is designed to be instantiated in a KubeFlex hosting cluster, once per WDS. The focus of the chart is getting the KubeStellar controller-manager installed.</p>
+<p>The source for the Helm chart is in
+the <code>chart/</code> directory. <code>make chart</code> (re)derives
+it from local sources. This is not included in <code>make all-generated</code>.</p>
+<p>This chart creates (among other things) a <code>Deployment</code> object that runs a container from the <a href="#kubestellar-controller-manager-container-image">KubeStellar controller-manager container image</a>.</p>
+<p>The chart is published at the OCI repository
+<code>ghcr.io/kubestellar/kubestellar/controller-manager-chart</code>. A GitHub Actions workflow (in <code>.github/workflows/goreleaser.yml</code>) specializes and publishes this chart as part of <a href="../release/">the release process</a>.</p>
+<p>By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged <code>$VERSION</code> contains a Helm chart that declares its <code>version</code> and its <code>appVersion</code> to be <code>$VERSION</code> and that chart has a Deployment that uses the kubestellar-controller-manager container image tagged <code>$VERSION</code>.</p>
+<h3 id="clusteradm-container-image">clusteradm container image<a class="headerlink" href="#clusteradm-container-image" title="Permanent link">#</a></h3>
+<p>The kubestellar GitHub repository has a script,
+<code>hack/build-clusteradm-image.sh</code>, that creates and publishes a
+container image holding the <code>clusteradm</code> command from OCM. The source
+of the container image is read from the latest release of
+<a href="https://github.com/open-cluster-management-io/clusteradm">github.com/open-cluster-management-io/clusteradm</a>,
+unless a command line flag says to use a specific version. This script
+also pushes the built container image to
+<a href="https://quay.io/repository/kubestellar/clusteradm">quay.io/kubestellar/clusteradm</a>
+using a tag that equals the ocm/clusteradm version that the image was
+built from.</p>
+<h3 id="kubeflex-postcreatehooks">KubeFlex PostCreateHooks<a class="headerlink" href="#kubeflex-postcreatehooks" title="Permanent link">#</a></h3>
+<p>There are two <code>PostCreateHook</code> objects defined in the <code>config/postcreate-hooks/</code> directory.</p>
+<h4 id="ocm-postcreatehook">ocm PostCreateHook<a class="headerlink" href="#ocm-postcreatehook" title="Permanent link">#</a></h4>
+<p>The PostCreateHook defined in <code>ocm.yaml</code> gets used on an ITS and adds the hub side of OCM there, using the image <code>quay.io/kubestellar/clusteradm:0.7.2</code>. See <a href="#clusteradm-container-image">above</a> about the source of that. Currently this PostCreateHook is used in the E2E tests but this is a problem because of its fixed reference to container image previously built from sources in this same Git repository.</p>
+<h4 id="kubestellar-postcreatehook">kubestellar PostCreateHook<a class="headerlink" href="#kubestellar-postcreatehook" title="Permanent link">#</a></h4>
+<p>The PostCreateHook defined in <code>kubestellar.yaml</code> is intended to be
+used in the hosting cluster, once per WDS, and runs container image
+<code>quay.io/kubestellar/helm:v3.14.0</code> (which is built from <a href="https://github.com/helm/helm/tree/v3.14.0">the Helm
+source</a> by a process that
+we need to document) to instantiate the chart from
+<code>oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart</code>;
+the chart version appears as a literal in the PostCreateHook,
+currently "0.20.0". Currently the only reference to any copy of this
+PostCreateHook is from the <a href="../examples/">examples doc</a>, which
+references the copy in the Git commit tagged <code>v0.20.0</code>.</p>
+<h2 id="amalgamated-graph">Amalgamated graph<a class="headerlink" href="#amalgamated-graph" title="Permanent link">#</a></h2>
+<p>Currently only showing kubestellar and ocm-status-addon.</p>
+<p>TODO: finish this</p>
+<div class="mermaid">flowchart LR
+    subgraph osa_repo["ocm-status-addon@GitHub"]
+    osa_code[OSA source code]
+    osa_hc_src[OSA Helm chart source]
+    end
+    osa_ctr_image[OSA container image] --&gt; osa_code
+    osa_hc_repo[published OSA Helm Chart] --&gt; osa_hc_src
+    osa_hc_src -.-&gt; osa_ctr_image
+    osa_hc_repo -.-&gt; osa_ctr_image
+    subgraph cladm_repo["ocm/clusteradm@GitHub"]
+    cladm_src["clusteradm source"]
+    end
+    subgraph ks_repo["kubestellar@GitHub"]
+    kcm_code[KCM source code]
+    kcm_hc_src[KCM Helm chart source]
+    ks_pch[kubestellar PostCreateHook]
+    ocm_pch["ocm PostCreateHook"]
+    ks_scripts -.-&gt; ocm_pch
+    ks_scripts -.-&gt; ks_pch
+    end
+    osa_repo -.-&gt; ks_repo
+    cladm_image["ks/clusteradm image"] --&gt; cladm_src
+    ocm_pch -.-&gt; cladm_image
+    kcm_ctr_image[KCM container image] --&gt; kcm_code
+    kcm_hc_repo[published KCM Helm Chart] --&gt; kcm_hc_src
+    kcm_hc_src -.-&gt; kcm_ctr_image
+    kcm_hc_repo -.-&gt; kcm_ctr_image
+    ks_pch  -.-&gt; kcm_hc_repo
+    ks_scripts -.-&gt; osa_hc_repo[published OSA Helm Chart]
+    ks_scripts -.-&gt; otp_something["published OTP ??"]
+    ks_scripts -.-&gt; KubeFlex
+</div>
+<p>Every dotted line is a reference that must be versioned. How do we
+keep all those versions right?</p>
+<p>Normally a git tag is an immutable reference to an immutable git
+commit. Let's not violate that.</p>
+<p>Can/should we say that an OCI image (or whatever) tag equals the tag
+of the commit that said image (or whatever) was built from? While
+keeping <code>main</code> always a working system?</p>
+<form class="md-feedback" hidden="" name="feedback">
+<fieldset>
+<legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+<div class="md-feedback__inner">
+<div class="md-feedback__list">
+<button class="md-feedback__icon md-icon" data-md-value="1" title="This page was helpful" type="submit">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81Z"></path></svg>
+</button>
+<button class="md-feedback__icon md-icon" data-md-value="0" title="This page could be improved" type="submit">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14Z"></path></svg>
+</button>
+</div>
+<div class="md-feedback__note">
+<div data-md-value="1" hidden="">
+              
+              
+                
+              
+              Thanks for your feedback!
+            </div>
+<div data-md-value="0" hidden="">
+              
+              
+                
+              
+              Thanks for your feedback! Help us improve this page by using our <a href="https://github.com/kubestellar/kubestellar/issues/new?assignees=&amp;labels=kind%2Fbug&amp;projects=&amp;template=bug_report.yaml&amp;title=bug%3A+" rel="noopener" target="_blank">feedback form</a>.
+            </div>
+</div>
+</div>
+</fieldset>
+</form>
+</article>
+</div>
+</div>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: Overview of contributing" class="md-footer__link md-footer__link--prev" href="../contributor/" rel="prev">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</div>
+<div class="md-footer__title">
+<div class="md-ellipsis">
+<span class="md-footer__direction">
+                  Previous
+                </span>
+                Overview of contributing
+              </div>
+</div>
+</a>
+<a aria-label="Next: Release Process" class="md-footer__link md-footer__link--next" href="../release/" rel="next">
+<div class="md-footer__title">
+<div class="md-ellipsis">
+<span class="md-footer__direction">
+                  Next
+                </span>
+                Release Process
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+<script src="../../assets/javascripts/bundle.ce72ebac.min.js"></script>
+<script src="../../js/open_in_new_tab.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.0.2/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>
