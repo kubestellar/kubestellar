@@ -21,6 +21,9 @@ Between each release of [ks/OTP](https://github.com/kubestellar/ocm-transport-pl
 
 - Edit `test/e2e/common/setup-kubestellar.sh`: update the setting of `OCM_TRANSPORT_PLUGIN_RELEASE` to the latest.
 
+- Edit `test/e2e/multi-cluster-deployment/README.md`: update the setting of `OCM_TRANSPORT_PLUGIN_RELEASE` to the latest.
+
+
 ### Reacting to a new ocm-status-addon release
 
 Update the references to the ocm-status-addon release in the following files.
@@ -37,7 +40,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Edit [the examples document](examples.md) to update the self-references for the coming release.
 
-- Update the kubestellar release number in `test/e2e/multi-cluster-deployment/README.md`.
+- Update the kubestellar self-reference in `test/e2e/multi-cluster-deployment/README.md`.
 
 - Until we have our first stable release, edit [the README](README.md#latest-stable-release) where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
 
