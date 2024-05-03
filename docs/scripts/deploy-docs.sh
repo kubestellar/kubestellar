@@ -22,8 +22,6 @@ set -o xtrace
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT/docs"
 
-STABLE_RELEASE=release-0.21.1
-
 if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" || "${GITHUB_EVENT_NAME:-}" == "pull_request_target" ]]; then
   # For PRs, we don't want to use GITHUB_REF_NAME, which will be something like merge/1234; instead, we want to use
   # the branch the PR is targeting, such as main or release-0.11
@@ -44,7 +42,22 @@ fi
 
 MIKE_OPTIONS=()
 ALIAS_OPTIONS=()
-ALIAS_OPTIONS_LATEST=()
+ALIAS_LIST=()
+
+while (( $# > 0 )); do
+    case "$1" in
+	(--alias-to=latest)
+	    ALIAS_OPTIONS=(--update-aliases)
+	    ALIAS_LIST+=(latest);;
+	(--alias-to=stable)
+	    ALIAS_OPTIONS=(--update-aliases)
+	    ALIAS_LIST+=(stable);;
+	(*)
+	    echo "$0 usage: [--alias-to={latest,stable}]*" >&2
+	    exit 1;;
+    esac
+    shift
+done
 
 if [[ -n "${REMOTE:-}" ]]; then
   MIKE_OPTIONS+=(--remote "$REMOTE")
@@ -55,31 +68,13 @@ if [[ -n "${BRANCH:-}" ]]; then
 fi
 
 if [[ -n "${CI:-}" ]]; then
-  if [[ "${GITHUB_EVENT_NAME:-}" == "push" ]]; then
+  if [[ "${GITHUB_EVENT_NAME}" =~ ^push|workflow_dispatch$ ]]; then
     # Only push to gh-pages if we're in GitHub Actions (CI is set) and we have a non-PR event.
     MIKE_OPTIONS+=(--push)
     MIKE_OPTIONS+=(--rebase)
     if [ $VERSION == "main" ]; then
-      ALIAS_OPTIONS+=(--update-aliases "$VERSION" "unstable")
-      ALIAS_OPTIONS_LATEST+=(--update-aliases "$VERSION" "latest")
-    elif [ $VERSION == "$STABLE_RELEASE" ]; then
-      ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
-    else
-      ALIAS_OPTIONS+=(--update-aliases "$VERSION")
-    fi
-  fi
-
-  if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]]; then
-    # Only push to gh-pages if we're in GitHub Actions (CI is set) and we have a non-PR event.
-    MIKE_OPTIONS+=(--push)
-    MIKE_OPTIONS+=(--rebase)
-    if [ $VERSION == "main" ]; then
-      ALIAS_OPTIONS+=(--update-aliases "$VERSION" "unstable")
-      ALIAS_OPTIONS_LATEST+=(--update-aliases "$VERSION" "latest")
-    elif [ $VERSION == "$STABLE_RELEASE" ]; then
-      ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
-    else
-      ALIAS_OPTIONS+=(--update-aliases "$VERSION")
+      ALIAS_OPTIONS=(--update-aliases)
+      ALIAS_LIST+=(unstable)
     fi
   fi
 
@@ -88,13 +83,9 @@ if [[ -n "${CI:-}" ]]; then
   git config user.email no-reply@kcp.io
 fi
 
-if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" || "${GITHUB_EVENT_NAME:-}" == "pull_request_target" ]]; then
+if [[ "${GITHUB_EVENT_NAME}" =~ ^pull_request|pull_request_target$ ]]; then
   mike deploy "${MIKE_OPTIONS[@]}" $VERSION
   exit
 fi
 
-mike deploy "${MIKE_OPTIONS[@]}" "${ALIAS_OPTIONS[@]}"
-
-if [ ${#ALIAS_OPTIONS_LATEST[@]} -gt 0 ]; then
-    mike deploy "${MIKE_OPTIONS[@]}" "${ALIAS_OPTIONS_LATEST[@]}"
-fi
+mike deploy "${MIKE_OPTIONS[@]}" "${ALIAS_OPTIONS[@]}" "$VERSION" "${ALIAS_LIST[@]}"
