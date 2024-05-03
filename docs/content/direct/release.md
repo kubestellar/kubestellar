@@ -64,11 +64,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - If the test results are good and the release is regular (not an RC) then declare the code freeze over.
 
-- If the test results are good and the release is regular (not an RC) then advance the website's alias for "latest" to refer to this release.
-
 - If the testing results are good, update [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin) to refer to the new ks/ks release and [make a new release of ks/OTP](https://github.com/kubestellar/ocm-transport-plugin/blob/main/docs/release.md).
-
-- When enough good experience is in, advance the website's alias for "stable" to this release.
 
 ## Goals and limitations
 
