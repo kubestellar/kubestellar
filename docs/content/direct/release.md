@@ -36,6 +36,8 @@ Update the references to the ocm-status-addon release in the following files.
 
 Making a new kubestellar release requires a contributor to do the following things. Here `$version` is the semver identifier for the release (e.g., `1.2.3-rc2`).
 
+- If not already in effect, declare a code freeze. There should be nothing but bug fixes and doc improvements while working towards a regular release.
+
 - Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
 
 - Edit [the examples document](examples.md) to update the self-references for the coming release.
@@ -48,6 +50,8 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Make a new Git commit with those changes and get it into the right branch in the shared repo (through the regular PR process if not authorized to cheat).
 
+- Wait for successful completion of the testing after that merge.
+
 - Apply the Git tag `v$version` to that new commit in the shared repo.
 
 - After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed [above](#technology)) and then the "Test latest release" workflow will run the E2E tests using those artifacts. 
@@ -58,7 +62,13 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Follow the procedure in [OCP testing](release-testing.md#e2e-release-tests-on-ocp), to verify that the release is functional on OCP.
 
+- If the test results are good and the release is regular (not an RC) then declare the code freeze over.
+
+- If the test results are good and the release is regular (not an RC) then advance the website's alias for "latest" to refer to this release.
+
 - If the testing results are good, update [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin) to refer to the new ks/ks release and [make a new release of ks/OTP](https://github.com/kubestellar/ocm-transport-plugin/blob/main/docs/release.md).
+
+- When enough good experience is in, advance the website's alias for "stable" to this release.
 
 ## Goals and limitations
 

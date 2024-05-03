@@ -129,13 +129,14 @@ In the document you want to include, add the start and end tags you configured i
 for more information on the 'include-markdown' plugin for mkdocs look [here](https://github.com/mondeja/mkdocs-include-markdown-plugin)
 
 ### Supported aliases for our documentation
-We currently support 3 aliases for our documentation:
 
-    - from the release major.minor branch:
-        - [{{ config.docs_url }}/stable]({{ config.docs_url }}/stable)
-    - from the main branch:
-        - [{{ config.docs_url }}/unstable]({{ config.docs_url }}/unstable)
-        - [{{ config.docs_url }}/latest]({{ config.docs_url }}/latest)
+`mike` has a concept of aliases. We currently maintain the following three aliases.
+
+- `unstable` ([{{config.docs_url}}/unstable](https://docs.kubestellar.io/unstable)), which always is an alias for the version named "main";
+- `stable` ([{{config.docs_url}}/stable](https://docs.kubestellar.io/stable)), for the latest of the releases that are considered "stable";
+- `latest` ([{{config.docs_url}}/latest](https://docs.kubestellar.io/latest)), for the latest release.
+
+Advancing the "latest" alias is a normal part of the release process (see the release process document). We advance the "stable" alias when a newer release is deemed "stable". Setting either alias is done by manually triggering the publishing workflow (see below) in [the GitHub web UI](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml).
 
 ### Shortcut URLs
 We have a few shortcut urls that come in handy when referring others to our project:
@@ -425,5 +426,9 @@ git add .;git commit -m "add index, home, and CNAME files";git push -u origin gh
 ## Publishing Workflow
 
 All documentation building and publishing is done using GitHub Actions in
-[docs-gen-and-push.yaml](../.github/workflows/docs-gen-and-push.yaml). The overall sequence is:
+`.github/workflows/docs-gen-and-push.yml`. This workflow is triggered either manually or by a push to a branch named `main` or `release-<something>`. This workflow will build and publish a website _version_ whose name is the same as the name of the branch that it is working on.
+
+This workflow has a couple of optional parameters that can tell it to also set the "latest" and/or "stable" aliases to refer to the version that the workflow is publishing. These appear in GitHub's web UI for manually dispatching a workflow.
+
+
 <!--readme-for-documentation-end-->
