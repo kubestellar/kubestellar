@@ -1701,6 +1701,9 @@ clues about the problem.</p>
 <p>Making a new kubestellar release requires a contributor to do the following things. Here <code>$version</code> is the semver identifier for the release (e.g., <code>1.2.3-rc2</code>).</p>
 <ul>
 <li>
+<p>If not already in effect, declare a code freeze. There should be nothing but bug fixes and doc improvements while working towards a regular release.</p>
+</li>
+<li>
 <p>Edit the source for the KCM PCH (in <code>config/postcreate-hooks/kubestellar.yaml</code>) and update the tag in the reference to the KCM container image (it appears in the last object, a <code>Job</code>).</p>
 </li>
 <li>
@@ -1719,6 +1722,9 @@ clues about the problem.</p>
 <p>Make a new Git commit with those changes and get it into the right branch in the shared repo (through the regular PR process if not authorized to cheat).</p>
 </li>
 <li>
+<p>Wait for successful completion of the testing after that merge.</p>
+</li>
+<li>
 <p>Apply the Git tag <code>v$version</code> to that new commit in the shared repo.</p>
 </li>
 <li>
@@ -1734,7 +1740,16 @@ clues about the problem.</p>
 <p>Follow the procedure in <a href="../release-testing/#e2e-release-tests-on-ocp">OCP testing</a>, to verify that the release is functional on OCP.</p>
 </li>
 <li>
+<p>If the test results are good and the release is regular (not an RC) then declare the code freeze over.</p>
+</li>
+<li>
+<p>If the test results are good and the release is regular (not an RC) then advance the website's alias for "latest" to refer to this release.</p>
+</li>
+<li>
 <p>If the testing results are good, update <a href="https://github.com/kubestellar/ocm-transport-plugin">ks/OTP</a> to refer to the new ks/ks release and <a href="https://github.com/kubestellar/ocm-transport-plugin/blob/main/docs/release.md">make a new release of ks/OTP</a>.</p>
+</li>
+<li>
+<p>When enough good experience is in, advance the website's alias for "stable" to this release.</p>
 </li>
 </ul>
 <h2 id="goals-and-limitations">Goals and limitations<a class="headerlink" href="#goals-and-limitations" title="Permanent link">#</a></h2>

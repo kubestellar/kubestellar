@@ -2028,13 +2028,13 @@ scripts in <code>hack</code>).</p>
 </p>
 <p>for more information on the 'include-markdown' plugin for mkdocs look <a href="https://github.com/mondeja/mkdocs-include-markdown-plugin">here</a></p>
 <h3 id="supported-aliases-for-our-documentation">Supported aliases for our documentation<a class="headerlink" href="#supported-aliases-for-our-documentation" title="Permanent link">#</a></h3>
-<p>We currently support 3 aliases for our documentation:</p>
-<div class="language-text highlight"><pre><span></span><code>- from the release major.minor branch:
-    - [https://docs.kubestellar.io/stable](../../../https://docs.kubestellar.io/stable)
-- from the main branch:
-    - [https://docs.kubestellar.io/unstable](../../../https://docs.kubestellar.io/unstable)
-    - [https://docs.kubestellar.io/latest](../../../https://docs.kubestellar.io/latest)
-</code></pre></div>
+<p><code>mike</code> has a concept of aliases. We currently maintain the following three aliases.</p>
+<ul>
+<li><code>unstable</code> (<a href="https://docs.kubestellar.io/unstable">https://docs.kubestellar.io/unstable</a>), which always is an alias for the version named "main";</li>
+<li><code>stable</code> (<a href="https://docs.kubestellar.io/stable">https://docs.kubestellar.io/stable</a>), for the latest of the releases that are considered "stable";</li>
+<li><code>latest</code> (<a href="https://docs.kubestellar.io/latest">https://docs.kubestellar.io/latest</a>), for the latest release.</li>
+</ul>
+<p>Advancing the "latest" alias is a normal part of the release process (see the release process document). We advance the "stable" alias when a newer release is deemed "stable". Setting either alias is done by manually triggering the publishing workflow (see below) in <a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml">the GitHub web UI</a>.</p>
 <h3 id="shortcut-urls">Shortcut URLs<a class="headerlink" href="#shortcut-urls" title="Permanent link">#</a></h3>
 <p>We have a few shortcut urls that come in handy when referring others to our project:</p>
 <p><b>note:</b> You need to join our mailing list first to get access to some of the links that follow (<a href="https://kubestellar.io/joinus">https://docs.kubestellar.io/joinus</a>)</p>
@@ -2270,7 +2270,8 @@ scripts in <code>hack</code>).</p>
 </ul>
 <h2 id="publishing-workflow">Publishing Workflow<a class="headerlink" href="#publishing-workflow" title="Permanent link">#</a></h2>
 <p>All documentation building and publishing is done using GitHub Actions in
-<a href="../../../../.github/workflows/docs-gen-and-push.yaml">docs-gen-and-push.yaml</a>. The overall sequence is:</p>
+<code>.github/workflows/docs-gen-and-push.yml</code>. This workflow is triggered either manually or by a push to a branch named <code>main</code> or <code>release-&lt;something&gt;</code>. This workflow will build and publish a website <em>version</em> whose name is the same as the name of the branch that it is working on.</p>
+<p>This workflow has a couple of optional parameters that can tell it to also set the "latest" and/or "stable" aliases to refer to the version that the workflow is publishing. These appear in GitHub's web UI for manually dispatching a workflow.</p>
 <!-- END INCLUDE -->
 
 
