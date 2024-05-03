@@ -33,11 +33,6 @@ jobs:
   
       - run: git fetch origin gh-pages
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version: v1.19
-          cache: true
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
