@@ -158,13 +158,9 @@
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
               
-  You're not viewing the latest release.
-  <a href="../latest/../../..">
-    <strong>Click here to go to the latest release</strong>
-  </a>
-  Also, FYI, 
-  <a href="../stable/../../..">
-    <strong>Click here to go to the latest stable release</strong>
+  You are not viewing the latest release.
+  <a href="../../../..">
+    <strong>Click here to go to the latest release.</strong>
   </a>
 
             </div>
@@ -2028,13 +2024,12 @@ scripts in <code>hack</code>).</p>
 </p>
 <p>for more information on the 'include-markdown' plugin for mkdocs look <a href="https://github.com/mondeja/mkdocs-include-markdown-plugin">here</a></p>
 <h3 id="supported-aliases-for-our-documentation">Supported aliases for our documentation<a class="headerlink" href="#supported-aliases-for-our-documentation" title="Permanent link">#</a></h3>
-<p><code>mike</code> has a concept of aliases. We currently maintain the following three aliases.</p>
+<p><code>mike</code> has a concept of aliases. We currently maintain the following two aliases.</p>
 <ul>
 <li><code>unstable</code> (<a href="https://docs.kubestellar.io/unstable">https://docs.kubestellar.io/unstable</a>), which always is an alias for the version named "main";</li>
-<li><code>stable</code> (<a href="https://docs.kubestellar.io/stable">https://docs.kubestellar.io/stable</a>), for the latest of the releases that are considered "stable";</li>
-<li><code>latest</code> (<a href="https://docs.kubestellar.io/latest">https://docs.kubestellar.io/latest</a>), for the latest release.</li>
+<li><code>latest</code> (<a href="https://docs.kubestellar.io/latest">https://docs.kubestellar.io/latest</a>), for the latest regular release.</li>
 </ul>
-<p>Advancing the "latest" alias is a normal part of the release process (see the release process document). We advance the "stable" alias when a newer release is deemed "stable". Setting either alias is done by manually triggering the publishing workflow (see below) in <a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml">the GitHub web UI</a>.</p>
+<p>The publishing workflow updates these aliases. The latest regular release is determined by picking the first version listed by <code>mike list</code> that matches the regexp <code>release-[0-9.]*</code>.</p>
 <h3 id="shortcut-urls">Shortcut URLs<a class="headerlink" href="#shortcut-urls" title="Permanent link">#</a></h3>
 <p>We have a few shortcut urls that come in handy when referring others to our project:</p>
 <p><b>note:</b> You need to join our mailing list first to get access to some of the links that follow (<a href="https://kubestellar.io/joinus">https://docs.kubestellar.io/joinus</a>)</p>
@@ -2270,8 +2265,7 @@ scripts in <code>hack</code>).</p>
 </ul>
 <h2 id="publishing-workflow">Publishing Workflow<a class="headerlink" href="#publishing-workflow" title="Permanent link">#</a></h2>
 <p>All documentation building and publishing is done using GitHub Actions in
-<code>.github/workflows/docs-gen-and-push.yml</code>. This workflow is triggered either manually or by a push to a branch named <code>main</code> or <code>release-&lt;something&gt;</code>. This workflow will build and publish a website <em>version</em> whose name is the same as the name of the branch that it is working on.</p>
-<p>This workflow has a couple of optional parameters that can tell it to also set the "latest" and/or "stable" aliases to refer to the version that the workflow is publishing. These appear in GitHub's web UI for manually dispatching a workflow.</p>
+<code>.github/workflows/docs-gen-and-push.yml</code>. This workflow is triggered either manually or by a push to a branch named <code>main</code> or <code>release-&lt;something&gt;</code>. This workflow will build and publish a website <em>version</em> whose name is the same as the name of the branch that it is working on. This workflow will also update the relevant <code>mike</code> alias, if necessary.</p>
 <!-- END INCLUDE -->
 
 
@@ -2390,7 +2384,7 @@ scripts in <code>hack</code>).</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
       <script src="../../../assets/javascripts/bundle.ce72ebac.min.js"></script>
