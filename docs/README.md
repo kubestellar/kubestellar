@@ -130,13 +130,12 @@ for more information on the 'include-markdown' plugin for mkdocs look [here](htt
 
 ### Supported aliases for our documentation
 
-`mike` has a concept of aliases. We currently maintain the following three aliases.
+`mike` has a concept of aliases. We currently maintain the following two aliases.
 
 - `unstable` ([{{config.docs_url}}/unstable](https://docs.kubestellar.io/unstable)), which always is an alias for the version named "main";
-- `stable` ([{{config.docs_url}}/stable](https://docs.kubestellar.io/stable)), for the latest of the releases that are considered "stable";
-- `latest` ([{{config.docs_url}}/latest](https://docs.kubestellar.io/latest)), for the latest release.
+- `latest` ([{{config.docs_url}}/latest](https://docs.kubestellar.io/latest)), for the latest regular release.
 
-Advancing the "latest" alias is a normal part of the release process (see the release process document). We advance the "stable" alias when a newer release is deemed "stable". Setting either alias is done by manually triggering the publishing workflow (see below) in [the GitHub web UI](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml).
+The publishing workflow updates these aliases. The latest regular release is determined by picking the first version listed by `mike list` that matches the regexp `release-[0-9.]*`.
 
 ### Shortcut URLs
 We have a few shortcut urls that come in handy when referring others to our project:
@@ -426,9 +425,6 @@ git add .;git commit -m "add index, home, and CNAME files";git push -u origin gh
 ## Publishing Workflow
 
 All documentation building and publishing is done using GitHub Actions in
-`.github/workflows/docs-gen-and-push.yml`. This workflow is triggered either manually or by a push to a branch named `main` or `release-<something>`. This workflow will build and publish a website _version_ whose name is the same as the name of the branch that it is working on.
-
-This workflow has a couple of optional parameters that can tell it to also set the "latest" and/or "stable" aliases to refer to the version that the workflow is publishing. These appear in GitHub's web UI for manually dispatching a workflow.
-
+`.github/workflows/docs-gen-and-push.yml`. This workflow is triggered either manually or by a push to a branch named `main` or `release-<something>`. This workflow will build and publish a website _version_ whose name is the same as the name of the branch that it is working on. This workflow will also update the relevant `mike` alias, if necessary.
 
 <!--readme-for-documentation-end-->

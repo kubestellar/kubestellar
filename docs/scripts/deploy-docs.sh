@@ -41,23 +41,6 @@ else
 fi
 
 MIKE_OPTIONS=()
-ALIAS_OPTIONS=()
-ALIAS_LIST=()
-
-while (( $# > 0 )); do
-    case "$1" in
-	(--alias-to=latest)
-	    ALIAS_OPTIONS=(--update-aliases)
-	    ALIAS_LIST+=(latest);;
-	(--alias-to=stable)
-	    ALIAS_OPTIONS=(--update-aliases)
-	    ALIAS_LIST+=(stable);;
-	(*)
-	    echo "$0 usage: [--alias-to={latest,stable}]*" >&2
-	    exit 1;;
-    esac
-    shift
-done
 
 if [[ -n "${REMOTE:-}" ]]; then
   MIKE_OPTIONS+=(--remote "$REMOTE")
@@ -72,10 +55,6 @@ if [[ -n "${CI:-}" ]]; then
     # Only push to gh-pages if we're in GitHub Actions (CI is set) and we have a non-PR event.
     MIKE_OPTIONS+=(--push)
     MIKE_OPTIONS+=(--rebase)
-    if [ $VERSION == "main" ]; then
-      ALIAS_OPTIONS=(--update-aliases)
-      ALIAS_LIST+=(unstable)
-    fi
   fi
 
   # Always set git user info in CI because even if we're not pushing, we need it
@@ -83,9 +62,25 @@ if [[ -n "${CI:-}" ]]; then
   git config user.email no-reply@kcp.io
 fi
 
-if [[ "${GITHUB_EVENT_NAME}" =~ ^pull_request|pull_request_target$ ]]; then
-  mike deploy "${MIKE_OPTIONS[@]}" $VERSION
-  exit
-fi
+mike deploy "${MIKE_OPTIONS[@]}" "$VERSION"
 
-mike deploy "${MIKE_OPTIONS[@]}" "${ALIAS_OPTIONS[@]}" "$VERSION" "${ALIAS_LIST[@]}"
+if [[ -n "${CI:-}" ]] && [[ "${GITHUB_EVENT_NAME}" =~ ^push|workflow_dispatch$ ]]; then
+  if [ $VERSION == "main" ]; then
+    desired_alias=unstable
+  elif [[ "$VERSION" =~ ^release- ]]; then
+    latest=$(mike list | awk '{ print $1 }' | grep '^release-[0-9.]*$' | head -1)
+    if [ "$VERSION" == "$latest" ]; then
+      desired_alias=latest
+    else
+      exit 0
+    fi
+  else
+    exit 0
+  fi
+else
+  exit 0
+fi
+currently_aliased_version="$(mike list "$desired_alias" | awk '{ print $1 }' | head -1)"
+if [[ "$VERSION" != "$currently_aliased_version" ]]; then
+    mike alias "${MIKE_OPTIONS[@]}" --update-aliases "$VERSION" "$desired_alias"
+fi

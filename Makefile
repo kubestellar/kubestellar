@@ -294,7 +294,7 @@ serve-docs: venv
 .PHONY: deploy-docs
 deploy-docs: venv
 	. $(VENV)/activate; \
-	REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/deploy-docs.sh $(DEPLOY_DOCS_EXTRA)
+	REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/deploy-docs.sh
 
 .PHONY: verify-go-versions
 verify-go-versions:
