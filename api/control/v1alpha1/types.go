@@ -510,6 +510,18 @@ const (
 	TypeArray  ValueType = "Array"
 )
 
+// CombinedStatusList is the API type for a list of CombinedStatus.
+//
+// +kubebuilder:object:root=true
+type CombinedStatusList struct {
+	metav1.TypeMeta `json:",inline"`
+	// Standard list metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	// +optional
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []CombinedStatus `json:"items"`
+}
+
 // CustomTransform describes how to select and transform some objects
 // on their way from WDS to WEC, without regard to the WEC (i.e.,
 // not changes that are specific to the individual WEC).

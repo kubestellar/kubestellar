@@ -26,6 +26,14 @@ type BindingListerExpansion interface{}
 // BindingPolicyLister.
 type BindingPolicyListerExpansion interface{}
 
+// CombinedStatusListerExpansion allows custom methods to be added to
+// CombinedStatusLister.
+type CombinedStatusListerExpansion interface{}
+
+// CombinedStatusNamespaceListerExpansion allows custom methods to be added to
+// CombinedStatusNamespaceLister.
+type CombinedStatusNamespaceListerExpansion interface{}
+
 // CustomTransformListerExpansion allows custom methods to be added to
 // CustomTransformLister.
 type CustomTransformListerExpansion interface{}

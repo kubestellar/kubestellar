@@ -28,6 +28,8 @@ type Interface interface {
 	Bindings() BindingInformer
 	// BindingPolicies returns a BindingPolicyInformer.
 	BindingPolicies() BindingPolicyInformer
+	// CombinedStatuses returns a CombinedStatusInformer.
+	CombinedStatuses() CombinedStatusInformer
 	// CustomTransforms returns a CustomTransformInformer.
 	CustomTransforms() CustomTransformInformer
 }
@@ -51,6 +53,11 @@ func (v *version) Bindings() BindingInformer {
 // BindingPolicies returns a BindingPolicyInformer.
 func (v *version) BindingPolicies() BindingPolicyInformer {
 	return &bindingPolicyInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// CombinedStatuses returns a CombinedStatusInformer.
+func (v *version) CombinedStatuses() CombinedStatusInformer {
+	return &combinedStatusInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // CustomTransforms returns a CustomTransformInformer.
