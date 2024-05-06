@@ -139,14 +139,12 @@ const (
 // DownsyncObjectTestAndStatusCollection identifies some objects (by a predicate)
 // and asks for some combined status to be returned from those objects.
 // The latter is dictated through applying a set of StatusCollectors,
-// each of which is applied to each of the selected objects in order of appearance.
 type DownsyncObjectTestAndStatusCollection struct {
 	DownsyncObjectTest `json:",inline"`
-	// statusCollectors is a list of StatusCollectors name references that are applied in order of appearance
-	// to the selected objects
+	// statusCollectors is a list of StatusCollectors name references that are applied to the selected objects.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
 	// inlinedStatusCollectors is a list of StatusCollectorSpec that are inlined in the BindingPolicy.
-	// The StatusCollectors in this list are applied in order of appearance to the selected objects.
+	// The StatusCollectors in this list are applied to the selected objects.
 	// InlinedStatusCollectors   []StatusCollectorSpec `json:"inlinedStatusCollectors,omitempty"` TODO
 }
 
