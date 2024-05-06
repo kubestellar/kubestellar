@@ -1,0 +1,223 @@
+{{- if .Values.InstallPCHs }}
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: wds
+  labels:
+    kflex.kubestellar.io/cptype: wds
+spec:
+  templates:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: "{{"{{.Namespace}}-{{.HookName}}"}}"
+    rules:
+    - nonResourceURLs:
+      - /metrics
+      verbs:
+      - get
+    - apiGroups:
+      - ""
+      resources:
+      - secrets
+      verbs:
+      - get
+      - list
+      - watch
+      - create
+      - patch
+      - update
+    - apiGroups:
+      - tenancy.kflex.kubestellar.org
+      resources:
+      - controlplanes
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - tenancy.kflex.kubestellar.org
+      resources:
+      - controlplanes/status
+      verbs:
+      - get
+      - patch
+      - update
+    - apiGroups:
+      - authentication.k8s.io
+      resources:
+      - tokenreviews
+      verbs:
+      - create
+    - apiGroups:
+      - authorization.k8s.io
+      resources:
+      - subjectaccessreviews
+      verbs:
+      - create
+    - apiGroups:
+      - rbac.authorization.k8s.io
+      resources:
+      - clusterroles
+      - clusterrolebindings
+      verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+    - apiGroups:
+      - rbac.authorization.k8s.io
+      resources:
+      - roles
+      - rolebindings
+      verbs:
+      - get
+      - list
+      - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: "{{"{{.Namespace}}-{{.HookName}}"}}"
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: "{{"{{.Namespace}}-{{.HookName}}"}}"
+    subjects:
+    - kind: ServiceAccount
+      name: default
+      namespace: "{{"{{.Namespace}}"}}"
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: "{{"{{.HookName}}"}}"
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+    - apiGroups:
+      - coordination.k8s.io
+      resources:
+      - leases
+      verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+    - apiGroups:
+      - ""
+      resources:
+      - events
+      - secrets
+      - services
+      verbs:
+      - create
+      - patch
+      - update
+    - apiGroups:
+      - ""
+      resources:
+      - serviceaccounts
+      verbs:
+      - get
+      - create
+    - apiGroups:
+      - ""
+      resources:
+      - services
+      verbs:
+      - get
+    - apiGroups:
+      - apps
+      resources:
+      - deployments
+      verbs:
+      - get
+      - create
+    - apiGroups:
+      - rbac.authorization.k8s.io
+      resources:
+      - roles
+      - rolebindings
+      verbs:
+      - create
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: "{{"{{.HookName}}"}}"
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: "{{"{{.HookName}}"}}"
+    subjects:
+    - kind: ServiceAccount
+      name: default
+      namespace: "{{"{{.Namespace}}"}}"
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: "{{"{{.HookName}}"}}"
+    spec:
+      template:
+        spec:
+          containers:
+          - name: "{{"{{.HookName}}-kubestellar"}}"
+            image: quay.io/kubestellar/helm:{{.Values.HELM_VERSION}}
+            imagePullPolicy: IfNotPresent
+            args:
+            - upgrade
+            - --install
+            - --namespace
+            - "{{"{{.Namespace}}"}}"
+            - kubestellar
+            - oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart
+            - --version
+            - {{.Values.KUBESTELLAR_VERSION}}
+            - --set
+            - "{{"ControlPlaneName={{.ControlPlaneName}}"}}"
+            - --set
+            - "{{"ITSName={{.ITSName}}"}}"
+            - --set
+            - "{{"APIGroups={{.APIGroups}}"}}"
+            - --set
+            - "ControllerManager.Verbosity={{.Values.verbosity.kubestellar | default .Values.verbosity.default | default 2 }}"
+            env:
+            - name: XDG_CACHE_HOME
+              value: /tmp/helm/.cache
+          - name: "{{"{{.HookName}}-otp"}}"
+            image: quay.io/kubestellar/helm:{{.Values.HELM_VERSION}}
+            imagePullPolicy: IfNotPresent
+            args:
+            - upgrade
+            - --install
+            - --namespace
+            - "{{"{{.Namespace}}"}}"
+            - ocm-transport-plugin
+            - oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin
+            - --version
+            - {{.Values.OCM_TRANSPORT_PLUGIN_VERSION}}
+            - --set
+            - "{{"wds_cp_name={{.ControlPlaneName}}"}}"
+            - --set
+            - "{{"transport_cp_name={{.ITSName}}"}}"
+            - --set
+            - "verbosity={{.Values.verbosity.transport | default .Values.verbosity.default | default 4 }}"
+            env:
+            - name: XDG_CACHE_HOME
+              value: /tmp/helm/.cache
+          restartPolicy: Never
+      backoffLimit: 1
+{{- end }}

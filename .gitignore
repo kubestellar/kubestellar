@@ -29,4 +29,6 @@ local-chart/
 # word counts
 /counts
 
-
+# Core Chart generated dependencies
+core-chart/Chart.lock
+core-chart/charts/

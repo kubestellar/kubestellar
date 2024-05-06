@@ -1,0 +1,8 @@
+{{- if index .Values "kubeflex-operator" "install" }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubeflex-system
+  labels:
+    name: kubestellar-core
+{{- end }}
