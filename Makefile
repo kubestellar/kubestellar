@@ -176,12 +176,12 @@ run: manifests generate fmt vet ## Run a controller from your host.
 .PHONY: ko-build-local
 ko-build-local: ## Build local container image with ko
 	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
-	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMAGE_REPO}:${IMAGE_TAG}
+	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMG}
 
 # this is used for local testing
 .PHONY: kind-load-image
 kind-load-image:
-	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${IMAGE_REPO}:${IMAGE_TAG}
+	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${IMG}
 
 .PHONY: chart
 chart: manifests kustomize
@@ -190,19 +190,6 @@ chart: manifests kustomize
 		| yq '. | select(.kind == "ClusterRole*").metadata.name |= "{{.Values.ControlPlaneName}}-" + .' \
 		| yq '. | select(.kind == "ClusterRoleBinding").roleRef.name |= "{{.Values.ControlPlaneName}}-" + .' \
 		> chart/templates/controller-manager.yaml
-
-.PHONY: local-chart
-local-chart: manifests kustomize
-ifeq (1,$(shell (git status | grep "config/manager/kustomization.yaml" | wc -l)))
-	@echo 'ERROR: config/manager/kustomization.yaml is already checked out!'
-	@exit 1
-endif
-	cp -R chart local-chart
-	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMG} | sed 's/\(:.*\)v/\1/')
-	$(KUSTOMIZE) build config/default \
-		| yq '. | select(.kind == "ClusterRole*").metadata.name |= "{{.Values.ControlPlaneName}}-" + .' \
-		| yq '. | select(.kind == "ClusterRoleBinding").roleRef.name |= "{{.Values.ControlPlaneName}}-" + .' \
-		> local-chart/templates/controller-manager.yaml
 	git checkout -- config/manager/kustomization.yaml
 
 ##@ Deployment
@@ -232,8 +219,8 @@ undeploy: ## Undeploy manager from the K8s cluster specified in ~/.kube/config. 
 # The Helm chart should be instantiated into the KubeFlex hosting cluster.
 # If $(KUBE_CONTEXT) is set then that indicates where to install the chart; otherwise it goes to the current kubeconfig context.
 .PHONY: install-local-chart
-install-local-chart: local-chart kind-load-image
-	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./local-chart  --set ControlPlaneName=${DEFAULT_WDS_NAME} --set ControllerManager.Verbosity=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY}
+install-local-chart: chart kind-load-image
+	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./chart  --set ControlPlaneName=${DEFAULT_WDS_NAME} --set ControllerManager.Verbosity=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} $(if $(ITS_NAME),--set ITSName=$(ITS_NAME),)
 
 ##@ Build Dependencies
 
