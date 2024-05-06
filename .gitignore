@@ -10,6 +10,9 @@ docs/scripts/generated_script.sh
 # local chart of the controller manager for dev/test
 local-chart/
 
+# KubeStellar controller-manager YAML is dynamically generated when needed
+/chart/templates/controller-manager.yaml
+
 # etc distributions
 /etcd-v*
 
