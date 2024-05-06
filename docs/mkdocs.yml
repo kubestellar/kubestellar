@@ -127,7 +127,7 @@ extra:
   #     link: mailto:kubestellar-dev@google.groups.com
   #     name: Email us
   version:
-    default: stable
+    default: latest
     # Enable mike for multi-version selection
     provider: mike
   analytics:
