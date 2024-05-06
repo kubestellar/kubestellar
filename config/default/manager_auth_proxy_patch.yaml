@@ -53,5 +53,6 @@ spec:
         - "--metrics-bind-address=127.0.0.1:8080"
         - "--leader-elect"
         - "--wds-name={{.Values.ControlPlaneName}}"
+        - "--its-name={{.Values.ITSName}}"
         - "--api-groups={{.Values.APIGroups}}"
         - -v={{.Values.ControllerManager.Verbosity}}
