@@ -40,7 +40,9 @@ The following steps establish an initial state used in the examples below.
 
 1. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
 in KubeFlex. Note that `-p ocm` runs a post-create hook on the *vcluster* control plane
-which installs OCM on it. This step includes the status add-on described [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
+which installs OCM on it.
+This step includes the installation of the status add-on controller.
+See [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
 
     ```shell
     kflex create its1 --type vcluster -p ocm
