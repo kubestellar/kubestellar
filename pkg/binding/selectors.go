@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/klog/v2"
 
+	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -34,7 +35,7 @@ import (
 // resolutions that are affected by the update. Every changed resolution leads
 // to queueing its relevant binding for syncing.
 func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.ObjectIdentifier) error {
-	bindingPolicyRuntimeObjects, err := c.listBindingPolicies()
+	bindingPolicies, err := c.listBindingPolicies()
 	if err != nil {
 		return err
 	}
@@ -43,9 +44,9 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 
 	obj, err := c.getObjectFromIdentifier(objIdentifier)
 	if errors.IsNotFound(err) {
-		logger.V(3).Info("Removing non-existent object from resolutions", "object", objIdentifier, "numPolicies", len(bindingPolicyRuntimeObjects))
+		logger.V(3).Info("Removing non-existent object from resolutions", "object", objIdentifier, "numPolicies", len(bindingPolicies))
 		// object is deleted, delete from all resolutions it exists in (and enqueue Binding references for the latter)
-		return c.removeObjectFromBindingPolicies(ctx, objIdentifier, bindingPolicyRuntimeObjects)
+		return c.removeObjectFromBindingPolicies(ctx, objIdentifier, bindingPolicies)
 	} else if err != nil {
 		return fmt.Errorf("failed to get runtime.Object from object identifier (%v): %w", objIdentifier, err)
 	}
@@ -58,11 +59,7 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 
 	isSelectedBySingletonBinding := false
 
-	for _, item := range bindingPolicyRuntimeObjects {
-		bindingPolicy, err := runtimeObjectToBindingPolicy(item)
-		if err != nil {
-			return fmt.Errorf("failed to convert runtime.Object to BindingPolicy: %w", err)
-		}
+	for _, bindingPolicy := range bindingPolicies {
 
 		if !c.bindingPolicyResolver.ResolutionExists(bindingPolicy.GetName()) {
 			continue // resolution does not exist, skip
@@ -189,14 +186,9 @@ func (c *Controller) handleSingletonLabel(ctx context.Context, obj runtime.Objec
 }
 
 func (c *Controller) removeObjectFromBindingPolicies(ctx context.Context, objIdentifier util.ObjectIdentifier,
-	bindingPolicyRuntimeObjects []runtime.Object) error {
+	bindingPolicies []*v1alpha1.BindingPolicy) error {
 	logger := klog.FromContext(ctx)
-	for _, bindingPolicyRuntimeObject := range bindingPolicyRuntimeObjects {
-		bindingPolicy, err := runtimeObjectToBindingPolicy(bindingPolicyRuntimeObject)
-		if err != nil {
-			return fmt.Errorf("failed to convert runtime.Object to BindingPolicy: %w", err)
-		}
-
+	for _, bindingPolicy := range bindingPolicies {
 		if resolutionUpdated := c.bindingPolicyResolver.RemoveObjectIdentifier(bindingPolicy.GetName(),
 			objIdentifier); resolutionUpdated {
 			// enqueue binding to be synced since object was removed from its bindingpolicy's resolution

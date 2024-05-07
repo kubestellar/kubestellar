@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 
+	clusterclientset "open-cluster-management.io/api/client/cluster/clientset/versioned"
 	clusterv1 "open-cluster-management.io/api/cluster/v1"
 	workv1 "open-cluster-management.io/api/work/v1"
 
@@ -60,21 +61,18 @@ func GetOCMClient(kubeconfig *rest.Config) client.Client {
 	return c
 }
 
-func FindClustersBySelectors(ocmClient client.Client, selectors []metav1.LabelSelector) (sets.Set[string], error) {
-	clusters := &clusterv1.ManagedClusterList{}
+func FindClustersBySelectors(ctx context.Context, client clusterclientset.Interface, selectors []metav1.LabelSelector) (sets.Set[string], error) {
 	// in order to support OR between label selectors in a straightforward manner, we perform List for each selector.
 	// additionally, to support complex selectors (such as set selectors), we avoid conversion to maps.
 	clusterNames := sets.New[string]()
 	for _, s := range selectors {
-		selector, err := metav1.LabelSelectorAsSelector(&s)
+		ls, err := metav1.LabelSelectorAsSelector(&s)
 		if err != nil {
-			return nil, fmt.Errorf("error converting v1.LabelSelector to labels.Selector: %w", err)
+			return clusterNames, fmt.Errorf("failed to convert metav1.LabelSelector to labels.Selector: %w", err)
 		}
-
-		if err := ocmClient.List(context.TODO(), clusters, &client.ListOptions{
-			LabelSelector: selector,
-		}); err != nil {
-			return nil, fmt.Errorf("error listing clusters: %w", err)
+		clusters, err := client.ClusterV1().ManagedClusters().List(ctx, metav1.ListOptions{LabelSelector: ls.String()})
+		if err != nil {
+			return nil, fmt.Errorf("error listing clusters with selector %s: %w", ls, err)
 		}
 
 		for _, cluster := range clusters.Items {

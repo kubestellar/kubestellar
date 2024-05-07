@@ -25,13 +25,11 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -56,33 +54,30 @@ const (
 //   - if binding policy wants singleton-status reported, requeue all selected
 //     workload objects to remove the singleton label.
 //   - delete the bindingpolicy's finalizer and remove its resolution.
-func (c *Controller) handleBindingPolicy(ctx context.Context, objIdentifier util.ObjectIdentifier) error {
+func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName string) error {
 	logger := klog.FromContext(ctx)
 
-	obj, err := c.getObjectFromIdentifier(objIdentifier)
+	bindingPolicy, err := c.bindingPolicyLister.Get(bindingPolicyName)
+	// `*bindingPolicy` is immutable
 	if errors.IsNotFound(err) {
 		// binding policy is deleted, update resolver.
-		return c.deleteResolutionForBindingPolicy(ctx, objIdentifier.ObjectName.Name)
+		return c.deleteResolutionForBindingPolicy(ctx, bindingPolicyName)
 	} else if err != nil {
-		return fmt.Errorf("failed to get runtime.Object from object identifier (%v): %w", objIdentifier, err)
-	}
-
-	bindingPolicy, err := runtimeObjectToBindingPolicy(obj)
-	if err != nil {
-		return fmt.Errorf("failed to convert runtime.Object to BindingPolicy: %w", err)
+		return fmt.Errorf("failed to get BindingPolicy from informer cache (name=%v): %w", bindingPolicyName, err)
 	}
 
 	// handle requeing for changes in bindingpolicy, excluding deletion
-	if !isBeingDeleted(obj) {
+	if !isBeingDeleted(bindingPolicy) {
 		if err := c.handleBindingPolicyFinalizer(ctx, bindingPolicy); err != nil {
 			return fmt.Errorf("failed to handle finalizer for bindingPolicy %s: %w", bindingPolicy.Name, err)
 		}
 
 		// note bindingpolicy in resolver to create/update its resolution
 		c.bindingPolicyResolver.NoteBindingPolicy(bindingPolicy)
+		logger.V(5).Info("Noted BindingPolicy", "bindingPolicy", bindingPolicy)
 
 		// update bindingpolicy resolution destinations since bindingpolicy was updated
-		clusterSet, err := ocm.FindClustersBySelectors(c.ocmClient, bindingPolicy.Spec.ClusterSelectors)
+		clusterSet, err := ocm.FindClustersBySelectors(ctx, c.clusterClient, bindingPolicy.Spec.ClusterSelectors)
 		if err != nil {
 			return fmt.Errorf("failed to ocm.FindClustersBySelectors: %w", err)
 		}
@@ -116,7 +111,7 @@ func (c *Controller) handleBindingPolicy(ctx context.Context, objIdentifier util
 		return fmt.Errorf("failed to handle finalizer for bindingPolicy %s: %w", bindingPolicy.Name, err)
 	}
 
-	return c.deleteResolutionForBindingPolicy(ctx, objIdentifier.ObjectName.Name)
+	return c.deleteResolutionForBindingPolicy(ctx, bindingPolicyName)
 }
 
 func (c *Controller) deleteResolutionForBindingPolicy(ctx context.Context, bindingPolicyName string) error {
@@ -166,12 +161,7 @@ func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clust
 		utilruntime.HandleError(err)
 		return
 	}
-	for _, obj := range bindingPolicies {
-		bindingPolicy, err := runtimeObjectToBindingPolicy(obj)
-		if err != nil {
-			utilruntime.HandleError(err)
-			return
-		}
+	for _, bindingPolicy := range bindingPolicies {
 		match1, err := util.SelectorsMatchLabels(bindingPolicy.Spec.ClusterSelectors, oldLabels)
 		if err != nil {
 			utilruntime.HandleError(err)
@@ -183,8 +173,8 @@ func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clust
 			return
 		}
 		if match1 || match2 {
-			logger.V(4).Info("Enqueuing workload object due to cluster and BindingPolicy", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
-			c.enqueueObject(bindingPolicy, util.BindingPolicyResource)
+			logger.V(4).Info("Enqueuing reference to bindingPolicy because of changing match with cluster", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
+			c.workqueue.Add(bindingPolicyRef(bindingPolicy.Name))
 		}
 	}
 }
@@ -198,47 +188,27 @@ func (c *Controller) evaluateBindingPolicies(ctx context.Context, clusterId stri
 		utilruntime.HandleError(err)
 		return
 	}
-	for _, obj := range bindingPolicies {
-		bindingPolicy, err := runtimeObjectToBindingPolicy(obj)
-		if err != nil {
-			utilruntime.HandleError(err)
-			return
-		}
+	for _, bindingPolicy := range bindingPolicies {
 		match, err := util.SelectorsMatchLabels(bindingPolicy.Spec.ClusterSelectors, labelsSet)
 		if err != nil {
 			utilruntime.HandleError(err)
 			return
 		}
 		if match {
-			logger.V(4).Info("Enqueuing BindingPolicy due to cluster notification", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
-			c.enqueueObject(bindingPolicy, util.BindingPolicyResource)
+			logger.V(4).Info("Enqueuing reference to BindingPolicy due to cluster notification", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
+			c.workqueue.Add(bindingPolicyRef(bindingPolicy.Name))
 		}
 	}
 }
 
-func (c *Controller) listBindingPolicies() ([]runtime.Object, error) {
-	lister, found := c.listers.Get(util.GetBindingPolicyGVR())
-	if !found {
-		return nil, fmt.Errorf("could not get lister for BindingPolicy")
-	}
-
-	list, err := lister.List(labels.Everything())
+// Returns all the BindingPolicy objects in the informer's local cache.
+// These are immutable.
+func (c *Controller) listBindingPolicies() ([]*v1alpha1.BindingPolicy, error) {
+	list, err := c.bindingPolicyLister.List(labels.Everything())
 	if err != nil {
 		return nil, err
 	}
 	return list, nil
-}
-
-func runtimeObjectToBindingPolicy(obj runtime.Object) (*v1alpha1.BindingPolicy, error) {
-	unstructuredObj, ok := obj.(*unstructured.Unstructured)
-	if !ok {
-		return nil, fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
-	}
-	var bindingPolicy *v1alpha1.BindingPolicy
-	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredObj.UnstructuredContent(), &bindingPolicy); err != nil {
-		return nil, err
-	}
-	return bindingPolicy, nil
 }
 
 // read objects from all workload listers and enqueue
@@ -270,12 +240,15 @@ func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyNa
 	})
 }
 
-// finalizer logic
+// finalizer logic.
+// Nothing mutates `*bindingPolicy` while this call is in progress.
 func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPolicy *v1alpha1.BindingPolicy) error {
 	if bindingPolicy.GetDeletionTimestamp() != nil {
 		if controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
+			bindingPolicy = bindingPolicy.DeepCopy()
 			controllerutil.RemoveFinalizer(bindingPolicy, KSFinalizer)
-			if err := updateBindingPolicy(ctx, c.dynamicClient, bindingPolicy); err != nil {
+			_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: controllerName})
+			if err != nil {
 				if errors.IsNotFound(err) {
 					// object was deleted after getting into this function. This is not an error.
 					return nil
@@ -288,32 +261,14 @@ func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPo
 	}
 
 	if !controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
+		bindingPolicy = bindingPolicy.DeepCopy()
 		controllerutil.AddFinalizer(bindingPolicy, KSFinalizer)
-		if err := updateBindingPolicy(ctx, c.dynamicClient, bindingPolicy); err != nil {
+		_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: controllerName})
+		if err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func updateBindingPolicy(ctx context.Context, client dynamic.Interface, bindingPolicy *v1alpha1.BindingPolicy) error {
-	gvr := schema.GroupVersionResource{
-		Group:    v1alpha1.GroupVersion.Group,
-		Version:  v1alpha1.GroupVersion.Version,
-		Resource: util.BindingPolicyResource,
-	}
-
-	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(bindingPolicy)
-	if err != nil {
-		return fmt.Errorf("failed to convert BindingPolicy to unstructured: %w", err)
-	}
-
-	unstructuredObj := &unstructured.Unstructured{
-		Object: innerObj,
-	}
-
-	_, err = client.Resource(gvr).Namespace("").Update(ctx, unstructuredObj, metav1.UpdateOptions{})
-	return err
 }
 
 type mrObject interface {

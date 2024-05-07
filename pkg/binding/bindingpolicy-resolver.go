@@ -63,6 +63,7 @@ type BindingPolicyResolver interface {
 	// NoteBindingPolicy associates a new resolution with the given
 	// bindingpolicy, if none is associated. This method maintains the
 	// singleton status reporting requirement in the resolution.
+	// `*bindingPolicy` is immutable
 	NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy)
 
 	// EnsureObjectIdentifierWithVersion ensures that an object's identifier is
@@ -173,6 +174,7 @@ func (resolver *bindingPolicyResolver) CompareBinding(bindingPolicyKey string,
 // NoteBindingPolicy associates a new resolution with the given
 // bindingpolicy, if none is associated. This method maintains the
 // singleton status reporting requirement in the resolution.
+// `*bindingPolicy` is immutable
 func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy) {
 	if resolution := resolver.getResolution(bindingpolicy.GetName()); resolution != nil {
 		resolution.requiresSingletonReportedState = bindingpolicy.Spec.WantSingletonReportedState
@@ -299,6 +301,7 @@ func (resolver *bindingPolicyResolver) getResolution(bindingPolicyKey string) *b
 	return resolver.bindingPolicyToResolution[bindingPolicyKey]
 }
 
+// `*bindingPolicy` is immutable
 func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.BindingPolicy) *bindingPolicyResolution {
 	resolver.Lock() // lock for modifying map
 	defer resolver.Unlock()
@@ -308,7 +311,7 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 		return bindingPolicyResolution
 	}
 
-	ownerReference := metav1.NewControllerRef(bindingpolicy, bindingpolicy.GroupVersionKind())
+	ownerReference := metav1.NewControllerRef(bindingpolicy, v1alpha1.SchemeGroupVersion.WithKind(util.BindingPolicyKind))
 	ownerReference.BlockOwnerDeletion = &[]bool{false}[0]
 
 	bindingPolicyResolution := &bindingPolicyResolution{
