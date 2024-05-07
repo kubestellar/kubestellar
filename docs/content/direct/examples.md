@@ -22,8 +22,6 @@ The following steps establish an initial state used in the examples below.
 
     ```shell
     export KUBESTELLAR_VERSION=0.22.0
-    export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
-    export OCM_TRANSPORT_PLUGIN=0.1.7
     ```
 
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
@@ -43,42 +41,20 @@ The following steps establish an initial state used in the examples below.
 1. Create an inventory & mailbox space of type `vcluster` running *OCM* (Open Cluster Management)
 in KubeFlex. Note that `-p ocm` runs a post-create hook on the *vcluster* control plane
 which installs OCM on it.
+This step includes the installation of the status add-on controller.
+See [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
 
     ```shell
     kflex create its1 --type vcluster -p ocm
     ```
 
-1. Install status add-on on its1:
-
-    Wait until the `managedclusteraddons` resource shows up on `its1`. You can check on that with the command:
-
-    ```shell
-    kubectl --context its1 api-resources | grep managedclusteraddons || true
-    ```
-
-    and then install the status add-on:
-
-    ```shell
-    helm --kube-context its1 upgrade --install status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v${OCM_STATUS_ADDON_VERSION}
-    ```
-
-    see [here](./architecture.md#ocm-status-add-on-agent) for more details on the add-on.
-
 1. Create a Workload Description Space `wds1` in KubeFlex. Similarly to before, `-p kubestellar`
 runs a post-create hook on the *k8s* control plane that starts an instance of a KubeStellar controller
 manager which connects to the `wds1` front-end and the `its1` OCM control plane back-end.
+Additionally the OCM based transport controller will be deployed.
 
     ```shell
     kflex create wds1 -p kubestellar
-    ```
-
-1. Deploy the OCM based transport controller
-
-    ```shell
-    helm --kube-context kind-kubeflex upgrade --install ocm-transport-plugin oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin --version ${OCM_TRANSPORT_PLUGIN} \
-     --set transport_cp_name=its1 \
-     --set wds_cp_name=wds1 \
-     -n wds1-system
     ```
 
 1. Follow the steps to [create and register two clusters with OCM](example-wecs.md).

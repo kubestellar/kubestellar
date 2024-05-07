@@ -14,17 +14,40 @@ spec:
       template:
         spec:
           containers:
-          - name: "{{.HookName}}"
+          - name: "{{.HookName}}-ocm"
             image: quay.io/kubestellar/clusteradm:0.7.2
             args:
             - init
             env:
             - name: KUBECONFIG
-              value: "/etc/kube/config-incluster"    
+              value: "/etc/kube/config-incluster"
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
-              readOnly: true  
+              readOnly: true
+          - name: "{{.HookName}}-statusaddon"
+            image: quay.io/kubestellar/helm:3.14.0
+            args:
+              - upgrade
+              - --install
+              - status-addon
+              - oci://ghcr.io/kubestellar/ocm-status-addon-chart
+              - --version
+              - v0.2.0-rc8
+              - --namespace
+              - open-cluster-management
+              - --create-namespace
+            env:
+            - name: HELM_CONFIG_HOME
+              value: "/tmp"
+            - name: HELM_CACHE_HOME
+              value: "/tmp"
+            - name: KUBECONFIG
+              value: "/etc/kube/config-incluster"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
           volumes:
           - name: kubeconfig
             secret:
