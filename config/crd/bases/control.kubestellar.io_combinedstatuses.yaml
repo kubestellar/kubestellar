@@ -39,10 +39,11 @@ spec:
           particular (workload object, BindingPolicy) pair. The namespace of the CombinedStatus
           object is the namespace of the workload object, or "kubestellar-report"
           if the workload object has no namespace. The name of the CombinedStatus
-          object is the concatenation of: - the Name the workload object - the string
-          ":" - the Name of the BindingPolicy object. The CombinedStatus object has
-          the following labels: - "status.kubestellar.io/api-group" holding the API
-          Group (not verison) of the workload object; - "status.kubestellar.io/resource"
+          object is derived by taking the first 63 characters of the base64-encoded
+          SHA256 hash. The hash is computed from the concatenation of the following:
+          - the Name the workload object - the string ":" - the Name of the BindingPolicy
+          object. The CombinedStatus object has the following labels: - "status.kubestellar.io/api-group"
+          holding the API Group (not verison) of the workload object; - "status.kubestellar.io/resource"
           holding the resource (lowercase plural) of the workload object; - "status.kubestellar.io/namespace"
           holding the namespace of the workload object; - "status.kubestellar.io/name"
           holding the name of the workload object; - "status.kubestellar.io/binding-policy"
