@@ -210,7 +210,7 @@ There are two `PostCreateHook` objects defined in the `config/postcreate-hooks/`
 
 #### ocm PostCreateHook
 
-The PostCreateHook defined in `ocm.yaml` gets used on an ITS and adds the hub side of OCM there, using the image `quay.io/kubestellar/clusteradm:0.7.2`. See [above](#clusteradm-container-image) about the source of that. Currently this PostCreateHook is used in the E2E tests but this is a problem because of its fixed reference to container image previously built from sources in this same Git repository.
+The PostCreateHook defined in `ocm.yaml` gets used on an ITS and adds the hub side of OCM there, using the image `quay.io/kubestellar/clusteradm:0.8.2`. This image includes the `clusteradm` CLI release `v0.8.2` which is bundled with the OCM release `v0.13.2`. See [above](#clusteradm-container-image) about the source of that. Currently this PostCreateHook is used in the E2E tests but this is a problem because of its fixed reference to container image previously built from sources in this same Git repository.
 
 #### kubestellar PostCreateHook
 
