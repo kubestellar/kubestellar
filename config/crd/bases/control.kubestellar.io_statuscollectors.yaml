@@ -56,7 +56,8 @@ spec:
                         a value to extract or a boolean combination of comparisons
                         of atomic values. While the expression here in the Go type
                         system admits other values, the controller will accept only
-                        the restricted set stated above.
+                        the restricted set stated above. Post-apiserver validation
+                        errors are posted to the StatusCollectorStatus.
                       properties:
                         args:
                           items: {}
@@ -93,7 +94,8 @@ spec:
                 type: object
               groupBy:
                 description: '`groupBy` says how to group workload objects for aggregation
-                  (if there is any). Each expression must evaluate to an atomic value.'
+                  (if there is any). Each expression must evaluate to an atomic value.
+                  `groupBy` must be empty if `combinedFields` is not.'
                 items:
                   description: NamedExpression pairs a name with a way of extracting
                     a value from a JSON object.
@@ -104,7 +106,8 @@ spec:
                         a value to extract or a boolean combination of comparisons
                         of atomic values. While the expression here in the Go type
                         system admits other values, the controller will accept only
-                        the restricted set stated above.
+                        the restricted set stated above. Post-apiserver validation
+                        errors are posted to the StatusCollectorStatus.
                       properties:
                         args:
                           items: {}
@@ -141,7 +144,8 @@ spec:
                         a value to extract or a boolean combination of comparisons
                         of atomic values. While the expression here in the Go type
                         system admits other values, the controller will accept only
-                        the restricted set stated above.
+                        the restricted set stated above. Post-apiserver validation
+                        errors are posted to the StatusCollectorStatus.
                       properties:
                         args:
                           items: {}

@@ -18,16 +18,16 @@ spec:
   versions:
   - additionalPrinterColumns:
     - jsonPath: .metadata.labels['status\.kubestellar\.io/api-group']
-      name: GROUP
+      name: SUBJECT_GROUP
       type: string
     - jsonPath: .metadata.labels['status\.kubestellar\.io/resource']
-      name: RSC
+      name: SUBJECT_RSC
       type: string
     - jsonPath: .metadata.labels['status\.kubestellar\.io/namespace']
-      name: NS
+      name: SUBJECT_NS
       type: string
     - jsonPath: .metadata.labels['status\.kubestellar\.io/name']
-      name: NAME
+      name: SUBJECT_NAME
       type: string
     - jsonPath: .metadata.labels['status\.kubestellar\.io/policy']
       name: BINDINGPOLICY
@@ -39,10 +39,10 @@ spec:
           particular (workload object, BindingPolicy) pair. The namespace of the CombinedStatus
           object is the namespace of the workload object, or "kubestellar-report"
           if the workload object has no namespace. The name of the CombinedStatus
-          object is the concatenation of: - the NamespacedName the workload object
-          - the string ":" - the Name of the BindingPolicy object. The CombinedStatus
-          object has the following labels: - "status.kubestellar.io/api-group" holding
-          the API Group (not verison) of the workload object; - "status.kubestellar.io/resource"
+          object is the concatenation of: - the Name the workload object - the string
+          ":" - the Name of the BindingPolicy object. The CombinedStatus object has
+          the following labels: - "status.kubestellar.io/api-group" holding the API
+          Group (not verison) of the workload object; - "status.kubestellar.io/resource"
           holding the resource (lowercase plural) of the workload object; - "status.kubestellar.io/namespace"
           holding the namespace of the workload object; - "status.kubestellar.io/name"
           holding the name of the workload object; - "status.kubestellar.io/binding-policy"
@@ -61,10 +61,10 @@ spec:
           metadata:
             type: object
           results:
-            description: '`results` has an entry for every applicable NamedStatusCombiner.'
+            description: '`results` has an entry for every applicable StatusCollector.'
             items:
               description: NamedStatusCombination holds the rows that come from evaluating
-                one NamedStatusCombiner.
+                one StatusCollector.
               properties:
                 columnNames:
                   items:

@@ -338,6 +338,7 @@ type StatusCollectorSpec struct {
 
 	// `groupBy` says how to group workload objects for aggregation (if there is any).
 	// Each expression must evaluate to an atomic value.
+	// `groupBy` must be empty if `combinedFields` is not.
 	// +optional
 	GroupBy []NamedExpression `json:"groupBy,omitempty"`
 
@@ -395,6 +396,7 @@ const (
 // or a boolean combination of comparisons of atomic values.
 // While the expression here in the Go type system admits other values,
 // the controller will accept only the restricted set stated above.
+// Post-apiserver validation errors are posted to the StatusCollectorStatus.
 type Expression struct {
 	Op   ExpressionOperator `json:"op"`
 	Path string             `json:"path,omitempty"`
@@ -435,7 +437,7 @@ type StatusCollectorList struct {
 // The namespace of the CombinedStatus object is the namespace of the workload object,
 // or "kubestellar-report" if the workload object has no namespace.
 // The name of the CombinedStatus object is the concatenation of:
-// - the NamespacedName the workload object
+// - the Name the workload object
 // - the string ":"
 // - the Name of the BindingPolicy object.
 // The CombinedStatus object has the following labels:
@@ -448,21 +450,21 @@ type StatusCollectorList struct {
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:shortName={cs}
-// +kubebuilder:printcolumn:name="GROUP",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/api-group']"
-// +kubebuilder:printcolumn:name="RSC",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/resource']"
-// +kubebuilder:printcolumn:name="NS",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/namespace']"
-// +kubebuilder:printcolumn:name="NAME",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/name']"
+// +kubebuilder:printcolumn:name="SUBJECT_GROUP",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/api-group']"
+// +kubebuilder:printcolumn:name="SUBJECT_RSC",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/resource']"
+// +kubebuilder:printcolumn:name="SUBJECT_NS",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/namespace']"
+// +kubebuilder:printcolumn:name="SUBJECT_NAME",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/name']"
 // +kubebuilder:printcolumn:name="BINDINGPOLICY",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/policy']"
 type CombinedStatus struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// `results` has an entry for every applicable NamedStatusCombiner.
+	// `results` has an entry for every applicable StatusCollector.
 	// +optional
 	Results []NamedStatusCombination `json:"results,omitempty"`
 }
 
-// NamedStatusCombination holds the rows that come from evaluating one NamedStatusCombiner.
+// NamedStatusCombination holds the rows that come from evaluating one StatusCollector.
 type NamedStatusCombination struct {
 	Name string `json:"name"`
 
