@@ -99,7 +99,6 @@ if [ "$use_release" != true ]; then
   cd "${SRC_DIR}/../../.."
   pwd
   make ko-build-local
-  rm -rf local-chart
   make install-local-chart KUBE_CONTEXT=kind-kubeflex "KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY"
   cd -
 fi
