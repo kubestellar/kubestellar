@@ -58,7 +58,7 @@ The user can configure additional transformations of workload objects by putting
 
 Currently the binding is simply by naming the workload object's API group and "resource" name in the `CustomTransform`'s `spec`. The transformations from all of the bound `CustomTransform` objects are applied to the workload object. There should be at most one `CustomTransform` object that specifies a given API group and resource.
 
-Currently the only available transformations are removals of specified content. The content to be removed is identified by a small subset of JSONPath. In this subset, the only available operators are `.someName` and `["some string"]`. The allowed names and strings are as specified in [RFC 9535](https://www.rfc-editor.org/rfc/rfc9535.html), except that only double-quoted strings are allowed.
+Currently the only available transformations are removals of specified content. The content to be removed is identified by a small subset of JSONPath (which was originally and somewhat loosely defined in [an article by Stefan Goessner](https://goessner.net/articles/JsonPath/) and later defined more carefully in [RFC 9535](https://datatracker.ietf.org/doc/rfc9535/)). In the subset accepted here: the root node identifier (`$`) must be followed by a positive number of segments, where each segment is either (a) `.` and a name (a `member-name-shorthand`, in the grammar of the RFC) or (b) `[`, a string literal, and `]`; no more of the grammar is allowed, not even whitespace. The allowed names and string literalss are as specified in RFC 9535, except that only double-quoted strings are allowed.
 
 For example, the following `CustomTransform` object says to remove the `spec` field named `suspend` from `Job` objects (in the API group `batch`).
 
