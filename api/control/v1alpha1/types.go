@@ -433,11 +433,10 @@ type StatusCollectorList struct {
 // CombinedStatus holds the combined status from the WECs for one particular (workload object, BindingPolicy) pair.
 // The namespace of the CombinedStatus object is the namespace of the workload object,
 // or "kubestellar-report" if the workload object has no namespace.
-// The name of the CombinedStatus object is derived by taking the first 63 characters of the base64-encoded SHA256 hash.
-// The hash is computed from the concatenation of the following:
-// - the Name the workload object
+// The name of the CombinedStatus object is the concatenation of:
+// - the UID of the workload object
 // - the string ":"
-// - the Name of the BindingPolicy object.
+// - the UID of the BindingPolicy object.
 // The CombinedStatus object has the following labels:
 // - "status.kubestellar.io/api-group" holding the API Group (not verison) of the workload object;
 // - "status.kubestellar.io/resource" holding the resource (lowercase plural) of the workload object;
