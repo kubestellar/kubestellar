@@ -984,7 +984,7 @@ built from.</p>
 <h3 id="kubeflex-postcreatehooks">KubeFlex PostCreateHooks<a class="headerlink" href="#kubeflex-postcreatehooks" title="Permanent link">#</a></h3>
 <p>There are two <code>PostCreateHook</code> objects defined in the <code>config/postcreate-hooks/</code> directory.</p>
 <h4 id="ocm-postcreatehook">ocm PostCreateHook<a class="headerlink" href="#ocm-postcreatehook" title="Permanent link">#</a></h4>
-<p>The PostCreateHook defined in <code>ocm.yaml</code> gets used on an ITS and adds the hub side of OCM there, using the image <code>quay.io/kubestellar/clusteradm:0.7.2</code>. See <a href="#clusteradm-container-image">above</a> about the source of that. Currently this PostCreateHook is used in the E2E tests but this is a problem because of its fixed reference to container image previously built from sources in this same Git repository.</p>
+<p>The PostCreateHook defined in <code>ocm.yaml</code> gets used on an ITS and adds the hub side of OCM there, using the image <code>quay.io/kubestellar/clusteradm:0.8.2</code>. This image includes the <code>clusteradm</code> CLI release <code>v0.8.2</code> which is bundled with the OCM release <code>v0.13.2</code>. See <a href="#clusteradm-container-image">above</a> about the source of that. Currently this PostCreateHook is used in the E2E tests but this is a problem because of its fixed reference to container image previously built from sources in this same Git repository.</p>
 <h4 id="kubestellar-postcreatehook">kubestellar PostCreateHook<a class="headerlink" href="#kubestellar-postcreatehook" title="Permanent link">#</a></h4>
 <p>The PostCreateHook defined in <code>kubestellar.yaml</code> is intended to be
 used in the hosting cluster, once per WDS, and runs container image
