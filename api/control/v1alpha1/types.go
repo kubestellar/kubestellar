@@ -143,9 +143,6 @@ type DownsyncObjectTestAndStatusCollection struct {
 	DownsyncObjectTest `json:",inline"`
 	// statusCollectors is a list of StatusCollectors name references that are applied to the selected objects.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
-	// inlinedStatusCollectors is a list of StatusCollectorSpec that are inlined in the BindingPolicy.
-	// The StatusCollectors in this list are applied to the selected objects.
-	// InlinedStatusCollectors   []StatusCollectorSpec `json:"inlinedStatusCollectors,omitempty"` TODO
 }
 
 // DownsyncObjectTest is a set of criteria that characterize matching objects.
@@ -436,7 +433,8 @@ type StatusCollectorList struct {
 // CombinedStatus holds the combined status from the WECs for one particular (workload object, BindingPolicy) pair.
 // The namespace of the CombinedStatus object is the namespace of the workload object,
 // or "kubestellar-report" if the workload object has no namespace.
-// The name of the CombinedStatus object is the concatenation of:
+// The name of the CombinedStatus object is derived by taking the first 63 characters of the base64-encoded SHA256 hash.
+// The hash is computed from the concatenation of the following:
 // - the Name the workload object
 // - the string ":"
 // - the Name of the BindingPolicy object.
