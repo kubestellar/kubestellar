@@ -7,7 +7,6 @@ on:
   # To confirm any changes to docs build successfully, without deploying them
   push:
     branches:
-      - main
       - "release-*"
     paths:
       - "docs/**"
