@@ -39,20 +39,30 @@ func TestGinkgo(t *testing.T) {
 }
 
 var (
-	ctx           context.Context
-	coreCluster   *kubernetes.Clientset
-	wds           *kubernetes.Clientset
-	ksWds         *ksClient.Clientset
-	wec1          *kubernetes.Clientset
-	wec2          *kubernetes.Clientset
-	its           *ocmWorkClient.Clientset
-	releasedFlag  bool
-	skipSetupFlag bool
+	ctx                context.Context
+	coreCluster        *kubernetes.Clientset
+	wds                *kubernetes.Clientset
+	ksWds              *ksClient.Clientset
+	wec1               *kubernetes.Clientset
+	wec2               *kubernetes.Clientset
+	its                *ocmWorkClient.Clientset
+	releasedFlag       bool
+	skipSetupFlag      bool
+	hostClusterCtxFlag string
+	wds1CtxFlag        string
+	its1CtxFlag        string
+	wec1CtxFlag        string
+	wec2CtxFlag        string
 )
 
 func init() {
 	flag.BoolVar(&releasedFlag, "released", false, "released controls whether we use a release image")
 	flag.BoolVar(&skipSetupFlag, "skip-setup", false, "skip kubestellar cleanup and setup")
+	flag.StringVar(&hostClusterCtxFlag, "host-cluster-context", "kind-kubeflex", "context for kubeflex hosting cluster")
+	flag.StringVar(&wds1CtxFlag, "wds1-context", "wds1", "context for KS wds1 space")
+	flag.StringVar(&its1CtxFlag, "its1-context", "its1", "context for KS its1 space")
+	flag.StringVar(&wec1CtxFlag, "wec1-context", "cluster1", "context for wec1 cluster")
+	flag.StringVar(&wec2CtxFlag, "wec2-context", "cluster2", "context for wec2 cluster")
 }
 
 var _ = ginkgo.BeforeSuite(func() {
@@ -62,11 +72,11 @@ var _ = ginkgo.BeforeSuite(func() {
 	}
 
 	ctx = context.Background()
-	configCore := util.GetConfig("kind-kubeflex")
-	configWds := util.GetConfig("wds1")
-	configITS := util.GetConfig("its1")
-	configWec1 := util.GetConfig("cluster1")
-	configWec2 := util.GetConfig("cluster2")
+	configCore := util.GetConfig(hostClusterCtxFlag)
+	configWds := util.GetConfig(wds1CtxFlag)
+	configITS := util.GetConfig(its1CtxFlag)
+	configWec1 := util.GetConfig(wec1CtxFlag)
+	configWec2 := util.GetConfig(wec2CtxFlag)
 	coreCluster = util.CreateKubeClient(configCore)
 	wds = util.CreateKubeClient(configWds)
 	ksWds = util.CreateKSClient(configWds)
