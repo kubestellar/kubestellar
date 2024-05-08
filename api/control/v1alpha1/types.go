@@ -335,7 +335,7 @@ type StatusCollectorSpec struct {
 
 	// `groupBy` says how to group workload objects for aggregation (if there is any).
 	// Each expression must evaluate to an atomic value.
-	// `groupBy` must be empty if `combinedFields` is not.
+	// `groupBy` must be empty if `combinedFields` is.
 	// +optional
 	GroupBy []NamedExpression `json:"groupBy,omitempty"`
 
