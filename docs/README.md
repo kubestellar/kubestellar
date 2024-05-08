@@ -130,9 +130,8 @@ for more information on the 'include-markdown' plugin for mkdocs look [here](htt
 
 ### Supported aliases for our documentation
 
-`mike` has a concept of aliases. We currently maintain the following two aliases.
+`mike` has a concept of aliases. We currently maintain only one alias.
 
-- `unstable` ([{{config.docs_url}}/unstable](https://docs.kubestellar.io/unstable)), which always is an alias for the version named "main";
 - `latest` ([{{config.docs_url}}/latest](https://docs.kubestellar.io/latest)), for the latest regular release.
 
 The publishing workflow updates these aliases. The latest regular release is determined by picking the first version listed by `mike list` that matches the regexp `release-[0-9.]*`.
@@ -368,7 +367,7 @@ docs.kubestellar.io
 The versions.json file contains the version and alias information required by 'mike' to properly serve our doc site.  This file is maintained by the 'mike' environment and should not be edited by hand.
 
 ```json
-[{"version": "release-0.2", "title": "release-0.2", "aliases": ["stable"]}, {"version": "{{config.ks_branch}}", "title": "{{config.ks_branch}}", "aliases": ["latest", "unstable"]}]
+[{"version": "release-0.22.0", "title": "release-0.22.0", "aliases": ["latest"]}, {"version": "release-0.22.0-rc3", "title": "release-0.22.0-rc3", "aliases": []}, {"version": "release-0.21.2", "title": "release-0.21.2", "aliases": []}, {"version": "release-0.21.2-rc1", "title": "release-0.21.2-rc1", "aliases": []}, {"version": "release-0.21.1", "title": "release-0.21.1", "aliases": []}, {"version": "release-0.21.0", "title": "release-0.21.0", "aliases": []}, {"version": "release-0.14", "title": "release-0.14", "aliases": []}]
 ```
 
 ### In case of emergency
@@ -388,22 +387,11 @@ cd KubeStellar
 rm -rf *
 git add; git commit -m "removing all gh-pages files"; git push -u origin gh-pages
 ```
--- switch to the 'main' branch
+- switch to the 'release' branch, switch to /docs and run 'mike deploy' for the release branch. Add the alias 'latest' for the latest release 
 ```shell
-git checkout main
+git checkout release-0.22
 git pull
-```
-- switch to /docs and run 'mike deploy' for the main branch for alias 'unstable' and 'latest'
-```shell
-cd docs
-mike deploy --push --rebase --update-aliases main unstable
-mike deploy --push --rebase --update-aliases main latest
-```
-- switch to the 'release' branch and 'mike deploy' for the release branch for alias 'stable' (your release name will vary)
-```shell
-git checkout release-0.2
-git pull
-mike deploy --push --rebase --update-aliases release-0.2 stable
+mike deploy --push --rebase --update-aliases release-0.22 latest
 ```
 - switch back to the gh-pages branch and recreate the home.html, index.html, and CNAME files as needed (make sure you back out of the docs path first before switching to gh-pages because that path does not exist in that branch)
 ```shell

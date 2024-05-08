@@ -65,9 +65,7 @@ fi
 mike deploy "${MIKE_OPTIONS[@]}" "$VERSION"
 
 if [[ -n "${CI:-}" ]] && [[ "${GITHUB_EVENT_NAME}" =~ ^push|workflow_dispatch$ ]]; then
-  if [ $VERSION == "main" ]; then
-    desired_alias=unstable
-  elif [[ "$VERSION" =~ ^release- ]]; then
+  if [[ "$VERSION" =~ ^release- ]]; then
     latest=$(mike list | awk '{ print $1 }' | grep '^release-[0-9.]*$' | head -1)
     if [ "$VERSION" == "$latest" ]; then
       desired_alias=latest
