@@ -392,7 +392,7 @@ git add; git commit -m "removing all gh-pages files"; git push -u origin gh-page
 git checkout main
 git pull
 ```
-- switch to the 'release' branch and 'mike deploy' for the release branch. Add the alias 'latest' fir the latest branch
+- switch to the 'release' branch and run 'mike deploy' for the release branch. Add the alias 'latest' for the latest release 
 ```shell
 git checkout release-0.22
 git pull

@@ -183,24 +183,6 @@ git commit -m "new release version {{ config.ks_next_branch }}"
 git push -u origin {{ config.ks_next_branch }} # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
 
-### Remove the current 'stable' alias using 'mike' (DANGER!)
-Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
-```shell
-cd docs
-mike delete stable # remove the 'stable' alias from the current '{{ config.ks_branch }}' branches' doc set
-mike deploy --push --rebase --update-aliases main stable # this generates the 'main' branches' docs set and points 'stable' at it temporarily
-cd ..
-```
-
-### Update the 'stable' alias using 'mike'
-```shell
-cd docs
-mike delete stable # remove the 'stable' alias from the 'main' branches' doc set
-git pull
-mike deploy --push --rebase --update-aliases {{ config.ks_next_branch }} stable  # this generates the new '{{ config.ks_next_branch }}' branches' doc set and points 'stable' at it
-cd ..
-```
-
 ### Test your doc site
 Open a Chrome Incognito browser to [{{ config.docs_url }}]({{ config.docs_url }}) and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'
 
