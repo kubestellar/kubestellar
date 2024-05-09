@@ -64,5 +64,5 @@ HACK_DIR="${SRC_DIR}/../../../hack"
 
 "${COMMON_SRCS}/cleanup.sh" --env "$env"
 source "${COMMON_SRCS}/setup-shell.sh"
-"${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags -env "$env"
+"${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env"
 "${SRC_DIR}/use-kubestellar.sh" --env "$env"

@@ -13,11 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script installs the transport controller in the current kubeconfig context
-
-
 DEFAULT_TRANSPORT_CONTROLLER_IMAGE=ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.7
 
+context=""
 args=()
 
 TRANSPORT_CONTROLLER_IMAGE=""
@@ -25,7 +23,7 @@ TRANSPORT_CONTROLLER_IMAGE=""
 while [ $# != 0 ]; do
     case "$1" in
         (-h|--help)
-            echo "$0 usage: \$WDS_name \$ITS_name [\$transport_controller_image_ref] (--image-pull-policy \$policy | --controller-verbosity \$number | --transport-controller-image \$image_ref)*"
+            echo "$0 usage: \$WDS_name \$ITS_name [\$transport_controller_image_ref] (--image-pull-policy \$policy | --controller-verbosity \$number | --transport-controller-image \$image_ref | --context \$kubeconfig_context_name)*"
             exit;;
         (--transport-controller-image)
           if (( $# > 1 )); then
@@ -51,6 +49,14 @@ while [ $# != 0 ]; do
             echo "Missing controller-verbosity value" >&2
             exit 1;
           fi;;
+        (--context)
+          if (( $# > 1 )); then
+            context="$2"
+            shift
+          else
+            echo "Missing kubeconfig context name" >&2
+            exit 1;
+          fi;;
         (-*) echo "$0: unrecognized flag '$1'" >&2
             exit 1;;
         (*) args[${#args[*]}]="$1"
@@ -61,6 +67,10 @@ done
 if (( ${#args[*]} < 2 || ${#args[*]} > 3 )); then
     echo "$0: expecting two or three positional arguments (use -h to see usage)" >&2
     exit 1
+fi
+
+if [ -z "$context" ]; then
+    context=$(kubectl config current-context)
 fi
 
 WDS_NAME="${args[0]}"
@@ -77,7 +87,7 @@ elif [ -n "${args[2]}" ]; then
 fi
 
 # generate from template and env vars and then apply a configmap and a deployment for transport-controller
-kubectl apply -f - <<EOF
+kubectl --context $context apply -f - <<EOF
 apiVersion: v1
 kind: ConfigMap
 metadata:

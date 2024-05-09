@@ -56,6 +56,7 @@ while [ $# != 0 ]; do
             (*) echo "--env must be given 'kind' or 'ocp'" >&2
                 exit 1;;
 	  esac
+          shift;;
         (*) echo "$0: unrecognized argument/flag '$1'" >&2
             exit 1
     esac
@@ -145,14 +146,11 @@ if [ "$use_release" != true ]; then
   pwd
   rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
   echo "running ocm transport plugin..."
-  kubectl config use-context "$HOSTING_CONTEXT" ## transport deployment script works with current context
-  IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 its1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} --controller-verbosity "$TRANSPORT_CONTROLLER_VERBOSITY"
+  IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 its1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} --controller-verbosity "$TRANSPORT_CONTROLLER_VERBOSITY" --context "$HOSTING_CONTEXT"
   popd
-else
-  kubectl config use-context "$HOSTING_CONTEXT"
 fi
 
-wait-for-cmd '(kubectl -n wds1-system wait --for=condition=Ready pod/$(kubectl -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))'
+wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/$(kubectl --context "$HOSTING_CONTEXT" -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
 
 echo "transport controller is running."
 
@@ -196,7 +194,7 @@ kubectl --context its1 create cm -n customization-properties cluster2 --from-lit
 : Expect to see the wds1 kubestellar-controller-manager and transport-controller created in the wds1-system
 : namespace and the its1 statefulset created in the its1-system namespace.
 :
-wait-for-cmd '(($(kubectl --context kscore get deployments,statefulsets --all-namespaces | grep -e wds1 -e its1 | wc -l) == 5))'
+wait-for-cmd "(($(kubectl --context "$HOSTING_CONTEXT" get deployments,statefulsets --all-namespaces | grep -e wds1 -e its1 | wc -l) == 5))"
 
 :
 : -------------------------------------------------------------------------
