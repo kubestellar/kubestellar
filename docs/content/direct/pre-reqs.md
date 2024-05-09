@@ -5,7 +5,7 @@ You can use the [check-pre-req](#check-pre-requisites-for-kubestellar) script, t
 
 ## For Using KubeStellar
 
-- kubeflex version 0.4.2 or higher
+- kubeflex version 0.6.1 or higher
     To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). To upgrade from an existing installation,
 follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex). At the end of the install make sure that the kubeflex CLI, kflex, is in your path.
 

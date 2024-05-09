@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/go-logr/logr v1.3.0
-	github.com/kubestellar/kubeflex v0.4.2
+	github.com/kubestellar/kubeflex v0.6.1
 	github.com/onsi/ginkgo/v2 v2.13.0
 	github.com/onsi/gomega v1.29.0
 	github.com/spf13/pflag v1.0.5
