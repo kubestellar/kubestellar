@@ -63,6 +63,7 @@ Currently the only available transformations are removals of specified content. 
 For example, the following `CustomTransform` object says to remove the `spec` field named `suspend` from `Job` objects (in the API group `batch`).
 
 ```yaml
+apiVersion: control.kubestellar.io/v1alpha1
 kind: CustomTransform
 metadata:
   name: example
