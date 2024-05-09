@@ -60,13 +60,11 @@ func main() {
 	var probeAddr string
 	var itsName string
 	var wdsName string
-	var wdsLabel string
 	var allowedGroupsString string
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.StringVar(&itsName, "its-name", "", "name of the Inventory and Transport Space to connect to (empty string means to use the only one)")
 	flag.StringVar(&wdsName, "wds-name", "", "name of the workload description space to connect to")
-	flag.StringVar(&wdsLabel, "wds-label", "", "label of the workload description space to connect to")
 	flag.StringVar(&allowedGroupsString, "api-groups", "", "list of allowed api groups, comma separated. Empty string means all API groups are allowed")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
@@ -122,7 +120,7 @@ func main() {
 
 	// get the config for WDS
 	setupLog.Info("Getting config for WDS", "name", wdsName)
-	wdsRestConfig, wdsName, err := util.GetWDSKubeconfig(setupLog, wdsName, wdsLabel)
+	wdsRestConfig, wdsName, err := util.GetWDSKubeconfig(setupLog, wdsName)
 	if err != nil {
 		setupLog.Error(err, "unable to get WDS kubeconfig")
 		os.Exit(1)
