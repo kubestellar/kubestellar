@@ -48,27 +48,21 @@ while [ $# != 0 ]; do
     shift
 done
 
+case "$env" in
+    (kind|ocp) ;;
+    (*) echo "$0: --env must be 'kind' or 'ocp'" >&2
+        exit 1;;
+esac
+
 set -e # exit on error
 
-if [ $env == "kind" ];then
-    SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
-    COMMON_SRCS="${SRC_DIR}/../common"
-    HACK_DIR="${SRC_DIR}/../../../hack"
+SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
+COMMON_SRCS="${SRC_DIR}/../common"
+HACK_DIR="${SRC_DIR}/../../../hack"
 
-    "${HACK_DIR}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
+"${HACK_DIR}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
 
-    "${COMMON_SRCS}/cleanup.sh"
-    source "${COMMON_SRCS}/setup-shell.sh"
-    "${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags
-    "${SRC_DIR}/use-kubestellar.sh"
-
-elif [ $env == "ocp" ];then
-    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/common/cleanup.sh) --env ocp
-    source <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/common/setup-shell.sh)
-    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/common/setup-kubestellar-ocp.sh)
-    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/multi-cluster-deployment/use-kubestellar.sh) --env ocp
-else
-   echo "$0: unknown flag option" >&2 ;
-   echo "Usage: $0 [--env kind | --env ocp]" >& 2
-   exit 1
-fi
+"${COMMON_SRCS}/cleanup.sh" --env "$env"
+source "${COMMON_SRCS}/setup-shell.sh"
+"${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env"
+"${SRC_DIR}/use-kubestellar.sh" --env "$env"
