@@ -2,6 +2,10 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.23.0
+
+The main change is introduction of the an all-in-one chart, called the hub chart, for installing KubeStellar in a given hosting cluster and creating an initial set of WDSes and ITSes.
+
 ## 0.22.0 and its release candidates
 
 The changes include adding the following features.
