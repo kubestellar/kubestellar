@@ -31,6 +31,7 @@ type ControlV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	BindingsGetter
 	BindingPoliciesGetter
+	CombinedStatusesGetter
 	CustomTransformsGetter
 }
 
@@ -45,6 +46,10 @@ func (c *ControlV1alpha1Client) Bindings() BindingInterface {
 
 func (c *ControlV1alpha1Client) BindingPolicies() BindingPolicyInterface {
 	return newBindingPolicies(c)
+}
+
+func (c *ControlV1alpha1Client) CombinedStatuses(namespace string) CombinedStatusInterface {
+	return newCombinedStatuses(c, namespace)
 }
 
 func (c *ControlV1alpha1Client) CustomTransforms() CustomTransformInterface {

@@ -1,0 +1,115 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.13.0
+  name: combinedstatuses.control.kubestellar.io
+spec:
+  group: control.kubestellar.io
+  names:
+    kind: CombinedStatus
+    listKind: CombinedStatusList
+    plural: combinedstatuses
+    shortNames:
+    - cs
+    singular: combinedstatus
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.labels['status\.kubestellar\.io/api-group']
+      name: SUBJECT_GROUP
+      type: string
+    - jsonPath: .metadata.labels['status\.kubestellar\.io/resource']
+      name: SUBJECT_RSC
+      type: string
+    - jsonPath: .metadata.labels['status\.kubestellar\.io/namespace']
+      name: SUBJECT_NS
+      type: string
+    - jsonPath: .metadata.labels['status\.kubestellar\.io/name']
+      name: SUBJECT_NAME
+      type: string
+    - jsonPath: .metadata.labels['status\.kubestellar\.io/policy']
+      name: BINDINGPOLICY
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: 'CombinedStatus holds the combined status from the WECs for one
+          particular (workload object, BindingPolicy) pair. The namespace of the CombinedStatus
+          object is the namespace of the workload object, or "kubestellar-report"
+          if the workload object has no namespace. The name of the CombinedStatus
+          object is the concatenation of: - the UID of the workload object - the string
+          ":" - the UID of the BindingPolicy object. The CombinedStatus object has
+          the following labels: - "status.kubestellar.io/api-group" holding the API
+          Group (not verison) of the workload object; - "status.kubestellar.io/resource"
+          holding the resource (lowercase plural) of the workload object; - "status.kubestellar.io/namespace"
+          holding the namespace of the workload object; - "status.kubestellar.io/name"
+          holding the name of the workload object; - "status.kubestellar.io/binding-policy"
+          holding the name of the BindingPolicy object. This API is under development
+          and is not yet functional.'
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          results:
+            description: '`results` has an entry for every applicable StatusCollector.'
+            items:
+              description: NamedStatusCombination holds the rows that come from evaluating
+                one StatusCollector.
+              properties:
+                columnNames:
+                  items:
+                    type: string
+                  type: array
+                name:
+                  type: string
+                rows:
+                  items:
+                    properties:
+                      columns:
+                        items:
+                          description: Value holds a JSON value. This is a union type.
+                          properties:
+                            array:
+                              items: {}
+                              type: array
+                            bool:
+                              type: boolean
+                            float:
+                              description: Integer or floating-point, in JavaScript
+                                Object Notation.
+                              type: string
+                            object:
+                              additionalProperties: {}
+                              type: object
+                            string:
+                              type: string
+                            type:
+                              type: string
+                          required:
+                          - type
+                          type: object
+                        type: array
+                    required:
+                    - columns
+                    type: object
+                  type: array
+              required:
+              - columnNames
+              - name
+              type: object
+            type: array
+        type: object
+    served: true
+    storage: true
+    subresources: {}

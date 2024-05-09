@@ -149,13 +149,17 @@ func DeleteBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 
 func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name string,
 	clusterSelector []metav1.LabelSelector, objectTest []ksapi.DownsyncObjectTest) {
+	testAndStatusCollection := make([]ksapi.DownsyncObjectTestAndStatusCollection, len(objectTest))
+	for idx, test := range objectTest {
+		testAndStatusCollection[idx].DownsyncObjectTest = test
+	}
 	bindingPolicy := ksapi.BindingPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
 		Spec: ksapi.BindingPolicySpec{
 			ClusterSelectors: clusterSelector,
-			Downsync:         objectTest,
+			Downsync:         testAndStatusCollection,
 		},
 	}
 	_, err := wds.ControlV1alpha1().BindingPolicies().Create(ctx, &bindingPolicy, metav1.CreateOptions{})

@@ -56,6 +56,24 @@ const TemplateExpansionAnnotationKey string = "control.kubestellar.io/expand-tem
 // WEC properties to be used in customization.
 const PropertyConfigMapNamespace = "customization-properties"
 
+// BindingPolicy defines in which ways the workload objects ('what') and the destinations ('where') are bound together.
+// +genclient
+// +genclient:nonNamespaced
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
+// +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
+// +kubebuilder:printcolumn:name="TYPE",type="string",JSONPath=".spec.type"
+// +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
+// +kubebuilder:resource:scope=Cluster,shortName={bp}
+type BindingPolicy struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   BindingPolicySpec   `json:"spec,omitempty"`
+	Status BindingPolicyStatus `json:"status,omitempty"`
+}
+
 // BindingPolicySpec defines the desired state of BindingPolicy
 type BindingPolicySpec struct {
 	// `clusterSelectors` identifies the relevant Cluster objects in terms of their labels.
@@ -77,45 +95,21 @@ type BindingPolicySpec struct {
 	// +optional
 	// NumberOfClusters *int32 `json:"numberOfClusters,omitempty"`
 
-	// `downsync` selects the objects to bind with the selected Locations for downsync.
+	// `downsync` selects the objects to bind with the selected WECs for downsync,
+	// and describes how to collect the status from those WECs for each of the
+	// selected objects.
 	// An object is selected if it matches at least one member of this list.
-	// +optional
-	Downsync []DownsyncObjectTest `json:"downsync,omitempty"`
+	// All of the referenced StatusCollectors are applied to the object.
+	Downsync []DownsyncObjectTestAndStatusCollection `json:"downsync,omitempty"`
 
-	// WantSingletonReportedState indicates that (a) the number of selected locations is intended
-	// to be 1 and (b) the reported state of each downsynced object should be returned back to
-	// the object in this space.
-	// When this field is true, there should be no other BindingPolicy that matches any of the
-	// same workload objects.
-	//
-	// At the moment, it is the user's responsibility to comply to the above.
+	// WantSingletonReportedState means that for objects that are distributed --- taking
+	// all BindingPolicies into account --- to exactly one WEC, the object's reported state
+	// from the WEC should be written to the object in its WDS.
+	// WantSingletonReportedState connotes an expectation that indeed the object will
+	// propagate to exactly one WEC, but there is no guaranteed reaction when this
+	// expectation is not met.
 	// +optional
 	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
-}
-
-// BindingPolicyStatus defines the observed state of BindingPolicy
-type BindingPolicyStatus struct {
-	Conditions         []BindingPolicyCondition `json:"conditions"`
-	ObservedGeneration int64                    `json:"observedGeneration"`
-	Errors             []string                 `json:"errors,omitempty"`
-}
-
-// BindingPolicy defines in which ways the workload objects ('what') and the destinations ('where') are bound together.
-// +genclient
-// +genclient:nonNamespaced
-// +kubebuilder:object:root=true
-// +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
-// +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
-// +kubebuilder:printcolumn:name="TYPE",type="string",JSONPath=".spec.type"
-// +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
-// +kubebuilder:resource:scope=Cluster,shortName={bp}
-type BindingPolicy struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   BindingPolicySpec   `json:"spec,omitempty"`
-	Status BindingPolicyStatus `json:"status,omitempty"`
 }
 
 const (
@@ -141,6 +135,16 @@ const (
 	// BindingPolicyConditionMisconfigured means BindingPolicy configuration is incorrect.
 	BindingPolicyConditionMisconfigured string = "BindingPolicyMisconfigured"
 )
+
+// DownsyncObjectTestAndStatusCollection identifies some objects (by a predicate)
+// and asks for some combined status to be returned from those objects.
+// The latter is dictated through applying a set of StatusCollectors,
+type DownsyncObjectTestAndStatusCollection struct {
+	DownsyncObjectTest `json:",inline"`
+	// statusCollectors is a list of StatusCollectors name references that are applied to the selected objects.
+	// This API is under development and is not yet functional.
+	StatusCollectors []string `json:"statusCollectors,omitempty"`
+}
 
 // DownsyncObjectTest is a set of criteria that characterize matching objects.
 // An object matches if:
@@ -196,6 +200,13 @@ type DownsyncObjectTest struct {
 	// Empty list is a special case, it matches every object.
 	// +optional
 	ObjectNames []string `json:"objectNames,omitempty"`
+}
+
+// BindingPolicyStatus defines the observed state of BindingPolicy
+type BindingPolicyStatus struct {
+	Conditions         []BindingPolicyCondition `json:"conditions"`
+	ObservedGeneration int64                    `json:"observedGeneration"`
+	Errors             []string                 `json:"errors,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -300,6 +311,215 @@ type BindingList struct {
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Binding `json:"items"`
+}
+
+// StatusCollector defines one way to collect status about a given workload object from
+// the set of WECs that it propagates to.
+// This is modeled after an SQL SELECT statement that does aggregation.
+// This API is under development and is not yet functional.
+//
+// +kubebuilder:object:root=true
+type StatusCollector struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   StatusCollectorSpec   `json:"spec,omitempty"`
+	Status StatusCollectorStatus `json:"status,omitempty"`
+}
+
+// StatusCollectorSpec defines the desired state of StatusCollector.
+type StatusCollectorSpec struct {
+	// `filter`, if given, is applied first.
+	// It must evaluate to a boolean or null (which is treated as false).
+	// This is like the WHERE clause in an SQL SELECT statement.
+	// +optional
+	Filter *Expression `json:"filter,omitempty"`
+
+	// `groupBy` says how to group workload objects for aggregation (if there is any).
+	// Each expression must evaluate to an atomic value.
+	// `groupBy` must be empty if `combinedFields` is.
+	// +optional
+	GroupBy []NamedExpression `json:"groupBy,omitempty"`
+
+	// `combinedFields` defines the aggregations to do, if any.
+	// `combinedFields` must be empty if `select` is not.
+	// +optional
+	CombinedFields []NamedAggregator `json:"combinedFields,omitempty"`
+
+	// `select` defines named values to extract from each object.
+	// `select` must be emtpy when `combinedFields` is not.
+	// +optional
+	Select []NamedExpression `json:"select,omitempty"`
+
+	// `limit` limits the number of rows returned.
+	// The default value is 20.
+	Limit int64 `json:"limit"`
+}
+
+// NamedExpression pairs a name with a way of extracting a value from a JSON object.
+type NamedExpression struct {
+	Name string     `json:"name"`
+	Def  Expression `json:"def"`
+}
+
+// NamedAggregator pairs a name with a way to aggregate over some objects.
+//
+// - For `type=="COUNT"`, `subject` is omitted and the aggregate is the count
+// of those objects that are not `null`.
+//
+// - For the other types, `subject` is required and SHOULD
+// evaluate to a numeric value; exceptions are handled as follows.
+// For a string value: if it parses as an int64 or float64 then that is used.
+// Otherwise this is an error condition: a value of 0 is used, and the error
+// is reported in the BindingPolicyStatus.Errors (not necessarily repeated for each WEC).
+type NamedAggregator struct {
+	Type AggregatorType `json:"type"`
+
+	// +optional
+	Subject *Expression `json:"subject,omitempty"`
+}
+
+// AggregatorType indicates what sort of aggregation is to be done.
+type AggregatorType string
+
+const (
+	AggregatorTypeCount AggregatorType = "COUNT"
+	AggregatorTypeSum   AggregatorType = "SUM"
+	AggregatorTypeAvg   AggregatorType = "AVG"
+	AggregatorTypeMin   AggregatorType = "MIN"
+	AggregatorTypeMax   AggregatorType = "MAX"
+)
+
+// Expression is some value to derive from a workload object from a WEC.
+// An Expression is either a JSONPath identifying a value to extract
+// or a boolean combination of comparisons of atomic values.
+// While the expression here in the Go type system admits other values,
+// the controller will accept only the restricted set stated above.
+// Post-apiserver validation errors are posted to the StatusCollectorStatus.
+type Expression struct {
+	Op   ExpressionOperator `json:"op"`
+	Path string             `json:"path,omitempty"`
+	Args []Expression       `json:"args,omitempty"`
+}
+
+type ExpressionOperator string
+
+const (
+	OperatorPath  ExpressionOperator = "Path" // JSONPath string
+	OperatorOr    ExpressionOperator = "Or"
+	OperatorAnd   ExpressionOperator = "And"
+	OperatorNot   ExpressionOperator = "Not"
+	OperatorEqual ExpressionOperator = "Equal"
+)
+
+// StatusCollectorStatus defines the observed state of StatusCollector.
+type StatusCollectorStatus struct {
+	ObservedGeneration int64 `json:"observedGeneration"`
+
+	// +optional
+	Errors []string `json:"errors,omitempty"`
+}
+
+// StatusCollectorList is the API type for a list of StatusCollector.
+//
+// +kubebuilder:object:root=true
+type StatusCollectorList struct {
+	metav1.TypeMeta `json:",inline"`
+	// Standard list metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	// +optional
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []StatusCollector `json:"items"`
+}
+
+// CombinedStatus holds the combined status from the WECs for one particular (workload object, BindingPolicy) pair.
+// The namespace of the CombinedStatus object is the namespace of the workload object,
+// or "kubestellar-report" if the workload object has no namespace.
+// The name of the CombinedStatus object is the concatenation of:
+// - the UID of the workload object
+// - the string ":"
+// - the UID of the BindingPolicy object.
+// The CombinedStatus object has the following labels:
+// - "status.kubestellar.io/api-group" holding the API Group (not verison) of the workload object;
+// - "status.kubestellar.io/resource" holding the resource (lowercase plural) of the workload object;
+// - "status.kubestellar.io/namespace" holding the namespace of the workload object;
+// - "status.kubestellar.io/name" holding the name of the workload object;
+// - "status.kubestellar.io/binding-policy" holding the name of the BindingPolicy object.
+// This API is under development and is not yet functional.
+//
+// +genclient
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:shortName={cs}
+// +kubebuilder:printcolumn:name="SUBJECT_GROUP",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/api-group']"
+// +kubebuilder:printcolumn:name="SUBJECT_RSC",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/resource']"
+// +kubebuilder:printcolumn:name="SUBJECT_NS",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/namespace']"
+// +kubebuilder:printcolumn:name="SUBJECT_NAME",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/name']"
+// +kubebuilder:printcolumn:name="BINDINGPOLICY",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/policy']"
+type CombinedStatus struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	// `results` has an entry for every applicable StatusCollector.
+	// +optional
+	Results []NamedStatusCombination `json:"results,omitempty"`
+}
+
+// NamedStatusCombination holds the rows that come from evaluating one StatusCollector.
+type NamedStatusCombination struct {
+	Name string `json:"name"`
+
+	ColumnNames []string `json:"columnNames"`
+
+	// +optional
+	Rows []StatusCombinationRow `json:"rows,omitempty"`
+}
+
+type StatusCombinationRow struct {
+	Columns []Value `json:"columns"`
+}
+
+// Value holds a JSON value. This is a union type.
+type Value struct {
+	Type ValueType `json:"type"`
+
+	// +optional
+	String *string `json:"string,omitempty"`
+
+	// Integer or floating-point, in JavaScript Object Notation.
+	// +optional
+	Number *string `json:"float,omitempty"`
+
+	// +optional
+	Bool *bool `json:"bool,omitempty"`
+
+	// +optional
+	Object map[string]Value `json:"object,omitempty"`
+
+	// +optional
+	Array []Value `json:"array,omitempty"`
+}
+
+type ValueType string
+
+const (
+	TypeString ValueType = "String"
+	TypeNumber ValueType = "Number"
+	TypeBool   ValueType = "Bool"
+	TypeNull   ValueType = "Null"
+	TypeObject ValueType = "Object"
+	TypeArray  ValueType = "Array"
+)
+
+// CombinedStatusList is the API type for a list of CombinedStatus.
+//
+// +kubebuilder:object:root=true
+type CombinedStatusList struct {
+	metav1.TypeMeta `json:",inline"`
+	// Standard list metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	// +optional
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []CombinedStatus `json:"items"`
 }
 
 // CustomTransform describes how to select and transform some objects

@@ -37,6 +37,10 @@ func (c *FakeControlV1alpha1) BindingPolicies() v1alpha1.BindingPolicyInterface 
 	return &FakeBindingPolicies{c}
 }
 
+func (c *FakeControlV1alpha1) CombinedStatuses(namespace string) v1alpha1.CombinedStatusInterface {
+	return &FakeCombinedStatuses{c, namespace}
+}
+
 func (c *FakeControlV1alpha1) CustomTransforms() v1alpha1.CustomTransformInterface {
 	return &FakeCustomTransforms{c}
 }

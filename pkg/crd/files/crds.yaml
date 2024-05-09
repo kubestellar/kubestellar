@@ -108,20 +108,15 @@ spec:
                 type: array
               downsync:
                 description: '`downsync` selects the objects to bind with the selected
-                  Locations for downsync. An object is selected if it matches at least
-                  one member of this list.'
+                  WECs for downsync, and describes how to collect the status from
+                  those WECs for each of the selected objects. An object is selected
+                  if it matches at least one member of this list. All of the referenced
+                  StatusCollectors are applied to the object.'
                 items:
-                  description: 'DownsyncObjectTest is a set of criteria that characterize
-                    matching objects. An object matches if: - the `apiGroup` criterion
-                    is satisfied; - the `resources` criterion is satisfied; - the
-                    `namespaces` criterion is satisfied; - the `namespaceSelectors`
-                    criterion is satisfied; - the `objectNames` criterion is satisfied;
-                    and - the `objectSelectors` criterion is satisfied. At least one
-                    of the fields must make some discrimination; it is not valid for
-                    every field to match all objects. Validation might not be fully
-                    checked by apiservers until the Kubernetes dependency is release
-                    1.25; in the meantime validation error messages will appear in
-                    annotations whose key is `validation-error.kubestellar.io/{number}`.'
+                  description: DownsyncObjectTestAndStatusCollection identifies some
+                    objects (by a predicate) and asks for some combined status to
+                    be returned from those objects. The latter is dictated through
+                    applying a set of StatusCollectors,
                   properties:
                     apiGroup:
                       description: '`apiGroup` is the API group of the referenced
@@ -267,16 +262,23 @@ spec:
                       items:
                         type: string
                       type: array
+                    statusCollectors:
+                      description: statusCollectors is a list of StatusCollectors
+                        name references that are applied to the selected objects.
+                        This API is under development and is not yet functional.
+                      items:
+                        type: string
+                      type: array
                   type: object
                 type: array
               wantSingletonReportedState:
-                description: "WantSingletonReportedState indicates that (a) the number
-                  of selected locations is intended to be 1 and (b) the reported state
-                  of each downsynced object should be returned back to the object
-                  in this space. When this field is true, there should be no other
-                  BindingPolicy that matches any of the same workload objects. \n
-                  At the moment, it is the user's responsibility to comply to the
-                  above."
+                description: WantSingletonReportedState means that for objects that
+                  are distributed --- taking all BindingPolicies into account ---
+                  to exactly one WEC, the object's reported state from the WEC should
+                  be written to the object in its WDS. WantSingletonReportedState
+                  connotes an expectation that indeed the object will propagate to
+                  exactly one WEC, but there is no guaranteed reaction when this expectation
+                  is not met.
                 type: boolean
             type: object
           status:
