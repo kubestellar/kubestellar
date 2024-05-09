@@ -5,7 +5,7 @@
 
 We have two web sites, as follows.
 
-- `https://kubestellar.io`. This is hosted by GoDaddy and administered by Andy Anderson. It contains a few redirects. The most important is that `https://kubestellar.io/` redirects to `https://docs.kubestellar.io/`.
+- `https://kubestellar.io`. This is hosted by GoDaddy and administered by [Andy Anderson](mailto://andy@clubanderson.com). It contains a few redirects. The most important is that `https://kubestellar.io/` redirects to `https://docs.kubestellar.io/`.
 - `https://docs.kubestellar.io`. This is a GitHub pages website based on the `github.com/kubestellar/kubestellar/` repository.
 
 ### GitHub pages
