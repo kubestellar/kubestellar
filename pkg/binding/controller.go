@@ -24,8 +24,10 @@ import (
 
 	"github.com/go-logr/logr"
 	"golang.org/x/time/rate"
-	ocmclientset "open-cluster-management.io/api/client/cluster/clientset/versioned"
-	ocminformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
+	clusterclientset "open-cluster-management.io/api/client/cluster/clientset/versioned"
+	clusterpkginformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
+	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions/cluster/v1"
+	clusterlisters "open-cluster-management.io/api/client/cluster/listers/cluster/v1"
 
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -42,11 +44,14 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/crd"
-	"github.com/kubestellar/kubestellar/pkg/ocm"
+	ksclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
+	controlclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
+	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
+	controlinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
+	controllisters "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -61,6 +66,7 @@ var excludedGroups = map[string]bool{
 	"discovery.k8s.io":             true,
 	"apiregistration.k8s.io":       true,
 	"coordination.k8s.io":          true,
+	"control.kubestellar.io":       true,
 }
 
 // Resource names to exclude for watchers as they should not delivered to other clusters
@@ -86,11 +92,20 @@ const (
 // Controller watches all objects, finds associated bindingpolicies, when matched a bindingpolicy wraps and
 // places objects into mailboxes
 type Controller struct {
-	logger           logr.Logger
-	ocmClientset     ocmclientset.Interface // used for ManagedCluster in ITS
-	ocmClient        client.Client          // used for ManagedCluster, ManifestWork in ITS
-	dynamicClient    dynamic.Interface      // used for CRD, Binding[Policy], workload
-	kubernetesClient kubernetes.Interface   // used for Namespaces, and Discovery
+	logger                      logr.Logger
+	controlClient               controlclient.ControlV1alpha1Interface // used for Binding, BindingPolicy
+	ksInformerFactoryStart      func(stopCh <-chan struct{})
+	bindingInformer             cache.SharedIndexInformer
+	bindingLister               controllisters.BindingLister
+	bindingPolicyInformer       cache.SharedIndexInformer
+	bindingPolicyLister         controllisters.BindingPolicyLister
+	clusterClient               clusterclientset.Interface // used for ManagedCluster in ITS
+	clusterInformerFactoryStart func(stopCh <-chan struct{})
+	clusterInformer             cache.SharedIndexInformer // used for ManagedCluster in ITS
+	clusterLister               clusterlisters.ManagedClusterLister
+	dynamicClient               dynamic.Interface // used for workload
+
+	kubernetesClient kubernetes.Interface // used for Namespaces, and Discovery
 
 	extClient apiextensionsclientset.Interface // used for CRD
 
@@ -100,11 +115,19 @@ type Controller struct {
 	stoppers         util.ConcurrentMap[schema.GroupVersionResource, chan struct{}]
 
 	bindingPolicyResolver BindingPolicyResolver
-	workqueue             workqueue.RateLimitingInterface
-	initializedTs         time.Time
-	wdsName               string
-	allowedGroupsSet      sets.Set[string]
+
+	// Contains bindingPolicyRef, bindingRef, util.ObjectIdentifier
+	workqueue        workqueue.RateLimitingInterface
+	initializedTs    time.Time
+	wdsName          string
+	allowedGroupsSet sets.Set[string]
 }
+
+// bindingPolicyRef is a workqueue item that references a BindingPolicy
+type bindingPolicyRef string
+
+// bindingRef is a workqueue item that references a Binding
+type bindingRef string
 
 // Create a new binding controller
 func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, itsRestConfig *rest.Config,
@@ -147,14 +170,19 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, itsRest
 		return nil, err
 	}
 
-	ocmClientset, err := ocmclientset.NewForConfig(itsRestConfig)
+	ksClient, err := ksclient.NewForConfig(wdsRestConfig)
 	if err != nil {
 		return nil, err
 	}
+	ksInformerFactory := ksinformers.NewSharedInformerFactory(ksClient, defaultResyncPeriod)
 
-	ocmClient := ocm.GetOCMClient(itsRestConfig)
+	clusterClient, err := clusterclientset.NewForConfig(itsRestConfig)
+	if err != nil {
+		return nil, err
+	}
+	clusterInformerFactory := clusterpkginformers.NewSharedInformerFactory(clusterClient, defaultResyncPeriod)
 
-	return makeController(logger, dynamicClient, kubernetesClient, extClient, ocmClientset, ocmClient, apiResourceLists, wdsName, allowedGroupsSet)
+	return makeController(logger, ksClient.ControlV1alpha1(), ksInformerFactory.Start, ksInformerFactory.Control().V1alpha1(), dynamicClient, kubernetesClient, extClient, clusterClient, clusterInformerFactory.Start, clusterInformerFactory.Cluster().V1().ManagedClusters(), apiResourceLists, wdsName, allowedGroupsSet)
 }
 
 // doDiscovery contains the exact one occurence of ServerPreferredResources() in this repository.
@@ -205,11 +233,15 @@ func computeQPSFromNumGVRs(nGVRs int) float32 {
 }
 
 func makeController(logger logr.Logger,
+	controlClient controlclient.ControlV1alpha1Interface,
+	ksInformerFactoryStart func(stopCh <-chan struct{}),
+	controlInformers controlinformers.Interface,
 	dynamicClient dynamic.Interface, // used for CRD, Binding[Policy], workload
 	kubernetesClient kubernetes.Interface, // used for Namespaces, and Discovery
 	extClient apiextensionsclientset.Interface, // used for CRD
-	ocmClientset ocmclientset.Interface, // used for ManagedCluster in ITS
-	ocmClient client.Client, // used for ManagedCluster, ManifestWork in ITS
+	clusterClient clusterclientset.Interface, // used for ManagedCluster in ITS
+	clusterInformerFactoryStart func(<-chan struct{}),
+	clusterPreInformer clusterinformers.ManagedClusterInformer, // used for ManagedCluster in ITS
 	apiResourceLists []*metav1.APIResourceList,
 	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
 
@@ -218,21 +250,30 @@ func makeController(logger logr.Logger,
 		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
 	)
 
+	clusterInformer := clusterPreInformer.Informer()
 	controller := &Controller{
-		wdsName:               wdsName,
-		logger:                logger,
-		ocmClientset:          ocmClientset,
-		ocmClient:             ocmClient,
-		dynamicClient:         dynamicClient,
-		kubernetesClient:      kubernetesClient,
-		extClient:             extClient,
-		apiResourceLists:      apiResourceLists,
-		listers:               util.NewConcurrentMap[schema.GroupVersionResource, cache.GenericLister](),
-		informers:             util.NewConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer](),
-		stoppers:              util.NewConcurrentMap[schema.GroupVersionResource, chan struct{}](),
-		bindingPolicyResolver: NewBindingPolicyResolver(),
-		workqueue:             workqueue.NewRateLimitingQueue(ratelimiter),
-		allowedGroupsSet:      allowedGroupsSet,
+		wdsName:                     wdsName,
+		logger:                      logger,
+		controlClient:               controlClient,
+		ksInformerFactoryStart:      ksInformerFactoryStart,
+		bindingInformer:             controlInformers.Bindings().Informer(),
+		bindingLister:               controlInformers.Bindings().Lister(),
+		bindingPolicyInformer:       controlInformers.BindingPolicies().Informer(),
+		bindingPolicyLister:         controlInformers.BindingPolicies().Lister(),
+		clusterClient:               clusterClient,
+		clusterInformerFactoryStart: clusterInformerFactoryStart,
+		clusterInformer:             clusterInformer,
+		clusterLister:               clusterPreInformer.Lister(),
+		dynamicClient:               dynamicClient,
+		kubernetesClient:            kubernetesClient,
+		extClient:                   extClient,
+		apiResourceLists:            apiResourceLists,
+		listers:                     util.NewConcurrentMap[schema.GroupVersionResource, cache.GenericLister](),
+		informers:                   util.NewConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer](),
+		stoppers:                    util.NewConcurrentMap[schema.GroupVersionResource, chan struct{}](),
+		bindingPolicyResolver:       NewBindingPolicyResolver(),
+		workqueue:                   workqueue.NewRateLimitingQueue(ratelimiter),
+		allowedGroupsSet:            allowedGroupsSet,
 	}
 
 	return controller, nil
@@ -241,7 +282,7 @@ func makeController(logger logr.Logger,
 // EnsureCRDs will ensure that the CRDs are installed.
 // Call this before Start.
 func (c *Controller) EnsureCRDs(ctx context.Context) error {
-	return crd.ApplyCRDs(ctx, c.dynamicClient, c.kubernetesClient, c.extClient, c.logger)
+	return crd.ApplyCRDs(ctx, controllerName, c.kubernetesClient, c.extClient, c.logger)
 }
 
 // AppendKSResources lets the controller know about the KS resources.
@@ -260,6 +301,24 @@ func (c *Controller) AppendKSResources(ctx context.Context) error {
 func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan interface{}) error {
 	logger := klog.FromContext(parentCtx).WithName(controllerName)
 	ctx := klog.NewContext(parentCtx, logger)
+
+	// Create informer on managedclusters so we can re-evaluate BindingPolicies.
+	// This informer differs from the other informers in that it listens on the ocm hub.
+	if err := c.setupManagedClustersInformer(ctx); err != nil {
+		return err
+	}
+
+	if err := c.setupBindingPolicyInformer(ctx); err != nil {
+		return err
+	}
+	if err := c.setupBindingInformer(ctx); err != nil {
+		return err
+	}
+	c.ksInformerFactoryStart(ctx.Done())
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.bindingPolicyInformer.HasSynced, c.bindingInformer.HasSynced); !ok {
+		return fmt.Errorf("failed to wait for KubeStellar informers to sync")
+	}
+
 	errChan := make(chan error, 1)
 	go func() {
 		errChan <- c.run(ctx, workers, cListers)
@@ -354,16 +413,9 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 		return err // no need to wrap because it is already clear
 	}
 
-	c.logger.Info("All caches synced")
+	c.logger.Info("All workload caches synced")
 	cListers <- c.listers
 	c.logger.Info("Sent listers")
-
-	// Create informer on managedclusters so we can re-evaluate BindingPolicies.
-	// This informer differ from the previous informers in that it listens on the ocm hub.
-	err := c.createManagedClustersInformer(ctx)
-	if err != nil {
-		return err
-	}
 
 	// populate the BindingPolicyResolver with entries for existing bindingpolicies
 	if err := c.populateBindingPolicyResolverWithExistingBindingPolicies(); err != nil {
@@ -386,10 +438,8 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	return nil
 }
 
-func (c *Controller) createManagedClustersInformer(ctx context.Context) error {
-	informerFactory := ocminformers.NewSharedInformerFactory(c.ocmClientset, defaultResyncPeriod)
-	informer := informerFactory.Cluster().V1().ManagedClusters().Informer()
-	_, err := informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+func (c *Controller) setupManagedClustersInformer(ctx context.Context) error {
+	_, err := c.clusterInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			objM := obj.(metav1.Object)
 			c.evaluateBindingPolicies(ctx, objM.GetName(), objM.GetLabels())
@@ -413,9 +463,73 @@ func (c *Controller) createManagedClustersInformer(ctx context.Context) error {
 		c.logger.Error(err, "failed to add managedclusters informer event handler")
 		return err
 	}
-	informerFactory.Start(ctx.Done())
-	if ok := cache.WaitForCacheSync(ctx.Done(), informer.HasSynced); !ok {
-		return fmt.Errorf("failed to wait for caches to sync")
+	c.clusterInformerFactoryStart(ctx.Done())
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.clusterInformer.HasSynced); !ok {
+		return fmt.Errorf("failed to wait for MangedCluster informer to sync")
+	}
+	return nil
+}
+
+func (c *Controller) setupBindingPolicyInformer(ctx context.Context) error {
+	logger := klog.FromContext(ctx)
+	_, err := c.bindingPolicyInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			bp := obj.(*v1alpha1.BindingPolicy)
+			logger.V(5).Info("Enqueuing reference to BindingPolicy because of informer add event", "name", bp.Name, "resourceVersion", bp.ResourceVersion)
+			c.workqueue.Add(bindingPolicyRef(bp.Name))
+		},
+		UpdateFunc: func(old, new interface{}) {
+			oldBP := old.(*v1alpha1.BindingPolicy)
+			newBP := new.(*v1alpha1.BindingPolicy)
+			if oldBP.Generation != newBP.Generation {
+				logger.V(5).Info("Enqueuing reference to BindingPolicy because of informer update event", "name", newBP.Name, "resourceVersion", newBP.ResourceVersion)
+				c.workqueue.Add(bindingPolicyRef(newBP.Name))
+			}
+		},
+		DeleteFunc: func(obj interface{}) {
+			if typed, is := obj.(cache.DeletedFinalStateUnknown); is {
+				obj = typed.Obj
+			}
+			bp := obj.(*v1alpha1.BindingPolicy)
+			logger.V(5).Info("Enqueuing reference to BindingPolicy because of informer delete event", "name", bp.Name)
+			c.workqueue.Add(bindingPolicyRef(bp.Name))
+		},
+	})
+	if err != nil {
+		c.logger.Error(err, "failed to add bindingpolicies informer event handler")
+		return err
+	}
+	return nil
+}
+
+func (c *Controller) setupBindingInformer(ctx context.Context) error {
+	logger := klog.FromContext(ctx)
+	_, err := c.bindingInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			bdg := obj.(*v1alpha1.Binding)
+			logger.V(5).Info("Enqueuing reference to Binding because of informer add event", "name", bdg.Name, "resourceVersion", bdg.ResourceVersion)
+			c.workqueue.Add(bindingPolicyRef(bdg.Name))
+		},
+		UpdateFunc: func(old, new interface{}) {
+			oldBdg := old.(*v1alpha1.Binding)
+			newBdg := new.(*v1alpha1.Binding)
+			if oldBdg.Generation != newBdg.Generation {
+				logger.V(5).Info("Enqueuing reference to Binding because of informer update event", "name", newBdg.Name, "resourceVersion", newBdg.ResourceVersion)
+				c.workqueue.Add(bindingPolicyRef(newBdg.Name))
+			}
+		},
+		DeleteFunc: func(obj interface{}) {
+			if typed, is := obj.(cache.DeletedFinalStateUnknown); is {
+				obj = typed.Obj
+			}
+			bdg := obj.(*v1alpha1.Binding)
+			logger.V(5).Info("Enqueuing reference to Binding because of informer delete event", "name", bdg.Name)
+			c.workqueue.Add(bindingPolicyRef(bdg.Name))
+		},
+	})
+	if err != nil {
+		c.logger.Error(err, "failed to add bindingpolicies informer event handler")
+		return err
 	}
 	return nil
 }
@@ -474,19 +588,10 @@ func (c *Controller) enqueueObjectIdentifier(objIdentifier util.ObjectIdentifier
 }
 
 func (c *Controller) enqueueBinding(name string) {
-	c.workqueue.AddAfter(util.ObjectIdentifier{
-		GVK: schema.GroupVersionKind{
-			Group:   v1alpha1.GroupVersion.Group,
-			Version: v1alpha1.GroupVersion.Version,
-			Kind:    util.BindingKind},
-		Resource: util.BindingResource,
-		ObjectName: cache.ObjectName{
-			Namespace: metav1.NamespaceNone,
-			Name:      name,
-		},
-	}, bindingQueueingDelay) // this resource can have bursts of
+	// this resource can have bursts of
 	// updates due to being updated by multiple workload-objects getting
 	// processed concurrently at a high rate.
+	c.workqueue.AddAfter(bindingRef(name), bindingQueueingDelay)
 }
 
 // runWorker is a long-running function that will continually call the
@@ -506,43 +611,29 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 		logger.V(1).Info("Worker is done")
 		return false
 	}
-	logger.V(4).Info("Dequeued", "item", item)
+	logger.V(4).Info("Dequeued", "item", item, "type", fmt.Sprintf("%T", item))
 
 	// We wrap this block in a func so we can defer c.workqueue.Done.
-	err := func(objIdentifierA any) error {
+	err := func() error {
 		// We call Done here so the workqueue knows we have finished
 		// processing this item. We also must remember to call Forget if we
 		// do not want this work item being re-queued. For example, we do
 		// not call Forget if a transient error occurs, instead the item is
 		// put back on the workqueue and attempted again after a back-off
 		// period.
-		defer c.workqueue.Done(objIdentifierA)
-		var objIdentifier util.ObjectIdentifier
-		var ok bool
-		// We expect util.ObjectIdentifier to come off the workqueue. We do this as the
-		// delayed nature of the workqueue means the items in the informer
-		// cache may actually be more up to date that when the item was
-		// initially put onto the workqueue.
-		if objIdentifier, ok = objIdentifierA.(util.ObjectIdentifier); !ok {
-			// if the item in the workqueue is invalid, we call
-			// Forget here to avoid process a work item that is invalid.
-			c.workqueue.Forget(objIdentifierA)
-			utilruntime.HandleError(fmt.Errorf("expected util.ObjectIdentifier in workqueue but got %#v",
-				objIdentifierA))
-			return nil
-		}
+		defer c.workqueue.Done(item)
 		// Run the reconciler, passing it the full object identifier
-		if err := c.reconcile(ctx, objIdentifier); err != nil {
+		if err := c.reconcile(ctx, item); err != nil {
 			// Put the item back on the workqueue to handle any transient errors.
-			c.workqueue.AddRateLimited(objIdentifier)
-			return fmt.Errorf("error reconciling object (identifier: %#v): %s, requeuing", objIdentifier, err.Error())
+			c.workqueue.AddRateLimited(item)
+			return fmt.Errorf("error reconciling object (identifier: %#v, type: %T): %s, requeuing", item, item, err.Error())
 		}
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
-		c.workqueue.Forget(objIdentifier)
-		logger.V(4).Info("Successfully reconciled", "objectIdentifier", objIdentifier)
+		c.workqueue.Forget(item)
+		logger.V(4).Info("Successfully reconciled", "objectIdentifier", item, "type", fmt.Sprintf("%T", item))
 		return nil
-	}(item)
+	}()
 
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -552,31 +643,33 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 	return true
 }
 
-func (c *Controller) reconcile(ctx context.Context, objIdentifier util.ObjectIdentifier) error {
+func (c *Controller) reconcile(ctx context.Context, item any) error {
 	logger := klog.FromContext(ctx)
 
-	// special handling for selected API resources
-	// note that object is *unstructured.Unstructured so we cannot
-	// just use "switch obj.(type)"
-	if util.ObjIdentifierIsForBinding(objIdentifier) {
-		return c.syncBinding(ctx, objIdentifier) // this function logs through all its exits
-	} else if util.ObjIdentifierIsForBindingPolicy(objIdentifier) {
-		if err := c.handleBindingPolicy(ctx, objIdentifier); err != nil {
+	switch objIdentifier := item.(type) {
+	case bindingRef:
+		return c.syncBinding(ctx, string(objIdentifier)) // this function logs through all its exits
+	case bindingPolicyRef:
+		if err := c.syncBindingPolicy(ctx, string(objIdentifier)); err != nil {
 			return fmt.Errorf("failed to handle bindingpolicy: %w", err) // error logging after this call
 			// will add name.
 		}
 
 		logger.Info("Handled bindingpolicy", "objectIdentifier", objIdentifier)
 		return nil
-	} else if util.ObjIdentifierIsForCRD(objIdentifier) {
-		if err := c.handleCRD(ctx, objIdentifier); err != nil {
-			return fmt.Errorf("failed to handle CRD: %w", err) // error logging after this call
-			// will add name.
+	case util.ObjectIdentifier:
+		if util.ObjIdentifierIsForCRD(objIdentifier) {
+			if err := c.handleCRD(ctx, objIdentifier); err != nil {
+				return fmt.Errorf("failed to handle CRD: %w", err) // error logging after this call
+				// will add name.
+			}
+			logger.Info("Handled CRD", "objectIdentifier", objIdentifier)
 		}
-		logger.Info("Handled CRD", "objectIdentifier", objIdentifier)
-	}
 
-	return c.updateResolutions(ctx, objIdentifier)
+		return c.updateResolutions(ctx, objIdentifier)
+	}
+	logger.Error(nil, "Impossible workqueue entry", "type", fmt.Sprintf("%T", item), "value", item)
+	return nil
 }
 
 func (c *Controller) getObjectFromIdentifier(objIdentifier util.ObjectIdentifier) (runtime.Object, error) {
@@ -617,12 +710,7 @@ func (c *Controller) populateBindingPolicyResolverWithExistingBindingPolicies() 
 		return fmt.Errorf("failed to list BindingPolicies: %w", err)
 	}
 
-	for _, bindingPolicyObject := range bindingpolicies {
-		bindingpolicy, err := runtimeObjectToBindingPolicy(bindingPolicyObject)
-		if err != nil {
-			return fmt.Errorf("failed to convert runtime.Object to BindingPolicy: %w", err)
-		}
-
+	for _, bindingpolicy := range bindingpolicies {
 		c.bindingPolicyResolver.NoteBindingPolicy(bindingpolicy)
 	}
 

@@ -22,21 +22,16 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
-	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 // syncBinding syncs a binding object with what is resolved by the bindingpolicy resolver.
-func (c *Controller) syncBinding(ctx context.Context, objIdentifier util.ObjectIdentifier) error {
+func (c *Controller) syncBinding(ctx context.Context, bindingName string) error {
 	logger := klog.FromContext(ctx)
 
-	var unstructuredObj *unstructured.Unstructured
-	if !c.bindingPolicyResolver.ResolutionExists(objIdentifier.ObjectName.Name) {
+	if !c.bindingPolicyResolver.ResolutionExists(bindingName) {
 		// if a resolution is not associated to the binding's name
 		// then the bindingpolicy has been deleted, and the binding
 		// will eventually be garbage collected. We can safely ignore this.
@@ -44,24 +39,19 @@ func (c *Controller) syncBinding(ctx context.Context, objIdentifier util.ObjectI
 		return nil
 	}
 
-	obj, err := c.getObjectFromIdentifier(objIdentifier)
+	binding, err := c.bindingLister.Get(bindingName)
+	// `*binding` is immutable
 	if errors.IsNotFound(err) {
 		// a resolution exists and the object is not found, therefore it is deleted and should be created
-		unstructuredObj = util.EmptyUnstructuredObjectFromIdentifier(objIdentifier)
-	} else if err != nil {
-		return fmt.Errorf("failed to get runtime.Object from object identifier (%v): %w", objIdentifier, err)
-	} else {
-		// perform the type assertion only if getObjectFromIdentifier did not fail
-		var ok bool
-		unstructuredObj, ok = obj.(*unstructured.Unstructured)
-		if !ok {
-			return fmt.Errorf("the given runtime.Object (%#v) is not a pointer to Unstructured", obj)
+		binding = &v1alpha1.Binding{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Binding",
+				APIVersion: v1alpha1.GroupVersion.String()},
+			ObjectMeta: metav1.ObjectMeta{
+				Name: bindingName},
 		}
-	}
-
-	binding, err := unstructuredObjectToBinding(unstructuredObj)
-	if err != nil {
-		return fmt.Errorf("failed to convert from Unstructured to Binding: %w", err)
+	} else if err != nil {
+		return fmt.Errorf("failed to get Binding from informer cache (name=%v): %w", bindingName, err)
 	}
 
 	// binding name matches that of the bindingpolicy 1:1, therefore its NamespacedName is the same.
@@ -89,8 +79,10 @@ func (c *Controller) syncBinding(ctx context.Context, objIdentifier util.ObjectI
 
 // updateOrCreateBinding updates or creates a binding object in the cluster.
 // If the object already exists, it is updated. Otherwise, it is created.
+// The given `bdg *v1alpha1.Binding` points to immutable storage.
 func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Binding,
 	generatedBindingSpec *v1alpha1.BindingSpec) error {
+	bdg = bdg.DeepCopy()
 	// use the passed binding and set its spec
 	bdg.Spec = *generatedBindingSpec
 
@@ -101,58 +93,23 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 	}
 	bdg.SetOwnerReferences([]metav1.OwnerReference{ownerReference})
 
-	// update or create binding
-	unstructuredBinding, err := bindingToUnstructuredObject(bdg)
-	if err != nil {
-		return fmt.Errorf("failed to convert Binding to Unstructured: %w", err)
-	}
-
 	logger := klog.FromContext(ctx)
+	bdgEcho, err := c.controlClient.Bindings().Update(ctx, bdg, metav1.UpdateOptions{FieldManager: controllerName})
 
-	_, err = c.dynamicClient.Resource(schema.GroupVersionResource{
-		Group:    v1alpha1.SchemeGroupVersion.Group,
-		Version:  bdg.GetObjectKind().GroupVersionKind().Version,
-		Resource: util.BindingResource,
-	}).Update(ctx, unstructuredBinding, metav1.UpdateOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
-			_, err = c.dynamicClient.Resource(schema.GroupVersionResource{
-				Group:    v1alpha1.SchemeGroupVersion.Group,
-				Version:  bdg.GetObjectKind().GroupVersionKind().Version,
-				Resource: util.BindingResource,
-			}).Create(ctx, unstructuredBinding, metav1.CreateOptions{})
+			bdgEcho, err = c.controlClient.Bindings().Create(ctx, bdg, metav1.CreateOptions{FieldManager: controllerName})
 			if err != nil {
-				return fmt.Errorf("failed to create binding: %w", err)
+				return fmt.Errorf("failed to create binding (name=%s): %w", bdg.Name, err)
 			}
 
-			logger.Info("created binding", "name", bdg.GetName())
+			logger.Info("created binding", "name", bdg.GetName(), "resourceVersion", bdgEcho.ResourceVersion)
 			return nil
 		} else {
 			return fmt.Errorf("failed to update binding: %w", err)
 		}
 	}
 
-	logger.Info("updated binding", "name", bdg.GetName())
+	logger.Info("updated binding", "name", bdg.GetName(), "resourceVersion", bdgEcho.ResourceVersion)
 	return nil
-}
-
-func unstructuredObjectToBinding(unstructuredObj *unstructured.Unstructured) (*v1alpha1.Binding, error) {
-	var binding *v1alpha1.Binding
-	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredObj.UnstructuredContent(),
-		&binding); err != nil {
-		return nil, fmt.Errorf("failed to convert Unstructured to Binding: %w", err)
-	}
-
-	return binding, nil
-}
-
-func bindingToUnstructuredObject(binding *v1alpha1.Binding) (*unstructured.Unstructured, error) {
-	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(binding)
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert Binding to map[string]interface{}: %w", err)
-	}
-
-	return &unstructured.Unstructured{
-		Object: innerObj,
-	}, nil
 }
