@@ -113,6 +113,12 @@ bash <(curl -s \{\{ config.repo_raw_url \}\}/\{\{ config.ks_branch \}\}/bootstra
 &nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at [mkdocs information](./content/Contribution%20guidelines/operations/all-macros.md) <br />
 &nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our <a href="{{ config.repo_url }}/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br />
 
+### Navigation (website menu)
+
+The navigation for the documentation is _also_ configured in  <a href="{{ config.repo_raw_url }}/{{ config.ks_branch }}/docs/mkdocs.yml">docs/mkdocs.yml</a>.
+The section which begins with **nav:** lays out the navigation structure and which markdown files correspond to each topic. 
+
+
 ### Page variables
 
 A markdown source file can contribute additional variables by defining them in `name: value` lines at the start of the file, set off by lines of triple dashes. For example, suppose a markdown file begins with the following.
