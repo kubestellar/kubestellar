@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Transport deployment script assumes it runs using the kubeflex hosting cluster context.
+# This script installs the transport controller in the current kubeconfig context
 
 
 DEFAULT_TRANSPORT_CONTROLLER_IMAGE=ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.7
