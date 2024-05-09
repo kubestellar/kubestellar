@@ -1,6 +1,15 @@
 <!--readme-for-documentation-start-->
 ## Overview
 
+### Websites
+
+We have two web sites, as follows.
+
+- `https://kubestellar.io`. This is hosted by GoDaddy and administered by Andy Anderson. It contains a few redirects. The most important is that `https://kubestellar.io/` redirects to `https://docs.kubestellar.io/`.
+- `https://docs.kubestellar.io`. This is a GitHub pages website based on the `github.com/kubestellar/kubestellar/` repository.
+
+### GitHub pages
+
 Our documentation is powered by [mike](https://github.com/jimporter/mike) and [MkDocs](https://www.mkdocs.org/). MkDocs is powered by [Python-Markdown](https://pypi.org/project/Markdown/). These are immensely configurable and extensible. You can see our MkDocs configuration in `docs/mkdocs.yml`. Following are some of the choices we have made.
 
 - The MkDocs theme is [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/).
@@ -338,10 +347,10 @@ make MANIFEST="Coding Milestones/PoC2023q1/example1" execute-html
 
 ### Important files in our gh-pages branch
 #### index.html and home.html
-In the 'gh-pages' branch there are two(2) important files that redirect the github docs url to our {{ config.site_name }} doc site hosted with [GoDaddy.com](https://godaddy.com).
+These appear in the branch named `gh-pages` and redirect from the root to the version named `latest`. The one named `index.html` is managed by `mike set-default`. The other should be kept consistent.
 
-<a href="{{config.repo_url}}/blob/gh-pages/home.html">{{config.repo_url}}/blob/gh-pages/home.html</a>
-<a href="{{config.repo_url}}/blob/gh-pages/index.html">{{config.repo_url}}/blob/gh-pages/index.html</a>
+- <a href="{{config.repo_url}}/blob/gh-pages/home.html">{{config.repo_url}}/blob/gh-pages/home.html</a>
+- <a href="{{config.repo_url}}/blob/gh-pages/index.html">{{config.repo_url}}/blob/gh-pages/index.html</a>
 
 both files have content similar to:
 ```html title="index.html and home.html"
@@ -350,7 +359,7 @@ both files have content similar to:
 <head>
 <title>KubeStellar</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" >
-<meta http-equiv="refresh" content="0; URL=https://docs.kubestellar.io/stable" />
+<meta http-equiv="refresh" content="0; URL=https://docs.kubestellar.io/latest" />
 </head>
 ```
 
