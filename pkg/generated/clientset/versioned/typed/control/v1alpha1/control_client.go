@@ -33,6 +33,7 @@ type ControlV1alpha1Interface interface {
 	BindingPoliciesGetter
 	CombinedStatusesGetter
 	CustomTransformsGetter
+	StatusCollectorsGetter
 }
 
 // ControlV1alpha1Client is used to interact with features provided by the control.kubestellar.io group.
@@ -54,6 +55,10 @@ func (c *ControlV1alpha1Client) CombinedStatuses(namespace string) CombinedStatu
 
 func (c *ControlV1alpha1Client) CustomTransforms() CustomTransformInterface {
 	return newCustomTransforms(c)
+}
+
+func (c *ControlV1alpha1Client) StatusCollectors(namespace string) StatusCollectorInterface {
+	return newStatusCollectors(c, namespace)
 }
 
 // NewForConfig creates a new ControlV1alpha1Client for the given config.

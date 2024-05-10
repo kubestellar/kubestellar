@@ -32,6 +32,8 @@ type Interface interface {
 	CombinedStatuses() CombinedStatusInformer
 	// CustomTransforms returns a CustomTransformInformer.
 	CustomTransforms() CustomTransformInformer
+	// StatusCollectors returns a StatusCollectorInformer.
+	StatusCollectors() StatusCollectorInformer
 }
 
 type version struct {
@@ -63,4 +65,9 @@ func (v *version) CombinedStatuses() CombinedStatusInformer {
 // CustomTransforms returns a CustomTransformInformer.
 func (v *version) CustomTransforms() CustomTransformInformer {
 	return &customTransformInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// StatusCollectors returns a StatusCollectorInformer.
+func (v *version) StatusCollectors() StatusCollectorInformer {
+	return &statusCollectorInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

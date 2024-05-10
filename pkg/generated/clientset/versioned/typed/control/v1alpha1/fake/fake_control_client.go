@@ -45,6 +45,10 @@ func (c *FakeControlV1alpha1) CustomTransforms() v1alpha1.CustomTransformInterfa
 	return &FakeCustomTransforms{c}
 }
 
+func (c *FakeControlV1alpha1) StatusCollectors(namespace string) v1alpha1.StatusCollectorInterface {
+	return &FakeStatusCollectors{c, namespace}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeControlV1alpha1) RESTClient() rest.Interface {

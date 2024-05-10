@@ -11,6 +11,8 @@ spec:
     kind: StatusCollector
     listKind: StatusCollectorList
     plural: statuscollectors
+    shortNames:
+    - sc
     singular: statuscollector
   scope: Namespaced
   versions:
