@@ -41,7 +41,7 @@ elif [ $env == "ocp" ];then
         cluster=$1
 
         kubectl --context $cluster delete ns nginx --ignore-not-found
-        clusteradm unjoin --cluster-name $cluster
+        clusteradm unjoin --cluster-name $cluster  2> /dev/null
         kubectl --context $cluster delete ns open-cluster-management open-cluster-management-agent open-cluster-management-agent-addon --ignore-not-found
     }
 
