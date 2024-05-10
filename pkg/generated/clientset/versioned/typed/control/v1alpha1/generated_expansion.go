@@ -25,3 +25,5 @@ type BindingPolicyExpansion interface{}
 type CombinedStatusExpansion interface{}
 
 type CustomTransformExpansion interface{}
+
+type StatusCollectorExpansion interface{}

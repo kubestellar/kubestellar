@@ -11,8 +11,10 @@ spec:
     kind: StatusCollector
     listKind: StatusCollectorList
     plural: statuscollectors
+    shortNames:
+    - sc
     singular: statuscollector
-  scope: Namespaced
+  scope: Cluster
   versions:
   - name: v1alpha1
     schema:
@@ -184,3 +186,5 @@ spec:
         type: object
     served: true
     storage: true
+    subresources:
+      status: {}

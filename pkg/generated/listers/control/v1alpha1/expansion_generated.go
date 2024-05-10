@@ -37,3 +37,7 @@ type CombinedStatusNamespaceListerExpansion interface{}
 // CustomTransformListerExpansion allows custom methods to be added to
 // CustomTransformLister.
 type CustomTransformListerExpansion interface{}
+
+// StatusCollectorListerExpansion allows custom methods to be added to
+// StatusCollectorLister.
+type StatusCollectorListerExpansion interface{}

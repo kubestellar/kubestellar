@@ -318,7 +318,11 @@ type BindingList struct {
 // This is modeled after an SQL SELECT statement that does aggregation.
 // This API is under development and is not yet functional.
 //
+// +genclient
+// +genclient:nonNamespaced
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:scope=Cluster,shortName={sc}
 type StatusCollector struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
