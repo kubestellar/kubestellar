@@ -150,7 +150,7 @@ if [ "$use_release" != true ]; then
   popd
 fi
 
-wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/$(kubectl --context "$HOSTING_CONTEXT" -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
+wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
 
 echo "transport controller is running."
 
@@ -194,7 +194,7 @@ kubectl --context its1 create cm -n customization-properties cluster2 --from-lit
 : Expect to see the wds1 kubestellar-controller-manager and transport-controller created in the wds1-system
 : namespace and the its1 statefulset created in the its1-system namespace.
 :
-wait-for-cmd "(($(kubectl --context "$HOSTING_CONTEXT" get deployments,statefulsets --all-namespaces | grep -e wds1 -e its1 | wc -l) == 5))"
+wait-for-cmd "((\$(kubectl --context '$HOSTING_CONTEXT' get deployments,statefulsets --all-namespaces | grep -e wds1 -e its1 | wc -l) == 5))"
 
 :
 : -------------------------------------------------------------------------
