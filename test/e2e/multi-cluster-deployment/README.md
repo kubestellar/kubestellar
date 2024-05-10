@@ -17,8 +17,9 @@ cd test/e2e/multi-cluster-deployment
 
 ## Running the test in three existing OCP clusters
 
+**NOTE**: at present this _only_ works with `--released`.
 
-1. Create a kubeconfig with contexts for the `kscore`, `cluster1` and `cluster2`. The following shows what the result should look like.
+1. Create a kubeconfig with contexts named `kscore` (for the kubeflex hosting cluster), `cluster1` and `cluster2`. The following shows what the result should look like.
 
 ```bash
 $ kubectl config get-contexts
@@ -37,8 +38,6 @@ $ kubectl config rename-context <default-wec1-context-name> kscore
 2. Run e2e test in your ocp cluster:
 
 ```
- export KUBESTELLAR_VERSION=0.23.0-alpha.1
- export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
- export OCM_TRANSPORT_PLUGIN=0.1.7
- bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/multi-cluster-deployment/run-test.sh) --env ocp
+cd test/e2e/multi-cluster-deployment
+./run-test.sh --env ocp --released
 ```
