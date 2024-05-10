@@ -57,8 +57,8 @@ func (c *ControlV1alpha1Client) CustomTransforms() CustomTransformInterface {
 	return newCustomTransforms(c)
 }
 
-func (c *ControlV1alpha1Client) StatusCollectors(namespace string) StatusCollectorInterface {
-	return newStatusCollectors(c, namespace)
+func (c *ControlV1alpha1Client) StatusCollectors() StatusCollectorInterface {
+	return newStatusCollectors(c)
 }
 
 // NewForConfig creates a new ControlV1alpha1Client for the given config.

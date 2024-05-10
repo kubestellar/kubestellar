@@ -33,7 +33,6 @@ import (
 // FakeStatusCollectors implements StatusCollectorInterface
 type FakeStatusCollectors struct {
 	Fake *FakeControlV1alpha1
-	ns   string
 }
 
 var statuscollectorsResource = v1alpha1.SchemeGroupVersion.WithResource("statuscollectors")
@@ -43,8 +42,7 @@ var statuscollectorsKind = v1alpha1.SchemeGroupVersion.WithKind("StatusCollector
 // Get takes name of the statusCollector, and returns the corresponding statusCollector object, and an error if there is any.
 func (c *FakeStatusCollectors) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.StatusCollector, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(statuscollectorsResource, c.ns, name), &v1alpha1.StatusCollector{})
-
+		Invokes(testing.NewRootGetAction(statuscollectorsResource, name), &v1alpha1.StatusCollector{})
 	if obj == nil {
 		return nil, err
 	}
@@ -54,8 +52,7 @@ func (c *FakeStatusCollectors) Get(ctx context.Context, name string, options v1.
 // List takes label and field selectors, and returns the list of StatusCollectors that match those selectors.
 func (c *FakeStatusCollectors) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.StatusCollectorList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(statuscollectorsResource, statuscollectorsKind, c.ns, opts), &v1alpha1.StatusCollectorList{})
-
+		Invokes(testing.NewRootListAction(statuscollectorsResource, statuscollectorsKind, opts), &v1alpha1.StatusCollectorList{})
 	if obj == nil {
 		return nil, err
 	}
@@ -76,15 +73,13 @@ func (c *FakeStatusCollectors) List(ctx context.Context, opts v1.ListOptions) (r
 // Watch returns a watch.Interface that watches the requested statusCollectors.
 func (c *FakeStatusCollectors) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(statuscollectorsResource, c.ns, opts))
-
+		InvokesWatch(testing.NewRootWatchAction(statuscollectorsResource, opts))
 }
 
 // Create takes the representation of a statusCollector and creates it.  Returns the server's representation of the statusCollector, and an error, if there is any.
 func (c *FakeStatusCollectors) Create(ctx context.Context, statusCollector *v1alpha1.StatusCollector, opts v1.CreateOptions) (result *v1alpha1.StatusCollector, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(statuscollectorsResource, c.ns, statusCollector), &v1alpha1.StatusCollector{})
-
+		Invokes(testing.NewRootCreateAction(statuscollectorsResource, statusCollector), &v1alpha1.StatusCollector{})
 	if obj == nil {
 		return nil, err
 	}
@@ -94,8 +89,7 @@ func (c *FakeStatusCollectors) Create(ctx context.Context, statusCollector *v1al
 // Update takes the representation of a statusCollector and updates it. Returns the server's representation of the statusCollector, and an error, if there is any.
 func (c *FakeStatusCollectors) Update(ctx context.Context, statusCollector *v1alpha1.StatusCollector, opts v1.UpdateOptions) (result *v1alpha1.StatusCollector, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(statuscollectorsResource, c.ns, statusCollector), &v1alpha1.StatusCollector{})
-
+		Invokes(testing.NewRootUpdateAction(statuscollectorsResource, statusCollector), &v1alpha1.StatusCollector{})
 	if obj == nil {
 		return nil, err
 	}
@@ -106,8 +100,7 @@ func (c *FakeStatusCollectors) Update(ctx context.Context, statusCollector *v1al
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 func (c *FakeStatusCollectors) UpdateStatus(ctx context.Context, statusCollector *v1alpha1.StatusCollector, opts v1.UpdateOptions) (*v1alpha1.StatusCollector, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(statuscollectorsResource, "status", c.ns, statusCollector), &v1alpha1.StatusCollector{})
-
+		Invokes(testing.NewRootUpdateSubresourceAction(statuscollectorsResource, "status", statusCollector), &v1alpha1.StatusCollector{})
 	if obj == nil {
 		return nil, err
 	}
@@ -117,14 +110,13 @@ func (c *FakeStatusCollectors) UpdateStatus(ctx context.Context, statusCollector
 // Delete takes name of the statusCollector and deletes it. Returns an error if one occurs.
 func (c *FakeStatusCollectors) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(statuscollectorsResource, c.ns, name, opts), &v1alpha1.StatusCollector{})
-
+		Invokes(testing.NewRootDeleteActionWithOptions(statuscollectorsResource, name, opts), &v1alpha1.StatusCollector{})
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeStatusCollectors) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(statuscollectorsResource, c.ns, listOpts)
+	action := testing.NewRootDeleteCollectionAction(statuscollectorsResource, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.StatusCollectorList{})
 	return err
@@ -133,8 +125,7 @@ func (c *FakeStatusCollectors) DeleteCollection(ctx context.Context, opts v1.Del
 // Patch applies the patch and returns the patched statusCollector.
 func (c *FakeStatusCollectors) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.StatusCollector, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(statuscollectorsResource, c.ns, name, pt, data, subresources...), &v1alpha1.StatusCollector{})
-
+		Invokes(testing.NewRootPatchSubresourceAction(statuscollectorsResource, name, pt, data, subresources...), &v1alpha1.StatusCollector{})
 	if obj == nil {
 		return nil, err
 	}

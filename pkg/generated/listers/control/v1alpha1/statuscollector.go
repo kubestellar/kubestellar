@@ -32,8 +32,9 @@ type StatusCollectorLister interface {
 	// List lists all StatusCollectors in the indexer.
 	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.StatusCollector, err error)
-	// StatusCollectors returns an object that can list and get StatusCollectors.
-	StatusCollectors(namespace string) StatusCollectorNamespaceLister
+	// Get retrieves the StatusCollector from the index for a given name.
+	// Objects returned here must be treated as read-only.
+	Get(name string) (*v1alpha1.StatusCollector, error)
 	StatusCollectorListerExpansion
 }
 
@@ -55,41 +56,9 @@ func (s *statusCollectorLister) List(selector labels.Selector) (ret []*v1alpha1.
 	return ret, err
 }
 
-// StatusCollectors returns an object that can list and get StatusCollectors.
-func (s *statusCollectorLister) StatusCollectors(namespace string) StatusCollectorNamespaceLister {
-	return statusCollectorNamespaceLister{indexer: s.indexer, namespace: namespace}
-}
-
-// StatusCollectorNamespaceLister helps list and get StatusCollectors.
-// All objects returned here must be treated as read-only.
-type StatusCollectorNamespaceLister interface {
-	// List lists all StatusCollectors in the indexer for a given namespace.
-	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.StatusCollector, err error)
-	// Get retrieves the StatusCollector from the indexer for a given namespace and name.
-	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.StatusCollector, error)
-	StatusCollectorNamespaceListerExpansion
-}
-
-// statusCollectorNamespaceLister implements the StatusCollectorNamespaceLister
-// interface.
-type statusCollectorNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all StatusCollectors in the indexer for a given namespace.
-func (s statusCollectorNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.StatusCollector, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.StatusCollector))
-	})
-	return ret, err
-}
-
-// Get retrieves the StatusCollector from the indexer for a given namespace and name.
-func (s statusCollectorNamespaceLister) Get(name string) (*v1alpha1.StatusCollector, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
+// Get retrieves the StatusCollector from the index for a given name.
+func (s *statusCollectorLister) Get(name string) (*v1alpha1.StatusCollector, error) {
+	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}

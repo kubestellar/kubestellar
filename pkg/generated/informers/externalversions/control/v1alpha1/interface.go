@@ -69,5 +69,5 @@ func (v *version) CustomTransforms() CustomTransformInformer {
 
 // StatusCollectors returns a StatusCollectorInformer.
 func (v *version) StatusCollectors() StatusCollectorInformer {
-	return &statusCollectorInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+	return &statusCollectorInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

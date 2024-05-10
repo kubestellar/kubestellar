@@ -319,8 +319,10 @@ type BindingList struct {
 // This API is under development and is not yet functional.
 //
 // +genclient
+// +genclient:nonNamespaced
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:shortName={sc}
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:scope=Cluster,shortName={sc}
 type StatusCollector struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

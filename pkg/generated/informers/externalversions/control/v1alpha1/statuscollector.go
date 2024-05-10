@@ -43,33 +43,32 @@ type StatusCollectorInformer interface {
 type statusCollectorInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
-	namespace        string
 }
 
 // NewStatusCollectorInformer constructs a new informer for StatusCollector type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewStatusCollectorInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredStatusCollectorInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewStatusCollectorInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredStatusCollectorInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredStatusCollectorInformer constructs a new informer for StatusCollector type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredStatusCollectorInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredStatusCollectorInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ControlV1alpha1().StatusCollectors(namespace).List(context.TODO(), options)
+				return client.ControlV1alpha1().StatusCollectors().List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ControlV1alpha1().StatusCollectors(namespace).Watch(context.TODO(), options)
+				return client.ControlV1alpha1().StatusCollectors().Watch(context.TODO(), options)
 			},
 		},
 		&controlv1alpha1.StatusCollector{},
@@ -79,7 +78,7 @@ func NewFilteredStatusCollectorInformer(client versioned.Interface, namespace st
 }
 
 func (f *statusCollectorInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredStatusCollectorInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+	return NewFilteredStatusCollectorInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
 func (f *statusCollectorInformer) Informer() cache.SharedIndexInformer {
