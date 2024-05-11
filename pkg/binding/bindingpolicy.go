@@ -276,8 +276,13 @@ type mrObject interface {
 	runtime.Object
 }
 
+// testObject tests if the object matches the given tests.
+// The returned tuple is:
+//   - bool: whether the object matches ANY of the tests
+//   - sets.Set[string]: the UNION of the statuscollector names that appear within
+//     EACH of the tests that the object matches
 func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
-	tests []v1alpha1.DownsyncObjectTestAndStatusCollection) bool {
+	tests []v1alpha1.DownsyncObjectTestAndStatusCollection) (bool, sets.Set[string]) {
 	gvr := schema.GroupVersionResource{
 		Group:    objIdentifier.GVK.Group,
 		Version:  objIdentifier.GVK.Version,
@@ -285,6 +290,9 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 	}
 
 	logger := klog.FromContext(ctx)
+
+	matchedStatusCollectors := sets.New[string]()
+	matched := false
 
 	var objNS *corev1.Namespace
 	for _, test := range tests {
@@ -321,9 +329,13 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 				continue
 			}
 		}
-		return true
+
+		// test is a match
+		matchedStatusCollectors.Insert(test.StatusCollectors...)
+		matched = true
 	}
-	return false
+
+	return matched, matchedStatusCollectors
 }
 
 func labelsMatchAny(logger logr.Logger, labelSet map[string]string, selectors []metav1.LabelSelector) bool {

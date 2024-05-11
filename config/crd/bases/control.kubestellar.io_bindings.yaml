@@ -50,6 +50,13 @@ spec:
                       type: string
                   type: object
                 type: array
+              statusCollectors:
+                description: '`statusCollectors` is a list of StatusCollectors name
+                  references that appear in the associated BindingPolicy and are applied
+                  to one or more of the objects in the `workload` field.'
+                items:
+                  type: string
+                type: array
               workload:
                 description: '`workload` is a collection of namespaced and cluster
                   scoped object references and their associated resource versions,
@@ -75,6 +82,13 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
+                        statusCollectorIndices:
+                          description: '`statusCollectorIndices` is a list of indices
+                            in spec.statusCollectors that should be applied to the
+                            object.'
+                          items:
+                            type: integer
+                          type: array
                         version:
                           type: string
                       required:
@@ -109,6 +123,13 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
+                        statusCollectorIndices:
+                          description: '`statusCollectorIndices` is a list of indices
+                            in spec.statusCollectors that should be applied to the
+                            object.'
+                          items:
+                            type: integer
+                          type: array
                         version:
                           type: string
                       required:

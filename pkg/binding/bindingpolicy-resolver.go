@@ -93,6 +93,15 @@ type BindingPolicyResolver interface {
 	// after this call by the caller.
 	// If no resolution is associated with the given key, an error is returned.
 	SetDestinations(bindingPolicyKey string, destinations sets.Set[string]) error
+	// SetStatusCollectorsForObject sets the statuscollector names for the
+	// given object identifier.
+	// The given set is expected not to be mutated during and after this call
+	// by the caller.
+	// The returned bool indicates whether the bindingpolicy resolution was
+	// changed. If no resolution is associated with the given key, an error is
+	// returned.
+	SetStatusCollectorsForObject(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
+		statusCollectors sets.Set[string]) (bool, error)
 
 	// ResolutionExists returns true if a resolution is associated with the
 	// given bindingpolicy key.
@@ -257,6 +266,25 @@ func (resolver *bindingPolicyResolver) SetDestinations(bindingPolicyKey string,
 	return nil
 }
 
+// SetStatusCollectorsForObject sets the statuscollector names for the
+// given object identifier.
+// The given set is expected not to be mutated during and after this call
+// by the caller.
+// The returned bool indicates whether the bindingpolicy resolution was
+// changed. If no resolution is associated with the given key, an error is
+// returned.
+func (resolver *bindingPolicyResolver) SetStatusCollectorsForObject(bindingPolicyKey string,
+	objIdentifier util.ObjectIdentifier, statusCollectors sets.Set[string]) (bool, error) {
+	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
+
+	if bindingPolicyResolution == nil {
+		return false, fmt.Errorf("%s - object-identifier: %s", bindingPolicyResolutionNotFoundErrorPrefix,
+			objIdentifier)
+	}
+
+	return bindingPolicyResolution.setStatusCollectorsForObjectIdentifier(objIdentifier, statusCollectors), nil
+}
+
 // ResolutionExists returns true if a resolution is associated with the
 // given bindingpolicy key.
 func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string) bool {
@@ -315,10 +343,11 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 	ownerReference.BlockOwnerDeletion = &[]bool{false}[0]
 
 	bindingPolicyResolution := &bindingPolicyResolution{
-		objectIdentifierToResourceVersion: make(map[util.ObjectIdentifier]string),
-		destinations:                      sets.New[string](),
-		ownerReference:                    ownerReference,
-		requiresSingletonReportedState:    bindingpolicy.Spec.WantSingletonReportedState,
+		objectIdentifierToResourceVersion:  make(map[util.ObjectIdentifier]string),
+		objectIdentifierToStatusCollectors: make(map[util.ObjectIdentifier]sets.Set[string]),
+		destinations:                       sets.New[string](),
+		ownerReference:                     ownerReference,
+		requiresSingletonReportedState:     bindingpolicy.Spec.WantSingletonReportedState,
 	}
 	resolver.bindingPolicyToResolution[bindingpolicy.GetName()] = bindingPolicyResolution
 
