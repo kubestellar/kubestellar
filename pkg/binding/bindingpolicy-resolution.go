@@ -183,6 +183,8 @@ func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec
 	}
 }
 
+// generateStatusCollectorsListAndIndices generates a sorted list of status-
+// collectors and a map from statuscollector name to index in the sorted list.
 func (resolution *bindingPolicyResolution) generateStatusCollectorsListAndIndices() ([]string, map[string]int) {
 	resolution.RLock()
 	defer resolution.RUnlock()
@@ -193,7 +195,7 @@ func (resolution *bindingPolicyResolution) generateStatusCollectorsListAndIndice
 		statusCollectorsSet.Insert(statusCollectors.UnsortedList()...)
 	}
 
-	statusCollectorsList := statusCollectorsSet.UnsortedList()
+	statusCollectorsList := sets.List(statusCollectorsSet)
 	statusCollectorNameToIndex := make(map[string]int, statusCollectorsSet.Len())
 
 	for i, name := range statusCollectorsList {
