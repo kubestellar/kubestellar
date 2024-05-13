@@ -19,11 +19,12 @@
 set -x # so users can see what is going on
 
 env="kind"
+test="bash"
 
 
 while [ $# != 0 ]; do
     case "$1" in
-        (-h|--help) echo "$0 usage: (--released | --env | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num)*"
+        (-h|--help) echo "$0 usage: (--released | --env | --test-type | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num)*"
                     exit;;
         (--released) setup_flags="$setup_flags $1";;
         (--kubestellar-controller-manager-verbosity|--transport-controller-verbosity)
@@ -42,6 +43,14 @@ while [ $# != 0 ]; do
             echo "Missing environment value" >&2
             exit 1;
           fi;;
+        (--test-type)
+          if (( $# > 1 )); then
+            test="$2"
+            shift
+          else
+            echo "Missing test type value" >&2
+            exit 1;
+          fi;;
         (*) echo "$0: unrecognized argument '$1'" >&2
             exit 1
     esac
@@ -51,6 +60,12 @@ done
 case "$env" in
     (kind|ocp) ;;
     (*) echo "$0: --env must be 'kind' or 'ocp'" >&2
+        exit 1;;
+esac
+
+case "$test" in
+    (bash|ginkgo) ;;
+    (*) echo "$0: --test-type must be 'bash' or 'ginkgo'" >&2
         exit 1;;
 esac
 
@@ -65,4 +80,10 @@ HACK_DIR="${SRC_DIR}/../../../hack"
 "${COMMON_SRCS}/cleanup.sh" --env "$env"
 source "${COMMON_SRCS}/setup-shell.sh"
 "${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env"
-"${SRC_DIR}/use-kubestellar.sh" --env "$env"
+
+if [ $test == "bash" ];then
+    "${SRC_DIR}/use-kubestellar.sh" --env "$env"
+elif [ $test == "ginkgo" ];then
+    GINKGO_DIR="${SRC_DIR}/../ginkgo"
+    KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color $GINKGO_DIR -- -skip-setup
+fi

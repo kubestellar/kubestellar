@@ -10,9 +10,16 @@ The transport controller will be invoked with `-v=4` unless othewise specified o
 
 Starting from a local directory containing the git repo, do the following.
 
-```
+a) Bash tests:
+```bash
 cd test/e2e/multi-cluster-deployment
 ./run-test.sh
+```
+
+b) Ginkgo tests:
+```bash
+cd test/e2e/multi-cluster-deployment
+./run-test.sh --test-type ginkgo
 ```
 
 ## Running the test in three existing OCP clusters
@@ -32,12 +39,19 @@ CURRENT   NAME          CLUSTER                   AUTHINFO               NAMESPA
 Use the following command to rename the default context name for `cluster1` workload execution cluster:
 
 ```bash 
-$ kubectl config rename-context <default-wec1-context-name> kscore
+$ kubectl config rename-context <default-wec1-context-name> cluster1
 ```
 
 2. Run e2e test in your ocp cluster:
 
-```
+a) Bash tests:
+```bash
 cd test/e2e/multi-cluster-deployment
 ./run-test.sh --env ocp --released
+```
+
+b) Ginkgo tests:
+```bash
+cd test/e2e/multi-cluster-deployment
+./run-test.sh --env ocp --released --test-type ginkgo
 ```
