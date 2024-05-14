@@ -43,85 +43,68 @@ const (
 	ControlPlaneTypeWDS   = "wds"
 	// errors
 	ErrNoControlPlane        = "no control plane found. At least one control plane labeled with %s=%s must be present"
-	ErrControlPlaneNotFound  = "control plane with label %s=%s and name %s was not found"
-	ErrMultipleControlPlanes = "more than one control plane with same label %s=%s was found and no name was specified"
+	ErrControlPlaneNotFound  = "control plane with type %s and name %s was not found"
+	ErrMultipleControlPlanes = "more than one control plane of type %s was found and no name was specified"
 )
 
-func GetWDSKubeconfig(logger logr.Logger, wdsName, wdsLabel string) (*rest.Config, string, error) {
-	// default label for WDS
-	label := Label{
-		Key:   ControlPlaneTypeLabel,
-		Value: ControlPlaneTypeWDS,
-	}
-	// use the specified label instead of default label if provided
-	var err error
-	if wdsLabel != "" {
-		label, err = SplitLabelKeyAndValue(wdsLabel)
-		if err != nil {
-			return nil, "", err
-		}
-	}
-	logger.Info("using label", "key", label.Key, "value", label.Value)
-	return getRestConfig(logger, wdsName, label.Key, label.Value)
+func GetWDSKubeconfig(logger logr.Logger, wdsName string) (*rest.Config, string, error) {
+	return getRestConfig(logger, wdsName, ControlPlaneTypeWDS)
 }
 
 func GetITSKubeconfig(logger logr.Logger, itsName string) (*rest.Config, string, error) {
-	return getRestConfig(logger, itsName, ControlPlaneTypeLabel, ControlPlaneTypeITS)
+	return getRestConfig(logger, itsName, ControlPlaneTypeITS)
 }
 
 // get the rest config for a control plane based on labels and name
-func getRestConfig(logger logr.Logger, cpName, labelKey, labelValue string) (*rest.Config, string, error) {
+func getRestConfig(logger logr.Logger, cpName, labelValue string) (*rest.Config, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
 	kubeClient := *kslclient.GetClient()
-	list := &kfv1aplha1.ControlPlaneList{}
 	labelSelector := labels.SelectorFromSet(labels.Set(map[string]string{
 		ControlPlaneTypeLabel: labelValue,
 	}))
+	var targetCP *kfv1aplha1.ControlPlane
 
 	// wait until there are control planes with supplied labels
-	logger.Info("waiting for cp with label", "key", labelKey, "value", labelValue)
+	logger.Info("Waiting for cp", "type", labelValue, "name", cpName)
 	err := wait.PollUntilContextCancel(ctx, 2*time.Second, true, func(ctx context.Context) (bool, error) {
+		if cpName != "" {
+			cp := &kfv1aplha1.ControlPlane{}
+			err := kubeClient.Get(ctx, client.ObjectKey{Name: cpName}, cp, &client.GetOptions{})
+			if err == nil {
+				targetCP = cp
+				return true, nil
+			}
+			return false, nil
+		}
+		list := &kfv1aplha1.ControlPlaneList{}
 		err := kubeClient.List(ctx, list, &client.ListOptions{LabelSelector: labelSelector})
 		if err != nil {
-			logger.Error(err, "error listing control planes")
+			logger.Info("Failed to list control planes, will retry", "err", err)
 			return false, nil
 		}
 		if len(list.Items) == 0 {
-			return true, fmt.Errorf(ErrNoControlPlane, labelKey, labelValue)
+			logger.Info("No control planes yet, will retry")
+			return false, nil
 		}
-		return true, nil
+		if len(list.Items) == 1 {
+			targetCP = &list.Items[0]
+			return true, nil
+		}
+		// TODO - we do not allow this case for a WDS as there is a 1:1 relashionship controller:cp for WDS.
+		// Need to revisit for ITS where we can have multiple shards.
+		// Assume we are not waiting for control planes to go away.
+		return true, fmt.Errorf(ErrMultipleControlPlanes, labelValue)
 	})
 	if err != nil {
 		return nil, "", err
 	}
-
-	if len(list.Items) == 0 {
-		return nil, "", fmt.Errorf(ErrNoControlPlane, labelKey, labelValue)
-	}
-
-	// get the target control plane
-	var targetCP kfv1aplha1.ControlPlane
-	if cpName != "" {
-		found := false
-		for _, cp := range list.Items {
-			if cp.Name == cpName {
-				targetCP = cp
-				found = true
-				break
-			}
+	if targetCP == nil {
+		if cpName != "" {
+			return nil, "", fmt.Errorf(ErrControlPlaneNotFound, labelValue, cpName)
 		}
-		if !found {
-			return nil, "", fmt.Errorf(ErrControlPlaneNotFound, labelKey, labelValue, cpName)
-		}
-	} else {
-		// TODO - we do not allow this case for a WDS as there is a 1:1 relashionship controller:cp for WDS
-		// Need to revisit for ITS where we can have multiple shards
-		if len(list.Items) > 1 {
-			return nil, "", fmt.Errorf(ErrMultipleControlPlanes, labelKey, labelValue)
-		}
-		targetCP = list.Items[0]
+		return nil, "", fmt.Errorf(ErrNoControlPlane, ControlPlaneTypeLabel, labelValue)
 	}
 
 	clientset, err := kubernetes.NewForConfig(ctrl.GetConfigOrDie())
