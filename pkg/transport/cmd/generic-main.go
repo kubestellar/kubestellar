@@ -33,6 +33,8 @@ import (
 	k8sinformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/component-base/metrics/legacyregistry"
+	_ "k8s.io/component-base/metrics/prometheus/clientgo"
+	_ "k8s.io/component-base/metrics/prometheus/version"
 	"k8s.io/klog/v2"
 
 	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
