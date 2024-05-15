@@ -55,13 +55,13 @@ func init() {
 }
 
 func main() {
-	var metricsAddr string
+	var metricsAddr, pprofAddr, probeAddr string
 	var enableLeaderElection bool
-	var probeAddr string
 	var itsName string
 	var wdsName string
 	var allowedGroupsString string
-	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
+	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The [host]:port from which /metrics is served.")
+	flag.StringVar(&pprofAddr, "pprof-bind-address", ":8082", "The [host]:port fron which /debug/pprof is served.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.StringVar(&itsName, "its-name", "", "name of the Inventory and Transport Space to connect to (empty string means to use the only one)")
 	flag.StringVar(&wdsName, "wds-name", "", "name of the workload description space to connect to")
@@ -89,6 +89,7 @@ func main() {
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
+		PprofBindAddress:       pprofAddr,
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
