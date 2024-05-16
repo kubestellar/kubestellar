@@ -138,7 +138,7 @@ const (
 
 // DownsyncObjectTestAndStatusCollection identifies some objects (by a predicate)
 // and asks for some combined status to be returned from those objects.
-// The latter is dictated through applying a set of StatusCollectors,
+// The latter is dictated through applying a set of StatusCollectors.
 type DownsyncObjectTestAndStatusCollection struct {
 	DownsyncObjectTest `json:",inline"`
 	// statusCollectors is a list of StatusCollectors name references that are applied to the selected objects.
@@ -260,11 +260,19 @@ type BindingSpec struct {
 type DownsyncObjectReferences struct {
 	// `clusterScope` holds a list of cluster-scoped object references with their associated
 	// resource versions to downsync.
-	ClusterScope []ClusterScopeDownsyncObject `json:"clusterScope,omitempty"`
+	ClusterScope []ClusterScopeDownsyncObjectAndStatusCollectors `json:"clusterScope,omitempty"`
 
 	// `namespaceScope` holds a list of namespace-scoped object references with their associated
 	// resource versions to downsync.
-	NamespaceScope []NamespaceScopeDownsyncObject `json:"namespaceScope,omitempty"`
+	NamespaceScope []NamespaceScopeDownsyncObjectAndStatusCollectors `json:"namespaceScope,omitempty"`
+}
+
+// NamespaceScopeDownsyncObjectAndStatusCollectors represents a specific namespace-scoped object to downsync,
+// and the status collectors that should be applied to it.
+type NamespaceScopeDownsyncObjectAndStatusCollectors struct {
+	*NamespaceScopeDownsyncObject `json:",inline"`
+	// `statusCollectors` is a list of StatusCollectors name references that are applied to the object.
+	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }
 
 // NamespaceScopeDownsyncObject represents a specific namespace-scoped object to downsync,
@@ -278,6 +286,14 @@ type NamespaceScopeDownsyncObject struct {
 	Name string `json:"name"`
 	// `resourceVersion` is the version of the resource to downsync.
 	ResourceVersion string `json:"resourceVersion"`
+}
+
+// ClusterScopeDownsyncObjectAndStatusCollectors represents a specific cluster-scoped object to downsync,
+// and the status collectors that should be applied to it.
+type ClusterScopeDownsyncObjectAndStatusCollectors struct {
+	*ClusterScopeDownsyncObject `json:",inline"`
+	// `statusCollectors` is a list of StatusCollectors name references that are applied to the object.
+	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }
 
 // ClusterScopeDownsyncObject represents a specific cluster-scoped object to downsync,

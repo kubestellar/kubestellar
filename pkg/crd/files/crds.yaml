@@ -116,7 +116,7 @@ spec:
                   description: DownsyncObjectTestAndStatusCollection identifies some
                     objects (by a predicate) and asks for some combined status to
                     be returned from those objects. The latter is dictated through
-                    applying a set of StatusCollectors,
+                    applying a set of StatusCollectors.
                   properties:
                     apiGroup:
                       description: '`apiGroup` is the API group of the referenced
@@ -380,13 +380,6 @@ spec:
                       type: string
                   type: object
                 type: array
-              statusCollectors:
-                description: '`statusCollectors` is a list of StatusCollectors name
-                  references that appear in the associated BindingPolicy and are applied
-                  to one or more of the objects in the `workload` field.'
-                items:
-                  type: string
-                type: array
               workload:
                 description: '`workload` is a collection of namespaced and cluster
                   scoped object references and their associated resource versions,
@@ -396,10 +389,9 @@ spec:
                     description: '`clusterScope` holds a list of cluster-scoped object
                       references with their associated resource versions to downsync.'
                     items:
-                      description: ClusterScopeDownsyncObject represents a specific
-                        cluster-scoped object to downsync, identified by its GroupVersionResource
-                        and name. The ResourceVersion specifies the exact version
-                        of the object to downsync.
+                      description: ClusterScopeDownsyncObjectAndStatusCollectors represents
+                        a specific cluster-scoped object to downsync, and the status
+                        collectors that should be applied to it.
                       properties:
                         group:
                           type: string
@@ -412,12 +404,11 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
-                        statusCollectorIndices:
-                          description: '`statusCollectorIndices` is a list of indices
-                            in spec.statusCollectors that should be applied to the
-                            object.'
+                        statusCollectors:
+                          description: '`statusCollectors` is a list of StatusCollectors
+                            name references that are applied to the object.'
                           items:
-                            type: integer
+                            type: string
                           type: array
                         version:
                           type: string
@@ -434,10 +425,9 @@ spec:
                       object references with their associated resource versions to
                       downsync.'
                     items:
-                      description: NamespaceScopeDownsyncObject represents a specific
-                        namespace-scoped object to downsync, identified by its GroupVersionResource,
-                        namespace, and name. The ResourceVersion specifies the exact
-                        version of the object to downsync.
+                      description: NamespaceScopeDownsyncObjectAndStatusCollectors
+                        represents a specific namespace-scoped object to downsync,
+                        and the status collectors that should be applied to it.
                       properties:
                         group:
                           type: string
@@ -453,12 +443,11 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
-                        statusCollectorIndices:
-                          description: '`statusCollectorIndices` is a list of indices
-                            in spec.statusCollectors that should be applied to the
-                            object.'
+                        statusCollectors:
+                          description: '`statusCollectors` is a list of StatusCollectors
+                            name references that are applied to the object.'
                           items:
-                            type: integer
+                            type: string
                           type: array
                         version:
                           type: string

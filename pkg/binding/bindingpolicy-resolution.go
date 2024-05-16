@@ -27,7 +27,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
-	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -37,8 +36,7 @@ import (
 type bindingPolicyResolution struct {
 	sync.RWMutex
 
-	objectIdentifierToResourceVersion  map[util.ObjectIdentifier]string
-	objectIdentifierToStatusCollectors map[util.ObjectIdentifier]sets.Set[string]
+	objectIdentifierToData map[util.ObjectIdentifier]*objectData
 
 	destinations sets.Set[string]
 
@@ -51,52 +49,41 @@ type bindingPolicyResolution struct {
 	requiresSingletonReportedState bool
 }
 
-// ensureObjectIdentifierWithVersion ensures that an object identifier exists
-// in the resolution and is associated with the given resource version.
-// The returned bool indicates whether the resolution was changed.
-// This function is thread-safe.
-func (resolution *bindingPolicyResolution) ensureObjectIdentifierWithVersion(objIdentifier util.ObjectIdentifier,
-	resourceVersion string) bool {
-	resolution.Lock()
-	defer resolution.Unlock()
-
-	currentResourceVersion := resolution.objectIdentifierToResourceVersion[objIdentifier]
-	if currentResourceVersion == resourceVersion {
-		return false
-	}
-
-	resolution.objectIdentifierToResourceVersion[objIdentifier] = resourceVersion
-	return true
+// objectData stores the resource version and status collectors for an object.
+type objectData struct {
+	ResourceVersion  string
+	StatusCollectors sets.Set[string]
 }
 
-// setStatusCollectorsForObjectIdentifier sets the statuscollector names for
-// the given object identifier. The return bool indicates whether the
-// resolution was changed.
+// ensureObjectIdentifier ensures that an object identifier exists
+// in the resolution and is associated with the given resource version
+// and statuscollectors set.
 // The given set is expected not to be mutated during and after this call by
 // the caller.
-// If the object identifier does not exist in the resolution, nothing happens.
+//
+// The returned bool indicates whether the resolution was changed.
 // This function is thread-safe.
-func (resolution *bindingPolicyResolution) setStatusCollectorsForObjectIdentifier(objIdentifier util.ObjectIdentifier,
-	statusCollectors sets.Set[string]) bool {
+func (resolution *bindingPolicyResolution) ensureObjectIdentifier(objIdentifier util.ObjectIdentifier,
+	resourceVersion string, statusCollectors sets.Set[string]) bool {
 	resolution.Lock()
 	defer resolution.Unlock()
 
-	if _, exists := resolution.objectIdentifierToResourceVersion[objIdentifier]; !exists {
-		return false
-	}
-
-	// if the object identifier does not exist in the statuscollectors map, add it
-	if _, exists := resolution.objectIdentifierToStatusCollectors[objIdentifier]; !exists {
-		resolution.objectIdentifierToStatusCollectors[objIdentifier] = statusCollectors
+	objData := resolution.objectIdentifierToData[objIdentifier]
+	if objData == nil {
+		resolution.objectIdentifierToData[objIdentifier] = &objectData{
+			ResourceVersion:  resourceVersion,
+			StatusCollectors: statusCollectors,
+		}
 		return true
 	}
 
-	// if the object identifier's statuscollectors set is already equal the given set, do nothing
-	if resolution.objectIdentifierToStatusCollectors[objIdentifier].Equal(statusCollectors) {
+	if objData.ResourceVersion == resourceVersion && objData.StatusCollectors.Equal(statusCollectors) {
 		return false
 	}
 
-	resolution.objectIdentifierToStatusCollectors[objIdentifier] = statusCollectors
+	objData.ResourceVersion = resourceVersion
+	objData.StatusCollectors = statusCollectors
+
 	return true
 }
 
@@ -107,11 +94,11 @@ func (resolution *bindingPolicyResolution) removeObjectIdentifier(objIdentifier 
 	resolution.Lock()
 	defer resolution.Unlock()
 
-	if _, exists := resolution.objectIdentifierToResourceVersion[objIdentifier]; !exists {
+	if _, exists := resolution.objectIdentifierToData[objIdentifier]; !exists {
 		return false
 	}
 
-	delete(resolution.objectIdentifierToResourceVersion, objIdentifier)
+	delete(resolution.objectIdentifierToData, objIdentifier)
 	return true
 }
 
@@ -129,7 +116,7 @@ func (resolution *bindingPolicyResolution) getObjectIdentifiers() sets.Set[util.
 	resolution.RLock()
 	defer resolution.RUnlock()
 
-	return sets.KeySet(resolution.objectIdentifierToResourceVersion)
+	return sets.KeySet(resolution.objectIdentifierToData)
 }
 
 // toBindingSpec converts the resolution to a binding
@@ -139,70 +126,45 @@ func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec
 	defer resolution.RUnlock()
 
 	workload := v1alpha1.DownsyncObjectReferences{}
-	statusCollectorNames, statusCollectorNameToIndex := resolution.generateStatusCollectorsListAndIndices()
 
 	// iterate over all objects and build workload efficiently. No (GVR, namespace, name) tuple is
 	// duplicated in the objectIdentifierToResourceVersion map, due to the uniqueness of the identifiers.
 	// Therefore, whenever an object is about to be appended, we simply append.
-	for objIdentifier, objResourceVersion := range resolution.objectIdentifierToResourceVersion {
-		// get the statuscollector names for the object
-		statusCollectorNamesForObj := resolution.objectIdentifierToStatusCollectors[objIdentifier].UnsortedList()
-
+	for objIdentifier, objData := range resolution.objectIdentifierToData {
 		// check if object is cluster-scoped or namespaced by checking namespace
 		if objIdentifier.ObjectName.Namespace == metav1.NamespaceNone {
-			workload.ClusterScope = append(workload.ClusterScope, v1alpha1.ClusterScopeDownsyncObject{
-				GroupVersionResource: metav1.GroupVersionResource(objIdentifier.GVR()),
-				Name:                 objIdentifier.ObjectName.Name,
-				ResourceVersion:      objResourceVersion,
-				StatusCollectorIndices: abstract.SliceMap(statusCollectorNamesForObj, func(name string) int {
-					return statusCollectorNameToIndex[name]
-				}),
-			})
+			workload.ClusterScope = append(workload.ClusterScope,
+				v1alpha1.ClusterScopeDownsyncObjectAndStatusCollectors{
+					ClusterScopeDownsyncObject: &v1alpha1.ClusterScopeDownsyncObject{
+						GroupVersionResource: metav1.GroupVersionResource(objIdentifier.GVR()),
+						Name:                 objIdentifier.ObjectName.Name,
+						ResourceVersion:      objData.ResourceVersion,
+					},
+					StatusCollectors: sets.List(objData.StatusCollectors),
+				})
 
 			continue
 		}
 
-		workload.NamespaceScope = append(workload.NamespaceScope, v1alpha1.NamespaceScopeDownsyncObject{
-			GroupVersionResource: metav1.GroupVersionResource(objIdentifier.GVR()),
-			Name:                 objIdentifier.ObjectName.Name,
-			Namespace:            objIdentifier.ObjectName.Namespace,
-			ResourceVersion:      objResourceVersion,
-			StatusCollectorIndices: abstract.SliceMap(statusCollectorNamesForObj, func(name string) int {
-				return statusCollectorNameToIndex[name]
-			}),
-		})
+		workload.NamespaceScope = append(workload.NamespaceScope,
+			v1alpha1.NamespaceScopeDownsyncObjectAndStatusCollectors{
+				NamespaceScopeDownsyncObject: &v1alpha1.NamespaceScopeDownsyncObject{
+					GroupVersionResource: metav1.GroupVersionResource(objIdentifier.GVR()),
+					Name:                 objIdentifier.ObjectName.Name,
+					Namespace:            objIdentifier.ObjectName.Namespace,
+					ResourceVersion:      objData.ResourceVersion,
+				},
+				StatusCollectors: sets.List(objData.StatusCollectors),
+			})
 	}
 
 	// sort workload objects
 	sortBindingWorkloadObjects(&workload)
 
 	return &v1alpha1.BindingSpec{
-		Workload:         workload,
-		Destinations:     destinationsStringSetToSortedDestinations(resolution.destinations),
-		StatusCollectors: statusCollectorNames,
+		Workload:     workload,
+		Destinations: destinationsStringSetToSortedDestinations(resolution.destinations),
 	}
-}
-
-// generateStatusCollectorsListAndIndices generates a sorted list of status-
-// collectors and a map from statuscollector name to index in the sorted list.
-func (resolution *bindingPolicyResolution) generateStatusCollectorsListAndIndices() ([]string, map[string]int) {
-	resolution.RLock()
-	defer resolution.RUnlock()
-
-	statusCollectorsSet := sets.New[string]()
-
-	for _, statusCollectors := range resolution.objectIdentifierToStatusCollectors {
-		statusCollectorsSet.Insert(statusCollectors.UnsortedList()...)
-	}
-
-	statusCollectorsList := sets.List(statusCollectorsSet)
-	statusCollectorNameToIndex := make(map[string]int, statusCollectorsSet.Len())
-
-	for i, name := range statusCollectorsList {
-		statusCollectorNameToIndex[name] = i
-	}
-
-	return statusCollectorsList, statusCollectorNameToIndex
 }
 
 func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alpha1.BindingSpec) bool {
@@ -215,21 +177,20 @@ func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alp
 	}
 
 	// check workload
-	if len(resolution.objectIdentifierToResourceVersion) != len(bindingSpec.Workload.ClusterScope)+
+	if len(resolution.objectIdentifierToData) != len(bindingSpec.Workload.ClusterScope)+
 		len(bindingSpec.Workload.NamespaceScope) {
 		return false
 	}
 
-	objectRefToStatusCollectorsSet := bindingObjectRefToStatusCollectorsSetFromWorkload(&bindingSpec.Workload,
-		bindingSpec.StatusCollectors)
+	objRefAndDataSetFromWorkload := bindingObjectRefAndDataSetFromWorkload(&bindingSpec.Workload)
 
-	for objIdentifier, objResourceVersion := range resolution.objectIdentifierToResourceVersion {
-		// check if object ref exists, then check if the status collectors are equal
-		if objectRefSetFromWorkload, exists := objectRefToStatusCollectorsSet[objectRef{
+	for objIdentifier, objData := range resolution.objectIdentifierToData {
+		// check if object ref exists, then check if the object data matches
+		if !objRefAndDataSetFromWorkload.Has(objectRefAndData{
 			GroupVersionResource: objIdentifier.GVR(),
 			ObjectName:           objIdentifier.ObjectName,
-			ResourceVersion:      objResourceVersion,
-		}]; !exists || !resolution.objectIdentifierToStatusCollectors[objIdentifier].Equal(objectRefSetFromWorkload) {
+			objectData:           objData,
+		}) {
 			return false
 		}
 
@@ -254,43 +215,45 @@ func destinationsMatch(resolvedDestinations sets.Set[string], bindingDestination
 	return true
 }
 
-type objectRef struct {
+type objectRefAndData struct {
 	schema.GroupVersionResource
 	cache.ObjectName
-	ResourceVersion string
+
+	*objectData
 }
 
-func bindingObjectRefToStatusCollectorsSetFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectReferences,
-	bindingSpecStatusCollectors []string) map[objectRef]sets.Set[string] {
-	bindingObjectRefAndVersionToStatusCollectors := make(map[objectRef]sets.Set[string])
+func bindingObjectRefAndDataSetFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectReferences) sets.Set[objectRefAndData] {
+	bindingObjectRefAndDataSet := sets.New[objectRefAndData]()
 
 	for _, clusterScopeDownsyncObject := range bindingSpecWorkload.ClusterScope {
-		bindingObjectRefAndVersionToStatusCollectors[objectRef{
+		bindingObjectRefAndDataSet.Insert(objectRefAndData{
 			GroupVersionResource: schema.GroupVersionResource(clusterScopeDownsyncObject.GroupVersionResource),
 			ObjectName: cache.ObjectName{
 				Name:      clusterScopeDownsyncObject.Name,
 				Namespace: metav1.NamespaceNone,
 			},
-			ResourceVersion: clusterScopeDownsyncObject.ResourceVersion,
-		}] = sets.New[string](abstract.SliceMap(clusterScopeDownsyncObject.StatusCollectorIndices, func(index int) string {
-			return bindingSpecStatusCollectors[index]
-		})...)
+			objectData: &objectData{
+				ResourceVersion:  clusterScopeDownsyncObject.ResourceVersion,
+				StatusCollectors: sets.New[string](clusterScopeDownsyncObject.StatusCollectors...),
+			},
+		})
 	}
 
 	for _, namespacedScopeDownsyncObject := range bindingSpecWorkload.NamespaceScope {
-		bindingObjectRefAndVersionToStatusCollectors[objectRef{
+		bindingObjectRefAndDataSet.Insert(objectRefAndData{
 			GroupVersionResource: schema.GroupVersionResource(namespacedScopeDownsyncObject.GroupVersionResource),
 			ObjectName: cache.ObjectName{
 				Name:      namespacedScopeDownsyncObject.Name,
 				Namespace: namespacedScopeDownsyncObject.Namespace,
 			},
-			ResourceVersion: namespacedScopeDownsyncObject.ResourceVersion,
-		}] = sets.New[string](abstract.SliceMap(namespacedScopeDownsyncObject.StatusCollectorIndices, func(index int) string {
-			return bindingSpecStatusCollectors[index]
-		})...)
+			objectData: &objectData{
+				ResourceVersion:  namespacedScopeDownsyncObject.ResourceVersion,
+				StatusCollectors: sets.New[string](namespacedScopeDownsyncObject.StatusCollectors...),
+			},
+		})
 	}
 
-	return bindingObjectRefAndVersionToStatusCollectors
+	return bindingObjectRefAndDataSet
 }
 
 func destinationsStringSetToSortedDestinations(destinationsStringSet sets.Set[string]) []v1alpha1.Destination {
@@ -305,7 +268,7 @@ func destinationsStringSetToSortedDestinations(destinationsStringSet sets.Set[st
 
 func sortBindingWorkloadObjects(bindingWorkload *v1alpha1.DownsyncObjectReferences) {
 	// sort clusterScopeDownsyncObjects
-	slices.SortFunc(bindingWorkload.ClusterScope, func(a, b v1alpha1.ClusterScopeDownsyncObject) bool {
+	slices.SortFunc(bindingWorkload.ClusterScope, func(a, b v1alpha1.ClusterScopeDownsyncObjectAndStatusCollectors) bool {
 		if a.GroupVersionResource.String() != b.GroupVersionResource.String() {
 			return a.GroupVersionResource.String() < b.GroupVersionResource.String()
 		}
@@ -315,7 +278,7 @@ func sortBindingWorkloadObjects(bindingWorkload *v1alpha1.DownsyncObjectReferenc
 		return a.ResourceVersion < b.ResourceVersion
 	})
 	// sort namespaceScopeDownsyncObjects
-	slices.SortFunc(bindingWorkload.NamespaceScope, func(a, b v1alpha1.NamespaceScopeDownsyncObject) bool {
+	slices.SortFunc(bindingWorkload.NamespaceScope, func(a, b v1alpha1.NamespaceScopeDownsyncObjectAndStatusCollectors) bool {
 		if a.GroupVersionResource.String() != b.GroupVersionResource.String() {
 			return a.GroupVersionResource.String() < b.GroupVersionResource.String()
 		}

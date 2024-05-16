@@ -20,14 +20,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-logr/logr"
-
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -87,15 +84,41 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 		}
 
 		// obj is selected by bindingpolicy, update the bindingpolicy resolver
-		if err := c.noteObjectForBindingPolicy(logger, objIdentifier, objMR.GetResourceVersion(),
-			matchedStatusCollectorsSet, objBeingDeleted, bindingPolicy.GetName()); err != nil {
-			return fmt.Errorf("failed to note object for bindingpolicy %s: %w", bindingPolicy.GetName(), err)
+		resolutionUpdated, err := c.bindingPolicyResolver.EnsureObjectIdentifier(bindingPolicy.GetName(),
+			objIdentifier, objMR.GetResourceVersion(), matchedStatusCollectorsSet)
+		if err != nil {
+			if errorIsBindingPolicyResolutionNotFound(err) {
+				// this case can occur if a bindingpolicy resolution was deleted AFTER
+				// the BindingPolicyResolver::ResolutionExists call and BEFORE getting to the NoteObject function,
+				// which occurs if a bindingpolicy was deleted in this time-window.
+				logger.V(4).Info("skipped EnsureObjectIdentifierWithVersion for object because "+
+					"bindingpolicy was deleted", "objectIdentifier", objIdentifier,
+					"bindingpolicy", bindingPolicy.GetName())
+				continue
+			}
+
+			return fmt.Errorf("failed to update resolution for bindingpolicy %s for object (identifier: %v): %v",
+				bindingPolicy.GetName(), objIdentifier, err)
+		}
+
+		if resolutionUpdated {
+			// enqueue binding to be synced since an object was added to its bindingpolicy's resolution
+			logger.V(4).Info("Enqueued Binding for syncing due to a noting of an "+
+				"object in its resolution", "binding", bindingPolicy.GetName(),
+				"objectIdentifier", objIdentifier, "objBeingDeleted", objBeingDeleted,
+				"resourceVersion", objMR.GetResourceVersion())
+			c.enqueueBinding(bindingPolicy.GetName())
+		} else {
+			logger.V(5).Info("Not enqueuing Binding due to no change in resolution",
+				"binding", bindingPolicy.GetName(),
+				"objectIdentifier", objIdentifier, "objBeingDeleted", objBeingDeleted,
+				"resourceVersion", objMR.GetResourceVersion())
+
 		}
 
 		// make sure object has singleton status if needed
 		if !objBeingDeleted && c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicy.GetName()) {
-			if err := c.handleSingletonLabel(ctx, obj, objGVR,
-				util.BindingPolicyLabelSingletonStatusValueSet); err != nil {
+			if err := c.handleSingletonLabel(ctx, obj, objGVR, util.BindingPolicyLabelSingletonStatusValueSet); err != nil {
 				return fmt.Errorf("failed to add singleton label to object: %w", err)
 			}
 
@@ -111,52 +134,6 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 		if err := c.handleSingletonLabel(ctx, obj, objGVR, util.BindingPolicyLabelSingletonStatusValueUnset); err != nil {
 			return fmt.Errorf("failed to update singleton label for object: %w", err)
 		}
-	}
-
-	return nil
-}
-
-func (c *Controller) noteObjectForBindingPolicy(logger logr.Logger, objIdentifier util.ObjectIdentifier, objResourceVersion string,
-	matchedStatusCollectorsSet sets.Set[string], objBeingDeleted bool, bindingPolicyName string) error {
-	resolutionUpdated, err := c.bindingPolicyResolver.EnsureObjectIdentifierWithVersion(bindingPolicyName,
-		objIdentifier, objResourceVersion)
-	if err != nil {
-		if errorIsBindingPolicyResolutionNotFound(err) {
-			// this case can occur if a bindingpolicy resolution was deleted AFTER
-			// the BindingPolicyResolver::ResolutionExists call and BEFORE getting to the NoteObject function,
-			// which occurs if a bindingpolicy was deleted in this time-window.
-			logger.V(4).Info("skipped EnsureObjectIdentifierWithVersion for object because "+
-				"bindingpolicy was deleted", "objectIdentifier", objIdentifier,
-				"bindingpolicy", objResourceVersion)
-			return nil
-		}
-
-		return fmt.Errorf("failed to update resolution for bindingpolicy %s for object (identifier: %v): %v",
-			objResourceVersion, objIdentifier, err)
-	}
-
-	resolutionStatusCollectorsChanged, err := c.bindingPolicyResolver.SetStatusCollectorsForObject(bindingPolicyName,
-		objIdentifier, matchedStatusCollectorsSet)
-	if err != nil {
-		return fmt.Errorf("failed to set statuscollectors for object (identifier: %v): %v", objIdentifier,
-			err)
-	}
-
-	if resolutionUpdated || resolutionStatusCollectorsChanged {
-		// enqueue binding to be synced since an object was added to its bindingpolicy's resolution
-		logger.V(4).Info("Enqueued Binding for syncing due to a change in its resolution",
-			"objectEnsuringInducedChange", resolutionUpdated,
-			"statusCollectorsInducedChange", resolutionStatusCollectorsChanged,
-			"binding", bindingPolicyName,
-			"objectIdentifier", objIdentifier, "objBeingDeleted", objBeingDeleted,
-			"resourceVersion", objResourceVersion)
-		c.enqueueBinding(bindingPolicyName)
-	} else {
-		logger.V(5).Info("Not enqueuing Binding due to no change in resolution",
-			"binding", objResourceVersion,
-			"objectIdentifier", objIdentifier, "objBeingDeleted", objBeingDeleted,
-			"resourceVersion", objResourceVersion)
-
 	}
 
 	return nil
