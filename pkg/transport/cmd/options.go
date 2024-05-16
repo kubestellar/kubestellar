@@ -31,6 +31,8 @@ type TransportOptions struct {
 	WdsClientOptions       *clientopts.ClientOptions
 	TransportClientOptions *clientopts.ClientOptions
 	WdsName                string
+	metricsBindAddr        string
+	pprofBindAddr          string
 }
 
 func NewTransportOptions() *TransportOptions {
@@ -38,6 +40,8 @@ func NewTransportOptions() *TransportOptions {
 		Concurrency:            defaultConcurrency,
 		WdsClientOptions:       clientopts.NewClientOptions("wds", "access the wds"),
 		TransportClientOptions: clientopts.NewClientOptions("transport", "access the transport space"),
+		metricsBindAddr:        ":8090",
+		pprofBindAddr:          ":8092",
 	}
 }
 
@@ -46,4 +50,6 @@ func (options *TransportOptions) AddFlags(fs *pflag.FlagSet) {
 	options.WdsClientOptions.AddFlags(fs)
 	options.TransportClientOptions.AddFlags(fs)
 	fs.StringVar(&options.WdsName, "wds-name", options.WdsName, "name of the wds to connect to. name should be unique")
+	fs.StringVar(&options.metricsBindAddr, "metrics-bind-addr", options.metricsBindAddr, "the [host]:port from which to serve /metrics")
+	fs.StringVar(&options.pprofBindAddr, "pprof-bind-addr", options.pprofBindAddr, "the [host]:port from which to serve /debug/pprof")
 }

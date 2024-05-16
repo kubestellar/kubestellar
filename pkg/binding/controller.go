@@ -272,7 +272,7 @@ func makeController(logger logr.Logger,
 		informers:                   util.NewConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer](),
 		stoppers:                    util.NewConcurrentMap[schema.GroupVersionResource, chan struct{}](),
 		bindingPolicyResolver:       NewBindingPolicyResolver(),
-		workqueue:                   workqueue.NewRateLimitingQueue(ratelimiter),
+		workqueue:                   workqueue.NewRateLimitingQueueWithConfig(ratelimiter, workqueue.RateLimitingQueueConfig{Name: controllerName + "-" + wdsName}),
 		allowedGroupsSet:            allowedGroupsSet,
 	}
 
