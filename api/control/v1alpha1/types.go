@@ -394,27 +394,15 @@ const (
 	AggregatorTypeMax   AggregatorType = "MAX"
 )
 
-// Expression is some value to derive from a workload object from a WEC.
-// An Expression is either a JSONPath identifying a value to extract
-// or a boolean combination of comparisons of atomic values.
-// While the expression here in the Go type system admits other values,
-// the controller will accept only the restricted set stated above.
-// Post-apiserver validation errors are posted to the StatusCollectorStatus.
-type Expression struct {
-	Op   ExpressionOperator `json:"op"`
-	Path string             `json:"path,omitempty"`
-	Args []Expression       `json:"args,omitempty"`
-}
-
-type ExpressionOperator string
-
-const (
-	OperatorPath  ExpressionOperator = "Path" // JSONPath string
-	OperatorOr    ExpressionOperator = "Or"
-	OperatorAnd   ExpressionOperator = "And"
-	OperatorNot   ExpressionOperator = "Not"
-	OperatorEqual ExpressionOperator = "Equal"
-)
+// Expression is written in the [Common Expression Language](https://cel.dev/).
+// See github.com/google/cel-go for the Go implementation used in Kubernetes,
+// and https://kubernetes.io/docs/reference/using-api/cel/ about CEL's uses in Kubernetes.
+// The expression will be type-checked against the schema for the object type at hand,
+// using the Kubernetes library code for converting an OpenAPI schema to a CEL type
+// (e.g., https://github.com/kubernetes/apiserver/blob/v0.28.2/pkg/cel/common/schemas.go#L40).
+// Parsing errors are posted to the status.Errors of the StatusCollector.
+// Type checking errors are posted to the status.Errors of the Binding and BindingPolicy.
+type Expression string
 
 // StatusCollectorStatus defines the observed state of StatusCollector.
 type StatusCollectorStatus struct {
