@@ -23,13 +23,14 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
-	control "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control"
-	internalinterfaces "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/internalinterfaces"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
+
+	versioned "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
+	control "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control"
+	internalinterfaces "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/internalinterfaces"
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.

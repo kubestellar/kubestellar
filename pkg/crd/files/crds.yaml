@@ -631,23 +631,17 @@ spec:
                     repeated for each WEC)."
                   properties:
                     subject:
-                      description: Expression is some value to derive from a workload
-                        object from a WEC. An Expression is either a JSONPath identifying
-                        a value to extract or a boolean combination of comparisons
-                        of atomic values. While the expression here in the Go type
-                        system admits other values, the controller will accept only
-                        the restricted set stated above. Post-apiserver validation
-                        errors are posted to the StatusCollectorStatus.
-                      properties:
-                        args:
-                          x-kubernetes-preserve-unknown-fields: true
-                        op:
-                          type: string
-                        path:
-                          type: string
-                      required:
-                      - op
-                      type: object
+                      description: Expression is written in the [Common Expression
+                        Language](https://cel.dev/). See github.com/google/cel-go
+                        for the Go implementation used in Kubernetes, and https://kubernetes.io/docs/reference/using-api/cel/
+                        about CEL's uses in Kubernetes. The expression will be type-checked
+                        against the schema for the object type at hand, using the
+                        Kubernetes library code for converting an OpenAPI schema to
+                        a CEL type (e.g., https://github.com/kubernetes/apiserver/blob/v0.28.2/pkg/cel/common/schemas.go#L40).
+                        Parsing errors are posted to the status.Errors of the StatusCollector.
+                        Type checking errors are posted to the status.Errors of the
+                        Binding and BindingPolicy.
+                      type: string
                     type:
                       description: AggregatorType indicates what sort of aggregation
                         is to be done.
@@ -660,16 +654,7 @@ spec:
                 description: '`filter`, if given, is applied first. It must evaluate
                   to a boolean or null (which is treated as false). This is like the
                   WHERE clause in an SQL SELECT statement.'
-                properties:
-                  args:
-                    x-kubernetes-preserve-unknown-fields: true
-                  op:
-                    type: string
-                  path:
-                    type: string
-                required:
-                - op
-                type: object
+                type: string
               groupBy:
                 description: '`groupBy` says how to group workload objects for aggregation
                   (if there is any). Each expression must evaluate to an atomic value.
@@ -679,23 +664,17 @@ spec:
                     a value from a JSON object.
                   properties:
                     def:
-                      description: Expression is some value to derive from a workload
-                        object from a WEC. An Expression is either a JSONPath identifying
-                        a value to extract or a boolean combination of comparisons
-                        of atomic values. While the expression here in the Go type
-                        system admits other values, the controller will accept only
-                        the restricted set stated above. Post-apiserver validation
-                        errors are posted to the StatusCollectorStatus.
-                      properties:
-                        args:
-                          x-kubernetes-preserve-unknown-fields: true
-                        op:
-                          type: string
-                        path:
-                          type: string
-                      required:
-                      - op
-                      type: object
+                      description: Expression is written in the [Common Expression
+                        Language](https://cel.dev/). See github.com/google/cel-go
+                        for the Go implementation used in Kubernetes, and https://kubernetes.io/docs/reference/using-api/cel/
+                        about CEL's uses in Kubernetes. The expression will be type-checked
+                        against the schema for the object type at hand, using the
+                        Kubernetes library code for converting an OpenAPI schema to
+                        a CEL type (e.g., https://github.com/kubernetes/apiserver/blob/v0.28.2/pkg/cel/common/schemas.go#L40).
+                        Parsing errors are posted to the status.Errors of the StatusCollector.
+                        Type checking errors are posted to the status.Errors of the
+                        Binding and BindingPolicy.
+                      type: string
                     name:
                       type: string
                   required:
@@ -716,23 +695,17 @@ spec:
                     a value from a JSON object.
                   properties:
                     def:
-                      description: Expression is some value to derive from a workload
-                        object from a WEC. An Expression is either a JSONPath identifying
-                        a value to extract or a boolean combination of comparisons
-                        of atomic values. While the expression here in the Go type
-                        system admits other values, the controller will accept only
-                        the restricted set stated above. Post-apiserver validation
-                        errors are posted to the StatusCollectorStatus.
-                      properties:
-                        args:
-                          x-kubernetes-preserve-unknown-fields: true
-                        op:
-                          type: string
-                        path:
-                          type: string
-                      required:
-                      - op
-                      type: object
+                      description: Expression is written in the [Common Expression
+                        Language](https://cel.dev/). See github.com/google/cel-go
+                        for the Go implementation used in Kubernetes, and https://kubernetes.io/docs/reference/using-api/cel/
+                        about CEL's uses in Kubernetes. The expression will be type-checked
+                        against the schema for the object type at hand, using the
+                        Kubernetes library code for converting an OpenAPI schema to
+                        a CEL type (e.g., https://github.com/kubernetes/apiserver/blob/v0.28.2/pkg/cel/common/schemas.go#L40).
+                        Parsing errors are posted to the status.Errors of the StatusCollector.
+                        Type checking errors are posted to the status.Errors of the
+                        Binding and BindingPolicy.
+                      type: string
                     name:
                       type: string
                   required:
