@@ -148,6 +148,7 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, itsRest
 	disposableConfig := rest.CopyConfig(wdsRestConfig)
 	disposableConfig.Burst = referenceBurstUpperBound
 	disposableConfig.QPS = referenceQPSUpperBound
+	disposableConfig.RateLimiter = nil
 	disposableClient, err := kubernetes.NewForConfig(disposableConfig)
 	if err != nil {
 		return nil, err
@@ -161,6 +162,7 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, itsRest
 	wdsRestConfigTuned := rest.CopyConfig(wdsRestConfig)
 	wdsRestConfigTuned.Burst = computeBurstFromNumGVRs(nGVRs)
 	wdsRestConfigTuned.QPS = computeQPSFromNumGVRs(nGVRs)
+	wdsRestConfigTuned.RateLimiter = nil
 	logger.V(1).Info("Parameters of the tuned client's token bucket rate limiter", "burst", wdsRestConfigTuned.Burst, "qps", wdsRestConfigTuned.QPS)
 
 	// dynamicClient needs higher rate than its default because dynamicClient is repeatedly used by the

@@ -28,8 +28,8 @@ const (
 
 type TransportOptions struct {
 	Concurrency            int
-	WdsClientOptions       *clientopts.ClientOptions
-	TransportClientOptions *clientopts.ClientOptions
+	WdsClientOptions       *clientopts.ClientOptions[*pflag.FlagSet]
+	TransportClientOptions *clientopts.ClientOptions[*pflag.FlagSet]
 	WdsName                string
 	metricsBindAddr        string
 	pprofBindAddr          string
@@ -38,8 +38,8 @@ type TransportOptions struct {
 func NewTransportOptions() *TransportOptions {
 	return &TransportOptions{
 		Concurrency:            defaultConcurrency,
-		WdsClientOptions:       clientopts.NewClientOptions("wds", "access the wds"),
-		TransportClientOptions: clientopts.NewClientOptions("transport", "access the transport space"),
+		WdsClientOptions:       clientopts.NewClientOptions[*pflag.FlagSet]("wds", "accessing the WDS"),
+		TransportClientOptions: clientopts.NewClientOptions[*pflag.FlagSet]("transport", "accessing the ITS"),
 		metricsBindAddr:        ":8090",
 		pprofBindAddr:          ":8092",
 	}

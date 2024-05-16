@@ -33,6 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	clientopts "github.com/kubestellar/kubestellar/options"
 	"github.com/kubestellar/kubestellar/pkg/binding"
 	"github.com/kubestellar/kubestellar/pkg/status"
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -70,6 +71,10 @@ func main() {
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 
+	itsClientLimits := clientopts.NewClientLimits[*flag.FlagSet]("its", "accessing the ITS")
+	wdsClientLimits := clientopts.NewClientLimits[*flag.FlagSet]("wds", "accessing the WDS")
+	itsClientLimits.AddFlags(flag.CommandLine)
+	wdsClientLimits.AddFlags(flag.CommandLine)
 	klog.InitFlags(nil)
 	flag.Parse()
 	ctx := context.Background()
@@ -127,6 +132,7 @@ func main() {
 		os.Exit(1)
 	}
 	setupLog.Info("Got config for WDS", "name", wdsName)
+	wdsRestConfig = wdsClientLimits.LimitConfig(wdsRestConfig)
 
 	// get the config for ITS
 	setupLog.Info("Getting config for ITS")
@@ -136,6 +142,7 @@ func main() {
 		os.Exit(1)
 	}
 	setupLog.Info("Got config for ITS", "name", itsName)
+	itsRestConfig = itsClientLimits.LimitConfig(itsRestConfig)
 
 	// start the binding controller
 	bindingController, err := binding.NewController(mgr.GetLogger(), wdsRestConfig, itsRestConfig, wdsName, allowedGroupsSet)
