@@ -382,14 +382,14 @@ spec:
                 type: array
               workload:
                 description: '`workload` is a collection of namespaced and cluster
-                  scoped object references and their associated resource versions,
-                  to be propagated to destination clusters.'
+                  scoped object references and their associated data - resource versions
+                  and statuscollectors, to be propagated to destination clusters.'
                 properties:
                   clusterScope:
                     description: '`clusterScope` holds a list of cluster-scoped object
                       references with their associated resource versions to downsync.'
                     items:
-                      description: ClusterScopeDownsyncObjectAndStatusCollectors represents
+                      description: ClusterScopeDownsyncObjectAndStatusCollectors references
                         a specific cluster-scoped object to downsync, and the status
                         collectors that should be applied to it.
                       properties:

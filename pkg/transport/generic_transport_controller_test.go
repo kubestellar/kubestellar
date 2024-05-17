@@ -172,7 +172,7 @@ type bindingCase struct {
 
 func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion string) ksapi.ClusterScopeDownsyncObjectAndStatusCollectors {
 	return ksapi.ClusterScopeDownsyncObjectAndStatusCollectors{
-		ClusterScopeDownsyncObject: &ksapi.ClusterScopeDownsyncObject{
+		ClusterScopeDownsyncObject: ksapi.ClusterScopeDownsyncObject{
 			GroupVersionResource: gvr,
 			Name:                 name,
 			ResourceVersion:      resourceVersion,
@@ -181,7 +181,7 @@ func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion stri
 
 func newNamespaceScope(gvr metav1.GroupVersionResource, namespace, name, resourceVersion string) ksapi.NamespaceScopeDownsyncObjectAndStatusCollectors {
 	return ksapi.NamespaceScopeDownsyncObjectAndStatusCollectors{
-		NamespaceScopeDownsyncObject: &ksapi.NamespaceScopeDownsyncObject{
+		NamespaceScopeDownsyncObject: ksapi.NamespaceScopeDownsyncObject{
 			GroupVersionResource: gvr,
 			Namespace:            namespace,
 			Name:                 name,

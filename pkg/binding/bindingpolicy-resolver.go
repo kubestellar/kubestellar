@@ -66,7 +66,7 @@ type BindingPolicyResolver interface {
 	// `*bindingPolicy` is immutable
 	NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy)
 
-	// EnsureObjectIdentifier ensures that an object's identifier is
+	// EnsureObjectData ensures that an object's identifier is
 	// in the resolution for the given bindingpolicy key, and is associated
 	// with the given resource-version and statuscollectors set.
 	// The given set is expected not to be mutated during and after this call
@@ -75,7 +75,7 @@ type BindingPolicyResolver interface {
 	// The returned bool indicates whether the bindingpolicy resolution was
 	// changed. If no resolution is associated with the given key, an error is
 	// returned.
-	EnsureObjectIdentifier(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
+	EnsureObjectData(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
 		resourceVersion string, statusCollectors sets.Set[string]) (bool, error)
 	// RemoveObjectIdentifier ensures the absence of the given object
 	// identifier from the resolution for the given bindingpolicy key.
@@ -186,7 +186,7 @@ func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1
 	resolver.createResolution(bindingpolicy)
 }
 
-// EnsureObjectIdentifier ensures that an object's identifier is
+// EnsureObjectData ensures that an object's identifier is
 // in the resolution for the given bindingpolicy key, and is associated
 // with the given resource-version and statuscollectors set.
 // The given set is expected not to be mutated during and after this call
@@ -195,7 +195,7 @@ func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1
 // The returned bool indicates whether the bindingpolicy resolution was
 // changed. If no resolution is associated with the given key, an error is
 // returned.
-func (resolver *bindingPolicyResolver) EnsureObjectIdentifier(bindingPolicyKey string,
+func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string,
 	objIdentifier util.ObjectIdentifier, resourceVersion string, statusCollectors sets.Set[string]) (bool, error) {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 

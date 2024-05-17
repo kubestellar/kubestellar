@@ -247,17 +247,17 @@ type Binding struct {
 // All objects referenced in this spec are propagated to all destinations present.
 type BindingSpec struct {
 	// `workload` is a collection of namespaced and cluster scoped object references and their associated
-	// resource versions, to be propagated to destination clusters.
-	Workload DownsyncObjectReferences `json:"workload,omitempty"`
+	// data - resource versions and statuscollectors, to be propagated to destination clusters.
+	Workload DownsyncObjectReferencesWithStatusCollectors `json:"workload,omitempty"`
 
 	// `destinations` is a list of cluster-identifiers that the objects should be propagated to.
 	Destinations []Destination `json:"destinations,omitempty"`
 }
 
-// DownsyncObjectReferences defines the objects to be down-synced, grouping them by scope.
+// DownsyncObjectReferencesWithStatusCollectors defines the objects to be down-synced, grouping them by scope.
 // It specifies a set of object references with their associated resource versions, to be downsynced.
-// This effectively acts as a map from object reference to ResourceVersion.
-type DownsyncObjectReferences struct {
+// Each object reference is associated with a set of statuscollectors that should be applied to it.
+type DownsyncObjectReferencesWithStatusCollectors struct {
 	// `clusterScope` holds a list of cluster-scoped object references with their associated
 	// resource versions to downsync.
 	ClusterScope []ClusterScopeDownsyncObjectAndStatusCollectors `json:"clusterScope,omitempty"`
@@ -270,7 +270,7 @@ type DownsyncObjectReferences struct {
 // NamespaceScopeDownsyncObjectAndStatusCollectors represents a specific namespace-scoped object to downsync,
 // and the status collectors that should be applied to it.
 type NamespaceScopeDownsyncObjectAndStatusCollectors struct {
-	*NamespaceScopeDownsyncObject `json:",inline"`
+	NamespaceScopeDownsyncObject `json:",inline"`
 	// `statusCollectors` is a list of StatusCollectors name references that are applied to the object.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }
@@ -288,15 +288,15 @@ type NamespaceScopeDownsyncObject struct {
 	ResourceVersion string `json:"resourceVersion"`
 }
 
-// ClusterScopeDownsyncObjectAndStatusCollectors represents a specific cluster-scoped object to downsync,
+// ClusterScopeDownsyncObjectAndStatusCollectors references a specific cluster-scoped object to downsync,
 // and the status collectors that should be applied to it.
 type ClusterScopeDownsyncObjectAndStatusCollectors struct {
-	*ClusterScopeDownsyncObject `json:",inline"`
+	ClusterScopeDownsyncObject `json:",inline"`
 	// `statusCollectors` is a list of StatusCollectors name references that are applied to the object.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }
 
-// ClusterScopeDownsyncObject represents a specific cluster-scoped object to downsync,
+// ClusterScopeDownsyncObject references a specific cluster-scoped object to downsync,
 // identified by its GroupVersionResource and name. The ResourceVersion specifies the
 // exact version of the object to downsync.
 type ClusterScopeDownsyncObject struct {
