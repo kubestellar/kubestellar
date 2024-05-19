@@ -49,13 +49,13 @@ type bindingPolicyResolution struct {
 	requiresSingletonReportedState bool
 }
 
-// objectData stores the resource version and status collectors for an object.
+// objectData stores the resource version and statuscollectors for an object.
 type objectData struct {
 	ResourceVersion  string
 	StatusCollectors sets.Set[string]
 }
 
-// ensureObjectIdentifier ensures that an object identifier exists
+// ensureObjectData ensures that an object identifier exists
 // in the resolution and is associated with the given resource version
 // and statuscollectors set.
 // The given set is expected not to be mutated during and after this call by
@@ -63,7 +63,7 @@ type objectData struct {
 //
 // The returned bool indicates whether the resolution was changed.
 // This function is thread-safe.
-func (resolution *bindingPolicyResolution) ensureObjectIdentifier(objIdentifier util.ObjectIdentifier,
+func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.ObjectIdentifier,
 	resourceVersion string, statusCollectors sets.Set[string]) bool {
 	resolution.Lock()
 	defer resolution.Unlock()
@@ -194,7 +194,6 @@ func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alp
 			!objData.StatusCollectors.Equal(objDataFromWorkload.StatusCollectors) {
 			return false
 		}
-
 	} // this check works because both groups have unique members and are of equal size
 
 	return true

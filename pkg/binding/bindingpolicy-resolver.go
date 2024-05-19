@@ -206,7 +206,7 @@ func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string,
 	}
 
 	// ensureObjectIdentifier is thread-safe
-	return bindingPolicyResolution.ensureObjectIdentifier(objIdentifier, resourceVersion, statusCollectors), nil
+	return bindingPolicyResolution.ensureObjectData(objIdentifier, resourceVersion, statusCollectors), nil
 }
 
 // RemoveObjectIdentifier ensures the absence of the given object
