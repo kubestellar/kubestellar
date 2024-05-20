@@ -96,7 +96,7 @@ spec:
                       downsync.'
                     items:
                       description: NamespaceScopeDownsyncObjectAndStatusCollectors
-                        represents a specific namespace-scoped object to downsync,
+                        references a specific namespace-scoped object to downsync,
                         and the status collectors that should be applied to it.
                       properties:
                         group:

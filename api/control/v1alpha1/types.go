@@ -267,7 +267,7 @@ type DownsyncObjectReferencesWithStatusCollectors struct {
 	NamespaceScope []NamespaceScopeDownsyncObjectAndStatusCollectors `json:"namespaceScope,omitempty"`
 }
 
-// NamespaceScopeDownsyncObjectAndStatusCollectors represents a specific namespace-scoped object to downsync,
+// NamespaceScopeDownsyncObjectAndStatusCollectors references a specific namespace-scoped object to downsync,
 // and the status collectors that should be applied to it.
 type NamespaceScopeDownsyncObjectAndStatusCollectors struct {
 	NamespaceScopeDownsyncObject `json:",inline"`
@@ -275,7 +275,7 @@ type NamespaceScopeDownsyncObjectAndStatusCollectors struct {
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }
 
-// NamespaceScopeDownsyncObject represents a specific namespace-scoped object to downsync,
+// NamespaceScopeDownsyncObject references a specific namespace-scoped object to downsync,
 // identified by its GroupVersionResource, namespace, and name. The ResourceVersion specifies
 // the exact version of the object to downsync.
 type NamespaceScopeDownsyncObject struct {
