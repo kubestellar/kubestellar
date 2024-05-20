@@ -116,7 +116,7 @@ spec:
                   description: DownsyncObjectTestAndStatusCollection identifies some
                     objects (by a predicate) and asks for some combined status to
                     be returned from those objects. The latter is dictated through
-                    applying a set of StatusCollectors,
+                    applying a set of StatusCollectors.
                   properties:
                     apiGroup:
                       description: '`apiGroup` is the API group of the referenced
@@ -382,17 +382,16 @@ spec:
                 type: array
               workload:
                 description: '`workload` is a collection of namespaced and cluster
-                  scoped object references and their associated resource versions,
-                  to be propagated to destination clusters.'
+                  scoped object references and their associated data - resource versions
+                  and statuscollectors, to be propagated to destination clusters.'
                 properties:
                   clusterScope:
                     description: '`clusterScope` holds a list of cluster-scoped object
                       references with their associated resource versions to downsync.'
                     items:
-                      description: ClusterScopeDownsyncObject represents a specific
-                        cluster-scoped object to downsync, identified by its GroupVersionResource
-                        and name. The ResourceVersion specifies the exact version
-                        of the object to downsync.
+                      description: ClusterScopeDownsyncObjectAndStatusCollectors references
+                        a specific cluster-scoped object to downsync, and the status
+                        collectors that should be applied to it.
                       properties:
                         group:
                           type: string
@@ -405,6 +404,12 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
+                        statusCollectors:
+                          description: '`statusCollectors` is a list of StatusCollectors
+                            name references that are applied to the object.'
+                          items:
+                            type: string
+                          type: array
                         version:
                           type: string
                       required:
@@ -420,10 +425,9 @@ spec:
                       object references with their associated resource versions to
                       downsync.'
                     items:
-                      description: NamespaceScopeDownsyncObject represents a specific
-                        namespace-scoped object to downsync, identified by its GroupVersionResource,
-                        namespace, and name. The ResourceVersion specifies the exact
-                        version of the object to downsync.
+                      description: NamespaceScopeDownsyncObjectAndStatusCollectors
+                        references a specific namespace-scoped object to downsync,
+                        and the status collectors that should be applied to it.
                       properties:
                         group:
                           type: string
@@ -439,6 +443,12 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
+                        statusCollectors:
+                          description: '`statusCollectors` is a list of StatusCollectors
+                            name references that are applied to the object.'
+                          items:
+                            type: string
+                          type: array
                         version:
                           type: string
                       required:
@@ -557,6 +567,165 @@ spec:
                 items:
                   type: string
                 type: array
+            required:
+            - observedGeneration
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.13.0
+  name: statuscollectors.control.kubestellar.io
+spec:
+  group: control.kubestellar.io
+  names:
+    kind: StatusCollector
+    listKind: StatusCollectorList
+    plural: statuscollectors
+    shortNames:
+    - sc
+    singular: statuscollector
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: StatusCollector defines one way to collect status about a given
+          workload object from the set of WECs that it propagates to. This is modeled
+          after an SQL SELECT statement that does aggregation. This API is under development
+          and is not yet functional.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: StatusCollectorSpec defines the desired state of StatusCollector.
+            properties:
+              combinedFields:
+                description: '`combinedFields` defines the aggregations to do, if
+                  any. `combinedFields` must be empty if `select` is not.'
+                items:
+                  description: "NamedAggregator pairs a name with a way to aggregate
+                    over some objects. \n - For `type==\"COUNT\"`, `subject` is omitted
+                    and the aggregate is the count of those objects that are not `null`.
+                    \n - For the other types, `subject` is required and SHOULD evaluate
+                    to a numeric value; exceptions are handled as follows. For a string
+                    value: if it parses as an int64 or float64 then that is used.
+                    Otherwise this is an error condition: a value of 0 is used, and
+                    the error is reported in the BindingPolicyStatus.Errors (not necessarily
+                    repeated for each WEC)."
+                  properties:
+                    subject:
+                      description: Expression is written in the [Common Expression
+                        Language](https://cel.dev/). See github.com/google/cel-go
+                        for the Go implementation used in Kubernetes, and https://kubernetes.io/docs/reference/using-api/cel/
+                        about CEL's uses in Kubernetes. The expression will be type-checked
+                        against the schema for the object type at hand, using the
+                        Kubernetes library code for converting an OpenAPI schema to
+                        a CEL type (e.g., https://github.com/kubernetes/apiserver/blob/v0.28.2/pkg/cel/common/schemas.go#L40).
+                        Parsing errors are posted to the status.Errors of the StatusCollector.
+                        Type checking errors are posted to the status.Errors of the
+                        Binding and BindingPolicy.
+                      type: string
+                    type:
+                      description: AggregatorType indicates what sort of aggregation
+                        is to be done.
+                      type: string
+                  required:
+                  - type
+                  type: object
+                type: array
+              filter:
+                description: '`filter`, if given, is applied first. It must evaluate
+                  to a boolean or null (which is treated as false). This is like the
+                  WHERE clause in an SQL SELECT statement.'
+                type: string
+              groupBy:
+                description: '`groupBy` says how to group workload objects for aggregation
+                  (if there is any). Each expression must evaluate to an atomic value.
+                  `groupBy` must be empty if `combinedFields` is.'
+                items:
+                  description: NamedExpression pairs a name with a way of extracting
+                    a value from a JSON object.
+                  properties:
+                    def:
+                      description: Expression is written in the [Common Expression
+                        Language](https://cel.dev/). See github.com/google/cel-go
+                        for the Go implementation used in Kubernetes, and https://kubernetes.io/docs/reference/using-api/cel/
+                        about CEL's uses in Kubernetes. The expression will be type-checked
+                        against the schema for the object type at hand, using the
+                        Kubernetes library code for converting an OpenAPI schema to
+                        a CEL type (e.g., https://github.com/kubernetes/apiserver/blob/v0.28.2/pkg/cel/common/schemas.go#L40).
+                        Parsing errors are posted to the status.Errors of the StatusCollector.
+                        Type checking errors are posted to the status.Errors of the
+                        Binding and BindingPolicy.
+                      type: string
+                    name:
+                      type: string
+                  required:
+                  - def
+                  - name
+                  type: object
+                type: array
+              limit:
+                description: '`limit` limits the number of rows returned. The default
+                  value is 20.'
+                format: int64
+                type: integer
+              select:
+                description: '`select` defines named values to extract from each object.
+                  `select` must be emtpy when `combinedFields` is not.'
+                items:
+                  description: NamedExpression pairs a name with a way of extracting
+                    a value from a JSON object.
+                  properties:
+                    def:
+                      description: Expression is written in the [Common Expression
+                        Language](https://cel.dev/). See github.com/google/cel-go
+                        for the Go implementation used in Kubernetes, and https://kubernetes.io/docs/reference/using-api/cel/
+                        about CEL's uses in Kubernetes. The expression will be type-checked
+                        against the schema for the object type at hand, using the
+                        Kubernetes library code for converting an OpenAPI schema to
+                        a CEL type (e.g., https://github.com/kubernetes/apiserver/blob/v0.28.2/pkg/cel/common/schemas.go#L40).
+                        Parsing errors are posted to the status.Errors of the StatusCollector.
+                        Type checking errors are posted to the status.Errors of the
+                        Binding and BindingPolicy.
+                      type: string
+                    name:
+                      type: string
+                  required:
+                  - def
+                  - name
+                  type: object
+                type: array
+            required:
+            - limit
+            type: object
+          status:
+            description: StatusCollectorStatus defines the observed state of StatusCollector.
+            properties:
+              errors:
+                items:
+                  type: string
+                type: array
+              observedGeneration:
+                format: int64
+                type: integer
             required:
             - observedGeneration
             type: object

@@ -113,7 +113,7 @@ spec:
                   description: DownsyncObjectTestAndStatusCollection identifies some
                     objects (by a predicate) and asks for some combined status to
                     be returned from those objects. The latter is dictated through
-                    applying a set of StatusCollectors,
+                    applying a set of StatusCollectors.
                   properties:
                     apiGroup:
                       description: '`apiGroup` is the API group of the referenced

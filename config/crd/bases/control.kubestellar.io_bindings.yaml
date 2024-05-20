@@ -52,17 +52,16 @@ spec:
                 type: array
               workload:
                 description: '`workload` is a collection of namespaced and cluster
-                  scoped object references and their associated resource versions,
-                  to be propagated to destination clusters.'
+                  scoped object references and their associated data - resource versions
+                  and statuscollectors, to be propagated to destination clusters.'
                 properties:
                   clusterScope:
                     description: '`clusterScope` holds a list of cluster-scoped object
                       references with their associated resource versions to downsync.'
                     items:
-                      description: ClusterScopeDownsyncObject represents a specific
-                        cluster-scoped object to downsync, identified by its GroupVersionResource
-                        and name. The ResourceVersion specifies the exact version
-                        of the object to downsync.
+                      description: ClusterScopeDownsyncObjectAndStatusCollectors references
+                        a specific cluster-scoped object to downsync, and the status
+                        collectors that should be applied to it.
                       properties:
                         group:
                           type: string
@@ -75,6 +74,12 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
+                        statusCollectors:
+                          description: '`statusCollectors` is a list of StatusCollectors
+                            name references that are applied to the object.'
+                          items:
+                            type: string
+                          type: array
                         version:
                           type: string
                       required:
@@ -90,10 +95,9 @@ spec:
                       object references with their associated resource versions to
                       downsync.'
                     items:
-                      description: NamespaceScopeDownsyncObject represents a specific
-                        namespace-scoped object to downsync, identified by its GroupVersionResource,
-                        namespace, and name. The ResourceVersion specifies the exact
-                        version of the object to downsync.
+                      description: NamespaceScopeDownsyncObjectAndStatusCollectors
+                        references a specific namespace-scoped object to downsync,
+                        and the status collectors that should be applied to it.
                       properties:
                         group:
                           type: string
@@ -109,6 +113,12 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
+                        statusCollectors:
+                          description: '`statusCollectors` is a list of StatusCollectors
+                            name references that are applied to the object.'
+                          items:
+                            type: string
+                          type: array
                         version:
                           type: string
                       required:

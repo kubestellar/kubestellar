@@ -49,6 +49,7 @@ var crdNames = sets.New(
 	"bindings.control.kubestellar.io",
 	"bindingpolicies.control.kubestellar.io",
 	"customtransforms.control.kubestellar.io",
+	"statuscollectors.control.kubestellar.io",
 )
 
 //go:embed files/*

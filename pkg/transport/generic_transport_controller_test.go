@@ -170,21 +170,23 @@ type bindingCase struct {
 	ExpectedKeys []any // JSON equivalent of keys of expect, for logging
 }
 
-func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion string) ksapi.ClusterScopeDownsyncObject {
-	return ksapi.ClusterScopeDownsyncObject{
-		GroupVersionResource: gvr,
-		Name:                 name,
-		ResourceVersion:      resourceVersion,
-	}
+func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion string) ksapi.ClusterScopeDownsyncObjectAndStatusCollectors {
+	return ksapi.ClusterScopeDownsyncObjectAndStatusCollectors{
+		ClusterScopeDownsyncObject: ksapi.ClusterScopeDownsyncObject{
+			GroupVersionResource: gvr,
+			Name:                 name,
+			ResourceVersion:      resourceVersion,
+		}}
 }
 
-func newNamespaceScope(gvr metav1.GroupVersionResource, namespace, name, resourceVersion string) ksapi.NamespaceScopeDownsyncObject {
-	return ksapi.NamespaceScopeDownsyncObject{
-		GroupVersionResource: gvr,
-		Namespace:            namespace,
-		Name:                 name,
-		ResourceVersion:      resourceVersion,
-	}
+func newNamespaceScope(gvr metav1.GroupVersionResource, namespace, name, resourceVersion string) ksapi.NamespaceScopeDownsyncObjectAndStatusCollectors {
+	return ksapi.NamespaceScopeDownsyncObjectAndStatusCollectors{
+		NamespaceScopeDownsyncObject: ksapi.NamespaceScopeDownsyncObject{
+			GroupVersionResource: gvr,
+			Namespace:            namespace,
+			Name:                 name,
+			ResourceVersion:      resourceVersion,
+		}}
 }
 
 func (bc *bindingCase) Add(obj mrObjRsc) {

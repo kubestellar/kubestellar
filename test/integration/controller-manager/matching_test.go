@@ -423,7 +423,7 @@ func id2r(objId util.ObjectIdentifier) gvrnn {
 }
 
 // workloadIsExpected returns the symmetric difference, as JSON data
-func workloadIsExpected(workload ksapi.DownsyncObjectReferences, expectation map[gvrnn]any) (excess []gvrnn, missed map[string]any) {
+func workloadIsExpected(workload ksapi.DownsyncObjectReferencesWithStatusCollectors, expectation map[gvrnn]any) (excess []gvrnn, missed map[string]any) {
 	excess = []gvrnn{}
 	missed = map[string]any{}
 	for key, val := range expectation {
