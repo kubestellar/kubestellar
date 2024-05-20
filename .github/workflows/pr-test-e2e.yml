@@ -148,7 +148,7 @@ jobs:
         env:
           TEST_FLAGS: ${{ github.event.inputs.testFlags }}
         run: |
-          cd test/e2e/multi-cluster-deployment 
+          cd test/e2e/ 
           KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
 
       - name: show kubeconfig contexts
