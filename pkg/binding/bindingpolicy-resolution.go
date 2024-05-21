@@ -199,6 +199,15 @@ func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alp
 	return true
 }
 
+// getDestinationsList returns a sorted list of v1alpha1.Destination in the
+// resolution.
+func (resolution *bindingPolicyResolution) getDestinationsList() []v1alpha1.Destination {
+	resolution.RLock()
+	defer resolution.RUnlock()
+
+	return destinationsStringSetToSortedDestinations(resolution.destinations)
+}
+
 // destinationsMatch returns true if the destinations in the resolution
 // match the destinations in the binding spec.
 func destinationsMatch(resolvedDestinations sets.Set[string], bindingDestinations []v1alpha1.Destination) bool {
