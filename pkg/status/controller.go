@@ -33,7 +33,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
@@ -46,16 +45,14 @@ import (
 
 const controllerName = "Status"
 
-// Status controller watches workstatues and checks whether the corresponding
+// Controller watches workstatues and checks whether the corresponding
 // workload object asks for the singleton status returning. If yes,
 // the full status will be copied to the workload object in WDS.
 type Controller struct {
 	logger             logr.Logger
 	wdsName            string
 	wdsDynClient       dynamic.Interface
-	wdsKubeClient      kubernetes.Interface
 	itsDynClient       dynamic.Interface
-	itsKubeClient      kubernetes.Interface
 	workStatusInformer cache.SharedIndexInformer
 	workStatusLister   cache.GenericLister
 	workqueue          workqueue.RateLimitingInterface
@@ -76,17 +73,7 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 		return nil, err
 	}
 
-	wdsKubeClient, err := kubernetes.NewForConfig(wdsRestConfig)
-	if err != nil {
-		return nil, err
-	}
-
 	itsDynClient, err := dynamic.NewForConfig(itsRestConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	itsKubeClient, err := kubernetes.NewForConfig(itsRestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -95,13 +82,11 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 	log.SetLogger(zapLogger)
 
 	controller := &Controller{
-		wdsName:       wdsName,
-		logger:        log.Log.WithName(controllerName),
-		wdsDynClient:  wdsDynClient,
-		wdsKubeClient: wdsKubeClient,
-		itsDynClient:  itsDynClient,
-		itsKubeClient: itsKubeClient,
-		workqueue:     workqueue.NewRateLimitingQueue(ratelimiter),
+		wdsName:      wdsName,
+		logger:       log.Log.WithName(controllerName),
+		wdsDynClient: wdsDynClient,
+		itsDynClient: itsDynClient,
+		workqueue:    workqueue.NewRateLimitingQueue(ratelimiter),
 	}
 
 	return controller, nil
