@@ -17,11 +17,13 @@ limitations under the License.
 package binding
 
 import (
+	"sync"
+
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/util"
-	"k8s.io/apimachinery/pkg/util/sets"
-	"sync"
 )
 
 // ResolutionBroker allows for the registration of callback functions that
@@ -91,7 +93,7 @@ func (broker *resolutionBroker) RegisterCallback(callback func(bindingPolicyKey 
 // GetResolution retrieves the resolution for a given bindingPolicyKey.
 // If no resolution is associated with the given key, nil is returned.
 func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) *Resolution {
-	bindingPolicyResolution := broker.bindingPolicyResolutionGetter(bindingPolicyKey)
+	bindingPolicyResolution := broker.bindingPolicyResolutionGetter(bindingPolicyKey) //thread-safe
 
 	if bindingPolicyResolution == nil {
 		return nil
