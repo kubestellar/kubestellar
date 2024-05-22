@@ -1,6 +1,6 @@
 # Kubestellar end to end testing
 
-This e2e tests can test either (a) the  local copy of the repo or (b) the release identified in the kubestellar PostCreateHook (which will be the last release created, regardless of quality, except for that brief time when it identifies the release about to be made). Testing the local copy is the default behavior; to test the release identified in the PostCreateHook, pass `--released` on the command line of `run-test.sh`.
+Run the e2e tests using either (a) the  local copy of the repo or (b) the release identified in the kubestellar PostCreateHook (which will be the last release created, regardless of quality, except for that brief time when it identifies the release about to be made). Testing the local copy is the default behavior; to test the release identified in the PostCreateHook, pass `--released` on the command line of `run-test.sh`.
 
 The kubestellar controller-manager will be invoked with `-v=2` unless otherwise specified on the command line with `--kubestellar-controller-manager-verbosity $number`. This verbosity can not be set to a value other than 2 when using `--released`.
 
@@ -14,13 +14,13 @@ Starting from a local directory containing the git repo, do the following.
 
 a) Bash tests:
 ```bash
-cd test/e2e/multi-cluster-deployment
+cd test/e2e
 ./run-test.sh
 ```
 
 b) Ginkgo tests:
 ```bash
-cd test/e2e/multi-cluster-deployment
+cd test/e2e
 ./run-test.sh --test-type ginkgo
 ```
 
@@ -38,7 +38,7 @@ CURRENT   NAME          CLUSTER                   AUTHINFO               NAMESPA
 *         cluster2     <url>:port               <defaul-value>            default
 ```
 
-Use the following command to rename the default context name for host cluster and workload execution clusters:
+FYI, if you need to rename a kubeconfig context in order to reach the above configuration then you can use the `kubectl config rename-context` command. For example:
 
 ```bash 
 $ kubectl config rename-context <default-wec1-context-name> cluster1
@@ -48,12 +48,12 @@ $ kubectl config rename-context <default-wec1-context-name> cluster1
 
 a) Bash tests:
 ```bash
-cd test/e2e/multi-cluster-deployment
+cd test/e2e
 ./run-test.sh --env ocp --released
 ```
 
 b) Ginkgo tests:
 ```bash
-cd test/e2e/multi-cluster-deployment
+cd test/e2e
 ./run-test.sh --env ocp --released --test-type ginkgo
 ```
