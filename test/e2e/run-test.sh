@@ -72,8 +72,8 @@ esac
 set -e # exit on error
 
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
-COMMON_SRCS="${SRC_DIR}/../common"
-HACK_DIR="${SRC_DIR}/../../../hack"
+COMMON_SRCS="${SRC_DIR}/common"
+HACK_DIR="${SRC_DIR}/../../hack"
 
 "${HACK_DIR}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
 
@@ -82,8 +82,8 @@ source "${COMMON_SRCS}/setup-shell.sh"
 "${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env"
 
 if [ $test == "bash" ];then
-    "${SRC_DIR}/use-kubestellar.sh" --env "$env"
+    "${SRC_DIR}/bash/use-kubestellar.sh" --env "$env"
 elif [ $test == "ginkgo" ];then
-    GINKGO_DIR="${SRC_DIR}/../ginkgo"
+    GINKGO_DIR="${SRC_DIR}/ginkgo"
     KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color $GINKGO_DIR -- -skip-setup
 fi
