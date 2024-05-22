@@ -1,34 +1,30 @@
 # Kubestellar end to end testing
 
-Run the e2e tests using either (a) the  local copy of the repo or (b) the release identified in the kubestellar PostCreateHook (which will be the last release created, regardless of quality, except for that brief time when it identifies the release about to be made). Testing the local copy is the default behavior; to test the release identified in the PostCreateHook, pass `--released` on the command line of `run-test.sh`.
+KubeStellar end-to-end testing covers the following test matrix.
 
-The kubestellar controller-manager will be invoked with `-v=2` unless otherwise specified on the command line with `--kubestellar-controller-manager-verbosity $number`. This verbosity can not be set to a value other than 2 when using `--released`.
+- Run either of two scenarios.
+- Either create three new `kind` clusters or use three pre-existing OCP clusters.
+- Test either the local copy of the repo or the latest release before the local copy's version.
 
-The transport controller will be invoked with `-v=4` unless othewise specified on the command line with `--transport-controller-verbosity $number`.
+However there is a restriction: when using OCP, only a release can be tested.
 
-## Running the test on three new Kind clusters
+This directory has a script that will run a given one of the six allowed cells in that matrix. The script is [run-test.sh](run-test.sh). The command line flags say which cell to run. The default is the bash scenario using three new `kind` clusters and the local copy of the repo.
 
-**PRE-REQ**: All of these tests use three `kind` clusters, so you need to [raise the relevant OS limits](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
+## Version
 
-Starting from a local directory containing the git repo, do the following.
+This script will test the relevant release if `--released` appears on the command line, otherwise will test the local copy of the repo.
 
-a) Bash tests:
-```bash
-cd test/e2e
-./run-test.sh
-```
+## Scenario
 
-b) Ginkgo tests:
-```bash
-cd test/e2e
-./run-test.sh --test-type ginkgo
-```
+Select the scenario by putting `--test-type $scenario` on the command line, where `$scenario` is either `bash` (for the scenario in the [bash subdirectory](bash)) or `ginkgo` (for the scenario in the [ginkgo subdirectory](ginkgo)). In order to run the ginkgo scenario you **need to** have [ginkgo](https://onsi.github.io/ginkgo/) installed; see [ginkgo Getting Started](https://onsi.github.io/ginkgo/#getting-started).
 
-## Running the test in three existing OCP clusters
+## Infrastructure
 
-**NOTE**: at present this _only_ works with `--released`.
+Select the infrastructure by putting `--env $env` on the command line, where `$env` is either `kind` (for three new `kind` clusters) or `ocp` (for three pre-existing OCP clusters).
 
-1. Create a kubeconfig with contexts named `kscore` (for the kubeflex hosting cluster), `cluster1` and `cluster2`. The following shows what the result should look like.
+When using `kind`, this test involves three `kind` clusters, so you **need to** [raise the relevant OS limits](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
+
+When using three pre-existing OCP clusters, your kubeconfig must include contexts named `kscore` (for the kubeflex hosting cluster), `cluster1` and `cluster2`. The following shows an example listing of adequate contexts.
 
 ```bash
 $ kubectl config get-contexts
@@ -44,16 +40,8 @@ FYI, if you need to rename a kubeconfig context in order to reach the above conf
 $ kubectl config rename-context <default-wec1-context-name> cluster1
 ```
 
-2. Run e2e test in your ocp clusters:
+## Verbosity
 
-a) Bash tests:
-```bash
-cd test/e2e
-./run-test.sh --env ocp --released
-```
+The kubestellar controller-manager will be invoked with `-v=2` unless otherwise specified on the command line with `--kubestellar-controller-manager-verbosity $number`. This verbosity can not be set to a value other than 2 when using `--released`.
 
-b) Ginkgo tests:
-```bash
-cd test/e2e
-./run-test.sh --env ocp --released --test-type ginkgo
-```
+The transport controller will be invoked with `-v=4` unless othewise specified on the command line with `--transport-controller-verbosity $number`.
