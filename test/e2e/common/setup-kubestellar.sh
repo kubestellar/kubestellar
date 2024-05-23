@@ -134,7 +134,7 @@ echo "wds1 created."
 if [ "$use_release" != true ]; then
   pushd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
   KUBESTELLAR_DIR="$(pwd)"
-  OCM_TRANSPORT_PLUGIN_RELEASE="0.1.7"
+  OCM_TRANSPORT_PLUGIN_RELEASE="0.1.8"
   curl -sL https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz | tar xz
   cd ocm-transport-plugin-${OCM_TRANSPORT_PLUGIN_RELEASE}
   OCM_TRANSPORT_PLUGIN_DIR="$(pwd)"

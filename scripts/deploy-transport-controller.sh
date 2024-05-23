@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DEFAULT_TRANSPORT_CONTROLLER_IMAGE=ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.7
+DEFAULT_TRANSPORT_CONTROLLER_IMAGE=ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.8
 
 context=""
 args=()
