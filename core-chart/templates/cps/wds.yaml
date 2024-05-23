@@ -1,0 +1,14 @@
+{{- range $cp := .Values.WDSes }}
+---
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: ControlPlane
+metadata:
+  name: {{ $cp.name }}
+spec:
+  backend: shared
+  type: {{ $cp.type | default "k8s" }}
+  postCreateHook: wds
+  postCreateHookVars:
+    ITSName: "{{ $cp.ITSName | default "" }}"
+    APIGroups: "{{ $cp.APIGroups | default "" }}"
+{{- end }}

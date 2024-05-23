@@ -8,11 +8,12 @@ on:
 permissions:
   contents: write
   packages: write
- 
+
 env:
   REGISTRY: ghcr.io
   CONTROLLER_MANAGER_IMAGE: kubestellar/kubestellar/controller-manager
   CHART_PATH: ./chart
+  CORE_CHART_PATH: ./core-chart
 
 jobs:
   goreleaser:
@@ -48,18 +49,21 @@ jobs:
       uses: azure/setup-helm@v4
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Login to registry
       uses: docker/login-action@v3
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-      
-    - name: Package and push chart
+
+    - name: Package and push charts
       run: |
         chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
         make chart IMG=${{ env.REGISTRY }}/${{ env.CONTROLLER_MANAGER_IMAGE }}:${{github.ref_name}}
         helm package ${{ env.CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion}
-        helm push ./*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar    
+        helm push ./controller-manager-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar
+        sed -i "s/^KUBESTELLAR_VERSION:.*$/KUBESTELLAR_VERSION: \"${chartVersion}\"/g" ${{ env.CORE_CHART_PATH }}/values.yaml
+        helm package ${{ env.CORE_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
+        helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar
 

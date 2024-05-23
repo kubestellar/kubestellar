@@ -1,0 +1,14 @@
+{{- range $cp := .Values.ITSes }}
+---
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: ControlPlane
+metadata:
+  name: {{ $cp.name }}
+spec:
+  backend: shared
+  type: {{ $cp.type | default "vcluster" }}
+  postCreateHook: its
+  postCreateHookVars:
+    ITSSecretName: {{ (eq $cp.type "host") | ternary "admin-kubeconfig" "vc-vcluster" }}
+    ITSkubeconfig: {{ (eq $cp.type "host") | ternary "kubeconfig-incluster" "config-incluster" }}
+{{- end }}

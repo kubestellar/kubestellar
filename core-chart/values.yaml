@@ -1,0 +1,61 @@
+# Default values for KubeStellar-Core.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+# Container/chart image versions. These values are set during the chart release process,
+# please do not change them unless you know what your are doing.
+HELM_VERSION: "3.15.0"
+KUBECTL_VERSION: "1.30.1"
+KUBESTELLAR_VERSION: "0.23.0-alpha.2"
+CLUSTERADM_VERSION: "0.8.2"
+OCM_STATUS_ADDON_VERSION: "0.2.0-rc8"
+OCM_TRANSPORT_PLUGIN_VERSION: "0.1.8"
+
+
+# Control controller log verbosity
+# The "default" verbosity value will be used for all controllers unless a specific controller verbosity override is specified
+verbosity:
+  default: 2
+  # Specific controller verbosity overrides:
+  # kubestellar: 6
+  # clusteradm: 6
+  # status_controller: 6
+  # status_agent: 6
+  # transport: 6
+
+
+# KubeFlex override values
+kubeflex-operator:
+  install: true
+  # installPostgreSQL: true # automatically install the appropriate version of PostgreSQL required by KubeFlex
+  # isOpenShift: false # set this variable to true when installing the chart in an OpenShift cluster
+  # domain: localtest.me # used to define the DNS domain name used from outside the KubeFlex hosting cluster to reach that cluster's Ingress endpoint
+  # externalPort: 9443 # used to set the port to access the Control Planes API
+  # hostContainer: kubeflex-control-plane # used to set the name of the container that runs the KubeFlex hosting cluster
+  # verbosity: 0 $ used to set the verbosity of KubeFlex controller (this is not impacted by the global VERBOSITY value)
+
+
+# Determine if the Post Create Hooks should be installed by the chart
+InstallPCHs: true
+
+
+# List the Inventory and Transport Spaces (ITSes) to be created by the chart
+# Each ITS consists of a mandatory unique name and an optional type, which could be either host or vcluster (default to vcluster, if not specified)
+ITSes: # all the CPs in this list will execute the its.yaml PCH
+  # - name: its1 # name of the control plane
+  #   type: host # optional type of control plane host or vcluster (default to vcluster, if not specified)
+  # - name: its2 # name of the control plane
+  #   type: host # optional type of control plane host or vcluster (default to vcluster, if not specified)
+
+
+# List the Workload Description Spaces (WDSes) to be created by the chart
+# Each WDS consists of a mandatory unique name and several optional parameters:
+# - type: host or k8s (default to k8s, if not specified)
+# - APIGroups: string holding a comma-separated list of APIGroups
+# - ITSName: the name of the ITS control plane to be used by the WDS. Note that the ITSName MUST be specified if more than one ITS exists at the moment the WDS PCH starts.
+WDSes: # all the CPs in this list will execute the wds.yaml PCH
+  # - name: wds1 # name of the control plane
+  #   type: host # optional type of control plane host or k8s (default to k8s, if not specified)
+  #   APIGroups: "" # optional string holding a comma-separated list of APIGroups
+  #   ITSName: its1 # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCH starts
