@@ -25,8 +25,8 @@ Between each release of [ks/OTP](https://github.com/kubestellar/ocm-transport-pl
 
 Update the references to the ocm-status-addon release in the following files.
 
-- `docs/content/direct/examples.md`
-- `test/e2e/common/setup-kubestellar.sh`
+- `config/postcreate-hooks/ocm.yaml`
+- `core-chart/values.yaml`
 
 ### Making a new kubestellar release
 
