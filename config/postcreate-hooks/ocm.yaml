@@ -33,7 +33,7 @@ spec:
               - status-addon
               - oci://ghcr.io/kubestellar/ocm-status-addon-chart
               - --version
-              - v0.2.0-rc8
+              - v0.2.0-rc9
               - --namespace
               - open-cluster-management
               - --create-namespace
