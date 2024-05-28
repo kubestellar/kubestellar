@@ -25,7 +25,7 @@ arg_verbose=true
 
 display_help() {
   cat << EOF
-Usage: $0 [--kubeconfig <filename>] [--context <name>] [--replace-local-ip-address <address>] [--merge] [-o <filename>] [-V] [-X]
+Usage: $0 [--kubeconfig <filename>] [--context <name>] [--names <list of names>] [--replace-local-ip-address <address>] [--merge] [-o <filename>] [-V] [-X]
 --kubeconfig <filename>                 use the specified kubeconfig
 --context <name>                        use the specified context
 --names <name1>,<name2>                 comma separated list of KubeFlex Control Planes names to import, instead of default *all*
@@ -68,8 +68,8 @@ get_kubeconfig() {
 
     # make kubeconfig unique for the control plane
     echov "- Making the kubeconfig unique..."
-    cluster=$(KUBECONFIG="$in_KUBECONFIG" kubectl --kubeconfig <(echo "$kubeconfig") config get-clusters | tail -n +2)
-    user=$(KUBECONFIG="$in_KUBECONFIG" kubectl --kubeconfig <(echo "$kubeconfig") config get-users | tail -n +2)
+    cluster=$(kubectl --kubeconfig <(echo "$kubeconfig") config get-clusters | tail -n +2)
+    user=$(kubectl --kubeconfig <(echo "$kubeconfig") config get-users | tail -n +2)
     kubeconfig=$(
         echo "$kubeconfig" \
         | yq ".clusters[0].name = \"$cp_name-cluster\"" \
@@ -158,7 +158,10 @@ elif [[ "$KUBECONFIG" != "" ]] ; then
     in_KUBECONFIG="$KUBECONFIG"
     if [[ "$arg_output" == "" ]] ; then
         if [[ "$KUBECONFIG" == *":"* ]] ; then
-            out_kubeconfig="$HOME/.kube/config" # hard to decide
+            # hard to decide
+            # out_kubeconfig="$HOME/.kube/config"
+            >&2 echo "ERROR: please soecify an output kubeconfig filename with \"-o <filename>\"!"
+            exit 1
         else
             out_kubeconfig="$KUBECONFIG"
         fi
@@ -182,17 +185,17 @@ if [[ "$arg_context" == "" ]] ; then
 else
     contexts=("$arg_context")
 fi
-for j in "${!contexts[@]}" ; do # for all contexts
-    echov "- \"${contexts[j]}\""
+for context in "${contexts[@]}" ; do # for all contexts
+    echov "- \"${context}\""
 done
 
 
 echov "Getting kubeconfigs of KubeFlex Control Planes:"
 n=0
-for j in "${!contexts[@]}" ; do # for all contexts
-    echov "- searching context \"${contexts[j]}\""
-    cps=($(KUBECONFIG="$in_KUBECONFIG" kubectl --context "${contexts[j]}" get controlplanes -no-headers -o name 2> /dev/null))
-    for i in "${!cps[@]}" ; do # for all control planes in context ${contexts[j]
+for context in "${contexts[@]}" ; do # for all contexts
+    echov "- searching context \"${context}\""
+    cps=($(KUBECONFIG="$in_KUBECONFIG" kubectl --context "${context}" get controlplanes -no-headers -o name 2> /dev/null))
+    for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         name=${cps[i]##*/}
         if [[ "$arg_names" != "" && ",$arg_names," != *",$name,"* ]] ; then
             echov "  - skipping \"$name\""
@@ -201,7 +204,7 @@ for j in "${!contexts[@]}" ; do # for all contexts
         cp_name[n]=$name
         cp_type[n]=$(KUBECONFIG="$in_KUBECONFIG" kubectl get controlplane ${cp_name[n]} -o jsonpath='{.spec.type}')
         echov "  - found \"${cp_name[i]}\" of type \"${cp_type[i]}\""
-        cp_kubeconfig[n]=$(get_kubeconfig "${contexts[j]}" "${cp_name[n]}" "${cp_type[n]}" "$arg_ip_addr")
+        cp_kubeconfig[n]=$(get_kubeconfig "${context}" "${cp_name[n]}" "${cp_type[n]}" "$arg_ip_addr")
         n=$((n+1))
     done
 done
