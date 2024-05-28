@@ -36,14 +36,14 @@ For convenience, a new local **Kind** cluster that satisfies the requirements fo
 and that can be used to exercises the [examples](./examples.md) can be created with the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v23.0/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0-alpha.3/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
 ```
 
 Alternatively, a new local **k3s** cluster that satisfies the requirements for KubeStellar setup
 and that can be used to exercises the [examples](./examples.md) can be created with the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v23.0/scripts/create-k3s-cluster-with-SSL-passthrough.sh) --port 9443
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0-alpha.3/scripts/create-k3s-cluster-with-SSL-passthrough.sh) --port 9443
 ```
 
 3. An **OpenShift** cluster
