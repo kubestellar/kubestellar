@@ -75,6 +75,19 @@ func SliceMap[Domain, Range any](slice []Domain, fn func(Domain) Range) []Range 
 	return ans
 }
 
+func SliceToMap[Domain, Range any, Key comparable](slice []Domain, keyFn func(Domain) Key,
+	ValFn func(Domain) Range) map[Key]Range {
+	if slice == nil {
+		return nil
+	}
+
+	ans := make(map[Key]Range, len(slice))
+	for _, elt := range slice {
+		ans[keyFn(elt)] = ValFn(elt)
+	}
+	return ans
+}
+
 func SliceMapToK8sSet[Domain any, Range comparable](slice []Domain, fn func(Domain) Range) sets.Set[Range] {
 	if slice == nil {
 		return nil

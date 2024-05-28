@@ -33,17 +33,26 @@ import (
 )
 
 const (
-	CRDKind                       = "CustomResourceDefinition"
-	AnyVersion                    = "*"
-	ServiceVersion                = "v1"
-	ServiceKind                   = "Service"
-	BindingPolicyKind             = "BindingPolicy"
-	BindingPolicyResource         = "bindingpolicies"
-	BindingKind                   = "Binding"
-	BindingResource               = "bindings"
-	WorkStatusGroup               = "control.kubestellar.io"
-	WorkStatusVersion             = "v1alpha1"
-	WorkStatusResource            = "workstatuses"
+	CRDKind    = "CustomResourceDefinition"
+	AnyVersion = "*"
+
+	ServiceVersion = "v1"
+	ServiceKind    = "Service"
+
+	BindingPolicyKind     = "BindingPolicy"
+	BindingPolicyResource = "bindingpolicies"
+	BindingKind           = "Binding"
+	BindingResource       = "bindings"
+
+	WorkStatusGroup    = "control.kubestellar.io"
+	WorkStatusVersion  = "v1alpha1"
+	WorkStatusResource = "workstatuses"
+
+	StatusCollectorKind     = "StatusCollector"
+	StatusCollectorResource = "statuscollectors"
+	StatusCollectorGroup    = "control.kubestellar.io"
+	StatusCollectorVersion  = "v1alpha1"
+
 	AnnotationToPreserveValuesKey = "annotations.kubestellar.io/preserve"
 	PreserveNodePortValue         = "nodeport"
 )

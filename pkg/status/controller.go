@@ -40,6 +40,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	"github.com/kubestellar/kubestellar/pkg/binding"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -59,6 +60,16 @@ type Controller struct {
 	// all wds listers are used to retrieve objects and update status
 	// without having to re-create new caches for this controller
 	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
+
+	// TODO: callbacks on binding resolution updates should be set up through
+	// broker, where a callback should queue up a binding's identifier,
+	// and the picking up of the identifier by a worker should have the worker
+	// retrieve the binding Resolution from the broker, and note it through
+	// the combinedStatusResolver.
+	// The handling of informer events on StatusCollector and WorkStatus objects
+	// should go through the combinedStatusResolver.
+	binding.ResolutionBroker
+	combinedStatusResolver
 }
 
 // Create a new  status controller

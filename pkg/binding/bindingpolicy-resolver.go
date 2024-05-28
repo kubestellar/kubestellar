@@ -148,6 +148,9 @@ func (resolver *bindingPolicyResolver) GetOwnerReference(bindingPolicyKey string
 			bindingPolicyResolutionNotFoundErrorPrefix, bindingPolicyKey)
 	}
 
+	bindingPolicyResolution.RLock()
+	defer bindingPolicyResolution.RUnlock()
+
 	return *bindingPolicyResolution.ownerReference, nil
 }
 
@@ -239,8 +242,10 @@ func (resolver *bindingPolicyResolver) GetObjectIdentifiers(bindingPolicyKey str
 			bindingPolicyKey)
 	}
 
-	// getObjectIdentifiers is thread-safe
-	return bindingPolicyResolution.getObjectIdentifiers(), nil
+	bindingPolicyResolution.RLock()
+	defer bindingPolicyResolution.RUnlock()
+
+	return sets.KeySet(bindingPolicyResolution.objectIdentifierToData), nil
 }
 
 // SetDestinations updates the maintained bindingpolicy's
@@ -257,7 +262,10 @@ func (resolver *bindingPolicyResolver) SetDestinations(bindingPolicyKey string,
 			bindingPolicyKey)
 	}
 
-	bindingPolicyResolution.setDestinations(destinations)
+	bindingPolicyResolution.Lock()
+	defer bindingPolicyResolution.Unlock()
+
+	bindingPolicyResolution.destinations = destinations
 	return nil
 }
 
