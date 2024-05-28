@@ -36,9 +36,13 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
 
-- Edit [the examples document](examples.md) to update the self-references for the coming release.
+- Edit the examples document(`docs/content/direct/examples.md`) to update the self-references for the coming release. In the interim while we have some content split out into `docs/content/direct/common-setup-core-chart.md` and `docs/content/direct/common-setup-step-by-step.md`, edit in those places.
 
-- Until we have our first stable release, edit [the README](README.md#latest-stable-release) where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
+- Update the version in the core chart instructions, `docs/content/direct/core-chart.md`.
+
+- Update the microshift directions, `docs/content/direct/microshift.md`.
+
+- Until we have our first stable release, edit the docs README(`docs/content/direct/README.md`, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
 
 - Edit [the release notes](release-notes.md).
 

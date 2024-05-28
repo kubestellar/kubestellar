@@ -9,7 +9,7 @@ The following steps create a deployment of KubeStellar Core
 1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
 
     ```shell
-    export KUBESTELLAR_VERSION=0.23.0-alpha.2
+    export KUBESTELLAR_VERSION=0.23.0-alpha.3
     ```
 
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
