@@ -22,9 +22,7 @@ For convenience, a new local Kind cluster that satisfies the requirements for Ku
 and that can be used to exercises the [examples](./examples.md) can be created with the following command:
 
 ```shell
-sudo su <<EOF
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
-EOF
 ```
 
 ## Install KubeStellar Core chart
