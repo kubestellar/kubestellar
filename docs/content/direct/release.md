@@ -38,6 +38,8 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Edit the examples document(`docs/content/direct/examples.md`) to update the self-references for the coming release. In the interim while we have some content split out into `docs/content/direct/common-setup-core-chart.md` and `docs/content/direct/common-setup-step-by-step.md`, edit in those places.
 
+- Update the version in the core chart defaults, `core-chart/values.yaml`.
+
 - Update the version in the core chart instructions, `docs/content/direct/core-chart.md`.
 
 - Update the microshift directions, `docs/content/direct/microshift.md`.
