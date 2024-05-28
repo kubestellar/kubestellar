@@ -40,7 +40,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
 
-- Update the version in the core chart instructions, `docs/content/direct/core-chart.md`.
+- Update the version every place it appears in the core chart instructions, `docs/content/direct/core-chart.md`. Eventually we may settle on a regular release for some curl-to-bash invocations.
 
 - Update the microshift directions, `docs/content/direct/microshift.md`.
 
