@@ -1,0 +1,107 @@
+name: Run E2E tests on OCP
+
+on:
+  workflow_call:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+
+jobs:
+  ginkgo-test:
+    name: ginkgo tests
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4.1.1
+      
+      - uses: actions/setup-go@v5
+        with:
+          go-version: v1.20
+          cache: true
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+        id: install
+
+      - name: Install dependencies
+        run: |
+          export USE_SUDO=false
+          mkdir clusteradm
+          export INSTALL_DIR="$PWD/clusteradm"
+          curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.4.2/kubeflex_0.4.2_linux_amd64.tar.gz --output kubeflex.tar.gz
+          tar -xvf kubeflex.tar.gz bin/kflex
+          go install github.com/onsi/ginkgo/v2/ginkgo
+          curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
+          tar -xvf openshift-client-linux.tar.gz 
+          cp oc bin
+          curl -L https://github.com/kubestellar/kubestellar/archive/refs/tags/v0.22.0.tar.gz --output kubestellar.tar.gz
+          tar -xvf kubestellar.tar.gz 
+          mv kubestellar-0.22.0 kubestellar
+
+      - name: Run test
+        run: |
+          export PATH=$PWD/clusteradm:$PWD/bin:$PATH
+          kubectl get secret kubeconfigfile --output="jsonpath={.data.edgeplatform-cicd-config}" | base64 --decode > kubeconfig.tmp
+          export KUBECONFIG=$PWD/kubeconfig.tmp
+          export KUBESTELLAR_VERSION=0.22.0
+          export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
+          export OCM_TRANSPORT_PLUGIN=0.1.8
+          export PATH=~/oc:$PATH
+          export KFLEX_DISABLE_CHATTY=true
+          bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/common/cleanup.sh) --env ocp
+          source <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/common/setup-shell.sh)
+          bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/common/setup-kubestellar-ocp.sh)
+          cd kubestellar/test/e2e/ginkgo 
+          KFLEX_DISABLE_CHATTY=true ginkgo -v --trace --no-color -- -released -skip-setup 
+
+  bash-script-test:
+    name: bash script tests 
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4.1.1
+      
+      - uses: actions/setup-go@v5
+        with:
+          go-version: v1.20
+          cache: true
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+        id: install
+
+      - name: Install dependencies
+        run: |
+          mkdir clusteradm
+          export USE_SUDO=false
+          export INSTALL_DIR="$PWD/clusteradm"
+          curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.4.2/kubeflex_0.4.2_linux_amd64.tar.gz --output kubeflex.tar.gz
+          tar -xvf kubeflex.tar.gz bin/kflex
+          go install github.com/onsi/ginkgo/v2/ginkgo
+          curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
+          tar -xvf openshift-client-linux.tar.gz 
+          cp oc bin
+
+      - name: Run test
+        run: |
+          export PATH=$PWD/clusteradm:$PWD/bin:$PATH
+          kubectl get secret kubeconfigfile --output="jsonpath={.data.edgeplatform-cicd-config}" | base64 --decode > kubeconfig.tmp
+          export KUBECONFIG=$PWD/kubeconfig.tmp
+          export KUBESTELLAR_VERSION=0.22.0
+          export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
+          export OCM_TRANSPORT_PLUGIN=0.1.8
+          export PATH=~/oc:$PATH
+          export KFLEX_DISABLE_CHATTY=true
+          bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/multi-cluster-deployment/run-test.sh) --env ocp --released
+
+          
+
