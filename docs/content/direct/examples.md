@@ -172,7 +172,7 @@ helm --kube-context kind-kubeflex upgrade --install ocm-transport-plugin oci://g
 ```
 
 where the `-t host` option specifies a control plane of type `host`.
-You can only create on control plane of type `host`.
+You can only create one control plane of type `host`.
 
 In this example, we use the helm chart method to install the kubestellat controller manager for the
 hosting cluster so that we can pass additional startup options.

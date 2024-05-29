@@ -9,6 +9,7 @@ The information provided is specific for the following release:
 
 ```shell
 export KUBESTELLAR_VERSION=0.23.0-alpha.3
+export OCM_TRANSPORT_PLUGIN=0.1.8
 ```
 
 It may also be a good idea to do a bit of cleanup first. See how it is done in the cleanup script for our E2E tests (in `test/e2e/common/cleanup.sh`).
@@ -37,12 +38,14 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 
 Remember to include the option `--set "kubeflex-operator.isOpenShift=true"`, when deploying in an OpenShift cluster.
 
-## Obtain the kubeconfigs to access the KubeFlex Control Planes
+## Kubeconfig contexts for Control Planes
 
-After the KubeStellar Core has fully deployed, before changing the kubeconfig context, `kflex` CLI can be used to retrieve the kubeconfig of all the KubeFlex Control Planes and store them as contexts of the current kubeconfig:
+After the KubeStellar Core has fully deployed, before changing the kubeconfig context, `kflex` CLI can be used to retrieve the Kubernetes client configurations for all the KubeFlex Control Planes and store them as contexts of the current kubeconfig file:
 
 ```shell
+kubectl config delete-context its1 || true
 kflex ctx its1
+kubectl config delete-context wds1 || true
 kflex ctx wds1
 kflex ctx # switch back to the initial context
 ```
