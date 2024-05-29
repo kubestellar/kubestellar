@@ -6,10 +6,11 @@ The following steps create a deployment of KubeStellar Core
 
 1. If you ran through these scenarios previously then you will need to do a bit of cleanup first. See how it is done in the cleanup script for our E2E tests (in `test/e2e/common/cleanup.sh`).
 
-1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
+1. Set environment variables to hold KubeStellar and OCM-transport-plugin desired versions:
 
     ```shell
     export KUBESTELLAR_VERSION=0.23.0-alpha.3
+    export OCM_TRANSPORT_PLUGIN=0.1.8
     ```
 
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:

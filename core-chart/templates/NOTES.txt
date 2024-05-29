@@ -1,8 +1,10 @@
-Below is a code snippet that allows to wait for all KubeFlex Control Planes to be ready:
+If you are using `kflex` from KubeFlex release 0.6.1 or earlier then
+you should wait for the KubeFlex control planes (of type other than
+"host") that you just made to become "ready". The following commands
+will do that.
 
-echo "Waiting for all KubeFlex Control Planes to be Ready:"
-for cpname in `kubectl get controlplane -o name`; do
-  cpname=${cpname##*/}
+echo "Waiting for new non-host KubeFlex Control Planes to be Ready:"
+for cpname in {{- range $cp := (concat (.Values.ITSes | default list) (.Values.WDSes | default list) ) }}{{if ne $cp.type "host" }} {{ $cp.name }}{{end }}{{end }}; do
   while [[ `kubectl get cp $cpname -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}'` != "True" ]]; do
     echo "Waiting for \"$cpname\"..."
     sleep 5
@@ -10,45 +12,22 @@ for cpname in `kubectl get controlplane -o name`; do
   echo "\"$cpname\" is ready."
 done
 
-While KubeFlex Control Planes of type host can be accessed using the host cluster kubeconfig, the following
-code snippet can be used to obtain the kubeconfig to access a Control Plane $cpname of another type:
+For your convenience you will probably want to add contexts to your
+kubeconfig named after the non-host-type control planes (WDSes and
+ITSes) that you just created (a host-type control plane is just an
+alias for the KubeFlex hosting cluster). You can do that with the
+following `kflex` commands; each creates a context and makes it the
+current one. See
+https://github.com/kubestellar/kubestellar/blob/main/docs/content/direct/core-chart.md#kubeconfig-files-and-contexts-for-control-planes
+(replace "main" with "\{\{ .Values.KUBESTELLAR_VERSION \}\}" when
+making the next release) for a way to do this without using `kflex`.
 
-echo "Getting the kubeconfig of KubeFlex Control Planes \"$cpname\" ==> \"./kubeconfig-$cpname\"..."
-kubectl get secret $(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.name}') \
-  -n $(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.namespace}') \
-  -o=jsonpath="{.data.$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.key}')}" \
-  | base64 -d > "./kubeconfig-$cpname"
+{{range $cp := (concat (.Values.ITSes | default list) (.Values.WDSes | default list) ) }}
+{{- if ne $cp.type "host" }}
+kubectl config delete-context {{ $cp.name }} || true
+kflex ctx {{ $cp.name }}
+{{- end }}
+{{- end }}
 
-which will create a file "kubeconfig-$cpname" in the current folder.
-
-The following code snippet allows one to obtain the kubeconfig of all KubeFlex Control Plane in the cluster:
-
-echo "Getting the kubeconfig of all KubeFlex Control Planes:"
-for cpname in `kubectl get controlplane -o name`; do
-  cpname=${cpname##*/}
-  echo "Getting the kubeconfig of \"$cpname\" ==> \"kubeconfig-$cpname\"..."
-  if [[ "$(kubectl get controlplane $cpname -o=jsonpath='{.spec.type}')" == "host" ]] ; then
-    kubectl config view --minify --flatten > "kubeconfig-$cpname"
-  else
-    kubectl get secret $(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.name}') \
-      -n $(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.namespace}') \
-      -o=jsonpath="{.data.$(kubectl get controlplane $cpname -o=jsonpath='{.status.secretRef.key}')}" \
-      | base64 -d > "kubeconfig-$cpname"
-  fi
-  kubectl --kubeconfig "kubeconfig-$cpname" config rename-context $(kubectl --kubeconfig "kubeconfig-$cpname" config current-context) $cpname 2> /dev/null
-done
-
-Afterwards, the context of a KubeFlex Control Plane $cpname by specifing its kubeconfig:
-
-kubectl --kubeconfig "kubeconfig-$cpname" ...
-
-The individual kubeconfigs can also be merged as contexts of the current `~/.kube/config` with the following code snippet:
-
-echo "Merging the Control Planes kubeconfigs as contexts..."
-cp ~/.kube/config ~/.kube/config.bak
-KUBECONFIG=~/.kube/config:$(find . -maxdepth 1 -type f -name 'kubeconfig-*' | tr '\n' ':') kubectl config view --flatten > ~/.kube/kubeconfig-merged
-mv ~/.kube/kubeconfig-merged ~/.kube/config
-
-Afterwards a Control Plane $cpname can be accessed by specifing its contexts:
-
-kubectl --context "$cpname" ...
+Finally you can use `kflex ctx` to switch back to the kubeconfig
+context for your KubeFlex hosting cluster.
