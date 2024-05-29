@@ -4,7 +4,9 @@ The following sections list the known issues for each release. The issue list is
 
 ## 0.23.0
 
-The main change is introduction of the an all-in-one chart, called the hub chart, for installing KubeStellar in a given hosting cluster and creating an initial set of WDSes and ITSes.
+The main change is introduction of the an all-in-one chart, called the core chart, for installing KubeStellar in a given hosting cluster and creating an initial set of WDSes and ITSes.
+
+This release will also feature reported state combination and better observability (`/metrics` and `/debug/pprof`) and control over client-side self-restraint (request QPS and burst).
 
 ## 0.22.0 and its release candidates
 

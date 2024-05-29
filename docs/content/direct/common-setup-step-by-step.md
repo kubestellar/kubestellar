@@ -9,7 +9,7 @@ The following steps create a deployment of KubeStellar Core
 1. Set environment variables to hold KubeStellar and OCM-transport-plugin desired versions:
 
     ```shell
-    export KUBESTELLAR_VERSION=0.23.0-alpha.3
+    export KUBESTELLAR_VERSION=0.23.0-alpha.4
     export OCM_TRANSPORT_PLUGIN=0.1.8
     ```
 
