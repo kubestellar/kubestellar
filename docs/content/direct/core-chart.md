@@ -168,14 +168,14 @@ helm upgrade --install add-wds2 oci://ghcr.io/kubestellar/kubestellar/core-chart
 The following code can be used to wait for the Ready state of all the KubeFlex Control Planes in the hosting cluster:
 
 ```shell
-echo "Waiting for all Control Planes to be ready..."
+echo "Waiting for all KubeFlex Control Planes to be Ready:"
 for cpname in `kubectl get controlplane -o name`; do
   cpname=${cpname##*/}
-  while [[ $(kubectl get cp $cpname -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-    echo "Waiting for Control Plane $cpname..."
+  while [[ `kubectl get cp $cpname -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}'` != "True" ]]; do
+    echo "Waiting for \"$cpname\"..."
     sleep 5
   done
-  echo $cpname
+  echo "\"$cpname\" is ready."
 done
 ```
 
@@ -214,10 +214,10 @@ kubectl --context "$cpname" ...
 The following code can be used to obtain the kubeconfig of all the KubeFlex Control Planes in the hosting cluster:
 
 ```shell
-echo "Getting the kubeconfig of all Control Planes..."
+echo "Getting the kubeconfig of all KubeFlex Control Planes:"
 for cpname in `kubectl get controlplane -o name`; do
   cpname=${cpname##*/}
-  echo "Getting the kubeconfig of Control Planes $cpname ==> kubeconfig-$cpname..."
+  echo "Getting the kubeconfig of \"$cpname\" ==> \"kubeconfig-$cpname\"..."
   if [[ "$(kubectl get controlplane $cpname -o=jsonpath='{.spec.type}')" == "host" ]] ; then
     kubectl config view --minify --flatten > "kubeconfig-$cpname"
   else
@@ -241,6 +241,7 @@ kubectl --kubeconfig "kubeconfig-$cpname" ...
 The individual kubeconfigs can also be merged as contexts of the current `~/.kube/config` with the following command:
 
 ```shell
+echo "Merging the Control Planes kubeconfigs as contexts..."
 cp ~/.kube/config ~/.kube/config.bak
 KUBECONFIG=~/.kube/config:$(find . -maxdepth 1 -type f -name 'kubeconfig-*' | tr '\n' ':') kubectl config view --flatten > ~/.kube/kubeconfig-merged
 mv ~/.kube/kubeconfig-merged ~/.kube/config
