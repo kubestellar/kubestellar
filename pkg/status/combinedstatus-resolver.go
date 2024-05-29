@@ -57,15 +57,15 @@ type CombinedStatusResolver interface {
 	// NoteStatusCollector notes a statuscollector's spec.
 	// The statuscollector is cached on the resolver's level, and is updated
 	// for every resolution it is involved with.
-	// The returned array contains the identifiers of workload objects that
+	// The returned set contains the identifiers of workload objects that
 	// should have their associated workstatuses processed for evaluation.
 	// The statuscollector is assumed to be valid.
-	NoteStatusCollector(statusCollector *v1alpha1.StatusCollector) bool
+	NoteStatusCollector(statusCollector *v1alpha1.StatusCollector) sets.Set[util.ObjectIdentifier]
 
 	// NoteWorkStatus notes a workstatus's content in the combinedstatus
 	// resolution associated with its source workload object.
 	// The returned boolean indicates whether the combinedstatus resolution
-	// was updated.
+	// associated with the workstatus was updated.
 	NoteWorkStatus(ctx context.Context, workStatusIdentifier util.ObjectIdentifier,
 		workStatusContent *runtime.RawExtension) bool
 
@@ -219,7 +219,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingResolution binding
 // NoteWorkStatus notes a workstatus's content in the combinedstatus
 // resolution associated with its source workload object.
 // The returned boolean indicates whether the combinedstatus resolution
-// was updated.
+// associated with the workstatus was updated.
 func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatusIdentifier util.ObjectIdentifier,
 	workStatusContent *runtime.RawExtension) bool {
 	return false // TODO
@@ -228,11 +228,11 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatusI
 // NoteStatusCollector notes a statuscollector's spec.
 // The statuscollector is cached on the resolver's level, and is updated
 // for every resolution it is involved with.
-// The returned array contains the identifiers of workload objects that
+// The returned set contains the identifiers of workload objects that
 // should have their associated workstatuses processed for evaluation.
 // The statuscollector is assumed to be valid.
-func (c *combinedStatusResolver) NoteStatusCollector(statusCollector *v1alpha1.StatusCollector) bool {
-	return false // TODO
+func (c *combinedStatusResolver) NoteStatusCollector(statusCollector *v1alpha1.StatusCollector) sets.Set[util.ObjectIdentifier] {
+	return nil // TODO
 }
 
 // ResolutionExists returns true if a combinedstatus resolution exists for
