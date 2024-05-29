@@ -114,7 +114,8 @@ type statusCollectorClauses struct {
 // NoteBindingResolution notes a binding resolution for status collection.
 //
 // 1. If `deleted` is true, the associated combinedstatus resolutions are
-// removed from memory.
+// removed from memory. The same is done if a resolution no longer requires
+// status collection.
 //
 // 2. Excessive combinedstatus resolutions are removed if they are no longer
 // associated with the binding.
@@ -125,8 +126,8 @@ type statusCollectorClauses struct {
 // to identify the bindingpolicy that the resolution is associated with.
 //
 // The returned array contains:
-//   - The identifiers of workstatus objects that need to be processed
-//     for evaluation.
+//   - The identifiers of workload objects that should have their
+//     associated workstatuses processed for evaluation.
 //   - The identifiers of statuscollectors that need to be processed and
 //     cached.
 func (c *combinedStatusResolver) NoteBindingResolution(bindingResolution binding.Resolution,
