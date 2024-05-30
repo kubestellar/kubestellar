@@ -1,4 +1,4 @@
-# Create and Register WECs for examples
+# Create and Register WECs for the "Common Setup" used in Examples
 
 The following steps show how to create two new `kind` clusters and
 register them with the hub as descibed in the
