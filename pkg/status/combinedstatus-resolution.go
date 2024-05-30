@@ -231,6 +231,11 @@ func (c *combinedStatusResolution) evaluateWorkStatusAgainstStatusCollector(celE
 		fiterEval := eval.Value().(bool)
 		updated = fiterEval != wsData.filterEval
 		wsData.filterEval = fiterEval
+
+		if !fiterEval {
+			// workstatus does not match the filter
+			return updated, nil
+		}
 	}
 
 	// evaluate select
