@@ -204,8 +204,9 @@ func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEv
 }
 
 // evaluateWorkStatusAgainstStatusCollector evaluates the workstatus against
-// the statuscollector clauses and caches the evaluations. The function returns
-// true if an evaluation is updated.
+// the statuscollector clauses and caches the evaluations. If the workstatus
+// does not match the filter, no other clauses are evaluated.
+// The function returns true if an evaluation is updated.
 // If any evaluation fails, the function returns an error.
 func (c *combinedStatusResolution) evaluateWorkStatusAgainstStatusCollector(celEvaluator *celEvaluator,
 	workStatusIdentifier util.ObjectIdentifier, workStatusContent *runtime.RawExtension,
