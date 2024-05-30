@@ -20,8 +20,8 @@ verbosity:
   # Specific controller verbosity overrides:
   # kubestellar: 6
   # clusteradm: 6
-  # status_controller: 6
-  # status_agent: 6
+  # status_controller: 6 DEPRECATED
+  # status_agent: 6 DEPRECATED
   # transport: 6
 
 
@@ -35,6 +35,24 @@ kubeflex-operator:
   # hostContainer: kubeflex-control-plane # used to set the name of the container that runs the KubeFlex hosting cluster
   # verbosity: 0 $ used to set the verbosity of KubeFlex controller (this is not impacted by the global VERBOSITY value)
 
+# Configuration for the OCM Status Add-On Controller.
+# v here takes precedence over verbosity.status_controller
+status_controller: {}
+  # v: 2
+
+# Configuration for the OCM Status Add-On Agent.
+# v here takes precedence over verbosity.status_agent.
+status_agent:
+  hub_burst: 10 # int Allowed burst in requests/sec for accessing the hub from the agent
+  hub_qps: 5 # float Max average requests/sec for accessing the hub from the agent
+  local_burst: 10 # int Allowed burst in requests/sec for accessing the local cluster from the agent
+  local_qps: 5 # float Max average requests/sec for accessing the local cluster from the agent
+  log_flush_frequency: "5s" # duration Maximum number of seconds between log flushes on the agent
+  logging_format: text # string Sets the log format. Permitted formats: "json", "text". on the agent
+  metrics_bind_addr: ":8080" # string [host]:port at which to listen for HTTP requests for Prometheus /metrics requests on the agent
+  pprof_bind_addr: ":8082" # string [host]:port at which to listen for HTTP requests for go /debug/pprof requests on the agent
+  # v: 0 # Level number for the log level verbosity on the agent
+  vmodule: "" # pattern=N,... comma-separated list of pattern=N settings for file-filtered logging (only works for text log format) on the agent
 
 # Determine if the Post Create Hooks should be installed by the chart
 InstallPCHs: true
