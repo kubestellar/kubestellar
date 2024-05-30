@@ -21,9 +21,7 @@ import (
 	"fmt"
 	"sync"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -31,7 +29,8 @@ import (
 )
 
 // combinedStatusResolution is a struct that represents the resolution of a
-// combinedstatus. A combinedstatus resolution maps to (binding, object).
+// combinedstatus. A combinedstatus resolution is associated with a (binding,
+// object) tuple.
 // A resolution's logic is as follows:
 // - Composition:
 //   - A combinedstatus resolution is composed of multiple statuscollector
@@ -49,10 +48,6 @@ import (
 //     resolution, every clause in every statuscollector is evaluated against
 //     the workstatus. The caching of collector-clause -> evaluation makes
 //     calculating combinedFields efficient if present.
-//
-// - Ownership:
-//   - A combinedstatus resolution is owned by the binding that it is
-//     associated with.
 type combinedStatusResolution struct {
 	sync.RWMutex
 
@@ -61,19 +56,12 @@ type combinedStatusResolution struct {
 	// If a status collector name is mapped to nil, it means that the status
 	// collector has not been processed.
 	statusCollectorNameToData map[string]*statusCollectorData
-	// workStatusToStatusCollectorName is a map of workstatus references to
-	// a set of statuscollector names that they contribute to.
-	workStatusToStatusCollectorName map[util.ObjectIdentifier]sets.Set[string]
-
-	// ownerReference identifies the binding that this resolution is
-	// associated with as an owning object.
-	ownerReference *metav1.OwnerReference
 }
 
 // statusCollectorData is a struct that represents the data of a status
 // collector in a combinedstatus resolution.
 type statusCollectorData struct {
-	*statusCollectorClauses
+	*v1alpha1.StatusCollectorSpec
 
 	// workStatusRefToData is a map of workstatus references to their
 	// corresponding work status data.
@@ -109,52 +97,50 @@ type workStatusData struct {
 
 // setStatusCollectors sets ALL the statuscollectors relevant to the
 // combinedstatus resolution.
-// The given map is expected to be thread-safe, its values contain valid
-// expressions, and are immutable. If a value is nil, it is assumed that the
-// associated statuscollector has not been processed.
-// The function returns a tuple (bool1, bool2):
+// The given map is expected not to be mutated during this call, its values
+// contain valid expressions, and are immutable.
+// If a value is nil, it is assumed that the associated statuscollector has not
+// been processed.
+// The function returns a tuple (removedSome, addedSome):
 //
-// - bool1: true if one or more statuscollectors were removed.
+// - removedSome: true if one or more statuscollectors were removed.
 //
-// - bool2: true if one or more statuscollectors were added.
-func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToClauses map[string]*statusCollectorClauses) (bool, bool) {
+// - addedSome: true if one or more statuscollectors were added.
+func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec map[string]*v1alpha1.StatusCollectorSpec) (bool, bool) {
 	c.Lock()
 	defer c.Unlock()
 
-	workStatusRemoved, workStatusAdded := false, false
+	removedSome, addedSome := false, false
 
 	// remove statuscollector data that are not relevant anymore and update the
-	// statuscollector data that are. If one of the latter is updated, add its
-	// workstatuses to be queued up.
+	// statuscollector data that are. If one of the latter is updated, mark it as added
 	for statusCollectorName, statusCollectorData := range c.statusCollectorNameToData {
-		clauses, ok := statusCollectorNameToClauses[statusCollectorName]
+		statusCollectorSpec, ok := statusCollectorNameToSpec[statusCollectorName]
 		if !ok {
 			delete(c.statusCollectorNameToData, statusCollectorName)
-			workStatusRemoved = true
+			removedSome = true
 			continue
 		}
 
-		if !statusCollectorData.equals(clauses) {
-			c.statusCollectorNameToData[statusCollectorName].statusCollectorClauses = clauses
-			workStatusAdded = true
+		if statusCollectorSpecsMatch(statusCollectorData.StatusCollectorSpec, statusCollectorSpec) {
+			c.statusCollectorNameToData[statusCollectorName].StatusCollectorSpec = statusCollectorSpec
+			addedSome = true
 		}
 	}
 
-	// add new statuscollector data and queue up all workstatuses. this does not qualify as
-	// a change in the resolution, since the workstatuses will update the statuscollector data
-	// when they are evaluated
-	for statusCollectorName, clauses := range statusCollectorNameToClauses {
+	// add new statuscollector data
+	for statusCollectorName, statusCollectorSpec := range statusCollectorNameToSpec {
 		if _, ok := c.statusCollectorNameToData[statusCollectorName]; !ok {
 			c.statusCollectorNameToData[statusCollectorName] = &statusCollectorData{
-				statusCollectorClauses: clauses,
-				workStatusRefToData:    make(map[util.ObjectIdentifier]workStatusData),
+				StatusCollectorSpec: statusCollectorSpec,
+				workStatusRefToData: make(map[util.ObjectIdentifier]workStatusData),
 			}
 
-			workStatusAdded = true
+			addedSome = true
 		}
 	}
 
-	return workStatusRemoved, workStatusAdded
+	return removedSome, addedSome
 }
 
 // getIdentifier returns the identifier of the combinedstatus resolution.
@@ -166,10 +152,10 @@ func (c *combinedStatusResolution) getIdentifier() util.ObjectIdentifier {
 // updateStatusCollector updates the status collector data in the
 // combinedstatus resolution. If the status collector is not relevant to the
 // latter, the function returns false. The function returns true if the status
-// collector data is updated. The given clauses are assumed to be valid and
+// collector data is updated. The given spec is assumed to be valid and
 // immutable.
 func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName string,
-	clauses *statusCollectorClauses) bool {
+	statusCollectorSpec *v1alpha1.StatusCollectorSpec) bool {
 	c.Lock()
 	defer c.Unlock()
 
@@ -178,15 +164,15 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 		return false // statusCollector is irrelevant to this combinedstatus resolution
 	}
 
-	if scData.equals(clauses) {
+	if statusCollectorSpecsMatch(scData.StatusCollectorSpec, statusCollectorSpec) {
 		return false // statusCollector data is already up-to-date
 	}
 
 	// status collector clauses need to be updated, therefore update fields
 	// and invalidate all cached workstatus evaluations by resetting the map
 	c.statusCollectorNameToData[statusCollectorName] = &statusCollectorData{
-		statusCollectorClauses: clauses,
-		workStatusRefToData:    make(map[util.ObjectIdentifier]workStatusData),
+		StatusCollectorSpec: statusCollectorSpec,
+		workStatusRefToData: make(map[util.ObjectIdentifier]workStatusData),
 	}
 
 	return true
@@ -202,12 +188,7 @@ func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEv
 	logger := klog.FromContext(ctx)
 
 	updated := false
-	for statusCollectorName := range c.statusCollectorNameToData {
-		scData, ok := c.statusCollectorNameToData[statusCollectorName]
-		if !ok {
-			continue
-		}
-
+	for statusCollectorName, scData := range c.statusCollectorNameToData {
 		changed, err := c.evaluateWorkStatusAgainstStatusCollector(celEvaluator, workStatusIdentifier,
 			workStatusContent, scData)
 		if err != nil {
@@ -237,8 +218,8 @@ func (c *combinedStatusResolution) evaluateWorkStatusAgainstStatusCollector(celE
 
 	updated := false
 	// evaluate all clauses
-	if scData.filter != nil {
-		eval, err := celEvaluator.Evaluate(string(*scData.filter), workStatusContent)
+	if scData.Filter != nil {
+		eval, err := celEvaluator.Evaluate(string(*scData.Filter), workStatusContent)
 		if err != nil {
 			return false, fmt.Errorf("failed to evaluate filter expression: %w", err)
 		}
@@ -254,7 +235,7 @@ func (c *combinedStatusResolution) evaluateWorkStatusAgainstStatusCollector(celE
 
 	// evaluate select
 	selectEvals := make(map[string]any)
-	for _, selectNamedExp := range scData.selectClause {
+	for _, selectNamedExp := range scData.Select {
 		eval, err := celEvaluator.Evaluate(string(selectNamedExp.Def), workStatusContent)
 		if err != nil {
 			return false, fmt.Errorf("failed to evaluate select expression: %w", err)
@@ -267,7 +248,7 @@ func (c *combinedStatusResolution) evaluateWorkStatusAgainstStatusCollector(celE
 
 	// evaluate groupBy
 	groupByEvals := make(map[string]any)
-	for _, groupByNamedExp := range scData.groupBy {
+	for _, groupByNamedExp := range scData.GroupBy {
 		eval, err := celEvaluator.Evaluate(string(groupByNamedExp.Def), workStatusContent)
 		if err != nil {
 			return false, fmt.Errorf("failed to evaluate groupBy expression: %w", err)
@@ -280,7 +261,7 @@ func (c *combinedStatusResolution) evaluateWorkStatusAgainstStatusCollector(celE
 
 	// evaluate combinedFields
 	combinedFieldEvals := make(map[string]any)
-	for _, combinedFieldNamedAgg := range scData.combinedFields {
+	for _, combinedFieldNamedAgg := range scData.CombinedFields {
 		if combinedFieldNamedAgg.Type == v1alpha1.AggregatorTypeCount {
 			// count does not require a subject - mark the evaluation with the type
 			updated = updated || wsData.combinedFieldsEval[combinedFieldNamedAgg.Name] != v1alpha1.AggregatorTypeCount

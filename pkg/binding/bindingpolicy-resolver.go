@@ -151,7 +151,7 @@ func (resolver *bindingPolicyResolver) GetOwnerReference(bindingPolicyKey string
 	bindingPolicyResolution.RLock()
 	defer bindingPolicyResolution.RUnlock()
 
-	return *bindingPolicyResolution.ownerReference, nil
+	return bindingPolicyResolution.getOwnerReference(), nil
 }
 
 // CompareBinding compares the given binding spec

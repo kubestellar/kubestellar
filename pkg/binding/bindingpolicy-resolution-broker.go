@@ -19,7 +19,6 @@ package binding
 import (
 	"sync"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -45,7 +44,6 @@ type ResolutionBroker interface {
 // Resolution is a struct that represents the resolution of a binding policy.
 // It contains the destinations and object data for the resolution.
 type Resolution struct {
-	Name string
 	// Destinations is a list of destinations that are the "where" part of the
 	// resolution.
 	Destinations []v1alpha1.Destination
@@ -55,10 +53,6 @@ type Resolution struct {
 		ResourceVersion  string
 		StatusCollectors []string
 	}
-
-	// OwnerReference identifies the bindingpolicy that this resolution is
-	// associated with as an owning object.
-	OwnerReference metav1.OwnerReference
 }
 
 func (r *Resolution) RequiresStatusCollection() bool {
@@ -116,7 +110,6 @@ func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) *Resoluti
 	}
 
 	return &Resolution{
-		Name:         bindingPolicyKey,
 		Destinations: bindingPolicyResolution.getDestinationsList(),
 		ObjectIdentifierToData: abstract.PrimitiveMapSafeValMap(&bindingPolicyResolution.RWMutex,
 			bindingPolicyResolution.objectIdentifierToData,
@@ -133,7 +126,6 @@ func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) *Resoluti
 				}
 			}), // while this function breaks the constraint, it maintains its own concurrency safety
 		// by using the PrimitiveMapSafeValMap which transforms a map safely using its read-lock.
-		OwnerReference: bindingPolicyResolution.getOwnerReference(),
 	}
 }
 
