@@ -34,33 +34,57 @@ site_dir: 'generated'
 nav:
   - Welcome:
       - Landing: index.md 
-  - Overview:
-      - Readme: readme.md
-      - User guide: direct/user-guide.md
+  - What is KubeStellar?:
+      - Overview: readme.md
       - Architecture: direct/architecture.md
+      - Related:
+        - KubeFlex: direct/kubeflex-intro.md
+        - KubeStellar Galaxy: direct/galaxy-intro.md
       - Release-notes: direct/release-notes.md
-  - Getting Started: 
-          - Pre-reqs: direct/pre-reqs.md
+  - Using Kubestellar:
+          - Basics: direct/usage-basics.md
+          - Prerequisites: direct/pre-reqs.md
           - Setting up KubeStellar:
-              - Using existing hosting cluster: direct/hosting-cluster.md
-              - KubeStellar on KIND: direct/ks-on-kind.md
-              - KubeStellar on K3D: direct/deploy-on-k3d.md
-              - KubeStellar on OCP: direct/ks-on-ocp.md
+              - Set Up Kubestellar Core Components: 
+                - Try the "Common-setup": direct/common-setup-intro.md
+                - Step by Step: direct/common-setup-step-by-step.md
+                - (experimental) Via Helm Chart: direct/core-chart.md
+#                - Prepare the environment: common-subs/placeholder.md
+#                - Initialize Kubeflex: common-subs/placeholder.md
+#                - Install Kubestellar Core components: common-subs/placeholder.md
+#                - Create the Inventory & Transport Space: common-subs/placeholder.md
+#                - Create the Workload Description Space: common-subs/placeholder.md
+              - Set up and Register Workload Execution Clusters (WECs): direct/example-wecs.md
+              - Commission Workloads: direct/commission-workloads.md
+#          - Modifying Workloads: common-subs/placeholder.md
+          - Installation & Usage Examples:
+              - Example Cluster Preparation: direct/hosting-cluster.md
+              - Sample scenarios: direct/examples.md
+              - Deploy KubeStellar via Helm chart: direct/core-chart.md
+
+              - Deploying KubeStellar on K3D: direct/deploy-on-k3d.md
           - Best practices: direct/best-practices.md
-          - Examples: direct/examples.md
+          - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar@v0.22.0/api/control/v1alpha1
+          - User Guide: direct/user-guide.md
+          - Miscellaneous Documentation:
+            - What's in here?: direct/misc-files.md
+            - KubeStellar on KIND: direct/ks-on-kind.md
+            - KubeStellar on OCP: direct/ks-on-ocp.md
   - Contributing: 
-      - Overview of contributing: direct/contributor.md
-      - Packaging: direct/packaging.md
-      - Release Process: direct/release.md
-      - Guidelines: Contribution guidelines/CONTRIBUTING.md
+      - How to join in: direct/contribute.md
       - Code of Conduct: Contribution guidelines/coc.md
       - License: Contribution guidelines/LICENSE.md
       - Governance: Contribution guidelines/governance.md
       - Onboarding: Contribution guidelines/onboarding.md
       - Website: Contribution guidelines/operations/document-management.md
-      - Security: 
+      - Security:
           - Policy: Contribution guidelines/security/security.md
           - Contacts: Contribution guidelines/security/security_contacts.md
+      - Contribution Notes:
+        - For Contributors: direct/contributor.md
+        - Packaging: direct/packaging.md
+        - Release Process: direct/release.md
+        - Guidelines: Contribution guidelines/CONTRIBUTING.md
   - Community: 
     - Get Involved: Community/_index.md
     - Contact Us:
@@ -154,6 +178,8 @@ plugins:
   # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
   # Greater control over how navigation links are shown
   - awesome-pages
+  # apidoc
+  # - mkdocs-apidoc
   # Docs site search
   - search
   - mermaid2:

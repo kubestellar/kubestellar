@@ -1,6 +1,8 @@
-# KubeStellar Contributors
+# Notes for KubeStellar Contributors
 
-![](./images/construction.png)
+These notes are incomplete; as mentioned in the introduction, if you are interested in contributing directly to the development of KubeStellar, we recommend joining in via the [KubeStellar github repository](github.com/kubestellar/kubestellar) and [KubeStellar Slack](https://kubernetes.slack.com/archives/C058SUSL5AA/)
+
+---
 
 
 Make sure all pre-requisites are installed as described in [pre-reqs](pre-reqs.md).
