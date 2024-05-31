@@ -25,15 +25,15 @@ arg_verbose=true
 
 display_help() {
   cat << EOF
-Usage: $0 [--kubeconfig <filename>] [--context <name>] [--names <list of names>] [--replace-local-ip-address <address>] [--merge] [-o <filename>] [-V] [-X]
---kubeconfig <filename>                 use the specified kubeconfig
---context <name>                        use the specified context
---names <name1>,<name2>                 comma separated list of KubeFlex Control Planes names to import, instead of default *all*
---replace-local-ip-address <address>    replaces server addresses "127.0.0.1" with <address>
---merge                                 merge the control planes contexts with the existing cluster contexts
--o <filename>                           specify a different kubeconfig file to save the contexts (- for stdout)
---silent                                no information output
--X                                      enable verbose execution of the script for debugging
+Usage: $0 [--kubeconfig <filename>] [--context <name>] [--names <list of names>] [--replace-localhost <address>] [--merge] [-o <filename>] [-V] [-X]
+--kubeconfig <filename>       use the specified kubeconfig
+--context <name>              use the specified context
+--names <name1>,<name2>       comma separated list of KubeFlex Control Planes names to import, instead of default *all*
+--replace-localhost <address> replaces server addresses "127.0.0.1" with <address>
+--merge                       merge the control planes contexts with the existing cluster contexts
+-o <filename>                 specify a different kubeconfig file to save the contexts (- for stdout)
+--silent                      no information output
+-X                            enable verbose execution of the script for debugging
 EOF
 }
 
@@ -44,7 +44,7 @@ get_kubeconfig() {
     cp_type="$3"
     ip_addr="$4"
 
-    echov "Getting the kubeconfig of Control Plane \"$cp_name\" of type \"$cp_type\" in context \"$context\":"
+    echov "Getting the kubeconfig of Control Plane \"$cp_name\" of type \"$cp_type\" from context \"$context\":"
 
     # wait for CP ready
     while [[ $(KUBECONFIG="$in_KUBECONFIG" kubectl --context $context get controlplane $cp_name -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
@@ -52,9 +52,9 @@ get_kubeconfig() {
         sleep 5
     done
 
-    # get out of cluster kubeconfig
+    # put into the shell variable "kubeconfig" the kubeconfig contents for use from outside of the hosting cluster
     if [[ "$cp_type" == "host" ]] ; then
-        echov "- Using cluster context \"${context}\""
+        echov "- Using hosting cluster context \"${context}\""
         kubeconfig=$(KUBECONFIG="$in_KUBECONFIG" kubectl --context $context config view --flatten --minify)
     else
         # determine the secret name and namespace
@@ -106,7 +106,7 @@ while (( $# > 0 )); do
         then { arg_context="$2"; shift; }
         else { echo "$0: missing context name" >&2; exit 1; }
         fi;;
-    (--replace-local-ip-address|-r)
+    (--replace-localhost|-r)
         if (( $# > 1 ));
         then { arg_ip_addr="$2"; shift; }
         else { echo "$0: missing ip address" >&2; exit 1; }
