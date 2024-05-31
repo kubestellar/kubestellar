@@ -17,7 +17,11 @@ Between each release of [ks/OTP](https://github.com/kubestellar/ocm-transport-pl
 
 - Edit `scripts/deploy-transport-controller.sh`: update the tag in the default transport controller image setting (`export TRANSPORT_CONTROLLER_IMAGE...`) to the latest release of ks/OTP.
 
-- Edit `docs/content/direct/examples.md`: update the version in the `export OCM_TRANSPORT_PLUGIN=...` statement to the latest release of ks/OTP.
+- Edit `config/postcreate-hooks/kubestellar.yaml`: update the version of the OTP Helm chart.
+
+- Edit `core-chart/values.yaml`: update the OTP version.
+
+- Edit `docs/content/direct/examples.md` (`docs/content/direct/common-setup-core-chart.md`, `docs/content/direct/common-setup-step-by-step.md`): update the version in the `export OCM_TRANSPORT_PLUGIN=...` statement to the latest release of ks/OTP.
 
 - Edit `test/e2e/common/setup-kubestellar.sh`: update the setting of `OCM_TRANSPORT_PLUGIN_RELEASE` to the latest.
 

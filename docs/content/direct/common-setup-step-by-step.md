@@ -10,7 +10,7 @@ The following steps create a deployment of KubeStellar Core
 
     ```shell
     export KUBESTELLAR_VERSION=0.23.0-alpha.4
-    export OCM_TRANSPORT_PLUGIN=0.1.8
+    export OCM_TRANSPORT_PLUGIN=0.1.9
     ```
 
 1. Create a Kind hosting cluster with nginx ingress controller and KubeFlex controller-manager installed:
