@@ -16,9 +16,24 @@ limitations under the License.
 
 package status
 
-import "github.com/kubestellar/kubestellar/pkg/util"
+import (
+	"context"
 
-// TODO: implement syncing CombinedStatus objects
+	"github.com/kubestellar/kubestellar/pkg/util"
+	"k8s.io/client-go/tools/cache"
+)
+
+func (c *Controller) syncCombinedStatus(ctx context.Context, key string) error {
+
+	// TODO implement combinedStatus reconciler
+
+	ns, name, err := cache.SplitMetaNamespaceKey(key)
+	if err != nil {
+		return err
+	}
+	c.logger.Info("Handled CombinedStatus", "ns", ns, "name", name)
+	return nil
+}
 
 func getCombinedStatusIdentifier(bindingName string, objectIdentifier util.ObjectIdentifier) util.ObjectIdentifier {
 	// The name of the CombinedStatus object is the concatenation of:
