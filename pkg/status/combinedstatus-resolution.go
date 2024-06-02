@@ -21,11 +21,12 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/google/cel-go/common/types/ref"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
-	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 // combinedStatusResolution is a struct that represents the resolution of a
@@ -63,25 +64,16 @@ type combinedStatusResolution struct {
 type statusCollectorData struct {
 	*v1alpha1.StatusCollectorSpec
 
-	// workStatusRefToData is a map of workstatus references to their
-	// corresponding work status data.
-	// A workstatus reference is identical to its source object's identifier,
-	// apart from the namespace, which is set to the associated clusterName.
-	// If a workstatus reference is mapped to nil, it means that the workstatus
-	// has not been evaluated against the statuscollector's clauses.
-	workStatusRefToData map[util.ObjectIdentifier]workStatusData
+	// workStatusRefToData is a map of workstatus-hosting WEC name to the
+	// evaluation of the workstatus against the statuscollector's clauses.
+	workStatusRefToData map[string]*workStatusData
 }
 
 // workStatusData is a struct that represents the evaluation of a workstatus
 // against a statuscollector's clauses.
 type workStatusData struct {
-	// filterEval is a boolean that represents the evaluation of the filter
-	// expression against the workstatus. If true, the workstatus is included
-	// in the statuscollector's result.
-	filterEval bool
-
 	// groupByEval is a map of groupBy expression names to their evaluated values.
-	groupByEval map[string]any
+	groupByEval map[string]ref.Val
 	// combinedFieldsEval is a map of combinedFields expression names to their
 	// evaluated values. CombinedField types:
 	// - COUNT: the number of workstatuses per groupBy value. If groupBy is
@@ -90,9 +82,10 @@ type workStatusData struct {
 	// - AVG: the average of the values of the workstatuses groupBy values.
 	// - MIN: the minimum value of the workstatuses groupBy values.
 	// - MAX: the maximum value of the workstatuses groupBy values.
-	combinedFieldsEval map[string]any
+	// If a combinedField's eval is nil, its TYPE is COUNT.
+	combinedFieldsEval map[string]ref.Val
 
-	selectEval map[string]any
+	selectEval map[string]ref.Val
 }
 
 // setStatusCollectors sets ALL the statuscollectors relevant to the
@@ -133,7 +126,7 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 		if _, ok := c.statusCollectorNameToData[statusCollectorName]; !ok {
 			c.statusCollectorNameToData[statusCollectorName] = &statusCollectorData{
 				StatusCollectorSpec: statusCollectorSpec,
-				workStatusRefToData: make(map[util.ObjectIdentifier]workStatusData),
+				workStatusRefToData: make(map[string]*workStatusData),
 			}
 
 			addedSome = true
@@ -141,12 +134,6 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 	}
 
 	return removedSome, addedSome
-}
-
-// getIdentifier returns the identifier of the combinedstatus resolution.
-// TODO: implement
-func (c *combinedStatusResolution) getIdentifier() util.ObjectIdentifier {
-	return util.ObjectIdentifier{}
 }
 
 // updateStatusCollector updates the status collector data in the
@@ -172,7 +159,7 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 	// and invalidate all cached workstatus evaluations by resetting the map
 	c.statusCollectorNameToData[statusCollectorName] = &statusCollectorData{
 		StatusCollectorSpec: statusCollectorSpec,
-		workStatusRefToData: make(map[util.ObjectIdentifier]workStatusData),
+		workStatusRefToData: make(map[string]*workStatusData),
 	}
 
 	return true
@@ -181,7 +168,7 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 // evaluateWorkStatus evaluates the workstatus per relevant statuscollector.
 // The function returns true if any statuscollector data is updated.
 func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEvaluator *celEvaluator,
-	workStatusIdentifier util.ObjectIdentifier, workStatusContent *runtime.RawExtension) (bool, error) {
+	workStatusWECName string, workStatusContent *runtime.RawExtension) (bool, error) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -189,8 +176,8 @@ func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEv
 
 	updated := false
 	for statusCollectorName, scData := range c.statusCollectorNameToData {
-		changed, err := c.evaluateWorkStatusAgainstStatusCollector(celEvaluator, workStatusIdentifier,
-			workStatusContent, scData)
+		changed, err := evaluateWorkStatusAgainstStatusCollector(celEvaluator, workStatusWECName, workStatusContent,
+			scData)
 		if err != nil {
 			logger.Error(err, "failed to evaluate workstatus against statuscollector",
 				"statusCollectorName", statusCollectorName)
@@ -205,22 +192,22 @@ func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEv
 
 // evaluateWorkStatusAgainstStatusCollector evaluates the workstatus against
 // the statuscollector clauses and caches the evaluations. If the workstatus
-// does not match the filter, no other clauses are evaluated.
+// does not match the filter, no other clause is evaluated.
 // The function returns true if an evaluation is updated.
 // If any evaluation fails, the function returns an error.
-func (c *combinedStatusResolution) evaluateWorkStatusAgainstStatusCollector(celEvaluator *celEvaluator,
-	workStatusIdentifier util.ObjectIdentifier, workStatusContent *runtime.RawExtension,
-	scData *statusCollectorData) (bool, error) {
-	wsData, ok := scData.workStatusRefToData[workStatusIdentifier]
-	if !ok {
-		wsData = workStatusData{}
-		scData.workStatusRefToData[workStatusIdentifier] = wsData
+// The function assumes that the caller holds a lock over the combinedstatus
+// resolution.
+func evaluateWorkStatusAgainstStatusCollector(celEvaluator *celEvaluator, workStatusWECName string,
+	workStatusContent *runtime.RawExtension, scData *statusCollectorData) (bool, error) {
+	wsData, exists := scData.workStatusRefToData[workStatusWECName]
+	if !exists {
+		wsData = &workStatusData{}
+		scData.workStatusRefToData[workStatusWECName] = wsData
 	}
 
-	updated := false
 	// evaluate all clauses
 	if scData.Filter != nil {
-		eval, err := celEvaluator.Evaluate(string(*scData.Filter), workStatusContent)
+		eval, err := celEvaluator.Evaluate(*scData.Filter, workStatusContent)
 		if err != nil {
 			return false, fmt.Errorf("failed to evaluate filter expression: %w", err)
 		}
@@ -229,61 +216,57 @@ func (c *combinedStatusResolution) evaluateWorkStatusAgainstStatusCollector(celE
 			return false, fmt.Errorf("filter expression must evaluate to a boolean")
 		}
 
-		fiterEval := eval.Value().(bool)
-		updated = fiterEval != wsData.filterEval
-		wsData.filterEval = fiterEval
-
-		if !fiterEval {
-			// workstatus does not match the filter
-			return updated, nil
+		if !eval.Value().(bool) && !exists { // workstatus not previously evaluated and still irrelevant
+			return false, nil
 		}
 	}
 
+	updated := false
+
 	// evaluate select
-	selectEvals := make(map[string]any)
+	selectEvals := make(map[string]ref.Val)
 	for _, selectNamedExp := range scData.Select {
-		eval, err := celEvaluator.Evaluate(string(selectNamedExp.Def), workStatusContent)
+		eval, err := celEvaluator.Evaluate(selectNamedExp.Def, workStatusContent)
 		if err != nil {
 			return false, fmt.Errorf("failed to evaluate select expression: %w", err)
 		}
 
-		selectEval := eval.Value()
-		updated = updated || selectEval != wsData.selectEval[selectNamedExp.Name]
-		selectEvals[selectNamedExp.Name] = selectEval
+		updated = updated || eval.Value() != wsData.selectEval[selectNamedExp.Name]
+		selectEvals[selectNamedExp.Name] = eval
 	}
 
 	// evaluate groupBy
-	groupByEvals := make(map[string]any)
+	groupByEvals := make(map[string]ref.Val)
 	for _, groupByNamedExp := range scData.GroupBy {
-		eval, err := celEvaluator.Evaluate(string(groupByNamedExp.Def), workStatusContent)
+		eval, err := celEvaluator.Evaluate(groupByNamedExp.Def, workStatusContent)
 		if err != nil {
 			return false, fmt.Errorf("failed to evaluate groupBy expression: %w", err)
 		}
 
-		groupByEval := eval.Value()
-		updated = updated || groupByEval != wsData.groupByEval[groupByNamedExp.Name]
-		groupByEvals[groupByNamedExp.Name] = groupByEval
+		updated = updated || eval.Value() != wsData.groupByEval[groupByNamedExp.Name]
+		groupByEvals[groupByNamedExp.Name] = eval
 	}
 
 	// evaluate combinedFields
-	combinedFieldEvals := make(map[string]any)
+	combinedFieldEvals := make(map[string]ref.Val)
 	for _, combinedFieldNamedAgg := range scData.CombinedFields {
 		if combinedFieldNamedAgg.Type == v1alpha1.AggregatorTypeCount {
 			// count does not require a subject - mark the evaluation with the type
-			updated = updated || wsData.combinedFieldsEval[combinedFieldNamedAgg.Name] != v1alpha1.AggregatorTypeCount
-			combinedFieldEvals[combinedFieldNamedAgg.Name] = v1alpha1.AggregatorTypeCount
+			currentEval, exists := wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]
+			updated = updated || !exists || currentEval != nil
+
+			combinedFieldEvals[combinedFieldNamedAgg.Name] = nil
 			continue
 		}
 
 		// evaluate subject which should not be nil since the statuscollector is valid
-		eval, err := celEvaluator.Evaluate(string(*combinedFieldNamedAgg.Subject), workStatusContent)
+		eval, err := celEvaluator.Evaluate(*combinedFieldNamedAgg.Subject, workStatusContent)
 		if err != nil {
 			return false, fmt.Errorf("failed to evaluate combinedFields expression: %w", err)
 		}
 
-		combinedFieldEval := eval.Value()
-		updated = updated || combinedFieldEval != wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]
-		combinedFieldEvals[combinedFieldNamedAgg.Name] = combinedFieldEval
+		updated = updated || eval.Value() != wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]
+		combinedFieldEvals[combinedFieldNamedAgg.Name] = eval
 	}
 
 	// update the workstatus data

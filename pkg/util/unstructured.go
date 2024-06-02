@@ -53,6 +53,11 @@ const (
 	StatusCollectorGroup    = "control.kubestellar.io"
 	StatusCollectorVersion  = "v1alpha1"
 
+	CombinedStatusKind     = "CombinedStatus"
+	CombinedStatusResource = "combinedstatuses"
+	CombinedStatusGroup    = "control.kubestellar.io"
+	CombinedStatusVersion  = "v1alpha1"
+
 	AnnotationToPreserveValuesKey = "annotations.kubestellar.io/preserve"
 	PreserveNodePortValue         = "nodeport"
 )

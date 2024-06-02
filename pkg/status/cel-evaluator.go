@@ -25,6 +25,8 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 // celEvaluator is a struct that holds the CEL environment
@@ -65,8 +67,8 @@ func (e *celEvaluator) CheckExpression(expression string) error {
 
 // Evaluate takes an expression and a Kubernetes raw object, and returns the
 // evaluation of the expression with the object as the context.
-func (e *celEvaluator) Evaluate(expression string, rawObj *runtime.RawExtension) (ref.Val, error) {
-	ast, issues := e.env.Parse(expression)
+func (e *celEvaluator) Evaluate(expression v1alpha1.Expression, rawObj *runtime.RawExtension) (ref.Val, error) {
+	ast, issues := e.env.Parse(string(expression))
 	if issues != nil && issues.Err() != nil {
 		return nil, fmt.Errorf("failed to parse expression: %w", issues.Err())
 	}
