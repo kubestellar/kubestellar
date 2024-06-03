@@ -14,6 +14,9 @@
 # limitations under the License.
 
 
+set -e
+
+
 arg_names=""
 arg_kubeconfig=""
 arg_context=""
@@ -44,11 +47,11 @@ get_kubeconfig() {
     cp_type="$3"
     ip_addr="$4"
 
-    echov "Getting the kubeconfig of Control Plane \"$cp_name\" of type \"$cp_type\" from context \"$context\":"
+    echov "Getting the kubeconfig of KubeFlex Control Plane \"$cp_name\" of type \"$cp_type\" from context \"$context\":"
 
     # wait for CP ready
     while [[ $(KUBECONFIG="$in_KUBECONFIG" kubectl --context $context get controlplane $cp_name -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-        echov "* Waiting for Control Plane \"$cp_name\" in context \"$context\" to be Ready..."
+        echov "* Waiting for KubeFlex Control Plane \"$cp_name\" in context \"$context\" to be Ready..."
         sleep 5
     done
 
@@ -58,8 +61,8 @@ get_kubeconfig() {
         kubeconfig=$(KUBECONFIG="$in_KUBECONFIG" kubectl --context $context config view --flatten --minify)
     else
         # determine the secret name and namespace
-                    key=$(KUBECONFIG="$in_KUBECONFIG" kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.key}')
-            secret_name=$(KUBECONFIG="$in_KUBECONFIG" kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
+                     key=$(KUBECONFIG="$in_KUBECONFIG" kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.key}')
+             secret_name=$(KUBECONFIG="$in_KUBECONFIG" kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
         secret_namespace=$(KUBECONFIG="$in_KUBECONFIG" kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
         # get the kubeconfig
         echov "- Using \"$key\" from \"$secret_name\" secret in \"$secret_namespace\""
@@ -81,10 +84,10 @@ get_kubeconfig() {
     # swap out 127.0.0.1 with an external ip address
     if [[ "$ip_addr" != "" ]] ; then
         echov "- Replacing server ip address \"127.0.0.1\" with \"$ip_addr\""
-        kubeconfig=$(echo "$kubeconfig" | sed "s@server: https://127\.0\.0\.1:@server: https://$ip_addr:@g")
+        kubeconfig=$(echo "$kubeconfig" | sed -e "s@server: https://127\.0\.0\.1:@server: https://$ip_addr:@g")
     fi
 
-    # return the kubecconfig of the control plane in plain text
+    # return the kubeconfig file contents in YAML format
     echo "$kubeconfig"
 }
 
@@ -156,8 +159,7 @@ elif [[ "$KUBECONFIG" != "" ]] ; then
     in_KUBECONFIG="$KUBECONFIG"
     if [[ "$arg_output" == "" ]] ; then
         if [[ "$KUBECONFIG" == *":"* ]] ; then
-            # hard to decide
-            # out_kubeconfig="$HOME/.kube/config"
+            # hard to decide may be out_kubeconfig="$HOME/.kube/config"
             >&2 echo "ERROR: please specify an output kubeconfig filename with \"-o <filename>\"!"
             exit 1
         else
@@ -192,7 +194,7 @@ echov "Getting kubeconfigs of KubeFlex Control Planes:"
 n=0
 for context in "${contexts[@]}" ; do # for all contexts
     echov "- searching context \"${context}\""
-    cps=($(KUBECONFIG="$in_KUBECONFIG" kubectl --context "${context}" get controlplanes -no-headers -o name 2> /dev/null))
+    cps=($(KUBECONFIG="$in_KUBECONFIG" kubectl --context "${context}" get controlplanes -no-headers -o name 2> /dev/null || true))
     for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         name=${cps[i]##*/}
         if [[ "$arg_names" != "" && ",$arg_names," != *",$name,"* ]] ; then
@@ -217,12 +219,12 @@ fi
 echov "Merging the contexts of KubeFlex Control Planes:"
 kubeconfig_list=""
 for i in "${!cp_name[@]}" ; do
-    echov "- \"${cp_name[i]}\" of type \"${cp_type[i]}\" ==> saving to temporary file \"$HOME/.kube/kubeconfig_${cp_name[i]}\""
-    echo "${cp_kubeconfig[i]}" > "$HOME/.kube/kubeconfig_${cp_name[i]}"
-    kubeconfig_list="$kubeconfig_list:$HOME/.kube/kubeconfig_${cp_name[i]}"
+    echov "- \"${cp_name[i]}\" of type \"${cp_type[i]}\" ==> saving to temporary file \"kubeconfig_${cp_name[i]}\""
+    echo "${cp_kubeconfig[i]}" > "kubeconfig_${cp_name[i]}"
+    kubeconfig_list="$kubeconfig_list:kubeconfig_${cp_name[i]}"
 done
 if [[ "$arg_merge" == "true" ]] ; then
-    echov "* including current kubeconfig"
+    echov "* including current kubeconfig: \"$in_KUBECONFIG\""
     merge_KUBECONFIG="$in_KUBECONFIG$kubeconfig_list"
 else
     merge_KUBECONFIG="${kubeconfig_list:1}"
@@ -230,15 +232,15 @@ fi
 if [[ "$out_kubeconfig" == "-" ]] ; then
     KUBECONFIG="$merge_KUBECONFIG" kubectl config view --flatten
 else
-    (KUBECONFIG="$merge_KUBECONFIG" kubectl config view --flatten) > "$HOME/.kube/tmp"
+    (KUBECONFIG="$merge_KUBECONFIG" kubectl config view --flatten) > "kubeconfig_tmp"
     echov "* backing up \"${out_kubeconfig}\" to \"${out_kubeconfig}.bak\""
-    mv "${out_kubeconfig}" "${out_kubeconfig}.bak" 2> /dev/null
+    mv -f "${out_kubeconfig}" "${out_kubeconfig}.bak" 2> /dev/null
     echov "* saving new kubeconfig to \"${out_kubeconfig}\""
-    mv "$HOME/.kube/tmp" "${out_kubeconfig}"
+    mv "kubeconfig_tmp" "${out_kubeconfig}"
 fi
 for i in "${!cp_name[@]}" ; do
-    echov "* removing temporary file \"$HOME/.kube/kubeconfig_${cp_name[i]}\""
-    rm "$HOME/.kube/kubeconfig_${cp_name[i]}" 2> /dev/null
+    echov "* removing temporary file \"kubeconfig_${cp_name[i]}\""
+    rm "kubeconfig_${cp_name[i]}" 2> /dev/null
 done
 
 if [[ "$arg_verbose" == "true"  && "${out_kubeconfig}" != "-" ]] ; then
