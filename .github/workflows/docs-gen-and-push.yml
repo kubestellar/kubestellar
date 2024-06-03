@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - "release-*"
+      - "doc-*"
     paths:
       - "docs/**"
       - "*.md"
@@ -20,14 +21,29 @@ concurrency:
   group: ${{ github.workflow }}
 
 jobs:
+  debug:
+    name: print relevant info
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "github.actor=${{ github.actor }}"
+          echo "github.action_ref=${{ github.action_ref }}"
+          echo "github.event_name=${{ github.event_name }}"
+          echo "github.head_ref=${{ github.head_ref }}"
+          echo "github.ref=${{ github.ref }}"
+          echo "github.ref_name=${{ github.ref_name }}"
+          echo "github.repository_owner=${{ github.repository_owner }}"
+          echo "github.triggering_actor=${{ github.triggering_actor }}"
+          echo "GITHUB_ACTION_REF=$GITHUB_ACTION_REF"
+
   generate-and-push:
-    if: github.repository_owner == 'kubestellar'
+    if: github.repository_owner == 'kubestellar' || github.repository_owner == github.actor
     name: Generate and push docs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
         with:
-          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          token: ${{ github.repository_owner == 'kubestellar' && secrets.GH_ALL_PROJECT_TOKEN || github.token }}
           persist-credentials: 'true'
   
       - run: git fetch origin gh-pages
