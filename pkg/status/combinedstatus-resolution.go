@@ -17,16 +17,16 @@ limitations under the License.
 package status
 
 import (
-	"context"
 	"fmt"
 	"sync"
 
 	"github.com/google/cel-go/common/types/ref"
 
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/klog/v2"
+	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 // combinedStatusResolution is a struct that represents the resolution of a
@@ -165,22 +165,31 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 	return true
 }
 
+// generateCombinedStatus calculates the combinedstatus from the statuscollector
+// data in the combinedstatus resolution.
+func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
+	workloadObjectIdentifier util.ObjectIdentifier) *v1alpha1.CombinedStatus {
+	return nil // TODO
+}
+
+func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.CombinedStatus) bool {
+	return false //TODO
+}
+
 // evaluateWorkStatus evaluates the workstatus per relevant statuscollector.
 // The function returns true if any statuscollector data is updated.
-func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEvaluator *celEvaluator,
+func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator,
 	workStatusWECName string, workStatusContent *runtime.RawExtension) (bool, error) {
 	c.Lock()
 	defer c.Unlock()
 
-	logger := klog.FromContext(ctx)
-
 	updated := false
 	for statusCollectorName, scData := range c.statusCollectorNameToData {
-		changed, err := evaluateWorkStatusAgainstStatusCollector(celEvaluator, workStatusWECName, workStatusContent,
-			scData)
+		changed, err := evaluateWorkStatusAgainstStatusCollectorLocked(celEvaluator, workStatusWECName,
+			workStatusContent, scData)
 		if err != nil {
-			logger.Error(err, "failed to evaluate workstatus against statuscollector",
-				"statusCollectorName", statusCollectorName)
+			runtime2.HandleError(fmt.Errorf("failed to evaluate workstatus against statuscollector (%s): %w",
+				statusCollectorName, err)) // TODO: handle
 			return false, nil
 		}
 
@@ -197,15 +206,11 @@ func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEv
 // If any evaluation fails, the function returns an error.
 // The function assumes that the caller holds a lock over the combinedstatus
 // resolution.
-func evaluateWorkStatusAgainstStatusCollector(celEvaluator *celEvaluator, workStatusWECName string,
+func evaluateWorkStatusAgainstStatusCollectorLocked(celEvaluator *celEvaluator, workStatusWECName string,
 	workStatusContent *runtime.RawExtension, scData *statusCollectorData) (bool, error) {
 	wsData, exists := scData.workStatusRefToData[workStatusWECName]
-	if !exists {
-		wsData = &workStatusData{}
-		scData.workStatusRefToData[workStatusWECName] = wsData
-	}
 
-	// evaluate all clauses
+	// evaluate filter to determine if the workstatus is relevant
 	if scData.Filter != nil {
 		eval, err := celEvaluator.Evaluate(*scData.Filter, workStatusContent)
 		if err != nil {
@@ -216,11 +221,20 @@ func evaluateWorkStatusAgainstStatusCollector(celEvaluator *celEvaluator, workSt
 			return false, fmt.Errorf("filter expression must evaluate to a boolean")
 		}
 
-		if !eval.Value().(bool) && !exists { // workstatus not previously evaluated and still irrelevant
+		if !eval.Value().(bool) { // workstatus is not relevant
+			if exists { // remove the workstatus data if it exists
+				delete(scData.workStatusRefToData, workStatusWECName)
+				return true, nil
+			}
+
 			return false, nil
 		}
 	}
 
+	if !exists {
+		wsData = &workStatusData{}
+		scData.workStatusRefToData[workStatusWECName] = wsData
+	}
 	updated := false
 
 	// evaluate select
