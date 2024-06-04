@@ -388,7 +388,7 @@ func TestGenericController(t *testing.T) {
 		wdsKsClientFake,
 		wdsDynamicClient,
 		itsK8sClientFake.CoreV1().Namespaces(), parmCfgMapPreInformer,
-		itsDynamicClient, "test-wds", wrapperGVR)
+		itsDynamicClient, 500*1024, "test-wds", wrapperGVR)
 	ctlr.RegisterMetrics(legacyregistry.Register)
 	inventoryInformerFactory.Start(ctx.Done())
 	wdsKsInformerFactory.Start(ctx.Done())
