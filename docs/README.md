@@ -8,6 +8,8 @@ We have two web sites, as follows.
 - `https://kubestellar.io`. This is hosted by GoDaddy and administered by [Andy Anderson](mailto://andy@clubanderson.com). It contains a few redirects. The most important is that `https://kubestellar.io/` redirects to `https://docs.kubestellar.io/`.
 - `https://docs.kubestellar.io`. This is a GitHub pages website based on the `github.com/kubestellar/kubestellar/` repository.
 
+Also, a contributor has their own copy of the website, at `https://${repo_owner}.github.io/${fork_name}`.
+
 ### GitHub pages
 
 Our documentation is powered by [mike](https://github.com/jimporter/mike) and [MkDocs](https://www.mkdocs.org/). MkDocs is powered by [Python-Markdown](https://pypi.org/project/Markdown/). These are immensely configurable and extensible. You can see our MkDocs configuration in `docs/mkdocs.yml`. Following are some of the choices we have made.
@@ -425,9 +427,13 @@ git add .;git commit -m "add index, home, and CNAME files";git push -u origin gh
 
 - if the above did not work, then you might have an issue with the GoDaddy domain (expired, files missing, etc.)
 
+### How to delete a rendering of a branch
+
+Use `mike delete $branch_name`, either acting locally on your checked out `gh-pages` branch (after pull and before git commit and push) or acting more directly on the remote repo using `--remote` and `--push`. See [the mike delete command doc](https://github.com/jimporter/mike?tab=readme-ov-file#deleting-docs).
+
 ## Publishing Workflow
 
 All documentation building and publishing is done using GitHub Actions in
-`.github/workflows/docs-gen-and-push.yml`. This workflow is triggered either manually or by a push to a branch named `main` or `release-<something>`. This workflow will build and publish a website _version_ whose name is the same as the name of the branch that it is working on. This workflow will also update the relevant `mike` alias, if necessary.
+`.github/workflows/docs-gen-and-push.yml`. This workflow is triggered either manually or by a push to a branch named `main` or `release-<something>` or `doc-<something>`. This workflow will actually do something _ONLY_ if either (a) it is acting on the shared GitHub repository at `github.com/kubestellar/kubestellar` and on behalf of the repository owner or (b) it is acting on a contributor's fork of that repo and on behalf of that same contributor. The published site appears at `https://pages.github.io/kubestellar/${branch}` in case (a) and at `https://${repo_owner}.github.io/${fork_name}/${branch}` in case (b). This workflow will build and publish a website _version_ whose name is the same as the name of the branch that it is working on. This workflow will also update the relevant `mike` alias, if necessary.
 
 <!--readme-for-documentation-end-->
