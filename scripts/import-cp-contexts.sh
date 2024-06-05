@@ -32,9 +32,9 @@ Usage: $0 [--kubeconfig <filename>] [--context <name>] [--names <list of names>]
 --kubeconfig <filename>       use the specified kubeconfig
 --context <name>              use the specified context
 --names <name1>,<name2>       comma separated list of KubeFlex Control Planes names to import, instead of default *all*
---replace-localhost <address> replaces server addresses "127.0.0.1" with <address>
---merge                       merge the control planes contexts with the existing cluster contexts
--o <filename>                 specify a different kubeconfig file to save the contexts (- for stdout)
+--replace-localhost <address> replaces server addresses "127.0.0.1" with <address>, which can be an ip address or domanin
+--merge                       the resulting kubeconfig gets merged into the pre-existing contents of the output file
+-o <filename>                 specify where to write the resulting kubeconfig (- for stdout)
 --silent                      no information output
 -X                            enable verbose execution of the script for debugging
 EOF
