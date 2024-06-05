@@ -1475,7 +1475,7 @@
 
 <h1 id="deploy-kubestellar-on-k3d">Deploy KubeStellar on K3D<a class="headerlink" href="#deploy-kubestellar-on-k3d" title="Permanent link">#</a></h1>
 <p>This document shows how to deploy kubestellar on K3D hub and wec clusters.</p>
-<p>This is a point-in-time statement that worked with KubeStellar release v0.22.0-rc1.</p>
+<p>This is a point-in-time statement that worked with KubeStellar release v0.22.0.</p>
 <h2 id="prereqs">Prereqs<a class="headerlink" href="#prereqs" title="Permanent link">#</a></h2>
 <p>In addition to <a href="../pre-reqs/">pre-reqs</a>, install k3d v5.6.0 (only k3d version tested so far)</p>
 <h2 id="common-setup-for-standard-examples">Common Setup for standard examples<a class="headerlink" href="#common-setup-for-standard-examples" title="Permanent link">#</a></h2>
@@ -1496,9 +1496,9 @@
 </li>
 <li>
 <p>Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
-    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBESTELLAR_VERSION</span><span class="o">=</span><span class="m">0</span>.22.0-rc1
+    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBESTELLAR_VERSION</span><span class="o">=</span><span class="m">0</span>.22.0
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OCM_STATUS_ADDON_VERSION</span><span class="o">=</span><span class="m">0</span>.2.0-rc8
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OCM_TRANSPORT_PLUGIN</span><span class="o">=</span><span class="m">0</span>.1.3
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OCM_TRANSPORT_PLUGIN</span><span class="o">=</span><span class="m">0</span>.1.7
 </code></pre></div></p>
 </li>
 <li>
