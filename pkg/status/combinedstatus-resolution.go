@@ -24,6 +24,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -57,6 +58,9 @@ type combinedStatusResolution struct {
 	// If a status collector name is mapped to nil, it means that the status
 	// collector has not been processed.
 	statusCollectorNameToData map[string]*statusCollectorData
+	// collectionDestinations is a set of destinations that are expected to be
+	// collected from.
+	collectionDestinations sets.Set[string]
 }
 
 // statusCollectorData is a struct that represents the data of a status
@@ -86,6 +90,39 @@ type workStatusData struct {
 	combinedFieldsEval map[string]ref.Val
 
 	selectEval map[string]ref.Val
+}
+
+// setCollectionDestinations sets the collection destinations of the
+// combinedstatus resolution.
+// The given set is expected not to be mutated during and after this call.
+// The function returns:
+//   - removedDestinations: a boolean indicating if one or more destinations
+//     were removed.
+//   - a set of destinations that were added.
+func (c *combinedStatusResolution) setCollectionDestinations(destinations sets.Set[string]) (bool, sets.Set[string]) {
+	c.Lock()
+	defer c.Unlock()
+
+	removedDestinations := c.collectionDestinations.Difference(destinations)
+	newDestinations := destinations.Difference(c.collectionDestinations)
+	// if nothing changed, return
+	if len(removedDestinations) == 0 && len(newDestinations) == 0 {
+		return false, nil
+	}
+
+	c.collectionDestinations = destinations
+	// trim the statuscollector data that are not relevant anymore
+	for _, data := range c.statusCollectorNameToData {
+		if data.workStatusRefToData == nil {
+			continue
+		}
+
+		for clusterName := range removedDestinations {
+			delete(data.workStatusRefToData, clusterName)
+		}
+	}
+
+	return len(removedDestinations) > 0, newDestinations
 }
 
 // setStatusCollectors sets ALL the statuscollectors relevant to the
@@ -182,6 +219,10 @@ func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator
 	workStatusWECName string, workStatusContent *runtime.RawExtension) (bool, error) {
 	c.Lock()
 	defer c.Unlock()
+
+	if !c.collectionDestinations.Has(workStatusWECName) {
+		return false, nil // workstatus is not relevant to this combinedstatus resolution
+	}
 
 	updated := false
 	for statusCollectorName, scData := range c.statusCollectorNameToData {
