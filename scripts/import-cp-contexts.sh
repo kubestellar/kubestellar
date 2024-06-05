@@ -216,7 +216,7 @@ if [[ "${#cp_name[@]}" == "0" ]] ; then
 fi
 
 
-echov "Merging the contexts of KubeFlex Control Planes:"
+echov "Creating new kubeconfig content with a context for each ControlPlane:"
 kubeconfig_list=""
 for i in "${!cp_name[@]}" ; do
     echov "- \"${cp_name[i]}\" of type \"${cp_type[i]}\" ==> saving to temporary file \"kubeconfig_${cp_name[i]}\""
