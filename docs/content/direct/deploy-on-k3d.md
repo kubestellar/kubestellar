@@ -2,7 +2,7 @@
 
 This document shows how to deploy kubestellar on K3D hub and wec clusters.
 
-This is a point-in-time statement that worked with KubeStellar release v0.22.0-rc1.
+This is a point-in-time statement that worked with KubeStellar release v0.22.0.
 
 ## Prereqs
 
@@ -25,9 +25,9 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
 
 1. Set environment variables to hold KubeStellar and OCM-status-addon desired versions:
     ```shell
-    export KUBESTELLAR_VERSION=0.22.0-rc1
+    export KUBESTELLAR_VERSION=0.22.0
     export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
-    export OCM_TRANSPORT_PLUGIN=0.1.3
+    export OCM_TRANSPORT_PLUGIN=0.1.7
     ```
 
 1. Create a K3D hosting cluster with nginx ingress controller:
