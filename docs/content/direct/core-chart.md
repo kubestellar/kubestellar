@@ -317,7 +317,7 @@ the `kflex` CLI and one not.
     - `--kubeconfig <filename>` specify the kubeconfig of the hosting cluster where the KubeFlex Control Planes are located. Note that this argument will override the content of the `KUBECONFIG` environment variable
     - `--context <name>` specify a context of the current kubeconfig where to look for KubeFlex Control Planes. If this argument is not specified, then all contexts will be searched.
     - `--names|-n <name1>,<name2>,..` comma separated list of KubeFlex Control Planes names to import. If this argument is not specified then *all* available KubeFlex Control Planes will be imported.
-    - `--replace-localhost|-r <address>` replaces server addresses "127.0.0.1" with a desired `<address>`. This parameter is useful for making KubeFlex Control Planes of type `host` accessible from outside the machine hosting the cluster.
+    - `--replace-localhost|-r <host>` replaces server addresses "127.0.0.1" with a desired `<host>`. This parameter is useful for making KubeFlex Control Planes of type `host` accessible from outside the machine hosting the cluster.
     - `--merge|-m` merge the kubeconfig with the contexts of the control planes with the existing cluster kubeconfig. If this flag is not specified, then only the kubeconfig with the contexts of the KubeFlex Control Planes will be produced.
     - `--output|-o <filename>|-` specify a kubeconfig file to save the kubeconfig to. Use `-` for stdout. If this argument is not provided, then the kubeconfig will be saved to the input specified kubeconfig, if provided, or to `~/.kube/config`.
     - `--silent|-s` quiet mode, do not print informarmation. This may be useful when using `-o -`.

@@ -20,7 +20,7 @@ set -e
 arg_names=""
 arg_kubeconfig=""
 arg_context=""
-arg_ip_addr=""
+arg_host=""
 arg_merge=false
 arg_output=""
 arg_verbose=true
@@ -29,14 +29,16 @@ arg_verbose=true
 display_help() {
   cat << EOF
 Usage: $0 [--kubeconfig <filename>] [--context <name>] [--names <list of names>] [--replace-localhost <address>] [--merge] [-o <filename>] [-V] [-X]
---kubeconfig <filename>       use the specified kubeconfig
---context <name>              use the specified context
---names <name1>,<name2>       comma separated list of KubeFlex Control Planes names to import, instead of default *all*
---replace-localhost <address> replaces server addresses "127.0.0.1" with <address>, which can be an ip address or domanin
---merge                       the resulting kubeconfig gets merged into the pre-existing contents of the output file
--o <filename>                 specify where to write the resulting kubeconfig (- for stdout)
---silent                      no information output
--X                            enable verbose execution of the script for debugging
+--kubeconfig <filename>    use the specified kubeconfig
+--context <name>           use the specified context
+--names <name1>,<name2>    comma separated list of KubeFlex Control Planes names to import, instead of default *all*
+--replace-localhost <host> replaces server addresses "127.0.0.1" with <host>, which can be an ip address or a domanin
+--merge                    the resulting kubeconfig gets merged into the pre-existing contents of the output file
+-o <filename>              specify where to write the resulting kubeconfig (- for stdout)
+--silent                   no information output
+-X                         enable verbose execution of the script for debugging
+
+Note: if multiple KubeFlex Control Planes with the same names are found, only the last one found will be 
 EOF
 }
 
@@ -45,7 +47,7 @@ get_kubeconfig() {
     context="$1"
     cp_name="$2"
     cp_type="$3"
-    ip_addr="$4"
+    host="$4"
 
     echov "Getting the kubeconfig of KubeFlex Control Plane \"$cp_name\" of type \"$cp_type\" from context \"$context\":"
 
@@ -81,10 +83,10 @@ get_kubeconfig() {
         | yq ".current-context = \"$cp_name\""
     )
 
-    # swap out 127.0.0.1 with an external ip address
-    if [[ "$ip_addr" != "" ]] ; then
-        echov "- Replacing server ip address \"127.0.0.1\" with \"$ip_addr\""
-        kubeconfig=$(echo "$kubeconfig" | sed -e "s@server: https://127\.0\.0\.1:@server: https://$ip_addr:@g")
+    # swap out 127.0.0.1 with an external ip address or domanin
+    if [[ "$host" != "" ]] ; then
+        echov "- Replacing server ip address \"127.0.0.1\" with \"$host\""
+        kubeconfig=$(echo "$kubeconfig" | sed -e "s@server: https://127\.0\.0\.1:@server: https://$host:@g")
     fi
 
     # return the kubeconfig file contents in YAML format
@@ -111,8 +113,8 @@ while (( $# > 0 )); do
         fi;;
     (--replace-localhost|-r)
         if (( $# > 1 ));
-        then { arg_ip_addr="$2"; shift; }
-        else { echo "$0: missing ip address" >&2; exit 1; }
+        then { arg_host="$2"; shift; }
+        else { echo "$0: missing host" >&2; exit 1; }
         fi;;
     (--merge|-m)
         arg_merge=true;;
@@ -204,7 +206,7 @@ for context in "${contexts[@]}" ; do # for all contexts
         cp_name[n]=$name
         cp_type[n]=$(KUBECONFIG="$in_KUBECONFIG" kubectl get controlplane ${cp_name[n]} -o jsonpath='{.spec.type}')
         echov "  - found KubeFlex Control Plane \"${cp_name[i]}\" of type \"${cp_type[i]}\""
-        cp_kubeconfig[n]=$(get_kubeconfig "${context}" "${cp_name[n]}" "${cp_type[n]}" "$arg_ip_addr")
+        cp_kubeconfig[n]=$(get_kubeconfig "${context}" "${cp_name[n]}" "${cp_type[n]}" "$arg_host")
         n=$((n+1))
     done
 done
@@ -237,10 +239,8 @@ else
         echov "* backing up \"${out_kubeconfig}\" to \"${out_kubeconfig}.bak\""
         mv -f "${out_kubeconfig}" "${out_kubeconfig}.bak" 2> /dev/null
     fi
-    if [ -f "kubeconfig_tmp" ] ; then
-        echov "* saving new kubeconfig to \"${out_kubeconfig}\""
-        mv -f "kubeconfig_tmp" "${out_kubeconfig}"
-    fi``
+    echov "* saving new kubeconfig to \"${out_kubeconfig}\""
+    mv -f "kubeconfig_tmp" "${out_kubeconfig}"
 fi
 for i in "${!cp_name[@]}" ; do
     echov "* removing temporary file \"kubeconfig_${cp_name[i]}\""
