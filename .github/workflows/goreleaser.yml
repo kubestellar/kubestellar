@@ -35,7 +35,7 @@ jobs:
       run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
 
     - name: Run GoReleaser on tag
-      uses: goreleaser/goreleaser-action@v5
+      uses: goreleaser/goreleaser-action@v6
       with:
         distribution: goreleaser
         version: latest
