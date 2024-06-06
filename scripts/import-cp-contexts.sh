@@ -233,10 +233,14 @@ if [[ "$out_kubeconfig" == "-" ]] ; then
     KUBECONFIG="$merge_KUBECONFIG" kubectl config view --flatten
 else
     (KUBECONFIG="$merge_KUBECONFIG" kubectl config view --flatten) > "kubeconfig_tmp"
-    echov "* backing up \"${out_kubeconfig}\" to \"${out_kubeconfig}.bak\""
-    mv -f "${out_kubeconfig}" "${out_kubeconfig}.bak" 2> /dev/null
-    echov "* saving new kubeconfig to \"${out_kubeconfig}\""
-    mv "kubeconfig_tmp" "${out_kubeconfig}"
+    if [ -f "${out_kubeconfig}" ] ; then
+        echov "* backing up \"${out_kubeconfig}\" to \"${out_kubeconfig}.bak\""
+        mv -f "${out_kubeconfig}" "${out_kubeconfig}.bak" 2> /dev/null
+    fi
+    if [ -f "kubeconfig_tmp" ] ; then
+        echov "* saving new kubeconfig to \"${out_kubeconfig}\""
+        mv -f "kubeconfig_tmp" "${out_kubeconfig}"
+    fi``
 fi
 for i in "${!cp_name[@]}" ; do
     echov "* removing temporary file \"kubeconfig_${cp_name[i]}\""
