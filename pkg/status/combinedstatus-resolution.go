@@ -152,7 +152,7 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 			continue
 		}
 
-		if statusCollectorSpecsMatch(statusCollectorData.StatusCollectorSpec, statusCollectorSpec) {
+		if !statusCollectorSpecsMatch(statusCollectorData.StatusCollectorSpec, statusCollectorSpec) {
 			c.statusCollectorNameToData[statusCollectorName].StatusCollectorSpec = statusCollectorSpec
 			addedSome = true
 		}
@@ -226,7 +226,7 @@ func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator
 
 	updated := false
 	for statusCollectorName, scData := range c.statusCollectorNameToData {
-		changed, err := evaluateWorkStatusAgainstStatusCollectorLocked(celEvaluator, workStatusWECName,
+		changed, err := evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator, workStatusWECName,
 			workStatusContent, scData)
 		if err != nil {
 			runtime2.HandleError(fmt.Errorf("failed to evaluate workstatus against statuscollector (%s): %w",
@@ -240,14 +240,14 @@ func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator
 	return updated, nil
 }
 
-// evaluateWorkStatusAgainstStatusCollector evaluates the workstatus against
+// evaluateWorkStatusAgainstStatusCollectorWriteLocked evaluates the workstatus against
 // the statuscollector clauses and caches the evaluations. If the workstatus
 // does not match the filter, no other clause is evaluated.
 // The function returns true if an evaluation is updated.
 // If any evaluation fails, the function returns an error.
 // The function assumes that the caller holds a lock over the combinedstatus
 // resolution.
-func evaluateWorkStatusAgainstStatusCollectorLocked(celEvaluator *celEvaluator, workStatusWECName string,
+func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvaluator, workStatusWECName string,
 	workStatusContent *runtime.RawExtension, scData *statusCollectorData) (bool, error) {
 	wsData, exists := scData.workStatusRefToData[workStatusWECName]
 
@@ -272,11 +272,13 @@ func evaluateWorkStatusAgainstStatusCollectorLocked(celEvaluator *celEvaluator, 
 		}
 	}
 
+	updated := false
+
 	if !exists {
 		wsData = &workStatusData{}
 		scData.workStatusRefToData[workStatusWECName] = wsData
+		updated = true
 	}
-	updated := false
 
 	// evaluate select
 	selectEvals := make(map[string]ref.Val)
@@ -286,7 +288,7 @@ func evaluateWorkStatusAgainstStatusCollectorLocked(celEvaluator *celEvaluator, 
 			return false, fmt.Errorf("failed to evaluate select expression: %w", err)
 		}
 
-		updated = updated || eval.Value() != wsData.selectEval[selectNamedExp.Name]
+		updated = updated || eval.Value() != wsData.selectEval[selectNamedExp.Name].Value()
 		selectEvals[selectNamedExp.Name] = eval
 	}
 
@@ -298,7 +300,7 @@ func evaluateWorkStatusAgainstStatusCollectorLocked(celEvaluator *celEvaluator, 
 			return false, fmt.Errorf("failed to evaluate groupBy expression: %w", err)
 		}
 
-		updated = updated || eval.Value() != wsData.groupByEval[groupByNamedExp.Name]
+		updated = updated || eval.Value() != wsData.groupByEval[groupByNamedExp.Name].Value()
 		groupByEvals[groupByNamedExp.Name] = eval
 	}
 
@@ -306,7 +308,7 @@ func evaluateWorkStatusAgainstStatusCollectorLocked(celEvaluator *celEvaluator, 
 	combinedFieldEvals := make(map[string]ref.Val)
 	for _, combinedFieldNamedAgg := range scData.CombinedFields {
 		if combinedFieldNamedAgg.Type == v1alpha1.AggregatorTypeCount {
-			// count does not require a subject - mark the evaluation with the type
+			// count does not require a subject - mark the evaluation with nil
 			currentEval, exists := wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]
 			updated = updated || !exists || currentEval != nil
 
@@ -320,7 +322,7 @@ func evaluateWorkStatusAgainstStatusCollectorLocked(celEvaluator *celEvaluator, 
 			return false, fmt.Errorf("failed to evaluate combinedFields expression: %w", err)
 		}
 
-		updated = updated || eval.Value() != wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]
+		updated = updated || eval.Value() != wsData.combinedFieldsEval[combinedFieldNamedAgg.Name].Value()
 		combinedFieldEvals[combinedFieldNamedAgg.Name] = eval
 	}
 
