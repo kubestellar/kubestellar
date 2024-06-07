@@ -57,6 +57,7 @@ import (
 	controlv1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
 	controlv1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/jsonpath"
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/transport/filtering"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
@@ -79,6 +80,7 @@ var objectsFilter = filtering.NewObjectFilteringMap()
 // the given transport and transportClientset to discover the GVR of wrapped objects.
 // The given transportDynamicClient is used to access the ITS.
 func NewTransportController(ctx context.Context,
+	wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics,
 	inventoryPreInformer clusterinformers.ManagedClusterInformer,
 	bindingClient controlclient.BindingInterface,
 	bindingInformer controlv1alpha1informers.BindingInformer,
@@ -96,12 +98,13 @@ func NewTransportController(ctx context.Context,
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
 	}
-	return NewTransportControllerForWrappedObjectGVR(ctx, inventoryPreInformer, bindingClient, bindingInformer, customTransformInformer, transport, wdsClientset, wdsDynamicClient, itsNSClient, propCfgMapPreInformer, transportDynamicClient, wdsName, wrappedObjectGVR), nil
+	return NewTransportControllerForWrappedObjectGVR(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer, bindingClient, bindingInformer, customTransformInformer, transport, wdsClientset, wdsDynamicClient, itsNSClient, propCfgMapPreInformer, transportDynamicClient, wdsName, wrappedObjectGVR), nil
 }
 
 // NewTransportControllerForWrappedObjectGVR returns a new transport controller.
 // The given transportDynamicClient is used to access the ITS.
 func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
+	wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics,
 	inventoryPreInformer clusterinformers.ManagedClusterInformer,
 	bindingClient controlclient.BindingInterface,
 	bindingInformer controlv1alpha1informers.BindingInformer,
@@ -113,18 +116,25 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 	propCfgMapPreInformer corev1informers.ConfigMapInformer,
 	transportDynamicClient dynamic.Interface,
 	wdsName string, wrappedObjectGVR schema.GroupVersionResource) *genericTransportController {
-	dynamicInformerFactory := dynamicinformer.NewDynamicSharedInformerFactory(transportDynamicClient, 0)
+	measuredBindingClient := ksmetrics.NewWrappedClusterScopedClient[*v1alpha1.Binding, *v1alpha1.BindingList](wdsClientMetrics, util.GetBindingGVR(), bindingClient)
+	measuredWDSDynamicClient := ksmetrics.NewWrappedDynamicClient(wdsClientMetrics, wdsDynamicClient)
+	measuredITSDynamicClient := ksmetrics.NewWrappedDynamicClient(itsClientMetrics, transportDynamicClient)
+	dynamicInformerFactory := dynamicinformer.NewDynamicSharedInformerFactory(measuredITSDynamicClient, 0)
 	wrappedObjectGenericInformer := dynamicInformerFactory.ForResource(wrappedObjectGVR)
 	customTransformInformer.Informer().AddIndexers(map[string]cache.IndexFunc{customTransformDomainIndexName: customTransformToDomain})
+	customTransformsClient := wdsClientset.ControlV1alpha1().CustomTransforms()
+	measuredCustomTransformClient := ksmetrics.NewWrappedClusterScopedClient[*v1alpha1.CustomTransform, *v1alpha1.CustomTransformList](wdsClientMetrics, v1alpha1.GroupVersion.WithResource("customtransforms"), customTransformsClient)
+	measuredITSNSClient := ksmetrics.NewWrappedClusterScopedClient[*corev1.Namespace, *corev1.NamespaceList](itsClientMetrics, corev1.SchemeGroupVersion.WithResource("namespaces"), itsNSClient)
 	workqueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
+
 	transportController := &genericTransportController{
 		logger:                        klog.FromContext(ctx),
 		inventoryInformerSynced:       inventoryPreInformer.Informer().HasSynced,
 		inventoryLister:               inventoryPreInformer.Lister(),
-		bindingClient:                 bindingClient,
+		bindingClient:                 measuredBindingClient,
 		bindingLister:                 bindingInformer.Lister(),
 		bindingInformerSynced:         bindingInformer.Informer().HasSynced,
-		itsNSClient:                   itsNSClient,
+		itsNSClient:                   measuredITSNSClient,
 		propCfgMapLister:              propCfgMapPreInformer.Lister().ConfigMaps(v1alpha1.PropertyConfigMapNamespace),
 		propCfgMapInformerSynced:      propCfgMapPreInformer.Informer().HasSynced,
 		wrappedObjectInformerSynced:   wrappedObjectGenericInformer.Informer().HasSynced,
@@ -132,14 +142,13 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 		customTransformInformerSynced: customTransformInformer.Informer().HasSynced,
 		workqueue:                     workqueue,
 		transport:                     transport,
-		transportClient:               transportDynamicClient,
+		transportClient:               measuredITSDynamicClient,
 		wrappedObjectGVR:              wrappedObjectGVR,
-		wdsClientset:                  wdsClientset,
-		wdsDynamicClient:              wdsDynamicClient,
+		wdsDynamicClient:              measuredWDSDynamicClient,
 		wdsName:                       wdsName,
 		bindingSensitiveDestinations:  make(map[string]sets.Set[v1alpha1.Destination]),
 		destinationProperties:         make(map[v1alpha1.Destination]clusterProperties),
-		customTransformCollection: newCustomTransformCollection(wdsClientset.ControlV1alpha1().CustomTransforms(),
+		customTransformCollection: newCustomTransformCollection(measuredCustomTransformClient,
 			customTransformInformer.Informer().GetIndexer().ByIndex,
 			workqueue.Add),
 	}
@@ -255,10 +264,10 @@ type genericTransportController struct {
 
 	inventoryInformerSynced     cache.InformerSynced
 	inventoryLister             clusterlisters.ManagedClusterLister
-	bindingClient               controlclient.BindingInterface
+	bindingClient               ksmetrics.ClientModNamespace[*v1alpha1.Binding, *v1alpha1.BindingList]
 	bindingLister               controlv1alpha1listers.BindingLister
 	bindingInformerSynced       cache.InformerSynced
-	itsNSClient                 corev1client.NamespaceInterface
+	itsNSClient                 ksmetrics.ClientModNamespace[*corev1.Namespace, *corev1.NamespaceList]
 	propCfgMapLister            corev1listers.ConfigMapNamespaceLister
 	propCfgMapInformerSynced    cache.InformerSynced
 	wrappedObjectInformerSynced cache.InformerSynced
@@ -278,7 +287,6 @@ type genericTransportController struct {
 	transportClient  dynamic.Interface // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
-	wdsClientset     ksclientset.Interface
 	wdsDynamicClient dynamic.Interface
 	wdsName          string
 

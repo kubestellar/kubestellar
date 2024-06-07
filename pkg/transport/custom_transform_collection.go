@@ -27,8 +27,8 @@ import (
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/abstract"
-	controlclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/jsonpath"
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 )
 
 // customTransformCollection digests CustomTransform objects and caches the results.
@@ -52,7 +52,7 @@ type customTransformChanges struct {
 // customTransformCollectionImpl implements customTransformCollection
 type customTransformCollectionImpl struct {
 	// client is here for updating the status of a CustomTransform
-	client controlclient.CustomTransformInterface
+	client ksmetrics.ClientModNamespace[*v1alpha1.CustomTransform, *v1alpha1.CustomTransformList]
 
 	// getTransformObjects is the part of the CustomTransform informer's cache.Indexer behavior
 	// that is needed here, for using the index named in `customTransformDomainIndexName`.
@@ -93,7 +93,7 @@ type groupResourceTransformData struct {
 	changes          customTransformChanges
 }
 
-func newCustomTransformCollection(client controlclient.CustomTransformInterface, getTransformObjects func(indexName, indexedValue string) ([]any, error), enqueue func(any)) customTransformCollection {
+func newCustomTransformCollection(client ksmetrics.ClientModNamespace[*v1alpha1.CustomTransform, *v1alpha1.CustomTransformList], getTransformObjects func(indexName, indexedValue string) ([]any, error), enqueue func(any)) customTransformCollection {
 	return &customTransformCollectionImpl{
 		client:                      client,
 		getTransformObjects:         getTransformObjects,

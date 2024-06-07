@@ -39,6 +39,7 @@ import (
 
 	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/transport"
 )
 
@@ -105,7 +106,10 @@ func GenericMain(transportImplementation transport.Transport) {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 	transportRestConfig.UserAgent = transport.ControllerName
+	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
+	ksmetrics.MustRegister(legacyregistry.Register, spacesClientMetrics)
 	// clients for WDS
+	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
 	wdsClientset, err := ksclientset.NewForConfig(wdsRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create KubeStellar clientset for Workload Description Space (WDS)")
@@ -117,6 +121,7 @@ func GenericMain(transportImplementation transport.Transport) {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 	// clients for transport space
+	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
 	transportClientset, err := kubernetes.NewForConfig(transportRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create k8s clientset for transport space")
@@ -142,7 +147,7 @@ func GenericMain(transportImplementation transport.Transport) {
 
 	itsK8sInformerFactory := k8sinformers.NewSharedInformerFactory(transportClientset, defaultResyncPeriod)
 
-	transportController, err := transport.NewTransportController(ctx, inventoryPreInformer,
+	transportController, err := transport.NewTransportController(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer,
 		wdsClientset.ControlV1alpha1().Bindings(), wdsControlInformers.Bindings(),
 		wdsControlInformers.CustomTransforms(),
 		transportImplementation, wdsClientset, wdsDynamicClient, transportClientset.CoreV1().Namespaces(), itsK8sInformerFactory.Core().V1().ConfigMaps(),
@@ -152,11 +157,10 @@ func GenericMain(transportImplementation transport.Transport) {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
-	ocmInformerFactory.Start(ctx.Done())
-	itsK8sInformerFactory.Start(ctx.Done())
-
 	// notice that there is no need to run Start method in a separate goroutine.
 	// Start method is non-blocking and runs each of the factory's informers in its own dedicated goroutine.
+	ocmInformerFactory.Start(ctx.Done())
+	itsK8sInformerFactory.Start(ctx.Done())
 	wdsKsInformerFactory.Start(ctx.Done())
 
 	if err := transportController.Run(ctx, options.Concurrency); err != nil {

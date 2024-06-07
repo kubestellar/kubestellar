@@ -43,12 +43,14 @@ import (
 	dynamicfake "k8s.io/client-go/dynamic/fake"
 	k8sinformers "k8s.io/client-go/informers"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
+	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	ksclientfake "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/fake"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -375,7 +377,11 @@ func TestGenericController(t *testing.T) {
 	itsK8sClientFake := k8sfake.NewSimpleClientset()
 	itsK8sInformerFactory := k8sinformers.NewSharedInformerFactory(itsK8sClientFake, 0*time.Minute)
 	parmCfgMapPreInformer := itsK8sInformerFactory.Core().V1().ConfigMaps()
-	ctlr := NewTransportControllerForWrappedObjectGVR(ctx,
+	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
+	ksmetrics.MustRegister(legacyregistry.Register, spacesClientMetrics)
+	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
+	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
+	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, wdsClientMetrics, itsClientMetrics,
 		inventoryPreInformer, wdsKsClientFake.ControlV1alpha1().Bindings(),
 		wdsControlInformers.Bindings(), wdsControlInformers.CustomTransforms(),
 		transport,

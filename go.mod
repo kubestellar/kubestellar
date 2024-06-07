@@ -8,6 +8,7 @@ require (
 	github.com/kubestellar/kubeflex v0.6.1
 	github.com/onsi/ginkgo/v2 v2.13.0
 	github.com/onsi/gomega v1.29.0
+	github.com/prometheus/client_golang v1.16.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 	golang.org/x/time v0.3.0
@@ -97,7 +98,6 @@ require (
 	github.com/opencontainers/selinux v1.10.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
-	github.com/prometheus/client_golang v1.16.0 // indirect
 	github.com/prometheus/client_model v0.4.0 // indirect
 	github.com/prometheus/common v0.44.0 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
