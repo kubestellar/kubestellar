@@ -23,7 +23,7 @@ Once workload(s) are deployed, KubeStellar lets you
 ## Getting Started: Try the "Common Setup"
 Given the multitude of infrastructure configurations possible, the details of any particular installation can obviously vary.
 
-We have developed a [common setup](common-setup-intro.md) for our examples which you may find a useful starting point. You can use a [helm chart](common-setup-hub-chart.md) to automate the process of setting up the core components, or you may [work through the steps individually](common-setup-step-by-step.md) to more completely customize the installation.
+We have developed a [common setup](common-setup-intro.md) for our examples which you may find a useful starting point. You can use a [helm chart](common-setup-core-chart.md) to automate the process of setting up the core components, or you may [work through the steps individually](common-setup-step-by-step.md) to more completely customize the installation.
 
 <!--
 * Set up infrastructure to host the hub and workload clusters
