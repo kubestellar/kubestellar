@@ -156,6 +156,7 @@ func GenericMain(transportImplementation transport.Transport) {
 		logger.Error(err, "failed to construct transport controller")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
+	transportController.RegisterMetrics(legacyregistry.Register)
 
 	// notice that there is no need to run Start method in a separate goroutine.
 	// Start method is non-blocking and runs each of the factory's informers in its own dedicated goroutine.

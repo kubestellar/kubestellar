@@ -76,6 +76,12 @@ func MustRegister(reg RegisterFn, registerable ...interface{ Register(RegisterFn
 	}
 }
 
+func MustRegisterAbles(reg RegisterFn, registerable ...k8smetrics.Registerable) {
+	for _, ra := range registerable {
+		Must(reg(ra))
+	}
+}
+
 type multiSpaceClientMetrics struct {
 	// CallLatency measures round-trip seconds.
 	// Labels are:
