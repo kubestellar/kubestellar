@@ -85,14 +85,19 @@ The following diagram shows most of it. For simplicity, this omits the clusterad
 
 ```mermaid
 flowchart LR
+    osa_hc_repo[published OSA Helm Chart]
+    otp_code["OTP source in GitHub"]
     subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
+    gtc_code["generic transport<br>controller code"]
     kcm_hc_src[KCM Helm chart source]
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
     ocm_pch["ocm PostCreateHook"]
-    ks_scripts -.-> ocm_pch
-    ks_scripts -.-> ks_pch
+    setup_ksc["example setup<br>using core"]
+    setup_steps["example setup<br>step-by-step"]
+    e2e_local["E2E setup<br>local"]
+    e2e_release["E2E setup<br>release"]
     end
     ocm_pch -.-> osa_hc_repo
     kcm_ctr_image[KCM container image] --> kcm_code
@@ -108,10 +113,20 @@ flowchart LR
     ksc_hc_repo -.-> osa_hc_repo
     ksc_hc_repo -.-> otp_hc_repo
     ksc_hc_repo -.-> kcm_hc_repo
-    ks_scripts -.-> ksc_hc_repo
-    ks_scripts -.-> osa_hc_repo[published OSA Helm Chart]
-    ks_scripts -.-> otp_something["published OTP ??"]
-    ks_scripts -.-> KubeFlex
+    setup_steps -.-> ocm_pch
+    setup_steps -.-> ks_pch
+    setup_steps -.-> KubeFlex
+    setup_ksc -.-> ksc_hc_repo
+    setup_ksc -.-> KubeFlex
+    e2e_local -.-> ocm_pch
+    e2e_local -.-> kcm_code
+    e2e_local -.-> kcm_hc_src
+    e2e_local -.-> gtc_code
+    e2e_local -.-> otp_code
+    e2e_local -.-> KubeFlex
+    e2e_release -.-> ocm_pch
+    e2e_release -.-> ks_pch
+    e2e_release -.-> KubeFlex
 ```
 
 The following diagram shows the parts involving the clusteradm and Helm CLI container images.
@@ -128,8 +143,9 @@ flowchart LR
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
     ocm_pch["ocm PostCreateHook"]
-    ks_scripts -.-> ocm_pch
-    ks_scripts -.-> ks_pch
+    setup_steps["example setup<br>step-by-step"]
+    e2e_local["E2E setup<br>local"]
+    e2e_release["E2E setup<br>release"]
     end
     helm_image["ks/helm image"] --> helm_src
     cladm_image["ks/clusteradm image"] --> cladm_src
@@ -141,17 +157,16 @@ flowchart LR
     ksc_hc_src -.-> cladm_image
     ksc_hc_repo -.-> cladm_image
     ksc_hc_repo -.-> helm_image
+    setup_steps -.-> ocm_pch
+    setup_steps -.-> ks_pch
+    e2e_local -.-> ocm_pch
+    e2e_release -.-> ocm_pch
+    e2e_release -.-> ks_pch
 ```
 
 The dashed dependencies are at run time, not build time.
 
 "KCM" is the KubeStellar controller-manager.
-
-"ks_scripts" are the user-facing instructions and the end-to-end tests
-that use published artifacts (container images, Helm charts). (There
-are also e2e tests that do not use previously published artifacts,
-their temporary local artifacts are beyond the scope of this
-document.)
 
 **NOTE**: among the references to published artifacts, some have a
   version that is maintained in Git while others have a placeholder in
@@ -297,13 +312,13 @@ The instructions display commands to update the user's kubeconfig file to have c
 
 #### E2E setup for testing a release
 
-When setting up to test a release, the setup script uses the following KubeStellar piecees.
+When setting up to test a release, the setup script uses the following KubeStellar pieces.
 
 The script creates the `ocm` and `kubestellar` PCHes from the local YAML for them. The script uses these PCHes in `kflex` commands that create one ITS and one WDS, respectively.
 
 #### E2E setup for testing local copy/version
 
-When setting up to test a release, the setup script uses the following KubeStellar piecees.
+When setting up to test a release, the setup script uses the following KubeStellar pieces.
 
 The script creates the `ocm` PCH from the local YAML for it. The script uses this PCH in a `kflex` command that create one ITS.
 
@@ -311,7 +326,7 @@ The scripts builds a local kubestellar controller-manager container image from l
 
 The script temporarily updates the local kubestellar controller-manager Helm chart to reference the kubestellar controller-manager container image that was loaded into the hosting cluster. Then the script invokes the Helm CLI to instantiate that chart in the hosting cluster, configured to apply to the WDS being set up. Then the script partially undoes its temporary modification of the kubestellar controller-manager Helm chart, using `git checkout --`.
 
-The script builds a local container image for the OCM transport controller from (a) local sources for the generic part and (b) the transport plugin in a ks/ocm-transport-plugin release identified by a literal version number in the script. This version is updated as part of tracking a ks/OTP release. Then the script loads this container image into the hosting cluster. Then the setup script invokes `scripts/deploy-transport-controller.sh` to 
+The script builds a local container image for the OCM transport controller from (a) local sources for the generic part and (b) the transport plugin in a ks/ocm-transport-plugin release identified by a literal version number in the script. This version is updated as part of tracking a ks/OTP release. Then the script loads this container image into the hosting cluster. Then the setup script invokes `scripts/deploy-transport-controller.sh`, which creates a Deployment object that runs the published transport controller image using a version that appears as a literal in the script and is manually updated in the process of reacting to a new ks/OTP release.
 
 
 ## Amalgamated graph
@@ -324,6 +339,7 @@ TODO: finish this
 
 ```mermaid
 flowchart LR
+    otp_code["OTP source in GitHub"]
     subgraph osa_repo["ocm-status-addon@GitHub"]
     osa_code[OSA source code]
     osa_hc_src[OSA Helm chart source]
@@ -334,12 +350,15 @@ flowchart LR
     osa_hc_repo -.-> osa_ctr_image
     subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
+    gtc_code["generic transport<br>controller code"]
     kcm_hc_src[KCM Helm chart source]
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
     ocm_pch["ocm PostCreateHook"]
-    ks_scripts -.-> ocm_pch
-    ks_scripts -.-> ks_pch
+    setup_ksc["example setup<br>using core"]
+    setup_steps["example setup<br>step-by-step"]
+    e2e_local["E2E setup<br>local"]
+    e2e_release["E2E setup<br>release"]
     end
     osa_repo -.-> ks_repo
     ocm_pch -.-> osa_hc_repo
@@ -356,10 +375,20 @@ flowchart LR
     ksc_hc_repo -.-> osa_hc_repo
     ksc_hc_repo -.-> kcm_hc_repo
     ksc_hc_repo -.-> otp_hc_repo
-    ks_scripts -.-> ksc_hc_repo
-    ks_scripts -.-> osa_hc_repo[published OSA Helm Chart]
-    ks_scripts -.-> otp_something["published OTP ??"]
-    ks_scripts -.-> KubeFlex
+    setup_steps -.-> ocm_pch
+    setup_steps -.-> ks_pch
+    setup_steps -.-> KubeFlex
+    setup_ksc -.-> ksc_hc_repo
+    setup_ksc -.-> KubeFlex
+    e2e_local -.-> ocm_pch
+    e2e_local -.-> kcm_code
+    e2e_local -.-> kcm_hc_src
+    e2e_local -.-> gtc_code
+    e2e_local -.-> otp_code
+    e2e_local -.-> KubeFlex
+    e2e_release -.-> ocm_pch
+    e2e_release -.-> ks_pch
+    e2e_release -.-> KubeFlex
 ```
 
 Every dotted line is a reference that must be versioned. How do we
