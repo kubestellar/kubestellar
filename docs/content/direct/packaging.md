@@ -184,21 +184,6 @@ The [release process](release.md) builds and publishes that container image.
 `make ko-build-local` will make a local image for just the local
 platform. This is used in local testing.
 
-### KubeStellar controller-manager Helm Chart
-
-There is a Helm chart that is designed to be instantiated in a KubeFlex hosting cluster, once per WDS. The focus of the chart is getting the KubeStellar controller-manager installed.
-
-The source for the Helm chart is in
-the `chart/` directory. `make chart` (re)derives
-it from local sources. This is not included in `make all-generated`.
-
-This chart creates (among other things) a `Deployment` object that runs a container from the [KubeStellar controller-manager container image](#kubestellar-controller-manager-container-image).
-
-The chart is published at the OCI repository
-`ghcr.io/kubestellar/kubestellar/controller-manager-chart`. A GitHub Actions workflow (in `.github/workflows/goreleaser.yml`) specializes and publishes this chart as part of [the release process](release.md).
-
-By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and that chart has a Deployment that uses the kubestellar-controller-manager container image tagged `$VERSION`.
-
 ### clusteradm container image
 
 The kubestellar GitHub repository has a script,
@@ -217,6 +202,21 @@ This image is used by the [ocm PostCreateHook](#ocm-postcreatehook) to initializ
 ### Helm CLI container image
 
 The container image at `quay.io/kubestellar/helm:3.14.0` was built by `hack/build-helm-image.sh`.
+
+### KubeStellar controller-manager Helm Chart
+
+There is a Helm chart that is designed to be instantiated in a KubeFlex hosting cluster, once per WDS. The focus of the chart is getting the KubeStellar controller-manager installed.
+
+The source for the Helm chart is in
+the `chart/` directory. `make chart` (re)derives
+it from local sources. This is not included in `make all-generated`.
+
+This chart creates (among other things) a `Deployment` object that runs a container from the [KubeStellar controller-manager container image](#kubestellar-controller-manager-container-image).
+
+The chart is published at the OCI repository
+`ghcr.io/kubestellar/kubestellar/controller-manager-chart`. A GitHub Actions workflow (in `.github/workflows/goreleaser.yml`) specializes and publishes this chart as part of [the release process](release.md).
+
+By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and that chart has a Deployment that uses the kubestellar-controller-manager container image tagged `$VERSION`.
 
 ### KubeFlex PostCreateHooks
 
