@@ -240,7 +240,7 @@ This Helm chart is instantiated in a pre-existing Kubernetes cluster and (1) mak
 
 This Helm chart defines and uses two KubeFlex PostCreateHooks, as follows.
 
-- `its` defines a Job with two containers. One container uses the clusteradm container image to initialize the target cluster as a KubeFlex hosting cluster. The other container uses the Helm CLI container image to instantiate the [OCM Status Addon Helm chart](#ocm-status-addon-helm-chart). The version to use is defined in the `values.yaml` of the core chart. This PCH is used for every requested ITS.
+- `its` defines a Job with two containers. One container uses the clusteradm container image to initialize the target cluster as an OCM "hub". The other container uses the Helm CLI container image to instantiate the [OCM Status Addon Helm chart](#ocm-status-addon-helm-chart). The version to use is defined in the `values.yaml` of the core chart. This PCH is used for every requested ITS.
 
 - `wds` defines a Job with two containers. One container uses the Helm CLI image to instantiate the [KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart). The other container uses the Helm CLI image to instantiate the OCM Transport Helm chart. For both of those subsidiary charts, the version to use is defined in the `values.yaml` of the core chart. This PCH is used for every requested WDS.
 
@@ -280,6 +280,39 @@ The PostCreateHook defined in
 `config/postcreate-hooks/kubestellar.yaml` is intended to be used in
 the hosting cluster, once per WDS, and defines a `Job` that has two containers.
 One uses [the Helm CLI image](#helm-cli-container-image) to instantiate [the KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart). The chart version appears as a literal in the PCH definition and is manually updated during the process of creating a release (see [the release process document](release.md)). The other container uses the Helm CLI image to instantiate OCM Transport Helm chart. The version to instantiate appears as a literal in the PCH definition and is manually updated after each OTP release (see [the release process doc](release.md#reacting-to-a-new-ocm-transport-plugin-release)).
+
+### Scripts and instructions
+
+There are instructions for using a release (the [examples](examples.md) document) and a [setup script for end-to-end testing](../../../test/e2e/common/setup-kubestellar.sh). The end-to-end testing can either test the local copy/version of the kubestellar repo or test a release. So there are three cases to consider.
+
+#### Example setup instructions
+
+There are two variants of the setup instructions for the examples: [the older one](common-setup-step-by-step.md), which is called "step-by-step" and uses the `ocm` and `kubestellar` PostCreateHooks, and [the newer one](common-setup-core-chart.md), which uses the [core Helm chart](#kubestellar-core-helm-chart). The latter is the preferred method, and is the only one described here.
+
+The instructions are a Markdown file that displays commands for a user to execute. These start with commands that define environment variables that hold the release of ks/kubestellar and of ks/ocm-transport-plugin to use.
+
+The instructions display a command to instantiate the core Helm chart, at the version in the relevant environment variable, requesting the creation of one ITS and one WDS.
+
+The instructions display commands to update the user's kubeconfig file to have contexts for the ITS and the WDS created by the chart instance. These commands use the KubeFlex CLI (`kflex`). There is also a script under development that will do the job using `kubectl` instead of `kflex`; when it appears, the instructions will display a curl-to-bash command that fetches the script from GitHub using a version that appears as a literal in the instructions and gets manually updated as part of making a new release.
+
+#### E2E setup for testing a release
+
+When setting up to test a release, the setup script uses the following KubeStellar piecees.
+
+The script creates the `ocm` and `kubestellar` PCHes from the local YAML for them. The script uses these PCHes in `kflex` commands that create one ITS and one WDS, respectively.
+
+#### E2E setup for testing local copy/version
+
+When setting up to test a release, the setup script uses the following KubeStellar piecees.
+
+The script creates the `ocm` PCH from the local YAML for it. The script uses this PCH in a `kflex` command that create one ITS.
+
+The scripts builds a local kubestellar controller-manager container image from local sources. Then the script loads that image into the KubeFlex hosting cluster (e.g., using `kind load`).
+
+The script temporarily updates the local kubestellar controller-manager Helm chart to reference the kubestellar controller-manager container image that was loaded into the hosting cluster. Then the script invokes the Helm CLI to instantiate that chart in the hosting cluster, configured to apply to the WDS being set up. Then the script partially undoes its temporary modification of the kubestellar controller-manager Helm chart, using `git checkout --`.
+
+The script builds a local container image for the OCM transport controller from (a) local sources for the generic part and (b) the transport plugin in a ks/ocm-transport-plugin release identified by a literal version number in the script. This version is updated as part of tracking a ks/OTP release. Then the script loads this container image into the hosting cluster. Then the setup script invokes `scripts/deploy-transport-controller.sh` to 
+
 
 ## Amalgamated graph
 
