@@ -34,10 +34,8 @@ including OCM Klusterlet for the WECs.
 ## Latest release
 
 The first release using the new architecture is 0.20.0; it is feture-incomplete.
-Release 0.21.0 works but is not well documented on the website; [view the missing information directly at GitHub](https://github.com/kubestellar/kubestellar/tree/release-0.21.0/docs/content/direct).
-Release 0.21.2 mostly works but references an outdated version (0.1.0) of the OCM transport plugin.
-The latest release is 0.22.0.
-A preview of the latest Helm charting work is in 0.23.0-alpha.4.
+The latest regular release is 0.22.0.
+0.23.0-rc1 is a candidate for the next regular release.
 See also [the release notes](release-notes.md).
 
 ## Architecture
