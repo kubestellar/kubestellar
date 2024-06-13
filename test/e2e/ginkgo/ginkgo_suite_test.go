@@ -39,7 +39,6 @@ func TestGinkgo(t *testing.T) {
 }
 
 var (
-	ctx                context.Context
 	coreCluster        *kubernetes.Clientset
 	wds                *kubernetes.Clientset
 	ksWds              *ksClient.Clientset
@@ -65,13 +64,12 @@ func init() {
 	flag.StringVar(&wec2CtxFlag, "wec2-context", "cluster2", "context for wec2 cluster")
 }
 
-var _ = ginkgo.BeforeSuite(func() {
+var _ = ginkgo.BeforeSuite(func(ctx context.Context) {
 	if !skipSetupFlag {
-		util.Cleanup()
-		util.SetupKubestellar(releasedFlag)
+		util.Cleanup(ctx)
+		util.SetupKubestellar(ctx, releasedFlag)
 	}
 
-	ctx = context.Background()
 	configCore := util.GetConfig(hostClusterCtxFlag)
 	configWds := util.GetConfig(wds1CtxFlag)
 	configITS := util.GetConfig(its1CtxFlag)
