@@ -8,7 +8,7 @@ with a choice of user-defined KubeFlex Control Planes (CPs).
 The information provided is specific for the following release:
 
 ```shell
-export KUBESTELLAR_VERSION=0.23.0-rc1
+export KUBESTELLAR_VERSION=0.23.0-rc2
 export OCM_TRANSPORT_PLUGIN=0.1.10
 ```
 
