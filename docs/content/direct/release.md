@@ -38,15 +38,11 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - If not already in effect, declare a code freeze. There should be nothing but bug fixes and doc improvements while working towards a regular release.
 
+- Edit `docs/mkdocs.yml` and update the definition of `ks_latest_release` to `$version` (e.g., `'0.23.0-rc42'`). If this is a regular release then also update the definition of `ks_latest_regular_release`.
+
 - Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
 
-- Edit the examples document(`docs/content/direct/examples.md`) to update the self-references for the coming release. In the interim while we have some content split out into `docs/content/direct/common-setup-core-chart.md` and `docs/content/direct/common-setup-step-by-step.md`, edit in those places.
-
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
-
-- Update the version every place it appears in the core chart instructions, `docs/content/direct/core-chart.md`. Eventually we may settle on a regular release for some curl-to-bash invocations.
-
-- Update the microshift directions, `docs/content/direct/microshift.md`.
 
 - Until we have our first stable release, edit the docs README(`docs/content/direct/README.md`, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
 
