@@ -36,21 +36,20 @@ Examples of users interaction with KubeStellar are illustrated in the
 
 The KubeStellar architecture has these main modules:
 
-- *KubeStellar Controller Manager*: this module is responsible for watching `BindingPolicy` objects and create from it a matching `Binding` object that contains list of references to the concrete objects and list of references to the concrete clusters, and for updating the status of objects in the WDS.
+- *KubeStellar Controller Manager*: this module is instantiated once per WDS and is responsible for watching `BindingPolicy` objects and create from it a matching `Binding` object that contains list of references to the concrete objects and list of references to the concrete clusters, and for updating the status of objects in the WDS.
 
-- *Pluggable Transport Controller*: this module is responsible for delivering workload objects from the WDS to the ITS according to `Binding` objects.
+- *Pluggable Transport Controller*: this module is instiated once per WDS and is responsible for delivering workload objects from the WDS to the ITS according to `Binding` objects.
 
 - *Space Manager*: This module manages the lifecycle of spaces.
 
-- *OCM Cluster Manager*: This module syncs objects from the ITS to the Workload Execution 
+- *OCM Cluster Manager*: This module is instantiated once per ITS and syncs objects from that ITS to the Workload Execution 
 Clusters (WECs). In the ITS, each mailbox namespace is associated with one WEC. Objects 
 that are put in a mailbox namespace are delivered to the matching WEC.
 
-- *Status Add-On Controller*: This module installs the OCM status add-on agent 
-on all WECs and sets the RBAC permissions for it using the OCM add-on framework.
-
 - *OCM Agent*: This module registers the WEC to the OCM Hub, watches for 
 [ManifestWork.v1.work.open-cluster-management.io](https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L17) objects and unwraps and syncs the objects into the WEC.
+
+- *OCM Status Add-On Controller*: This module is instantiated once per ITS and uses the [OCM Add-on Framework](https://open-cluster-management.io/concepts/addon/) to get the OCM Status Add-On Agent installed in each WEC along with supporting RBAC objects.
 
 - *OCM Status Add-On Agent*: This module watches [AppliedManifestWork.v1.work.open-cluster-management.io](https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L528) objects 
 to find objects that are synced by the OCM agent, gets their status 
@@ -132,22 +131,6 @@ OCM provides an add-on framework that allows to automatically install additional
 agents on the managed clusters to provide specific features. This framework is used to
 install the status add-on on all managed clusters.
 KubeStellar currently exposes users directly to OCM inventory management and WEC registration.
-We plan to make the transport features provided by the OCM project pluggable in the near future.
-
-## Status Add-On Controller
-
-This module automates the installation of the status add-on agent 
-on all managed clusters. It is based on the 
-[OCM Add-on Framework](https://open-cluster-management.io/concepts/addon/), 
-which is a framework that helps developers to develop extensions 
-for working with multiple clusters in custom cases. A module based on 
-the add-on framework has two components: a controller and the 
-add-on agent. The controller interacts with the add-on manager to register 
-the add-on, manage the distribution of the add-on to all clusters, and set 
-up the RBAC permissions required by the add-on agent to interact with the mailbox 
-namespace associated with the managed cluster. More specifically, the status 
-add-on controller sets up RBAC permissions to allow the add-on agent to 
-list and get `ManifestWork` objects and create and update *WorkStatus* objects.
 
 ## OCM Agent
 
@@ -180,6 +163,21 @@ on the managed cluster for each ManifestWork as an anchor for resources relating
 When ManifestWork is deleted, the work agent runs a *Foreground* deletion, and that ManifestWork 
 will stay in deleting state until all its related resources have been fully cleaned in the managed 
 cluster.
+
+## OCM Status Add-On Controller
+
+This module automates the installation of the OCM status add-on agent 
+on all managed clusters. It is based on the 
+[OCM Add-on Framework](https://open-cluster-management.io/concepts/addon/), 
+which is a framework that helps developers to develop extensions 
+for working with multiple clusters in custom cases. A module based on 
+the add-on framework has two components: a controller and an 
+agent. The controller interacts with the add-on manager to register 
+the add-on, manage the distribution of the add-on to all clusters, and set 
+up the RBAC permissions required by the add-on agent to interact with the mailbox 
+namespace associated with the managed cluster. More specifically, the status 
+add-on controller sets up RBAC permissions to allow the add-on agent to 
+list and get `ManifestWork` objects and create and update *WorkStatus* objects.
 
 ## OCM Status Add-On Agent
 
