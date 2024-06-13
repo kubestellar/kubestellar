@@ -47,6 +47,7 @@ import (
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
+	k8smetrics "k8s.io/component-base/metrics"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -57,6 +58,7 @@ import (
 	controlv1alpha1informers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
 	controlv1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/jsonpath"
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/transport/filtering"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
@@ -79,6 +81,7 @@ var objectsFilter = filtering.NewObjectFilteringMap()
 // the given transport and transportClientset to discover the GVR of wrapped objects.
 // The given transportDynamicClient is used to access the ITS.
 func NewTransportController(ctx context.Context,
+	wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics,
 	inventoryPreInformer clusterinformers.ManagedClusterInformer,
 	bindingClient controlclient.BindingInterface,
 	bindingInformer controlv1alpha1informers.BindingInformer,
@@ -96,12 +99,13 @@ func NewTransportController(ctx context.Context,
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
 	}
-	return NewTransportControllerForWrappedObjectGVR(ctx, inventoryPreInformer, bindingClient, bindingInformer, customTransformInformer, transport, wdsClientset, wdsDynamicClient, itsNSClient, propCfgMapPreInformer, transportDynamicClient, wdsName, wrappedObjectGVR), nil
+	return NewTransportControllerForWrappedObjectGVR(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer, bindingClient, bindingInformer, customTransformInformer, transport, wdsClientset, wdsDynamicClient, itsNSClient, propCfgMapPreInformer, transportDynamicClient, wdsName, wrappedObjectGVR), nil
 }
 
 // NewTransportControllerForWrappedObjectGVR returns a new transport controller.
 // The given transportDynamicClient is used to access the ITS.
 func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
+	wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics,
 	inventoryPreInformer clusterinformers.ManagedClusterInformer,
 	bindingClient controlclient.BindingInterface,
 	bindingInformer controlv1alpha1informers.BindingInformer,
@@ -113,33 +117,69 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 	propCfgMapPreInformer corev1informers.ConfigMapInformer,
 	transportDynamicClient dynamic.Interface,
 	wdsName string, wrappedObjectGVR schema.GroupVersionResource) *genericTransportController {
-	dynamicInformerFactory := dynamicinformer.NewDynamicSharedInformerFactory(transportDynamicClient, 0)
+	measuredBindingClient := ksmetrics.NewWrappedClusterScopedClient[*v1alpha1.Binding, *v1alpha1.BindingList](wdsClientMetrics, util.GetBindingGVR(), bindingClient)
+	measuredWDSDynamicClient := ksmetrics.NewWrappedDynamicClient(wdsClientMetrics, wdsDynamicClient)
+	measuredITSDynamicClient := ksmetrics.NewWrappedDynamicClient(itsClientMetrics, transportDynamicClient)
+	dynamicInformerFactory := dynamicinformer.NewDynamicSharedInformerFactory(measuredITSDynamicClient, 0)
 	wrappedObjectGenericInformer := dynamicInformerFactory.ForResource(wrappedObjectGVR)
 	customTransformInformer.Informer().AddIndexers(map[string]cache.IndexFunc{customTransformDomainIndexName: customTransformToDomain})
+	customTransformsClient := wdsClientset.ControlV1alpha1().CustomTransforms()
+	measuredCustomTransformClient := ksmetrics.NewWrappedClusterScopedClient[*v1alpha1.CustomTransform, *v1alpha1.CustomTransformList](wdsClientMetrics, v1alpha1.GroupVersion.WithResource("customtransforms"), customTransformsClient)
+	measuredITSNSClient := ksmetrics.NewWrappedClusterScopedClient[*corev1.Namespace, *corev1.NamespaceList](itsClientMetrics, corev1.SchemeGroupVersion.WithResource("namespaces"), itsNSClient)
 	workqueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
+
 	transportController := &genericTransportController{
 		logger:                        klog.FromContext(ctx),
 		inventoryInformerSynced:       inventoryPreInformer.Informer().HasSynced,
 		inventoryLister:               inventoryPreInformer.Lister(),
-		bindingClient:                 bindingClient,
+		bindingClient:                 measuredBindingClient,
 		bindingLister:                 bindingInformer.Lister(),
 		bindingInformerSynced:         bindingInformer.Informer().HasSynced,
-		itsNSClient:                   itsNSClient,
+		itsNSClient:                   measuredITSNSClient,
 		propCfgMapLister:              propCfgMapPreInformer.Lister().ConfigMaps(v1alpha1.PropertyConfigMapNamespace),
 		propCfgMapInformerSynced:      propCfgMapPreInformer.Informer().HasSynced,
 		wrappedObjectInformerSynced:   wrappedObjectGenericInformer.Informer().HasSynced,
 		customTransformLister:         customTransformInformer.Lister(),
 		customTransformInformerSynced: customTransformInformer.Informer().HasSynced,
-		workqueue:                     workqueue,
-		transport:                     transport,
-		transportClient:               transportDynamicClient,
-		wrappedObjectGVR:              wrappedObjectGVR,
-		wdsClientset:                  wdsClientset,
-		wdsDynamicClient:              wdsDynamicClient,
-		wdsName:                       wdsName,
-		bindingSensitiveDestinations:  make(map[string]sets.Set[v1alpha1.Destination]),
-		destinationProperties:         make(map[v1alpha1.Destination]clusterProperties),
-		customTransformCollection: newCustomTransformCollection(wdsClientset.ControlV1alpha1().CustomTransforms(),
+		wecSampler: ksmetrics.NewListLenSampler(inventoryPreInformer.Informer().GetStore().List,
+			&k8smetrics.KubeOpts{Namespace: "kubestellar", Subsystem: "transport_controller",
+				Name: "wecs", Help: "number of inventory objects", StabilityLevel: k8smetrics.ALPHA}),
+		bindingSampler: ksmetrics.NewListLenSampler(bindingInformer.Informer().GetStore().List,
+			&k8smetrics.KubeOpts{Namespace: "kubestellar", Subsystem: "transport_controller",
+				Name: "bindings", Help: "number of Binding objects", StabilityLevel: k8smetrics.ALPHA}),
+		transformSampler: ksmetrics.NewListLenSampler(customTransformInformer.Informer().GetStore().List,
+			&k8smetrics.KubeOpts{Namespace: "kubestellar", Subsystem: "transport_controller",
+				Name: "transforms", Help: "number of CustomTransform objects", StabilityLevel: k8smetrics.ALPHA}),
+		propMapSampler: ksmetrics.NewListLenSampler(propCfgMapPreInformer.Informer().GetStore().List,
+			&k8smetrics.KubeOpts{Namespace: "kubestellar", Subsystem: "transport_controller",
+				Name: "prop_maps", Help: "number of property ConfigMaps", StabilityLevel: k8smetrics.ALPHA}),
+		wrappedSampler: ksmetrics.NewListLenSampler(wrappedObjectGenericInformer.Informer().GetStore().List,
+			&k8smetrics.KubeOpts{Namespace: "kubestellar", Subsystem: "transport_controller",
+				Name: "wrapped_objects", Help: "number of wrapped objects", StabilityLevel: k8smetrics.ALPHA}),
+		bindingWhatsHist: k8smetrics.NewHistogram(&k8smetrics.HistogramOpts{
+			Namespace: "kubestellar", Subsystem: "transport_controller", Name: "binding_whats",
+			Help:           "number of workload objects referenced by a Binding",
+			Buckets:        []float64{0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000},
+			StabilityLevel: k8smetrics.ALPHA}),
+		bindingWheresHist: k8smetrics.NewHistogram(&k8smetrics.HistogramOpts{
+			Namespace: "kubestellar", Subsystem: "transport_controller", Name: "binding_wheres",
+			Help:           "number of WECs referenced by a Binding",
+			Buckets:        []float64{0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000},
+			StabilityLevel: k8smetrics.ALPHA}),
+		bindingAreaHist: k8smetrics.NewHistogram(&k8smetrics.HistogramOpts{
+			Namespace: "kubestellar", Subsystem: "transport_controller", Name: "binding_areas",
+			Help:           "product of number of WECs and number of workload objects referenced by a Binding",
+			Buckets:        []float64{0, 1, 3, 10, 30, 100, 300, 1000, 3000, 10000, 30000},
+			StabilityLevel: k8smetrics.ALPHA}),
+		workqueue:                    workqueue,
+		transport:                    transport,
+		transportClient:              measuredITSDynamicClient,
+		wrappedObjectGVR:             wrappedObjectGVR,
+		wdsDynamicClient:             measuredWDSDynamicClient,
+		wdsName:                      wdsName,
+		bindingSensitiveDestinations: make(map[string]sets.Set[v1alpha1.Destination]),
+		destinationProperties:        make(map[v1alpha1.Destination]clusterProperties),
+		customTransformCollection: newCustomTransformCollection(measuredCustomTransformClient,
 			customTransformInformer.Informer().GetIndexer().ByIndex,
 			workqueue.Add),
 	}
@@ -149,6 +189,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 	bindingInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
 			transportController.handleBinding(obj, "add")
+			transportController.bindingSampler.Prod()
 		},
 		UpdateFunc: func(_, new interface{}) { transportController.handleBinding(new, "update") },
 		DeleteFunc: func(obj any) {
@@ -156,17 +197,22 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 				obj = dfsu.Obj
 			}
 			transportController.handleBinding(obj, "delete")
+			transportController.bindingSampler.Prod()
 		},
 	})
 
 	customTransformInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    func(obj any) { transportController.handleCustomTransform(obj, "add") },
+		AddFunc: func(obj any) {
+			transportController.handleCustomTransform(obj, "add")
+			transportController.transformSampler.Prod()
+		},
 		UpdateFunc: func(_, obj any) { transportController.handleCustomTransform(obj, "update") },
 		DeleteFunc: func(obj any) {
 			if deletedStateUnknown, ok := obj.(cache.DeletedFinalStateUnknown); ok {
 				obj = deletedStateUnknown.Obj
 			}
 			transportController.handleCustomTransform(obj, "delete")
+			transportController.transformSampler.Prod()
 		},
 	})
 
@@ -177,6 +223,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 	wrappedObjectGenericInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
 			transportController.handleWrappedObject(obj, "add")
+			transportController.wrappedSampler.Prod()
 		},
 		UpdateFunc: func(_, new interface{}) {
 			transportController.handleWrappedObject(new, "update")
@@ -186,11 +233,13 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 				obj = dfsu.Obj
 			}
 			transportController.handleWrappedObject(obj, "delete")
+			transportController.wrappedSampler.Prod()
 		},
 	})
 	inventoryPreInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
 			transportController.handlePropertiesEvent(obj, "add")
+			transportController.wecSampler.Prod()
 		},
 		UpdateFunc: func(old, new interface{}) {
 			transportController.handlePropertiesEvent(new, "update")
@@ -200,11 +249,13 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 				obj = dfsu.Obj
 			}
 			transportController.handlePropertiesEvent(obj, "delete")
+			transportController.wecSampler.Prod()
 		},
 	})
 	propCfgMapPreInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
 			transportController.handlePropertiesEvent(obj, "add")
+			transportController.propMapSampler.Prod()
 		},
 		UpdateFunc: func(old, new interface{}) {
 			transportController.handlePropertiesEvent(new, "update")
@@ -214,11 +265,21 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 				obj = dfsu.Obj
 			}
 			transportController.handlePropertiesEvent(obj, "delete")
+			transportController.propMapSampler.Prod()
 		},
 	})
 	dynamicInformerFactory.Start(ctx.Done())
 
 	return transportController
+}
+
+func (c *genericTransportController) RegisterMetrics(reg ksmetrics.RegisterFn) {
+	ksmetrics.MustRegister(reg,
+		c.wecSampler, c.bindingSampler, c.transformSampler, c.propMapSampler, c.wrappedSampler,
+	)
+	ksmetrics.MustRegisterAbles(reg,
+		c.bindingWhatsHist, c.bindingWheresHist, c.bindingAreaHist,
+	)
 }
 
 func convertObjectToUnstructured(object runtime.Object) (*unstructured.Unstructured, error) {
@@ -255,16 +316,18 @@ type genericTransportController struct {
 
 	inventoryInformerSynced     cache.InformerSynced
 	inventoryLister             clusterlisters.ManagedClusterLister
-	bindingClient               controlclient.BindingInterface
+	bindingClient               ksmetrics.ClientModNamespace[*v1alpha1.Binding, *v1alpha1.BindingList]
 	bindingLister               controlv1alpha1listers.BindingLister
 	bindingInformerSynced       cache.InformerSynced
-	itsNSClient                 corev1client.NamespaceInterface
+	itsNSClient                 ksmetrics.ClientModNamespace[*corev1.Namespace, *corev1.NamespaceList]
 	propCfgMapLister            corev1listers.ConfigMapNamespaceLister
 	propCfgMapInformerSynced    cache.InformerSynced
 	wrappedObjectInformerSynced cache.InformerSynced
 
-	customTransformLister         controlv1alpha1listers.CustomTransformLister
-	customTransformInformerSynced cache.InformerSynced
+	customTransformLister                                                        controlv1alpha1listers.CustomTransformLister
+	customTransformInformerSynced                                                cache.InformerSynced
+	wecSampler, bindingSampler, transformSampler, propMapSampler, wrappedSampler ksmetrics.Sampler
+	bindingWhatsHist, bindingWheresHist, bindingAreaHist                         *k8smetrics.Histogram
 
 	// workqueue is a rate limited work queue of references to objects to work on.
 	// This is used to queue work to be processed instead of performing it as soon as a change happens.
@@ -278,7 +341,6 @@ type genericTransportController struct {
 	transportClient  dynamic.Interface // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
-	wdsClientset     ksclientset.Interface
 	wdsDynamicClient dynamic.Interface
 	wdsName          string
 
@@ -537,6 +599,11 @@ func (c *genericTransportController) syncBinding(ctx context.Context, objectName
 		return fmt.Errorf("failed to get Binding object '%s' - %w", objectName, err)
 	}
 
+	numWhat := len(binding.Spec.Workload.ClusterScope) + len(binding.Spec.Workload.NamespaceScope)
+	numWhere := len(binding.Spec.Destinations)
+	c.bindingWhatsHist.Observe(float64(numWhat))
+	c.bindingWheresHist.Observe(float64(numWhere))
+	c.bindingAreaHist.Observe(float64(numWhat * numWhere))
 	if isObjectBeingDeleted(binding) {
 		c.setBindingSensitivities(binding.Name, nil)
 		return c.deleteWrappedObjectsAndFinalizer(ctx, binding)

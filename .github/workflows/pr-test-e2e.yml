@@ -83,6 +83,10 @@ jobs:
         if: always()
         run: kubectl --context kind-kubeflex get deployments -A
 
+      - name: show Deployment objects in its1
+        if: always()
+        run: kubectl --context its1 get deployments -A
+
       - name: show kubestellar controller manager log
         if: always()
         run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
@@ -118,6 +122,39 @@ jobs:
       - name: show workstatuses
         if: always()
         run: kubectl --context its1 get workstatuses -A -o yaml
+
+      - name: scrape kubestellar controller-manager
+        if: always()
+        run: |
+          kubectl --context kind-kubeflex port-forward -n wds1-system deploy/kubestellar-controller-manager 8080 &
+          sleep 10
+          curl http://localhost:8080/metrics
+          kill %
+
+      - name: scrape transport controller
+        if: always()
+        run: |
+          kubectl --context kind-kubeflex port-forward -n wds1-system deploy/transport-controller 8090 &
+          sleep 10
+          curl http://localhost:8090/metrics
+          kill %
+
+      - name: scrape OCM Status Add-On Controller
+        if: always()
+        run: |
+          kubectl --context its1 port-forward -n open-cluster-management deploy/addon-status-controller 9280 &
+          sleep 10
+          curl http://localhost:9280/metrics
+          kill %
+          sleep 1
+
+      - name: scrape OCM Status Add-On Agent
+        if: always()
+        run: |
+          kubectl --context cluster1 port-forward -n open-cluster-management-agent-addon deploy/status-agent 8080 &
+          sleep 10
+          curl http://localhost:8080/metrics
+          kill %
 
   test-bash:
     name: Test in bash
@@ -166,6 +203,10 @@ jobs:
         if: always()
         run: kubectl --context kind-kubeflex get deployments -A
 
+      - name: show Deployment objects in its1
+        if: always()
+        run: kubectl --context its1 get deployments -A
+
       - name: show kubestellar controller manager log
         if: always()
         run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
@@ -201,3 +242,36 @@ jobs:
       - name: show workstatuses
         if: always()
         run: kubectl --context its1 get workstatuses -A -o yaml
+
+      - name: scrape kubestellar controller-manager
+        if: always()
+        run: |
+          kubectl --context kind-kubeflex port-forward -n wds1-system deploy/kubestellar-controller-manager 8080 &
+          sleep 10
+          curl http://localhost:8080/metrics
+          kill %
+
+      - name: scrape transport controller
+        if: always()
+        run: |
+          kubectl --context kind-kubeflex port-forward -n wds1-system deploy/transport-controller 8090 &
+          sleep 10
+          curl http://localhost:8090/metrics
+          kill %
+
+      - name: scrape OCM Status Add-On Controller
+        if: always()
+        run: |
+          kubectl --context its1 port-forward -n open-cluster-management deploy/addon-status-controller 9280 &
+          sleep 10
+          curl http://localhost:9280/metrics
+          kill %
+          sleep 1
+
+      - name: scrape OCM Status Add-On Agent
+        if: always()
+        run: |
+          kubectl --context cluster1 port-forward -n open-cluster-management-agent-addon deploy/status-agent 8080 &
+          sleep 10
+          curl http://localhost:8080/metrics
+          kill %
