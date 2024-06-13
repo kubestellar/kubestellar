@@ -9,7 +9,7 @@ The information provided is specific for the following release:
 
 ```shell
 export KUBESTELLAR_VERSION=0.23.0-rc1
-export OCM_TRANSPORT_PLUGIN=0.1.9
+export OCM_TRANSPORT_PLUGIN=0.1.10
 ```
 
 It may also be a good idea to do a bit of cleanup first. See how it is done in the cleanup script for our E2E tests (in `test/e2e/common/cleanup.sh`).
