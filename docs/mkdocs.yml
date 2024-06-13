@@ -14,16 +14,6 @@ edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: 'latest'
 
-ks_stable_tag: 'v0.9.0'
-
-ks_current_branch: 'release-0.15'
-ks_current_tag: 'v0.15.0'
-ks_current_helm_version: '8'
-
-ks_next_branch: 'release-0.16'
-ks_next_tag: 'v0.16.0'
-ks_next_helm_version: '9'
-
 ks_kind_port_num: '1119'
 
 # Site content
