@@ -102,9 +102,9 @@ func CreateNS(ctx context.Context, client *kubernetes.Clientset, name string) {
 	}, timeout).Should(gomega.Succeed())
 }
 
-func Cleanup() {
+func Cleanup(ctx context.Context) {
 	var e, o bytes.Buffer
-	cmd := exec.Command("../common/cleanup.sh")
+	cmd := exec.CommandContext(ctx, "../common/cleanup.sh")
 	cmd.Stderr = &e
 	cmd.Stdout = &o
 	err := cmd.Run()
@@ -115,8 +115,7 @@ func Cleanup() {
 	gomega.Expect(err).To(gomega.Succeed())
 }
 
-func SetupKubestellar(releasedFlag bool) {
-	var cmd *exec.Cmd
+func SetupKubestellar(ctx context.Context, releasedFlag bool) {
 	var e, o bytes.Buffer
 	var args []string
 	if releasedFlag {
@@ -124,7 +123,7 @@ func SetupKubestellar(releasedFlag bool) {
 	}
 	commandName := "../common/setup-kubestellar.sh"
 	ginkgo.By(fmt.Sprintf("Execing command %v", append([]string{commandName}, args...)))
-	cmd = exec.Command(commandName, args...)
+	cmd := exec.CommandContext(ctx, commandName, args...)
 	cmd.Stderr = &e
 	cmd.Stdout = &o
 	err := cmd.Run()

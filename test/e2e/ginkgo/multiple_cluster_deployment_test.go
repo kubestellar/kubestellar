@@ -17,6 +17,8 @@ limitations under the License.
 package e2e
 
 import (
+	"context"
+
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
@@ -33,7 +35,7 @@ const (
 )
 
 var _ = ginkgo.Describe("end to end testing", func() {
-	ginkgo.BeforeEach(func() {
+	ginkgo.BeforeEach(func(ctx context.Context) {
 		// Cleanup the WDS, create 1 deployment and 1 binding policy.
 		util.CleanupWDS(ctx, wds, ksWds, ns)
 		util.CreateDeployment(ctx, wds, ns, "nginx",
@@ -50,6 +52,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx"}},
 				}}})
 	})
+
+	ctx := context.Background()
 
 	ginkgo.Context("multiple WECs", func() {
 		ginkgo.It("propagates deployment to the WECs while applying CustomTransform", func() {
