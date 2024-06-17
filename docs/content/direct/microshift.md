@@ -5,7 +5,7 @@ This documents explains how to use KubeStellar Core chart in MicroShift.
 The information provided is specific for the following release:
 
 ```shell
-export KUBESTELLAR_VERSION=0.23.0-rc2
+export KUBESTELLAR_VERSION=0.23.0
 ```
 
 ## Pre-requisites
