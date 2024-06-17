@@ -201,7 +201,7 @@ spec:
               - ocm-transport-plugin
               - oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin
               - --version
-              - "0.1.10"
+              - "0.1.11"
               - --set
               - "wds_cp_name={{.ControlPlaneName}}"
             env:
