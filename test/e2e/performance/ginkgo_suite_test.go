@@ -33,7 +33,6 @@ import (
 )
 
 var (
-	ctx               context.Context
 	coreClusterClient *kubernetes.Clientset
 	wdsClient         *kubernetes.Clientset
 	ksWdsClient       *ksClient.Clientset
@@ -57,13 +56,12 @@ func init() {
 	flag.BoolVar(&justSummary, "just-summary", false, "just print the summary info")
 }
 
-var _ = ginkgo.BeforeSuite(func() {
+var _ = ginkgo.BeforeSuite(func(ctx context.Context) {
 	if !skipSetupFlag {
-		util.Cleanup()
-		util.SetupKubestellar(releasedFlag)
+		util.Cleanup(ctx)
+		util.SetupKubestellar(ctx, releasedFlag)
 	}
 
-	ctx = context.Background()
 	configCore := util.GetConfig("kind-kubeflex")
 	configWds := util.GetConfig("wds1")
 	configITS := util.GetConfig("imbs1")
