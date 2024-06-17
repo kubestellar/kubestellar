@@ -1,7 +1,7 @@
 # Kubestellar performance regression testing
 This is a simple performance test that aims to identify major regressions. 
 
-The setup is a single bindingpolicy and a single deployment. The test adds the deployment to the WDS and measures the amount of time it takes to create the WDS object, the Binding object, the ManifestWork object, and the deployment object on the WEC. The starting time is just prior to adding the WDS object and the end time is just after the deployment object is observed on the WEC. The other timings are obtained from the objects creation timestamp. The test intentionally looks at seconds rather than milliseconds since we expect this test to run on VMs and and anything below seconds is likely just noise. In addition, the test uses creation timestamps which have seconds granuality.
+The test adds a deployment to the WDS and measures the cumulative time it takes to create the WDS workload object, the Binding object, the ManifestWork object, and the deployment object on the WEC. The starting time is just prior to adding the workload to the WDS and the end time is just after the object is observed on the WEC. The timings are obtained from the objects creation timestamp which have seconds granuality. We expect this test to run on VMs and and anything below seconds is likely just noise. 
 
 This is what the results look like:
 ```shell
@@ -28,7 +28,7 @@ To execute these tests, issue the following command.
 ginkgo -v 
 ```
 
-To test the latest release image, pass `-released` to the test. For example:
+To test the latest release up through the commit of test/e2e being used, pass `-released` to the test. For example:
 
 ```shell
 ginkgo -v -- -released
