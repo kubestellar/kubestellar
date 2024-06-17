@@ -17,7 +17,10 @@ limitations under the License.
 package status
 
 import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/tools/cache"
 
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
@@ -25,5 +28,43 @@ import (
 type workStatus struct {
 	wecName                string
 	sourceObjectIdentifier util.ObjectIdentifier
-	status                 *runtime.RawExtension
+	status                 map[string]interface{}
+}
+
+func convertToWorkStatusesList(objList []runtime.Object) ([]*workStatus, error) {
+	var workStatuses []*workStatus
+	for _, ws := range objList {
+		wStatus, err := convertToWorkStatus(ws)
+		if err != nil {
+			return workStatuses, err
+		}
+		workStatuses = append(workStatuses, wStatus)
+	}
+
+	return workStatuses, nil
+}
+
+func convertToWorkStatus(obj runtime.Object) (*workStatus, error) {
+	// wecName is the WorkStatus namespace
+	wecName := obj.(metav1.Object).GetNamespace()
+
+	status, err := util.GetWorkStatusStatus(obj)
+	if err != nil {
+		return nil, err
+	}
+	sourceRef, err := util.GetWorkStatusSourceRef(obj)
+	if err != nil {
+		return nil, err
+	}
+
+	objIdentifier := util.ObjectIdentifier{
+		GVK:        schema.GroupVersionKind{Group: sourceRef.Group, Version: sourceRef.Version, Kind: sourceRef.Kind},
+		Resource:   sourceRef.Resource,
+		ObjectName: cache.NewObjectName(sourceRef.Namespace, sourceRef.Name),
+	}
+
+	return &workStatus{
+		wecName:                wecName,
+		sourceObjectIdentifier: objIdentifier,
+		status:                 status}, nil
 }

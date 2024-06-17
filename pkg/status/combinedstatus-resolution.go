@@ -22,7 +22,6 @@ import (
 
 	"github.com/google/cel-go/common/types/ref"
 
-	"k8s.io/apimachinery/pkg/runtime"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -160,6 +159,10 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 
 	// add new statuscollector data
 	for statusCollectorName, statusCollectorSpec := range statusCollectorNameToSpec {
+		if statusCollectorSpec == nil {
+			continue // not cached
+		}
+
 		if _, ok := c.statusCollectorNameToData[statusCollectorName]; !ok {
 			c.statusCollectorNameToData[statusCollectorName] = &statusCollectorData{
 				StatusCollectorSpec: statusCollectorSpec,
@@ -202,6 +205,21 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 	return true
 }
 
+// removeStatusCollector removes the status collector data from the
+// combinedstatus resolution. The function returns true if the status collector
+// data is removed.
+func (c *combinedStatusResolution) removeStatusCollector(statusCollectorName string) bool {
+	c.Lock()
+	defer c.Unlock()
+
+	if _, ok := c.statusCollectorNameToData[statusCollectorName]; !ok {
+		return false // statusCollector is irrelevant to this combinedstatus resolution
+	}
+
+	delete(c.statusCollectorNameToData, statusCollectorName)
+	return true
+}
+
 // generateCombinedStatus calculates the combinedstatus from the statuscollector
 // data in the combinedstatus resolution.
 func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
@@ -216,7 +234,7 @@ func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.Combin
 // evaluateWorkStatus evaluates the workstatus per relevant statuscollector.
 // The function returns true if any statuscollector data is updated.
 func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator,
-	workStatusWECName string, workStatusContent *runtime.RawExtension) (bool, error) {
+	workStatusWECName string, workStatusContent map[string]interface{}) (bool, error) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -248,8 +266,13 @@ func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator
 // The function assumes that the caller holds a lock over the combinedstatus
 // resolution.
 func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvaluator, workStatusWECName string,
-	workStatusContent *runtime.RawExtension, scData *statusCollectorData) (bool, error) {
+	workStatusContent map[string]interface{}, scData *statusCollectorData) (bool, error) {
 	wsData, exists := scData.workStatusRefToData[workStatusWECName]
+
+	if workStatusContent == nil && exists { // workstatus is empty/deleted, remove the workstatus data if it exists
+		delete(scData.workStatusRefToData, workStatusWECName)
+		return true, nil
+	}
 
 	// evaluate filter to determine if the workstatus is relevant
 	if scData.Filter != nil {
@@ -288,7 +311,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 			return false, fmt.Errorf("failed to evaluate select expression: %w", err)
 		}
 
-		updated = updated || eval.Value() != wsData.selectEval[selectNamedExp.Name].Value()
+		updated = updated || eval.Equal(wsData.selectEval[selectNamedExp.Name]).Value() != true
 		selectEvals[selectNamedExp.Name] = eval
 	}
 
@@ -300,7 +323,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 			return false, fmt.Errorf("failed to evaluate groupBy expression: %w", err)
 		}
 
-		updated = updated || eval.Value() != wsData.groupByEval[groupByNamedExp.Name].Value()
+		updated = updated || eval.Equal(wsData.groupByEval[groupByNamedExp.Name]).Value() != true
 		groupByEvals[groupByNamedExp.Name] = eval
 	}
 
@@ -322,7 +345,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 			return false, fmt.Errorf("failed to evaluate combinedFields expression: %w", err)
 		}
 
-		updated = updated || eval.Value() != wsData.combinedFieldsEval[combinedFieldNamedAgg.Name].Value()
+		updated = updated || eval.Equal(wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]).Value() != true
 		combinedFieldEvals[combinedFieldNamedAgg.Name] = eval
 	}
 

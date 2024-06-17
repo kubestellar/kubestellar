@@ -17,14 +17,11 @@ limitations under the License.
 package status
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types/ref"
-
-	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
@@ -67,7 +64,7 @@ func (e *celEvaluator) CheckExpression(expression string) error {
 
 // Evaluate takes an expression and a Kubernetes raw object, and returns the
 // evaluation of the expression with the object as the context.
-func (e *celEvaluator) Evaluate(expression v1alpha1.Expression, rawObj *runtime.RawExtension) (ref.Val, error) {
+func (e *celEvaluator) Evaluate(expression v1alpha1.Expression, objMap map[string]interface{}) (ref.Val, error) {
 	ast, issues := e.env.Parse(string(expression))
 	if issues != nil && issues.Err() != nil {
 		return nil, fmt.Errorf("failed to parse expression: %w", issues.Err())
@@ -82,13 +79,6 @@ func (e *celEvaluator) Evaluate(expression v1alpha1.Expression, rawObj *runtime.
 	prog, err := e.env.Program(checked)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create program: %w", err)
-	}
-
-	// unmarshal the raw JSON data into a map
-	var objMap map[string]interface{}
-	err = json.Unmarshal(rawObj.Raw, &objMap)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal raw object: %w", err)
 	}
 
 	// evaluate the expression with the unstructured object

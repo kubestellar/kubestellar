@@ -20,8 +20,11 @@ import (
 	"fmt"
 	"sync"
 
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/client-go/tools/cache"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/abstract"
@@ -56,14 +59,13 @@ type CombinedStatusResolver interface {
 	// The update may involve adding or removing statuscollectors, and changing
 	// the set of destinations associated with the binding.
 	//
-	// The function uses the statuscollector lister and the given workstatus
-	// objects to update internal state. The given array is assumed to contain
-	// all objects that may be relevant to the binding.
+	// The function uses the workstatus and statuscollector listers to update
+	// internal state.
 	//
 	// The returned set contains the identifiers of combinedstatus objects
 	// that should be queued for syncing.
 	NoteBindingResolution(bindingName string, bindingResolution binding.Resolution, deleted bool,
-		workStatuses []*workStatus,
+		workStatusLister cache.GenericLister,
 		statusCollectorLister controllisters.StatusCollectorLister) sets.Set[util.ObjectIdentifier]
 
 	// NoteStatusCollector notes a statuscollector's spec.
@@ -71,14 +73,14 @@ type CombinedStatusResolver interface {
 	// for every resolution it is involved with. The statuscollector is assumed
 	// to be valid and immutable.
 	//
-	// The given array is assumed to contain all objects that may be associated
-	// with any combinedstatus resolution.
-	// The array and its contents must not be mutated during this call.
+	// If `deleted` is true, the statuscollector is removed from the cache.
+	//
+	// The function uses the workstatus lister to update internal state.
 	//
 	// The returned set contains the identifiers of combinedstatus objects
 	// that should be queued for syncing.
-	NoteStatusCollector(statusCollector *v1alpha1.StatusCollector,
-		workStatuses []*workStatus) sets.Set[util.ObjectIdentifier]
+	NoteStatusCollector(statusCollector *v1alpha1.StatusCollector, deleted bool,
+		workStatusLister cache.GenericLister) sets.Set[util.ObjectIdentifier]
 
 	// NoteWorkStatus notes a workstatus in the combinedstatus resolution
 	// associated with its source workload object.
@@ -100,8 +102,9 @@ func NewCombinedStatusResolver(celEvaluator *celEvaluator) (CombinedStatusResolv
 	}
 
 	return &combinedStatusResolver{
-		celEvaluator:             celEvaluator,
-		bindingNameToResolutions: make(map[string]map[util.ObjectIdentifier]*combinedStatusResolution),
+		celEvaluator:              celEvaluator,
+		bindingNameToResolutions:  make(map[string]map[util.ObjectIdentifier]*combinedStatusResolution),
+		statusCollectorNameToSpec: make(map[string]*v1alpha1.StatusCollectorSpec),
 	}, nil
 }
 
@@ -168,14 +171,13 @@ func (c *combinedStatusResolver) CompareCombinedStatus(bindingName string,
 // The update may involve adding or removing statuscollectors, and changing
 // the set of destinations associated with the binding.
 //
-// The function uses the statuscollector lister and the cached workstatus
-// objects to update internal state. The given array is assumed to contain
-// all objects that may be relevant to the binding.
+// The function uses the workstatus and statuscollector listers to update
+// internal state.
 //
 // The returned set contains the identifiers of combinedstatus objects
 // that should be queued for syncing.
 func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindingResolution binding.Resolution,
-	deleted bool, workStatuses []*workStatus,
+	deleted bool, workStatusLister cache.GenericLister,
 	statusCollectorLister controllisters.StatusCollectorLister) sets.Set[util.ObjectIdentifier] {
 	c.Lock()
 	defer c.Unlock()
@@ -264,11 +266,14 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 	// evaluate workstatuses associated with members of workloadIdentifiersToEvaluate and return the combinedstatus
 	// identifiers that should be queued for syncing
 	return combinedStatusIdentifiersToQueue.Union(c.evaluateWorkStatusesPerBindingReadLocked(bindingName,
-		workloadIdentifiersToEvaluate, collectionDestinations, workStatuses))
+		workloadIdentifiersToEvaluate, collectionDestinations, workStatusLister))
 }
 
 // NoteWorkStatus notes a workstatus in the combinedstatus resolution
 // associated with its source workload object.
+//
+// If the workstatus's status field is nil, the workstatus is removed from
+// resolutions it affects.
 //
 // The returned set contains the identifiers of combinedstatus objects
 // that should be queued for syncing.
@@ -287,7 +292,7 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 		}
 
 		changed, err := resolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, workStatus.status)
-		if err != nil { //
+		if err != nil {
 			bindingNameToError[bindingName] = err
 		}
 
@@ -305,14 +310,14 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 // for every resolution it is involved with. The statuscollector is assumed
 // to be valid and immutable.
 //
-// The given array is assumed to contain all objects that may be associated
-// with any combinedstatus resolution.
-// The array and its contents must not be mutated during this call.
+// If `deleted` is true, the statuscollector is removed from the cache.
+//
+// The function uses the workstatus lister to update internal state.
 //
 // The returned set contains the identifiers of combinedstatus objects
 // that should be queued for syncing.
-func (c *combinedStatusResolver) NoteStatusCollector(statusCollector *v1alpha1.StatusCollector,
-	workStatuses []*workStatus) sets.Set[util.ObjectIdentifier] {
+func (c *combinedStatusResolver) NoteStatusCollector(statusCollector *v1alpha1.StatusCollector, deleted bool,
+	workStatusLister cache.GenericLister) sets.Set[util.ObjectIdentifier] {
 	c.Lock()
 	defer c.Unlock()
 
@@ -321,21 +326,34 @@ func (c *combinedStatusResolver) NoteStatusCollector(statusCollector *v1alpha1.S
 		return nil // already cached and the spec has not changed
 	}
 
-	// update the cache
-	c.statusCollectorNameToSpec[statusCollector.Name] = &statusCollector.Spec // readonly
-
 	combinedStatusIdentifiersToQueue := sets.New[util.ObjectIdentifier]()
 	// update resolutions that use the statuscollector
-	// this call cannot add an association that was not already present
+	// this call cannot add an association that was not already present.
+	// if deleted, the association is removed.
 	for bindingName, resolutions := range c.bindingNameToResolutions {
 		for workloadObjectIdentifier, resolution := range resolutions {
+			if deleted {
+				if resolution.removeStatusCollector(statusCollector.Name) {
+					combinedStatusIdentifiersToQueue.Insert(getCombinedStatusIdentifier(bindingName,
+						workloadObjectIdentifier))
+				}
+
+				continue
+			}
+
 			if resolution.updateStatusCollector(statusCollector.Name, &statusCollector.Spec) { // true if changed
 				// evaluate ALL workstatuses associated with the (binding, workload object) pair
 				combinedStatusIdentifiersToQueue.Insert(c.evaluateWorkStatusesPerBindingReadLocked(bindingName,
 					sets.New(workloadObjectIdentifier), resolution.collectionDestinations,
-					workStatuses).UnsortedList()...)
+					workStatusLister).UnsortedList()...)
 			}
 		}
+	}
+
+	if !deleted {
+		c.statusCollectorNameToSpec[statusCollector.Name] = &statusCollector.Spec
+	} else {
+		delete(c.statusCollectorNameToSpec, statusCollector.Name)
 	}
 
 	return combinedStatusIdentifiersToQueue
@@ -384,31 +402,38 @@ func (c *combinedStatusResolver) fetchMissingStatusCollectorSpecsLocked(statusCo
 // should be queued for syncing.
 // The method is expected to be called with the read lock held.
 func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindingName string,
-	workloadIdentifiersToEvaluate sets.Set[util.ObjectIdentifier], destinations sets.Set[string],
-	workStatuses []*workStatus) sets.Set[util.ObjectIdentifier] {
+	workloadObjIdentifiersToEvaluate sets.Set[util.ObjectIdentifier], destinations sets.Set[string],
+	workStatusLister cache.GenericLister) sets.Set[util.ObjectIdentifier] {
 	workloadObjectToError := make(map[util.ObjectIdentifier]error) // TODO: use
 	combinedStatusesToQueue := sets.Set[util.ObjectIdentifier]{}
 
-	for _, workStatus := range workStatuses {
-		// skip workstatuses that are not associated with the binding's destinations
-		if destinations.Has(workStatus.wecName) {
-			continue
-		}
-
-		// skip workstatuses that are not associated with the workload objects
-		if !workloadIdentifiersToEvaluate.Has(workStatus.sourceObjectIdentifier) {
-			continue
-		}
-
-		// evaluate workstatus
-		csResolution := c.bindingNameToResolutions[bindingName][workStatus.sourceObjectIdentifier]
-		changed, err := csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, workStatus.status)
+	for workloadObjIdentifier := range workloadObjIdentifiersToEvaluate {
+		// fetch workstatuses
+		workStatuses, err := getWorkStatusesOfObject(workStatusLister, workloadObjIdentifier)
 		if err != nil {
-			workloadObjectToError[workStatus.sourceObjectIdentifier] = err
+			runtime2.HandleError(fmt.Errorf("failed to get workstatuses for workload object %v: %w",
+				workloadObjIdentifier, err))
+			continue
 		}
 
-		if changed {
-			combinedStatusesToQueue.Insert(getCombinedStatusIdentifier(bindingName, workStatus.sourceObjectIdentifier))
+		// evaluate workstatuses
+		for _, workStatus := range workStatuses {
+			// skip workstatuses that are not associated with the binding's destinations
+			if destinations.Has(workStatus.wecName) {
+				continue
+			}
+
+			// evaluate workstatus
+			csResolution := c.bindingNameToResolutions[bindingName][workStatus.sourceObjectIdentifier]
+			changed, err := csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, workStatus.status)
+			if err != nil {
+				workloadObjectToError[workStatus.sourceObjectIdentifier] = err
+			}
+
+			if changed {
+				combinedStatusesToQueue.Insert(getCombinedStatusIdentifier(bindingName,
+					workStatus.sourceObjectIdentifier))
+			}
 		}
 	}
 
@@ -469,4 +494,27 @@ func namedExpressionSliceToMap(slice []v1alpha1.NamedExpression) map[string]v1al
 	}
 
 	return result
+}
+
+func getWorkStatusesOfObject(workStatusLister cache.GenericLister,
+	objectIdentifier util.ObjectIdentifier) ([]*workStatus, error) {
+	// fetch workstatuses
+	requirement, err := labels.NewRequirement(util.WorkStatusSourceRefKey,
+		selection.Equals,
+		[]string{objectIdentifier.ObjectName.String()})
+	if err != nil {
+		return nil, err
+	}
+
+	objs, err := workStatusLister.List(labels.NewSelector().Add(*requirement))
+	if err != nil {
+		return nil, err
+	}
+
+	workStatuses, err := convertToWorkStatusesList(objs)
+	if err != nil {
+		return nil, err
+	}
+
+	return workStatuses, nil
 }
