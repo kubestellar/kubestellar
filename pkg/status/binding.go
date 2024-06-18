@@ -21,7 +21,6 @@ import (
 )
 
 func (c *Controller) syncBinding(ctx context.Context, key string) error {
-
 	isDeleted := false
 
 	resolution := c.bindingResolutionBroker.GetResolution(key)
@@ -30,8 +29,9 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 		isDeleted = true
 	}
 
-	// TODO: make sure that NoteBindingResolution can handle resolution == nil
-	combinedStatusSet := c.combinedStatusResolver.NoteBindingResolution(key, *resolution, isDeleted, c.workStatusLister, c.statusCollectorLister)
+	// NoteBindingResolution does not use the resolution if isDeleted is true
+	combinedStatusSet := c.combinedStatusResolver.NoteBindingResolution(key, resolution, isDeleted, c.workStatusIndexer,
+		c.statusCollectorLister)
 	for combinedStatus := range combinedStatusSet {
 		// TODO: combinedStatusResolver.NoteBindingResolution can return a list of strings(ns/name)
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)

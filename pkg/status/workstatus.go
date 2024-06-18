@@ -32,48 +32,12 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
+const workStatusIdentificationIndexKey = "workStatusIdentificationIndex"
+
 type workStatus struct {
 	wecName                string
 	sourceObjectIdentifier util.ObjectIdentifier
 	status                 map[string]interface{}
-}
-
-func convertToWorkStatusesList(objList []runtime.Object) ([]*workStatus, error) {
-	var workStatuses []*workStatus
-	for _, ws := range objList {
-		wStatus, err := convertToWorkStatus(ws)
-		if err != nil {
-			return workStatuses, err
-		}
-		workStatuses = append(workStatuses, wStatus)
-	}
-
-	return workStatuses, nil
-}
-
-func convertToWorkStatus(obj runtime.Object) (*workStatus, error) {
-	// wecName is the WorkStatus namespace
-	wecName := obj.(metav1.Object).GetNamespace()
-
-	status, err := util.GetWorkStatusStatus(obj)
-	if err != nil {
-		return nil, err
-	}
-	sourceRef, err := util.GetWorkStatusSourceRef(obj)
-	if err != nil {
-		return nil, err
-	}
-
-	objIdentifier := util.ObjectIdentifier{
-		GVK:        schema.GroupVersionKind{Group: sourceRef.Group, Version: sourceRef.Version, Kind: sourceRef.Kind},
-		Resource:   sourceRef.Resource,
-		ObjectName: cache.NewObjectName(sourceRef.Namespace, sourceRef.Name),
-	}
-
-	return &workStatus{
-		wecName:                wecName,
-		sourceObjectIdentifier: objIdentifier,
-		status:                 status}, nil
 }
 
 func (c *Controller) syncWorkStatus(ctx context.Context, key string) error {
@@ -86,7 +50,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, key string) error {
 		// The resource no longer exist, which means it has been deleted.
 		if errors.IsNotFound(err) {
 			utilruntime.HandleError(fmt.Errorf("object %#v in work queue no longer exists", key))
-			return nil
+			return nil // TODO: this is a bug, should notify the resolver of removal
 		}
 		return err
 	}
@@ -97,7 +61,6 @@ func (c *Controller) syncWorkStatus(ctx context.Context, key string) error {
 	}
 	combinedStatusSet := c.combinedStatusResolver.NoteWorkStatus(ws)
 	for combinedStatus := range combinedStatusSet {
-		// TODO: combinedStatusResolver.NoteWorkStatus can return a list of strings(ns/name)
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
@@ -166,7 +129,31 @@ func updateObjectStatus(ctx context.Context, objRef *util.SourceRef, status map[
 	return nil
 }
 
-// TODO - move these to a common lib
+func convertToWorkStatus(obj runtime.Object) (*workStatus, error) {
+	// wecName is the WorkStatus namespace
+	wecName := obj.(metav1.Object).GetNamespace()
+
+	status, err := util.GetWorkStatusStatus(obj)
+	if err != nil {
+		return nil, err
+	}
+	sourceRef, err := util.GetWorkStatusSourceRef(obj)
+	if err != nil {
+		return nil, err
+	}
+
+	objIdentifier := util.ObjectIdentifier{
+		GVK:        schema.GroupVersionKind{Group: sourceRef.Group, Version: sourceRef.Version, Kind: sourceRef.Kind},
+		Resource:   sourceRef.Resource,
+		ObjectName: cache.NewObjectName(sourceRef.Namespace, sourceRef.Name),
+	}
+
+	return &workStatus{
+		wecName:                wecName,
+		sourceObjectIdentifier: objIdentifier,
+		status:                 status}, nil
+}
+
 func getObject(lister cache.GenericLister, namespace, name string) (runtime.Object, error) {
 	if namespace != "" {
 		return lister.ByNamespace(namespace).Get(name)
