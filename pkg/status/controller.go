@@ -69,6 +69,7 @@ type Controller struct {
 	combinedStatusLister    controllisters.CombinedStatusLister
 	workStatusInformer      cache.SharedIndexInformer
 	workStatusLister        cache.GenericLister
+	workStatusIndexer       cache.Indexer
 	workqueue               workqueue.RateLimitingInterface
 	// all wds listers are used to retrieve objects and update status
 	// without having to re-create new caches for this controller
@@ -138,10 +139,8 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 	if err != nil {
 		return controller, err
 	}
-	resolver, err := NewCombinedStatusResolver(celEvaluator)
-	if err != nil {
-		return controller, err
-	}
+	resolver := NewCombinedStatusResolver(celEvaluator)
+
 	controller.combinedStatusResolver = resolver
 	return controller, nil
 }
@@ -287,6 +286,18 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 		Resource: util.WorkStatusResource}
 
 	c.workStatusInformer = informerFactory.ForResource(gvr).Informer()
+	// add indexer on key from (wecName, sourceRef) for workstatus fetching efficiency
+	c.workStatusInformer.AddIndexers(cache.Indexers{
+		workStatusIdentificationIndexKey: func(obj interface{}) ([]string, error) {
+			wecName := obj.(metav1.Object).GetNamespace()
+			sourceRef, err := util.GetWorkStatusSourceRef(obj.(runtime.Object))
+			if err != nil {
+				return nil, err
+			}
+
+			return []string{util.KeyFromSourceRefAndWecName(sourceRef, wecName)}, nil
+		}})
+	c.workStatusIndexer = c.workStatusInformer.GetIndexer()
 	c.workStatusLister = cache.NewGenericLister(c.workStatusInformer.GetIndexer(), gvr.GroupResource())
 
 	// add the event handler functions

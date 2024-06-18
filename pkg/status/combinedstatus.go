@@ -19,8 +19,9 @@ package status
 import (
 	"context"
 
-	"github.com/kubestellar/kubestellar/pkg/util"
 	"k8s.io/client-go/tools/cache"
+
+	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 func (c *Controller) syncCombinedStatus(ctx context.Context, key string) error {

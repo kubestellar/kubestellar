@@ -152,6 +152,22 @@ func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 	}, nil
 }
 
+func KeyFromSourceRefAndWecName(sourceRef *SourceRef, wecName string) string {
+	return fmt.Sprintf("%s/%s/%s/%s/%s/%s", sourceRef.Group, sourceRef.Version, sourceRef.Resource,
+		sourceRef.Kind, sourceRef.Name, wecName)
+}
+
+func SourceRefFromObjectIdentifier(objIdentifier ObjectIdentifier) *SourceRef {
+	return &SourceRef{
+		Group:     objIdentifier.GVK.Group,
+		Version:   objIdentifier.GVK.Version,
+		Resource:  objIdentifier.Resource,
+		Kind:      objIdentifier.GVK.Kind,
+		Name:      objIdentifier.ObjectName.Name,
+		Namespace: objIdentifier.ObjectName.Namespace,
+	}
+}
+
 func GetWorkStatusStatus(workStatus runtime.Object) (map[string]interface{}, error) {
 	obj, ok := workStatus.(*unstructured.Unstructured)
 	if !ok {

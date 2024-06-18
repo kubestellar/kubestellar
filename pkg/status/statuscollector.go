@@ -19,8 +19,9 @@ package status
 import (
 	"context"
 
-	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
+
+	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 func (c *Controller) syncStatusCollector(ctx context.Context, key string) error {
@@ -29,18 +30,18 @@ func (c *Controller) syncStatusCollector(ctx context.Context, key string) error 
 	statusCollector, err := c.statusCollectorLister.Get(key)
 	if err != nil {
 		// The resource no longer exist, which means it has been deleted.
-		if errors.IsNotFound(err) {
-			isDeleted = true
-			statusCollector = &v1alpha1.StatusCollector{}
-			statusCollector.Name = key
+		if !errors.IsNotFound(err) {
+			return err
 		}
-		return err
+
+		isDeleted = true // not found, should be deleted
+		statusCollector = &v1alpha1.StatusCollector{}
+		statusCollector.Name = key
 	}
 
-	// TODO: NoteStatusCollector assumes that the given object is valid. The check should be done here.
-	combinedStatusSet := c.combinedStatusResolver.NoteStatusCollector(statusCollector, isDeleted, c.workStatusLister)
+	// TODO: validate the statusCollector if not nil
+	combinedStatusSet := c.combinedStatusResolver.NoteStatusCollector(statusCollector, isDeleted, c.workStatusIndexer)
 	for combinedStatus := range combinedStatusSet {
-		// TODO: combinedStatusResolver.NoteStatusCollector can return a list of strings(ns/name)
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
