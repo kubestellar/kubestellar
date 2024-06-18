@@ -24,9 +24,7 @@ import (
 	"github.com/go-logr/logr"
 	"golang.org/x/time/rate"
 
-	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -40,23 +38,38 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/binding"
+	ksclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
+	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
+	controllisters "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-const controllerName = "Status"
+const (
+	controllerName      = "Status"
+	defaultResyncPeriod = time.Duration(0)
+	queueingDelay       = 2 * time.Second
+	originWdsLabelKey   = "transport.kubestellar.io/originWdsName"
+)
 
 // Controller watches workstatues and checks whether the corresponding
 // workload object asks for the singleton status returning. If yes,
 // the full status will be copied to the workload object in WDS.
 type Controller struct {
-	logger             logr.Logger
-	wdsName            string
-	wdsDynClient       dynamic.Interface
-	itsDynClient       dynamic.Interface
-	workStatusInformer cache.SharedIndexInformer
-	workStatusLister   cache.GenericLister
-	workqueue          workqueue.RateLimitingInterface
+	logger       logr.Logger
+	wdsName      string
+	wdsDynClient dynamic.Interface
+	wdsKsClient  ksclient.Interface
+	itsDynClient dynamic.Interface
+
+	statusCollectorInformer cache.SharedIndexInformer
+	statusCollectorLister   controllisters.StatusCollectorLister
+	combinedStatusInformer  cache.SharedIndexInformer
+	combinedStatusLister    controllisters.CombinedStatusLister
+	workStatusInformer      cache.SharedIndexInformer
+	workStatusLister        cache.GenericLister
+	workqueue               workqueue.RateLimitingInterface
 	// all wds listers are used to retrieve objects and update status
 	// without having to re-create new caches for this controller
 	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
@@ -68,9 +81,21 @@ type Controller struct {
 	// the combinedStatusResolver.
 	// The handling of informer events on StatusCollector and WorkStatus objects
 	// should go through the combinedStatusResolver.
-	binding.ResolutionBroker
-	combinedStatusResolver
+	bindingResolutionBroker binding.ResolutionBroker
+	combinedStatusResolver  CombinedStatusResolver
 }
+
+// bindingRef is a workqueue item that references a Binding
+type bindingRef string
+
+// workStatusRef is a workqueue item that references a WorkStatus
+type workStatusRef string
+
+// combinedStatusRef is a workqueue item that references a CombinedStatus
+type combinedStatusRef string
+
+// statusCollectorRef is a workqueue item that references a StatusCollector
+type statusCollectorRef string
 
 // Create a new  status controller
 func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsName string) (*Controller, error) {
@@ -89,17 +114,35 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 		return nil, err
 	}
 
+	wdsKsClient, err := ksclient.NewForConfig(wdsRestConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	zapLogger := zap.New(zap.UseDevMode(true))
 	log.SetLogger(zapLogger)
 
+	resolutionBroker := binding.NewResolutionBroker(nil) // TODO: implement ResolutionGetter func
+
 	controller := &Controller{
-		wdsName:      wdsName,
-		logger:       log.Log.WithName(controllerName),
-		wdsDynClient: wdsDynClient,
-		itsDynClient: itsDynClient,
-		workqueue:    workqueue.NewRateLimitingQueue(ratelimiter),
+		wdsName:                 wdsName,
+		logger:                  log.Log.WithName(controllerName),
+		wdsDynClient:            wdsDynClient,
+		wdsKsClient:             wdsKsClient,
+		itsDynClient:            itsDynClient,
+		workqueue:               workqueue.NewRateLimitingQueue(ratelimiter),
+		bindingResolutionBroker: resolutionBroker,
 	}
 
+	celEvaluator, err := newCELEvaluator()
+	if err != nil {
+		return controller, err
+	}
+	resolver, err := NewCombinedStatusResolver(celEvaluator)
+	if err != nil {
+		return controller, err
+	}
+	controller.combinedStatusResolver = resolver
 	return controller, nil
 }
 
@@ -126,7 +169,23 @@ func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan
 func (c *Controller) run(ctx context.Context, workers int, cListers chan interface{}) error {
 	defer c.workqueue.ShutDown()
 
+	c.bindingResolutionBroker.RegisterCallback(func(bindingPolicyKey string) {
+		//TODO: implement callback func
+	})
+
 	go c.runWorkStatusInformer(ctx)
+
+	ksInformerFactory := ksinformers.NewSharedInformerFactory(c.wdsKsClient, defaultResyncPeriod)
+	if err := c.setupStatusCollectorInformer(ctx, ksInformerFactory); err != nil {
+		return err
+	}
+	if err := c.setupCombinedStatusInformer(ctx, ksInformerFactory); err != nil {
+		return err
+	}
+	ksInformerFactory.Start(ctx.Done())
+	if ok := cache.WaitForCacheSync(ctx.Done(), c.statusCollectorInformer.HasSynced, c.combinedStatusInformer.HasSynced); !ok {
+		return fmt.Errorf("failed to wait for KubeStellar informers to sync")
+	}
 
 	c.listers = (<-cListers).(util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister])
 	c.logger.Info("Received listers")
@@ -141,6 +200,83 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	c.logger.Info("Shutting down workers")
 
 	return nil
+}
+
+func (c *Controller) setupStatusCollectorInformer(ctx context.Context, ksInformerFactory ksinformers.SharedInformerFactory) error {
+	logger := klog.FromContext(ctx)
+	c.statusCollectorInformer = ksInformerFactory.Control().V1alpha1().StatusCollectors().Informer()
+	c.statusCollectorLister = ksInformerFactory.Control().V1alpha1().StatusCollectors().Lister()
+	_, err := c.statusCollectorInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			sc := obj.(*v1alpha1.StatusCollector)
+			logger.V(5).Info("Enqueuing reference to StatusCollector because of informer add event", "name", sc.Name, "resourceVersion", sc.ResourceVersion)
+			c.workqueue.Add(statusCollectorRef(sc.Name))
+		},
+		UpdateFunc: func(old, new interface{}) {
+			oldSc := old.(*v1alpha1.StatusCollector)
+			newSc := new.(*v1alpha1.StatusCollector)
+			if oldSc.Generation != newSc.Generation {
+				logger.V(5).Info("Enqueuing reference to StatusCollector because of informer update event", "name", newSc.Name, "resourceVersion", newSc.ResourceVersion)
+				c.workqueue.Add(statusCollectorRef(newSc.Name))
+			}
+		},
+		DeleteFunc: func(obj interface{}) {
+			if typed, is := obj.(cache.DeletedFinalStateUnknown); is {
+				obj = typed.Obj
+			}
+			sc := obj.(*v1alpha1.StatusCollector)
+			logger.V(5).Info("Enqueuing reference to StatusCollector because of informer delete event", "name", sc.Name)
+			c.workqueue.Add(statusCollectorRef(sc.Name))
+		},
+	})
+	if err != nil {
+		c.logger.Error(err, "failed to add statuscollectors informer event handler")
+		return err
+	}
+	return nil
+}
+
+func (c *Controller) setupCombinedStatusInformer(ctx context.Context, ksInformerFactory ksinformers.SharedInformerFactory) error {
+	logger := klog.FromContext(ctx)
+	c.combinedStatusInformer = ksInformerFactory.Control().V1alpha1().CombinedStatuses().Informer()
+	c.combinedStatusLister = ksInformerFactory.Control().V1alpha1().CombinedStatuses().Lister()
+	_, err := c.combinedStatusInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			cs := obj.(*v1alpha1.CombinedStatus)
+			logger.V(5).Info("Enqueuing reference to CombinedStatus because of informer add event", "name", cs.Name, "resourceVersion", cs.ResourceVersion)
+			c.enqueueCombinedStatus(cs)
+		},
+		UpdateFunc: func(old, new interface{}) {
+			oldCs := old.(*v1alpha1.CombinedStatus)
+			newCs := new.(*v1alpha1.CombinedStatus)
+			if oldCs.Generation != newCs.Generation {
+				logger.V(5).Info("Enqueuing reference to CombinedStatus because of informer update event", "name", newCs.Name, "resourceVersion", newCs.ResourceVersion)
+				c.enqueueCombinedStatus(newCs)
+			}
+		},
+		DeleteFunc: func(obj interface{}) {
+			if typed, is := obj.(cache.DeletedFinalStateUnknown); is {
+				obj = typed.Obj
+			}
+			cs := obj.(*v1alpha1.CombinedStatus)
+			logger.V(5).Info("Enqueuing reference to CombinedStatus because of informer delete event", "name", cs.Name)
+			c.enqueueCombinedStatus(cs)
+		},
+	})
+	if err != nil {
+		c.logger.Error(err, "failed to add combinedstatuses informer event handler")
+		return err
+	}
+	return nil
+}
+
+func (c *Controller) enqueueCombinedStatus(obj interface{}) {
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
+	if err != nil {
+		utilruntime.HandleError(err)
+		return
+	}
+	c.workqueue.AddAfter(combinedStatusRef(key), queueingDelay)
 }
 
 func (c *Controller) runWorkStatusInformer(ctx context.Context) {
@@ -207,7 +343,7 @@ func (c *Controller) enqueueObject(obj interface{}) {
 		utilruntime.HandleError(err)
 		return
 	}
-	c.workqueue.Add(ref)
+	c.workqueue.Add(workStatusRef(ref.String()))
 }
 
 // runWorker is a long-running function that will continually call the
@@ -221,45 +357,33 @@ func (c *Controller) runWorker(ctx context.Context) {
 // processNextWorkItem reads a single work item off the workqueue and
 // attempt to process it by calling the reconcile.
 func (c *Controller) processNextWorkItem(ctx context.Context) bool {
-	obj, shutdown := c.workqueue.Get()
+	item, shutdown := c.workqueue.Get()
 	if shutdown {
 		return false
 	}
 
 	// We wrap this block in a func so we can defer c.workqueue.Done.
-	err := func(obj interface{}) error {
+	err := func(item interface{}) error {
 		// We call Done here so the workqueue knows we have finished
 		// processing this item. We also must remember to call Forget if we
 		// do not want this work item being re-queued. For example, we do
 		// not call Forget if a transient error occurs, instead the item is
 		// put back on the workqueue and attempted again after a back-off
 		// period.
-		defer c.workqueue.Done(obj)
+		defer c.workqueue.Done(item)
 
-		// We expect a cache.ObjectName to come off the workqueue. We do this as the delayed
-		// nature of the workqueue means the items in the informer cache may actually be
-		// more up to date that when the item was initially put onto the
-		// workqueue.
-		ref, ok := obj.(cache.ObjectName)
-		if !ok {
-			// if the item in the workqueue is invalid, we call
-			// Forget here to avoid process a work item that is invalid.
-			c.workqueue.Forget(obj)
-			utilruntime.HandleError(fmt.Errorf("expected a string key in the workqueue but got %#v", obj))
-			return nil
-		}
-		// Run the reconciler, passing it the full key or the metav1 Object
-		if err := c.reconcile(ctx, ref); err != nil {
+		// Run the reconciler, passing it the full key of the metav1 Object
+		if err := c.reconcile(ctx, item); err != nil {
 			// Put the item back on the workqueue to handle any transient errors.
-			c.workqueue.AddRateLimited(obj)
-			return fmt.Errorf("error syncing key '%s': %s, requeuing", obj, err.Error())
+			c.workqueue.AddRateLimited(item)
+			return fmt.Errorf("error syncing key '%s': %s, requeuing", item, err.Error())
 		}
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
-		c.workqueue.Forget(obj)
-		c.logger.V(2).Info("Successfully synced", "object", obj)
+		c.workqueue.Forget(item)
+		c.logger.V(2).Info("Successfully synced", "object", item)
 		return nil
-	}(obj)
+	}(item)
 
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -269,86 +393,19 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 	return true
 }
 
-func (c *Controller) reconcile(ctx context.Context, ref cache.ObjectName) error {
-	obj, err := getObject(c.workStatusLister, ref.Namespace, ref.Name)
-	if err != nil {
-		// The resource no longer exist, which means it has been deleted.
-		if errors.IsNotFound(err) {
-			utilruntime.HandleError(fmt.Errorf("object %#v in work queue no longer exists", ref))
-			return nil
-		}
-		return err
+func (c *Controller) reconcile(ctx context.Context, item any) error {
+	logger := klog.FromContext(ctx)
+
+	switch objIdentifier := item.(type) {
+	case workStatusRef:
+		return c.syncWorkStatus(ctx, string(objIdentifier))
+	case bindingRef:
+		return c.syncBinding(ctx, string(objIdentifier))
+	case statusCollectorRef:
+		return c.syncStatusCollector(ctx, string(objIdentifier))
+	case combinedStatusRef:
+		return c.syncCombinedStatus(ctx, string(objIdentifier))
 	}
-
-	// only process workstatues with the label for single reported status
-	statusLabelVal, ok := obj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]
-	if !ok {
-		return nil
-	}
-
-	sourceRef, err := util.GetWorkStatusSourceRef(obj)
-	if err != nil {
-		return err
-	}
-
-	// remove the status if singleton status label value is unset
-	if statusLabelVal == util.BindingPolicyLabelSingletonStatusValueUnset {
-		emptyStatus := make(map[string]interface{})
-		return updateObjectStatus(ctx, sourceRef, emptyStatus, c.listers, c.wdsDynClient)
-	}
-
-	status, err := util.GetWorkStatusStatus(obj)
-	if err != nil {
-		// status gets updated after workstatus is created, it's ok to requeue
-		return err
-	}
-
-	c.logger.Info("updating singleton status", "kind", sourceRef.Kind, "name", sourceRef.Name, "namespace", sourceRef.Namespace)
-	return updateObjectStatus(ctx, sourceRef, status, c.listers, c.wdsDynClient)
-}
-
-func updateObjectStatus(ctx context.Context, objRef *util.SourceRef, status map[string]interface{},
-	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister], wdsDynClient dynamic.Interface) error {
-
-	gvr := schema.GroupVersionResource{Group: objRef.Group, Version: objRef.Version, Resource: objRef.Resource}
-	lister, found := listers.Get(gvr)
-	if !found {
-		return fmt.Errorf("could not find lister for gvr %s", gvr)
-	}
-
-	obj, err := getObject(lister, objRef.Namespace, objRef.Name)
-	if err != nil {
-		return err
-	}
-
-	unstrObj, ok := obj.(*unstructured.Unstructured)
-	if !ok {
-		return fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s", util.RefToRuntimeObj(obj))
-	}
-
-	// set the status and update the object
-	unstrObj.Object["status"] = status
-
-	if objRef.Namespace == "" {
-		_, err = wdsDynClient.Resource(gvr).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{})
-	} else {
-		_, err = wdsDynClient.Resource(gvr).Namespace(objRef.Namespace).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{})
-	}
-	if err != nil {
-		// if resource not found it may mean no status subresource - try to patch the status
-		if errors.IsNotFound(err) {
-			return util.PatchStatus(ctx, unstrObj, status, objRef.Namespace, gvr, wdsDynClient)
-		}
-		return fmt.Errorf("failed to update status: %w", err)
-	}
-
+	logger.Error(nil, "Impossible workqueue entry", "type", fmt.Sprintf("%T", item), "value", item)
 	return nil
-}
-
-// TODO - move these to a common lib
-func getObject(lister cache.GenericLister, namespace, name string) (runtime.Object, error) {
-	if namespace != "" {
-		return lister.ByNamespace(namespace).Get(name)
-	}
-	return lister.Get(name)
 }
