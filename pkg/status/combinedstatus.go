@@ -20,19 +20,20 @@ import (
 	"context"
 
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-func (c *Controller) syncCombinedStatus(ctx context.Context, key string) error {
-
+func (c *Controller) syncCombinedStatus(ctx context.Context, ref string) error {
+	logger := klog.FromContext(ctx)
 	// TODO implement combinedStatus reconciler
-
-	ns, name, err := cache.SplitMetaNamespaceKey(key)
+	ns, name, err := cache.SplitMetaNamespaceKey(ref)
 	if err != nil {
 		return err
 	}
-	c.logger.Info("Handled CombinedStatus", "ns", ns, "name", name)
+
+	logger.Info("Synced CombinedStatus", "ns", ns, "name", name)
 	return nil
 }
 

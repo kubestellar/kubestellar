@@ -392,7 +392,6 @@ func (c *combinedStatusResolver) fetchMissingStatusCollectorSpecsLocked(statusCo
 func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindingName string,
 	workloadObjIdentifiersToEvaluate sets.Set[util.ObjectIdentifier], destinations sets.Set[string],
 	workStatusIndexer cache.Indexer) sets.Set[util.ObjectIdentifier] {
-	workloadObjectToError := make(map[util.ObjectIdentifier]error) // TODO: use
 	combinedStatusesToQueue := sets.Set[util.ObjectIdentifier]{}
 
 	for workloadObjIdentifier := range workloadObjIdentifiersToEvaluate {
@@ -403,7 +402,7 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 
 			objs, err := workStatusIndexer.ByIndex(workStatusIdentificationIndexKey, indexKey) // one obj expected
 			if err != nil {
-				workloadObjectToError[workloadObjIdentifier] = err
+				runtime2.HandleError(fmt.Errorf("failed to get workstatus with indexKey %s: %w", indexKey, err))
 				continue
 			}
 
@@ -411,9 +410,9 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 				continue
 			}
 
-			workStatus, err := convertToWorkStatus(objs[0].(runtime.Object))
+			workStatus, err := runtimeObjectToWorkStatus(objs[0].(runtime.Object))
 			if err != nil {
-				workloadObjectToError[workloadObjIdentifier] = err
+				runtime2.HandleError(fmt.Errorf("failed to convert runtime.Object to workStatus: %w", err))
 				continue
 			}
 

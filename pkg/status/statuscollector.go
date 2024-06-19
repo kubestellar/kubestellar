@@ -24,10 +24,10 @@ import (
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
-func (c *Controller) syncStatusCollector(ctx context.Context, key string) error {
+func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error {
 	isDeleted := false
 
-	statusCollector, err := c.statusCollectorLister.Get(key)
+	statusCollector, err := c.statusCollectorLister.Get(ref)
 	if err != nil {
 		// The resource no longer exist, which means it has been deleted.
 		if !errors.IsNotFound(err) {
@@ -36,7 +36,7 @@ func (c *Controller) syncStatusCollector(ctx context.Context, key string) error 
 
 		isDeleted = true // not found, should be deleted
 		statusCollector = &v1alpha1.StatusCollector{}
-		statusCollector.Name = key
+		statusCollector.Name = ref
 	}
 
 	// TODO: validate the statusCollector if not nil
@@ -45,6 +45,6 @@ func (c *Controller) syncStatusCollector(ctx context.Context, key string) error 
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
-	c.logger.Info("Handled StatusCollector", "key", key)
+	c.logger.Info("Synced StatusCollector", "ref", ref)
 	return nil
 }

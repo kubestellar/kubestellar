@@ -90,7 +90,14 @@ type Controller struct {
 type bindingRef string
 
 // workStatusRef is a workqueue item that references a WorkStatus
-type workStatusRef string
+type workStatusRef struct {
+	// name is the name of the WorkStatus object
+	name string
+	// wecName is the WorkStatus namespace
+	wecName string
+	// sourceObjectIdentifier is the identifier of the source object
+	sourceObjectIdentifier util.ObjectIdentifier
+}
 
 // combinedStatusRef is a workqueue item that references a CombinedStatus
 type combinedStatusRef string
@@ -242,14 +249,16 @@ func (c *Controller) setupCombinedStatusInformer(ctx context.Context, ksInformer
 	_, err := c.combinedStatusInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			cs := obj.(*v1alpha1.CombinedStatus)
-			logger.V(5).Info("Enqueuing reference to CombinedStatus because of informer add event", "name", cs.Name, "resourceVersion", cs.ResourceVersion)
+			logger.V(5).Info("Enqueuing reference to CombinedStatus because of informer add event",
+				"name", cs.Name, "resourceVersion", cs.ResourceVersion)
 			c.enqueueCombinedStatus(cs)
 		},
 		UpdateFunc: func(old, new interface{}) {
 			oldCs := old.(*v1alpha1.CombinedStatus)
 			newCs := new.(*v1alpha1.CombinedStatus)
 			if oldCs.Generation != newCs.Generation {
-				logger.V(5).Info("Enqueuing reference to CombinedStatus because of informer update event", "name", newCs.Name, "resourceVersion", newCs.ResourceVersion)
+				logger.V(5).Info("Enqueuing reference to CombinedStatus because of informer update event",
+					"name", newCs.Name, "resourceVersion", newCs.ResourceVersion)
 				c.enqueueCombinedStatus(newCs)
 			}
 		},
@@ -258,7 +267,8 @@ func (c *Controller) setupCombinedStatusInformer(ctx context.Context, ksInformer
 				obj = typed.Obj
 			}
 			cs := obj.(*v1alpha1.CombinedStatus)
-			logger.V(5).Info("Enqueuing reference to CombinedStatus because of informer delete event", "name", cs.Name)
+			logger.V(5).Info("Enqueuing reference to CombinedStatus because of informer delete event",
+				"name", cs.Name)
 			c.enqueueCombinedStatus(cs)
 		},
 	})
@@ -269,16 +279,14 @@ func (c *Controller) setupCombinedStatusInformer(ctx context.Context, ksInformer
 	return nil
 }
 
-func (c *Controller) enqueueCombinedStatus(obj interface{}) {
-	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
-	if err != nil {
-		utilruntime.HandleError(err)
-		return
-	}
+func (c *Controller) enqueueCombinedStatus(obj metav1.Object) {
+	key := cache.MetaObjectToName(obj).String()
 	c.workqueue.AddAfter(combinedStatusRef(key), queueingDelay)
 }
 
 func (c *Controller) runWorkStatusInformer(ctx context.Context) {
+	logger := klog.FromContext(ctx)
+
 	informerFactory := dynamicinformer.NewDynamicSharedInformerFactory(c.itsDynClient, 0*time.Minute)
 
 	gvr := schema.GroupVersionResource{Group: util.WorkStatusGroup,
@@ -292,7 +300,8 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 			wecName := obj.(metav1.Object).GetNamespace()
 			sourceRef, err := util.GetWorkStatusSourceRef(obj.(runtime.Object))
 			if err != nil {
-				return nil, err
+				logger.V(5).Error(err, "failed to get source ref",
+					"object", util.RefToRuntimeObj(obj.(runtime.Object)))
 			}
 
 			return []string{util.KeyFromSourceRefAndWecName(sourceRef, wecName)}, nil
@@ -302,18 +311,18 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 
 	// add the event handler functions
 	c.workStatusInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: c.handleObject,
+		AddFunc: c.handleWorkStatus,
 		UpdateFunc: func(old, new interface{}) {
 			if shouldSkipUpdate(old, new) {
 				return
 			}
-			c.handleObject(new)
+			c.handleWorkStatus(new)
 		},
 		DeleteFunc: func(obj interface{}) {
 			if shouldSkipDelete(obj) {
 				return
 			}
-			c.handleObject(obj)
+			c.handleWorkStatus(obj)
 		},
 	})
 
@@ -339,22 +348,20 @@ func shouldSkipDelete(_ interface{}) bool {
 	return false
 }
 
-// Event handler: enqueues the objects to be processed
+// Event handler: enqueues the workstatus objects to be processed
 // At this time it is very simple, more complex processing might be required here
-func (c *Controller) handleObject(obj any) {
-	rObj := obj.(runtime.Object)
-	c.logger.V(4).Info("Got object event", "obj", util.RefToRuntimeObj(rObj))
-	c.enqueueObject(obj)
-}
-
-// enqueueObject generates key and put it onto the work queue.
-func (c *Controller) enqueueObject(obj interface{}) {
-	ref, err := cache.ObjectToName(obj)
+func (c *Controller) handleWorkStatus(obj any) {
+	wsRef, err := runtimeObjectToWorkStatusRef(obj.(runtime.Object))
 	if err != nil {
 		utilruntime.HandleError(err)
 		return
 	}
-	c.workqueue.Add(workStatusRef(ref.String()))
+
+	c.logger.V(5).Info("Enqueuing reference to WorkStatus because of informer event",
+		"sourceObjectName", wsRef.sourceObjectIdentifier.ObjectName,
+		"sourceObjectGVK", wsRef.sourceObjectIdentifier.GVK, "wecName", wsRef.wecName)
+
+	c.workqueue.Add(wsRef)
 }
 
 // runWorker is a long-running function that will continually call the
@@ -407,15 +414,15 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 func (c *Controller) reconcile(ctx context.Context, item any) error {
 	logger := klog.FromContext(ctx)
 
-	switch objIdentifier := item.(type) {
+	switch ref := item.(type) {
 	case workStatusRef:
-		return c.syncWorkStatus(ctx, string(objIdentifier))
+		return c.syncWorkStatus(ctx, ref)
 	case bindingRef:
-		return c.syncBinding(ctx, string(objIdentifier))
+		return c.syncBinding(ctx, string(ref))
 	case statusCollectorRef:
-		return c.syncStatusCollector(ctx, string(objIdentifier))
+		return c.syncStatusCollector(ctx, string(ref))
 	case combinedStatusRef:
-		return c.syncCombinedStatus(ctx, string(objIdentifier))
+		return c.syncCombinedStatus(ctx, string(ref))
 	}
 	logger.Error(nil, "Impossible workqueue entry", "type", fmt.Sprintf("%T", item), "value", item)
 	return nil

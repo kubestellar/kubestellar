@@ -49,10 +49,14 @@ type Resolution struct {
 	Destinations []v1alpha1.Destination
 	// ObjectIdentifierToData is a map of object identifiers to their
 	// corresponding ObjectData.
-	ObjectIdentifierToData map[util.ObjectIdentifier]struct {
-		ResourceVersion  string
-		StatusCollectors []string
-	}
+	ObjectIdentifierToData map[util.ObjectIdentifier]ObjectData
+}
+
+// ObjectData is a struct that represents the data associated with an object
+// in a resolution.
+type ObjectData struct {
+	ResourceVersion  string
+	StatusCollectors []string
 }
 
 func (r *Resolution) RequiresStatusCollection() bool {
@@ -113,14 +117,8 @@ func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) *Resoluti
 		Destinations: bindingPolicyResolution.getDestinationsList(),
 		ObjectIdentifierToData: abstract.PrimitiveMapSafeValMap(&bindingPolicyResolution.RWMutex,
 			bindingPolicyResolution.objectIdentifierToData,
-			func(data *objectData) struct {
-				ResourceVersion  string
-				StatusCollectors []string
-			} {
-				return struct {
-					ResourceVersion  string
-					StatusCollectors []string
-				}{
+			func(data *objectData) ObjectData {
+				return ObjectData{
 					ResourceVersion:  data.ResourceVersion,
 					StatusCollectors: sets.List(data.StatusCollectors), // members are string copies
 				}
