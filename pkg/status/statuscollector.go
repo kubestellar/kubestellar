@@ -20,11 +20,13 @@ import (
 	"context"
 
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error {
+	logger := klog.FromContext(ctx)
 	isDeleted := false
 
 	statusCollector, err := c.statusCollectorLister.Get(ref)
@@ -45,6 +47,6 @@ func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error 
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
-	c.logger.Info("Synced StatusCollector", "ref", ref)
+	logger.Info("Synced StatusCollector", "ref", ref)
 	return nil
 }

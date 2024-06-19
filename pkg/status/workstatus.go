@@ -40,6 +40,8 @@ type workStatus struct {
 }
 
 func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) error {
+	logger := klog.FromContext(ctx)
+
 	workStatus := &workStatus{
 		workStatusRef: ref, //readonly
 		status:        nil,
@@ -53,7 +55,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 	} else {
 		status, err := util.GetWorkStatusStatus(obj)
 		if err != nil {
-			return fmt.Errorf("failed to get status from workstatus (%v): %w", ref, err)
+			logger.Error(err, "Failed to get status from workstatus", "workStatusRef", ref)
 		}
 
 		workStatus.status = status // might be nil
@@ -62,6 +64,14 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 	combinedStatusSet := c.combinedStatusResolver.NoteWorkStatus(workStatus) // nil .status is equivalent to deleted
 	for combinedStatus := range combinedStatusSet {
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
+	}
+
+	////////////////////////
+	// LEGACY SINGLETON HANDLING CODE
+	////////////////////////
+
+	if obj == nil {
+		return nil
 	}
 
 	// only process workstatues with the label for single reported status
@@ -87,7 +97,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 		return nil
 	}
 
-	c.logger.Info("updating singleton status", "objectIdentifier", ref.sourceObjectIdentifier)
+	logger.Info("Updating singleton status", "objectIdentifier", ref.sourceObjectIdentifier)
 	return updateObjectStatus(ctx, &ref.sourceObjectIdentifier, status, c.listers, c.wdsDynClient)
 }
 
@@ -98,14 +108,14 @@ func updateObjectStatus(ctx context.Context, objectIdentifier *util.ObjectIdenti
 	gvr := objectIdentifier.GVR()
 	lister, found := listers.Get(gvr)
 	if !found {
-		logger.V(5).Info("could not find lister for gvr", "gvr", gvr)
+		logger.V(5).Info("Could not find lister for gvr", "gvr", gvr)
 		return nil
 	}
 
 	obj, err := lister.ByNamespace(objectIdentifier.ObjectName.Namespace).Get(objectIdentifier.ObjectName.Name)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			logger.V(5).Info("could not find object", "objectIdentifier", objectIdentifier)
+			logger.V(5).Info("Could not find object", "objectIdentifier", objectIdentifier)
 			return nil
 		}
 
