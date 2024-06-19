@@ -18,11 +18,14 @@ package status
 
 import (
 	"context"
+
+	"k8s.io/klog/v2"
 )
 
 func (c *Controller) syncBinding(ctx context.Context, key string) error {
-	isDeleted := false
+	logger := klog.FromContext(ctx)
 
+	isDeleted := false
 	resolution := c.bindingResolutionBroker.GetResolution(key)
 	if resolution == nil {
 		// If a binding key gets here and no resolution exists, then isDeleted can be set to true.
@@ -37,6 +40,6 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
-	c.logger.Info("Handled Binding", "key", key)
+	logger.Info("Handled Binding", "key", key)
 	return nil
 }

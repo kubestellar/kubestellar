@@ -67,9 +67,11 @@ type combinedStatusResolution struct {
 type statusCollectorData struct {
 	*v1alpha1.StatusCollectorSpec
 
-	// workStatusRefToData is a map of workstatus-hosting WEC name to the
+	// wecToData is a map of workstatus-hosting WEC name to the
 	// evaluation of the workstatus against the statuscollector's clauses.
-	workStatusRefToData map[string]*workStatusData
+	// The map contains entries for workstatuses that pass the statuscollector's
+	// filter.
+	wecToData map[string]*workStatusData
 }
 
 // workStatusData is a struct that represents the evaluation of a workstatus
@@ -112,12 +114,12 @@ func (c *combinedStatusResolution) setCollectionDestinations(destinationsSet set
 	c.collectionDestinations = destinationsSet
 	// trim the statuscollector data that are not relevant anymore
 	for _, data := range c.statusCollectorNameToData {
-		if data.workStatusRefToData == nil {
+		if data.wecToData == nil {
 			continue
 		}
 
 		for clusterName := range removedDestinations {
-			delete(data.workStatusRefToData, clusterName)
+			delete(data.wecToData, clusterName)
 		}
 	}
 
@@ -160,7 +162,7 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 		if _, ok := c.statusCollectorNameToData[statusCollectorName]; !ok {
 			c.statusCollectorNameToData[statusCollectorName] = &statusCollectorData{
 				StatusCollectorSpec: &statusCollectorSpec,
-				workStatusRefToData: make(map[string]*workStatusData),
+				wecToData:           make(map[string]*workStatusData),
 			}
 
 			addedSome = true
@@ -193,7 +195,7 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 	// and invalidate all cached workstatus evaluations by resetting the map
 	c.statusCollectorNameToData[statusCollectorName] = &statusCollectorData{
 		StatusCollectorSpec: statusCollectorSpec,
-		workStatusRefToData: make(map[string]*workStatusData),
+		wecToData:           make(map[string]*workStatusData),
 	}
 
 	return true
@@ -230,6 +232,8 @@ func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.Combin
 //
 // The function returns true if any statuscollector
 // data is updated. If an evaluation fails, the function logs an error.
+// if workStatusContent is nil, the function removes the workstatus data if it
+// exists.
 // TODO: handle errors
 func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator,
 	workStatusWECName string, workStatusContent map[string]interface{}) bool {
@@ -265,10 +269,10 @@ func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator
 // resolution.
 func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvaluator, workStatusWECName string,
 	workStatusContent map[string]interface{}, scData *statusCollectorData) (bool, error) {
-	wsData, exists := scData.workStatusRefToData[workStatusWECName]
+	wsData, exists := scData.wecToData[workStatusWECName]
 
 	if workStatusContent == nil && exists { // workstatus is empty/deleted, remove the workstatus data if it exists
-		delete(scData.workStatusRefToData, workStatusWECName)
+		delete(scData.wecToData, workStatusWECName)
 		return true, nil
 	}
 
@@ -285,7 +289,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 
 		if !eval.Value().(bool) { // workstatus is not relevant
 			if exists { // remove the workstatus data if it exists
-				delete(scData.workStatusRefToData, workStatusWECName)
+				delete(scData.wecToData, workStatusWECName)
 				return true, nil
 			}
 
@@ -297,7 +301,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 
 	if !exists {
 		wsData = &workStatusData{}
-		scData.workStatusRefToData[workStatusWECName] = wsData
+		scData.wecToData[workStatusWECName] = wsData
 		updated = true
 	}
 
