@@ -300,8 +300,10 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 			wecName := obj.(metav1.Object).GetNamespace()
 			sourceRef, err := util.GetWorkStatusSourceRef(obj.(runtime.Object))
 			if err != nil {
-				logger.V(5).Error(err, "failed to get source ref",
+				logger.Error(err, "Failed to get source ref",
 					"object", util.RefToRuntimeObj(obj.(runtime.Object)))
+
+				return nil, nil
 			}
 
 			return []string{util.KeyFromSourceRefAndWecName(sourceRef, wecName)}, nil
