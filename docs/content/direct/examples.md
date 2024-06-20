@@ -17,7 +17,7 @@ The following steps establish an initial state used in the examples below.
 There are to main way to proceed:
 
 1. [Step-by-step manual setup](common-setup-step-by-step.md)
-2. [Using KubeStellar Core chart](common-setup-core-chart.md)
+2. [Using KubeStellar Core Helm chart](common-setup-core-chart.md)
 
 ## Create and register two clusters with OCM
 
