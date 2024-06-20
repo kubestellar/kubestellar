@@ -31,13 +31,10 @@ nav:
       - Release-notes: direct/release-notes.md
   - Getting Started: 
           - Pre-reqs: direct/pre-reqs.md
-          - Setting up KubeStellar:
-              - Using existing hosting cluster: direct/hosting-cluster.md
-              - KubeStellar on KIND: direct/ks-on-kind.md
-              - KubeStellar on K3D: direct/deploy-on-k3d.md
-              - KubeStellar on OCP: direct/ks-on-ocp.md
-          - Best practices: direct/best-practices.md
           - Examples: direct/examples.md
+          - Using existing hosting cluster: direct/hosting-cluster.md
+          - KubeStellar on K3D: direct/deploy-on-k3d.md
+          - Best practices: direct/best-practices.md
   - Contributing: 
       - Overview of contributing: direct/contributor.md
       - Packaging: direct/packaging.md
