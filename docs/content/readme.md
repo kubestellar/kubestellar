@@ -40,7 +40,7 @@ KubeStellar simplifies this process by allowing developers to define a binding p
 
 ## Contributing
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing]({{ config.docs_url }}/{{ config.ks_branch }}/Contribution%20guidelines/CONTRIBUTING/) guide.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](Contribution%20guidelines/CONTRIBUTING.md) guide.
 
 ## Getting in touch
 
