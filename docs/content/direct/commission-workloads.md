@@ -1,4 +1,4 @@
-# Deploying Workloads KubeStellar Usage Examples
+# Commissioning Workloads KubeStellar Usage Examples
 
 We are still working on generalized step-by-step instructions for defining, binding and deploying particular workloads.
 

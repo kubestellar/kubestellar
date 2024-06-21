@@ -49,12 +49,10 @@ nav:
 
               - Deploying KubeStellar on K3D: direct/deploy-on-k3d.md
           - Best practices: direct/best-practices.md
-          - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar@v0.22.0/api/control/v1alpha1
+          - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
           - Miscellaneous Documentation:
             - What's in here?: direct/misc-files.md
             - Usage Notes: direct/usage-notes.md
-            - KubeStellar on KIND: direct/ks-on-kind.md
-            - KubeStellar on OCP: direct/ks-on-ocp.md
   - Contributing: 
       - How to join in: direct/contribute.md
       - Code of Conduct: Contribution guidelines/coc.md
