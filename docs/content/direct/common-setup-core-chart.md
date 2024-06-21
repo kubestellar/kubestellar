@@ -1,6 +1,6 @@
 # Common Setup - KubeStellar Core chart
 
-For more details please see [here](./core-chart.md).
+For more details please see [this more detailed documentation on the Core chart](./core-chart.md).
 
 This documents explains how to use KubeStellar Core chart to deploy a new instance of KubeStellar
 with a choice of user-defined KubeFlex Control Planes (CPs).
@@ -82,3 +82,4 @@ NAMESPACE         NAME                                   READY   AGE
 its1-system       statefulset.apps/vcluster              1/1     11h
 kubeflex-system   statefulset.apps/postgres-postgresql   1/1     22h
 ```
+

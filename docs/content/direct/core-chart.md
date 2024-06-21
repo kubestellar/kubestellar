@@ -1,3 +1,4 @@
+
 # KubeStellar Core chart usage
 
 This documents explains how to use KubeStellar Core chart to deploy a new instance of KubeStellar
@@ -15,7 +16,7 @@ To install the Helm chart the only requirement is [Helm](https://helm.sh/).
 However, additional executables may be required to create/manage the cluster(s) (_e.g._, Kind and kubectl),
 to join Workload Execution Clusters (WEKs) (_e.g._, clusteradm),
 and to interact with Control Planes (_e.g._, kubectl), _etc_.
-For such purpose, a full list of executable that may be required can be fund [here](./pre-reqs.md).
+For such purpose, a full list of executable that may be required can be found [here](./pre-reqs.md).
 
 The setup of KubStellar via the Core chart requires the existence of a KubeFlex hosting cluster.
 
@@ -295,3 +296,4 @@ Alternatively, if a **k3s** cluster was created with the provide script, it can 
 ```shell
 /usr/local/bin/k3s-uninstall.sh
 ```
+

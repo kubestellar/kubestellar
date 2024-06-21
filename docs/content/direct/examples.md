@@ -26,6 +26,7 @@ Follow the steps to [create and register two clusters with OCM](example-wecs.md)
 ## Scenario 1 - multi-cluster workload deployment with kubectl
 
 This scenario proceeds from the state established by the [common setup](#common-setup).
+<!-- Start for app commissioning in quickstart -->
 
 Check for available clusters with label `location-group=edge`
 
@@ -124,6 +125,7 @@ kubectl --context wds1 delete ns nginx
 kubectl --context wds1 delete bindingpolicies nginx-bpolicy
 ```
 
+<!-- End for app commissioning in quickstart -->
 ## Scenario 2 - using the hosting cluster as WDS to deploy a custom resource
 
 This scenario follows on from the state established by scenario 1.
@@ -174,7 +176,7 @@ helm --kube-context kind-kubeflex upgrade --install ocm-transport-plugin oci://g
 where the `-t host` option specifies a control plane of type `host`.
 You can only create one control plane of type `host`.
 
-In this example, we use the helm chart method to install the kubestellat controller manager for the
+In this example, we use the helm chart method to install the KubeStellar controller manager for the
 hosting cluster so that we can pass additional startup options.
 
 Label the `wds2` control plane as type `wds`:
