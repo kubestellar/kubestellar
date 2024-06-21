@@ -1,8 +1,8 @@
 # Deploy KubeStellar on K3D
 
-This document shows how to deploy kubestellar on K3D hub and wec clusters.
+This document shows how KubeStellar release 0.22.0 was set up using feshly created k3d clusters for the hosting cluster and two WECs.
 
-This is a point-in-time statement that worked with KubeStellar release v0.22.0.
+**NOTE WELL:** This is a report of a something was done in the past with an older release of KubeStellar; 0.22.0 is NOT the latest release.
 
 ## Prereqs
 
