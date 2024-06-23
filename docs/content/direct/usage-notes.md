@@ -32,7 +32,7 @@ The following are applied to every workload object.
 1. Remove the annotation named `kubectl.kubernetes.io/last-applied-configuration`.
 1. Remove the `status`.
 
-## Built-in transformations of specific kinds of workload object
+### Built-in transformations of specific kinds of workload object
 
 In a `Service` (core API group) object:
 

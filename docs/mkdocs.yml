@@ -35,33 +35,39 @@ nav:
       - Release-notes: direct/release-notes.md
   - Quick Start: direct/get-started.md
   - User Guide:
-          - Basics: direct/usage-basics.md
-          - Prerequisites: direct/pre-reqs.md
-          - Quick Start: direct/get-started.md
-          - Setting up KubeStellar:
-              - Set Up Kubestellar Core Components: 
-                - Try the "Common-setup": direct/common-setup-intro.md
-                - Step by Step: direct/common-setup-step-by-step.md
-                - Via Helm Chart: direct/common-setup-core-chart.md
-              - Commission Workloads: direct/commission-workloads.md
-          - Installation & Usage Examples:
-              - Example Cluster Preparation: direct/hosting-cluster.md
-              - Sample scenarios: direct/examples.md
-              - Deploy KubeStellar via Helm chart: direct/core-chart.md
-
-              - Deploying KubeStellar on K3D: direct/deploy-on-k3d.md
-          - Best practices: direct/best-practices.md
-          - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
-          - Miscellaneous Documentation:
-            - What's in here?: direct/misc-files.md
-            - Usage Notes: direct/usage-notes.md
+      - Basics: direct/usage-basics.md
+      - Prerequisites: direct/pre-reqs.md
+      - Quick Start: direct/get-started.md
+      - Setting up KubeStellar:
+          - Set Up Kubestellar Core Components: 
+            - Try the "Common-setup": direct/common-setup-intro.md
+            - Step by Step: direct/common-setup-step-by-step.md
+            - Via Helm Chart: direct/common-setup-core-chart.md
+          - Commission Workloads: direct/commission-workloads.md
+      - Installation & Usage Examples:
+          - Example Cluster Preparation: direct/hosting-cluster.md
+          - Sample scenarios:
+              - Outline and Scenarios: direct/examples.md
+              - Creating Example WECs: direct/example-wecs.md
+              - Example Third-Party integrations: direct/thirdparties.md
+          - Deploy KubeStellar via Helm chart: direct/core-chart.md
+          - Deploying KubeStellar on K3D: direct/deploy-on-k3d.md
+      - Best practices: direct/best-practices.md
+      - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
+      - Miscellaneous Documentation:
+        - What's in here?: direct/misc-files.md
+        - Usage Notes: direct/usage-notes.md
+        - Combined Status: direct/combined-status.md
   - Contributing: 
       - How to join in: direct/contribute.md
       - Code of Conduct: Contribution guidelines/coc.md
       - License: Contribution guidelines/LICENSE.md
       - Governance: Contribution guidelines/governance.md
       - Onboarding: Contribution guidelines/onboarding.md
-      - Website: Contribution guidelines/operations/document-management.md
+      - Website:
+          - Overview: Contribution guidelines/operations/document-management.md
+          - Testing website PRs: Contribution guidelines/operations/testing-doc-prs.md
+          - Listing of variables: Contribution guidelines/operations/all-macros.md
       - Security:
           - Policy: Contribution guidelines/security/security.md
           - Contacts: Contribution guidelines/security/security_contacts.md
@@ -69,6 +75,7 @@ nav:
         - For Contributors: direct/contributor.md
         - Packaging: direct/packaging.md
         - Release Process: direct/release.md
+        - Releaes Testing: direct/release-testing.md
         - Guidelines: Contribution guidelines/CONTRIBUTING.md
   - Community: 
     - Get Involved: Community/_index.md
