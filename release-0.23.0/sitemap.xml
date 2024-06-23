@@ -120,13 +120,6 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/release-0.23.0/Contribution%20guidelines/operations/packaging-and-versioning/</loc>
-         <lastmod>2024-06-23</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.23.0/en/Contribution%20guidelines/operations/packaging-and-versioning/"/>
-         
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/release-0.23.0/Contribution%20guidelines/operations/testing-doc-prs/</loc>
          <lastmod>2024-06-23</lastmod>
          <changefreq>daily</changefreq>
@@ -173,13 +166,6 @@
          <lastmod>2024-06-23</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.23.0/en/direct/best-practices/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.23.0/direct/combined-status/</loc>
-         <lastmod>2024-06-23</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.23.0/en/direct/combined-status/"/>
          
     </url>
     <url>
@@ -236,20 +222,6 @@
          <lastmod>2024-06-23</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.23.0/en/direct/hosting-cluster/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.23.0/direct/ks-on-kind/</loc>
-         <lastmod>2024-06-23</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.23.0/en/direct/ks-on-kind/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.23.0/direct/ks-on-ocp/</loc>
-         <lastmod>2024-06-23</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.23.0/en/direct/ks-on-ocp/"/>
          
     </url>
     <url>

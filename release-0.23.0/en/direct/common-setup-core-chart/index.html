@@ -11,13 +11,17 @@
         <link rel="canonical" href="https://docs.kubestellar.io/release-0.23.0/en/direct/common-setup-core-chart/">
       
       
+        <link rel="prev" href="../examples/">
+      
+      
+        <link rel="next" href="../common-setup-step-by-step/">
       
       <link rel="icon" href="../../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
     
     
       
-        <title>Common Setup - KubeStellar Core chart - KubeStellar</title>
+        <title>Setup using Core Helm chart - KubeStellar</title>
       
     
     
@@ -74,7 +78,7 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - Common Setup - KubeStellar Core chart" />
+  <meta property="og:title" content="KubeStellar - Setup using Core Helm chart" />
   <meta property="og:description" content="None" />
   <meta property="og:url" content="https://docs.kubestellar.io/release-0.23.0/en/direct/common-setup-core-chart/" />
   <meta property="og:image" content="https://docs.kubestellar.io/release-0.23.0assets/images/illustrations/banner.png" />
@@ -188,7 +192,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Common Setup - KubeStellar Core chart
+              Setup using Core Helm chart
             
           </span>
         </div>
@@ -292,13 +296,15 @@
         
   
   
+    
+  
 
 
   
   
   
     <li class="md-tabs__item">
-      <a href="../pre-reqs/" class="md-tabs__link">
+      <a href="../pre-reqs/" class="md-tabs__link md-tabs__link--active">
         Getting Started
       </a>
     </li>
@@ -544,16 +550,20 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
       
       
+        
+          
         
           
         
@@ -572,7 +582,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_3">
           <span class="md-nav__icon md-icon"></span>
           Getting Started
@@ -597,11 +607,177 @@
               
   
   
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+          Examples
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Examples
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
   
     <li class="md-nav__item">
       <a href="../examples/" class="md-nav__link">
-        Examples
+        Outline and Scenarios
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Setup using Core Helm chart
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Setup using Core Helm chart
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-kind-cluster" class="md-nav__link">
+    Create a Kind cluster
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-kubestellar-core-chart" class="md-nav__link">
+    Install KubeStellar Core chart
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubeconfig-contexts-for-control-planes" class="md-nav__link">
+    Kubeconfig contexts for Control Planes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-check-relevant-deployments-and-statefulsets-running-in-the-hosting-cluster" class="md-nav__link">
+    (optional) Check relevant deployments and statefulsets running in the hosting cluster
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../common-setup-step-by-step/" class="md-nav__link">
+        Step-By-Step Setup
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-wecs/" class="md-nav__link">
+        Creating Example WECs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../thirdparties/" class="md-nav__link">
+        Example Third-Party integrations
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -629,6 +805,20 @@
     <li class="md-nav__item">
       <a href="../deploy-on-k3d/" class="md-nav__link">
         KubeStellar on K3D
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core-chart/" class="md-nav__link">
+        Core Helm chart
       </a>
     </li>
   
@@ -671,6 +861,8 @@
       <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
       
       
+        
+          
         
           
         
@@ -754,6 +946,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../release-testing/" class="md-nav__link">
+        Release Testing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../Contribution%20guidelines/CONTRIBUTING/" class="md-nav__link">
         Guidelines
       </a>
@@ -823,10 +1029,80 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          Website
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_10">
+          <span class="md-nav__icon md-icon"></span>
+          Website
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
     <li class="md-nav__item">
       <a href="../../Contribution%20guidelines/operations/document-management/" class="md-nav__link">
-        Website
+        Overview
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Contribution%20guidelines/operations/testing-doc-prs/" class="md-nav__link">
+        Testing website PRs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Contribution%20guidelines/operations/all-macros/" class="md-nav__link">
+        Listing of variables
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -843,7 +1119,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
       
       
         
@@ -853,13 +1129,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
           Security
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_10">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_11">
           <span class="md-nav__icon md-icon"></span>
           Security
         </label>
@@ -1471,6 +1747,42 @@ statefulset <code>vcluster</code> in the <code>its1-system</code> namespace, bot
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../examples/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Outline and Scenarios" rel="prev">
+            <div class="md-footer__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <div class="md-ellipsis">
+                <span class="md-footer__direction">
+                  Previous
+                </span>
+                Outline and Scenarios
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../common-setup-step-by-step/" class="md-footer__link md-footer__link--next" aria-label="Next: Step-By-Step Setup" rel="next">
+            <div class="md-footer__title">
+              <div class="md-ellipsis">
+                <span class="md-footer__direction">
+                  Next
+                </span>
+                Step-By-Step Setup
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

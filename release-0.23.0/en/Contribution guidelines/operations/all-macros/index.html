@@ -6,9 +6,11 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="https://docs.kubestellar.io/release-0.23.0/en/Contribution%20guidelines/operations/all-macros/" rel="canonical"/>
+<link href="../testing-doc-prs/" rel="prev"/>
+<link href="../../security/security/" rel="next"/>
 <link href="../../../../favicons/favicon.ico" rel="icon"/>
 <meta content="mkdocs-1.4.2, mkdocs-material-9.1.0" name="generator"/>
-<title>All macros - KubeStellar</title>
+<title>Listing of variables - KubeStellar</title>
 <link href="../../../../assets/stylesheets/main.402914a4.min.css" rel="stylesheet"/>
 <link href="../../../../assets/stylesheets/palette.a0c5b2b5.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -23,7 +25,7 @@
 <!-- The image needs to have an absolute URL -->
 <!-- Open graph meta tags -->
 <meta content="website" property="og:type">
-<meta content="KubeStellar - All macros" property="og:title">
+<meta content="KubeStellar - Listing of variables" property="og:title">
 <meta content="None" property="og:description"/>
 <meta content="https://docs.kubestellar.io/release-0.23.0/en/Contribution%20guidelines/operations/all-macros/" property="og:url"/>
 <meta content="https://docs.kubestellar.io/release-0.23.0assets/images/illustrations/banner.png" property="og:image"/>
@@ -102,7 +104,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              All macros
+              Listing of variables
             
           </span>
 </div>
@@ -170,7 +172,7 @@
       </a>
 </li>
 <li class="md-tabs__item">
-<a class="md-tabs__link" href="../../../direct/contributor/">
+<a class="md-tabs__link md-tabs__link--active" href="../../../direct/contributor/">
         Contributing
       </a>
 </li>
@@ -276,10 +278,45 @@
         Pre-reqs
       </a>
 </li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+          Examples
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_2">
+<span class="md-nav__icon md-icon"></span>
+          Examples
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../../direct/examples/">
-        Examples
+        Outline and Scenarios
       </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../direct/common-setup-core-chart/">
+        Setup using Core Helm chart
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../direct/common-setup-step-by-step/">
+        Step-By-Step Setup
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../direct/example-wecs/">
+        Creating Example WECs
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../direct/thirdparties/">
+        Example Third-Party integrations
+      </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../../direct/hosting-cluster/">
@@ -292,6 +329,11 @@
       </a>
 </li>
 <li class="md-nav__item">
+<a class="md-nav__link" href="../../../direct/core-chart/">
+        Core Helm chart
+      </a>
+</li>
+<li class="md-nav__item">
 <a class="md-nav__link" href="../../../direct/best-practices/">
         Best practices
       </a>
@@ -299,13 +341,13 @@
 </ul>
 </nav>
 </li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
           Contributing
           <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<nav aria-expanded="true" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_4">
 <span class="md-nav__icon md-icon"></span>
           Contributing
@@ -324,6 +366,11 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../../direct/release/">
         Release Process
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../direct/release-testing/">
+        Release Testing
       </a>
 </li>
 <li class="md-nav__item">
@@ -351,19 +398,92 @@
         Onboarding
       </a>
 </li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_4_10" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          Website
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_4_10_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_10">
+<span class="md-nav__icon md-icon"></span>
+          Website
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../document-management/">
-        Website
+        Overview
       </a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../testing-doc-prs/">
+        Testing website PRs
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+          Listing of variables
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+        Listing of variables
+      </a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#general-list">
+    General List
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#config-information">
+    Config Information
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#macros">
+    Macros
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#git-information">
+    Git Information
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#page-attributes">
+    Page Attributes
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#plugin-filters">
+    Plugin Filters
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#builtin-jinja2-filters">
+    Builtin Jinja2 Filters
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" id="__nav_4_10" type="checkbox"/>
-<label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+<input class="md-nav__toggle md-toggle" id="__nav_4_11" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
           Security
           <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="false" aria-labelledby="__nav_4_10_label" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_4_10">
+<nav aria-expanded="false" aria-labelledby="__nav_4_11_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_11">
 <span class="md-nav__icon md-icon"></span>
           Security
         </label>
@@ -587,7 +707,7 @@
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>config</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>MkDocsConfig</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">{'config_file_path': '/home/runner/work/kubestellar/kubestellar/docs/mike-mkdocsxs5e_3vb.yml', 'site_name': 'KubeStellar', 'nav': [{'Welcome': [{'Landing': 'index.md'}]}, {'Overview': [{'Readme': 'readme.md'}, {'User guide': 'direct/user-guide.md'}, {'Architecture': 'direct/architecture.md'}, {'Release-notes': 'direct/release-notes.md'}]}, {'Getting Started': [{'Pre-reqs': 'direct/pre-reqs.md'}, {'Examples': 'direct/examples.md'}, {'Using existing hosting cluster': 'direct/hosting-cluster.md'}, {'KubeStellar on K3D': 'direct/deploy-on-k3d.md'}, {'Best practices': 'direct/best-practices.md'}]}, {'Contributing': [{'Overview of contributing': 'direct/contributor.md'}, {'Packaging': 'direct/packaging.md'}, {'Release Process': 'direct/release.md'}, {'Guidelines': 'Contribution guidelines/CONTRIBUTING.md'}, {'Code of Conduct': 'Contribution guidelines/coc.md'}, {'License': 'Contribution guidelines/LICENSE.md'}, {'Governance': 'Contribution guidelines/governance.md'}, {'Onboarding': 'Contribution guidelines/onboarding.md'}, {'Website': 'Contribution guidelines/operations/document-management.md'}, {'Security': [{'Policy': 'Contribution guidelines/security/security.md'}, {'Contacts': 'Contribution guidelines/security/security_contacts.md'}]}]}, {'Community': [{'Get Involved': 'Community/_index.md'}, {'Contact Us': [{'Mailing List': 'https://kubestellar.io/join_us'}, {'Community Meeting Agenda (join mailing list first)': 'https://kubestellar.io/agenda'}, {'Slack': 'https://kubestellar.io/slack'}, {'Medium Blog': 'https://kubestellar.io/blog'}, {'YouTube Channel': 'https://kubestellar.io/tv'}, {'LinkedIn': 'https://kubestellar.io/linkedin'}, {'Reddit': 'https://www.reddit.com/r/kubestellar/'}, {'Google Drive': 'https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS'}]}, {'Partners': [{'ArgoCD': 'Community/partners/argocd.md'}, {'Turbonomic': 'Community/partners/turbonomic.md'}, {'MVI': 'Community/partners/mvi.md'}, {'FluxCD': 'Community/partners/fluxcd.md'}, {'OpenZiti': 'Community/partners/openziti.md'}, {'Kyverno': 'Community/partners/kyverno.md'}]}]}, {'Blog': 'https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank'}], 'pages': None, 'site_url': 'https://docs.kubestellar.io/release-0.23.0', 'site_description': None, 'site_author': None, 'theme': Theme(name='material', dirs=['/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/mkdocs_static_i18n/custom_i18n_sitemap', '/home/runner/work/kubestellar/kubestellar/docs/overrides', '/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/material', '/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/mkdocs/templates'], static_templates=['sitemap.xml', '404.html'], name='material', locale=Locale(language='en', territory=''), language='en', direction=None, features=['content.action.edit', 'content.action.view', 'navigation.indexes', 'navigation.tabs', 'navigation.path', 'navigation.footer', 'content.code.copy', 'content.code.annotate'], palette={'primary': None, 'accent': None}, font={'text': 'SapceMono', 'code': 'Roboto Mono'}, icon=None, favicon='favicons/favicon.ico', logo='logo.png'), 'docs_dir': '/home/runner/work/kubestellar/kubestellar/docs/content', 'site_dir': '/home/runner/work/kubestellar/kubestellar/docs/generated', 'copyright': None, 'google_analytics': None, 'dev_addr': _IpAddressValue(host='127.0.0.1', port=8000), 'use_directory_urls': True, 'repo_url': 'https://github.com/kubestellar/kubestellar', 'repo_name': 'GitHub', 'edit_uri_template': None, 'edit_uri': 'edit/main/docs/content/', 'extra_css': ['stylesheets/kubestellar.css'], 'extra_javascript': ['js/open_in_new_tab.js'], 'extra_templates': [], 'markdown_extensions': ['toc', 'tables', 'fenced_code', 'markdown_captions', 'pymdownx.superfences', 'attr_list', 'md_in_html', 'pymdownx.highlight', 'pymdownx.inlinehilite', 'pymdownx.snippets', 'pymdownx.tabbed', 'admonition'], 'mdx_configs': {'pymdownx.superfences': {'custom_fences': [{'name': 'mermaid', 'class': 'mermaid', 'format': <function 0x7f0e2e7f3370="" at="" fence_mermaid="">}]}, 'toc': {'permalink': '#'}, 'pymdownx.highlight': {'anchor_linenums': True, 'pygments_lang_class': True}, 'pymdownx.tabbed': {'alternate_style': True}}, 'strict': False, 'remote_branch': 'gh-pages', 'remote_name': 'origin', 'extra': {'version': {'default': 'latest', 'provider': 'mike'}, 'analytics': {'provider': 'google', 'property': 'G-SR5TD1CXY7', 'feedback': {'title': 'Was this page helpful?', 'ratings': [{'icon': 'material/emoticon-happy-outline', 'name': 'This page was helpful', 'data': 1, 'note': 'Thanks for your feedback!'}, {'icon': 'material/emoticon-sad-outline', 'name': 'This page could be improved', 'data': 0, 'note': 'Thanks for your feedback! Help us improve this page by using our <a href="https://github.com/kubestellar/kubestellar/issues/new?assignees=&amp;labels=kind%2Fbug&amp;projects=&amp;template=bug_report.yaml&amp;title=bug%3A+" rel="noopener" target="_blank">feedback form</a>.'}]}}}, 'plugins': {'mike': <mike.mkdocs_plugin.mikeplugin 0x7f0e2e76a7a0="" at="" object="">, 'awesome-pages': <mkdocs_awesome_pages_plugin.plugin.awesomepagesplugin 0x7f0e2e49ccd0="" at="" object="">, 'material/search': <material.plugins.search.plugin.searchplugin 0x7f0e2e367010="" at="" object="">, 'mermaid2': <mermaid2.plugin.markdownmermaidplugin 0x7f0e2e367550="" at="" object="">, 'open-in-new-tab': <open_in_new_tab.plugin.openinnewtabplugin 0x7f0e2dce9810="" at="" object="">, 'include-markdown': <mkdocs_include_markdown_plugin.plugin.includemarkdownplugin 0x7f0e2dcea950="" at="" object="">, 'macros': <mkdocs_macros.plugin.macrosplugin 0x7f0e2dcea860="" at="" object="">, 'i18n': <mkdocs_static_i18n.plugin.i18n 0x7f0e2db267d0="" at="" object="">}, 'hooks': {}, 'watch': ['/home/runner/work/kubestellar/kubestellar/docs/mkdocs.yml', '/home/runner/work/kubestellar/kubestellar/docs/content', '/home/runner/work/kubestellar/kubestellar/docs/overrides'], 'repo_short_name': 'kubestellar/kubestellar', 'repo_default_file_path': 'kubestellar', 'helm_repo_short_name': 'kubestellar/helm', 'helm_repo_default_file_path': 'helm', 'brew_repo_short_name': 'kubestellar/homebrew-kubestellar', 'brew_repo_default_file_path': 'homebrew-kubestellar', 'docs_url': 'https://docs.kubestellar.io', 'repo_raw_url': 'https://raw.githubusercontent.com/kubestellar/kubestellar', 'ks_branch': 'main', 'ks_tag': 'latest', 'ks_kind_port_num': '1119'}</mkdocs_static_i18n.plugin.i18n></mkdocs_macros.plugin.macrosplugin></mkdocs_include_markdown_plugin.plugin.includemarkdownplugin></open_in_new_tab.plugin.openinnewtabplugin></mermaid2.plugin.markdownmermaidplugin></material.plugins.search.plugin.searchplugin></mkdocs_awesome_pages_plugin.plugin.awesomepagesplugin></mike.mkdocs_plugin.mikeplugin></function></td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">{'config_file_path': '/home/runner/work/kubestellar/kubestellar/docs/mike-mkdocshq8_57zd.yml', 'site_name': 'KubeStellar', 'nav': [{'Welcome': [{'Landing': 'index.md'}]}, {'Overview': [{'Readme': 'readme.md'}, {'User guide': 'direct/user-guide.md'}, {'Architecture': 'direct/architecture.md'}, {'Release-notes': 'direct/release-notes.md'}]}, {'Getting Started': [{'Pre-reqs': 'direct/pre-reqs.md'}, {'Examples': [{'Outline and Scenarios': 'direct/examples.md'}, {'Setup using Core Helm chart': 'direct/common-setup-core-chart.md'}, {'Step-By-Step Setup': 'direct/common-setup-step-by-step.md'}, {'Creating Example WECs': 'direct/example-wecs.md'}, {'Example Third-Party integrations': 'direct/thirdparties.md'}]}, {'Using existing hosting cluster': 'direct/hosting-cluster.md'}, {'KubeStellar on K3D': 'direct/deploy-on-k3d.md'}, {'Core Helm chart': 'direct/core-chart.md'}, {'Best practices': 'direct/best-practices.md'}]}, {'Contributing': [{'Overview of contributing': 'direct/contributor.md'}, {'Packaging': 'direct/packaging.md'}, {'Release Process': 'direct/release.md'}, {'Release Testing': 'direct/release-testing.md'}, {'Guidelines': 'Contribution guidelines/CONTRIBUTING.md'}, {'Code of Conduct': 'Contribution guidelines/coc.md'}, {'License': 'Contribution guidelines/LICENSE.md'}, {'Governance': 'Contribution guidelines/governance.md'}, {'Onboarding': 'Contribution guidelines/onboarding.md'}, {'Website': [{'Overview': 'Contribution guidelines/operations/document-management.md'}, {'Testing website PRs': 'Contribution guidelines/operations/testing-doc-prs.md'}, {'Listing of variables': 'Contribution guidelines/operations/all-macros.md'}]}, {'Security': [{'Policy': 'Contribution guidelines/security/security.md'}, {'Contacts': 'Contribution guidelines/security/security_contacts.md'}]}]}, {'Community': [{'Get Involved': 'Community/_index.md'}, {'Contact Us': [{'Mailing List': 'https://kubestellar.io/join_us'}, {'Community Meeting Agenda (join mailing list first)': 'https://kubestellar.io/agenda'}, {'Slack': 'https://kubestellar.io/slack'}, {'Medium Blog': 'https://kubestellar.io/blog'}, {'YouTube Channel': 'https://kubestellar.io/tv'}, {'LinkedIn': 'https://kubestellar.io/linkedin'}, {'Reddit': 'https://www.reddit.com/r/kubestellar/'}, {'Google Drive': 'https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS'}]}, {'Partners': [{'ArgoCD': 'Community/partners/argocd.md'}, {'Turbonomic': 'Community/partners/turbonomic.md'}, {'MVI': 'Community/partners/mvi.md'}, {'FluxCD': 'Community/partners/fluxcd.md'}, {'OpenZiti': 'Community/partners/openziti.md'}, {'Kyverno': 'Community/partners/kyverno.md'}]}]}, {'Blog': 'https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank'}], 'pages': None, 'site_url': 'https://docs.kubestellar.io/release-0.23.0', 'site_description': None, 'site_author': None, 'theme': Theme(name='material', dirs=['/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/mkdocs_static_i18n/custom_i18n_sitemap', '/home/runner/work/kubestellar/kubestellar/docs/overrides', '/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/material', '/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/mkdocs/templates'], static_templates=['404.html', 'sitemap.xml'], name='material', locale=Locale(language='en', territory=''), language='en', direction=None, features=['content.action.edit', 'content.action.view', 'navigation.indexes', 'navigation.tabs', 'navigation.path', 'navigation.footer', 'content.code.copy', 'content.code.annotate'], palette={'primary': None, 'accent': None}, font={'text': 'SapceMono', 'code': 'Roboto Mono'}, icon=None, favicon='favicons/favicon.ico', logo='logo.png'), 'docs_dir': '/home/runner/work/kubestellar/kubestellar/docs/content', 'site_dir': '/home/runner/work/kubestellar/kubestellar/docs/generated', 'copyright': None, 'google_analytics': None, 'dev_addr': _IpAddressValue(host='127.0.0.1', port=8000), 'use_directory_urls': True, 'repo_url': 'https://github.com/kubestellar/kubestellar', 'repo_name': 'GitHub', 'edit_uri_template': None, 'edit_uri': 'edit/main/docs/content/', 'extra_css': ['stylesheets/kubestellar.css'], 'extra_javascript': ['js/open_in_new_tab.js'], 'extra_templates': [], 'markdown_extensions': ['toc', 'tables', 'fenced_code', 'markdown_captions', 'pymdownx.superfences', 'attr_list', 'md_in_html', 'pymdownx.highlight', 'pymdownx.inlinehilite', 'pymdownx.snippets', 'pymdownx.tabbed', 'admonition'], 'mdx_configs': {'pymdownx.superfences': {'custom_fences': [{'name': 'mermaid', 'class': 'mermaid', 'format': <function 0x7f528a44f370="" at="" fence_mermaid="">}]}, 'toc': {'permalink': '#'}, 'pymdownx.highlight': {'anchor_linenums': True, 'pygments_lang_class': True}, 'pymdownx.tabbed': {'alternate_style': True}}, 'strict': False, 'remote_branch': 'gh-pages', 'remote_name': 'origin', 'extra': {'version': {'default': 'latest', 'provider': 'mike'}, 'analytics': {'provider': 'google', 'property': 'G-SR5TD1CXY7', 'feedback': {'title': 'Was this page helpful?', 'ratings': [{'icon': 'material/emoticon-happy-outline', 'name': 'This page was helpful', 'data': 1, 'note': 'Thanks for your feedback!'}, {'icon': 'material/emoticon-sad-outline', 'name': 'This page could be improved', 'data': 0, 'note': 'Thanks for your feedback! Help us improve this page by using our <a href="https://github.com/kubestellar/kubestellar/issues/new?assignees=&amp;labels=kind%2Fbug&amp;projects=&amp;template=bug_report.yaml&amp;title=bug%3A+" rel="noopener" target="_blank">feedback form</a>.'}]}}}, 'plugins': {'mike': <mike.mkdocs_plugin.mikeplugin 0x7f528a3be7d0="" at="" object="">, 'awesome-pages': <mkdocs_awesome_pages_plugin.plugin.awesomepagesplugin 0x7f528a0f8d00="" at="" object="">, 'material/search': <material.plugins.search.plugin.searchplugin 0x7f5289fc3040="" at="" object="">, 'mermaid2': <mermaid2.plugin.markdownmermaidplugin 0x7f5289fc3580="" at="" object="">, 'open-in-new-tab': <open_in_new_tab.plugin.openinnewtabplugin 0x7f528993dd20="" at="" object="">, 'include-markdown': <mkdocs_include_markdown_plugin.plugin.includemarkdownplugin 0x7f528993ee60="" at="" object="">, 'macros': <mkdocs_macros.plugin.macrosplugin 0x7f528993ed70="" at="" object="">, 'i18n': <mkdocs_static_i18n.plugin.i18n 0x7f52899cace0="" at="" object="">}, 'hooks': {}, 'watch': ['/home/runner/work/kubestellar/kubestellar/docs/mkdocs.yml', '/home/runner/work/kubestellar/kubestellar/docs/content', '/home/runner/work/kubestellar/kubestellar/docs/overrides'], 'repo_short_name': 'kubestellar/kubestellar', 'repo_default_file_path': 'kubestellar', 'helm_repo_short_name': 'kubestellar/helm', 'helm_repo_default_file_path': 'helm', 'brew_repo_short_name': 'kubestellar/homebrew-kubestellar', 'brew_repo_default_file_path': 'homebrew-kubestellar', 'docs_url': 'https://docs.kubestellar.io', 'repo_raw_url': 'https://raw.githubusercontent.com/kubestellar/kubestellar', 'ks_branch': 'main', 'ks_tag': 'latest', 'ks_kind_port_num': '1119'}</mkdocs_static_i18n.plugin.i18n></mkdocs_macros.plugin.macrosplugin></mkdocs_include_markdown_plugin.plugin.includemarkdownplugin></open_in_new_tab.plugin.openinnewtabplugin></mermaid2.plugin.markdownmermaidplugin></material.plugins.search.plugin.searchplugin></mkdocs_awesome_pages_plugin.plugin.awesomepagesplugin></mike.mkdocs_plugin.mikeplugin></function></td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>environment</b></td>
@@ -602,7 +722,7 @@
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>git</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>dict</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">status = True, <b>date</b> [<i>datetime</i>], short_commit = 'f6a946522', commit = 'f6a94652280e98f8a7b0047d526c7aeed5d180d6', tag = '', author = 'kcp CI Bot', author_email = '134318005+kcp-ci-bot@users.noreply.github.com', committer = 'GitHub', committer_email = 'noreply@github.com', date_ISO = 'Sun Jun 23 10:20:39 2024 +0200', message = 'Merge pull request #2241 from MikeSpreitzer/doc-fixrel2-r0230\n\n📖 [release-0.23.0] Replace another wrong absolute link with correct relative one', raw = 'commit f6a94652280e98f8a7b0047d526c7aeed5d180d6\nAuthor: kcp CI Bot &lt;134318005+kcp-ci-bot@users.noreply.github.com&gt;\nDate:   Sun Jun 23 10:20:39 2024 +0200\n\n    Merge pull request #2241 from MikeSpreitzer/doc-fixrel2-r0230\n    \n    📖 [release-0.23.0] Replace another wrong absolute link with correct relative one', root_dir = '/home/runner/work/kubestellar/kubestellar'</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">status = True, <b>date</b> [<i>datetime</i>], short_commit = '85cfc0d97', commit = '85cfc0d973257930b7487bdb27699b6c18a4c26f', tag = '', author = 'kcp CI Bot', author_email = '134318005+kcp-ci-bot@users.noreply.github.com', committer = 'GitHub', committer_email = 'noreply@github.com', date_ISO = 'Sun Jun 23 10:32:40 2024 +0200', message = 'Merge pull request #2243 from MikeSpreitzer/doc-undangle-r0230\n\n📖 [release-0.23.0] Some doc file cleanup', raw = 'commit 85cfc0d973257930b7487bdb27699b6c18a4c26f\nAuthor: kcp CI Bot &lt;134318005+kcp-ci-bot@users.noreply.github.com&gt;\nDate:   Sun Jun 23 10:32:40 2024 +0200\n\n    Merge pull request #2243 from MikeSpreitzer/doc-undangle-r0230\n    \n    📖 [release-0.23.0] Some doc file cleanup', root_dir = '/home/runner/work/kubestellar/kubestellar'</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>version</b></td>
@@ -632,17 +752,17 @@
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>navigation</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>Navigation</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">Section(title='Welcome')<br/>    Page(title='Landing', url='/release-0.23.0/')<br/>Section(title='Overview')<br/>    Page(title='Readme', url='/release-0.23.0/readme/')<br/>    Page(title='User guide', url='/release-0.23.0/direct/user-guide/')<br/>    Page(title='Architecture', url='/release-0.23.0/direct/architecture/')<br/>    Page(title='Release-notes', url='/release-0.23.0/direct/release-notes/')<br/>Section(title='Getting Started')<br/>    Page(title='Pre-reqs', url='/release-0.23.0/direct/pre-reqs/')<br/>    Page(title='Examples', url='/release-0.23.0/direct/examples/')<br/>    Page(title='Using existing hosting cluster', url='/release-0.23.0/direct/hosting-cluster/')<br/>    Page(title='KubeStellar on K3D', url='/release-0.23.0/direct/deploy-on-k3d/')<br/>    Page(title='Best practices', url='/release-0.23.0/direct/best-practices/')<br/>Section(title='Contributing')<br/>    Page(title='Overview of contributing', url='/release-0.23.0/direct/contributor/')<br/>    Page(title='Packaging', url='/release-0.23.0/direct/packaging/')<br/>    Page(title='Release Process', url='/release-0.23.0/direct/release/')<br/>    Page(title='Guidelines', url='/release-0.23.0/Contribution%20guidelines/CONTRIBUTING/')<br/>    Page(title='Code of Conduct', url='/release-0.23.0/Contribution%20guidelines/coc/')<br/>    Page(title='License', url='/release-0.23.0/Contribution%20guidelines/LICENSE/')<br/>    Page(title='Governance', url='/release-0.23.0/Contribution%20guidelines/governance/')<br/>    Page(title='Onboarding', url='/release-0.23.0/Contribution%20guidelines/onboarding/')<br/>    Page(title='Website', url='/release-0.23.0/Contribution%20guidelines/operations/document-management/')<br/>    Section(title='Security')<br/>        Page(title='Policy', url='/release-0.23.0/Contribution%20guidelines/security/security/')<br/>        Page(title='Contacts', url='/release-0.23.0/Contribution%20guidelines/security/security_contacts/')<br/>Section(title='Community')<br/>    Page(title='Get Involved', url='/release-0.23.0/Community/_index/')<br/>    Section(title='Contact Us')<br/>        Link(title='Mailing List', url='https://kubestellar.io/join_us')<br/>        Link(title='Community Meeting Agenda (join mailing list first)', url='https://kubestellar.io/agenda')<br/>        Link(title='Slack', url='https://kubestellar.io/slack')<br/>        Link(title='Medium Blog', url='https://kubestellar.io/blog')<br/>        Link(title='YouTube Channel', url='https://kubestellar.io/tv')<br/>        Link(title='LinkedIn', url='https://kubestellar.io/linkedin')<br/>        Link(title='Reddit', url='https://www.reddit.com/r/kubestellar/')<br/>        Link(title='Google Drive', url='https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS')<br/>    Section(title='Partners')<br/>        Page(title='ArgoCD', url='/release-0.23.0/Community/partners/argocd/')<br/>        Page(title='Turbonomic', url='/release-0.23.0/Community/partners/turbonomic/')<br/>        Page(title='MVI', url='/release-0.23.0/Community/partners/mvi/')<br/>        Page(title='FluxCD', url='/release-0.23.0/Community/partners/fluxcd/')<br/>        Page(title='OpenZiti', url='/release-0.23.0/Community/partners/openziti/')<br/>        Page(title='Kyverno', url='/release-0.23.0/Community/partners/kyverno/')<br/>Link(title='Blog', url='https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank')</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">Section(title='Welcome')<br/>    Page(title='Landing', url='/release-0.23.0/')<br/>Section(title='Overview')<br/>    Page(title='Readme', url='/release-0.23.0/readme/')<br/>    Page(title='User guide', url='/release-0.23.0/direct/user-guide/')<br/>    Page(title='Architecture', url='/release-0.23.0/direct/architecture/')<br/>    Page(title='Release-notes', url='/release-0.23.0/direct/release-notes/')<br/>Section(title='Getting Started')<br/>    Page(title='Pre-reqs', url='/release-0.23.0/direct/pre-reqs/')<br/>    Section(title='Examples')<br/>        Page(title='Outline and Scenarios', url='/release-0.23.0/direct/examples/')<br/>        Page(title='Setup using Core Helm chart', url='/release-0.23.0/direct/common-setup-core-chart/')<br/>        Page(title='Step-By-Step Setup', url='/release-0.23.0/direct/common-setup-step-by-step/')<br/>        Page(title='Creating Example WECs', url='/release-0.23.0/direct/example-wecs/')<br/>        Page(title='Example Third-Party integrations', url='/release-0.23.0/direct/thirdparties/')<br/>    Page(title='Using existing hosting cluster', url='/release-0.23.0/direct/hosting-cluster/')<br/>    Page(title='KubeStellar on K3D', url='/release-0.23.0/direct/deploy-on-k3d/')<br/>    Page(title='Core Helm chart', url='/release-0.23.0/direct/core-chart/')<br/>    Page(title='Best practices', url='/release-0.23.0/direct/best-practices/')<br/>Section(title='Contributing')<br/>    Page(title='Overview of contributing', url='/release-0.23.0/direct/contributor/')<br/>    Page(title='Packaging', url='/release-0.23.0/direct/packaging/')<br/>    Page(title='Release Process', url='/release-0.23.0/direct/release/')<br/>    Page(title='Release Testing', url='/release-0.23.0/direct/release-testing/')<br/>    Page(title='Guidelines', url='/release-0.23.0/Contribution%20guidelines/CONTRIBUTING/')<br/>    Page(title='Code of Conduct', url='/release-0.23.0/Contribution%20guidelines/coc/')<br/>    Page(title='License', url='/release-0.23.0/Contribution%20guidelines/LICENSE/')<br/>    Page(title='Governance', url='/release-0.23.0/Contribution%20guidelines/governance/')<br/>    Page(title='Onboarding', url='/release-0.23.0/Contribution%20guidelines/onboarding/')<br/>    Section(title='Website')<br/>        Page(title='Overview', url='/release-0.23.0/Contribution%20guidelines/operations/document-management/')<br/>        Page(title='Testing website PRs', url='/release-0.23.0/Contribution%20guidelines/operations/testing-doc-prs/')<br/>        Page(title='Listing of variables', url='/release-0.23.0/Contribution%20guidelines/operations/all-macros/')<br/>    Section(title='Security')<br/>        Page(title='Policy', url='/release-0.23.0/Contribution%20guidelines/security/security/')<br/>        Page(title='Contacts', url='/release-0.23.0/Contribution%20guidelines/security/security_contacts/')<br/>Section(title='Community')<br/>    Page(title='Get Involved', url='/release-0.23.0/Community/_index/')<br/>    Section(title='Contact Us')<br/>        Link(title='Mailing List', url='https://kubestellar.io/join_us')<br/>        Link(title='Community Meeting Agenda (join mailing list first)', url='https://kubestellar.io/agenda')<br/>        Link(title='Slack', url='https://kubestellar.io/slack')<br/>        Link(title='Medium Blog', url='https://kubestellar.io/blog')<br/>        Link(title='YouTube Channel', url='https://kubestellar.io/tv')<br/>        Link(title='LinkedIn', url='https://kubestellar.io/linkedin')<br/>        Link(title='Reddit', url='https://www.reddit.com/r/kubestellar/')<br/>        Link(title='Google Drive', url='https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS')<br/>    Section(title='Partners')<br/>        Page(title='ArgoCD', url='/release-0.23.0/Community/partners/argocd/')<br/>        Page(title='Turbonomic', url='/release-0.23.0/Community/partners/turbonomic/')<br/>        Page(title='MVI', url='/release-0.23.0/Community/partners/mvi/')<br/>        Page(title='FluxCD', url='/release-0.23.0/Community/partners/fluxcd/')<br/>        Page(title='OpenZiti', url='/release-0.23.0/Community/partners/openziti/')<br/>        Page(title='Kyverno', url='/release-0.23.0/Community/partners/kyverno/')<br/>Link(title='Blog', url='https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank')</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>files</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>I18nFiles</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><mkdocs_static_i18n.suffix_structure.i18nfiles 0x7f0e2db79000="" at="" object=""></mkdocs_static_i18n.suffix_structure.i18nfiles></td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><mkdocs_static_i18n.suffix_structure.i18nfiles 0x7f52897bd810="" at="" object=""></mkdocs_static_i18n.suffix_structure.i18nfiles></td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>page</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>Page</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">Page(title='All macros', url='/release-0.23.0/en/Contribution%20guidelines/operations/all-macros/')</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">Page(title='Listing of variables', url='/release-0.23.0/en/Contribution%20guidelines/operations/all-macros/')</td>
 </tr>
 </table>
 <h2 id="config-information">Config Information<a class="headerlink" href="#config-information" title="Permanent link">#</a></h2>
@@ -656,7 +776,7 @@
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>config_file_path</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>str</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'/home/runner/work/kubestellar/kubestellar/docs/mike-mkdocsxs5e_3vb.yml'</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'/home/runner/work/kubestellar/kubestellar/docs/mike-mkdocshq8_57zd.yml'</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>site_name</b></td>
@@ -666,7 +786,7 @@
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>nav</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>list</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">[{'Welcome': [{'Landing': 'index.md'}]}, {'Overview': [{'Readme': 'readme.md'}, {'User guide': 'direct/user-guide.md'}, {'Architecture': 'direct/architecture.md'}, {'Release-notes': 'direct/release-notes.md'}]}, {'Getting Started': [{'Pre-reqs': 'direct/pre-reqs.md'}, {'Examples': 'direct/examples.md'}, {'Using existing hosting cluster': 'direct/hosting-cluster.md'}, {'KubeStellar on K3D': 'direct/deploy-on-k3d.md'}, {'Best practices': 'direct/best-practices.md'}]}, {'Contributing': [{'Overview of contributing': 'direct/contributor.md'}, {'Packaging': 'direct/packaging.md'}, {'Release Process': 'direct/release.md'}, {'Guidelines': 'Contribution guidelines/CONTRIBUTING.md'}, {'Code of Conduct': 'Contribution guidelines/coc.md'}, {'License': 'Contribution guidelines/LICENSE.md'}, {'Governance': 'Contribution guidelines/governance.md'}, {'Onboarding': 'Contribution guidelines/onboarding.md'}, {'Website': 'Contribution guidelines/operations/document-management.md'}, {'Security': [{'Policy': 'Contribution guidelines/security/security.md'}, {'Contacts': 'Contribution guidelines/security/security_contacts.md'}]}]}, {'Community': [{'Get Involved': 'Community/_index.md'}, {'Contact Us': [{'Mailing List': 'https://kubestellar.io/join_us'}, {'Community Meeting Agenda (join mailing list first)': 'https://kubestellar.io/agenda'}, {'Slack': 'https://kubestellar.io/slack'}, {'Medium Blog': 'https://kubestellar.io/blog'}, {'YouTube Channel': 'https://kubestellar.io/tv'}, {'LinkedIn': 'https://kubestellar.io/linkedin'}, {'Reddit': 'https://www.reddit.com/r/kubestellar/'}, {'Google Drive': 'https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS'}]}, {'Partners': [{'ArgoCD': 'Community/partners/argocd.md'}, {'Turbonomic': 'Community/partners/turbonomic.md'}, {'MVI': 'Community/partners/mvi.md'}, {'FluxCD': 'Community/partners/fluxcd.md'}, {'OpenZiti': 'Community/partners/openziti.md'}, {'Kyverno': 'Community/partners/kyverno.md'}]}]}, {'Blog': 'https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank'}]</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">[{'Welcome': [{'Landing': 'index.md'}]}, {'Overview': [{'Readme': 'readme.md'}, {'User guide': 'direct/user-guide.md'}, {'Architecture': 'direct/architecture.md'}, {'Release-notes': 'direct/release-notes.md'}]}, {'Getting Started': [{'Pre-reqs': 'direct/pre-reqs.md'}, {'Examples': [{'Outline and Scenarios': 'direct/examples.md'}, {'Setup using Core Helm chart': 'direct/common-setup-core-chart.md'}, {'Step-By-Step Setup': 'direct/common-setup-step-by-step.md'}, {'Creating Example WECs': 'direct/example-wecs.md'}, {'Example Third-Party integrations': 'direct/thirdparties.md'}]}, {'Using existing hosting cluster': 'direct/hosting-cluster.md'}, {'KubeStellar on K3D': 'direct/deploy-on-k3d.md'}, {'Core Helm chart': 'direct/core-chart.md'}, {'Best practices': 'direct/best-practices.md'}]}, {'Contributing': [{'Overview of contributing': 'direct/contributor.md'}, {'Packaging': 'direct/packaging.md'}, {'Release Process': 'direct/release.md'}, {'Release Testing': 'direct/release-testing.md'}, {'Guidelines': 'Contribution guidelines/CONTRIBUTING.md'}, {'Code of Conduct': 'Contribution guidelines/coc.md'}, {'License': 'Contribution guidelines/LICENSE.md'}, {'Governance': 'Contribution guidelines/governance.md'}, {'Onboarding': 'Contribution guidelines/onboarding.md'}, {'Website': [{'Overview': 'Contribution guidelines/operations/document-management.md'}, {'Testing website PRs': 'Contribution guidelines/operations/testing-doc-prs.md'}, {'Listing of variables': 'Contribution guidelines/operations/all-macros.md'}]}, {'Security': [{'Policy': 'Contribution guidelines/security/security.md'}, {'Contacts': 'Contribution guidelines/security/security_contacts.md'}]}]}, {'Community': [{'Get Involved': 'Community/_index.md'}, {'Contact Us': [{'Mailing List': 'https://kubestellar.io/join_us'}, {'Community Meeting Agenda (join mailing list first)': 'https://kubestellar.io/agenda'}, {'Slack': 'https://kubestellar.io/slack'}, {'Medium Blog': 'https://kubestellar.io/blog'}, {'YouTube Channel': 'https://kubestellar.io/tv'}, {'LinkedIn': 'https://kubestellar.io/linkedin'}, {'Reddit': 'https://www.reddit.com/r/kubestellar/'}, {'Google Drive': 'https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS'}]}, {'Partners': [{'ArgoCD': 'Community/partners/argocd.md'}, {'Turbonomic': 'Community/partners/turbonomic.md'}, {'MVI': 'Community/partners/mvi.md'}, {'FluxCD': 'Community/partners/fluxcd.md'}, {'OpenZiti': 'Community/partners/openziti.md'}, {'Kyverno': 'Community/partners/kyverno.md'}]}]}, {'Blog': 'https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank'}]</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>pages</b></td>
@@ -691,7 +811,7 @@
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>theme</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>Theme</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">Theme(name='material', dirs=['/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/mkdocs_static_i18n/custom_i18n_sitemap', '/home/runner/work/kubestellar/kubestellar/docs/overrides', '/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/material', '/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/mkdocs/templates'], static_templates=['sitemap.xml', '404.html'], name='material', locale=Locale(language='en', territory=''), language='en', direction=None, features=['content.action.edit', 'content.action.view', 'navigation.indexes', 'navigation.tabs', 'navigation.path', 'navigation.footer', 'content.code.copy', 'content.code.annotate'], palette={'primary': None, 'accent': None}, font={'text': 'SapceMono', 'code': 'Roboto Mono'}, icon=None, favicon='favicons/favicon.ico', logo='logo.png')</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">Theme(name='material', dirs=['/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/mkdocs_static_i18n/custom_i18n_sitemap', '/home/runner/work/kubestellar/kubestellar/docs/overrides', '/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/material', '/home/runner/work/kubestellar/kubestellar/docs/venv/lib/python3.10/site-packages/mkdocs/templates'], static_templates=['404.html', 'sitemap.xml'], name='material', locale=Locale(language='en', territory=''), language='en', direction=None, features=['content.action.edit', 'content.action.view', 'navigation.indexes', 'navigation.tabs', 'navigation.path', 'navigation.footer', 'content.code.copy', 'content.code.annotate'], palette={'primary': None, 'accent': None}, font={'text': 'SapceMono', 'code': 'Roboto Mono'}, icon=None, favicon='favicons/favicon.ico', logo='logo.png')</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>docs_dir</b></td>
@@ -908,17 +1028,17 @@ documentation project:</p>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>date</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>datetime</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">datetime.datetime(2024, 6, 23, 10, 20, 39, tzinfo=tzoffset(None, 7200))</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">datetime.datetime(2024, 6, 23, 10, 32, 40, tzinfo=tzoffset(None, 7200))</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>short_commit</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>str</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'f6a946522'</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'85cfc0d97'</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>commit</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>str</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'f6a94652280e98f8a7b0047d526c7aeed5d180d6'</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'85cfc0d973257930b7487bdb27699b6c18a4c26f'</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>tag</b></td>
@@ -948,17 +1068,17 @@ documentation project:</p>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>date_ISO</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>str</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'Sun Jun 23 10:20:39 2024 +0200'</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'Sun Jun 23 10:32:40 2024 +0200'</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>message</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>str</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'Merge pull request #2241 from MikeSpreitzer/doc-fixrel2-r0230\n\n📖 [release-0.23.0] Replace another wrong absolute link with correct relative one'</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'Merge pull request #2243 from MikeSpreitzer/doc-undangle-r0230\n\n📖 [release-0.23.0] Some doc file cleanup'</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>raw</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>str</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'commit f6a94652280e98f8a7b0047d526c7aeed5d180d6\nAuthor: kcp CI Bot &lt;134318005+kcp-ci-bot@users.noreply.github.com&gt;\nDate:   Sun Jun 23 10:20:39 2024 +0200\n\n    Merge pull request #2241 from MikeSpreitzer/doc-fixrel2-r0230\n    \n    📖 [release-0.23.0] Replace another wrong absolute link with correct relative one'</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'commit 85cfc0d973257930b7487bdb27699b6c18a4c26f\nAuthor: kcp CI Bot &lt;134318005+kcp-ci-bot@users.noreply.github.com&gt;\nDate:   Sun Jun 23 10:32:40 2024 +0200\n\n    Merge pull request #2243 from MikeSpreitzer/doc-undangle-r0230\n    \n    📖 [release-0.23.0] Some doc file cleanup'</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>root_dir</b></td>
@@ -983,12 +1103,12 @@ documentation project:</p>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>title</b></td>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>str</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'All macros'</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">'Listing of variables'</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>parent</b></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>NoneType</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">None</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>Section</i></td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">title = 'Website', children = [Page(title='Overview', url='/release-0.23.0/en/Contribution%20guidelines/operations/document-management/'), Page(title='Testing website PRs', url='/release-0.23.0/en/Contribution%20guidelines/operations/testing-doc-prs/'), Page(title='Listing of variables', url='/release-0.23.0/en/Contribution%20guidelines/operations/all-macros/')], <b>parent</b> [<i>Section</i>], _Section__active = False</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>children</b></td>
@@ -997,13 +1117,13 @@ documentation project:</p>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>previous_page</b></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>NoneType</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">None</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>Page</i></td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">Page(title='Testing website PRs', url='/release-0.23.0/en/Contribution%20guidelines/operations/testing-doc-prs/')</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>next_page</b></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>NoneType</i></td>
-<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">None</td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><i>Page</i></td>
+<td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px">Page(title='Policy', url='/release-0.23.0/en/Contribution%20guidelines/security/security/')</td>
 </tr>
 <tr>
 <td style="vertical-align:top; border:1px solid #DCDCDC; padding: 5px"><b>_Page__active</b></td>
@@ -1384,6 +1504,34 @@ documentation project:</p>
 </div>
 </main>
 <footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: Testing website PRs" class="md-footer__link md-footer__link--prev" href="../testing-doc-prs/" rel="prev">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</div>
+<div class="md-footer__title">
+<div class="md-ellipsis">
+<span class="md-footer__direction">
+                  Previous
+                </span>
+                Testing website PRs
+              </div>
+</div>
+</a>
+<a aria-label="Next: Policy" class="md-footer__link md-footer__link--next" href="../../security/security/" rel="next">
+<div class="md-footer__title">
+<div class="md-ellipsis">
+<span class="md-footer__direction">
+                  Next
+                </span>
+                Policy
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"></path></svg>
+</div>
+</a>
+</nav>
 <div class="md-footer-meta md-typeset">
 <div class="md-footer-meta__inner md-grid">
 <div class="md-copyright">
