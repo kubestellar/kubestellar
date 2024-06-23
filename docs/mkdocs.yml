@@ -30,21 +30,31 @@ nav:
       - Architecture: direct/architecture.md
       - Release-notes: direct/release-notes.md
   - Getting Started: 
-          - Pre-reqs: direct/pre-reqs.md
-          - Examples: direct/examples.md
-          - Using existing hosting cluster: direct/hosting-cluster.md
-          - KubeStellar on K3D: direct/deploy-on-k3d.md
-          - Best practices: direct/best-practices.md
+      - Pre-reqs: direct/pre-reqs.md
+      - Examples:
+          - Outline and Scenarios: direct/examples.md
+          - Setup using Core Helm chart: direct/common-setup-core-chart.md
+          - Step-By-Step Setup: direct/common-setup-step-by-step.md
+          - Creating Example WECs: direct/example-wecs.md
+          - Example Third-Party integrations: direct/thirdparties.md
+      - Using existing hosting cluster: direct/hosting-cluster.md
+      - KubeStellar on K3D: direct/deploy-on-k3d.md
+      - Core Helm chart: direct/core-chart.md
+      - Best practices: direct/best-practices.md
   - Contributing: 
       - Overview of contributing: direct/contributor.md
       - Packaging: direct/packaging.md
       - Release Process: direct/release.md
+      - Release Testing: direct/release-testing.md
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
       - Code of Conduct: Contribution guidelines/coc.md
       - License: Contribution guidelines/LICENSE.md
       - Governance: Contribution guidelines/governance.md
       - Onboarding: Contribution guidelines/onboarding.md
-      - Website: Contribution guidelines/operations/document-management.md
+      - Website:
+          - Overview: Contribution guidelines/operations/document-management.md
+          - Testing website PRs: Contribution guidelines/operations/testing-doc-prs.md
+          - Listing of variables: Contribution guidelines/operations/all-macros.md
       - Security: 
           - Policy: Contribution guidelines/security/security.md
           - Contacts: Contribution guidelines/security/security_contacts.md
