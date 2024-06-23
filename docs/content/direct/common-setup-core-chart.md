@@ -28,7 +28,7 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBE
 
 ## Install KubeStellar Core chart
 
-A KubeStellar Core installation compatible with the common setup suitable for Common Setup described in the [examples](https://docs.kubestellar.io/release-0.22.0/direct/examples/) could be achieved with the following command:
+A KubeStellar Core installation compatible with the common setup suitable for Common Setup described in the [examples](examples.md) could be achieved with the following command:
 
 ```shell
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
