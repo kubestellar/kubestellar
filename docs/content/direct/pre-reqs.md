@@ -6,18 +6,23 @@ You can use the [check-pre-req](#automated-check-of-pre-requisites-for-kubestell
 
 ## Infrastructure (clusters)
 
-Because of its multicluster architecture, KubeStellar requires that you have the necessary privileges and infrastructure access to create and/or configure the necessary clusters. 
-To create/administer the required few small kubernetes clusters, our current examples can use:
+Because of its multicluster architecture, KubeStellar requires that you have the necessary privileges and infrastructure access to create and/or configure the necessary Kubernetes clusters. These are the following; see [the architecture document](architecture.md) for more details.
 
-- **kind** OR
-- **k3s** OR
+- One cluster to serve as the [KubeFlex](https://github.com/kubestellar/kubeflex/) hosting cluster.
+- Any additional Kubernetes clusters that are not created by KubeFlex but you will use as a WDS or ITS.
+- Your WECs.
+
+Our documentation has remarks about using the following sorts of clusters:
+
+- **kind**
+- **k3s**
 - **openshift** 
 
 ## Software Prerequisites: for Using KubeStellar
 
 - **kubeflex** version 0.6.1 or higher
     To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). To upgrade from an existing installation,
-follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex). At the end of the install make sure that the kubeflex CLI, kflex, is in your path.
+follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex). At the end of the install make sure that the kubeflex CLI, kflex, is in your `$PATH`.
 
 - **OCM CLI (clusteradm)**
     To install OCM CLI use:
@@ -26,7 +31,7 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
     curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
     ```
 
-    Note that the default installation of clusteradm will install in /usr/local/bin which will require root access. If you prefer to avoid root, you can specify an alternative installation path using the INSTALL_DIR environment variable, as follows:
+    Note that the default installation of clusteradm will install in /usr/local/bin which will require root access. If you prefer to avoid root, you can specify an alternative installation location using the INSTALL_DIR environment variable, as follows:
 
     ```shell
     mkdir -p ocm
@@ -35,7 +40,7 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
     export PATH=$PWD/ocm:$PATH
     ```
 
-    At the end of the install make sure that the OCM CLI, clusteradm, is in your path.
+    At the end of the install make sure that the OCM CLI, clusteradm, is in your `$PATH`.
 
 - **helm** - to deploy the kubestellar and kubeflex charts
 - **kubectl** - to access the kubernetes clusters
@@ -61,7 +66,7 @@ To build and _**test**_ KubeStellar properly, you will also need
 ## Automated Check of Pre-Requisites for KubeStellar
 The [check_pre_req](https://github.com/kubestellar/kubestellar/blob/main/hack/check_pre_req.sh) script offers a convenient way to check for the pre-requisites eeded for [KubeStellar](./pre-reqs.md) deployment and [use case scenarios](./examples.md).
 
-The script checks for a pre-requisite presence in the path, by using the `which` command, and it can optionally provide version and path information for pre-requisites that are present, or installation information for missing pre-requisites.
+The script checks for a pre-requisite presence in the `$PATH`, by using the `which` command, and it can optionally provide version and path information for pre-requisites that are present, or installation information for missing pre-requisites.
 
 We envision that this script could be useful for user-side debugging as well as for asserting the presence of pre-requisites in higher-level automation scripts.
 
