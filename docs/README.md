@@ -101,6 +101,8 @@ There are many global variables defined in the <a href="{{ config.repo_raw_url }
     - edit_uri: {{ config.edit_uri }}
     - ks_branch: {{ config.ks_branch }}
     - ks_tag: {{ config.ks_tag }}
+    - ks_latest_regular_release: {{ config.ks_latest_regular_release }}
+    - ks_latest_release: {{ config.ks_latest_release }}
 
 to use a variables/macro in your documentation reference like this:
 

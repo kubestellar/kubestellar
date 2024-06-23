@@ -7,7 +7,7 @@ with a choice of user-defined KubeFlex Control Planes (CPs).
 The information provided is specific for the following release:
 
 ```shell
-export KUBESTELLAR_VERSION=0.23.0
+export KUBESTELLAR_VERSION={{ config.ks_latest_release }}
 ```
 
 ## Pre-requisites
@@ -37,14 +37,14 @@ For convenience, a new local **Kind** cluster that satisfies the requirements fo
 and that can be used to exercises the [examples](./examples.md) can be created with the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
 ```
 
 Alternatively, a new local **k3s** cluster that satisfies the requirements for KubeStellar setup
 and that can be used to exercises the [examples](./examples.md) can be created with the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0/scripts/create-k3s-cluster-with-SSL-passthrough.sh) --port 9443
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/scripts/create-k3s-cluster-with-SSL-passthrough.sh) --port 9443
 ```
 
 3. An **OpenShift** cluster
@@ -119,7 +119,7 @@ WDSes: # all the CPs in this list will execute the wds.yaml PCH
   ...
 ```
 
-where `name` must specify a name unique among all the control planes in that KubeFlex deployment (note that this must be unique among both ITSes and WDSes), the optional `type` can be either k8s (default) or host, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information, the optional `APIGroups` provides a list of APIGroups, see [here](https://docs.kubestellar.io/release-0.23.0/direct/examples/#scenario-2-using-the-hosting-cluster-as-wds-to-deploy-a-custom-resource) for more information, and `ITSName` specify the ITS connected to the new WDS being created (this parameter MUST be specified if more that one ITS exists in the cluster, if no value is specified and only one ITS exists in the cluster, then it will be automatically selected).
+where `name` must specify a name unique among all the control planes in that KubeFlex deployment (note that this must be unique among both ITSes and WDSes), the optional `type` can be either k8s (default) or host, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information, the optional `APIGroups` provides a list of APIGroups, see [here](https://docs.kubestellar.io/release-{{ config.ks_latest_release }}/direct/examples/#scenario-2-using-the-hosting-cluster-as-wds-to-deploy-a-custom-resource) for more information, and `ITSName` specify the ITS connected to the new WDS being created (this parameter MUST be specified if more that one ITS exists in the cluster, if no value is specified and only one ITS exists in the cluster, then it will be automatically selected).
 
 ## KubeStellar Core Chart usage
 
