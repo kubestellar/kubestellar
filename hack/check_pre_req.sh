@@ -123,7 +123,7 @@ is_installed_make() {
     is_installed 'GNU Make' \
         'make' \
         'make --version | head -1' \
-        'sudo apt-get install make or sudo yum install make'
+        'sudo apt-get install make or brew install make'
 }
 
 is_installed_ocm() {
