@@ -1,13 +1,12 @@
-# KubeStellar User Guide
+# Outline of Installation and Usage of KubeStellar
 
 See the KubeStellar [overview](../readme.md) for architecture and other information.
 
 This user guide is an ongoing project. If you find errors, please point them out in our [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/) or open an issue in our [github repository](https://github.com/kubestellar/kubestellar)!
 
-# Outline of KubeStellar Usage
+Installing and using KubeStellar progresses through the following stages.
 
-After installing the [prerequisites](pre-reqs.md), using KubeStellar progresses through the following stages.
-
+1. Install software prerequisites (see [prerequisites](pre-reqs.md)).
 1. Acquire the ability to use a Kubernetes cluster to serve as the [KubeFlex](https://github.com/kubestellar/kubeflex/) hosting cluster.
 1. Initialize that cluster as a KubeFlex hosting cluster.
 1. Create an Inventory and Transport Space (ITS)
@@ -28,6 +27,7 @@ There is some flexibility in the ordering of those stage. The following flowchar
 KubeStellar activity ordering
 ---
 flowchart LR
+    step0[SW prereqs]
     step1[Acquire host cluster]
     step2[Initialize host cluster]
     step3i[Create ITS]
@@ -38,6 +38,7 @@ flowchart LR
     step7[Create control objects]
     step8[Enjoy]
     step9[Consume reported state]
+    step0 --> step2
     step1 --> step2
     step2 --> step3i
     step2 --> step3w
@@ -56,4 +57,4 @@ You can have multiple ITSes, WDSes, and WECs, created and deleted over time as y
 
 KubeStellar's [Core Helm chart](core-chart.md) combines initializing the KubeFlex hosting cluster, creating some ITSes, and creating some WDSes.
 
-You can find an example run through the first 8 steps in [the quickstart](get-started.md). You can find examples of all the steps in [the examples document](examples.md).
+You can find an example run through of steps 2--7 in [the quickstart](get-started.md). This dovetails with [the example scenarios document](example-scenarios.md), which shows examples of the later steps.

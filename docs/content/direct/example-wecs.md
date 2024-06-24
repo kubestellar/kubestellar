@@ -1,5 +1,3 @@
-# Create and Register WECs for the "Common Setup" used in Examples
-
 The following steps show how to create two new `kind` clusters and
 register them with the hub as descibed in the
 [official open cluster management docs](https://open-cluster-management.io/getting-started/installation/start-the-control-plane/).

@@ -35,7 +35,8 @@ nav:
       - Release-notes: direct/release-notes.md
   - Quick Start: direct/get-started.md
   - User Guide:
-      - Outline: direct/usage-basics.md
+      - Quick Start: direct/get-started.md
+      - Outline of Installation and Usage of KubeStellar: direct/usage-basics.md
       - Prerequisites: direct/pre-reqs.md
       - The KubeFlex Hosting cluster: direct/hosting-cluster.md
       - ITSes and WDSes: direct/its-and-wds.md
@@ -45,7 +46,7 @@ nav:
           - Binding: direct/binding.md
           - Transforming desired state: direct/transforming.md
           - Combining reported state: direct/combined-status.md
-      - Quick Start: direct/get-started.md
+      - Example Scenarios: direct/example-scenarios.md
       - Best practices: direct/best-practices.md
       - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
       - Miscellaneous Documentation:
