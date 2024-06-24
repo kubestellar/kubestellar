@@ -1,6 +1,8 @@
-# Using existing Kubernetes cluster to host KubeStellar
+# The KubeFlex hosting cluster
 
-Status of this document: it is the barest of a start. Much more needs to be written.
+This document tells you what makes a Kubernetes cluster suitable to serve as the KubeFlex hosting cluster and how to initialize that cluster to play that role.
+
+TODO: write this. The following subsections are old fragments that will be relevant
 
 ## Using an existing Kind cluster as the hosting cluster
 
