@@ -18,6 +18,7 @@ Our documentation has remarks about using the following sorts of clusters:
 - **k3s**
 - **openshift** 
 
+<!-- begin software prerequisites -->
 ## Software Prerequisites: for Using KubeStellar
 
 - **kubeflex** version 0.6.1 or higher
