@@ -26,13 +26,23 @@ After the quickstart setup, I looked at an OCM Agent (klusterlet-agent, to be sp
 
 ## Creating a hosting cluster
 
-### Create and init a kind cluster as hosting cluster
+### Create and init a kind cluster as hosting cluster with kflex
 
 The following command will use `kind` to create a cluster with an Ingress controller with SSL passthrough and then proceed to install the KubeFlex implementation in it and set your current kubeconfig context to access that cluster as admin.
 
 ```shell
 kflex init --create-kind
 ```
+
+### Create and init a kind cluster as hosting cluster with curl-to-bash script
+
+There is a bash script at [`https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh`](https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) that can be fed directly into `bash` and will create a `kind` cluster and initialize it as the KubeFlex hosting cluster. This script accepts the following command line flags.
+
+- `--name name`: set a specific name of the kind cluster (default: kubestellar).
+- `--port port`: map the specified host port to the kind cluster port 443 (default: 9443).
+- `--nowait`: when given, the script proceeds without waiting for the nginx ingress patching to complete.
+- `--nosetcontext`: when given, the script does not change the current kubectl context to the newly created cluster.
+- `-X` enable verbose execution of the script for debugging.
 
 ### Create a k3d cluster
 
@@ -82,7 +92,11 @@ When the hosting cluster is an OpenShift cluster, the recipe for registering a W
 
 ### kflex init --create-kind
 
-See [above](#create-and-init-a-kind-cluster-as-hosting-cluster)
+See [above](#create-and-init-a-kind-cluster-as-hosting-cluster-with-kflex).
+
+### Curl-to-bash
+
+See [above](#create-and-init-a-kind-cluster-as-hosting-cluster-with-curl-to-bash-script).
 
 ### KubeStellar core Helm chart
 
