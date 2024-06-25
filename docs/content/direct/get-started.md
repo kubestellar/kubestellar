@@ -28,6 +28,21 @@ This Quick Start outlines step 1 and shows a concrete example of steps 2--7 in t
 
 ---
 
+### Delete debris from preivous trials
+
+If you have run this quickstart or any related recipe previously then
+you will first want to remove any related debris. The following
+commands tear down the state established by this quickstart.
+
+```shell
+kind delete cluster --name kubeflex
+kind delete cluster --name cluster1
+kind delete cluster --name cluster2
+kubectl config delete-context kind-kubeflex
+kubectl config delete-context cluster1
+kubectl config delete-context cluster2
+```
+
 ## Set the Version appropriately as an environment variable
 
 ```shell
