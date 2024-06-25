@@ -34,7 +34,9 @@ we will not differentiate between these roles. Instead we will use the term
 Examples of users interaction with KubeStellar are illustrated in the
 [KubeStellar Usage Examples](./examples.md) section.
 
-The KubeStellar architecture has these main modules:
+The KubeStellar architecture has the following main modules.
+
+- [*KubeFlex*](https://github.com/kubestellar/kubeflex/). KubeStellar builds on the services of KubeFlex, using it to keep track of, and possibly provide, the Inventory and Transport spaces and the Workload Description spaces. Each of those appears as a `ControlPlane` object in the KubeFlex hosting cluster.
 
 - *KubeStellar Controller Manager*: this module is instantiated once per WDS and is responsible for watching `BindingPolicy` objects and create from it a matching `Binding` object that contains list of references to the concrete objects and list of references to the concrete clusters, and for updating the status of objects in the WDS.
 
