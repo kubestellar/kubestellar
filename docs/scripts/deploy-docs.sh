@@ -40,6 +40,10 @@ else
 #  fi
 fi
 
+if [ "$VERSION" == main ]
+then VERSION=unreleased-development
+fi
+
 MIKE_OPTIONS=()
 
 if [[ -n "${REMOTE:-}" ]]; then
