@@ -65,6 +65,42 @@ make serve-docs
 ```
 Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
 
+## Supported aliases for our documentation
+
+`mike` has a concept of aliases. We currently maintain only one alias.
+
+- `latest` ([{{config.docs_url}}/latest](https://docs.kubestellar.io/latest)), for the latest regular release.
+
+The publishing workflow updates these aliases. The latest regular release is determined by picking the first version listed by `mike list` that matches the regexp `release-[0-9.]*`.
+
+## Publishing from the branch named "main"
+
+The branch named "main" also gets published as a "version" on the
+website, but with a different name. This is not done by `mike`
+aliasing, because that only _adds_ a version. The branch named "main"
+is published as the version named "unreleased-development".
+
+## Shortcut URLs
+
+We have a few shortcut urls that come in handy when referring others to our project:
+
+<b>note:</b> You need to join our mailing list first to get access to some of the links that follow ([{{ config.docs_url }}/joinus](https://kubestellar.io/joinus))
+
+- [https://kubestellar.io/agenda](https://kubestellar.io/agenda) - our community meeting agenda google doc
+- [https://kubestellar.io/blog](https://kubestellar.io/blog) - our medium reading list
+- [https://kubestellar.io/code](https://kubestellar.io/code) - our current GitHub repo (wherever that is)
+- [https://kubestellar.io/community](https://kubestellar.io/community) - our stable docs community page
+- [https://kubestellar.io/drive](https://kubestellar.io/drive) - our google drive
+- [https://kubestellar.io/joinus](https://kubestellar.io/joinus) - our dev mailing list where you join and get our invites
+- [https://kubestellar.io/join_us](https://kubestellar.io/join_us) - also, our dev mailing list
+- [https://kubestellar.io/linkedin](https://kubestellar.io/linkedin) - our linkedin filter (soon, our page)
+- [https://kubestellar.io/tv](https://kubestellar.io/tv) - our youtube channel
+- [https://kubestellar.io/youtube](https://kubestellar.io/tv) - also, our youtube channel
+- [https://kubestellar.io/infomercial](https://kubestellar.io/infomercial) - our infomercial that premieres on June 12th at 9am
+
+and.. the very important…
+- [https://kubestellar.io/quickstart](https://kubestellar.io/quickstart) - our 'stable' quickstart
+
 ## Jinja templating
 
 Our documentation stack includes [Jinja](https://jinja.palletsprojects.com/en/3.1.x/). The Jinja constructs --- \{\# comment \#\}, \{\{ expr \}\}, and {&#37; statment &#37;} --- can appear in the markdown sources.
@@ -146,34 +182,6 @@ In the document you want to include, add the start and end tags you configured i
 ![Included Markdown](./content/Contribution%20guidelines/operations/included-markdown-example.png)
 
 for more information on the 'include-markdown' plugin for mkdocs look [here](https://github.com/mondeja/mkdocs-include-markdown-plugin)
-
-### Supported aliases for our documentation
-
-`mike` has a concept of aliases. We currently maintain only one alias.
-
-- `latest` ([{{config.docs_url}}/latest](https://docs.kubestellar.io/latest)), for the latest regular release.
-
-The publishing workflow updates these aliases. The latest regular release is determined by picking the first version listed by `mike list` that matches the regexp `release-[0-9.]*`.
-
-### Shortcut URLs
-We have a few shortcut urls that come in handy when referring others to our project:
-
-<b>note:</b> You need to join our mailing list first to get access to some of the links that follow ([{{ config.docs_url }}/joinus](https://kubestellar.io/joinus))
-
-- [https://kubestellar.io/agenda](https://kubestellar.io/agenda) - our community meeting agenda google doc
-- [https://kubestellar.io/blog](https://kubestellar.io/blog) - our medium reading list
-- [https://kubestellar.io/code](https://kubestellar.io/code) - our current GitHub repo (wherever that is)
-- [https://kubestellar.io/community](https://kubestellar.io/community) - our stable docs community page
-- [https://kubestellar.io/drive](https://kubestellar.io/drive) - our google drive
-- [https://kubestellar.io/joinus](https://kubestellar.io/joinus) - our dev mailing list where you join and get our invites
-- [https://kubestellar.io/join_us](https://kubestellar.io/join_us) - also, our dev mailing list
-- [https://kubestellar.io/linkedin](https://kubestellar.io/linkedin) - our linkedin filter (soon, our page)
-- [https://kubestellar.io/tv](https://kubestellar.io/tv) - our youtube channel
-- [https://kubestellar.io/youtube](https://kubestellar.io/tv) - also, our youtube channel
-- [https://kubestellar.io/infomercial](https://kubestellar.io/infomercial) - our infomercial that premieres on June 12th at 9am
-
-and.. the very important…
-- [https://kubestellar.io/quickstart](https://kubestellar.io/quickstart) - our 'stable' quickstart
 
 ### Codeblocks
 mkdocs has some very helpful ways to include blocks of code in a style that makes it clear to our readers that console interaction is necessary in the documentation.  There are options to include a plain codeblock (```), shell (shell), console (console - no used in our documentation), language or format-specific (yaml, etc.), and others.  For more detailed information, checkout the [mkdocs information on codeblocks](https://squidfunk.github.io/mkdocs-material/reference/code-blocks/).
