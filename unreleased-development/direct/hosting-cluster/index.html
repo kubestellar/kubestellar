@@ -11,17 +11,17 @@
         <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/direct/hosting-cluster/">
       
       
-        <link rel="prev" href="../commission-workloads/">
+        <link rel="prev" href="../pre-reqs/">
       
       
-        <link rel="next" href="../examples/">
+        <link rel="next" href="../its-and-wds/">
       
       <link rel="icon" href="../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
     
     
       
-        <title>Example Cluster Preparation - KubeStellar</title>
+        <title>The KubeFlex Hosting cluster - KubeStellar</title>
       
     
     
@@ -78,7 +78,7 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - Example Cluster Preparation" />
+  <meta property="og:title" content="KubeStellar - The KubeFlex Hosting cluster" />
   <meta property="og:description" content="None" />
   <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/direct/hosting-cluster/" />
   <meta property="og:image" content="https://docs.kubestellar.io/unreleased-developmentassets/images/illustrations/banner.png" />
@@ -113,7 +113,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#using-existing-kubernetes-cluster-to-host-kubestellar" class="md-skip">
+        <a href="#the-kubeflex-hosting-cluster" class="md-skip">
           Skip to content
         </a>
       
@@ -192,7 +192,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Example Cluster Preparation
+              The KubeFlex Hosting cluster
             
           </span>
         </div>
@@ -316,7 +316,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../usage-basics/" class="md-tabs__link md-tabs__link--active">
+      <a href="../get-started/" class="md-tabs__link md-tabs__link--active">
         User Guide
       </a>
     </li>
@@ -660,6 +660,12 @@
         
           
         
+          
+        
+          
+        
+          
+        
       
       
         <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
@@ -680,8 +686,22 @@
   
   
     <li class="md-nav__item">
+      <a href="../get-started/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../usage-basics/" class="md-nav__link">
-        Basics
+        Outline of Installation and Usage of KubeStellar
       </a>
     </li>
   
@@ -706,10 +726,174 @@
               
   
   
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          The KubeFlex Hosting cluster
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        The KubeFlex Hosting cluster
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements-on-the-kubeflex-hosting-cluster" class="md-nav__link">
+    Requirements on the KubeFlex hosting cluster
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connectivity-from-clients" class="md-nav__link">
+    Connectivity from clients
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-hosting-cluster" class="md-nav__link">
+    Creating a hosting cluster
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating a hosting cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-and-init-a-kind-cluster-as-hosting-cluster-with-kflex" class="md-nav__link">
+    Create and init a kind cluster as hosting cluster with kflex
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-and-init-a-kind-cluster-as-hosting-cluster-with-curl-to-bash-script" class="md-nav__link">
+    Create and init a kind cluster as hosting cluster with curl-to-bash script
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-k3d-cluster" class="md-nav__link">
+    Create a k3d cluster
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#initialize-the-kubeflex-hosting-cluster" class="md-nav__link">
+    Initialize the KubeFlex hosting cluster
+  </a>
+  
+    <nav class="md-nav" aria-label="Initialize the KubeFlex hosting cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kflex-init" class="md-nav__link">
+    kflex init
+  </a>
+  
+    <nav class="md-nav" aria-label="kflex init">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" class="md-nav__link">
+    Using an existing OpenShift cluster as the hosting cluster
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kflex-init-create-kind" class="md-nav__link">
+    kflex init --create-kind
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#curl-to-bash" class="md-nav__link">
+    Curl-to-bash
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kubestellar-core-helm-chart" class="md-nav__link">
+    KubeStellar core Helm chart
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
   
     <li class="md-nav__item">
-      <a href="../get-started/" class="md-nav__link">
-        Quick Start
+      <a href="../its-and-wds/" class="md-nav__link">
+        ITSes and WDSes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wec/" class="md-nav__link">
+        WECs
       </a>
     </li>
   
@@ -727,7 +911,200 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+          Control
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_7">
+          <span class="md-nav__icon md-icon"></span>
+          Control
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../control/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../binding/" class="md-nav__link">
+        Binding
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transforming/" class="md-nav__link">
+        Transforming desired state
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../combined-status/" class="md-nav__link">
+        Combining reported state
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-scenarios/" class="md-nav__link">
+        Example Scenarios
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../best-practices/" class="md-nav__link">
+        Best practices
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1" class="md-nav__link">
+        API reference (new tab)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+          Miscellaneous Documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_11">
+          <span class="md-nav__icon md-icon"></span>
+          Miscellaneous Documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../misc-files/" class="md-nav__link">
+        What's in here?
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11_2" >
       
       
         
@@ -737,13 +1114,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_11_2" id="__nav_4_11_2_label" tabindex="0">
           Setting up KubeStellar
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_4">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_11_2_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_11_2">
           <span class="md-nav__icon md-icon"></span>
           Setting up KubeStellar
         </label>
@@ -760,7 +1137,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4_1" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11_2_1" >
       
       
         
@@ -772,13 +1149,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_4_1" id="__nav_4_4_1_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_11_2_1" id="__nav_4_11_2_1_label" tabindex="0">
           Set Up Kubestellar Core Components
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_4_1_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_4_1">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_11_2_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_11_2_1">
           <span class="md-nav__icon md-icon"></span>
           Set Up Kubestellar Core Components
         </label>
@@ -858,16 +1235,14 @@
               
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11_3" >
       
       
         
@@ -877,83 +1252,19 @@
         
           
         
-          
-        
       
       
-        <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_11_3" id="__nav_4_11_3_label" tabindex="0">
           Installation & Usage Examples
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="true">
-        <label class="md-nav__title" for="__nav_4_5">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_11_3_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_11_3">
           <span class="md-nav__icon md-icon"></span>
           Installation & Usage Examples
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-    
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Example Cluster Preparation
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        Example Cluster Preparation
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#using-an-existing-kind-cluster-as-the-hosting-cluster" class="md-nav__link">
-    Using an existing Kind cluster as the hosting cluster
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" class="md-nav__link">
-    Using an existing OpenShift cluster as the hosting cluster
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-            
           
             
               
@@ -966,7 +1277,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_2" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11_3_1" >
       
       
         
@@ -978,13 +1289,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_5_2" id="__nav_4_5_2_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_11_3_1" id="__nav_4_11_3_1_label" tabindex="0">
           Sample scenarios
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_2_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_5_2">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_11_3_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_11_3_1">
           <span class="md-nav__icon md-icon"></span>
           Sample scenarios
         </label>
@@ -1080,99 +1391,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../best-practices/" class="md-nav__link">
-        Best practices
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1" class="md-nav__link">
-        API reference (new tab)
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
-      
-      
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
-          Miscellaneous Documentation
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_8">
-          <span class="md-nav__icon md-icon"></span>
-          Miscellaneous Documentation
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../misc-files/" class="md-nav__link">
-        What's in here?
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../usage-notes/" class="md-nav__link">
         Usage Notes
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../combined-status/" class="md-nav__link">
-        Combined Status
       </a>
     </li>
   
@@ -1978,16 +2198,104 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#using-an-existing-kind-cluster-as-the-hosting-cluster" class="md-nav__link">
-    Using an existing Kind cluster as the hosting cluster
+  <a href="#requirements-on-the-kubeflex-hosting-cluster" class="md-nav__link">
+    Requirements on the KubeFlex hosting cluster
   </a>
   
 </li>
       
         <li class="md-nav__item">
+  <a href="#connectivity-from-clients" class="md-nav__link">
+    Connectivity from clients
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-hosting-cluster" class="md-nav__link">
+    Creating a hosting cluster
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating a hosting cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-and-init-a-kind-cluster-as-hosting-cluster-with-kflex" class="md-nav__link">
+    Create and init a kind cluster as hosting cluster with kflex
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-and-init-a-kind-cluster-as-hosting-cluster-with-curl-to-bash-script" class="md-nav__link">
+    Create and init a kind cluster as hosting cluster with curl-to-bash script
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-k3d-cluster" class="md-nav__link">
+    Create a k3d cluster
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#initialize-the-kubeflex-hosting-cluster" class="md-nav__link">
+    Initialize the KubeFlex hosting cluster
+  </a>
+  
+    <nav class="md-nav" aria-label="Initialize the KubeFlex hosting cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kflex-init" class="md-nav__link">
+    kflex init
+  </a>
+  
+    <nav class="md-nav" aria-label="kflex init">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" class="md-nav__link">
     Using an existing OpenShift cluster as the hosting cluster
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kflex-init-create-kind" class="md-nav__link">
+    kflex init --create-kind
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#curl-to-bash" class="md-nav__link">
+    Curl-to-bash
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kubestellar-core-helm-chart" class="md-nav__link">
+    KubeStellar core Helm chart
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2022,20 +2330,80 @@
   
 
 
-<h1 id="using-existing-kubernetes-cluster-to-host-kubestellar">Using existing Kubernetes cluster to host KubeStellar<a class="headerlink" href="#using-existing-kubernetes-cluster-to-host-kubestellar" title="Permanent link">#</a></h1>
-<p>Status of this document: it is the barest of a start. Much more needs to be written.</p>
-<h2 id="using-an-existing-kind-cluster-as-the-hosting-cluster">Using an existing Kind cluster as the hosting cluster<a class="headerlink" href="#using-an-existing-kind-cluster-as-the-hosting-cluster" title="Permanent link">#</a></h2>
-<p>This requires a pre-existing Kind cluster that has an Ingress controller that is listening on host port 9443 and configured with TLS passthrough.</p>
-<p>The examples say to create a Kind cluster for hosting using the following command.</p>
+<h1 id="the-kubeflex-hosting-cluster">The KubeFlex hosting cluster<a class="headerlink" href="#the-kubeflex-hosting-cluster" title="Permanent link">#</a></h1>
+<p>This document tells you what makes a Kubernetes cluster suitable to serve as the KubeFlex hosting cluster and how to initialize that cluster to play that role.</p>
+<h2 id="requirements-on-the-kubeflex-hosting-cluster">Requirements on the KubeFlex hosting cluster<a class="headerlink" href="#requirements-on-the-kubeflex-hosting-cluster" title="Permanent link">#</a></h2>
+<p>The KubeFlex hosting cluster needs to run an Ingress controller with
+SSL passthrough enabled.</p>
+<h2 id="connectivity-from-clients">Connectivity from clients<a class="headerlink" href="#connectivity-from-clients" title="Permanent link">#</a></h2>
+<p>The clients in KubeStellar need to be able to open a TCP connection to where the Ingress controller is listening for HTTPS connections.</p>
+<p>The clients in KubeStellar comprise the following.</p>
+<ul>
+<li>The OCM Agent and the OCM Status Add-On Agent in each WEC.</li>
+<li>The KubeStellar controller-manager and the transport controller for each WDS, running in the KubeFlex hosting cluster.</li>
+</ul>
+<p>TODO: finish writing this subsection for real. Following are some clues.</p>
+<p>When everything runs on one machine, the defaults just work. When core and some WECs are on different machines, it gets more challenging. When the KubeFlex hosting cluster is an OpenShift cluster with a public domain name, the defaults just work.</p>
+<p>After the quickstart setup, I looked at an OCM Agent (klusterlet-agent, to be specifc) and did not find a clear passing of kubeconfig. I found adjacent Secrets holding kubeconfigs in which <code>cluster[0].cluster.server</code> was <code>https://kubeflex-control-plane:31048</code>. Note that <code>kubeflex-control-plane</code> is the name of the Docker container running <code>kind</code> cluster serving as KubeFlex hosting cluster. I could not find an explanation for the port number 31048; that Docker container maps port 443 inside to 9443 on the outside.</p>
+<p><code>kflex init</code> takes a command line flag <code>--domain string</code> described as <code>domain for FQDN (default "localtest.me")</code>.</p>
+<h2 id="creating-a-hosting-cluster">Creating a hosting cluster<a class="headerlink" href="#creating-a-hosting-cluster" title="Permanent link">#</a></h2>
+<h3 id="create-and-init-a-kind-cluster-as-hosting-cluster-with-kflex">Create and init a kind cluster as hosting cluster with kflex<a class="headerlink" href="#create-and-init-a-kind-cluster-as-hosting-cluster-with-kflex" title="Permanent link">#</a></h3>
+<p>The following command will use <code>kind</code> to create a cluster with an Ingress controller with SSL passthrough and then proceed to install the KubeFlex implementation in it and set your current kubeconfig context to access that cluster as admin.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kflex<span class="w"> </span>init<span class="w"> </span>--create-kind
 </code></pre></div>
-<p>To use a pre-existing Kind cluster instead, make sure that your current kubeconfig context is for accessing that cluster and issue the following command.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kflex<span class="w"> </span>init
+<h3 id="create-and-init-a-kind-cluster-as-hosting-cluster-with-curl-to-bash-script">Create and init a kind cluster as hosting cluster with curl-to-bash script<a class="headerlink" href="#create-and-init-a-kind-cluster-as-hosting-cluster-with-curl-to-bash-script" title="Permanent link">#</a></h3>
+<p>There is a bash script at <a href="https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0/scripts/create-kind-cluster-with-SSL-passthrough.sh"><code>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0/scripts/create-kind-cluster-with-SSL-passthrough.sh</code></a> that can be fed directly into <code>bash</code> and will create a <code>kind</code> cluster and initialize it as the KubeFlex hosting cluster. This script accepts the following command line flags.</p>
+<ul>
+<li><code>--name name</code>: set a specific name of the kind cluster (default: kubestellar).</li>
+<li><code>--port port</code>: map the specified host port to the kind cluster port 443 (default: 9443).</li>
+<li><code>--nowait</code>: when given, the script proceeds without waiting for the nginx ingress patching to complete.</li>
+<li><code>--nosetcontext</code>: when given, the script does not change the current kubectl context to the newly created cluster.</li>
+<li><code>-X</code> enable verbose execution of the script for debugging.</li>
+</ul>
+<h3 id="create-a-k3d-cluster">Create a k3d cluster<a class="headerlink" href="#create-a-k3d-cluster" title="Permanent link">#</a></h3>
+<ol>
+<li>
+<p>Create a K3D hosting cluster with nginx ingress controller:
+    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>k3d<span class="w"> </span>cluster<span class="w"> </span>create<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;9443:443@loadbalancer&quot;</span><span class="w"> </span>--k3s-arg<span class="w"> </span><span class="s2">&quot;--disable=traefik@server:*&quot;</span><span class="w"> </span>kubeflex
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>helm<span class="w"> </span>install<span class="w"> </span>ingress-nginx<span class="w"> </span>ingress-nginx<span class="w"> </span>--repo<span class="w"> </span>https://kubernetes.github.io/ingress-nginx<span class="w"> </span>--version<span class="w"> </span><span class="m">4</span>.6.1<span class="w"> </span>--namespace<span class="w"> </span>ingress-nginx<span class="w"> </span>--create-namespace
+</code></pre></div></p>
+</li>
+<li>
+<p>When we use kind, the name of the container is kubeflex-control-plane and that is what we use 
+   in the internal URL for <code>--force-internal-endpoint-lookup</code>.
+   Here the name of the container created by K3D is <code>k3d-kubeflex-server-0</code> so we rename it:
+    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker<span class="w"> </span>stop<span class="w"> </span>k3d-kubeflex-server-0
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>docker<span class="w"> </span>rename<span class="w"> </span>k3d-kubeflex-server-0<span class="w"> </span>kubeflex-control-plane
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>docker<span class="w"> </span>start<span class="w"> </span>kubeflex-control-plane
 </code></pre></div>
-<p>All the subsequent kubectl and helm commands that say to use the kubeconfig context named <code>kind-kubeflex</code> need to be modified to use the appropriate kubeconfig context for accessing the hosting cluster.</p>
-<h2 id="using-an-existing-openshift-cluster-as-the-hosting-cluster">Using an existing OpenShift cluster as the hosting cluster<a class="headerlink" href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" title="Permanent link">#</a></h2>
-<p>This is similar to using an existing Kind cluster but requires an additional modification. Modify the <code>kflex</code> init command and subsequent kubeconfig context references as in the existing-kind-cluster scenario.</p>
-<p>Additionally, the recipe for registering a WEC with the ITS needs to be modified. In the <code>clusteradm</code> command, omit the <code>--force-internal-endpoint-lookup</code> flag. If following the example commands literally, this means to define <code>flags=""</code> rather than <code>flags="--force-internal-endpoint-lookup"</code>.</p>
+    Wait 1-2 minutes for all pods to be restarted.
+    Use the following command to confirm all are fully running:
+    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>k3d-kubeflex<span class="w"> </span>get<span class="w"> </span>po<span class="w"> </span>-A
+</code></pre></div></p>
+</li>
+<li>
+<p>Enable SSL passthrough:
+   We are using nginx ingress with tls passthru.
+   The current install for kubeflex installs also nginx ingress but specifically for kind.
+   To specify passthru for K3D, edit the ingress placement controller with the following command and add <code>--enable-ssl-passthrough</code> to the list of args for the container
+    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>edit<span class="w"> </span>deployment<span class="w"> </span>ingress-nginx-controller<span class="w"> </span>-n<span class="w"> </span>ingress-nginx<span class="w">  </span>
+</code></pre></div></p>
+</li>
+</ol>
+<h2 id="initialize-the-kubeflex-hosting-cluster">Initialize the KubeFlex hosting cluster<a class="headerlink" href="#initialize-the-kubeflex-hosting-cluster" title="Permanent link">#</a></h2>
+<p>The KubeFlex implementation has to be installed in the cluster chosen to play the role of KubeFlex hosting cluster. This can be done in any of the following ways.</p>
+<h3 id="kflex-init">kflex init<a class="headerlink" href="#kflex-init" title="Permanent link">#</a></h3>
+<p>The following command will install the KubeFlex implementation in the cluster that <code>kubectl</code> is configured to access, if you have sufficient privileges.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kflex<span class="w"> </span>init
+</code></pre></div>
+<h4 id="using-an-existing-openshift-cluster-as-the-hosting-cluster">Using an existing OpenShift cluster as the hosting cluster<a class="headerlink" href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" title="Permanent link">#</a></h4>
+<p>When the hosting cluster is an OpenShift cluster, the recipe for registering a WEC with the ITS (<a href="../wec/">to be written</a>) needs to be modified. In the <code>clusteradm</code> command, omit the <code>--force-internal-endpoint-lookup</code> flag. If following <a href="../get-started/#create-and-register-two-workload-execution-clusters">the quickstart commands</a> literally, this means to define <code>flags=""</code> rather than <code>flags="--force-internal-endpoint-lookup"</code>.</p>
+<h3 id="kflex-init-create-kind">kflex init --create-kind<a class="headerlink" href="#kflex-init-create-kind" title="Permanent link">#</a></h3>
+<p>See <a href="#create-and-init-a-kind-cluster-as-hosting-cluster-with-kflex">above</a>.</p>
+<h3 id="curl-to-bash">Curl-to-bash<a class="headerlink" href="#curl-to-bash" title="Permanent link">#</a></h3>
+<p>See <a href="#create-and-init-a-kind-cluster-as-hosting-cluster-with-curl-to-bash-script">above</a>.</p>
+<h3 id="kubestellar-core-helm-chart">KubeStellar core Helm chart<a class="headerlink" href="#kubestellar-core-helm-chart" title="Permanent link">#</a></h3>
+<p>The <a href="../core-chart/">KubeStellar core Helm chart</a> will install the KubeFlex implementation in the cluster that <code>kubectl</code> is configured to access, as well as create ITSes and WDSes.</p>
 
 
   
@@ -2099,7 +2467,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../commission-workloads/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Commission Workloads" rel="prev">
+          <a href="../pre-reqs/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Prerequisites" rel="prev">
             <div class="md-footer__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
@@ -2108,20 +2476,20 @@
                 <span class="md-footer__direction">
                   Previous
                 </span>
-                Commission Workloads
+                Prerequisites
               </div>
             </div>
           </a>
         
         
           
-          <a href="../examples/" class="md-footer__link md-footer__link--next" aria-label="Next: Outline and Scenarios" rel="next">
+          <a href="../its-and-wds/" class="md-footer__link md-footer__link--next" aria-label="Next: ITSes and WDSes" rel="next">
             <div class="md-footer__title">
               <div class="md-ellipsis">
                 <span class="md-footer__direction">
                   Next
                 </span>
-                Outline and Scenarios
+                ITSes and WDSes
               </div>
             </div>
             <div class="md-footer__button md-icon">
