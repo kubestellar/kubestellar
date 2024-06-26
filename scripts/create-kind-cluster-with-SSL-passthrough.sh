@@ -85,6 +85,8 @@ else
   echo "Skipping... \"${name}\" kind cluster already exists."
 fi
 
+kubectl config rename-context kind-kubeflex kubeflex
+
 echo "Installing an nginx ingress..."
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
