@@ -20,40 +20,13 @@ Installing and using KubeStellar progresses through the following stages.
 
 By "maintain" we mean create, read, update, delete, list, and watch as you like, over time. KubeStellar is eventually consistent: you can change your inputs as you like over time, and KubeStellar continually strives to achieve what you are currently asking it to do.
 
-There is some flexibility in the ordering of those stage. The following flowchart shows the dependencies.
+There is some flexibility in the ordering of those stage. The following flowchart shows the dependencies. 
 
-```mermaid
----
-KubeStellar activity ordering
----
-flowchart LR
-    step0[SW prereqs]
-    step1[Acquire host cluster]
-    step2[Initialize host cluster]
-    step3i[Create ITS]
-    step3w[Create WDS]
-    step4[Create WEC]
-    step5[Register WEC]
-    step6[Create workload]
-    step7[Create control objects]
-    step8[Enjoy]
-    step9[Consume reported state]
-    step0 --> step2
-    step1 --> step2
-    step2 --> step3i
-    step2 --> step3w
-    step4 --> step5
-    step3i --> step5
-    step3i --> step3w
-    step3w --> step6
-    step3w --> step7
-    step5 --> step8
-    step6 --> step8
-    step7 --> step8
-    step8 --> step9
-```
+![Ordering among installation and usage actions](images/usage-outline.svg)
 
 You can have multiple ITSes, WDSes, and WECs, created and deleted over time as you like.
+
+Besides "Start", the other green items in that graph are entry points for extending usage at any later time. You could also see them as distinct user roles or authorities.
 
 KubeStellar's [Core Helm chart](core-chart.md) combines initializing the KubeFlex hosting cluster, creating some ITSes, and creating some WDSes.
 
