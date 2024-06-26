@@ -2,7 +2,7 @@
 
 KubeStellar provides multi-cluster deployment of Kubernetes objects, controlled by simple `BindingPolicy` objects, where Kubernetes objects are expressed in their native format with no wrapping or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.
 
-![Figure 1 - High Level Architecture](./images/high-level-architecture.png)
+![Figure 1 - High Level Architecture](./images/high-level-architecture.svg)
 
 KubeStellar relies on the concept of *spaces*.  
 A Space is an abstraction to represent an API service that 
@@ -57,7 +57,7 @@ that are put in a mailbox namespace are delivered to the matching WEC.
 to find objects that are synced by the OCM agent, gets their status 
 and updates `WorkStatus` objects in the ITS namespace associated with the WEC.
 
-![Figure 2 - Main Modules](./images/main-modules.png)
+![Figure 2 - Main Modules](./images/main-modules.svg)
 
 ## KubeStellar Controller Manager
 
@@ -251,7 +251,7 @@ The architecture and the event flow of the code for create/update object events 
 illustrated in Figure 3 (some details might be omitted to make the flow easier
 to understand). 
 
-![Figure 3 - Binding Controller](./images/binding-controller.png)
+![Figure 3 - Binding Controller](./images/binding-controller.svg)
 
 At startup, the controller code sets up the dynamic informers, the event
 handler and the work queue as follows:
@@ -426,7 +426,7 @@ The `WorkStatus` objects are created and updated on the ITS by the OCM Status Ad
 
 The high-level flow for the singleton status update is described in Figure 4.
 
-![Figure 4 - Status Controller](./images/status-controller.png)
+![Figure 4 - Status Controller](./images/status-controller.svg)
 
 
 ### Transport Controller
@@ -448,7 +448,7 @@ We expect to have more transport plugin options in the future.
 
 The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.
 
-![Figure 5 - Transport Controller](./images/transport-controller.png)
+![Figure 5 - Transport Controller](./images/transport-controller.svg)
 
 The transport controller is driven by `Binding` objects in the WDS. There is a 1:1 correspondence between `Binding` objects and `BindingPolicy` objects, but the transport controller does not care about the latter. A `Binding` object contains (a) a list of references to workload objects that are selected for distribution and (b) a list of references to the destinations for those workload objects.
 
