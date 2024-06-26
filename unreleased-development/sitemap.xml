@@ -400,10 +400,10 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/images/png-files-readme/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/images/image-files-readme/</loc>
          <lastmod>2024-06-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/images/png-files-readme/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/images/image-files-readme/"/>
          
     </url>
 </urlset>

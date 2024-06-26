@@ -2431,7 +2431,7 @@
 <h1 id="kubestellar-architecture">KubeStellar Architecture<a class="headerlink" href="#kubestellar-architecture" title="Permanent link">#</a></h1>
 <p>KubeStellar provides multi-cluster deployment of Kubernetes objects, controlled by simple <code>BindingPolicy</code> objects, where Kubernetes objects are expressed in their native format with no wrapping or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.</p>
 <p>
-<figure><img src="../images/high-level-architecture.png" /><figcaption>Figure 1 - High Level Architecture</figcaption>
+<figure><img src="../images/high-level-architecture.svg" /><figcaption>Figure 1 - High Level Architecture</figcaption>
 </figure>
 </p>
 <p>KubeStellar relies on the concept of <em>spaces</em>.<br />
@@ -2495,7 +2495,7 @@ and updates <code>WorkStatus</code> objects in the ITS namespace associated with
 </li>
 </ul>
 <p>
-<figure><img src="../images/main-modules.png" /><figcaption>Figure 2 - Main Modules</figcaption>
+<figure><img src="../images/main-modules.svg" /><figcaption>Figure 2 - Main Modules</figcaption>
 </figure>
 </p>
 <h2 id="kubestellar-controller-manager">KubeStellar Controller Manager<a class="headerlink" href="#kubestellar-controller-manager" title="Permanent link">#</a></h2>
@@ -2677,7 +2677,7 @@ objects and references to the concrete list of destinations that were selected b
 illustrated in Figure 3 (some details might be omitted to make the flow easier
 to understand). </p>
 <p>
-<figure><img src="../images/binding-controller.png" /><figcaption>Figure 3 - Binding Controller</figcaption>
+<figure><img src="../images/binding-controller.svg" /><figcaption>Figure 3 - Binding Controller</figcaption>
 </figure>
 </p>
 <p>At startup, the controller code sets up the dynamic informers, the event
@@ -2855,7 +2855,7 @@ objects with the corresponding status found in the workstatus object.</p>
 <p>The <code>WorkStatus</code> objects are created and updated on the ITS by the OCM Status Add-On Agent described <a href="#ocm-status-add-on-agent">above</a>.</p>
 <p>The high-level flow for the singleton status update is described in Figure 4.</p>
 <p>
-<figure><img src="../images/status-controller.png" /><figcaption>Figure 4 - Status Controller</figcaption>
+<figure><img src="../images/status-controller.svg" /><figcaption>Figure 4 - Status Controller</figcaption>
 </figure>
 </p>
 <h3 id="transport-controller">Transport Controller<a class="headerlink" href="#transport-controller" title="Permanent link">#</a></h3>
@@ -2873,7 +2873,7 @@ implementations of the transport interface. The interface between the plugin and
 We expect to have more transport plugin options in the future.</p>
 <p>The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.</p>
 <p>
-<figure><img src="../images/transport-controller.png" /><figcaption>Figure 5 - Transport Controller</figcaption>
+<figure><img src="../images/transport-controller.svg" /><figcaption>Figure 5 - Transport Controller</figcaption>
 </figure>
 </p>
 <p>The transport controller is driven by <code>Binding</code> objects in the WDS. There is a 1:1 correspondence between <code>Binding</code> objects and <code>BindingPolicy</code> objects, but the transport controller does not care about the latter. A <code>Binding</code> object contains (a) a list of references to workload objects that are selected for distribution and (b) a list of references to the destinations for those workload objects.</p>
