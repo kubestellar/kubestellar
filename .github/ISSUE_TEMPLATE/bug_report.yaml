@@ -47,7 +47,7 @@ body:
     validations:
       required: true
 
- - type: checkboxes
+  - type: checkboxes
     id: contribute
     attributes:
       label: Want to contribute?
