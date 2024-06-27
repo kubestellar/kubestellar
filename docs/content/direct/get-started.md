@@ -1,34 +1,26 @@
 # KubeStellar Quickstart Setup
 
-This Quick Start outlines step 1 and shows a concrete example of steps 2--7 in the [Installation and Usage outline](usage-basics.md). In this example you will create three new `kind` clusters to serve as your KubeFlex hosting cluster and two WECs.
+This Quick Start outlines step 1, shows a concrete example of steps 2--7 in the [Installation and Usage outline](usage-basics.md), and forwards you to one example of the remaining steps. In this example you will create three new `kind` clusters to serve as your KubeFlex hosting cluster and two WECs.
 
-  1. Before you begin, prepare your system (get the software prerequisites)
-  2. Create the KubeFlex hosting cluster and Kubestellar core components
-  3. Create and register two WECs.
-
----
-## Before You Begin
-
-
-{%
-    include-markdown "pre-reqs.md"
-    rewrite-relative-urls=true
-    start="<!-- begin software prerequisites -->"
-    end="Additional Software For Running"
-    heading-offset=1
-%}
----
-{%
-    include-markdown "pre-reqs.md"
-    rewrite-relative-urls=true
-    heading-offset=2
-    start="<!-- start tag for check script  include -->"
-    end="<!-- end tag for check-prereq script -->"
-%}
+  1. Install software prerequisites
+  1. Cleanup from previous runs
+  1. Create the KubeFlex hosting cluster and Kubestellar core components
+  1. Create and register two WECs.
+  1. Use KubeStellar to distribute a Deployment object to the two WECs.
 
 ---
+## Install software prerequisites
 
-### Delete debris from preivous trials
+The following command will check for the prerequisites that you will need for this quickstart. See [the prerequisites doc](pre-reqs.md) for more details.
+
+```shell
+bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/hack/check_pre_req.sh) kflex ocm helm kubectl docker kind
+```
+
+This quickstart uses [kind](https://kind.sigs.k8s.io/) to create three Kubernetes cluster on your machine.
+Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
+
+### Cleanup from previous runs
 
 If you have run this quickstart or any related recipe previously then
 you will first want to remove any related debris. The following
@@ -75,7 +67,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 
 ## Exercise KubeStellar
 
-Proceed to exercise any of the [example scenarios](example-scenarios.md) after defining the shell variables that charaterize the setup done above. Following are setting for those variables.
+Proceed to Scenario 1 (multi-cluster workload deployment with kubectl) in [the example scenarios](example-scenarios.md) after defining the shell variables that charaterize the setup done above. Following are setting for those variables.
 
 ```shell
 host_context=kind-kubeflex
