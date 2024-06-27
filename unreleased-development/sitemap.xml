@@ -155,13 +155,6 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/"/>
-         
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/unreleased-development/direct/architecture/</loc>
          <lastmod>2024-06-27</lastmod>
          <changefreq>daily</changefreq>
@@ -187,41 +180,6 @@
          <lastmod>2024-06-27</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/combined-status/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/commission-workloads/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/commission-workloads/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/common-setup-core-chart/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/common-setup-core-chart/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/common-setup-intro/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/common-setup-intro/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/common-setup-kind/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/common-setup-kind/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/common-setup-step-by-step/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/common-setup-step-by-step/"/>
          
     </url>
     <url>
@@ -253,13 +211,6 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/deploy-on-k3d/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/deploy-on-k3d/"/>
-         
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/unreleased-development/direct/example-scenarios/</loc>
          <lastmod>2024-06-27</lastmod>
          <changefreq>daily</changefreq>
@@ -271,13 +222,6 @@
          <lastmod>2024-06-27</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/example-wecs/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/examples/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/examples/"/>
          
     </url>
     <url>
@@ -313,20 +257,6 @@
          <lastmod>2024-06-27</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/kubeflex-intro/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/microshift/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/microshift/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/misc-files/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/misc-files/"/>
          
     </url>
     <url>
@@ -383,13 +313,6 @@
          <lastmod>2024-06-27</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/usage-basics/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/usage-notes/</loc>
-         <lastmod>2024-06-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/usage-notes/"/>
          
     </url>
     <url>

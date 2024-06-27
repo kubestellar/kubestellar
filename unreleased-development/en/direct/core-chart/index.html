@@ -11,17 +11,17 @@
         <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/en/direct/core-chart/">
       
       
-        <link rel="prev" href="../thirdparties/">
+        <link rel="prev" href="../its-and-wds/">
       
       
-        <link rel="next" href="../deploy-on-k3d/">
+        <link rel="next" href="../wec/">
       
       <link rel="icon" href="../../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
     
     
       
-        <title>Deploy KubeStellar via Helm chart - KubeStellar</title>
+        <title>Swiss Army Knife - KubeStellar</title>
       
     
     
@@ -78,7 +78,7 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - Deploy KubeStellar via Helm chart" />
+  <meta property="og:title" content="KubeStellar - Swiss Army Knife" />
   <meta property="og:description" content="None" />
   <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/en/direct/core-chart/" />
   <meta property="og:image" content="https://docs.kubestellar.io/unreleased-developmentassets/images/illustrations/banner.png" />
@@ -192,7 +192,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Deploy KubeStellar via Helm chart
+              Swiss Army Knife
             
           </span>
         </div>
@@ -666,6 +666,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
@@ -754,6 +756,89 @@
               
   
   
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Swiss Army Knife
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Swiss Army Knife
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pre-requisites" class="md-nav__link">
+    Pre-requisites
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-core-chart-values" class="md-nav__link">
+    KubeStellar Core Chart values
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-core-chart-usage_1" class="md-nav__link">
+    KubeStellar Core Chart usage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubeconfig-files-and-contexts-for-control-planes" class="md-nav__link">
+    Kubeconfig files and contexts for Control Planes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uninstalling-the-kubestellar-core-chart" class="md-nav__link">
+    Uninstalling the KubeStellar Core chart
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
   
     <li class="md-nav__item">
       <a href="../wec/" class="md-nav__link">
@@ -775,7 +860,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
       
       
         
@@ -789,13 +874,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
           Control
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_7">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_8">
           <span class="md-nav__icon md-icon"></span>
           Control
         </label>
@@ -910,59 +995,6 @@
               
   
   
-    
-  
-  
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" checked>
-      
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
-          Miscellaneous Documentation
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="true">
-        <label class="md-nav__title" for="__nav_4_11">
-          <span class="md-nav__icon md-icon"></span>
-          Miscellaneous Documentation
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../misc-files/" class="md-nav__link">
-        What's in here?
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
   
     
     <li class="md-nav__item md-nav__item--nested">
@@ -970,7 +1002,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11_2" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
       
       
         
@@ -980,208 +1012,17 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_11_2" id="__nav_4_11_2_label" tabindex="0">
-          Setting up KubeStellar
+        <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
+          Miscellaneous bits
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_11_2_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_11_2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_12">
           <span class="md-nav__icon md-icon"></span>
-          Setting up KubeStellar
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11_2_1" >
-      
-      
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        <label class="md-nav__link" for="__nav_4_11_2_1" id="__nav_4_11_2_1_label" tabindex="0">
-          Set Up Kubestellar Core Components
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_11_2_1_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_11_2_1">
-          <span class="md-nav__icon md-icon"></span>
-          Set Up Kubestellar Core Components
+          Miscellaneous bits
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../common-setup-intro/" class="md-nav__link">
-        Try the "Common-setup"
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../common-setup-step-by-step/" class="md-nav__link">
-        Step by Step
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../common-setup-core-chart/" class="md-nav__link">
-        Via Helm Chart
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../commission-workloads/" class="md-nav__link">
-        Commission Workloads
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-    
-  
-  
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11_3" checked>
-      
-      
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        <label class="md-nav__link" for="__nav_4_11_3" id="__nav_4_11_3_label" tabindex="0">
-          Installation & Usage Examples
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_11_3_label" aria-expanded="true">
-        <label class="md-nav__title" for="__nav_4_11_3">
-          <span class="md-nav__icon md-icon"></span>
-          Installation & Usage Examples
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11_3_1" >
-      
-      
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        <label class="md-nav__link" for="__nav_4_11_3_1" id="__nav_4_11_3_1_label" tabindex="0">
-          Sample scenarios
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_11_3_1_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_11_3_1">
-          <span class="md-nav__icon md-icon"></span>
-          Sample scenarios
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../examples/" class="md-nav__link">
-        Outline and Scenarios
-      </a>
-    </li>
-  
-
-            
           
             
               
@@ -1205,131 +1046,6 @@
     <li class="md-nav__item">
       <a href="../thirdparties/" class="md-nav__link">
         Example Third-Party integrations
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-    
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Deploy KubeStellar via Helm chart
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        Deploy KubeStellar via Helm chart
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#pre-requisites" class="md-nav__link">
-    Pre-requisites
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#kubestellar-core-chart-values" class="md-nav__link">
-    KubeStellar Core Chart values
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#kubestellar-core-chart-usage_1" class="md-nav__link">
-    KubeStellar Core Chart usage
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#kubeconfig-files-and-contexts-for-control-planes" class="md-nav__link">
-    Kubeconfig files and contexts for Control Planes
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#uninstalling-the-kubestellar-core-chart" class="md-nav__link">
-    Uninstalling the KubeStellar Core chart
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../deploy-on-k3d/" class="md-nav__link">
-        Deploying KubeStellar on K3D
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage-notes/" class="md-nav__link">
-        Usage Notes
       </a>
     </li>
   
@@ -2201,8 +1917,16 @@
 
 
 <h1 id="kubestellar-core-chart-usage">KubeStellar Core chart usage<a class="headerlink" href="#kubestellar-core-chart-usage" title="Permanent link">#</a></h1>
-<p>This documents explains how to use KubeStellar Core chart to deploy a new instance of KubeStellar
-with a choice of user-defined KubeFlex Control Planes (CPs).</p>
+<p>This documents explains how to use KubeStellar Core chart to do three
+of the 11 installation and usage steps; please see <a href="../usage-basics/">the
+outline</a> for generalities and <a href="../get-started/">the
+quickstart</a> for an example of usage.</p>
+<p>This Helm chart can do any subset of the following things.</p>
+<ul>
+<li>Initialize a pre-existing cluster to serve as the KubeFlex hosting cluster.</li>
+<li>Create some ITSes.</li>
+<li>Create some WDSes.</li>
+</ul>
 <p>The information provided is specific for the following release:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBESTELLAR_VERSION</span><span class="o">=</span><span class="m">0</span>.23.0
 </code></pre></div>
@@ -2223,11 +1947,11 @@ The <code>&lt;control-plane-container-name&gt;</code> is the name of the contain
 <p>If a host port number different from the expected 9443 is used for the Kind cluster, then the same port number must be specified during the chart installation by adding the following argument <code>--set "kubeflex-controller.externalPort=&lt;port&gt;"</code>.</p>
 <p>By default the KubeStelalr Core chart uses a test domain <code>localtest.me</code>, which is ok for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set <code>--set "kubeflex-controller.domain=&lt;domain&gt;"</code> to a more appropriate <code>&lt;domain&gt;</code> that can be reached from Workload Execution CLusters (WECs).</p>
 <p>For convenience, a new local <strong>Kind</strong> cluster that satisfies the requirements for KubeStellar setup
-and that can be used to exercises the <a href="../examples/">examples</a> can be created with the following command:</p>
+and that can be used to exercises the <a href="./examples.md">examples</a> can be created with the following command:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0/scripts/create-kind-cluster-with-SSL-passthrough.sh<span class="o">)</span><span class="w"> </span>--name<span class="w"> </span>kubeflex<span class="w"> </span>--port<span class="w"> </span><span class="m">9443</span>
 </code></pre></div>
 <p>Alternatively, a new local <strong>k3s</strong> cluster that satisfies the requirements for KubeStellar setup
-and that can be used to exercises the <a href="../examples/">examples</a> can be created with the following command:</p>
+and that can be used to exercises the <a href="./examples.md">examples</a> can be created with the following command:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0/scripts/create-k3s-cluster-with-SSL-passthrough.sh<span class="o">)</span><span class="w"> </span>--port<span class="w"> </span><span class="m">9443</span>
 </code></pre></div>
 <ol>
@@ -2300,7 +2024,7 @@ Please remeber to add <code>--set "kubeflex-operator.isOpenShift=true"</code>, w
 <li>add two ITSes named its1 and its2 of of type vlcuster and host, respectevely: <code>--set-json='ITSes=[{"name":"its1"},{"name":"its2","type":"host"}]'</code></li>
 <li>add a single WDS named wds1 of default k8s type connected to the one and only ITS: <code>--set-json='WDSes=[{"name":"wds1"}]'</code></li>
 </ul>
-<p>A KubeStellar Core installation compatible with the common setup suitable for Common Setup described in the <a href="../examples/">examples</a> could be achieved with the following command:</p>
+<p>A KubeStellar Core installation compatible with the common setup suitable for Common Setup described in the <a href="./examples.md">examples</a> could be achieved with the following command:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ks-core<span class="w"> </span>oci://ghcr.io/kubestellar/kubestellar/core-chart<span class="w"> </span>--version<span class="w"> </span><span class="nv">$KUBESTELLAR_VERSION</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>--set-json<span class="o">=</span><span class="s1">&#39;ITSes=[{&quot;name&quot;:&quot;its1&quot;}]&#39;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>--set-json<span class="o">=</span><span class="s1">&#39;WDSes=[{&quot;name&quot;:&quot;wds1&quot;}]&#39;</span>
@@ -2478,7 +2202,7 @@ The current context will be renamed to <code>$cpname</code>, if it does not alre
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../thirdparties/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Example Third-Party integrations" rel="prev">
+          <a href="../its-and-wds/" class="md-footer__link md-footer__link--prev" aria-label="Previous: ITSes and WDSes" rel="prev">
             <div class="md-footer__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
@@ -2487,20 +2211,20 @@ The current context will be renamed to <code>$cpname</code>, if it does not alre
                 <span class="md-footer__direction">
                   Previous
                 </span>
-                Example Third-Party integrations
+                ITSes and WDSes
               </div>
             </div>
           </a>
         
         
           
-          <a href="../deploy-on-k3d/" class="md-footer__link md-footer__link--next" aria-label="Next: Deploying KubeStellar on K3D" rel="next">
+          <a href="../wec/" class="md-footer__link md-footer__link--next" aria-label="Next: WECs" rel="next">
             <div class="md-footer__title">
               <div class="md-ellipsis">
                 <span class="md-footer__direction">
                   Next
                 </span>
-                Deploying KubeStellar on K3D
+                WECs
               </div>
             </div>
             <div class="md-footer__button md-icon">
