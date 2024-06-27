@@ -38,7 +38,6 @@ nav:
           - Creating Example WECs: direct/example-wecs.md
           - Example Third-Party integrations: direct/thirdparties.md
       - Using existing hosting cluster: direct/hosting-cluster.md
-      - KubeStellar on K3D: direct/deploy-on-k3d.md
       - Core Helm chart: direct/core-chart.md
       - Best practices: direct/best-practices.md
   - Contributing: 
