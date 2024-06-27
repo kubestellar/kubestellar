@@ -1,8 +1,16 @@
 
 # KubeStellar Core chart usage
 
-This documents explains how to use KubeStellar Core chart to deploy a new instance of KubeStellar
-with a choice of user-defined KubeFlex Control Planes (CPs).
+This documents explains how to use KubeStellar Core chart to do three
+of the 11 installation and usage steps; please see [the
+outline](usage-basics.md) for generalities and [the
+quickstart](get-started.md) for an example of usage.
+
+This Helm chart can do any subset of the following things.
+
+- Initialize a pre-existing cluster to serve as the KubeFlex hosting cluster.
+- Create some ITSes.
+- Create some WDSes.
 
 The information provided is specific for the following release:
 

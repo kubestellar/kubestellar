@@ -67,7 +67,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 
 ## Exercise KubeStellar
 
-Proceed to Scenario 1 (multi-cluster workload deployment with kubectl) in [the example scenarios](example-scenarios.md) after defining the shell variables that charaterize the setup done above. Following are setting for those variables.
+Proceed to Scenario 1 (multi-cluster workload deployment with kubectl) in [the example scenarios](example-scenarios.md) after defining the shell variables that charaterize the setup done above. Following are setting for those variables, whose meanings are defined at the start of the example scenarios document.
 
 ```shell
 host_context=kind-kubeflex
