@@ -46,6 +46,8 @@ There is a bash script at [`https://raw.githubusercontent.com/kubestellar/kubest
 
 ### Create a k3d cluster
 
+This has been tested with version 5.6.0 of [k3d](https://k3d.io).
+
 1. Create a K3D hosting cluster with nginx ingress controller:
     ```shell
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
