@@ -8,27 +8,27 @@
       
       
       
-        <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/direct/its-and-wds/">
+        <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/en/direct/init-hosting-cluster/">
       
       
-        <link rel="prev" href="../hosting-cluster/">
+        <link rel="prev" href="../acquire-hosting-cluster/">
       
       
-        <link rel="next" href="../core-chart/">
+        <link rel="next" href="../its/">
       
-      <link rel="icon" href="../../favicons/favicon.ico">
+      <link rel="icon" href="../../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
     
     
       
-        <title>ITSes and WDSes - KubeStellar</title>
+        <title>Initialize KubeFlex Hosting cluster - KubeStellar</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.402914a4.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.402914a4.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.a0c5b2b5.min.css">
       
       
 
@@ -44,9 +44,9 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/kubestellar.css">
+      <link rel="stylesheet" href="../../../stylesheets/kubestellar.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -78,9 +78,9 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - ITSes and WDSes" />
+  <meta property="og:title" content="KubeStellar - Initialize KubeFlex Hosting cluster" />
   <meta property="og:description" content="None" />
-  <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/direct/its-and-wds/" />
+  <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/en/direct/init-hosting-cluster/" />
   <meta property="og:image" content="https://docs.kubestellar.io/unreleased-developmentassets/images/illustrations/banner.png" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1080" />
@@ -92,7 +92,7 @@
 <!-- Extra stylesheets -->
 <!--  <link
     rel="stylesheet"
-    href="../../assets/stylesheets/overrides.css"
+    href="../../../assets/stylesheets/overrides.css"
   />-->
 
   </head>
@@ -113,7 +113,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#inventory-and-transport-spaces-and-workload-description-spaces" class="md-skip">
+        <a href="#initializing-the-kubeflex-hosting-cluster" class="md-skip">
           Skip to content
         </a>
       
@@ -159,7 +159,7 @@
             <div class="md-banner__inner md-grid md-typeset">
               
   You are not viewing the latest regular release.
-  <a href="../../..">
+  <a href="../../../..">
     <strong>Click here to go to the latest regular release.</strong>
   </a>
 
@@ -174,9 +174,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="KubeStellar" class="md-header__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+    <a href="../../" title="KubeStellar" class="md-header__button md-logo" aria-label="KubeStellar" data-md-component="logo">
       
-  <img src="../../logo.png" alt="logo">
+  <img src="../../../logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -192,7 +192,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ITSes and WDSes
+              Initialize KubeFlex Hosting cluster
             
           </span>
         </div>
@@ -270,7 +270,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../" class="md-tabs__link">
         Welcome
       </a>
     </li>
@@ -316,7 +316,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../get-started/" class="md-tabs__link md-tabs__link--active">
+      <a href="../user-guide-intro/" class="md-tabs__link md-tabs__link--active">
         User Guide
       </a>
     </li>
@@ -388,9 +388,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="KubeStellar" class="md-nav__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+    <a href="../../" title="KubeStellar" class="md-nav__button md-logo" aria-label="KubeStellar" data-md-component="logo">
       
-  <img src="../../logo.png" alt="logo">
+  <img src="../../../logo.png" alt="logo">
 
     </a>
     KubeStellar
@@ -436,7 +436,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../..">Welcome</a>
+          <a href="../../">Welcome</a>
           
         </div>
       
@@ -668,6 +668,10 @@
         
           
         
+          
+        
+          
+        
       
       
         <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
@@ -688,22 +692,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../get-started/" class="md-nav__link">
-        Quick Start
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage-basics/" class="md-nav__link">
-        Outline of Installation and Usage of KubeStellar
+      <a href="../user-guide-intro/" class="md-nav__link">
+        Overview
       </a>
     </li>
   
@@ -730,8 +720,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../hosting-cluster/" class="md-nav__link">
-        The KubeFlex Hosting cluster
+      <a href="../acquire-hosting-cluster/" class="md-nav__link">
+        Acquire cluster for KubeFlex Hosting
       </a>
     </li>
   
@@ -753,9 +743,67 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Initialize KubeFlex Hosting cluster
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
-        ITSes and WDSes
+        Initialize KubeFlex Hosting cluster
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bundled-with-cluster-creation" class="md-nav__link">
+    Bundled with cluster creation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kflex-init" class="md-nav__link">
+    kflex init
+  </a>
+  
+    <nav class="md-nav" aria-label="kflex init">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" class="md-nav__link">
+    Using an existing OpenShift cluster as the hosting cluster
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-core-helm-chart" class="md-nav__link">
+    KubeStellar core Helm chart
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -768,8 +816,22 @@
   
   
     <li class="md-nav__item">
-      <a href="../core-chart/" class="md-nav__link">
-        Swiss Army Knife
+      <a href="../its/" class="md-nav__link">
+        Inventory and Transport Spaces
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wds/" class="md-nav__link">
+        Workload Description Spaces
       </a>
     </li>
   
@@ -783,7 +845,21 @@
   
     <li class="md-nav__item">
       <a href="../wec/" class="md-nav__link">
-        WECs
+        Workload Execution Clusters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wec-registration/" class="md-nav__link">
+        Register a Workload Execution Cluster
       </a>
     </li>
   
@@ -801,7 +877,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
       
       
         
@@ -813,15 +889,17 @@
         
           
         
+          
+        
       
       
-        <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
           Control
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_8">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_9">
           <span class="md-nav__icon md-icon"></span>
           Control
         </label>
@@ -835,6 +913,20 @@
     <li class="md-nav__item">
       <a href="../control/" class="md-nav__link">
         Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1" class="md-nav__link">
+        API reference (new tab)
       </a>
     </li>
   
@@ -896,36 +988,36 @@
   
   
     <li class="md-nav__item">
+      <a href="../core-chart/" class="md-nav__link">
+        Core Helm chart
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../get-started/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../example-scenarios/" class="md-nav__link">
         Example Scenarios
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../best-practices/" class="md-nav__link">
-        Best practices
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1" class="md-nav__link">
-        API reference (new tab)
       </a>
     </li>
   
@@ -943,25 +1035,23 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
       
       
         
           
         
-          
-        
       
       
-        <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
-          Miscellaneous bits
+        <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          Third-party integrations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_12">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_13">
           <span class="md-nav__icon md-icon"></span>
-          Miscellaneous bits
+          Third-party integrations
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -971,9 +1061,16 @@
   
   
     <li class="md-nav__item">
-      <a href="../example-wecs/" class="md-nav__link">
-        Creating Example WECs
+      <a href="../argo-to-wds1/" class="md-nav__link">
+        ArgoCD to WDS
       </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -985,16 +1082,9 @@
   
   
     <li class="md-nav__item">
-      <a href="../thirdparties/" class="md-nav__link">
-        Example Third-Party integrations
+      <a href="../best-practices/" class="md-nav__link">
+        Best practices
       </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
     </li>
   
 
@@ -1785,6 +1875,48 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bundled-with-cluster-creation" class="md-nav__link">
+    Bundled with cluster creation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kflex-init" class="md-nav__link">
+    kflex init
+  </a>
+  
+    <nav class="md-nav" aria-label="kflex init">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" class="md-nav__link">
+    Using an existing OpenShift cluster as the hosting cluster
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-core-helm-chart" class="md-nav__link">
+    KubeStellar core Helm chart
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1798,7 +1930,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/its-and-wds.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/init-hosting-cluster.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -1807,18 +1939,31 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/its-and-wds.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/init-hosting-cluster.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
     </a>
   
 
 
-<h1 id="inventory-and-transport-spaces-and-workload-description-spaces">Inventory and Transport Spaces and Workload Description Spaces<a class="headerlink" href="#inventory-and-transport-spaces-and-workload-description-spaces" title="Permanent link">#</a></h1>
-<p>This document will tell users what they need to know about these.</p>
-<p>Including the fact that the KubeFlex hosting cluster can play the role
-of ITS and can play the role of WDS, and how to make those happen.</p>
-<p>TODO: write this.</p>
+<h1 id="initializing-the-kubeflex-hosting-cluster">Initializing the KubeFlex hosting cluster<a class="headerlink" href="#initializing-the-kubeflex-hosting-cluster" title="Permanent link">#</a></h1>
+<p>The <a href="https://github.com/kubestellar/kubeflex">KubeFlex</a> implementation
+has to be installed in the cluster chosen to play the role of KubeFlex
+hosting cluster. This can be done in any of the following ways.</p>
+<h2 id="bundled-with-cluster-creation">Bundled with cluster creation<a class="headerlink" href="#bundled-with-cluster-creation" title="Permanent link">#</a></h2>
+<p>As mentioned earlier, there are a couple fo ways to both create the hosting cluster and initialize it for KubeFlex in one operation.</p>
+<ul>
+<li><a href="../acquire-hosting-cluster/#create-and-init-a-kind-cluster-as-hosting-cluster-with-kflex">Using kflex init --create-kind</a>.</li>
+<li><a href="../acquire-hosting-cluster/#create-and-init-a-kind-cluster-as-hosting-cluster-with-curl-to-bash-script">curl-to-bash script</a>.</li>
+</ul>
+<h2 id="kflex-init">kflex init<a class="headerlink" href="#kflex-init" title="Permanent link">#</a></h2>
+<p>The following command will install the KubeFlex implementation in the cluster that <code>kubectl</code> is configured to access, if you have sufficient privileges.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kflex<span class="w"> </span>init
+</code></pre></div>
+<h3 id="using-an-existing-openshift-cluster-as-the-hosting-cluster">Using an existing OpenShift cluster as the hosting cluster<a class="headerlink" href="#using-an-existing-openshift-cluster-as-the-hosting-cluster" title="Permanent link">#</a></h3>
+<p>When the hosting cluster is an OpenShift cluster, the recipe for registering a WEC with the ITS (<a href="../wec/">to be written</a>) needs to be modified. In the <code>clusteradm</code> command, omit the <code>--force-internal-endpoint-lookup</code> flag. If following <a href="../get-started/#create-and-register-two-workload-execution-clusters">the quickstart commands</a> literally, this means to define <code>flags=""</code> rather than <code>flags="--force-internal-endpoint-lookup"</code>.</p>
+<h2 id="kubestellar-core-helm-chart">KubeStellar core Helm chart<a class="headerlink" href="#kubestellar-core-helm-chart" title="Permanent link">#</a></h2>
+<p>The <a href="../core-chart/">KubeStellar core Helm chart</a> will install the KubeFlex implementation in the cluster that <code>kubectl</code> is configured to access, as well as create ITSes and WDSes.</p>
 
 
   
@@ -1882,7 +2027,7 @@ of ITS and can play the role of WDS, and how to make those happen.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../hosting-cluster/" class="md-footer__link md-footer__link--prev" aria-label="Previous: The KubeFlex Hosting cluster" rel="prev">
+          <a href="../acquire-hosting-cluster/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Acquire cluster for KubeFlex Hosting" rel="prev">
             <div class="md-footer__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
@@ -1891,20 +2036,20 @@ of ITS and can play the role of WDS, and how to make those happen.</p>
                 <span class="md-footer__direction">
                   Previous
                 </span>
-                The KubeFlex Hosting cluster
+                Acquire cluster for KubeFlex Hosting
               </div>
             </div>
           </a>
         
         
           
-          <a href="../core-chart/" class="md-footer__link md-footer__link--next" aria-label="Next: Swiss Army Knife" rel="next">
+          <a href="../its/" class="md-footer__link md-footer__link--next" aria-label="Next: Inventory and Transport Spaces" rel="next">
             <div class="md-footer__title">
               <div class="md-ellipsis">
                 <span class="md-footer__direction">
                   Next
                 </span>
-                Swiss Army Knife
+                Inventory and Transport Spaces
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1936,12 +2081,12 @@ of ITS and can play the role of WDS, and how to make those happen.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.ce72ebac.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.ce72ebac.min.js"></script>
       
-        <script src="../../js/open_in_new_tab.js"></script>
+        <script src="../../../js/open_in_new_tab.js"></script>
       
     
   </body>

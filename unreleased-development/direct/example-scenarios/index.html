@@ -11,10 +11,10 @@
         <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/direct/example-scenarios/">
       
       
-        <link rel="prev" href="../combined-status/">
+        <link rel="prev" href="../get-started/">
       
       
-        <link rel="next" href="../best-practices/">
+        <link rel="next" href="../argo-to-wds1/">
       
       <link rel="icon" href="../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
@@ -316,7 +316,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../get-started/" class="md-tabs__link md-tabs__link--active">
+      <a href="../user-guide-intro/" class="md-tabs__link md-tabs__link--active">
         User Guide
       </a>
     </li>
@@ -668,6 +668,10 @@
         
           
         
+          
+        
+          
+        
       
       
         <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
@@ -688,22 +692,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../get-started/" class="md-nav__link">
-        Quick Start
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage-basics/" class="md-nav__link">
-        Outline of Installation and Usage of KubeStellar
+      <a href="../user-guide-intro/" class="md-nav__link">
+        Overview
       </a>
     </li>
   
@@ -730,8 +720,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../hosting-cluster/" class="md-nav__link">
-        The KubeFlex Hosting cluster
+      <a href="../acquire-hosting-cluster/" class="md-nav__link">
+        Acquire cluster for KubeFlex Hosting
       </a>
     </li>
   
@@ -744,8 +734,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../its-and-wds/" class="md-nav__link">
-        ITSes and WDSes
+      <a href="../init-hosting-cluster/" class="md-nav__link">
+        Initialize KubeFlex Hosting cluster
       </a>
     </li>
   
@@ -758,8 +748,22 @@
   
   
     <li class="md-nav__item">
-      <a href="../core-chart/" class="md-nav__link">
-        Swiss Army Knife
+      <a href="../its/" class="md-nav__link">
+        Inventory and Transport Spaces
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wds/" class="md-nav__link">
+        Workload Description Spaces
       </a>
     </li>
   
@@ -773,7 +777,21 @@
   
     <li class="md-nav__item">
       <a href="../wec/" class="md-nav__link">
-        WECs
+        Workload Execution Clusters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wec-registration/" class="md-nav__link">
+        Register a Workload Execution Cluster
       </a>
     </li>
   
@@ -791,7 +809,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
       
       
         
@@ -803,15 +821,17 @@
         
           
         
+          
+        
       
       
-        <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
           Control
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_8">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_9">
           <span class="md-nav__icon md-icon"></span>
           Control
         </label>
@@ -825,6 +845,20 @@
     <li class="md-nav__item">
       <a href="../control/" class="md-nav__link">
         Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1" class="md-nav__link">
+        API reference (new tab)
       </a>
     </li>
   
@@ -875,6 +909,34 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core-chart/" class="md-nav__link">
+        Core Helm chart
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../get-started/" class="md-nav__link">
+        Quick Start
+      </a>
     </li>
   
 
@@ -1067,59 +1129,29 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../best-practices/" class="md-nav__link">
-        Best practices
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1" class="md-nav__link">
-        API reference (new tab)
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
       
       
         
           
         
-          
-        
       
       
-        <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
-          Miscellaneous bits
+        <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          Third-party integrations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_12">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_13">
           <span class="md-nav__icon md-icon"></span>
-          Miscellaneous bits
+          Third-party integrations
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1129,9 +1161,16 @@
   
   
     <li class="md-nav__item">
-      <a href="../example-wecs/" class="md-nav__link">
-        Creating Example WECs
+      <a href="../argo-to-wds1/" class="md-nav__link">
+        ArgoCD to WDS
       </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -1143,16 +1182,9 @@
   
   
     <li class="md-nav__item">
-      <a href="../thirdparties/" class="md-nav__link">
-        Example Third-Party integrations
+      <a href="../best-practices/" class="md-nav__link">
+        Best practices
       </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
     </li>
   
 
@@ -2217,7 +2249,7 @@ KubeStellar can handle the case where the CRD is part of the workload,
 this example concerns the case where the CRD is established in the
 WECs by some other means.</p>
 <p>In order to run this scenario using the post-create-hook method you need
-the raise the permissions for the kubeflex controller manager (TODO 1: move this material and its undo to <a href="wds.md">the doc on WDS</a>; TODO 2: why is this needed? Is it needed for the core chart too? can we remove the need for this?):</p>
+the raise the permissions for the kubeflex controller manager (TODO 1: move this material and its undo to <a href="../wds/">the doc on WDS</a>; TODO 2: why is this needed? Is it needed for the core chart too? can we remove the need for this?):</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="s">kind: ClusterRoleBinding</span>
@@ -2510,7 +2542,7 @@ KubeFlex and KubeStellar controllers:</p>
 </code></pre></div>
 <h2 id="scenario-6-multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd">Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD<a class="headerlink" href="#scenario-6-multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd" title="Permanent link">#</a></h2>
 <p>Before running this scenario, install ArgoCD on the hosting cluster and configure it
-work with the WDS as outlined <a href="../thirdparties/#install-and-configure-argocd">here</a>.</p>
+work with the WDS as outlined <a href="../argo-to-wds1/">here</a>.</p>
 <p>Including a ServiceAccount tests whether there will be a controller fight over a token Secret for that ServiceAccount, which was observed in some situations with older code.</p>
 <p>Apply the following BindingPolicy to the WDS:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
@@ -2619,7 +2651,7 @@ are not created in the WDS and both clusters:</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../combined-status/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Combining reported state" rel="prev">
+          <a href="../get-started/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Quick Start" rel="prev">
             <div class="md-footer__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
@@ -2628,20 +2660,20 @@ are not created in the WDS and both clusters:</p>
                 <span class="md-footer__direction">
                   Previous
                 </span>
-                Combining reported state
+                Quick Start
               </div>
             </div>
           </a>
         
         
           
-          <a href="../best-practices/" class="md-footer__link md-footer__link--next" aria-label="Next: Best practices" rel="next">
+          <a href="../argo-to-wds1/" class="md-footer__link md-footer__link--next" aria-label="Next: ArgoCD to WDS" rel="next">
             <div class="md-footer__title">
               <div class="md-ellipsis">
                 <span class="md-footer__direction">
                   Next
                 </span>
-                Best practices
+                ArgoCD to WDS
               </div>
             </div>
             <div class="md-footer__button md-icon">

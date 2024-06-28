@@ -172,7 +172,7 @@
     </a>
 </li>
 <li class="md-tabs__item">
-<a class="md-tabs__link" href="../get-started/">
+<a class="md-tabs__link" href="../user-guide-intro/">
         User Guide
       </a>
 </li>
@@ -304,13 +304,8 @@
         </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../get-started/">
-        Quick Start
-      </a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../usage-basics/">
-        Outline of Installation and Usage of KubeStellar
+<a class="md-nav__link" href="../user-guide-intro/">
+        Overview
       </a>
 </li>
 <li class="md-nav__item">
@@ -319,33 +314,43 @@
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../hosting-cluster/">
-        The KubeFlex Hosting cluster
+<a class="md-nav__link" href="../acquire-hosting-cluster/">
+        Acquire cluster for KubeFlex Hosting
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../its-and-wds/">
-        ITSes and WDSes
+<a class="md-nav__link" href="../init-hosting-cluster/">
+        Initialize KubeFlex Hosting cluster
       </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../core-chart/">
-        Swiss Army Knife
+<a class="md-nav__link" href="../its/">
+        Inventory and Transport Spaces
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../wds/">
+        Workload Description Spaces
       </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../wec/">
-        WECs
+        Workload Execution Clusters
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../wec-registration/">
+        Register a Workload Execution Cluster
       </a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" id="__nav_4_8" type="checkbox"/>
-<label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+<input class="md-nav__toggle md-toggle" id="__nav_4_9" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
           Control
           <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="false" aria-labelledby="__nav_4_8_label" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_4_8">
+<nav aria-expanded="false" aria-labelledby="__nav_4_9_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_9">
 <span class="md-nav__icon md-icon"></span>
           Control
         </label>
@@ -353,6 +358,11 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../control/">
         Overview
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1">
+        API reference (new tab)
       </a>
 </li>
 <li class="md-nav__item">
@@ -374,44 +384,44 @@
 </nav>
 </li>
 <li class="md-nav__item">
+<a class="md-nav__link" href="../core-chart/">
+        Core Helm chart
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../get-started/">
+        Quick Start
+      </a>
+</li>
+<li class="md-nav__item">
 <a class="md-nav__link" href="../example-scenarios/">
         Example Scenarios
       </a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4_13" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          Third-party integrations
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_13_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_13">
+<span class="md-nav__icon md-icon"></span>
+          Third-party integrations
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../argo-to-wds1/">
+        ArgoCD to WDS
+      </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../best-practices/">
         Best practices
       </a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1">
-        API reference (new tab)
-      </a>
-</li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" id="__nav_4_12" type="checkbox"/>
-<label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
-          Miscellaneous bits
-          <span class="md-nav__icon md-icon"></span>
-</label>
-<nav aria-expanded="false" aria-labelledby="__nav_4_12_label" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_4_12">
-<span class="md-nav__icon md-icon"></span>
-          Miscellaneous bits
-        </label>
-<ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="../example-wecs/">
-        Creating Example WECs
-      </a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../thirdparties/">
-        Example Third-Party integrations
-      </a>
-</li>
-</ul>
-</nav>
 </li>
 </ul>
 </nav>

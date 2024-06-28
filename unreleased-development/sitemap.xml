@@ -155,10 +155,24 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/acquire-hosting-cluster/</loc>
+         <lastmod>2024-06-28</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/acquire-hosting-cluster/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/unreleased-development/direct/architecture/</loc>
          <lastmod>2024-06-28</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/architecture/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/argo-to-wds1/</loc>
+         <lastmod>2024-06-28</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/argo-to-wds1/"/>
          
     </url>
     <url>
@@ -239,17 +253,17 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/hosting-cluster/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/init-hosting-cluster/</loc>
          <lastmod>2024-06-28</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/hosting-cluster/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/init-hosting-cluster/"/>
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/its-and-wds/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/its/</loc>
          <lastmod>2024-06-28</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/its-and-wds/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/its/"/>
          
     </url>
     <url>
@@ -295,13 +309,6 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/thirdparties/</loc>
-         <lastmod>2024-06-28</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/thirdparties/"/>
-         
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/unreleased-development/direct/transforming/</loc>
          <lastmod>2024-06-28</lastmod>
          <changefreq>daily</changefreq>
@@ -309,10 +316,24 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/usage-basics/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/user-guide-intro/</loc>
          <lastmod>2024-06-28</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/usage-basics/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/user-guide-intro/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/wds/</loc>
+         <lastmod>2024-06-28</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/wds/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/wec-registration/</loc>
+         <lastmod>2024-06-28</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/wec-registration/"/>
          
     </url>
     <url>
