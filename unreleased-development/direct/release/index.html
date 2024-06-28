@@ -2116,7 +2116,7 @@ clues about the problem.</p>
 <p>Update the version in the core chart defaults, <code>core-chart/values.yaml</code>.</p>
 </li>
 <li>
-<p>Until we have our first stable release, edit the docs README(<code>docs/content/direct/README.md</code>, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.</p>
+<p>Until we have our first stable release, edit the oldocs README(<code>oldocs/README.md</code>, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.</p>
 </li>
 <li>
 <p>Edit <a href="../release-notes/">the release notes</a>.</p>
@@ -2189,8 +2189,8 @@ clues about the problem.</p>
 <p>We have GitHub workflows that exercise the E2E tests, normally on the copy of the repo that the workflow applies to. However, these workflows are parameterized and can be told to test the released artifacts instead.</p>
 <p>We also have a GitHub workflow, named "Test latest release" in <code>.github/workflows/test-latest-release.yml</code>, that invokes those E2E tests on the latest release. This workflow can be triggered manually, and is also configured to run after completion of the workflow ("goreleaser") that publishes release artifacts.</p>
 <p>We will maintain a document that lists releases that pass our quality bar. The latest of those is thus the latest stable release. This document is updated in <code>main</code> as quality evaluations come in.</p>
-<p>In <a href="README.md">docs/content/direct/README.md</a> we maintain a statement of what is the latest stable release.</p>
-<p>We maintain an <a href="examples.md">examples document</a> that tells users how to exercise the release that the document appears in. This requires a self-reference that is updated as part of the release process.</p>
+<p>We used to maintain a statement of what is the latest stable release in <code>docs/content/direct/README.md</code>.</p>
+<p>We maintain a <a href="../get-started/">quickstart</a> that tells users how to exercise the release that the document appears in. This requires a self-reference that is updated as part of the release process.</p>
 <h2 id="policy">Policy<a class="headerlink" href="#policy" title="Permanent link">#</a></h2>
 <p>We aim for all regular releases to be working. In order to do that, we have to make test releases and test them. The widely recognized pattern for doing that is to make "release candidates" (i.e., releases for testing purposes) <code>1.2.3-rc0</code>, <code>1.2.3-rc1</code>, <code>1.2.3-rc2</code>, and so on, while trying to get to a quality release <code>1.2.3</code>. Once one of them is judged to be of passing quality, we make a release without the <code>-rc&lt;N&gt;</code> suffix. Due to the self-reference in the KCM PostCreateHook, this will involve making a new commit.</p>
 <p>Right after making a release we test it thoroughly.</p>

@@ -1947,11 +1947,11 @@ The <code>&lt;control-plane-container-name&gt;</code> is the name of the contain
 <p>If a host port number different from the expected 9443 is used for the Kind cluster, then the same port number must be specified during the chart installation by adding the following argument <code>--set "kubeflex-controller.externalPort=&lt;port&gt;"</code>.</p>
 <p>By default the KubeStelalr Core chart uses a test domain <code>localtest.me</code>, which is ok for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set <code>--set "kubeflex-controller.domain=&lt;domain&gt;"</code> to a more appropriate <code>&lt;domain&gt;</code> that can be reached from Workload Execution CLusters (WECs).</p>
 <p>For convenience, a new local <strong>Kind</strong> cluster that satisfies the requirements for KubeStellar setup
-and that can be used to exercises the <a href="./examples.md">examples</a> can be created with the following command:</p>
+(e.g., as in <a href="../get-started/">the quickstart</a>) can be created with the following command:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0/scripts/create-kind-cluster-with-SSL-passthrough.sh<span class="o">)</span><span class="w"> </span>--name<span class="w"> </span>kubeflex<span class="w"> </span>--port<span class="w"> </span><span class="m">9443</span>
 </code></pre></div>
 <p>Alternatively, a new local <strong>k3s</strong> cluster that satisfies the requirements for KubeStellar setup
-and that can be used to exercises the <a href="./examples.md">examples</a> can be created with the following command:</p>
+can be created with the following command:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0/scripts/create-k3s-cluster-with-SSL-passthrough.sh<span class="o">)</span><span class="w"> </span>--port<span class="w"> </span><span class="m">9443</span>
 </code></pre></div>
 <ol>
@@ -2024,7 +2024,7 @@ Please remeber to add <code>--set "kubeflex-operator.isOpenShift=true"</code>, w
 <li>add two ITSes named its1 and its2 of of type vlcuster and host, respectevely: <code>--set-json='ITSes=[{"name":"its1"},{"name":"its2","type":"host"}]'</code></li>
 <li>add a single WDS named wds1 of default k8s type connected to the one and only ITS: <code>--set-json='WDSes=[{"name":"wds1"}]'</code></li>
 </ul>
-<p>A KubeStellar Core installation compatible with the common setup suitable for Common Setup described in the <a href="./examples.md">examples</a> could be achieved with the following command:</p>
+<p>A KubeStellar Core installation that is consistent with <a href="../get-started/">the quickstart</a> and and supports <a href="../example-scenarios/">the example scenarios</a> could be achieved with the following command:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ks-core<span class="w"> </span>oci://ghcr.io/kubestellar/kubestellar/core-chart<span class="w"> </span>--version<span class="w"> </span><span class="nv">$KUBESTELLAR_VERSION</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>--set-json<span class="o">=</span><span class="s1">&#39;ITSes=[{&quot;name&quot;:&quot;its1&quot;}]&#39;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>--set-json<span class="o">=</span><span class="s1">&#39;WDSes=[{&quot;name&quot;:&quot;wds1&quot;}]&#39;</span>

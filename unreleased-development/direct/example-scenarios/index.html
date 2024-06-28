@@ -2217,7 +2217,7 @@ KubeStellar can handle the case where the CRD is part of the workload,
 this example concerns the case where the CRD is established in the
 WECs by some other means.</p>
 <p>In order to run this scenario using the post-create-hook method you need
-the raise the permissions for the kubeflex controller manager (TODO 1: move this material and its undo to <a href="../its-and-wds/">the doc on WDS</a>; TODO 2: why is this needed? Is it needed for the core chart too? can we remove the need for this?):</p>
+the raise the permissions for the kubeflex controller manager (TODO 1: move this material and its undo to <a href="wds.md">the doc on WDS</a>; TODO 2: why is this needed? Is it needed for the core chart too? can we remove the need for this?):</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="s">kind: ClusterRoleBinding</span>
