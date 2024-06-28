@@ -1,6 +1,6 @@
 # KubeStellar Example Scenarios
 
-This document shows some simple examples of using the release that contains this version of this document. These scenarios can be used to test a KubeSteller installation for proper functionality. Each scenario supposes that one ITS and one WDS have been created and two WECs have been created and registered. These scenarios are written as shell commands (bash or zsh). These commands assume that you have defined the following shell variables to convey the needed information about that ITS and WDS and those WECs.
+This document shows some simple examples of using the release that contains this version of this document. These scenarios can be used to test a KubeStellar installation for proper functionality. Each scenario supposes that one ITS and one WDS have been created and two WECs have been created and registered. These scenarios are written as shell commands (bash or zsh). These commands assume that you have defined the following shell variables to convey the needed information about that ITS and WDS and those WECs.
 
 - `host_context`: the name of the kubeconfig context to use when accessing the KubeFlex hosting cluster.
 - `its_cp`: the name of the KubeFlex control plane that is playing the role of ITS.
@@ -18,7 +18,7 @@ There are also end-to-end (E2E) tests that are based on scenario 4 and an extend
 
 ## Scenario 0 - look around
 
-The following command will list all the `ManagedCluster` objects that will be reelvant to these scenarios.
+The following command will list all the `ManagedCluster` objects that will be relevant to these scenarios.
 
 ```shell
 kubectl --context "$its_context" get managedclusters -l "$label_query_both"
@@ -165,7 +165,7 @@ If desired, you may remove the `kubeflex-manager-cluster-admin-rolebinding` afte
 the kubestellar-controller-manager is started, with the command
 `kubectl --context "$host_context" delete clusterrolebinding kubeflex-manager-cluster-admin-rolebinding`
 
-Run the following comamand to give permission for the Klusterlet to
+Run the following command to give permission for the klusterlet to
 operate on the appwrapper cluster resource.
 
 ```shell
@@ -305,7 +305,7 @@ kubectl --context "$wds_context" label ns postgres-system app.kubernetes.io/mana
 helm --kube-context "$wds_context" install -n postgres-system postgres oci://registry-1.docker.io/bitnamicharts/postgresql
 ```
 
-Verify that statefulset has been created in both clusters
+Verify that `StatefulSet` has been created in both clusters
 
 ```shell
 kubectl --context "$wec1_context" get statefulsets -n postgres-system
@@ -588,7 +588,7 @@ kubectl --context "$wec1_context" -n nginx-sa get deployments,sa,secrets
 kubectl --context "$wec2_context" -n nginx-sa get deployments,sa,secrets
 ```
 
-Repeat multiple syncing on Argo and verify that extra secrets for the service acccount
+Repeat multiple syncing on Argo and verify that extra secrets for the service account
 are not created in the WDS and both clusters:
 
 ```shell

@@ -26,7 +26,7 @@ To a given workload object, the user can bind one or more named "status combiner
 
 1. The SELECT statement can have a WHERE clause that filters out some of the rows.
 
-1. The SELECT statmement either does aggregation or does not. In the case of not doing aggregation, the SELECT statement simply has a collection of named expressions defining the columns of its output.
+1. The SELECT statement either does aggregation or does not. In the case of not doing aggregation, the SELECT statement simply has a collection of named expressions defining the columns of its output.
 
 1. In the case of aggregation, the SELECT statement has the following.
 

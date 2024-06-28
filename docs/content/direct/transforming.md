@@ -52,7 +52,7 @@ The user can configure additional transformations of workload objects by putting
 
 Currently the binding is simply by naming the workload object's API group and "resource" name in the `CustomTransform`'s `spec`. The transformations from all of the bound `CustomTransform` objects are applied to the workload object. There should be at most one `CustomTransform` object that specifies a given API group and resource.
 
-Currently the only available transformations are removals of specified content. The content to be removed is identified by a small subset of JSONPath (which was originally and somewhat loosely defined in [an article by Stefan Goessner](https://goessner.net/articles/JsonPath/) and later defined more carefully in [RFC 9535](https://datatracker.ietf.org/doc/rfc9535/)). In the subset accepted here: the root node identifier (`$`) must be followed by a positive number of segments, where each segment is either (a) `.` and a name (a `member-name-shorthand`, in the grammar of the RFC) or (b) `[`, a string literal, and `]`; no more of the grammar is allowed, not even whitespace. The allowed names and string literalss are as specified in RFC 9535, except that only double-quoted strings are allowed.
+Currently the only available transformations are removals of specified content. The content to be removed is identified by a small subset of JSONPath (which was originally and somewhat loosely defined in [an article by Stefan Goessner](https://goessner.net/articles/JsonPath/) and later defined more carefully in [RFC 9535](https://datatracker.ietf.org/doc/rfc9535/)). In the subset accepted here: the root node identifier (`$`) must be followed by a positive number of segments, where each segment is either (a) `.` and a name (a `member-name-shorthand`, in the grammar of the RFC) or (b) `[`, a string literal, and `]`; no more of the grammar is allowed, not even whitespace. The allowed names and string literals are as specified in RFC 9535, except that only double-quoted strings are allowed.
 
 For example, the following `CustomTransform` object says to remove the `spec` field named `suspend` from `Job` objects (in the API group `batch`).
 
@@ -83,20 +83,20 @@ Template expansion is an optional feature that a user can request on an object-b
     control.kubestellar.io/expand-templates: "true"
 ```
 
-The customization that template expansion does when distributing an object from a WDS to a WEC is applied independently to each leaf string of the object and is based on the "text/template" standard pacakge of Go. The string is parsed as a template and then replaced with the result of expanding the template. Errors from this process are reported in the status field of the Binding object involved. Errors during template expansion usually produce broken YAML, in which case no corresponding object will be created in the WEC.
+The customization that template expansion does when distributing an object from a WDS to a WEC is applied independently to each leaf string of the object and is based on the "text/template" standard package of Go. The string is parsed as a template and then replaced with the result of expanding the template. Errors from this process are reported in the status field of the Binding object involved. Errors during template expansion usually produce broken YAML, in which case no corresponding object will be created in the WEC.
 
 The data used when expanding the template are properties of the WEC. These properties are collected from the following four sources, which are listed in decreasing order of precedence.
 
 1. The ConfigMap object, if any, that is in the namespace named "customization-properties" in the ITS and has the same name as the inventory object for the WEC. In particular, the ConfigMap string and binary data items whose name is valid as a [Go language identifier](https://go.dev/ref/spec#Identifiers) supply properties.
 1. The annotations of the inventory item for the WEC supply properties if the annotation's name (AKA key) is valid as a Go language identifier.
 1. The labels of the inventory item for the WEC supply properties if the label's name (AKA key) is valid as a Go language identifier.
-1. There is a pre-defined property whose name is "clusterName" and whose value is the name of the inventory item (i.e., the ManagedCluster object) for the WEC.
+1. There is a pre-defined property whose name is "clusterName" and whose value is the name of the inventory item (i.e., the `ManagedCluster` object) for the WEC.
 
 A Binding object's `status` section has a field holding a slice of error message strings reporting user errors that arose the last time the transport controller processed that Binding, along with the `observedGeneration` reporting the `metadata.generation` that was processed. For each workload object that the Binding references: if template expansion reports errors for any destinations, the errors reported for the first such destination are included in the Binding object's status.
 
-Any failure in any template expansion for a given Binding suppresses propagation of desired state from that Binding; the previosly propagated desired state from that Binding, if any, remains in place in the WEC.
+Any failure in any template expansion for a given Binding suppresses propagation of desired state from that Binding; the previously propagated desired state from that Binding, if any, remains in place in the WEC.
 
-Template expansion can only be applied when and where the un-expanded leaf strings pass the validation that the WDS applies, and can only epxress substring replacements.
+Template expansion can only be applied when and where the un-expanded leaf strings pass the validation that the WDS applies, and can only express substring replacements.
 
 For example, consider the following example workload object.
 

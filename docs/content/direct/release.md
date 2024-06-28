@@ -44,7 +44,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
 
-- Until we have our first stable release, edit the oldocs README(`oldocs/README.md`, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
+- Until we have our first stable release, edit the oldocs README(`oldocs/README.md`, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to refer to the coming release.
 
 - Edit [the release notes](release-notes.md).
 
@@ -138,9 +138,9 @@ We plan a few deliberately feature-incomplete releases. They will be regular rel
 
 ### Website
 
-We aim to keep the documents viewable both through the website and GitHub's web UI for viewing files. We aim for all of the documentation to be reachable on the website and in the GitHub file UI starting from the repo's README.md.
+We aim to keep the documents viewable both through the website and GitHub's web UI for viewing files. We aim for all of the documentation to be reachable on the website and in the GitHub file UI starting from the repository's README.md.
 
-We create a release in the GitHub pages for every release. A patch release is a release. A test release is a release. Creating that GHP release is done by creating a git branch named `release-$version`.
+We create a release in the GitHub pages for every release. A patch release is a release. A test release is a release. Creating that GitHub pages release is done by creating a git branch named `release-$version`.
 
 ## Future Process Development
 

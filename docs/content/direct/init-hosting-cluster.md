@@ -6,7 +6,7 @@ hosting cluster. This can be done in any of the following ways.
 
 ## Bundled with cluster creation
 
-As mentioned earlier, there are a couple fo ways to both create the hosting cluster and initialize it for KubeFlex in one operation.
+As mentioned earlier, there are a couple of ways to both create the hosting cluster and initialize it for KubeFlex in one operation.
 
 - [Using kflex init --create-kind](acquire-hosting-cluster.md#create-and-init-a-kind-cluster-as-hosting-cluster-with-kflex).
 - [curl-to-bash script](acquire-hosting-cluster.md#create-and-init-a-kind-cluster-as-hosting-cluster-with-curl-to-bash-script).

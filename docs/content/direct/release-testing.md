@@ -2,7 +2,7 @@
 
 The following testing process should be applied to every new KubeStellar release in order to validate it, this include both regular releases and release candidates. All the tests should be done while the KubeStellar code is still under code-freeze and new code shouldn't be merged into the main branch until all tests are passed and the release is officially declared as ready.  
 In case the release tests fail (even one of them), the release should be declared as unstable and a fix through a new release candidate should be worked on ASAP. The KubeStellar code-freeze should be lifted only after all tests are passed and a the release was completed.  
-To reduce the exposure of instable releases the update of the KubeStellar site [kubestellar.io](https://docs.kubestellar.io) should be done only once all release tests passed successfully. 
+To reduce the exposure of unstable releases the update of the KubeStellar site [kubestellar.io](https://docs.kubestellar.io) should be done only once all release tests passed successfully. 
 
 ## Release tests
 The following section describe the tests that must be executed for each release.
