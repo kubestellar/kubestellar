@@ -532,7 +532,7 @@ kubectl --context "$wds_context" delete bindingpolicies nginx-res-bpolicy
 ## Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD
 
 Before running this scenario, install ArgoCD on the hosting cluster and configure it
-work with the WDS as outlined [here](./thirdparties.md#install-and-configure-argocd).
+work with the WDS as outlined [here](argo-to-wds1.md).
 
 Including a ServiceAccount tests whether there will be a controller fight over a token Secret for that ServiceAccount, which was observed in some situations with older code.
 

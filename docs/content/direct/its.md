@@ -1,8 +1,8 @@
-# Inventory and Transport Spaces and Workload Description Spaces
+# Inventory and Transport Spaces
 
 This document will tell users what they need to know about these.
 
 Including the fact that the KubeFlex hosting cluster can play the role
-of ITS and can play the role of WDS, and how to make those happen.
+of ITS, and how to make that happen.
 
 TODO: write this.
