@@ -16,7 +16,7 @@ and Argo Workflows + KubeStellar integration.
 
 - **shadow-pods** - controller used to support streaming logs in Argo Workflows and KFP.
 
-- **clustermetrics** - a CRD and controller that provide basic cluster metrics info for each node in a cluster, designed to work together with KubeStellar sync/status sycn mechanisms.
+- **clustermetrics** - a CRD and controller that provide basic cluster metrics info for each node in a cluster, designed to work together with KubeStellar sync/status sync mechanisms.
 
 - **mc-scheduling** - A Multi-cluster scheduling framework supporting pluggable schedulers.
 

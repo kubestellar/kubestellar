@@ -22,11 +22,11 @@ export KUBESTELLAR_VERSION={{ config.ks_latest_release }}
 
 To install the Helm chart the only requirement is [Helm](https://helm.sh/).
 However, additional executables may be required to create/manage the cluster(s) (_e.g._, Kind and kubectl),
-to join Workload Execution Clusters (WEKs) (_e.g._, clusteradm),
+to join Workload Execution Clusters (WECs) (_e.g._, clusteradm),
 and to interact with Control Planes (_e.g._, kubectl), _etc_.
 For such purpose, a full list of executable that may be required can be found [here](./pre-reqs.md).
 
-The setup of KubStellar via the Core chart requires the existence of a KubeFlex hosting cluster.
+The setup of KubeStellar via the Core chart requires the existence of a KubeFlex hosting cluster.
 
 This can be:
 
@@ -39,7 +39,7 @@ The `<control-plane-container-name>` is the name of the container in which kind 
 
 If a host port number different from the expected 9443 is used for the Kind cluster, then the same port number must be specified during the chart installation by adding the following argument `--set "kubeflex-controller.externalPort=<port>"`.
 
-By default the KubeStelalr Core chart uses a test domain `localtest.me`, which is ok for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-controller.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution CLusters (WECs).
+By default the KubeStellar Core chart uses a test domain `localtest.me`, which is OK for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-controller.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution CLusters (WECs).
 
 For convenience, a new local **Kind** cluster that satisfies the requirements for KubeStellar setup
 (e.g., as in [the quickstart](get-started.md)) can be created with the following command:
@@ -57,7 +57,7 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ con
 
 3. An **OpenShift** cluster
 
-When using this option, one is required to explicitely set the `isOpenShift` variable to `true` by including `--set "kubeflex-operator.isOpenShift=true"` in the Helm chart installation command.
+When using this option, one is required to explicitly set the `isOpenShift` variable to `true` by including `--set "kubeflex-operator.isOpenShift=true"` in the Helm chart installation command.
 
 ## KubeStellar Core Chart values
 
@@ -89,7 +89,7 @@ ITSes: # ==> installs ocm + ocm-status-addon
 WDSes: # ==> installs kubestellar + ocm-transport-plugin
 ```
 
-The first section of the `values.yaml` file refers to parameters that are specific to the KubeFlex instllation, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information.
+The first section of the `values.yaml` file refers to parameters that are specific to the KubeFlex installation, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information.
 
 In particular:
 - `kubeflex-operator.install` accepts a boolean value to enable/disable the installation of KubeFlex into the cluster by the chart
@@ -97,7 +97,7 @@ In particular:
 
 By default, the chart will install the KubeFlex and its PostgreSQL dependency.
 
-The second section allows a user of the chart to determine if Post Create Hooks (PCHs) needed for creating ITSes and WDSes control planes should be instlalled by the chart. By default `InstallPCHs` is set to `true` to enable the instllation of the PCHs, however one may want to set this value to `false` when installing multiple copies of the chart to avoid conflicts. A single copy of the PCHs is required and allowed per cluster.
+The second section allows a user of the chart to determine if Post Create Hooks (PCHs) needed for creating ITSes and WDSes control planes should be installed by the chart. By default `InstallPCHs` is set to `true` to enable the installation of the PCHs, however one may want to set this value to `false` when installing multiple copies of the chart to avoid conflicts. A single copy of the PCHs is required and allowed per cluster.
 
 The third section of the `values.yaml` file allows one to create a list of Inventory and Transport Spaces (ITSes). By default, this list is empty and no ITS will be created by the chart. A list of ITSes can be specified using the following format:
 
@@ -138,12 +138,12 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 ```
 
 The above command will install KubeFlex and the Post Create Hooks, but no Control Planes.
-Please remeber to add `--set "kubeflex-operator.isOpenShift=true"`, when installing into an OpenShift cluster.
+Please remember to add `--set "kubeflex-operator.isOpenShift=true"`, when installing into an OpenShift cluster.
 
 User defined control planes can be added using additional value files of `--set` arguments, _e.g._:
 
 - add a single ITS named its1 of default vcluster type: `--set-json='ITSes=[{"name":"its1"}]'`
-- add two ITSes named its1 and its2 of of type vlcuster and host, respectevely: `--set-json='ITSes=[{"name":"its1"},{"name":"its2","type":"host"}]'`
+- add two ITSes named its1 and its2 of of type vlcuster and host, respectively: `--set-json='ITSes=[{"name":"its1"},{"name":"its2","type":"host"}]'`
 - add a single WDS named wds1 of default k8s type connected to the one and only ITS: `--set-json='WDSes=[{"name":"wds1"}]'`
 
 A KubeStellar Core installation that is consistent with [the quickstart](get-started.md) and and supports [the example scenarios](./example-scenarios.md) could be achieved with the following command:
@@ -154,7 +154,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
   --set-json='WDSes=[{"name":"wds1"}]'
 ```
 
-After the initial instllation is completed, there are two main ways to install additional control planes (_e.g._, create a second `wds2` WDS):
+After the initial installation is completed, there are two main ways to install additional control planes (_e.g._, create a second `wds2` WDS):
 
 1. Upgrade the initial chart. This choice requires to relist the existing control planes, which would otherwise be deleted:
 
@@ -164,7 +164,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
   --set-json='WDSes=[{"name":"wds1"},{"name":"wds2"}]'
 ```
 
-2. Install a new chart with a different name. This choice does not requires to relist the existing control planes, but requies to disable the reinstallation of KubeFlex and PCHs:
+2. Install a new chart with a different name. This choice does not requires to relist the existing control planes, but requires to disable the reinstallation of KubeFlex and PCHs:
 
 ```shell
 helm upgrade --install add-wds2 oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
@@ -226,9 +226,9 @@ the `kflex` CLI and one not.
     done
     ```
 
-    After doing the above context switchery you may wish to use `kflex ctx` to switch back to the hosting cluster context.
+    After doing the above context switching you may wish to use `kflex ctx` to switch back to the hosting cluster context.
 
-    Afterwards the content of a Control Plane `$cpname` can be accessed by specifing its context:
+    Afterwards the content of a Control Plane `$cpname` can be accessed by specifying its context:
 
     ```shell
     kubectl --context "$cpname" ...
@@ -285,7 +285,7 @@ the `kflex` CLI and one not.
 
 ## Uninstalling the KubeStellar Core chart
 
-The chart can be uninsitalled using the command:
+The chart can be uninstalled using the command:
 
 ```shell
 helm uninstall ks-core

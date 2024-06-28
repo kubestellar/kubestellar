@@ -1,5 +1,5 @@
 The following steps show how to create two new `kind` clusters and
-register them with the hub as descibed in the
+register them with the hub as described in the
 [official open cluster management docs](https://open-cluster-management.io/getting-started/installation/start-the-control-plane/).
 
 Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
@@ -29,7 +29,7 @@ Note that `kind` does not support three or more concurrent clusters unless you r
     until you see that the certificate signing requests (CSR) for both cluster1 and cluster2 exist.
     Note that the CSRs condition is supposed to be `Pending` until you approve them in step 4.
 
-3. Once the CSRs are created approve the csrs to complete the cluster registration with the command:
+3. Once the CSRs are created, approve the CSRs complete the cluster registration with the command:
 
     ```shell
     clusteradm --context its1 accept --clusters cluster1

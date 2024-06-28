@@ -20,7 +20,7 @@ TODO: finish writing this subsection for real. Following are some clues.
 
 When everything runs on one machine, the defaults just work. When core and some WECs are on different machines, it gets more challenging. When the KubeFlex hosting cluster is an OpenShift cluster with a public domain name, the defaults just work.
 
-After the quickstart setup, I looked at an OCM Agent (klusterlet-agent, to be specifc) and did not find a clear passing of kubeconfig. I found adjacent Secrets holding kubeconfigs in which `cluster[0].cluster.server` was `https://kubeflex-control-plane:31048`. Note that `kubeflex-control-plane` is the name of the Docker container running `kind` cluster serving as KubeFlex hosting cluster. I could not find an explanation for the port number 31048; that Docker container maps port 443 inside to 9443 on the outside.
+After the quickstart setup, I looked at an OCM Agent (klusterlet-agent, to be specific) and did not find a clear passing of kubeconfig. I found adjacent Secrets holding kubeconfigs in which `cluster[0].cluster.server` was `https://kubeflex-control-plane:31048`. Note that `kubeflex-control-plane` is the name of the Docker container running `kind` cluster serving as KubeFlex hosting cluster. I could not find an explanation for the port number 31048; that Docker container maps port 443 inside to 9443 on the outside.
 
 `kflex init` takes a command line flag `--domain string` described as `domain for FQDN (default "localtest.me")`.
 
@@ -72,9 +72,9 @@ This has been tested with version 5.6.0 of [k3d](https://k3d.io).
     ```
 
 1. Enable SSL passthrough:
-   We are using nginx ingress with tls passthru.
+   We are using nginx ingress with tls passthrough.
    The current install for kubeflex installs also nginx ingress but specifically for kind.
-   To specify passthru for K3D, edit the ingress placement controller with the following command and add `--enable-ssl-passthrough` to the list of args for the container
+   To specify passthrough for K3D, edit the ingress placement controller with the following command and add `--enable-ssl-passthrough` to the list of arguments for the container
     ```shell
     kubectl edit deployment ingress-nginx-controller -n ingress-nginx  
     ```
