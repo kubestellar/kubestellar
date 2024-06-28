@@ -28,19 +28,23 @@ jobs:
     steps:
       - name: get workflow_dispatch branch name
         shell: bash
-        run: echo "branch=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+        run: |
+            echo "branch=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+            echo "version=$(sed 's/^main$/unreleased-development/' <<<"${GITHUB_REF##*/}")" >> $GITHUB_OUTPUT
         id: extract_branch
         if: github.event_name != 'pull_request' && github.event_name != 'push'
 #         run: echo workflow_dispatch - running on branch ${GITHUB_REF##*/}
 
       - name: echo workflow_dispatch branch name
-        run: echo workflow_dispatch - running on branch ${{ steps.extract_branch.outputs.branch }}
+        run: |
+            echo workflow_dispatch - running on branch ${{ steps.extract_branch.outputs.branch }}
+            echo workflow_dispatch - running on version ${{ steps.extract_branch.outputs.version }}
         if: github.event_name != 'pull_request' && github.event_name != 'push'
 
       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
-          website_url: https://docs.kubestellar.io/${{ steps.extract_branch.outputs.branch }}
-          include_url_prefix: https://docs.kubestellar.io/${{ steps.extract_branch.outputs.branch }}
+          website_url: https://docs.kubestellar.io/${{ steps.extract_branch.outputs.version }}
+          include_url_prefix: https://docs.kubestellar.io/${{ steps.extract_branch.outputs.vesion }}
           exclude_url_prefix: 'mailto:,https://drive.google.com'
           exclude_url_contained: '#__,/.,.svg'
           resolve_before_filtering: 'true'
