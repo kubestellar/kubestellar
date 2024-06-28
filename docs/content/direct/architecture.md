@@ -31,8 +31,8 @@ to CISOs and DevOps Engineers. However, for the purpose of this document,
 we will not differentiate between these roles. Instead we will use the term 
 'user' broadly, without attempting to make distinctions among roles.
 
-Examples of users interaction with KubeStellar are illustrated in the
-[KubeStellar Usage Examples](./examples.md) section.
+Examples of user interactions with KubeStellar are illustrated in the
+[KubeStellar Usage Example Scenarios](./example-scenarios.md) document.
 
 The KubeStellar architecture has the following main modules.
 

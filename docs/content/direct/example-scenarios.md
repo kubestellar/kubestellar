@@ -129,7 +129,7 @@ this example concerns the case where the CRD is established in the
 WECs by some other means.
 
 In order to run this scenario using the post-create-hook method you need
-the raise the permissions for the kubeflex controller manager (TODO 1: move this material and its undo to [the doc on WDS](its-and-wds.md); TODO 2: why is this needed? Is it needed for the core chart too? can we remove the need for this?):
+the raise the permissions for the kubeflex controller manager (TODO 1: move this material and its undo to [the doc on WDS](wds.md); TODO 2: why is this needed? Is it needed for the core chart too? can we remove the need for this?):
 
 ```shell
 kubectl --context "$host_context" apply -f - <<EOF

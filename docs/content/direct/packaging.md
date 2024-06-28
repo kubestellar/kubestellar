@@ -281,7 +281,7 @@ By our development practices and not doing any manual hacking, we maintain the a
 
 In addition to the two PostCreateHooks in the core Helm chart described above, there are two more PostCreateHooks defined in the `config/postcreate-hooks/` directory.
 
-These two PostCreateHooks are used in the "step-by-step" variant of the example setup instructions (see [the examples doc](examples.md#common-setup) and [the step-by-step setup](common-setup-step-by-step.md)). These instructions tell the user to use the PCH sources from a KubeStellar release on GitHub. The version is a literal in the instructions and is updated in the process of preparing for a KubeStellar release. The step-by-step variant is intended to be deleted (in favor of using the core Helm chart) by the time the next release is made.
+These two PostCreateHooks were used in the "step-by-step" variant of the example setup instructions (which are currently out of service). Those instructions told the user to use the PCH sources from a KubeStellar release on GitHub. The version is a literal in the instructions and is updated in the process of preparing for a KubeStellar release. The step-by-step variant is intended to be deleted (in favor of using the core Helm chart) by the time the next release is made.
 
 The setup script for E2E testing (`test/e2e/setup-kubestellar.sh`) uses the local copy of the `ocm` PCH unconditionally and uses the local copy of the `kubestellar` PCH when testing a release.
 
@@ -298,11 +298,11 @@ One uses [the Helm CLI image](#helm-cli-container-image) to instantiate [the Kub
 
 ### Scripts and instructions
 
-There are instructions for using a release (the [examples](examples.md) document) and a [setup script for end-to-end testing](../../../test/e2e/common/setup-kubestellar.sh). The end-to-end testing can either test the local copy/version of the kubestellar repo or test a release. So there are three cases to consider.
+There are instructions for using a release (the [quickstart](get-started.md) document) and a setup script for end-to-end testing(`test/e2e/common/setup-kubestellar.sh`). The end-to-end testing can either test the local copy/version of the kubestellar repo or test a release. So there are three cases to consider.
 
 #### Example setup instructions
 
-There are two variants of the setup instructions for the examples: [the older one](common-setup-step-by-step.md), which is called "step-by-step" and uses the `ocm` and `kubestellar` PostCreateHooks, and [the newer one](common-setup-core-chart.md), which uses the [core Helm chart](#kubestellar-core-helm-chart). The latter is the preferred method, and is the only one described here.
+There were two variants of the setup instructions for the examples: an older one --- which is out of service at the moment, is called "step-by-step", and uses the `ocm` and `kubestellar` PostCreateHooks --- and [the quickstart](get-started.md), which uses the [core Helm chart](#kubestellar-core-helm-chart). The latter is the preferred method, and is the only one described here.
 
 The instructions are a Markdown file that displays commands for a user to execute. These start with commands that define environment variables that hold the release of ks/kubestellar and of ks/ocm-transport-plugin to use.
 

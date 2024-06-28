@@ -69,7 +69,7 @@ To build and _**test**_ KubeStellar properly, you will also need
 <!-- start tag for check script  include -->
 
 ## Automated Check of Pre-Requisites for KubeStellar
-The [check_pre_req](https://github.com/kubestellar/kubestellar/blob/main/hack/check_pre_req.sh) script offers a convenient way to check for the pre-requisites eeded for [KubeStellar](./pre-reqs.md) deployment and [use case scenarios](./examples.md).
+The [check_pre_req](https://github.com/kubestellar/kubestellar/blob/main/hack/check_pre_req.sh) script offers a convenient way to check for the pre-requisites eeded for [KubeStellar](./pre-reqs.md) deployment and [use](./example-scenarios.md).
 
 The script checks for a pre-requisite presence in the `$PATH`, by using the `which` command, and it can optionally provide version and path information for pre-requisites that are present, or installation information for missing pre-requisites.
 

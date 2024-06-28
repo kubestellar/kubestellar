@@ -44,7 +44,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
 
-- Until we have our first stable release, edit the docs README(`docs/content/direct/README.md`, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
+- Until we have our first stable release, edit the oldocs README(`oldocs/README.md`, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.
 
 - Edit [the release notes](release-notes.md).
 
@@ -122,9 +122,9 @@ We also have a GitHub workflow, named "Test latest release" in `.github/workflow
 
 We will maintain a document that lists releases that pass our quality bar. The latest of those is thus the latest stable release. This document is updated in `main` as quality evaluations come in.
 
-In [docs/content/direct/README.md](README.md) we maintain a statement of what is the latest stable release.
+We used to maintain a statement of what is the latest stable release in `docs/content/direct/README.md`.
 
-We maintain an [examples document](examples.md) that tells users how to exercise the release that the document appears in. This requires a self-reference that is updated as part of the release process.
+We maintain a [quickstart](get-started.md) that tells users how to exercise the release that the document appears in. This requires a self-reference that is updated as part of the release process.
 
 ## Policy
 
