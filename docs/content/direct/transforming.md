@@ -1,6 +1,6 @@
 # Transforming Desired State
 
-This document is for users of a release. Examples of using the latest stable release are in [the examples document](examples.md). This document adds information not conveyed in the examples.
+This document is for users of a release. Examples of using the latest release are in [the example scenarios document](example-scenarios.md). This document adds information not conveyed in the examples.
 
 KubeStellar has two kinds of transformations of desired workload state
 on its way from WDS to WEC: one kind is independent of the WEC, and
