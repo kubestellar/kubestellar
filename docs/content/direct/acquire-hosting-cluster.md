@@ -1,13 +1,13 @@
-# The KubeFlex hosting cluster
+# A cluster for KubeFlex hosting
 
-This document tells you what makes a Kubernetes cluster suitable to serve as the KubeFlex hosting cluster and how to initialize that cluster to play that role.
+This document tells you what makes a Kubernetes cluster suitable to serve as the [KubeFlex](https://github.com/kubestellar/kubeflex) hosting cluster and shows some ways to create such a cluster.
 
 ## Requirements on the KubeFlex hosting cluster
 
 The KubeFlex hosting cluster needs to run an Ingress controller with
 SSL passthrough enabled.
 
-## Connectivity from clients
+### Connectivity from clients
 
 The clients in KubeStellar need to be able to open a TCP connection to where the Ingress controller is listening for HTTPS connections.
 
@@ -26,9 +26,12 @@ After the quickstart setup, I looked at an OCM Agent (klusterlet-agent, to be sp
 
 ## Creating a hosting cluster
 
+Following are some ways to create a Kubernetes cluster that is suitable to use
+as a KubeFlex hosting cluster. This is not an exhaustive list.
+
 ### Create and init a kind cluster as hosting cluster with kflex
 
-The following command will use `kind` to create a cluster with an Ingress controller with SSL passthrough and then proceed to install the KubeFlex implementation in it and set your current kubeconfig context to access that cluster as admin.
+The following command will use `kind` to create a cluster with an Ingress controller with SSL passthrough _AND ALSO_ proceed to install the KubeFlex implementation in it and set your current kubeconfig context to access that cluster as admin.
 
 ```shell
 kflex init --create-kind
@@ -36,7 +39,7 @@ kflex init --create-kind
 
 ### Create and init a kind cluster as hosting cluster with curl-to-bash script
 
-There is a bash script at [`https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh`](https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) that can be fed directly into `bash` and will create a `kind` cluster and initialize it as the KubeFlex hosting cluster. This script accepts the following command line flags.
+There is a bash script at [`https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh`](https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) that can be fed directly into `bash` and will create a `kind` cluster _AND ALSO_ initialize it as the KubeFlex hosting cluster. This script accepts the following command line flags.
 
 - `--name name`: set a specific name of the kind cluster (default: kubestellar).
 - `--port port`: map the specified host port to the kind cluster port 443 (default: 9443).
@@ -75,32 +78,4 @@ This has been tested with version 5.6.0 of [k3d](https://k3d.io).
     ```shell
     kubectl edit deployment ingress-nginx-controller -n ingress-nginx  
     ```
-
-## Initialize the KubeFlex hosting cluster
-
-The KubeFlex implementation has to be installed in the cluster chosen to play the role of KubeFlex hosting cluster. This can be done in any of the following ways.
-
-### kflex init
-
-The following command will install the KubeFlex implementation in the cluster that `kubectl` is configured to access, if you have sufficient privileges.
-
-```shell
-kflex init
-```
-
-#### Using an existing OpenShift cluster as the hosting cluster
-
-When the hosting cluster is an OpenShift cluster, the recipe for registering a WEC with the ITS ([to be written](wec.md)) needs to be modified. In the `clusteradm` command, omit the `--force-internal-endpoint-lookup` flag. If following [the quickstart commands](get-started.md#create-and-register-two-workload-execution-clusters) literally, this means to define `flags=""` rather than `flags="--force-internal-endpoint-lookup"`.
-
-### kflex init --create-kind
-
-See [above](#create-and-init-a-kind-cluster-as-hosting-cluster-with-kflex).
-
-### Curl-to-bash
-
-See [above](#create-and-init-a-kind-cluster-as-hosting-cluster-with-curl-to-bash-script).
-
-### KubeStellar core Helm chart
-
-The [KubeStellar core Helm chart](core-chart.md) will install the KubeFlex implementation in the cluster that `kubectl` is configured to access, as well as create ITSes and WDSes.
 

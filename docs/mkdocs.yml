@@ -35,24 +35,26 @@ nav:
       - Release-notes: direct/release-notes.md
   - Quick Start: direct/get-started.md
   - User Guide:
-      - Quick Start: direct/get-started.md
-      - Outline of Installation and Usage of KubeStellar: direct/usage-basics.md
+      - Overview: direct/user-guide-intro.md
       - Prerequisites: direct/pre-reqs.md
-      - The KubeFlex Hosting cluster: direct/hosting-cluster.md
-      - ITSes and WDSes: direct/its-and-wds.md
-      - Swiss Army Knife: direct/core-chart.md
-      - WECs: direct/wec.md
+      - Acquire cluster for KubeFlex Hosting: direct/acquire-hosting-cluster.md
+      - Initialize KubeFlex Hosting cluster: direct/init-hosting-cluster.md
+      - Inventory and Transport Spaces: direct/its.md
+      - Workload Description Spaces: direct/wds.md
+      - Workload Execution Clusters: direct/wec.md
+      - Register a Workload Execution Cluster: direct/wec-registration.md
       - Control:
           - Overview: direct/control.md
+          - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
           - Binding: direct/binding.md
           - Transforming desired state: direct/transforming.md
           - Combining reported state: direct/combined-status.md
+      - Core Helm chart: direct/core-chart.md
+      - Quick Start: direct/get-started.md
       - Example Scenarios: direct/example-scenarios.md
+      - Third-party integrations:
+          - ArgoCD to WDS: direct/argo-to-wds1.md
       - Best practices: direct/best-practices.md
-      - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
-      - Miscellaneous bits:
-          - Creating Example WECs: direct/example-wecs.md
-          - Example Third-Party integrations: direct/thirdparties.md
   - Contributing: 
       - How to join in: direct/contribute.md
       - Code of Conduct: Contribution guidelines/coc.md

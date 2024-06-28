@@ -3,7 +3,7 @@
 
 This documents explains how to use KubeStellar Core chart to do three
 of the 11 installation and usage steps; please see [the
-outline](usage-basics.md) for generalities and [the
+outline](user-guide-intro.md) for generalities and [the
 quickstart](get-started.md) for an example of usage.
 
 This Helm chart can do any subset of the following things.

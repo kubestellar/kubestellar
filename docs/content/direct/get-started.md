@@ -1,6 +1,6 @@
 # KubeStellar Quickstart Setup
 
-This Quick Start outlines step 1, shows a concrete example of steps 2--7 in the [Installation and Usage outline](usage-basics.md), and forwards you to one example of the remaining steps. In this example you will create three new `kind` clusters to serve as your KubeFlex hosting cluster and two WECs.
+This Quick Start outlines step 1, shows a concrete example of steps 2--7 in the [Installation and Usage outline](user-guide-intro.md), and forwards you to one example of the remaining steps. In this example you will create three new `kind` clusters to serve as your KubeFlex hosting cluster and two WECs.
 
   1. Install software prerequisites
   1. Cleanup from previous runs
