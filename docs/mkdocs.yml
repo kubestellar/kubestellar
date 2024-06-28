@@ -36,7 +36,7 @@ nav:
   - Quick Start: direct/get-started.md
   - User Guide:
       - Quick Start: direct/get-started.md
-      - Outline of Installation and Usage of KubeStellar: direct/usage-basics.md
+      - Outline of Installation and Usage of KubeStellar: direct/user-guide-intro.md
       - Prerequisites: direct/pre-reqs.md
       - The KubeFlex Hosting cluster: direct/hosting-cluster.md
       - ITSes and WDSes: direct/its-and-wds.md
