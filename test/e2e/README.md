@@ -44,4 +44,4 @@ $ kubectl config rename-context <default-wec1-context-name> cluster1
 
 The kubestellar controller-manager will be invoked with `-v=2` unless otherwise specified on the command line with `--kubestellar-controller-manager-verbosity $number`. This verbosity can not be set to a value other than 2 when using `--released`.
 
-The transport controller will be invoked with `-v=4` unless othewise specified on the command line with `--transport-controller-verbosity $number`.
+The transport controller will be invoked with `-v=4` unless otherwise specified on the command line with `--transport-controller-verbosity $number`.

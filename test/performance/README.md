@@ -35,13 +35,13 @@ EOF
 $ vi test-workload.yaml
 ```
   
-   d) configure the parameters to create the workload traffic (e.g., RandomizedLoad, RSteppedLoad, Sequence, etc.)
+   d) configure the parameters to create the workload traffic (e.g., RandomizedLoad, SteppedLoad, Sequence, etc.)
    
 ```bash
 $ vi performance-test-config.yaml
 ``` 
 
-To learn more about the clusterloader2 load experiments configuration paramaters, see the following: [clusterloader tunningSets](https://github.com/kubernetes/perf-tests/blob/master/clusterloader2/docs/design.md#tuning-set)
+To learn more about the clusterloader2 load experiments configuration parameters, see the following: [clusterloader tuningSets](https://github.com/kubernetes/perf-tests/blob/master/clusterloader2/docs/design.md#tuning-set)
 
 
 3. Run your first workload:

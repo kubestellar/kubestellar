@@ -1,4 +1,3 @@
-
 # KubeStellar Core chart usage
 
 This documents explains how to use KubeStellar Core chart to do three
@@ -97,20 +96,20 @@ In particular:
 
 By default, the chart will install the KubeFlex and its PostgreSQL dependency.
 
-The second section allows a user of the chart to determine if Post Create Hooks (PCHs) needed for creating ITSes and WDSes control planes should be installed by the chart. By default `InstallPCHs` is set to `true` to enable the installation of the PCHs, however one may want to set this value to `false` when installing multiple copies of the chart to avoid conflicts. A single copy of the PCHs is required and allowed per cluster.
+The second section allows a user of the chart to determine if Post Create Hooks (PCHes) needed for creating ITSes and WDSes control planes should be installed by the chart. By default `InstallPCHs` is set to `true` to enable the installation of the PCHes, however one may want to set this value to `false` when installing multiple copies of the chart to avoid conflicts. A single copy of the PCHes is required and allowed per cluster.
 
 The third section of the `values.yaml` file allows one to create a list of Inventory and Transport Spaces (ITSes). By default, this list is empty and no ITS will be created by the chart. A list of ITSes can be specified using the following format:
 
 ```yaml
 ITSes: # all the CPs in this list will execute the its.yaml PCH
   - name: <its1>          # mandatory name of the control plane
-    type: <vlcuster|host> # optional type of control plane host or vcluster (default to vcluster, if not specified)
+    type: <vcluster|host> # optional type of control plane host or vcluster (default to vcluster, if not specified)
   - name: <its2>          # mandatory name of the control plane
-    type: <vlcuster|host> # optional type of control plane host or vcluster (default to vcluster, if not specified)
+    type: <vcluster|host> # optional type of control plane host or vcluster (default to vcluster, if not specified)
   ...
 ```
 
-where `name` must specify a name unique among all the control planes in that KubeFlex deployment and the optional `type` can be either vlcuster (default) or host, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information.
+where `name` must specify a name unique among all the control planes in that KubeFlex deployment and the optional `type` can be either vcluster (default) or host, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information.
 
 The fourth section of the `values.yaml` file allows one to create a list of Workload Description Spaces (WDSes). By default, this list is empty and no WDS will be created by the chart. A list of WDSes can be specified using the following format:
 
@@ -143,7 +142,7 @@ Please remember to add `--set "kubeflex-operator.isOpenShift=true"`, when instal
 User defined control planes can be added using additional value files of `--set` arguments, _e.g._:
 
 - add a single ITS named its1 of default vcluster type: `--set-json='ITSes=[{"name":"its1"}]'`
-- add two ITSes named its1 and its2 of of type vlcuster and host, respectively: `--set-json='ITSes=[{"name":"its1"},{"name":"its2","type":"host"}]'`
+- add two ITSes named its1 and its2 of of type vcluster and host, respectively: `--set-json='ITSes=[{"name":"its1"},{"name":"its2","type":"host"}]'`
 - add a single WDS named wds1 of default k8s type connected to the one and only ITS: `--set-json='WDSes=[{"name":"wds1"}]'`
 
 A KubeStellar Core installation that is consistent with [the quickstart](get-started.md) and and supports [the example scenarios](./example-scenarios.md) could be achieved with the following command:
@@ -164,7 +163,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
   --set-json='WDSes=[{"name":"wds1"},{"name":"wds2"}]'
 ```
 
-2. Install a new chart with a different name. This choice does not requires to relist the existing control planes, but requires to disable the reinstallation of KubeFlex and PCHs:
+2. Install a new chart with a different name. This choice does not requires to relist the existing control planes, but requires to disable the reinstallation of KubeFlex and PCHes:
 
 ```shell
 helm upgrade --install add-wds2 oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
@@ -277,7 +276,7 @@ the `kflex` CLI and one not.
     mv ~/.kube/kubeconfig-merged ~/.kube/config
     ```
 
-    Afterwards the content of a Control Plane `$cpname` can be accessed by specifing its context:
+    Afterwards the content of a Control Plane `$cpname` can be accessed by specifying its context:
 
     ```shell
     kubectl --context "$cpname" ...
@@ -291,7 +290,7 @@ The chart can be uninstalled using the command:
 helm uninstall ks-core
 ```
 
-This will remove KubeFlex, PostgreSQL, Post Create Hooks (PCHs), and all KubeFlex Control Planes (_i.e._, ITSes and WDSes) that were created by the chart.
+This will remove KubeFlex, PostgreSQL, Post Create Hooks (PCHes), and all KubeFlex Control Planes (_i.e._, ITSes and WDSes) that were created by the chart.
 
 Additionally, if a **Kind** cluster was created with the provide script, it can be deleted with the command:
 

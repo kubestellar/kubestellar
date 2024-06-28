@@ -12,16 +12,16 @@ API machinery generalities (not management of containerized workloads).
 A KubeFlex `ControlPlane` is an example. A regular Kubernetes cluster is another example.
 Users can use spaces to perform these tasks:
 
-1. Create *Workload Definition Spaces* (WDSs) to store the definitions of their workloads.
+1. Create *Workload Definition Spaces* (WDSes) to store the definitions of their workloads.
 A Kubernetes workload is an application that runs on Kubernetes. A workload can be made by a 
 single Kubernetes object or several objects that work together.
-2. Create *Inventory and Transport Spaces* (ITSs) to manage the inventory of clusters and 
+2. Create *Inventory and Transport Spaces* (ITSes) to manage the inventory of clusters and 
 the transport of workloads.
 3. Register and label Workload Execution Clusters (WECs) with the Inventory and 
 Transport Space, to keep track of the available clusters and their characteristics.
 4. Define `BindingPolicy` to specify *what* objects and *where* should be 
 deployed on the WECs.
-5. Submit objects in the native Kubernetes format to the WDSs, 
+5. Submit objects in the native Kubernetes format to the WDSes, 
 and let the `BindingPolicy` govern which WECs should receive them.
 6. Check the status of submitted objects from the WDS.
 
@@ -40,7 +40,7 @@ The KubeStellar architecture has the following main modules.
 
 - *KubeStellar Controller Manager*: this module is instantiated once per WDS and is responsible for watching `BindingPolicy` objects and create from it a matching `Binding` object that contains list of references to the concrete objects and list of references to the concrete clusters, and for updating the status of objects in the WDS.
 
-- *Pluggable Transport Controller*: this module is instiated once per WDS and is responsible for delivering workload objects from the WDS to the ITS according to `Binding` objects.
+- *Pluggable Transport Controller*: this module is instantiated once per WDS and is responsible for delivering workload objects from the WDS to the ITS according to `Binding` objects.
 
 - *Space Manager*: This module manages the lifecycle of spaces.
 
@@ -90,7 +90,7 @@ More details on the internals of this module are provided in [KubeStellar Contro
 The Space Manager handles the lifecycle of spaces. 
 KubeStellar uses the [KubeFlex project](https://github.com/kubestellar/kubeflex)
 for space management. In KubeFlex, a space is named a `ControlPlane`, and we will use 
-both terms in this document. KubeSteller currently prereqs KubeFlex to 
+both terms in this document. KubeStellar currently prereqs KubeFlex to 
 provide one or more spaces. We plan to make this optional in the near future.
 
 KubeFlex is a flexible framework that supports various kinds of control planes, such
@@ -441,12 +441,12 @@ implementations of the transport interface. The interface between the plugin and
 
 The above list is required in order to comply with [<u>SIG Multi-Cluster Work API</u>](https://multicluster.sigs.k8s.io/concepts/work-api/).
 
-Each plugin has an executable with a `main` func that calls the generic code (in `pkg/transport/cmd/generic-main.go`), passing the plugin object that implements the plugin interface. The generic code does the rule-based customization; the plugin is given customized objects. The generic code also ensures that the namespace named "customization-properties" exists in the ITS.
+Each plugin has an executable with a `main` function that calls the generic code (in `pkg/transport/cmd/generic-main.go`), passing the plugin object that implements the plugin interface. The generic code does the rule-based customization; the plugin is given customized objects. The generic code also ensures that the namespace named "customization-properties" exists in the ITS.
 
 KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project [Open Cluster Management](https://open-cluster-management.io). OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available [here](https://github.com/kubestellar/ocm-transport-plugin).  
 We expect to have more transport plugin options in the future.
 
-The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is describted in Figure 5.
+The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is described in Figure 5.
 
 ![Figure 5 - Transport Controller](./images/transport-controller.svg)
 
@@ -454,15 +454,15 @@ The transport controller is driven by `Binding` objects in the WDS. There is a 1
 
 The transport controller watches for `Binding` objects on the WDS, using an informer. Upon every add, update, and delete event from that informer, the controller puts a reference to that `Binding` object in its work queue. The transport controller also has informers on the inventory objects (both `ManagedCluster` and their associated `ConfigMap`) and on the wrapped objects (`ManifestWork`). Forked goroutines process items from the work queue. For a reference to a control or workload object, that processing starts with retrieving the informer's cached copy of that object. 
 
-The transport controller also maintains a finalizer on each Binding object. When processing a reference to a `Binding` object that no longer exists, the transport controller has nothing more to do (because it processes the deleetion before removing its finalizer).
+The transport controller also maintains a finalizer on each Binding object. When processing a reference to a `Binding` object that no longer exists, the transport controller has nothing more to do (because it processes the deletion before removing its finalizer).
 
 When processing a reference to a `Binding` object that still exists, the transport controller looks at whether that `Binding` is in the process of being deleted. If so then the controller ensures that the corresponding wrapped object (`ManifestWork`) in the ITS no longer exists and then removes the finalizer from the `Binding`.
 
-When processing a `Binding` object that is not being deleted, the transport controller first ensures that the finalizer is on that object. Then the controller constructs an internal function from destination to the customized wrapped object for that destionation. The controller then iterates over the `Binding`'s list of desinations and propagates the corresponding wrapped object (reported by the function just described) to the corresponding mailbox namespace.  Once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/delete the workload objects on the WEC.
+When processing a `Binding` object that is not being deleted, the transport controller first ensures that the finalizer is on that object. Then the controller constructs an internal function from destination to the customized wrapped object for that destination. The controller then iterates over the `Binding`'s list of destinations and propagates the corresponding wrapped object (reported by the function just described) to the corresponding mailbox namespace.  Once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/delete the workload objects on the WEC.
 
 To construct the function from destination to customized wrapped object, the transport controller reads the `Binding`'s list of references to workload objects. The controller reads those objects from the WDS using a Kubernetes "dynamic" client. Immediately upon reading each workload object, the controller applies the WEC-independent transforms (from the `CustomTransform` objects). After doing that for all the listed workload objects, the controller goes through those objects one-by-one and applies template expansion for each destination if the object requests template expansion. If any of those objects requests template expansion and has a string that actually involves template expansion: the controller accumulates a map from destination to slice of customized objects and then invokes the transport plugin on each of those slices, to ultimately produce the function from destination to wrapped object. If none of the selected workload objects actually involved any template expansion then the controller wraps the slice of workload objects to get one wrapped object and produces a constant function from destination to that one wrapped object. 
 
-Transport controller is based on the controller design patten and aims to bring the current state to the desired state. If a WEC was removed from the `Binding`, the transport controller will also make sure to remove the matching wrapped object(s) from the WEC's mailbox namespace.
+Transport controller is based on the controller design pattern and aims to bring the current state to the desired state. If a WEC was removed from the `Binding`, the transport controller will also make sure to remove the matching wrapped object(s) from the WEC's mailbox namespace.
 
 #### Custom transform cache
 
@@ -509,7 +509,7 @@ The cache interface has the following methods.
 
     Of course this method maintains the cache's invariants. That means adding rows to SPECS as necessary. It also means removing a row from INSTRUCTIONS upon discovery that a `CustomTransform`'s Spec has changed its `GroupResource`. Note that the cache's invariants require this removal by this method, not relying on an eventual call to `NoteCustomTransform` (because the cache records at most the latest Spec for each `CustomTransform`, a later cache operation will not know about the previous `GroupResource`).
 
-    Removing a row from INSTRUCTIONS also entails removing the corresponding rows from SPECs, to maintain the cache's invariants.
+    Removing a row from INSTRUCTIONS also entails removing the corresponding rows from SPECS, to maintain the cache's invariants.
 
 - `noteCustomTransform` reacts to a create/update/delete of a `CustomTransform` object. In the update case, if the `CustomResourceSpec` changed its `GroupResource` then this method removes two rows from INSTRUCTIONS (if they were present): the one for the old `GroupResource` and the one for the new. In case of create, delete, or other change in Spec, this method removes the one relevant row (if present) in INSTRUCTIONS.
 

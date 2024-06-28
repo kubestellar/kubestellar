@@ -8,7 +8,7 @@ an open and welcoming community, we pledge to respect all people who participate
 through reporting issues, posting feature requests, updating documentation,
 submitting pull requests or patches, attending conferences or events, or engaging in other community or project activities.
 
-We are committed to making participation in the CNCF community a harassment-free experience for everyone, regardless of age, body size, caste, disability, ethnicity, level of experience, family status, gender, gender identity and expression, marital status, military or veteran status, nationality, personal appearance, race, religion, sexual orientation, socieconomic status, tribe, or any other dimension of diversity.
+We are committed to making participation in the CNCF community a harassment-free experience for everyone, regardless of age, body size, caste, disability, ethnicity, level of experience, family status, gender, gender identity and expression, marital status, military or veteran status, nationality, personal appearance, race, religion, sexual orientation, socioeconomic status, tribe, or any other dimension of diversity.
 
 ## Scope 
 
@@ -63,9 +63,9 @@ Project maintainers who do not follow or enforce the Code of Conduct may be temp
 
 For incidents occurring in the KubeStellar community, contact the [KubeStellar Code of Conduct Committee of Conduct Committee](mailto:kubestellar-dev-private@googlegroups.com). You can expect a response within three business days.
 
-For other projects, or for incidents that are project-agnostic or impact multiple CNCF projects, please contact the [CNCF Code of Conduct Committee](https://www.cncf.io/conduct/committee/) via conduct@cncf.io.  Alternatively, you can contact any of the individual members of the [CNCF Code of Conduct Committee](https://www.cncf.io/conduct/committee/) to submit your report. For more detailed instructions on how to submit a report, including how to submit a report anonymously, please see our [Incident Resolution Procedures](https://www.cncf.io/conduct/procedures/). You can expect a response within three business days.
+For other projects, or for incidents that are project-agnostic or impact multiple CNCF projects, please contact the [CNCF Code of Conduct Committee](https://www.cncf.io/conduct/committee/) via [conduct@cncf.io](mailto:conduct@cncf.io).  Alternatively, you can contact any of the individual members of the [CNCF Code of Conduct Committee](https://www.cncf.io/conduct/committee/) to submit your report. For more detailed instructions on how to submit a report, including how to submit a report anonymously, please see our [Incident Resolution Procedures](https://www.cncf.io/conduct/procedures/). You can expect a response within three business days.
 
-For incidents ocurring at CNCF event that is produced by the Linux Foundation, please contact eventconduct@cncf.io.
+For incidents occurring at CNCF event that is produced by the Linux Foundation, please contact [eventconduct@cncf.io](mailto:eventconduct@cncf.io).
 
 ## Enforcement 
 
