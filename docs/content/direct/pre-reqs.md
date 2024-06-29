@@ -1,7 +1,7 @@
 # KubeStellar prerequisites
 
 The following prerequisites are required.
-You can use the [check-pre-req](#automated-check-of-prerequisites-for-kubestellar) script, to validate if all needed prerequisite are installed.
+You can use the [check-pre-req](#automated-check-of-pre-requisites-for-kubestellar) script, to validate if all needed prerequisite are installed.
 
 
 ## Infrastructure (clusters)
