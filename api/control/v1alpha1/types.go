@@ -393,6 +393,7 @@ type NamedExpression struct {
 // Otherwise this is an error condition: a value of 0 is used, and the error
 // is reported in the BindingPolicyStatus.Errors (not necessarily repeated for each WEC).
 type NamedAggregator struct {
+	Name string         `json:"name"`
 	Type AggregatorType `json:"type"`
 
 	// +optional

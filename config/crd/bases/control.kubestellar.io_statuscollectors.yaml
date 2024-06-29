@@ -53,6 +53,8 @@ spec:
                     the error is reported in the BindingPolicyStatus.Errors (not necessarily
                     repeated for each WEC)."
                   properties:
+                    name:
+                      type: string
                     subject:
                       description: Expression is written in the [Common Expression
                         Language](https://cel.dev/). See github.com/google/cel-go
@@ -70,6 +72,7 @@ spec:
                         is to be done.
                       type: string
                   required:
+                  - name
                   - type
                   type: object
                 type: array
