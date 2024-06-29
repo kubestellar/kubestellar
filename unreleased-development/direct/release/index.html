@@ -2148,7 +2148,7 @@ clues about the problem.</p>
 <p>Update the version in the core chart defaults, <code>core-chart/values.yaml</code>.</p>
 </li>
 <li>
-<p>Until we have our first stable release, edit the oldocs README(<code>oldocs/README.md</code>, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to rever to the coming release.</p>
+<p>Until we have our first stable release, edit the oldocs README(<code>oldocs/README.md</code>, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to refer to the coming release.</p>
 </li>
 <li>
 <p>Edit <a href="../release-notes/">the release notes</a>.</p>
@@ -2217,7 +2217,7 @@ clues about the problem.</p>
 <h2 id="testing-and-examples">Testing and Examples<a class="headerlink" href="#testing-and-examples" title="Permanent link">#</a></h2>
 <p>The unit tests (of which we have almost none right now), integration tests (of which we also have very few), and end-to-end (E2E) tests in this repository are run in the context of a local copy of this repository and test that version of this repository --- not using any published release artifacts. Additionally, some E2E tests have the option to test published artifacts instead of the local copy of this repo.</p>
 <p>The end-to-end tests include ones written in <code>bash</code>, and these are the only documentation telling a user how to use the present version of this repository. Again, these tests do not use any published artifacts from a release of this repo.</p>
-<p>We have another category of tests, <em>release tests</em>. These test a given release, using the published artifacts of that release. Currently all the release tests are a subset of the E2E tests --- those that can be told to test published artifacts. In particular, they can test the published artifacts reached through the kubestellar PostCreatHook, which contains an explicit reference to one particular release (as explained elsewhere in this document).</p>
+<p>We have another category of tests, <em>release tests</em>. These test a given release, using the published artifacts of that release. Currently all the release tests are a subset of the E2E tests --- those that can be told to test published artifacts. In particular, they can test the published artifacts reached through the kubestellar PostCreateHook, which contains an explicit reference to one particular release (as explained elsewhere in this document).</p>
 <p>We have GitHub workflows that exercise the E2E tests, normally on the copy of the repo that the workflow applies to. However, these workflows are parameterized and can be told to test the released artifacts instead.</p>
 <p>We also have a GitHub workflow, named "Test latest release" in <code>.github/workflows/test-latest-release.yml</code>, that invokes those E2E tests on the latest release. This workflow can be triggered manually, and is also configured to run after completion of the workflow ("goreleaser") that publishes release artifacts.</p>
 <p>We will maintain a document that lists releases that pass our quality bar. The latest of those is thus the latest stable release. This document is updated in <code>main</code> as quality evaluations come in.</p>
@@ -2229,8 +2229,8 @@ clues about the problem.</p>
 <h3 id="deliberately-feature-incomplete-releases">Deliberately feature-incomplete releases<a class="headerlink" href="#deliberately-feature-incomplete-releases" title="Permanent link">#</a></h3>
 <p>We plan a few deliberately feature-incomplete releases. They will be regular releases as far as the technology here is concerned. They will be announced only to selected users who acknowledge that they are getting something that is incomplete. In GitHub, these will be marked as "pre-releases". The status of these releases will be made clear in their documentation (which currently appears in <a href="../release-notes/">the release notes</a>.</p>
 <h3 id="website_1">Website<a class="headerlink" href="#website_1" title="Permanent link">#</a></h3>
-<p>We aim to keep the documents viewable both through the website and GitHub's web UI for viewing files. We aim for all of the documentation to be reachable on the website and in the GitHub file UI starting from the repo's README.md.</p>
-<p>We create a release in the GitHub pages for every release. A patch release is a release. A test release is a release. Creating that GHP release is done by creating a git branch named <code>release-$version</code>.</p>
+<p>We aim to keep the documents viewable both through the website and GitHub's web UI for viewing files. We aim for all of the documentation to be reachable on the website and in the GitHub file UI starting from the repository's README.md.</p>
+<p>We create a release in the GitHub pages for every release. A patch release is a release. A test release is a release. Creating that GitHub pages release is done by creating a git branch named <code>release-$version</code>.</p>
 <h2 id="future-process-development">Future Process Development<a class="headerlink" href="#future-process-development" title="Permanent link">#</a></h2>
 <p>We intend to get rid of the self-reference in the KCM PCH, as follows. Define a Helm chart for installing the PCH. Update the release workflow to specialize that Helm chart, similarly to the specialization done for the KCM Helm chart.</p>
 <h2 id="open-questions">Open questions<a class="headerlink" href="#open-questions" title="Permanent link">#</a></h2>

@@ -2147,7 +2147,7 @@
 
 
 <h1 id="kubestellar-example-scenarios">KubeStellar Example Scenarios<a class="headerlink" href="#kubestellar-example-scenarios" title="Permanent link">#</a></h1>
-<p>This document shows some simple examples of using the release that contains this version of this document. These scenarios can be used to test a KubeSteller installation for proper functionality. Each scenario supposes that one ITS and one WDS have been created and two WECs have been created and registered. These scenarios are written as shell commands (bash or zsh). These commands assume that you have defined the following shell variables to convey the needed information about that ITS and WDS and those WECs.</p>
+<p>This document shows some simple examples of using the release that contains this version of this document. These scenarios can be used to test a KubeStellar installation for proper functionality. Each scenario supposes that one ITS and one WDS have been created and two WECs have been created and registered. These scenarios are written as shell commands (bash or zsh). These commands assume that you have defined the following shell variables to convey the needed information about that ITS and WDS and those WECs.</p>
 <ul>
 <li><code>host_context</code>: the name of the kubeconfig context to use when accessing the KubeFlex hosting cluster.</li>
 <li><code>its_cp</code>: the name of the KubeFlex control plane that is playing the role of ITS.</li>
@@ -2162,7 +2162,7 @@
 <p>Each example scenario concludes with instructions on how to undo its effects.</p>
 <p>There are also end-to-end (E2E) tests that are based on scenario 4 and an extended variant of scenario 1. These tests normally exercise the copy of the repo containing them (rather than a release). They can alternatively test a release. See the e2e tests (in <code>test/e2e</code>). Contributors can run these tests, and CI includes checking that these E2E tests pass. Some of these tests, and the setup for all of them, are written in <code>bash</code> so that contributors can easily follow them.</p>
 <h2 id="scenario-0-look-around">Scenario 0 - look around<a class="headerlink" href="#scenario-0-look-around" title="Permanent link">#</a></h2>
-<p>The following command will list all the <code>ManagedCluster</code> objects that will be reelvant to these scenarios.</p>
+<p>The following command will list all the <code>ManagedCluster</code> objects that will be relevant to these scenarios.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$its_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>managedclusters<span class="w"> </span>-l<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$label_query_both</span><span class="s2">&quot;</span>
 </code></pre></div>
 <p>Expect to get a listing of your two <code>ManagedCluster</code> objects.</p>
@@ -2277,7 +2277,7 @@ project.</p>
 <p>If desired, you may remove the <code>kubeflex-manager-cluster-admin-rolebinding</code> after
 the kubestellar-controller-manager is started, with the command
 <code>kubectl --context "$host_context" delete clusterrolebinding kubeflex-manager-cluster-admin-rolebinding</code></p>
-<p>Run the following comamand to give permission for the Klusterlet to
+<p>Run the following command to give permission for the klusterlet to
 operate on the appwrapper cluster resource.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">clusters</span><span class="o">=(</span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="o">)</span><span class="p">;</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">for</span><span class="w"> </span>cluster<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">clusters</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
@@ -2378,7 +2378,7 @@ for more details.</p>
 <a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>label<span class="w"> </span>ns<span class="w"> </span>postgres-system<span class="w"> </span>app.kubernetes.io/managed-by<span class="o">=</span>Helm<span class="w"> </span>app.kubernetes.io/instance<span class="o">=</span>postgres
 <a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>install<span class="w"> </span>-n<span class="w"> </span>postgres-system<span class="w"> </span>postgres<span class="w"> </span>oci://registry-1.docker.io/bitnamicharts/postgresql
 </code></pre></div>
-<p>Verify that statefulset has been created in both clusters</p>
+<p>Verify that <code>StatefulSet</code> has been created in both clusters</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>statefulsets<span class="w"> </span>-n<span class="w"> </span>postgres-system
 <a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>statefulsets<span class="w"> </span>-n<span class="w"> </span>postgres-system
 </code></pre></div>
@@ -2577,7 +2577,7 @@ create an app with the CLI)</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>deployments,sa,secrets
 <a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>deployments,sa,secrets
 </code></pre></div>
-<p>Repeat multiple syncing on Argo and verify that extra secrets for the service acccount
+<p>Repeat multiple syncing on Argo and verify that extra secrets for the service account
 are not created in the WDS and both clusters:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>secrets
 <a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>secrets

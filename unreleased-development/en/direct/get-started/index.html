@@ -2118,7 +2118,7 @@ commands tear down the state established by this quickstart.</p>
 <h2 id="create-and-register-two-workload-execution-clusters">Create and register two workload execution cluster(s)<a class="headerlink" href="#create-and-register-two-workload-execution-clusters" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE example-wecs.md -->
 <p>The following steps show how to create two new <code>kind</code> clusters and
- register them with the hub as descibed in the
+ register them with the hub as described in the
  <a href="https://open-cluster-management.io/getting-started/installation/start-the-control-plane/">official open cluster management docs</a>.</p>
 <p>Note that <code>kind</code> does not support three or more concurrent clusters unless you raise some limits as described in this <code>kind</code> "known issue": <a href="https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files">Pod errors due to “too many open files”</a>.</p>
 <ol>
@@ -2144,7 +2144,7 @@ commands tear down the state established by this quickstart.</p>
  Note that the CSRs condition is supposed to be <code>Pending</code> until you approve them in step 4.</p>
 </li>
 <li>
-<p>Once the CSRs are created approve the csrs to complete the cluster registration with the command:</p>
+<p>Once the CSRs are created, approve the CSRs complete the cluster registration with the command:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>cluster1
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>cluster2
 </code></pre></div>
@@ -2160,7 +2160,7 @@ commands tear down the state established by this quickstart.</p>
 <!-- END INCLUDE -->
 
 <h2 id="exercise-kubestellar">Exercise KubeStellar<a class="headerlink" href="#exercise-kubestellar" title="Permanent link">#</a></h2>
-<p>Proceed to Scenario 1 (multi-cluster workload deployment with kubectl) in <a href="../example-scenarios/">the example scenarios</a> after defining the shell variables that charaterize the setup done above. Following are setting for those variables, whose meanings are defined at the start of the example scenarios document.</p>
+<p>Proceed to Scenario 1 (multi-cluster workload deployment with kubectl) in <a href="../example-scenarios/">the example scenarios</a> after defining the shell variables that characterize the setup done above. Following are setting for those variables, whose meanings are defined at the start of the example scenarios document.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">host_context</span><span class="o">=</span>kind-kubeflex
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nv">its_cp</span><span class="o">=</span>its1
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nv">its_context</span><span class="o">=</span>its1

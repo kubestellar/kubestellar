@@ -1943,45 +1943,40 @@ Quay.io -->
 <p>You can do this either 1: from the kubestellar Github website using the "Fork" button or 2: by using the git fork command from your local git command line interface, such as git bash.</p>
 <p>copy the forked repo from Github to your local system by using the "git clone" command or by downloading the repository's zip file.</p>
 <p>In your new local forked repo, set upstream to kubestellar main</p>
-<p>check what your repo's remote settings are
+<p>check what your repository's remote settings are
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git remote -v
 </code></pre></div></p>
 <h3 id="set-upstream-to-use-kubestellar">Set upstream to use kubestellar:<a class="headerlink" href="#set-upstream-to-use-kubestellar" title="Permanent link">#</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git remote add upstream git@github.com:kubestellar/kubestellar.git
 </code></pre></div>
 <p>For example:
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>owner@BOOK-U0EMIUAFHD MINGW64 ~/src/edge-mc (main)
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a> git remote -v
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>origin  git@github.com:fileppb/edge-mc.git (fetch)
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>origin  git@github.com:fileppb/edge-mc.git (push)
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>owner@BOOK-U0EMIUAFHD MINGW64 ~/src/edge-mc (main)
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a> git remote add upstream git@github.com:kubestellar/kubestellar.git
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>owner@BOOK-U0EMIUAFHD MINGW64 ~/src/edge-mc (main)
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a> git remote -v
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>origin  git@github.com:fileppb/edge-mc.git (fetch)
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>origin  git@github.com:fileppb/edge-mc.git (push)
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>upstream        git@github.com:kubestellar/kubestellar.git (fetch)
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>upstream        git@github.com:kubestellar/kubestellar.git (push)
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>owner@BOOK-U0EMIUAFHD MINGW64 ~/src/edge-mc (main)
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a> git fetch upstream
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>Enter passphrase for key &#39;/c/Users/owner/.ssh/id_rsa&#39;:
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>remote: Enumerating objects: 60394, done.
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>remote: Counting objects: 100% (5568/5568), done.
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>remote: Compressing objects: 100% (255/255), done.
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>remote: Total 60394 (delta 4768), reused 5457 (delta 4706), pack-reused 54826
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>Receiving objects: 100% (60394/60394), 52.38 MiB | 3.25 MiB/s, done.
-<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>Resolving deltas: 100% (34496/34496), completed with 415 local objects.
-<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>
-<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>owner@BOOK-U0EMIUAFHD MINGW64 ~/src/edge-mc (main)
-<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a> git status
-<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>
-<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>On branch main
-<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>Your branch is up to date with &#39;origin/main&#39;.
-<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>
-<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>nothing to commit, working tree clean
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$ git remote -v
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>origin  git@github.com:fileppb/edge-mc.git (fetch)
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>origin  git@github.com:fileppb/edge-mc.git (push)
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>$ git remote add upstream git@github.com:kubestellar/kubestellar.git
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>$ git remote -v
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>origin  git@github.com:fileppb/edge-mc.git (fetch)
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>origin  git@github.com:fileppb/edge-mc.git (push)
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>upstream        git@github.com:kubestellar/kubestellar.git (fetch)
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>upstream        git@github.com:kubestellar/kubestellar.git (push)
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>$ git fetch upstream
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>Enter passphrase for key &#39;/c/Users/owner/.ssh/id_rsa&#39;:
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>remote: Enumerating objects: 60394, done.
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>remote: Counting objects: 100% (5568/5568), done.
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>remote: Compressing objects: 100% (255/255), done.
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>remote: Total 60394 (delta 4768), reused 5457 (delta 4706), pack-reused 54826
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>Receiving objects: 100% (60394/60394), 52.38 MiB | 3.25 MiB/s, done.
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>Resolving deltas: 100% (34496/34496), completed with 415 local objects.
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>$ git status
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>On branch main
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>Your branch is up to date with &#39;origin/main&#39;.
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>nothing to commit, working tree clean
 </code></pre></div></p>
 <h2 id="ongoing-contributions">Ongoing contributions<a class="headerlink" href="#ongoing-contributions" title="Permanent link">#</a></h2>
 <h3 id="prior-to-working-on-an-issue">Prior to working on an issue<a class="headerlink" href="#prior-to-working-on-an-issue" title="Permanent link">#</a></h3>
@@ -2004,7 +1999,7 @@ You can do this by opening your github repository page, check that the selected 
 1. use the "git log" command to see the history of commits to the branch
 2. Count the number of commits you want to squash
 3. use the "git rebase -i HEAD~n" where n is the number of commits you would like to squash together. (There are other ways to do this)
-4. The text editor you have configured to use with git should automagically open your source and you will see a list of commits preceded by "pick". Leaving the first "pick" as it is, replace the remaining "pick"s with "squash"es. 
+4. The text editor you have configured to use with git should automatically open your source and you will see a list of commits preceded by "pick". Leaving the first "pick" as it is, replace the remaining "pick"s with "squash"es. 
 5. Save the text file and exit the editor.
 6. The text editor will open again to let you edit comments for your new squashed commit.
 7. Make your edits if any and save and exit the file.
@@ -2036,7 +2031,7 @@ Your selected Action workflow will execute and the results will be available whe
 Add one of the listed emojis to the first character of the title of your new PR indicating the type of issue (bug fix, feature, etc)
 Complete the summary description field
 Complete the Related issue field by inserting the issue number preceded by the # character, for example "#1187"
-Decide whether this is a draft PR or if it's ready for review, and select the option you want by expanding on the Create Pull Reuest button.
+Decide whether this is a draft PR or if it's ready for review, and select the option you want by expanding on the Create Pull Request button.
 Assign a label to the PR from the available list of labels (a drop down list on the right side of the web page)</p>
 <p>Kubestellar CI pipeline:</p>
 <p>Prow (https://docs.prow.k8s.io/docs/overview/)</p>

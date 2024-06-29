@@ -2000,7 +2000,7 @@ SSL passthrough enabled.</p>
 </ul>
 <p>TODO: finish writing this subsection for real. Following are some clues.</p>
 <p>When everything runs on one machine, the defaults just work. When core and some WECs are on different machines, it gets more challenging. When the KubeFlex hosting cluster is an OpenShift cluster with a public domain name, the defaults just work.</p>
-<p>After the quickstart setup, I looked at an OCM Agent (klusterlet-agent, to be specifc) and did not find a clear passing of kubeconfig. I found adjacent Secrets holding kubeconfigs in which <code>cluster[0].cluster.server</code> was <code>https://kubeflex-control-plane:31048</code>. Note that <code>kubeflex-control-plane</code> is the name of the Docker container running <code>kind</code> cluster serving as KubeFlex hosting cluster. I could not find an explanation for the port number 31048; that Docker container maps port 443 inside to 9443 on the outside.</p>
+<p>After the quickstart setup, I looked at an OCM Agent (klusterlet-agent, to be specific) and did not find a clear passing of kubeconfig. I found adjacent Secrets holding kubeconfigs in which <code>cluster[0].cluster.server</code> was <code>https://kubeflex-control-plane:31048</code>. Note that <code>kubeflex-control-plane</code> is the name of the Docker container running <code>kind</code> cluster serving as KubeFlex hosting cluster. I could not find an explanation for the port number 31048; that Docker container maps port 443 inside to 9443 on the outside.</p>
 <p><code>kflex init</code> takes a command line flag <code>--domain string</code> described as <code>domain for FQDN (default "localtest.me")</code>.</p>
 <h2 id="creating-a-hosting-cluster">Creating a hosting cluster<a class="headerlink" href="#creating-a-hosting-cluster" title="Permanent link">#</a></h2>
 <p>Following are some ways to create a Kubernetes cluster that is suitable to use
@@ -2042,9 +2042,9 @@ as a KubeFlex hosting cluster. This is not an exhaustive list.</p>
 </li>
 <li>
 <p>Enable SSL passthrough:
-   We are using nginx ingress with tls passthru.
+   We are using nginx ingress with tls passthrough.
    The current install for kubeflex installs also nginx ingress but specifically for kind.
-   To specify passthru for K3D, edit the ingress placement controller with the following command and add <code>--enable-ssl-passthrough</code> to the list of args for the container
+   To specify passthrough for K3D, edit the ingress placement controller with the following command and add <code>--enable-ssl-passthrough</code> to the list of arguments for the container
     <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>edit<span class="w"> </span>deployment<span class="w"> </span>ingress-nginx-controller<span class="w"> </span>-n<span class="w"> </span>ingress-nginx<span class="w">  </span>
 </code></pre></div></p>
 </li>
