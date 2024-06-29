@@ -18,8 +18,9 @@ jobs:
     name: debug-event-contents
     runs-on: ubuntu-latest
     steps:
-      - run: echo "event name is:" ${{ github.event_name }} 
-      - run: echo "event type is:" ${{ github.event.action }} 
+      - run: echo event name is: ${{ github.event_name }}
+      - run: echo event type is: "${{ github.event.action }}"
+      - run: echo event type is: ${{ github.repository }}
 
   broken-links-crawler:
     name: broken-links-crawler
@@ -44,7 +45,6 @@ jobs:
       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
           website_url: https://docs.kubestellar.io/${{ steps.extract_branch.outputs.version }}
-          include_url_prefix: https://docs.kubestellar.io/${{ steps.extract_branch.outputs.vesion }}
           exclude_url_prefix: 'mailto:,https://drive.google.com'
           exclude_url_contained: '#__,/.,.svg'
           resolve_before_filtering: 'true'
