@@ -5,7 +5,7 @@ These notes are incomplete; as mentioned in the introduction, if you are interes
 ---
 
 
-Make sure all prerequisite are installed as described in [pre-reqs](pre-reqs.md).
+Make sure all prerequisites are installed as described in [pre-reqs](pre-reqs.md).
 
 ## Unit testing
 
