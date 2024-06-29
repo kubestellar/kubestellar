@@ -4,11 +4,9 @@ run-name: Broken Links Crawler - ${{ github.ref_name }}
 on:
   # So we can trigger manually if needed
   workflow_dispatch:
-  # To confirm any changes to docs build successfully, without deploying them
-  workflow_run:
-    workflows: ["Generate and push docs"]
-    types:
-      - completed
+
+  # Normal use is being called on a particular branch
+  workflow_call:
 
 permissions:
   contents: write
@@ -29,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - name: get workflow_dispatch branch name
+      - name: set variables and check timing
         shell: bash
         run: |
             branch="${GITHUB_REF##*/}"
@@ -45,12 +43,25 @@ jobs:
             fi
             site="${site,,}"
             echo "site=$site" >>$GITHUB_OUTPUT
+            echo "site=<$site> version=<$version>"
+            sleep 30
+            cat <<EOF
+            Because the website does not actually get updated until after the
+            completion of an asynchronous workflow named
+            'pages build and deployment', you should check that the website was
+            updated after that workflow started.
+            BTW, the time is now $(date).
+            Following is the last run of 'pages build and deployment';
+            note created_at and updated_at.
+            EOF
+            curl -L -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?per_page=10" | jq '[ .workflow_runs[] | select(.name == "pages build and deployment") ] | .[0]'
+            echo "HEAD of https://${site}/${version}/ (compare last-modified):"
+            curl -IL "https://${site}/${version}/"
 
         id: extract_branch
         if: github.event_name != 'pull_request' && github.event_name != 'push'
-#         run: echo workflow_dispatch - running on branch ${GITHUB_REF##*/}
 
-      - name: echo workflow_dispatch branch name
+      - name: echo workflow_dispatch branch name et cetera
         run: |
             echo workflow_dispatch - runhing on site ${{ steps.extract_branch.outputs.site }}
             echo workflow_dispatch - running on branch ${{ steps.extract_branch.outputs.branch }}

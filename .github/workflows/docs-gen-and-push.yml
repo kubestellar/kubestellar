@@ -55,3 +55,7 @@ jobs:
           cache: 'pip'
 
       - run: make deploy-docs
+
+  call-crawl:
+    needs: generate-and-push
+    uses: ./.github/workflows/broken-links-crawler.yml
