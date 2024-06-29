@@ -8,7 +8,7 @@ The information provided is specific for the following release:
 export KUBESTELLAR_VERSION={{ config.ks_latest_release }}
 ```
 
-## Pre-requisites
+## Prerequisites
 
 In this exxample we assume to have two Raspberry Pi running a MicroShift cluster. Detailed informations on how to setup MicroShift on the Raspberry Pi can be found [here](https://community.ibm.com/community/user/cloud/blogs/alexei-karve/2021/11/28/microshift-4). The first Raspberry Pi (_e.g._, core.local) will be used to deploy the KubeStellar Core, while the second Raspberry Pi (_e.g._, wec.local) will be used as a Workload Execution Cluster.
 

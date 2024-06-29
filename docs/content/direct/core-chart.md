@@ -17,7 +17,7 @@ The information provided is specific for the following release:
 export KUBESTELLAR_VERSION={{ config.ks_latest_release }}
 ```
 
-## Pre-requisites
+## Prerequisites
 
 To install the Helm chart the only requirement is [Helm](https://helm.sh/).
 However, additional executables may be required to create/manage the cluster(s) (_e.g._, Kind and kubectl),

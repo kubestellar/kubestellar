@@ -191,21 +191,21 @@ if [ "$list" == "true" ]; then
 fi
 
 if [ ${#programs[@]} -eq 0 ]; then
-    echo "Checking pre-requisites for using KubeStellar:"
+    echo "Checking prerequisites for using KubeStellar:"
     is_installed_docker
     is_installed_kubectl
     is_installed_kflex
     is_installed_ocm
     is_installed_helm
-    echo "Checking additional pre-requisites for running the examples:"
+    echo "Checking additional prerequisites for running the examples:"
     is_installed_kind
     is_installed_argo
-    echo "Checking pre-requisites for building KubeStellar:"
+    echo "Checking prerequisites for building KubeStellar:"
     is_installed_make
     is_installed_go
     is_installed_ko
 else
-    echov "Checking pre-requisites for KubeStellar:"
+    echov "Checking prerequisites for KubeStellar:"
     for p in ${programs[@]} ; do
         eval "is_installed_$p"
     done
