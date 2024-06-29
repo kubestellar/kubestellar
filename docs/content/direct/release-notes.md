@@ -14,7 +14,7 @@ This release also features better observability (`/metrics` and `/debug/pprof`) 
 
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
-* Objects on two different WDSs shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 
 ## 0.22.0 and its release candidates
 
@@ -35,7 +35,7 @@ See [the changelogs on GitHub](https://github.com/kubestellar/kubestellar/releas
 
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
-* Objects on two different WDSs shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 
 
 ## 0.21.2 and its release candidates
@@ -64,14 +64,14 @@ This release mainly updates the documentation exposed under kubestellar.io.
 
 * Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
-* Objects on two different WDSs shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 
 ## 0.20.0 and its release candidates
 
 * Dynamic changes to WECs are not supported. Existing ManifestWorks will not be updated when new WECs are added or when labels are added/deleted on existing WECs
 * Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
-* Objects on two different WDSs shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 * An update to a workload object that removes some BindingPolicies from the matching set is not handled correctly.
 * Some operations are not handled correctly while the controller is down:
    * If a workload object is deleted, or changed to remove some BindingPolicies from the matching set, it will not be handled correctly.

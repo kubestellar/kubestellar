@@ -24,6 +24,7 @@ Aleksander
 Andrey
 Ansible
 AppWrapper
+AppliedManifestWork
 ArgoCD
 Ayoub
 Backend
@@ -80,7 +81,7 @@ Deployers
 DeprecatedClusterName
 Dettori
 DevOpsCube
-Devops
+DevOps
 Dockerfile
 Downsync
 Downsyncing
@@ -98,6 +99,7 @@ EdgeSyncConfig
 EdgeSyncConfigs
 EdgeV
 Effi
+Enqueues
 FieldsType
 FieldsV
 Filepp
@@ -113,6 +115,7 @@ GoDaddy
 Goessner
 Grafana
 GroupResource
+GVR
 HOSTTYPE
 HomeBrew
 HorizontalPodAutoscaler
@@ -137,6 +140,7 @@ Karve
 Keypair
 Kube
 KubeFlex
+KubeFlex's
 KubeFlow
 KubeStellar
 KubeStellar's
@@ -156,6 +160,8 @@ MERCHANTABILITY
 MVI
 MacOS
 Makefile
+ManagedCluster
+ManagedClusters
 ManagedFields
 ManifestWork
 ManifestWorks
@@ -178,6 +184,7 @@ NewReplicaSetAvailable
 Nir
 OCI
 OCM
+OCM's
 OCP
 OLM
 OSA
@@ -216,7 +223,9 @@ PriorityClass
 PriorityLevelConfiguration
 Pygments
 QEMU
+QPS
 QuickStart
+RandomizedLoad
 RBAC
 README
 RHEL
@@ -251,6 +260,7 @@ Spreitzer
 StatefulSet
 StatusSummary
 Stellari
+SteppedLoad
 StorageClass
 SubjectAccessReview
 SubjectAlternativeName
@@ -285,6 +295,7 @@ VolumeAttachment
 WDS
 WDSes
 WEC
+WEC's
 WECs
 WMW
 WMWs
@@ -316,6 +327,7 @@ apis
 apiserver
 apiwatch
 appVersion
+appliedmanifestworks
 approvers
 appwrapper
 appwrappers
@@ -347,6 +359,7 @@ clusterSelectors
 clusterType
 clusteradm
 clusterid
+clusterloader
 clustermetrics
 clusterrole
 clusterrolebinding
@@ -365,6 +378,7 @@ configmap
 configmaps
 configs
 containerPort
+controlplane
 coredns
 cosmo
 cpumemload
@@ -379,6 +393,7 @@ crontabs
 crt
 css
 csv
+ctName
 customizer
 darwin
 denature
@@ -405,6 +420,10 @@ edgesyncer
 ef
 egrep
 enablement
+enqueue
+enqueued
+enqueues
+enqueuing
 env
 envar
 esac
@@ -420,6 +439,7 @@ faq
 fi
 fileppb
 filesystem
+finalizer
 flowcontrol
 francostellari
 fullyLabeledReplicas
@@ -438,10 +458,12 @@ golang
 googlegroups
 goreleaser
 goroutine
+goroutines
 gpg
 grafana
 groupPriorityMinimum
 gz
+hashmap
 hl
 homebrew
 hostContainer
@@ -462,6 +484,7 @@ inspectable
 installPostgreSQL
 instanceSelector
 integrations
+invariants
 io
 ipaddr
 ipport
@@ -492,11 +515,14 @@ lastTransitionTime
 lastUpdateTime
 lgtm
 licensable
+lifecycle
 limitranges
 linenums
 linkTitle
 linkedin
 linux
+lister
+listers
 loc
 localhost
 localtest
@@ -509,6 +535,7 @@ manifestworks
 matchLabels
 mb
 md
+metav
 mishi
 mixup
 mkdocs
@@ -516,6 +543,7 @@ moby
 mountPath
 mspreitz
 multicast
+multicloud
 multicluster
 namespace
 namespaceScope
@@ -533,6 +561,7 @@ ns
 nslookup
 num
 objectNames
+objectSelector
 objectSelectors
 observability
 observedGeneration
@@ -558,6 +587,7 @@ policyreports
 popd
 pprof
 pre
+prereqs
 programmatically
 prometheus
 provisioner
@@ -586,6 +616,7 @@ req
 reqs
 resolver's
 resourceNames
+resourceStatus
 resourceVersion
 resourcequotas
 rmi
@@ -682,6 +713,8 @@ william
 wmw
 workspace
 workspaces
+workstatus
+workstatuses
 wrt
 ws
 www
