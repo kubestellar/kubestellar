@@ -182,19 +182,21 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	go c.runWorkStatusInformer(ctx)
 
 	ksInformerFactory := ksinformers.NewSharedInformerFactory(c.wdsKsClient, defaultResyncPeriod)
-	if err := c.setupStatusCollectorInformer(ctx, ksInformerFactory); err != nil {
-		return err
-	}
-	if err := c.setupCombinedStatusInformer(ctx, ksInformerFactory); err != nil {
-		return err
-	}
+	// if err := c.setupStatusCollectorInformer(ctx, ksInformerFactory); err != nil {
+	// 	return err
+	// }
+	// if err := c.setupCombinedStatusInformer(ctx, ksInformerFactory); err != nil {
+	// 	return err
+	// }
 	ksInformerFactory.Start(ctx.Done())
-	if ok := cache.WaitForCacheSync(ctx.Done(), c.statusCollectorInformer.HasSynced, c.combinedStatusInformer.HasSynced); !ok {
-		return fmt.Errorf("failed to wait for KubeStellar informers to sync")
-	}
+	// if ok := cache.WaitForCacheSync(ctx.Done(), c.statusCollectorInformer.HasSynced, c.combinedStatusInformer.HasSynced); !ok {
+	// 	return fmt.Errorf("failed to wait for KubeStellar informers to sync")
+	// }
 
 	c.listers = (<-cListers).(util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister])
 	c.logger.Info("Received listers")
+
+	c.initSingletonState(ctx)
 
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
@@ -417,6 +419,8 @@ func (c *Controller) reconcile(ctx context.Context, item any) error {
 	logger := klog.FromContext(ctx)
 
 	switch ref := item.(type) {
+	case *workStatusRef:
+		return c.reconcileSingletonByWs(ctx, *ref)
 	case workStatusRef:
 		return c.syncWorkStatus(ctx, ref)
 	case bindingRef:
