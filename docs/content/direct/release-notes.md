@@ -2,6 +2,16 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.23.1
+
+The main change from 0.23.0 is a re-organization of the website, which is still a work in progress, and archival of all website content that is outdated.
+
+### Remaining limitations in 0.23.1
+
+* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+
 ## 0.23.0 and its release candidates
 
 The main change is introduction of the an all-in-one chart, called the core chart, for installing KubeStellar in a given hosting cluster and creating an initial set of WDSes and ITSes.
