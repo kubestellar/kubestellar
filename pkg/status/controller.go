@@ -155,7 +155,7 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 			if shouldSkipDelete(obj) {
 				return
 			}
-			c.handleObject(obj)
+			c.handleObjectDeletion(obj)
 		},
 	})
 
@@ -189,6 +189,14 @@ func (c *Controller) handleObject(obj any) {
 	c.enqueueObject(obj)
 }
 
+// handleObjectDeletion is like handleObject except that handleObjectDeletion calls
+// enqueueObjectDeletion instead of enqueueObject
+func (c *Controller) handleObjectDeletion(obj any) {
+	rObj := obj.(runtime.Object)
+	c.logger.V(4).Info("Got object deletion event", "obj", util.RefToRuntimeObj(rObj))
+	c.enqueueObjectDeletion(obj)
+}
+
 // enqueueObject generates key and put it onto the work queue.
 func (c *Controller) enqueueObject(obj interface{}) {
 	ref, err := cache.ObjectToName(obj)
@@ -197,6 +205,12 @@ func (c *Controller) enqueueObject(obj interface{}) {
 		return
 	}
 	c.workqueue.Add(ref)
+}
+
+// enqueueObjectDeletion is like enqueueObject except that enqueueObjectDeletion
+// puts the full object instead of its reference into the work queue.
+func (c *Controller) enqueueObjectDeletion(obj interface{}) {
+	c.workqueue.Add(obj)
 }
 
 // runWorker is a long-running function that will continually call the
@@ -228,25 +242,35 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 		// We expect a cache.ObjectName to come off the workqueue. We do this as the delayed
 		// nature of the workqueue means the items in the informer cache may actually be
 		// more up to date that when the item was initially put onto the
-		// workqueue.
-		ref, ok := obj.(cache.ObjectName)
-		if !ok {
-			// if the item in the workqueue is invalid, we call
-			// Forget here to avoid process a work item that is invalid.
+		// workqueue. With the exception that the object is being deleted.
+		if ref, ok := obj.(cache.ObjectName); ok {
+			if err := c.reconcile(ctx, ref); err != nil {
+				// Put the item back on the workqueue to handle any transient errors.
+				c.workqueue.AddRateLimited(obj)
+				return fmt.Errorf("error syncing key '%s': %s, requeuing", obj, err.Error())
+			}
+			// If no error occurs we Forget this item so it does not
+			// get queued again until another change happens.
 			c.workqueue.Forget(obj)
-			utilruntime.HandleError(fmt.Errorf("expected a string key in the workqueue but got %#v", obj))
+			c.logger.V(2).Info("Successfully synced", "obj", obj)
 			return nil
 		}
-		// Run the reconciler, passing it the full key or the metav1 Object
-		if err := c.reconcile(ctx, ref); err != nil {
-			// Put the item back on the workqueue to handle any transient errors.
-			c.workqueue.AddRateLimited(obj)
-			return fmt.Errorf("error syncing key '%s': %s, requeuing", obj, err.Error())
+
+		// Object is being deleted.
+		if full, ok := obj.(runtime.Object); ok {
+			if err := c.reconcileDeletion(ctx, full); err != nil {
+				c.workqueue.AddRateLimited(obj)
+				return fmt.Errorf("error syncing deletion of %s: %s, requeuing", util.RefToRuntimeObj(full), err.Error())
+			}
+			c.workqueue.Forget(obj)
+			c.logger.V(2).Info("Successfully synced deletion", "obj", util.RefToRuntimeObj(full))
+			return nil
 		}
-		// Finally, if no error occurs we Forget this item so it does not
-		// get queued again until another change happens.
+
+		// If the item in the workqueue is invalid, we call
+		// Forget here to avoid processing a work item that is invalid.
 		c.workqueue.Forget(obj)
-		c.logger.V(2).Info("Successfully synced", "object", obj)
+		utilruntime.HandleError(fmt.Errorf("got unexpected item from workqueue %#v", obj))
 		return nil
 	}(obj)
 
@@ -294,6 +318,28 @@ func (c *Controller) reconcile(ctx context.Context, ref cache.ObjectName) error 
 
 	c.logger.Info("updating singleton status", "kind", sourceRef.Kind, "name", sourceRef.Name, "namespace", sourceRef.Namespace)
 	return updateObjectStatus(ctx, sourceRef, status, c.listers, c.wdsDynClient)
+}
+
+// reconcileDeletion needs a full WorkStatus object instead of cache.ObjectName, because
+// (a) on WorkStatus object deletion, the controller may need to cleanup the status
+// of the corresponding workload object in WDS; and
+// (b) the corresponding workload object is tracked in the spec of the WorkStatus object.
+func (c *Controller) reconcileDeletion(ctx context.Context, full runtime.Object) error {
+	sourceRef, err := util.GetWorkStatusSourceRef(full)
+	if err != nil {
+		return err
+	}
+
+	statusLabelVal, ok := full.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]
+	if !ok {
+		return nil
+	}
+
+	if statusLabelVal == util.BindingPolicyLabelSingletonStatusValueSet {
+		emptyStatus := make(map[string]interface{})
+		return updateObjectStatus(ctx, sourceRef, emptyStatus, c.listers, c.wdsDynClient)
+	}
+	return nil
 }
 
 func updateObjectStatus(ctx context.Context, objRef *util.SourceRef, status map[string]interface{},
