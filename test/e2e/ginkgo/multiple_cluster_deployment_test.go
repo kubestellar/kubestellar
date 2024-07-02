@@ -129,6 +129,46 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 		})
 
+		ginkgo.It("shards a binding object when needed", func() {
+			util.DeleteDeployment(ctx, wds, ns, "nginx")
+			ginkgo.DeferCleanup(func() {
+				patch := []byte(`{"spec":{"template":{"spec":{"containers":[{"args":["--max-size-wrapped-object=512000","--transport-kubeconfig=/mnt/shared/transport-kubeconfig","--wds-kubeconfig=/mnt/shared/wds-kubeconfig","--wds-name=wds1","-v=4"],"name":"transport-controller"}]}}}}`)
+				_, err := coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "transport-controller", types.StrategicMergePatchType, patch, metav1.PatchOptions{})
+				gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+			})
+			ginkgo.By("set max size of wrapped object to 1000 bytes")
+			patch := []byte(`{"spec":{"template":{"spec":{"containers":[{"args":["--max-size-wrapped-object=1000","--transport-kubeconfig=/mnt/shared/transport-kubeconfig","--wds-kubeconfig=/mnt/shared/wds-kubeconfig","--wds-name=wds1","-v=4"],"name":"transport-controller"}]}}}}`)
+			_, err := coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "transport-controller", types.StrategicMergePatchType, patch, metav1.PatchOptions{})
+			gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+			var names = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
+			for _, i := range names {
+				util.CreateDeployment(ctx, wds, ns, i,
+					map[string]string{
+						"label1": "test1",
+					})
+			}
+			util.CreateBindingPolicy(ctx, ksWds, "multipledep",
+				[]metav1.LabelSelector{
+					{MatchLabels: map[string]string{"name": "cluster1"}},
+				},
+				[]ksapi.DownsyncObjectTest{
+					{ObjectSelectors: []metav1.LabelSelector{
+						{MatchLabels: map[string]string{
+							"label1": "test1",
+						}},
+					}}})
+
+			util.ValidateNumDeployments(ctx, wec1, ns, 10)
+			util.ValidateNumDeployments(ctx, wec2, ns, 0)
+
+			ginkgo.By("test that sharded manifestworks are properly deleted and recreated")
+			patch = []byte(`{"spec": {"clusterSelectors": [{"matchLabels": {"name": "cluster2"}}]}}`)
+			_, err = ksWds.ControlV1alpha1().BindingPolicies().Patch(ctx, "multipledep", types.MergePatchType, patch, metav1.PatchOptions{})
+			gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+			util.ValidateNumDeployments(ctx, wec1, ns, 0)
+			util.ValidateNumDeployments(ctx, wec2, ns, 10)
+		})
+
 		// 1. Create object 1 with label A and label B, object 2 with label B,
 		// and a Placement that matches labels A AND B, and verify that only
 		// object 1 matches and is delivered.

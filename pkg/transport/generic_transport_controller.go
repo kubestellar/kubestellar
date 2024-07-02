@@ -28,7 +28,6 @@ import (
 	clusterlisters "open-cluster-management.io/api/client/cluster/listers/cluster/v1"
 
 	corev1 "k8s.io/api/core/v1"
-	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -93,13 +92,13 @@ func NewTransportController(ctx context.Context,
 	propCfgMapPreInformer corev1informers.ConfigMapInformer,
 	transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface,
-	wdsName string) (*genericTransportController, error) {
+	maxSizeWrappedObject int, wdsName string) (*genericTransportController, error) {
 	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
 	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
 	}
-	return NewTransportControllerForWrappedObjectGVR(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer, bindingClient, bindingInformer, customTransformInformer, transport, wdsClientset, wdsDynamicClient, itsNSClient, propCfgMapPreInformer, transportDynamicClient, wdsName, wrappedObjectGVR), nil
+	return NewTransportControllerForWrappedObjectGVR(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer, bindingClient, bindingInformer, customTransformInformer, transport, wdsClientset, wdsDynamicClient, itsNSClient, propCfgMapPreInformer, transportDynamicClient, maxSizeWrappedObject, wdsName, wrappedObjectGVR), nil
 }
 
 // NewTransportControllerForWrappedObjectGVR returns a new transport controller.
@@ -116,6 +115,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 	itsNSClient corev1client.NamespaceInterface,
 	propCfgMapPreInformer corev1informers.ConfigMapInformer,
 	transportDynamicClient dynamic.Interface,
+	maxSizeWrappedObject int,
 	wdsName string, wrappedObjectGVR schema.GroupVersionResource) *genericTransportController {
 	measuredBindingClient := ksmetrics.NewWrappedClusterScopedClient[*v1alpha1.Binding, *v1alpha1.BindingList](wdsClientMetrics, util.GetBindingGVR(), bindingClient)
 	measuredWDSDynamicClient := ksmetrics.NewWrappedDynamicClient(wdsClientMetrics, wdsDynamicClient)
@@ -176,6 +176,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 		transportClient:              measuredITSDynamicClient,
 		wrappedObjectGVR:             wrappedObjectGVR,
 		wdsDynamicClient:             measuredWDSDynamicClient,
+		MaxSizeWrappedObject:         maxSizeWrappedObject,
 		wdsName:                      wdsName,
 		bindingSensitiveDestinations: make(map[string]sets.Set[v1alpha1.Destination]),
 		destinationProperties:        make(map[v1alpha1.Destination]clusterProperties),
@@ -341,8 +342,9 @@ type genericTransportController struct {
 	transportClient  dynamic.Interface // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
-	wdsDynamicClient dynamic.Interface
-	wdsName          string
+	wdsDynamicClient     dynamic.Interface
+	MaxSizeWrappedObject int
+	wdsName              string
 
 	customTransformCollection customTransformCollection
 
@@ -734,7 +736,8 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 //     the function has no answer for the given destination.
 //   - the slice of strings describing user errors in the Binding.
 //   - an error if something transient went wrong.
-func (c *genericTransportController) computeDestToWrappedObjects(ctx context.Context, binding *v1alpha1.Binding) (func(v1alpha1.Destination) (*unstructured.Unstructured, bool), []string, sets.Set[metav1.GroupResource], error) {
+func (c *genericTransportController) computeDestToWrappedObjects(ctx context.Context, binding *v1alpha1.Binding) (
+	func(v1alpha1.Destination) ([]*unstructured.Unstructured, bool), []string, sets.Set[metav1.GroupResource], error) {
 	objectsToPropagate, grs, err := c.getObjectsFromWDS(ctx, binding)
 	if err != nil {
 		return nil, nil, grs, fmt.Errorf("failed to get objects to propagate to WECs from Binding object '%s' - %w", binding.GetName(), err)
@@ -747,10 +750,10 @@ func (c *genericTransportController) computeDestToWrappedObjects(ctx context.Con
 	destToCustomizedObjects, bindingErrors := c.computeDestToCustomizedObjects(objectsToPropagate, binding)
 
 	// This will be constant if no object needed customization, otherwise a map's get func
-	var destToWrappedObject func(v1alpha1.Destination) (*unstructured.Unstructured, bool)
+	var destToWrappedObject func(v1alpha1.Destination) ([]*unstructured.Unstructured, bool)
 
 	if destToCustomizedObjects != nil {
-		asMap := map[v1alpha1.Destination]*unstructured.Unstructured{}
+		asMap := map[v1alpha1.Destination][]*unstructured.Unstructured{}
 		for dest, objects := range destToCustomizedObjects {
 			wrappedObject, err := c.wrap(objects, binding)
 			if err != nil {
@@ -764,7 +767,7 @@ func (c *genericTransportController) computeDestToWrappedObjects(ctx context.Con
 		if err != nil {
 			return nil, nil, grs, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 		}
-		destToWrappedObject = func(v1alpha1.Destination) (*unstructured.Unstructured, bool) { return wrappedObject, true }
+		destToWrappedObject = func(v1alpha1.Destination) ([]*unstructured.Unstructured, bool) { return wrappedObject, true }
 	}
 
 	return destToWrappedObject, bindingErrors, grs, nil
@@ -831,20 +834,64 @@ func (c *genericTransportController) computeDestToCustomizedObjects(objectsToPro
 	return destToCustomizedObjects, bindingErrors
 }
 
-func (c *genericTransportController) wrap(objectsToPropagate []*unstructured.Unstructured, binding *v1alpha1.Binding) (*unstructured.Unstructured, error) {
-	wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(objectsToPropagate))
+func (c *genericTransportController) wrapBatch(batchToPropagate []*unstructured.Unstructured, binding *v1alpha1.Binding, numShard int, isSharded bool) (*unstructured.Unstructured, error) {
+	wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(batchToPropagate))
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 	}
-	// wrapped object name is (Binding.GetName()-WdsName).
+	// wrapped object name is (Binding.GetName()-WdsName) or (Binding.GetName()-WdsName-numShard).
 	// pay attention - we cannot use the Binding object name, cause we might have duplicate names coming from different WDS spaces.
 	// we add WdsName to the object name to assure name uniqueness,
 	// in order to easily get the origin Binding object name and wds, we add it as an annotations.
-	wrappedObject.SetName(fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName))
+	if isSharded {
+		wrappedObject.SetName(fmt.Sprintf("%s-%s-%d", binding.GetName(), c.wdsName, numShard))
+	} else {
+		wrappedObject.SetName(fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName))
+	}
 	setLabel(wrappedObject, originOwnerReferenceLabel, binding.GetName())
 	setLabel(wrappedObject, originWdsLabel, c.wdsName)
 	setAnnotation(wrappedObject, originOwnerGenerationAnnotation, binding.GetGeneration())
-	return wrappedObject, nil
+	return wrappedObject, err
+}
+
+func (c *genericTransportController) wrap(objectsToPropagate []*unstructured.Unstructured, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
+	var wrappedObjects []*unstructured.Unstructured
+	var batchToPropagate []*unstructured.Unstructured = nil
+	maxBatchSize := c.MaxSizeWrappedObject
+	isSharded := false
+	numShard := 0
+	var batchSize int = 0
+	for _, obj := range objectsToPropagate {
+		bytes, err := obj.MarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		objSize := len(bytes)
+		if objSize > maxBatchSize {
+			return nil, fmt.Errorf("failed to wrap object that is larger than max size")
+		}
+		if objSize+batchSize >= maxBatchSize {
+			isSharded = true
+			wrappedObject, err := c.wrapBatch(batchToPropagate, binding, numShard, isSharded)
+			if err != nil {
+				return nil, err
+			}
+			numShard += 1
+			wrappedObjects = append(wrappedObjects, wrappedObject)
+			batchToPropagate = nil
+			batchSize = 0
+		}
+		batchToPropagate = append(batchToPropagate, obj)
+		batchSize += objSize
+	}
+	if batchToPropagate != nil {
+		wrappedObject, err := c.wrapBatch(batchToPropagate, binding, numShard, isSharded)
+		if err != nil {
+			return nil, err
+		}
+		wrappedObjects = append(wrappedObjects, wrappedObject)
+	}
+	return wrappedObjects, nil
 }
 
 // getPropertiesForDestination returns the properties to use for the given destination and notes
@@ -949,7 +996,7 @@ func (c *genericTransportController) customizeForDestination(object *unstructure
 	return object, nil, false
 }
 
-func (c *genericTransportController) propagateWrappedObjectToClusters(ctx context.Context, destToDesiredWrappedObject func(v1alpha1.Destination) (*unstructured.Unstructured, bool),
+func (c *genericTransportController) propagateWrappedObjectToClusters(ctx context.Context, destToDesiredWrappedObject func(v1alpha1.Destination) ([]*unstructured.Unstructured, bool),
 	currentWrappedObjectList *unstructured.UnstructuredList, destinations []v1alpha1.Destination, broken bool) error {
 	// if the desired wrapped object is nil, that means we should not propagate this object.
 	// this may happen when the workload section is empty.
@@ -960,17 +1007,37 @@ func (c *genericTransportController) propagateWrappedObjectToClusters(ctx contex
 	}
 
 	for _, destination := range destinations {
-		currentWrappedObject := c.popWrappedObjectByNamespace(currentWrappedObjectList, destination.ClusterId)
-		if broken {
-			continue
-		}
-		desiredWrappedObject, _ := destToDesiredWrappedObject(destination)
-		if currentWrappedObject != nil && apiequality.Semantic.DeepEqual(currentWrappedObject.UnstructuredContent(), desiredWrappedObject.UnstructuredContent()) {
-			continue // current wrapped object is already in the desired state
-		}
-		// othereise, need to create or update the wrapped object
-		if err := c.createOrUpdateWrappedObject(ctx, destination.ClusterId, desiredWrappedObject); err != nil {
-			return fmt.Errorf("failed to propagate wrapped object to cluster mailbox namespace '%s' - %w", destination.ClusterId, err)
+		// Loop until popWrappedObjectByNamespace returns nil, in case the manifestwork is sharded.
+		for {
+			currentWrappedObject := c.popWrappedObjectByNamespace(currentWrappedObjectList, destination.ClusterId)
+			if broken {
+				continue
+			}
+
+			foundMatch := false
+			desiredWrappedObjects, _ := destToDesiredWrappedObject(destination)
+			if currentWrappedObject != nil {
+				for _, desiredWrappedObject := range desiredWrappedObjects {
+					// Can't use apiequality.Semantic.DeepEqual to compare the two objects
+					if currentWrappedObject.GetAnnotations() != nil &&
+						currentWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] == desiredWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] {
+						foundMatch = true
+						break
+					}
+				}
+			}
+			if foundMatch {
+				continue
+			}
+			// othereise, need to create or update the wrapped objects
+			for _, desiredWrappedObject := range desiredWrappedObjects {
+				if err := c.createOrUpdateWrappedObject(ctx, destination.ClusterId, desiredWrappedObject); err != nil {
+					return fmt.Errorf("failed to propagate wrapped object to cluster mailbox namespace '%s' - %w", destination.ClusterId, err)
+				}
+			}
+			if currentWrappedObject == nil {
+				break
+			}
 		}
 	}
 
