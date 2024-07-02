@@ -51,7 +51,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			return fmt.Errorf("failed to get workstatus (%v): %w", ref, err)
-		}
+		} // if not found, the above workstatus will reflect the fact
 	} else {
 		status, err := util.GetWorkStatusStatus(obj)
 		if err != nil {

@@ -17,17 +17,21 @@ limitations under the License.
 package status
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 
 	"github.com/google/cel-go/common/types/ref"
 
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
+
+const nilValue = "nil"
 
 // combinedStatusResolution is a struct that represents the resolution of a
 // combinedstatus. A combinedstatus resolution is associated with a (binding,
@@ -52,10 +56,9 @@ import (
 type combinedStatusResolution struct {
 	sync.RWMutex
 
+	name string
 	// statusCollectorNameToData is a map of status collector names to
 	// their corresponding data.
-	// If a status collector name is mapped to nil, it means that the status
-	// collector has not been processed.
 	statusCollectorNameToData map[string]*statusCollectorData
 	// collectionDestinations is a set of destinations that are expected to be
 	// collected from.
@@ -91,6 +94,13 @@ type workStatusData struct {
 	combinedFieldsEval map[string]ref.Val
 
 	selectEval map[string]ref.Val
+}
+
+func (c *combinedStatusResolution) getName() string {
+	c.RLock()
+	defer c.RUnlock()
+
+	return c.name
 }
 
 // setCollectionDestinations sets the collection destinations of the
@@ -216,11 +226,93 @@ func (c *combinedStatusResolution) removeStatusCollector(statusCollectorName str
 	return true
 }
 
+func (c *combinedStatusResolution) isEmpty() bool {
+	c.RLock()
+	defer c.RUnlock()
+
+	if len(c.statusCollectorNameToData) == 0 {
+		return true
+	}
+
+	for _, scData := range c.statusCollectorNameToData {
+		if len(scData.wecToData) > 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
 // generateCombinedStatus calculates the combinedstatus from the statuscollector
 // data in the combinedstatus resolution.
 func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 	workloadObjectIdentifier util.ObjectIdentifier) *v1alpha1.CombinedStatus {
-	return nil // TODO
+	c.RLock()
+	defer c.RUnlock()
+
+	combinedStatus := &v1alpha1.CombinedStatus{
+		ObjectMeta: v1.ObjectMeta{Name: "TODO",
+			Namespace: workloadObjectIdentifier.ObjectName.Namespace},
+		Results: make([]v1alpha1.NamedStatusCombination, 0, len(c.statusCollectorNameToData)),
+	}
+
+	for scName, scData := range c.statusCollectorNameToData {
+		// the data has either select or combinedFields (with groupBy)
+		if len(scData.Select) > 0 {
+			namedStatusCombination := v1alpha1.NamedStatusCombination{
+				Name:        scName,
+				ColumnNames: make([]string, 0, len(scData.Select)+1), // for now, manually add wecName to all rows
+				Rows:        make([]v1alpha1.StatusCombinationRow, 0, len(scData.wecToData)),
+			}
+
+			namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames, "wecName")
+
+			for _, selectNamedExp := range scData.Select {
+				namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames, selectNamedExp.Name)
+				for wecName, wsData := range scData.wecToData {
+					row := v1alpha1.StatusCombinationRow{
+						Columns: make([]v1alpha1.Value, 0, len(scData.Select)+1),
+					}
+
+					row.Columns = append(row.Columns, v1alpha1.Value{
+						Type: v1alpha1.TypeString,
+						Data: &v1alpha1.Data{
+							RawMessage: json.RawMessage(wecName),
+						},
+					})
+
+					for _, selectNamedExp := range scData.Select {
+						eval := wsData.selectEval[selectNamedExp.Name]
+						if eval == nil {
+							row.Columns = append(row.Columns, v1alpha1.Value{
+								Type: v1alpha1.TypeNull})
+							continue
+						}
+
+						evalJSON, err := json.Marshal(eval.Value())
+						if err != nil {
+							runtime2.HandleError(fmt.Errorf("failed to marshal select evaluation: %w", err))
+							row.Columns = append(row.Columns, v1alpha1.Value{
+								Type: v1alpha1.TypeNull})
+							continue
+						}
+
+						row.Columns = append(row.Columns, v1alpha1.Value{
+							Type: v1alpha1.TypeString,
+							Data: &v1alpha1.Data{
+								RawMessage: json.RawMessage(evalJSON)}})
+					}
+				}
+			}
+
+			combinedStatus.Results = append(combinedStatus.Results, namedStatusCombination)
+			continue
+		}
+
+		// aggregation, TODO
+	}
+
+	return combinedStatus
 }
 
 func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.CombinedStatus) bool {

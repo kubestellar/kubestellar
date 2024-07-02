@@ -33,10 +33,9 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 	}
 
 	// NoteBindingResolution does not use the resolution if isDeleted is true
-	combinedStatusSet := c.combinedStatusResolver.NoteBindingResolution(key, resolution, isDeleted, c.workStatusIndexer,
-		c.statusCollectorLister)
-	for combinedStatus := range combinedStatusSet {
-		// TODO: combinedStatusResolver.NoteBindingResolution can return a list of strings(ns/name)
+	changedCombinedStatuses := c.combinedStatusResolver.NoteBindingResolution(key, resolution, isDeleted,
+		c.workStatusIndexer, c.statusCollectorLister)
+	for combinedStatus := range changedCombinedStatuses {
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
