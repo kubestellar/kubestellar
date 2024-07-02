@@ -226,12 +226,15 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 				objectIdentifier.ObjectName.Namespace))
 			delete(objectIdentifierToResolution, objectIdentifier)
 			delete(c.resolutionNameToKey, resolution.getName())
+
+			fmt.Printf("$$STATUS$$: removed resolution %s for %v\n\n", resolution.getName(), objectIdentifier)
 		}
 	}
 
 	// (~2+3) create/update combinedstatus resolutions for every object that requires status collection,
 	// and delete resolutions that are no longer required
 	for objectIdentifier, objectData := range bindingResolution.ObjectIdentifierToData {
+		fmt.Printf("$$STATUS$$: noting object: \n%v\n%v for binding resolution %s\n", objectIdentifier, objectData, bindingName)
 		csResolution, exists := objectIdentifierToResolution[objectIdentifier]
 		if len(objectData.StatusCollectors) == 0 {
 			if exists { // associated resolution is no longer required
@@ -240,6 +243,8 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 
 				delete(objectIdentifierToResolution, objectIdentifier)
 				delete(c.resolutionNameToKey, csResolution.getName())
+
+				fmt.Printf("$$STATUS$$: removed2 resolution %s for %v\n\n", csResolution.getName(), objectIdentifier)
 			}
 
 			continue
@@ -253,6 +258,8 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 			}
 			objectIdentifierToResolution[objectIdentifier] = csResolution
 			c.resolutionNameToKey[csResolution.getName()] = resolutionKey{bindingName, objectIdentifier}
+
+			fmt.Printf("$$STATUS$$: created resolution %s for %v, %v\n\n", csResolution.getName(), objectIdentifier, c.resolutionNameToKey)
 		}
 
 		// fetch missing statuscollector specs
@@ -276,6 +283,9 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 		}
 	}
 
+	fmt.Printf("$$STATUS$$: noted binding resolution %s, updated %v combined statuses\n\n", bindingName,
+		combinedStatusIdentifiersToQueue)
+
 	// evaluate workstatuses associated with members of workloadIdentifiersToEvaluate and return the combinedstatus
 	// identifiers that should be queued for syncing
 	return combinedStatusIdentifiersToQueue.Union(c.evaluateWorkStatusesPerBindingReadLocked(bindingName,
@@ -297,6 +307,8 @@ func (c *combinedStatusResolver) deleteResolutionsForBindingWriteLocked(bindingN
 		combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
 			objectIdentifier.ObjectName.Namespace))
 		delete(c.resolutionNameToKey, resolution.getName())
+
+		fmt.Printf("$$STATUS$$: removed3 resolution %s for %v\n\n", resolution.getName(), objectIdentifier)
 	}
 
 	delete(c.bindingNameToResolutions, bindingName)
@@ -332,6 +344,8 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 				workStatus.sourceObjectIdentifier.ObjectName.Namespace))
 		}
 	}
+
+	fmt.Printf("$$STATUS$$: noted workstatus %v, updated %v combined statuses\n", workStatus, combinedStatusIdentifiersToQueue)
 
 	return combinedStatusIdentifiersToQueue
 }

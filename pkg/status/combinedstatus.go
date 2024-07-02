@@ -130,5 +130,5 @@ func getCombinedStatusName(bindingUID, sourceObjectUID string) string {
 	// - the UID of the workload object
 	// - the string ":"
 	// - the UID of the BindingPolicy object.
-	return fmt.Sprintf("%s:%s", sourceObjectUID, bindingUID)
+	return fmt.Sprintf("%s.%s", sourceObjectUID, bindingUID)
 }

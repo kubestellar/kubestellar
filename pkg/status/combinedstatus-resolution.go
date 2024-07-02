@@ -57,6 +57,8 @@ type combinedStatusResolution struct {
 	sync.RWMutex
 
 	name string
+	ns   string
+
 	// statusCollectorNameToData is a map of status collector names to
 	// their corresponding data.
 	statusCollectorNameToData map[string]*statusCollectorData
@@ -251,8 +253,10 @@ func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 	defer c.RUnlock()
 
 	combinedStatus := &v1alpha1.CombinedStatus{
-		ObjectMeta: v1.ObjectMeta{Name: "TODO",
-			Namespace: workloadObjectIdentifier.ObjectName.Namespace},
+		ObjectMeta: v1.ObjectMeta{
+			Name:      c.name,
+			Namespace: workloadObjectIdentifier.ObjectName.Namespace,
+		},
 		Results: make([]v1alpha1.NamedStatusCombination, 0, len(c.statusCollectorNameToData)),
 	}
 
@@ -265,44 +269,76 @@ func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 				Rows:        make([]v1alpha1.StatusCombinationRow, 0, len(scData.wecToData)),
 			}
 
+			// add column names
 			namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames, "wecName")
-
 			for _, selectNamedExp := range scData.Select {
 				namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames, selectNamedExp.Name)
-				for wecName, wsData := range scData.wecToData {
-					row := v1alpha1.StatusCombinationRow{
-						Columns: make([]v1alpha1.Value, 0, len(scData.Select)+1),
+			}
+
+			// add rows for each workstatus
+			for wecName, wsData := range scData.wecToData {
+				row := v1alpha1.StatusCombinationRow{
+					Columns: make([]v1alpha1.Value, 0, len(scData.Select)+1),
+				}
+
+				wecNameStr := wecName
+				row.Columns = append(row.Columns, v1alpha1.Value{
+					Type:   v1alpha1.TypeString,
+					String: &wecNameStr})
+
+				for _, selectNamedExp := range scData.Select {
+					eval := wsData.selectEval[selectNamedExp.Name]
+					if eval == nil {
+						row.Columns = append(row.Columns, v1alpha1.Value{
+							Type: v1alpha1.TypeNull})
+						continue
 					}
 
-					row.Columns = append(row.Columns, v1alpha1.Value{
-						Type: v1alpha1.TypeString,
-						Data: &v1alpha1.Data{
-							RawMessage: json.RawMessage(wecName),
-						},
-					})
-
-					for _, selectNamedExp := range scData.Select {
-						eval := wsData.selectEval[selectNamedExp.Name]
-						if eval == nil {
-							row.Columns = append(row.Columns, v1alpha1.Value{
-								Type: v1alpha1.TypeNull})
-							continue
+					evalValue := eval.Value()
+					var col v1alpha1.Value
+					// temporary until type checking is implemented
+					switch v := evalValue.(type) {
+					case string:
+						col = v1alpha1.Value{
+							Type:   v1alpha1.TypeString,
+							String: &v,
 						}
-
-						evalJSON, err := json.Marshal(eval.Value())
+					case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+						numStr := fmt.Sprintf("%d", v)
+						col = v1alpha1.Value{
+							Type:   v1alpha1.TypeNumber,
+							Number: &numStr,
+						}
+					case float32, float64:
+						numStr := fmt.Sprintf("%f", v)
+						col = v1alpha1.Value{
+							Type:   v1alpha1.TypeNumber,
+							Number: &numStr,
+						}
+					case bool:
+						col = v1alpha1.Value{
+							Type: v1alpha1.TypeBool,
+							Bool: &v,
+						}
+					default:
+						evalJSON, err := json.Marshal(evalValue)
 						if err != nil {
 							runtime2.HandleError(fmt.Errorf("failed to marshal select evaluation: %w", err))
-							row.Columns = append(row.Columns, v1alpha1.Value{
-								Type: v1alpha1.TypeNull})
-							continue
+							col = v1alpha1.Value{
+								Type: v1alpha1.TypeNull,
+							}
+						} else {
+							col = v1alpha1.Value{
+								Type:   v1alpha1.TypeObject,
+								Object: json.RawMessage(evalJSON),
+							}
 						}
-
-						row.Columns = append(row.Columns, v1alpha1.Value{
-							Type: v1alpha1.TypeString,
-							Data: &v1alpha1.Data{
-								RawMessage: json.RawMessage(evalJSON)}})
 					}
+
+					row.Columns = append(row.Columns, col)
 				}
+
+				namedStatusCombination.Rows = append(namedStatusCombination.Rows, row)
 			}
 
 			combinedStatus.Results = append(combinedStatus.Results, namedStatusCombination)
@@ -312,7 +348,7 @@ func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 		// aggregation, TODO
 	}
 
-	return combinedStatus
+	return addLabelsToCombinedStatus(combinedStatus, bindingName, workloadObjectIdentifier)
 }
 
 func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.CombinedStatus) bool {
@@ -449,4 +485,24 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 	wsData.combinedFieldsEval = combinedFieldEvals
 
 	return updated, nil
+}
+
+func addLabelsToCombinedStatus(combinedStatus *v1alpha1.CombinedStatus,
+	bindingName string, workloadObjectIdentifier util.ObjectIdentifier) *v1alpha1.CombinedStatus {
+	if combinedStatus.Labels == nil {
+		combinedStatus.Labels = make(map[string]string)
+	}
+	// The CombinedStatus object has the following labels:
+	// - "status.kubestellar.io/api-group" holding the API Group (not verison) of the workload object;
+	// - "status.kubestellar.io/resource" holding the resource (lowercase plural) of the workload object;
+	// - "status.kubestellar.io/namespace" holding the namespace of the workload object;
+	// - "status.kubestellar.io/name" holding the name of the workload object;
+	// - "status.kubestellar.io/binding-policy" holding the name of the BindingPolicy object.
+	combinedStatus.Labels["status.kubestellar.io/api-group"] = workloadObjectIdentifier.GVR().Group
+	combinedStatus.Labels["status.kubestellar.io/resource"] = workloadObjectIdentifier.GVR().Resource
+	combinedStatus.Labels["status.kubestellar.io/namespace"] = workloadObjectIdentifier.ObjectName.Namespace
+	combinedStatus.Labels["status.kubestellar.io/name"] = workloadObjectIdentifier.ObjectName.Name
+	combinedStatus.Labels["status.kubestellar.io/binding-policy"] = bindingName // identical to binding-policy name
+
+	return combinedStatus
 }
