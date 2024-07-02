@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"encoding/json"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -492,20 +494,11 @@ type Value struct {
 	Type ValueType `json:"type"`
 
 	// +optional
-	String *string `json:"string,omitempty"`
+	Data *Data `json:"data,omitempty"`
+}
 
-	// Integer or floating-point, in JavaScript Object Notation.
-	// +optional
-	Number *string `json:"float,omitempty"`
-
-	// +optional
-	Bool *bool `json:"bool,omitempty"`
-
-	// +optional
-	Object map[string]Value `json:"object,omitempty"`
-
-	// +optional
-	Array []Value `json:"array,omitempty"`
+type Data struct {
+	json.RawMessage `json:"raw,omitempty"`
 }
 
 type ValueType string
