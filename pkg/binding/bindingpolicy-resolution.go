@@ -102,23 +102,6 @@ func (resolution *bindingPolicyResolution) removeObjectIdentifier(objIdentifier 
 	return true
 }
 
-// setDestinations updates the destinations list in the resolution.
-// The given destinations set is expected not to be mutated after this call.
-func (resolution *bindingPolicyResolution) setDestinations(destinations sets.Set[string]) {
-	resolution.Lock()
-	defer resolution.Unlock()
-
-	resolution.destinations = destinations
-}
-
-// getObjectIdentifiers returns a copy of the object identifiers in the resolution.
-func (resolution *bindingPolicyResolution) getObjectIdentifiers() sets.Set[util.ObjectIdentifier] {
-	resolution.RLock()
-	defer resolution.RUnlock()
-
-	return sets.KeySet(resolution.objectIdentifierToData)
-}
-
 // toBindingSpec converts the resolution to a binding
 // spec. This function is thread-safe.
 func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec {
@@ -206,6 +189,14 @@ func (resolution *bindingPolicyResolution) getDestinationsList() []v1alpha1.Dest
 	defer resolution.RUnlock()
 
 	return destinationsStringSetToSortedDestinations(resolution.destinations)
+}
+
+// getOwnerReference returns the owner reference of the resolution.
+func (resolution *bindingPolicyResolution) getOwnerReference() metav1.OwnerReference {
+	resolution.RLock()
+	defer resolution.RUnlock()
+
+	return *resolution.ownerReference
 }
 
 // destinationsMatch returns true if the destinations in the resolution

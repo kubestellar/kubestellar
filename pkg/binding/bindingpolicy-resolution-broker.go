@@ -49,10 +49,24 @@ type Resolution struct {
 	Destinations []v1alpha1.Destination
 	// ObjectIdentifierToData is a map of object identifiers to their
 	// corresponding ObjectData.
-	ObjectIdentifierToData map[util.ObjectIdentifier]struct {
-		ResourceVersion  string
-		StatusCollectors []string
+	ObjectIdentifierToData map[util.ObjectIdentifier]ObjectData
+}
+
+// ObjectData is a struct that represents the data associated with an object
+// in a resolution.
+type ObjectData struct {
+	ResourceVersion  string
+	StatusCollectors []string
+}
+
+func (r *Resolution) RequiresStatusCollection() bool {
+	for _, data := range r.ObjectIdentifierToData {
+		if len(data.StatusCollectors) > 0 {
+			return true
+		}
 	}
+
+	return false
 }
 
 // NewResolutionBroker creates a new ResolutionBroker with the given
@@ -101,21 +115,15 @@ func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) *Resoluti
 
 	return &Resolution{
 		Destinations: bindingPolicyResolution.getDestinationsList(),
-		ObjectIdentifierToData: abstract.PrimitiveMapSafeMap(&bindingPolicyResolution.RWMutex,
+		ObjectIdentifierToData: abstract.PrimitiveMapSafeValMap(&bindingPolicyResolution.RWMutex,
 			bindingPolicyResolution.objectIdentifierToData,
-			func(data *objectData) struct {
-				ResourceVersion  string
-				StatusCollectors []string
-			} {
-				return struct {
-					ResourceVersion  string
-					StatusCollectors []string
-				}{
+			func(data *objectData) ObjectData {
+				return ObjectData{
 					ResourceVersion:  data.ResourceVersion,
 					StatusCollectors: sets.List(data.StatusCollectors), // members are string copies
 				}
 			}), // while this function breaks the constraint, it maintains its own concurrency safety
-		// by using the PrimitiveMapSafeMap which transforms a map safely using its read-lock.
+		// by using the PrimitiveMapSafeValMap which transforms a map safely using its read-lock.
 	}
 }
 

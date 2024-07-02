@@ -73,6 +73,24 @@ func ObjIdentifierIsForBinding(objIdentifier ObjectIdentifier) bool {
 	return gvkMatches(objIdentifier.GVK, v1alpha1.GroupVersion.Group, AnyVersion, BindingKind)
 }
 
+func IdentifierForStatusCollector(name string) ObjectIdentifier {
+	return ObjectIdentifier{
+		GVK: schema.GroupVersionKind{Group: StatusCollectorGroup, Version: StatusCollectorVersion,
+			Kind: StatusCollectorKind},
+		Resource:   StatusCollectorResource,
+		ObjectName: cache.ObjectName{Name: name},
+	}
+}
+
+func IdentifierForCombinedStatus(name, ns string) ObjectIdentifier {
+	return ObjectIdentifier{
+		GVK: schema.GroupVersionKind{Group: CombinedStatusGroup, Version: CombinedStatusVersion,
+			Kind: CombinedStatusKind},
+		Resource:   CombinedStatusResource,
+		ObjectName: cache.ObjectName{Name: name, Namespace: ns},
+	}
+}
+
 func gvkMatches(gvk schema.GroupVersionKind, group, version, kind string) bool {
 	if gvk.Group == group && (version == AnyVersion || gvk.Version == version) &&
 		gvk.Kind == kind {
