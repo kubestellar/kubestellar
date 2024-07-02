@@ -448,7 +448,7 @@ type StatusCollectorList struct {
 // or "kubestellar-report" if the workload object has no namespace.
 // The name of the CombinedStatus object is the concatenation of:
 // - the UID of the workload object
-// - the string ":"
+// - the string "."
 // - the UID of the BindingPolicy object.
 // The CombinedStatus object has the following labels:
 // - "status.kubestellar.io/api-group" holding the API Group (not verison) of the workload object;
@@ -494,11 +494,20 @@ type Value struct {
 	Type ValueType `json:"type"`
 
 	// +optional
-	Data *Data `json:"data,omitempty"`
-}
+	String *string `json:"string,omitempty"`
 
-type Data struct {
-	json.RawMessage `json:"raw,omitempty"`
+	// Integer or floating-point, in JavaScript Object Notation.
+	// +optional
+	Number *string `json:"float,omitempty"`
+
+	// +optional
+	Bool *bool `json:"bool,omitempty"`
+
+	// +optional
+	Object json.RawMessage `json:"object,omitempty"`
+
+	// +optional
+	Array json.RawMessage `json:"array,omitempty"`
 }
 
 type ValueType string
