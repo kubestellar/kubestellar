@@ -632,6 +632,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0231" class="md-nav__link">
+    0.23.1
+  </a>
+  
+    <nav class="md-nav" aria-label="0.23.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remaining-limitations-in-0231" class="md-nav__link">
+    Remaining limitations in 0.23.1
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0230-and-its-release-candidates" class="md-nav__link">
     0.23.0 and its release candidates
   </a>
@@ -1943,6 +1963,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0231" class="md-nav__link">
+    0.23.1
+  </a>
+  
+    <nav class="md-nav" aria-label="0.23.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remaining-limitations-in-0231" class="md-nav__link">
+    Remaining limitations in 0.23.1
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0230-and-its-release-candidates" class="md-nav__link">
     0.23.0 and its release candidates
   </a>
@@ -2070,6 +2110,14 @@
 
 <h1 id="release-notes">Release notes<a class="headerlink" href="#release-notes" title="Permanent link">#</a></h1>
 <p>The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. </p>
+<h2 id="0231">0.23.1<a class="headerlink" href="#0231" title="Permanent link">#</a></h2>
+<p>The main change from 0.23.0 is a re-organization of the website, which is still a work in progress, and archival of all website content that is outdated.</p>
+<h3 id="remaining-limitations-in-0231">Remaining limitations in 0.23.1<a class="headerlink" href="#remaining-limitations-in-0231" title="Permanent link">#</a></h3>
+<ul>
+<li>Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object</li>
+<li>Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.</li>
+<li>Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.</li>
+</ul>
 <h2 id="0230-and-its-release-candidates">0.23.0 and its release candidates<a class="headerlink" href="#0230-and-its-release-candidates" title="Permanent link">#</a></h2>
 <p>The main change is introduction of the an all-in-one chart, called the core chart, for installing KubeStellar in a given hosting cluster and creating an initial set of WDSes and ITSes.</p>
 <p>This release also introduces a preliminary API for combining workload object reported state from the WECs --- <strong>BUT THE IMPLEMENTATION IS NOT DONE</strong>*. The control objects can be created but the designed response is not there. The design of the control objects is likely to change in the future too (without change in the Kubernetes API group's version string). In short, stay away from this feature in this release.</p>
