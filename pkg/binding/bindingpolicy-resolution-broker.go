@@ -39,11 +39,16 @@ type ResolutionBroker interface {
 	// GetResolution retrieves the resolution for a given bindingPolicyKey.
 	// If no resolution is associated with the given key, nil is returned.
 	GetResolution(bindingPolicyKey string) *Resolution
+
+	// NotifyCallbacks calls all registered callbacks with the given bindingPolicyKey.
+	// The callbacks are called on separate goroutines.
+	NotifyCallbacks(bindingPolicyKey string)
 }
 
 // Resolution is a struct that represents the resolution of a binding policy.
 // It contains the destinations and object data for the resolution.
 type Resolution struct {
+	UID string
 	// Destinations is a list of destinations that are the "where" part of the
 	// resolution.
 	Destinations []v1alpha1.Destination
@@ -55,6 +60,7 @@ type Resolution struct {
 // ObjectData is a struct that represents the data associated with an object
 // in a resolution.
 type ObjectData struct {
+	UID              string
 	ResourceVersion  string
 	StatusCollectors []string
 }
@@ -69,13 +75,15 @@ func (r *Resolution) RequiresStatusCollection() bool {
 	return false
 }
 
-// NewResolutionBroker creates a new ResolutionBroker with the given
+// newResolutionBroker creates a new ResolutionBroker with the given
 // bindingPolicyResolutionGetter function.
 // The latter function's returned `bindingPolicyResolution` is expected to be
 // thread-safe under the constraint that only its methods are used.
-func NewResolutionBroker(bindingPolicyResolutionGetter func(bindingPolicyKey string) *bindingPolicyResolution) ResolutionBroker {
+func newResolutionBroker(bindingPolicyResolutionGetter func(bindingPolicyKey string) *bindingPolicyResolution,
+	allBindingPolicyResolutionKeysGetter func() []string) ResolutionBroker {
 	return &resolutionBroker{
-		bindingPolicyResolutionGetter: bindingPolicyResolutionGetter,
+		bindingPolicyResolutionGetter:        bindingPolicyResolutionGetter,
+		allBindingPolicyResolutionKeysGetter: allBindingPolicyResolutionKeysGetter,
 	}
 }
 
@@ -91,17 +99,26 @@ type resolutionBroker struct {
 	// The returned `bindingPolicyResolution` is expected to be thread-safe as
 	// long as only its methods are used.
 	bindingPolicyResolutionGetter func(bindingPolicyKey string) *bindingPolicyResolution
+
+	allBindingPolicyResolutionKeysGetter func() []string
 }
 
 // RegisterCallback adds a new callback function that will be called, on a
 // separate goroutine, when a resolution is updated. The callback function
 // should accept a bindingPolicyKey.
+//
+// Upon registration, the callback is immediately called with all existing
+// resolutions.
 // There is no deduplication of callbacks.
 func (broker *resolutionBroker) RegisterCallback(callback func(bindingPolicyKey string)) {
 	broker.Lock()
 	defer broker.Unlock()
 
 	broker.callbacks = append(broker.callbacks, callback)
+
+	for _, bindingPolicyKey := range broker.allBindingPolicyResolutionKeysGetter() {
+		go callback(bindingPolicyKey)
+	}
 }
 
 // GetResolution retrieves the resolution for a given bindingPolicyKey.
@@ -114,6 +131,7 @@ func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) *Resoluti
 	}
 
 	return &Resolution{
+		UID:          string(bindingPolicyResolution.ownerReference.UID), // necessarily exists
 		Destinations: bindingPolicyResolution.getDestinationsList(),
 		ObjectIdentifierToData: abstract.PrimitiveMapSafeValMap(&bindingPolicyResolution.RWMutex,
 			bindingPolicyResolution.objectIdentifierToData,
