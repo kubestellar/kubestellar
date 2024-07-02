@@ -96,6 +96,24 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
 		})
 
+		ginkgo.It("handles changes in workload object labels", func() {
+			ginkgo.By("deletes WEC objects when workload object labels stop matching")
+			patch := []byte(`{"metadata": {"labels": {"app.kubernetes.io/name": "not-me"}}}`)
+			_, err := wds.AppsV1().Deployments("nginx").Patch(
+				ctx, "nginx", types.MergePatchType, patch, metav1.PatchOptions{})
+			gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+			util.ValidateNumDeployments(ctx, wec1, ns, 0)
+			util.ValidateNumDeployments(ctx, wec2, ns, 0)
+
+			ginkgo.By("creates WEC objects when workload object labels resume matching")
+			patch = []byte(`{"metadata": {"labels": {"app.kubernetes.io/name": "nginx"}}}`)
+			_, err = wds.AppsV1().Deployments("nginx").Patch(
+				ctx, "nginx", types.MergePatchType, patch, metav1.PatchOptions{})
+			gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+			util.ValidateNumDeployments(ctx, wec1, ns, 1)
+			util.ValidateNumDeployments(ctx, wec2, ns, 1)
+		})
+
 		ginkgo.It("handles multiple bindingpolicies with overlapping matches", func() {
 			ginkgo.By("creates a second bindingpolicy with overlapping matches")
 			util.CreateBindingPolicy(ctx, ksWds, "nginx-2",
