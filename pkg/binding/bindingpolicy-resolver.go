@@ -76,7 +76,7 @@ type BindingPolicyResolver interface {
 	// changed. If no resolution is associated with the given key, an error is
 	// returned.
 	EnsureObjectData(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
-		resourceVersion string, statusCollectors sets.Set[string]) (bool, error)
+		objUID, resourceVersion string, statusCollectors sets.Set[string]) (bool, error)
 	// RemoveObjectIdentifier ensures the absence of the given object
 	// identifier from the resolution for the given bindingpolicy key.
 	//
@@ -109,15 +109,23 @@ type BindingPolicyResolver interface {
 	// DeleteResolution deletes the resolution associated with the given key,
 	// if it exists.
 	DeleteResolution(bindingPolicyKey string)
+
+	// Broker returns a ResolutionBroker for the resolver.
+	Broker() ResolutionBroker
 }
 
 func NewBindingPolicyResolver() BindingPolicyResolver {
-	return &bindingPolicyResolver{
+	bpResolver := &bindingPolicyResolver{
 		bindingPolicyToResolution: make(map[string]*bindingPolicyResolution),
 	}
+	bpResolver.broker = newResolutionBroker(bpResolver.getResolution, bpResolver.getAllResolutionKeys)
+
+	return bpResolver
 }
 
 type bindingPolicyResolver struct {
+	broker ResolutionBroker
+
 	sync.RWMutex
 	bindingPolicyToResolution map[string]*bindingPolicyResolution
 }
@@ -198,8 +206,8 @@ func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1
 // The returned bool indicates whether the bindingpolicy resolution was
 // changed. If no resolution is associated with the given key, an error is
 // returned.
-func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string,
-	objIdentifier util.ObjectIdentifier, resourceVersion string, statusCollectors sets.Set[string]) (bool, error) {
+func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
+	objUID, resourceVersion string, statusCollectors sets.Set[string]) (bool, error) {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
@@ -209,7 +217,7 @@ func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string,
 	}
 
 	// ensureObjectIdentifier is thread-safe
-	return bindingPolicyResolution.ensureObjectData(objIdentifier, resourceVersion, statusCollectors), nil
+	return bindingPolicyResolution.ensureObjectData(objIdentifier, objUID, resourceVersion, statusCollectors), nil
 }
 
 // RemoveObjectIdentifier ensures the absence of the given object
@@ -304,6 +312,11 @@ func (resolver *bindingPolicyResolver) DeleteResolution(bindingPolicyKey string)
 	delete(resolver.bindingPolicyToResolution, bindingPolicyKey)
 }
 
+// Broker returns a ResolutionBroker for the resolver.
+func (resolver *bindingPolicyResolver) Broker() ResolutionBroker {
+	return resolver.broker
+}
+
 // getResolution retrieves the resolution associated with the given key.
 // If the resolution does not exist, nil is returned.
 func (resolver *bindingPolicyResolver) getResolution(bindingPolicyKey string) *bindingPolicyResolution {
@@ -311,6 +324,20 @@ func (resolver *bindingPolicyResolver) getResolution(bindingPolicyKey string) *b
 	defer resolver.RUnlock() // unlock after accessing map
 
 	return resolver.bindingPolicyToResolution[bindingPolicyKey]
+}
+
+// getAllResolutionKeys returns all keys associated with the maintained
+// bindingpolicy resolutions.
+func (resolver *bindingPolicyResolver) getAllResolutionKeys() []string {
+	resolver.RLock()         // lock for reading map
+	defer resolver.RUnlock() // unlock after accessing map
+
+	keys := make([]string, 0, len(resolver.bindingPolicyToResolution))
+	for key := range resolver.bindingPolicyToResolution {
+		keys = append(keys, key)
+	}
+
+	return keys
 }
 
 // `*bindingPolicy` is immutable

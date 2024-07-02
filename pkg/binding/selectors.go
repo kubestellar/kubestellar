@@ -85,7 +85,7 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 
 		// obj is selected by bindingpolicy, update the bindingpolicy resolver
 		resolutionUpdated, err := c.bindingPolicyResolver.EnsureObjectData(bindingPolicy.GetName(),
-			objIdentifier, objMR.GetResourceVersion(), matchedStatusCollectorsSet)
+			objIdentifier, string(objMR.GetUID()), objMR.GetResourceVersion(), matchedStatusCollectorsSet)
 		if err != nil {
 			if errorIsBindingPolicyResolutionNotFound(err) {
 				// this case can occur if a bindingpolicy resolution was deleted AFTER

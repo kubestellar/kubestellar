@@ -36,6 +36,7 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 		// then the bindingpolicy has been deleted, and the binding
 		// will eventually be garbage collected. We can safely ignore this.
 
+		c.bindingPolicyResolver.Broker().NotifyCallbacks(bindingName)
 		return nil
 	}
 
@@ -70,6 +71,8 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 			return fmt.Errorf("failed to update or create binding: %w", err)
 		}
 
+		// notify the bindingpolicy resolution broker that the binding has been updated
+		c.bindingPolicyResolver.Broker().NotifyCallbacks(bindingPolicyIdentifier)
 		return nil
 	}
 

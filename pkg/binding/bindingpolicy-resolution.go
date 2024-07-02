@@ -51,6 +51,7 @@ type bindingPolicyResolution struct {
 
 // objectData stores the resource version and statuscollectors for an object.
 type objectData struct {
+	UID              string
 	ResourceVersion  string
 	StatusCollectors sets.Set[string]
 }
@@ -64,23 +65,25 @@ type objectData struct {
 // The returned bool indicates whether the resolution was changed.
 // This function is thread-safe.
 func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.ObjectIdentifier,
-	resourceVersion string, statusCollectors sets.Set[string]) bool {
+	objUID, resourceVersion string, statusCollectors sets.Set[string]) bool {
 	resolution.Lock()
 	defer resolution.Unlock()
 
 	objData := resolution.objectIdentifierToData[objIdentifier]
 	if objData == nil {
 		resolution.objectIdentifierToData[objIdentifier] = &objectData{
+			UID:              objUID,
 			ResourceVersion:  resourceVersion,
 			StatusCollectors: statusCollectors,
 		}
 		return true
 	}
 
-	if objData.ResourceVersion == resourceVersion && objData.StatusCollectors.Equal(statusCollectors) {
+	if objData.UID == objUID && objData.ResourceVersion == resourceVersion && objData.StatusCollectors.Equal(statusCollectors) {
 		return false
 	}
 
+	objData.UID = objUID
 	objData.ResourceVersion = resourceVersion
 	objData.StatusCollectors = statusCollectors
 

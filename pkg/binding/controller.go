@@ -336,6 +336,12 @@ func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan
 	}
 }
 
+// GetBindingPolicyResolutionBroker returns the ResolutionBroker for the
+// BindingPolicyResolver managed by the controller.
+func (c *Controller) GetBindingPolicyResolutionBroker() ResolutionBroker {
+	return c.bindingPolicyResolver.Broker()
+}
+
 // Invoked by Start() to run the controller
 func (c *Controller) run(ctx context.Context, workers int, cListers chan interface{}) error {
 	defer c.workqueue.ShutDown()
