@@ -51,6 +51,7 @@ type bindingPolicyResolution struct {
 
 // objectData stores the resource version and statuscollectors for an object.
 type objectData struct {
+	UID              string
 	ResourceVersion  string
 	StatusCollectors sets.Set[string]
 }
@@ -64,23 +65,25 @@ type objectData struct {
 // The returned bool indicates whether the resolution was changed.
 // This function is thread-safe.
 func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.ObjectIdentifier,
-	resourceVersion string, statusCollectors sets.Set[string]) bool {
+	objUID, resourceVersion string, statusCollectors sets.Set[string]) bool {
 	resolution.Lock()
 	defer resolution.Unlock()
 
 	objData := resolution.objectIdentifierToData[objIdentifier]
 	if objData == nil {
 		resolution.objectIdentifierToData[objIdentifier] = &objectData{
+			UID:              objUID,
 			ResourceVersion:  resourceVersion,
 			StatusCollectors: statusCollectors,
 		}
 		return true
 	}
 
-	if objData.ResourceVersion == resourceVersion && objData.StatusCollectors.Equal(statusCollectors) {
+	if objData.UID == objUID && objData.ResourceVersion == resourceVersion && objData.StatusCollectors.Equal(statusCollectors) {
 		return false
 	}
 
+	objData.UID = objUID
 	objData.ResourceVersion = resourceVersion
 	objData.StatusCollectors = statusCollectors
 
@@ -100,23 +103,6 @@ func (resolution *bindingPolicyResolution) removeObjectIdentifier(objIdentifier 
 
 	delete(resolution.objectIdentifierToData, objIdentifier)
 	return true
-}
-
-// setDestinations updates the destinations list in the resolution.
-// The given destinations set is expected not to be mutated after this call.
-func (resolution *bindingPolicyResolution) setDestinations(destinations sets.Set[string]) {
-	resolution.Lock()
-	defer resolution.Unlock()
-
-	resolution.destinations = destinations
-}
-
-// getObjectIdentifiers returns a copy of the object identifiers in the resolution.
-func (resolution *bindingPolicyResolution) getObjectIdentifiers() sets.Set[util.ObjectIdentifier] {
-	resolution.RLock()
-	defer resolution.RUnlock()
-
-	return sets.KeySet(resolution.objectIdentifierToData)
 }
 
 // toBindingSpec converts the resolution to a binding
@@ -206,6 +192,14 @@ func (resolution *bindingPolicyResolution) getDestinationsList() []v1alpha1.Dest
 	defer resolution.RUnlock()
 
 	return destinationsStringSetToSortedDestinations(resolution.destinations)
+}
+
+// getOwnerReference returns the owner reference of the resolution.
+func (resolution *bindingPolicyResolution) getOwnerReference() metav1.OwnerReference {
+	resolution.RLock()
+	defer resolution.RUnlock()
+
+	return *resolution.ownerReference
 }
 
 // destinationsMatch returns true if the destinations in the resolution

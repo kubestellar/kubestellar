@@ -39,17 +39,23 @@ func PrimitiveMapEqual[Key, Val comparable](map1, map2 map[Key]Val) bool {
 	return true
 }
 
-// PrimitiveMapSafeMap creates a new map by applying a mapper function to each value in the source map.
-// The source map is read-locked during the operation using the provided lock.
-func PrimitiveMapSafeMap[Key comparable, Val, Mapped any](lock *sync.RWMutex, source map[Key]Val,
+// PrimitiveMapValMap creates a new map by applying a mapper function to each value in the source map.
+func PrimitiveMapValMap[Key comparable, Val, Mapped any](source map[Key]Val,
 	mapper func(Val) Mapped) map[Key]Mapped {
-	lock.RLock()
-	defer lock.RUnlock()
-
 	result := make(map[Key]Mapped, len(source))
 	for key, val := range source {
 		result[key] = mapper(val)
 	}
 
 	return result
+}
+
+// PrimitiveMapSafeValMap creates a new map by applying a mapper function to each value in the source map.
+// The source map is read-locked during the operation using the provided lock.
+func PrimitiveMapSafeValMap[Key comparable, Val, Mapped any](lock *sync.RWMutex, source map[Key]Val,
+	mapper func(Val) Mapped) map[Key]Mapped {
+	lock.RLock()
+	defer lock.RUnlock()
+
+	return PrimitiveMapValMap(source, mapper)
 }

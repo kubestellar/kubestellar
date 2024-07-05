@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -393,6 +394,7 @@ type NamedExpression struct {
 // Otherwise this is an error condition: a value of 0 is used, and the error
 // is reported in the BindingPolicyStatus.Errors (not necessarily repeated for each WEC).
 type NamedAggregator struct {
+	Name string         `json:"name"`
 	Type AggregatorType `json:"type"`
 
 	// +optional
@@ -445,7 +447,7 @@ type StatusCollectorList struct {
 // or "kubestellar-report" if the workload object has no namespace.
 // The name of the CombinedStatus object is the concatenation of:
 // - the UID of the workload object
-// - the string ":"
+// - the string "."
 // - the UID of the BindingPolicy object.
 // The CombinedStatus object has the following labels:
 // - "status.kubestellar.io/api-group" holding the API Group (not verison) of the workload object;
@@ -483,6 +485,9 @@ type NamedStatusCombination struct {
 }
 
 type StatusCombinationRow struct {
+	// +optional
+	Name *string `json:"name"`
+
 	Columns []Value `json:"columns"`
 }
 
@@ -501,10 +506,10 @@ type Value struct {
 	Bool *bool `json:"bool,omitempty"`
 
 	// +optional
-	Object map[string]Value `json:"object,omitempty"`
+	Object *v1.JSON `json:"object,omitempty"`
 
 	// +optional
-	Array []Value `json:"array,omitempty"`
+	Array *v1.JSON `json:"array,omitempty"`
 }
 
 type ValueType string

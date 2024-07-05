@@ -170,7 +170,8 @@ func main() {
 
 	// check if status add-on present and if yes start the status controller
 	if util.CheckWorkStatusPresence(itsRestConfig) {
-		statusController, err := status.NewController(wdsRestConfig, itsRestConfig, wdsName)
+		statusController, err := status.NewController(wdsRestConfig, itsRestConfig, wdsName,
+			bindingController.GetBindingPolicyResolutionBroker())
 		if err != nil {
 			setupLog.Error(err, "unable to create status controller")
 			os.Exit(1)

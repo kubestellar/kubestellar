@@ -40,7 +40,7 @@ spec:
           object is the namespace of the workload object, or "kubestellar-report"
           if the workload object has no namespace. The name of the CombinedStatus
           object is the concatenation of: - the UID of the workload object - the string
-          ":" - the UID of the BindingPolicy object. The CombinedStatus object has
+          "." - the UID of the BindingPolicy object. The CombinedStatus object has
           the following labels: - "status.kubestellar.io/api-group" holding the API
           Group (not verison) of the workload object; - "status.kubestellar.io/resource"
           holding the resource (lowercase plural) of the workload object; - "status.kubestellar.io/namespace"
@@ -81,8 +81,7 @@ spec:
                           description: Value holds a JSON value. This is a union type.
                           properties:
                             array:
-                              items: {}
-                              type: array
+                              x-kubernetes-preserve-unknown-fields: true
                             bool:
                               type: boolean
                             float:
@@ -90,8 +89,7 @@ spec:
                                 Object Notation.
                               type: string
                             object:
-                              additionalProperties: {}
-                              type: object
+                              x-kubernetes-preserve-unknown-fields: true
                             string:
                               type: string
                             type:
@@ -100,6 +98,8 @@ spec:
                           - type
                           type: object
                         type: array
+                      name:
+                        type: string
                     required:
                     - columns
                     type: object

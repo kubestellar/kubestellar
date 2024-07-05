@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,20 +31,35 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
+	"k8s.io/klog/v2"
 )
 
 const (
-	CRDKind                       = "CustomResourceDefinition"
-	AnyVersion                    = "*"
-	ServiceVersion                = "v1"
-	ServiceKind                   = "Service"
-	BindingPolicyKind             = "BindingPolicy"
-	BindingPolicyResource         = "bindingpolicies"
-	BindingKind                   = "Binding"
-	BindingResource               = "bindings"
-	WorkStatusGroup               = "control.kubestellar.io"
-	WorkStatusVersion             = "v1alpha1"
-	WorkStatusResource            = "workstatuses"
+	CRDKind    = "CustomResourceDefinition"
+	AnyVersion = "*"
+
+	ServiceVersion = "v1"
+	ServiceKind    = "Service"
+
+	BindingPolicyKind     = "BindingPolicy"
+	BindingPolicyResource = "bindingpolicies"
+	BindingKind           = "Binding"
+	BindingResource       = "bindings"
+
+	WorkStatusGroup    = "control.kubestellar.io"
+	WorkStatusVersion  = "v1alpha1"
+	WorkStatusResource = "workstatuses"
+
+	StatusCollectorKind     = "StatusCollector"
+	StatusCollectorResource = "statuscollectors"
+	StatusCollectorGroup    = "control.kubestellar.io"
+	StatusCollectorVersion  = "v1alpha1"
+
+	CombinedStatusKind     = "CombinedStatus"
+	CombinedStatusResource = "combinedstatuses"
+	CombinedStatusGroup    = "control.kubestellar.io"
+	CombinedStatusVersion  = "v1alpha1"
+
 	AnnotationToPreserveValuesKey = "annotations.kubestellar.io/preserve"
 	PreserveNodePortValue         = "nodeport"
 )
@@ -138,6 +154,24 @@ func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 	}, nil
 }
 
+func KeyFromSourceRefAndWecName(sourceRef *SourceRef, wecName string) string {
+	return fmt.Sprintf("%s/%s/%s/%s/%s/%s", sourceRef.Group, sourceRef.Version, sourceRef.Resource,
+		sourceRef.Kind, sourceRef.Name, wecName)
+}
+
+func SourceRefFromObjectIdentifier(objIdentifier ObjectIdentifier) *SourceRef {
+	return &SourceRef{
+		Group:     objIdentifier.GVK.Group,
+		Version:   objIdentifier.GVK.Version,
+		Resource:  objIdentifier.Resource,
+		Kind:      objIdentifier.GVK.Kind,
+		Name:      objIdentifier.ObjectName.Name,
+		Namespace: objIdentifier.ObjectName.Namespace,
+	}
+}
+
+// GetWorkStatusStatus returns the status of the work status object.
+// (nil, nil) is returned if the status is not present in the object.
 func GetWorkStatusStatus(workStatus runtime.Object) (map[string]interface{}, error) {
 	obj, ok := workStatus.(*unstructured.Unstructured)
 	if !ok {
@@ -146,7 +180,7 @@ func GetWorkStatusStatus(workStatus runtime.Object) (map[string]interface{}, err
 
 	statusObj := obj.Object["status"]
 	if statusObj == nil {
-		return nil, fmt.Errorf("could not find status in object %s", obj.GetName())
+		return nil, nil
 	}
 
 	status, ok := statusObj.(map[string]interface{})
@@ -201,6 +235,7 @@ func CreateStatusPatch(unstrObj *unstructured.Unstructured, status map[string]in
 // PatchStatus updates the object status with Patch.
 func PatchStatus(ctx context.Context, unstrObj *unstructured.Unstructured, status map[string]interface{},
 	namespace string, gvr schema.GroupVersionResource, dynamicClient dynamic.Interface) error {
+	logger := klog.FromContext(ctx)
 
 	patchBytes, err := json.Marshal(CreateStatusPatch(unstrObj, status))
 	if err != nil {
@@ -211,6 +246,13 @@ func PatchStatus(ctx context.Context, unstrObj *unstructured.Unstructured, statu
 		_, err = dynamicClient.Resource(gvr).Namespace(namespace).Patch(ctx, unstrObj.GetName(), types.MergePatchType, patchBytes, metav1.PatchOptions{})
 	} else {
 		_, err = dynamicClient.Resource(gvr).Patch(ctx, unstrObj.GetName(), types.MergePatchType, patchBytes, metav1.PatchOptions{})
+	}
+
+	if err != nil {
+		if errors.IsNotFound(err) {
+			logger.V(5).Info("could not find object to patch", "object", unstrObj)
+			return nil
+		}
 	}
 
 	return err

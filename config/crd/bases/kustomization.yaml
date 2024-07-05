@@ -5,3 +5,4 @@ resources:
 - control.kubestellar.io_bindings.yaml
 - control.kubestellar.io_customtransforms.yaml
 - control.kubestellar.io_statuscollectors.yaml
+- control.kubestellar.io_combinedstatuses.yaml

@@ -45,6 +45,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&BindingList{},
 		&CustomTransform{},
 		&CustomTransformList{},
+		&StatusCollector{},
+		&StatusCollectorList{},
+		&CombinedStatus{},
+		&CombinedStatusList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
