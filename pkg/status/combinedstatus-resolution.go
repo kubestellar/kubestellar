@@ -22,6 +22,7 @@ import (
 	"math"
 	"reflect"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/google/cel-go/common/types/ref"
@@ -36,7 +37,10 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-const allValue = "all"
+const (
+	allValue           = "all"
+	expressionRootName = "obj"
+)
 
 // combinedStatusResolution is a struct that represents the resolution of a
 // combinedstatus. A combinedstatus resolution is associated with a (binding,
@@ -334,19 +338,52 @@ func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator
 	}
 
 	updated := false
-	for statusCollectorName, scData := range c.statusCollectorNameToData {
-		changed, err := evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator, workStatusWECName,
+	for _, scData := range c.statusCollectorNameToData {
+		changed := evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator, workStatusWECName,
 			workStatusContent, scData)
-		if err != nil {
-			runtime2.HandleError(fmt.Errorf("failed to evaluate workstatus (%s) against statuscollector (%s): %w",
-				workStatusWECName, statusCollectorName, err))
-			continue
-		}
 
 		updated = updated || changed
 	}
 
 	return updated
+}
+
+func (c *combinedStatusResolution) requiresSourceObjectMetaOrSpec() bool {
+	c.RLock()
+	defer c.RUnlock()
+
+	pred := func(s string) bool {
+		return strings.Contains(s, fmt.Sprintf("%s.metadata", expressionRootName)) ||
+			strings.Contains(s, fmt.Sprintf("%s.spec", expressionRootName)) ||
+			strings.Contains(s, fmt.Sprintf("%s.kind", expressionRootName)) ||
+			strings.Contains(s, fmt.Sprintf("%s.apiVersion", expressionRootName))
+	}
+
+	for _, scData := range c.statusCollectorNameToData {
+		if scData.Filter != nil && pred(string(*scData.Filter)) {
+			return true
+		}
+
+		for _, selectNamedExp := range scData.Select {
+			if pred(string(selectNamedExp.Def)) {
+				return true
+			}
+		}
+
+		for _, combinedFieldNamedAgg := range scData.CombinedFields {
+			if combinedFieldNamedAgg.Subject != nil && pred(string(*combinedFieldNamedAgg.Subject)) {
+				return true
+			}
+		}
+
+		for _, groupByNamedExp := range scData.GroupBy {
+			if pred(string(groupByNamedExp.Def)) {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 // evaluateWorkStatusAgainstStatusCollectorWriteLocked evaluates the workstatus against
@@ -357,32 +394,34 @@ func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator
 // The function assumes that the caller holds a lock over the combinedstatus
 // resolution.
 func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvaluator, workStatusWECName string,
-	workStatusContent map[string]interface{}, scData *statusCollectorData) (bool, error) {
+	workStatusContent map[string]interface{}, scData *statusCollectorData) bool {
 	wsData, exists := scData.wecToData[workStatusWECName]
 
 	if workStatusContent == nil && exists { // workstatus is empty/deleted, remove the workstatus data if it exists
 		delete(scData.wecToData, workStatusWECName)
-		return true, nil
+		return true
 	}
 
 	// evaluate filter to determine if the workstatus is relevant
 	if scData.Filter != nil {
 		eval, err := celEvaluator.Evaluate(*scData.Filter, workStatusContent)
 		if err != nil {
-			return false, fmt.Errorf("failed to evaluate filter expression: %w", err)
+			runtime2.HandleError(fmt.Errorf("failed to evaluate filter expression: %w", err))
+			return false
 		}
 
 		if eval.Type().TypeName() != "bool" {
-			return false, fmt.Errorf("filter expression must evaluate to a boolean")
+			runtime2.HandleError(fmt.Errorf("filter expression must evaluate to a boolean"))
+			return false
 		}
 
 		if !eval.Value().(bool) { // workstatus is not relevant
 			if exists { // remove the workstatus data if it exists
 				delete(scData.wecToData, workStatusWECName)
-				return true, nil
+				return true
 			}
 
-			return false, nil
+			return false
 		}
 	}
 
@@ -399,7 +438,8 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 	for _, selectNamedExp := range scData.Select {
 		eval, err := celEvaluator.Evaluate(selectNamedExp.Def, workStatusContent)
 		if err != nil {
-			return false, fmt.Errorf("failed to evaluate select expression: %w", err)
+			runtime2.HandleError(fmt.Errorf("failed to evaluate select expression: %w", err))
+			continue
 		}
 
 		updated = updated || eval.Equal(wsData.selectEval[selectNamedExp.Name]).Value() != true
@@ -411,7 +451,8 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 	for _, groupByNamedExp := range scData.GroupBy {
 		eval, err := celEvaluator.Evaluate(groupByNamedExp.Def, workStatusContent)
 		if err != nil {
-			return false, fmt.Errorf("failed to evaluate groupBy expression: %w", err)
+			runtime2.HandleError(fmt.Errorf("failed to evaluate groupBy expression: %w", err))
+			continue
 		}
 
 		updated = updated || eval.Equal(wsData.groupByEval[groupByNamedExp.Name]).Value() != true
@@ -433,7 +474,8 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 		// evaluate subject which should not be nil since the statuscollector is valid
 		eval, err := celEvaluator.Evaluate(*combinedFieldNamedAgg.Subject, workStatusContent)
 		if err != nil {
-			return false, fmt.Errorf("failed to evaluate combinedFields expression: %w", err)
+			runtime2.HandleError(fmt.Errorf("failed to evaluate combinedFields subject expression: %w", err))
+			continue
 		}
 
 		updated = updated || eval.Equal(wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]).Value() != true
@@ -445,7 +487,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 	wsData.groupByEval = groupByEvals
 	wsData.combinedFieldsEval = combinedFieldEvals
 
-	return updated, nil
+	return updated
 }
 
 func addLabelsToCombinedStatus(combinedStatus *v1alpha1.CombinedStatus,
@@ -539,14 +581,20 @@ func handleSelect(scName string, scData *statusCollectorData) *v1alpha1.NamedSta
 					Type:   v1alpha1.TypeString,
 					String: &v,
 				}
-			case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-				numStr := fmt.Sprintf("%d", v)
+			case int, int8, int16, int32, int64:
+				numStr := strconv.Itoa(int(v.(int64)))
+				col = v1alpha1.Value{
+					Type:   v1alpha1.TypeNumber,
+					Number: &numStr,
+				}
+			case uint, uint8, uint16, uint32, uint64:
+				numStr := strconv.FormatInt(int64(v.(uint64)), 10)
 				col = v1alpha1.Value{
 					Type:   v1alpha1.TypeNumber,
 					Number: &numStr,
 				}
 			case float32, float64:
-				numStr := fmt.Sprintf("%f", v)
+				numStr := strconv.FormatFloat(v.(float64), 'f', -1, 64)
 				col = v1alpha1.Value{
 					Type:   v1alpha1.TypeNumber,
 					Number: &numStr,
@@ -646,7 +694,7 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 
 	switch combinedFieldNamedAgg.Type {
 	case v1alpha1.AggregatorTypeCount:
-		numStr = fmt.Sprintf("%d", len(wsDataGroup))
+		numStr = strconv.Itoa(len(wsDataGroup))
 	case v1alpha1.AggregatorTypeSum:
 		sum := 0.0
 		for _, wsData := range wsDataGroup {
@@ -657,7 +705,7 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 
 			sum += *subject
 		}
-		numStr = fmt.Sprintf("%f", sum)
+		numStr = strconv.FormatFloat(sum, 'f', -1, 64)
 	case v1alpha1.AggregatorTypeAvg:
 		sum := 0.0
 		for _, wsData := range wsDataGroup {
@@ -668,7 +716,8 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 
 			sum += *subject
 		}
-		numStr = fmt.Sprintf("%f", sum/float64(len(wsDataGroup)))
+		avg := sum / float64(len(wsDataGroup))
+		numStr = strconv.FormatFloat(avg, 'f', -1, 64)
 	case v1alpha1.AggregatorTypeMin:
 		min := math.Inf(1)
 		for _, wsData := range wsDataGroup {
@@ -681,7 +730,7 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 				min = *subject
 			}
 		}
-		numStr = fmt.Sprintf("%f", min)
+		numStr = strconv.FormatFloat(min, 'f', -1, 64)
 	case v1alpha1.AggregatorTypeMax:
 		max := math.Inf(-1)
 		for _, wsData := range wsDataGroup {
@@ -694,7 +743,7 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 				max = *subject
 			}
 		}
-		numStr = fmt.Sprintf("%f", max)
+		numStr = strconv.FormatFloat(max, 'f', -1, 64)
 	default:
 		return v1alpha1.Value{
 			Type: v1alpha1.TypeNull,
@@ -787,7 +836,8 @@ func statusCombinationEqual(a, b *v1alpha1.NamedStatusCombination) bool {
 }
 
 func statusCombinationRowEqual(a, b *v1alpha1.StatusCombinationRow) bool {
-	if a.Name != b.Name {
+	if a.Name != nil && b.Name != nil && *a.Name != *b.Name ||
+		a.Name == nil && b.Name != nil || a.Name != nil && b.Name == nil {
 		return false
 	}
 
@@ -813,7 +863,16 @@ func valueEqual(a, b *v1alpha1.Value) bool {
 	case v1alpha1.TypeString:
 		return *a.String == *b.String
 	case v1alpha1.TypeNumber:
-		return *a.Number == *b.Number
+		aNum, err := parseNumber(*a.Number)
+		if err != nil {
+			return false
+		}
+
+		bNum, err := parseNumber(*b.Number)
+		if err != nil {
+			return false
+		}
+		return aNum == bNum
 	case v1alpha1.TypeBool:
 		return *a.Bool == *b.Bool
 	case v1alpha1.TypeObject:
@@ -826,4 +885,16 @@ func valueEqual(a, b *v1alpha1.Value) bool {
 	default:
 		return false
 	}
+}
+
+func parseNumber(s string) (float64, error) {
+	if intValue, err := strconv.Atoi(s); err == nil {
+		return float64(intValue), nil
+	}
+
+	if floatValue, err := strconv.ParseFloat(s, 64); err == nil {
+		return floatValue, nil
+	}
+
+	return 0, fmt.Errorf("failed to parse number")
 }

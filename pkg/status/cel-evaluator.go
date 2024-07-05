@@ -85,6 +85,7 @@ func (e *celEvaluator) Evaluate(expression v1alpha1.Expression, objMap map[strin
 	result, _, err := prog.Eval(map[string]interface{}{
 		"obj": objMap,
 	})
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to evaluate expression: %w", err)
 	}
