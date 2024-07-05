@@ -18,6 +18,8 @@ package status
 
 import (
 	"fmt"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sync"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -103,9 +105,11 @@ type CombinedStatusResolver interface {
 }
 
 // NewCombinedStatusResolver creates a new CombinedStatusResolver.
-func NewCombinedStatusResolver(celEvaluator *celEvaluator) CombinedStatusResolver {
+func NewCombinedStatusResolver(celEvaluator *celEvaluator,
+	wdsListers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]) CombinedStatusResolver {
 	return &combinedStatusResolver{
 		celEvaluator:              celEvaluator,
+		wdsListers:                wdsListers,
 		bindingNameToResolutions:  make(map[string]map[util.ObjectIdentifier]*combinedStatusResolution),
 		resolutionNameToKey:       make(map[string]resolutionKey),
 		statusCollectorNameToSpec: make(map[string]*v1alpha1.StatusCollectorSpec),
@@ -121,6 +125,7 @@ type resolutionKey struct {
 
 type combinedStatusResolver struct {
 	celEvaluator *celEvaluator
+	wdsListers   util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
 
 	sync.RWMutex
 
@@ -313,8 +318,25 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 			continue
 		}
 
+		content := map[string]interface{}{}
+		content["status"] = workStatus.status
+
+		if resolution.requiresSourceObjectMetaOrSpec() {
+			objMap, err := c.getObjectMetaAndSpec(workStatus.sourceObjectIdentifier)
+			if err != nil {
+				runtime2.HandleError(fmt.Errorf("failed to get meta & spec for source object %s: %w",
+					workStatus.sourceObjectIdentifier, err))
+			}
+
+			if objMap != nil {
+				for k, v := range objMap {
+					content[k] = v
+				}
+			}
+		}
+
 		// this call logs errors, but does not return them for now
-		if resolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, workStatus.status) {
+		if resolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, content) {
 			combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
 				workStatus.sourceObjectIdentifier.ObjectName.Namespace))
 		}
@@ -456,9 +478,26 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 				continue
 			}
 
-			// evaluate workstatus
 			csResolution := c.bindingNameToResolutions[bindingName][workStatus.sourceObjectIdentifier]
-			if csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, workStatus.status) {
+			content := map[string]interface{}{}
+			content["status"] = workStatus.status
+
+			if csResolution.requiresSourceObjectMetaOrSpec() {
+				objMap, err := c.getObjectMetaAndSpec(workStatus.sourceObjectIdentifier)
+				if err != nil {
+					runtime2.HandleError(fmt.Errorf("failed to get meta & spec for source object %s: %w",
+						workStatus.sourceObjectIdentifier, err))
+				}
+
+				if objMap != nil {
+					for k, v := range objMap {
+						content[k] = v
+					}
+				}
+			}
+
+			// evaluate workstatus
+			if csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, content) {
 				combinedStatusesToQueue.Insert(util.IdentifierForCombinedStatus(csResolution.getName(),
 					workloadObjIdentifier.ObjectName.Namespace))
 			}
@@ -466,6 +505,41 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 	}
 
 	return combinedStatusesToQueue
+}
+
+// getObjectMetaAndSpec fetches the metadata and spec of the object associated
+// with the given workload object identifier.
+// The function is guaranteed not to return a key of `status` in the map.
+// If the resource contains any other subresources, they are fetched as well.
+func (c *combinedStatusResolver) getObjectMetaAndSpec(objectIdentifier util.ObjectIdentifier) (map[string]interface{}, error) {
+	// fetch object
+	lister, exists := c.wdsListers.Get(objectIdentifier.GVR())
+	if !exists {
+		return nil, fmt.Errorf("lister not found for gvr %s", objectIdentifier.GVR())
+	}
+
+	obj, err := lister.ByNamespace(objectIdentifier.ObjectName.Namespace).Get(objectIdentifier.ObjectName.Name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get object (%v) with gvr (%v): %w", objectIdentifier.ObjectName,
+			objectIdentifier.GVR(), err)
+	}
+
+	unstrObj, ok := obj.(*unstructured.Unstructured)
+	if !ok {
+		return nil, fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s",
+			util.RefToRuntimeObj(obj))
+	}
+
+	objMap := map[string]interface{}{}
+	// get all but status from the READONLY object
+	// if the object has custom subresources, this will preserve them
+	for k, v := range unstrObj.Object { // rather than DeepCopy()
+		if k != "status" {
+			objMap[k] = v
+		}
+	}
+
+	return objMap, nil
 }
 
 func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool {
