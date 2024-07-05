@@ -17,8 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"encoding/json"
-
+	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -448,7 +447,7 @@ type StatusCollectorList struct {
 // or "kubestellar-report" if the workload object has no namespace.
 // The name of the CombinedStatus object is the concatenation of:
 // - the UID of the workload object
-// - the string ":"
+// - the string "."
 // - the UID of the BindingPolicy object.
 // The CombinedStatus object has the following labels:
 // - "status.kubestellar.io/api-group" holding the API Group (not verison) of the workload object;
@@ -486,6 +485,9 @@ type NamedStatusCombination struct {
 }
 
 type StatusCombinationRow struct {
+	// +optional
+	Name *string `json:"name"`
+
 	Columns []Value `json:"columns"`
 }
 
@@ -494,11 +496,20 @@ type Value struct {
 	Type ValueType `json:"type"`
 
 	// +optional
-	Data *Data `json:"data,omitempty"`
-}
+	String *string `json:"string,omitempty"`
 
-type Data struct {
-	json.RawMessage `json:"raw,omitempty"`
+	// Integer or floating-point, in JavaScript Object Notation.
+	// +optional
+	Number *string `json:"float,omitempty"`
+
+	// +optional
+	Bool *bool `json:"bool,omitempty"`
+
+	// +optional
+	Object *v1.JSON `json:"object,omitempty"`
+
+	// +optional
+	Array *v1.JSON `json:"array,omitempty"`
 }
 
 type ValueType string

@@ -49,7 +49,7 @@ import (
 const (
 	controllerName      = "Status"
 	defaultResyncPeriod = time.Duration(0)
-	queueingDelay       = 2 * time.Second
+	queueingDelay       = 5 * time.Second
 	originWdsLabelKey   = "transport.kubestellar.io/originWdsName"
 )
 
@@ -75,13 +75,6 @@ type Controller struct {
 	// without having to re-create new caches for this controller
 	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
 
-	// TODO: callbacks on binding resolution updates should be set up through
-	// broker, where a callback should queue up a binding's identifier,
-	// and the picking up of the identifier by a worker should have the worker
-	// retrieve the binding Resolution from the broker, and note it through
-	// the combinedStatusResolver.
-	// The handling of informer events on StatusCollector and WorkStatus objects
-	// should go through the combinedStatusResolver.
 	bindingResolutionBroker binding.ResolutionBroker
 	combinedStatusResolver  CombinedStatusResolver
 }
@@ -105,8 +98,13 @@ type combinedStatusRef string
 // statusCollectorRef is a workqueue item that references a StatusCollector
 type statusCollectorRef string
 
+// singletonWorkStatusRef is a workqueue item that references a WorkStatus
+// that is a singleton status
+type singletonWorkStatusRef workStatusRef
+
 // Create a new  status controller
-func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsName string) (*Controller, error) {
+func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsName string,
+	bindingResolutionBroker binding.ResolutionBroker) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
@@ -130,8 +128,6 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 	zapLogger := zap.New(zap.UseDevMode(true))
 	log.SetLogger(zapLogger)
 
-	resolutionBroker := binding.NewResolutionBroker(nil) // TODO: implement ResolutionGetter func
-
 	controller := &Controller{
 		wdsName:                 wdsName,
 		logger:                  log.Log.WithName(controllerName),
@@ -139,7 +135,7 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 		wdsKsClient:             wdsKsClient,
 		itsDynClient:            itsDynClient,
 		workqueue:               workqueue.NewRateLimitingQueue(ratelimiter),
-		bindingResolutionBroker: resolutionBroker,
+		bindingResolutionBroker: bindingResolutionBroker,
 	}
 
 	celEvaluator, err := newCELEvaluator()
@@ -176,8 +172,9 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	defer c.workqueue.ShutDown()
 
 	c.bindingResolutionBroker.RegisterCallback(func(bindingPolicyKey string) {
-		//TODO: implement callback func
-	})
+		// add binding to workqueue
+		c.workqueue.Add(bindingRef(bindingPolicyKey))
+	}) // this will have the broker call the callback for all existing resolutions
 
 	go c.runWorkStatusInformer(ctx)
 
@@ -318,6 +315,20 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 			if shouldSkipUpdate(old, new) {
 				return
 			}
+
+			// if old has singleton status label and new does not, then we need to pass the label to
+			// handleWorkStatus for it to remove the status from the source object
+			if _, ok := old.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]; ok {
+				if _, ok := new.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]; !ok {
+					// add label to new object
+					labels := new.(metav1.Object).GetLabels()
+					if labels == nil {
+						labels = make(map[string]string)
+					}
+
+					labels[util.BindingPolicyLabelSingletonStatusKey] = util.BindingPolicyLabelSingletonStatusValueUnset
+				}
+			}
 			c.handleWorkStatus(new)
 		},
 		DeleteFunc: func(obj interface{}) {
@@ -359,11 +370,16 @@ func (c *Controller) handleWorkStatus(obj any) {
 		return
 	}
 
+	_, ok := obj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]
+	if !ok {
+		c.workqueue.Add(*wsRef)
+	} else {
+		c.workqueue.Add(singletonWorkStatusRef(*wsRef))
+	}
+
 	c.logger.V(5).Info("Enqueuing reference to WorkStatus because of informer event",
 		"sourceObjectName", wsRef.sourceObjectIdentifier.ObjectName,
 		"sourceObjectGVK", wsRef.sourceObjectIdentifier.GVK, "wecName", wsRef.wecName)
-
-	c.workqueue.Add(wsRef)
 }
 
 // runWorker is a long-running function that will continually call the
@@ -419,6 +435,8 @@ func (c *Controller) reconcile(ctx context.Context, item any) error {
 	switch ref := item.(type) {
 	case workStatusRef:
 		return c.syncWorkStatus(ctx, ref)
+	case singletonWorkStatusRef:
+		return c.syncSingletonWorkStatus(ctx, ref)
 	case bindingRef:
 		return c.syncBinding(ctx, string(ref))
 	case statusCollectorRef:

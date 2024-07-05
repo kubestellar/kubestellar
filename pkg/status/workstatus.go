@@ -51,7 +51,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			return fmt.Errorf("failed to get workstatus (%v): %w", ref, err)
-		}
+		} // if not found, the above workstatus will reflect the fact
 	} else {
 		status, err := util.GetWorkStatusStatus(obj)
 		if err != nil {
@@ -66,16 +66,31 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
-	////////////////////////
-	// LEGACY SINGLETON HANDLING CODE
-	////////////////////////
+	return nil
+}
 
-	if obj == nil {
-		return nil
+func (c *Controller) syncSingletonWorkStatus(ctx context.Context, ref singletonWorkStatusRef) error {
+	logger := klog.FromContext(ctx)
+
+	workStatusObj, err := c.workStatusLister.ByNamespace(ref.wecName).Get(ref.name)
+	if err != nil {
+		if !errors.IsNotFound(err) {
+			return fmt.Errorf("failed to get workstatus (%v): %w", ref, err)
+		}
+	}
+
+	if workStatusObj == nil { // make sure status of source obj is deleted
+		emptyStatus := make(map[string]interface{})
+		if err = updateObjectStatus(ctx, &ref.sourceObjectIdentifier, emptyStatus,
+			c.listers, c.wdsDynClient); err != nil {
+			return err
+		}
+
+		return c.syncWorkStatus(ctx, workStatusRef(ref))
 	}
 
 	// only process workstatues with the label for single reported status
-	statusLabelVal, ok := obj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]
+	statusLabelVal, ok := workStatusObj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]
 	if !ok {
 		return nil
 	}
@@ -87,7 +102,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 			c.listers, c.wdsDynClient)
 	}
 
-	status, err := util.GetWorkStatusStatus(obj)
+	status, err := util.GetWorkStatusStatus(workStatusObj)
 	if err != nil {
 		return err
 	}
@@ -98,7 +113,11 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 	}
 
 	logger.Info("Updating singleton status", "objectIdentifier", ref.sourceObjectIdentifier)
-	return updateObjectStatus(ctx, &ref.sourceObjectIdentifier, status, c.listers, c.wdsDynClient)
+	if err = updateObjectStatus(ctx, &ref.sourceObjectIdentifier, status, c.listers, c.wdsDynClient); err != nil {
+		return err
+	}
+
+	return c.syncWorkStatus(ctx, workStatusRef(ref))
 }
 
 func updateObjectStatus(ctx context.Context, objectIdentifier *util.ObjectIdentifier, status map[string]interface{},

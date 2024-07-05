@@ -310,6 +310,7 @@ func (resolver *bindingPolicyResolver) DeleteResolution(bindingPolicyKey string)
 	defer resolver.Unlock()
 
 	delete(resolver.bindingPolicyToResolution, bindingPolicyKey)
+	resolver.broker.NotifyCallbacks(bindingPolicyKey)
 }
 
 // Broker returns a ResolutionBroker for the resolver.

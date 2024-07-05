@@ -137,6 +137,7 @@ func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) *Resoluti
 			bindingPolicyResolution.objectIdentifierToData,
 			func(data *objectData) ObjectData {
 				return ObjectData{
+					UID:              string(data.UID),
 					ResourceVersion:  data.ResourceVersion,
 					StatusCollectors: sets.List(data.StatusCollectors), // members are string copies
 				}

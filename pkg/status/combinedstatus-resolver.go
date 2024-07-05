@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"sync"
 
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -33,16 +34,12 @@ import (
 )
 
 type CombinedStatusResolver interface {
-	// GenerateCombinedStatus generates a CombinedStatus object for the given
-	// binding name and workload object identifier.
-	// If no resolution is associated with the given combination, nil is returned.
-	GenerateCombinedStatus(bindingName string, objectIdentifier util.ObjectIdentifier) *v1alpha1.CombinedStatus
-
 	// CompareCombinedStatus compares the given CombinedStatus object with the
 	// one associated with the given binding name and workload object identifier.
-	// True is returned in case of a match, false otherwise.
+	// If the in-memory state differs from the given object, the function returns
+	// the up-to-date CombinedStatus object. Otherwise, nil.
 	CompareCombinedStatus(bindingName string, objectIdentifier util.ObjectIdentifier,
-		combinedStatus *v1alpha1.CombinedStatus) bool
+		combinedStatus *v1alpha1.CombinedStatus) *v1alpha1.CombinedStatus
 
 	// NoteBindingResolution notes a binding resolution for status collection.
 	//
@@ -90,9 +87,19 @@ type CombinedStatusResolver interface {
 	// that should be queued for syncing.
 	NoteWorkStatus(workStatus *workStatus) sets.Set[util.ObjectIdentifier]
 
-	// ResolutionExists returns true if a combinedstatus resolution exists for
-	// the given binding name and workload object identifier.
-	ResolutionExists(bindingName string, objectIdentifier util.ObjectIdentifier) bool
+	// ResolutionExists returns true if a combinedstatus resolution is
+	// associated with the given name. The name is expected to follow the
+	// formatting specified in the API.
+	// The function returns a tuple of:
+	//
+	// - The associated binding's name, if the resolution exists.
+	//
+	// - The workload object identifier, if the resolution exists.
+	//
+	// - A boolean indicating whether the resolution exists.
+	//
+	// The returned pointers are expected to be read-only.
+	ResolutionExists(name string) (*string, *util.ObjectIdentifier, bool)
 }
 
 // NewCombinedStatusResolver creates a new CombinedStatusResolver.
@@ -100,18 +107,28 @@ func NewCombinedStatusResolver(celEvaluator *celEvaluator) CombinedStatusResolve
 	return &combinedStatusResolver{
 		celEvaluator:              celEvaluator,
 		bindingNameToResolutions:  make(map[string]map[util.ObjectIdentifier]*combinedStatusResolution),
+		resolutionNameToKey:       make(map[string]resolutionKey),
 		statusCollectorNameToSpec: make(map[string]*v1alpha1.StatusCollectorSpec),
 	}
+}
+
+// resolutionKey is a key used to identify a combinedstatus resolution.
+// It consists of a binding name and a workload object identifier.
+type resolutionKey struct {
+	bindingName            string
+	sourceObjectIdentifier util.ObjectIdentifier
 }
 
 type combinedStatusResolver struct {
 	celEvaluator *celEvaluator
 
 	sync.RWMutex
-	// bindingNameToResolutions is a map of binding names to their resolution
-	// entries. The latter is a map of object identifiers to their
+
+	// resolutions is a map of resolution keys to their
 	// combinedstatus resolutions.
 	bindingNameToResolutions map[string]map[util.ObjectIdentifier]*combinedStatusResolution
+	// resolutionNameToKey is a map of resolution names to their keys.
+	resolutionNameToKey map[string]resolutionKey
 	// statusCollectorNameToSpec is a map of statuscollector names to their
 	// specs. This serves as a cache that is the source of truth for
 	// statuscollectors that are used in the combinedstatus resolutions.
@@ -119,38 +136,22 @@ type combinedStatusResolver struct {
 	statusCollectorNameToSpec map[string]*v1alpha1.StatusCollectorSpec
 }
 
-// GenerateCombinedStatus generates a CombinedStatus object for the given
-// binding name and workload object identifier.
-// If no resolution is associated with the given combination, nil is returned.
-func (c *combinedStatusResolver) GenerateCombinedStatus(bindingName string,
-	objectIdentifier util.ObjectIdentifier) *v1alpha1.CombinedStatus {
+// CompareCombinedStatus compares the given CombinedStatus object with the
+// one associated with the given binding name and workload object identifier.
+// If the in-memory state differs from the given object, the function returns
+// the up-to-date CombinedStatus object. Otherwise, nil.
+func (c *combinedStatusResolver) CompareCombinedStatus(bindingName string,
+	objectIdentifier util.ObjectIdentifier, combinedStatus *v1alpha1.CombinedStatus) *v1alpha1.CombinedStatus {
 	c.RLock()
 	defer c.RUnlock()
 
 	if resolutions, exists := c.bindingNameToResolutions[bindingName]; exists {
 		if resolution, exists := resolutions[objectIdentifier]; exists {
-			return resolution.generateCombinedStatus(bindingName, objectIdentifier)
+			return resolution.compareCombinedStatus(combinedStatus, bindingName, objectIdentifier)
 		}
 	}
 
 	return nil
-}
-
-// CompareCombinedStatus compares the given CombinedStatus object with the
-// one associated with the given binding name and workload object identifier.
-// True is returned in case of a match, false otherwise.
-func (c *combinedStatusResolver) CompareCombinedStatus(bindingName string,
-	objectIdentifier util.ObjectIdentifier, combinedStatus *v1alpha1.CombinedStatus) bool {
-	c.RLock()
-	defer c.RUnlock()
-
-	if resolutions, exists := c.bindingNameToResolutions[bindingName]; exists {
-		if resolution, exists := resolutions[objectIdentifier]; exists {
-			return resolution.compareCombinedStatus(combinedStatus)
-		}
-	}
-
-	return false
 }
 
 // NoteBindingResolution notes a binding resolution for status collection.
@@ -184,14 +185,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 
 	// (1)
 	if deleted {
-		// for every combinedstatus resolution - queue its object identifier for syncing
-		// and remove the resolution from memory
-		for workloadObjectIdentifier, _ := range c.bindingNameToResolutions[bindingName] {
-			combinedStatusIdentifiersToQueue.Insert(getCombinedStatusIdentifier(bindingName, workloadObjectIdentifier))
-		}
-
-		delete(c.bindingNameToResolutions, bindingName)
-		return combinedStatusIdentifiersToQueue
+		return c.deleteResolutionsForBindingWriteLocked(bindingName)
 	}
 
 	destinationsSet := sets.New(abstract.SliceMap(bindingResolution.Destinations,
@@ -207,21 +201,32 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 
 	// (2) remove excessive combinedstatus resolutions of objects that are no longer
 	// associated with the binding resolution
-	for objectIdentifier, _ := range objectIdentifierToResolution {
+	for objectIdentifier, resolution := range objectIdentifierToResolution {
 		if _, exists := bindingResolution.ObjectIdentifierToData[objectIdentifier]; !exists {
-			combinedStatusIdentifiersToQueue.Insert(getCombinedStatusIdentifier(bindingName, objectIdentifier))
+			combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
+				objectIdentifier.ObjectName.Namespace))
 			delete(objectIdentifierToResolution, objectIdentifier)
+			delete(c.resolutionNameToKey, resolution.getName())
 		}
 	}
 
 	// (~2+3) create/update combinedstatus resolutions for every object that requires status collection,
 	// and delete resolutions that are no longer required
 	for objectIdentifier, objectData := range bindingResolution.ObjectIdentifierToData {
+		// namespace-scoped only for now - a resource cannot be both namespace and cluster scoped
+		// therefore combinedstatus objects are only namespace-scoped
+		if objectIdentifier.ObjectName.Namespace == v1.NamespaceNone {
+			continue
+		}
+
 		csResolution, exists := objectIdentifierToResolution[objectIdentifier]
 		if len(objectData.StatusCollectors) == 0 {
 			if exists { // associated resolution is no longer required
-				combinedStatusIdentifiersToQueue.Insert(getCombinedStatusIdentifier(bindingName, objectIdentifier))
+				combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(csResolution.getName(),
+					objectIdentifier.ObjectName.Namespace))
+
 				delete(objectIdentifierToResolution, objectIdentifier)
+				delete(c.resolutionNameToKey, csResolution.getName())
 			}
 
 			continue
@@ -230,9 +235,11 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 		// create resolution entry if missing
 		if !exists {
 			csResolution = &combinedStatusResolution{
+				name:                      getCombinedStatusName(bindingResolution.UID, objectData.UID),
 				statusCollectorNameToData: make(map[string]*statusCollectorData),
 			}
 			objectIdentifierToResolution[objectIdentifier] = csResolution
+			c.resolutionNameToKey[csResolution.getName()] = resolutionKey{bindingName, objectIdentifier}
 		}
 
 		// fetch missing statuscollector specs
@@ -246,7 +253,8 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 
 		// should queue the combinedstatus object for syncing if lost collectors / destinations
 		if removedCollectors || removedDestinations {
-			combinedStatusIdentifiersToQueue.Insert(getCombinedStatusIdentifier(bindingName, objectIdentifier))
+			combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(csResolution.getName(),
+				objectIdentifier.ObjectName.Namespace))
 		}
 
 		// should evaluate workstatuses if added/updated collectors or added destinations
@@ -259,6 +267,28 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 	// identifiers that should be queued for syncing
 	return combinedStatusIdentifiersToQueue.Union(c.evaluateWorkStatusesPerBindingReadLocked(bindingName,
 		workloadIdentifiersToEvaluate, destinationsSet, workStatusIndexer))
+}
+
+// deleteResolutionsForBindingWriteLocked deletes all combinedstatus resolutions associated with the given binding name.
+// The method returns the identifiers of combinedstatus objects that should be queued for syncing (deletion).
+// The method is expected to be called with the write lock held.
+func (c *combinedStatusResolver) deleteResolutionsForBindingWriteLocked(bindingName string) sets.Set[util.ObjectIdentifier] {
+	combinedStatusIdentifiersToQueue := sets.New[util.ObjectIdentifier]()
+
+	resolutions, exists := c.bindingNameToResolutions[bindingName]
+	if !exists {
+		return combinedStatusIdentifiersToQueue
+	}
+
+	for sourceObjIdentifier, resolution := range resolutions {
+		combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
+			sourceObjIdentifier.ObjectName.Namespace))
+		delete(c.resolutionNameToKey, resolution.getName())
+	}
+
+	delete(c.bindingNameToResolutions, bindingName)
+
+	return combinedStatusIdentifiersToQueue
 }
 
 // NoteWorkStatus notes a workstatus in the combinedstatus resolutions
@@ -277,7 +307,7 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 	combinedStatusIdentifiersToQueue := sets.New[util.ObjectIdentifier]()
 
 	// update resolutions sensitive to the workstatus
-	for bindingName, resolutions := range c.bindingNameToResolutions {
+	for _, resolutions := range c.bindingNameToResolutions {
 		resolution, exists := resolutions[workStatus.sourceObjectIdentifier]
 		if !exists {
 			continue
@@ -285,8 +315,8 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 
 		// this call logs errors, but does not return them for now
 		if resolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, workStatus.status) {
-			combinedStatusIdentifiersToQueue.Insert(getCombinedStatusIdentifier(bindingName,
-				workStatus.sourceObjectIdentifier))
+			combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
+				workStatus.sourceObjectIdentifier.ObjectName.Namespace))
 		}
 	}
 
@@ -323,8 +353,8 @@ func (c *combinedStatusResolver) NoteStatusCollector(statusCollector *v1alpha1.S
 		for workloadObjectIdentifier, resolution := range resolutions {
 			if deleted {
 				if resolution.removeStatusCollector(statusCollector.Name) {
-					combinedStatusIdentifiersToQueue.Insert(getCombinedStatusIdentifier(bindingName,
-						workloadObjectIdentifier))
+					combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
+						workloadObjectIdentifier.ObjectName.Namespace))
 				}
 
 				continue
@@ -348,18 +378,28 @@ func (c *combinedStatusResolver) NoteStatusCollector(statusCollector *v1alpha1.S
 	return combinedStatusIdentifiersToQueue
 }
 
-// ResolutionExists returns true if a combinedstatus resolution exists for
-// the given binding name and workload object identifier.
-func (c *combinedStatusResolver) ResolutionExists(bindingName string, objectIdentifier util.ObjectIdentifier) bool {
+// ResolutionExists returns true if a combinedstatus resolution is
+// associated with the given name. The name is expected to follow the
+// formatting specified in the API.
+// The function returns a tuple of:
+//
+// - The associated binding's name, if the resolution exists.
+//
+// - The workload object identifier, if the resolution exists.
+//
+// - A boolean indicating whether the resolution exists.
+//
+// The returned pointers are expected to be read-only.
+func (c *combinedStatusResolver) ResolutionExists(name string) (*string, *util.ObjectIdentifier, bool) {
 	c.RLock()
 	defer c.RUnlock()
 
-	if resolutions, exists := c.bindingNameToResolutions[bindingName]; exists {
-		_, exists = resolutions[objectIdentifier]
-		return exists
+	key, exists := c.resolutionNameToKey[name]
+	if !exists {
+		return nil, nil, false
 	}
 
-	return false
+	return &key.bindingName, &key.sourceObjectIdentifier, true
 }
 
 // fetchMissingStatusCollectorSpecs fetches the missing statuscollector specs
@@ -419,8 +459,8 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 			// evaluate workstatus
 			csResolution := c.bindingNameToResolutions[bindingName][workStatus.sourceObjectIdentifier]
 			if csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, workStatus.status) {
-				combinedStatusesToQueue.Insert(getCombinedStatusIdentifier(bindingName,
-					workStatus.sourceObjectIdentifier))
+				combinedStatusesToQueue.Insert(util.IdentifierForCombinedStatus(csResolution.getName(),
+					workloadObjIdentifier.ObjectName.Namespace))
 			}
 		}
 	}
@@ -433,7 +473,8 @@ func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool 
 		return false
 	}
 
-	if spec1.Filter != spec2.Filter {
+	// compare string pointers
+	if !expressionPtrsEqual(spec1.Filter, spec2.Filter) {
 		return false
 	}
 
@@ -464,7 +505,7 @@ func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool 
 		func(na v1alpha1.NamedAggregator) v1alpha1.NamedAggregator { return na })
 	for _, na := range spec2.CombinedFields {
 		if aggregator, ok := combinedFieldsMap[na.Name]; !ok ||
-			aggregator.Type != na.Type || aggregator.Subject != na.Subject {
+			aggregator.Type != na.Type || !expressionPtrsEqual(aggregator.Subject, na.Subject) {
 			return false
 		}
 	}
@@ -496,4 +537,8 @@ func namedExpressionSliceToMap(slice []v1alpha1.NamedExpression) map[string]v1al
 	}
 
 	return result
+}
+
+func expressionPtrsEqual(e1, e2 *v1alpha1.Expression) bool {
+	return e1 == nil && e2 == nil || e1 != nil && e2 != nil && *e1 == *e2
 }
