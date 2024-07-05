@@ -151,7 +151,7 @@ func GenericMain(transportImplementation transport.Transport) {
 		wdsClientset.ControlV1alpha1().Bindings(), wdsControlInformers.Bindings(),
 		wdsControlInformers.CustomTransforms(),
 		transportImplementation, wdsClientset, wdsDynamicClient, transportClientset.CoreV1().Namespaces(), itsK8sInformerFactory.Core().V1().ConfigMaps(),
-		transportClientset, transportDynamicClient, options.WdsName)
+		transportClientset, transportDynamicClient, options.MaxSizeWrappedObject, options.WdsName)
 	if err != nil {
 		logger.Error(err, "failed to construct transport controller")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
