@@ -518,7 +518,7 @@ func (c *combinedStatusResolver) getObjectMetaAndSpec(objectIdentifier util.Obje
 		return nil, fmt.Errorf("lister not found for gvr %s", objectIdentifier.GVR())
 	}
 
-	obj, err := lister.ByNamespace(objectIdentifier.ObjectName.Namespace).Get(objectIdentifier.ObjectName.Name)
+	obj, err := getObject(lister, objectIdentifier.ObjectName.Namespace, objectIdentifier.ObjectName.Name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get object (%v) with gvr (%v): %w", objectIdentifier.ObjectName,
 			objectIdentifier.GVR(), err)
@@ -540,6 +540,13 @@ func (c *combinedStatusResolver) getObjectMetaAndSpec(objectIdentifier util.Obje
 	}
 
 	return objMap, nil
+}
+
+func getObject(lister cache.GenericLister, namespace, name string) (runtime.Object, error) {
+	if namespace != "" {
+		return lister.ByNamespace(namespace).Get(name)
+	}
+	return lister.Get(name)
 }
 
 func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool {
