@@ -236,23 +236,6 @@ func (c *combinedStatusResolution) removeStatusCollector(statusCollectorName str
 	return true
 }
 
-func (c *combinedStatusResolution) isEmpty() bool {
-	c.RLock()
-	defer c.RUnlock()
-
-	if len(c.statusCollectorNameToData) == 0 {
-		return true
-	}
-
-	for _, scData := range c.statusCollectorNameToData {
-		if len(scData.wecToData) > 0 {
-			return false
-		}
-	}
-
-	return true
-}
-
 // generateCombinedStatus calculates the combinedstatus from the statuscollector
 // data in the combinedstatus resolution.
 func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
@@ -588,13 +571,13 @@ func handleSelect(scName string, scData *statusCollectorData) *v1alpha1.NamedSta
 					Number: &numStr,
 				}
 			case uint, uint8, uint16, uint32, uint64:
-				numStr := strconv.FormatInt(int64(v.(uint64)), 10)
+				numStr := strconv.FormatUint(v.(uint64), 10)
 				col = v1alpha1.Value{
 					Type:   v1alpha1.TypeNumber,
 					Number: &numStr,
 				}
 			case float32, float64:
-				numStr := strconv.FormatFloat(v.(float64), 'f', -1, 64)
+				numStr := strconv.FormatFloat(v.(float64), 'g', -1, 64)
 				col = v1alpha1.Value{
 					Type:   v1alpha1.TypeNumber,
 					Number: &numStr,
@@ -705,7 +688,7 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 
 			sum += *subject
 		}
-		numStr = strconv.FormatFloat(sum, 'f', -1, 64)
+		numStr = strconv.FormatFloat(sum, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeAvg:
 		sum := 0.0
 		for _, wsData := range wsDataGroup {
@@ -717,7 +700,7 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 			sum += *subject
 		}
 		avg := sum / float64(len(wsDataGroup))
-		numStr = strconv.FormatFloat(avg, 'f', -1, 64)
+		numStr = strconv.FormatFloat(avg, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeMin:
 		min := math.Inf(1)
 		for _, wsData := range wsDataGroup {
@@ -730,7 +713,7 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 				min = *subject
 			}
 		}
-		numStr = strconv.FormatFloat(min, 'f', -1, 64)
+		numStr = strconv.FormatFloat(min, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeMax:
 		max := math.Inf(-1)
 		for _, wsData := range wsDataGroup {
@@ -743,7 +726,7 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 				max = *subject
 			}
 		}
-		numStr = strconv.FormatFloat(max, 'f', -1, 64)
+		numStr = strconv.FormatFloat(max, 'g', -1, 64)
 	default:
 		return v1alpha1.Value{
 			Type: v1alpha1.TypeNull,
@@ -872,7 +855,8 @@ func valueEqual(a, b *v1alpha1.Value) bool {
 		if err != nil {
 			return false
 		}
-		return aNum == bNum
+
+		return numericEqual(aNum, bNum)
 	case v1alpha1.TypeBool:
 		return *a.Bool == *b.Bool
 	case v1alpha1.TypeObject:
@@ -887,14 +871,33 @@ func valueEqual(a, b *v1alpha1.Value) bool {
 	}
 }
 
-func parseNumber(s string) (float64, error) {
-	if intValue, err := strconv.Atoi(s); err == nil {
-		return float64(intValue), nil
+func parseNumber(s string) (any, error) {
+	if intValue, err := strconv.ParseInt(s, 10, 64); err == nil {
+		return intValue, nil
+	}
+
+	if uintValue, err := strconv.ParseUint(s, 10, 64); err == nil {
+		return uintValue, nil
 	}
 
 	if floatValue, err := strconv.ParseFloat(s, 64); err == nil {
 		return floatValue, nil
 	}
 
-	return 0, fmt.Errorf("failed to parse number")
+	return nil, fmt.Errorf("failed to parse number")
+}
+
+// numericEqual compares two numeric values. It is assumed that the types of a
+// and b are the same.
+func numericEqual(a, b any) bool {
+	switch aValue := a.(type) {
+	case int64:
+		return aValue == b.(int64)
+	case uint64:
+		return aValue == b.(uint64)
+	case float64:
+		return aValue == b.(float64)
+	default:
+		return false
+	}
 }
