@@ -484,7 +484,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				ksapi.StatusCollectorSpec{
 					GroupBy: []ksapi.NamedExpression{{
 						Name: "num-available",
-						Def:  "obj.availableReplicas",
+						Def:  "obj.status.availableReplicas",
 					}},
 					CombinedFields: []ksapi.NamedAggregator{{
 						Name: "count",
@@ -515,7 +515,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				ksapi.StatusCollectorSpec{
 					Select: []ksapi.NamedExpression{{
 						Name: "availableReplicas",
-						Def:  "obj.availableReplicas",
+						Def:  "obj.status.availableReplicas",
 					}},
 					Limit: 20,
 				})
@@ -524,7 +524,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				ksapi.StatusCollectorSpec{
 					Select: []ksapi.NamedExpression{{
 						Name: "replicas",
-						Def:  "obj.replicas",
+						Def:  "obj.status.replicas",
 					}},
 					Limit: 20,
 				})
