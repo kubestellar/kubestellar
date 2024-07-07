@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"sync"
 
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -218,12 +217,6 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 	// (~2+3) create/update combinedstatus resolutions for every object that requires status collection,
 	// and delete resolutions that are no longer required
 	for objectIdentifier, objectData := range bindingResolution.ObjectIdentifierToData {
-		// namespace-scoped only for now - a resource cannot be both namespace and cluster scoped
-		// therefore combinedstatus objects are only namespace-scoped
-		if objectIdentifier.ObjectName.Namespace == v1.NamespaceNone {
-			continue
-		}
-
 		csResolution, exists := objectIdentifierToResolution[objectIdentifier]
 		if len(objectData.StatusCollectors) == 0 {
 			if exists { // associated resolution is no longer required

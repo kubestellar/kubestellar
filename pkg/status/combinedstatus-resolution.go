@@ -887,17 +887,20 @@ func parseNumber(s string) (any, error) {
 	return nil, fmt.Errorf("failed to parse number")
 }
 
-// numericEqual compares two numeric values. It is assumed that the types of a
-// and b are the same.
-func numericEqual(a, b any) bool {
+func numericEqual(a, b interface{}) bool {
 	switch aValue := a.(type) {
 	case int64:
-		return aValue == b.(int64)
+		if bValue, ok := b.(int64); ok {
+			return aValue == bValue
+		}
 	case uint64:
-		return aValue == b.(uint64)
+		if bValue, ok := b.(uint64); ok {
+			return aValue == bValue
+		}
 	case float64:
-		return aValue == b.(float64)
-	default:
-		return false
+		if bValue, ok := b.(float64); ok {
+			return aValue == bValue
+		}
 	}
+	return false
 }

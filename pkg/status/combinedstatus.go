@@ -22,12 +22,16 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
+
+const clusterScopedObjectsNamespace = "kubestellar-report"
 
 func (c *Controller) syncCombinedStatus(ctx context.Context, ref string) error {
 	logger := klog.FromContext(ctx)
@@ -83,6 +87,13 @@ func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context, combinedS
 	// set results
 	combinedStatus.Results = generatedCombinedStatus.Results
 
+	if combinedStatus.Namespace == metav1.NamespaceNone {
+		combinedStatus.Namespace = clusterScopedObjectsNamespace
+		if err := c.ensureNamespaceExists(ctx, combinedStatus.Namespace); err != nil {
+			return fmt.Errorf("failed to ensure namespace exists: %w", err)
+		}
+	}
+
 	logger := klog.FromContext(ctx)
 	csEcho, err := c.wdsKsClient.ControlV1alpha1().CombinedStatuses(combinedStatus.Namespace).Update(ctx,
 		combinedStatus, metav1.UpdateOptions{FieldManager: controllerName})
@@ -125,6 +136,38 @@ func (c *Controller) deleteCombinedStatus(ctx context.Context, ns, name string) 
 	}
 
 	logger.Info("Deleted CombinedStatus", "ns", ns, "name", name)
+	return nil
+}
+
+func (c *Controller) ensureNamespaceExists(ctx context.Context, ns string) error {
+	namespaceGVR := schema.GroupVersionResource{
+		Group:    "",
+		Version:  "v1",
+		Resource: "namespaces",
+	}
+
+	_, err := c.wdsDynClient.Resource(namespaceGVR).Namespace(ns).Get(ctx, ns, metav1.GetOptions{})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			namespaceObj := &unstructured.Unstructured{
+				Object: map[string]interface{}{
+					"apiVersion": "v1",
+					"kind":       "Namespace",
+					"metadata": map[string]interface{}{
+						"name": ns,
+					},
+				},
+			}
+			_, err = c.wdsDynClient.Resource(namespaceGVR).Create(ctx, namespaceObj,
+				metav1.CreateOptions{FieldManager: controllerName})
+			if err != nil {
+				return fmt.Errorf("failed to create namespace: %w", err)
+			}
+		} else {
+			return fmt.Errorf("failed to get namespace: %w", err)
+		}
+	}
+
 	return nil
 }
 
