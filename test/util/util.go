@@ -147,11 +147,7 @@ func DeleteBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 }
 
 func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name string,
-	clusterSelector []metav1.LabelSelector, objectTest []ksapi.DownsyncObjectTest) {
-	testAndStatusCollection := make([]ksapi.DownsyncObjectTestAndStatusCollection, len(objectTest))
-	for idx, test := range objectTest {
-		testAndStatusCollection[idx].DownsyncObjectTest = test
-	}
+	clusterSelector []metav1.LabelSelector, testAndStatusCollection []ksapi.DownsyncObjectTestAndStatusCollection) {
 	bindingPolicy := ksapi.BindingPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
@@ -167,6 +163,58 @@ func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 		p, _ := wds.ControlV1alpha1().BindingPolicies().Get(ctx, name, metav1.GetOptions{})
 		return p
 	}, timeout).Should(gomega.Not(gomega.BeNil()))
+}
+
+func CreateStatusCollector(ctx context.Context, wds *ksClient.Clientset, name string, spec ksapi.StatusCollectorSpec) {
+	satusCollector := ksapi.StatusCollector{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "StatusCollector",
+			APIVersion: "control.kubestellar.io/v1alpha1",
+		},
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec:       spec,
+	}
+	_, err := wds.ControlV1alpha1().StatusCollectors().Create(ctx, &satusCollector, metav1.CreateOptions{})
+	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Eventually(func() *ksapi.StatusCollector {
+		p, _ := wds.ControlV1alpha1().StatusCollectors().Get(ctx, name, metav1.GetOptions{})
+		return p
+	}, timeout).Should(gomega.Not(gomega.BeNil()))
+}
+
+// GetCombinedStatus is a helper func which expects the workload object to be a Deployment.
+// CombinedStatus name is the concatenation of:
+// - the UID of the workload object
+// - the string "."
+// - the UID of the BindingPolicy object.
+func GetCombinedStatus(ctx context.Context, ksClient *ksClient.Clientset, kubeClient *kubernetes.Clientset, ns, objectName, policyName string) *ksapi.CombinedStatus {
+	var cs *ksapi.CombinedStatus
+
+	p, err := ksClient.ControlV1alpha1().BindingPolicies().Get(ctx, policyName, metav1.GetOptions{})
+	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+
+	d, err := kubeClient.AppsV1().Deployments(ns).Get(ctx, objectName, metav1.GetOptions{})
+	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+
+	cs_name := string(d.UID) + "." + string(p.UID)
+
+	gomega.Eventually(func() error {
+		cs, err = ksClient.ControlV1alpha1().CombinedStatuses(ns).Get(ctx, cs_name, metav1.GetOptions{})
+		return err
+	}, timeout).Should(gomega.Not(gomega.HaveOccurred()))
+
+	gomega.Eventually(func() error {
+		cs, err = ksClient.ControlV1alpha1().CombinedStatuses(ns).Get(ctx, cs_name, metav1.GetOptions{})
+		return err
+	}, timeout).ShouldNot(gomega.HaveOccurred())
+
+	// now that CombinedStatus exists, we need to wait some time for it to be completed
+	// TODO: find a way to determine completion
+	time.Sleep(40 * time.Second)
+	cs, err = ksClient.ControlV1alpha1().CombinedStatuses(ns).Get(ctx, cs_name, metav1.GetOptions{})
+	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+
+	return cs
 }
 
 func DeleteDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string, name string) {
