@@ -311,22 +311,7 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 			continue
 		}
 
-		content := map[string]interface{}{}
-		content["status"] = workStatus.status
-
-		if resolution.requiresSourceObjectMetaOrSpec() {
-			objMap, err := c.getObjectMetaAndSpec(workStatus.sourceObjectIdentifier)
-			if err != nil {
-				runtime2.HandleError(fmt.Errorf("failed to get meta & spec for source object %s: %w",
-					workStatus.sourceObjectIdentifier, err))
-			}
-
-			if objMap != nil {
-				for k, v := range objMap {
-					content[k] = v
-				}
-			}
-		}
+		content := c.getCombinedContentMap(workStatus, resolution)
 
 		// this call logs errors, but does not return them for now
 		if resolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, content) {
@@ -472,22 +457,7 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 			}
 
 			csResolution := c.bindingNameToResolutions[bindingName][workStatus.sourceObjectIdentifier]
-			content := map[string]interface{}{}
-			content["status"] = workStatus.status
-
-			if csResolution.requiresSourceObjectMetaOrSpec() {
-				objMap, err := c.getObjectMetaAndSpec(workStatus.sourceObjectIdentifier)
-				if err != nil {
-					runtime2.HandleError(fmt.Errorf("failed to get meta & spec for source object %s: %w",
-						workStatus.sourceObjectIdentifier, err))
-				}
-
-				if objMap != nil {
-					for k, v := range objMap {
-						content[k] = v
-					}
-				}
-			}
+			content := c.getCombinedContentMap(workStatus, csResolution)
 
 			// evaluate workstatus
 			if csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, content) {
@@ -498,6 +468,27 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 	}
 
 	return combinedStatusesToQueue
+}
+
+// getCombinedContentMap returns a map of content for the given workstatus.
+func (c *combinedStatusResolver) getCombinedContentMap(workStatus *workStatus,
+	resolution *combinedStatusResolution) map[string]interface{} {
+	content := map[string]interface{}{
+		statusKey:    workStatus.status,
+		inventoryKey: inventoryForWorkStatus(workStatus),
+	}
+
+	if resolution.requiresSourceObjectMetaOrSpec() {
+		objMap, err := c.getObjectMetaAndSpec(workStatus.sourceObjectIdentifier)
+		if err != nil {
+			runtime2.HandleError(fmt.Errorf("failed to get meta & spec for source object %s: %w",
+				workStatus.sourceObjectIdentifier, err))
+		}
+
+		content[sourceObjectKey] = objMap
+	}
+
+	return content
 }
 
 // getObjectMetaAndSpec fetches the metadata and spec of the object associated
@@ -615,4 +606,11 @@ func namedExpressionSliceToMap(slice []v1alpha1.NamedExpression) map[string]v1al
 
 func expressionPtrsEqual(e1, e2 *v1alpha1.Expression) bool {
 	return e1 == nil && e2 == nil || e1 != nil && e2 != nil && *e1 == *e2
+}
+
+// inventoryForWorkStatus returns an inventory map for the given workstatus.
+func inventoryForWorkStatus(ws *workStatus) map[string]interface{} {
+	return map[string]interface{}{
+		"name": ws.wecName,
+	}
 }
