@@ -312,7 +312,7 @@ func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.Combin
 // exists.
 // TODO: handle errors
 func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator,
-	workStatusWECName string, workStatusContent map[string]interface{}) bool {
+	workStatusWECName string, content map[string]interface{}) bool {
 	c.Lock()
 	defer c.Unlock()
 
@@ -323,7 +323,7 @@ func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator
 	updated := false
 	for _, scData := range c.statusCollectorNameToData {
 		changed := evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator, workStatusWECName,
-			workStatusContent, scData)
+			content, scData)
 
 		updated = updated || changed
 	}
@@ -377,17 +377,17 @@ func (c *combinedStatusResolution) requiresSourceObjectMetaOrSpec() bool {
 // The function assumes that the caller holds a lock over the combinedstatus
 // resolution.
 func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvaluator, workStatusWECName string,
-	workStatusContent map[string]interface{}, scData *statusCollectorData) bool {
+	content map[string]interface{}, scData *statusCollectorData) bool {
 	wsData, exists := scData.wecToData[workStatusWECName]
 
-	if workStatusContent == nil && exists { // workstatus is empty/deleted, remove the workstatus data if it exists
+	if content == nil && exists { // workstatus is empty/deleted, remove the workstatus data if it exists
 		delete(scData.wecToData, workStatusWECName)
 		return true
 	}
 
 	// evaluate filter to determine if the workstatus is relevant
 	if scData.Filter != nil {
-		eval, err := celEvaluator.Evaluate(*scData.Filter, workStatusContent)
+		eval, err := celEvaluator.Evaluate(*scData.Filter, content)
 		if err != nil {
 			runtime2.HandleError(fmt.Errorf("failed to evaluate filter expression: %w", err))
 			return false
@@ -419,7 +419,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 	// evaluate select
 	selectEvals := make(map[string]ref.Val)
 	for _, selectNamedExp := range scData.Select {
-		eval, err := celEvaluator.Evaluate(selectNamedExp.Def, workStatusContent)
+		eval, err := celEvaluator.Evaluate(selectNamedExp.Def, content)
 		if err != nil {
 			runtime2.HandleError(fmt.Errorf("failed to evaluate select expression: %w", err))
 			continue
@@ -432,7 +432,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 	// evaluate groupBy
 	groupByEvals := make(map[string]ref.Val)
 	for _, groupByNamedExp := range scData.GroupBy {
-		eval, err := celEvaluator.Evaluate(groupByNamedExp.Def, workStatusContent)
+		eval, err := celEvaluator.Evaluate(groupByNamedExp.Def, content)
 		if err != nil {
 			runtime2.HandleError(fmt.Errorf("failed to evaluate groupBy expression: %w", err))
 			continue
@@ -455,7 +455,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 		}
 
 		// evaluate subject which should not be nil since the statuscollector is valid
-		eval, err := celEvaluator.Evaluate(*combinedFieldNamedAgg.Subject, workStatusContent)
+		eval, err := celEvaluator.Evaluate(*combinedFieldNamedAgg.Subject, content)
 		if err != nil {
 			runtime2.HandleError(fmt.Errorf("failed to evaluate combinedFields subject expression: %w", err))
 			continue
@@ -525,27 +525,21 @@ func validateCombinedStatusLabels(combinedStatus *v1alpha1.CombinedStatus,
 func handleSelect(scName string, scData *statusCollectorData) *v1alpha1.NamedStatusCombination {
 	namedStatusCombination := v1alpha1.NamedStatusCombination{
 		Name:        scName,
-		ColumnNames: make([]string, 0, len(scData.Select)+1), // for now, manually add wecName to all rows
+		ColumnNames: make([]string, 0, len(scData.Select)), // for now, manually add wecName to all rows
 		Rows:        make([]v1alpha1.StatusCombinationRow, 0, len(scData.wecToData)),
 	}
 
 	// add column names
-	namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames, "wecName")
 	namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames,
 		abstract.SliceMap(scData.Select, func(selectNamedExp v1alpha1.NamedExpression) string {
 			return selectNamedExp.Name
 		})...)
 
 	// add rows for each workstatus
-	for wecName, wsData := range scData.wecToData {
+	for _, wsData := range scData.wecToData {
 		row := v1alpha1.StatusCombinationRow{
-			Columns: make([]v1alpha1.Value, 0, len(scData.Select)+1),
+			Columns: make([]v1alpha1.Value, 0, len(scData.Select)),
 		}
-
-		wecNameStr := wecName
-		row.Columns = append(row.Columns, v1alpha1.Value{
-			Type:   v1alpha1.TypeString,
-			String: &wecNameStr})
 
 		for _, selectNamedExp := range scData.Select {
 			eval := wsData.selectEval[selectNamedExp.Name]
