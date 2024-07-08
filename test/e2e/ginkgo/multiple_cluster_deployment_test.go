@@ -55,10 +55,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		)
 	})
 
-	ctx := context.Background()
-
 	ginkgo.Context("multiple WECs", func() {
-		ginkgo.It("propagates deployment to the WECs while applying CustomTransform", func() {
+		ginkgo.It("propagates deployment to the WECs while applying CustomTransform", func(ctx context.Context) {
 			util.CreateCustomTransform(ctx, ksWds, "test", "apps", "deployments", `$.metadata.labels["test.kubestellar.io/test-label"]`)
 			testLabelAbsent := func(deployment *appsv1.Deployment) string {
 				if _, has := deployment.Labels["test.kubestellar.io/test-label"]; has {
@@ -70,7 +68,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec2, ns, 1, testLabelAbsent)
 		})
 
-		ginkgo.It("updates objects on the WECs following an update on the WDS", func() {
+		ginkgo.It("updates objects on the WECs following an update on the WDS", func(ctx context.Context) {
 			patch := []byte(`{"spec":{"replicas": 2}}`)
 			_, err := wds.AppsV1().Deployments(ns).Patch(
 				ctx, "nginx", types.MergePatchType, patch, metav1.PatchOptions{})
@@ -80,7 +78,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 2)
 		})
 
-		ginkgo.It("handles changes in bindingpolicy ObjectSelector", func() {
+		ginkgo.It("handles changes in bindingpolicy ObjectSelector", func(ctx context.Context) {
 			ginkgo.By("deletes WEC objects when bindingpolicy ObjectSelector stops matching")
 			patch := []byte(`{"spec": {"downsync": [{"objectSelectors": [{"matchLabels": {"app.kubernetes.io/name": "invalid"}}]}]}}`)
 			_, err := ksWds.ControlV1alpha1().BindingPolicies().Patch(
@@ -98,7 +96,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
 		})
 
-		ginkgo.It("handles changes in workload object labels", func() {
+		ginkgo.It("handles changes in workload object labels", func(ctx context.Context) {
 			ginkgo.By("deletes WEC objects when workload object labels stop matching")
 			patch := []byte(`{"metadata": {"labels": {"app.kubernetes.io/name": "not-me"}}}`)
 			_, err := wds.AppsV1().Deployments("nginx").Patch(
@@ -116,7 +114,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
 		})
 
-		ginkgo.It("handles multiple bindingpolicies with overlapping matches", func() {
+		ginkgo.It("handles multiple bindingpolicies with overlapping matches", func(ctx context.Context) {
 			ginkgo.By("creates a second bindingpolicy with overlapping matches")
 			util.CreateBindingPolicy(ctx, ksWds, "nginx-2",
 				[]metav1.LabelSelector{
@@ -138,22 +136,22 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
 		})
 
-		ginkgo.It("deletes WEC objects when wds deployment is deleted", func() {
+		ginkgo.It("deletes WEC objects when wds deployment is deleted", func(ctx context.Context) {
 			util.DeleteDeployment(ctx, wds, ns, "nginx")
 			util.ValidateNumDeployments(ctx, wec1, ns, 0)
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 		})
 
-		ginkgo.It("deletes WEC objects when BindingPolicy is deleted", func() {
+		ginkgo.It("deletes WEC objects when BindingPolicy is deleted", func(ctx context.Context) {
 			err := ksWds.ControlV1alpha1().BindingPolicies().Delete(ctx, "nginx", metav1.DeleteOptions{})
 			gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
 			util.ValidateNumDeployments(ctx, wec1, ns, 0)
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 		})
 
-		ginkgo.It("shards a wrapped workload when needed", func() {
+		ginkgo.It("shards a wrapped workload when needed", func(ctx context.Context) {
 			util.DeleteDeployment(ctx, wds, ns, "nginx")
-			ginkgo.DeferCleanup(func() {
+			ginkgo.DeferCleanup(func(ctx context.Context) {
 				patch := []byte(`{"spec":{"template":{"spec":{"containers":[{"args":["--max-size-wrapped-object=512000","--transport-kubeconfig=/mnt/shared/transport-kubeconfig","--wds-kubeconfig=/mnt/shared/wds-kubeconfig","--wds-name=wds1","-v=4"],"name":"transport-controller"}]}}}}`)
 				_, err := coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "transport-controller", types.StrategicMergePatchType, patch, metav1.PatchOptions{})
 				gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
@@ -202,7 +200,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		// and a Placement that matches labels A AND B, and verify that only
 		// object 1 matches and is delivered.
 		// 2. Patch the cluster selector and expect objects to be removed and downsynced correctly.
-		ginkgo.It("downsync objects that fully match on object and cluster selector", func() {
+		ginkgo.It("downsync objects that fully match on object and cluster selector", func(ctx context.Context) {
 			ginkgo.By("create two deployments and a bindingpolicy that matches only one")
 			util.DeleteDeployment(ctx, wds, ns, "nginx")
 			util.CreateDeployment(ctx, wds, ns, "one",
@@ -237,7 +235,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
 		})
 
-		ginkgo.It("handles clusterSelector with MatchLabels and MatchExpressions", func() {
+		ginkgo.It("handles clusterSelector with MatchLabels and MatchExpressions", func(ctx context.Context) {
 			util.DeleteDeployment(ctx, wds, ns, "nginx")
 			util.CreateDeployment(ctx, wds, ns, "one",
 				map[string]string{
@@ -271,7 +269,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec2, ns, 2)
 		})
 
-		ginkgo.It("downsync based on object labels and object name", func() {
+		ginkgo.It("downsync based on object labels and object name", func(ctx context.Context) {
 			util.DeleteDeployment(ctx, wds, ns, "nginx")
 			util.CreateDeployment(ctx, wds, ns, "one",
 				map[string]string{
@@ -302,7 +300,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 	})
 
 	ginkgo.Context("singleton status testing", func() {
-		ginkgo.It("sets (or deletes) singleton status when a singleton bindingpolicy/deployment is created (or deleted)", func() {
+		ginkgo.It("sets (or deletes) singleton status when a singleton bindingpolicy/deployment is created (or deleted)", func(ctx context.Context) {
 			util.DeleteDeployment(ctx, wds, ns, "nginx") // we don't have to delete nginx
 			util.CreateDeployment(ctx, wds, ns, "nginx-singleton",
 				map[string]string{
@@ -336,7 +334,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 	})
 
 	ginkgo.Context("object cleaning", func() {
-		ginkgo.It("properly starts a service", func() {
+		ginkgo.It("properly starts a service", func(ctx context.Context) {
 			util.CreateService(ctx, wds, ns, "hello-service", "hello-service")
 			util.CreateBindingPolicy(ctx, ksWds, "hello-service",
 				[]metav1.LabelSelector{
@@ -350,7 +348,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			)
 			util.ValidateNumServices(ctx, wec1, ns, 1)
 		})
-		ginkgo.It("properly starts a job with metadata.generateName", func() {
+		ginkgo.It("properly starts a job with metadata.generateName", func(ctx context.Context) {
 			util.CreateJob(ctx, wds, ns, "hello-job", "hello-job")
 			util.CreateBindingPolicy(ctx, ksWds, "hello-job",
 				[]metav1.LabelSelector{
@@ -367,7 +365,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 	})
 
 	ginkgo.Context("resiliency testing", func() {
-		ginkgo.It("survives WDS coming down", func() {
+		ginkgo.It("survives WDS coming down", func(ctx context.Context) {
 			util.DeletePods(ctx, coreCluster, "wds1-system", "kubestellar")
 			util.DeletePods(ctx, coreCluster, "wds1-system", "transport")
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
@@ -375,20 +373,20 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.Expect1PodOfEach(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", "transport-controller")
 		})
 
-		ginkgo.It("survives kubeflex coming down", func() {
+		ginkgo.It("survives kubeflex coming down", func(ctx context.Context) {
 			util.DeletePods(ctx, coreCluster, "kubeflex-system", "")
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
 			util.Expect1PodOfEach(ctx, coreCluster, "kubeflex-system", "kubeflex-controller-manager", "postgres-postgresql-0")
 		})
 
-		ginkgo.It("survives ITS vcluster coming down", func() {
+		ginkgo.It("survives ITS vcluster coming down", func(ctx context.Context) {
 			util.DeletePods(ctx, coreCluster, "its1-system", "vcluster")
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, wec2, ns, 1)
 		})
 
-		ginkgo.It("survives everything coming down", func() {
+		ginkgo.It("survives everything coming down", func(ctx context.Context) {
 			ginkgo.By("kill as many pods as possible")
 			util.DeletePods(ctx, coreCluster, "wds1-system", "kubestellar")
 			util.DeletePods(ctx, coreCluster, "wds1-system", "transport")
@@ -429,7 +427,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			},
 		}
 
-		ginkgo.It("select full status", func() {
+		ginkgo.It("select full status", func(ctx context.Context) {
 			util.CreateStatusCollector(ctx, ksWds, fullStatusCollectorName,
 				ksapi.StatusCollectorSpec{
 					Select: []ksapi.NamedExpression{{
@@ -470,7 +468,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			gomega.Expect(cs.Results[0].Rows[1].Columns[1].Object).Should(gomega.Not(gomega.BeNil()))
 		})
 
-		ginkgo.It("available replicas count", func() {
+		ginkgo.It("available replicas count", func(ctx context.Context) {
 			util.CreateStatusCollector(ctx, ksWds, countAvailableReplicasStatusCollectorName,
 				ksapi.StatusCollectorSpec{
 					GroupBy: []ksapi.NamedExpression{{
@@ -501,7 +499,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			gomega.Expect(*cs.Results[0].Rows[0].Columns[0].Number).To(gomega.Equal("2"))
 		})
 
-		ginkgo.It("policy with multiple StatusCollectors", func() {
+		ginkgo.It("policy with multiple StatusCollectors", func(ctx context.Context) {
 			util.CreateStatusCollector(ctx, ksWds, selectAvailableStatusCollectorName,
 				ksapi.StatusCollectorSpec{
 					Select: []ksapi.NamedExpression{{
