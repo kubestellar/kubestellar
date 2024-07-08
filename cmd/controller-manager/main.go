@@ -31,6 +31,8 @@ import (
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
+	crmetrics "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	crwebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	clientopts "github.com/kubestellar/kubestellar/options"
@@ -93,9 +95,9 @@ func main() {
 	// manager here is mainly used for leader election and health checks
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
-		MetricsBindAddress:     metricsAddr,
+		Metrics:                crmetrics.Options{BindAddress: metricsAddr},
 		PprofBindAddress:       pprofAddr,
-		Port:                   9443,
+		WebhookServer:          crwebhook.NewServer(crwebhook.Options{}),
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "c6f71c85.kflex.kubestellar.org",
