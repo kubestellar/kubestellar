@@ -1,6 +1,8 @@
 # KubeStellar Example Scenarios
 
-This document shows some simple examples of using the release that contains this version of this document. These scenarios can be used to test a KubeStellar installation for proper functionality. Each scenario supposes that one ITS and one WDS have been created and two WECs have been created and registered. These scenarios are written as shell commands (bash or zsh). These commands assume that you have defined the following shell variables to convey the needed information about that ITS and WDS and those WECs.
+This document shows some simple examples of using the release that contains this version of this document. These scenarios can be used to test a KubeStellar installation for proper functionality. General setup instructions are outlined in [the Overview](user-guide-intro.md); a simple example setup is in [the quickstart](get-started.md).
+
+Each scenario supposes that one ITS and one WDS have been created and two WECs have been created and registered. These scenarios are written as shell commands (bash or zsh). These commands assume that you have defined the following shell variables to convey the needed information about that ITS and WDS and those WECs.
 
 - `host_context`: the name of the kubeconfig context to use when accessing the KubeFlex hosting cluster.
 - `its_cp`: the name of the KubeFlex control plane that is playing the role of ITS.
