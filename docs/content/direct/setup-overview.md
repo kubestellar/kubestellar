@@ -1,6 +1,6 @@
 # Setting up KubeStellar
 
-"Setup" is a porous grouping of some of the steps in [the full outline](user-guide-intro.md#the-full-story), and comprises the following.
+"Setup" is a porous grouping of some of the steps in [the full outline](user-guide-intro.md#the-full-story), and comprises the following. Also, bear in mind the [Setup limitations](direct/setup-limitations.md).
 
 - Install software prerequisites. See [prerequisites](pre-reqs.md).
 - KubeFlex Hosting cluster
@@ -13,4 +13,3 @@
 - Workload Execution Clusters
     - Create a [Workload Execution Cluster](wec.md) (WEC).
     - [Register the WEC in the ITS](wec-registration.md).
-- [Setup limitations](direct/setup-limitations.md).

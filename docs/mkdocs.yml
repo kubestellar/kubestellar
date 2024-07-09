@@ -39,6 +39,7 @@ nav:
       - Quickstart: direct/get-started.md
       - Setup:
           - Overview: direct/setup-overview.md
+          - Setup limitations: direct/setup-limitations.md
           - Prerequisites: direct/pre-reqs.md
           - KubeFlex Hosting cluster:
             - Acquire cluster for KubeFlex Hosting: direct/acquire-hosting-cluster.md
@@ -50,8 +51,8 @@ nav:
           - Workload Execution Clusters:
             - About Workload Execution Clusters: direct/wec.md
             - Register a Workload Execution Cluster: direct/wec-registration.md
-          - Setup limitations: direct/setup-limitations.md
       - Usage:
+          - Usage limitations: direct/usage-limitations.md
           - KubeStellar API:
               - Overview: direct/control.md
               - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
@@ -61,7 +62,6 @@ nav:
           - Example Scenarios: direct/example-scenarios.md
           - Third-party integrations:
               - ArgoCD to WDS: direct/argo-to-wds1.md
-          - Usage limitations: direct/usage-limitations.md
   - Contributing: 
       - How to join in: direct/contribute.md
       - Code of Conduct: Contribution guidelines/coc.md
