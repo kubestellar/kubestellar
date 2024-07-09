@@ -775,11 +775,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#automated-check-of-pre-requisites-for-kubestellar" class="md-nav__link">
-    Automated Check of Pre-Requisites for KubeStellar
+  <a href="#automated-check-of-prerequisites-for-kubestellar" class="md-nav__link">
+    Automated Check of Prerequisites for KubeStellar
   </a>
   
-    <nav class="md-nav" aria-label="Automated Check of Pre-Requisites for KubeStellar">
+    <nav class="md-nav" aria-label="Automated Check of Prerequisites for KubeStellar">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1952,11 +1952,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#automated-check-of-pre-requisites-for-kubestellar" class="md-nav__link">
-    Automated Check of Pre-Requisites for KubeStellar
+  <a href="#automated-check-of-prerequisites-for-kubestellar" class="md-nav__link">
+    Automated Check of Prerequisites for KubeStellar
   </a>
   
-    <nav class="md-nav" aria-label="Automated Check of Pre-Requisites for KubeStellar">
+    <nav class="md-nav" aria-label="Automated Check of Prerequisites for KubeStellar">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2016,9 +2016,9 @@
   
 
 
-<h1 id="kubestellar-prerequisites">KubeStellar prerequisites<a class="headerlink" href="#kubestellar-prerequisites" title="Permanent link">#</a></h1>
+<h1 id="kubestellar-prerequisites">KubeStellar Prerequisites<a class="headerlink" href="#kubestellar-prerequisites" title="Permanent link">#</a></h1>
 <p>The following prerequisites are required.
-You can use the <a href="#automated-check-of-pre-requisites-for-kubestellar">check-pre-req</a> script, to validate if all needed pre-requisites are installed.</p>
+You can use the <a href="#automated-check-of-pre-requisites-for-kubestellar">check-pre-req</a> script, to validate if all needed prerequisites are installed.</p>
 <h2 id="infrastructure-clusters">Infrastructure (clusters)<a class="headerlink" href="#infrastructure-clusters" title="Permanent link">#</a></h2>
 <p>Because of its multicluster architecture, KubeStellar requires that you have the necessary privileges and infrastructure access to create and/or configure the necessary Kubernetes clusters. These are the following; see <a href="../architecture/">the architecture document</a> for more details.</p>
 <ul>
@@ -2080,25 +2080,25 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 </ul>
 <!-- start tag for check script  include -->
 
-<h2 id="automated-check-of-pre-requisites-for-kubestellar">Automated Check of Pre-Requisites for KubeStellar<a class="headerlink" href="#automated-check-of-pre-requisites-for-kubestellar" title="Permanent link">#</a></h2>
-<p>The <a href="https://github.com/kubestellar/kubestellar/blob/main/hack/check_pre_req.sh">check_pre_req</a> script offers a convenient way to check for the pre-requisites needed for <a href="./">KubeStellar</a> deployment and <a href="../example-scenarios/">use</a>.</p>
-<p>The script checks for a pre-requisite presence in the <code>$PATH</code>, by using the <code>which</code> command, and it can optionally provide version and path information for pre-requisites that are present, or installation information for missing pre-requisites.</p>
-<p>We envision that this script could be useful for user-side debugging as well as for asserting the presence of pre-requisites in higher-level automation scripts.</p>
+<h2 id="automated-check-of-prerequisites-for-kubestellar">Automated Check of Prerequisites for KubeStellar<a class="headerlink" href="#automated-check-of-prerequisites-for-kubestellar" title="Permanent link">#</a></h2>
+<p>The <a href="https://github.com/kubestellar/kubestellar/blob/main/hack/check_pre_req.sh">check_pre_req</a> script offers a convenient way to check for the prerequisites needed for <a href="./">KubeStellar</a> deployment and <a href="../example-scenarios/">use</a>.</p>
+<p>The script checks for a prerequisite presence in the <code>$PATH</code>, by using the <code>which</code> command, and it can optionally provide version and path information for prerequisites that are present, or installation information for missing prerequisites.</p>
+<p>We envision that this script could be useful for user-side debugging as well as for asserting the presence of prerequisites in higher-level automation scripts.</p>
 <p>The script accepts a list of optional flags and arguments.</p>
 <h3 id="supported-flags"><strong>Supported flags:</strong><a class="headerlink" href="#supported-flags" title="Permanent link">#</a></h3>
 <ul>
-<li><code>-A|--assert</code>: exits with error code 2 upon finding the fist missing pre-requisite</li>
-<li><code>-L|--list</code>: prints a list of supported pre-requisites</li>
-<li><code>-V|--verbose</code>: displays version and path information for installed pre-requisites or installation information for missing pre-requisites</li>
+<li><code>-A|--assert</code>: exits with error code 2 upon finding the fist missing prerequisite</li>
+<li><code>-L|--list</code>: prints a list of supported prerequisites</li>
+<li><code>-V|--verbose</code>: displays version and path information for installed prerequisites or installation information for missing prerequisites</li>
 <li><code>-X</code>: enable <code>set -x</code> for debugging the script</li>
 </ul>
 <h3 id="supported-arguments"><strong>Supported arguments:</strong><a class="headerlink" href="#supported-arguments" title="Permanent link">#</a></h3>
-<p>The script accepts a list of specific pre-requisites to check, among the list of available ones:</p>
+<p>The script accepts a list of specific prerequisites to check, among the list of available ones:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>check_pre_req.sh<span class="w"> </span>--list
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>argo<span class="w"> </span>brew<span class="w"> </span>docker<span class="w"> </span>go<span class="w"> </span>helm<span class="w"> </span>jq<span class="w"> </span>kflex<span class="w"> </span>kind<span class="w"> </span>ko<span class="w"> </span>kubectl<span class="w"> </span>make<span class="w"> </span>ocm<span class="w"> </span>yq
 </code></pre></div>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">#</a></h3>
-<p>For example, list of pre-requisites required by KubeStellar can be checked with the command below (add the <code>-V</code> flag to get the version of each program and a suggestions on how to install missing pre-requisites):</p>
+<p>For example, list of prerequisites required by KubeStellar can be checked with the command below (add the <code>-V</code> flag to get the version of each program and a suggestions on how to install missing prerequisites):</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>hack/check_pre_req.sh
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Checking<span class="w"> </span>pre-requisites<span class="w"> </span><span class="k">for</span><span class="w"> </span>using<span class="w"> </span>KubeStellar:
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>✔<span class="w"> </span>Docker
@@ -2116,7 +2116,7 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 </code></pre></div>
 <!-- end tag for check-prereq script -->
 
-<p>In another example, a specific list of pre-requisites could be asserted by an higher-level script, while providing some installation information, with the command below (note that the script will terminate upon finding a missing pre-requisite):</p>
+<p>In another example, a specific list of prerequisites could be asserted by an higher-level script, while providing some installation information, with the command below (note that the script will terminate upon finding a missing prerequisite):</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$<span class="w"> </span>check_pre_req.sh<span class="w"> </span>--assert<span class="w"> </span>--verbose<span class="w"> </span>helm<span class="w"> </span>argo<span class="w"> </span>docker<span class="w"> </span>kind
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Checking<span class="w"> </span>KubeStellar<span class="w"> </span>pre-requisites:
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>✔<span class="w"> </span>Helm
