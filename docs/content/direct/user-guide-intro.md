@@ -5,7 +5,18 @@ See the KubeStellar [overview](../readme.md) for architecture and other informat
 
 This user guide is an ongoing project. If you find errors, please point them out in our [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/) or open an issue in our [github repository](https://github.com/kubestellar/kubestellar)!
 
-Installing and using KubeStellar progresses through the following stages.
+## In Brief
+
+If you want a simple rough grouping, you can divide the concepts here into:
+
+- "setup" (steps 1--7 below), exemplified by [the quickstart](get-started.md), and
+- "usage" (the remaining steps), illustrated by [the example scenarios document](example-scenarios.md).
+
+However, you do not need to follow that dichotomy. As noted below, the relevant components can be organized more flexibly.
+
+## The Full Story
+
+Installing and using KubeStellar progresses through the following steps.
 
 1. Install software prerequisites. See [prerequisites](pre-reqs.md).
 1. Acquire the ability to use a Kubernetes cluster to serve as the [KubeFlex](https://github.com/kubestellar/kubeflex/) hosting cluster. See [Acquire cluster for KubeFlex hosting](acquire-hosting-cluster.md).
@@ -24,7 +35,7 @@ Installing and using KubeStellar progresses through the following stages.
 
 By "maintain" we mean create, read, update, delete, list, and watch as you like, over time. KubeStellar is eventually consistent: you can change your inputs as you like over time, and KubeStellar continually strives to achieve what you are currently asking it to do.
 
-There is some flexibility in the ordering of those stage. The following flowchart shows the dependencies. 
+There is some flexibility in the ordering of those steps. The following flowchart shows the key ordering constraints. 
 
 ![Ordering among installation and usage actions](images/usage-outline.svg)
 
@@ -35,7 +46,3 @@ Besides "Start", the other green items in that graph are entry points for extend
 KubeStellar's [Core Helm chart](core-chart.md) combines initializing the KubeFlex hosting cluster, creating some ITSes, and creating some WDSes.
 
 You can find an example run through of steps 2--7 in [the quickstart](get-started.md). This dovetails with [the example scenarios document](example-scenarios.md), which shows examples of the later steps.
-
-There is a [Best Practices](best-practices.md) document that documents
-some usage limitations; others are documented in the [Release
-Notes](release-notes.md). (TODO: clean up this mess.)

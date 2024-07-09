@@ -36,25 +36,28 @@ nav:
   - Quick Start: direct/get-started.md
   - User Guide:
       - Overview: direct/user-guide-intro.md
-      - Prerequisites: direct/pre-reqs.md
-      - Acquire cluster for KubeFlex Hosting: direct/acquire-hosting-cluster.md
-      - Initialize KubeFlex Hosting cluster: direct/init-hosting-cluster.md
-      - Inventory and Transport Spaces: direct/its.md
-      - Workload Description Spaces: direct/wds.md
-      - Workload Execution Clusters: direct/wec.md
-      - Register a Workload Execution Cluster: direct/wec-registration.md
-      - Control:
-          - Overview: direct/control.md
-          - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
-          - Binding: direct/binding.md
-          - Transforming desired state: direct/transforming.md
-          - Combining reported state: direct/combined-status.md
-      - Core Helm chart: direct/core-chart.md
-      - Quick Start: direct/get-started.md
-      - Example Scenarios: direct/example-scenarios.md
-      - Third-party integrations:
-          - ArgoCD to WDS: direct/argo-to-wds1.md
-      - Best practices: direct/best-practices.md
+      - Quickstart: direct/get-started.md
+      - Setup:
+          - Prerequisites: direct/pre-reqs.md
+          - Acquire cluster for KubeFlex Hosting: direct/acquire-hosting-cluster.md
+          - Initialize KubeFlex Hosting cluster: direct/init-hosting-cluster.md
+          - Inventory and Transport Spaces: direct/its.md
+          - Workload Description Spaces: direct/wds.md
+          - Workload Execution Clusters: direct/wec.md
+          - Register a Workload Execution Cluster: direct/wec-registration.md
+          - Core Helm chart: direct/core-chart.md
+          - Setup limitations: direct/setup-limitations.md
+      - Usage:
+          - KubeStellar API:
+              - Overview: direct/control.md
+              - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
+              - Binding: direct/binding.md
+              - Transforming desired state: direct/transforming.md
+              - Combining reported state: direct/combined-status.md
+          - Example Scenarios: direct/example-scenarios.md
+          - Third-party integrations:
+              - ArgoCD to WDS: direct/argo-to-wds1.md
+          - Usage limitations: direct/usage-limitations.md
   - Contributing: 
       - How to join in: direct/contribute.md
       - Code of Conduct: Contribution guidelines/coc.md

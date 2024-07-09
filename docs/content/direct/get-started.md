@@ -6,7 +6,7 @@ This Quick Start outlines step 1, shows a concrete example of steps 2--7 in the 
   1. Cleanup from previous runs
   1. Create the KubeFlex hosting cluster and Kubestellar core components
   1. Create and register two WECs.
-  1. Use KubeStellar to distribute a Deployment object to the two WECs.
+  1. Exercise KubeStellar
 
 ---
 ## Install software prerequisites
@@ -20,7 +20,7 @@ bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config
 This quickstart uses [kind](https://kind.sigs.k8s.io/) to create three Kubernetes cluster on your machine.
 Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
 
-### Cleanup from previous runs
+## Cleanup from previous runs
 
 If you have run this quickstart or any related recipe previously then
 you will first want to remove any related debris. The following
@@ -38,7 +38,7 @@ kubectl config delete-context cluster2
 ## Set the Version appropriately as an environment variable
 
 ```shell
-export KUBESTELLAR_VERSION=0.23.0
+export KUBESTELLAR_VERSION={{ config.ks_latest_release }}
 ```
 
 ## Create a kind cluster to host KubeFlex
