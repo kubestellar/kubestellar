@@ -7,7 +7,7 @@ This user guide is an ongoing project. If you find errors, please point them out
 
 ## Quickstart
 
-If you want to try a simplified installation process and example, you can try our [Quickstart](get-started.md) using Kind and [a helm chart](core-chart.md).
+If you want to try a simplified installation process and example, you can try our [Quickstart](get-started.md), which uses [kind](https://kind.sigs.k8s.io/) and a helm chart. The [helm chart](core-chart.md) supports many options; the instructions on the Quickstart page show only the chart's usage in that recipe.
 
 ## In Brief
 
