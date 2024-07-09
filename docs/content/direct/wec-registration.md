@@ -1,4 +1,4 @@
-# Registering a Workload Execution Space
+# Registering a Workload Execution Cluster
 
 This document will tell users what how to register a WEC in an ITS.
 
