@@ -17,7 +17,7 @@ The following command will check for the prerequisites that you will need for th
 bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/hack/check_pre_req.sh) kflex ocm helm kubectl docker kind
 ```
 
-This quickstart uses [kind](https://kind.sigs.k8s.io/) to create three Kubernetes cluster on your machine.
+This quickstart uses [kind](https://kind.sigs.k8s.io/) to create three Kubernetes clusters on your machine.
 Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
 
 ## Cleanup from previous runs
