@@ -124,7 +124,7 @@ We will maintain a document that lists releases that pass our quality bar. The l
 
 We used to maintain a statement of what is the latest stable release in `docs/content/direct/README.md`.
 
-We maintain a [quickstart](get-started.md) that tells users how to exercise the release that the document appears in. This requires a self-reference that is updated as part of the release process.
+We maintain a [Getting Started](get-started.md) document that tells users how to exercise the release that the document appears in. This requires a self-reference that is updated as part of the release process.
 
 ## Policy
 

@@ -46,7 +46,7 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 - **helm** - to deploy the kubestellar and kubeflex charts
 - **kubectl** - to access the kubernetes clusters
 
-## Additional Software for the Quickstart setup
+## Additional Software for the Getting Started setup
 
 - [**kind**](https://kind.sigs.k8s.io/)
 - **docker** (or compatible docker engine that works with kind)

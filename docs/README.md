@@ -99,7 +99,7 @@ We have a few shortcut urls that come in handy when referring others to our proj
 - [https://kubestellar.io/infomercial](https://kubestellar.io/infomercial) - our infomercial that premieres on June 12th at 9am
 
 and.. the very important…
-- [https://kubestellar.io/quickstart](https://kubestellar.io/quickstart) - our 'stable' quickstart
+- [https://kubestellar.io/quickstart](https://kubestellar.io/quickstart) - our 'stable' Getting Started recipe
 
 ## Jinja templating
 

@@ -2,8 +2,7 @@
 
 This documents explains how to use KubeStellar Core chart to do three
 of the 11 installation and usage steps; please see [the
-outline](user-guide-intro.md) for generalities and [the
-quickstart](get-started.md) for an example of usage.
+full outline](user-guide-intro.md#the-full-story) for generalities and [Getting Started](get-started.md) for an example of usage.
 
 This Helm chart can do any subset of the following things.
 
@@ -41,7 +40,7 @@ If a host port number different from the expected 9443 is used for the Kind clus
 By default the KubeStellar Core chart uses a test domain `localtest.me`, which is OK for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-controller.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution CLusters (WECs).
 
 For convenience, a new local **Kind** cluster that satisfies the requirements for KubeStellar setup
-(e.g., as in [the quickstart](get-started.md)) can be created with the following command:
+(e.g., as in [Getting Started](get-started.md)) can be created with the following command:
 
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
@@ -145,7 +144,7 @@ User defined control planes can be added using additional value files of `--set`
 - add two ITSes named its1 and its2 of of type vcluster and host, respectively: `--set-json='ITSes=[{"name":"its1"},{"name":"its2","type":"host"}]'`
 - add a single WDS named wds1 of default k8s type connected to the one and only ITS: `--set-json='WDSes=[{"name":"wds1"}]'`
 
-A KubeStellar Core installation that is consistent with [the quickstart](get-started.md) and and supports [the example scenarios](./example-scenarios.md) could be achieved with the following command:
+A KubeStellar Core installation that is consistent with [Getting Started](get-started.md) and and supports [the example scenarios](./example-scenarios.md) could be achieved with the following command:
 
 ```shell
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
