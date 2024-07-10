@@ -204,7 +204,7 @@ the `kflex` CLI and one not.
     is present.
 
     ```shell
-    kubectl config delete-context $cpname || true
+    kubectl config delete-context $cpname
     kflex ctx $cpname
     ```
 
