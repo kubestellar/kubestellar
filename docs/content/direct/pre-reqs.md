@@ -79,7 +79,7 @@ The script accepts a list of optional flags and arguments.
 
 ### **Supported flags:**
 
-- `-A|--assert`: exits with error code 2 upon finding the fist missing prerequisite
+- `-A|--assert`: exits with error code 2 upon finding the first missing prerequisite
 - `-L|--list`: prints a list of supported prerequisites
 - `-V|--verbose`: displays version and path information for installed prerequisites or installation information for missing prerequisites
 - `-X`: enable `set -x` for debugging the script
