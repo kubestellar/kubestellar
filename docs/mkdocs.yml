@@ -33,11 +33,10 @@ nav:
         - KubeFlex: direct/kubeflex-intro.md
         - KubeStellar Galaxy: direct/galaxy-intro.md
       - Release-notes: direct/release-notes.md
-  - Quick Start: direct/get-started.md
+  - Getting Started: direct/get-started.md
   - User Guide:
       - Overview: direct/user-guide-intro.md
-      - Quickstart: direct/get-started.md
-      - Setup:
+      - General Setup:
           - Overview: direct/setup-overview.md
           - Setup limitations: direct/setup-limitations.md
           - Prerequisites: direct/pre-reqs.md

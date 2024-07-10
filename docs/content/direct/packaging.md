@@ -298,11 +298,11 @@ One uses [the Helm CLI image](#helm-cli-container-image) to instantiate [the Kub
 
 ### Scripts and instructions
 
-There are instructions for using a release (the [quickstart](get-started.md) document) and a setup script for end-to-end testing(`test/e2e/common/setup-kubestellar.sh`). The end-to-end testing can either test the local copy/version of the kubestellar repo or test a release. So there are three cases to consider.
+There are instructions for using a release ([Getting Started](get-started.md) document) and a setup script for end-to-end testing(`test/e2e/common/setup-kubestellar.sh`). The end-to-end testing can either test the local copy/version of the kubestellar repo or test a release. So there are three cases to consider.
 
 #### Example setup instructions
 
-There were two variants of the setup instructions for the examples: an older one --- which is out of service at the moment, is called "step-by-step", and uses the `ocm` and `kubestellar` PostCreateHooks --- and [the quickstart](get-started.md), which uses the [core Helm chart](#kubestellar-core-helm-chart). The latter is the preferred method, and is the only one described here.
+There were two variants of the setup instructions for the examples: an older one --- which is out of service at the moment, is called "step-by-step", and uses the `ocm` and `kubestellar` PostCreateHooks --- and [Getting Started](get-started.md), which uses the [core Helm chart](#kubestellar-core-helm-chart). The latter is the preferred method, and is the only one described here.
 
 The instructions are a Markdown file that displays commands for a user to execute. These start with commands that define environment variables that hold the release of ks/kubestellar and of ks/ocm-transport-plugin to use.
 

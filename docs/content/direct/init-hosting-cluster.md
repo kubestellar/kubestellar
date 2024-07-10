@@ -21,7 +21,7 @@ kflex init
 
 ### Using an existing OpenShift cluster as the hosting cluster
 
-When the hosting cluster is an OpenShift cluster, the recipe for registering a WEC with the ITS ([to be written](wec.md)) needs to be modified. In the `clusteradm` command, omit the `--force-internal-endpoint-lookup` flag. If following [the quickstart commands](get-started.md#create-and-register-two-workload-execution-clusters) literally, this means to define `flags=""` rather than `flags="--force-internal-endpoint-lookup"`.
+When the hosting cluster is an OpenShift cluster, the recipe for registering a WEC with the ITS ([to be written](wec.md)) needs to be modified. In the `clusteradm` command, omit the `--force-internal-endpoint-lookup` flag. If following [Getting Started](get-started.md#create-and-register-two-workload-execution-clusters) literally, this means to define `flags=""` rather than `flags="--force-internal-endpoint-lookup"`.
 
 ## KubeStellar core Helm chart
 

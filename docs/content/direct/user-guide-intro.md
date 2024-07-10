@@ -5,15 +5,15 @@ See the KubeStellar [overview](../readme.md) for architecture and other informat
 
 This user guide is an ongoing project. If you find errors, please point them out in our [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/) or open an issue in our [github repository](https://github.com/kubestellar/kubestellar)!
 
-## Quickstart
+## Simple Example
 
-If you want to try a simplified installation process and example, you can try our [Quickstart](get-started.md), which uses [kind](https://kind.sigs.k8s.io/) and a helm chart. The [helm chart](core-chart.md) supports many options; the instructions on the Quickstart page show only the chart's usage in that recipe.
+If you want to try a simple installation process and example then you can try out [Getting Started](get-started.md), which uses [kind](https://kind.sigs.k8s.io/) and a helm chart. The [helm chart](core-chart.md) supports many options; the instructions on the Getting Started page show only the chart's usage in that recipe.
 
 ## In Brief
 
 If you want a simple rough grouping, you can divide the concepts here into:
 
-- "setup" (steps 1--7 below), exemplified by [the quickstart](get-started.md), and
+- "setup" (steps 1--7 below), exemplified in [the Setup section of Getting Started](get-started.md#setup), and
 - "usage" (the remaining steps), illustrated by [the example scenarios document](example-scenarios.md).
 
 However, you do not need to follow that dichotomy. As noted below, the relevant components can be organized more flexibly.
@@ -49,4 +49,4 @@ Besides "Start", the other green items in that graph are entry points for extend
 
 KubeStellar's [Core Helm chart](core-chart.md) combines initializing the KubeFlex hosting cluster, creating some ITSes, and creating some WDSes.
 
-You can find an example run through of steps 2--7 in [the quickstart](get-started.md). This dovetails with [the example scenarios document](example-scenarios.md), which shows examples of the later steps.
+You can find an example run through of steps 2--7 in [Getting Started](get-started.md). This dovetails with [the example scenarios document](example-scenarios.md), which shows examples of the later steps.
