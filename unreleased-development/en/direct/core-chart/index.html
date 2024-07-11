@@ -2309,7 +2309,7 @@ the <code>kflex</code> CLI and one not.</p>
 control plane, to your current kubeconfig file and make that the
 current context. The deletion is to remove an older vintage if it
 is present.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span><span class="nv">$cpname</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span><span class="nv">$cpname</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>kflex<span class="w"> </span>ctx<span class="w"> </span><span class="nv">$cpname</span>
 </code></pre></div>
 <p>The <code>kflex ctx</code> command is unable to create a new context if the
