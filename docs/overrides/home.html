@@ -10,9 +10,9 @@
     <div class="px-1 ctx-header-text conteiner">
       
        <span class="shortcut-bar Space-Bd-BT"> 
-        <a class="shortcut-bar-text" href="direct/get-started/">START</a>&nbsp;&nbsp;&nbsp;
-        <a class="shortcut-bar-text" href="readme/">ABOUT</a>&nbsp;&nbsp;&nbsp;
-        <a class="shortcut-bar-text" href="direct/user-guide-intro/">USE</a>&nbsp;&nbsp;&nbsp;
+        <a class="shortcut-bar-text" href="direct/get-started/" title="Get Started">START</a>&nbsp;&nbsp;&nbsp;
+        <a class="shortcut-bar-text" href="readme/" title="KubeStellar Architecture">ABOUT</a>&nbsp;&nbsp;&nbsp;
+        <a class="shortcut-bar-text" href="direct/user-guide-intro/" title="User Guide">USE</a>&nbsp;&nbsp;&nbsp;
         <a class="shortcut-bar-text" href="direct/contribute/">CONTRIBUTE</a>&nbsp;&nbsp;&nbsp;&nbsp;
         <a class="shortcut-bar-text" href="https://kubestellar.io/blog">BLOG</a>&nbsp;&nbsp;&nbsp;&nbsp;
         <a class="shortcut-bar-text" href="https://kubestellar.io/tv">YOUTUBE</a>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -61,24 +61,30 @@
         <strong>Don't change anything, just add KubeStellar!</strong>
       </p>
       <div class="conteiner-row conteiner-xs">
-        <button
-          type="button"
-          title="{{ page.next_page.title | e }}"
-          onclick="location.href='direct/user-guide-intro/'"
-          class="btn-dark btn-xl-large btn-lg-large mx-3  mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
-        >
-            Documentation
-        </button>
-        <button
-          type="button"
-          title="{{ page.next_page.title | e }}"
-          onclick="window.open('https://kubestellar.io/joinus', '_blank')"
-          class="btn-warning btn-xl-large btn-lg-large mx-3 mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
-        >
-          Join Us
-        </button>
-      </div>
-    </div>
+	      <div style="width:50%; float:left">      
+	        <button
+        	  type="button"
+          	  title="Documentation"
+	          onclick="location.href='readme/'"
+	          class="btn-dark btn-xl-large btn-lg-large mx-3  mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
+        	>
+	            Documentation
+	        </button>	
+			Learn More (Getting Started, User Guide, Architecture...)
+	      </div>
+	      <div style="width:50%; float:left">		
+	        <button				
+	          type="button"
+        	  title="Community Access"
+	          onclick="window.open('https://kubestellar.io/joinus', '_blank')"
+	          class="btn-warning btn-xl-large btn-lg-large mx-3 mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
+       		>
+	          Join Us
+	        </button>
+			Access to our email group and community meetings!
+	      </div>
+	</div>
+   </div>
     <div class="ctx-header-img d-xl">
       <img src="kubestellar-deploy.png" class="laverage-header-img" style="width:100%"" />
     </div>
