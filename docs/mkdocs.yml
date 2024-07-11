@@ -70,7 +70,6 @@ nav:
       - Website:
           - Overview: Contribution guidelines/operations/document-management.md
           - Testing website PRs: Contribution guidelines/operations/testing-doc-prs.md
-          - Listing of variables: Contribution guidelines/operations/all-macros.md
       - Security:
           - Policy: Contribution guidelines/security/security.md
           - Contacts: Contribution guidelines/security/security_contacts.md
