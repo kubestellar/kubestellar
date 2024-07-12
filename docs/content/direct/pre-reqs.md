@@ -115,7 +115,7 @@ Checking pre-requisites for building KubeStellar:
 
 <!-- end tag for check-prereq script -->
 
-In another example, a specific list of prerequisites could be asserted by an higher-level script, while providing some installation information, with the command below (note that the script will terminate upon finding a missing prerequisite):
+In another example, a specific list of prerequisites could be asserted by a higher-level script, while providing some installation information, with the command below (note that the script will terminate upon finding a missing prerequisite):
 
 ```shell
 $ check_pre_req.sh --assert --verbose helm argo docker kind
