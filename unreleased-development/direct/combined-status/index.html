@@ -1190,6 +1190,53 @@
     Relation with SQL
   </a>
   
+    <nav class="md-nav" aria-label="Relation with SQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview-of-relation-with-sql" class="md-nav__link">
+    Overview of Relation with SQL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detailed-relation-with-sql" class="md-nav__link">
+    Detailed Relation with SQL
+  </a>
+  
+    <nav class="md-nav" aria-label="Detailed Relation with SQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plain-selection" class="md-nav__link">
+    Plain selection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregation-without-group-by" class="md-nav__link">
+    Aggregation without GROUP BY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregation-with-group-by" class="md-nav__link">
+    Aggregation with GROUP BY
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -1241,8 +1288,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#list-of-wecs-where-the-deployment-is-not-fully-available" class="md-nav__link">
-    List of WECs where the Deployment is not fully available
+  <a href="#list-of-wecs-where-the-deployment-is-not-as-available-as-desired" class="md-nav__link">
+    List of WECs where the Deployment is not as available as desired
   </a>
   
 </li>
@@ -2143,6 +2190,53 @@
     Relation with SQL
   </a>
   
+    <nav class="md-nav" aria-label="Relation with SQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview-of-relation-with-sql" class="md-nav__link">
+    Overview of Relation with SQL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detailed-relation-with-sql" class="md-nav__link">
+    Detailed Relation with SQL
+  </a>
+  
+    <nav class="md-nav" aria-label="Detailed Relation with SQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plain-selection" class="md-nav__link">
+    Plain selection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregation-without-group-by" class="md-nav__link">
+    Aggregation without GROUP BY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregation-with-group-by" class="md-nav__link">
+    Aggregation with GROUP BY
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -2194,8 +2288,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#list-of-wecs-where-the-deployment-is-not-fully-available" class="md-nav__link">
-    List of WECs where the Deployment is not fully available
+  <a href="#list-of-wecs-where-the-deployment-is-not-as-available-as-desired" class="md-nav__link">
+    List of WECs where the Deployment is not as available as desired
   </a>
   
 </li>
@@ -2258,13 +2352,19 @@ It may make sense to expand the latter into a general feature in the future, acc
 <p>The general technique involves the following ideas.</p>
 <ol>
 <li>
-<p>The way that reported state is combined is specified by the user, in a simple but powerful way modeled on SQL. This is chosen because it is a well worked out set of ideas, is widely known, and is something that we may someday want to use in our implementation. We do not need to support anything like full SQL (for any version of SQL). This proposal only involves one particular pattern of relatively simple SELECT statement, and a small subset of the expression language.</p>
+<p>The way that reported state is combined is specified by the user, in a simple but powerful way modeled on SQL. This is chosen because it is a well worked out set of ideas, is widely known, and is something that we may someday want to use in our implementation. We do not need to support anything like full SQL (for any version of SQL). This proposal only involves one particular pattern of relatively simple SELECT statement, and a different expression language (CEL, which is the most prominent expression language in the Kubernetes milieu).</p>
 </li>
 <li>
-<p>The specification of how to combine reported state is defined in <code>StatusCollector</code> objects. These objects are referenced in the BindingPolicies right next to the criteria for selecting workload objects. This saves users the trouble of having to write selection criteria twice. With the specification being separate, it is possible to have a library of <code>StatusCollectors</code> that can be reused across different BindingPolicies. In the future KubeStellar would provide a library of <code>StatusCollector</code> objects that cover convenient use-cases for kubernetes built-in resources such as deployments.</p>
+<p>The expressions may reference the content of the workload object as it sits in the WDS as well as the state returned from the WECs.</p>
 </li>
 <li>
-<p>The combined reported state appears in a new kind of object, one per (workload object, BindingPolicy object) pair.</p>
+<p>The specification of how to combine reported state is defined in <code>StatusCollector</code> objects. These objects are referenced in the <code>BindingPolicy</code> objects right next to the criteria for selecting workload objects. This saves users the trouble of having to write selection criteria twice. With the specification being separate rather than embedded, it is possible to have a library of <code>StatusCollectors</code> that can be reused across different <code>BindingPolicy</code> objects. In the future KubeStellar would provide a library of <code>StatusCollector</code> objects that cover convenient use-cases for kubernetes built-in resources such as deployments.</p>
+</li>
+<li>
+<p>The <code>Binding</code> objects also hold references to <code>StatusCollector</code> objects. Each reference to a workload object is paired with references to all the <code>StatusCollectors</code> mentioned in all the <code>DownsyncObjectTestAndStatusCollection</code> structs that matched the workload object.</p>
+</li>
+<li>
+<p>The combined reported state appears in a new kind of object, one per (workload object, <code>Binding</code> object) pair.</p>
 </li>
 <li>
 <p>A user can request a list without aggregation, possibly after filtering, but certainly with a limit on list length. The expectation is that such a list makes sense only if the length of the list will be modest. For users that want access to the full reported state from each WEC for a large number of WECs, KubeStellar should have an abstraction that gives the users access --- in a functional way, not by making another copy --- to that state (which is already in the mailbox namespaces).</p>
@@ -2274,10 +2374,11 @@ It may make sense to expand the latter into a general feature in the future, acc
 </li>
 </ol>
 <h3 id="relation-with-sql">Relation with SQL<a class="headerlink" href="#relation-with-sql" title="Permanent link">#</a></h3>
-<p>To a given workload object, the user can bind one or more named "status combiners". Each status combiner is analogous to an SQL SELECT statement that does the following things.</p>
+<h4 id="overview-of-relation-with-sql">Overview of Relation with SQL<a class="headerlink" href="#overview-of-relation-with-sql" title="Permanent link">#</a></h4>
+<p>To a given workload object, and in the context of a given <code>Binding</code> object, the user has bound some <code>StatusCollector</code> objects. The meaning of a <code>StatusCollector</code> in the context of a (workload object, <code>Binding</code> object) pair is analogous to an SQL SELECT statement that does the following things.</p>
 <ol>
 <li>
-<p>The SELECT statement has one input table, and that has a row per WEC that the object is prescribed to propagate to.</p>
+<p>The SELECT statement has one input table, which has a row per WEC that the Binding says the workload object should go to.</p>
 </li>
 <li>
 <p>The SELECT statement can have a WHERE clause that filters out some of the rows.</p>
@@ -2287,95 +2388,114 @@ It may make sense to expand the latter into a general feature in the future, acc
 </li>
 <li>
 <p>In the case of aggregation, the SELECT statement has the following.</p>
-</li>
+<ul>
 <li>
-<p>A <code>GROUP BY</code> clause saying how the rows (WECs) are grouped to
-     form the inputs for aggregation, in terms of named
-     expressions. For convenience here, each of these named
-     expressions is implicitly included in the output columns.</p>
+<p>An optional <code>GROUP BY</code> clause saying how the rows (WECs) are
+  grouped to form the inputs for aggregation, in terms of named
+  expressions. For convenience here, each of these named
+  expressions is implicitly included in the output columns.</p>
 </li>
 <li>
 <p>A collection of named expressions using aggregation functions to define
-     additional output columns.</p>
+  additional output columns.</p>
+</li>
+</ul>
 </li>
 <li>
 <p>The SELECT statement has a LIMIT on the number of rows that it will yield.</p>
 </li>
 </ol>
+<h4 id="detailed-relation-with-sql">Detailed Relation with SQL<a class="headerlink" href="#detailed-relation-with-sql" title="Permanent link">#</a></h4>
+<p>For a given workload object, <code>Binding</code>, and <code>StatusCollector</code>: start with a table named <code>PerWEC</code>. This table has one primary key column and it holds the name of the WEC that the reported state is from. The dependent columns hold the workload object content from the WDS, the workload object content returned from the WEC, and the augmentations.</p>
+<p>There are three forms of <code>StatusCollector</code>, equivalent to three forms of SQL statement.</p>
+<h5 id="plain-selection">Plain selection<a class="headerlink" href="#plain-selection" title="Permanent link">#</a></h5>
+<p>When the <code>StatusCollector</code> has selection but no "GROUOP BY" and no aggregation, this is equivalent to the following form of SELECT statement. The <a href="#list-of-stale-wecs">List of stale WECs example below</a> is an example of this form.</p>
+<div class="language-sql highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">&lt;</span><span class="n">selected</span><span class="w"> </span><span class="n">columns</span><span class="o">&gt;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">PerWEC</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="o">&lt;</span><span class="n">filter</span><span class="w"> </span><span class="n">condition</span><span class="o">&gt;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">LIMIT</span><span class="w"> </span><span class="o">&lt;</span><span class="k">limit</span><span class="o">&gt;</span>
+</code></pre></div>
+<h5 id="aggregation-without-group-by">Aggregation without GROUP BY<a class="headerlink" href="#aggregation-without-group-by" title="Permanent link">#</a></h5>
+<p>When there is aggregation but no plain selection and <em>no</em> "GROUP BY", this is equivalent to the following form of SELECT statement. The <a href="#number-of-wecs">Number of WECs example below</a> is an example of this form.</p>
+<div class="language-sql highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">&lt;</span><span class="n">aggregation</span><span class="w"> </span><span class="n">columns</span><span class="o">&gt;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">PerWEC</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="o">&lt;</span><span class="n">filter</span><span class="w"> </span><span class="n">condition</span><span class="o">&gt;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">LIMIT</span><span class="w"> </span><span class="o">&lt;</span><span class="k">limit</span><span class="o">&gt;</span>
+</code></pre></div>
+<h5 id="aggregation-with-group-by">Aggregation with GROUP BY<a class="headerlink" href="#aggregation-with-group-by" title="Permanent link">#</a></h5>
+<p>When there is "GROUP BY" and aggregation but no plain selection, this is equivalent to the following form of SELECT statement. The <a href="#histogram-of-pod-phase">Histogram of Pod phase example below</a> is an example of this form.</p>
+<div class="language-sql highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">&lt;</span><span class="k">group</span><span class="o">-</span><span class="k">by</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="k">names</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="n">aggregation</span><span class="w"> </span><span class="n">columns</span><span class="o">&gt;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="o">&lt;</span><span class="k">group</span><span class="o">-</span><span class="k">by</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">expr</span><span class="o">&gt;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="o">&lt;</span><span class="k">group</span><span class="o">-</span><span class="k">by</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">name</span><span class="o">&gt;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">             </span><span class="p">...</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">             </span><span class="o">&lt;</span><span class="k">group</span><span class="o">-</span><span class="k">by</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="n">expr</span><span class="o">&gt;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="o">&lt;</span><span class="k">group</span><span class="o">-</span><span class="k">by</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="n">name</span><span class="o">&gt;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">             </span><span class="o">*</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="k">FROM</span><span class="w"> </span><span class="n">PerWEC</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="o">&lt;</span><span class="n">filter</span><span class="w"> </span><span class="n">condition</span><span class="o">&gt;</span><span class="p">)</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="o">&lt;</span><span class="k">group</span><span class="o">-</span><span class="k">by</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="k">names</span><span class="o">&gt;</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="k">LIMIT</span><span class="w"> </span><span class="o">&lt;</span><span class="k">limit</span><span class="o">&gt;</span>
+</code></pre></div>
+<p>When there are N "GROUP BY" columns, the result has a row for each tuple of values (v1, v2, ... vN) such that there exists a WEC for which (v1, v2, ... vN) are the values of the "GROUP BY" columns. The result has no more rows than that.</p>
 <h2 id="specification-of-the-general-technique">Specification of the general technique<a class="headerlink" href="#specification-of-the-general-technique" title="Permanent link">#</a></h2>
 <p>See <code>types.go</code>.</p>
 <h2 id="examples-of-using-the-general-technique">Examples of using the general technique<a class="headerlink" href="#examples-of-using-the-general-technique" title="Permanent link">#</a></h2>
 <h3 id="number-of-wecs">Number of WECs<a class="headerlink" href="#number-of-wecs" title="Permanent link">#</a></h3>
-<p>The NamedStatusCombiner would look like the following.</p>
-<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">numWECs</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">combinedFields</span><span class="p">:</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">count</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">     </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COUNT</span>
+<p>The <code>StatusCollectorSpec</code> would look like the following.</p>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">combinedFields</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">count</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">     </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COUNT</span>
 </code></pre></div>
+<p>The analogous SQL statement would look something like the following.</p>
+<div class="language-sql highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">count</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">PerWEC</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="o">&lt;</span><span class="n">something</span><span class="o">&gt;</span>
+</code></pre></div>
+<p>The table resulting from this would have one column and one row. The one value in this table would be the number of WECs.</p>
 <h3 id="list-of-stale-wecs">List of stale WECs<a class="headerlink" href="#list-of-stale-wecs" title="Permanent link">#</a></h3>
 <p>This produces a list of WECs for which the core has stale information.</p>
-<p>The NamedStatusCombiner would look like the following.</p>
-<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">staleOnes</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">filter</span><span class="p">:</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">   </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">   </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$.propagation.stale&quot;</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nt">select</span><span class="p">:</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">   </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">   </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$.inventory.name&quot;</span>
+<p>The <code>StatusCollectorSpec</code> would look like the following.</p>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">filter</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">propagation.stale</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">select</span><span class="p">:</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wec</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inventory.name</span>
 </code></pre></div>
+<p>The analogous SQL statement would look something like the following.</p>
+<div class="language-sql highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">&lt;</span><span class="k">SQL</span><span class="w"> </span><span class="n">expression</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">inventory</span><span class="p">.</span><span class="n">name</span><span class="o">&gt;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">wec</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">PerWEC</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="o">&lt;</span><span class="n">something</span><span class="o">&gt;</span>
+</code></pre></div>
+<p>The table resulting fro this would have one column. Each row would hold the name of a WEC from which the core does not have recent information about the workload object.</p>
 <h3 id="histogram-of-pod-phase">Histogram of Pod phase<a class="headerlink" href="#histogram-of-pod-phase" title="Permanent link">#</a></h3>
-<p>The NamedStatusCombiner would look like the following.</p>
-<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">podPhase</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">groupBy</span><span class="p">:</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">phase</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$.status.phase&quot;</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nt">combinedFields</span><span class="p">:</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">count</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">     </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COUNT</span>
+<p>The <code>StatusCollectorSpec</code> would look like the following.</p>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">groupBy</span><span class="p">:</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">phase</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">returned.status.phase</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nt">combinedFields</span><span class="p">:</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">count</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">     </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COUNT</span>
 </code></pre></div>
+<p>The analogous SQL statement would look something like the following.</p>
+<div class="language-sql highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">phase</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">count</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="o">&lt;</span><span class="k">SQL</span><span class="w"> </span><span class="n">expression</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">returned</span><span class="p">.</span><span class="n">status</span><span class="p">.</span><span class="n">phase</span><span class="o">&gt;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">phase</span><span class="p">,</span><span class="w"> </span><span class="o">*</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">      </span><span class="k">FROM</span><span class="w"> </span><span class="n">PerWEC</span><span class="p">)</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">phase</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="k">LIMIT</span><span class="w"> </span><span class="o">&lt;</span><span class="n">something</span><span class="o">&gt;</span>
+</code></pre></div>
+<p>The result would have two columns, holding a phase value and a count. The number of rows equals the number of different values of <code>returned.status.phase</code> that appear among the WECs. For each row (P, N): P is a phase value that appears in at least one WEC, and N is the number of WECs where the phase value is P.</p>
 <h3 id="histogram-of-number-of-available-replicas-of-a-deployment">Histogram of number of available replicas of a Deployment<a class="headerlink" href="#histogram-of-number-of-available-replicas-of-a-deployment" title="Permanent link">#</a></h3>
 <p>This reports, for each number of available replicas, how many WECs have that number.</p>
-<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">availableReplicasHistogram</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">groupBy</span><span class="p">:</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">numAvailable</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$.status.availableReplicas&quot;</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="nt">combinedFields</span><span class="p">:</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">count</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">     </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COUNT</span>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">groupBy</span><span class="p">:</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">numAvailable</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">returned.status.availableReplicas</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nt">combinedFields</span><span class="p">:</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">count</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">     </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COUNT</span>
 </code></pre></div>
-<h3 id="list-of-wecs-where-the-deployment-is-not-fully-available">List of WECs where the Deployment is not fully available<a class="headerlink" href="#list-of-wecs-where-the-deployment-is-not-fully-available" title="Permanent link">#</a></h3>
-<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sadOnes</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">filter</span><span class="p">:</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">   </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Not</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">   </span><span class="nt">args</span><span class="p">:</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Equal</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">        </span><span class="nt">args</span><span class="p">:</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">           </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">             </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$.spec.replicas&quot;</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">           </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">             </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$.status.availableReplicas&quot;</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nt">select</span><span class="p">:</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wec</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path</span>
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$.inventory.name&quot;</span>
+<h3 id="list-of-wecs-where-the-deployment-is-not-as-available-as-desired">List of WECs where the Deployment is not as available as desired<a class="headerlink" href="#list-of-wecs-where-the-deployment-is-not-as-available-as-desired" title="Permanent link">#</a></h3>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">filter</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;obj.spec.replicas</span><span class="nv"> </span><span class="s">!=</span><span class="nv"> </span><span class="s">reported.status.availableReplicas&quot;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nt">select</span><span class="p">:</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wec</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inventory.name</span>
 </code></pre></div>
 <h3 id="full-status-from-each-wec">Full status from each WEC<a class="headerlink" href="#full-status-from-each-wec" title="Permanent link">#</a></h3>
 <p>This produces a listing of object status paired with inventory object name.</p>
-<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fullStatus</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">select</span><span class="p">:</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wec</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$.inventory.name&quot;</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">status</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$.status&quot;</span>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">select</span><span class="p">:</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wec</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inventory.name</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">status</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">     </span><span class="nt">def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reported.status</span>
 </code></pre></div>
 <h2 id="special-case-for-1-wec">Special case for 1 WEC<a class="headerlink" href="#special-case-for-1-wec" title="Permanent link">#</a></h2>
 <p>This proposal refines the meaning of <code>BindingPolicySpec.WantSingletonReportedState</code> to request the special case when it applies.</p>
