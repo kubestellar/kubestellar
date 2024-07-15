@@ -100,7 +100,7 @@ type CombinedStatusResolver interface {
 	// - A boolean indicating whether the resolution exists.
 	//
 	// The returned pointers are expected to be read-only.
-	ResolutionExists(name string) (*string, *util.ObjectIdentifier, bool)
+	ResolutionExists(name string) (string, util.ObjectIdentifier, bool)
 }
 
 // NewCombinedStatusResolver creates a new CombinedStatusResolver.
@@ -390,16 +390,16 @@ func (c *combinedStatusResolver) NoteStatusCollector(statusCollector *v1alpha1.S
 // - A boolean indicating whether the resolution exists.
 //
 // The returned pointers are expected to be read-only.
-func (c *combinedStatusResolver) ResolutionExists(name string) (*string, *util.ObjectIdentifier, bool) {
+func (c *combinedStatusResolver) ResolutionExists(name string) (string, util.ObjectIdentifier, bool) {
 	c.RLock()
 	defer c.RUnlock()
 
 	key, exists := c.resolutionNameToKey[name]
 	if !exists {
-		return nil, nil, false
+		return "", util.ObjectIdentifier{}, false
 	}
 
-	return &key.bindingName, &key.sourceObjectIdentifier, true
+	return key.bindingName, key.sourceObjectIdentifier, true
 }
 
 // fetchMissingStatusCollectorSpecs fetches the missing statuscollector specs
@@ -474,7 +474,7 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 func (c *combinedStatusResolver) getCombinedContentMap(workStatus *workStatus,
 	resolution *combinedStatusResolution) map[string]interface{} {
 	content := map[string]interface{}{
-		statusKey:    workStatus.status,
+		returnedKey:  workStatus.Content(),
 		inventoryKey: inventoryForWorkStatus(workStatus),
 	}
 
@@ -514,16 +514,7 @@ func (c *combinedStatusResolver) getObjectMetaAndSpec(objectIdentifier util.Obje
 			util.RefToRuntimeObj(obj))
 	}
 
-	objMap := map[string]interface{}{}
-	// get all but status from the READONLY object
-	// if the object has custom subresources, this will preserve them
-	for k, v := range unstrObj.Object { // rather than DeepCopy()
-		if k != "status" {
-			objMap[k] = v
-		}
-	}
-
-	return objMap, nil
+	return unstrObj.Object, nil
 }
 
 func getObject(lister cache.GenericLister, namespace, name string) (runtime.Object, error) {

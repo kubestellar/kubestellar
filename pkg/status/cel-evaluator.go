@@ -27,8 +27,8 @@ import (
 )
 
 const (
-	// statusKey is the key used to store the status of the object.
-	statusKey = "returned.status"
+	// returnedKey is the key used to store the status of the object.
+	returnedKey = "returned"
 	// inventoryKey is the key used to store the inventory of the object.
 	inventoryKey = "inventory"
 	// sourceObjectKey is the key used to store the object.
@@ -47,8 +47,8 @@ func newCELEvaluator() (*celEvaluator, error) {
 	env, err := cel.NewEnv(
 		cel.Declarations(
 			decls.NewVar(sourceObjectKey, decls.NewMapType(decls.String, decls.Dyn)),
-			decls.NewVar(statusKey, decls.NewMapType(decls.String, decls.Dyn)),
-			decls.NewVar(inventoryKey, decls.NewMapType(decls.String, decls.Dyn)),
+			decls.NewVar(returnedKey, decls.NewMapType(decls.String, decls.Dyn)),
+			decls.NewVar(inventoryKey, decls.NewMapType(decls.String, decls.String)),
 		),
 	)
 	if err != nil {
@@ -93,11 +93,7 @@ func (e *celEvaluator) Evaluate(expression v1alpha1.Expression, objMap map[strin
 	}
 
 	// evaluate the expression with the unstructured object
-	result, _, err := prog.Eval(map[string]interface{}{
-		sourceObjectKey: objMap[sourceObjectKey],
-		statusKey:       objMap[statusKey],
-		inventoryKey:    objMap[inventoryKey],
-	})
+	result, _, err := prog.Eval(objMap)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to evaluate expression: %w", err)

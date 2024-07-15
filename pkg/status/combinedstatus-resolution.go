@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -28,7 +29,7 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 
 	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -38,7 +39,7 @@ import (
 )
 
 const (
-	allValue           = "all"
+	allValue           = ""
 	expressionRootName = "obj"
 )
 
@@ -74,8 +75,10 @@ type combinedStatusResolution struct {
 	collectionDestinations sets.Set[string]
 }
 
-// statusCollectorData is a struct that represents the data of a status
-// collector in a combinedstatus resolution.
+// statusCollectorData is a struct that represents the data of a
+// statuscollector in a combinedstatus resolution.
+// Making it the resolution of the tuple:
+// (binding, object, statuscollector).
 type statusCollectorData struct {
 	*v1alpha1.StatusCollectorSpec
 
@@ -88,6 +91,8 @@ type statusCollectorData struct {
 
 // workStatusData is a struct that represents the evaluation of a workstatus
 // against a statuscollector's clauses.
+// Making it the resolution of the tuple:
+// (binding, object, statuscollector, workstatus).
 type workStatusData struct {
 	// groupByEval is a map of groupBy expression names to their evaluated values.
 	groupByEval map[string]ref.Val
@@ -244,21 +249,26 @@ func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 	defer c.RUnlock()
 
 	combinedStatus := &v1alpha1.CombinedStatus{
-		ObjectMeta: v1.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name:      c.name,
 			Namespace: workloadObjectIdentifier.ObjectName.Namespace,
 		},
 		Results: make([]v1alpha1.NamedStatusCombination, 0, len(c.statusCollectorNameToData)),
 	}
 
-	for scName, scData := range c.statusCollectorNameToData {
+	if combinedStatus.Namespace == metav1.NamespaceNone {
+		combinedStatus.Namespace = util.ClusterScopedObjectsCombinedStatusNamespace
+	}
+
+	for _, scName := range sortedStringSlice(abstract.PrimitiveMapKeySlice(c.statusCollectorNameToData)) {
+		scData := c.statusCollectorNameToData[scName]
 		// the data has either select or combinedFields (with groupBy)
 		if len(scData.Select) > 0 {
 			combinedStatus.Results = append(combinedStatus.Results, *handleSelect(scName, scData))
 			continue
 		}
 
-		combinedStatus.Results = append(combinedStatus.Results, *handleCombinedFields(scName, scData))
+		combinedStatus.Results = append(combinedStatus.Results, *handleAggregation(scName, scData))
 	}
 
 	return addLabelsToCombinedStatus(combinedStatus, bindingName, workloadObjectIdentifier)
@@ -522,6 +532,10 @@ func validateCombinedStatusLabels(combinedStatus *v1alpha1.CombinedStatus,
 	return true
 }
 
+// handleSelect handles the select expressions of a statuscollector data.
+// This means that the function evaluates the select expressions against the
+// possibly filtered workstatuses and returns the result in a
+// NamedStatusCombination.
 func handleSelect(scName string, scData *statusCollectorData) *v1alpha1.NamedStatusCombination {
 	namedStatusCombination := v1alpha1.NamedStatusCombination{
 		Name:        scName,
@@ -542,61 +556,7 @@ func handleSelect(scName string, scData *statusCollectorData) *v1alpha1.NamedSta
 		}
 
 		for _, selectNamedExp := range scData.Select {
-			eval := wsData.selectEval[selectNamedExp.Name]
-			if eval == nil {
-				row.Columns = append(row.Columns, v1alpha1.Value{
-					Type: v1alpha1.TypeNull})
-				continue
-			}
-
-			evalValue := eval.Value()
-			var col v1alpha1.Value
-			// temporary until type checking is implemented
-			switch v := evalValue.(type) {
-			case string:
-				col = v1alpha1.Value{
-					Type:   v1alpha1.TypeString,
-					String: &v,
-				}
-			case int, int8, int16, int32, int64:
-				numStr := strconv.Itoa(int(v.(int64)))
-				col = v1alpha1.Value{
-					Type:   v1alpha1.TypeNumber,
-					Number: &numStr,
-				}
-			case uint, uint8, uint16, uint32, uint64:
-				numStr := strconv.FormatUint(v.(uint64), 10)
-				col = v1alpha1.Value{
-					Type:   v1alpha1.TypeNumber,
-					Number: &numStr,
-				}
-			case float32, float64:
-				numStr := strconv.FormatFloat(v.(float64), 'g', -1, 64)
-				col = v1alpha1.Value{
-					Type:   v1alpha1.TypeNumber,
-					Number: &numStr,
-				}
-			case bool:
-				col = v1alpha1.Value{
-					Type: v1alpha1.TypeBool,
-					Bool: &v,
-				}
-			default:
-				evalJSON, err := json.Marshal(evalValue)
-				if err != nil {
-					runtime2.HandleError(fmt.Errorf("failed to marshal select evaluation: %w", err))
-					col = v1alpha1.Value{
-						Type: v1alpha1.TypeNull,
-					}
-				} else {
-					col = v1alpha1.Value{
-						Type:   v1alpha1.TypeObject,
-						Object: &extv1.JSON{Raw: evalJSON},
-					}
-				}
-			}
-
-			row.Columns = append(row.Columns, col)
+			row.Columns = append(row.Columns, refValToValue(wsData.selectEval[selectNamedExp.Name]))
 		}
 
 		namedStatusCombination.Rows = append(namedStatusCombination.Rows, row)
@@ -605,64 +565,171 @@ func handleSelect(scName string, scData *statusCollectorData) *v1alpha1.NamedSta
 	return &namedStatusCombination
 }
 
-func handleCombinedFields(scName string, scData *statusCollectorData) *v1alpha1.NamedStatusCombination {
-	groupByNameToValueToWorkStatus := map[string]map[any][]*workStatusData{}
-	// fill the outer layer
-	if len(scData.GroupBy) > 0 {
-		for _, groupByNamedExp := range scData.GroupBy {
-			groupByNameToValueToWorkStatus[groupByNamedExp.Name] = make(map[any][]*workStatusData)
-		}
-	} else {
-		// if there is no groupBy, create a single group
-		groupByNameToValueToWorkStatus[allValue] = make(map[any][]*workStatusData)
+func refValToValue(val ref.Val) v1alpha1.Value {
+	if val == nil {
+		return v1alpha1.Value{Type: v1alpha1.TypeNull}
 	}
 
-	// fill the inner layer
-	for _, wsData := range scData.wecToData {
-		for _, groupByNamedExp := range scData.GroupBy {
-			groupByValue := wsData.groupByEval[groupByNamedExp.Name]
-			if groupByValue == nil {
-				continue
+	valValue := val.Value()
+	// temporary until type checking is implemented
+	switch v := valValue.(type) {
+	case string:
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeString,
+			String: &v,
+		}
+	case int, int8, int16, int32, int64:
+		numStr := strconv.Itoa(int(v.(int64)))
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case uint, uint8, uint16, uint32, uint64:
+		numStr := strconv.FormatUint(v.(uint64), 10)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case float32, float64:
+		numStr := strconv.FormatFloat(v.(float64), 'g', -1, 64)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case bool:
+		return v1alpha1.Value{
+			Type: v1alpha1.TypeBool,
+			Bool: &v,
+		}
+	default:
+		evalJSON, err := json.Marshal(valValue)
+		if err != nil {
+			runtime2.HandleError(fmt.Errorf("failed to marshal select evaluation: %w", err))
+			return v1alpha1.Value{
+				Type: v1alpha1.TypeNull,
+			}
+		} else {
+			return v1alpha1.Value{
+				Type:   v1alpha1.TypeObject,
+				Object: &extv1.JSON{Raw: evalJSON},
+			}
+		}
+	}
+}
+
+// handleAggregation handles the aggregation of the statuscollector data.
+// This means that the function evaluates the groupBy expressions and the
+// combinedFields expressions against the possibly filtered workstatuses and
+// returns the result in a NamedStatusCombination.
+//
+// If there is no groupBy, the function treats all workstatuses as a single
+// group.
+func handleAggregation(scName string, scData *statusCollectorData) *v1alpha1.NamedStatusCombination {
+	// The aggregation requires grouping workstatuses by tuples of groupBy values,
+	// where for N groupBy expressions, a group key would be a tuple of N values.
+	// To achieve this grouping, we maintain two maps:
+	// 1. groupBy Evaluation Value -> unique ID
+	// 2. N-values tuple -> []*workStatusData
+	// 		Where the N-values tuple is the string concatenation of the assigned numbers
+	// 		seperated by commas, ordered by the groupBy expressions in scData.GroupBy slice.
+	generator := 0
+	ValueToNumber := map[any]int{}
+	orderedTupleToWorkStatusGroup := map[string][]*workStatusData{}
+
+	if len(scData.GroupBy) > 0 {
+		for _, wsData := range scData.wecToData {
+			valuesTuple := make([]string, 0, len(scData.GroupBy))
+			for _, groupByNamedExp := range scData.GroupBy {
+				groupByValue := wsData.groupByEval[groupByNamedExp.Name]
+				// ensure unique number mapping for the value
+				uid, exists := ValueToNumber[groupByValue.Value()]
+				if !exists {
+					ValueToNumber[groupByValue.Value()] = generator
+					uid = generator
+					generator++
+				}
+
+				valuesTuple = append(valuesTuple, strconv.Itoa(uid))
 			}
 
-			groupByNameToValueToWorkStatus[groupByNamedExp.Name][groupByValue.Value()] =
-				append(groupByNameToValueToWorkStatus[groupByNamedExp.Name][groupByValue.Value()], wsData)
+			key := strings.Join(valuesTuple, ",")
+			orderedTupleToWorkStatusGroup[key] = append(orderedTupleToWorkStatusGroup[key], wsData)
+		}
+	} else {
+		// if there is no groupBy, create a single group with all workstatuses
+		orderedTupleToWorkStatusGroup[allValue] = make([]*workStatusData, 0, len(scData.wecToData))
+		for _, wsData := range scData.wecToData {
+			orderedTupleToWorkStatusGroup[allValue] = append(orderedTupleToWorkStatusGroup[allValue], wsData)
 		}
 	}
 
+	// calculate the combinedFields for each group in one table
+	return calculateCombinedResult(orderedTupleToWorkStatusGroup, scName, scData)
+}
+
+// calculateCombinedResult calculates the combinedFields for each group in the
+// orderedTupleToWorkStatusGroup map and returns the result in a
+// NamedStatusCombination.
+func calculateCombinedResult(orderedTupleToWorkStatusGroup map[string][]*workStatusData,
+	statusCollectorName string, statusCollectorData *statusCollectorData) *v1alpha1.NamedStatusCombination {
+	// create the named status combination
 	namedStatusCombination := v1alpha1.NamedStatusCombination{
-		Name:        scName,
-		ColumnNames: make([]string, 0, len(scData.CombinedFields)),
+		Name:        statusCollectorName,
+		ColumnNames: make([]string, 0, len(statusCollectorData.CombinedFields)),
 		Rows:        []v1alpha1.StatusCombinationRow{},
 	}
 
-	// add column names
+	// add column names: one per groupBy expression and one per combinedField
 	namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames,
-		abstract.SliceMap(scData.CombinedFields, func(combinedFieldNamedAgg v1alpha1.NamedAggregator) string {
-			return combinedFieldNamedAgg.Name
-		})...)
+		abstract.SliceMap(statusCollectorData.GroupBy,
+			func(groupByNamedExp v1alpha1.NamedExpression) string {
+				return groupByNamedExp.Name
+			})...)
+	namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames,
+		abstract.SliceMap(statusCollectorData.CombinedFields,
+			func(combinedFieldNamedAgg v1alpha1.NamedAggregator) string {
+				return combinedFieldNamedAgg.Name
+			})...)
 
 	// handle combinedFields (named aggregators) per group
-	for groupByExpName, valueToWorkStatus := range groupByNameToValueToWorkStatus {
-		// one named-row per "groupExpName"."value" which columns are the combinedField aggregations.
-		for value, wsDataGroup := range valueToWorkStatus {
-			rowName := fmt.Sprintf("%s.%v", groupByExpName, value)
-			row := v1alpha1.StatusCombinationRow{
-				Name:    &rowName,
-				Columns: make([]v1alpha1.Value, 0, len(scData.CombinedFields)),
-			}
-
-			// add combinedFields
-			for _, combinedFieldNamedAgg := range scData.CombinedFields {
-				aggregation := calculateCombinedFieldAggregation(combinedFieldNamedAgg, wsDataGroup)
-				row.Columns = append(row.Columns, aggregation)
-			}
-
-			namedStatusCombination.Rows = append(namedStatusCombination.Rows, row)
+	for _, wsDataGroup := range orderedTupleToWorkStatusGroup {
+		if len(wsDataGroup) == 0 {
+			continue
 		}
+
+		row := v1alpha1.StatusCombinationRow{
+			Columns: make([]v1alpha1.Value, 0,
+				len(statusCollectorData.GroupBy)+len(statusCollectorData.CombinedFields)),
+		}
+
+		// fill groupBy values using one of the workstatuses in the group
+		if len(statusCollectorData.GroupBy) > 0 {
+			wsData := wsDataGroup[0]
+			for _, groupByNamedExp := range statusCollectorData.GroupBy {
+				groupByValue := wsData.groupByEval[groupByNamedExp.Name]
+				row.Columns = append(row.Columns, refValToValue(groupByValue))
+			}
+		}
+
+		// add combinedFields
+		for _, combinedFieldNamedAgg := range statusCollectorData.CombinedFields {
+			aggregation := calculateCombinedFieldAggregation(combinedFieldNamedAgg, wsDataGroup)
+			row.Columns = append(row.Columns, aggregation)
+		}
+
+		namedStatusCombination.Rows = append(namedStatusCombination.Rows, row)
 	}
 
 	return &namedStatusCombination
+}
+
+func getStatusCombinationRowName(groupByExpName string, value any) *string {
+	if groupByExpName == allValue && value == allValue {
+		return nil
+	}
+
+	rowName := fmt.Sprintf("%s.%v", groupByExpName, value)
+	return &rowName
 }
 
 func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggregator,
@@ -813,11 +880,6 @@ func statusCombinationEqual(a, b *v1alpha1.NamedStatusCombination) bool {
 }
 
 func statusCombinationRowEqual(a, b *v1alpha1.StatusCombinationRow) bool {
-	if a.Name != nil && b.Name != nil && *a.Name != *b.Name ||
-		a.Name == nil && b.Name != nil || a.Name != nil && b.Name == nil {
-		return false
-	}
-
 	if len(a.Columns) != len(b.Columns) {
 		return false
 	}
@@ -833,6 +895,10 @@ func statusCombinationRowEqual(a, b *v1alpha1.StatusCombinationRow) bool {
 
 func valueEqual(a, b *v1alpha1.Value) bool {
 	if a.Type != b.Type {
+		return false
+	}
+
+	if !validateValue(a) || !validateValue(b) {
 		return false
 	}
 
@@ -858,6 +924,23 @@ func valueEqual(a, b *v1alpha1.Value) bool {
 		json.Unmarshal([]byte(a.Object.Raw), &v1)
 		json.Unmarshal([]byte(b.Object.Raw), &v2)
 		return reflect.DeepEqual(v1, v2)
+	case v1alpha1.TypeNull:
+		return true
+	default:
+		return false
+	}
+}
+
+func validateValue(value *v1alpha1.Value) bool {
+	switch value.Type {
+	case v1alpha1.TypeString:
+		return value.String != nil
+	case v1alpha1.TypeNumber:
+		return value.Number != nil
+	case v1alpha1.TypeBool:
+		return value.Bool != nil
+	case v1alpha1.TypeObject:
+		return value.Object != nil
 	case v1alpha1.TypeNull:
 		return true
 	default:
@@ -897,4 +980,9 @@ func numericEqual(a, b interface{}) bool {
 		}
 	}
 	return false
+}
+
+func sortedStringSlice(s []string) []string {
+	sort.Sort(sort.StringSlice(s))
+	return s
 }

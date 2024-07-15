@@ -485,9 +485,6 @@ type NamedStatusCombination struct {
 }
 
 type StatusCombinationRow struct {
-	// +optional
-	Name *string `json:"name"`
-
 	Columns []Value `json:"columns"`
 }
 

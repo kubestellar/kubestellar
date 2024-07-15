@@ -579,8 +579,6 @@ spec:
                           - type
                           type: object
                         type: array
-                      name:
-                        type: string
                     required:
                     - columns
                     type: object
