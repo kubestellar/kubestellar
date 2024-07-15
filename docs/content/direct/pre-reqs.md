@@ -43,7 +43,7 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 
     At the end of the install make sure that the OCM CLI, clusteradm, is in your `$PATH`.
 
-- **helm** - to deploy the kubestellar and kubeflex charts
+- **helm** - to deploy the Kubestellar and kubeflex charts
 - **kubectl** - to access the kubernetes clusters
 
 ## Additional Software for the Getting Started setup
@@ -57,9 +57,9 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 
 ## Additional Software For Building KubeStellar from Source
 
-- **go** version 1.20 or higher - to build kubestellar
-- **make** - to build kubestellar and create the kubestellar image
-- **ko** - to create the kubestellar image
+- **go** version 1.20 or higher - to build Kubestellar
+- **make** - to build Kubestellar and create the Kubestellar image
+- **ko** - to create the Kubestellar image
 
 To build and _**test**_ KubeStellar properly, you will also need
 
