@@ -35,7 +35,7 @@ nav:
       - Release-notes: direct/release-notes.md
   - Getting Started: direct/get-started.md
   - User Guide:
-      - Overview: direct/user-guide-intro.md
+      - Guide Overview: direct/user-guide-intro.md
       - Getting Started: direct/get-started.md
       - General Setup:
           - Overview: direct/setup-overview.md
