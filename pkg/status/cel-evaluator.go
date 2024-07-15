@@ -59,8 +59,13 @@ func newCELEvaluator() (*celEvaluator, error) {
 }
 
 // CheckExpression checks if an expression is valid.
-func (e *celEvaluator) CheckExpression(expression string) error {
-	ast, issues := e.env.Parse(expression)
+// If the expression is nil, it returns nil.
+func (e *celEvaluator) CheckExpression(expression *v1alpha1.Expression) error {
+	if expression == nil {
+		return nil
+	}
+
+	ast, issues := e.env.Parse(string(*expression))
 	if issues != nil && issues.Err() != nil {
 		return fmt.Errorf("failed to parse expression: %w", issues.Err())
 	}

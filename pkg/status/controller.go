@@ -77,6 +77,7 @@ type Controller struct {
 	// without having to re-create new caches for this controller
 	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
 
+	celEvaluator            *celEvaluator
 	bindingResolutionBroker binding.ResolutionBroker
 	combinedStatusResolver  CombinedStatusResolver
 }
@@ -140,6 +141,14 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 		bindingResolutionBroker: bindingResolutionBroker,
 	}
 
+	celEvaluator, err := newCELEvaluator()
+	if err != nil {
+		return controller, err
+	}
+
+	controller.celEvaluator = celEvaluator
+	controller.combinedStatusResolver = NewCombinedStatusResolver(celEvaluator)
+
 	return controller, nil
 }
 
@@ -171,6 +180,11 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 			"cluster-scoped objects: %w", util.ClusterScopedObjectsCombinedStatusNamespace, err)
 	}
 
+	c.bindingResolutionBroker.RegisterCallback(func(bindingPolicyKey string) {
+		// add binding to workqueue
+		c.workqueue.Add(bindingRef(bindingPolicyKey))
+	}) // this will have the broker call the callback for all existing resolutions
+
 	go c.runWorkStatusInformer(ctx)
 
 	ksInformerFactory := ksinformers.NewSharedInformerFactory(c.wdsKsClient, defaultResyncPeriod)
@@ -187,18 +201,6 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 
 	c.listers = (<-cListers).(util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister])
 	c.logger.Info("Received listers")
-
-	celEvaluator, err := newCELEvaluator()
-	if err != nil {
-		return err
-	}
-	c.combinedStatusResolver = NewCombinedStatusResolver(celEvaluator, c.listers)
-
-	c.bindingResolutionBroker.RegisterCallback(func(bindingPolicyKey string) {
-		// add binding to workqueue
-		c.workqueue.Add(bindingRef(bindingPolicyKey))
-	}) // this will have the broker call the callback for all existing resolutions
-	c.logger.Info("Registered binding resolution broker callback")
 
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
