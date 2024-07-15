@@ -19,12 +19,13 @@ package status
 import (
 	"context"
 	"fmt"
-	"github.com/kubestellar/kubestellar/pkg/abstract"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/abstract"
 )
 
 func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error {
