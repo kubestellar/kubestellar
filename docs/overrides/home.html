@@ -71,7 +71,7 @@
       <p class="h3 text-xs-center">Think of KubeStellar as a post office for your Kubernetes resources. Like a post office, KubeStellar doesn't open your packages; it safely stores and delivers them to selected clusters worldwide—public clouds, private clouds, or at the edge. It's a super useful solution for spreading your Kubernetes resources wherever you need them.
         <strong>Don't change anything, just add KubeStellar!</strong>
       </p>
-      <div class="conteiner-row conteiner-xs">
+      <div class="conteiner-row conteiner-xs" style="z-index:100;">
 	      
 	      <div style="text-align:center; width:50%; float:left; text-size:larger">      
 	        <button
@@ -79,28 +79,28 @@
           	  title="Documentation (docs.kubestellar.io)"
 	          onclick="location.href='readme/'"
 	          class="btn-dark btn-xl-large btn-lg-large mx-3  mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
-		  style="margin-left:auto;margin-right:auto;"
+		  style="margin-left:auto;margin-right:auto;margin-bottom:20px"
 		>
 	            Documentation
 	        </button>
-
+		<br />
 		<strong><a href="readme/">docs.kubestellar.io</a></strong><br />
 		Learn More About KubeStellar <br />
 		(Getting Started, User Guide, Architecture...)
 
 	      </div>
 
-	      <div style="text-align:center; width:50%; float:right; text-size:larger" >
+	      <div style="text-align:center; width:50%; float:right; text-size:larger;" >
 	        <button				
 	          type="button"
         	  title="Community Access (KubeStellar Google Group)"
 	          onclick="window.open('https://kubestellar.io/joinus', '_blank')"
 	          class="btn-warning btn-xl-large btn-lg-large mx-3 mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
-		  style="margin-left:auto;margin-right:auto;"
+		  style="margin-left:auto;margin-right:auto;margin-bottom:20px"
        		>
 	          Join Us
 		</button>
-
+		<br />
 			<strong><a href="https://www.kubestellar.io/joinus/">KubeStellar Google Group</a></strong><br />
                         Access to our email group and community meetings
 	      </div>
@@ -139,10 +139,11 @@
         	    title="Contribute to KubeStellar via its GitHub repository"
 	            type="button"
         	    class="btn-white btn-xl-large btn-lg-large box-shadow mx-auto my-4"
+		    style="z-index:95"
 	          >
         	    Contribute on GitHub
 	        </button>
-		<div class="text-dark" style="text-size:larger;text-align:center">
+		<div class="text-dark" style="text-size:larger;text-align:center" style="z-index:96">
 			<strong><a href="https://github.com/kubestellar/kubestellar">
 			  Contribute to KubeStellar via GitHub
 			</a></strong>	  
@@ -150,7 +151,8 @@
           <div class="text-dark h3 section-sm">
           </br></br>
             <ul>
-              <li>- <b>Centrally</b> apply Kubernetes resources for selective deployment across multiple clusters</li>
+              <li>- <b>Centrally</b> apply Kubernetes resources f
+		      or selective deployment across multiple clusters</li>
             </br>          
               <li>- Use <b>standard Kubernetes-native deployment tools</b> (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required</li>
             </br>
