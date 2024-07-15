@@ -123,6 +123,10 @@ jobs:
         if: always()
         run: kubectl --context its1 get workstatuses -A -o yaml
 
+      - name: show combinedstatuses
+        if: always()
+        run: kubectl --context wds1 get combinedstatuses -A -o yaml
+
       - name: scrape kubestellar controller-manager
         if: always()
         run: |
@@ -242,6 +246,10 @@ jobs:
       - name: show workstatuses
         if: always()
         run: kubectl --context its1 get workstatuses -A -o yaml
+
+      - name: show combinedstatuses
+        if: always()
+        run: kubectl --context wds1 get combinedstatuses -A -o yaml
 
       - name: scrape kubestellar controller-manager
         if: always()

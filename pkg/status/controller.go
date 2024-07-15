@@ -24,7 +24,9 @@ import (
 	"github.com/go-logr/logr"
 	"golang.org/x/time/rate"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -163,6 +165,11 @@ func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan
 // Invoked by Start() to run the translator
 func (c *Controller) run(ctx context.Context, workers int, cListers chan interface{}) error {
 	defer c.workqueue.ShutDown()
+
+	if err := c.ensureNamespaceExists(ctx, util.ClusterScopedObjectsCombinedStatusNamespace); err != nil {
+		return fmt.Errorf("failed to ensure namespace (%s) for combinedstatuses associated with "+
+			"cluster-scoped objects: %w", util.ClusterScopedObjectsCombinedStatusNamespace, err)
+	}
 
 	go c.runWorkStatusInformer(ctx)
 
@@ -445,5 +452,37 @@ func (c *Controller) reconcile(ctx context.Context, item any) error {
 		return c.syncCombinedStatus(ctx, string(ref))
 	}
 	logger.Error(nil, "Impossible workqueue entry", "type", fmt.Sprintf("%T", item), "value", item)
+	return nil
+}
+
+func (c *Controller) ensureNamespaceExists(ctx context.Context, ns string) error {
+	namespaceGVR := schema.GroupVersionResource{
+		Group:    "",
+		Version:  "v1",
+		Resource: "namespaces",
+	}
+
+	_, err := c.wdsDynClient.Resource(namespaceGVR).Namespace(ns).Get(ctx, ns, metav1.GetOptions{})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			namespaceObj := &unstructured.Unstructured{
+				Object: map[string]interface{}{
+					"apiVersion": "v1",
+					"kind":       "Namespace",
+					"metadata": map[string]interface{}{
+						"name": ns,
+					},
+				},
+			}
+			_, err = c.wdsDynClient.Resource(namespaceGVR).Create(ctx, namespaceObj,
+				metav1.CreateOptions{FieldManager: controllerName})
+			if err != nil && !errors.IsAlreadyExists(err) {
+				return fmt.Errorf("failed to create namespace: %w", err)
+			}
+		} else {
+			return fmt.Errorf("failed to get namespace: %w", err)
+		}
+	}
+
 	return nil
 }
