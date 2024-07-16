@@ -44,7 +44,7 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
     At the end of the install make sure that the OCM CLI, clusteradm, is in your `$PATH`.
 
 - **helm** - to deploy the Kubestellar and kubeflex charts
-- **kubectl** - to access the kubernetes clusters
+- [**kubectl**](https://kubernetes.io/docs/tasks/tools/) - to access the kubernetes clusters
 
 ## Additional Software for the Getting Started setup
 
@@ -53,18 +53,18 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 
 ## Additional Software For Running the Examples
 
-- **argocd** - for the examples that use it
+- [**argocd**](https://argo-cd.readthedocs.io/en/stable/getting_started/) - for the examples that use it
 
 ## Additional Software For Building KubeStellar from Source
 
-- **go** version 1.20 or higher - to build Kubestellar
-- **make** - to build Kubestellar and create the Kubestellar image
-- **ko** - to create the Kubestellar image
+- [**go**](https://go.dev/doc/install) version 1.20 or higher - to build Kubestellar
+- [**make**](https://www.gnu.org/software/make/) - to build Kubestellar and create the Kubestellar image
+- [**ko**](https://ko.build/install/) - to create the Kubestellar image
 
 To build and _**test**_ KubeStellar properly, you will also need
 
-- **kind**
-- **OCP**
+- [**kind**](https://kind.sigs.k8s.io/)
+- [**OCP**](https://docs.openshift.com/container-platform/4.13/installing/index.html)
 
 <!-- start tag for check script  include -->
 
