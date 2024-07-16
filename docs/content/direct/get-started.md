@@ -50,7 +50,7 @@ export KUBESTELLAR_VERSION={{ config.ks_latest_release }}
 For convenience, a new local **Kind** cluster that satisfies the requirements for playing the role of KubeFlex hosting cluster can be created with the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.0/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
 ```
 
 ### Use Core Helm chart to initialize KubeFlex and create ITS and WDS
