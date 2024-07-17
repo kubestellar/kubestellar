@@ -46,13 +46,13 @@ func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error 
 
 	// Validate the StatusCollector
 	if errs := c.validateStatusCollector(statusCollector); len(errs) > 0 {
-		if err := c.updateStatusCollectorErrors(ctx, statusCollector, errs); err != nil {
+		if err := c.updateStatusCollectorErrors(ctx, statusCollector.DeepCopy(), errs); err != nil {
 			return err
 		}
 
-		isDeleted = true // invalid statuscollector, should be deleted if it exists
+		isDeleted = true // invalid statuscollector, treated as if it doesn't exist
 	} else if statusCollector.Status.Errors != nil {
-		if err := c.updateStatusCollectorErrors(ctx, statusCollector, nil); err != nil {
+		if err := c.updateStatusCollectorErrors(ctx, statusCollector.DeepCopy(), nil); err != nil {
 			return err
 		}
 	}
@@ -66,6 +66,9 @@ func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error 
 	return nil
 }
 
+// validateStatusCollector validates the StatusCollector resource
+// and returns a list of errors if any.
+// The passed statuscollector is not mutated.
 func (c *Controller) validateStatusCollector(statusCollector *v1alpha1.StatusCollector) []error {
 	var errs []error
 	// groupBy & CombinedFields empty if select is not
@@ -129,6 +132,8 @@ func (c *Controller) validateStatusCollector(statusCollector *v1alpha1.StatusCol
 	return errs
 }
 
+// updateStatusCollectorErrors updates the StatusCollector status with the
+// given errors. The given statuscollector is mutated.
 func (c *Controller) updateStatusCollectorErrors(ctx context.Context, statusCollector *v1alpha1.StatusCollector,
 	errs []error) error {
 	logger := klog.FromContext(ctx)
@@ -142,7 +147,8 @@ func (c *Controller) updateStatusCollectorErrors(ctx context.Context, statusColl
 
 	if err != nil {
 		if errors.IsNotFound(err) {
-			// StatusCollector has been deleted
+			logger.V(4).Info("StatusCollector not found (status updating skipped)",
+				"ns", statusCollector.Namespace, "name", statusCollector.Name)
 			return nil
 		} else {
 			return fmt.Errorf("failed to update StatusCollector status (ns, name = %s, %s): %w",
