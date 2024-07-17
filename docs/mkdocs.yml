@@ -78,7 +78,7 @@ nav:
         - For Contributors: direct/contributor.md
         - Packaging: direct/packaging.md
         - Release Process: direct/release.md
-        - Releaes Testing: direct/release-testing.md
+        - Release Testing: direct/release-testing.md
         - Guidelines: Contribution guidelines/CONTRIBUTING.md
   - Community: 
     - Get Involved: Community/_index.md
