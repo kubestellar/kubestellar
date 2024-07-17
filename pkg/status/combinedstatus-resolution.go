@@ -390,9 +390,9 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 	content map[string]interface{}, scData *statusCollectorData) bool {
 	wsData, exists := scData.wecToData[workStatusWECName]
 
-	if content == nil && exists { // workstatus is empty/deleted, remove the workstatus data if it exists
+	if content == nil { // workstatus is empty/deleted, remove the workstatus data if it exists
 		delete(scData.wecToData, workStatusWECName)
-		return true
+		return exists
 	}
 
 	// evaluate filter to determine if the workstatus is relevant
@@ -421,7 +421,11 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 	updated := false
 
 	if !exists {
-		wsData = &workStatusData{}
+		wsData = &workStatusData{
+			groupByEval:        make(map[string]ref.Val),
+			combinedFieldsEval: make(map[string]ref.Val),
+			selectEval:         make(map[string]ref.Val),
+		}
 		scData.wecToData[workStatusWECName] = wsData
 		updated = true
 	}
@@ -435,7 +439,13 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 			continue
 		}
 
-		updated = updated || eval.Equal(wsData.selectEval[selectNamedExp.Name]).Value() != true
+		prevVal, exists := wsData.selectEval[selectNamedExp.Name]
+		if eval != nil {
+			updated = updated || !exists || eval.Equal(prevVal).Value() != true
+		} else {
+			updated = updated || exists
+		}
+
 		selectEvals[selectNamedExp.Name] = eval
 	}
 
@@ -448,7 +458,13 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 			continue
 		}
 
-		updated = updated || eval.Equal(wsData.groupByEval[groupByNamedExp.Name]).Value() != true
+		prevVal, exists := wsData.selectEval[groupByNamedExp.Name]
+		if eval != nil {
+			updated = updated || !exists || eval.Equal(prevVal).Value() != true
+		} else {
+			updated = updated || exists
+		}
+
 		groupByEvals[groupByNamedExp.Name] = eval
 	}
 
@@ -471,7 +487,13 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 			continue
 		}
 
-		updated = updated || eval.Equal(wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]).Value() != true
+		prevVal, exists := wsData.selectEval[combinedFieldNamedAgg.Name]
+		if eval != nil {
+			updated = updated || !exists || eval.Equal(prevVal).Value() != true
+		} else {
+			updated = updated || exists
+		}
+
 		combinedFieldEvals[combinedFieldNamedAgg.Name] = eval
 	}
 
@@ -539,7 +561,7 @@ func validateCombinedStatusLabels(combinedStatus *v1alpha1.CombinedStatus,
 func handleSelect(scName string, scData *statusCollectorData) *v1alpha1.NamedStatusCombination {
 	namedStatusCombination := v1alpha1.NamedStatusCombination{
 		Name:        scName,
-		ColumnNames: make([]string, 0, len(scData.Select)), // for now, manually add wecName to all rows
+		ColumnNames: make([]string, 0, len(scData.Select)),
 		Rows:        make([]v1alpha1.StatusCombinationRow, 0, len(scData.wecToData)),
 	}
 
