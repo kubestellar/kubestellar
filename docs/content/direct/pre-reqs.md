@@ -57,9 +57,9 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 
 ## Additional Software For Building KubeStellar from Source
 
-- [**go**](https://go.dev/doc/install) version 1.20 or higher - to build Kubestellar
-- [**make**](https://www.gnu.org/software/make/) - to build Kubestellar and create the Kubestellar image
-- [**ko**](https://ko.build/install/) - to create the Kubestellar image
+- [**go**](https://go.dev/doc/install) version 1.21 or higher - to build Kubestellar
+- [**make**](https://www.gnu.org/software/make/) - to build Kubestellar and create the Kubestellar container
+- [**ko**](https://ko.build/install/) - to create the Kubestellar container
 
 To build and _**test**_ KubeStellar properly, you will also need
 
