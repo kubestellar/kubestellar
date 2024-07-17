@@ -6,7 +6,7 @@ This guide is a work in progress.
 
 - Remember that for each of your BindingPolicy objects, there is a corresponding Binding object that reports what matched the policy object.
 - Although not part of the interface, when debugging you can look at the ManifestWork and WorkStatus objects in the ITS.
-- Look at logs of controllers. If they have had controller restarts that look relevant, look also at the previous logs.
+- Look at logs of controllers. If they have had container restarts that look relevant, look also at the previous logs.
 - If a controller's `-v` is not at least 4, increase it.
 - Remember that Kubernetes controllers tend to report transient problems as errors without making it clear that the problem is transient and tend to not make it clear if/when the problem has been resolved (sigh).
 
