@@ -20,8 +20,9 @@ import (
 	"fmt"
 	"sync"
 
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/cache"
@@ -99,13 +100,15 @@ type CombinedStatusResolver interface {
 	// - A boolean indicating whether the resolution exists.
 	//
 	// The returned pointers are expected to be read-only.
-	ResolutionExists(name string) (*string, *util.ObjectIdentifier, bool)
+	ResolutionExists(name string) (string, util.ObjectIdentifier, bool)
 }
 
 // NewCombinedStatusResolver creates a new CombinedStatusResolver.
-func NewCombinedStatusResolver(celEvaluator *celEvaluator) CombinedStatusResolver {
+func NewCombinedStatusResolver(celEvaluator *celEvaluator,
+	wdsListers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]) CombinedStatusResolver {
 	return &combinedStatusResolver{
 		celEvaluator:              celEvaluator,
+		wdsListers:                wdsListers,
 		bindingNameToResolutions:  make(map[string]map[util.ObjectIdentifier]*combinedStatusResolution),
 		resolutionNameToKey:       make(map[string]resolutionKey),
 		statusCollectorNameToSpec: make(map[string]*v1alpha1.StatusCollectorSpec),
@@ -121,6 +124,7 @@ type resolutionKey struct {
 
 type combinedStatusResolver struct {
 	celEvaluator *celEvaluator
+	wdsListers   util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
 
 	sync.RWMutex
 
@@ -213,12 +217,6 @@ func (c *combinedStatusResolver) NoteBindingResolution(bindingName string, bindi
 	// (~2+3) create/update combinedstatus resolutions for every object that requires status collection,
 	// and delete resolutions that are no longer required
 	for objectIdentifier, objectData := range bindingResolution.ObjectIdentifierToData {
-		// namespace-scoped only for now - a resource cannot be both namespace and cluster scoped
-		// therefore combinedstatus objects are only namespace-scoped
-		if objectIdentifier.ObjectName.Namespace == v1.NamespaceNone {
-			continue
-		}
-
 		csResolution, exists := objectIdentifierToResolution[objectIdentifier]
 		if len(objectData.StatusCollectors) == 0 {
 			if exists { // associated resolution is no longer required
@@ -313,8 +311,10 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 			continue
 		}
 
+		content := c.getCombinedContentMap(workStatus, resolution)
+
 		// this call logs errors, but does not return them for now
-		if resolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, workStatus.status) {
+		if resolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, content) {
 			combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
 				workStatus.sourceObjectIdentifier.ObjectName.Namespace))
 		}
@@ -390,16 +390,16 @@ func (c *combinedStatusResolver) NoteStatusCollector(statusCollector *v1alpha1.S
 // - A boolean indicating whether the resolution exists.
 //
 // The returned pointers are expected to be read-only.
-func (c *combinedStatusResolver) ResolutionExists(name string) (*string, *util.ObjectIdentifier, bool) {
+func (c *combinedStatusResolver) ResolutionExists(name string) (string, util.ObjectIdentifier, bool) {
 	c.RLock()
 	defer c.RUnlock()
 
 	key, exists := c.resolutionNameToKey[name]
 	if !exists {
-		return nil, nil, false
+		return "", util.ObjectIdentifier{}, false
 	}
 
-	return &key.bindingName, &key.sourceObjectIdentifier, true
+	return key.bindingName, key.sourceObjectIdentifier, true
 }
 
 // fetchMissingStatusCollectorSpecs fetches the missing statuscollector specs
@@ -456,9 +456,11 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 				continue
 			}
 
-			// evaluate workstatus
 			csResolution := c.bindingNameToResolutions[bindingName][workStatus.sourceObjectIdentifier]
-			if csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, workStatus.status) {
+			content := c.getCombinedContentMap(workStatus, csResolution)
+
+			// evaluate workstatus
+			if csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, content) {
 				combinedStatusesToQueue.Insert(util.IdentifierForCombinedStatus(csResolution.getName(),
 					workloadObjIdentifier.ObjectName.Namespace))
 			}
@@ -466,6 +468,60 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 	}
 
 	return combinedStatusesToQueue
+}
+
+// getCombinedContentMap returns a map of content for the given workstatus.
+func (c *combinedStatusResolver) getCombinedContentMap(workStatus *workStatus,
+	resolution *combinedStatusResolution) map[string]interface{} {
+	content := map[string]interface{}{
+		returnedKey:  workStatus.Content(),
+		inventoryKey: inventoryForWorkStatus(workStatus),
+	}
+
+	if resolution.requiresSourceObjectMetaOrSpec() {
+		objMap, err := c.getObjectMetaAndSpec(workStatus.sourceObjectIdentifier)
+		if err != nil {
+			runtime2.HandleError(fmt.Errorf("failed to get meta & spec for source object %s: %w",
+				workStatus.sourceObjectIdentifier, err))
+		}
+
+		content[sourceObjectKey] = objMap
+	}
+
+	return content
+}
+
+// getObjectMetaAndSpec fetches the metadata and spec of the object associated
+// with the given workload object identifier.
+// The function is guaranteed not to return a key of `status` in the map.
+// If the resource contains any other subresources, they are fetched as well.
+func (c *combinedStatusResolver) getObjectMetaAndSpec(objectIdentifier util.ObjectIdentifier) (map[string]interface{}, error) {
+	// fetch object
+	lister, exists := c.wdsListers.Get(objectIdentifier.GVR())
+	if !exists {
+		return nil, fmt.Errorf("lister not found for gvr %s", objectIdentifier.GVR())
+	}
+
+	obj, err := getObject(lister, objectIdentifier.ObjectName.Namespace, objectIdentifier.ObjectName.Name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get object (%v) with gvr (%v): %w", objectIdentifier.ObjectName,
+			objectIdentifier.GVR(), err)
+	}
+
+	unstrObj, ok := obj.(*unstructured.Unstructured)
+	if !ok {
+		return nil, fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s",
+			util.RefToRuntimeObj(obj))
+	}
+
+	return unstrObj.Object, nil
+}
+
+func getObject(lister cache.GenericLister, namespace, name string) (runtime.Object, error) {
+	if namespace != "" {
+		return lister.ByNamespace(namespace).Get(name)
+	}
+	return lister.Get(name)
 }
 
 func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool {
@@ -541,4 +597,11 @@ func namedExpressionSliceToMap(slice []v1alpha1.NamedExpression) map[string]v1al
 
 func expressionPtrsEqual(e1, e2 *v1alpha1.Expression) bool {
 	return e1 == nil && e2 == nil || e1 != nil && e2 != nil && *e1 == *e2
+}
+
+// inventoryForWorkStatus returns an inventory map for the given workstatus.
+func inventoryForWorkStatus(ws *workStatus) map[string]interface{} {
+	return map[string]interface{}{
+		"name": ws.wecName,
+	}
 }

@@ -26,6 +26,15 @@ import (
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
+const (
+	// returnedKey is the key used to store the status of the object.
+	returnedKey = "returned"
+	// inventoryKey is the key used to store the inventory of the object.
+	inventoryKey = "inventory"
+	// sourceObjectKey is the key used to store the object.
+	sourceObjectKey = "obj"
+)
+
 // celEvaluator is a struct that holds the CEL environment
 // and provides a method to evaluate an expression with an unstructured object
 // as the context.
@@ -37,7 +46,9 @@ type celEvaluator struct {
 func newCELEvaluator() (*celEvaluator, error) {
 	env, err := cel.NewEnv(
 		cel.Declarations(
-			decls.NewVar("obj", decls.NewMapType(decls.String, decls.Dyn)),
+			decls.NewVar(sourceObjectKey, decls.NewMapType(decls.String, decls.Dyn)),
+			decls.NewVar(returnedKey, decls.NewMapType(decls.String, decls.Dyn)),
+			decls.NewVar(inventoryKey, decls.NewMapType(decls.String, decls.String)),
 		),
 	)
 	if err != nil {
@@ -82,9 +93,8 @@ func (e *celEvaluator) Evaluate(expression v1alpha1.Expression, objMap map[strin
 	}
 
 	// evaluate the expression with the unstructured object
-	result, _, err := prog.Eval(map[string]interface{}{
-		"obj": objMap,
-	})
+	result, _, err := prog.Eval(objMap)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to evaluate expression: %w", err)
 	}

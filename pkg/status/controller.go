@@ -24,7 +24,9 @@ import (
 	"github.com/go-logr/logr"
 	"golang.org/x/time/rate"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -138,13 +140,6 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 		bindingResolutionBroker: bindingResolutionBroker,
 	}
 
-	celEvaluator, err := newCELEvaluator()
-	if err != nil {
-		return controller, err
-	}
-	resolver := NewCombinedStatusResolver(celEvaluator)
-
-	controller.combinedStatusResolver = resolver
 	return controller, nil
 }
 
@@ -171,10 +166,10 @@ func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan
 func (c *Controller) run(ctx context.Context, workers int, cListers chan interface{}) error {
 	defer c.workqueue.ShutDown()
 
-	c.bindingResolutionBroker.RegisterCallback(func(bindingPolicyKey string) {
-		// add binding to workqueue
-		c.workqueue.Add(bindingRef(bindingPolicyKey))
-	}) // this will have the broker call the callback for all existing resolutions
+	if err := c.ensureNamespaceExists(ctx, util.ClusterScopedObjectsCombinedStatusNamespace); err != nil {
+		return fmt.Errorf("failed to ensure namespace (%s) for combinedstatuses associated with "+
+			"cluster-scoped objects: %w", util.ClusterScopedObjectsCombinedStatusNamespace, err)
+	}
 
 	go c.runWorkStatusInformer(ctx)
 
@@ -192,6 +187,18 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 
 	c.listers = (<-cListers).(util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister])
 	c.logger.Info("Received listers")
+
+	celEvaluator, err := newCELEvaluator()
+	if err != nil {
+		return err
+	}
+	c.combinedStatusResolver = NewCombinedStatusResolver(celEvaluator, c.listers)
+
+	c.bindingResolutionBroker.RegisterCallback(func(bindingPolicyKey string) {
+		// add binding to workqueue
+		c.workqueue.Add(bindingRef(bindingPolicyKey))
+	}) // this will have the broker call the callback for all existing resolutions
+	c.logger.Info("Registered binding resolution broker callback")
 
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
@@ -445,5 +452,37 @@ func (c *Controller) reconcile(ctx context.Context, item any) error {
 		return c.syncCombinedStatus(ctx, string(ref))
 	}
 	logger.Error(nil, "Impossible workqueue entry", "type", fmt.Sprintf("%T", item), "value", item)
+	return nil
+}
+
+func (c *Controller) ensureNamespaceExists(ctx context.Context, ns string) error {
+	namespaceGVR := schema.GroupVersionResource{
+		Group:    "",
+		Version:  "v1",
+		Resource: "namespaces",
+	}
+
+	_, err := c.wdsDynClient.Resource(namespaceGVR).Namespace(ns).Get(ctx, ns, metav1.GetOptions{})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			namespaceObj := &unstructured.Unstructured{
+				Object: map[string]interface{}{
+					"apiVersion": "v1",
+					"kind":       "Namespace",
+					"metadata": map[string]interface{}{
+						"name": ns,
+					},
+				},
+			}
+			_, err = c.wdsDynClient.Resource(namespaceGVR).Create(ctx, namespaceObj,
+				metav1.CreateOptions{FieldManager: controllerName})
+			if err != nil && !errors.IsAlreadyExists(err) {
+				return fmt.Errorf("failed to create namespace: %w", err)
+			}
+		} else {
+			return fmt.Errorf("failed to get namespace: %w", err)
+		}
+	}
+
 	return nil
 }

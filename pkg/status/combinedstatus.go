@@ -22,7 +22,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
@@ -61,53 +60,53 @@ func (c *Controller) syncCombinedStatus(ctx context.Context, ref string) error {
 		return fmt.Errorf("failed to get CombinedStatus from informer cache (ns=%v, name=%v): %w", ns, name, err)
 	}
 
-	generatedCombinedStatus := c.combinedStatusResolver.CompareCombinedStatus(*bindingName,
-		*sourceObjectIdentifier, combinedStatus)
+	generatedCombinedStatus := c.combinedStatusResolver.CompareCombinedStatus(bindingName,
+		sourceObjectIdentifier, combinedStatus)
 	if generatedCombinedStatus == nil {
 		logger.Info("CombinedStatus is up-to-date", "ns", ns, "name", name)
 		return nil
 	}
 
-	if err = c.updateOrCreateCombinedStatus(ctx, combinedStatus, generatedCombinedStatus); err != nil {
+	generatedCombinedStatus.ResourceVersion = combinedStatus.ResourceVersion // in case of update
+	if err = c.updateOrCreateCombinedStatus(ctx, generatedCombinedStatus); err != nil {
 		return fmt.Errorf("failed to update or create CombinedStatus: %w", err)
-	}
+	} // all the call's exit routes log the event
 
-	logger.Info("Synced CombinedStatus", "ns", ns, "name", name)
 	return nil
 }
 
-func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context, combinedStatus,
+func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
 	generatedCombinedStatus *v1alpha1.CombinedStatus) error {
-	// set labels
-	combinedStatus.Labels = generatedCombinedStatus.Labels
-	// set results
-	combinedStatus.Results = generatedCombinedStatus.Results
-
 	logger := klog.FromContext(ctx)
-	csEcho, err := c.wdsKsClient.ControlV1alpha1().CombinedStatuses(combinedStatus.Namespace).Update(ctx,
-		combinedStatus, metav1.UpdateOptions{FieldManager: controllerName})
 
-	if err != nil {
-		if errors.IsNotFound(err) {
-			csEcho, err = c.wdsKsClient.ControlV1alpha1().CombinedStatuses(combinedStatus.Namespace).Create(ctx,
-				combinedStatus, metav1.CreateOptions{FieldManager: controllerName})
-			if err != nil {
-				runtime2.HandleError(fmt.Errorf("failed to create CombinedStatus (ns, name = %v, %v): %w",
-					combinedStatus.Namespace, combinedStatus.Name, err))
-				return nil
+	if generatedCombinedStatus.ResourceVersion != "" {
+		csEcho, err := c.wdsKsClient.ControlV1alpha1().CombinedStatuses(generatedCombinedStatus.Namespace).Update(ctx,
+			generatedCombinedStatus, metav1.UpdateOptions{FieldManager: controllerName})
+		if err != nil {
+			if errors.IsNotFound(err) {
+				logger.Info("CombinedStatus not found (update skipped)",
+					"ns", generatedCombinedStatus.Namespace, "name", generatedCombinedStatus.Name)
+				return nil // the object was deleted during the syncing procedure, event will be handled
 			}
 
-			logger.Info("Created CombinedStatus", "ns", combinedStatus.Namespace,
-				"name", combinedStatus.Name, "resourceVersion", csEcho.ResourceVersion)
-			return nil
-		} else {
 			return fmt.Errorf("failed to update CombinedStatus (ns, name = %v, %v): %w",
-				combinedStatus.Namespace, combinedStatus.Name, err)
+				generatedCombinedStatus.Namespace, generatedCombinedStatus.Name, err)
 		}
+
+		logger.Info("Updated CombinedStatus", "ns", generatedCombinedStatus.Namespace,
+			"name", generatedCombinedStatus.Name, "resourceVersion", csEcho.ResourceVersion)
+		return nil
 	}
 
-	logger.Info("Updated CombinedStatus", "ns", combinedStatus.Namespace,
-		"name", combinedStatus.Name, "resourceVersion", csEcho.ResourceVersion)
+	csEcho, err := c.wdsKsClient.ControlV1alpha1().CombinedStatuses(generatedCombinedStatus.Namespace).Create(ctx,
+		generatedCombinedStatus, metav1.CreateOptions{FieldManager: controllerName})
+	if err != nil {
+		return fmt.Errorf("failed to create CombinedStatus (ns, name = %v, %v): %w",
+			generatedCombinedStatus.Namespace, generatedCombinedStatus.Name, err)
+	}
+
+	logger.Info("Created CombinedStatus", "ns", generatedCombinedStatus.Namespace,
+		"name", generatedCombinedStatus.Name, "resourceVersion", csEcho.ResourceVersion)
 	return nil
 }
 

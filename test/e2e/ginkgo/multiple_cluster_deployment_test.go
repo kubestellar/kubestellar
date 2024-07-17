@@ -423,7 +423,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		workloadName := "nginx"
 		bpName := "nginx-combinedstatus"
 		fullStatusCollectorName := "full-status"
-		countAvailableReplicasStatusCollectorName := "count-available-replicas"
+		sumAvailableReplicasStatusCollectorName := "sum-available-replicas"
 		selectAvailableStatusCollectorName := "select-available-replicas"
 		selectReplicasStatusCollectorName := "replicas"
 
@@ -441,10 +441,16 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		ginkgo.It("select full status", func(ctx context.Context) {
 			util.CreateStatusCollector(ctx, ksWds, fullStatusCollectorName,
 				ksapi.StatusCollectorSpec{
-					Select: []ksapi.NamedExpression{{
-						Name: "status",
-						Def:  "obj",
-					}},
+					Select: []ksapi.NamedExpression{
+						{
+							Name: "wecName",
+							Def:  "inventory.name",
+						},
+						{
+							Name: "status",
+							Def:  "returned.status",
+						},
+					},
 					Limit: 20,
 				})
 
@@ -480,30 +486,28 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("available replicas count", func(ctx context.Context) {
-			util.CreateStatusCollector(ctx, ksWds, countAvailableReplicasStatusCollectorName,
+			availableReplicasCEL := ksapi.Expression("returned.status.availableReplicas")
+			util.CreateStatusCollector(ctx, ksWds, sumAvailableReplicasStatusCollectorName,
 				ksapi.StatusCollectorSpec{
-					GroupBy: []ksapi.NamedExpression{{
-						Name: "num-available",
-						Def:  "obj.availableReplicas",
-					}},
 					CombinedFields: []ksapi.NamedAggregator{{
-						Name: "count",
-						Type: ksapi.AggregatorTypeCount,
+						Name:    "sum",
+						Subject: &availableReplicasCEL,
+						Type:    ksapi.AggregatorTypeSum,
 					}},
 					Limit: 10,
 				})
 
-			testAndStatusCollection[0].StatusCollectors = []string{countAvailableReplicasStatusCollectorName}
+			testAndStatusCollection[0].StatusCollectors = []string{sumAvailableReplicasStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
 
 			// Validate CombinedStatus results
 			gomega.Expect(len(cs.Results)).To(gomega.Equal(1))
-			gomega.Expect(cs.Results[0].Name).To(gomega.Equal(countAvailableReplicasStatusCollectorName))
+			gomega.Expect(cs.Results[0].Name).To(gomega.Equal(sumAvailableReplicasStatusCollectorName))
 
 			gomega.ExpectWithOffset(1, len(cs.Results[0].ColumnNames)).To(gomega.Equal(1))
-			gomega.Expect(cs.Results[0].ColumnNames[0]).To(gomega.Equal("count"))
+			gomega.Expect(cs.Results[0].ColumnNames[0]).To(gomega.Equal("sum"))
 
 			gomega.ExpectWithOffset(1, len(cs.Results[0].Rows)).To(gomega.Equal(1))
 			gomega.ExpectWithOffset(1, len(cs.Results[0].Rows[0].Columns)).To(gomega.Equal(1))
@@ -513,19 +517,28 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		ginkgo.It("policy with multiple StatusCollectors", func(ctx context.Context) {
 			util.CreateStatusCollector(ctx, ksWds, selectAvailableStatusCollectorName,
 				ksapi.StatusCollectorSpec{
-					Select: []ksapi.NamedExpression{{
-						Name: "availableReplicas",
-						Def:  "obj.availableReplicas",
-					}},
+					Select: []ksapi.NamedExpression{
+						{
+							Name: "wecName",
+							Def:  "inventory.name",
+						}, {
+							Name: "availableReplicas",
+							Def:  "returned.status.availableReplicas",
+						}},
 					Limit: 20,
 				})
 
 			util.CreateStatusCollector(ctx, ksWds, selectReplicasStatusCollectorName,
 				ksapi.StatusCollectorSpec{
-					Select: []ksapi.NamedExpression{{
-						Name: "replicas",
-						Def:  "obj.replicas",
-					}},
+					Select: []ksapi.NamedExpression{
+						{
+							Name: "wecName",
+							Def:  "inventory.name",
+						},
+						{
+							Name: "replicas",
+							Def:  "returned.status.replicas",
+						}},
 					Limit: 20,
 				})
 

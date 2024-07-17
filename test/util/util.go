@@ -452,9 +452,15 @@ func CleanupWDS(ctx context.Context, wds *kubernetes.Clientset, ksWds *ksClient.
 	DeleteAll[*batchv1.JobList](ctx, wds.BatchV1().Jobs(ns), func(objList *batchv1.JobList) []string {
 		return objectsToNames((*batchv1.Job).GetName, objList.Items)
 	})
-	DeleteAll[*ksapi.BindingPolicyList](ctx, ksWds.ControlV1alpha1().BindingPolicies(), func(objList *ksapi.BindingPolicyList) []string {
-		return objectsToNames((*ksapi.BindingPolicy).GetName, objList.Items)
-	})
+	DeleteAll[*ksapi.BindingPolicyList](ctx, ksWds.ControlV1alpha1().BindingPolicies(),
+		func(objList *ksapi.BindingPolicyList) []string {
+			return objectsToNames((*ksapi.BindingPolicy).GetName, objList.Items)
+		})
+	DeleteAll[*ksapi.StatusCollectorList](ctx, ksWds.ControlV1alpha1().StatusCollectors(),
+		func(objList *ksapi.StatusCollectorList) []string {
+			return objectsToNames((*ksapi.StatusCollector).GetName, objList.Items)
+
+		})
 }
 
 type ResourceInterface[ObjectListType metav1.ListInterface] interface {

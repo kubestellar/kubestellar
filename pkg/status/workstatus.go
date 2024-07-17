@@ -39,6 +39,12 @@ type workStatus struct {
 	status map[string]interface{}
 }
 
+func (ws *workStatus) Content() map[string]interface{} {
+	return map[string]interface{}{
+		"status": ws.status,
+	}
+}
+
 func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) error {
 	logger := klog.FromContext(ctx)
 
