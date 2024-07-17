@@ -50,3 +50,7 @@ Besides "Start", the other green items in that graph are entry points for extend
 KubeStellar's [Core Helm chart](core-chart.md) combines initializing the KubeFlex hosting cluster, creating some ITSes, and creating some WDSes.
 
 You can find an example run through of steps 2--7 in [Getting Started](get-started.md). This dovetails with [the example scenarios document](example-scenarios.md), which shows examples of the later steps.
+
+## Troubleshooting
+
+See [the Troubleshooting guide](troubleshooting.md).
