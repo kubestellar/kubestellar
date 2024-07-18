@@ -81,7 +81,7 @@ Whether it's editing files from Kubestellar.io or directly from the Kubestellar 
    - When committing, make sure to specify the type of PR at the beginning of your commit message (i.e. :bug: if it addresses a bug-type issue)
    - If the PR addresses a specific issue that has already been opened in the github, make sure to include the opened issue in **additional comments** (i.e. "fixes Issue #2XXX")
      
-2. Click **Propose Changes** after writing the commit message to submit the PR.
+2. Click **Propose Changes** after writing the commit message, review your changes, and then create the PR.
 3. If your PR addresses an already opened issue on the github, make sure to close the issue once your PR is approved and closed.
 
 <br />
@@ -101,9 +101,10 @@ Your submitted PR must pass the automated checks in order to be reviewed. This r
 5. Clone the repository using ```git clone``` followed by pasting the URL you just copied.
 6. Change your directory to the Kubestellar repo using ```cd kubestellar```.
 7. ```git checkout``` to the branch in your fork where the changes were committed.
-   - the branch name should be written at the top of your submitted PR page and looks something like "patch-*X*" (where "X" should be the number of PRs made on your fork to date)
+   - The branch name should be written at the top of your submitted PR page and looks something like "patch-*X*" (where "X" should be the number of PRs made on your fork to date)
 8. Once in your branch, type ```git commit -s --amend``` to sign off your PR.
-   - you may replace ```--amend``` with a ```-m``` followed by a commit message if you desire; the ```--amend``` simply uses the same commit message as the one you wrote when initially submitting the PR
+   - You may replace ```--amend``` with a ```-m``` followed by a commit message if you desire; the ```--amend``` simply uses the same commit message as the one you wrote when initially submitting the PR
+   - If prompted with a sign-off page in your Git Bash, type ```:wq!``` to exit the prompt
 9. Type ```git push -f origin [branch_name]```, replacing ```[branch_name]``` with the actual name of your branch.
 10. Navigate back to your PR github page.
     - A green ```dco-signoff: yes``` label indicates that your PR is successfully signed
