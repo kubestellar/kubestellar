@@ -47,7 +47,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			[]metav1.LabelSelector{
 				{MatchLabels: map[string]string{"location-group": "edge"}},
 			},
-			[]ksapi.DownsyncObjectTestAndStatusCollection{
+			[]ksapi.DownsyncPolicyClause{
 				{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 					ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx"}}},
 				}},
@@ -120,7 +120,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"location-group": "edge"}},
 				},
-				[]ksapi.DownsyncObjectTestAndStatusCollection{
+				[]ksapi.DownsyncPolicyClause{
 					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx"}}},
 					}},
@@ -171,7 +171,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"name": "cluster1"}},
 				},
-				[]ksapi.DownsyncObjectTestAndStatusCollection{
+				[]ksapi.DownsyncPolicyClause{
 					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 						ObjectSelectors: []metav1.LabelSelector{
 							{MatchLabels: map[string]string{"label1": "test1"}},
@@ -227,7 +227,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"name": "cluster1"}},
 				},
-				[]ksapi.DownsyncObjectTestAndStatusCollection{
+				[]ksapi.DownsyncPolicyClause{
 					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 						ObjectSelectors: []metav1.LabelSelector{
 							{MatchLabels: map[string]string{"label1": "test1", "label2": "test2"}}},
@@ -267,7 +267,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 						{Key: "name", Operator: metav1.LabelSelectorOpIn, Values: []string{"cluster1", "cluster2", "cluster3"}},
 					}},
 				},
-				[]ksapi.DownsyncObjectTestAndStatusCollection{
+				[]ksapi.DownsyncPolicyClause{
 					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 						ObjectSelectors: []metav1.LabelSelector{
 							{MatchLabels: map[string]string{"label1": "A"}},
@@ -298,7 +298,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"location-group": "edge"}},
 				},
-				[]ksapi.DownsyncObjectTestAndStatusCollection{
+				[]ksapi.DownsyncPolicyClause{
 					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 						ObjectNames:     []string{"three"},
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"label1": "C"}}},
@@ -321,7 +321,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"name": "cluster1"}},
 				},
-				[]ksapi.DownsyncObjectTestAndStatusCollection{
+				[]ksapi.DownsyncPolicyClause{
 					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx-singleton"}}},
 					}},
@@ -351,7 +351,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"name": "cluster1"}},
 				},
-				[]ksapi.DownsyncObjectTestAndStatusCollection{
+				[]ksapi.DownsyncPolicyClause{
 					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "hello-service"}}},
 					}},
@@ -365,7 +365,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"name": "cluster1"}},
 				},
-				[]ksapi.DownsyncObjectTestAndStatusCollection{
+				[]ksapi.DownsyncPolicyClause{
 					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "hello-job"}}},
 					}},
@@ -430,7 +430,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		clusterSelector := []metav1.LabelSelector{
 			{MatchLabels: map[string]string{"location-group": "edge"}},
 		}
-		testAndStatusCollection := []ksapi.DownsyncObjectTestAndStatusCollection{
+		testAndStatusCollection := []ksapi.DownsyncPolicyClause{
 			{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 				ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": workloadName}}},
 			},

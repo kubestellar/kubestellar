@@ -282,7 +282,7 @@ type mrObject interface {
 //   - sets.Set[string]: the UNION of the statuscollector names that appear within
 //     EACH of the tests that the object matches
 func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
-	tests []v1alpha1.DownsyncObjectTestAndStatusCollection) (bool, sets.Set[string]) {
+	tests []v1alpha1.DownsyncPolicyClause) (bool, sets.Set[string]) {
 	gvr := schema.GroupVersionResource{
 		Group:    objIdentifier.GVK.Group,
 		Version:  objIdentifier.GVK.Version,

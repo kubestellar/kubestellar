@@ -97,11 +97,12 @@ type BindingPolicySpec struct {
 	// NumberOfClusters *int32 `json:"numberOfClusters,omitempty"`
 
 	// `downsync` selects the objects to bind with the selected WECs for downsync,
-	// and describes how to collect the status from those WECs for each of the
-	// selected objects.
+	// and modulates their downsync.
 	// An object is selected if it matches at least one member of this list.
-	// All of the referenced StatusCollectors are applied to the object.
-	Downsync []DownsyncObjectTestAndStatusCollection `json:"downsync,omitempty"`
+	// When multiple DownsyncPolicyClause match the same workload object:
+	// the `createOnly` bits are ORed together, and the StatusCollector reference
+	// sets are combined by union.
+	Downsync []DownsyncPolicyClause `json:"downsync,omitempty"`
 
 	// WantSingletonReportedState means that for objects that are distributed --- taking
 	// all BindingPolicies into account --- to exactly one WEC, the object's reported state
@@ -137,11 +138,21 @@ const (
 	BindingPolicyConditionMisconfigured string = "BindingPolicyMisconfigured"
 )
 
-// DownsyncObjectTestAndStatusCollection identifies some objects (by a predicate)
-// and asks for some combined status to be returned from those objects.
-// The latter is dictated through applying a set of StatusCollectors.
-type DownsyncObjectTestAndStatusCollection struct {
+// DownsyncPolicyClause identifies some objects (by a predicate)
+// and modulates how they are downsynced.
+// One modulation is specifying a set of StatusCollectors to apply
+// to returned status.
+// The other modulation is specifying whether the propagation from WDS to WEC
+// involves continual maintenance of the spec or the object is only created
+// if it is absent.
+type DownsyncPolicyClause struct {
 	DownsyncObjectTest `json:",inline"`
+
+	// `createOnly` indicates that in a given WEC, the object is not to be updated
+	// if it already exists.
+	// +optional
+	CreateOnly bool `json:"createOnly,omitempty"`
+
 	// statusCollectors is a list of StatusCollectors name references that are applied to the selected objects.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }
@@ -247,30 +258,36 @@ type Binding struct {
 // All objects referenced in this spec are propagated to all destinations present.
 type BindingSpec struct {
 	// `workload` is a collection of namespaced and cluster scoped object references and their associated
-	// data - resource versions and statuscollectors, to be propagated to destination clusters.
-	Workload DownsyncObjectReferencesWithStatusCollectors `json:"workload,omitempty"`
+	// data - resource versions, create-only bits, and statuscollectors - to be propagated to destination clusters.
+	Workload DownsyncObjectClauses `json:"workload,omitempty"`
 
 	// `destinations` is a list of cluster-identifiers that the objects should be propagated to.
 	Destinations []Destination `json:"destinations,omitempty"`
 }
 
-// DownsyncObjectReferencesWithStatusCollectors defines the objects to be down-synced, grouping them by scope.
+// DownsyncObjectClauses defines the objects to be down-synced, grouping them by scope.
 // It specifies a set of object references with their associated resource versions, to be downsynced.
 // Each object reference is associated with a set of statuscollectors that should be applied to it.
-type DownsyncObjectReferencesWithStatusCollectors struct {
-	// `clusterScope` holds a list of cluster-scoped object references with their associated
-	// resource versions to downsync.
-	ClusterScope []ClusterScopeDownsyncObjectAndStatusCollectors `json:"clusterScope,omitempty"`
+type DownsyncObjectClauses struct {
+	// `clusterScope` holds a list of references to cluster-scoped objects to downsync and how the
+	// downsync is to be modulated.
+	ClusterScope []ClusterScopeDownsyncClause `json:"clusterScope,omitempty"`
 
-	// `namespaceScope` holds a list of namespace-scoped object references with their associated
-	// resource versions to downsync.
-	NamespaceScope []NamespaceScopeDownsyncObjectAndStatusCollectors `json:"namespaceScope,omitempty"`
+	// `namespaceScope` holds a list of references to namsepace-scoped objects to downsync and how the
+	// downsync is to be modulated.
+	NamespaceScope []NamespaceScopeDownsyncClause `json:"namespaceScope,omitempty"`
 }
 
-// NamespaceScopeDownsyncObjectAndStatusCollectors references a specific namespace-scoped object to downsync,
+// NamespaceScopeDownsyncClause references a specific namespace-scoped object to downsync,
 // and the status collectors that should be applied to it.
-type NamespaceScopeDownsyncObjectAndStatusCollectors struct {
+type NamespaceScopeDownsyncClause struct {
 	NamespaceScopeDownsyncObject `json:",inline"`
+
+	// `createOnly` indicates that in a given WEC, the object is not to be updated
+	// if it already exists.
+	// +optional
+	CreateOnly bool `json:"createOnly,omitempty"`
+
 	// `statusCollectors` is a list of StatusCollectors name references that are applied to the object.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }
@@ -288,10 +305,16 @@ type NamespaceScopeDownsyncObject struct {
 	ResourceVersion string `json:"resourceVersion"`
 }
 
-// ClusterScopeDownsyncObjectAndStatusCollectors references a specific cluster-scoped object to downsync,
+// ClusterScopeDownsyncClause references a specific cluster-scoped object to downsync,
 // and the status collectors that should be applied to it.
-type ClusterScopeDownsyncObjectAndStatusCollectors struct {
+type ClusterScopeDownsyncClause struct {
 	ClusterScopeDownsyncObject `json:",inline"`
+
+	// `createOnly` indicates that in a given WEC, the object is not to be updated
+	// if it already exists.
+	// +optional
+	CreateOnly bool `json:"createOnly,omitempty"`
+
 	// `statusCollectors` is a list of StatusCollectors name references that are applied to the object.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }

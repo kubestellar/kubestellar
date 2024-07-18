@@ -286,7 +286,7 @@ func TestMatching(t *testing.T) {
 		idxsCreated = newIdxsCreated
 		idxsNotCreated = newIdxsNotCreated
 	}
-	tests := []ksapi.DownsyncObjectTestAndStatusCollection{}
+	tests := []ksapi.DownsyncPolicyClause{}
 	bindingClient := ksClient.Bindings()
 	const thrashBeforeBit int = 1
 	const changeTestsBit int = 2
@@ -304,13 +304,13 @@ func TestMatching(t *testing.T) {
 		}
 		if roundType&changeTestsBit != 0 {
 			idxsNotInTest := append([]int{}, allIdxs...)
-			tests = []ksapi.DownsyncObjectTestAndStatusCollection{}
+			tests = []ksapi.DownsyncPolicyClause{}
 			for i := 0; i*3 < nObj*2; i++ {
 				j := rg.Intn(len(idxsNotInTest))
 				idx := idxsNotInTest[j]
 				a.SliceDelete(&idxsNotInTest, j)
 				obj := objs[idx]
-				test := ksapi.DownsyncObjectTestAndStatusCollection{DownsyncObjectTest: extractTest(rg, obj)}
+				test := ksapi.DownsyncPolicyClause{DownsyncObjectTest: extractTest(rg, obj)}
 				logger.Info("Adding test", "test", test)
 				tests = append(tests, test)
 			}
@@ -423,7 +423,7 @@ func id2r(objId util.ObjectIdentifier) gvrnn {
 }
 
 // workloadIsExpected returns the symmetric difference, as JSON data
-func workloadIsExpected(workload ksapi.DownsyncObjectReferencesWithStatusCollectors, expectation map[gvrnn]any) (excess []gvrnn, missed map[string]any) {
+func workloadIsExpected(workload ksapi.DownsyncObjectClauses, expectation map[gvrnn]any) (excess []gvrnn, missed map[string]any) {
 	excess = []gvrnn{}
 	missed = map[string]any{}
 	for key, val := range expectation {
@@ -459,7 +459,7 @@ type mrObjRsc struct {
 	delete    func() error
 }
 
-func (mor mrObjRsc) MatchesAny(t *testing.T, tests []ksapi.DownsyncObjectTestAndStatusCollection) *ksapi.DownsyncObjectTest {
+func (mor mrObjRsc) MatchesAny(t *testing.T, tests []ksapi.DownsyncPolicyClause) *ksapi.DownsyncObjectTest {
 	for _, test := range tests {
 		gvk := mor.MRObject.GetObjectKind().GroupVersionKind()
 		if test.APIGroup != nil && gvk.Group != *test.APIGroup {
