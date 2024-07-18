@@ -143,7 +143,6 @@ const (
 type DownsyncObjectTestAndStatusCollection struct {
 	DownsyncObjectTest `json:",inline"`
 	// statusCollectors is a list of StatusCollectors name references that are applied to the selected objects.
-	// This API is under development and is not yet functional.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }
 
@@ -333,7 +332,6 @@ type BindingList struct {
 // StatusCollector defines one way to collect status about a given workload object from
 // the set of WECs that it propagates to.
 // This is modeled after an SQL SELECT statement that does aggregation.
-// This API is under development and is not yet functional.
 //
 // +genclient
 // +genclient:nonNamespaced
@@ -368,7 +366,7 @@ type StatusCollectorSpec struct {
 	CombinedFields []NamedAggregator `json:"combinedFields,omitempty"`
 
 	// `select` defines named values to extract from each object.
-	// `select` must be emtpy when `combinedFields` is not.
+	// `select` must be empty when `combinedFields` is not.
 	// +optional
 	Select []NamedExpression `json:"select,omitempty"`
 
@@ -455,7 +453,6 @@ type StatusCollectorList struct {
 // - "status.kubestellar.io/namespace" holding the namespace of the workload object;
 // - "status.kubestellar.io/name" holding the name of the workload object;
 // - "status.kubestellar.io/binding-policy" holding the name of the BindingPolicy object.
-// This API is under development and is not yet functional.
 //
 // +genclient
 // +kubebuilder:object:root=true

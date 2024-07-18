@@ -262,7 +262,6 @@ spec:
                     statusCollectors:
                       description: statusCollectors is a list of StatusCollectors
                         name references that are applied to the selected objects.
-                        This API is under development and is not yet functional.
                       items:
                         type: string
                       type: array

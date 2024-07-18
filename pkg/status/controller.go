@@ -77,6 +77,7 @@ type Controller struct {
 	// without having to re-create new caches for this controller
 	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
 
+	celEvaluator            *celEvaluator
 	bindingResolutionBroker binding.ResolutionBroker
 	combinedStatusResolver  CombinedStatusResolver
 }
@@ -192,6 +193,8 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	if err != nil {
 		return err
 	}
+
+	c.celEvaluator = celEvaluator
 	c.combinedStatusResolver = NewCombinedStatusResolver(celEvaluator, c.listers)
 
 	c.bindingResolutionBroker.RegisterCallback(func(bindingPolicyKey string) {

@@ -21,8 +21,7 @@ spec:
       openAPIV3Schema:
         description: StatusCollector defines one way to collect status about a given
           workload object from the set of WECs that it propagates to. This is modeled
-          after an SQL SELECT statement that does aggregation. This API is under development
-          and is not yet functional.
+          after an SQL SELECT statement that does aggregation.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -115,7 +114,7 @@ spec:
                 type: integer
               select:
                 description: '`select` defines named values to extract from each object.
-                  `select` must be emtpy when `combinedFields` is not.'
+                  `select` must be empty when `combinedFields` is not.'
                 items:
                   description: NamedExpression pairs a name with a way of extracting
                     a value from a JSON object.
