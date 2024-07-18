@@ -111,6 +111,8 @@ theme:
   # Common files such as images, stylesheets, theme overrides
   custom_dir: 'overrides'
   features:
+    # enable the ability to dismiss the announcement bar
+    - announce.dismiss
     - content.action.edit
     - content.action.view
     # Enable navigation section index pages, so we don't see Concepts > Concepts
