@@ -1,6 +1,6 @@
-# How to Sign Your Pull Requests
+# How to Sign-off on Your Pull Requests
 
-In order to get your pull requests approved, you must first complete a DCO sign-off. To do this, you must have a GPG and SSH key. Basic setup instructions can be found below (For more detailed instructions, refer to the Github [GPG](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) and [SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) setup pages):
+In order to get your pull requests approved, you must first complete a DCO sign-off. This process is defined by the CNCF, and there are two cases: individual contributors and contributors that work for a corporate CNCF member. To do this as an individual contributor, you must have a GPG and SSH key. Basic setup instructions can be found below (For more detailed instructions, refer to the Github [GPG](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) and [SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) setup pages):
 
 ---
 
@@ -105,7 +105,9 @@ Whether it's editing files from Kubestellar.io or directly from the Kubestellar 
 
 <br />
 
-## Signing Pull Requests
+## Pull Request Sign-off
+
+**NOTE**: "sign-off" is different from "signing" a commit or tag (see [the git book](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work) about signing). The former indicates your assent to the repo's terms for contributors, the latter adds a cryptograph checksum that is rarely displayed.
 
 Your submitted PR must pass the automated checks in order to be reviewed. This requires for you to perform a DCO sign-off for your PR. The following instructions provide a basic walkthrough if you have already set up your GPG and SSH keys:
 
