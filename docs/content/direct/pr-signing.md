@@ -4,17 +4,28 @@ In order to get your pull requests approved, you must first complete a DCO sign-
 
 ---
 
-Before starting, make sure that your user email is verified on Github. Git Bash is also highly recommended. 
+Before starting, make sure that your user email is verified on Github. To check for this:
+
+1. Login to Github and navigate to your Github **Settings** page
+2. In the sidebar, open the **Emails** tab
+3. Emails associated with Github should be listed at the top of the page under the "Emails" label
+4. An unverified email would have an "Unverified" label under it in orange text
+5. To verify, click **Resend verification email** and follow its prompts
+6. Navigate back to your **Emails** page, if the "Unverified" label is no longer there, then you're good to go!
+
+<br />
+
+**Git Bash** is also highly recommended.
 
 <br />
 
 ## Setting up the GPG Key
 
-1. Install [GnuPG](https://www.gnupg.org/download/) (the GPG command line tool).
-   - Binary releases for your specific OS can be found after scrolling down to the Binary Releases section (i.e. Gpg4win on Windows, Mac GPG for macOS, etc).
-   - Follow the prompts on the installer to set up GnuPG.
+1. Install GnuPG (the GPG command line tool).
+   - Binary releases for your specific OS can be found [here](https://www.gnupg.org/download/) after scrolling down to the Binary Releases section (i.e. Gpg4win on Windows, Mac GPG for macOS, etc).
+   - After downloading the installer, follow the prompts to set up GnuPG.
 
-2. Open Git Bash and use the following command to generate your GPG key pair: 
+2. Open Git Bash (or your CLI of choice) and use the following command to generate your GPG key pair: 
    ```shell
    gpg --full-generate-key
    ```
@@ -52,7 +63,7 @@ Before starting, make sure that your user email is verified on Github. Git Bash 
 
 ## Setting up the SSH Key
 
-1. Open Git Bash and use the following command to generate your new SSH key (make sure to replace ```your_email``` with your Github-verified email address):
+1. Open Git Bash (or your CLI of choice) and use the following command to generate your new SSH key (make sure to replace ```your_email``` with your Github-verified email address):
    ```shell
    ssh-keygen -t ed25519 -C "your_email"
    ```
@@ -70,6 +81,14 @@ Before starting, make sure that your user email is verified on Github. Git Bash 
    - Open the dropdown menu under "Key type" and select **Signing Key**
    - Paste your SSH key that you copied/saved in **Step 3** under "Key"
 7. Your new SSH key should now be displayed under SSH keys.
+8. **Optional**: To test if your SSH key is connecting properly or not, run the following command in your CLI (more specific instructions can be found in the [Github documentation](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection)):
+   ```shell
+   ssh -T git@github.com
+   ```
+   - If given a warning saying something like ```The authenticity of the host '[host IP]' can't be established``` along with a key fingerprint and a prompt to continue, verify if the provided key fingerprint matches any of those listed [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints)
+   - Once you've verified the match, type ```yes```
+   - If the resulting message says something along the lines of ```Hi [User]! You've successfully authenticated, but GitHub does not provide shell access.```, then it means your SSH key is up and ready.
+
 
 <br />
 
@@ -79,7 +98,7 @@ Whether it's editing files from Kubestellar.io or directly from the Kubestellar 
 
 1. Changes made to any file are automatically committed to a new branch in your fork.
    - When committing, make sure to specify the type of PR at the beginning of your commit message (i.e. :bug: if it addresses a bug-type issue)
-   - If the PR addresses a specific issue that has already been opened in the github, make sure to include the opened issue in **additional comments** (i.e. "fixes Issue #2XXX")
+   - If the PR addresses a specific issue that has already been opened in the github, make sure to include the opened issue in **additional comments** (i.e. "fixes Issue #XXXX")
      
 2. Click **Propose Changes** after writing the commit message, review your changes, and then create the PR.
 3. If your PR addresses an already opened issue on the github, make sure to close the issue once your PR is approved and closed.
@@ -97,14 +116,14 @@ Your submitted PR must pass the automated checks in order to be reviewed. This r
 3. Once in your fork, click the **Code** dropdown.
    - Under the "Local" tab at the top of the dropdown, select the SSH tab
    - Copy the SSH repo URL to your clipboard
-4. Open Git Bash (create or change to a different directory if desired).
+4. Open Git Bash (or your CLI of choice), create or change to a different directory if desired.
 5. Clone the repository using ```git clone``` followed by pasting the URL you just copied.
 6. Change your directory to the Kubestellar repo using ```cd kubestellar```.
 7. ```git checkout``` to the branch in your fork where the changes were committed.
    - The branch name should be written at the top of your submitted PR page and looks something like "patch-*X*" (where "X" should be the number of PRs made on your fork to date)
 8. Once in your branch, type ```git commit -s --amend``` to sign off your PR.
    - You may replace ```--amend``` with a ```-m``` followed by a commit message if you desire; the ```--amend``` simply uses the same commit message as the one you wrote when initially submitting the PR
-   - If prompted with a sign-off page in your Git Bash, type ```:wq!``` to exit the prompt
+   - If prompted with a sign-off page in your Git Bash (or alternative CLI), type ```:wq!``` to exit the prompt
 9. Type ```git push -f origin [branch_name]```, replacing ```[branch_name]``` with the actual name of your branch.
 10. Navigate back to your PR github page.
     - A green ```dco-signoff: yes``` label indicates that your PR is successfully signed
