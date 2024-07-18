@@ -26,3 +26,27 @@ type Transport interface {
 	// In case slice is empty, the function should return an empty wrapped object.
 	WrapObjects(objects []*unstructured.Unstructured) runtime.Object
 }
+
+// TransportWithCreateOnly is a subtype of Transport that knows how to handle
+// the create-only option.
+type TransportWithCreateOnly interface {
+	Transport
+
+	// WrapObjectsHavingCreateOnly gets slice of Wrapee and wraps them into a single wrapped object.
+	// In case slice is empty, the function should return an empty wrapped object.
+	WrapObjectsHavingCreateOnly(objects []Wrapee) runtime.Object
+}
+
+// Wrapee is a workload object to wrap and its associated create-only bit
+type Wrapee struct {
+	Object     *unstructured.Unstructured
+	CreateOnly bool
+}
+
+func (wr Wrapee) GetObject() *unstructured.Unstructured { return wr.Object }
+
+func (wr Wrapee) GetCreateOnly() bool { return wr.CreateOnly }
+
+func NewWrapee(object *unstructured.Unstructured, createOnly bool) Wrapee {
+	return Wrapee{object, createOnly}
+}
