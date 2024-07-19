@@ -29,6 +29,15 @@ type Transport interface {
 
 // TransportWithCreateOnly is a subtype of Transport that knows how to handle
 // the create-only option.
+// The presence of this subtype is an intermediate development step only, required
+// because of the factoring into multiple repos.
+// The first step is a release of ks/ks exposing this new type.
+// After the ks/OTP repo has made a release that passes values that implement this type
+// to the generic code (this package here), the generic code will be changed so that the
+// `Transport` interface has just the `WrapObjectsHavingCreateOnly` method and the `TransportWithCreateOnly`
+// interface will be deleted. After a release
+// of that, the ks/OTP repo can be changed so that its Transport implementation does
+// not implement the older method (`WrapObjects`).
 type TransportWithCreateOnly interface {
 	Transport
 
