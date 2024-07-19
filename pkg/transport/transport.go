@@ -42,6 +42,9 @@ type TransportWithCreateOnly interface {
 	Transport
 
 	// WrapObjectsHavingCreateOnly gets slice of Wrapee and wraps them into a single wrapped object.
+	// The "HavingCreateOnly" is short for "having a create-only bit",
+	// not for "having the create-only bit set to true".
+	// That is, this method honors the create-only bit whatever it is set to.
 	// In case slice is empty, the function should return an empty wrapped object.
 	WrapObjectsHavingCreateOnly(objects []Wrapee) runtime.Object
 }
