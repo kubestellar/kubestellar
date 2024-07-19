@@ -254,7 +254,7 @@ type testTransport struct {
 }
 
 func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.Object {
-	return tt.WrapObjectsHavingCreateOnly(abstract.SliceMap(objs, TODO_FIXME_ADD_CONSTANT_CREATEONLY))
+	return tt.WrapObjectsHavingCreateOnly(abstract.SliceMap(objs, FIXME_ADD_CONSTANT_CREATEONLY))
 }
 
 func (tt *testTransport) WrapObjectsHavingCreateOnly(wrapees []Wrapee) runtime.Object {

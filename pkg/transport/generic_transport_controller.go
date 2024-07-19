@@ -852,14 +852,15 @@ func (c *genericTransportController) computeDestToCustomizedObjects(objectsToPro
 	return destToCustomizedObjects, bindingErrors
 }
 
-func TODO_FIXME_ADD_CONSTANT_CREATEONLY(obj *unstructured.Unstructured) Wrapee {
+// TODO: replace all usage of this function with something that actually copes with the create-only bit.
+func FIXME_ADD_CONSTANT_CREATEONLY(obj *unstructured.Unstructured) Wrapee {
 	return Wrapee{obj, false}
 }
 
 func (c *genericTransportController) wrapBatch(batchToPropagate []*unstructured.Unstructured, binding *v1alpha1.Binding, numShard int, isSharded bool) (*unstructured.Unstructured, error) {
 	var wrapped runtime.Object
 	if t2, is := c.transport.(TransportWithCreateOnly); is {
-		wrapees := abstract.SliceMap(batchToPropagate, TODO_FIXME_ADD_CONSTANT_CREATEONLY)
+		wrapees := abstract.SliceMap(batchToPropagate, FIXME_ADD_CONSTANT_CREATEONLY)
 		wrapped = t2.WrapObjectsHavingCreateOnly(wrapees)
 	} else {
 		wrapped = c.transport.WrapObjects(batchToPropagate)
