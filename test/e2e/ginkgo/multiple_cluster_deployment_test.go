@@ -18,6 +18,7 @@ package e2e
 
 import (
 	"context"
+	"time"
 
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
@@ -25,6 +26,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/klog/v2"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/test/util"
@@ -76,6 +78,52 @@ var _ = ginkgo.Describe("end to end testing", func() {
 
 			util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 2)
 			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 2)
+		})
+
+		ginkgo.It("supports create-only mode", func(ctx context.Context) {
+			ginkgo.By("deleting old BindingPolicy and expecting Deployment deletions")
+			util.DeleteBindingPolicy(ctx, ksWds, "nginx")
+			util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 0)
+			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 0)
+
+			ginkgo.By("creating new BindingPolicy and expecting corresponding Binding")
+			util.CreateBindingPolicy(ctx, ksWds, "nginx",
+				[]metav1.LabelSelector{
+					{MatchLabels: map[string]string{"location-group": "edge"}},
+				},
+				[]ksapi.DownsyncPolicyClause{
+					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
+						Resources:       []string{"namespaces"},
+						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx"}}},
+					}},
+					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
+						Resources:       []string{"deployments"},
+						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx"}}},
+					},
+						CreateOnly: true},
+				},
+			)
+			util.ValidateBinding(ctx, ksWds, "nginx", func(binding *ksapi.Binding) bool {
+				klog.FromContext(ctx).V(2).Info("Checking Binding", "binding", binding)
+				return len(binding.Spec.Workload.ClusterScope) == 1 &&
+					!binding.Spec.Workload.ClusterScope[0].CreateOnly &&
+					len(binding.Spec.Workload.NamespaceScope) == 1 &&
+					binding.Spec.Workload.NamespaceScope[0].CreateOnly
+			})
+			util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 1)
+			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 1)
+
+			if false { // TODO: enable this after the transport plugin implements create-only
+				ginkgo.By("modifying the Deployment in the WDS and expecting no change in the WECs")
+				objPatch := []byte(`{"spec":{"replicas": 2}}`)
+				_, err := wds.AppsV1().Deployments(ns).Patch(
+					ctx, "nginx", types.MergePatchType, objPatch, metav1.PatchOptions{})
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+
+				time.Sleep(30 * time.Second)
+				util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 1)
+				util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 1)
+			}
 		})
 
 		ginkgo.It("handles changes in bindingpolicy ObjectSelector", func(ctx context.Context) {
