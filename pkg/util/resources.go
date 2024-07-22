@@ -40,6 +40,14 @@ func ParseAPIGroupsString(apiGroups string) sets.Set[string] {
 	return groupsSet
 }
 
+func ParseControllersString(controllers string) sets.Set[string] {
+	if controllers == "*" {
+		return nil
+	}
+
+	return sets.New(strings.Split(controllers, ",")...)
+}
+
 // IsResourceGroupAllowed checks if a API group is explicitly allowed by user,
 // an empty or nil allowedResources slice is equivalent to allow all.
 func IsAPIGroupAllowed(apiGroup string, allowedAPIGroups sets.Set[string]) bool {
@@ -47,6 +55,15 @@ func IsAPIGroupAllowed(apiGroup string, allowedAPIGroups sets.Set[string]) bool 
 		return true
 	}
 	return allowedAPIGroups.Has(apiGroup)
+}
+
+// ShouldStartController checks if the given controller should be started,
+// empty of nil controllers is equivalent to start all.
+func ShouldStartController(controller string, controllers sets.Set[string]) bool {
+	if len(controllers) == 0 {
+		return true
+	}
+	return controllers.Has(controller)
 }
 
 // append the minimal set of resources that are required to operate
