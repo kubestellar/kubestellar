@@ -279,10 +279,11 @@ type mrObject interface {
 // testObject tests if the object matches the given tests.
 // The returned tuple is:
 //   - bool: whether the object matches ANY of the tests
+//   - bool: whether any of the tests says CreateOnly==true
 //   - sets.Set[string]: the UNION of the statuscollector names that appear within
 //     EACH of the tests that the object matches
 func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
-	tests []v1alpha1.DownsyncPolicyClause) (bool, sets.Set[string]) {
+	tests []v1alpha1.DownsyncPolicyClause) (bool, bool, sets.Set[string]) {
 	gvr := schema.GroupVersionResource{
 		Group:    objIdentifier.GVK.Group,
 		Version:  objIdentifier.GVK.Version,
@@ -292,7 +293,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 	logger := klog.FromContext(ctx)
 
 	matchedStatusCollectors := sets.New[string]()
-	matched := false
+	var matched, createOnly bool
 
 	var objNS *corev1.Namespace
 	for _, test := range tests {
@@ -333,9 +334,10 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 		// test is a match
 		matchedStatusCollectors.Insert(test.StatusCollectors...)
 		matched = true
+		createOnly = createOnly || test.CreateOnly
 	}
 
-	return matched, matchedStatusCollectors
+	return matched, createOnly, matchedStatusCollectors
 }
 
 func labelsMatchAny(logger logr.Logger, labelSet map[string]string, selectors []metav1.LabelSelector) bool {
