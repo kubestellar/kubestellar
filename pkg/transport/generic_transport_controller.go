@@ -718,9 +718,9 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	return nil
 }
 
-func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, sets.Set[metav1.GroupResource], error) {
+func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]Wrapee, sets.Set[metav1.GroupResource], error) {
 	groupResources := sets.New[metav1.GroupResource]()
-	objectsToPropagate := make([]*unstructured.Unstructured, 0)
+	objectsToPropagate := make([]Wrapee, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clusterScopedObject := range binding.Spec.Workload.ClusterScope {
 		gvr := schema.GroupVersionResource(clusterScopedObject.GroupVersionResource)
@@ -730,7 +730,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 		}
 		gr := metav1.GroupResource{Group: clusterScopedObject.GroupVersionResource.Group, Resource: clusterScopedObject.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		objectsToPropagate = append(objectsToPropagate, TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name))
+		objectsToPropagate = append(objectsToPropagate, Wrapee{TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), clusterScopedObject.CreateOnly})
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, namespaceScopedObject := range binding.Spec.Workload.NamespaceScope {
@@ -742,7 +742,7 @@ func (c *genericTransportController) getObjectsFromWDS(ctx context.Context, bind
 		}
 		gr := metav1.GroupResource{Group: namespaceScopedObject.GroupVersionResource.Group, Resource: namespaceScopedObject.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		objectsToPropagate = append(objectsToPropagate, TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name))
+		objectsToPropagate = append(objectsToPropagate, Wrapee{TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), namespaceScopedObject.CreateOnly})
 	}
 
 	return objectsToPropagate, groupResources, nil
@@ -797,15 +797,16 @@ func (c *genericTransportController) computeDestToWrappedObjects(ctx context.Con
 //   - the slice of strings containing the user errors found in the given Binding.
 //
 // This func also updates c.bindingSensitiveDestinations for the given Binding.
-func (c *genericTransportController) computeDestToCustomizedObjects(objectsToPropagate []*unstructured.Unstructured, binding *v1alpha1.Binding) (map[v1alpha1.Destination][]*unstructured.Unstructured, []string) {
+func (c *genericTransportController) computeDestToCustomizedObjects(objectsToPropagate []Wrapee, binding *v1alpha1.Binding) (map[v1alpha1.Destination][]Wrapee, []string) {
 	// This will become non-nil if any object to propagate needs customization
-	var destToCustomizedObjects map[v1alpha1.Destination][]*unstructured.Unstructured
+	var destToCustomizedObjects map[v1alpha1.Destination][]Wrapee
 
 	bindingErrors := []string{}
 
 	// Look through the objects to propagate to see if any needs customization.
 	// If any needs customization then catch up destToCustomizedObjects and proceed from there.
-	for objIdx, objToPropagate := range objectsToPropagate {
+	for objIdx, wrapee := range objectsToPropagate {
+		objToPropagate, createOnly := wrapee.Object, wrapee.CreateOnly
 		objAnnotations := objToPropagate.GetAnnotations()
 		objRequestsExpansion := objAnnotations[v1alpha1.TemplateExpansionAnnotationKey] == "true"
 		customizeThisObject := false
@@ -828,14 +829,14 @@ func (c *genericTransportController) computeDestToCustomizedObjects(objectsToPro
 				}
 			}
 			if customizeThisObject && destToCustomizedObjects == nil {
-				destToCustomizedObjects = map[v1alpha1.Destination][]*unstructured.Unstructured{}
+				destToCustomizedObjects = map[v1alpha1.Destination][]Wrapee{}
 				for _, dest := range binding.Spec.Destinations {
 					destToCustomizedObjects[dest] = abstract.SliceCopy(objectsToPropagate[:objIdx])
 				}
 			}
 			if destToCustomizedObjects != nil {
 				customizedObjectsSoFar := destToCustomizedObjects[dest]
-				customizedObjectsSoFar = append(customizedObjectsSoFar, objC)
+				customizedObjectsSoFar = append(customizedObjectsSoFar, Wrapee{objC, createOnly})
 				destToCustomizedObjects[dest] = customizedObjectsSoFar
 			}
 		}
@@ -852,18 +853,13 @@ func (c *genericTransportController) computeDestToCustomizedObjects(objectsToPro
 	return destToCustomizedObjects, bindingErrors
 }
 
-// TODO: replace all usage of this function with something that actually copes with the create-only bit.
-func FIXME_ADD_CONSTANT_CREATEONLY(obj *unstructured.Unstructured) Wrapee {
-	return Wrapee{obj, false}
-}
-
-func (c *genericTransportController) wrapBatch(batchToPropagate []*unstructured.Unstructured, binding *v1alpha1.Binding, numShard int, isSharded bool) (*unstructured.Unstructured, error) {
+func (c *genericTransportController) wrapBatch(batchToPropagate []Wrapee, binding *v1alpha1.Binding, numShard int, isSharded bool) (*unstructured.Unstructured, error) {
 	var wrapped runtime.Object
 	if t2, is := c.transport.(TransportWithCreateOnly); is {
-		wrapees := abstract.SliceMap(batchToPropagate, FIXME_ADD_CONSTANT_CREATEONLY)
-		wrapped = t2.WrapObjectsHavingCreateOnly(wrapees)
+		wrapped = t2.WrapObjectsHavingCreateOnly(batchToPropagate)
 	} else {
-		wrapped = c.transport.WrapObjects(batchToPropagate)
+		justObjs := abstract.SliceMap(batchToPropagate, Wrapee.GetObject)
+		wrapped = c.transport.WrapObjects(justObjs)
 	}
 	wrappedObject, err := convertObjectToUnstructured(wrapped)
 	if err != nil {
@@ -884,15 +880,15 @@ func (c *genericTransportController) wrapBatch(batchToPropagate []*unstructured.
 	return wrappedObject, err
 }
 
-func (c *genericTransportController) wrap(objectsToPropagate []*unstructured.Unstructured, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
+func (c *genericTransportController) wrap(objectsToPropagate []Wrapee, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
 	var wrappedObjects []*unstructured.Unstructured
-	var batchToPropagate []*unstructured.Unstructured = nil
+	var batchToPropagate []Wrapee = nil
 	maxBatchSize := c.MaxSizeWrappedObject
 	isSharded := false
 	numShard := 0
 	var batchSize int = 0
 	for _, obj := range objectsToPropagate {
-		bytes, err := obj.MarshalJSON()
+		bytes, err := obj.Object.MarshalJSON()
 		if err != nil {
 			return nil, err
 		}
