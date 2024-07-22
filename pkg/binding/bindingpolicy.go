@@ -247,7 +247,7 @@ func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPo
 		if controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
 			bindingPolicy = bindingPolicy.DeepCopy()
 			controllerutil.RemoveFinalizer(bindingPolicy, KSFinalizer)
-			_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: controllerName})
+			_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: ControllerName})
 			if err != nil {
 				if errors.IsNotFound(err) {
 					// object was deleted after getting into this function. This is not an error.
@@ -263,7 +263,7 @@ func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPo
 	if !controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
 		bindingPolicy = bindingPolicy.DeepCopy()
 		controllerutil.AddFinalizer(bindingPolicy, KSFinalizer)
-		_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: controllerName})
+		_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: ControllerName})
 		if err != nil {
 			return err
 		}

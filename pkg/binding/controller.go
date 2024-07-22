@@ -56,7 +56,7 @@ import (
 )
 
 const (
-	controllerName      = "Binding"
+	ControllerName      = "Binding"
 	defaultResyncPeriod = time.Duration(0)
 )
 
@@ -132,7 +132,7 @@ type bindingRef string
 // Create a new binding controller
 func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, itsRestConfig *rest.Config,
 	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
-	logger := parentLogger.WithName(controllerName)
+	logger := parentLogger.WithName(ControllerName)
 
 	kubernetesClient, err := kubernetes.NewForConfig(wdsRestConfig)
 	if err != nil {
@@ -274,7 +274,7 @@ func makeController(logger logr.Logger,
 		informers:                   util.NewConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer](),
 		stoppers:                    util.NewConcurrentMap[schema.GroupVersionResource, chan struct{}](),
 		bindingPolicyResolver:       NewBindingPolicyResolver(),
-		workqueue:                   workqueue.NewRateLimitingQueueWithConfig(ratelimiter, workqueue.RateLimitingQueueConfig{Name: controllerName + "-" + wdsName}),
+		workqueue:                   workqueue.NewRateLimitingQueueWithConfig(ratelimiter, workqueue.RateLimitingQueueConfig{Name: ControllerName + "-" + wdsName}),
 		allowedGroupsSet:            allowedGroupsSet,
 	}
 
@@ -284,7 +284,7 @@ func makeController(logger logr.Logger,
 // EnsureCRDs will ensure that the CRDs are installed.
 // Call this before Start.
 func (c *Controller) EnsureCRDs(ctx context.Context) error {
-	return crd.ApplyCRDs(ctx, controllerName, c.kubernetesClient, c.extClient, c.logger)
+	return crd.ApplyCRDs(ctx, ControllerName, c.kubernetesClient, c.extClient, c.logger)
 }
 
 // AppendKSResources lets the controller know about the KS resources.
@@ -301,7 +301,7 @@ func (c *Controller) AppendKSResources(ctx context.Context) error {
 
 // Start the controller
 func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan interface{}) error {
-	logger := klog.FromContext(parentCtx).WithName(controllerName)
+	logger := klog.FromContext(parentCtx).WithName(ControllerName)
 	ctx := klog.NewContext(parentCtx, logger)
 
 	// Create informer on managedclusters so we can re-evaluate BindingPolicies.

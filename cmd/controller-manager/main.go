@@ -63,12 +63,14 @@ func main() {
 	var itsName string
 	var wdsName string
 	var allowedGroupsString string
+	var controllers string
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The [host]:port from which /metrics is served.")
 	flag.StringVar(&pprofAddr, "pprof-bind-address", ":8082", "The [host]:port fron which /debug/pprof is served.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.StringVar(&itsName, "its-name", "", "name of the Inventory and Transport Space to connect to (empty string means to use the only one)")
 	flag.StringVar(&wdsName, "wds-name", "", "name of the workload description space to connect to")
 	flag.StringVar(&allowedGroupsString, "api-groups", "", "list of allowed api groups, comma separated. Empty string means all API groups are allowed")
+	flag.StringVar(&controllers, "controllers", "*", "list of controllers to be started by the controller manager, comma separated")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -90,6 +92,8 @@ func main() {
 
 	// parse allowed resources string
 	allowedGroupsSet := util.ParseAPIGroupsString(allowedGroupsString)
+	// parse controllers string
+	ctlrsToStart := util.ParseControllersString(controllers)
 
 	// setup manager
 	// manager here is mainly used for leader election and health checks
@@ -165,13 +169,15 @@ func main() {
 
 	cListers := make(chan interface{}, 1)
 
-	if err := bindingController.Start(ctx, workers, cListers); err != nil {
-		setupLog.Error(err, "error starting the binding controller")
-		os.Exit(1)
+	if util.ShouldStartController(binding.ControllerName, ctlrsToStart) {
+		if err := bindingController.Start(ctx, workers, cListers); err != nil {
+			setupLog.Error(err, "error starting the binding controller")
+			os.Exit(1)
+		}
 	}
 
-	// check if status add-on present and if yes start the status controller
-	if util.CheckWorkStatusPresence(itsRestConfig) {
+	// check if status add-on present before starting the status controller
+	if util.CheckWorkStatusPresence(itsRestConfig) && util.ShouldStartController(status.ControllerName, ctlrsToStart) {
 		statusController, err := status.NewController(wdsRestConfig, itsRestConfig, wdsName,
 			bindingController.GetBindingPolicyResolutionBroker())
 		if err != nil {

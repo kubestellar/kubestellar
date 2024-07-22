@@ -143,7 +143,7 @@ func (c *Controller) updateStatusCollectorErrors(ctx context.Context, statusColl
 	})
 
 	scEcho, err := c.wdsKsClient.ControlV1alpha1().StatusCollectors().UpdateStatus(ctx,
-		statusCollector, metav1.UpdateOptions{FieldManager: controllerName})
+		statusCollector, metav1.UpdateOptions{FieldManager: ControllerName})
 
 	if err != nil {
 		if errors.IsNotFound(err) {
