@@ -68,7 +68,7 @@ type BindingPolicyResolver interface {
 
 	// EnsureObjectData ensures that an object's identifier is
 	// in the resolution for the given bindingpolicy key, and is associated
-	// with the given resource-version and statuscollectors set.
+	// with the given resource-version, create-only bit, and statuscollectors set.
 	// The given set is expected not to be mutated during and after this call
 	// by the caller.
 	//
@@ -76,7 +76,7 @@ type BindingPolicyResolver interface {
 	// changed. If no resolution is associated with the given key, an error is
 	// returned.
 	EnsureObjectData(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
-		objUID, resourceVersion string, statusCollectors sets.Set[string]) (bool, error)
+		objUID, resourceVersion string, createOnly bool, statusCollectors sets.Set[string]) (bool, error)
 	// RemoveObjectIdentifier ensures the absence of the given object
 	// identifier from the resolution for the given bindingpolicy key.
 	//
@@ -199,7 +199,7 @@ func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1
 
 // EnsureObjectData ensures that an object's identifier is
 // in the resolution for the given bindingpolicy key, and is associated
-// with the given resource-version and statuscollectors set.
+// with the given resource-version, create-only bit, and statuscollectors set.
 // The given set is expected not to be mutated during and after this call
 // by the caller.
 //
@@ -207,7 +207,7 @@ func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1
 // changed. If no resolution is associated with the given key, an error is
 // returned.
 func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
-	objUID, resourceVersion string, statusCollectors sets.Set[string]) (bool, error) {
+	objUID, resourceVersion string, createOnly bool, statusCollectors sets.Set[string]) (bool, error) {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
@@ -217,7 +217,7 @@ func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string,
 	}
 
 	// ensureObjectIdentifier is thread-safe
-	return bindingPolicyResolution.ensureObjectData(objIdentifier, objUID, resourceVersion, statusCollectors), nil
+	return bindingPolicyResolution.ensureObjectData(objIdentifier, objUID, resourceVersion, createOnly, statusCollectors), nil
 }
 
 // RemoveObjectIdentifier ensures the absence of the given object
