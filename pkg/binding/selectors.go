@@ -82,6 +82,7 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 			}
 			continue
 		}
+		logger.V(4).Info("BindingPolicy matched workload object", "policy", bindingPolicy.Name, "objIdentifier", objIdentifier)
 
 		// obj is selected by bindingpolicy, update the bindingpolicy resolver
 		resolutionUpdated, err := c.bindingPolicyResolver.EnsureObjectData(bindingPolicy.GetName(),

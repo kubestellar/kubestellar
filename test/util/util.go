@@ -40,6 +40,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog/v2"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	ksClient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
@@ -411,6 +412,19 @@ func ValidateSingletonStatus(ctx context.Context, wds *kubernetes.Clientset, ns 
 		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
 		return int(deployment.Status.AvailableReplicas)
 	}, timeout).Should(gomega.Equal(1))
+}
+
+func ValidateBinding(ctx context.Context, wds ksClient.Interface, name string, validate func(*ksapi.Binding) bool) {
+	ginkgo.GinkgoHelper()
+	gomega.Eventually(func() bool {
+		binding, err := wds.ControlV1alpha1().Bindings().Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			klog.FromContext(ctx).V(2).Info("Get Binding failed", "name", name, "err", err)
+			return false
+		}
+		return validate(binding)
+	}, timeout).Should(gomega.Equal(true))
+
 }
 
 func ValidateNumManifestworks(ctx context.Context, ocmWorkIts *ocmWorkClient.Clientset, ns string, num int) {

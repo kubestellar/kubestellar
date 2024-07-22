@@ -331,6 +331,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 			}
 		}
 
+		klog.FromContext(ctx).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
 		// test is a match
 		matchedStatusCollectors.Insert(test.StatusCollectors...)
 		matched = true
