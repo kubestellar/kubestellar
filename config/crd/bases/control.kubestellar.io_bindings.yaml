@@ -52,17 +52,22 @@ spec:
                 type: array
               workload:
                 description: '`workload` is a collection of namespaced and cluster
-                  scoped object references and their associated data - resource versions
-                  and statuscollectors, to be propagated to destination clusters.'
+                  scoped object references and their associated data - resource versions,
+                  create-only bits, and statuscollectors - to be propagated to destination
+                  clusters.'
                 properties:
                   clusterScope:
-                    description: '`clusterScope` holds a list of cluster-scoped object
-                      references with their associated resource versions to downsync.'
+                    description: '`clusterScope` holds a list of references to cluster-scoped
+                      objects to downsync and how the downsync is to be modulated.'
                     items:
-                      description: ClusterScopeDownsyncObjectAndStatusCollectors references
-                        a specific cluster-scoped object to downsync, and the status
-                        collectors that should be applied to it.
+                      description: ClusterScopeDownsyncClause references a specific
+                        cluster-scoped object to downsync, and the status collectors
+                        that should be applied to it.
                       properties:
+                        createOnly:
+                          description: '`createOnly` indicates that in a given WEC,
+                            the object is not to be updated if it already exists.'
+                          type: boolean
                         group:
                           type: string
                         name:
@@ -91,14 +96,17 @@ spec:
                       type: object
                     type: array
                   namespaceScope:
-                    description: '`namespaceScope` holds a list of namespace-scoped
-                      object references with their associated resource versions to
-                      downsync.'
+                    description: '`namespaceScope` holds a list of references to namsepace-scoped
+                      objects to downsync and how the downsync is to be modulated.'
                     items:
-                      description: NamespaceScopeDownsyncObjectAndStatusCollectors
-                        references a specific namespace-scoped object to downsync,
-                        and the status collectors that should be applied to it.
+                      description: NamespaceScopeDownsyncClause references a specific
+                        namespace-scoped object to downsync, and the status collectors
+                        that should be applied to it.
                       properties:
+                        createOnly:
+                          description: '`createOnly` indicates that in a given WEC,
+                            the object is not to be updated if it already exists.'
+                          type: boolean
                         group:
                           type: string
                         name:

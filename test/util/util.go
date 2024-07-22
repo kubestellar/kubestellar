@@ -147,7 +147,7 @@ func DeleteBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 }
 
 func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name string,
-	clusterSelector []metav1.LabelSelector, testAndStatusCollection []ksapi.DownsyncObjectTestAndStatusCollection) {
+	clusterSelector []metav1.LabelSelector, testAndStatusCollection []ksapi.DownsyncPolicyClause) {
 	bindingPolicy := ksapi.BindingPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
