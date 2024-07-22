@@ -474,6 +474,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		sumAvailableReplicasStatusCollectorName := "sum-available-replicas"
 		selectAvailableStatusCollectorName := "select-available-replicas"
 		selectReplicasStatusCollectorName := "replicas"
+		listNginxWecsStatusCollectorName := "nginx-wecs"
 
 		clusterSelector := []metav1.LabelSelector{
 			{MatchLabels: map[string]string{"location-group": "edge"}},
@@ -560,6 +561,36 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			gomega.Expect(len(cs.Results[0].Rows)).To(gomega.Equal(1))
 			gomega.Expect(len(cs.Results[0].Rows[0].Columns)).To(gomega.Equal(1))
 			gomega.Expect(*cs.Results[0].Rows[0].Columns[0].Number).To(gomega.Equal("2"))
+		})
+
+		ginkgo.It("list of WECs with available nginx deployment", func(ctx context.Context) {
+
+			availableNginxCEL := ksapi.Expression("obj.spec.replicas == returned.status.availableReplicas && obj.metadata.labels['app.kubernetes.io/name'] == 'nginx'")
+			util.CreateStatusCollector(ctx, ksWds, listNginxWecsStatusCollectorName,
+				ksapi.StatusCollectorSpec{
+					Filter: &availableNginxCEL,
+					Select: []ksapi.NamedExpression{
+						{
+							Name: "wecName",
+							Def:  "inventory.name",
+						},
+					},
+					Limit: 10,
+				})
+
+			testAndStatusCollection[0].StatusCollectors = []string{listNginxWecsStatusCollectorName}
+			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
+
+			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
+
+			// Validate CombinedStatus results
+			gomega.Expect(len(cs.Results)).To(gomega.Equal(1))
+			gomega.Expect(cs.Results[0].Name).To(gomega.Equal(listNginxWecsStatusCollectorName))
+
+			gomega.ExpectWithOffset(1, len(cs.Results[0].ColumnNames)).To(gomega.Equal(1))
+			gomega.Expect(cs.Results[0].ColumnNames[0]).To(gomega.Equal("wecName"))
+
+			gomega.ExpectWithOffset(1, len(cs.Results[0].Rows)).To(gomega.Equal(2))
 		})
 
 		ginkgo.It("can support multiple StatusCollectors", func(ctx context.Context) {

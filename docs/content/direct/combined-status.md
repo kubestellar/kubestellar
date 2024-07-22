@@ -176,7 +176,7 @@ combinedFields:
 ### List of WECs where the Deployment is not as available as desired
 
 ```yaml
-filter: "obj.spec.replicas != reported.status.availableReplicas"
+filter: "obj.spec.replicas != returned.status.availableReplicas"
 select:
    - name: wec
      def: inventory.name
@@ -191,7 +191,7 @@ select:
    - name: wec
      def: inventory.name
    - name: status
-     def: reported.status
+     def: returned.status
 ```
 
 ## Special case for 1 WEC
