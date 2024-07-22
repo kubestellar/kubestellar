@@ -280,9 +280,9 @@ func (tt *testTransport) WrapObjectsHavingCreateOnly(wrapees []Wrapee) runtime.O
 		// TODO: test wrapee.CreateOnly
 		key := util.RefToRuntimeObj(obj)
 		delete(tt.missed, key.String())
-		if expectedObj, found := tt.expect[key]; found {
-			if wrapee.CreateOnly != expectedObj.createOnly {
-				tt.t.Errorf("Expected createOnly=%v, got %v obj=%v", expectedObj.createOnly, wrapee.CreateOnly, key)
+		if expectedJMTW, found := tt.expect[key]; found {
+			if wrapee.CreateOnly != expectedJMTW.createOnly {
+				tt.t.Errorf("Expected createOnly=%v, got %v obj=%v", expectedJMTW.createOnly, wrapee.CreateOnly, key)
 			}
 			objM := obj.UnstructuredContent()
 			apiVersion := obj.GetAPIVersion()
@@ -297,7 +297,7 @@ func (tt *testTransport) WrapObjectsHavingCreateOnly(wrapees []Wrapee) runtime.O
 			}
 			groupResource := metav1.GroupResource{Group: groupKind.Group, Resource: resource}
 			// clean expected object since transport objects are cleaned
-			uncleanedExpectedObj := &unstructured.Unstructured{Object: expectedObj.jm}
+			uncleanedExpectedObj := &unstructured.Unstructured{Object: expectedJMTW.jm}
 			cleanedExpectedObjU := TransformObject(tt.ctx, tt.ctc, groupResource, uncleanedExpectedObj, tt.bindingName)
 			cleanedExpectedObj := cleanedExpectedObjU.Object
 			cleanable := obj.GetKind() == "ClusterRole"
