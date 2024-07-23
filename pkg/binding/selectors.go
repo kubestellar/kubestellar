@@ -65,7 +65,7 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 			continue // resolution does not exist, skip
 		}
 
-		matchedAny, matchedStatusCollectorsSet := c.testObject(ctx, objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
+		matchedAny, createOnly, matchedStatusCollectorsSet := c.testObject(ctx, objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
 		if !matchedAny {
 			// if previously selected, remove
 			if resolutionUpdated := c.bindingPolicyResolver.RemoveObjectIdentifier(bindingPolicy.GetName(),
@@ -82,10 +82,11 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 			}
 			continue
 		}
+		logger.V(4).Info("BindingPolicy matched workload object", "policy", bindingPolicy.Name, "objIdentifier", objIdentifier)
 
 		// obj is selected by bindingpolicy, update the bindingpolicy resolver
 		resolutionUpdated, err := c.bindingPolicyResolver.EnsureObjectData(bindingPolicy.GetName(),
-			objIdentifier, string(objMR.GetUID()), objMR.GetResourceVersion(), matchedStatusCollectorsSet)
+			objIdentifier, string(objMR.GetUID()), objMR.GetResourceVersion(), createOnly, matchedStatusCollectorsSet)
 		if err != nil {
 			if errorIsBindingPolicyResolutionNotFound(err) {
 				// this case can occur if a bindingpolicy resolution was deleted AFTER
