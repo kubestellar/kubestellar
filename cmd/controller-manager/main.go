@@ -75,7 +75,7 @@ func main() {
 	pflag.StringVar(&itsName, "its-name", "", "name of the Inventory and Transport Space to connect to (empty string means to use the only one)")
 	pflag.StringVar(&wdsName, "wds-name", "", "name of the workload description space to connect to")
 	pflag.StringVar(&allowedGroupsString, "api-groups", "", "list of allowed api groups, comma separated. Empty string means all API groups are allowed")
-	pflag.StringSliceVar(&controllers, "controllers", []string{}, "list of controllers to be started by the controller manager, comma separated, e.g. 'binding,status'")
+	pflag.StringSliceVar(&controllers, "controllers", []string{}, "list of controllers to be started by the controller manager, lower case and comma separated, e.g. 'binding,status'. If not specified (or emtpy list specifed), all controllers are started. Currently available controllers are 'binding' and 'status'.")
 	pflag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -98,11 +98,17 @@ func main() {
 
 	// parse allowed resources string
 	allowedGroupsSet := util.ParseAPIGroupsString(allowedGroupsString)
-	// parse controllers
-	ctlrsToStart, err := parseControllers(controllers)
-	if err != nil {
-		setupLog.Error(err, "unable to parse controllers")
+
+	// check controllers flag
+	ctlrsToStart := sets.New(controllers...)
+	if !sets.New(
+		strings.ToLower(binding.ControllerName),
+		strings.ToLower(status.ControllerName),
+	).IsSuperset(ctlrsToStart) {
+		setupLog.Error(fmt.Errorf("unkown controller specified"), "'controllers' flag has incorrect value")
+		os.Exit(1)
 	}
+
 	// setup manager
 	// manager here is mainly used for leader election and health checks
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
@@ -177,7 +183,7 @@ func main() {
 
 	cListers := make(chan interface{}, 1)
 
-	if shouldStartController(strings.ToLower(binding.ControllerName), ctlrsToStart) {
+	if len(ctlrsToStart) == 0 || ctlrsToStart.Has(strings.ToLower(binding.ControllerName)) {
 		setupLog.Info("Starting controller", "name", binding.ControllerName)
 		if err := bindingController.Start(ctx, workers, cListers); err != nil {
 			setupLog.Error(err, "error starting the binding controller")
@@ -186,7 +192,8 @@ func main() {
 	}
 
 	// check if status add-on present before starting the status controller
-	if util.CheckWorkStatusPresence(itsRestConfig) && shouldStartController(strings.ToLower(status.ControllerName), ctlrsToStart) {
+	if util.CheckWorkStatusPresence(itsRestConfig) &&
+		(len(ctlrsToStart) == 0 || ctlrsToStart.Has(strings.ToLower(status.ControllerName))) {
 		setupLog.Info("Starting controller", "name", status.ControllerName)
 		statusController, err := status.NewController(wdsRestConfig, itsRestConfig, wdsName,
 			bindingController.GetBindingPolicyResolutionBroker())
@@ -207,27 +214,4 @@ func main() {
 		os.Exit(1)
 	}
 	select {}
-}
-
-func parseControllers(controllers []string) (sets.Set[string], error) {
-	if len(controllers) == 0 {
-		return nil, nil
-	}
-
-	for _, name := range controllers {
-		if strings.ToLower(name) != name {
-			return nil, fmt.Errorf("upper case letters not allowed for controller name %q", name)
-		}
-	}
-
-	return sets.New(controllers...), nil
-}
-
-// shouldStartController checks if the given controller should be started,
-// empty controllers is equivalent to start all.
-func shouldStartController(controller string, controllers sets.Set[string]) bool {
-	if len(controllers) == 0 {
-		return true
-	}
-	return controllers.Has(controller)
 }
