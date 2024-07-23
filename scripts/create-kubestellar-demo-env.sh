@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+
+# The formal instructions accompaning this script can be found at:
+# https://docs.kubestellar.io/release-0.23.1/direct/get-started/
+
+set -e
+
+echo -e "Checking that pre-req softwares are installed..."
+curl -s -o check_pre_req.sh https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.1/hack/check_pre_req.sh
+chmod +x check_pre_req.sh
+./check_pre_req.sh -V kflex ocm helm kubectl docker kind
+
+output=$(./check_pre_req.sh -V kflex ocm helm kubectl docker kind)
+
+if echo "$output" | grep -q "X"; then
+    echo "Please install all the necessary dependencies before contiuning"
+    exit 1
+else
+    echo "Pre-req are properly installed. Proceeding to environment clean up"
+fi
+
+echo -e "\nStarting environment clean up..."
+echo -e "Starting cluster clean up..."
+
+cluster_clean_up() {
+    error_message=$(eval "$1" 2>&1)
+    if [ $? -ne 0 ]; then
+        echo "clean up failed. Error:"
+        echo "$error_message"
+    fi
+}
+
+cluster_clean_up "kind delete cluster --name kubeflex"
+cluster_clean_up "kind delete cluster --name cluster1"
+cluster_clean_up "kind delete cluster --name cluster2"
+echo -e "Cluster space clean up has been completed"
+
+echo -e "\nStarting context clean up..."
+
+context_clean_up() {
+    output=$(kubectx)
+    # echo $output
+    while IFS= read -r line; do
+        if [ "$line" == "kind-kubeflex" ]; then 
+            echo "Deleting kind-kubeflex context..."
+            kubectl config delete-context kind-kubeflex
+
+        elif [ "$line" == "cluster1" ]; then
+            echo "Deleting cluster1 context..."
+            kubectl config delete-context cluster1
+
+        elif [ "$line" == "cluster2" ]; then
+            echo "Deleting cluster2 context..."
+            kubectl config delete-context cluster2
+        
+        elif [ "$line" == "its1" ]; then
+            echo "Deleting its1 context..."
+            kubectl config delete-context its1
+        
+        elif [ "$line" == "wds1" ]; then
+            echo "Deleting wds1 context..."
+            kubectl config delete-context wds1
+        
+        fi
+
+    done <<< "$output"
+}
+
+context_clean_up
+echo "Context space clean up completed"
+
+echo -e "\nStarting the process to install kubestellar core: kind-kubeflex..."
+export KUBESTELLAR_VERSION=0.23.1
+
+curl -s -o create-kind-cluster-with-SSL-passthrough.sh https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/create-kind-cluster-with-SSL-passthrough.sh
+
+chmod +x create-kind-cluster-with-SSL-passthrough.sh
+
+./create-kind-cluster-with-SSL-passthrough.sh --name kubeflex --port 9443
+
+helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION --set-json='ITSes=[{"name":"its1"}]' --set-json='WDSes=[{"name":"wds1"}]'
+
+echo -e "\nWaiting for new non-host KubeFlex Control Planes to be Ready:"
+for cpname in its1 wds1; do
+  while [[ `kubectl get cp $cpname -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}'` != "True" ]]; do
+    echo "Waiting for \"$cpname\"..."
+    sleep 5
+  done
+  echo "\"$cpname\" is ready."
+done
+
+kubectl config delete-context its1 || true
+kflex ctx its1
+kubectl config delete-context wds1 || true
+kflex ctx wds1
+kflex ctx
+
+echo -e "\nCreating cluster and context for cluster 1 and 2..."
+: set flags to "" if you have installed KubeStellar on an OpenShift cluster
+flags="--force-internal-endpoint-lookup"
+clusters=(cluster1 cluster2);
+for cluster in "${clusters[@]}"; do
+   kind create cluster --name ${cluster}
+   kubectl config rename-context kind-${cluster} ${cluster}
+   clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${flags}'"}' | sh
+done
+
+echo -e "Checking that the CSR for cluster 1 and 2 appears..."
+checking_cluster1_and_cluster2() {
+    output=$(kubectl --context its1 get csr)
+    c1=false
+    c2=false
+    
+    while [ "$c1" = false ] || [ "$c2" = false ]; do
+
+        output=$(kubectl --context its1 get csr)
+
+        while IFS= read -r line; do
+
+            if echo "$line" | grep -q "cluster1"; then
+                c1=true
+            fi
+            if echo "$line" | grep -q "cluster2"; then
+                c2=true
+            fi
+        done <<< "$output"
+
+        if [ "$c1" = true ] && [ "$c2" = true ]; then
+            echo "Cluster 1 and Cluster CRS 2 found"
+        else
+            echo "Cluster 1 and Cluster 2 CSR not found"
+            echo "Trying again..."
+            sleep 5
+        fi
+    done
+}
+
+checking_cluster1_and_cluster2
+
+echo""
+echo "Approving CSR for cluster1 and cluster2..."
+clusteradm --context its1 accept --clusters cluster1
+clusteradm --context its1 accept --clusters cluster2
+
+echo""
+echo "Checking the new clusters are in the OCM inventory and label them"
+kubectl --context its1 get managedclusters
+kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
+kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
