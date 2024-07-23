@@ -279,7 +279,7 @@ type mrObject interface {
 // testObject tests if the object matches the given tests.
 // The returned tuple is:
 //   - bool: whether the object matches ANY of the tests
-//   - bool: whether any of the tests says CreateOnly==true
+//   - bool: whether any test that matches the object also says CreateOnly==true
 //   - sets.Set[string]: the UNION of the statuscollector names that appear within
 //     EACH of the tests that the object matches
 func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,

@@ -49,7 +49,7 @@ type bindingPolicyResolution struct {
 	requiresSingletonReportedState bool
 }
 
-// objectData stores the UID (why?), resource version, create-only bit,
+// objectData stores the UID, resource version, create-only bit,
 // and statuscollectors for an object.
 type objectData struct {
 	UID              string
