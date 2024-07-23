@@ -30,13 +30,14 @@ This can be:
 
 1. A local **Kind** or **k3s** cluster with an ingress with SSL passthrough and a mapping to host port 9443
 
-This option is particularly useful for first time users or users that would like to have a local deployment.
+    This option is particularly useful for first time users or users that would like to have a local deployment.
 
-It is important to note that, when the hosting cluster was created by **kind** or **k3s** and its Ingress domain name is left to default to localtest.me, then the name of the container running hosting cluster must be also be referenced during the Helm chart installation by setting `--set "kubeflex-controller.hostContainer=<control-plane-container-name>"`.
-The `<control-plane-container-name>` is the name of the container in which kind or k3d is running the relevant control plane. One may use `docker ps` to find the `<control-plane-container-name>`.
+    It is important to note that, when the hosting cluster was created by **kind** or **k3s** and its Ingress domain name is left to default to localtest.me, then the name of the container running hosting cluster must be also be referenced during the Helm chart installation by setting `--set "kubeflex-controller.hostContainer=<control-plane-container-name>"`.
+    The `<control-plane-container-name>` is the name of the container in which kind or k3d is running the relevant control plane. One may use `docker ps` to find the `<control-plane-container-name>`.
 
-If a host port number different from the expected 9443 is used for the Kind cluster, then the same port number must be specified during the chart installation by adding the following argument `--set "kubeflex-controller.externalPort=<port>"`.
+    If a host port number different from the expected 9443 is used for the Kind cluster, then the same port number must be specified during the chart installation by adding the following argument `--set "kubeflex-controller.externalPort=<port>"`.
 
+<<<<<<< HEAD
 By default the KubeStellar Core chart uses a test domain `localtest.me`, which is OK for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-controller.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution CLusters (WECs).
 
 For convenience, a new local **Kind** cluster that satisfies the requirements for KubeStellar setup
@@ -52,10 +53,31 @@ can be created with the following command:
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/scripts/create-k3s-cluster-with-SSL-passthrough.sh) --port 9443
 ```
+=======
+    By default the KubeStelalr Core chart uses a test domain `localtest.me`, which is ok for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-controller.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution CLusters (WECs).
 
-3. An **OpenShift** cluster
+    For convenience, a new local **Kind** cluster that satisfies the requirements for KubeStellar setup
+    and that can be used to exercises the [examples](./examples.md) can be created with the following command:
 
+    ```shell
+    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
+    ```
+
+    Alternatively, a new local **k3s** cluster that satisfies the requirements for KubeStellar setup
+    and that can be used to exercises the [examples](./examples.md) can be created with the following command:
+
+    ```shell
+    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/create-k3s-cluster-with-SSL-passthrough.sh) --port 9443
+    ```
+>>>>>>> e8f1666eb (Address Mike's comments)
+
+2. An **OpenShift** cluster
+
+<<<<<<< HEAD
 When using this option, one is required to explicitly set the `isOpenShift` variable to `true` by including `--set "kubeflex-operator.isOpenShift=true"` in the Helm chart installation command.
+=======
+    When using this option, one is required to explicitely set the `isOpenShift` variable to `true` by including `--set "kubeflex-operator.isOpenShift=true"` in the Helm chart installation command.
+>>>>>>> e8f1666eb (Address Mike's comments)
 
 ## KubeStellar Core Chart values
 
@@ -156,19 +178,19 @@ After the initial installation is completed, there are two main ways to install 
 
 1. Upgrade the initial chart. This choice requires to relist the existing control planes, which would otherwise be deleted:
 
-```shell
-helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
-  --set-json='ITSes=[{"name":"its1"}]' \
-  --set-json='WDSes=[{"name":"wds1"},{"name":"wds2"}]'
-```
+    ```shell
+    helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
+      --set-json='ITSes=[{"name":"its1"}]' \
+      --set-json='WDSes=[{"name":"wds1"},{"name":"wds2"}]'
+    ```
 
 2. Install a new chart with a different name. This choice does not requires to relist the existing control planes, but requires to disable the reinstallation of KubeFlex and PCHes:
 
-```shell
-helm upgrade --install add-wds2 oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
-  --set='kubeflex-operator.install=false,InstallPCHs=false' \
-  --set-json='WDSes=[{name":"wds2"}]'
-```
+    ```shell
+    helm upgrade --install add-wds2 oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
+      --set='kubeflex-operator.install=false,InstallPCHs=false' \
+      --set-json='WDSes=[{name":"wds2"}]'
+    ```
 
 ## Kubeconfig files and contexts for Control Planes
 
@@ -261,7 +283,6 @@ the `kflex` CLI and one not.
 
     With the above kubeconfig files in place, the control plane named `$cpname` can be accessed as follows.
 
-
     ```shell
     kubectl --kubeconfig "kubeconfig-$cpname" ...
     ```
@@ -280,6 +301,27 @@ the `kflex` CLI and one not.
     ```shell
     kubectl --context "$cpname" ...
     ```
+
+3. Using `import-cp-contexts.sh` script
+
+    The following covenience command can also be used to import all the KubeFlex Control Planes in the current hosting cluster as contexts of the current kubeconfig:
+
+    ```shell
+    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/import-cp-contexts.sh) --merge
+    ```
+
+    The script above only requires `kubectl` and `yq`.
+
+    The script accepts the following arguments:
+
+    - `--kubeconfig <filename>` specify the kubeconfig of the hosting cluster where the KubeFlex Control Planes are located. Note that this argument will override the content of the `KUBECONFIG` environment variable
+    - `--context <name>` specify a context of the current kubeconfig where to look for KubeFlex Control Planes. If this argument is not specified, then all contexts will be searched.
+    - `--names|-n <name1>,<name2>,..` comma separated list of KubeFlex Control Planes names to import. If this argument is not specified then *all* available KubeFlex Control Planes will be imported.
+    - `--replace-localhost|-r <host>` replaces server addresses "127.0.0.1" with a desired `<host>`. This parameter is useful for making KubeFlex Control Planes of type `host` accessible from outside the machine hosting the cluster.
+    - `--merge|-m` merge the kubeconfig with the contexts of the control planes with the existing cluster kubeconfig. If this flag is not specified, then only the kubeconfig with the contexts of the KubeFlex Control Planes will be produced.
+    - `--output|-o <filename>|-` specify a kubeconfig file to save the kubeconfig to. Use `-` for stdout. If this argument is not provided, then the kubeconfig will be saved to the input specified kubeconfig, if provided, or to `~/.kube/config`.
+    - `--silent|-s` quiet mode, do not print informarmation. This may be useful when using `-o -`.
+    - `-X` enable verbose execution of the script for debugging
 
 ## Uninstalling the KubeStellar Core chart
 
