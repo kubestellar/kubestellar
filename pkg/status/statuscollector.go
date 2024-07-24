@@ -138,9 +138,7 @@ func (c *Controller) updateStatusCollectorErrors(ctx context.Context, statusColl
 	errs []error) error {
 	logger := klog.FromContext(ctx)
 
-	statusCollector.Status.Errors = abstract.SliceMap(errs, func(err error) string {
-		return err.Error()
-	})
+	statusCollector.Status.Errors = abstract.SliceMap(errs, error.Error)
 
 	scEcho, err := c.wdsKsClient.ControlV1alpha1().StatusCollectors().UpdateStatus(ctx,
 		statusCollector, metav1.UpdateOptions{FieldManager: ControllerName})
