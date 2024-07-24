@@ -49,7 +49,7 @@ import (
 )
 
 const (
-	controllerName      = "Status"
+	ControllerName      = "Status"
 	defaultResyncPeriod = time.Duration(0)
 	queueingDelay       = 5 * time.Second
 	originWdsLabelKey   = "transport.kubestellar.io/originWdsName"
@@ -133,7 +133,7 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 
 	controller := &Controller{
 		wdsName:                 wdsName,
-		logger:                  log.Log.WithName(controllerName),
+		logger:                  log.Log.WithName(ControllerName),
 		wdsDynClient:            wdsDynClient,
 		wdsKsClient:             wdsKsClient,
 		itsDynClient:            itsDynClient,
@@ -146,7 +146,7 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 
 // Start the status controller
 func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan interface{}) error {
-	logger := klog.FromContext(parentCtx).WithName(controllerName)
+	logger := klog.FromContext(parentCtx).WithName(ControllerName)
 	ctx := klog.NewContext(parentCtx, logger)
 	errChan := make(chan error, 1)
 	go func() {
@@ -478,7 +478,7 @@ func (c *Controller) ensureNamespaceExists(ctx context.Context, ns string) error
 				},
 			}
 			_, err = c.wdsDynClient.Resource(namespaceGVR).Create(ctx, namespaceObj,
-				metav1.CreateOptions{FieldManager: controllerName})
+				metav1.CreateOptions{FieldManager: ControllerName})
 			if err != nil && !errors.IsAlreadyExists(err) {
 				return fmt.Errorf("failed to create namespace: %w", err)
 			}

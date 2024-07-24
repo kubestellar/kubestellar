@@ -81,7 +81,7 @@ func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
 
 	if generatedCombinedStatus.ResourceVersion != "" {
 		csEcho, err := c.wdsKsClient.ControlV1alpha1().CombinedStatuses(generatedCombinedStatus.Namespace).Update(ctx,
-			generatedCombinedStatus, metav1.UpdateOptions{FieldManager: controllerName})
+			generatedCombinedStatus, metav1.UpdateOptions{FieldManager: ControllerName})
 		if err != nil {
 			if errors.IsNotFound(err) {
 				logger.Info("CombinedStatus not found (update skipped)",
@@ -99,7 +99,7 @@ func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
 	}
 
 	csEcho, err := c.wdsKsClient.ControlV1alpha1().CombinedStatuses(generatedCombinedStatus.Namespace).Create(ctx,
-		generatedCombinedStatus, metav1.CreateOptions{FieldManager: controllerName})
+		generatedCombinedStatus, metav1.CreateOptions{FieldManager: ControllerName})
 	if err != nil {
 		return fmt.Errorf("failed to create CombinedStatus (ns, name = %v, %v): %w",
 			generatedCombinedStatus.Namespace, generatedCombinedStatus.Name, err)
