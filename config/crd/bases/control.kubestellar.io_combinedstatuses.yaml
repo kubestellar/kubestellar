@@ -46,8 +46,7 @@ spec:
           holding the resource (lowercase plural) of the workload object; - "status.kubestellar.io/namespace"
           holding the namespace of the workload object; - "status.kubestellar.io/name"
           holding the name of the workload object; - "status.kubestellar.io/binding-policy"
-          holding the name of the BindingPolicy object. This API is under development
-          and is not yet functional.'
+          holding the name of the BindingPolicy object.'
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -98,8 +97,6 @@ spec:
                           - type
                           type: object
                         type: array
-                      name:
-                        type: string
                     required:
                     - columns
                     type: object

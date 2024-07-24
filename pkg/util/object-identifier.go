@@ -18,12 +18,15 @@ package util
 
 import (
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
+
+const ClusterScopedObjectsCombinedStatusNamespace = "kubestellar-report"
 
 // ObjectIdentifier struct is used to add items to the workqueue.
 // The ObjectIdentifier contains all the necessary information to retrieve an object.
@@ -83,12 +86,18 @@ func IdentifierForStatusCollector(name string) ObjectIdentifier {
 }
 
 func IdentifierForCombinedStatus(name, ns string) ObjectIdentifier {
-	return ObjectIdentifier{
+	identifier := ObjectIdentifier{
 		GVK: schema.GroupVersionKind{Group: CombinedStatusGroup, Version: CombinedStatusVersion,
 			Kind: CombinedStatusKind},
 		Resource:   CombinedStatusResource,
 		ObjectName: cache.ObjectName{Name: name, Namespace: ns},
 	}
+
+	if identifier.ObjectName.Namespace == v1.NamespaceNone {
+		identifier.ObjectName.Namespace = ClusterScopedObjectsCombinedStatusNamespace
+	}
+
+	return identifier
 }
 
 func gvkMatches(gvk schema.GroupVersionKind, group, version, kind string) bool {

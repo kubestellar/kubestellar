@@ -40,6 +40,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog/v2"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	ksClient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
@@ -147,7 +148,7 @@ func DeleteBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 }
 
 func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name string,
-	clusterSelector []metav1.LabelSelector, testAndStatusCollection []ksapi.DownsyncObjectTestAndStatusCollection) {
+	clusterSelector []metav1.LabelSelector, testAndStatusCollection []ksapi.DownsyncPolicyClause) {
 	bindingPolicy := ksapi.BindingPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
@@ -413,6 +414,19 @@ func ValidateSingletonStatus(ctx context.Context, wds *kubernetes.Clientset, ns 
 	}, timeout).Should(gomega.Equal(1))
 }
 
+func ValidateBinding(ctx context.Context, wds ksClient.Interface, name string, validate func(*ksapi.Binding) bool) {
+	ginkgo.GinkgoHelper()
+	gomega.Eventually(func() bool {
+		binding, err := wds.ControlV1alpha1().Bindings().Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			klog.FromContext(ctx).V(2).Info("Get Binding failed", "name", name, "err", err)
+			return false
+		}
+		return validate(binding)
+	}, timeout).Should(gomega.Equal(true))
+
+}
+
 func ValidateNumManifestworks(ctx context.Context, ocmWorkIts *ocmWorkClient.Clientset, ns string, num int) {
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() int {
@@ -454,6 +468,9 @@ func CleanupWDS(ctx context.Context, wds *kubernetes.Clientset, ksWds *ksClient.
 	})
 	DeleteAll[*ksapi.BindingPolicyList](ctx, ksWds.ControlV1alpha1().BindingPolicies(), func(objList *ksapi.BindingPolicyList) []string {
 		return objectsToNames((*ksapi.BindingPolicy).GetName, objList.Items)
+	})
+	DeleteAll[*ksapi.StatusCollectorList](ctx, ksWds.ControlV1alpha1().StatusCollectors(), func(objList *ksapi.StatusCollectorList) []string {
+		return objectsToNames((*ksapi.StatusCollector).GetName, objList.Items)
 	})
 }
 

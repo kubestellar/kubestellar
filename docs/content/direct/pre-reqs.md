@@ -43,8 +43,8 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 
     At the end of the install make sure that the OCM CLI, clusteradm, is in your `$PATH`.
 
-- **helm** - to deploy the kubestellar and kubeflex charts
-- **kubectl** - to access the kubernetes clusters
+- **helm** - to deploy the Kubestellar and kubeflex charts
+- [**kubectl**](https://kubernetes.io/docs/tasks/tools/) - to access the kubernetes clusters
 
 ## Additional Software for the Getting Started setup
 
@@ -53,18 +53,18 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 
 ## Additional Software For Running the Examples
 
-- **argocd** - for the examples that use it
+- [**argocd**](https://argo-cd.readthedocs.io/en/stable/getting_started/) - for the examples that use it
 
 ## Additional Software For Building KubeStellar from Source
 
-- **go** version 1.20 or higher - to build kubestellar
-- **make** - to build kubestellar and create the kubestellar image
-- **ko** - to create the kubestellar image
+- [**go**](https://go.dev/doc/install) version 1.21 or higher - to build Kubestellar
+- [**make**](https://www.gnu.org/software/make/) - to build Kubestellar and create the Kubestellar container
+- [**ko**](https://ko.build/install/) - to create the Kubestellar container
 
 To build and _**test**_ KubeStellar properly, you will also need
 
-- **kind**
-- **OCP**
+- [**kind**](https://kind.sigs.k8s.io/)
+- [**OCP**](https://docs.openshift.com/container-platform/4.13/installing/index.html)
 
 <!-- start tag for check script  include -->
 
@@ -115,7 +115,7 @@ Checking pre-requisites for building KubeStellar:
 
 <!-- end tag for check-prereq script -->
 
-In another example, a specific list of prerequisites could be asserted by an higher-level script, while providing some installation information, with the command below (note that the script will terminate upon finding a missing prerequisite):
+In another example, a specific list of prerequisites could be asserted by a higher-level script, while providing some installation information, with the command below (note that the script will terminate upon finding a missing prerequisite):
 
 ```shell
 $ check_pre_req.sh --assert --verbose helm argo docker kind

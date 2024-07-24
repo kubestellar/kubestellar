@@ -48,6 +48,7 @@ import (
 	"k8s.io/klog/v2/ktesting"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/abstract"
 	ksclientfake "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/fake"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
@@ -172,8 +173,8 @@ type bindingCase struct {
 	ExpectedKeys []any // JSON equivalent of keys of expect, for logging
 }
 
-func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion string) ksapi.ClusterScopeDownsyncObjectAndStatusCollectors {
-	return ksapi.ClusterScopeDownsyncObjectAndStatusCollectors{
+func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion string) ksapi.ClusterScopeDownsyncClause {
+	return ksapi.ClusterScopeDownsyncClause{
 		ClusterScopeDownsyncObject: ksapi.ClusterScopeDownsyncObject{
 			GroupVersionResource: gvr,
 			Name:                 name,
@@ -181,8 +182,8 @@ func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion stri
 		}}
 }
 
-func newNamespaceScope(gvr metav1.GroupVersionResource, namespace, name, resourceVersion string) ksapi.NamespaceScopeDownsyncObjectAndStatusCollectors {
-	return ksapi.NamespaceScopeDownsyncObjectAndStatusCollectors{
+func newNamespaceScope(gvr metav1.GroupVersionResource, namespace, name, resourceVersion string) ksapi.NamespaceScopeDownsyncClause {
+	return ksapi.NamespaceScopeDownsyncClause{
 		NamespaceScopeDownsyncObject: ksapi.NamespaceScopeDownsyncObject{
 			GroupVersionResource: gvr,
 			Namespace:            namespace,
@@ -253,6 +254,10 @@ type testTransport struct {
 }
 
 func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.Object {
+	return tt.WrapObjectsHavingCreateOnly(abstract.SliceMap(objs, FIXME_ADD_CONSTANT_CREATEONLY))
+}
+
+func (tt *testTransport) WrapObjectsHavingCreateOnly(wrapees []Wrapee) runtime.Object {
 	tt.Lock()
 	defer tt.Unlock()
 	tt.wrapped = true
@@ -262,7 +267,9 @@ func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.
 	}
 	tt.wrong = map[string]any{}
 	tt.extra = []any{}
-	for _, obj := range objs {
+	for _, wrapee := range wrapees {
+		obj := wrapee.Object
+		// TODO: test wrapee.CreateOnly
 		key := util.RefToRuntimeObj(obj)
 		delete(tt.missed, key.String())
 		if expectedObj, found := tt.expect[key]; found {

@@ -108,21 +108,27 @@ spec:
                 type: array
               downsync:
                 description: '`downsync` selects the objects to bind with the selected
-                  WECs for downsync, and describes how to collect the status from
-                  those WECs for each of the selected objects. An object is selected
-                  if it matches at least one member of this list. All of the referenced
-                  StatusCollectors are applied to the object.'
+                  WECs for downsync, and modulates their downsync. An object is selected
+                  if it matches at least one member of this list. When multiple DownsyncPolicyClause
+                  match the same workload object: the `createOnly` bits are ORed together,
+                  and the StatusCollector reference sets are combined by union.'
                 items:
-                  description: DownsyncObjectTestAndStatusCollection identifies some
-                    objects (by a predicate) and asks for some combined status to
-                    be returned from those objects. The latter is dictated through
-                    applying a set of StatusCollectors.
+                  description: DownsyncPolicyClause identifies some objects (by a
+                    predicate) and modulates how they are downsynced. One modulation
+                    is specifying a set of StatusCollectors to apply to returned status.
+                    The other modulation is specifying whether the propagation from
+                    WDS to WEC involves continual maintenance of the spec or the object
+                    is only created if it is absent.
                   properties:
                     apiGroup:
                       description: '`apiGroup` is the API group of the referenced
                         object, empty string for the core API group. `nil` matches
                         every API group.'
                       type: string
+                    createOnly:
+                      description: '`createOnly` indicates that in a given WEC, the
+                        object is not to be updated if it already exists.'
+                      type: boolean
                     namespaceSelectors:
                       description: '`namespaceSelectors` a list of label selectors.
                         For a namespaced object, at least one of these label selectors
@@ -265,7 +271,6 @@ spec:
                     statusCollectors:
                       description: statusCollectors is a list of StatusCollectors
                         name references that are applied to the selected objects.
-                        This API is under development and is not yet functional.
                       items:
                         type: string
                       type: array
@@ -382,17 +387,22 @@ spec:
                 type: array
               workload:
                 description: '`workload` is a collection of namespaced and cluster
-                  scoped object references and their associated data - resource versions
-                  and statuscollectors, to be propagated to destination clusters.'
+                  scoped object references and their associated data - resource versions,
+                  create-only bits, and statuscollectors - to be propagated to destination
+                  clusters.'
                 properties:
                   clusterScope:
-                    description: '`clusterScope` holds a list of cluster-scoped object
-                      references with their associated resource versions to downsync.'
+                    description: '`clusterScope` holds a list of references to cluster-scoped
+                      objects to downsync and how the downsync is to be modulated.'
                     items:
-                      description: ClusterScopeDownsyncObjectAndStatusCollectors references
-                        a specific cluster-scoped object to downsync, and the status
-                        collectors that should be applied to it.
+                      description: ClusterScopeDownsyncClause references a specific
+                        cluster-scoped object to downsync, and the status collectors
+                        that should be applied to it.
                       properties:
+                        createOnly:
+                          description: '`createOnly` indicates that in a given WEC,
+                            the object is not to be updated if it already exists.'
+                          type: boolean
                         group:
                           type: string
                         name:
@@ -421,14 +431,17 @@ spec:
                       type: object
                     type: array
                   namespaceScope:
-                    description: '`namespaceScope` holds a list of namespace-scoped
-                      object references with their associated resource versions to
-                      downsync.'
+                    description: '`namespaceScope` holds a list of references to namsepace-scoped
+                      objects to downsync and how the downsync is to be modulated.'
                     items:
-                      description: NamespaceScopeDownsyncObjectAndStatusCollectors
-                        references a specific namespace-scoped object to downsync,
-                        and the status collectors that should be applied to it.
+                      description: NamespaceScopeDownsyncClause references a specific
+                        namespace-scoped object to downsync, and the status collectors
+                        that should be applied to it.
                       properties:
+                        createOnly:
+                          description: '`createOnly` indicates that in a given WEC,
+                            the object is not to be updated if it already exists.'
+                          type: boolean
                         group:
                           type: string
                         name:
@@ -527,8 +540,7 @@ spec:
           holding the resource (lowercase plural) of the workload object; - "status.kubestellar.io/namespace"
           holding the namespace of the workload object; - "status.kubestellar.io/name"
           holding the name of the workload object; - "status.kubestellar.io/binding-policy"
-          holding the name of the BindingPolicy object. This API is under development
-          and is not yet functional.'
+          holding the name of the BindingPolicy object.'
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -579,8 +591,6 @@ spec:
                           - type
                           type: object
                         type: array
-                      name:
-                        type: string
                     required:
                     - columns
                     type: object
@@ -713,8 +723,7 @@ spec:
       openAPIV3Schema:
         description: StatusCollector defines one way to collect status about a given
           workload object from the set of WECs that it propagates to. This is modeled
-          after an SQL SELECT statement that does aggregation. This API is under development
-          and is not yet functional.
+          after an SQL SELECT statement that does aggregation.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -807,7 +816,7 @@ spec:
                 type: integer
               select:
                 description: '`select` defines named values to extract from each object.
-                  `select` must be emtpy when `combinedFields` is not.'
+                  `select` must be empty when `combinedFields` is not.'
                 items:
                   description: NamedExpression pairs a name with a way of extracting
                     a value from a JSON object.

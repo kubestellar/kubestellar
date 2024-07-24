@@ -93,7 +93,12 @@ func NewTransportController(ctx context.Context,
 	transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface,
 	maxSizeWrappedObject int, wdsName string) (*genericTransportController, error) {
-	emptyWrappedObject := transport.WrapObjects(make([]*unstructured.Unstructured, 0)) // empty wrapped object to get GVR from it.
+	var emptyWrappedObject runtime.Object
+	if t2, is := transport.(TransportWithCreateOnly); is {
+		emptyWrappedObject = t2.WrapObjectsHavingCreateOnly(make([]Wrapee, 0)) // empty wrapped object to get GVR from it.
+	} else {
+		emptyWrappedObject = transport.WrapObjects([]*unstructured.Unstructured{})
+	}
 	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
@@ -847,8 +852,20 @@ func (c *genericTransportController) computeDestToCustomizedObjects(objectsToPro
 	return destToCustomizedObjects, bindingErrors
 }
 
+// TODO: replace all usage of this function with something that actually copes with the create-only bit.
+func FIXME_ADD_CONSTANT_CREATEONLY(obj *unstructured.Unstructured) Wrapee {
+	return Wrapee{obj, false}
+}
+
 func (c *genericTransportController) wrapBatch(batchToPropagate []*unstructured.Unstructured, binding *v1alpha1.Binding, numShard int, isSharded bool) (*unstructured.Unstructured, error) {
-	wrappedObject, err := convertObjectToUnstructured(c.transport.WrapObjects(batchToPropagate))
+	var wrapped runtime.Object
+	if t2, is := c.transport.(TransportWithCreateOnly); is {
+		wrapees := abstract.SliceMap(batchToPropagate, FIXME_ADD_CONSTANT_CREATEONLY)
+		wrapped = t2.WrapObjectsHavingCreateOnly(wrapees)
+	} else {
+		wrapped = c.transport.WrapObjects(batchToPropagate)
+	}
+	wrappedObject, err := convertObjectToUnstructured(wrapped)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 	}

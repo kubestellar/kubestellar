@@ -59,3 +59,11 @@ func PrimitiveMapSafeValMap[Key comparable, Val, Mapped any](lock *sync.RWMutex,
 
 	return PrimitiveMapValMap(source, mapper)
 }
+
+func PrimitiveMapKeySlice[Key comparable, Val any](rep map[Key]Val) []Key {
+	keys := make([]Key, 0, len(rep))
+	for key := range rep {
+		keys = append(keys, key)
+	}
+	return keys
+}

@@ -247,7 +247,7 @@ func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPo
 		if controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
 			bindingPolicy = bindingPolicy.DeepCopy()
 			controllerutil.RemoveFinalizer(bindingPolicy, KSFinalizer)
-			_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: controllerName})
+			_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: ControllerName})
 			if err != nil {
 				if errors.IsNotFound(err) {
 					// object was deleted after getting into this function. This is not an error.
@@ -263,7 +263,7 @@ func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPo
 	if !controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
 		bindingPolicy = bindingPolicy.DeepCopy()
 		controllerutil.AddFinalizer(bindingPolicy, KSFinalizer)
-		_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: controllerName})
+		_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: ControllerName})
 		if err != nil {
 			return err
 		}
@@ -279,10 +279,11 @@ type mrObject interface {
 // testObject tests if the object matches the given tests.
 // The returned tuple is:
 //   - bool: whether the object matches ANY of the tests
+//   - bool: whether any test that matches the object also says CreateOnly==true
 //   - sets.Set[string]: the UNION of the statuscollector names that appear within
 //     EACH of the tests that the object matches
 func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
-	tests []v1alpha1.DownsyncObjectTestAndStatusCollection) (bool, sets.Set[string]) {
+	tests []v1alpha1.DownsyncPolicyClause) (bool, bool, sets.Set[string]) {
 	gvr := schema.GroupVersionResource{
 		Group:    objIdentifier.GVK.Group,
 		Version:  objIdentifier.GVK.Version,
@@ -292,7 +293,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 	logger := klog.FromContext(ctx)
 
 	matchedStatusCollectors := sets.New[string]()
-	matched := false
+	var matched, createOnly bool
 
 	var objNS *corev1.Namespace
 	for _, test := range tests {
@@ -330,12 +331,14 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 			}
 		}
 
+		klog.FromContext(ctx).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
 		// test is a match
 		matchedStatusCollectors.Insert(test.StatusCollectors...)
 		matched = true
+		createOnly = createOnly || test.CreateOnly
 	}
 
-	return matched, matchedStatusCollectors
+	return matched, createOnly, matchedStatusCollectors
 }
 
 func labelsMatchAny(logger logr.Logger, labelSet map[string]string, selectors []metav1.LabelSelector) bool {

@@ -35,7 +35,8 @@ nav:
       - Release-notes: direct/release-notes.md
   - Getting Started: direct/get-started.md
   - User Guide:
-      - Overview: direct/user-guide-intro.md
+      - Guide Overview: direct/user-guide-intro.md
+      - Getting Started: direct/get-started.md
       - General Setup:
           - Overview: direct/setup-overview.md
           - Setup limitations: direct/setup-limitations.md
@@ -61,6 +62,7 @@ nav:
           - Example Scenarios: direct/example-scenarios.md
           - Third-party integrations:
               - ArgoCD to WDS: direct/argo-to-wds1.md
+          - Troubleshooting: direct/troubleshooting.md
   - Contributing: 
       - How to join in: direct/contribute.md
       - Code of Conduct: Contribution guidelines/coc.md
@@ -77,8 +79,9 @@ nav:
         - For Contributors: direct/contributor.md
         - Packaging: direct/packaging.md
         - Release Process: direct/release.md
-        - Releaes Testing: direct/release-testing.md
+        - Release Testing: direct/release-testing.md
         - Guidelines: Contribution guidelines/CONTRIBUTING.md
+        - Signing Contributions: direct/pr-signing.md
   - Community: 
     - Get Involved: Community/_index.md
     - Contact Us:
@@ -110,6 +113,8 @@ theme:
   # Common files such as images, stylesheets, theme overrides
   custom_dir: 'overrides'
   features:
+    # enable the ability to dismiss the announcement bar
+    - announce.dismiss
     - content.action.edit
     - content.action.view
     # Enable navigation section index pages, so we don't see Concepts > Concepts
