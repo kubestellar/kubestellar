@@ -1159,9 +1159,54 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Binding
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         Binding
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#binding-basics" class="md-nav__link">
+    Binding Basics
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bindingpolicy" class="md-nav__link">
+    BindingPolicy
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#binding" class="md-nav__link">
+    Binding
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -2075,6 +2120,35 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#binding-basics" class="md-nav__link">
+    Binding Basics
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bindingpolicy" class="md-nav__link">
+    BindingPolicy
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#binding" class="md-nav__link">
+    Binding
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -2105,8 +2179,67 @@
 
 
 <h1 id="binding-workload-with-wec">Binding workload with WEC<a class="headerlink" href="#binding-workload-with-wec" title="Permanent link">#</a></h1>
-<p>This document is about BindingPolicy and Binding objects and the concept of downsync.</p>
-<p>TODO: write it.</p>
+<p>This document is about associating WECs with workload objects. The
+primary concept is sometimes called "downsync", which confusingly
+refers to both the propagation and <a href="../transforming/">transformation</a>
+of desired state from core to WECs <em>and</em> the propagation and
+summarization of reported state from WECs to core.</p>
+<h2 id="binding-basics">Binding Basics<a class="headerlink" href="#binding-basics" title="Permanent link">#</a></h2>
+<p>The user controls downsync primarily through API objects of kinds
+<code>BindingPolicy</code> and <code>Binding</code>. These go in a WDS and associate
+workload objects in that WDS with WECs, along with adding some
+modulations on how downsync is done.</p>
+<p><code>BindingPolicy</code> is a higher level concept than <code>Binding</code>. KubeStellar
+has a controller that translates each <code>BindingPolicy</code> to a
+<code>Binding</code>. A user <em>could</em> eschew the <code>BindingPolicy</code> and directly
+maintain a <code>Binding</code> object or let a different controller maintain the
+<code>Binding</code> object (TODO: check that this is true). The <code>Binding</code> object
+shows which workload objects and which WECs matched the predicates in
+the <code>BindingPolicy</code> and so is also useful as feedback to the user
+about that.</p>
+<h2 id="bindingpolicy">BindingPolicy<a class="headerlink" href="#bindingpolicy" title="Permanent link">#</a></h2>
+<p>The <code>spec</code> of a <code>BindingPolicy</code> has two predicates that (1) identify a
+subset of the WECs in the inventory of the ITS associated with the WDS
+and (2) identify a subset of the workload objects in the WDS. The
+primary function of the <code>BindingPolicy</code> is to assert the desired
+association between (1) and (2). A <code>BindingPolicy</code> can also add some
+modulations on how those workload objects are downsynced to/from those
+WECs.</p>
+<p>The WEC-selecting predicate is an array of label selectors in
+<code>spec.clusterSelectors</code>. These label selectors test the labels of the
+inventory objects describing the WECs. The bound WECs are the ones
+whose inventory object passes at least one of the the label selectors
+in <code>spec.clusterSelectors</code>.</p>
+<p>The workload object selection predicate is in <code>spec.downsync</code>, which
+holds a list of <code>DownsyncPolicyClause</code>s; each includes both a workload
+object selection predicate and also two kinds of information that
+modulate the downsync.</p>
+<p>For more definitional details about a <code>BindingPolicy</code>, see <a href="https://pkg.go.dev/github.com/kubestellar/kubestellar@v0.23.1/api/control/v1alpha1#BindingPolicy">the API reference</a>.</p>
+<p>Following is an example of a <code>BindingPolicy</code> object, used in the
+end-to-end test of <code>createOnly</code> functionality.</p>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">control.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BindingPolicy</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">clusterSelectors</span><span class="p">:</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">matchLabels</span><span class="p">:</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="nt">location-group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="nt">downsync</span><span class="p">:</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">objectSelectors</span><span class="p">:</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">matchLabels</span><span class="p">:</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="nt">app.kubernetes.io/name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="nt">resources</span><span class="p">:</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">namespaces</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">createOnly</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="nt">objectSelectors</span><span class="p">:</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">matchLabels</span><span class="p">:</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">        </span><span class="nt">app.kubernetes.io/name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span><span class="nt">resources</span><span class="p">:</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployments</span>
+</code></pre></div>
+<h2 id="binding">Binding<a class="headerlink" href="#binding" title="Permanent link">#</a></h2>
+<p>TODO: write this</p>
 
 
   
