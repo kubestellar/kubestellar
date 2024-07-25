@@ -48,7 +48,6 @@ import (
 	"k8s.io/klog/v2/ktesting"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
-	"github.com/kubestellar/kubestellar/pkg/abstract"
 	ksclientfake "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/fake"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
@@ -169,30 +168,32 @@ func typeMeta(kind string, groupVersion k8sschema.GroupVersion) metav1.TypeMeta 
 
 type bindingCase struct {
 	Binding      *ksapi.Binding
-	expect       map[util.GVKObjRef]jsonMap
+	expect       map[util.GVKObjRef]jsonMapToWrap
 	ExpectedKeys []any // JSON equivalent of keys of expect, for logging
 }
 
-func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion string) ksapi.ClusterScopeDownsyncClause {
+func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion string, createOnly bool) ksapi.ClusterScopeDownsyncClause {
 	return ksapi.ClusterScopeDownsyncClause{
 		ClusterScopeDownsyncObject: ksapi.ClusterScopeDownsyncObject{
 			GroupVersionResource: gvr,
 			Name:                 name,
 			ResourceVersion:      resourceVersion,
-		}}
+		},
+		CreateOnly: createOnly}
 }
 
-func newNamespaceScope(gvr metav1.GroupVersionResource, namespace, name, resourceVersion string) ksapi.NamespaceScopeDownsyncClause {
+func newNamespaceScope(gvr metav1.GroupVersionResource, namespace, name, resourceVersion string, createOnly bool) ksapi.NamespaceScopeDownsyncClause {
 	return ksapi.NamespaceScopeDownsyncClause{
 		NamespaceScopeDownsyncObject: ksapi.NamespaceScopeDownsyncObject{
 			GroupVersionResource: gvr,
 			Namespace:            namespace,
 			Name:                 name,
 			ResourceVersion:      resourceVersion,
-		}}
+		},
+		CreateOnly: createOnly}
 }
 
-func (bc *bindingCase) Add(obj mrObjRsc) {
+func (bc *bindingCase) Add(obj mrObjRsc, createOnly bool) {
 	key := util.RefToRuntimeObj(obj.MRObject)
 	gvr := metav1.GroupVersionResource{
 		Group:    key.GK.Group,
@@ -208,14 +209,14 @@ func (bc *bindingCase) Add(obj mrObjRsc) {
 	}
 
 	if objNS == "" {
-		clusterObj := newClusterScope(gvr, objName, objRV)
+		clusterObj := newClusterScope(gvr, objName, objRV, createOnly)
 		bc.Binding.Spec.Workload.ClusterScope = append(bc.Binding.Spec.Workload.ClusterScope, clusterObj)
 	} else {
-		namespaceObj := newNamespaceScope(gvr, objNS, objName, objRV)
+		namespaceObj := newNamespaceScope(gvr, objNS, objName, objRV, createOnly)
 		bc.Binding.Spec.Workload.NamespaceScope = append(bc.Binding.Spec.Workload.NamespaceScope, namespaceObj)
 	}
 
-	bc.expect[key] = jm
+	bc.expect[key] = jsonMapToWrap{jm, createOnly}
 	bc.ExpectedKeys = append(bc.ExpectedKeys, key.String())
 }
 
@@ -226,17 +227,23 @@ func (rg *generator) generateBindingCase(name string, objs []mrObjRsc) bindingCa
 			ObjectMeta: rg.generateObjectMeta(name, nil),
 			Spec:       ksapi.BindingSpec{},
 		},
-		expect: map[util.GVKObjRef]jsonMap{},
+		expect: map[util.GVKObjRef]jsonMapToWrap{},
 	}
 	for _, obj := range objs {
 		if rg.Intn(10) < 7 {
-			bc.Add(obj)
+			createOnly := rg.Intn(2) == 0
+			klog.FromContext(rg.ctx).V(3).Info("Adding to bindingCase", "case", name, "obj", util.RefToRuntimeObj(obj.MRObject), "createOnly", createOnly)
+			bc.Add(obj, createOnly)
 		}
 	}
 	return bc
 }
 
 type jsonMap = map[string]any
+type jsonMapToWrap struct {
+	jm         jsonMap
+	createOnly bool
+}
 
 type testTransport struct {
 	t              *testing.T
@@ -245,7 +252,7 @@ type testTransport struct {
 	ctc            customTransformCollection
 	kindToResource map[metav1.GroupKind]string
 
-	expect map[util.GVKObjRef]jsonMap
+	expect map[util.GVKObjRef]jsonMapToWrap
 	sync.Mutex
 	wrapped bool
 	missed  map[string]any
@@ -254,7 +261,8 @@ type testTransport struct {
 }
 
 func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.Object {
-	return tt.WrapObjectsHavingCreateOnly(abstract.SliceMap(objs, FIXME_ADD_CONSTANT_CREATEONLY))
+	tt.t.Error("WrapObjects called instead of WrapObjectsHavingCreateOnly")
+	return objs[0]
 }
 
 func (tt *testTransport) WrapObjectsHavingCreateOnly(wrapees []Wrapee) runtime.Object {
@@ -272,7 +280,10 @@ func (tt *testTransport) WrapObjectsHavingCreateOnly(wrapees []Wrapee) runtime.O
 		// TODO: test wrapee.CreateOnly
 		key := util.RefToRuntimeObj(obj)
 		delete(tt.missed, key.String())
-		if expectedObj, found := tt.expect[key]; found {
+		if expectedJMTW, found := tt.expect[key]; found {
+			if wrapee.CreateOnly != expectedJMTW.createOnly {
+				tt.t.Errorf("Expected createOnly=%v, got %v obj=%v", expectedJMTW.createOnly, wrapee.CreateOnly, key)
+			}
 			objM := obj.UnstructuredContent()
 			apiVersion := obj.GetAPIVersion()
 			groupVersion, err := k8sschema.ParseGroupVersion(apiVersion)
@@ -286,7 +297,7 @@ func (tt *testTransport) WrapObjectsHavingCreateOnly(wrapees []Wrapee) runtime.O
 			}
 			groupResource := metav1.GroupResource{Group: groupKind.Group, Resource: resource}
 			// clean expected object since transport objects are cleaned
-			uncleanedExpectedObj := &unstructured.Unstructured{Object: expectedObj}
+			uncleanedExpectedObj := &unstructured.Unstructured{Object: expectedJMTW.jm}
 			cleanedExpectedObjU := TransformObject(tt.ctx, tt.ctc, groupResource, uncleanedExpectedObj, tt.bindingName)
 			cleanedExpectedObj := cleanedExpectedObjU.Object
 			cleanable := obj.GetKind() == "ClusterRole"
