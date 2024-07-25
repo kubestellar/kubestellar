@@ -18,6 +18,8 @@ package e2e
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/onsi/ginkgo/v2"
@@ -358,7 +360,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 	})
 
-	ginkgo.Context("singleton status testing", func() {
+	ginkgo.Context("singleton status creation and deletion", func() {
 		ginkgo.It("sets (or deletes) singleton status when a singleton bindingpolicy/deployment is created (or deleted)", func(ctx context.Context) {
 			util.DeleteDeployment(ctx, wds, ns, "nginx") // we don't have to delete nginx
 			util.CreateDeployment(ctx, wds, ns, "nginx-singleton",
@@ -382,13 +384,82 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 			util.ValidateSingletonStatus(ctx, wds, ns, "nginx-singleton")
-			patch_again := []byte(`{"spec":{"clusterSelectors":[{"matchLabels":{"name":"CelestialNexus"}}]}}`)
+			patchAgain := []byte(`{"spec":{"clusterSelectors":[{"matchLabels":{"name":"CelestialNexus"}}]}}`)
 			_, err = ksWds.ControlV1alpha1().BindingPolicies().Patch(
-				ctx, "nginx-singleton", types.MergePatchType, patch_again, metav1.PatchOptions{})
+				ctx, "nginx-singleton", types.MergePatchType, patchAgain, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			util.ValidateNumDeployments(ctx, wec1, ns, 0)
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 			util.ValidateSingletonStatusZeroValue(ctx, wds, ns, "nginx-singleton")
+		})
+	})
+
+	ginkgo.Context("singleton status eventual consistency", func() {
+		ginkgo.It("cleans up previously synced but currently invalid singleton status", func(ctx context.Context) {
+			util.DeleteDeployment(ctx, wds, ns, "nginx")
+			util.CreateDeployment(ctx, wds, ns, "nginx-singleton",
+				map[string]string{
+					"app.kubernetes.io/name": "nginx-singleton",
+				})
+			util.CreateBindingPolicy(ctx, ksWds, "nginx-singleton",
+				[]metav1.LabelSelector{
+					{MatchLabels: map[string]string{"name": "cluster1"}},
+				},
+				[]ksapi.DownsyncPolicyClause{
+					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
+						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx-singleton"}}},
+					}},
+				},
+			)
+			BPPatch := []byte(`{"spec":{"wantSingletonReportedState": true}}`)
+			_, err := ksWds.ControlV1alpha1().BindingPolicies().Patch(
+				ctx, "nginx-singleton", types.MergePatchType, BPPatch, metav1.PatchOptions{})
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ValidateNumDeployments(ctx, wec1, ns, 1)
+			util.ValidateNumDeployments(ctx, wec2, ns, 0)
+			util.ValidateSingletonStatus(ctx, wds, ns, "nginx-singleton")
+			ginkgo.GinkgoWriter.Println("Singleton status synced")
+
+			readArgs := util.ReadContainerArgsInDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", "manager")
+			readArgsBytes, err := json.Marshal(readArgs)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			changedArgs := append(readArgs, "--controllers=binding")
+			changedArgsBytes, err := json.Marshal(changedArgs)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+
+			// Restart the controller manager without starting the status controller.
+			util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 0)
+			CMPatch := []byte(fmt.Sprintf(`{"spec":{"template":{"spec":{"containers":[{"args":%s,"name":"manager"}]}}}}`, string(changedArgsBytes)))
+			_, err = coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "kubestellar-controller-manager", types.StrategicMergePatchType, CMPatch, metav1.PatchOptions{})
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 1)
+			util.ExpectDepolymentAvailability(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager")
+
+			// At this time, the status controller should not be running, this is a simulation of a crush.
+			BPPatch = []byte(`{"spec":{"clusterSelectors":[{"matchLabels":{"name":"CelestialNexus"}}]}}`)
+			_, err = ksWds.ControlV1alpha1().BindingPolicies().Patch(
+				ctx, "nginx-singleton", types.MergePatchType, BPPatch, metav1.PatchOptions{})
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ValidateNumDeployments(ctx, wec1, ns, 0)
+			util.ValidateNumDeployments(ctx, wec2, ns, 0)
+
+			// Restart the controller manager normally.
+			util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 0)
+			CMPatch = []byte(fmt.Sprintf(`{"spec":{"template":{"spec":{"containers":[{"args":%s,"name":"manager"}]}}}}`, string(readArgsBytes)))
+			_, err = coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "kubestellar-controller-manager", types.StrategicMergePatchType, CMPatch, metav1.PatchOptions{})
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 1)
+			util.ExpectDepolymentAvailability(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager")
+
+			// The status controller, 'recovered' from the simulated crush, should drive the singleton status
+			// of the Deployment towards eventual consistency, i.e. clean the 'previously synced but currently invalid' status.
+			// That is, we should write func ValidateSingletonStatusZeroValue here instead of ValidateSingletonStatus**Non**ZeroValue.
+			// But that would break the CI without the the improved status controller in-place yet.
+			// More importantly, this func demonstrates the status controller's current 'eventually **in**consistent' behavior.
+			// This func must be replaced by util.ValidateSingletonStatusZeroValue once the improvemets are merged.
+			util.ValidateSingletonStatusNonZeroValue(ctx, wds, ns, "nginx-singleton")
+			// TODO: Write the line below instead of the line above.
+			// util.ValidateSingletonStatusZeroValue(ctx, wds, ns, "nginx-singleton")
 		})
 	})
 
