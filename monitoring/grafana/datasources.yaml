@@ -1,0 +1,16 @@
+datasources:
+  pyroscope.yaml:
+   apiVersion: 1
+   datasources:
+   - name: pyroscope
+     type: grafana-pyroscope-datasource
+     uid: pyroscope-test
+     url: http://pyroscope.ks-monitoring.svc.cluster.local:4040
+  prometheus.yaml:
+   apiVersion: 1
+   datasources:
+   - name: prometheus
+     type: prometheus
+     uid: prometheus-test
+     url: http://prometheus-kube-prometheus-prometheus.ks-monitoring.svc.cluster.local:9090
+  
