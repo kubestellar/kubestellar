@@ -37,23 +37,6 @@ This can be:
 
     If a host port number different from the expected 9443 is used for the Kind cluster, then the same port number must be specified during the chart installation by adding the following argument `--set "kubeflex-controller.externalPort=<port>"`.
 
-<<<<<<< HEAD
-By default the KubeStellar Core chart uses a test domain `localtest.me`, which is OK for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-controller.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution CLusters (WECs).
-
-For convenience, a new local **Kind** cluster that satisfies the requirements for KubeStellar setup
-(e.g., as in [Getting Started](get-started.md)) can be created with the following command:
-
-```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
-```
-
-Alternatively, a new local **k3s** cluster that satisfies the requirements for KubeStellar setup
-can be created with the following command:
-
-```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/scripts/create-k3s-cluster-with-SSL-passthrough.sh) --port 9443
-```
-=======
     By default the KubeStelalr Core chart uses a test domain `localtest.me`, which is ok for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-controller.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution CLusters (WECs).
 
     For convenience, a new local **Kind** cluster that satisfies the requirements for KubeStellar setup
@@ -69,15 +52,10 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ con
     ```shell
     bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/create-k3s-cluster-with-SSL-passthrough.sh) --port 9443
     ```
->>>>>>> e8f1666eb (Address Mike's comments)
 
 2. An **OpenShift** cluster
 
-<<<<<<< HEAD
-When using this option, one is required to explicitly set the `isOpenShift` variable to `true` by including `--set "kubeflex-operator.isOpenShift=true"` in the Helm chart installation command.
-=======
     When using this option, one is required to explicitely set the `isOpenShift` variable to `true` by including `--set "kubeflex-operator.isOpenShift=true"` in the Helm chart installation command.
->>>>>>> e8f1666eb (Address Mike's comments)
 
 ## KubeStellar Core Chart values
 
