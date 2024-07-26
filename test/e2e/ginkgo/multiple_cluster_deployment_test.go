@@ -587,10 +587,10 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			gomega.Expect(len(cs.Results)).To(gomega.Equal(1))
 			gomega.Expect(cs.Results[0].Name).To(gomega.Equal(listNginxWecsStatusCollectorName))
 
-			gomega.ExpectWithOffset(1, len(cs.Results[0].ColumnNames)).To(gomega.Equal(1))
+			gomega.Expect(len(cs.Results[0].ColumnNames)).To(gomega.Equal(1))
 			gomega.Expect(cs.Results[0].ColumnNames[0]).To(gomega.Equal("wecName"))
 
-			gomega.ExpectWithOffset(1, len(cs.Results[0].Rows)).To(gomega.Equal(2))
+			gomega.Expect(len(cs.Results[0].Rows)).To(gomega.Equal(2))
 
 			// we don't know which row will hold data for which WEC
 			row0expectedWec := "cluster1"
