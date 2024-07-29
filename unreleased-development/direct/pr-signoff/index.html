@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/direct/pr-signing/">
+        <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/direct/pr-signoff/">
       
       
         <link rel="prev" href="../../Contribution%20guidelines/CONTRIBUTING/">
@@ -21,7 +21,7 @@
     
     
       
-        <title>Signing Contributions - KubeStellar</title>
+        <title>Sign-off on Contributions - KubeStellar</title>
       
     
     
@@ -78,9 +78,9 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - Signing Contributions" />
+  <meta property="og:title" content="KubeStellar - Sign-off on Contributions" />
   <meta property="og:description" content="None" />
-  <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/direct/pr-signing/" />
+  <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/direct/pr-signoff/" />
   <meta property="og:image" content="https://docs.kubestellar.io/unreleased-developmentassets/images/illustrations/banner.png" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1080" />
@@ -113,7 +113,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#how-to-sign-your-pull-requests" class="md-skip">
+        <a href="#how-to-sign-off-on-your-pull-requests" class="md-skip">
           Skip to content
         </a>
       
@@ -198,7 +198,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Signing Contributions
+              Sign-off on Contributions
             
           </span>
         </div>
@@ -1664,12 +1664,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Signing Contributions
+          Sign-off on Contributions
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Signing Contributions
+        Sign-off on Contributions
       </a>
       
         
@@ -1709,8 +1709,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#signing-pull-requests" class="md-nav__link">
-    Signing Pull Requests
+  <a href="#pull-request-sign-off" class="md-nav__link">
+    Pull Request Sign-off
   </a>
   
 </li>
@@ -2153,8 +2153,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#signing-pull-requests" class="md-nav__link">
-    Signing Pull Requests
+  <a href="#pull-request-sign-off" class="md-nav__link">
+    Pull Request Sign-off
   </a>
   
 </li>
@@ -2174,7 +2174,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/pr-signing.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/pr-signoff.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -2183,15 +2183,15 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/pr-signing.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/pr-signoff.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
     </a>
   
 
 
-<h1 id="how-to-sign-your-pull-requests">How to Sign Your Pull Requests<a class="headerlink" href="#how-to-sign-your-pull-requests" title="Permanent link">#</a></h1>
-<p>In order to get your pull requests approved, you must first complete a DCO sign-off. To do this, you must have a GPG and SSH key. Basic setup instructions can be found below (For more detailed instructions, refer to the Github <a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key">GPG</a> and <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key">SSH</a> setup pages):</p>
+<h1 id="how-to-sign-off-on-your-pull-requests">How to Sign-off on Your Pull Requests<a class="headerlink" href="#how-to-sign-off-on-your-pull-requests" title="Permanent link">#</a></h1>
+<p>In order to get your pull requests approved, you must first complete a DCO sign-off. This process is defined by the CNCF, and there are two cases: individual contributors and contributors that work for a corporate CNCF member. To do this as an individual contributor, you must have a GPG and SSH key. Basic setup instructions can be found below (For more detailed instructions, refer to the Github <a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key">GPG</a> and <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key">SSH</a> setup pages):</p>
 <hr />
 <p>Before starting, make sure that your user email is verified on Github. To check for this:</p>
 <ol>
@@ -2291,7 +2291,8 @@
 <li>If your PR addresses an already opened issue on the github, make sure to close the issue once your PR is approved and closed.</li>
 </ol>
 <p><br /></p>
-<h2 id="signing-pull-requests">Signing Pull Requests<a class="headerlink" href="#signing-pull-requests" title="Permanent link">#</a></h2>
+<h2 id="pull-request-sign-off">Pull Request Sign-off<a class="headerlink" href="#pull-request-sign-off" title="Permanent link">#</a></h2>
+<p><strong>NOTE</strong>: "sign-off" is different from "signing" a commit or tag (see <a href="https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work">the git book</a> about signing). The former indicates your assent to the repo's terms for contributors, the latter adds a cryptograph checksum that is rarely displayed.</p>
 <p>Your submitted PR must pass the automated checks in order to be reviewed. This requires for you to perform a DCO sign-off for your PR. The following instructions provide a basic walkthrough if you have already set up your GPG and SSH keys:</p>
 <ol>
 <li>
