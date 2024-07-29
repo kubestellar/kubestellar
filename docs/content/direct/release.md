@@ -27,7 +27,7 @@ Between each release of [ks/OTP](https://github.com/kubestellar/ocm-transport-pl
 
 ### Reacting to a new ocm-status-addon release
 
-Update the references to the ocm-status-addon release in the following files.
+Between each release of [ks/OSA](https://github.com/kubestellar/ocm-status-addon) and the next release of ks/ks, update the references to the ocm-status-addon release in the following files.
 
 - `config/postcreate-hooks/ocm.yaml`
 - `core-chart/values.yaml`
@@ -46,7 +46,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Until we have our first stable release, edit the oldocs README(`oldocs/README.md`, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to refer to the coming release.
 
-- Edit [the release notes](release-notes.md).
+- Edit the release notes in `docs/content/direct/release-notes.md`.
 
 - Make a new Git commit with those changes and get it into the right branch in the shared repo (through the regular PR process if not authorized to cheat).
 
