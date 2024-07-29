@@ -148,7 +148,8 @@ func DeleteBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 }
 
 func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name string,
-	clusterSelector []metav1.LabelSelector, testAndStatusCollection []ksapi.DownsyncPolicyClause) {
+	clusterSelector []metav1.LabelSelector, testAndStatusCollection []ksapi.DownsyncPolicyClause,
+	mutators ...func(*ksapi.BindingPolicy) error) {
 	bindingPolicy := ksapi.BindingPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
@@ -157,6 +158,10 @@ func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 			ClusterSelectors: clusterSelector,
 			Downsync:         testAndStatusCollection,
 		},
+	}
+	for _, m := range mutators {
+		err := m(&bindingPolicy)
+		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
 	}
 	_, err := wds.ControlV1alpha1().BindingPolicies().Create(ctx, &bindingPolicy, metav1.CreateOptions{})
 	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())

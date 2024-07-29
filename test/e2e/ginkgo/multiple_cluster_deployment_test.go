@@ -376,17 +376,17 @@ var _ = ginkgo.Describe("end to end testing", func() {
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx-singleton"}}},
 					}},
 				},
+				func(bp *ksapi.BindingPolicy) error {
+					bp.Spec.WantSingletonReportedState = true
+					return nil
+				},
 			)
-			patch := []byte(`{"spec":{"wantSingletonReportedState": true}}`)
-			_, err := ksWds.ControlV1alpha1().BindingPolicies().Patch(
-				ctx, "nginx-singleton", types.MergePatchType, patch, metav1.PatchOptions{})
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 			util.ValidateSingletonStatus(ctx, wds, ns, "nginx-singleton")
-			patchAgain := []byte(`{"spec":{"clusterSelectors":[{"matchLabels":{"name":"CelestialNexus"}}]}}`)
-			_, err = ksWds.ControlV1alpha1().BindingPolicies().Patch(
-				ctx, "nginx-singleton", types.MergePatchType, patchAgain, metav1.PatchOptions{})
+			patch := []byte(`{"spec":{"clusterSelectors":[{"matchLabels":{"name":"CelestialNexus"}}]}}`)
+			_, err := ksWds.ControlV1alpha1().BindingPolicies().Patch(
+				ctx, "nginx-singleton", types.MergePatchType, patch, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			util.ValidateNumDeployments(ctx, wec1, ns, 0)
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
@@ -410,11 +410,11 @@ var _ = ginkgo.Describe("end to end testing", func() {
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx-singleton"}}},
 					}},
 				},
+				func(bp *ksapi.BindingPolicy) error {
+					bp.Spec.WantSingletonReportedState = true
+					return nil
+				},
 			)
-			BPPatch := []byte(`{"spec":{"wantSingletonReportedState": true}}`)
-			_, err := ksWds.ControlV1alpha1().BindingPolicies().Patch(
-				ctx, "nginx-singleton", types.MergePatchType, BPPatch, metav1.PatchOptions{})
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			util.ValidateNumDeployments(ctx, wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 			util.ValidateSingletonStatus(ctx, wds, ns, "nginx-singleton")
@@ -436,7 +436,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ExpectDepolymentAvailability(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager")
 
 			// At this time, the status controller should not be running, this is a simulation of a crush.
-			BPPatch = []byte(`{"spec":{"clusterSelectors":[{"matchLabels":{"name":"CelestialNexus"}}]}}`)
+			BPPatch := []byte(`{"spec":{"clusterSelectors":[{"matchLabels":{"name":"CelestialNexus"}}]}}`)
 			_, err = ksWds.ControlV1alpha1().BindingPolicies().Patch(
 				ctx, "nginx-singleton", types.MergePatchType, BPPatch, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
