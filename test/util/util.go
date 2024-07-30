@@ -612,18 +612,18 @@ func Expect1PodOfEach(ctx context.Context, client *kubernetes.Clientset, ns stri
 	ginkgo.By(fmt.Sprintf("Waited for ready pods in namespace %q with name prefixes %v", ns, namePrefixes))
 }
 
-func ScaleDeployment(ctx context.Context, client *kubernetes.Clientset, ns string, name string, target int32) {
+func ScaleDeployment(ctx context.Context, client *kubernetes.Clientset, ns string, name string, target int32) error {
 	ginkgo.By(fmt.Sprintf("Scale Deployment %q in namespace %q to %d", name, ns, target))
+	gotSc, err := client.AppsV1().Deployments(ns).GetScale(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+	gotSc.Spec.Replicas = target
+	_, err = client.AppsV1().Deployments(ns).UpdateScale(ctx, name, gotSc, metav1.UpdateOptions{})
+	if err != nil {
+		return err
+	}
 	gomega.EventuallyWithOffset(1, func() error {
-		gotSc, err := client.AppsV1().Deployments(ns).GetScale(ctx, name, metav1.GetOptions{})
-		if err != nil {
-			return err
-		}
-		gotSc.Spec.Replicas = target
-		_, err = client.AppsV1().Deployments(ns).UpdateScale(ctx, name, gotSc, metav1.UpdateOptions{})
-		if err != nil {
-			return err
-		}
 		gotDeploy, err := client.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
 		if err != nil {
 			return err
@@ -638,12 +638,13 @@ func ScaleDeployment(ctx context.Context, client *kubernetes.Clientset, ns strin
 		if len(podList.Items) != int(target) {
 			return fmt.Errorf("pod count not converged yet")
 		}
-		if gotDeploy.Status.ReadyReplicas != target {
-			return fmt.Errorf("ready replicas not converged yet")
+		if gotDeploy.Status.AvailableReplicas != target {
+			return fmt.Errorf("AvailableReplicas not converged yet")
 		}
 		return nil
 	}, timeout).Should(gomega.Succeed())
 	ginkgo.GinkgoWriter.Printf("Scaled Deployment %q in namespace %q to %d\n", name, ns, target)
+	return nil
 }
 
 func ExpectDepolymentAvailability(ctx context.Context, client *kubernetes.Clientset, ns string, name string) {
