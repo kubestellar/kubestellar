@@ -6,7 +6,7 @@ The following sections list the known issues for each release. The issue list is
 
 The main change from 0.23.X is the completion of the status combination and introduction of the create-only feature. There is also further work on the organization of the website.
 
-### 0.24.0-alpha.1
+### 0.24.0-alpha.2
 
 The first of several releases required to get the create-only feature implemented in both the ks/ks and ks/OTP repositories. The API for this feature is present but the implementation is incomplete: the `Binding` objects are correctly derived from the `BindingPolicy` objects but the transport controller does not implement the feature.
 
