@@ -148,7 +148,8 @@ func DeleteBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 }
 
 func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name string,
-	clusterSelector []metav1.LabelSelector, testAndStatusCollection []ksapi.DownsyncPolicyClause) {
+	clusterSelector []metav1.LabelSelector, testAndStatusCollection []ksapi.DownsyncPolicyClause,
+	mutators ...func(*ksapi.BindingPolicy) error) {
 	bindingPolicy := ksapi.BindingPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
@@ -157,6 +158,10 @@ func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 			ClusterSelectors: clusterSelector,
 			Downsync:         testAndStatusCollection,
 		},
+	}
+	for _, m := range mutators {
+		err := m(&bindingPolicy)
+		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
 	}
 	_, err := wds.ControlV1alpha1().BindingPolicies().Create(ctx, &bindingPolicy, metav1.CreateOptions{})
 	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
@@ -358,7 +363,7 @@ type countAndProblems struct {
 	problems []string
 }
 
-// ValidateNumDeployments waits a limited amount of time for the number of Deployjment objects to equal the given count and
+// ValidateNumDeployments waits a limited amount of time for the number of Deployment objects to equal the given count and
 // all the problemFuncs to return the empty string for every Deployment.
 func ValidateNumDeployments(ctx context.Context, wec *kubernetes.Clientset, ns string, num int, problemFuncs ...func(*appsv1.Deployment) string) {
 	ginkgo.GinkgoHelper()
@@ -403,6 +408,14 @@ func ValidateSingletonStatusZeroValue(ctx context.Context, wds *kubernetes.Clien
 		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
 		return deployment.Status.Conditions
 	}, timeout).Should(gomega.BeNil())
+}
+
+func ValidateSingletonStatusNonZeroValue(ctx context.Context, wds *kubernetes.Clientset, ns string, name string) {
+	gomega.Eventually(func() []appsv1.DeploymentCondition {
+		deployment, err := wds.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
+		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		return deployment.Status.Conditions
+	}, timeout).Should(gomega.Not(gomega.BeNil()))
 }
 
 func ValidateSingletonStatus(ctx context.Context, wds *kubernetes.Clientset, ns string, name string) {
@@ -597,4 +610,76 @@ func Expect1PodOfEach(ctx context.Context, client *kubernetes.Clientset, ns stri
 		return problems
 	}, timeout).Should(gomega.BeEmpty())
 	ginkgo.By(fmt.Sprintf("Waited for ready pods in namespace %q with name prefixes %v", ns, namePrefixes))
+}
+
+func ScaleDeployment(ctx context.Context, client *kubernetes.Clientset, ns string, name string, target int32) error {
+	ginkgo.By(fmt.Sprintf("Scale Deployment %q in namespace %q to %d", name, ns, target))
+	gotSc, err := client.AppsV1().Deployments(ns).GetScale(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+	gotSc.Spec.Replicas = target
+	_, err = client.AppsV1().Deployments(ns).UpdateScale(ctx, name, gotSc, metav1.UpdateOptions{})
+	if err != nil {
+		return err
+	}
+	gomega.EventuallyWithOffset(1, func() error {
+		gotDeploy, err := client.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+		labelSelector := metav1.FormatLabelSelector(gotDeploy.Spec.Selector)
+		podList, err := client.CoreV1().Pods(ns).List(ctx, metav1.ListOptions{
+			LabelSelector: labelSelector,
+		})
+		if err != nil {
+			return err
+		}
+		if len(podList.Items) != int(target) {
+			return fmt.Errorf("pod count not converged yet")
+		}
+		if gotDeploy.Status.AvailableReplicas != target {
+			return fmt.Errorf("AvailableReplicas not converged yet")
+		}
+		return nil
+	}, timeout).Should(gomega.Succeed())
+	ginkgo.GinkgoWriter.Printf("Scaled Deployment %q in namespace %q to %d\n", name, ns, target)
+	return nil
+}
+
+func ExpectDepolymentAvailability(ctx context.Context, client *kubernetes.Clientset, ns string, name string) {
+	gomega.EventuallyWithOffset(1, func() error {
+		deploy, err := client.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+		if deploy.Status.AvailableReplicas <= 0 {
+			return fmt.Errorf("deployment %q in namespace %q is not available", name, ns)
+		}
+		return nil
+	}, timeout).Should(gomega.Succeed())
+	ginkgo.GinkgoWriter.Printf("Deployment %q in namespace %q is available\n", name, ns)
+}
+
+func ReadContainerArgsInDeployment(ctx context.Context, client *kubernetes.Clientset, ns string, deploymentName string, containerName string) []string {
+	var args []string
+	gomega.EventuallyWithOffset(1, func() error {
+		deploy, err := client.AppsV1().Deployments(ns).Get(ctx, deploymentName, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+		foundContainer := false
+		for _, c := range deploy.Spec.Template.Spec.Containers {
+			if c.Name == containerName {
+				foundContainer = true
+				args = c.Args
+				break
+			}
+		}
+		if !foundContainer {
+			return fmt.Errorf("container %q in Deployment %q is not found", containerName, deploymentName)
+		}
+		return nil
+	}, timeout).Should(gomega.Succeed())
+	return args
 }
