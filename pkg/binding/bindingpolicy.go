@@ -172,8 +172,8 @@ func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clust
 			utilruntime.HandleError(err)
 			return
 		}
-		if match1 || match2 {
-			logger.V(4).Info("Enqueuing reference to bindingPolicy because of changing match with cluster", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
+		if match1 != match2 {
+			logger.V(4).Info("Enqueuing reference to bindingPolicy because of changing match with cluster", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name, "oldMatch", match1, "newMatch", match2, "oldLabels", oldLabels, "newLabels", newLabels)
 			c.workqueue.Add(bindingPolicyRef(bindingPolicy.Name))
 		}
 	}
@@ -331,7 +331,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 			}
 		}
 
-		klog.FromContext(ctx).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
+		klog.FromContext(ctx).V(4).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
 		// test is a match
 		matchedStatusCollectors.Insert(test.StatusCollectors...)
 		matched = true

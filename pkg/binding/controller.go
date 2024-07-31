@@ -459,6 +459,7 @@ func (c *Controller) setupManagedClustersInformer(ctx context.Context) error {
 			oldLabels := oldM.GetLabels()
 			newLabels := newM.GetLabels()
 			if !reflect.DeepEqual(oldLabels, newLabels) {
+				c.logger.V(4).Info("Handling labels change", "old", old, "new", new)
 				c.evaluateBindingPoliciesForUpdate(ctx, newM.GetName(), oldLabels, newLabels)
 			}
 		},
