@@ -70,6 +70,9 @@ func init() {
 var _ = ginkgo.BeforeSuite(func(ctx context.Context) {
 	if !skipSetupFlag {
 		separatedFlags := strings.Split(ksSetupFlags, " ")
+		if len(ksSetupFlags) == 0 {
+			separatedFlags = separatedFlags[:0]
+		}
 		util.Cleanup(ctx)
 		util.SetupKubestellar(ctx, releasedFlag, separatedFlags...)
 	}

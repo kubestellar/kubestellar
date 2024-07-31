@@ -172,8 +172,8 @@ func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clust
 			utilruntime.HandleError(err)
 			return
 		}
-		if match1 || match2 {
-			logger.V(4).Info("Enqueuing reference to bindingPolicy because of changing match with cluster", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
+		if match1 != match2 {
+			logger.V(4).Info("Enqueuing reference to bindingPolicy because of changing match with cluster", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name, "oldMatch", match1, "newMatch", match2, "oldLabels", oldLabels, "newLabels", newLabels)
 			c.workqueue.Add(bindingPolicyRef(bindingPolicy.Name))
 		}
 	}
@@ -284,11 +284,6 @@ type mrObject interface {
 //     EACH of the tests that the object matches
 func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
 	tests []v1alpha1.DownsyncPolicyClause) (bool, bool, sets.Set[string]) {
-	gvr := schema.GroupVersionResource{
-		Group:    objIdentifier.GVK.Group,
-		Version:  objIdentifier.GVK.Version,
-		Resource: objIdentifier.Resource,
-	}
 
 	logger := klog.FromContext(ctx)
 
@@ -301,7 +296,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 			continue
 		}
 		if len(test.Resources) > 0 && !(SliceContains(test.Resources, "*") ||
-			SliceContains(test.Resources, gvr.Resource)) {
+			SliceContains(test.Resources, objIdentifier.Resource)) {
 			continue
 		}
 		if len(test.Namespaces) > 0 && !(SliceContains(test.Namespaces, "*") ||
@@ -331,7 +326,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 			}
 		}
 
-		klog.FromContext(ctx).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
+		klog.FromContext(ctx).V(4).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
 		// test is a match
 		matchedStatusCollectors.Insert(test.StatusCollectors...)
 		matched = true

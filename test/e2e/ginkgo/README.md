@@ -41,7 +41,6 @@ To test the latest release image, either (a) pass the `--released` flag to setup
 KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color -- -released
 ```
 
-
 To test a specific test use ginkgo's `--focus` parameter.  For example:
 
 ```shell

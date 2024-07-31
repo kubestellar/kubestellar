@@ -132,7 +132,7 @@ func SetupKubestellar(ctx context.Context, releasedFlag bool, otherFlags ...stri
 	}
 	args = append(args, otherFlags...)
 	commandName := "../common/setup-kubestellar.sh"
-	ginkgo.By(fmt.Sprintf("Execing command %v", append([]string{commandName}, args...)))
+	ginkgo.By(fmt.Sprintf("Execing command %#v", append([]string{commandName}, args...)))
 	cmd := exec.CommandContext(ctx, commandName, args...)
 	cmd.Stderr = &e
 	cmd.Stdout = &o
@@ -401,7 +401,7 @@ func ValidateNumServices(ctx context.Context, wec *kubernetes.Clientset, ns stri
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() int {
 		services, err := wec.CoreV1().Services(ns).List(ctx, metav1.ListOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		return len(services.Items)
 	}, timeout).Should(gomega.Equal(num))
 }
@@ -410,7 +410,7 @@ func ValidateNumJobs(ctx context.Context, wec *kubernetes.Clientset, ns string, 
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() int {
 		jobs, err := wec.BatchV1().Jobs(ns).List(ctx, metav1.ListOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		return len(jobs.Items)
 	}, timeout).Should(gomega.Equal(num))
 }
@@ -419,7 +419,7 @@ func ValidateSingletonStatusZeroValue(ctx context.Context, wds *kubernetes.Clien
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() []appsv1.DeploymentCondition {
 		deployment, err := wds.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		return deployment.Status.Conditions
 	}, timeout).Should(gomega.BeNil())
 }
@@ -428,7 +428,7 @@ func ValidateSingletonStatusNonZeroValue(ctx context.Context, wds *kubernetes.Cl
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() []appsv1.DeploymentCondition {
 		deployment, err := wds.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		return deployment.Status.Conditions
 	}, timeout).Should(gomega.Not(gomega.BeNil()))
 }
@@ -437,7 +437,7 @@ func ValidateSingletonStatus(ctx context.Context, wds *kubernetes.Clientset, ns 
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() int {
 		deployment, err := wds.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		return int(deployment.Status.AvailableReplicas)
 	}, timeout).Should(gomega.Equal(1))
 }
@@ -459,7 +459,7 @@ func ValidateNumManifestworks(ctx context.Context, ocmWorkIts *ocmWorkClient.Cli
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() int {
 		list, err := ocmWorkIts.WorkV1().ManifestWorks(ns).List(ctx, metav1.ListOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		return len(list.Items)
 	}, timeout).Should(gomega.Equal(num))
 }
@@ -468,7 +468,7 @@ func ValidateNumDeploymentReplicas(ctx context.Context, wec *kubernetes.Clientse
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() int {
 		deployments, err := wec.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		if len(deployments.Items) != 1 {
 			return 0
 		}

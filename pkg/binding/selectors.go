@@ -76,8 +76,8 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 					"objectIdentifier", objIdentifier)
 				c.enqueueBinding(bindingPolicy.GetName())
 			} else {
-				logger.V(4).Info("Not enqueuing Binding for syncing due to the removal of an "+
-					"object from its resolution", "binding", bindingPolicy.GetName(),
+				logger.V(4).Info("Not enqueuing Binding for syncing, because its resolution continues "+
+					"to not include workload object", "binding", bindingPolicy.GetName(),
 					"objectIdentifier", objIdentifier)
 			}
 			continue
