@@ -51,38 +51,44 @@ const (
 )
 
 func GetConfig(context string) *rest.Config {
+	ginkgo.GinkgoHelper()
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		clientcmd.NewDefaultClientConfigLoadingRules(),
 		&clientcmd.ConfigOverrides{CurrentContext: context}).ClientConfig()
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 	return config
 }
 
 func CreateKubeClient(config *rest.Config) *kubernetes.Clientset {
+	ginkgo.GinkgoHelper()
 	clientset, err := kubernetes.NewForConfig(config)
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 	return clientset
 }
 
 func CreateKSClient(config *rest.Config) *ksClient.Clientset {
+	ginkgo.GinkgoHelper()
 	clientset, err := ksClient.NewForConfig(config)
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 	return clientset
 }
 
 func CreateOcmWorkClient(config *rest.Config) *ocmWorkClient.Clientset {
+	ginkgo.GinkgoHelper()
 	ocmWorkClient, err := ocmWorkClient.NewForConfig(config)
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 	return ocmWorkClient
 }
 
 func CreateDynamicClient(config *rest.Config) *dynamic.DynamicClient {
+	ginkgo.GinkgoHelper()
 	dynamicClient, err := dynamic.NewForConfig(config)
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 	return dynamicClient
 }
 
 func CreateNS(ctx context.Context, client *kubernetes.Clientset, name string) {
+	ginkgo.GinkgoHelper()
 	labels := make(map[string]string)
 	labels["app.kubernetes.io/name"] = "nginx"
 	nsObj := &corev1.Namespace{
@@ -96,7 +102,7 @@ func CreateNS(ctx context.Context, client *kubernetes.Clientset, name string) {
 	if errors.IsAlreadyExists(err) {
 		err = nil
 	}
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 	gomega.Eventually(func() error {
 		_, err := client.CoreV1().Namespaces().Get(ctx, name, metav1.GetOptions{})
 		return err
@@ -104,6 +110,7 @@ func CreateNS(ctx context.Context, client *kubernetes.Clientset, name string) {
 }
 
 func Cleanup(ctx context.Context) {
+	ginkgo.GinkgoHelper()
 	var e, o bytes.Buffer
 	cmd := exec.CommandContext(ctx, "../common/cleanup.sh")
 	cmd.Stderr = &e
@@ -116,12 +123,14 @@ func Cleanup(ctx context.Context) {
 	gomega.Expect(err).To(gomega.Succeed())
 }
 
-func SetupKubestellar(ctx context.Context, releasedFlag bool) {
+func SetupKubestellar(ctx context.Context, releasedFlag bool, otherFlags ...string) {
+	ginkgo.GinkgoHelper()
 	var e, o bytes.Buffer
 	var args []string
 	if releasedFlag {
 		args = []string{"--released"}
 	}
+	args = append(args, otherFlags...)
 	commandName := "../common/setup-kubestellar.sh"
 	ginkgo.By(fmt.Sprintf("Execing command %v", append([]string{commandName}, args...)))
 	cmd := exec.CommandContext(ctx, commandName, args...)
@@ -140,6 +149,7 @@ func int32Ptr(i int32) *int32 {
 }
 
 func DeleteBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name string) {
+	ginkgo.GinkgoHelper()
 	wds.ControlV1alpha1().BindingPolicies().Delete(ctx, name, metav1.DeleteOptions{})
 	gomega.Eventually(func() error {
 		_, err := wds.ControlV1alpha1().BindingPolicies().Get(ctx, name, metav1.GetOptions{})
@@ -150,6 +160,7 @@ func DeleteBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name string,
 	clusterSelector []metav1.LabelSelector, testAndStatusCollection []ksapi.DownsyncPolicyClause,
 	mutators ...func(*ksapi.BindingPolicy) error) {
+	ginkgo.GinkgoHelper()
 	bindingPolicy := ksapi.BindingPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
@@ -161,10 +172,10 @@ func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 	}
 	for _, m := range mutators {
 		err := m(&bindingPolicy)
-		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+		gomega.Expect(err).NotTo(gomega.HaveOccurred())
 	}
 	_, err := wds.ControlV1alpha1().BindingPolicies().Create(ctx, &bindingPolicy, metav1.CreateOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 	gomega.Eventually(func() *ksapi.BindingPolicy {
 		p, _ := wds.ControlV1alpha1().BindingPolicies().Get(ctx, name, metav1.GetOptions{})
 		return p
@@ -172,6 +183,7 @@ func CreateBindingPolicy(ctx context.Context, wds *ksClient.Clientset, name stri
 }
 
 func CreateStatusCollector(ctx context.Context, wds *ksClient.Clientset, name string, spec ksapi.StatusCollectorSpec) {
+	ginkgo.GinkgoHelper()
 	satusCollector := ksapi.StatusCollector{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "StatusCollector",
@@ -181,7 +193,7 @@ func CreateStatusCollector(ctx context.Context, wds *ksClient.Clientset, name st
 		Spec:       spec,
 	}
 	_, err := wds.ControlV1alpha1().StatusCollectors().Create(ctx, &satusCollector, metav1.CreateOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 	gomega.Eventually(func() *ksapi.StatusCollector {
 		p, _ := wds.ControlV1alpha1().StatusCollectors().Get(ctx, name, metav1.GetOptions{})
 		return p
@@ -194,20 +206,16 @@ func CreateStatusCollector(ctx context.Context, wds *ksClient.Clientset, name st
 // - the string "."
 // - the UID of the BindingPolicy object.
 func GetCombinedStatus(ctx context.Context, ksClient *ksClient.Clientset, kubeClient *kubernetes.Clientset, ns, objectName, policyName string) *ksapi.CombinedStatus {
+	ginkgo.GinkgoHelper()
 	var cs *ksapi.CombinedStatus
 
 	p, err := ksClient.ControlV1alpha1().BindingPolicies().Get(ctx, policyName, metav1.GetOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 	d, err := kubeClient.AppsV1().Deployments(ns).Get(ctx, objectName, metav1.GetOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 	cs_name := string(d.UID) + "." + string(p.UID)
-
-	gomega.Eventually(func() error {
-		cs, err = ksClient.ControlV1alpha1().CombinedStatuses(ns).Get(ctx, cs_name, metav1.GetOptions{})
-		return err
-	}, timeout).Should(gomega.Not(gomega.HaveOccurred()))
 
 	gomega.Eventually(func() error {
 		cs, err = ksClient.ControlV1alpha1().CombinedStatuses(ns).Get(ctx, cs_name, metav1.GetOptions{})
@@ -218,12 +226,13 @@ func GetCombinedStatus(ctx context.Context, ksClient *ksClient.Clientset, kubeCl
 	// TODO: find a way to determine completion
 	time.Sleep(40 * time.Second)
 	cs, err = ksClient.ControlV1alpha1().CombinedStatuses(ns).Get(ctx, cs_name, metav1.GetOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 	return cs
 }
 
 func DeleteDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string, name string) {
+	ginkgo.GinkgoHelper()
 	wds.AppsV1().Deployments(ns).Delete(ctx, name, metav1.DeleteOptions{})
 	gomega.Eventually(func() error {
 		_, err := wds.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
@@ -232,6 +241,7 @@ func DeleteDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string,
 }
 
 func CreateDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string, name string, labels map[string]string) {
+	ginkgo.GinkgoHelper()
 	deployment := appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
@@ -276,6 +286,7 @@ func CreateDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string,
 }
 
 func CreateCustomTransform(ctx context.Context, wds *ksClient.Clientset, name, apiGroup, resource string, remove ...string) {
+	ginkgo.GinkgoHelper()
 	ct := ksapi.CustomTransform{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
@@ -293,6 +304,7 @@ func CreateCustomTransform(ctx context.Context, wds *ksClient.Clientset, name, a
 }
 
 func CreateService(ctx context.Context, wds *kubernetes.Clientset, ns string, name string, appName string) {
+	ginkgo.GinkgoHelper()
 	service := corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
@@ -322,6 +334,7 @@ func CreateService(ctx context.Context, wds *kubernetes.Clientset, ns string, na
 }
 
 func CreateJob(ctx context.Context, wds *kubernetes.Clientset, ns string, name string, appName string) {
+	ginkgo.GinkgoHelper()
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: "pi-",
@@ -403,6 +416,7 @@ func ValidateNumJobs(ctx context.Context, wec *kubernetes.Clientset, ns string, 
 }
 
 func ValidateSingletonStatusZeroValue(ctx context.Context, wds *kubernetes.Clientset, ns string, name string) {
+	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() []appsv1.DeploymentCondition {
 		deployment, err := wds.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
 		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
@@ -411,6 +425,7 @@ func ValidateSingletonStatusZeroValue(ctx context.Context, wds *kubernetes.Clien
 }
 
 func ValidateSingletonStatusNonZeroValue(ctx context.Context, wds *kubernetes.Clientset, ns string, name string) {
+	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() []appsv1.DeploymentCondition {
 		deployment, err := wds.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
 		gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
@@ -464,12 +479,14 @@ func ValidateNumDeploymentReplicas(ctx context.Context, wec *kubernetes.Clientse
 }
 
 func DeleteWECDeployments(ctx context.Context, wec *kubernetes.Clientset, ns string) {
+	ginkgo.GinkgoHelper()
 	err := wec.AppsV1().Deployments(ns).DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{})
-	gomega.ExpectWithOffset(1, err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 // CleanupWDS: removes all deployments and services from ns and all bindingPolicies from cluster
 func CleanupWDS(ctx context.Context, wds *kubernetes.Clientset, ksWds *ksClient.Clientset, ns string) {
+	ginkgo.GinkgoHelper()
 	DeleteAll[*appsv1.DeploymentList](ctx, wds.AppsV1().Deployments(ns), func(objList *appsv1.DeploymentList) []string {
 		return objectsToNames((*appsv1.Deployment).GetName, objList.Items)
 	})
@@ -498,6 +515,7 @@ type ResourceCollectionInterface[ObjectListType metav1.ListInterface] interface 
 }
 
 func Delete1By1[ObjectListType metav1.ListInterface](ctx context.Context, client ResourceInterface[ObjectListType], listNames func(ObjectListType) []string) {
+	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() error {
 		list, err := client.List(ctx, metav1.ListOptions{})
 		if err != nil {
@@ -519,6 +537,7 @@ func Delete1By1[ObjectListType metav1.ListInterface](ctx context.Context, client
 }
 
 func DeleteAll[ObjectListType metav1.ListInterface](ctx context.Context, client ResourceCollectionInterface[ObjectListType], listNames func(ObjectListType) []string) {
+	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() error {
 		err := client.DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{})
 		if err != nil {
@@ -545,9 +564,10 @@ func objectsToNames[ObjectType any](getName func(*ObjectType) string, objects []
 }
 
 func DeletePods(ctx context.Context, client *kubernetes.Clientset, ns string, namePrefix string) {
+	ginkgo.GinkgoHelper()
 	ginkgo.By(fmt.Sprintf("Enumerating Pods in namespace %q with names starting with %q", ns, namePrefix))
 	var pods *corev1.PodList
-	gomega.EventuallyWithOffset(1, func() error {
+	gomega.Eventually(func() error {
 		var err error
 		pods, err = client.CoreV1().Pods(ns).List(ctx, metav1.ListOptions{})
 		return err
@@ -560,7 +580,7 @@ func DeletePods(ctx context.Context, client *kubernetes.Clientset, ns string, na
 			stillNeedsDelete[pod.Name] = pod.UID
 		}
 	}
-	gomega.EventuallyWithOffset(1, func() map[string]error {
+	gomega.Eventually(func() map[string]error {
 		problems := map[string]error{}
 		for podName := range stillNeedsDelete {
 			err := client.CoreV1().Pods(ns).Delete(ctx, podName, metav1.DeleteOptions{})
@@ -573,7 +593,7 @@ func DeletePods(ctx context.Context, client *kubernetes.Clientset, ns string, na
 		return problems
 	}, timeout).Should(gomega.BeEmpty())
 	ginkgo.By(fmt.Sprintf("Deleted pods %v", goners))
-	gomega.EventuallyWithOffset(1, func() map[string]types.UID {
+	gomega.Eventually(func() map[string]types.UID {
 		remaining := map[string]types.UID{}
 		for podName, podUID := range goners {
 			pod, err := client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
@@ -586,7 +606,8 @@ func DeletePods(ctx context.Context, client *kubernetes.Clientset, ns string, na
 }
 
 func Expect1PodOfEach(ctx context.Context, client *kubernetes.Clientset, ns string, namePrefixes ...string) {
-	gomega.EventuallyWithOffset(1, func() map[string]int {
+	ginkgo.GinkgoHelper()
+	gomega.Eventually(func() map[string]int {
 		pods, err := client.CoreV1().Pods(ns).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return map[string]int{err.Error(): 1}
@@ -651,8 +672,9 @@ func WaitForDepolymentAvailability(ctx context.Context, client kubernetes.Interf
 }
 
 func ReadContainerArgsInDeployment(ctx context.Context, client *kubernetes.Clientset, ns string, deploymentName string, containerName string) []string {
+	ginkgo.GinkgoHelper()
 	var args []string
-	gomega.EventuallyWithOffset(1, func() error {
+	gomega.Eventually(func() error {
 		deploy, err := client.AppsV1().Deployments(ns).Get(ctx, deploymentName, metav1.GetOptions{})
 		if err != nil {
 			return err

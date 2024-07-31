@@ -19,6 +19,7 @@ package e2e
 import (
 	"context"
 	"flag"
+	"strings"
 	"testing"
 	"time"
 
@@ -46,6 +47,7 @@ var (
 	wec2               *kubernetes.Clientset
 	its                *ocmWorkClient.Clientset
 	releasedFlag       bool
+	ksSetupFlags       string
 	skipSetupFlag      bool
 	hostClusterCtxFlag string
 	wds1CtxFlag        string
@@ -57,6 +59,7 @@ var (
 func init() {
 	flag.BoolVar(&releasedFlag, "released", false, "released controls whether we use a release image")
 	flag.BoolVar(&skipSetupFlag, "skip-setup", false, "skip kubestellar cleanup and setup")
+	flag.StringVar(&ksSetupFlags, "kubestellar-setup-flags", ksSetupFlags, "additional command line flags for setup-kubestellar.sh, space separated")
 	flag.StringVar(&hostClusterCtxFlag, "host-cluster-context", "kind-kubeflex", "context for kubeflex hosting cluster")
 	flag.StringVar(&wds1CtxFlag, "wds1-context", "wds1", "context for KS wds1 space")
 	flag.StringVar(&its1CtxFlag, "its1-context", "its1", "context for KS its1 space")
@@ -66,8 +69,9 @@ func init() {
 
 var _ = ginkgo.BeforeSuite(func(ctx context.Context) {
 	if !skipSetupFlag {
+		separatedFlags := strings.Split(ksSetupFlags, " ")
 		util.Cleanup(ctx)
-		util.SetupKubestellar(ctx, releasedFlag)
+		util.SetupKubestellar(ctx, releasedFlag, separatedFlags...)
 	}
 
 	configCore := util.GetConfig(hostClusterCtxFlag)
