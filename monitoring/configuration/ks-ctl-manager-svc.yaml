@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: ks-controller-manager
+  labels:
+    app: ks-controller-manager
+spec:
+  selector:
+    control-plane: controller-manager
+  ports:
+  - name: metrics
+    port: 8443

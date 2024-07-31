@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: wds-apiserver
+  labels:
+    app: wds-apiserver
+spec:
+  endpoints:
+  - bearerTokenSecret:
+      name: prometheus-secret
+      key: token
+    interval: 5s
+    path: /metrics
+    port: https
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+  namespaceSelector:
+    matchNames:
+    - %WDS_NS%
+  selector:
+    matchLabels:
+      app: kube-apiserver

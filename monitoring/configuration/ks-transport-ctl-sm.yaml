@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ks-transport-controller
+spec:
+  endpoints:
+  - interval: 5s
+    path: /metrics
+    port: metrics
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - %WDS_NS%
+  selector:
+    matchLabels:
+      app: ks-transport-controller
