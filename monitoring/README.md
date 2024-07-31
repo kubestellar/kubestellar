@@ -29,18 +29,39 @@ This example shows how to deploy monitoring tools (Prometheus, Grafana and Pyros
 
 2. Configure Prometheus and Pyroscope to scrape your KubeStellar spaces:
 
+    a) WDS space:
+
     ```bash
-    $ ./configure-metrics-tools.sh
+    $ ./configure-metrics-wds.sh
     ```
 
-    Optionally, check the prometheus service monitor objects:
+    If you have more than one WDS, you can run the above script with the `--space-name` flag. For example: `./configure-metrics-wds.sh --space-name wds2`
+    
+    Optionally, check the prometheus service monitor objects for the WDS space:
 
     ```bash
     $ kubectl -n ks-monitoring get servicemonitor -l "app.kubernetes.io/part-of!=kube-prometheus-stack"
-    NAME                      AGE
-    ks-controller-manager     70m
-    ks-transport-controller   70m
-    wds-apiserver             70m
+    NAME                           AGE
+    wds1-apiserver                 64m
+    wds1-ks-controller-manager     64m
+    wds1-ks-transport-controller   64m
+    ```
+
+    b) ITS space:
+
+    ```bash
+    $ ./configure-metrics-its.sh
+    ```
+
+    If you have more than one ITS, you can run the above script with the `--space-name` flag. For example: `./configure-metrics-its.sh --space-name its2`
+    
+    Optionally, check the prometheus service monitor objects for the ITS space:
+
+    ```bash
+    $ kubectl -n ks-monitoring get servicemonitor -l "app.kubernetes.io/part-of!=kube-prometheus-stack"
+    NAME                           AGE
+    its1-apiserver                 64m
+    its1-status-addon-controller   64m
     ```
 
 
@@ -72,10 +93,11 @@ This example shows how to deploy monitoring tools (Prometheus, Grafana and Pyros
 
     a) WDS API Server: input into the following text boxes.
     - `SpaceNS`: name of the KubeStellar space namespace, e.g., *wds1-system*, *wds2-system*, etc.
-    - `SpaceName`: name of the KubeStellar space, e.g., *wds1*, *wds2*, etc.
+    - `APIService`: name of the service for the KS spaces APIserver, e.g., *vcluster*, *wds1*, *wds2*, etc.
 
         <img src="images/wds-apiserver-monitoring.png" width="60%" height="80%" title="wds-apiserver-monitoring"> 
 
+    Note: you can also monitor the APIserver of the hosting cluster using the following values: `SpaceNS: default` and `APIService: apiserver`
 
     b) KubeStellar controllers: input into the following text box and drop-down menu. 
 

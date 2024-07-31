@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: %WDS%-ks-transport-controller
+  name: %ITS%-status-addon-controller
 spec:
   endpoints:
   - interval: 5s
@@ -10,7 +10,7 @@ spec:
     scheme: http
   namespaceSelector:
     matchNames:
-    - %WDS%-system
+    - %ITS%-system
   selector:
     matchLabels:
-      app: ks-transport-controller
+      app: status-addon-controller

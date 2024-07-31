@@ -1,12 +1,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: kube-rbac-proxy
+  name: %ITS%-apiserver
   labels:
-    app: kube-rbac-proxy
+    app: %ITS%-apiserver
 spec:
   endpoints:
-  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  - bearerTokenSecret:
+      name: prometheus-%ITS%-secret
+      key: token
     interval: 5s
     path: /metrics
     port: https
@@ -15,7 +17,7 @@ spec:
       insecureSkipVerify: true
   namespaceSelector:
     matchNames:
-    - %WDS_NS%
+    - %ITS%-system
   selector:
     matchLabels:
-      app: kube-rbac-proxy
+      its-app: kube-apiserver

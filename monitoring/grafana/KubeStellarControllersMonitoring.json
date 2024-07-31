@@ -18,12 +18,12 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 7,
+  "id": 2,
   "links": [],
   "panels": [
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -83,32 +83,7 @@
           },
           "unit": "s"
         },
-        "overrides": [
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "75th 10.244.0.17:8090 transport-controller"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": true
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
@@ -137,17 +112,30 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "exemplar": false,
+          "exemplar": true,
           "expr": "histogram_quantile(0.99, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{namespace=\"$SpaceNS\", job=\"$KSController\"}[5m])))",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
           "interval": "",
-          "legendFormat": "90th {{instance}} {{name}}",
+          "legendFormat": "99th {{instance}} {{name}}",
           "range": true,
           "refId": "A",
           "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-test"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.75, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{namespace=\"$SpaceNS\", job=\"$KSController\"}[5m])))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "75th {{instance}} {{name}}",
+          "range": true,
+          "refId": "B"
         },
         {
           "datasource": {
@@ -160,7 +148,7 @@
           "instant": false,
           "legendFormat": "50th {{instance}} {{name}}",
           "range": true,
-          "refId": "B"
+          "refId": "C"
         },
         {
           "datasource": {
@@ -172,19 +160,6 @@
           "hide": false,
           "instant": false,
           "legendFormat": "25th {{instance}} {{name}}",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-test"
-          },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{namespace=\"$SpaceNS\", job=\"$KSController\"}[5m])))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "75th {{instance}} {{name}}",
           "range": true,
           "refId": "D"
         }
@@ -300,6 +275,7 @@
         "type": "prometheus",
         "uid": "prometheus-test"
       },
+      "description": "averaged over the last 5 minutes",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -393,7 +369,7 @@
           "useBackend": false
         }
       ],
-      "title": "99th Percentile of Latencies on Requests to the API server.",
+      "title": "99th Percentile of Latencies on Requests to the API server",
       "type": "timeseries"
     },
     {
@@ -548,7 +524,7 @@
           "useBackend": false
         }
       ],
-      "title": "Rate of HTTP Client Requests from KS Controller by HTTP Response Code.",
+      "title": "Rate of HTTP Client Requests from KS Controller by HTTP Response Code",
       "type": "timeseries"
     },
     {
@@ -825,6 +801,6 @@
   "timezone": "browser",
   "title": "KubeStellar Controllers Monitoring",
   "uid": "edrgjjlt1oagwe",
-  "version": 9,
+  "version": 5,
   "weekStart": ""
 }
