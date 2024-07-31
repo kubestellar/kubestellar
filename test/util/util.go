@@ -613,6 +613,7 @@ func Expect1PodOfEach(ctx context.Context, client *kubernetes.Clientset, ns stri
 }
 
 func ScaleDeployment(ctx context.Context, client *kubernetes.Clientset, ns string, name string, target int32) error {
+	ginkgo.GinkgoHelper()
 	ginkgo.By(fmt.Sprintf("Scale Deployment %q in namespace %q to %d", name, ns, target))
 	gotSc, err := client.AppsV1().Deployments(ns).GetScale(ctx, name, metav1.GetOptions{})
 	if err != nil {
@@ -620,45 +621,30 @@ func ScaleDeployment(ctx context.Context, client *kubernetes.Clientset, ns strin
 	}
 	gotSc.Spec.Replicas = target
 	_, err = client.AppsV1().Deployments(ns).UpdateScale(ctx, name, gotSc, metav1.UpdateOptions{})
-	if err != nil {
-		return err
-	}
-	gomega.EventuallyWithOffset(1, func() error {
+	return err
+}
+
+func WaitForDepolymentAvailability(ctx context.Context, client kubernetes.Interface, ns string, name string) {
+	ginkgo.GinkgoHelper()
+	var target int32
+	gomega.Eventually(func() error {
 		gotDeploy, err := client.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
-		labelSelector := metav1.FormatLabelSelector(gotDeploy.Spec.Selector)
-		podList, err := client.CoreV1().Pods(ns).List(ctx, metav1.ListOptions{
-			LabelSelector: labelSelector,
-		})
-		if err != nil {
-			return err
+		if gotDeploy.Generation != gotDeploy.Status.ObservedGeneration {
+			return fmt.Errorf("got Status.ObservedGeneration=%d but Generation=%d", gotDeploy.Status.ObservedGeneration, gotDeploy.Generation)
 		}
-		if len(podList.Items) != int(target) {
-			return fmt.Errorf("pod count not converged yet")
+		if gotDeploy.Spec.Replicas == nil {
+			return fmt.Errorf("desired number of replicas is not set")
 		}
-		if gotDeploy.Status.AvailableReplicas != target {
-			return fmt.Errorf("AvailableReplicas not converged yet")
+		target = *gotDeploy.Spec.Replicas
+		if gotDeploy.Status.AvailableReplicas != *gotDeploy.Spec.Replicas {
+			return fmt.Errorf("got Status.AvailableReplicas=%d but Spec.Replicas=%d", gotDeploy.Status.AvailableReplicas, *gotDeploy.Spec.Replicas)
 		}
 		return nil
 	}, timeout).Should(gomega.Succeed())
-	ginkgo.GinkgoWriter.Printf("Scaled Deployment %q in namespace %q to %d\n", name, ns, target)
-	return nil
-}
-
-func ExpectDepolymentAvailability(ctx context.Context, client *kubernetes.Clientset, ns string, name string) {
-	gomega.EventuallyWithOffset(1, func() error {
-		deploy, err := client.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
-		if err != nil {
-			return err
-		}
-		if deploy.Status.AvailableReplicas <= 0 {
-			return fmt.Errorf("deployment %q in namespace %q is not available", name, ns)
-		}
-		return nil
-	}, timeout).Should(gomega.Succeed())
-	ginkgo.GinkgoWriter.Printf("Deployment %q in namespace %q is available\n", name, ns)
+	ginkgo.GinkgoWriter.Printf("Deployment %q in namespace %q has desired AvailableReplicas=%d\n", name, ns, target)
 }
 
 func ReadContainerArgsInDeployment(ctx context.Context, client *kubernetes.Clientset, ns string, deploymentName string, containerName string) []string {
