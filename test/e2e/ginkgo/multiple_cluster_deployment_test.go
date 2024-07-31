@@ -199,7 +199,63 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 		})
 
-		ginkgo.It("shards a wrapped workload when needed", func(ctx context.Context) {
+		ginkgo.It("shards a wrapped workload based on max-num-wrapped", func(ctx context.Context) {
+			util.DeleteDeployment(ctx, wds, ns, "nginx")
+			originalArgs := util.ReadContainerArgsInDeployment(ctx, coreCluster, "wds1-system", "transport-controller", "transport-controller")
+			originalArgsBytes, err := json.Marshal(originalArgs)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			originalArgsPatch := []byte(fmt.Sprintf(`{"spec":{"template":{"spec":{"containers":[{"args":%s,"name":"transport-controller"}]}}}}`, string(originalArgsBytes)))
+			changedArgs := append(originalArgs, "--max-num-wrapped=1000")
+			changedArgsBytes, err := json.Marshal(changedArgs)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			changedArgsPatch := []byte(fmt.Sprintf(`{"spec":{"template":{"spec":{"containers":[{"args":%s,"name":"transport-controller"}]}}}}`, string(changedArgsBytes)))
+
+			ginkgo.By("setting max num of wrapped object to 2")
+			ginkgo.DeferCleanup(func(ctx context.Context) {
+				_, err = coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "transport-controller", types.StrategicMergePatchType, originalArgsPatch, metav1.PatchOptions{})
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			})
+			_, err = coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "transport-controller", types.StrategicMergePatchType, changedArgsPatch, metav1.PatchOptions{})
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.WaitForDepolymentAvailability(ctx, coreCluster, "wds1-system", "transport-controller")
+
+			var names = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
+			for _, i := range names {
+				util.CreateDeployment(ctx, wds, ns, i,
+					map[string]string{
+						"label1": "test1",
+					})
+			}
+			util.CreateBindingPolicy(ctx, ksWds, "multipledep",
+				[]metav1.LabelSelector{
+					{MatchLabels: map[string]string{"name": "cluster1"}},
+				},
+				[]ksapi.DownsyncPolicyClause{
+					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
+						ObjectSelectors: []metav1.LabelSelector{
+							{MatchLabels: map[string]string{"label1": "test1"}},
+						},
+					}},
+				},
+			)
+
+			util.ValidateNumDeployments(ctx, wec1, ns, 10)
+			util.ValidateNumDeployments(ctx, wec2, ns, 0)
+
+			ginkgo.By("update to bindingpolicy object with sharded wrapped workloads updates deployments")
+			BPPatch := []byte(`{"spec": {"clusterSelectors": [{"matchLabels": {"name": "cluster2"}}]}}`)
+			_, err = ksWds.ControlV1alpha1().BindingPolicies().Patch(ctx, "multipledep", types.MergePatchType, BPPatch, metav1.PatchOptions{})
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ValidateNumDeployments(ctx, wec1, ns, 0)
+			util.ValidateNumDeployments(ctx, wec2, ns, 10)
+
+			ginkgo.By("delete of bindingpolicy with sharded wrapped workloads deletes deployments")
+			util.DeleteBindingPolicy(ctx, ksWds, "multipledep")
+			util.ValidateNumDeployments(ctx, wec1, ns, 0)
+			util.ValidateNumDeployments(ctx, wec2, ns, 0)
+		})
+
+		ginkgo.It("shards a wrapped workload based on max-size-wrapped", func(ctx context.Context) {
 			util.DeleteDeployment(ctx, wds, ns, "nginx")
 			originalArgs := util.ReadContainerArgsInDeployment(ctx, coreCluster, "wds1-system", "transport-controller", "transport-controller")
 			originalArgsBytes, err := json.Marshal(originalArgs)
