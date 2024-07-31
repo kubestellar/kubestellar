@@ -209,30 +209,13 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			changedArgsBytes, err := json.Marshal(changedArgs)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			changedArgsPatch := []byte(fmt.Sprintf(`{"spec":{"template":{"spec":{"containers":[{"args":%s,"name":"transport-controller"}]}}}}`, string(changedArgsBytes)))
-			var scaledDown, mwLimited bool
-			ginkgo.DeferCleanup(func(ctx context.Context) {
-				if mwLimited {
-					_, err = coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "transport-controller", types.StrategicMergePatchType, originalArgsPatch, metav1.PatchOptions{})
-					gomega.Expect(err).NotTo(gomega.HaveOccurred())
-				}
-				if scaledDown {
-					err = util.ScaleDeployment(ctx, coreCluster, "wds1-system", "transport-controller", 1)
-					gomega.Expect(err).NotTo(gomega.HaveOccurred())
-				}
-			})
-
-			ginkgo.By("stopping the transport controller")
-			scaledDown = true
-			err = util.ScaleDeployment(ctx, coreCluster, "wds1-system", "transport-controller", 0)
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			util.WaitForDepolymentAvailability(ctx, coreCluster, "wds1-system", "transport-controller")
 
 			ginkgo.By("setting max size of wrapped object to 1000 bytes")
-			mwLimited = true
+			ginkgo.DeferCleanup(func(ctx context.Context) {
+				_, err = coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "transport-controller", types.StrategicMergePatchType, originalArgsPatch, metav1.PatchOptions{})
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			})
 			_, err = coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "transport-controller", types.StrategicMergePatchType, changedArgsPatch, metav1.PatchOptions{})
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			ginkgo.By("restarting the transport controller")
-			err = util.ScaleDeployment(ctx, coreCluster, "wds1-system", "transport-controller", 1)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			util.WaitForDepolymentAvailability(ctx, coreCluster, "wds1-system", "transport-controller")
 

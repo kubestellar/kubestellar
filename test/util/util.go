@@ -642,6 +642,9 @@ func WaitForDepolymentAvailability(ctx context.Context, client kubernetes.Interf
 		if gotDeploy.Status.AvailableReplicas != *gotDeploy.Spec.Replicas {
 			return fmt.Errorf("got Status.AvailableReplicas=%d but Spec.Replicas=%d", gotDeploy.Status.AvailableReplicas, *gotDeploy.Spec.Replicas)
 		}
+		if gotDeploy.Status.UnavailableReplicas != 0 {
+			return fmt.Errorf("got UnavailableReplicas=%d", gotDeploy.Status.UnavailableReplicas)
+		}
 		return nil
 	}, timeout).Should(gomega.Succeed())
 	ginkgo.GinkgoWriter.Printf("Deployment %q in namespace %q has desired AvailableReplicas=%d\n", name, ns, target)
