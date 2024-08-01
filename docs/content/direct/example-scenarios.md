@@ -35,14 +35,14 @@ Expect to get a listing of your two `ManagedCluster` objects.
 Create a BindingPolicy to deliver an app to all clusters in the WDS:
 
 ```shell
-kubectl --context "$wec1_context" apply -f - <<EOF
+kubectl --context "$wds_context" apply -f - <<EOF
 apiVersion: control.kubestellar.io/v1alpha1
 kind: BindingPolicy
 metadata:
   name: nginx-bpolicy
 spec:
   clusterSelectors:
-  - matchLabels: {$(echo "$label_query_both" | tr , $'\n' | while IFS="=" read key val; do echo -n ", \"$key\": \"$val\""; done | tail +3c)}
+  - matchLabels: {$(echo "$label_query_both" | tr , $'\n' | while IFS="=" read key val; do echo -n ", \"$key\": \"$val\""; done | tail -c +3)}
   downsync:
   - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx"}
@@ -226,7 +226,7 @@ metadata:
   name: aw-bpolicy
 spec:
   clusterSelectors:
-  - matchLabels: {$(echo "$label_query_both" | tr , $'\n' | while IFS="=" read key val; do echo -n ", \"$key\": \"$val\""; done | tail +3c)}
+  - matchLabels: {$(echo "$label_query_both" | tr , $'\n' | while IFS="=" read key val; do echo -n ", \"$key\": \"$val\""; done | tail -c +3)}
   downsync:
   - objectSelectors:
     - matchLabels: {"app.kubernetes.io/part-of":"my-appwrapper-app"}
@@ -290,7 +290,7 @@ metadata:
   name: postgres-bpolicy
 spec:
   clusterSelectors:
-  - matchLabels: {$(echo "$label_query_both" | tr , $'\n' | while IFS="=" read key val; do echo -n ", \"$key\": \"$val\""; done | tail +3c)}
+  - matchLabels: {$(echo "$label_query_both" | tr , $'\n' | while IFS="=" read key val; do echo -n ", \"$key\": \"$val\""; done | tail -c +3)}
   downsync:
   - objectSelectors:
     - matchLabels: {
@@ -476,7 +476,7 @@ metadata:
   name: nginx-res-bpolicy
 spec:
   clusterSelectors:
-  - matchLabels: {$(echo "$label_query_both" | tr , $'\n' | while IFS="=" read key val; do echo -n ", \"$key\": \"$val\""; done | tail +3c)}
+  - matchLabels: {$(echo "$label_query_both" | tr , $'\n' | while IFS="=" read key val; do echo -n ", \"$key\": \"$val\""; done | tail -c +3)}
   downsync:
   - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx-res"}
@@ -550,7 +550,7 @@ metadata:
   name: argocd-sa-bpolicy
 spec:
   clusterSelectors:
-  - matchLabels: {$(echo "$label_query_both" | tr , $'\n' | while IFS="=" read key val; do echo -n ", \"$key\": \"$val\""; done | tail +3c)}
+  - matchLabels: {$(echo "$label_query_both" | tr , $'\n' | while IFS="=" read key val; do echo -n ", \"$key\": \"$val\""; done | tail -c +3)}
   downsync:
   - objectSelectors:
     - matchLabels: {"argocd.argoproj.io/instance":"nginx-sa"}
