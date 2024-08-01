@@ -445,8 +445,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 				}
 				if scaledDown {
-					err = util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 1)
-					gomega.Expect(err).NotTo(gomega.HaveOccurred())
+					util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 1)
 				}
 			})
 
@@ -458,16 +457,14 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			// without surrounding by scaling down and then up the CM Deployment
 			// leads to the later patch to the nginx-singleton BindingPolicy
 			// triggering the nginx-singleton Deployment's Status being zeroed.
-			err = util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 0)
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 0)
 			util.WaitForDepolymentAvailability(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager")
 			ginkgo.By("reconfiguring the kubestellar controller-manager to not run the status controller")
 			changedArgsPatch := []byte(fmt.Sprintf(`{"spec":{"template":{"spec":{"containers":[{"args":%s,"name":"manager"}]}}}}`, string(changedArgsBytes)))
 			semiCrashed = true
 			_, err = coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "kubestellar-controller-manager", types.StrategicMergePatchType, changedArgsPatch, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			err = util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 1)
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 1)
 			scaledDown = false
 			util.WaitForDepolymentAvailability(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager")
 			util.ValidateSingletonStatusNonZeroValue(ctx, wds, ns, "nginx-singleton")
@@ -484,15 +481,13 @@ var _ = ginkgo.Describe("end to end testing", func() {
 
 			scaledDown = true
 			// Restart the controller manager normally.
-			err = util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 0)
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 0)
 			util.WaitForDepolymentAvailability(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager")
 			ginkgo.By("restoring normal configuration of the kubestellar controller-manager")
 			_, err = coreCluster.AppsV1().Deployments("wds1-system").Patch(ctx, "kubestellar-controller-manager", types.StrategicMergePatchType, originalArgsPatch, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			semiCrashed = false
-			err = util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 1)
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ScaleDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", 1)
 			scaledDown = false
 			util.WaitForDepolymentAvailability(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager")
 

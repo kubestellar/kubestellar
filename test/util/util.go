@@ -633,16 +633,18 @@ func Expect1PodOfEach(ctx context.Context, client *kubernetes.Clientset, ns stri
 	ginkgo.By(fmt.Sprintf("Waited for ready pods in namespace %q with name prefixes %v", ns, namePrefixes))
 }
 
-func ScaleDeployment(ctx context.Context, client *kubernetes.Clientset, ns string, name string, target int32) error {
+func ScaleDeployment(ctx context.Context, client *kubernetes.Clientset, ns string, name string, target int32) {
 	ginkgo.GinkgoHelper()
 	ginkgo.By(fmt.Sprintf("Scale Deployment %q in namespace %q to %d", name, ns, target))
-	gotSc, err := client.AppsV1().Deployments(ns).GetScale(ctx, name, metav1.GetOptions{})
-	if err != nil {
+	gomega.Eventually(ctx, func(ctx context.Context) error {
+		gotSc, err := client.AppsV1().Deployments(ns).GetScale(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+		gotSc.Spec.Replicas = target
+		_, err = client.AppsV1().Deployments(ns).UpdateScale(ctx, name, gotSc, metav1.UpdateOptions{})
 		return err
-	}
-	gotSc.Spec.Replicas = target
-	_, err = client.AppsV1().Deployments(ns).UpdateScale(ctx, name, gotSc, metav1.UpdateOptions{})
-	return err
+	}, timeout).Should(gomega.Succeed())
 }
 
 func WaitForDepolymentAvailability(ctx context.Context, client kubernetes.Interface, ns string, name string) {
