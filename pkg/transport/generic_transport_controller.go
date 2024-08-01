@@ -92,7 +92,7 @@ func NewTransportController(ctx context.Context,
 	propCfgMapPreInformer corev1informers.ConfigMapInformer,
 	transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface,
-	maxSizeWrappedObject int, wdsName string) (*genericTransportController, error) {
+	maxSizeWrapped int, maxNumWrapped int, wdsName string) (*genericTransportController, error) {
 	var emptyWrappedObject runtime.Object
 	if t2, is := transport.(TransportWithCreateOnly); is {
 		emptyWrappedObject = t2.WrapObjectsHavingCreateOnly(make([]Wrapee, 0)) // empty wrapped object to get GVR from it.
@@ -103,7 +103,7 @@ func NewTransportController(ctx context.Context,
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
 	}
-	return NewTransportControllerForWrappedObjectGVR(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer, bindingClient, bindingInformer, customTransformInformer, transport, wdsClientset, wdsDynamicClient, itsNSClient, propCfgMapPreInformer, transportDynamicClient, maxSizeWrappedObject, wdsName, wrappedObjectGVR), nil
+	return NewTransportControllerForWrappedObjectGVR(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer, bindingClient, bindingInformer, customTransformInformer, transport, wdsClientset, wdsDynamicClient, itsNSClient, propCfgMapPreInformer, transportDynamicClient, maxSizeWrapped, maxNumWrapped, wdsName, wrappedObjectGVR), nil
 }
 
 // NewTransportControllerForWrappedObjectGVR returns a new transport controller.
@@ -120,7 +120,8 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 	itsNSClient corev1client.NamespaceInterface,
 	propCfgMapPreInformer corev1informers.ConfigMapInformer,
 	transportDynamicClient dynamic.Interface,
-	maxSizeWrappedObject int,
+	maxSizeWrapped int,
+	maxNumWrapped int,
 	wdsName string, wrappedObjectGVR schema.GroupVersionResource) *genericTransportController {
 	measuredBindingClient := ksmetrics.NewWrappedClusterScopedClient[*v1alpha1.Binding, *v1alpha1.BindingList](wdsClientMetrics, util.GetBindingGVR(), bindingClient)
 	measuredWDSDynamicClient := ksmetrics.NewWrappedDynamicClient(wdsClientMetrics, wdsDynamicClient)
@@ -181,7 +182,8 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 		transportClient:              measuredITSDynamicClient,
 		wrappedObjectGVR:             wrappedObjectGVR,
 		wdsDynamicClient:             measuredWDSDynamicClient,
-		MaxSizeWrappedObject:         maxSizeWrappedObject,
+		MaxSizeWrapped:               maxSizeWrapped,
+		MaxNumWrapped:                maxNumWrapped,
 		wdsName:                      wdsName,
 		bindingSensitiveDestinations: make(map[string]sets.Set[v1alpha1.Destination]),
 		destinationProperties:        make(map[v1alpha1.Destination]clusterProperties),
@@ -347,9 +349,10 @@ type genericTransportController struct {
 	transportClient  dynamic.Interface // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
-	wdsDynamicClient     dynamic.Interface
-	MaxSizeWrappedObject int
-	wdsName              string
+	wdsDynamicClient dynamic.Interface
+	MaxSizeWrapped   int
+	MaxNumWrapped    int
+	wdsName          string
 
 	customTransformCollection customTransformCollection
 
@@ -886,20 +889,22 @@ func (c *genericTransportController) wrapBatch(batchToPropagate []Wrapee, bindin
 func (c *genericTransportController) wrap(wrapeesToPropagate []Wrapee, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
 	var wrappedObjects []*unstructured.Unstructured
 	var batchToPropagate []Wrapee = nil
-	maxBatchSize := c.MaxSizeWrappedObject
+	maxSize := c.MaxSizeWrapped
+	maxCount := c.MaxNumWrapped
 	isSharded := false
 	numShard := 0
 	var batchSize int = 0
+	var batchCount int = 0
 	for _, obj := range wrapeesToPropagate {
 		bytes, err := obj.Object.MarshalJSON()
 		if err != nil {
 			return nil, err
 		}
 		objSize := len(bytes)
-		if objSize > maxBatchSize {
+		if objSize > maxSize {
 			return nil, fmt.Errorf("failed to wrap object that is larger than max size")
 		}
-		if objSize+batchSize >= maxBatchSize {
+		if (objSize+batchSize >= maxSize) || (batchCount+1 > maxCount) {
 			isSharded = true
 			wrappedObject, err := c.wrapBatch(batchToPropagate, binding, numShard, isSharded)
 			if err != nil {
@@ -909,9 +914,11 @@ func (c *genericTransportController) wrap(wrapeesToPropagate []Wrapee, binding *
 			wrappedObjects = append(wrappedObjects, wrappedObject)
 			batchToPropagate = nil
 			batchSize = 0
+			batchCount = 0
 		}
 		batchToPropagate = append(batchToPropagate, obj)
 		batchSize += objSize
+		batchCount += 1
 	}
 	if batchToPropagate != nil {
 		wrappedObject, err := c.wrapBatch(batchToPropagate, binding, numShard, isSharded)
