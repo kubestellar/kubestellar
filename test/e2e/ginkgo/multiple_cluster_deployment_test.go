@@ -205,7 +205,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			originalArgsBytes, err := json.Marshal(originalArgs)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			originalArgsPatch := []byte(fmt.Sprintf(`{"spec":{"template":{"spec":{"containers":[{"args":%s,"name":"transport-controller"}]}}}}`, string(originalArgsBytes)))
-			changedArgs := append(originalArgs, "--max-num-wrapped=1000")
+			changedArgs := append(originalArgs, "--max-num-wrapped=2")
 			changedArgsBytes, err := json.Marshal(changedArgs)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			changedArgsPatch := []byte(fmt.Sprintf(`{"spec":{"template":{"spec":{"containers":[{"args":%s,"name":"transport-controller"}]}}}}`, string(changedArgsBytes)))
@@ -239,6 +239,10 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				},
 			)
 
+			// Expect addon-addon-status-deploy-0  and nginx-wds1 manifest works on both clusters.
+			// And the 5 manifestworks for the deployment on cluster1.
+			util.ValidateNumManifestworks(ctx, its, "cluster1", 7)
+			util.ValidateNumManifestworks(ctx, its, "cluster2", 2)
 			util.ValidateNumDeployments(ctx, wec1, ns, 10)
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 
@@ -246,11 +250,18 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			BPPatch := []byte(`{"spec": {"clusterSelectors": [{"matchLabels": {"name": "cluster2"}}]}}`)
 			_, err = ksWds.ControlV1alpha1().BindingPolicies().Patch(ctx, "multipledep", types.MergePatchType, BPPatch, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			// Expect addon-addon-status-deploy-0  and nginx-wds1 manifest works on both clusters.
+			// And the 5 manifestworks for the deployment on cluster2.
+			util.ValidateNumManifestworks(ctx, its, "cluster1", 2)
+			util.ValidateNumManifestworks(ctx, its, "cluster2", 7)
 			util.ValidateNumDeployments(ctx, wec1, ns, 0)
 			util.ValidateNumDeployments(ctx, wec2, ns, 10)
 
 			ginkgo.By("delete of bindingpolicy with sharded wrapped workloads deletes deployments")
 			util.DeleteBindingPolicy(ctx, ksWds, "multipledep")
+			// Expect addon-addon-status-deploy-0  and nginx-wds1 manifest works on both clusters.
+			util.ValidateNumManifestworks(ctx, its, "cluster1", 2)
+			util.ValidateNumManifestworks(ctx, its, "cluster2", 2)
 			util.ValidateNumDeployments(ctx, wec1, ns, 0)
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 		})
@@ -261,7 +272,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			originalArgsBytes, err := json.Marshal(originalArgs)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			originalArgsPatch := []byte(fmt.Sprintf(`{"spec":{"template":{"spec":{"containers":[{"args":%s,"name":"transport-controller"}]}}}}`, string(originalArgsBytes)))
-			changedArgs := append(originalArgs, "--max-size-wrapped-object=1000")
+			changedArgs := append(originalArgs, "--max-size-wrapped=1000")
 			changedArgsBytes, err := json.Marshal(changedArgs)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			changedArgsPatch := []byte(fmt.Sprintf(`{"spec":{"template":{"spec":{"containers":[{"args":%s,"name":"transport-controller"}]}}}}`, string(changedArgsBytes)))
