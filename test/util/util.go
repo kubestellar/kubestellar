@@ -32,7 +32,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -99,7 +99,7 @@ func CreateNS(ctx context.Context, client *kubernetes.Clientset, name string) {
 		},
 	}
 	_, err := client.CoreV1().Namespaces().Create(ctx, nsObj, metav1.CreateOptions{})
-	if errors.IsAlreadyExists(err) {
+	if k8serrors.IsAlreadyExists(err) {
 		err = nil
 	}
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -584,7 +584,7 @@ func DeletePods(ctx context.Context, client *kubernetes.Clientset, ns string, na
 		problems := map[string]error{}
 		for podName := range stillNeedsDelete {
 			err := client.CoreV1().Pods(ns).Delete(ctx, podName, metav1.DeleteOptions{})
-			if err == nil || errors.IsNotFound(err) {
+			if err == nil || k8serrors.IsNotFound(err) {
 				delete(stillNeedsDelete, podName)
 			} else {
 				problems[podName] = err
@@ -597,7 +597,7 @@ func DeletePods(ctx context.Context, client *kubernetes.Clientset, ns string, na
 		remaining := map[string]types.UID{}
 		for podName, podUID := range goners {
 			pod, err := client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
-			if err == nil && pod.UID == podUID || err != nil && !errors.IsNotFound(err) {
+			if err == nil && pod.UID == podUID || err != nil && !k8serrors.IsNotFound(err) {
 				remaining[pod.Name] = pod.UID
 			}
 		}
