@@ -13,4 +13,3 @@ datasources:
      type: prometheus
      uid: prometheus-test
      url: http://prometheus-kube-prometheus-prometheus.ks-monitoring.svc.cluster.local:9090
-  
