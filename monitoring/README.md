@@ -1,112 +1,87 @@
-# Monitoring Tools for KubeStellar (Prometheus, Grafana and Node Exporter)
+# Monitoring Tools for KubeStellar Control Plane
 
-<img src="images/kubestellar-architecture-aws.png" width="200%" height="200%" title="kubestellar-architecture-aws">
+<img src="images/ks-monitoring-setup.png" width="80%" height="80%" title="kubestellar-monitoring-setup">
 
 
 ### Description
-This example shows how to deploy monitoring tools (Prometheus, Grafana and node exporter) for KubeStellar components (core and edge regions) - see architecture image above. Prometheus server is deployed in the core region running the KCP server alongside the components for KCP edge. A Prometheus agent is deployed in the edge regions running the edge workload execution cluster (wec)
+This example shows how to deploy monitoring tools (Prometheus, Grafana and Pyroscope) for KubeStellar control plane components - see architecture image above. These instructions can be used to deploy monitoring tools to any KubeStellar system. If you already have the monitoring tools installed in your environment, you can skip to `step-2`.
 
-1. Create your hosts file with the list of target hosts (KCP server & Edge Workload Execution Clusters (WEC))
+1. Install the monitoring tools:
 
-```
-[kcp-server]
-192.168.56.2
+    Starting from a local directory containing the git repo, do the following:
 
-[edge-wecs]
-192.160.56.10
-192.160.56.12
-```
+    ```bash
+    $ cd monitoring
+    $ ./install-ks-monitoring.sh
+    ```
 
-2. Configure the Prometheus targets endpoints:
+    Optionally, check the deployment of the monitoring tools:
 
-a) Prometheus Server: edit the file roles/prometheus/templates/prometheus-config.yaml.j2
+    ```bash
+    $ kubectl -n ks-monitoring get pods
+    NAME                                                  READY   STATUS    RESTARTS   AGE
+    grafana-7969f6cf5c-lp4g6                              1/1     Running   0          66s
+    prometheus-kube-prometheus-operator-b56d747c9-wfs2w   1/1     Running   0          42s
+    prometheus-prometheus-kube-prometheus-prometheus-0    2/2     Running   0          39s
+    pyroscope-0                                           1/1     Running   0          90s
+    pyroscope-alloy-0                                     2/2     Running   0          90s
+    ```
 
-```
-global:
-  evaluation_interval: 5s
-  external_labels:
-    env: dev
-  scrape_interval: 30s
-scrape_configs:
-- job_name: mailbox-controller
-  scrape_interval: 15s
-  metrics_path: /metrics
-  static_configs:
-  - targets:
-    - '<host-ipAddress>:10203'
+2. Configure Prometheus and Pyroscope to scrape your KubeStellar spaces:
 
-- job_name: node-exporter
-  scrape_interval: 15s
-  metrics_path: /metrics
-  static_configs:
-  - targets:
-    - '<host-ipAddress>:9100'
+    ```bash
+    $ ./configure-metrics-tools.sh
+    ```
 
-- job_name: kcp
-  scrape_interval: 15s
-  scheme: https
-  metrics_path: /metrics
-  tls_config:
-    insecure_skip_verify: true
-  static_configs:
-  - targets:
-    - '<host-ipAddress>:6443'
+    Optionally, check the prometheus service monitor objects:
 
-```
+    ```bash
+    $ kubectl -n ks-monitoring get servicemonitor -l "app.kubernetes.io/part-of!=kube-prometheus-stack"
+    NAME                      AGE
+    ks-controller-manager     70m
+    ks-transport-controller   70m
+    wds-apiserver             70m
+    ```
 
 
-b) Prometheus Agent: edit the file roles/prometheus/templates/prometheus-agent-config.yaml.j2
+3. Connect to Grafana UI: 
 
-```
-# my global config
-global:
-  scrape_interval: 15s
-  evaluation_interval: 15s 
-scrape_configs:
-  - job_name: "prometheus-agent"
+    a) Port-forward Grafana to localhost, by using the kubectl command:
 
-    static_configs:
-      - targets: ["{{ ansible_default_ipv4.address }}:<port_number>"]
-remote_write:
-  - url: "http://<prometheus-server-ip-address>:<port_number>/api/v1/write"
-```
+    ```bash
+    $ kubectl port-forward -n ks-monitoring svc/grafana 3000:80
+    ```
+
+    b) Check Prometheus and Pyroscope data source configuration: in a browser, go to the Grafana server at http://localhost:3000 and on the left-hand side, go to Home > Connections > Data sources.
+
+    <img src="images/grafana-data-sources.png" width="60%" height="60%" title="grafana-data-sources">
 
 
-3. Install Prometheus server, grafana and node exporter to the KCP server host using the following playbook:
+4. Import KubeStellar Grafana dashboards into the Grafana UI:
 
-```
-- hosts: kcp-server
-  remote_user: ubuntu
-  become: yes
-  gather_facts: yes
-  connection: ssh
-  tasks:
-  roles:
-    - node-exporter
-    - prometheus
-    - grafana
-```
+    a) Click `Dashboards` in the primary menu
 
-```
-ansible-playbook -i hosts monitoring-kcpServer.yaml
-```
+    b) Click `New` and select `Import` in the drop-down menu
 
-4. Install Prometheus agent and node exporter to an edge workload execution cluster (wec) using the following playbook:
+    c) Upload the dashboard JSON files from your local `./grafana` sub-directory into the Grafana UI. You should be able to see the following dashboards:
 
-```
-- hosts: edge-wecs
-  remote_user: ubuntu
-  become: yes
-  gather_facts: yes
-  connection: ssh
-  vars:
-   agent: 'yes'
-  tasks:
-  roles:
-    - node-exporter
-    - prometheus
-```
+    <img src="images/grafana-dashboard-view.png" width="60%" height="60%" title="grafana-dashboard-view">
 
-```
-ansible-playbook -i hosts monitoring-wec.yaml
-```
+
+5. View Grafana dashboard based on KubeStellar WDS space and controller component names:
+
+    a) WDS API Server: input into the following text boxes.
+    - `SpaceNS`: name of the KubeStellar space namespace, e.g., *wds1-system*, *wds2-system*, etc.
+    - `SpaceName`: name of the KubeStellar space, e.g., *wds1*, *wds2*, etc.
+
+        <img src="images/wds-apiserver-monitoring.png" width="60%" height="80%" title="wds-apiserver-monitoring"> 
+
+
+    b) KubeStellar controllers: input into the following text box and drop-down menu. 
+
+    - `SpaceNS`: name of the KubeStellar space namespace, e.g., *wds1-system*, *wds2-system*, etc.
+
+    - `KSController`: select the KubeStellar controller name. Available options from the drop-down menu: *ks-controller-manager*, *ks-transport-controller* and *status-addon-controller*. 
+
+        <img src="images/ks-controllers-monitoring.png" width="60%" height="80%" title="ks-controllers-monitoring">
+    
