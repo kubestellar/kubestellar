@@ -57,7 +57,3 @@ spec:
         - "--its-name={{.Values.ITSName}}"
         - "--api-groups={{.Values.APIGroups}}"
         - -v={{.Values.ControllerManager.Verbosity}}
-        ports:
-        - containerPort: 8082
-          protocol: TCP
-          name: debug-pprof
