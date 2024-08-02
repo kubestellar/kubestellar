@@ -568,7 +568,7 @@ kubectl config set-context --current --namespace=argocd
 Create a new application in ArgoCD:
 
 ```shell
-argocd app create nginx-sa --repo https://github.com/pdettori/sample-apps.git --path nginx --dest-server https://"${wds_cp}.{wds_cp}-system" --dest-namespace nginx-sa
+argocd app create nginx-sa --repo https://github.com/pdettori/sample-apps.git --path nginx --dest-server https://"${wds_cp}.${wds_cp}-system" --dest-namespace nginx-sa
 ```
 
 Open browser to Argo UI:
