@@ -39,7 +39,7 @@ spec:
         ports:
         - containerPort: 8443
           protocol: TCP
-          name: https
+          name: metrics
         resources:
           limits:
             cpu: 500m
@@ -51,8 +51,13 @@ spec:
         args:
         - "--health-probe-bind-address=:8081"
         - "--metrics-bind-address=127.0.0.1:8080"
+        - "--pprof-bind-address=:8082"
         - "--leader-elect"
         - "--wds-name={{.Values.ControlPlaneName}}"
         - "--its-name={{.Values.ITSName}}"
         - "--api-groups={{.Values.APIGroups}}"
         - -v={{.Values.ControllerManager.Verbosity}}
+        ports:
+        - containerPort: 8082
+          protocol: TCP
+          name: debug-pprof
