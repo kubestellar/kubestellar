@@ -65,10 +65,7 @@ sed s/%WDS_NS%/$wds-system/g ${SCRIPT_DIR}/configuration/ks-ctl-manager-sm.yaml 
 : --------------------------------------------------------------------
 : Configure kubestellar controller manager pod for pyroscope scraping
 : --------------------------------------------------------------------
-: 1. Adding declarations of the pprof port, so that kubestellar service definition can refer to it by name
-kubectl -n $wds-system get deploy kubestellar-controller-manager -o yaml | yq '(del(.status) |.spec.template.spec.containers.[1].ports[0].name |= "http")' | yq '.spec.template.spec.containers.[1].ports[0].protocol |= "TCP"' | yq '.spec.template.spec.containers.[1].ports[0].containerPort |= 8082' | kubectl --context $ctx apply --namespace=$wds-system -f -
-
-: 2. Add labels for pyroscope scraping:
+: 1. Add labels for pyroscope scraping:
 kubectl -n $wds-system get deploy kubestellar-controller-manager -o yaml | yq '.spec.template.metadata.annotations."profiles.grafana.com/cpu.port" |= "8082" |  .spec.template.metadata.annotations."profiles.grafana.com/cpu.scrape"|= "true" | .spec.template.metadata.annotations."profiles.grafana.com/goroutine.port" |= "8082" | .spec.template.metadata.annotations."profiles.grafana.com/goroutine.scrape" |= "true" |
 .spec.template.metadata.annotations."profiles.grafana.com/memory.port" |= "8082" | .spec.template.metadata.annotations."profiles.grafana.com/memory.scrape" |= "true"' | kubectl -n $wds-system apply -f -
 
