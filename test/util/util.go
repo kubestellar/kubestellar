@@ -490,7 +490,7 @@ func CleanupWDS(ctx context.Context, wds *kubernetes.Clientset, ksWds *ksClient.
 	DeleteAll[*appsv1.DeploymentList](ctx, wds.AppsV1().Deployments(ns), func(objList *appsv1.DeploymentList) []string {
 		return objectsToNames((*appsv1.Deployment).GetName, objList.Items)
 	})
-	Delete1By1[*corev1.ServiceList](ctx, wds.CoreV1().Services(ns), func(objList *corev1.ServiceList) []string {
+	Delete1By1[*corev1.ServiceList](ctx, "Service", wds.CoreV1().Services(ns), func(objList *corev1.ServiceList) []string {
 		return objectsToNames((*corev1.Service).GetName, objList.Items)
 	})
 	DeleteAll[*batchv1.JobList](ctx, wds.BatchV1().Jobs(ns), func(objList *batchv1.JobList) []string {
@@ -514,8 +514,9 @@ type ResourceCollectionInterface[ObjectListType metav1.ListInterface] interface 
 	List(ctx context.Context, opts metav1.ListOptions) (ObjectListType, error)
 }
 
-func Delete1By1[ObjectListType metav1.ListInterface](ctx context.Context, client ResourceInterface[ObjectListType], listNames func(ObjectListType) []string) {
+func Delete1By1[ObjectListType metav1.ListInterface](ctx context.Context, kind string, client ResourceInterface[ObjectListType], listNames func(ObjectListType) []string) {
 	ginkgo.GinkgoHelper()
+	iteration := 1
 	gomega.Eventually(func() error {
 		list, err := client.List(ctx, metav1.ListOptions{})
 		if err != nil {
@@ -525,13 +526,17 @@ func Delete1By1[ObjectListType metav1.ListInterface](ctx context.Context, client
 		if len(remaining) == 0 {
 			return nil
 		}
-		errs := []error{fmt.Errorf("some objects remain; their names are: %v", remaining)}
+		errs := []error{fmt.Errorf("some objects remained at start of iteration %d; their names are: %v", iteration, remaining)}
 		for _, objName := range remaining {
 			err := client.Delete(ctx, objName, metav1.DeleteOptions{})
 			if err != nil {
+				ginkgo.GinkgoLogr.Error(err, "Failed to delete an object", "iteration", iteration, "kind", kind, "name", objName)
 				errs = append(errs, err)
+			} else {
+				ginkgo.GinkgoLogr.Info("Deleted object", "iteration", iteration, "kind", kind, "name", objName)
 			}
 		}
+		iteration++
 		return goerrors.Join(errs...)
 	}, timeout/3).Should(gomega.Succeed())
 }
@@ -670,7 +675,7 @@ func WaitForDepolymentAvailability(ctx context.Context, client kubernetes.Interf
 		}
 		return nil
 	}, timeout).Should(gomega.Succeed())
-	ginkgo.GinkgoWriter.Printf("Deployment %q in namespace %q has desired AvailableReplicas=%d\n", name, ns, target)
+	ginkgo.GinkgoLogr.Info("Deployment has desired AvailableReplicas", "name", name, "namespace", ns, "target", target)
 }
 
 func ReadContainerArgsInDeployment(ctx context.Context, client *kubernetes.Clientset, ns string, deploymentName string, containerName string) []string {

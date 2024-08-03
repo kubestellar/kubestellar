@@ -429,7 +429,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, wec2, ns, 0)
 			util.ValidateSingletonStatus(ctx, wds, ns, "nginx-singleton")
 			util.ValidateSingletonStatusNonZeroValue(ctx, wds, ns, "nginx-singleton")
-			ginkgo.GinkgoWriter.Println("Singleton status synced")
+			ginkgo.GinkgoLogr.Info("Singleton status synced")
 
 			originalArgs := util.ReadContainerArgsInDeployment(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", "manager")
 			originalArgsBytes, err := json.Marshal(originalArgs)

@@ -306,7 +306,7 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 
 	// update resolutions sensitive to the workstatus
 	for _, resolutions := range c.bindingNameToResolutions {
-		resolution, exists := resolutions[workStatus.sourceObjectIdentifier]
+		resolution, exists := resolutions[workStatus.SourceObjectIdentifier]
 		if !exists {
 			continue
 		}
@@ -314,9 +314,9 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 		content := c.getCombinedContentMap(workStatus, resolution)
 
 		// this call logs errors, but does not return them for now
-		if resolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, content) {
+		if resolution.evaluateWorkStatus(c.celEvaluator, workStatus.WECName, content) {
 			combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
-				workStatus.sourceObjectIdentifier.ObjectName.Namespace))
+				workStatus.SourceObjectIdentifier.ObjectName.Namespace))
 		}
 	}
 
@@ -456,11 +456,11 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(bindin
 				continue
 			}
 
-			csResolution := c.bindingNameToResolutions[bindingName][workStatus.sourceObjectIdentifier]
+			csResolution := c.bindingNameToResolutions[bindingName][workStatus.SourceObjectIdentifier]
 			content := c.getCombinedContentMap(workStatus, csResolution)
 
 			// evaluate workstatus
-			if csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.wecName, content) {
+			if csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.WECName, content) {
 				combinedStatusesToQueue.Insert(util.IdentifierForCombinedStatus(csResolution.getName(),
 					workloadObjIdentifier.ObjectName.Namespace))
 			}
@@ -479,10 +479,10 @@ func (c *combinedStatusResolver) getCombinedContentMap(workStatus *workStatus,
 	}
 
 	if resolution.requiresSourceObjectMetaOrSpec() {
-		objMap, err := c.getObjectMetaAndSpec(workStatus.sourceObjectIdentifier)
+		objMap, err := c.getObjectMetaAndSpec(workStatus.SourceObjectIdentifier)
 		if err != nil {
 			runtime2.HandleError(fmt.Errorf("failed to get meta & spec for source object %s: %w",
-				workStatus.sourceObjectIdentifier, err))
+				workStatus.SourceObjectIdentifier, err))
 		}
 
 		content[sourceObjectKey] = objMap
@@ -602,6 +602,6 @@ func expressionPtrsEqual(e1, e2 *v1alpha1.Expression) bool {
 // inventoryForWorkStatus returns an inventory map for the given workstatus.
 func inventoryForWorkStatus(ws *workStatus) map[string]interface{} {
 	return map[string]interface{}{
-		"name": ws.wecName,
+		"name": ws.WECName,
 	}
 }
