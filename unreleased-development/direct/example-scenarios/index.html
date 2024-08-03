@@ -2440,14 +2440,14 @@
 <p>Expect to get a listing of your two <code>ManagedCluster</code> objects.</p>
 <h2 id="scenario-1-multi-cluster-workload-deployment-with-kubectl">Scenario 1 - multi-cluster workload deployment with kubectl<a class="headerlink" href="#scenario-1-multi-cluster-workload-deployment-with-kubectl" title="Permanent link">#</a></h2>
 <p>Create a BindingPolicy to deliver an app to all clusters in the WDS:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="s">apiVersion: control.kubestellar.io/v1alpha1</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="s">kind: BindingPolicy</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="s">  name: nginx-bpolicy</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="s">spec:</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="s">  clusterSelectors:</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail +3c)}</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail -c +3)}</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="s">  downsync:</span>
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="s">  - objectSelectors:</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/name&quot;:&quot;nginx&quot;}</span>
@@ -2594,7 +2594,7 @@ for more details.</p>
 <a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="s">  name: aw-bpolicy</span>
 <a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="s">spec:</span>
 <a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="s">  clusterSelectors:</span>
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail +3c)}</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail -c +3)}</span>
 <a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="s">  downsync:</span>
 <a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="s">  - objectSelectors:</span>
 <a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/part-of&quot;:&quot;my-appwrapper-app&quot;}</span>
@@ -2636,7 +2636,7 @@ for more details.</p>
 <a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="s">  name: postgres-bpolicy</span>
 <a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="s">spec:</span>
 <a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="s">  clusterSelectors:</span>
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail +3c)}</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail -c +3)}</span>
 <a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="s">  downsync:</span>
 <a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="s">  - objectSelectors:</span>
 <a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="s">    - matchLabels: {</span>
@@ -2765,7 +2765,7 @@ KubeFlex and KubeStellar controllers:</p>
 <a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="s">  name: nginx-res-bpolicy</span>
 <a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="s">spec:</span>
 <a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="s">  clusterSelectors:</span>
-<a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail +3c)}</span>
+<a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail -c +3)}</span>
 <a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="s">  downsync:</span>
 <a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="s">  - objectSelectors:</span>
 <a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/name&quot;:&quot;nginx-res&quot;}</span>
@@ -2824,7 +2824,7 @@ work with the WDS as outlined <a href="../argo-to-wds1/">here</a>.</p>
 <a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="s">  name: argocd-sa-bpolicy</span>
 <a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="s">spec:</span>
 <a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="s">  clusterSelectors:</span>
-<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail +3c)}</span>
+<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail -c +3)}</span>
 <a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a><span class="s">  downsync:</span>
 <a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a><span class="s">  - objectSelectors:</span>
 <a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a><span class="s">    - matchLabels: {&quot;argocd.argoproj.io/instance&quot;:&quot;nginx-sa&quot;}</span>
