@@ -463,6 +463,9 @@ func (c *Controller) setupManagedClustersInformer(ctx context.Context) error {
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
+			if typed, is := obj.(cache.DeletedFinalStateUnknown); is {
+				obj = typed.Obj
+			}
 			objM := obj.(metav1.Object)
 			c.evaluateBindingPolicies(ctx, objM.GetName(), objM.GetLabels())
 		},
@@ -473,7 +476,7 @@ func (c *Controller) setupManagedClustersInformer(ctx context.Context) error {
 	}
 	c.clusterInformerFactoryStart(ctx.Done())
 	if ok := cache.WaitForCacheSync(ctx.Done(), c.clusterInformer.HasSynced); !ok {
-		return fmt.Errorf("failed to wait for MangedCluster informer to sync")
+		return fmt.Errorf("failed to wait for managedclusters informer to sync")
 	}
 	return nil
 }
