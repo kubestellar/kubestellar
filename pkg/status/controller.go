@@ -87,12 +87,12 @@ type bindingRef string
 
 // workStatusRef is a workqueue item that references a WorkStatus
 type workStatusRef struct {
-	// name is the name of the WorkStatus object
-	name string
-	// wecName is the WorkStatus namespace
-	wecName string
-	// sourceObjectIdentifier is the identifier of the source object
-	sourceObjectIdentifier util.ObjectIdentifier
+	// Name is the Name of the WorkStatus object
+	Name string
+	// WECName is the WorkStatus namespace
+	WECName string
+	// SourceObjectIdentifier is the identifier of the source object
+	SourceObjectIdentifier util.ObjectIdentifier
 }
 
 // combinedStatusRef is a workqueue item that references a CombinedStatus
@@ -388,8 +388,8 @@ func (c *Controller) handleWorkStatus(obj any) {
 	}
 
 	c.logger.V(5).Info("Enqueuing reference to WorkStatus because of informer event",
-		"sourceObjectName", wsRef.sourceObjectIdentifier.ObjectName,
-		"sourceObjectGVK", wsRef.sourceObjectIdentifier.GVK, "wecName", wsRef.wecName)
+		"sourceObjectName", wsRef.SourceObjectIdentifier.ObjectName,
+		"sourceObjectGVK", wsRef.SourceObjectIdentifier.GVK, "wecName", wsRef.WECName)
 }
 
 // runWorker is a long-running function that will continually call the
@@ -427,7 +427,7 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
 		c.workqueue.Forget(item)
-		c.logger.V(2).Info("Successfully synced", "object", item)
+		c.logger.V(2).Info("Successfully synced", "object", item, "type", fmt.Sprintf("%T", item))
 		return nil
 	}(item)
 
