@@ -41,6 +41,7 @@ import (
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/transport"
+	transportgeneric "github.com/kubestellar/kubestellar/pkg/transport/generic"
 )
 
 // The following code is responsible for running a transport controller with a given
@@ -59,11 +60,11 @@ const (
 )
 
 func GenericMain(transportImplementation transport.Transport) {
-	logger := klog.Background().WithName(transport.ControllerName)
+	logger := klog.Background().WithName(transportgeneric.ControllerName)
 	ctx := klog.NewContext(context.Background(), logger)
 
 	options := NewTransportOptions()
-	fs := pflag.NewFlagSet(transport.ControllerName, pflag.ExitOnError)
+	fs := pflag.NewFlagSet(transportgeneric.ControllerName, pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
 	options.AddFlags(fs)
@@ -97,7 +98,7 @@ func GenericMain(transportImplementation transport.Transport) {
 		logger.Error(err, "unable to build WDS kubeconfig")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
-	wdsRestConfig.UserAgent = transport.ControllerName
+	wdsRestConfig.UserAgent = transportgeneric.ControllerName
 
 	// get the config for Transport space
 	transportRestConfig, err := options.TransportClientOptions.ToRESTConfig()
@@ -105,7 +106,7 @@ func GenericMain(transportImplementation transport.Transport) {
 		logger.Error(err, "unable to build transport kubeconfig")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
-	transportRestConfig.UserAgent = transport.ControllerName
+	transportRestConfig.UserAgent = transportgeneric.ControllerName
 	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
 	ksmetrics.MustRegister(legacyregistry.Register, spacesClientMetrics)
 	// clients for WDS
@@ -147,7 +148,7 @@ func GenericMain(transportImplementation transport.Transport) {
 
 	itsK8sInformerFactory := k8sinformers.NewSharedInformerFactory(transportClientset, defaultResyncPeriod)
 
-	transportController, err := transport.NewTransportController(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer,
+	transportController, err := transportgeneric.NewTransportController(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer,
 		wdsClientset.ControlV1alpha1().Bindings(), wdsControlInformers.Bindings(),
 		wdsControlInformers.CustomTransforms(),
 		transportImplementation, wdsClientset, wdsDynamicClient, transportClientset.CoreV1().Namespaces(), itsK8sInformerFactory.Core().V1().ConfigMaps(),
