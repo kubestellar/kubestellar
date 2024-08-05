@@ -18,7 +18,7 @@ package main
 
 import (
 	"github.com/kubestellar/kubestellar/pkg/transport/generic/cmd"
-	ocm "github.com/kubestellar/kubestellar/pkg/transport/ocm/pkg"
+	ocm "github.com/kubestellar/kubestellar/pkg/transport/ocm-transport-controller/pkg"
 )
 
 func main() {
