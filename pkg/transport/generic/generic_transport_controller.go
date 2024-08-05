@@ -58,7 +58,8 @@ import (
 	controlv1alpha1listers "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/jsonpath"
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
-	"github.com/kubestellar/kubestellar/pkg/transport/filtering"
+	"github.com/kubestellar/kubestellar/pkg/transport"
+	"github.com/kubestellar/kubestellar/pkg/transport/generic/filtering"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -85,7 +86,7 @@ func NewTransportController(ctx context.Context,
 	bindingClient controlclient.BindingInterface,
 	bindingInformer controlv1alpha1informers.BindingInformer,
 	customTransformInformer controlv1alpha1informers.CustomTransformInformer,
-	transport Transport,
+	transportInstance transport.Transport,
 	wdsClientset ksclientset.Interface,
 	wdsDynamicClient dynamic.Interface,
 	itsNSClient corev1client.NamespaceInterface,
@@ -94,16 +95,16 @@ func NewTransportController(ctx context.Context,
 	transportDynamicClient dynamic.Interface,
 	maxSizeWrapped int, maxNumWrapped int, wdsName string) (*genericTransportController, error) {
 	var emptyWrappedObject runtime.Object
-	if t2, is := transport.(TransportWithCreateOnly); is {
-		emptyWrappedObject = t2.WrapObjectsHavingCreateOnly(make([]Wrapee, 0)) // empty wrapped object to get GVR from it.
+	if t2, is := transportInstance.(transport.TransportWithCreateOnly); is {
+		emptyWrappedObject = t2.WrapObjectsHavingCreateOnly(make([]transport.Wrapee, 0)) // empty wrapped object to get GVR from it.
 	} else {
-		emptyWrappedObject = transport.WrapObjects([]*unstructured.Unstructured{})
+		emptyWrappedObject = transportInstance.WrapObjects([]*unstructured.Unstructured{})
 	}
 	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
 	}
-	return NewTransportControllerForWrappedObjectGVR(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer, bindingClient, bindingInformer, customTransformInformer, transport, wdsClientset, wdsDynamicClient, itsNSClient, propCfgMapPreInformer, transportDynamicClient, maxSizeWrapped, maxNumWrapped, wdsName, wrappedObjectGVR), nil
+	return NewTransportControllerForWrappedObjectGVR(ctx, wdsClientMetrics, itsClientMetrics, inventoryPreInformer, bindingClient, bindingInformer, customTransformInformer, transportInstance, wdsClientset, wdsDynamicClient, itsNSClient, propCfgMapPreInformer, transportDynamicClient, maxSizeWrapped, maxNumWrapped, wdsName, wrappedObjectGVR), nil
 }
 
 // NewTransportControllerForWrappedObjectGVR returns a new transport controller.
@@ -114,7 +115,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 	bindingClient controlclient.BindingInterface,
 	bindingInformer controlv1alpha1informers.BindingInformer,
 	customTransformInformer controlv1alpha1informers.CustomTransformInformer,
-	transport Transport,
+	transportInstance transport.Transport,
 	wdsClientset ksclientset.Interface,
 	wdsDynamicClient dynamic.Interface,
 	itsNSClient corev1client.NamespaceInterface,
@@ -178,7 +179,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 			Buckets:        []float64{0, 1, 3, 10, 30, 100, 300, 1000, 3000, 10000, 30000},
 			StabilityLevel: k8smetrics.ALPHA}),
 		workqueue:                    workqueue,
-		transport:                    transport,
+		transport:                    transportInstance,
 		transportClient:              measuredITSDynamicClient,
 		wrappedObjectGVR:             wrappedObjectGVR,
 		wdsDynamicClient:             measuredWDSDynamicClient,
@@ -345,8 +346,8 @@ type genericTransportController struct {
 	// recollectProperties holding the name of a inventory object.
 	workqueue workqueue.RateLimitingInterface
 
-	transport        Transport         //transport is a specific implementation for the transport interface.
-	transportClient  dynamic.Interface // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
+	transport        transport.Transport //transport is a specific implementation for the transport interface.
+	transportClient  dynamic.Interface   // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
 	wdsDynamicClient dynamic.Interface
@@ -723,9 +724,9 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 
 // getWrapeesFromWDS returns a slice of Wrapee holding the objects that have been subject to destination-independent transformations
 // but not destination-dependent transformatinos (customizations).
-func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]Wrapee, sets.Set[metav1.GroupResource], error) {
+func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]transport.Wrapee, sets.Set[metav1.GroupResource], error) {
 	groupResources := sets.New[metav1.GroupResource]()
-	wrapees := make([]Wrapee, 0)
+	wrapees := make([]transport.Wrapee, 0)
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clause := range binding.Spec.Workload.ClusterScope {
 		gvr := schema.GroupVersionResource(clause.GroupVersionResource)
@@ -735,7 +736,7 @@ func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, bind
 		}
 		gr := metav1.GroupResource{Group: clause.GroupVersionResource.Group, Resource: clause.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		wrapees = append(wrapees, Wrapee{TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), clause.CreateOnly})
+		wrapees = append(wrapees, transport.Wrapee{Object: TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), CreateOnly: clause.CreateOnly})
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, clause := range binding.Spec.Workload.NamespaceScope {
@@ -747,7 +748,7 @@ func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, bind
 		}
 		gr := metav1.GroupResource{Group: clause.GroupVersionResource.Group, Resource: clause.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		wrapees = append(wrapees, Wrapee{TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), clause.CreateOnly})
+		wrapees = append(wrapees, transport.Wrapee{Object: TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), CreateOnly: clause.CreateOnly})
 	}
 
 	return wrapees, groupResources, nil
@@ -803,9 +804,9 @@ func (c *genericTransportController) computeDestToWrappedObjects(ctx context.Con
 //
 // This func also updates c.bindingSensitiveDestinations for the given Binding.
 // The input Wrapees have been subject to destination-independent transformation.
-func (c *genericTransportController) computeDestToCustomizedObjects(uncustomizedWrapees []Wrapee, binding *v1alpha1.Binding) (map[v1alpha1.Destination][]Wrapee, []string) {
+func (c *genericTransportController) computeDestToCustomizedObjects(uncustomizedWrapees []transport.Wrapee, binding *v1alpha1.Binding) (map[v1alpha1.Destination][]transport.Wrapee, []string) {
 	// This will become non-nil if any object to propagate needs customization
-	var destToCustomizedWrapees map[v1alpha1.Destination][]Wrapee
+	var destToCustomizedWrapees map[v1alpha1.Destination][]transport.Wrapee
 
 	bindingErrors := []string{}
 
@@ -835,14 +836,14 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 				}
 			}
 			if customizeThisObject && destToCustomizedWrapees == nil {
-				destToCustomizedWrapees = map[v1alpha1.Destination][]Wrapee{}
+				destToCustomizedWrapees = map[v1alpha1.Destination][]transport.Wrapee{}
 				for _, dest := range binding.Spec.Destinations {
 					destToCustomizedWrapees[dest] = abstract.SliceCopy(uncustomizedWrapees[:objIdx])
 				}
 			}
 			if destToCustomizedWrapees != nil {
 				customizedObjectsSoFar := destToCustomizedWrapees[dest]
-				customizedObjectsSoFar = append(customizedObjectsSoFar, Wrapee{objC, createOnly})
+				customizedObjectsSoFar = append(customizedObjectsSoFar, transport.Wrapee{Object: objC, CreateOnly: createOnly})
 				destToCustomizedWrapees[dest] = customizedObjectsSoFar
 			}
 		}
@@ -859,12 +860,12 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 	return destToCustomizedWrapees, bindingErrors
 }
 
-func (c *genericTransportController) wrapBatch(batchToPropagate []Wrapee, binding *v1alpha1.Binding, numShard int, isSharded bool) (*unstructured.Unstructured, error) {
+func (c *genericTransportController) wrapBatch(batchToPropagate []transport.Wrapee, binding *v1alpha1.Binding, numShard int, isSharded bool) (*unstructured.Unstructured, error) {
 	var wrapped runtime.Object
-	if t2, is := c.transport.(TransportWithCreateOnly); is {
+	if t2, is := c.transport.(transport.TransportWithCreateOnly); is {
 		wrapped = t2.WrapObjectsHavingCreateOnly(batchToPropagate)
 	} else {
-		justObjs := abstract.SliceMap(batchToPropagate, Wrapee.GetObject)
+		justObjs := abstract.SliceMap(batchToPropagate, transport.Wrapee.GetObject)
 		wrapped = c.transport.WrapObjects(justObjs)
 	}
 	wrappedObject, err := convertObjectToUnstructured(wrapped)
@@ -886,9 +887,9 @@ func (c *genericTransportController) wrapBatch(batchToPropagate []Wrapee, bindin
 	return wrappedObject, err
 }
 
-func (c *genericTransportController) wrap(wrapeesToPropagate []Wrapee, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
+func (c *genericTransportController) wrap(wrapeesToPropagate []transport.Wrapee, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
 	var wrappedObjects []*unstructured.Unstructured
-	var batchToPropagate []Wrapee = nil
+	var batchToPropagate []transport.Wrapee = nil
 	maxSize := c.MaxSizeWrapped
 	maxCount := c.MaxNumWrapped
 	isSharded := false

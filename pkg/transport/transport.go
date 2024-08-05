@@ -57,8 +57,6 @@ type Wrapee struct {
 
 func (wr Wrapee) GetObject() *unstructured.Unstructured { return wr.Object }
 
-func (wr Wrapee) GetCreateOnly() bool { return wr.CreateOnly }
-
 func NewWrapee(object *unstructured.Unstructured, createOnly bool) Wrapee {
 	return Wrapee{object, createOnly}
 }

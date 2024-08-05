@@ -133,22 +133,11 @@ echo "wds1 created."
 :
 if [ "$use_release" != true ]; then
   pushd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
-  KUBESTELLAR_DIR="$(pwd)"
-  OCM_TRANSPORT_PLUGIN_RELEASE=0.1.11
-  curl -sL https://github.com/kubestellar/ocm-transport-plugin/archive/refs/tags/v${OCM_TRANSPORT_PLUGIN_RELEASE}.tar.gz | tar xz
-  cd ocm-transport-plugin-${OCM_TRANSPORT_PLUGIN_RELEASE}
-  OCM_TRANSPORT_PLUGIN_DIR="$(pwd)"
-  pwd
-  echo "replace github.com/kubestellar/kubestellar => ${KUBESTELLAR_DIR}/" >> go.mod
-  echo "replace go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc => go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.14.0" >> go.mod # otel broke semver rules
-  echo "replace k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9" >> go.mod # compile fails without this; see https://github.com/kubestellar/ocm-transport-plugin/issues/22
-  IMAGE_TAG=${OCM_TRANSPORT_PLUGIN_RELEASE} make ko-build-local
-  kind load --name kubeflex docker-image ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
-  cd "${KUBESTELLAR_DIR}"
-  pwd
-  rm -rf ${OCM_TRANSPORT_PLUGIN_DIR}
+  OCM_TRANSPORT_PLUGIN_RELEASE=local
+  IMAGE_TAG=${OCM_TRANSPORT_PLUGIN_RELEASE} make ko-build-transport-local
+  kind load --name kubeflex docker-image ko.local/ocm-transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
   echo "running ocm transport plugin..."
-  IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 its1 ko.local/transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} --controller-verbosity "$TRANSPORT_CONTROLLER_VERBOSITY" --context "$HOSTING_CONTEXT"
+  IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 its1 ko.local/ocm-transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} --controller-verbosity "$TRANSPORT_CONTROLLER_VERBOSITY" --context "$HOSTING_CONTEXT"
   popd
 fi
 

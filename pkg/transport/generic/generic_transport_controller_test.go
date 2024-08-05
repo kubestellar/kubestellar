@@ -51,6 +51,7 @@ import (
 	ksclientfake "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/fake"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
+	"github.com/kubestellar/kubestellar/pkg/transport"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -265,7 +266,7 @@ func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.
 	return objs[0]
 }
 
-func (tt *testTransport) WrapObjectsHavingCreateOnly(wrapees []Wrapee) runtime.Object {
+func (tt *testTransport) WrapObjectsHavingCreateOnly(wrapees []transport.Wrapee) runtime.Object {
 	tt.Lock()
 	defer tt.Unlock()
 	tt.wrapped = true
