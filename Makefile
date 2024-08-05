@@ -180,7 +180,7 @@ ko-build-local: ## Build local container image with ko
 	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMAGE}
 
 .PHONY: ko-build-transport-local
-ko-build-local: modules vet fmt  ## Build local transport container image with `ko`.
+ko-build-local: ## Build local transport container image with `ko`.
 	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./pkg/transport/ocm/cmd -t ${IMAGE_TAG} --platform linux/${ARCH}
 	docker tag ko.local/${TRANSPORT_CMD_NAME}:${IMAGE_TAG} ${TRANSPORT_IMAGE}
 
