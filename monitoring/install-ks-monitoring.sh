@@ -61,10 +61,10 @@ kubectl create namespace $ns
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 
-helm -n $ns install pyroscope grafana/pyroscope
+helm -n $ns install pyroscope grafana/pyroscope --version 1.7.1
 
 wait-for-object $ctx $ns statefulset pyroscope
-wait-for-object $ctx $ns statefulset pyroscope-agent
+wait-for-object $ctx $ns statefulset pyroscope-alloy
 
 : --------------------------------------------------------------
 : Install Grafana
@@ -80,19 +80,24 @@ helm upgrade -n $ns --install grafana grafana/grafana \
   --set env.GF_DIAGNOSTICS_PROFILING_PORT=6060 \
   --set-string 'podAnnotations.pyroscope\.grafana\.com/scrape=true' \
   --set-string 'podAnnotations.pyroscope\.grafana\.com/port=6060' \
-  --values ${SCRIPT_DIR}/grafana/datasources.yaml
+  --values ${SCRIPT_DIR}/grafana/datasources.yaml \
+  --version 8.4.1
 
 wait-for-object $ctx $ns deployment grafana
 
 : --------------------------------------------------------------
 : Install Prometheus
 
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
 helm -n $ns install -f ${SCRIPT_DIR}/prometheus/prometheus-custom-values.yaml prometheus prometheus-community/kube-prometheus-stack \
    --set kubeStateMetrics.enabled=false \
    --set nodeExporter.enabled=false \
    --set grafana.enabled=false \
    --set alertmanager.enabled=false \
-   --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false
+   --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
+   --version 61.7.0
 
 wait-for-object $ctx $ns deployment prometheus-kube-prometheus-operator
 wait-for-object $ctx $ns statefulsets prometheus-prometheus-kube-prometheus-prometheus
