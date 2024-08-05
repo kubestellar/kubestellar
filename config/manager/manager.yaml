@@ -54,5 +54,9 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
+        ports:
+        - containerPort: 8082
+          protocol: TCP
+          name: debug-pprof
       serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10
