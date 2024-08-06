@@ -32,12 +32,12 @@ This can be:
 
     This option is particularly useful for first time users or users that would like to have a local deployment.
 
-    It is important to note that, when the hosting cluster was created by **kind** or **k3s** and its Ingress domain name is left to default to localtest.me, then the name of the container running hosting cluster must be also be referenced during the Helm chart installation by setting `--set "kubeflex-controller.hostContainer=<control-plane-container-name>"`.
+    It is important to note that, when the hosting cluster was created by **kind** or **k3s** and its Ingress domain name is left to default to localtest.me, then the name of the container running hosting cluster must be also be referenced during the Helm chart installation by setting `--set "kubeflex-operator.hostContainer=<control-plane-container-name>"`.
     The `<control-plane-container-name>` is the name of the container in which kind or k3d is running the relevant control plane. One may use `docker ps` to find the `<control-plane-container-name>`.
 
-    If a host port number different from the expected 9443 is used for the Kind cluster, then the same port number must be specified during the chart installation by adding the following argument `--set "kubeflex-controller.externalPort=<port>"`.
+    If a host port number different from the expected 9443 is used for the Kind cluster, then the same port number must be specified during the chart installation by adding the following argument `--set "kubeflex-operator.externalPort=<port>"`.
 
-    By default the KubeStelalr Core chart uses a test domain `localtest.me`, which is ok for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-controller.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution CLusters (WECs).
+    By default the KubeStelalr Core chart uses a test domain `localtest.me`, which is ok for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-operator.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution CLusters (WECs).
 
     For convenience, a new local **Kind** cluster that satisfies the requirements for KubeStellar setup
     and that can be used to exercises the [examples](./examples.md) can be created with the following command:
