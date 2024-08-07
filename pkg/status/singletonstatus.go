@@ -22,6 +22,7 @@ import (
 	"strings"
 	"sync"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -75,7 +76,22 @@ func (ss *singletonState) delete(id util.ObjectIdentifier) {
 
 func (c *Controller) buildSingletonStateAndOptionallyReconcile(ctx context.Context, reconcile bool) error {
 	logger := klog.FromContext(ctx)
-	logger.Info("Initializing the desired state for singleton statuses")
+	logger.V(2).Info("Building the desired state for singleton statuses")
+
+	for wObjIdentifier := range c.singletonState.wObjSync {
+		gvr := schema.GroupVersionResource{Group: wObjIdentifier.GVK.Group, Version: wObjIdentifier.GVK.Version, Resource: wObjIdentifier.Resource}
+		lister, found := c.listers.Get(gvr)
+		if !found {
+			return fmt.Errorf("could not get lister for gvr: %s", gvr)
+		}
+		_, err := lister.ByNamespace(wObjIdentifier.ObjectName.Namespace).Get(wObjIdentifier.ObjectName.Name)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				c.singletonState.delete(wObjIdentifier)
+			}
+			return err
+		}
+	}
 
 	allBdgs, err := c.wdsKsClient.ControlV1alpha1().Bindings().List(ctx, metav1.ListOptions{})
 	if err != nil {
@@ -145,7 +161,6 @@ func (c *Controller) buildSingletonStateAndOptionallyReconcile(ctx context.Conte
 	}
 
 	for wObjIdentifier := range c.singletonState.wObjSync {
-		// TODO: garbage collection should go here
 		if err := c.reconcileSingletonByWObj(ctx, wObjIdentifier); err != nil {
 			return err
 		}
@@ -187,11 +202,10 @@ func (c *Controller) reconcileSingletonByWObj(ctx context.Context, wObjID util.O
 	return nil
 }
 
-// To be improved
 func (c *Controller) reconcileSingletonByBdg(ctx context.Context, ref bindingRef) error {
 	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Reconciling singleton status by binding", "name", string(ref))
-	return c.buildSingletonStateAndOptionallyReconcile(ctx, true)
+	return c.buildSingletonStateAndOptionallyReconcile(ctx, true) // TODO: differentiate full build and incremental change
 }
 
 func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWorkStatusRef) error {
