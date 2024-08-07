@@ -19,7 +19,6 @@ package status
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -117,7 +116,6 @@ func (c *Controller) buildSingletonStateAndOptionallyReconcile(ctx context.Conte
 					Resource:   nsWObjRef.Resource,
 					ObjectName: cache.NewObjectName(nsWObjRef.Namespace, nsWObjRef.Name),
 				}
-				logger.V(2).Info("Found namespace scoped singleton workload object", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName)
 				if v == util.BindingPolicyLabelSingletonStatusValueSet && len(bdg.Spec.Destinations) > 0 {
 					logger.V(2).Info("Singleton workload object should have status synced", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", bdg.Name)
 					c.singletonState.set(wObjIdentifier)
@@ -144,7 +142,6 @@ func (c *Controller) buildSingletonStateAndOptionallyReconcile(ctx context.Conte
 					Resource:   cWObjRef.Resource,
 					ObjectName: cache.NewObjectName("", cWObjRef.Name),
 				}
-				logger.V(2).Info("Found cluster scoped singleton workload object", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName)
 				if v == util.BindingPolicyLabelSingletonStatusValueSet && len(bdg.Spec.Destinations) > 0 {
 					logger.V(2).Info("Singleton workload object should have status synced", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", bdg.Name)
 					c.singletonState.set(wObjIdentifier)
@@ -177,15 +174,14 @@ func (c *Controller) reconcileSingletonByWObj(ctx context.Context, wObjID util.O
 		return updateObjectStatus(ctx, &wObjID, emptyStatus, c.listers, c.wdsDynClient)
 	}
 
-	wsNameSuffix := strings.Join([]string{
-		wObjID.ObjectName.Namespace,
-		wObjID.ObjectName.Name,
-	}, "-")
-	// A (probably critical) question: How do I know which WEC is selected?
-	list, _ := c.workStatusLister.ByNamespace("cluster1").List(labels.Everything())
+	list, _ := c.workStatusLister.ByNamespace("").List(labels.Everything())
 	for _, obj := range list {
-		wsName := obj.(metav1.Object).GetName()
-		if !strings.HasSuffix(wsName, wsNameSuffix) {
+		wsRef, err := runtimeObjectToWorkStatusRef(obj)
+		if err != nil {
+			return err
+		}
+		sourceObjID := wsRef.SourceObjectIdentifier
+		if sourceObjID != wObjID {
 			continue
 		}
 		status, err := util.GetWorkStatusStatus(obj)
@@ -195,8 +191,7 @@ func (c *Controller) reconcileSingletonByWObj(ctx context.Context, wObjID util.O
 		if status == nil {
 			return nil
 		}
-		logger.V(2).Info("Got status for workstatus", "name", wsName)
-		wsRef, _ := runtimeObjectToWorkStatusRef(obj)
+		logger.V(2).Info("Updating singleton status", "workstatus", wsRef.Name, "wecName", wsRef.WECName)
 		return updateObjectStatus(ctx, &wsRef.SourceObjectIdentifier, status, c.listers, c.wdsDynClient)
 	}
 	return nil
@@ -204,12 +199,13 @@ func (c *Controller) reconcileSingletonByWObj(ctx context.Context, wObjID util.O
 
 func (c *Controller) reconcileSingletonByBdg(ctx context.Context, ref bindingRef) error {
 	logger := klog.FromContext(ctx)
-	logger.V(2).Info("Reconciling singleton status by binding", "name", string(ref))
-	return c.buildSingletonStateAndOptionallyReconcile(ctx, true) // TODO: differentiate full build and incremental change
+	logger.V(2).Info("Reconciling singleton status due to binding changes", "name", string(ref))
+	return c.buildSingletonStateAndOptionallyReconcile(ctx, true)
 }
 
 func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWorkStatusRef) error {
 	logger := klog.FromContext(ctx)
+	logger.V(2).Info("Reconciling singleton status due to workstatus changes", "name", string(ref.Name))
 	obj, _ := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
 	status, _ := util.GetWorkStatusStatus(obj)
 	if sync, ok := c.singletonState.wObjSync[ref.SourceObjectIdentifier]; !ok {
