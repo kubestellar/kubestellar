@@ -80,6 +80,8 @@ type Controller struct {
 	celEvaluator            *celEvaluator
 	bindingResolutionBroker binding.ResolutionBroker
 	combinedStatusResolver  CombinedStatusResolver
+
+	singletonState singletonState
 }
 
 // bindingRef is a workqueue item that references a Binding
@@ -139,6 +141,7 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 		itsDynClient:            itsDynClient,
 		workqueue:               workqueue.NewRateLimitingQueue(ratelimiter),
 		bindingResolutionBroker: bindingResolutionBroker,
+		singletonState:          singletonState{wObjSync: map[util.ObjectIdentifier]bool{}},
 	}
 
 	return controller, nil
@@ -203,7 +206,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	}) // this will have the broker call the callback for all existing resolutions
 	c.logger.Info("Registered binding resolution broker callback")
 
-	c.initSingletonState(ctx)
+	c.buildSingletonStateAndOptionallyReconcile(ctx, false)
 
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
@@ -448,9 +451,10 @@ func (c *Controller) reconcile(ctx context.Context, item any) error {
 	case workStatusRef:
 		return c.syncWorkStatus(ctx, ref)
 	case singletonWorkStatusRef:
-		c.initSingletonState(ctx) // (just to pass e2e tests) remove once reconcileSingletonByBdg is implemented
-		return c.reconcileSingletonByWs(ctx, ref)
+		c.reconcileSingletonByWs(ctx, ref)
+		return c.syncSingletonWorkStatus(ctx, ref)
 	case bindingRef:
+		c.reconcileSingletonByBdg(ctx, ref)
 		return c.syncBinding(ctx, string(ref))
 	case statusCollectorRef:
 		return c.syncStatusCollector(ctx, string(ref))
