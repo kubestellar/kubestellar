@@ -63,7 +63,7 @@ var theSingletonState singletonState = singletonState{
 	wObjSync: map[util.ObjectIdentifier]bool{},
 }
 
-func (c *Controller) initSingletonState(ctx context.Context) error {
+func (c *Controller) buildSingletonStateAndOptionallyReconcile(ctx context.Context, reconcile bool) error {
 	logger := klog.FromContext(ctx)
 	logger.Info("Initializing the desired state for singleton statuses")
 
@@ -81,7 +81,10 @@ func (c *Controller) initSingletonState(ctx context.Context) error {
 			if !found {
 				return fmt.Errorf("could not get lister for gvr: %s", nsWObjRef.GroupVersionResource)
 			}
-			nsWObj, _ := lister.ByNamespace(nsWObjRef.Namespace).Get(nsWObjRef.Name)
+			nsWObj, err := lister.ByNamespace(nsWObjRef.Namespace).Get(nsWObjRef.Name)
+			if err != nil {
+				return err
+			}
 			labels := nsWObj.(metav1.Object).GetLabels()
 			if v, ok := labels[util.BindingPolicyLabelSingletonStatusKey]; ok {
 				logger.V(2).Info("Found namespace scoped singleton workload object", "name", nsWObjRef.Name)
@@ -92,7 +95,9 @@ func (c *Controller) initSingletonState(ctx context.Context) error {
 						ObjectName: cache.NewObjectName(nsWObjRef.Namespace, nsWObjRef.Name),
 					}
 					theSingletonState.Set(wObjIdentifier)
-					c.reconcileSingletonByWObj(ctx, nsWObjRef) // Test only
+					if reconcile {
+						c.reconcileSingletonByWObj(ctx, nsWObjRef)
+					}
 				}
 			}
 		}
@@ -110,7 +115,6 @@ func metav1GVR2schemaGVR(in metav1.GroupVersionResource) (out schema.GroupVersio
 	return
 }
 
-// Test only, should be removed soon
 func (c *Controller) reconcileSingletonByWObj(ctx context.Context, wObjRef v1alpha1.NamespaceScopeDownsyncObject) error {
 	logger := klog.FromContext(ctx)
 	wsNameSuffix := strings.Join([]string{
@@ -138,8 +142,12 @@ func (c *Controller) reconcileSingletonByWObj(ctx context.Context, wObjRef v1alp
 	return nil
 }
 
-// To be implemented
-func (c *Controller) reconcileSingletonByBdg() error { return nil }
+// To be improved
+func (c *Controller) reconcileSingletonByBdg(ctx context.Context, ref bindingRef) error {
+	logger := klog.FromContext(ctx)
+	logger.V(2).Info("Reconciling singleton status by binding", "name", string(ref))
+	return c.buildSingletonStateAndOptionallyReconcile(ctx, true)
+}
 
 func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWorkStatusRef) error {
 	logger := klog.FromContext(ctx)
