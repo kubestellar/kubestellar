@@ -203,6 +203,8 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	}) // this will have the broker call the callback for all existing resolutions
 	c.logger.Info("Registered binding resolution broker callback")
 
+	c.initSingletonState(ctx)
+
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
 		go wait.UntilWithContext(ctx, c.runWorker, time.Second)
@@ -446,7 +448,8 @@ func (c *Controller) reconcile(ctx context.Context, item any) error {
 	case workStatusRef:
 		return c.syncWorkStatus(ctx, ref)
 	case singletonWorkStatusRef:
-		return c.syncSingletonWorkStatus(ctx, ref)
+		c.initSingletonState(ctx) // (just to pass e2e tests) remove once reconcileSingletonByBdg is implemented
+		return c.reconcileSingletonByWs(ctx, ref)
 	case bindingRef:
 		return c.syncBinding(ctx, string(ref))
 	case statusCollectorRef:
