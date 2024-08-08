@@ -40,9 +40,14 @@ import (
 
 // This is informed by https://github.com/kubernetes/sample-controller/blob/master/controller.go
 // and https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/controllers.md
-// and goes further by explicitly considering multiple types of input and multiple tyeps of output
+// and goes further by explicitly considering multiple types of input and multiple types of output
 // and being somewhat opinionated.
 // The primary opinions are as follows.
+// - Because mutiple input objects affect one output object, the work on these objects is factored.
+//   While the upstream controller outline does all the work when syncing a single input object,
+//   this controller outline splits the processing into two phases: (1) syncing input objects,
+//   which updates some internal data structures (which support the next phase), and (2) syncing
+//   output objects.
 // - Read API object state from the informer local caches (i.e., listers)
 //   rather than querying the apiserver; the latter is more expensive and should
 //   only be done when required for proper interlocking with other clients and/or concerns.
@@ -444,6 +449,10 @@ func (ctlr *controller) syncO1(ctx context.Context, ref cache.ObjectName) error 
 	// o1's state should be; if different then create/update/delete o1 and logger.V(2).Info that.
 	// If the design of I1Status or I2Status or ... INStatus makes it depend on o1's state
 	// then enqueue a reference to the relevant I1 or I2 or ... IN object(s) and logger.V(5).Info that.
+
+	// Comparing the state read for o1 with what the internal data structures say the state of o1
+	// should be, this handles all sorts of scenarios --- including ones where stuff happend while
+	// this controller was not running.
 	return nil // or an error, as appropriate
 }
 
