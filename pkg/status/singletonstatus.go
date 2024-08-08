@@ -19,89 +19,31 @@ package status
 import (
 	"context"
 	"fmt"
-	"sync"
 
-	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
+	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-type singletonState struct {
-	sync.RWMutex
-	wObjSync map[util.ObjectIdentifier]bool
-}
-
-func (ss *singletonState) get(id util.ObjectIdentifier) (sync, exists bool) {
-	ss.Lock()
-	defer ss.Unlock()
-
-	sync, exists = ss.wObjSync[id]
-	return
-}
-
-func (ss *singletonState) keys() []util.ObjectIdentifier {
-	ss.RLock()
-	defer ss.RUnlock()
-
-	keys := make([]util.ObjectIdentifier, 0, len(ss.wObjSync))
-	for oi := range ss.wObjSync {
-		keys = append(keys, oi)
-	}
-	return keys
-}
-
-func (ss *singletonState) set(id util.ObjectIdentifier) {
-	ss.Lock()
-	defer ss.Unlock()
-
-	ss.wObjSync[id] = true
-}
-
-func (ss *singletonState) unset(id util.ObjectIdentifier) {
-	ss.Lock()
-	defer ss.Unlock()
-
-	ss.wObjSync[id] = false
-}
-
-func (ss *singletonState) addIfNotExist(id util.ObjectIdentifier) {
-	ss.Lock()
-	defer ss.Unlock()
-
-	if _, ok := ss.wObjSync[id]; !ok {
-		ss.wObjSync[id] = false
-	}
-}
-
-func (ss *singletonState) delete(id util.ObjectIdentifier) {
-	ss.Lock()
-	defer ss.Unlock()
-
-	delete(ss.wObjSync, id)
-}
-
-func (c *Controller) buildSingletonStateAndOptionallyReconcile(ctx context.Context, reconcile bool) error {
+// reconcileSingletonByBdg goes over the binding-covered workload objects, decides sync or not for each of the workload objects,
+// then maintains their statuses based on the decisions.
+func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgRef bindingRef) error {
 	logger := klog.FromContext(ctx)
-	logger.V(2).Info("Building the desired state for singleton statuses")
+	logger.V(2).Info("Reconciling singleton status due to binding change", "binding", string(bdgRef))
 
-	for _, wObjIdentifier := range c.singletonState.keys() {
-		gvr := schema.GroupVersionResource{Group: wObjIdentifier.GVK.Group, Version: wObjIdentifier.GVK.Version, Resource: wObjIdentifier.Resource}
-		lister, found := c.listers.Get(gvr)
-		if !found {
-			return fmt.Errorf("could not get lister for gvr: %s", gvr)
-		}
-		_, err := lister.ByNamespace(wObjIdentifier.ObjectName.Namespace).Get(wObjIdentifier.ObjectName.Name)
-		if err != nil {
-			if errors.IsNotFound(err) {
-				c.singletonState.delete(wObjIdentifier)
-			}
-			return err
-		}
+	binding, err := c.wdsKsClient.ControlV1alpha1().Bindings().Get(ctx, string(bdgRef), metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("could not get binding %s from cache", string(bdgRef))
+	}
+
+	sync := make(map[util.ObjectIdentifier]bool)
+	if err = c.lookForSingletonWorkloadInBdg(ctx, *binding, sync, true); err != nil {
+		return err
 	}
 
 	allBdgs, err := c.wdsKsClient.ControlV1alpha1().Bindings().List(ctx, metav1.ListOptions{})
@@ -111,80 +53,29 @@ func (c *Controller) buildSingletonStateAndOptionallyReconcile(ctx context.Conte
 
 	for _, bdg := range allBdgs.Items {
 		logger.V(2).Info("Got Binding while building singleton state", "name", bdg.Name)
-		for _, item := range bdg.Spec.Workload.NamespaceScope {
-			nsWObjRef := item.NamespaceScopeDownsyncObject
-			lister, found := c.listers.Get(schema.GroupVersionResource(nsWObjRef.GroupVersionResource))
-			if !found {
-				return fmt.Errorf("could not get lister for gvr: %s", nsWObjRef.GroupVersionResource)
-			}
-			nsWObj, err := lister.ByNamespace(nsWObjRef.Namespace).Get(nsWObjRef.Name)
-			if err != nil {
-				return err
-			}
-			labels := nsWObj.(metav1.Object).GetLabels()
-			if v, ok := labels[util.BindingPolicyLabelSingletonStatusKey]; ok {
-				wObjIdentifier := util.ObjectIdentifier{
-					GVK:        schema.GroupVersionKind{Group: nsWObjRef.Group, Version: nsWObjRef.Version, Kind: nsWObj.GetObjectKind().GroupVersionKind().Kind},
-					Resource:   nsWObjRef.Resource,
-					ObjectName: cache.NewObjectName(nsWObjRef.Namespace, nsWObjRef.Name),
-				}
-				if v == util.BindingPolicyLabelSingletonStatusValueSet && len(bdg.Spec.Destinations) > 0 {
-					logger.V(2).Info("Singleton workload object should have status synced", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", bdg.Name)
-					c.singletonState.set(wObjIdentifier)
-				} else {
-					logger.V(2).Info("Singleton workload object status syncing is not driven by Binding", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", bdg.Name)
-					c.singletonState.addIfNotExist(wObjIdentifier)
-				}
-			}
+		if bdg.Name == binding.Name {
+			continue
 		}
-		for _, item := range bdg.Spec.Workload.ClusterScope {
-			cWObjRef := item.ClusterScopeDownsyncObject
-			lister, found := c.listers.Get(schema.GroupVersionResource(cWObjRef.GroupVersionResource))
-			if !found {
-				return fmt.Errorf("could not get lister for gvr: %s", cWObjRef.GroupVersionResource)
-			}
-			clusterWObj, err := lister.Get(cWObjRef.Name)
-			if err != nil {
-				return err
-			}
-			labels := clusterWObj.(metav1.Object).GetLabels()
-			if v, ok := labels[util.BindingPolicyLabelSingletonStatusKey]; ok {
-				wObjIdentifier := util.ObjectIdentifier{
-					GVK:        schema.GroupVersionKind{Group: cWObjRef.Group, Version: cWObjRef.Version, Kind: clusterWObj.GetObjectKind().GroupVersionKind().Kind},
-					Resource:   cWObjRef.Resource,
-					ObjectName: cache.NewObjectName("", cWObjRef.Name),
-				}
-				if v == util.BindingPolicyLabelSingletonStatusValueSet && len(bdg.Spec.Destinations) > 0 {
-					logger.V(2).Info("Singleton workload object should have status synced", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", bdg.Name)
-					c.singletonState.set(wObjIdentifier)
-				} else {
-					logger.V(2).Info("Singleton workload object status syncing is not driven by Binding", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", bdg.Name)
-					c.singletonState.addIfNotExist(wObjIdentifier)
-				}
-			}
+		if err = c.lookForSingletonWorkloadInBdg(ctx, bdg, sync, false); err != nil {
+			return err
 		}
 	}
 
-	if !reconcile {
-		return nil
-	}
-
-	for _, wObjIdentifier := range c.singletonState.keys() {
-		if err := c.reconcileSingletonByWObj(ctx, wObjIdentifier); err != nil {
+	for wObjIdentifier, v := range sync {
+		if err := c.reconcileSingletonWObj(ctx, wObjIdentifier, v); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (c *Controller) reconcileSingletonByWObj(ctx context.Context, wObjID util.ObjectIdentifier) error {
+func (c *Controller) reconcileSingletonWObj(ctx context.Context, wObjID util.ObjectIdentifier, sync bool) error {
 	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Reconciling singleton workload object", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
 
-	if sync, exists := c.singletonState.get(wObjID); !exists {
-		return fmt.Errorf("workload object not found in singleton state %s", wObjID.ObjectName)
-	} else if !sync {
+	if !sync {
 		emptyStatus := make(map[string]interface{})
+		logger.V(2).Info("Cleaning up singleton status", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
 		return updateObjectStatus(ctx, &wObjID, emptyStatus, c.listers, c.wdsDynClient)
 	}
 
@@ -211,27 +102,126 @@ func (c *Controller) reconcileSingletonByWObj(ctx context.Context, wObjID util.O
 	return nil
 }
 
-func (c *Controller) reconcileSingletonByBdg(ctx context.Context, ref bindingRef) error {
-	logger := klog.FromContext(ctx)
-	logger.V(2).Info("Reconciling singleton status due to binding changes", "name", string(ref))
-	return c.buildSingletonStateAndOptionallyReconcile(ctx, true)
-}
-
+// reconcileSingletonByWs decides sync or not for the corresponding workload object,
+// then maintains its status based on the decision.
 func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWorkStatusRef) error {
 	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Reconciling singleton status due to workstatus changes", "name", string(ref.Name))
-	obj, _ := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
-	status, _ := util.GetWorkStatusStatus(obj)
-	if sync, exists := c.singletonState.get(ref.SourceObjectIdentifier); !exists {
-		logger.V(2).Info("Not a singleton workload object", "objectIdentifier", ref.SourceObjectIdentifier)
+
+	wObjID := ref.SourceObjectIdentifier
+	wObjGVR := wObjID.GVR()
+	lister, found := c.listers.Get(wObjGVR)
+	if !found {
+		return fmt.Errorf("could not get lister for gvr: %s", wObjGVR)
+	}
+	wObj, err := lister.ByNamespace(wObjID.ObjectName.Namespace).Get(wObjID.ObjectName.Name) // TODO: does this work for cluster scoped resources?
+	if err != nil {
+		return err
+	}
+
+	labels := wObj.(metav1.Object).GetLabels()
+	if v, ok := labels[util.BindingPolicyLabelSingletonStatusKey]; !ok {
 		return nil
-	} else if !sync {
-		logger.V(2).Info("Singleton workload object should not have status synced, not updating status",
+	} else if v == util.BindingPolicyLabelSingletonStatusValueUnset {
+		return c.reconcileSingletonWObj(ctx, wObjID, false)
+	}
+
+	sync := map[util.ObjectIdentifier]bool{wObjID: false}
+	allBdgs, err := c.wdsKsClient.ControlV1alpha1().Bindings().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+	for _, bdg := range allBdgs.Items {
+		logger.V(2).Info("Got Binding while building singleton state", "name", bdg.Name)
+		if err = c.lookForSingletonWorkloadInBdg(ctx, bdg, sync, false); err != nil {
+			return err
+		}
+	}
+
+	if !sync[wObjID] {
+		logger.V(2).Info("Singleton workload object should not have status synced, cleaning status",
 			"resource", ref.SourceObjectIdentifier.Resource, "objectName", ref.SourceObjectIdentifier.ObjectName)
-		return nil
+		return c.reconcileSingletonWObj(ctx, wObjID, false)
 	} else {
 		logger.V(2).Info("Singleton workload object should have status synced, updating status",
 			"resource", ref.SourceObjectIdentifier.Resource, "objectName", ref.SourceObjectIdentifier.ObjectName)
-		return updateObjectStatus(ctx, &ref.SourceObjectIdentifier, status, c.listers, c.wdsDynClient)
+		wsObj, err := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
+		if err != nil {
+			return err
+		}
+		status, err := util.GetWorkStatusStatus(wsObj)
+		if err != nil {
+			return err
+		}
+		if status == nil {
+			// when status is updated, a new event will trigger update
+			return nil
+		}
+		return updateObjectStatus(ctx, &wObjID, status, c.listers, c.wdsDynClient)
 	}
+}
+
+func (c *Controller) lookForSingletonWorkloadInBdg(ctx context.Context, binding v1alpha1.Binding, sync map[util.ObjectIdentifier]bool, init bool) error {
+	logger := klog.FromContext(ctx)
+	for _, item := range binding.Spec.Workload.NamespaceScope {
+		nsWObjRef := item.NamespaceScopeDownsyncObject
+		lister, found := c.listers.Get(schema.GroupVersionResource(nsWObjRef.GroupVersionResource))
+		if !found {
+			return fmt.Errorf("could not get lister for gvr: %s", nsWObjRef.GroupVersionResource)
+		}
+		nsWObj, err := lister.ByNamespace(nsWObjRef.Namespace).Get(nsWObjRef.Name)
+		if err != nil {
+			return err
+		}
+		labels := nsWObj.(metav1.Object).GetLabels()
+		if v, ok := labels[util.BindingPolicyLabelSingletonStatusKey]; ok {
+			wObjIdentifier := util.ObjectIdentifier{
+				GVK:        schema.GroupVersionKind{Group: nsWObjRef.Group, Version: nsWObjRef.Version, Kind: nsWObj.GetObjectKind().GroupVersionKind().Kind},
+				Resource:   nsWObjRef.Resource,
+				ObjectName: cache.NewObjectName(nsWObjRef.Namespace, nsWObjRef.Name),
+			}
+			if init {
+				sync[wObjIdentifier] = false // hold a place
+			} else {
+				if _, ok = sync[wObjIdentifier]; !ok {
+					continue
+				}
+			}
+			if v == util.BindingPolicyLabelSingletonStatusValueSet && binding.GetDeletionTimestamp() == nil && len(binding.Spec.Destinations) > 0 {
+				logger.V(2).Info("Singleton workload object should have status synced", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", binding.Name)
+				sync[wObjIdentifier] = true
+			}
+		}
+	}
+	for _, item := range binding.Spec.Workload.ClusterScope {
+		cWObjRef := item.ClusterScopeDownsyncObject
+		lister, found := c.listers.Get(schema.GroupVersionResource(cWObjRef.GroupVersionResource))
+		if !found {
+			return fmt.Errorf("could not get lister for gvr: %s", cWObjRef.GroupVersionResource)
+		}
+		clusterWObj, err := lister.Get(cWObjRef.Name)
+		if err != nil {
+			return err
+		}
+		labels := clusterWObj.(metav1.Object).GetLabels()
+		if v, ok := labels[util.BindingPolicyLabelSingletonStatusKey]; ok {
+			wObjIdentifier := util.ObjectIdentifier{
+				GVK:        schema.GroupVersionKind{Group: cWObjRef.Group, Version: cWObjRef.Version, Kind: clusterWObj.GetObjectKind().GroupVersionKind().Kind},
+				Resource:   cWObjRef.Resource,
+				ObjectName: cache.NewObjectName("", cWObjRef.Name),
+			}
+			if init {
+				sync[wObjIdentifier] = false // hold a place
+			} else {
+				if _, ok = sync[wObjIdentifier]; !ok {
+					continue
+				}
+			}
+			if v == util.BindingPolicyLabelSingletonStatusValueSet && binding.GetDeletionTimestamp() == nil && len(binding.Spec.Destinations) > 0 {
+				logger.V(2).Info("Singleton workload object should have status synced", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", binding.Name)
+				sync[wObjIdentifier] = true
+			}
+		}
+	}
+	return nil
 }

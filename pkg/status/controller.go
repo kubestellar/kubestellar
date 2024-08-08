@@ -80,8 +80,6 @@ type Controller struct {
 	celEvaluator            *celEvaluator
 	bindingResolutionBroker binding.ResolutionBroker
 	combinedStatusResolver  CombinedStatusResolver
-
-	singletonState singletonState
 }
 
 // bindingRef is a workqueue item that references a Binding
@@ -141,7 +139,6 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 		itsDynClient:            itsDynClient,
 		workqueue:               workqueue.NewRateLimitingQueue(ratelimiter),
 		bindingResolutionBroker: bindingResolutionBroker,
-		singletonState:          singletonState{wObjSync: map[util.ObjectIdentifier]bool{}},
 	}
 
 	return controller, nil
@@ -205,8 +202,6 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 		c.workqueue.Add(bindingRef(bindingPolicyKey))
 	}) // this will have the broker call the callback for all existing resolutions
 	c.logger.Info("Registered binding resolution broker callback")
-
-	c.buildSingletonStateAndOptionallyReconcile(ctx, false)
 
 	c.logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
