@@ -36,11 +36,23 @@ type singletonState struct {
 	wObjSync map[util.ObjectIdentifier]bool
 }
 
-func (ss *singletonState) get(id util.ObjectIdentifier) bool {
+func (ss *singletonState) get(id util.ObjectIdentifier) (sync, exists bool) {
 	ss.Lock()
 	defer ss.Unlock()
 
-	return ss.wObjSync[id]
+	sync, exists = ss.wObjSync[id]
+	return
+}
+
+func (ss *singletonState) keys() []util.ObjectIdentifier {
+	ss.RLock()
+	defer ss.RUnlock()
+
+	keys := make([]util.ObjectIdentifier, 0, len(ss.wObjSync))
+	for oi := range ss.wObjSync {
+		keys = append(keys, oi)
+	}
+	return keys
 }
 
 func (ss *singletonState) set(id util.ObjectIdentifier) {
@@ -77,7 +89,7 @@ func (c *Controller) buildSingletonStateAndOptionallyReconcile(ctx context.Conte
 	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Building the desired state for singleton statuses")
 
-	for wObjIdentifier := range c.singletonState.wObjSync {
+	for _, wObjIdentifier := range c.singletonState.keys() {
 		gvr := schema.GroupVersionResource{Group: wObjIdentifier.GVK.Group, Version: wObjIdentifier.GVK.Version, Resource: wObjIdentifier.Resource}
 		lister, found := c.listers.Get(gvr)
 		if !found {
@@ -157,7 +169,7 @@ func (c *Controller) buildSingletonStateAndOptionallyReconcile(ctx context.Conte
 		return nil
 	}
 
-	for wObjIdentifier := range c.singletonState.wObjSync {
+	for _, wObjIdentifier := range c.singletonState.keys() {
 		if err := c.reconcileSingletonByWObj(ctx, wObjIdentifier); err != nil {
 			return err
 		}
@@ -169,7 +181,9 @@ func (c *Controller) reconcileSingletonByWObj(ctx context.Context, wObjID util.O
 	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Reconciling singleton workload object", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
 
-	if !c.singletonState.get(wObjID) {
+	if sync, exists := c.singletonState.get(wObjID); !exists {
+		return fmt.Errorf("workload object not found in singleton state %s", wObjID.ObjectName)
+	} else if !sync {
 		emptyStatus := make(map[string]interface{})
 		return updateObjectStatus(ctx, &wObjID, emptyStatus, c.listers, c.wdsDynClient)
 	}
@@ -208,7 +222,7 @@ func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWo
 	logger.V(2).Info("Reconciling singleton status due to workstatus changes", "name", string(ref.Name))
 	obj, _ := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
 	status, _ := util.GetWorkStatusStatus(obj)
-	if sync, ok := c.singletonState.wObjSync[ref.SourceObjectIdentifier]; !ok {
+	if sync, exists := c.singletonState.get(ref.SourceObjectIdentifier); !exists {
 		logger.V(2).Info("Not a singleton workload object", "objectIdentifier", ref.SourceObjectIdentifier)
 		return nil
 	} else if !sync {
