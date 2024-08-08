@@ -250,7 +250,7 @@ func PatchStatus(ctx context.Context, unstrObj *unstructured.Unstructured, statu
 
 	if err != nil {
 		if errors.IsNotFound(err) {
-			logger.V(5).Info("could not find object to patch", "object", unstrObj)
+			logger.V(2).Info("could not find object to patch", "object", unstrObj)
 			return nil
 		}
 	}

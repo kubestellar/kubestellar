@@ -41,7 +41,7 @@ jobs:
       - name: Run test
         run: |
           cd test/e2e 
-          KFLEX_DISABLE_CHATTY=true ./run-test.sh --released --test-type ginkgo
+          KFLEX_DISABLE_CHATTY=true ./run-test.sh --released --test-type ginkgo --kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5
 
       - name: show kubeconfig contexts
         if: always()

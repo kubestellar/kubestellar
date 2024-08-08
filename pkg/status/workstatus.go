@@ -118,7 +118,7 @@ func (c *Controller) syncSingletonWorkStatus(ctx context.Context, ref singletonW
 		return nil
 	}
 
-	logger.Info("Updating singleton status", "objectIdentifier", ref.SourceObjectIdentifier)
+	logger.V(2).Info("Updating singleton status", "objectIdentifier", ref.SourceObjectIdentifier)
 	if err = updateObjectStatus(ctx, &ref.SourceObjectIdentifier, status, c.listers, c.wdsDynClient); err != nil {
 		return err
 	}
@@ -133,14 +133,14 @@ func updateObjectStatus(ctx context.Context, objectIdentifier *util.ObjectIdenti
 	gvr := objectIdentifier.GVR()
 	lister, found := listers.Get(gvr)
 	if !found {
-		logger.V(5).Info("Could not find lister for gvr", "gvr", gvr)
+		logger.V(2).Info("Could not find lister for gvr", "gvr", gvr)
 		return nil
 	}
 
 	obj, err := lister.ByNamespace(objectIdentifier.ObjectName.Namespace).Get(objectIdentifier.ObjectName.Name)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			logger.V(5).Info("Could not find object", "objectIdentifier", objectIdentifier)
+			logger.V(2).Info("Could not find object", "objectIdentifier", objectIdentifier)
 			return nil
 		}
 

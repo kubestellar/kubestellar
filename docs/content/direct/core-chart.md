@@ -62,6 +62,15 @@ This can be:
 The KubeStellar chart makes available to the user several values that may be used to customize its installation into an existing cluster:
 
 ```yaml
+# Control controller log verbosity
+# The "default" verbosity value will be used for all controllers unless a specific controller verbosity override is specified
+verbosity:
+  default: 2
+  # Specific controller verbosity overrides:
+  # kubestellar: 6 (controller-manager)
+  # clusteradm: 6
+  # transport: 6
+
 # KubeFlex override values
 kubeflex-operator:
   install: true # enable/disable the installation of KubeFlex by the chart (default: true)

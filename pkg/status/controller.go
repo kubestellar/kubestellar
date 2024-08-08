@@ -427,7 +427,7 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
 		c.workqueue.Forget(item)
-		c.logger.V(2).Info("Successfully synced", "object", item, "type", fmt.Sprintf("%T", item))
+		c.logger.V(4).Info("Successfully synced", "object", item, "type", fmt.Sprintf("%T", item))
 		return nil
 	}(item)
 

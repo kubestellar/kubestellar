@@ -39,14 +39,14 @@ type APIResource struct {
 }
 
 // Handle CRDs should account for CRDs being added or deleted to start/stop new informers as needed
-func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIdentifier) error {
+func (c *Controller) syncCRD(ctx context.Context, objIdentifier util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
 	var crdObj *apiextensionsv1.CustomResourceDefinition
 	var specVersions []apiextensionsv1.CustomResourceDefinitionVersion
 
 	obj, err := c.getObjectFromIdentifier(objIdentifier)
 	if errors.IsNotFound(err) {
-		logger.V(2).Info("Handling deleted CRD", "name", objIdentifier.ObjectName.Name)
+		logger.V(2).Info("Syncing deleted CRD", "name", objIdentifier.ObjectName.Name)
 	} else if err != nil {
 		return fmt.Errorf("failed to get runtime.Object from identifier (%v): %w", objIdentifier, err)
 	} else {
@@ -94,11 +94,11 @@ func (c *Controller) handleCRD(ctx context.Context, objIdentifier util.ObjectIde
 	}
 
 	for _, gvr := range toStopList {
-		logger.Info("API should not be watched, ensuring the informer's absence.", "gvr", gvr)
 		stopper, ok := c.stoppers.Get(gvr)
 		if !ok {
-			logger.V(3).Info("Informer is already absent.", "gvr", gvr)
+			logger.V(5).Info("Informer is already absent.", "gvr", gvr)
 		} else {
+			logger.V(2).Info("API should not be watched, ensuring the informer's absence.", "gvr", gvr)
 			// close channel
 			close(stopper)
 		}
@@ -140,11 +140,11 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 		gvr := toStart.groupVersion.WithResource(toStart.resource.Name)
 
 		if _, found := c.informers.Get(gvr); found {
-			logger.V(3).Info("Informer already ensured.", "gvr", gvr)
+			logger.V(5).Info("Informer already ensured.", "gvr", gvr)
 			continue
 		}
 		// from this point onwards, the gvr is guaranteed not to be mapped in the informers, listers and stoppers maps
-		logger.Info("New API added. Starting informer for:", "group", toStart.groupVersion.Group,
+		logger.V(2).Info("New API added. Starting informer for:", "group", toStart.groupVersion.Group,
 			"version", toStart.groupVersion, "kind", toStart.resource.Kind, "resource", toStart.resource.Name)
 
 		informer := cache.NewSharedIndexInformer(

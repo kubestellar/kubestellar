@@ -35,7 +35,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
@@ -60,6 +59,7 @@ const (
 	FieldManager = "kubestellar"
 )
 
+// ApplyCRDs ensures that the KubeStellar control CRDs exist and are "established".
 func ApplyCRDs(ctx context.Context, controllerName string, clientset kubernetes.Interface, clientsetExt apiextensionsclientset.Interface, logger logr.Logger) error {
 	ctxLimited, cancel := context.WithTimeout(ctx, time.Minute)
 	defer cancel()
@@ -72,7 +72,7 @@ func ApplyCRDs(ctx context.Context, controllerName string, clientset kubernetes.
 	crdUnstructureds = filterCRDsByNames(crdUnstructureds, crdNames)
 
 	for _, crdU := range crdUnstructureds {
-		logger.Info("applying crd", "name", crdU.GetName())
+		logger.V(1).Info("Applying CRD", "name", crdU.GetName())
 
 		desiredCRD := &apiextensionsv1.CustomResourceDefinition{}
 		err = runtime.DefaultUnstructuredConverter.FromUnstructured(crdU.UnstructuredContent(), desiredCRD)
@@ -82,7 +82,7 @@ func ApplyCRDs(ctx context.Context, controllerName string, clientset kubernetes.
 		crdIfc := clientsetExt.ApiextensionsV1().CustomResourceDefinitions()
 		_, err = crdIfc.Create(ctx, desiredCRD, metav1.CreateOptions{FieldManager: controllerName})
 		if err == nil {
-			logger.Info("Created CRD %s", desiredCRD.Name)
+			logger.Info("Created CRD", "name", desiredCRD.Name)
 		} else if !errors.IsAlreadyExists(err) {
 			return fmt.Errorf("unable to create CRD named %s: %w", crdU.GetName(), err)
 		} else {
@@ -99,6 +99,7 @@ func ApplyCRDs(ctx context.Context, controllerName string, clientset kubernetes.
 			if err != nil {
 				return fmt.Errorf("unable to update existing CRD named %s: %w", crdU.GetName(), err)
 			}
+			logger.Info("Updated CRD", "name", desiredCRD.Name)
 		}
 
 		// wait until name accepted
@@ -106,26 +107,9 @@ func ApplyCRDs(ctx context.Context, controllerName string, clientset kubernetes.
 		if err != nil {
 			return err
 		}
-		logger.Info("crd established", "name", crdU.GetName())
+		logger.Info("CRD is established", "name", crdU.GetName())
 	}
 	return nil
-}
-
-// Convert GroupVersionKind to GroupVersionResource
-func groupVersionKindToResource(clientset kubernetes.Interface, gvk schema.GroupVersionKind, logger logr.Logger) (*schema.GroupVersionResource, error) {
-	gv := gvk.GroupVersion().String()
-	list, err := clientset.Discovery().ServerResourcesForGroupVersion(gv)
-	if err != nil {
-		logger.Info("Error getting APIResourceList", "gv", gv, "error", err.Error())
-	}
-
-	for _, apiResource := range list.APIResources {
-		if apiResource.Kind == gvk.Kind {
-			return &schema.GroupVersionResource{Group: gvk.Group, Version: gvk.Version, Resource: apiResource.Name}, nil
-		}
-	}
-
-	return nil, fmt.Errorf("GroupVersionResource not found for GroupVersionKind: %v", gvk)
 }
 
 func filterCRDsByNames(crds []*unstructured.Unstructured, names sets.Set[string]) []*unstructured.Unstructured {
