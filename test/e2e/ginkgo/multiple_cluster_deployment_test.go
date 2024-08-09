@@ -560,13 +560,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 
 			// The status controller, 'recovered' from the simulated crush, should drive the singleton status
 			// of the Deployment towards eventual consistency, i.e. clean the 'previously synced but currently invalid' status.
-			// That is, we should write func ValidateSingletonStatusZeroValue here instead of ValidateSingletonStatus**Non**ZeroValue.
-			// But that would break the CI without the the improved status controller in-place yet.
-			// More importantly, this func demonstrates the status controller's current 'eventually **in**consistent' behavior.
-			// This func must be replaced by util.ValidateSingletonStatusZeroValue once the improvemets are merged.
-			util.ValidateSingletonStatusNonZeroValue(ctx, wds, ns, "nginx-singleton")
-			// TODO: Write the line below instead of the line above.
-			// util.ValidateSingletonStatusZeroValue(ctx, wds, ns, "nginx-singleton")
+			util.ValidateSingletonStatusZeroValue(ctx, wds, ns, "nginx-singleton")
 		})
 	})
 
