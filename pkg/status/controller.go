@@ -446,10 +446,8 @@ func (c *Controller) reconcile(ctx context.Context, item any) error {
 	case workStatusRef:
 		return c.syncWorkStatus(ctx, ref)
 	case singletonWorkStatusRef:
-		c.reconcileSingletonByWs(ctx, ref)
 		return c.syncSingletonWorkStatus(ctx, ref)
 	case bindingRef:
-		c.reconcileSingletonByBdg(ctx, ref)
 		return c.syncBinding(ctx, string(ref))
 	case statusCollectorRef:
 		return c.syncStatusCollector(ctx, string(ref))

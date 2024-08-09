@@ -33,13 +33,13 @@ import (
 
 // reconcileSingletonByBdg goes over the binding-covered workload objects, decides sync or not for each of the workload objects,
 // then maintains their statuses based on the decisions.
-func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgRef bindingRef) error {
+func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string) error {
 	logger := klog.FromContext(ctx)
-	logger.V(2).Info("Reconciling singleton status due to binding change", "binding", string(bdgRef))
+	logger.V(2).Info("Reconciling singleton status due to binding change", "binding", bdgName)
 
-	binding, err := c.wdsKsClient.ControlV1alpha1().Bindings().Get(ctx, string(bdgRef), metav1.GetOptions{})
+	binding, err := c.wdsKsClient.ControlV1alpha1().Bindings().Get(ctx, bdgName, metav1.GetOptions{})
 	if err != nil {
-		return fmt.Errorf("could not get binding %s from cache", string(bdgRef))
+		return fmt.Errorf("could not get binding %s from cache", bdgName)
 	}
 
 	sync := make(map[util.ObjectIdentifier]bool)
@@ -162,7 +162,6 @@ func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWo
 			return err
 		}
 		if status == nil {
-			// when status is updated, a new event will trigger update
 			return nil
 		}
 		return updateObjectStatus(ctx, &wObjID, status, c.listers, c.wdsDynClient)

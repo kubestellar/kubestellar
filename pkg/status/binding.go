@@ -39,6 +39,10 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
+	if err := c.reconcileSingletonByBdg(ctx, key); err != nil {
+		return err
+	}
+
 	logger.V(5).Info("Synced Binding", "key", key)
 	return nil
 }
