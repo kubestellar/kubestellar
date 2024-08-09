@@ -28,6 +28,7 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	ocmWorkClient "open-cluster-management.io/api/client/work/clientset/versioned"
+	v1 "open-cluster-management.io/api/work/v1"
 
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -374,6 +375,36 @@ func CreateJob(ctx context.Context, wds *kubernetes.Clientset, ns string, name s
 type countAndProblems struct {
 	count    int
 	problems []string
+}
+
+func GetDeploymentTime(ctx context.Context, clientset *kubernetes.Clientset, ns string, name string) time.Time {
+	var deployment *appsv1.Deployment
+	gomega.Eventually(func() error {
+		var err error
+		deployment, err = clientset.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
+		return err
+	}, timeout).Should(gomega.Succeed())
+	return deployment.CreationTimestamp.Time
+}
+
+func GetBindingTime(ctx context.Context, clientset *ksClient.Clientset, name string) time.Time {
+	var binding *ksapi.Binding
+	gomega.Eventually(func() error {
+		var err error
+		binding, err = clientset.ControlV1alpha1().Bindings().Get(ctx, name, metav1.GetOptions{})
+		return err
+	}, timeout).Should(gomega.Succeed())
+	return binding.CreationTimestamp.Time
+}
+
+func GetManifestworkTime(ctx context.Context, ocmWorkImbs *ocmWorkClient.Clientset, ns string, name string) time.Time {
+	var manifestwork *v1.ManifestWork
+	gomega.Eventually(func() error {
+		var err error
+		manifestwork, err = ocmWorkImbs.WorkV1().ManifestWorks(ns).Get(ctx, name, metav1.GetOptions{})
+		return err
+	}, timeout).Should(gomega.Succeed())
+	return manifestwork.CreationTimestamp.Time
 }
 
 // ValidateNumDeployments waits a limited amount of time for the number of Deployment objects to equal the given count and
