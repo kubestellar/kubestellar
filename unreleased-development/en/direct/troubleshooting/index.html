@@ -1297,6 +1297,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#debug-log-levels" class="md-nav__link">
+    Debug log levels
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#things-to-look-at" class="md-nav__link">
     Things to look at
   </a>
@@ -2118,6 +2125,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#debug-log-levels" class="md-nav__link">
+    Debug log levels
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#things-to-look-at" class="md-nav__link">
     Things to look at
   </a>
@@ -2164,12 +2178,35 @@
 
 <h1 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">#</a></h1>
 <p>This guide is a work in progress.</p>
+<h2 id="debug-log-levels">Debug log levels<a class="headerlink" href="#debug-log-levels" title="Permanent link">#</a></h2>
+<p>The KubeStellar controllers take an optional command line flag that
+sets the level of debug logging to emit. Each debug log message is
+associated with a <em>log level</em>, which is a non-negative integer. Higher
+numbers correspond to messages that appear more frequently and/or give
+more details. The flag's name is <code>-v</code> and its value sets the highest
+log level that gets emitted; higher level messages are suppressed.</p>
+<p>The KubeStellar debug log messages are assigned to log levels roughly
+according to the following rules. Note that the various Kubernetes
+libraries used in these controllers also emit leveled debug log
+messages, according to their own numbering conventions. The
+KubeStellar rules are designed to not be very inconsistent with the
+Kubernetes practice.</p>
+<ul>
+<li><strong>0</strong>: messages that appear O(1) times per run.</li>
+<li><strong>1</strong>: more detailed messages that appear O(1) times per run.</li>
+<li><strong>2</strong>: messages that appear O(1) times per lifecycle event of an API object or important conjunction of them (e.g., when a Binding associates a workload object with a WEC).</li>
+<li><strong>3</strong>: more detailed messages that appear O(1) times per lifecycle event of an API object or important conjunction of them.</li>
+<li><strong>4</strong>: messages that appear O(1) times per sync. A sync is when a controller reads the current state of one API object and reacts to that.</li>
+<li><strong>5</strong>: more detailed messages that appear O(1) times per sync.</li>
+</ul>
+<p>The <a href="../core-chart/">core Helm chart</a> has "values" that set the
+verbosity (<code>-v</code>) of various controllers.</p>
 <h2 id="things-to-look-at">Things to look at<a class="headerlink" href="#things-to-look-at" title="Permanent link">#</a></h2>
 <ul>
 <li>Remember that for each of your BindingPolicy objects, there is a corresponding Binding object that reports what is matching the policy object.</li>
 <li>Although not part of the interface, when debugging you can look at the ManifestWork and WorkStatus objects in the ITS.</li>
 <li>Look at logs of controllers. If they have had container restarts that look relevant, look also at the previous logs. Do not forget OCM controllers. Do not forget that some Pods have more than one interesting container.</li>
-<li>If a controller's <code>-v</code> is not at least 4, increase it.</li>
+<li>If a controller's <code>-v</code> is not at least 5, increase it.</li>
 <li>Remember that Kubernetes controllers tend to report transient problems as errors without making it clear that the problem is transient and tend to not make it clear if/when the problem has been resolved (sigh).</li>
 </ul>
 <h2 id="making-a-good-trouble-report">Making a good trouble report<a class="headerlink" href="#making-a-good-trouble-report" title="Permanent link">#</a></h2>
