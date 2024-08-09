@@ -170,5 +170,5 @@ func GenericMain(transportImplementation transport.Transport) {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
-	logger.Info("transport controller stopped")
+	logger.Info("Transport controller stopped")
 }

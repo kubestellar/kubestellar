@@ -62,7 +62,7 @@ func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error 
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
-	logger.Info("Synced StatusCollector", "ref", ref)
+	logger.V(5).Info("Synced StatusCollector", "ref", ref)
 	return nil
 }
 
@@ -154,7 +154,7 @@ func (c *Controller) updateStatusCollectorErrors(ctx context.Context, statusColl
 		}
 	}
 
-	logger.Info("Updated StatusCollector status", "ns", statusCollector.Namespace,
+	logger.V(2).Info("Updated StatusCollector status", "ns", statusCollector.Namespace,
 		"name", statusCollector.Name, "resourceVersion", scEcho.ResourceVersion)
 	return nil
 }

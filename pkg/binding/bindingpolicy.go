@@ -82,7 +82,7 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 			return fmt.Errorf("failed to ocm.FindClustersBySelectors: %w", err)
 		}
 		if len(clusterSet) == 0 {
-			logger.Info("No clusters are selected by BindingPolicy", "name", bindingPolicy.Name)
+			logger.V(4).Info("No clusters are selected by BindingPolicy", "name", bindingPolicy.Name)
 		}
 
 		if bindingPolicy.Spec.WantSingletonReportedState {
@@ -98,7 +98,7 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 		// we can skip handling the error since the call to BindingPolicyResolver::NoteBindingPolicy above
 		// guarantees that an error won't be returned here
 		_ = c.bindingPolicyResolver.SetDestinations(bindingPolicy.GetName(), clusterSet)
-		logger.V(4).Info("Enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
+		logger.V(5).Info("Enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
 		c.enqueueBinding(bindingPolicy.GetName())
 
 		// requeue all objects to account for changes in bindingpolicy.
@@ -125,7 +125,7 @@ func (c *Controller) deleteResolutionForBindingPolicy(ctx context.Context, bindi
 
 	logger := klog.FromContext(ctx)
 	c.bindingPolicyResolver.DeleteResolution(bindingPolicyName)
-	logger.Info("Deleted resolution for bindingpolicy", "name", bindingPolicyName)
+	logger.V(2).Info("Deleted resolution for bindingpolicy", "name", bindingPolicyName)
 
 	return nil
 }
@@ -144,7 +144,7 @@ func (c *Controller) requeueSelectedWorkloadObjects(ctx context.Context, binding
 
 	logger := klog.FromContext(ctx)
 	for objIdentifier := range objectIdentifiers {
-		logger.V(4).Info("Enqueuing workload object due to change in BindingPolicy",
+		logger.V(5).Info("Enqueuing workload object due to change in BindingPolicy",
 			"objectIdentifier", objIdentifier, "bindingPolicyName", bindingPolicyName)
 		c.enqueueObjectIdentifier(objIdentifier)
 	}
@@ -155,7 +155,7 @@ func (c *Controller) requeueSelectedWorkloadObjects(ctx context.Context, binding
 func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clusterId string, oldLabels labels.Set, newLabels labels.Set) {
 	logger := klog.FromContext(ctx)
 
-	logger.Info("Evaluating BindingPolicies for cluster", "clusterId", clusterId)
+	logger.V(5).Info("Evaluating BindingPolicies for cluster", "clusterId", clusterId)
 	bindingPolicies, err := c.listBindingPolicies()
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -173,7 +173,7 @@ func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clust
 			return
 		}
 		if match1 != match2 {
-			logger.V(4).Info("Enqueuing reference to bindingPolicy because of changing match with cluster", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name, "oldMatch", match1, "newMatch", match2, "oldLabels", oldLabels, "newLabels", newLabels)
+			logger.V(5).Info("Enqueuing reference to bindingPolicy because of changing match with cluster", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name, "oldMatch", match1, "newMatch", match2, "oldLabels", oldLabels, "newLabels", newLabels)
 			c.workqueue.Add(bindingPolicyRef(bindingPolicy.Name))
 		}
 	}
@@ -182,7 +182,7 @@ func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clust
 func (c *Controller) evaluateBindingPolicies(ctx context.Context, clusterId string, labelsSet labels.Set) {
 	logger := klog.FromContext(ctx)
 
-	logger.Info("evaluating BindingPolicies")
+	logger.V(5).Info("evaluating BindingPolicies", "clusterId", clusterId)
 	bindingPolicies, err := c.listBindingPolicies()
 	if err != nil {
 		utilruntime.HandleError(err)
@@ -195,7 +195,7 @@ func (c *Controller) evaluateBindingPolicies(ctx context.Context, clusterId stri
 			return
 		}
 		if match {
-			logger.V(4).Info("Enqueuing reference to BindingPolicy due to cluster notification", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
+			logger.V(5).Info("Enqueuing reference to BindingPolicy due to cluster notification", "clusterId", clusterId, "bindingPolicyName", bindingPolicy.Name)
 			c.workqueue.Add(bindingPolicyRef(bindingPolicy.Name))
 		}
 	}
@@ -220,7 +220,7 @@ func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyNa
 	return c.listers.Iterator(func(key schema.GroupVersionResource, lister cache.GenericLister) error {
 		// do not requeue bindingpolicies or bindings
 		if key == util.GetBindingPolicyGVR() || key == util.GetBindingGVR() {
-			logger.Info("Not enqueuing control object", "key", key)
+			logger.V(5).Info("Not enqueuing control object as a workload object", "key", key)
 			return nil // continue iterating
 		}
 
@@ -230,7 +230,7 @@ func (c *Controller) requeueWorkloadObjects(ctx context.Context, bindingPolicyNa
 		}
 
 		for _, obj := range objs {
-			logger.V(4).Info("Enqueuing workload object due to BindingPolicy",
+			logger.V(5).Info("Enqueuing workload object due to BindingPolicy",
 				"listerKey", key, "obj", util.RefToRuntimeObj(obj),
 				"bindingPolicyName", bindingPolicyName)
 			c.enqueueObject(obj, key.GroupResource().Resource)
@@ -316,7 +316,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(context.TODO(),
 					objIdentifier.ObjectName.Namespace, metav1.GetOptions{})
 				if err != nil {
-					logger.Info("Object namespace not found, assuming object does not match",
+					logger.V(3).Info("Object namespace not found, assuming object does not match",
 						"object identifier", objIdentifier)
 					continue
 				}
@@ -326,7 +326,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 			}
 		}
 
-		klog.FromContext(ctx).V(4).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
+		klog.FromContext(ctx).V(5).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
 		// test is a match
 		matchedStatusCollectors.Insert(test.StatusCollectors...)
 		matched = true
@@ -340,7 +340,7 @@ func labelsMatchAny(logger logr.Logger, labelSet map[string]string, selectors []
 	for _, ls := range selectors {
 		sel, err := metav1.LabelSelectorAsSelector(&ls)
 		if err != nil {
-			logger.Info("Failed to convert LabelSelector to labels.Selector", "ls", ls, "err", err)
+			logger.V(3).Info("Failed to convert LabelSelector to labels.Selector", "ls", ls, "err", err)
 			continue
 		}
 		if sel.Matches(labels.Set(labelSet)) {

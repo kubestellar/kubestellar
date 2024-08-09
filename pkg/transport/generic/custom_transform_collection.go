@@ -188,7 +188,7 @@ func (ctc *customTransformCollectionImpl) parseRemovesAndUpdateStatus(ctx contex
 	if err != nil {
 		logger.Error(err, "Failed to write status of CustomTransform", "name", ct.Name, "resourceVersion", ct.ResourceVersion, "status", ctCopy.Status)
 	} else {
-		logger.V(4).Info("Wrote status of CustomTransform", "name", ct.Name, "resourceVersion", ctEcho.ResourceVersion, "observedGeneration", ctCopy.Status.ObservedGeneration)
+		logger.V(2).Info("Wrote status of CustomTransform", "name", ct.Name, "resourceVersion", ctEcho.ResourceVersion, "observedGeneration", ctCopy.Status.ObservedGeneration)
 	}
 	return
 }

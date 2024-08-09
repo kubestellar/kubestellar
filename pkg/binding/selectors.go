@@ -76,13 +76,13 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 					"objectIdentifier", objIdentifier)
 				c.enqueueBinding(bindingPolicy.GetName())
 			} else {
-				logger.V(4).Info("Not enqueuing Binding for syncing, because its resolution continues "+
+				logger.V(5).Info("Not enqueuing Binding for syncing, because its resolution continues "+
 					"to not include workload object", "binding", bindingPolicy.GetName(),
 					"objectIdentifier", objIdentifier)
 			}
 			continue
 		}
-		logger.V(4).Info("BindingPolicy matched workload object", "policy", bindingPolicy.Name, "objIdentifier", objIdentifier)
+		logger.V(5).Info("BindingPolicy matched workload object", "policy", bindingPolicy.Name, "objIdentifier", objIdentifier)
 
 		// obj is selected by bindingpolicy, update the bindingpolicy resolver
 		resolutionUpdated, err := c.bindingPolicyResolver.EnsureObjectData(bindingPolicy.GetName(),
@@ -104,13 +104,13 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 
 		if resolutionUpdated {
 			// enqueue binding to be synced since an object was added to its bindingpolicy's resolution
-			logger.V(4).Info("Enqueued Binding for syncing due to a noting of an "+
+			logger.V(5).Info("Enqueued Binding for syncing due to a noting of an "+
 				"object in its resolution", "binding", bindingPolicy.GetName(),
 				"objectIdentifier", objIdentifier, "objBeingDeleted", objBeingDeleted,
 				"resourceVersion", objMR.GetResourceVersion())
 			c.enqueueBinding(bindingPolicy.GetName())
 		} else {
-			logger.V(5).Info("Not enqueuing Binding due to no change in resolution",
+			logger.V(5).Info("Not enqueuing Binding, due to no change in resolution",
 				"binding", bindingPolicy.GetName(),
 				"objectIdentifier", objIdentifier, "objBeingDeleted", objBeingDeleted,
 				"resourceVersion", objMR.GetResourceVersion())
@@ -193,7 +193,7 @@ func (c *Controller) removeObjectFromBindingPolicies(ctx context.Context, objIde
 		if resolutionUpdated := c.bindingPolicyResolver.RemoveObjectIdentifier(bindingPolicy.GetName(),
 			objIdentifier); resolutionUpdated {
 			// enqueue binding to be synced since object was removed from its bindingpolicy's resolution
-			logger.V(4).Info("Enqueuing Binding due to deletion of matching object", "bindingPolicy", bindingPolicy.Name, "object", objIdentifier)
+			logger.V(5).Info("Enqueuing Binding due to deletion of matching object", "bindingPolicy", bindingPolicy.Name, "object", objIdentifier)
 			c.enqueueBinding(bindingPolicy.GetName())
 		} else {
 			logger.V(5).Info("Not enqueuing Binding due to deletion of non-matching object", "bindingPolicy", bindingPolicy.Name, "object", objIdentifier)

@@ -459,7 +459,7 @@ func (c *Controller) setupManagedClustersInformer(ctx context.Context) error {
 			oldLabels := oldM.GetLabels()
 			newLabels := newM.GetLabels()
 			if !reflect.DeepEqual(oldLabels, newLabels) {
-				c.logger.V(4).Info("Handling labels change", "old", old, "new", new)
+				c.logger.V(5).Info("Handling labels change", "old", old, "new", new)
 				c.evaluateBindingPoliciesForUpdate(ctx, newM.GetName(), oldLabels, newLabels)
 			}
 		},
@@ -581,7 +581,7 @@ func (c *Controller) handleObject(obj any, resource string, eventType string) {
 		obj = typed.Obj
 		wasDeletedFinalStateUnknown = true
 	}
-	c.logger.V(4).Info("Got object event", "eventType", eventType,
+	c.logger.V(5).Info("Got object event", "eventType", eventType,
 		"wasDeletedFinalStateUnknown", wasDeletedFinalStateUnknown, "obj", util.RefToRuntimeObj(obj.(runtime.Object)),
 		"resource", resource)
 
@@ -667,15 +667,15 @@ func (c *Controller) reconcile(ctx context.Context, item any) error {
 			// will add name.
 		}
 
-		logger.Info("Handled bindingpolicy", "objectIdentifier", objIdentifier)
+		logger.V(5).Info("Handled bindingpolicy", "objectIdentifier", objIdentifier)
 		return nil
 	case util.ObjectIdentifier:
 		if util.ObjIdentifierIsForCRD(objIdentifier) {
-			if err := c.handleCRD(ctx, objIdentifier); err != nil {
+			if err := c.syncCRD(ctx, objIdentifier); err != nil {
 				return fmt.Errorf("failed to handle CRD: %w", err) // error logging after this call
 				// will add name.
 			}
-			logger.Info("Handled CRD", "objectIdentifier", objIdentifier)
+			logger.V(5).Info("Handled CRD", "objectIdentifier", objIdentifier)
 		}
 
 		return c.updateResolutions(ctx, objIdentifier)

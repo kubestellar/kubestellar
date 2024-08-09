@@ -76,7 +76,7 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 		return nil
 	}
 
-	logger.Info("binding is up to date", "name", binding.GetName())
+	logger.V(4).Info("binding is up to date", "name", binding.GetName())
 	return nil
 }
 
@@ -106,13 +106,13 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 				return fmt.Errorf("failed to create binding (name=%s): %w", bdg.Name, err)
 			}
 
-			logger.Info("created binding", "name", bdg.GetName(), "resourceVersion", bdgEcho.ResourceVersion)
+			logger.V(2).Info("created binding", "name", bdg.GetName(), "resourceVersion", bdgEcho.ResourceVersion)
 			return nil
 		} else {
 			return fmt.Errorf("failed to update binding: %w", err)
 		}
 	}
 
-	logger.Info("updated binding", "name", bdg.GetName(), "resourceVersion", bdgEcho.ResourceVersion)
+	logger.V(2).Info("updated binding", "name", bdg.GetName(), "resourceVersion", bdgEcho.ResourceVersion)
 	return nil
 }

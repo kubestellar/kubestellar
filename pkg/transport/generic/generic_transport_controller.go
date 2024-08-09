@@ -377,7 +377,7 @@ type genericTransportController struct {
 // This func *shouldn't* handle any resource other than Binding.
 func (c *genericTransportController) handleBinding(obj interface{}, event string) {
 	binding := obj.(*v1alpha1.Binding)
-	c.logger.V(4).Info("Enqueuing reference to Binding due to informer event about that Binding", "name", binding.Name, "resourceVersion", binding.ResourceVersion, "event", event)
+	c.logger.V(5).Info("Enqueuing reference to Binding due to informer event about that Binding", "name", binding.Name, "resourceVersion", binding.ResourceVersion, "event", event)
 	c.workqueue.Add(binding.Name)
 }
 
@@ -398,10 +398,10 @@ func (c *genericTransportController) handleWrappedObject(obj interface{}, event 
 	wrappedObject := obj.(metav1.Object)
 	ownerBindingKey, found := wrappedObject.GetLabels()[originOwnerReferenceLabel] // safe if GetLabels() returns nil
 	if !found {
-		c.logger.Info("failed to extract binding key from wrapped object", "wrappedObjectRef", cache.MetaObjectToName(wrappedObject), "resourceVersion", wrappedObject.GetResourceVersion(), "event", event)
+		c.logger.V(2).Info("failed to extract binding key from wrapped object", "wrappedObjectRef", cache.MetaObjectToName(wrappedObject), "resourceVersion", wrappedObject.GetResourceVersion(), "event", event)
 		return
 	}
-	c.logger.V(4).Info("Enqueuing reference to Binding due to informer event about wrapped object", "bindingName", ownerBindingKey, "wrappedObjectRef", cache.MetaObjectToName(wrappedObject), "resourceVersion", wrappedObject.GetResourceVersion(), "event", event)
+	c.logger.V(5).Info("Enqueuing reference to Binding due to informer event about wrapped object", "bindingName", ownerBindingKey, "wrappedObjectRef", cache.MetaObjectToName(wrappedObject), "resourceVersion", wrappedObject.GetResourceVersion(), "event", event)
 	// enqueue Binding key to trigger reconciliation.
 	// if wrapped object was created not as a result of Binding,
 	// the required annotation won't be found and nothing will happen.
@@ -489,7 +489,7 @@ func (c *genericTransportController) processNextWorkItem(ctx context.Context) bo
 	if shutdown {
 		return false
 	}
-	klog.FromContext(ctx).V(5).Info("Popped workqueue item", "item", obj)
+	klog.FromContext(ctx).V(4).Info("Popped workqueue item", "item", obj)
 
 	var err error
 	var retry bool
@@ -498,10 +498,10 @@ func (c *genericTransportController) processNextWorkItem(ctx context.Context) bo
 			// If no error occurs we Forget this item so it does not
 			// get queued again until another change happens.
 			c.workqueue.Forget(obj)
-			logger.Info("Processed workqueue item successfully.", "item", obj, "itemType", fmt.Sprintf("%T", obj))
+			logger.V(4).Info("Processed workqueue item successfully.", "item", obj, "itemType", fmt.Sprintf("%T", obj))
 		} else if retry {
 			c.workqueue.AddRateLimited(obj)
-			logger.V(5).Info("Encountered transient error while processing workqueue item; do not be alarmed, this will be retried later", "item", obj, "itemType", fmt.Sprintf("%T", obj))
+			logger.V(4).Info("Encountered transient error while processing workqueue item; do not be alarmed, this will be retried later", "item", obj, "itemType", fmt.Sprintf("%T", obj))
 		} else {
 			c.workqueue.Forget(obj)
 			logger.Error(err, "Failed to process workqueue item", "item", obj, "itemType", fmt.Sprintf("%T", obj))
@@ -572,11 +572,11 @@ func (c *genericTransportController) syncProperties(ctx context.Context, invName
 	if abstract.PrimitiveMapEqual(oldProps, newProps) {
 		return
 	}
-	c.logger.V(4).Info("syncProperties", "dest", dest, "props", newProps)
+	c.logger.V(5).Info("syncProperties", "dest", dest, "props", newProps)
 	c.destinationProperties[dest] = newProps
 	for bindingName, dests := range c.bindingSensitiveDestinations {
 		if dests.Has(dest) {
-			c.logger.V(4).Info("Enqueuing reference to Binding that depends on changed destination properties", "binding", bindingName, "destination", dest)
+			c.logger.V(5).Info("Enqueuing reference to Binding that depends on changed destination properties", "binding", bindingName, "destination", dest)
 			c.workqueue.Add(bindingName)
 		}
 	}
@@ -703,7 +703,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 		if err != nil {
 			return fmt.Errorf("failed to update status of Binding '%s' - %w", binding.Name, err)
 		} else {
-			klog.FromContext(ctx).V(3).Info("Updated BindingStatus", "bindingName", binding.Name, "resourceVersion", binding2.ResourceVersion)
+			klog.FromContext(ctx).V(2).Info("Updated Binding.Status", "bindingName", binding.Name, "resourceVersion", binding2.ResourceVersion)
 		}
 	}
 	c.customTransformCollection.setBindingGroupResources(binding.Name, groupResources)
@@ -1013,7 +1013,7 @@ func (c *genericTransportController) setBindingSensitivities(bindingName string,
 func (c *genericTransportController) handlePropertiesEvent(triggerObj interface{}, event string) {
 	triggerObjM := triggerObj.(metav1.Object)
 	invName := triggerObjM.GetName()
-	c.logger.V(4).Info("Enqueuing a reconsideration of properties of inventory item due to informer event", "name", invName, "objType", fmt.Sprintf("%T", triggerObj), "resourceVersion", triggerObjM.GetResourceVersion(), "event", event)
+	c.logger.V(5).Info("Enqueuing a reconsideration of properties of inventory item due to informer event", "name", invName, "objType", fmt.Sprintf("%T", triggerObj), "resourceVersion", triggerObjM.GetResourceVersion(), "event", event)
 	ref := recollectProperties(invName)
 	c.workqueue.Add(ref)
 }
@@ -1043,7 +1043,7 @@ func (c *genericTransportController) propagateWrappedObjectToClusters(ctx contex
 		return nil // this is not considered an error.
 	}
 
-	c.logger.Info("in propagateWrappedObjectToCluster()")
+	c.logger.V(5).Info("In propagateWrappedObjectToClusters", "destinations", destinations)
 
 	for _, destination := range destinations {
 		// Loop until popWrappedObjectByNamespace returns nil, in case the wrapped object is sharded.
@@ -1104,6 +1104,7 @@ func (c *genericTransportController) popWrappedObjectByNamespace(list *unstructu
 }
 
 func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Context, namespace string, wrappedObject *unstructured.Unstructured) error {
+	logger := klog.FromContext(ctx)
 	existingWrappedObject, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Get(ctx, wrappedObject.GetName(), metav1.GetOptions{})
 	if err != nil {
 		if !errors.IsNotFound(err) { // if object is not there, we need to create it. otherwise report an error.
@@ -1114,26 +1115,29 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 		wrappedObject2, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Create(ctx, wrappedObject, metav1.CreateOptions{
 			FieldManager: ControllerName,
 		})
-		logger := klog.FromContext(ctx)
 		if err != nil {
 			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 		}
-		if hi := logger.V(4); hi.Enabled() {
+		if hi := logger.V(3); hi.Enabled() {
 			hi.Info("Created wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject2)
 		} else {
-			logger.V(3).Info("Created wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "resourceVersion", wrappedObject2.GetResourceVersion())
+			logger.V(2).Info("Created wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "resourceVersion", wrappedObject2.GetResourceVersion())
 		}
 		return nil
 	}
 	// // if we reached here object already exists, try update object
 	wrappedObject.SetResourceVersion(existingWrappedObject.GetResourceVersion())
-	_, err = c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{
+	wrappedObject2, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{
 		FieldManager: ControllerName,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to update wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
 	}
-	klog.FromContext(ctx).V(3).Info("Updated wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject)
+	if hi := logger.V(3); hi.Enabled() {
+		hi.Info("Updated wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject2)
+	} else {
+		logger.V(2).Info("Updated wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject, "resourceVersion", wrappedObject2.GetResourceVersion())
+	}
 
 	return nil
 }
@@ -1154,7 +1158,7 @@ func (c *genericTransportController) updateBinding(ctx context.Context, binding 
 	if err != nil {
 		return fmt.Errorf("failed to update Binding object '%s' in WDS - %w", binding.GetName(), err)
 	}
-	logger.V(3).Info("Updated Binding", "name", binding.Name, "resourceVersion", binding2.ResourceVersion)
+	logger.V(2).Info("Updated Binding", "name", binding.Name, "resourceVersion", binding2.ResourceVersion)
 	return nil
 }
 
