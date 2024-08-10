@@ -22,6 +22,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
@@ -114,7 +115,14 @@ func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWo
 	if !found {
 		return fmt.Errorf("could not get lister for gvr: %s", wObjGVR)
 	}
-	wObj, err := lister.ByNamespace(wObjID.ObjectName.Namespace).Get(wObjID.ObjectName.Name) // TODO: does this work for cluster scoped resources?
+
+	var wObj runtime.Object
+	var err error
+	if wObjID.ObjectName.Namespace != "" {
+		wObj, err = lister.ByNamespace(wObjID.ObjectName.Namespace).Get(wObjID.ObjectName.Name)
+	} else {
+		wObj, err = lister.Get(wObjID.ObjectName.Name)
+	}
 	if err != nil {
 		return err
 	}
