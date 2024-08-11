@@ -35,7 +35,7 @@ import (
 // then maintains their statuses based on the decisions.
 func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string) error {
 	logger := klog.FromContext(ctx)
-	logger.V(2).Info("Reconciling singleton status due to binding change", "binding", bdgName)
+	logger.V(4).Info("Reconciling singleton status due to binding change", "binding", bdgName)
 
 	binding, err := c.wdsKsClient.ControlV1alpha1().Bindings().Get(ctx, bdgName, metav1.GetOptions{})
 	if err != nil {
@@ -43,7 +43,7 @@ func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string
 	}
 
 	sync := make(map[util.ObjectIdentifier]bool)
-	if err = c.lookForSingletonWorkloadInBdg(ctx, *binding, sync, true); err != nil {
+	if err = c.checkSingletonWorkloadInBinding(ctx, *binding, sync, true); err != nil {
 		return err
 	}
 
@@ -53,11 +53,10 @@ func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string
 	}
 
 	for _, bdg := range allBdgs.Items {
-		logger.V(2).Info("Got Binding while building singleton state", "name", bdg.Name)
 		if bdg.Name == binding.Name {
 			continue
 		}
-		if err = c.lookForSingletonWorkloadInBdg(ctx, bdg, sync, false); err != nil {
+		if err = c.checkSingletonWorkloadInBinding(ctx, bdg, sync, false); err != nil {
 			return err
 		}
 	}
@@ -72,11 +71,11 @@ func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string
 
 func (c *Controller) reconcileSingletonWObj(ctx context.Context, wObjID util.ObjectIdentifier, sync bool) error {
 	logger := klog.FromContext(ctx)
-	logger.V(2).Info("Reconciling singleton workload object", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
+	logger.V(4).Info("Reconciling singleton workload object", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
 
 	if !sync {
 		emptyStatus := make(map[string]interface{})
-		logger.V(2).Info("Cleaning up singleton status", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
+		logger.V(4).Info("Cleaning up singleton status", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
 		return updateObjectStatus(ctx, &wObjID, emptyStatus, c.listers, c.wdsDynClient)
 	}
 
@@ -97,7 +96,7 @@ func (c *Controller) reconcileSingletonWObj(ctx context.Context, wObjID util.Obj
 		if status == nil {
 			return nil
 		}
-		logger.V(2).Info("Updating singleton status", "workstatus", wsRef.Name, "wecName", wsRef.WECName)
+		logger.V(4).Info("Updating singleton status", "workstatus", wsRef.Name, "wecName", wsRef.WECName)
 		return updateObjectStatus(ctx, &wsRef.SourceObjectIdentifier, status, c.listers, c.wdsDynClient)
 	}
 	return nil
@@ -107,7 +106,7 @@ func (c *Controller) reconcileSingletonWObj(ctx context.Context, wObjID util.Obj
 // then maintains its status based on the decision.
 func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWorkStatusRef) error {
 	logger := klog.FromContext(ctx)
-	logger.V(2).Info("Reconciling singleton status due to workstatus changes", "name", string(ref.Name))
+	logger.V(4).Info("Reconciling singleton status due to workstatus changes", "name", string(ref.Name))
 
 	wObjID := ref.SourceObjectIdentifier
 	wObjGVR := wObjID.GVR()
@@ -140,18 +139,17 @@ func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWo
 		return err
 	}
 	for _, bdg := range allBdgs.Items {
-		logger.V(2).Info("Got Binding while building singleton state", "name", bdg.Name)
-		if err = c.lookForSingletonWorkloadInBdg(ctx, bdg, sync, false); err != nil {
+		if err = c.checkSingletonWorkloadInBinding(ctx, bdg, sync, false); err != nil {
 			return err
 		}
 	}
 
 	if !sync[wObjID] {
-		logger.V(2).Info("Singleton workload object should not have status synced, cleaning status",
+		logger.V(4).Info("Singleton workload object should not have status synced, cleaning",
 			"resource", ref.SourceObjectIdentifier.Resource, "objectName", ref.SourceObjectIdentifier.ObjectName)
 		return c.reconcileSingletonWObj(ctx, wObjID, false)
 	} else {
-		logger.V(2).Info("Singleton workload object should have status synced, updating status",
+		logger.V(4).Info("Singleton workload object should have status synced, updating",
 			"resource", ref.SourceObjectIdentifier.Resource, "objectName", ref.SourceObjectIdentifier.ObjectName)
 		wsObj, err := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
 		if err != nil {
@@ -168,8 +166,9 @@ func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWo
 	}
 }
 
-func (c *Controller) lookForSingletonWorkloadInBdg(ctx context.Context, binding v1alpha1.Binding, sync map[util.ObjectIdentifier]bool, init bool) error {
+func (c *Controller) checkSingletonWorkloadInBinding(ctx context.Context, binding v1alpha1.Binding, sync map[util.ObjectIdentifier]bool, init bool) error {
 	logger := klog.FromContext(ctx)
+	logger.V(5).Info("Checking singleton workload object", "binding", binding.Name)
 	for _, item := range binding.Spec.Workload.NamespaceScope {
 		nsWObjRef := item.NamespaceScopeDownsyncObject
 		lister, found := c.listers.Get(schema.GroupVersionResource(nsWObjRef.GroupVersionResource))
@@ -195,7 +194,7 @@ func (c *Controller) lookForSingletonWorkloadInBdg(ctx context.Context, binding 
 				}
 			}
 			if v == util.BindingPolicyLabelSingletonStatusValueSet && binding.GetDeletionTimestamp() == nil && len(binding.Spec.Destinations) > 0 {
-				logger.V(2).Info("Singleton workload object should have status synced", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", binding.Name)
+				logger.V(5).Info("Singleton workload object should have status synced because of binding", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", binding.Name)
 				sync[wObjIdentifier] = true
 			}
 		}
@@ -225,7 +224,7 @@ func (c *Controller) lookForSingletonWorkloadInBdg(ctx context.Context, binding 
 				}
 			}
 			if v == util.BindingPolicyLabelSingletonStatusValueSet && binding.GetDeletionTimestamp() == nil && len(binding.Spec.Destinations) > 0 {
-				logger.V(2).Info("Singleton workload object should have status synced", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", binding.Name)
+				logger.V(5).Info("Singleton workload object should have status synced because of binding", "resource", wObjIdentifier.Resource, "objectName", wObjIdentifier.ObjectName, "binding", binding.Name)
 				sync[wObjIdentifier] = true
 			}
 		}
