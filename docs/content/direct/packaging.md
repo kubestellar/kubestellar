@@ -227,7 +227,7 @@ By our development practices and not doing any manual hacking we maintain the as
 
 The [release process](release.md) builds and publishes that container image.
 
-`make ko-build-local` will make a local image for just the local
+`make ko-build-controller-manager-local` will make a local image for just the local
 platform. This is used in local testing.
 
 ### clusteradm container image

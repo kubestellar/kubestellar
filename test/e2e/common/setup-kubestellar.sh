@@ -121,7 +121,7 @@ kubectl --context "$HOSTING_CONTEXT" label cp wds1 kflex.kubestellar.io/cptype=w
 if [ "$use_release" != true ]; then
   cd "${SRC_DIR}/../../.."
   pwd
-  make ko-build-local
+  make ko-build-controller-manager-local
   make install-local-chart KUBE_CONTEXT="$HOSTING_CONTEXT" "KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY"
   cd -
 fi

@@ -13,26 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DEFAULT_TRANSPORT_CONTROLLER_IMAGE=ghcr.io/kubestellar/ocm-transport-plugin/transport-controller:0.1.11
-
 context=""
 args=()
-
-TRANSPORT_CONTROLLER_IMAGE=""
 
 while [ $# != 0 ]; do
     case "$1" in
         (-h|--help)
-            echo "$0 usage: \$WDS_name \$ITS_name [\$transport_controller_image_ref] (--image-pull-policy \$policy | --controller-verbosity \$number | --transport-controller-image \$image_ref | --context \$kubeconfig_context_name)*"
+            echo "$0 usage: \$WDS_name \$ITS_name \$transport_controller_image (--image-pull-policy \$policy | --controller-verbosity \$number | --context \$kubeconfig_context_name)*"
             exit;;
-        (--transport-controller-image)
-          if (( $# > 1 )); then
-            TRANSPORT_CONTROLLER_IMAGE="$2"
-            shift
-          else
-            echo "Missing transport-controller-image value" >&2
-            exit 1;
-          fi;;
         (--image-pull-policy)
           if (( $# > 1 )); then
             IMAGE_PULL_POLICY="$2"
@@ -64,8 +52,8 @@ while [ $# != 0 ]; do
     shift
 done
 
-if (( ${#args[*]} < 2 || ${#args[*]} > 3 )); then
-    echo "$0: expecting two or three positional arguments (use -h to see usage)" >&2
+if (( ${#args[*]} != 3 )); then
+    echo "$0: expecting three positional arguments (use -h to see usage)" >&2
     exit 1
 fi
 
@@ -75,16 +63,7 @@ fi
 
 WDS_NAME="${args[0]}"
 ITS_NAME="${args[1]}"
-
-if [ -z "$TRANSPORT_CONTROLLER_IMAGE" ]; then
-    if [ -z "${args[2]}" ]
-    then TRANSPORT_CONTROLLER_IMAGE="$DEFAULT_TRANSPORT_CONTROLLER_IMAGE"
-    else TRANSPORT_CONTROLLER_IMAGE="${args[2]}"
-    fi
-elif [ -n "${args[2]}" ]; then
-    echo "$0: The transport controller image should be specified only one way" >&2
-    exit 1
-fi
+TRANSPORT_CONTROLLER_IMAGE="${args[2]}"
 
 # generate from template and env vars and then apply a configmap and a deployment for transport-controller
 kubectl --context $context apply -f - <<EOF
