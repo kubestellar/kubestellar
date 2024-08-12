@@ -417,10 +417,10 @@ has been deleted:
 
 ### Status Controller
 
-The status controller watches for `WorkStatus` objects on the ITS, and
-for WDS objects propagated by a `BindingPolicy` with  the flag
-`wantSingletonReportedState` set to true, updates the status of those
-objects with the corresponding status found in the workstatus object.
+The status controller watches for `Binding` objects in the WDS and `WorkStatus`
+objects in the ITS. For WDS objects propagated by a `BindingPolicy` with the flag
+`wantSingletonReportedState` set to true, the status controller manages the statuses of those
+objects with the corresponding statuses found in the `Workstatus` objects, if necessary.
 
 The `WorkStatus` objects are created and updated on the ITS by the OCM Status Add-On Agent described [above](#ocm-status-add-on-agent).
 
