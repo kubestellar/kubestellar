@@ -14,10 +14,10 @@
 
 # Image repo/tag to use all building/pushing image targets
 DOCKER_REGISTRY ?= ghcr.io/kubestellar/kubestellar
-CMD_NAME ?= controller-manager
+CONTROLLER_MANAGER_CMD_NAME ?= controller-manager
 TRANSPORT_CMD_NAME ?= ocm-transport-controller
 IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
-IMAGE ?= ${DOCKER_REGISTRY}/${CMD_NAME}:${IMAGE_TAG}
+CONTROLLER_MANAGER_IMAGE ?= ${DOCKER_REGISTRY}/${CONTROLLER_MANAGER_CMD_NAME}:${IMAGE_TAG}
 TRANSPORT_IMAGE ?= ${DOCKER_REGISTRY}/${TRANSPORT_CMD_NAME}:${IMAGE_TAG}
 
 KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY ?= 2
@@ -174,10 +174,10 @@ test: manifests generate fmt vet ## Run tests.
 run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./cmd/controller-manager/main.go $(ARGS)
 
-.PHONY: ko-build-local
-ko-build-local: ## Build local container image with ko
-	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
-	docker tag ko.local/${CMD_NAME}:${IMAGE_TAG} ${IMAGE}
+.PHONY: ko-build-controller-manager-local
+ko-build-controller-manager-local: ## Build local controller manager container image with ko
+	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CONTROLLER_MANAGER_CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
+	docker tag ko.local/${CONTROLLER_MANAGER_CMD_NAME}:${IMAGE_TAG} ${CONTROLLER_MANAGER_IMAGE}
 
 .PHONY: ko-build-transport-local
 ko-build-transport-local: ## Build local transport container image with `ko`.
@@ -187,11 +187,11 @@ ko-build-transport-local: ## Build local transport container image with `ko`.
 # this is used for local testing
 .PHONY: kind-load-image
 kind-load-image:
-	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${IMAGE}
+	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${CONTROLLER_MANAGER_IMAGE}
 
 .PHONY: chart
 chart: manifests kustomize
-	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${IMAGE} | sed 's/\(:.*\)v/\1/')
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${CONTROLLER_MANAGER_IMAGE} | sed 's/\(:.*\)v/\1/')
 	$(KUSTOMIZE) build config/default \
 		| yq '. | select(.kind == "ClusterRole*").metadata.name |= "{{.Values.ControlPlaneName}}-" + .' \
 		| yq '. | select(.kind == "ClusterRoleBinding").roleRef.name |= "{{.Values.ControlPlaneName}}-" + .' \
@@ -214,7 +214,7 @@ uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified 
 
 .PHONY: deploy
 deploy: manifests kustomize ## Deploy manager to the K8s cluster specified in ~/.kube/config.
-	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMAGE}
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${CONTROLLER_MANAGER_IMAGE}
 	$(KUSTOMIZE) build config/default | sed -e 's/{{.Release.Namespace}}/${DEFAULT_NAMESPACE}/g' -e 's/{{.Values.ControlPlaneName}}/${DEFAULT_WDS_NAME}/g' | kubectl apply -f -
 
 .PHONY: undeploy
