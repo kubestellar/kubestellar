@@ -1330,7 +1330,7 @@ controller-manager hosting the per-WDS controllers (<a href="../architecture/#bi
 <p>The image repository is <code>ghcr.io/kubestellar/kubestellar/controller-manager</code>.</p>
 <p>By our development practices and not doing any manual hacking we maintain the association that the container image tagged <code>$VERSION</code> is built from the Git commit having the Git tag <code>v$VERSION</code>.</p>
 <p>The <a href="../release/">release process</a> builds and publishes that container image.</p>
-<p><code>make ko-build-local</code> will make a local image for just the local
+<p><code>make ko-build-controller-manager-local</code> will make a local image for just the local
 platform. This is used in local testing.</p>
 <h3 id="clusteradm-container-image">clusteradm container image<a class="headerlink" href="#clusteradm-container-image" title="Permanent link">#</a></h3>
 <p>The kubestellar GitHub repository has a script,
