@@ -31,6 +31,7 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 )
 
@@ -170,8 +171,18 @@ func SourceRefFromObjectIdentifier(objIdentifier ObjectIdentifier) *SourceRef {
 	}
 }
 
-// GetWorkStatusStatus returns the status of the work status object.
-// (nil, nil) is returned if the status is not present in the object.
+func ObjectIdentifierFromSourceRef(sourceRef *SourceRef) ObjectIdentifier {
+	return ObjectIdentifier{
+		GVK: schema.GroupVersionKind{
+			Group:   sourceRef.Group,
+			Version: sourceRef.Version,
+			Kind:    sourceRef.Kind,
+		},
+		Resource:   sourceRef.Resource,
+		ObjectName: cache.NewObjectName(sourceRef.Namespace, sourceRef.Name),
+	}
+}
+
 func GetWorkStatusStatus(workStatus runtime.Object) (map[string]interface{}, error) {
 	obj, ok := workStatus.(*unstructured.Unstructured)
 	if !ok {

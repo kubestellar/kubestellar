@@ -76,53 +76,9 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 }
 
 func (c *Controller) syncSingletonWorkStatus(ctx context.Context, ref singletonWorkStatusRef) error {
-	logger := klog.FromContext(ctx)
-
-	workStatusObj, err := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
-	if err != nil {
-		if !errors.IsNotFound(err) {
-			return fmt.Errorf("failed to get workstatus (%v): %w", ref, err)
-		}
-	}
-
-	if workStatusObj == nil { // make sure status of source obj is deleted
-		emptyStatus := make(map[string]interface{})
-		if err = updateObjectStatus(ctx, &ref.SourceObjectIdentifier, emptyStatus,
-			c.listers, c.wdsDynClient); err != nil {
-			return err
-		}
-
-		return c.syncWorkStatus(ctx, workStatusRef(ref))
-	}
-
-	// only process workstatues with the label for single reported status
-	statusLabelVal, ok := workStatusObj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]
-	if !ok {
-		return nil
-	}
-
-	// remove the status if singleton status label value is unset
-	if statusLabelVal == util.BindingPolicyLabelSingletonStatusValueUnset {
-		emptyStatus := make(map[string]interface{})
-		return updateObjectStatus(ctx, &ref.SourceObjectIdentifier, emptyStatus,
-			c.listers, c.wdsDynClient)
-	}
-
-	status, err := util.GetWorkStatusStatus(workStatusObj)
-	if err != nil {
+	if err := c.reconcileSingletonByWs(ctx, ref); err != nil {
 		return err
 	}
-
-	if status == nil {
-		// when status is updated, a new event will trigger update
-		return nil
-	}
-
-	logger.V(2).Info("Updating singleton status", "objectIdentifier", ref.SourceObjectIdentifier)
-	if err = updateObjectStatus(ctx, &ref.SourceObjectIdentifier, status, c.listers, c.wdsDynClient); err != nil {
-		return err
-	}
-
 	return c.syncWorkStatus(ctx, workStatusRef(ref))
 }
 
