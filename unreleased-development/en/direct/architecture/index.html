@@ -2854,10 +2854,10 @@ has been deleted:</p>
   hashmap indexed by the GVR key.</li>
 </ul>
 <h3 id="status-controller">Status Controller<a class="headerlink" href="#status-controller" title="Permanent link">#</a></h3>
-<p>The status controller watches for <code>WorkStatus</code> objects on the ITS, and
-for WDS objects propagated by a <code>BindingPolicy</code> with  the flag
-<code>wantSingletonReportedState</code> set to true, updates the status of those
-objects with the corresponding status found in the workstatus object.</p>
+<p>The status controller watches for <code>Binding</code> objects in the WDS and <code>WorkStatus</code>
+objects in the ITS. For WDS objects propagated by a <code>BindingPolicy</code> with the flag
+<code>wantSingletonReportedState</code> set to true, the status controller manages the statuses of those
+objects with the corresponding statuses found in the <code>Workstatus</code> objects, if necessary.</p>
 <p>The <code>WorkStatus</code> objects are created and updated on the ITS by the OCM Status Add-On Agent described <a href="#ocm-status-add-on-agent">above</a>.</p>
 <p>The high-level flow for the singleton status update is described in Figure 4.</p>
 <p>
