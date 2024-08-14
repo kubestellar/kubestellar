@@ -1,0 +1,71 @@
+{{$namespaces := DefaultParam .namespaces 1}}
+{{$namespaceNamePrefix := DefaultParam .namespaceNamePrefix "perf-exp"}}
+{{$actionName := DefaultParam .actionName "Creating"}}
+{{$waitTime := DefaultParam .waitTime "5m"}}
+
+{{$KIND_CLUSTER := DefaultParam .KIND_CLUSTER true}}
+{{$OPENSHIFT_CLUSTER := DefaultParam .OPENSHIFT_CLUSTER false}}
+
+
+name: load
+namespace:
+  number: {{$namespaces}}
+tuningSets:
+
+# Global100qps: use 100 qps globally:
+# * split equally qps among all running phases
+# * if some phase finishes, other phases will get more qps.
+- name: Global100qps
+  globalQPSLoad:
+    qps: 100
+    burst: 1
+
+# RandomizedLoad defines a load that is spread randomly
+# across a given total time.
+- name: RandomizedLoad
+  randomizedLoad:
+    AverageQPS: 10
+
+# SteppedLoad defines a load that generates a burst of
+# a given size every X seconds.
+- name: RSteppedLoad
+  steppedLoad:
+    burstSize: 200
+    stepDelay: 1s
+
+# ParallelismLimitedLoad does the operations as quickly as possible subject to a given
+# limit on the number running concurrently.
+- name: Sequence
+  parallelismLimitedLoad:
+    parallelismLimit: 1
+
+
+{{if $KIND_CLUSTER}}
+steps:
+- module:
+    path: modules/cluster-density.yaml
+    params:
+      actionName: {{$actionName}}
+      tuningSet: RandomizedLoad
+      namespaces: {{$namespaces}}
+      namespaceNamePrefix: {{$namespaceNamePrefix}}
+{{end}}
+
+
+{{if $OPENSHIFT_CLUSTER}}
+steps:
+- module:
+    path: modules/cluster-density-ms.yaml
+    params:
+      actionName: {{$actionName}}
+      tuningSet: RandomizedLoad
+      namespaces: {{$namespaces}}
+      namespaceNamePrefix: {{$namespaceNamePrefix}}
+{{end}}
+
+- name: "Wait {{$waitTime}}"
+  measurements:
+    - Identifier: Wait
+      Method: Sleep
+      Params:
+        duration: {{$waitTime}}
