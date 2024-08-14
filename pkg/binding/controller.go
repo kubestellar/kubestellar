@@ -28,7 +28,10 @@ import (
 	clusterpkginformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions/cluster/v1"
 	clusterlisters "open-cluster-management.io/api/client/cluster/listers/cluster/v1"
+	managedclusterapi "open-cluster-management.io/api/cluster/v1"
 
+	k8scoreapi "k8s.io/api/core/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -52,6 +55,7 @@ import (
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	controlinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/control/v1alpha1"
 	controllisters "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -93,21 +97,23 @@ const (
 // places objects into mailboxes
 type Controller struct {
 	logger                      logr.Logger
-	controlClient               controlclient.ControlV1alpha1Interface // used for Binding, BindingPolicy
+	bindingPolicyClient         ksmetrics.ClientModNamespace[*v1alpha1.BindingPolicy, *v1alpha1.BindingPolicyList]
+	bindingClient               ksmetrics.ClientModNamespace[*v1alpha1.Binding, *v1alpha1.BindingList]
 	ksInformerFactoryStart      func(stopCh <-chan struct{})
 	bindingInformer             cache.SharedIndexInformer
 	bindingLister               controllisters.BindingLister
 	bindingPolicyInformer       cache.SharedIndexInformer
 	bindingPolicyLister         controllisters.BindingPolicyLister
-	clusterClient               clusterclientset.Interface // used for ManagedCluster in ITS
+	managedClusterClient        ksmetrics.ClientModNamespace[*managedclusterapi.ManagedCluster, *managedclusterapi.ManagedClusterList]
 	clusterInformerFactoryStart func(stopCh <-chan struct{})
 	clusterInformer             cache.SharedIndexInformer // used for ManagedCluster in ITS
 	clusterLister               clusterlisters.ManagedClusterLister
 	dynamicClient               dynamic.Interface // used for workload
 
-	kubernetesClient kubernetes.Interface // used for Namespaces, and Discovery
+	discoveryClient discovery.DiscoveryInterface                                                   // for WDS
+	namespaceClient ksmetrics.ClientModNamespace[*k8scoreapi.Namespace, *k8scoreapi.NamespaceList] // for WDS
 
-	extClient apiextensionsclientset.Interface // used for CRD
+	extClient ksmetrics.ClientModNamespace[*apiextensionsv1.CustomResourceDefinition, *apiextensionsv1.CustomResourceDefinitionList] // for CRDs in WDS
 
 	apiResourceLists []*metav1.APIResourceList
 	listers          util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
@@ -130,7 +136,9 @@ type bindingPolicyRef string
 type bindingRef string
 
 // Create a new binding controller
-func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, itsRestConfig *rest.Config,
+func NewController(parentLogger logr.Logger,
+	wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics,
+	wdsRestConfig *rest.Config, itsRestConfig *rest.Config,
 	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
 	logger := parentLogger.WithName(ControllerName)
 
@@ -165,12 +173,13 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, itsRest
 	wdsRestConfigTuned.RateLimiter = nil
 	logger.V(1).Info("Parameters of the tuned client's token bucket rate limiter", "burst", wdsRestConfigTuned.Burst, "qps", wdsRestConfigTuned.QPS)
 
-	// dynamicClient needs higher rate than its default because dynamicClient is repeatedly used by the
+	// baseDynamicClient needs higher rate than its default because dynamicClient is repeatedly used by the
 	// reflectors for each of the GVRs, all at the beginning of the controller run
-	dynamicClient, err := dynamic.NewForConfig(wdsRestConfigTuned)
+	baseDynamicClient, err := dynamic.NewForConfig(wdsRestConfigTuned)
 	if err != nil {
 		return nil, err
 	}
+	dynamicClient := ksmetrics.NewWrappedDynamicClient(wdsClientMetrics, baseDynamicClient)
 
 	ksClient, err := ksclient.NewForConfig(wdsRestConfig)
 	if err != nil {
@@ -184,7 +193,7 @@ func NewController(parentLogger logr.Logger, wdsRestConfig *rest.Config, itsRest
 	}
 	clusterInformerFactory := clusterpkginformers.NewSharedInformerFactory(clusterClient, defaultResyncPeriod)
 
-	return makeController(logger, ksClient.ControlV1alpha1(), ksInformerFactory.Start, ksInformerFactory.Control().V1alpha1(), dynamicClient, kubernetesClient, extClient, clusterClient, clusterInformerFactory.Start, clusterInformerFactory.Cluster().V1().ManagedClusters(), apiResourceLists, wdsName, allowedGroupsSet)
+	return makeController(logger, wdsClientMetrics, itsClientMetrics, ksClient.ControlV1alpha1(), ksInformerFactory.Start, ksInformerFactory.Control().V1alpha1(), dynamicClient, kubernetesClient, extClient, clusterClient, clusterInformerFactory.Start, clusterInformerFactory.Cluster().V1().ManagedClusters(), apiResourceLists, wdsName, allowedGroupsSet)
 }
 
 // doDiscovery contains the exact one occurence of ServerPreferredResources() in this repository.
@@ -235,6 +244,7 @@ func computeQPSFromNumGVRs(nGVRs int) float32 {
 }
 
 func makeController(logger logr.Logger,
+	wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics,
 	controlClient controlclient.ControlV1alpha1Interface,
 	ksInformerFactoryStart func(stopCh <-chan struct{}),
 	controlInformers controlinformers.Interface,
@@ -256,19 +266,21 @@ func makeController(logger logr.Logger,
 	controller := &Controller{
 		wdsName:                     wdsName,
 		logger:                      logger,
-		controlClient:               controlClient,
+		bindingPolicyClient:         ksmetrics.NewWrappedClusterScopedClient(wdsClientMetrics, util.GetBindingPolicyGVR(), controlClient.BindingPolicies()),
+		bindingClient:               ksmetrics.NewWrappedClusterScopedClient(wdsClientMetrics, util.GetBindingGVR(), controlClient.Bindings()),
 		ksInformerFactoryStart:      ksInformerFactoryStart,
 		bindingInformer:             controlInformers.Bindings().Informer(),
 		bindingLister:               controlInformers.Bindings().Lister(),
 		bindingPolicyInformer:       controlInformers.BindingPolicies().Informer(),
 		bindingPolicyLister:         controlInformers.BindingPolicies().Lister(),
-		clusterClient:               clusterClient,
+		managedClusterClient:        ksmetrics.NewWrappedClusterScopedClient[*managedclusterapi.ManagedCluster, *managedclusterapi.ManagedClusterList](itsClientMetrics, managedclusterapi.SchemeGroupVersion.WithResource("manageclusters"), clusterClient.ClusterV1().ManagedClusters()),
 		clusterInformerFactoryStart: clusterInformerFactoryStart,
 		clusterInformer:             clusterInformer,
 		clusterLister:               clusterPreInformer.Lister(),
 		dynamicClient:               dynamicClient,
-		kubernetesClient:            kubernetesClient,
-		extClient:                   extClient,
+		discoveryClient:             kubernetesClient.Discovery(),
+		namespaceClient:             ksmetrics.NewWrappedClusterScopedClient(wdsClientMetrics, k8scoreapi.SchemeGroupVersion.WithResource("namespaces"), kubernetesClient.CoreV1().Namespaces()),
+		extClient:                   ksmetrics.NewWrappedClusterScopedClient(wdsClientMetrics, apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"), extClient.ApiextensionsV1().CustomResourceDefinitions()),
 		apiResourceLists:            apiResourceLists,
 		listers:                     util.NewConcurrentMap[schema.GroupVersionResource, cache.GenericLister](),
 		informers:                   util.NewConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer](),
@@ -284,14 +296,14 @@ func makeController(logger logr.Logger,
 // EnsureCRDs will ensure that the CRDs are installed.
 // Call this before Start.
 func (c *Controller) EnsureCRDs(ctx context.Context) error {
-	return crd.ApplyCRDs(ctx, ControllerName, c.kubernetesClient, c.extClient, c.logger)
+	return crd.ApplyCRDs(ctx, ControllerName, c.extClient, c.logger)
 }
 
 // AppendKSResources lets the controller know about the KS resources.
 // Call this after EnsureCRDs and before Start.
 func (c *Controller) AppendKSResources(ctx context.Context) error {
 	gv := v1alpha1.GroupVersion.String()
-	list, err := c.kubernetesClient.Discovery().ServerResourcesForGroupVersion(gv)
+	list, err := c.discoveryClient.ServerResourcesForGroupVersion(gv)
 	if err != nil {
 		return err
 	}

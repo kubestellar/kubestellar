@@ -33,18 +33,32 @@ type MRObject interface {
 	runtime.Object
 }
 
-// ClientModNamespace is the commonly used methods of the typed stubs for a given object type.
+// BasicClientModNamespace is the commonly used methods of the typed stubs for a given object type.
+// No methods for subresources are included here.
 // These are the methods that a cluster-scoped kind of object has,
 // and the methods that a namespace-scoped kind of object has after specializing to a namespace.
-type ClientModNamespace[Single MRObject, List runtime.Object] interface {
+type BasicClientModNamespace[Single MRObject, List runtime.Object] interface {
 	Create(ctx context.Context, object Single, opts metav1.CreateOptions) (Single, error)
 	Update(ctx context.Context, object Single, opts metav1.UpdateOptions) (Single, error)
-	UpdateStatus(ctx context.Context, object Single, opts metav1.UpdateOptions) (Single, error)
 	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
 	Get(ctx context.Context, name string, opts metav1.GetOptions) (Single, error)
 	List(ctx context.Context, opts metav1.ListOptions) (List, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result Single, err error)
+}
+
+// ClientModNamespace is the commonly used methods of the typed stubs for a given object type.
+// These are the methods that a cluster-scoped kind of object has,
+// and the methods that a namespace-scoped kind of object has after specializing to a namespace.
+type ClientModNamespace[Single MRObject, List runtime.Object] interface {
+	BasicClientModNamespace[Single, List]
+	UpdateStatus(ctx context.Context, object Single, opts metav1.UpdateOptions) (Single, error)
+}
+
+// BasicNamespacedClient is similar to the interface of the typed stubs for a namespace-scoped kind of object,
+// but uses a fixed name for the method that specializes to a namespace.
+type BasicNamespacedClient[Single MRObject, List runtime.Object] interface {
+	Namespace(string) BasicClientModNamespace[Single, List]
 }
 
 // NamespacedClient is similar to the interface of the typed stubs for a namespace-scoped kind of object,
@@ -63,8 +77,18 @@ func (nsc *namespacedClient[Single, List]) Namespace(namespace string) ClientMod
 	return nsc.namespaceFn(namespace)
 }
 
+type MeasuredBasicClientModNamespace[Single MRObject, List runtime.Object] interface {
+	BasicClientModNamespace[Single, List]
+	ClientResourceMetrics
+}
+
 type MeasuredClientModNamespace[Single MRObject, List runtime.Object] interface {
 	ClientModNamespace[Single, List]
+	ClientResourceMetrics
+}
+
+type MeasuredBasicNamespacedClient[Single MRObject, List runtime.Object] interface {
+	BasicNamespacedClient[Single, List]
 	ClientResourceMetrics
 }
 
@@ -73,42 +97,69 @@ type MeasuredNamespacedClient[Single MRObject, List runtime.Object] interface {
 	ClientResourceMetrics
 }
 
-type wrappedClientMetrics[Single MRObject, List runtime.Object] struct {
+type wrappedBasicClientMetrics[Single MRObject, List runtime.Object] struct {
 	ClientResourceMetrics
+	Inner BasicClientModNamespace[Single, List]
+}
+
+type wrappedClientMetrics[Single MRObject, List runtime.Object] struct {
+	wrappedBasicClientMetrics[Single, List]
 	Inner ClientModNamespace[Single, List]
 }
 
 var _ MeasuredClientModNamespace[MRObject, MRObject] = &wrappedClientMetrics[MRObject, MRObject]{}
 
+func NewWrappedBasicClusterScopedClient[Single MRObject, List runtime.Object](cm ClientMetrics, gvr schema.GroupVersionResource, inner BasicClientModNamespace[Single, List]) MeasuredBasicClientModNamespace[Single, List] {
+	return &wrappedBasicClientMetrics[Single, List]{cm.ResourceMetrics(gvr), inner}
+}
+
 func NewWrappedClusterScopedClient[Single MRObject, List runtime.Object](cm ClientMetrics, gvr schema.GroupVersionResource, inner ClientModNamespace[Single, List]) MeasuredClientModNamespace[Single, List] {
 	return &wrappedClientMetrics[Single, List]{
-		Inner:                 inner,
+		wrappedBasicClientMetrics: wrappedBasicClientMetrics[Single, List]{cm.ResourceMetrics(gvr), inner},
+		Inner:                     inner,
+	}
+}
+
+func NewWrappedBasicNamespacedClient[Single MRObject, List runtime.Object](cm ClientMetrics, gvr schema.GroupVersionResource, namespaceFn func(string) BasicClientModNamespace[Single, List]) MeasuredBasicNamespacedClient[Single, List] {
+	return &wrappedBasicNamespacingMetrics[Single, List]{
+		namespaceFn:           namespaceFn,
 		ClientResourceMetrics: cm.ResourceMetrics(gvr),
 	}
 }
 
 func NewWrappedNamespacedClient[Single MRObject, List runtime.Object](cm ClientMetrics, gvr schema.GroupVersionResource, namespaceFn func(string) ClientModNamespace[Single, List]) MeasuredNamespacedClient[Single, List] {
 	return &wrappedNamespacingMetrics[Single, List]{
-		namespaceFn:           namespaceFn,
-		ClientResourceMetrics: cm.ResourceMetrics(gvr),
+		wrappedBasicNamespacingMetrics: wrappedBasicNamespacingMetrics[Single, List]{cm.ResourceMetrics(gvr), func(ns string) BasicClientModNamespace[Single, List] { return namespaceFn(ns) }},
+		namespaceFn:                    namespaceFn,
 	}
 }
 
-type wrappedNamespacingMetrics[Single MRObject, List runtime.Object] struct {
+type wrappedBasicNamespacingMetrics[Single MRObject, List runtime.Object] struct {
 	ClientResourceMetrics
+	namespaceFn func(string) BasicClientModNamespace[Single, List]
+}
+
+type wrappedNamespacingMetrics[Single MRObject, List runtime.Object] struct {
+	wrappedBasicNamespacingMetrics[Single, List]
 	namespaceFn func(string) ClientModNamespace[Single, List]
+}
+
+func (wnm *wrappedBasicNamespacingMetrics[Single, List]) Namespace(namespace string) BasicClientModNamespace[Single, List] {
+	inner := wnm.namespaceFn(namespace)
+	return &wrappedBasicClientMetrics[Single, List]{wnm.ClientResourceMetrics, inner}
 }
 
 func (wnm *wrappedNamespacingMetrics[Single, List]) Namespace(namespace string) ClientModNamespace[Single, List] {
 	inner := wnm.namespaceFn(namespace)
 	return &wrappedClientMetrics[Single, List]{
-		Inner:                 inner,
-		ClientResourceMetrics: wnm.ClientResourceMetrics}
+		wrappedBasicClientMetrics: wrappedBasicClientMetrics[Single, List]{
+			wnm.ClientResourceMetrics, inner},
+		Inner: inner}
 }
 
 var errPanic = errors.New("panic")
 
-func (wcm *wrappedClientMetrics[Single, List]) Create(ctx context.Context, object Single, opts metav1.CreateOptions) (Single, error) {
+func (wcm *wrappedBasicClientMetrics[Single, List]) Create(ctx context.Context, object Single, opts metav1.CreateOptions) (Single, error) {
 	var ans Single
 	err := errPanic
 	start := time.Now()
@@ -117,7 +168,7 @@ func (wcm *wrappedClientMetrics[Single, List]) Create(ctx context.Context, objec
 	return ans, err
 }
 
-func (wcm *wrappedClientMetrics[Single, List]) Update(ctx context.Context, object Single, opts metav1.UpdateOptions) (Single, error) {
+func (wcm *wrappedBasicClientMetrics[Single, List]) Update(ctx context.Context, object Single, opts metav1.UpdateOptions) (Single, error) {
 	var ans Single
 	err := errPanic
 	start := time.Now()
@@ -135,7 +186,7 @@ func (wcm *wrappedClientMetrics[Single, List]) UpdateStatus(ctx context.Context,
 	return ans, err
 }
 
-func (wcm *wrappedClientMetrics[Single, List]) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+func (wcm *wrappedBasicClientMetrics[Single, List]) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	err := errPanic
 	start := time.Now()
 	defer func() { wcm.ResourceRecord("delete", err, time.Since(start)) }()
@@ -143,7 +194,7 @@ func (wcm *wrappedClientMetrics[Single, List]) Delete(ctx context.Context, name 
 	return err
 }
 
-func (wcm *wrappedClientMetrics[Single, List]) Get(ctx context.Context, name string, opts metav1.GetOptions) (Single, error) {
+func (wcm *wrappedBasicClientMetrics[Single, List]) Get(ctx context.Context, name string, opts metav1.GetOptions) (Single, error) {
 	var ans Single
 	err := errPanic
 	start := time.Now()
@@ -152,7 +203,7 @@ func (wcm *wrappedClientMetrics[Single, List]) Get(ctx context.Context, name str
 	return ans, err
 }
 
-func (wcm *wrappedClientMetrics[Single, List]) List(ctx context.Context, opts metav1.ListOptions) (List, error) {
+func (wcm *wrappedBasicClientMetrics[Single, List]) List(ctx context.Context, opts metav1.ListOptions) (List, error) {
 	var ans List
 	err := errPanic
 	start := time.Now()
@@ -161,7 +212,7 @@ func (wcm *wrappedClientMetrics[Single, List]) List(ctx context.Context, opts me
 	return ans, err
 }
 
-func (wcm *wrappedClientMetrics[Single, List]) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+func (wcm *wrappedBasicClientMetrics[Single, List]) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
 	var ans watch.Interface
 	err := errPanic
 	start := time.Now()
@@ -170,7 +221,7 @@ func (wcm *wrappedClientMetrics[Single, List]) Watch(ctx context.Context, opts m
 	return ans, err
 }
 
-func (wcm *wrappedClientMetrics[Single, List]) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (Single, error) {
+func (wcm *wrappedBasicClientMetrics[Single, List]) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (Single, error) {
 	var ans Single
 	err := errPanic
 	start := time.Now()

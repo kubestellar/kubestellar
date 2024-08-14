@@ -82,7 +82,7 @@ func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
 	logger := klog.FromContext(ctx)
 
 	if generatedCombinedStatus.ResourceVersion != "" {
-		csEcho, err := c.wdsKsClient.ControlV1alpha1().CombinedStatuses(generatedCombinedStatus.Namespace).Update(ctx,
+		csEcho, err := c.combinedStatusClient.Namespace(generatedCombinedStatus.Namespace).Update(ctx,
 			generatedCombinedStatus, metav1.UpdateOptions{FieldManager: ControllerName})
 		if err != nil {
 			if errors.IsNotFound(err) {
@@ -102,7 +102,7 @@ func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
 		return nil
 	}
 
-	csEcho, err := c.wdsKsClient.ControlV1alpha1().CombinedStatuses(generatedCombinedStatus.Namespace).Create(ctx,
+	csEcho, err := c.combinedStatusClient.Namespace(generatedCombinedStatus.Namespace).Create(ctx,
 		generatedCombinedStatus, metav1.CreateOptions{FieldManager: ControllerName})
 	if err != nil {
 		return fmt.Errorf("failed to create CombinedStatus (ns, name = %v, %v): %w",
@@ -118,7 +118,7 @@ func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
 func (c *Controller) deleteCombinedStatus(ctx context.Context, ns, name string) error {
 	logger := klog.FromContext(ctx)
 
-	err := c.wdsKsClient.ControlV1alpha1().CombinedStatuses(ns).Delete(ctx, name, metav1.DeleteOptions{})
+	err := c.combinedStatusClient.Namespace(ns).Delete(ctx, name, metav1.DeleteOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.V(2).Info("CombinedStatus not found (deletion skipped)", "ns", ns, "name", name)

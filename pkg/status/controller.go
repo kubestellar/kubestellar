@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-logr/logr"
 	"golang.org/x/time/rate"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -36,14 +37,13 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
-	"sigs.k8s.io/controller-runtime/pkg/log"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/binding"
 	ksclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	controllisters "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -58,10 +58,14 @@ const (
 // workload object asks for the singleton status returning. If yes,
 // the full status will be copied to the workload object in WDS.
 type Controller struct {
-	wdsName      string
-	wdsDynClient dynamic.Interface
-	wdsKsClient  ksclient.Interface
-	itsDynClient dynamic.Interface
+	wdsName               string
+	wdsDynClient          dynamic.Interface
+	wdsKsClient           ksclient.Interface
+	bindingPolicyClient   ksmetrics.ClientModNamespace[*v1alpha1.BindingPolicy, *v1alpha1.BindingPolicyList]
+	bindingClient         ksmetrics.ClientModNamespace[*v1alpha1.Binding, *v1alpha1.BindingList]
+	statusCollectorClient ksmetrics.ClientModNamespace[*v1alpha1.StatusCollector, *v1alpha1.StatusCollectorList]
+	combinedStatusClient  ksmetrics.BasicNamespacedClient[*v1alpha1.CombinedStatus, *v1alpha1.CombinedStatusList]
+	itsDynClient          dynamic.Interface
 
 	statusCollectorInformer cache.SharedIndexInformer
 	statusCollectorLister   controllisters.StatusCollectorLister
@@ -104,37 +108,45 @@ type statusCollectorRef string
 type singletonWorkStatusRef workStatusRef
 
 // Create a new  status controller
-func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsName string,
+func NewController(logger logr.Logger,
+	wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics,
+	wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsName string,
 	bindingPolicyResolver binding.BindingPolicyResolver) (*Controller, error) {
+	logger = logger.WithName(ControllerName)
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
 	)
 
-	wdsDynClient, err := dynamic.NewForConfig(wdsRestConfig)
+	wdsDynClientBase, err := dynamic.NewForConfig(wdsRestConfig)
 	if err != nil {
 		return nil, err
 	}
+	wdsDynClient := ksmetrics.NewWrappedDynamicClient(wdsClientMetrics, wdsDynClientBase)
 
-	itsDynClient, err := dynamic.NewForConfig(itsRestConfig)
+	itsDynClientBase, err := dynamic.NewForConfig(itsRestConfig)
 	if err != nil {
 		return nil, err
 	}
+	itsDynClient := ksmetrics.NewWrappedDynamicClient(itsClientMetrics, itsDynClientBase)
 
 	wdsKsClient, err := ksclient.NewForConfig(wdsRestConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	zapLogger := zap.New(zap.UseDevMode(true))
-	log.SetLogger(zapLogger)
-
 	controller := &Controller{
 		wdsName:               wdsName,
 		wdsDynClient:          wdsDynClient,
 		wdsKsClient:           wdsKsClient,
 		itsDynClient:          itsDynClient,
-		workqueue:             workqueue.NewRateLimitingQueue(ratelimiter),
+		bindingClient:         ksmetrics.NewWrappedClusterScopedClient(wdsClientMetrics, util.GetBindingGVR(), wdsKsClient.ControlV1alpha1().Bindings()),
+		bindingPolicyClient:   ksmetrics.NewWrappedClusterScopedClient(wdsClientMetrics, util.GetBindingPolicyGVR(), wdsKsClient.ControlV1alpha1().BindingPolicies()),
+		statusCollectorClient: ksmetrics.NewWrappedClusterScopedClient(wdsClientMetrics, v1alpha1.GroupVersion.WithResource("statuscollectors"), wdsKsClient.ControlV1alpha1().StatusCollectors()),
+		combinedStatusClient: ksmetrics.NewWrappedBasicNamespacedClient(wdsClientMetrics, v1alpha1.GroupVersion.WithResource("combinedstatuses"), func(ns string) ksmetrics.BasicClientModNamespace[*v1alpha1.CombinedStatus, *v1alpha1.CombinedStatusList] {
+			return wdsKsClient.ControlV1alpha1().CombinedStatuses(ns)
+		}),
+		workqueue:             workqueue.NewRateLimitingQueueWithConfig(ratelimiter, workqueue.RateLimitingQueueConfig{Name: ControllerName + "-" + wdsName}),
 		bindingPolicyResolver: bindingPolicyResolver,
 	}
 
