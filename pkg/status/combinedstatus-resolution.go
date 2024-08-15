@@ -39,8 +39,7 @@ import (
 )
 
 const (
-	allValue           = ""
-	expressionRootName = "obj"
+	allValue = ""
 )
 
 // combinedStatusResolution is a struct that represents the resolution of a
@@ -73,6 +72,11 @@ type combinedStatusResolution struct {
 	// collectionDestinations is a set of destinations that are expected to be
 	// collected from.
 	collectionDestinations sets.Set[string]
+	// stalenessThresholdSecs is the threshold for determining staleness of the
+	// combinedstatus resolution. A combinedstatus resolution is considered
+	// stale if any contributing workstatus has an age of more than the
+	// staleness threshold.
+	stalenessThresholdSecs int32
 }
 
 // statusCollectorData is a struct that represents the data of a
@@ -115,6 +119,18 @@ func (c *combinedStatusResolution) getName() string {
 	defer c.RUnlock()
 
 	return c.name
+}
+
+func (c *combinedStatusResolution) setStalenessThresholdSecs(threshold int32) bool {
+	c.Lock()
+	defer c.Unlock()
+
+	if c.stalenessThresholdSecs == threshold {
+		return false
+	}
+
+	c.stalenessThresholdSecs = threshold
+	return true
 }
 
 // setCollectionDestinations sets the collection destinations of the
@@ -346,10 +362,10 @@ func (c *combinedStatusResolution) requiresSourceObjectMetaOrSpec() bool {
 	defer c.RUnlock()
 
 	pred := func(s string) bool {
-		return strings.Contains(s, fmt.Sprintf("%s.metadata", expressionRootName)) ||
-			strings.Contains(s, fmt.Sprintf("%s.spec", expressionRootName)) ||
-			strings.Contains(s, fmt.Sprintf("%s.kind", expressionRootName)) ||
-			strings.Contains(s, fmt.Sprintf("%s.apiVersion", expressionRootName))
+		return strings.Contains(s, fmt.Sprintf("%s.metadata", sourceObjectKey)) ||
+			strings.Contains(s, fmt.Sprintf("%s.spec", sourceObjectKey)) ||
+			strings.Contains(s, fmt.Sprintf("%s.kind", sourceObjectKey)) ||
+			strings.Contains(s, fmt.Sprintf("%s.apiVersion", sourceObjectKey))
 	}
 
 	for _, scData := range c.statusCollectorNameToData {

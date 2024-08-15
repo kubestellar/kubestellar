@@ -18,7 +18,9 @@ package status
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -36,13 +38,23 @@ const workStatusIdentificationIndexKey = "workStatusIdentificationIndex"
 
 type workStatus struct {
 	workStatusRef
-	status map[string]interface{}
+	status         map[string]interface{}
+	lastUpdateTime *metav1.Time
 }
 
 func (ws *workStatus) Content() map[string]interface{} {
 	return map[string]interface{}{
 		"status": ws.status,
 	}
+}
+
+func (ws *workStatus) AgeSecs() *int32 {
+	if ws.lastUpdateTime == nil {
+		return nil
+	}
+
+	ageDuration := int32(time.Since(ws.lastUpdateTime.Time).Seconds())
+	return &ageDuration
 }
 
 func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) error {
@@ -65,6 +77,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 		}
 
 		workStatus.status = status // might be nil
+		workStatus.lastUpdateTime = getObjectStatusLastUpdateTime(obj.(metav1.Object))
 	}
 
 	combinedStatusSet := c.combinedStatusResolver.NoteWorkStatus(workStatus) // nil .status is equivalent to deleted
@@ -142,8 +155,9 @@ func runtimeObjectToWorkStatus(obj runtime.Object) (*workStatus, error) {
 	}
 
 	return &workStatus{
-		workStatusRef: *ref,
-		status:        status,
+		workStatusRef:  *ref,
+		status:         status,
+		lastUpdateTime: getObjectStatusLastUpdateTime(obj.(metav1.Object)),
 	}, nil
 }
 
@@ -167,4 +181,27 @@ func runtimeObjectToWorkStatusRef(obj runtime.Object) (*workStatusRef, error) {
 		WECName:                wecName,
 		SourceObjectIdentifier: objIdentifier,
 	}, nil
+}
+
+func getObjectStatusLastUpdateTime(metaObj metav1.Object) *metav1.Time {
+	if managedFields := metaObj.GetManagedFields(); managedFields != nil && len(managedFields) > 0 {
+		// iterate through all managedFields entries to find the one that updated the status
+		for _, field := range managedFields {
+			if field.Operation == metav1.ManagedFieldsOperationUpdate &&
+				field.FieldsType == "FieldsV1" &&
+				field.FieldsV1 != nil {
+				// parse the FieldsV1.Raw to a map to check if "f:status" is present
+				var fieldsMap map[string]interface{}
+				if err := json.Unmarshal(field.FieldsV1.Raw, &fieldsMap); err != nil {
+					continue
+				}
+
+				if _, ok := fieldsMap["f:status"]; ok {
+					return field.Time
+				}
+			}
+		}
+	}
+
+	return nil
 }

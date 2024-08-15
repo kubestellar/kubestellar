@@ -86,6 +86,13 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
+                        stalenessThresholdSecs:
+                          description: '`stalenessThresholdSecs` is the threshold
+                            used to derive the `stale` bit in PropagationMeta values.
+                            The value is the minimum of the `stalenessThresholdSecs`
+                            in the tests that match the object.'
+                          format: int32
+                          type: integer
                         statusCollectors:
                           description: '`statusCollectors` is a list of StatusCollectors
                             name references that are applied to the object.'
@@ -134,6 +141,13 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
+                        stalenessThresholdSecs:
+                          description: '`stalenessThresholdSecs` is the threshold
+                            used to derive the `stale` bit in PropagationMeta values.
+                            The value is the minimum of the `stalenessThresholdSecs`
+                            in the tests that match the object.'
+                          format: int32
+                          type: integer
                         statusCollectors:
                           description: '`statusCollectors` is a list of StatusCollectors
                             name references that are applied to the object.'

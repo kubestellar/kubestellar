@@ -19,17 +19,22 @@ package binding
 import (
 	"context"
 	"fmt"
+	"math"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
+
+const defaultStatusCollectionStalenessThresholdSecs = 120
 
 // when an object is updated, we iterate over all bindingpolicies and update
 // resolutions that are affected by the update. Every changed resolution leads
@@ -60,12 +65,11 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 	isSelectedBySingletonBinding := false
 
 	for _, bindingPolicy := range bindingPolicies {
-
 		if !c.bindingPolicyResolver.ResolutionExists(bindingPolicy.GetName()) {
 			continue // resolution does not exist, skip
 		}
 
-		matchedAny, createOnly, matchedStatusCollectorsSet := c.testObject(ctx, objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
+		matchedAny, createOnly, stalenessThresholdSecs, matchedStatusCollectorsSet := c.testObject(ctx, objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
 		if !matchedAny {
 			// if previously selected, remove
 			if resolutionUpdated := c.bindingPolicyResolver.RemoveObjectIdentifier(bindingPolicy.GetName(),
@@ -86,7 +90,8 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 
 		// obj is selected by bindingpolicy, update the bindingpolicy resolver
 		resolutionUpdated, err := c.bindingPolicyResolver.EnsureObjectData(bindingPolicy.GetName(),
-			objIdentifier, string(objMR.GetUID()), objMR.GetResourceVersion(), createOnly, matchedStatusCollectorsSet)
+			objIdentifier, string(objMR.GetUID()), objMR.GetResourceVersion(), createOnly, stalenessThresholdSecs,
+			matchedStatusCollectorsSet)
 		if err != nil {
 			if errorIsBindingPolicyResolutionNotFound(err) {
 				// this case can occur if a bindingpolicy resolution was deleted AFTER
@@ -201,4 +206,81 @@ func (c *Controller) removeObjectFromBindingPolicies(ctx context.Context, objIde
 	}
 
 	return nil
+}
+
+// testObject tests if the object matches the given tests.
+// The returned tuple is:
+//   - bool: whether the object matches ANY of the tests
+//   - bool: whether any test that matches the object also says CreateOnly==true
+//   - int32: the minimum staleness threshold across all tests that match the object
+//   - sets.Set[string]: the UNION of the statuscollector names that appear within
+//     EACH of the tests that the object matches
+func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
+	tests []v1alpha1.DownsyncPolicyClause) (bool, bool, int32, sets.Set[string]) {
+
+	logger := klog.FromContext(ctx)
+
+	matchedStatusCollectors := sets.New[string]()
+	var matched, createOnly bool
+	var minStalenessThresholdSecs int32 = math.MaxInt32
+
+	var objNS *corev1.Namespace
+	for _, test := range tests {
+		if test.APIGroup != nil && (*test.APIGroup) != objIdentifier.GVK.Group {
+			continue
+		}
+		if len(test.Resources) > 0 && !(SliceContains(test.Resources, "*") ||
+			SliceContains(test.Resources, objIdentifier.Resource)) {
+			continue
+		}
+		if len(test.Namespaces) > 0 && !(SliceContains(test.Namespaces, "*") ||
+			SliceContains(test.Namespaces, objIdentifier.ObjectName.Namespace)) {
+			continue
+		}
+		if len(test.ObjectNames) > 0 && !(SliceContains(test.ObjectNames, "*") ||
+			SliceContains(test.ObjectNames, objIdentifier.ObjectName.Name)) {
+			continue
+		}
+		if len(test.ObjectSelectors) > 0 && !labelsMatchAny(c.logger, objLabels, test.ObjectSelectors) {
+			continue
+		}
+		if len(test.NamespaceSelectors) > 0 && !ALabelSelectorIsEmpty(test.NamespaceSelectors...) {
+			if objNS == nil {
+				var err error
+				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(context.TODO(),
+					objIdentifier.ObjectName.Namespace, metav1.GetOptions{})
+				if err != nil {
+					logger.V(3).Info("Object namespace not found, assuming object does not match",
+						"object identifier", objIdentifier)
+					continue
+				}
+			}
+			if !labelsMatchAny(logger, objNS.Labels, test.NamespaceSelectors) {
+				continue
+			}
+		}
+
+		klog.FromContext(ctx).V(5).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
+		// test is a match
+		if test.StatusCollection != nil {
+			matchedStatusCollectors.Insert(test.StatusCollection.StatusCollectors...)
+			minStalenessThresholdSecs = minInt(minStalenessThresholdSecs,
+				test.StatusCollection.StalenessThresholdSecs)
+		}
+		matched = true
+		createOnly = createOnly || test.CreateOnly
+	}
+
+	if len(matchedStatusCollectors) > 0 && minStalenessThresholdSecs == math.MaxInt32 {
+		minStalenessThresholdSecs = defaultStatusCollectionStalenessThresholdSecs
+	}
+
+	return matched, createOnly, minStalenessThresholdSecs, matchedStatusCollectors
+}
+
+func minInt(a, b int32) int32 {
+	if a < b {
+		return a
+	}
+	return b
 }

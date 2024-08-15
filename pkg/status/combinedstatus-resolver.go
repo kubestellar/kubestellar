@@ -243,6 +243,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 			csResolution = &combinedStatusResolution{
 				name:                      getCombinedStatusName(bindingResolution.UID, objectData.UID),
 				statusCollectorNameToData: make(map[string]*statusCollectorData),
+				stalenessThresholdSecs:    objectData.StalenessThresholdSecs, // minimum threshold of all statuscollectors
 			}
 			objectIdentifierToResolution[objectIdentifier] = csResolution
 			c.resolutionNameToKey[csResolution.getName()] = resolutionKey{bindingName, objectIdentifier}
@@ -257,6 +258,9 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 		// update destinations
 		removedDestinations, newDestinationsSet := csResolution.setCollectionDestinations(destinationsSet)
 
+		// update staleness threshold
+		updatedThreshold := csResolution.setStalenessThresholdSecs(objectData.StalenessThresholdSecs)
+
 		logger.V(5).Info("Updating CombinedStatus resolution", "binding", bindingName, "objectId", objectIdentifier,
 			"removedCollectors", removedCollectors, "addedCollectors", addedCollectors,
 			"removedDestinations", removedDestinations, "newDestinationsSet", newDestinationsSet)
@@ -267,8 +271,8 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 				objectIdentifier.ObjectName.Namespace))
 		}
 
-		// should evaluate workstatuses if added/updated collectors or added destinations
-		if addedCollectors || len(newDestinationsSet) > 0 {
+		// should evaluate workstatuses if added/updated collectors or added destinations or updated staleness threshold
+		if addedCollectors || len(newDestinationsSet) > 0 || updatedThreshold {
 			workloadIdentifiersToEvaluate.Insert(objectIdentifier) // TODO: this can be optimized through tightening
 		}
 	}
@@ -422,8 +426,8 @@ func (c *combinedStatusResolver) ResolutionExists(name string) (string, util.Obj
 // from the given lister and updates the cache.
 // The method is expected to be called with the write lock held.
 func (c *combinedStatusResolver) fetchMissingStatusCollectorSpecsLocked(statusCollectorLister controllisters.StatusCollectorLister,
-	statusCollectorNames []string) {
-	for _, statusCollectorName := range statusCollectorNames {
+	statusCollectorNames sets.Set[string]) {
+	for statusCollectorName := range statusCollectorNames {
 		if _, exists := c.statusCollectorNameToSpec[statusCollectorName]; exists {
 			continue // this method is not responsible for keeping the cache up-to-date
 		}
@@ -497,8 +501,9 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 func (c *combinedStatusResolver) getCombinedContentMap(workStatus *workStatus,
 	resolution *combinedStatusResolution) map[string]interface{} {
 	content := map[string]interface{}{
-		returnedKey:  workStatus.Content(),
-		inventoryKey: inventoryForWorkStatus(workStatus),
+		returnedKey:        workStatus.Content(),
+		inventoryKey:       inventoryForWorkStatus(workStatus),
+		propagationMetaKey: propagateMetaForWorkStatus(workStatus, resolution),
 	}
 
 	if resolution.requiresSourceObjectMetaOrSpec() {
@@ -592,9 +597,9 @@ func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool 
 	return true
 }
 
-func (c *combinedStatusResolver) statusCollectorNameToSpecFromCache(names []string) map[string]v1alpha1.StatusCollectorSpec {
+func (c *combinedStatusResolver) statusCollectorNameToSpecFromCache(names sets.Set[string]) map[string]v1alpha1.StatusCollectorSpec {
 	result := make(map[string]v1alpha1.StatusCollectorSpec, len(names))
-	for _, name := range names {
+	for name := range names {
 		spec, ok := c.statusCollectorNameToSpec[name]
 		if !ok {
 			continue
@@ -626,5 +631,16 @@ func expressionPtrsEqual(e1, e2 *v1alpha1.Expression) bool {
 func inventoryForWorkStatus(ws *workStatus) map[string]interface{} {
 	return map[string]interface{}{
 		"name": ws.WECName,
+	}
+}
+
+func propagateMetaForWorkStatus(ws *workStatus, resolution *combinedStatusResolution) map[string]interface{} {
+	stale := true
+	if ageSecs := ws.AgeSecs(); ageSecs != nil {
+		stale = *ageSecs > resolution.stalenessThresholdSecs
+	}
+
+	return map[string]interface{}{
+		"stale": stale,
 	}
 }

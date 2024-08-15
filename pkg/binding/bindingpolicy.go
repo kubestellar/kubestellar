@@ -276,66 +276,6 @@ type mrObject interface {
 	runtime.Object
 }
 
-// testObject tests if the object matches the given tests.
-// The returned tuple is:
-//   - bool: whether the object matches ANY of the tests
-//   - bool: whether any test that matches the object also says CreateOnly==true
-//   - sets.Set[string]: the UNION of the statuscollector names that appear within
-//     EACH of the tests that the object matches
-func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
-	tests []v1alpha1.DownsyncPolicyClause) (bool, bool, sets.Set[string]) {
-
-	logger := klog.FromContext(ctx)
-
-	matchedStatusCollectors := sets.New[string]()
-	var matched, createOnly bool
-
-	var objNS *corev1.Namespace
-	for _, test := range tests {
-		if test.APIGroup != nil && (*test.APIGroup) != objIdentifier.GVK.Group {
-			continue
-		}
-		if len(test.Resources) > 0 && !(SliceContains(test.Resources, "*") ||
-			SliceContains(test.Resources, objIdentifier.Resource)) {
-			continue
-		}
-		if len(test.Namespaces) > 0 && !(SliceContains(test.Namespaces, "*") ||
-			SliceContains(test.Namespaces, objIdentifier.ObjectName.Namespace)) {
-			continue
-		}
-		if len(test.ObjectNames) > 0 && !(SliceContains(test.ObjectNames, "*") ||
-			SliceContains(test.ObjectNames, objIdentifier.ObjectName.Name)) {
-			continue
-		}
-		if len(test.ObjectSelectors) > 0 && !labelsMatchAny(c.logger, objLabels, test.ObjectSelectors) {
-			continue
-		}
-		if len(test.NamespaceSelectors) > 0 && !ALabelSelectorIsEmpty(test.NamespaceSelectors...) {
-			if objNS == nil {
-				var err error
-				objNS, err = c.namespaceClient.Get(ctx,
-					objIdentifier.ObjectName.Namespace, metav1.GetOptions{})
-				if err != nil {
-					logger.V(3).Info("Object namespace not found, assuming object does not match",
-						"object identifier", objIdentifier)
-					continue
-				}
-			}
-			if !labelsMatchAny(logger, objNS.Labels, test.NamespaceSelectors) {
-				continue
-			}
-		}
-
-		klog.FromContext(ctx).V(5).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
-		// test is a match
-		matchedStatusCollectors.Insert(test.StatusCollectors...)
-		matched = true
-		createOnly = createOnly || test.CreateOnly
-	}
-
-	return matched, createOnly, matchedStatusCollectors
-}
-
 func labelsMatchAny(logger logr.Logger, labelSet map[string]string, selectors []metav1.LabelSelector) bool {
 	for _, ls := range selectors {
 		sel, err := metav1.LabelSelectorAsSelector(&ls)

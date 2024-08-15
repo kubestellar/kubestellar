@@ -153,7 +153,19 @@ type DownsyncPolicyClause struct {
 	// +optional
 	CreateOnly bool `json:"createOnly,omitempty"`
 
-	// statusCollectors is a list of StatusCollectors name references that are applied to the selected objects.
+	// `statusCollection` holds the rules for collecting status from the WECs.
+	// +optional
+	StatusCollection *StatusCollection `json:"statusCollection,omitempty"`
+}
+
+// StatusCollection holds the rules for collecting status from the WECs.
+type StatusCollection struct {
+	// `stalenessThresholdSecs` is the threshold used to derive
+	// the `stale` bit in PropagationMeta values.
+	// Default value is 120.
+	// +kubebuilder:default=120
+	StalenessThresholdSecs int32 `json:"stalenessThresholdSecs,omitempty"`
+	// `statusCollectors` is a list of StatusCollectors name references to be applied.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }
 
@@ -304,6 +316,11 @@ type NamespaceScopeDownsyncClause struct {
 
 	// `statusCollectors` is a list of StatusCollectors name references that are applied to the object.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
+
+	// `stalenessThresholdSecs` is the threshold used to derive
+	// the `stale` bit in PropagationMeta values.
+	// The value is the minimum of the `stalenessThresholdSecs` in the tests that match the object.
+	StalenessThresholdSecs int32 `json:"stalenessThresholdSecs,omitempty"`
 }
 
 // NamespaceScopeDownsyncObject references a specific namespace-scoped object to downsync,
@@ -331,6 +348,11 @@ type ClusterScopeDownsyncClause struct {
 
 	// `statusCollectors` is a list of StatusCollectors name references that are applied to the object.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
+
+	// `stalenessThresholdSecs` is the threshold used to derive
+	// the `stale` bit in PropagationMeta values.
+	// The value is the minimum of the `stalenessThresholdSecs` in the tests that match the object.
+	StalenessThresholdSecs int32 `json:"stalenessThresholdSecs,omitempty"`
 }
 
 // ClusterScopeDownsyncObject references a specific cluster-scoped object to downsync,
@@ -456,6 +478,27 @@ const (
 // Parsing errors are posted to the status.Errors of the StatusCollector.
 // Type checking errors are posted to the status.Errors of the Binding and BindingPolicy.
 type Expression string
+
+// Augmentation defines what is implicitly added to every workload object from a WEC,
+// for purposes of status collection.
+type Augmentation struct {
+	Inventory   InventoryObjectReference `json:"inventory"`
+	Propagation PropagationMeta          `json:"propagation"`
+}
+
+// InventoryObjectReference identifies an inventory object.
+// Inventory is queryable in StatusCollector expressions using the `inventory` object.
+type InventoryObjectReference struct {
+	// `name` is the inventory object's name
+	Name string `json:"name"`
+}
+
+// PropagationMeta is the last reported metadata about one workload object at one WEC.
+// PropagationMeta is queryable in StatusCollector expressions using the `propagation` object.
+type PropagationMeta struct {
+	// `stale` indicates whether `infoAgeSeconds > stalenessThresholdSecs`.
+	Stale bool `json:"stale"`
+}
 
 // StatusCollectorStatus defines the observed state of StatusCollector.
 type StatusCollectorStatus struct {

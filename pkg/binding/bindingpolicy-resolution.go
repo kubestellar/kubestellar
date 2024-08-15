@@ -36,7 +36,7 @@ import (
 type bindingPolicyResolution struct {
 	sync.RWMutex
 
-	objectIdentifierToData map[util.ObjectIdentifier]*objectData
+	objectIdentifierToData map[util.ObjectIdentifier]*ObjectData
 
 	// Every Set ever stored here is immutable from the time it is stored here.
 	destinations sets.Set[string]
@@ -50,13 +50,25 @@ type bindingPolicyResolution struct {
 	requiresSingletonReportedState bool
 }
 
-// objectData stores the UID, resource version, create-only bit,
+// ObjectData stores the UID, resource version, create-only bit,
 // and statuscollectors for an object.
-type objectData struct {
-	UID              string
-	ResourceVersion  string
-	CreateOnly       bool
+type ObjectData struct {
+	// UID is the UID of the object.
+	UID string
+	// ResourceVersion is the resource version of the object.
+	ResourceVersion string
+	// CreateOnly is a boolean that indicates whether the object was selected
+	// by at least one downsync clause with the createOnly bit set.
+	// If enabled, it means that the object should only be created and not
+	// maintained
+	CreateOnly bool
+	// StatusCollectors is a set of status collector names that are associated
 	StatusCollectors sets.Set[string]
+	// stalenessThresholdSecs dictates the staleness threshold for determining
+	// when the object's collected status is considered stale.
+	// If more than one BindingPolicy downsync clause selected the object,
+	// the minimum staleness threshold is used.
+	StalenessThresholdSecs int32
 }
 
 // ensureObjectData ensures that an object identifier exists
@@ -68,22 +80,25 @@ type objectData struct {
 // The returned bool indicates whether the resolution was changed.
 // This function is thread-safe.
 func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.ObjectIdentifier,
-	objUID, resourceVersion string, createOnly bool, statusCollectors sets.Set[string]) bool {
+	objUID, resourceVersion string, createOnly bool, stalenessThresholdSecs int32, statusCollectors sets.Set[string]) bool {
 	resolution.Lock()
 	defer resolution.Unlock()
 
 	objData := resolution.objectIdentifierToData[objIdentifier]
 	if objData == nil {
-		resolution.objectIdentifierToData[objIdentifier] = &objectData{
-			UID:              objUID,
-			ResourceVersion:  resourceVersion,
-			CreateOnly:       createOnly,
-			StatusCollectors: statusCollectors,
+		resolution.objectIdentifierToData[objIdentifier] = &ObjectData{
+			UID:                    objUID,
+			ResourceVersion:        resourceVersion,
+			CreateOnly:             createOnly,
+			StatusCollectors:       statusCollectors,
+			StalenessThresholdSecs: stalenessThresholdSecs,
 		}
 		return true
 	}
 
-	if objData.UID == objUID && objData.ResourceVersion == resourceVersion && objData.CreateOnly == createOnly && objData.StatusCollectors.Equal(statusCollectors) {
+	if objData.UID == objUID && objData.ResourceVersion == resourceVersion &&
+		objData.CreateOnly == createOnly && objData.StalenessThresholdSecs == stalenessThresholdSecs &&
+		objData.StatusCollectors.Equal(statusCollectors) {
 		return false
 	}
 
@@ -91,6 +106,7 @@ func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.O
 	objData.ResourceVersion = resourceVersion
 	objData.CreateOnly = createOnly
 	objData.StatusCollectors = statusCollectors
+	objData.StalenessThresholdSecs = stalenessThresholdSecs
 
 	return true
 }
@@ -131,8 +147,9 @@ func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec
 						Name:                 objIdentifier.ObjectName.Name,
 						ResourceVersion:      objData.ResourceVersion,
 					},
-					CreateOnly:       objData.CreateOnly,
-					StatusCollectors: sets.List(objData.StatusCollectors),
+					CreateOnly:             objData.CreateOnly,
+					StatusCollectors:       sets.List(objData.StatusCollectors),
+					StalenessThresholdSecs: objData.StalenessThresholdSecs,
 				})
 
 			continue
@@ -146,8 +163,9 @@ func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec
 					Namespace:            objIdentifier.ObjectName.Namespace,
 					ResourceVersion:      objData.ResourceVersion,
 				},
-				CreateOnly:       objData.CreateOnly,
-				StatusCollectors: sets.List(objData.StatusCollectors),
+				CreateOnly:             objData.CreateOnly,
+				StatusCollectors:       sets.List(objData.StatusCollectors),
+				StalenessThresholdSecs: objData.StalenessThresholdSecs,
 			})
 	}
 
@@ -185,7 +203,8 @@ func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alp
 		}]; objDataFromWorkload == nil ||
 			objData.ResourceVersion != objDataFromWorkload.ResourceVersion ||
 			objData.CreateOnly != objDataFromWorkload.CreateOnly ||
-			!objData.StatusCollectors.Equal(objDataFromWorkload.StatusCollectors) {
+			!objData.StatusCollectors.Equal(objDataFromWorkload.StatusCollectors) ||
+			objData.StalenessThresholdSecs != objDataFromWorkload.StalenessThresholdSecs {
 			return false
 		}
 	} // this check works because both groups have unique members and are of equal size
@@ -245,8 +264,8 @@ type objectRef struct {
 	cache.ObjectName
 }
 
-func bindingObjectRefToDataFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectClauses) map[objectRef]*objectData {
-	bindingObjectRefToData := make(map[objectRef]*objectData)
+func bindingObjectRefToDataFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectClauses) map[objectRef]*ObjectData {
+	bindingObjectRefToData := make(map[objectRef]*ObjectData)
 
 	for _, clusterScopeDownsyncClause := range bindingSpecWorkload.ClusterScope {
 		bindingObjectRefToData[objectRef{
@@ -255,7 +274,7 @@ func bindingObjectRefToDataFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncOb
 				Name:      clusterScopeDownsyncClause.Name,
 				Namespace: metav1.NamespaceNone,
 			},
-		}] = &objectData{
+		}] = &ObjectData{
 			ResourceVersion:  clusterScopeDownsyncClause.ResourceVersion,
 			CreateOnly:       clusterScopeDownsyncClause.CreateOnly,
 			StatusCollectors: sets.New(clusterScopeDownsyncClause.StatusCollectors...),
@@ -269,7 +288,7 @@ func bindingObjectRefToDataFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncOb
 				Name:      namespacedScopeDownsyncClause.Name,
 				Namespace: namespacedScopeDownsyncClause.Namespace,
 			},
-		}] = &objectData{
+		}] = &ObjectData{
 			ResourceVersion:  namespacedScopeDownsyncClause.ResourceVersion,
 			CreateOnly:       namespacedScopeDownsyncClause.CreateOnly,
 			StatusCollectors: sets.New(namespacedScopeDownsyncClause.StatusCollectors...),

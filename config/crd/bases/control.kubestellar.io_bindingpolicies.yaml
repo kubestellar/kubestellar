@@ -265,12 +265,24 @@ spec:
                       items:
                         type: string
                       type: array
-                    statusCollectors:
-                      description: statusCollectors is a list of StatusCollectors
-                        name references that are applied to the selected objects.
-                      items:
-                        type: string
-                      type: array
+                    statusCollection:
+                      description: '`statusCollection` holds the rules for collecting
+                        status from the WECs.'
+                      properties:
+                        stalenessThresholdSecs:
+                          default: 120
+                          description: '`stalenessThresholdSecs` is the threshold
+                            used to derive the `stale` bit in PropagationMeta values.
+                            Default value is 120.'
+                          format: int32
+                          type: integer
+                        statusCollectors:
+                          description: '`statusCollectors` is a list of StatusCollectors
+                            name references to be applied.'
+                          items:
+                            type: string
+                          type: array
+                      type: object
                   type: object
                 type: array
               wantSingletonReportedState:

@@ -68,15 +68,16 @@ type BindingPolicyResolver interface {
 
 	// EnsureObjectData ensures that an object's identifier is
 	// in the resolution for the given bindingpolicy key, and is associated
-	// with the given resource-version, create-only bit, and statuscollectors set.
+	// with the given resource-version, create-only bit, (status collection)
+	// staleness-threshold and statuscollectors set.
 	// The given set is expected not to be mutated during and after this call
 	// by the caller.
 	//
 	// The returned bool indicates whether the bindingpolicy resolution was
 	// changed. If no resolution is associated with the given key, an error is
 	// returned.
-	EnsureObjectData(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
-		objUID, resourceVersion string, createOnly bool, statusCollectors sets.Set[string]) (bool, error)
+	EnsureObjectData(bindingPolicyKey string, objIdentifier util.ObjectIdentifier, objUID, resourceVersion string,
+		createOnly bool, stalenessThresholdSecs int32, statusCollectors sets.Set[string]) (bool, error)
 	// RemoveObjectIdentifier ensures the absence of the given object
 	// identifier from the resolution for the given bindingpolicy key.
 	//
@@ -217,7 +218,8 @@ func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1
 
 // EnsureObjectData ensures that an object's identifier is
 // in the resolution for the given bindingpolicy key, and is associated
-// with the given resource-version, create-only bit, and statuscollectors set.
+// with the given resource-version, create-only bit, (status collection)
+// staleness-threshold and statuscollectors set.
 // The given set is expected not to be mutated during and after this call
 // by the caller.
 //
@@ -225,7 +227,8 @@ func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1
 // changed. If no resolution is associated with the given key, an error is
 // returned.
 func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
-	objUID, resourceVersion string, createOnly bool, statusCollectors sets.Set[string]) (bool, error) {
+	objUID, resourceVersion string, createOnly bool, stalenessThresholdSecs int32,
+	statusCollectors sets.Set[string]) (bool, error) {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
@@ -235,7 +238,8 @@ func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string,
 	}
 
 	// ensureObjectIdentifier is thread-safe
-	return bindingPolicyResolution.ensureObjectData(objIdentifier, objUID, resourceVersion, createOnly, statusCollectors), nil
+	return bindingPolicyResolution.ensureObjectData(objIdentifier, objUID, resourceVersion, createOnly,
+		stalenessThresholdSecs, statusCollectors), nil
 }
 
 // RemoveObjectIdentifier ensures the absence of the given object
@@ -417,7 +421,7 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 	ownerReference.BlockOwnerDeletion = &[]bool{false}[0]
 
 	bindingPolicyResolution := &bindingPolicyResolution{
-		objectIdentifierToData:         make(map[util.ObjectIdentifier]*objectData),
+		objectIdentifierToData:         make(map[util.ObjectIdentifier]*ObjectData),
 		destinations:                   sets.New[string](),
 		ownerReference:                 ownerReference,
 		requiresSingletonReportedState: bindingpolicy.Spec.WantSingletonReportedState,
