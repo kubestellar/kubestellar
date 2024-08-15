@@ -106,6 +106,15 @@ type BindingPolicyResolver interface {
 	// This means that if true is returned, then the singleton status reporting
 	// requirement is effective.
 	ResolutionRequiresSingletonReportedState(bindingPolicyKey string) bool
+
+	// GetSingletonReportedStateRequestForObject returns the combined effects of all
+	// the resolutions regarding singleton reported state return for a given workload object.
+	// The returned `bool` indicates whether singleton reported state return is requested.
+	// When that is `true`, the returned `int` is the number of WECs that the resolutions
+	// collectively associate with the workload object;
+	// otherwise the returned `int` is unspecified.
+	GetSingletonReportedStateRequestForObject(util.ObjectIdentifier) (bool, int)
+
 	// DeleteResolution deletes the resolution associated with the given key,
 	// if it exists.
 	DeleteResolution(bindingPolicyKey string)
@@ -126,7 +135,11 @@ func NewBindingPolicyResolver() BindingPolicyResolver {
 type bindingPolicyResolver struct {
 	broker ResolutionBroker
 
+	// Hold this mutex while accessing bindingPolicyToResolution.
+	// This mutex may be held while acquiring a bindingPolicyResolution's mutex,
+	// but not vice-versa.
 	sync.RWMutex
+
 	bindingPolicyToResolution map[string]*bindingPolicyResolution
 }
 
@@ -301,6 +314,35 @@ func (resolver *bindingPolicyResolver) ResolutionRequiresSingletonReportedState(
 	}
 
 	return bindingPolicyResolution.requiresSingletonReportedState
+}
+
+func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, int) {
+	resolver.RWMutex.RLock()
+	defer resolver.RWMutex.RUnlock()
+	var requested bool
+	// First, just compute whether singleton reported state return is requested for this object.
+	// Avoid thrashing the heap with that set collection unless it is really necessary.
+	for _, resolution := range resolver.bindingPolicyToResolution {
+		matches, thisRequest, _ := resolution.getSingletonReportedStateReturnRequest(objId)
+		if matches && thisRequest {
+			requested = true
+			break
+		}
+	}
+	if !requested {
+		return false, 0
+	}
+	requested = false
+	matchingWECs := sets.New[string]()
+	for _, resolution := range resolver.bindingPolicyToResolution {
+		matches, thisRequest, thisDests := resolution.getSingletonReportedStateReturnRequest(objId)
+		if !matches {
+			continue
+		}
+		requested = requested || thisRequest
+		matchingWECs = matchingWECs.Union(thisDests)
+	}
+	return requested, matchingWECs.Len()
 }
 
 // DeleteResolution deletes the resolution associated with the given key,
