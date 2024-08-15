@@ -38,6 +38,7 @@ type bindingPolicyResolution struct {
 
 	objectIdentifierToData map[util.ObjectIdentifier]*objectData
 
+	// Every Set ever stored here is immutable from the time it is stored here.
 	destinations sets.Set[string]
 
 	// ownerReference identifies the bindingpolicy that this resolution is
@@ -207,6 +208,20 @@ func (resolution *bindingPolicyResolution) getOwnerReference() metav1.OwnerRefer
 	defer resolution.RUnlock()
 
 	return *resolution.ownerReference
+}
+
+// getSingletonReportedStateReturnRequest returns what this resolution requests regarding singleton reported state return.
+// The first returned bool reports whether this resolution matches the given workload object ID;
+// if not then the other returned values are meaningless.
+// The second returned bool indicates whether singleton reported state return is requested.
+// The returned set is the names of the matching WECs, and is immutable.
+func (resolution *bindingPolicyResolution) getSingletonReportedStateReturnRequest(objId util.ObjectIdentifier) (bool, bool, sets.Set[string]) {
+	resolution.RLock()
+	defer resolution.RUnlock()
+	if _, has := resolution.objectIdentifierToData[objId]; !has {
+		return false, false, nil
+	}
+	return true, resolution.requiresSingletonReportedState, resolution.destinations
 }
 
 // destinationsMatch returns true if the destinations in the resolution
