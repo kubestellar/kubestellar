@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -39,7 +40,11 @@ func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string
 
 	binding, err := c.wdsKsClient.ControlV1alpha1().Bindings().Get(ctx, bdgName, metav1.GetOptions{})
 	if err != nil {
-		return fmt.Errorf("could not get binding %s from cache", bdgName)
+		if errors.IsNotFound(err) {
+			// A deleted Binding is equivalent to one that references zero workload objects
+			return nil
+		}
+		return fmt.Errorf("could not get binding %s: %w", bdgName, err)
 	}
 
 	sync := make(map[util.ObjectIdentifier]bool)
