@@ -320,6 +320,8 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject
 	resolver.RWMutex.RLock()
 	defer resolver.RWMutex.RUnlock()
 	var requested bool
+	// First, just compute whether singleton reported state return is requested for this object.
+	// Avoid thrashing the heap with that set collection unless it is really necessary.
 	for _, resolution := range resolver.bindingPolicyToResolution {
 		matches, thisRequest, _ := resolution.getSingletonReportedStateReturnRequest(objId)
 		if matches && thisRequest {
