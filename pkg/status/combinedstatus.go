@@ -26,6 +26,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 func (c *Controller) syncCombinedStatus(ctx context.Context, ref string) error {
@@ -63,12 +64,12 @@ func (c *Controller) syncCombinedStatus(ctx context.Context, ref string) error {
 	generatedCombinedStatus := c.combinedStatusResolver.CompareCombinedStatus(bindingName,
 		sourceObjectIdentifier, combinedStatus)
 	if generatedCombinedStatus == nil {
-		logger.V(4).Info("CombinedStatus is up-to-date", "ns", ns, "name", name)
+		logger.V(4).Info("CombinedStatus is up-to-date", "ns", ns, "name", name, "binding", bindingName, "sourceObjectIdentifier", sourceObjectIdentifier)
 		return nil
 	}
 
 	generatedCombinedStatus.ResourceVersion = combinedStatus.ResourceVersion // in case of update
-	if err = c.updateOrCreateCombinedStatus(ctx, generatedCombinedStatus); err != nil {
+	if err = c.updateOrCreateCombinedStatus(ctx, bindingName, sourceObjectIdentifier, generatedCombinedStatus); err != nil {
 		return fmt.Errorf("failed to update or create CombinedStatus: %w", err)
 	} // all the call's exit routes log the event
 
@@ -76,6 +77,7 @@ func (c *Controller) syncCombinedStatus(ctx context.Context, ref string) error {
 }
 
 func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
+	bindingName string, sourceObjectIdentifier util.ObjectIdentifier,
 	generatedCombinedStatus *v1alpha1.CombinedStatus) error {
 	logger := klog.FromContext(ctx)
 
@@ -85,6 +87,7 @@ func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
 		if err != nil {
 			if errors.IsNotFound(err) {
 				logger.V(2).Info("CombinedStatus not found (update skipped)",
+					"binding", bindingName, "sourceObjectIdentifier", sourceObjectIdentifier,
 					"ns", generatedCombinedStatus.Namespace, "name", generatedCombinedStatus.Name)
 				return nil // the object was deleted during the syncing procedure, event will be handled
 			}
@@ -94,7 +97,8 @@ func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
 		}
 
 		logger.V(2).Info("Updated CombinedStatus", "ns", generatedCombinedStatus.Namespace,
-			"name", generatedCombinedStatus.Name, "resourceVersion", csEcho.ResourceVersion)
+			"name", generatedCombinedStatus.Name, "resourceVersion", csEcho.ResourceVersion,
+			"binding", bindingName, "sourceObjectIdentifier", sourceObjectIdentifier)
 		return nil
 	}
 
@@ -106,7 +110,8 @@ func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
 	}
 
 	logger.V(2).Info("Created CombinedStatus", "ns", generatedCombinedStatus.Namespace,
-		"name", generatedCombinedStatus.Name, "resourceVersion", csEcho.ResourceVersion)
+		"name", generatedCombinedStatus.Name, "resourceVersion", csEcho.ResourceVersion,
+		"binding", bindingName, "sourceObjectIdentifier", sourceObjectIdentifier)
 	return nil
 }
 

@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-logr/logr"
 	"golang.org/x/time/rate"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -59,7 +58,6 @@ const (
 // workload object asks for the singleton status returning. If yes,
 // the full status will be copied to the workload object in WDS.
 type Controller struct {
-	logger       logr.Logger
 	wdsName      string
 	wdsDynClient dynamic.Interface
 	wdsKsClient  ksclient.Interface
@@ -133,7 +131,6 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 
 	controller := &Controller{
 		wdsName:                 wdsName,
-		logger:                  log.Log.WithName(ControllerName),
 		wdsDynClient:            wdsDynClient,
 		wdsKsClient:             wdsKsClient,
 		itsDynClient:            itsDynClient,
@@ -166,6 +163,7 @@ func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan
 // Invoked by Start() to run the translator
 func (c *Controller) run(ctx context.Context, workers int, cListers chan interface{}) error {
 	defer c.workqueue.ShutDown()
+	logger := klog.FromContext(ctx)
 
 	if err := c.ensureNamespaceExists(ctx, util.ClusterScopedObjectsCombinedStatusNamespace); err != nil {
 		return fmt.Errorf("failed to ensure namespace (%s) for combinedstatuses associated with "+
@@ -187,7 +185,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	}
 
 	c.listers = (<-cListers).(util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister])
-	c.logger.Info("Received listers")
+	logger.Info("Received listers")
 
 	celEvaluator, err := newCELEvaluator()
 	if err != nil {
@@ -199,18 +197,20 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 
 	c.bindingResolutionBroker.RegisterCallback(func(bindingPolicyKey string) {
 		// add binding to workqueue
+		logger.V(5).Info("Enqueuing reference to Binding due to notification from BindingResolutionBroken", "name", bindingPolicyKey)
 		c.workqueue.Add(bindingRef(bindingPolicyKey))
 	}) // this will have the broker call the callback for all existing resolutions
-	c.logger.Info("Registered binding resolution broker callback")
+	logger.Info("Registered binding resolution broker callback")
 
-	c.logger.Info("Starting workers", "count", workers)
+	logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
-		go wait.UntilWithContext(ctx, c.runWorker, time.Second)
+		workerCtx := klog.NewContext(ctx, logger.WithName(fmt.Sprintf("worker-%d", i)))
+		go wait.UntilWithContext(workerCtx, c.runWorker, time.Second)
 	}
-	c.logger.Info("Started workers")
+	logger.Info("Started workers")
 
 	<-ctx.Done()
-	c.logger.Info("Shutting down workers")
+	logger.Info("Shutting down workers")
 
 	return nil
 }
@@ -243,7 +243,7 @@ func (c *Controller) setupStatusCollectorInformer(ctx context.Context, ksInforme
 		},
 	})
 	if err != nil {
-		c.logger.Error(err, "failed to add statuscollectors informer event handler")
+		logger.Error(err, "failed to add statuscollectors informer event handler")
 		return err
 	}
 	return nil
@@ -280,7 +280,7 @@ func (c *Controller) setupCombinedStatusInformer(ctx context.Context, ksInformer
 		},
 	})
 	if err != nil {
-		c.logger.Error(err, "failed to add combinedstatuses informer event handler")
+		logger.Error(err, "failed to add combinedstatuses informer event handler")
 		return err
 	}
 	return nil
@@ -320,7 +320,9 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 
 	// add the event handler functions
 	c.workStatusInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: c.handleWorkStatus,
+		AddFunc: func(obj interface{}) {
+			c.handleWorkStatus(ctx, obj)
+		},
 		UpdateFunc: func(old, new interface{}) {
 			if shouldSkipUpdate(old, new) {
 				return
@@ -339,23 +341,23 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 					labels[util.BindingPolicyLabelSingletonStatusKey] = util.BindingPolicyLabelSingletonStatusValueUnset
 				}
 			}
-			c.handleWorkStatus(new)
+			c.handleWorkStatus(ctx, new)
 		},
 		DeleteFunc: func(obj interface{}) {
 			if shouldSkipDelete(obj) {
 				return
 			}
-			c.handleWorkStatus(obj)
+			c.handleWorkStatus(ctx, obj)
 		},
 	})
 
 	informerFactory.Start(ctx.Done())
 
-	c.logger.Info("waiting for workstatus cache to sync")
+	logger.Info("waiting for workstatus cache to sync")
 	if ok := cache.WaitForCacheSync(ctx.Done(), c.workStatusInformer.HasSynced); !ok {
-		c.logger.Info("failed to wait for workstatus caches to sync")
+		logger.Info("failed to wait for workstatus caches to sync")
 	}
-	c.logger.Info("workstatus cache synced")
+	logger.Info("workstatus cache synced")
 
 	<-ctx.Done()
 }
@@ -373,23 +375,24 @@ func shouldSkipDelete(_ interface{}) bool {
 
 // Event handler: enqueues the workstatus objects to be processed
 // At this time it is very simple, more complex processing might be required here
-func (c *Controller) handleWorkStatus(obj any) {
+func (c *Controller) handleWorkStatus(ctx context.Context, obj any) {
 	wsRef, err := runtimeObjectToWorkStatusRef(obj.(runtime.Object))
 	if err != nil {
 		utilruntime.HandleError(err)
 		return
 	}
+	logger := klog.FromContext(ctx)
 
 	_, ok := obj.(metav1.Object).GetLabels()[util.BindingPolicyLabelSingletonStatusKey]
+	logger.V(5).Info("Enqueuing reference to WorkStatus because of informer event",
+		"sourceObjectName", wsRef.SourceObjectIdentifier.ObjectName,
+		"sourceObjectGVK", wsRef.SourceObjectIdentifier.GVK, "wecName", wsRef.WECName,
+		"labeledAboutSingletonStatus", ok)
 	if !ok {
 		c.workqueue.Add(*wsRef)
 	} else {
 		c.workqueue.Add(singletonWorkStatusRef(*wsRef))
 	}
-
-	c.logger.V(5).Info("Enqueuing reference to WorkStatus because of informer event",
-		"sourceObjectName", wsRef.SourceObjectIdentifier.ObjectName,
-		"sourceObjectGVK", wsRef.SourceObjectIdentifier.GVK, "wecName", wsRef.WECName)
 }
 
 // runWorker is a long-running function that will continually call the
@@ -427,7 +430,8 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
 		c.workqueue.Forget(item)
-		c.logger.V(4).Info("Successfully synced", "object", item, "type", fmt.Sprintf("%T", item))
+		logger := klog.FromContext(ctx)
+		logger.V(4).Info("Successfully synced", "object", item, "type", fmt.Sprintf("%T", item))
 		return nil
 	}(item)
 
