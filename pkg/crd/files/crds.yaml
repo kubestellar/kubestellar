@@ -376,15 +376,21 @@ spec:
             properties:
               destinations:
                 description: '`destinations` is a list of cluster-identifiers that
-                  the objects should be propagated to.'
+                  the objects should be propagated to. No duplications are allowed
+                  in this list.'
                 items:
                   description: Destination wraps the identifiers required to uniquely
                     identify a destination cluster.
                   properties:
                     clusterId:
                       type: string
+                  required:
+                  - clusterId
                   type: object
                 type: array
+                x-kubernetes-list-map-keys:
+                - clusterId
+                x-kubernetes-list-type: map
               workload:
                 description: '`workload` is a collection of namespaced and cluster
                   scoped object references and their associated data - resource versions,
@@ -393,7 +399,8 @@ spec:
                 properties:
                   clusterScope:
                     description: '`clusterScope` holds a list of references to cluster-scoped
-                      objects to downsync and how the downsync is to be modulated.'
+                      objects to downsync and how the downsync is to be modulated.
+                      No duplications.'
                     items:
                       description: ClusterScopeDownsyncClause references a specific
                         cluster-scoped object to downsync, and the status collectors
@@ -430,9 +437,15 @@ spec:
                       - version
                       type: object
                     type: array
+                    x-kubernetes-list-map-keys:
+                    - group
+                    - resource
+                    - name
+                    x-kubernetes-list-type: map
                   namespaceScope:
                     description: '`namespaceScope` holds a list of references to namsepace-scoped
-                      objects to downsync and how the downsync is to be modulated.'
+                      objects to downsync and how the downsync is to be modulated.
+                      No duplications.'
                     items:
                       description: NamespaceScopeDownsyncClause references a specific
                         namespace-scoped object to downsync, and the status collectors
@@ -473,6 +486,12 @@ spec:
                       - version
                       type: object
                     type: array
+                    x-kubernetes-list-map-keys:
+                    - group
+                    - resource
+                    - namespace
+                    - name
+                    x-kubernetes-list-type: map
                 type: object
             type: object
           status:
