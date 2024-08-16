@@ -59,6 +59,7 @@ func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error 
 
 	combinedStatusSet := c.combinedStatusResolver.NoteStatusCollector(statusCollector, isDeleted, c.workStatusIndexer)
 	for combinedStatus := range combinedStatusSet {
+		logger.V(5).Info("Enqueuing reference to CombinedStatus while syncing StatusCollector", "combinedStatusRef", combinedStatus.ObjectName, "statusCollectorName", ref)
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 

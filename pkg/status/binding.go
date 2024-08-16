@@ -36,6 +36,7 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 	changedCombinedStatuses := c.combinedStatusResolver.NoteBindingResolution(key, resolution, isDeleted,
 		c.workStatusIndexer, c.statusCollectorLister)
 	for combinedStatus := range changedCombinedStatuses {
+		logger.V(5).Info("Enqueuing CombinedStatus due to sync of Binding", "combinedStatus", combinedStatus.ObjectName, "bindingName", key)
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
