@@ -197,7 +197,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 
 	c.bindingResolutionBroker.RegisterCallback(func(bindingPolicyKey string) {
 		// add binding to workqueue
-		logger.V(5).Info("Enqueuing reference to Binding due to notification from BindingResolutionBroken", "name", bindingPolicyKey)
+		logger.V(5).Info("Enqueuing reference to Binding due to notification from BindingResolutionBroker", "name", bindingPolicyKey)
 		c.workqueue.Add(bindingRef(bindingPolicyKey))
 	}) // this will have the broker call the callback for all existing resolutions
 	logger.Info("Registered binding resolution broker callback")
