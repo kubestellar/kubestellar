@@ -171,6 +171,35 @@ func (c *Controller) reconcileSingletonByWs(ctx context.Context, ref singletonWo
 	}
 }
 
+func (c *Controller) alsoReconcileSingletonByWS(ctx context.Context, ref singletonWorkStatusRef) error {
+	logger := klog.FromContext(ctx)
+	logger.V(4).Info("Reconciling singleton status due to workstatus changes", "name", string(ref.Name))
+	wObjID := ref.SourceObjectIdentifier
+
+	requested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
+	if !requested || nWECs != 1 {
+		logger.V(4).Info("Singleton workload object should not have status synced, cleaning",
+			"resource", ref.SourceObjectIdentifier.Resource, "objectName", ref.SourceObjectIdentifier.ObjectName,
+			"requested", requested, "nWECs", nWECs)
+		return c.reconcileSingletonWObj(ctx, wObjID, false)
+	} else {
+		logger.V(4).Info("Singleton workload object should have status synced, updating",
+			"resource", ref.SourceObjectIdentifier.Resource, "objectName", ref.SourceObjectIdentifier.ObjectName)
+		wsObj, err := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
+		if err != nil {
+			return err
+		}
+		status, err := util.GetWorkStatusStatus(wsObj)
+		if err != nil {
+			return err
+		}
+		if status == nil {
+			return nil
+		}
+		return updateObjectStatus(ctx, &wObjID, status, c.listers, c.wdsDynClient)
+	}
+}
+
 func (c *Controller) checkSingletonWorkloadInBinding(ctx context.Context, binding v1alpha1.Binding, sync map[util.ObjectIdentifier]bool, init bool) error {
 	logger := klog.FromContext(ctx)
 	logger.V(5).Info("Checking singleton workload object", "binding", binding.Name)
