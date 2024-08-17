@@ -196,7 +196,7 @@ func main() {
 		(len(ctlrsToStart) == 0 || ctlrsToStart.Has(strings.ToLower(status.ControllerName))) {
 		setupLog.Info("Starting controller", "name", status.ControllerName)
 		statusController, err := status.NewController(wdsRestConfig, itsRestConfig, wdsName,
-			bindingController.GetBindingPolicyResolutionBroker())
+			bindingController.GetBindingPolicyResolver())
 		if err != nil {
 			setupLog.Error(err, "unable to create status controller")
 			os.Exit(1)

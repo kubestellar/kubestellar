@@ -342,6 +342,10 @@ func (c *Controller) GetBindingPolicyResolutionBroker() ResolutionBroker {
 	return c.bindingPolicyResolver.Broker()
 }
 
+func (c *Controller) GetBindingPolicyResolver() BindingPolicyResolver {
+	return c.bindingPolicyResolver
+}
+
 // Invoked by Start() to run the controller
 func (c *Controller) run(ctx context.Context, workers int, cListers chan interface{}) error {
 	defer c.workqueue.ShutDown()

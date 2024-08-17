@@ -75,9 +75,9 @@ type Controller struct {
 	// without having to re-create new caches for this controller
 	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
 
-	celEvaluator            *celEvaluator
-	bindingResolutionBroker binding.ResolutionBroker
-	combinedStatusResolver  CombinedStatusResolver
+	celEvaluator           *celEvaluator
+	bindingPolicyResolver  binding.BindingPolicyResolver
+	combinedStatusResolver CombinedStatusResolver
 }
 
 // bindingRef is a workqueue item that references a Binding
@@ -105,7 +105,7 @@ type singletonWorkStatusRef workStatusRef
 
 // Create a new  status controller
 func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsName string,
-	bindingResolutionBroker binding.ResolutionBroker) (*Controller, error) {
+	bindingPolicyResolver binding.BindingPolicyResolver) (*Controller, error) {
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
@@ -130,12 +130,12 @@ func NewController(wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsNa
 	log.SetLogger(zapLogger)
 
 	controller := &Controller{
-		wdsName:                 wdsName,
-		wdsDynClient:            wdsDynClient,
-		wdsKsClient:             wdsKsClient,
-		itsDynClient:            itsDynClient,
-		workqueue:               workqueue.NewRateLimitingQueue(ratelimiter),
-		bindingResolutionBroker: bindingResolutionBroker,
+		wdsName:               wdsName,
+		wdsDynClient:          wdsDynClient,
+		wdsKsClient:           wdsKsClient,
+		itsDynClient:          itsDynClient,
+		workqueue:             workqueue.NewRateLimitingQueue(ratelimiter),
+		bindingPolicyResolver: bindingPolicyResolver,
 	}
 
 	return controller, nil
@@ -195,7 +195,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	c.celEvaluator = celEvaluator
 	c.combinedStatusResolver = NewCombinedStatusResolver(celEvaluator, c.listers)
 
-	c.bindingResolutionBroker.RegisterCallback(func(bindingPolicyKey string) {
+	c.bindingPolicyResolver.Broker().RegisterCallback(func(bindingPolicyKey string) {
 		// add binding to workqueue
 		logger.V(5).Info("Enqueuing reference to Binding due to notification from BindingResolutionBroker", "name", bindingPolicyKey)
 		c.workqueue.Add(bindingRef(bindingPolicyKey))
