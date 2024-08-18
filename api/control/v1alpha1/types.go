@@ -262,6 +262,9 @@ type BindingSpec struct {
 	Workload DownsyncObjectClauses `json:"workload,omitempty"`
 
 	// `destinations` is a list of cluster-identifiers that the objects should be propagated to.
+	// No duplications are allowed in this list.
+	// +listType=map
+	// +listMapKey=clusterId
 	Destinations []Destination `json:"destinations,omitempty"`
 }
 
@@ -271,10 +274,21 @@ type BindingSpec struct {
 type DownsyncObjectClauses struct {
 	// `clusterScope` holds a list of references to cluster-scoped objects to downsync and how the
 	// downsync is to be modulated.
+	// No duplications.
+	// +listType=map
+	// +listMapKey=group
+	// +listMapKey=resource
+	// +listMapKey=name
 	ClusterScope []ClusterScopeDownsyncClause `json:"clusterScope,omitempty"`
 
 	// `namespaceScope` holds a list of references to namsepace-scoped objects to downsync and how the
 	// downsync is to be modulated.
+	// No duplications.
+	// +listType=map
+	// +listMapKey=group
+	// +listMapKey=resource
+	// +listMapKey=namespace
+	// +listMapKey=name
 	NamespaceScope []NamespaceScopeDownsyncClause `json:"namespaceScope,omitempty"`
 }
 
@@ -332,7 +346,7 @@ type ClusterScopeDownsyncObject struct {
 
 // Destination wraps the identifiers required to uniquely identify a destination cluster.
 type Destination struct {
-	ClusterId string `json:"clusterId,omitempty"`
+	ClusterId string `json:"clusterId"`
 }
 
 type BindingStatus struct {
