@@ -104,15 +104,6 @@ type BindingPolicySpec struct {
 	// the `createOnly` bits are ORed together, and the StatusCollector reference
 	// sets are combined by union.
 	Downsync []DownsyncPolicyClause `json:"downsync,omitempty"`
-
-	// WantSingletonReportedState means that for workload objects that are distributed --- taking
-	// all BindingPolicies into account --- to exactly one WEC, the object's reported state
-	// from the WEC should be written to the object in its WDS.
-	// If any of the workload objects are distributed to more or less than 1 WEC then
-	// the `.status.errors` of this policy will report that discrepancy for
-	// some of them.
-	// +optional
-	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
 const (
@@ -144,6 +135,37 @@ type DownsyncPolicyClause struct {
 	// `statusCollection` holds the rules for collecting status from the WECs.
 	// +optional
 	StatusCollection *StatusCollection `json:"statusCollection,omitempty"`
+
+	// WantSingletonReportedState, in short, indicates an expectation
+	// that the matching workload objects are distributed to exactly one WEC
+	// and requests that the `.status` of such objects propagate from the WEC
+	// to the WDS.
+	//
+	// For a precise description, start with a couple of definitions.
+	// For a given workload object, _singleton status return is requested_
+	// if and only if there exists at least one BindingPolicy or Binding
+	// that has `wantSingletonReportedState==true` in a clause that
+	// matches/references the workload object.
+	//
+	// The _qualified WEC set_ of a workload object is the set of WECs that are
+	// associated with that workload object by at least one BindingPolicy or Binding
+	// that has `wantSingletonReportedState==true` in a clause that
+	// matches/references the workload object.
+	//
+	// For a given workload object, while singleton status return is requested,
+	// KubeStellar maintains a label on the object whose name (key) is
+	// `kubestellar.io/executing-count` and whose value is a string representation
+	// of the size of the qualified WEC set of that object.
+	// While singleton status return is _not_ requested, KubeStellar suppresses
+	// the existence of a label with that name (key).
+	// While singleton status return is requested _and_ the size of the qualified
+	// WEC set is 1, KubeStellar propagates the object's `.status` from that WEC
+	// to the `.status` section of the object in the WDS.
+	// While either singleton status return is NOT requested or the size of the
+	// qualified WEC set is NOT 1, the `.status` of the object in the WDS does
+	// not have contents propagated there from a WEC by KubeStellar.
+	// +optional
+	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
 // StatusCollection holds the rules for collecting status from the WECs.
@@ -304,6 +326,37 @@ type NamespaceScopeDownsyncClause struct {
 	// `statusCollection` holds the rules of status collection for the object.
 	// +optional
 	StatusCollection *StatusCollection `json:"statusCollection,omitempty"`
+
+	// WantSingletonReportedState, in short, indicates an expectation
+	// that the matching workload objects are distributed to exactly one WEC
+	// and requests that the `.status` of such objects propagate from the WEC
+	// to the WDS.
+	//
+	// For a precise description, start with a couple of definitions.
+	// For a given workload object, _singleton status return is requested_
+	// if and only if there exists at least one Binding
+	// that has `wantSingletonReportedState==true` in the clause that
+	// references the workload object.
+	//
+	// The _qualified WEC set_ of a workload object is the set of WECs that are
+	// associated with that workload object by at least one Binding
+	// that has `wantSingletonReportedState==true` in the clause that
+	// references the workload object.
+	//
+	// For a given workload object, while singleton status return is requested,
+	// KubeStellar maintains a label on the object whose name (key) is
+	// `kubestellar.io/executing-count` and whose value is a string representation
+	// of the size of the qualified WEC set of that object.
+	// While singleton status return is _not_ requested, KubeStellar suppresses
+	// the existence of a label with that name (key).
+	// While singleton status return is requested _and_ the size of the qualified
+	// WEC set is 1, KubeStellar propagates the object's `.status` from that WEC
+	// to the `.status` section of the object in the WDS.
+	// While either singleton status return is NOT requested or the size of the
+	// qualified WEC set is NOT 1, the `.status` of the object in the WDS does
+	// not have contents propagated there from a WEC by KubeStellar.
+	// +optional
+	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
 // NamespaceScopeDownsyncObject references a specific namespace-scoped object to downsync,
@@ -332,6 +385,37 @@ type ClusterScopeDownsyncClause struct {
 	// `statusCollection` holds the rules of status collection for the object.
 	// +optional
 	StatusCollection *StatusCollection `json:"statusCollection,omitempty"`
+
+	// WantSingletonReportedState, in short, indicates an expectation
+	// that the matching workload objects are distributed to exactly one WEC
+	// and requests that the `.status` of such objects propagate from the WEC
+	// to the WDS.
+	//
+	// For a precise description, start with a couple of definitions.
+	// For a given workload object, _singleton status return is requested_
+	// if and only if there exists at least one Binding
+	// that has `wantSingletonReportedState==true` in the clause that
+	// references the workload object.
+	//
+	// The _qualified WEC set_ of a workload object is the set of WECs that are
+	// associated with that workload object by at least one Binding
+	// that has `wantSingletonReportedState==true` in the clause that
+	// references the workload object.
+	//
+	// For a given workload object, while singleton status return is requested,
+	// KubeStellar maintains a label on the object whose name (key) is
+	// `kubestellar.io/executing-count` and whose value is a string representation
+	// of the size of the qualified WEC set of that object.
+	// While singleton status return is _not_ requested, KubeStellar suppresses
+	// the existence of a label with that name (key).
+	// While singleton status return is requested _and_ the size of the qualified
+	// WEC set is 1, KubeStellar propagates the object's `.status` from that WEC
+	// to the `.status` section of the object in the WDS.
+	// While either singleton status return is NOT requested or the size of the
+	// qualified WEC set is NOT 1, the `.status` of the object in the WDS does
+	// not have contents propagated there from a WEC by KubeStellar.
+	// +optional
+	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
 // ClusterScopeDownsyncObject references a specific cluster-scoped object to downsync,
