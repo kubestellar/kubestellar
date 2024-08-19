@@ -40,7 +40,7 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
 	}
 
-	if err := c.reconcileSingletonByBdg(ctx, key); err != nil {
+	if err := c.alsoReconcileSingletonByBdg(ctx, key); err != nil {
 		return err
 	}
 
