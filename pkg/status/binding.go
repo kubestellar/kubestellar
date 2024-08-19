@@ -33,7 +33,7 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 	}
 
 	// NoteBindingResolution does not use the resolution if isDeleted is true
-	changedCombinedStatuses := c.combinedStatusResolver.NoteBindingResolution(key, resolution, isDeleted,
+	changedCombinedStatuses := c.combinedStatusResolver.NoteBindingResolution(ctx, key, resolution, isDeleted,
 		c.workStatusIndexer, c.statusCollectorLister)
 	for combinedStatus := range changedCombinedStatuses {
 		logger.V(5).Info("Enqueuing CombinedStatus due to sync of Binding", "combinedStatus", combinedStatus.ObjectName, "bindingName", key)
