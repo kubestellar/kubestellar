@@ -104,15 +104,6 @@ type BindingPolicySpec struct {
 	// the `createOnly` bits are ORed together, and the StatusCollector reference
 	// sets are combined by union.
 	Downsync []DownsyncPolicyClause `json:"downsync,omitempty"`
-
-	// WantSingletonReportedState means that for workload objects that are distributed --- taking
-	// all BindingPolicies into account --- to exactly one WEC, the object's reported state
-	// from the WEC should be written to the object in its WDS.
-	// If any of the workload objects are distributed to more or less than 1 WEC then
-	// the `.status.errors` of this policy will report that discrepancy for
-	// some of them.
-	// +optional
-	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
 const (
@@ -367,9 +358,13 @@ type BindingList struct {
 	Items           []Binding `json:"items"`
 }
 
-// StatusCollector defines one way to collect status about a given workload object from
+// StatusCollector defines a way to collect and report status about a given workload object from
 // the set of WECs that it propagates to.
-// This is modeled after an SQL SELECT statement that does aggregation.
+// There are two styles of StatusCollectors, one general and one specialized.
+// The general style is modeled after a simple SQL SELECT statement and may or may not do aggregation;
+// the corresponding results go in CombinedStatus objects.
+// The specialized style is meant for the case where propagation is to exactly 1 WEC and picks out
+// parts of the object state to propagate back from that WEC to the WDS.
 //
 // +genclient
 // +genclient:nonNamespaced
@@ -411,6 +406,31 @@ type StatusCollectorSpec struct {
 	// `limit` limits the number of rows returned.
 	// The default value is 20.
 	Limit int64 `json:"limit"`
+
+	// `wantSingletonSelectedToWDS` may only be true when `select` is not empty and
+	// every expression in `select` is the CEL equivalent of a JSON Pointer (RFC 6901)
+	// extraction of some content from the workload object's state in the WEC.
+	// That is, the expression starts with the identifier for the object's state
+	// in the WEC and continues with just field selection, array subscripting (with
+	// literal index) and map entry picking (with literal key).
+	// When `true` the client expects that for each workload object for which
+	// there exists a Binding B and a StatusCollector C such that B associates that
+	// workload object with C and C has `wantSingletonSelectedToWDS==true`,
+	// 1 is the size of the set of WECs W for which there exists a Binding B and a StatusCollector C
+	// such that B references W and B associates the workload object with C and
+	// the workload object's state in W passes C's `filter`.
+	// When false, this StatusCollector asserts no expectation.
+	// When this bit is true, this StatusCollector does NOT contribute an entry
+	// to the `.results` of the relevant CombinedStatus objects.
+	// When any StatusCollector that is associated by any Binding with a given
+	// workload object has `wantSingletonSelectedToWDS==true`, then:
+	// (a) the `ExecutingCountKey` label is maintained on the object in the WDS, holding the
+	// size of the WEC set described above; and
+	// (b) while that count is 1 the implementation continually copies the extracted contents
+	// into the corresponding position in the object in the WDS.
+	// If/when that maintenance ceases, the copied contents are removed from the workload object
+	// in the WDS.
+	WantSingletonSelectedToWDS bool `json:"wantSingletonSelectedToWDS,omitempty"`
 }
 
 // NamedExpression pairs a name with a way of extracting a value from a JSON object.
@@ -514,7 +534,10 @@ type StatusCollectorList struct {
 	Items           []StatusCollector `json:"items"`
 }
 
-// CombinedStatus holds the combined status from the WECs for one particular (workload object, BindingPolicy) pair.
+// CombinedStatus holds the combined status from the WECs for one particular (workload object, Binding) pair.
+// There is a CombindStatus object for every (workload object, Binding) pair in which the Binding
+// references the workload object and associates some StatusCollectors that
+// have `wantSingletonSelectedToWDS==false`.
 // The namespace of the CombinedStatus object is the namespace of the workload object,
 // or "kubestellar-report" if the workload object has no namespace.
 // The name of the CombinedStatus object is the concatenation of:
@@ -540,7 +563,8 @@ type CombinedStatus struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// `results` has an entry for every applicable StatusCollector.
+	// `results` has an entry for every applicable StatusCollector
+	// except those that have `wantSingletonSelectedToWDS==true`.
 	// +optional
 	Results []NamedStatusCombination `json:"results,omitempty"`
 }
