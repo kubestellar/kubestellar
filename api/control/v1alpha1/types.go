@@ -104,15 +104,6 @@ type BindingPolicySpec struct {
 	// the `createOnly` bits are ORed together, and the StatusCollector reference
 	// sets are combined by union.
 	Downsync []DownsyncPolicyClause `json:"downsync,omitempty"`
-
-	// WantSingletonReportedState means that for workload objects that are distributed --- taking
-	// all BindingPolicies into account --- to exactly one WEC, the object's reported state
-	// from the WEC should be written to the object in its WDS.
-	// If any of the workload objects are distributed to more or less than 1 WEC then
-	// the `.status.errors` of this policy will report that discrepancy for
-	// some of them.
-	// +optional
-	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
 const (
@@ -144,6 +135,17 @@ type DownsyncPolicyClause struct {
 	// `statusCollection` holds the rules for collecting status from the WECs.
 	// +optional
 	StatusCollection *StatusCollection `json:"statusCollection,omitempty"`
+
+	// WantSingletonReportedState means that for objects that are distributed --- taking
+	// all BindingPolicies into account --- to exactly one WEC, the object's reported state
+	// from the WEC should be written to the object in its WDS.
+	// WantSingletonReportedState implies an expectation that indeed the object will
+	// propagate to exactly one WEC, and the actual number is reported in the
+	// `ExecutingCountKey` label on the workload object.
+	// Leaving this field false means that the above behavior is not requested in this position.
+	// The above behavior happens if it is requested from any position.
+	// +optional
+	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
 // StatusCollection holds the rules for collecting status from the WECs.
@@ -304,6 +306,17 @@ type NamespaceScopeDownsyncClause struct {
 	// `statusCollection` holds the rules of status collection for the object.
 	// +optional
 	StatusCollection *StatusCollection `json:"statusCollection,omitempty"`
+
+	// WantSingletonReportedState means that for objects that are distributed --- taking
+	// all Bindings into account --- to exactly one WEC, the object's reported state
+	// from the WEC should be written to the object in its WDS.
+	// WantSingletonReportedState implies an expectation that indeed the object will
+	// propagate to exactly one WEC, and the actual number is reported in the
+	// `ExecutingCountKey` label on the workload object.
+	// Leaving this field false means that the above behavior is not requested in this position.
+	// The above behavior happens if it is requested from any position.
+	// +optional
+	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
 // NamespaceScopeDownsyncObject references a specific namespace-scoped object to downsync,
@@ -332,6 +345,17 @@ type ClusterScopeDownsyncClause struct {
 	// `statusCollection` holds the rules of status collection for the object.
 	// +optional
 	StatusCollection *StatusCollection `json:"statusCollection,omitempty"`
+
+	// WantSingletonReportedState means that for objects that are distributed --- taking
+	// all Bindings into account --- to exactly one WEC, the object's reported state
+	// from the WEC should be written to the object in its WDS.
+	// WantSingletonReportedState implies an expectation that indeed the object will
+	// propagate to exactly one WEC, and the actual number is reported in the
+	// `ExecutingCountKey` label on the workload object.
+	// Leaving this field false means that the above behavior is not requested in this position.
+	// The above behavior happens if it is requested from any position.
+	// +optional
+	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
 // ClusterScopeDownsyncObject references a specific cluster-scoped object to downsync,
