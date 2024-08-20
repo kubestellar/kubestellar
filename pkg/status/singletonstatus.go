@@ -33,14 +33,14 @@ func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string
 	for i := range wObjIDs {
 		wObjID, r, n := wObjIDs[i], requested[i], nWECs[i]
 		if !r || n != 1 {
-			logger.V(4).Info("Singleton workload object should not have status synced, cleaning",
+			logger.V(4).Info("Workload object should not have singleton status synced, cleaning",
 				"resource", wObjID.Resource, "objectName", wObjID.ObjectName,
 				"requested", r, "nWECs", n)
 			if err := c.reconcileSingletonWObj(ctx, wObjID, false); err != nil {
 				return err
 			}
 		} else {
-			logger.V(4).Info("Singleton workload object should have status synced, updating",
+			logger.V(4).Info("Workload object should have singleton status synced, updating",
 				"resource", wObjID.Resource, "objectName", wObjID.ObjectName)
 			if err := c.reconcileSingletonWObj(ctx, wObjID, true); err != nil {
 				return err
@@ -57,12 +57,12 @@ func (c *Controller) reconcileSingletonByWS(ctx context.Context, ref singletonWo
 
 	requested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
 	if !requested || nWECs != 1 {
-		logger.V(4).Info("Singleton workload object should not have status synced, cleaning",
+		logger.V(4).Info("Workload object should not have singleton status synced, cleaning",
 			"resource", ref.SourceObjectIdentifier.Resource, "objectName", ref.SourceObjectIdentifier.ObjectName,
 			"requested", requested, "nWECs", nWECs)
 		return c.reconcileSingletonWObj(ctx, wObjID, false)
 	} else {
-		logger.V(4).Info("Singleton workload object should have status synced, updating",
+		logger.V(4).Info("Workload object should have singleton status synced, updating",
 			"resource", ref.SourceObjectIdentifier.Resource, "objectName", ref.SourceObjectIdentifier.ObjectName)
 		wsObj, err := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
 		if err != nil {
@@ -82,7 +82,7 @@ func (c *Controller) reconcileSingletonByWS(ctx context.Context, ref singletonWo
 
 func (c *Controller) reconcileSingletonWObj(ctx context.Context, wObjID util.ObjectIdentifier, sync bool) error {
 	logger := klog.FromContext(ctx)
-	logger.V(4).Info("Reconciling singleton workload object", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
+	logger.V(4).Info("Reconciling workload object for singleton status", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
 
 	if !sync {
 		emptyStatus := make(map[string]interface{})
