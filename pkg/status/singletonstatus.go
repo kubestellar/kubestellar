@@ -33,18 +33,18 @@ func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string
 	for i := range wObjIDs {
 		wObjID, r, n := wObjIDs[i], requested[i], nWECs[i]
 		if !r || n != 1 {
-			logger.V(4).Info("Workload object should not have singleton status synced, cleaning",
-				"resource", wObjID.Resource, "objectName", wObjID.ObjectName,
-				"requested", r, "nWECs", n)
 			if err := c.reconcileSingletonWObj(ctx, wObjID, false); err != nil {
 				return err
 			}
+			logger.V(4).Info("Cleaned singleton status for workload object",
+				"gvk", wObjID.GVK, "objectName", wObjID.ObjectName,
+				"requested", r, "nWECs", n)
 		} else {
-			logger.V(4).Info("Workload object should have singleton status synced, updating",
-				"resource", wObjID.Resource, "objectName", wObjID.ObjectName)
 			if err := c.reconcileSingletonWObj(ctx, wObjID, true); err != nil {
 				return err
 			}
+			logger.V(4).Info("Updated singleton status for workload object",
+				"gvk", wObjID.GVK, "objectName", wObjID.ObjectName)
 		}
 	}
 	return nil
@@ -53,40 +53,43 @@ func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string
 func (c *Controller) reconcileSingletonByWS(ctx context.Context, ref singletonWorkStatusRef) error {
 	logger := klog.FromContext(ctx)
 	logger.V(4).Info("Reconciling singleton status due to workstatus changes", "name", string(ref.Name))
-	wObjID := ref.SourceObjectIdentifier
 
+	wObjID := ref.SourceObjectIdentifier
 	requested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
 	if !requested || nWECs != 1 {
-		logger.V(4).Info("Workload object should not have singleton status synced, cleaning",
-			"resource", ref.SourceObjectIdentifier.Resource, "objectName", ref.SourceObjectIdentifier.ObjectName,
+		if err := c.reconcileSingletonWObj(ctx, wObjID, false); err != nil {
+			return err
+		}
+		logger.V(4).Info("Cleaned singleton status for workload object",
+			"gvk", ref.SourceObjectIdentifier.GVK, "objectName", ref.SourceObjectIdentifier.ObjectName,
 			"requested", requested, "nWECs", nWECs)
-		return c.reconcileSingletonWObj(ctx, wObjID, false)
-	} else {
-		logger.V(4).Info("Workload object should have singleton status synced, updating",
-			"resource", ref.SourceObjectIdentifier.Resource, "objectName", ref.SourceObjectIdentifier.ObjectName)
-		wsObj, err := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
-		if err != nil {
-			return err
-		}
-		status, err := util.GetWorkStatusStatus(wsObj)
-		if err != nil {
-			return err
-		}
-		if status == nil {
-			return nil
-		}
-		logger.V(4).Info("Updating singleton status", "workstatus", ref.Name, "wecName", ref.WECName)
-		return updateObjectStatus(ctx, &wObjID, status, c.listers, c.wdsDynClient)
+		return nil
 	}
+	wsObj, err := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
+	if err != nil {
+		return err
+	}
+	status, err := util.GetWorkStatusStatus(wsObj)
+	if err != nil {
+		return err
+	}
+	if status == nil {
+		return nil
+	}
+	if err := updateObjectStatus(ctx, &wObjID, status, c.listers, c.wdsDynClient); err != nil {
+		return err
+	}
+	logger.V(4).Info("Updated singleton status for workload object",
+		"gvk", ref.SourceObjectIdentifier.GVK, "objectName", ref.SourceObjectIdentifier.ObjectName)
+	return nil
 }
 
 func (c *Controller) reconcileSingletonWObj(ctx context.Context, wObjID util.ObjectIdentifier, sync bool) error {
 	logger := klog.FromContext(ctx)
-	logger.V(4).Info("Reconciling workload object for singleton status", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
+	logger.V(4).Info("Reconciling workload object for singleton status", "gvk", wObjID.GVK, "objectName", wObjID.ObjectName, "sync", sync)
 
 	if !sync {
 		emptyStatus := make(map[string]interface{})
-		logger.V(4).Info("Cleaning up singleton status", "resource", wObjID.Resource, "objectName", wObjID.ObjectName)
 		return updateObjectStatus(ctx, &wObjID, emptyStatus, c.listers, c.wdsDynClient)
 	}
 
@@ -107,7 +110,6 @@ func (c *Controller) reconcileSingletonWObj(ctx context.Context, wObjID util.Obj
 		if status == nil {
 			return nil
 		}
-		logger.V(4).Info("Updating singleton status", "workstatus", wsRef.Name, "wecName", wsRef.WECName)
 		return updateObjectStatus(ctx, &wsRef.SourceObjectIdentifier, status, c.listers, c.wdsDynClient)
 	}
 	return nil
