@@ -26,7 +26,7 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 	logger := klog.FromContext(ctx)
 
 	isDeleted := false
-	resolution := c.bindingResolutionBroker.GetResolution(key)
+	resolution := c.bindingPolicyResolver.Broker().GetResolution(key)
 	if resolution == nil {
 		// If a binding key gets here and no resolution exists, then isDeleted can be set to true.
 		isDeleted = true

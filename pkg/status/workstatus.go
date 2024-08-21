@@ -77,7 +77,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 }
 
 func (c *Controller) syncSingletonWorkStatus(ctx context.Context, ref singletonWorkStatusRef) error {
-	if err := c.reconcileSingletonByWs(ctx, ref); err != nil {
+	if err := c.reconcileSingletonByWS(ctx, ref); err != nil {
 		return err
 	}
 	return c.syncWorkStatus(ctx, workStatusRef(ref))

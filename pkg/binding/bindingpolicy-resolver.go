@@ -115,6 +115,11 @@ type BindingPolicyResolver interface {
 	// otherwise the returned `int` is unspecified.
 	GetSingletonReportedStateRequestForObject(util.ObjectIdentifier) (bool, int)
 
+	// GetSingletonReportedStateRequestsForBinding calls GetSingletonReportedStateRequestForObject
+	// for each of workload objects in the resolution if the resolution exists.
+	// If the resolution doesn't exist, empty slices are returned.
+	GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) ([]util.ObjectIdentifier, []bool, []int)
+
 	// DeleteResolution deletes the resolution associated with the given key,
 	// if it exists.
 	DeleteResolution(bindingPolicyKey string)
@@ -343,6 +348,21 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject
 		matchingWECs = matchingWECs.Union(thisDests)
 	}
 	return requested, matchingWECs.Len()
+}
+
+func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) ([]util.ObjectIdentifier, []bool, []int) {
+	resolver.RWMutex.RLock()
+	defer resolver.RWMutex.RUnlock()
+
+	objIds, requests, nWECs := []util.ObjectIdentifier{}, []bool{}, []int{}
+	if !resolver.ResolutionExists(bindingPolicyKey) {
+		return objIds, requests, nWECs
+	}
+	for objId := range resolver.getResolution(bindingPolicyKey).objectIdentifierToData {
+		r, n := resolver.GetSingletonReportedStateRequestForObject(objId)
+		objIds, requests, nWECs = append(objIds, objId), append(requests, r), append(nWECs, n)
+	}
+	return objIds, requests, nWECs
 }
 
 // DeleteResolution deletes the resolution associated with the given key,
