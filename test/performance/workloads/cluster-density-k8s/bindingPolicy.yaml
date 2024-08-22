@@ -1,0 +1,12 @@
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: {{.Name}}
+  labels:
+    kubestellar: performance-test
+spec:
+  clusterSelectors:
+  - matchLabels: {"location-group":"edge"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name": cluster-density-"{{.Index}}" }
