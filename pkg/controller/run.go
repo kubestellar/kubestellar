@@ -44,7 +44,7 @@ func InitialContext() (context.Context, func()) {
 	return ctx, cancel
 }
 
-func Start[FS ksopts.FlagSet](ctx context.Context, processOpts ksopts.ProcessOptions[FS]) {
+func Start(ctx context.Context, processOpts ksopts.ProcessOptions) {
 	logger := klog.FromContext(ctx)
 	if processOpts.HealthProbeBindAddr != "" {
 		go func() {

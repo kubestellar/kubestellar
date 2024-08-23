@@ -64,7 +64,7 @@ func init() {
 }
 
 func main() {
-	processOpts := clientopts.ProcessOptions[*pflag.FlagSet]{
+	processOpts := clientopts.ProcessOptions{
 		MetricsBindAddr:     ":8080",
 		HealthProbeBindAddr: ":8081",
 		PProfBindAddr:       ":8082",

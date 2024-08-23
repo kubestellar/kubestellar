@@ -30,12 +30,12 @@ const (
 
 type TransportOptions struct {
 	Concurrency            int
-	WdsClientOptions       *ksopts.ClientOptions[*pflag.FlagSet]
-	TransportClientOptions *ksopts.ClientOptions[*pflag.FlagSet]
+	WdsClientOptions       *ksopts.ClientOptions
+	TransportClientOptions *ksopts.ClientOptions
 	MaxSizeWrapped         int
 	MaxNumWrapped          int
 	WdsName                string
-	ksopts.ProcessOptions[*pflag.FlagSet]
+	ksopts.ProcessOptions
 }
 
 func NewTransportOptions() *TransportOptions {
@@ -45,7 +45,7 @@ func NewTransportOptions() *TransportOptions {
 		TransportClientOptions: ksopts.NewClientOptions[*pflag.FlagSet]("transport", "accessing the ITS"),
 		MaxNumWrapped:          math.MaxInt,
 		MaxSizeWrapped:         500 * 1024,
-		ProcessOptions: ksopts.ProcessOptions[*pflag.FlagSet]{
+		ProcessOptions: ksopts.ProcessOptions{
 			MetricsBindAddr: ":8090",
 			PProfBindAddr:   ":8092",
 		},
