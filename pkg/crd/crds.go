@@ -29,7 +29,6 @@ import (
 	"github.com/go-logr/logr"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,8 +37,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
-	"k8s.io/client-go/kubernetes"
 
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -60,7 +59,9 @@ const (
 )
 
 // ApplyCRDs ensures that the KubeStellar control CRDs exist and are "established".
-func ApplyCRDs(ctx context.Context, controllerName string, clientset kubernetes.Interface, clientsetExt apiextensionsclientset.Interface, logger logr.Logger) error {
+func ApplyCRDs(ctx context.Context, controllerName string,
+	clientsetExt ksmetrics.ClientModNamespace[*apiextensionsv1.CustomResourceDefinition, *apiextensionsv1.CustomResourceDefinitionList],
+	logger logr.Logger) error {
 	ctxLimited, cancel := context.WithTimeout(ctx, time.Minute)
 	defer cancel()
 
@@ -79,14 +80,13 @@ func ApplyCRDs(ctx context.Context, controllerName string, clientset kubernetes.
 		if err != nil {
 			return fmt.Errorf("unable to convert from Unstructured to CRD, name=%s: %w", crdU.GetName(), err)
 		}
-		crdIfc := clientsetExt.ApiextensionsV1().CustomResourceDefinitions()
-		_, err = crdIfc.Create(ctx, desiredCRD, metav1.CreateOptions{FieldManager: controllerName})
+		_, err = clientsetExt.Create(ctx, desiredCRD, metav1.CreateOptions{FieldManager: controllerName})
 		if err == nil {
 			logger.Info("Created CRD", "name", desiredCRD.Name)
 		} else if !errors.IsAlreadyExists(err) {
 			return fmt.Errorf("unable to create CRD named %s: %w", crdU.GetName(), err)
 		} else {
-			existingCRD, err := crdIfc.Get(ctx, desiredCRD.Name, metav1.GetOptions{})
+			existingCRD, err := clientsetExt.Get(ctx, desiredCRD.Name, metav1.GetOptions{})
 			if err != nil {
 				return fmt.Errorf("failed to fetch an existing CRD, name=%s: %w", desiredCRD.Name, err)
 			}
@@ -95,7 +95,7 @@ func ApplyCRDs(ctx context.Context, controllerName string, clientset kubernetes.
 				continue
 			}
 			desiredCRD.ResourceVersion = existingCRD.ResourceVersion
-			_, err = crdIfc.Update(ctx, desiredCRD, metav1.UpdateOptions{FieldManager: controllerName})
+			_, err = clientsetExt.Update(ctx, desiredCRD, metav1.UpdateOptions{FieldManager: controllerName})
 			if err != nil {
 				return fmt.Errorf("unable to update existing CRD named %s: %w", crdU.GetName(), err)
 			}
@@ -177,9 +177,11 @@ func DecodeYAML(yamlBytes []byte) ([]*unstructured.Unstructured, error) {
 	return objects, nil
 }
 
-func waitForCRDAccepted(ctx context.Context, clientset apiextensionsclientset.Interface, crdName string) error {
+func waitForCRDAccepted(ctx context.Context,
+	clientset ksmetrics.ClientModNamespace[*apiextensionsv1.CustomResourceDefinition, *apiextensionsv1.CustomResourceDefinitionList],
+	crdName string) error {
 	return wait.PollUntilContextCancel(ctx, 1*time.Second, true, func(ctx context.Context) (bool, error) {
-		crd, err := clientset.ApiextensionsV1().CustomResourceDefinitions().Get(ctx, crdName, metav1.GetOptions{})
+		crd, err := clientset.Get(ctx, crdName, metav1.GetOptions{})
 		if err != nil {
 			return false, nil
 		}

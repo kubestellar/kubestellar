@@ -17,6 +17,8 @@ limitations under the License.
 package clientsopts
 
 import (
+	"github.com/spf13/pflag"
+
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/flowcontrol"
@@ -28,21 +30,21 @@ type FlagSet interface {
 	StringVar(p *string, name string, value string, usage string)
 }
 
-type ClientLimits[FS FlagSet] struct {
+type ClientLimits struct {
 	name        string
 	description string
 	QPS         float64
 	Burst       int
 }
 
-type ClientOptions[FS FlagSet] struct {
-	ClientLimits[FS]
+type ClientOptions struct {
+	ClientLimits
 	loadingRules *clientcmd.ClientConfigLoadingRules
 	overrides    clientcmd.ConfigOverrides
 }
 
-func NewClientLimits[FS FlagSet](name, description string) ClientLimits[FS] {
-	return ClientLimits[FS]{
+func NewClientLimits[FS FlagSet](name, description string) ClientLimits {
+	return ClientLimits{
 		name:        name,
 		description: description,
 		QPS:         float64(rest.DefaultQPS),
@@ -50,20 +52,20 @@ func NewClientLimits[FS FlagSet](name, description string) ClientLimits[FS] {
 	}
 }
 
-func NewClientOptions[FS FlagSet](name string, description string) *ClientOptions[FS] {
-	return &ClientOptions[FS]{
+func NewClientOptions[FS FlagSet](name string, description string) *ClientOptions {
+	return &ClientOptions{
 		ClientLimits: NewClientLimits[FS](name, description),
 		loadingRules: clientcmd.NewDefaultClientConfigLoadingRules(),
 		overrides:    clientcmd.ConfigOverrides{},
 	}
 }
 
-func (opts *ClientLimits[FS]) AddFlags(flags FS) {
+func (opts *ClientLimits) AddFlags(flags *pflag.FlagSet) {
 	flags.Float64Var(&opts.QPS, opts.name+"-qps", opts.QPS, "Max average requests/sec for "+opts.description)
 	flags.IntVar(&opts.Burst, opts.name+"-burst", opts.Burst, "Allowed burst in requests/sec for "+opts.description)
 }
 
-func (opts *ClientOptions[FS]) AddFlags(flags FS) {
+func (opts *ClientOptions) AddFlags(flags *pflag.FlagSet) {
 	opts.ClientLimits.AddFlags(flags)
 	flags.StringVar(&opts.loadingRules.ExplicitPath, opts.name+"-kubeconfig", opts.loadingRules.ExplicitPath, "Path to the kubeconfig file to use for "+opts.description)
 	flags.StringVar(&opts.overrides.CurrentContext, opts.name+"-context", opts.overrides.CurrentContext, "The name of the kubeconfig context to use for "+opts.description)
@@ -72,7 +74,7 @@ func (opts *ClientOptions[FS]) AddFlags(flags FS) {
 
 }
 
-func (opts *ClientOptions[FS]) ToRESTConfig() (*rest.Config, error) {
+func (opts *ClientOptions) ToRESTConfig() (*rest.Config, error) {
 	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(opts.loadingRules, &opts.overrides)
 	base, err := clientConfig.ClientConfig()
 	if err != nil {
@@ -81,7 +83,7 @@ func (opts *ClientOptions[FS]) ToRESTConfig() (*rest.Config, error) {
 	return opts.ClientLimits.LimitConfig(base), nil
 }
 
-func (opts *ClientLimits[FS]) LimitConfig(base *rest.Config) *rest.Config {
+func (opts *ClientLimits) LimitConfig(base *rest.Config) *rest.Config {
 	ans := *base
 	ans.RateLimiter = flowcontrol.NewTokenBucketRateLimiter(float32(opts.QPS), opts.Burst)
 	return &ans

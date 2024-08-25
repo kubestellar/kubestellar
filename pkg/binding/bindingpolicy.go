@@ -77,7 +77,7 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 		logger.V(5).Info("Noted BindingPolicy", "bindingPolicy", bindingPolicy)
 
 		// update bindingpolicy resolution destinations since bindingpolicy was updated
-		clusterSet, err := ocm.FindClustersBySelectors(ctx, c.clusterClient, bindingPolicy.Spec.ClusterSelectors)
+		clusterSet, err := ocm.FindClustersBySelectors(ctx, c.managedClusterClient, bindingPolicy.Spec.ClusterSelectors)
 		if err != nil {
 			return fmt.Errorf("failed to ocm.FindClustersBySelectors: %w", err)
 		}
@@ -247,7 +247,7 @@ func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPo
 		if controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
 			bindingPolicy = bindingPolicy.DeepCopy()
 			controllerutil.RemoveFinalizer(bindingPolicy, KSFinalizer)
-			_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: ControllerName})
+			_, err := c.bindingPolicyClient.Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: ControllerName})
 			if err != nil {
 				if errors.IsNotFound(err) {
 					// object was deleted after getting into this function. This is not an error.
@@ -263,7 +263,7 @@ func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPo
 	if !controllerutil.ContainsFinalizer(bindingPolicy, KSFinalizer) {
 		bindingPolicy = bindingPolicy.DeepCopy()
 		controllerutil.AddFinalizer(bindingPolicy, KSFinalizer)
-		_, err := c.controlClient.BindingPolicies().Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: ControllerName})
+		_, err := c.bindingPolicyClient.Update(ctx, bindingPolicy, metav1.UpdateOptions{FieldManager: ControllerName})
 		if err != nil {
 			return err
 		}
@@ -313,7 +313,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 		if len(test.NamespaceSelectors) > 0 && !ALabelSelectorIsEmpty(test.NamespaceSelectors...) {
 			if objNS == nil {
 				var err error
-				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(context.TODO(),
+				objNS, err = c.namespaceClient.Get(ctx,
 					objIdentifier.ObjectName.Namespace, metav1.GetOptions{})
 				if err != nil {
 					logger.V(3).Info("Object namespace not found, assuming object does not match",

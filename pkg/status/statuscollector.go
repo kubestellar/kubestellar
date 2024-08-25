@@ -141,7 +141,7 @@ func (c *Controller) updateStatusCollectorErrors(ctx context.Context, statusColl
 
 	statusCollector.Status.Errors = abstract.SliceMap(errs, error.Error)
 
-	scEcho, err := c.wdsKsClient.ControlV1alpha1().StatusCollectors().UpdateStatus(ctx,
+	scEcho, err := c.statusCollectorClient.UpdateStatus(ctx,
 		statusCollector, metav1.UpdateOptions{FieldManager: ControllerName})
 
 	if err != nil {

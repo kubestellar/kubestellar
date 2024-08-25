@@ -28,11 +28,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	k8sjson "k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/apimachinery/pkg/util/wait"
+	k8smetrics "k8s.io/component-base/metrics"
 	"k8s.io/klog/v2/ktesting"
 	kastesting "k8s.io/kubernetes/cmd/kube-apiserver/app/testing"
 	"k8s.io/kubernetes/test/integration/framework"
 
 	"github.com/kubestellar/kubestellar/pkg/binding"
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 )
 
 // An integration test for the binding controller.
@@ -44,6 +46,11 @@ import (
 func TestCRDHandling(t *testing.T) {
 	testWriter := framework.NewTBWriter(t)
 	logger, ctx := ktesting.NewTestContext(t)
+	reg := k8smetrics.NewKubeRegistry()
+	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
+	ksmetrics.MustRegister(reg.Register, spacesClientMetrics)
+	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
+	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
 	logger.Info("Starting etcd server")
 	framework.StartEtcd(t, testWriter)
 	logger.Info("Starting TestController")
@@ -83,7 +90,7 @@ func TestCRDHandling(t *testing.T) {
 	createCRD(t, ctx, "ManagedCluster", managedClusterCRDURL, serializer, apiextClient)
 	createCRD(t, ctx, "ManifestWork", manifestWorkCRDURL, serializer, apiextClient)
 	time.Sleep(5 * time.Second)
-	ctlr, err := binding.NewController(logger, config4json, config, "test-wds", nil)
+	ctlr, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, config4json, config, "test-wds", nil)
 	if err != nil {
 		t.Fatalf("Failed to create controller: %s", err)
 	}

@@ -97,11 +97,11 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 	bdg.SetOwnerReferences([]metav1.OwnerReference{ownerReference})
 
 	logger := klog.FromContext(ctx)
-	bdgEcho, err := c.controlClient.Bindings().Update(ctx, bdg, metav1.UpdateOptions{FieldManager: ControllerName})
+	bdgEcho, err := c.bindingClient.Update(ctx, bdg, metav1.UpdateOptions{FieldManager: ControllerName})
 
 	if err != nil {
 		if errors.IsNotFound(err) {
-			bdgEcho, err = c.controlClient.Bindings().Create(ctx, bdg, metav1.CreateOptions{FieldManager: ControllerName})
+			bdgEcho, err = c.bindingClient.Create(ctx, bdg, metav1.CreateOptions{FieldManager: ControllerName})
 			if err != nil {
 				return fmt.Errorf("failed to create binding (name=%s): %w", bdg.Name, err)
 			}

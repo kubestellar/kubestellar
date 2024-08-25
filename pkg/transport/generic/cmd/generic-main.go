@@ -19,7 +19,6 @@ package cmd
 import (
 	"context"
 	"flag"
-	"net/http"
 	"os"
 	"time"
 
@@ -27,8 +26,6 @@ import (
 	clusterclient "open-cluster-management.io/api/client/cluster/clientset/versioned"
 	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 
-	"k8s.io/apiserver/pkg/server/mux"
-	"k8s.io/apiserver/pkg/server/routes"
 	"k8s.io/client-go/dynamic"
 	k8sinformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -37,6 +34,7 @@ import (
 	_ "k8s.io/component-base/metrics/prometheus/version"
 	"k8s.io/klog/v2"
 
+	ksctlr "github.com/kubestellar/kubestellar/pkg/controller"
 	ksclientset "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
@@ -74,23 +72,7 @@ func GenericMain(transportImplementation transport.Transport) {
 		logger.Info("Command line flag", "name", flg.Name, "value", flg.Value) // log all arguments
 	})
 
-	go func() {
-		err := http.ListenAndServe(options.metricsBindAddr, legacyregistry.Handler())
-		if err != nil {
-			logger.Error(err, "Failed to serve Prometheus metrics", "bindAddress", options.metricsBindAddr)
-			panic(err)
-		}
-	}()
-
-	mymux := mux.NewPathRecorderMux("transport-controller")
-	routes.Profiling{}.Install(mymux)
-	go func() {
-		err := http.ListenAndServe(options.pprofBindAddr, mymux)
-		if err != nil {
-			logger.Error(err, "Failure in serving /debug/pprof", "bindAddress", options.pprofBindAddr)
-			panic(err)
-		}
-	}()
+	ksctlr.Start(ctx, options.ProcessOptions)
 
 	// get the config for WDS
 	wdsRestConfig, err := options.WdsClientOptions.ToRESTConfig()

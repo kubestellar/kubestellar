@@ -20,7 +20,6 @@ package main
 // to ensure that exec-entrypoint and run can make use of them.
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -33,15 +32,17 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/component-base/metrics/legacyregistry"
+	_ "k8s.io/component-base/metrics/prometheus/clientgo"
+	_ "k8s.io/component-base/metrics/prometheus/version"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/healthz"
-	crmetrics "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-	crwebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	clientopts "github.com/kubestellar/kubestellar/options"
 	"github.com/kubestellar/kubestellar/pkg/binding"
+	ksctlr "github.com/kubestellar/kubestellar/pkg/controller"
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/status"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
@@ -63,15 +64,16 @@ func init() {
 }
 
 func main() {
-	var metricsAddr, pprofAddr, probeAddr string
+	processOpts := clientopts.ProcessOptions{
+		MetricsBindAddr:     ":8080",
+		HealthProbeBindAddr: ":8081",
+		PProfBindAddr:       ":8082",
+	}
 	var enableLeaderElection bool
 	var itsName string
 	var wdsName string
 	var allowedGroupsString string
 	var controllers []string
-	pflag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The [host]:port from which /metrics is served.")
-	pflag.StringVar(&pprofAddr, "pprof-bind-address", ":8082", "The [host]:port fron which /debug/pprof is served.")
-	pflag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	pflag.StringVar(&itsName, "its-name", "", "name of the Inventory and Transport Space to connect to (empty string means to use the only one)")
 	pflag.StringVar(&wdsName, "wds-name", "", "name of the workload description space to connect to")
 	pflag.StringVar(&allowedGroupsString, "api-groups", "", "list of allowed api groups, comma separated. Empty string means all API groups are allowed")
@@ -82,15 +84,16 @@ func main() {
 
 	itsClientLimits := clientopts.NewClientLimits[*pflag.FlagSet]("its", "accessing the ITS")
 	wdsClientLimits := clientopts.NewClientLimits[*pflag.FlagSet]("wds", "accessing the WDS")
+	processOpts.AddToFlags(pflag.CommandLine)
 	itsClientLimits.AddFlags(pflag.CommandLine)
 	wdsClientLimits.AddFlags(pflag.CommandLine)
 	klog.InitFlags(nil)
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
-	ctx := context.Background()
+	ctx, _ := ksctlr.InitialContext()
 	logger := klog.FromContext(ctx)
 	ctrl.SetLogger(logger)
-	setupLog := ctrl.Log.WithName("setup")
+	setupLog := logger.WithName("setup")
 
 	pflag.VisitAll(func(flg *pflag.Flag) {
 		setupLog.Info("Command line flag", "name", flg.Name, "value", flg.Value)
@@ -109,40 +112,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	// setup manager
-	// manager here is mainly used for leader election and health checks
-	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                 scheme,
-		Metrics:                crmetrics.Options{BindAddress: metricsAddr},
-		PprofBindAddress:       pprofAddr,
-		WebhookServer:          crwebhook.NewServer(crwebhook.Options{}),
-		HealthProbeBindAddress: probeAddr,
-		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "c6f71c85.kflex.kubestellar.org",
-		// LeaderElectionReleaseOnCancel defines if the leader should step down voluntarily
-		// when the Manager ends. This requires the binary to immediately end when the
-		// Manager is stopped, otherwise, this setting is unsafe. Setting this significantly
-		// speeds up voluntary leader transitions as the new leader don't have to wait
-		// LeaseDuration time first.
-		//
-		// In the default scaffold provided, the program ends immediately after
-		// the manager stops, so would be fine to enable this option. However,
-		// if you are doing or is intended to do any operation such as perform cleanups
-		// after the manager stops then its usage might be unsafe.
-		// LeaderElectionReleaseOnCancel: true,
-	})
-	if err != nil {
-		setupLog.Error(err, "unable to create manager")
-		os.Exit(1)
-	}
-	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up health check")
-		os.Exit(1)
-	}
-	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up ready check")
-		os.Exit(1)
-	}
+	ksctlr.Start(ctx, processOpts)
+
+	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
+	ksmetrics.MustRegister(legacyregistry.Register, spacesClientMetrics)
+	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
+	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
+
+	// TODO: engage leader election if requested
 
 	// get the config for WDS
 	setupLog.Info("Getting config for WDS", "name", wdsName)
@@ -165,7 +142,7 @@ func main() {
 	itsRestConfig = itsClientLimits.LimitConfig(itsRestConfig)
 
 	// start the binding controller
-	bindingController, err := binding.NewController(mgr.GetLogger(), wdsRestConfig, itsRestConfig, wdsName, allowedGroupsSet)
+	bindingController, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName, allowedGroupsSet)
 	if err != nil {
 		setupLog.Error(err, "unable to create binding controller")
 		os.Exit(1)
@@ -195,7 +172,7 @@ func main() {
 	if util.CheckWorkStatusPresence(itsRestConfig) &&
 		(len(ctlrsToStart) == 0 || ctlrsToStart.Has(strings.ToLower(status.ControllerName))) {
 		setupLog.Info("Starting controller", "name", status.ControllerName)
-		statusController, err := status.NewController(wdsRestConfig, itsRestConfig, wdsName,
+		statusController, err := status.NewController(logger, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName,
 			bindingController.GetBindingPolicyResolver())
 		if err != nil {
 			setupLog.Error(err, "unable to create status controller")
@@ -208,10 +185,5 @@ func main() {
 		}
 	}
 
-	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-		setupLog.Error(err, "problem running manager")
-		os.Exit(1)
-	}
 	select {}
 }

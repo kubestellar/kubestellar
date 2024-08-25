@@ -21,7 +21,7 @@ import (
 
 	"github.com/spf13/pflag"
 
-	clientopts "github.com/kubestellar/kubestellar/options"
+	ksopts "github.com/kubestellar/kubestellar/options"
 )
 
 const (
@@ -30,24 +30,25 @@ const (
 
 type TransportOptions struct {
 	Concurrency            int
-	WdsClientOptions       *clientopts.ClientOptions[*pflag.FlagSet]
-	TransportClientOptions *clientopts.ClientOptions[*pflag.FlagSet]
+	WdsClientOptions       *ksopts.ClientOptions
+	TransportClientOptions *ksopts.ClientOptions
 	MaxSizeWrapped         int
 	MaxNumWrapped          int
 	WdsName                string
-	metricsBindAddr        string
-	pprofBindAddr          string
+	ksopts.ProcessOptions
 }
 
 func NewTransportOptions() *TransportOptions {
 	return &TransportOptions{
 		Concurrency:            defaultConcurrency,
-		WdsClientOptions:       clientopts.NewClientOptions[*pflag.FlagSet]("wds", "accessing the WDS"),
-		TransportClientOptions: clientopts.NewClientOptions[*pflag.FlagSet]("transport", "accessing the ITS"),
+		WdsClientOptions:       ksopts.NewClientOptions[*pflag.FlagSet]("wds", "accessing the WDS"),
+		TransportClientOptions: ksopts.NewClientOptions[*pflag.FlagSet]("transport", "accessing the ITS"),
 		MaxNumWrapped:          math.MaxInt,
 		MaxSizeWrapped:         500 * 1024,
-		metricsBindAddr:        ":8090",
-		pprofBindAddr:          ":8092",
+		ProcessOptions: ksopts.ProcessOptions{
+			MetricsBindAddr: ":8090",
+			PProfBindAddr:   ":8092",
+		},
 	}
 }
 
@@ -58,6 +59,5 @@ func (options *TransportOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.IntVar(&options.MaxSizeWrapped, "max-size-wrapped", options.MaxSizeWrapped, "Max size of the wrapped object in bytes")
 	fs.IntVar(&options.MaxNumWrapped, "max-num-wrapped", options.MaxNumWrapped, "Max number of objects inside the wrapped object")
 	fs.StringVar(&options.WdsName, "wds-name", options.WdsName, "name of the wds to connect to. name should be unique")
-	fs.StringVar(&options.metricsBindAddr, "metrics-bind-addr", options.metricsBindAddr, "the [host]:port from which to serve /metrics")
-	fs.StringVar(&options.pprofBindAddr, "pprof-bind-addr", options.pprofBindAddr, "the [host]:port from which to serve /debug/pprof")
+	options.ProcessOptions.AddToFlags(fs)
 }
