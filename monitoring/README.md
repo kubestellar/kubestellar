@@ -97,7 +97,7 @@ This example shows how to deploy monitoring tools (Prometheus, Grafana and Pyros
 
         <img src="images/wds-apiserver-monitoring.png" width="60%" height="80%" title="wds-apiserver-monitoring"> 
 
-    To monitor a WDS space (e.g., wds1) use the following parameters: `NS: wds1-system` and `APIService: wds1`. Likewise, to monitor a ITS space (e.g., `its1`): `NS: its1-system` and `APIService: vcluster`
+    To monitor a WDS space (e.g., wds1) use the following parameters: `NS: wds1-system` and `APIService: wds1`. Likewise, to monitor a ITS space (e.g., its1): `NS: its1-system` and `APIService: vcluster`
     
     Note: you can also monitor the APIserver of the hosting cluster using the following values: `SpaceNS: default` and `APIService: apiserver`
 
@@ -105,7 +105,13 @@ This example shows how to deploy monitoring tools (Prometheus, Grafana and Pyros
 
     - `SpaceNS`: name of the KubeStellar space namespace, e.g., *wds1-system*, *wds2-system*, etc.
 
-    - `KSController`: select the KubeStellar controller name. Available options from the drop-down menu: *ks-controller-manager*, *ks-transport-controller* and *status-addon-controller*. 
+    - `KSController`: select the KubeStellar controller name. Available options from the drop-down menu: *kubestellar-controller-manager-metrics-service*, *ks-transport-controller* and *status-addon-controller*. 
 
         <img src="images/ks-controllers-monitoring.png" width="60%" height="80%" title="ks-controllers-monitoring">
+
+    To monitor a WDS space (e.g., wds1) use the following parameters: 
+    - `SpaceNS: wds1-system` and `KSController: kubestellar-controller-manager-metrics-service`
+    - `SpaceNS: wds1-system` and `KSController: ks-transport-controller`
+
+    Likewise, to monitor a ITS space (e.g., its1): `SpaceNS: its1-system` and `KSController: status-addon-controller`
     

@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 7,
   "links": [],
   "panels": [
     {
@@ -27,7 +27,7 @@
         "type": "prometheus",
         "uid": "prometheus-test"
       },
-      "description": "",
+      "description": "averaged over the last 5 minutes",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -761,9 +761,9 @@
       },
       {
         "current": {
-          "selected": false,
-          "text": "ks-transport-controller",
-          "value": "ks-transport-controller"
+          "selected": true,
+          "text": "kubestellar-controller-manager-metrics-service",
+          "value": "kubestellar-controller-manager-metrics-service"
         },
         "hide": 0,
         "includeAll": false,
@@ -771,12 +771,12 @@
         "name": "KSController",
         "options": [
           {
-            "selected": false,
-            "text": "ks-controller-manager",
-            "value": "ks-controller-manager"
+            "selected": true,
+            "text": "kubestellar-controller-manager-metrics-service",
+            "value": "kubestellar-controller-manager-metrics-service"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "ks-transport-controller",
             "value": "ks-transport-controller"
           },
@@ -786,7 +786,7 @@
             "value": "status-addon-controller"
           }
         ],
-        "query": "ks-controller-manager, ks-transport-controller, status-addon-controller",
+        "query": "kubestellar-controller-manager-metrics-service, ks-transport-controller, status-addon-controller",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
@@ -801,6 +801,6 @@
   "timezone": "browser",
   "title": "KubeStellar Controllers Monitoring",
   "uid": "edrgjjlt1oagwe",
-  "version": 5,
+  "version": 3,
   "weekStart": ""
 }
