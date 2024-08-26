@@ -18,12 +18,12 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 6,
   "links": [],
   "panels": [
     {
       "datasource": {
-        "default": true,
+        "default": false,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -111,7 +111,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(verb, le) (rate(apiserver_request_duration_seconds_bucket{job=\"$APIService\", namespace=\"$SpaceNS\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by(verb, le) (rate(apiserver_request_duration_seconds_bucket{job=\"$APIService\", namespace=\"$NS\"}[5m])))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -126,7 +126,7 @@
     },
     {
       "datasource": {
-        "default": true,
+        "default": false,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -213,7 +213,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "sum(rate(apiserver_request_total{job=\"$APIService\", code=~\"[45]..\", namespace=\"$SpaceNS\"}[5m])) * 100/sum(rate(apiserver_request_total{job=\"$APIService\", namespace=\"$SpaceNS\"}[5m]))",
+          "expr": "sum(rate(apiserver_request_total{job=\"$APIService\", code=~\"[45]..\", namespace=\"$NS\"}[5m])) * 100/sum(rate(apiserver_request_total{job=\"$APIService\", namespace=\"$NS\"}[5m]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -228,7 +228,7 @@
     },
     {
       "datasource": {
-        "default": true,
+        "default": false,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -316,7 +316,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "irate(process_cpu_seconds_total{job=~\"$APIService\", namespace=\"$SpaceNS\"}[1m])",
+          "expr": "irate(process_cpu_seconds_total{job=~\"$APIService\", namespace=\"$NS\"}[1m])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -331,7 +331,7 @@
     },
     {
       "datasource": {
-        "default": true,
+        "default": false,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -419,7 +419,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "(rate(etcd_request_duration_seconds_sum{job=\"$APIService\", namespace=\"$SpaceNS\"}[1m])) / (rate(etcd_request_duration_seconds_count{job=\"$APIService\", namespace=\"$SpaceNS\"}[1m]))",
+          "expr": "(rate(etcd_request_duration_seconds_sum{job=\"$APIService\", namespace=\"$NS\"}[1m])) / (rate(etcd_request_duration_seconds_count{job=\"$APIService\", namespace=\"$NS\"}[1m]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -434,7 +434,7 @@
     },
     {
       "datasource": {
-        "default": true,
+        "default": false,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -521,7 +521,7 @@
             "uid": "prometheus-test"
           },
           "editorMode": "code",
-          "expr": "sum(rate(apiserver_request_total{job=\"$APIService\", namespace=\"$SpaceNS\", code=~\"2..\"}[5m]))",
+          "expr": "sum(rate(apiserver_request_total{job=\"$APIService\", namespace=\"$NS\", code=~\"2..\"}[5m]))",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -534,7 +534,7 @@
     },
     {
       "datasource": {
-        "default": true,
+        "default": false,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -621,7 +621,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "apiserver_storage_objects{job=\"$APIService\", namespace=\"$SpaceNS\"}",
+          "expr": "apiserver_storage_objects{job=\"$APIService\", namespace=\"$NS\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -647,7 +647,7 @@
           "value": "wds1-system"
         },
         "hide": 0,
-        "name": "SpaceNS",
+        "name": "NS",
         "options": [
           {
             "selected": true,
@@ -686,8 +686,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "WDS API Server Monitoring",
+  "title": "API Server Monitoring",
   "uid": "bdrg7u0u4tyioc",
-  "version": 4,
+  "version": 13,
   "weekStart": ""
 }

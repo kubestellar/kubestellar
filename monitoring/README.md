@@ -89,17 +89,19 @@ This example shows how to deploy monitoring tools (Prometheus, Grafana and Pyros
     <img src="images/grafana-dashboard-view.png" width="60%" height="60%" title="grafana-dashboard-view">
 
 
-5. View Grafana dashboard based on KubeStellar WDS space and controller component names:
+5. View Grafana dashboard based on KubeStellar spaces and controller component names:
 
-    a) WDS API Server: input into the following text boxes.
-    - `SpaceNS`: name of the KubeStellar space namespace, e.g., *wds1-system*, *wds2-system*, etc.
-    - `APIService`: name of the service for the KS spaces APIserver, e.g., *vcluster*, *wds1*, *wds2*, etc.
+    a) API Server Monitoring: input into the following text boxes.
+    - `NS`: name of the KubeStellar space namespace, e.g., *wds1-system*, *wds2-system*, *its1-system*, etc.
+    - `APIService`: name of the service for the KS spaces APIserver, e.g., *wds1*, *wds2*, *vcluster*, etc.
 
         <img src="images/wds-apiserver-monitoring.png" width="60%" height="80%" title="wds-apiserver-monitoring"> 
 
+    To monitor a WDS space (e.g., wds1) use the following parameters: `NS: wds1-system` and `APIService: wds1`. Likewise, to monitor a ITS space (e.g., `its1`): `NS: its1-system` and `APIService: vcluster`
+    
     Note: you can also monitor the APIserver of the hosting cluster using the following values: `SpaceNS: default` and `APIService: apiserver`
 
-    b) KubeStellar controllers: input into the following text box and drop-down menu. 
+    b) KubeStellar Controllers Monitoring: input into the following text box and drop-down menu. 
 
     - `SpaceNS`: name of the KubeStellar space namespace, e.g., *wds1-system*, *wds2-system*, etc.
 
