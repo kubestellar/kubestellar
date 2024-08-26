@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: ks-controller-manager
+  name: %WDS%-ks-controller-manager
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -13,7 +13,7 @@ spec:
       insecureSkipVerify: true
   namespaceSelector:
     matchNames:
-    - %WDS_NS%
+    - %WDS%-system
   selector:
     matchLabels:
-      app: ks-controller-manager
+      control-plane: controller-manager

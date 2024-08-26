@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: status-addon-controller
+  labels:
+    app: status-addon-controller
+spec:
+  selector:
+    %STATUS_CTL_LABEL%
+  ports:
+  - name: metrics
+    port: 9280
