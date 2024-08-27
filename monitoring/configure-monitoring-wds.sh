@@ -59,6 +59,11 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 kubectl config use-context $ctx
 
 : --------------------------------------------------------------------
+: Configure APF for prometheus traffic to the WDS API server
+: --------------------------------------------------------------------
+kubectl --context $wds apply -f ${SCRIPT_DIR}/configuration/prometheus-pod-exempt.yaml
+
+: --------------------------------------------------------------------
 : Configure kubestellar controller manager pod for prometheus scraping
 : --------------------------------------------------------------------
 
