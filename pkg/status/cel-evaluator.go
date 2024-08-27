@@ -27,11 +27,17 @@ import (
 )
 
 const (
-	// returnedKey is the key used to store the status of the object.
+	// returnedKey is the key used to store the status of the object
+	// (WEC entity).
 	returnedKey = "returned"
 	// inventoryKey is the key used to store the inventory of the object.
+	// (WEC entity).
 	inventoryKey = "inventory"
+	// propagationMetaKey is the key used to store the propagation metadata
+	// of the object. (WEC entity).
+	propagationMetaKey = "propagation"
 	// sourceObjectKey is the key used to store the object.
+	// (WDS entity).
 	sourceObjectKey = "obj"
 )
 
@@ -48,7 +54,8 @@ func newCELEvaluator() (*celEvaluator, error) {
 		cel.Declarations(
 			decls.NewVar(sourceObjectKey, decls.NewMapType(decls.String, decls.Dyn)),
 			decls.NewVar(returnedKey, decls.NewMapType(decls.String, decls.Dyn)),
-			decls.NewVar(inventoryKey, decls.NewMapType(decls.String, decls.String)),
+			decls.NewVar(inventoryKey, decls.NewMapType(decls.String, decls.String)), // contains name:string only
+			decls.NewVar(propagationMetaKey, decls.NewMapType(decls.String, decls.Dyn)),
 		),
 	)
 	if err != nil {

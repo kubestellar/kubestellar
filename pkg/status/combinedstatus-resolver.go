@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"sync"
 
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
@@ -327,7 +326,7 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 			continue
 		}
 
-		content := c.getCombinedContentMap(workStatus, resolution)
+		content := getCombinedContentMap(c.wdsListers, workStatus, resolution)
 
 		// this call logs errors, but does not return them for now
 		if resolution.evaluateWorkStatus(c.celEvaluator, workStatus.WECName, content) {
@@ -422,8 +421,8 @@ func (c *combinedStatusResolver) ResolutionExists(name string) (string, util.Obj
 // from the given lister and updates the cache.
 // The method is expected to be called with the write lock held.
 func (c *combinedStatusResolver) fetchMissingStatusCollectorSpecsLocked(statusCollectorLister controllisters.StatusCollectorLister,
-	statusCollectorNames []string) {
-	for _, statusCollectorName := range statusCollectorNames {
+	statusCollectorNames sets.Set[string]) {
+	for statusCollectorName := range statusCollectorNames {
 		if _, exists := c.statusCollectorNameToSpec[statusCollectorName]; exists {
 			continue // this method is not responsible for keeping the cache up-to-date
 		}
@@ -480,7 +479,7 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 			}
 
 			csResolution := c.bindingNameToResolutions[bindingName][workStatus.SourceObjectIdentifier]
-			content := c.getCombinedContentMap(workStatus, csResolution)
+			content := getCombinedContentMap(c.wdsListers, workStatus, csResolution)
 
 			// evaluate workstatus
 			if csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.WECName, content) {
@@ -491,60 +490,6 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 	}
 
 	return combinedStatusesToQueue
-}
-
-// getCombinedContentMap returns a map of content for the given workstatus.
-func (c *combinedStatusResolver) getCombinedContentMap(workStatus *workStatus,
-	resolution *combinedStatusResolution) map[string]interface{} {
-	content := map[string]interface{}{
-		returnedKey:  workStatus.Content(),
-		inventoryKey: inventoryForWorkStatus(workStatus),
-	}
-
-	if resolution.requiresSourceObjectMetaOrSpec() {
-		objMap, err := c.getObjectMetaAndSpec(workStatus.SourceObjectIdentifier)
-		if err != nil {
-			runtime2.HandleError(fmt.Errorf("failed to get meta & spec for source object %s: %w",
-				workStatus.SourceObjectIdentifier, err))
-		}
-
-		content[sourceObjectKey] = objMap
-	}
-
-	return content
-}
-
-// getObjectMetaAndSpec fetches the metadata and spec of the object associated
-// with the given workload object identifier.
-// The function is guaranteed not to return a key of `status` in the map.
-// If the resource contains any other subresources, they are fetched as well.
-func (c *combinedStatusResolver) getObjectMetaAndSpec(objectIdentifier util.ObjectIdentifier) (map[string]interface{}, error) {
-	// fetch object
-	lister, exists := c.wdsListers.Get(objectIdentifier.GVR())
-	if !exists {
-		return nil, fmt.Errorf("lister not found for gvr %s", objectIdentifier.GVR())
-	}
-
-	obj, err := getObject(lister, objectIdentifier.ObjectName.Namespace, objectIdentifier.ObjectName.Name)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get object (%v) with gvr (%v): %w", objectIdentifier.ObjectName,
-			objectIdentifier.GVR(), err)
-	}
-
-	unstrObj, ok := obj.(*unstructured.Unstructured)
-	if !ok {
-		return nil, fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s",
-			util.RefToRuntimeObj(obj))
-	}
-
-	return unstrObj.Object, nil
-}
-
-func getObject(lister cache.GenericLister, namespace, name string) (runtime.Object, error) {
-	if namespace != "" {
-		return lister.ByNamespace(namespace).Get(name)
-	}
-	return lister.Get(name)
 }
 
 func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool {
@@ -592,9 +537,9 @@ func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool 
 	return true
 }
 
-func (c *combinedStatusResolver) statusCollectorNameToSpecFromCache(names []string) map[string]v1alpha1.StatusCollectorSpec {
+func (c *combinedStatusResolver) statusCollectorNameToSpecFromCache(names sets.Set[string]) map[string]v1alpha1.StatusCollectorSpec {
 	result := make(map[string]v1alpha1.StatusCollectorSpec, len(names))
-	for _, name := range names {
+	for name := range names {
 		spec, ok := c.statusCollectorNameToSpec[name]
 		if !ok {
 			continue
@@ -620,11 +565,4 @@ func namedExpressionSliceToMap(slice []v1alpha1.NamedExpression) map[string]v1al
 
 func expressionPtrsEqual(e1, e2 *v1alpha1.Expression) bool {
 	return e1 == nil && e2 == nil || e1 != nil && e2 != nil && *e1 == *e2
-}
-
-// inventoryForWorkStatus returns an inventory map for the given workstatus.
-func inventoryForWorkStatus(ws *workStatus) map[string]interface{} {
-	return map[string]interface{}{
-		"name": ws.WECName,
-	}
 }

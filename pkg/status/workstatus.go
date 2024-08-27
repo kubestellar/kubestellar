@@ -18,6 +18,7 @@ package status
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -36,7 +37,8 @@ const workStatusIdentificationIndexKey = "workStatusIdentificationIndex"
 
 type workStatus struct {
 	workStatusRef
-	status map[string]interface{}
+	status         map[string]interface{}
+	lastUpdateTime *metav1.Time
 }
 
 func (ws *workStatus) Content() map[string]interface{} {
@@ -65,6 +67,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 		}
 
 		workStatus.status = status // might be nil
+		workStatus.lastUpdateTime = getObjectStatusLastUpdateTime(obj.(metav1.Object))
 	}
 
 	combinedStatusSet := c.combinedStatusResolver.NoteWorkStatus(workStatus) // nil .status is equivalent to deleted
@@ -142,8 +145,9 @@ func runtimeObjectToWorkStatus(obj runtime.Object) (*workStatus, error) {
 	}
 
 	return &workStatus{
-		workStatusRef: *ref,
-		status:        status,
+		workStatusRef:  *ref,
+		status:         status,
+		lastUpdateTime: getObjectStatusLastUpdateTime(obj.(metav1.Object)),
 	}, nil
 }
 
@@ -167,4 +171,28 @@ func runtimeObjectToWorkStatusRef(obj runtime.Object) (*workStatusRef, error) {
 		WECName:                wecName,
 		SourceObjectIdentifier: objIdentifier,
 	}, nil
+}
+
+func getObjectStatusLastUpdateTime(metaObj metav1.Object) *metav1.Time {
+	// iterate through all managedFields entries to find the one that updated the status
+	latestTime := &metav1.Time{}
+
+	for _, field := range metaObj.GetManagedFields() {
+		if field.FieldsType == "FieldsV1" &&
+			field.FieldsV1 != nil {
+			// parse the FieldsV1.Raw to a map to check if "f:status" is present
+			var fieldsMap map[string]interface{}
+			if err := json.Unmarshal(field.FieldsV1.Raw, &fieldsMap); err != nil {
+				continue
+			}
+
+			if _, ok := fieldsMap["f:status"]; ok {
+				if field.Time.After(latestTime.Time) {
+					latestTime = field.Time
+				}
+			}
+		}
+	}
+
+	return latestTime
 }

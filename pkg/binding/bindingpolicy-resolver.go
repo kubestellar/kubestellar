@@ -68,7 +68,8 @@ type BindingPolicyResolver interface {
 
 	// EnsureObjectData ensures that an object's identifier is
 	// in the resolution for the given bindingpolicy key, and is associated
-	// with the given resource-version, create-only bit, and statuscollectors set.
+	// with the given resource-version, create-only bit and statuscollectors
+	// set.
 	// The given set is expected not to be mutated during and after this call
 	// by the caller.
 	//
@@ -417,7 +418,7 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 	ownerReference.BlockOwnerDeletion = &[]bool{false}[0]
 
 	bindingPolicyResolution := &bindingPolicyResolution{
-		objectIdentifierToData:         make(map[util.ObjectIdentifier]*objectData),
+		objectIdentifierToData:         make(map[util.ObjectIdentifier]*ObjectData),
 		destinations:                   sets.New[string](),
 		ownerReference:                 ownerReference,
 		requiresSingletonReportedState: bindingpolicy.Spec.WantSingletonReportedState,

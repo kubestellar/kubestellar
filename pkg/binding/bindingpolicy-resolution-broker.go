@@ -19,8 +19,6 @@ package binding
 import (
 	"sync"
 
-	"k8s.io/apimachinery/pkg/util/sets"
-
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -55,14 +53,6 @@ type Resolution struct {
 	// ObjectIdentifierToData is a map of object identifiers to their
 	// corresponding ObjectData.
 	ObjectIdentifierToData map[util.ObjectIdentifier]ObjectData
-}
-
-// ObjectData is a struct that represents the data associated with an object
-// in a resolution.
-type ObjectData struct {
-	UID              string
-	ResourceVersion  string
-	StatusCollectors []string
 }
 
 func (r *Resolution) RequiresStatusCollection() bool {
@@ -135,11 +125,11 @@ func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) *Resoluti
 		Destinations: bindingPolicyResolution.getDestinationsList(),
 		ObjectIdentifierToData: abstract.PrimitiveMapSafeValMap(&bindingPolicyResolution.RWMutex,
 			bindingPolicyResolution.objectIdentifierToData,
-			func(data *objectData) ObjectData {
+			func(data *ObjectData) ObjectData { // clone
 				return ObjectData{
 					UID:              string(data.UID),
 					ResourceVersion:  data.ResourceVersion,
-					StatusCollectors: sets.List(data.StatusCollectors), // members are string copies
+					StatusCollectors: data.StatusCollectors.Clone(),
 				}
 			}), // while this function breaks the constraint, it maintains its own concurrency safety
 		// by using the PrimitiveMapSafeValMap which transforms a map safely using its read-lock.

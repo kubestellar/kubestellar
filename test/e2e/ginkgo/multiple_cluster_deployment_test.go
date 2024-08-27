@@ -655,7 +655,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 				ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": workloadName}}},
 			},
-				StatusCollectors: []string{},
+				StatusCollection: &ksapi.StatusCollection{
+					StatusCollectors: []string{},
+				},
 			},
 		}
 
@@ -675,7 +677,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					Limit: 20,
 				})
 
-			testAndStatusCollection[0].StatusCollectors = []string{fullStatusCollectorName}
+			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{fullStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
@@ -718,7 +720,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					Limit: 10,
 				})
 
-			testAndStatusCollection[0].StatusCollectors = []string{sumAvailableReplicasStatusCollectorName}
+			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{sumAvailableReplicasStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
@@ -750,7 +752,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					Limit: 10,
 				})
 
-			testAndStatusCollection[0].StatusCollectors = []string{listNginxWecsStatusCollectorName}
+			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{listNginxWecsStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
@@ -803,7 +805,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					Limit: 20,
 				})
 
-			testAndStatusCollection[0].StatusCollectors = []string{selectAvailableStatusCollectorName, selectReplicasStatusCollectorName}
+			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{selectAvailableStatusCollectorName, selectReplicasStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)

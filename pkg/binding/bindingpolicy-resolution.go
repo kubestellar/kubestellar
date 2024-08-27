@@ -36,7 +36,7 @@ import (
 type bindingPolicyResolution struct {
 	sync.RWMutex
 
-	objectIdentifierToData map[util.ObjectIdentifier]*objectData
+	objectIdentifierToData map[util.ObjectIdentifier]*ObjectData
 
 	// Every Set ever stored here is immutable from the time it is stored here.
 	destinations sets.Set[string]
@@ -50,12 +50,19 @@ type bindingPolicyResolution struct {
 	requiresSingletonReportedState bool
 }
 
-// objectData stores the UID, resource version, create-only bit,
+// ObjectData stores the UID, resource version, create-only bit,
 // and statuscollectors for an object.
-type objectData struct {
-	UID              string
-	ResourceVersion  string
-	CreateOnly       bool
+type ObjectData struct {
+	// UID is the UID of the object.
+	UID string
+	// ResourceVersion is the resource version of the object.
+	ResourceVersion string
+	// CreateOnly is a boolean that indicates whether the object was selected
+	// by at least one downsync clause with the createOnly bit set.
+	// If true, it means that the object should only be created and not
+	// maintained
+	CreateOnly bool
+	// StatusCollectors is a set of status collector names that are associated
 	StatusCollectors sets.Set[string]
 }
 
@@ -74,7 +81,7 @@ func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.O
 
 	objData := resolution.objectIdentifierToData[objIdentifier]
 	if objData == nil {
-		resolution.objectIdentifierToData[objIdentifier] = &objectData{
+		resolution.objectIdentifierToData[objIdentifier] = &ObjectData{
 			UID:              objUID,
 			ResourceVersion:  resourceVersion,
 			CreateOnly:       createOnly,
@@ -83,7 +90,8 @@ func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.O
 		return true
 	}
 
-	if objData.UID == objUID && objData.ResourceVersion == resourceVersion && objData.CreateOnly == createOnly && objData.StatusCollectors.Equal(statusCollectors) {
+	if objData.UID == objUID && objData.ResourceVersion == resourceVersion && objData.CreateOnly == createOnly &&
+		objData.StatusCollectors.Equal(statusCollectors) {
 		return false
 	}
 
@@ -124,31 +132,40 @@ func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec
 	for objIdentifier, objData := range resolution.objectIdentifierToData {
 		// check if object is cluster-scoped or namespaced by checking namespace
 		if objIdentifier.ObjectName.Namespace == metav1.NamespaceNone {
-			workload.ClusterScope = append(workload.ClusterScope,
-				v1alpha1.ClusterScopeDownsyncClause{
-					ClusterScopeDownsyncObject: v1alpha1.ClusterScopeDownsyncObject{
-						GroupVersionResource: metav1.GroupVersionResource(objIdentifier.GVR()),
-						Name:                 objIdentifier.ObjectName.Name,
-						ResourceVersion:      objData.ResourceVersion,
-					},
-					CreateOnly:       objData.CreateOnly,
+			clause := v1alpha1.ClusterScopeDownsyncClause{
+				ClusterScopeDownsyncObject: v1alpha1.ClusterScopeDownsyncObject{
+					GroupVersionResource: metav1.GroupVersionResource(objIdentifier.GVR()),
+					Name:                 objIdentifier.ObjectName.Name,
+					ResourceVersion:      objData.ResourceVersion,
+				},
+				CreateOnly: objData.CreateOnly,
+			}
+			if objData.StatusCollectors.Len() > 0 {
+				clause.StatusCollection = &v1alpha1.StatusCollection{
 					StatusCollectors: sets.List(objData.StatusCollectors),
-				})
+				}
+			}
 
+			workload.ClusterScope = append(workload.ClusterScope, clause)
 			continue
 		}
 
-		workload.NamespaceScope = append(workload.NamespaceScope,
-			v1alpha1.NamespaceScopeDownsyncClause{
-				NamespaceScopeDownsyncObject: v1alpha1.NamespaceScopeDownsyncObject{
-					GroupVersionResource: metav1.GroupVersionResource(objIdentifier.GVR()),
-					Name:                 objIdentifier.ObjectName.Name,
-					Namespace:            objIdentifier.ObjectName.Namespace,
-					ResourceVersion:      objData.ResourceVersion,
-				},
-				CreateOnly:       objData.CreateOnly,
+		clause := v1alpha1.NamespaceScopeDownsyncClause{
+			NamespaceScopeDownsyncObject: v1alpha1.NamespaceScopeDownsyncObject{
+				GroupVersionResource: metav1.GroupVersionResource(objIdentifier.GVR()),
+				Name:                 objIdentifier.ObjectName.Name,
+				Namespace:            objIdentifier.ObjectName.Namespace,
+				ResourceVersion:      objData.ResourceVersion,
+			},
+			CreateOnly: objData.CreateOnly,
+		}
+		if objData.StatusCollectors.Len() > 0 {
+			clause.StatusCollection = &v1alpha1.StatusCollection{
 				StatusCollectors: sets.List(objData.StatusCollectors),
-			})
+			}
+		}
+
+		workload.NamespaceScope = append(workload.NamespaceScope, clause)
 	}
 
 	// sort workload objects
@@ -245,34 +262,44 @@ type objectRef struct {
 	cache.ObjectName
 }
 
-func bindingObjectRefToDataFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectClauses) map[objectRef]*objectData {
-	bindingObjectRefToData := make(map[objectRef]*objectData)
+func bindingObjectRefToDataFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncObjectClauses) map[objectRef]*ObjectData {
+	bindingObjectRefToData := make(map[objectRef]*ObjectData)
 
 	for _, clusterScopeDownsyncClause := range bindingSpecWorkload.ClusterScope {
+		var statusCollectors sets.Set[string]
+		if clusterScopeDownsyncClause.StatusCollection != nil {
+			statusCollectors = sets.New(clusterScopeDownsyncClause.StatusCollection.StatusCollectors...)
+		}
+
 		bindingObjectRefToData[objectRef{
 			GroupVersionResource: schema.GroupVersionResource(clusterScopeDownsyncClause.GroupVersionResource),
 			ObjectName: cache.ObjectName{
 				Name:      clusterScopeDownsyncClause.Name,
 				Namespace: metav1.NamespaceNone,
 			},
-		}] = &objectData{
+		}] = &ObjectData{
 			ResourceVersion:  clusterScopeDownsyncClause.ResourceVersion,
 			CreateOnly:       clusterScopeDownsyncClause.CreateOnly,
-			StatusCollectors: sets.New(clusterScopeDownsyncClause.StatusCollectors...),
+			StatusCollectors: statusCollectors,
 		}
 	}
 
 	for _, namespacedScopeDownsyncClause := range bindingSpecWorkload.NamespaceScope {
+		var statusCollectors sets.Set[string]
+		if namespacedScopeDownsyncClause.StatusCollection != nil {
+			statusCollectors = sets.New(namespacedScopeDownsyncClause.StatusCollection.StatusCollectors...)
+		}
+
 		bindingObjectRefToData[objectRef{
 			GroupVersionResource: schema.GroupVersionResource(namespacedScopeDownsyncClause.GroupVersionResource),
 			ObjectName: cache.ObjectName{
 				Name:      namespacedScopeDownsyncClause.Name,
 				Namespace: namespacedScopeDownsyncClause.Namespace,
 			},
-		}] = &objectData{
+		}] = &ObjectData{
 			ResourceVersion:  namespacedScopeDownsyncClause.ResourceVersion,
 			CreateOnly:       namespacedScopeDownsyncClause.CreateOnly,
-			StatusCollectors: sets.New(namespacedScopeDownsyncClause.StatusCollectors...),
+			StatusCollectors: statusCollectors,
 		}
 	}
 

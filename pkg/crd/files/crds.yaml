@@ -268,12 +268,17 @@ spec:
                       items:
                         type: string
                       type: array
-                    statusCollectors:
-                      description: statusCollectors is a list of StatusCollectors
-                        name references that are applied to the selected objects.
-                      items:
-                        type: string
-                      type: array
+                    statusCollection:
+                      description: '`statusCollection` holds the rules for collecting
+                        status from the WECs.'
+                      properties:
+                        statusCollectors:
+                          description: '`statusCollectors` is a list of StatusCollectors
+                            name references to be applied.'
+                          items:
+                            type: string
+                          type: array
+                      type: object
                   type: object
                 type: array
               wantSingletonReportedState:
@@ -421,12 +426,17 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
-                        statusCollectors:
-                          description: '`statusCollectors` is a list of StatusCollectors
-                            name references that are applied to the object.'
-                          items:
-                            type: string
-                          type: array
+                        statusCollection:
+                          description: '`statusCollection` holds the rules of status
+                            collection for the object.'
+                          properties:
+                            statusCollectors:
+                              description: '`statusCollectors` is a list of StatusCollectors
+                                name references to be applied.'
+                              items:
+                                type: string
+                              type: array
+                          type: object
                         version:
                           type: string
                       required:
@@ -469,12 +479,17 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
-                        statusCollectors:
-                          description: '`statusCollectors` is a list of StatusCollectors
-                            name references that are applied to the object.'
-                          items:
-                            type: string
-                          type: array
+                        statusCollection:
+                          description: '`statusCollection` holds the rules of status
+                            collection for the object.'
+                          properties:
+                            statusCollectors:
+                              description: '`statusCollectors` is a list of StatusCollectors
+                                name references to be applied.'
+                              items:
+                                type: string
+                              type: array
+                          type: object
                         version:
                           type: string
                       required:

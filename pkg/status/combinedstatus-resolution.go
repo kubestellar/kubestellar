@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/google/cel-go/common/types/ref"
 
@@ -39,8 +40,7 @@ import (
 )
 
 const (
-	allValue           = ""
-	expressionRootName = "obj"
+	allValue = ""
 )
 
 // combinedStatusResolution is a struct that represents the resolution of a
@@ -264,11 +264,11 @@ func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 		scData := c.statusCollectorNameToData[scName]
 		// the data has either select or combinedFields (with groupBy)
 		if len(scData.Select) > 0 {
-			combinedStatus.Results = append(combinedStatus.Results, *handleSelect(scName, scData))
+			combinedStatus.Results = append(combinedStatus.Results, *handleSelectReadLocked(scName, scData))
 			continue
 		}
 
-		combinedStatus.Results = append(combinedStatus.Results, *handleAggregation(scName, scData))
+		combinedStatus.Results = append(combinedStatus.Results, *handleAggregationReadLocked(scName, scData))
 	}
 
 	return addLabelsToCombinedStatus(combinedStatus, bindingName, workloadObjectIdentifier)
@@ -341,42 +341,54 @@ func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator
 	return updated
 }
 
-func (c *combinedStatusResolution) requiresSourceObjectMetaOrSpec() bool {
+// queryingContentRequirements determines which objects are required for
+// querying within the CEL expressions of the status collectors.
+// The function returns a tuple of booleans:
+//   - `sourceObjectKey` required
+//   - `returnedKey` required
+//   - `inventoryKey` required
+//   - `propagationMetaKey` required
+func (c *combinedStatusResolution) queryingContentRequirements() (bool, bool, bool, bool) {
 	c.RLock()
 	defer c.RUnlock()
 
-	pred := func(s string) bool {
-		return strings.Contains(s, fmt.Sprintf("%s.metadata", expressionRootName)) ||
-			strings.Contains(s, fmt.Sprintf("%s.spec", expressionRootName)) ||
-			strings.Contains(s, fmt.Sprintf("%s.kind", expressionRootName)) ||
-			strings.Contains(s, fmt.Sprintf("%s.apiVersion", expressionRootName))
+	sourceObjectKeyRequired, returnedKeyRequired,
+		inventoryKeyRequired, propagationMetaKeyRequired := false, false, false, false
+
+	pred := func(expr *string) (bool, bool, bool, bool) {
+		return objectIsQueried(expr, sourceObjectKey), objectIsQueried(expr, returnedKey),
+			objectIsQueried(expr, inventoryKey), objectIsQueried(expr, propagationMetaKey)
+	}
+
+	mergeBooleans := func(s, r, i, p bool) {
+		// outside variables are referenced in closures https://go.dev/tour/moretypes/25
+		sourceObjectKeyRequired = sourceObjectKeyRequired || s
+		returnedKeyRequired = returnedKeyRequired || r
+		inventoryKeyRequired = inventoryKeyRequired || i
+		propagationMetaKeyRequired = propagationMetaKeyRequired || p
 	}
 
 	for _, scData := range c.statusCollectorNameToData {
-		if scData.Filter != nil && pred(string(*scData.Filter)) {
-			return true
+		if scData.Filter != nil {
+			mergeBooleans(pred((*string)(scData.Filter)))
 		}
 
 		for _, selectNamedExp := range scData.Select {
-			if pred(string(selectNamedExp.Def)) {
-				return true
-			}
+			mergeBooleans(pred((*string)(&selectNamedExp.Def)))
 		}
 
 		for _, combinedFieldNamedAgg := range scData.CombinedFields {
-			if combinedFieldNamedAgg.Subject != nil && pred(string(*combinedFieldNamedAgg.Subject)) {
-				return true
+			if combinedFieldNamedAgg.Subject != nil {
+				mergeBooleans(pred((*string)(combinedFieldNamedAgg.Subject)))
 			}
 		}
 
 		for _, groupByNamedExp := range scData.GroupBy {
-			if pred(string(groupByNamedExp.Def)) {
-				return true
-			}
+			mergeBooleans(pred((*string)(&groupByNamedExp.Def)))
 		}
 	}
 
-	return false
+	return sourceObjectKeyRequired, returnedKeyRequired, inventoryKeyRequired, propagationMetaKeyRequired
 }
 
 // evaluateWorkStatusAgainstStatusCollectorWriteLocked evaluates the workstatus against
@@ -554,11 +566,11 @@ func validateCombinedStatusLabels(combinedStatus *v1alpha1.CombinedStatus,
 	return true
 }
 
-// handleSelect handles the select expressions of a statuscollector data.
-// This means that the function evaluates the select expressions against the
-// possibly filtered workstatuses and returns the result in a
+// handleSelectReadLocked handles the select expressions of a statuscollector
+// data. This means that the function evaluates the select expressions against
+// the possibly filtered workstatuses and returns the result in a
 // NamedStatusCombination.
-func handleSelect(scName string, scData *statusCollectorData) *v1alpha1.NamedStatusCombination {
+func handleSelectReadLocked(scName string, scData *statusCollectorData) *v1alpha1.NamedStatusCombination {
 	namedStatusCombination := v1alpha1.NamedStatusCombination{
 		Name:        scName,
 		ColumnNames: make([]string, 0, len(scData.Select)),
@@ -639,14 +651,14 @@ func refValToValue(val ref.Val) v1alpha1.Value {
 	}
 }
 
-// handleAggregation handles the aggregation of the statuscollector data.
-// This means that the function evaluates the groupBy expressions and the
+// handleAggregationReadLocked handles the aggregation of the statuscollector
+// data. This means that the function evaluates the groupBy expressions and the
 // combinedFields expressions against the possibly filtered workstatuses and
 // returns the result in a NamedStatusCombination.
 //
 // If there is no groupBy, the function treats all workstatuses as a single
 // group.
-func handleAggregation(scName string, scData *statusCollectorData) *v1alpha1.NamedStatusCombination {
+func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1alpha1.NamedStatusCombination {
 	// The aggregation requires grouping workstatuses by tuples of groupBy values,
 	// where for N groupBy expressions, a group key would be a tuple of N values.
 	// To achieve this grouping, we maintain two maps:
@@ -663,6 +675,7 @@ func handleAggregation(scName string, scData *statusCollectorData) *v1alpha1.Nam
 			valuesTuple := make([]string, 0, len(scData.GroupBy))
 			for _, groupByNamedExp := range scData.GroupBy {
 				groupByValue := wsData.groupByEval[groupByNamedExp.Name]
+
 				// ensure unique number mapping for the value
 				uid, exists := ValueToNumber[groupByValue.Value()]
 				if !exists {
@@ -1007,4 +1020,49 @@ func numericEqual(a, b interface{}) bool {
 func sortedStringSlice(s []string) []string {
 	sort.Sort(sort.StringSlice(s))
 	return s
+}
+
+// objectIsQueried checks whether `obj` appears in `query` as a standalone
+// occurrence.
+// That means, it must not be surrounded by alphanumeric characters.
+// query is assumed to be non-nil.
+func objectIsQueried(query *string, obj string) bool {
+	idx := 0
+
+	for {
+		idx = strings.Index((*query)[idx:], obj) // slices share the same storage, therefore efficient
+		if idx == -1 {
+			return false
+		}
+
+		if isWholeWord(query, idx, len(obj)) {
+			return true
+		}
+
+		idx += len(obj)
+	}
+}
+
+// isWholeWord checks whether the word at `idx` in `s` is a whole word.
+// s is assumed to be non-nil.
+func isWholeWord(s *string, idx, length int) bool {
+	// check preceding rune
+	if idx > 0 {
+		r := rune((*s)[idx-1])
+
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			return false
+		}
+	}
+
+	// check following rune
+	if idx+length < len(*s) {
+		r := rune((*s)[idx+length])
+
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			return false
+		}
+	}
+
+	return true
 }
