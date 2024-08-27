@@ -17,8 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"time"
-
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -499,7 +497,7 @@ type PropagatationData struct {
 	// `lastReturnedUpdateTimestamp` is the time of the last update to any
 	// of the returned object state in the core.
 	// Before the first such update, this is the zero value of `time.Time`.
-	LastReturnedUpdateTimestamp time.Time `json:"lastReturnedUpdateTimestamp"`
+	LastReturnedUpdateTimestamp metav1.Time `json:"lastReturnedUpdateTimestamp"`
 }
 
 // StatusCollectorStatus defines the observed state of StatusCollector.

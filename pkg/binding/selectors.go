@@ -241,7 +241,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 		if len(test.NamespaceSelectors) > 0 && !ALabelSelectorIsEmpty(test.NamespaceSelectors...) {
 			if objNS == nil {
 				var err error
-				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(ctx,
+				objNS, err = c.namespaceClient.Get(ctx,
 					objIdentifier.ObjectName.Namespace, metav1.GetOptions{})
 				if err != nil {
 					logger.V(3).Info("Object namespace not found, assuming object does not match",
