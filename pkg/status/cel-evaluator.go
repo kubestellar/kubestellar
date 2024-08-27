@@ -54,8 +54,8 @@ func newCELEvaluator() (*celEvaluator, error) {
 		cel.Declarations(
 			decls.NewVar(sourceObjectKey, decls.NewMapType(decls.String, decls.Dyn)),
 			decls.NewVar(returnedKey, decls.NewMapType(decls.String, decls.Dyn)),
-			decls.NewVar(inventoryKey, decls.NewMapType(decls.String, decls.String)),     // contains name:string only
-			decls.NewVar(propagationMetaKey, decls.NewMapType(decls.String, decls.Bool)), // contains stale:bool only
+			decls.NewVar(inventoryKey, decls.NewMapType(decls.String, decls.String)), // contains name:string only
+			decls.NewVar(propagationMetaKey, decls.NewMapType(decls.String, decls.Dyn)),
 		),
 	)
 	if err != nil {

@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"sync"
 
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
@@ -243,7 +242,6 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 			csResolution = &combinedStatusResolution{
 				name:                      getCombinedStatusName(bindingResolution.UID, objectData.UID),
 				statusCollectorNameToData: make(map[string]*statusCollectorData),
-				stalenessThresholdSecs:    objectData.StalenessThresholdSecs, // minimum threshold of all statuscollectors
 			}
 			objectIdentifierToResolution[objectIdentifier] = csResolution
 			c.resolutionNameToKey[csResolution.getName()] = resolutionKey{bindingName, objectIdentifier}
@@ -258,9 +256,6 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 		// update destinations
 		removedDestinations, newDestinationsSet := csResolution.setCollectionDestinations(destinationsSet)
 
-		// update staleness threshold
-		updatedThreshold := csResolution.setStalenessThresholdSecs(objectData.StalenessThresholdSecs)
-
 		logger.V(5).Info("Updating CombinedStatus resolution", "binding", bindingName, "objectId", objectIdentifier,
 			"removedCollectors", removedCollectors, "addedCollectors", addedCollectors,
 			"removedDestinations", removedDestinations, "newDestinationsSet", newDestinationsSet)
@@ -271,8 +266,8 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 				objectIdentifier.ObjectName.Namespace))
 		}
 
-		// should evaluate workstatuses if added/updated collectors or added destinations or updated staleness threshold
-		if addedCollectors || len(newDestinationsSet) > 0 || updatedThreshold {
+		// should evaluate workstatuses if added/updated collectors or added destinations
+		if addedCollectors || len(newDestinationsSet) > 0 {
 			workloadIdentifiersToEvaluate.Insert(objectIdentifier) // TODO: this can be optimized through tightening
 		}
 	}
@@ -331,7 +326,7 @@ func (c *combinedStatusResolver) NoteWorkStatus(workStatus *workStatus) sets.Set
 			continue
 		}
 
-		content := c.getCombinedContentMap(workStatus, resolution)
+		content := getCombinedContentMap(c.wdsListers, workStatus, resolution)
 
 		// this call logs errors, but does not return them for now
 		if resolution.evaluateWorkStatus(c.celEvaluator, workStatus.WECName, content) {
@@ -484,7 +479,7 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 			}
 
 			csResolution := c.bindingNameToResolutions[bindingName][workStatus.SourceObjectIdentifier]
-			content := c.getCombinedContentMap(workStatus, csResolution)
+			content := getCombinedContentMap(c.wdsListers, workStatus, csResolution)
 
 			// evaluate workstatus
 			if csResolution.evaluateWorkStatus(c.celEvaluator, workStatus.WECName, content) {
@@ -495,61 +490,6 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 	}
 
 	return combinedStatusesToQueue
-}
-
-// getCombinedContentMap returns a map of content for the given workstatus.
-func (c *combinedStatusResolver) getCombinedContentMap(workStatus *workStatus,
-	resolution *combinedStatusResolution) map[string]interface{} {
-	content := map[string]interface{}{
-		returnedKey:        workStatus.Content(),
-		inventoryKey:       inventoryForWorkStatus(workStatus),
-		propagationMetaKey: propagateMetaForWorkStatus(workStatus, resolution),
-	}
-
-	if resolution.requiresSourceObjectMetaOrSpec() {
-		objMap, err := c.getObjectMetaAndSpec(workStatus.SourceObjectIdentifier)
-		if err != nil {
-			runtime2.HandleError(fmt.Errorf("failed to get meta & spec for source object %s: %w",
-				workStatus.SourceObjectIdentifier, err))
-		}
-
-		content[sourceObjectKey] = objMap
-	}
-
-	return content
-}
-
-// getObjectMetaAndSpec fetches the metadata and spec of the object associated
-// with the given workload object identifier.
-// The function is guaranteed not to return a key of `status` in the map.
-// If the resource contains any other subresources, they are fetched as well.
-func (c *combinedStatusResolver) getObjectMetaAndSpec(objectIdentifier util.ObjectIdentifier) (map[string]interface{}, error) {
-	// fetch object
-	lister, exists := c.wdsListers.Get(objectIdentifier.GVR())
-	if !exists {
-		return nil, fmt.Errorf("lister not found for gvr %s", objectIdentifier.GVR())
-	}
-
-	obj, err := getObject(lister, objectIdentifier.ObjectName.Namespace, objectIdentifier.ObjectName.Name)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get object (%v) with gvr (%v): %w", objectIdentifier.ObjectName,
-			objectIdentifier.GVR(), err)
-	}
-
-	unstrObj, ok := obj.(*unstructured.Unstructured)
-	if !ok {
-		return nil, fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s",
-			util.RefToRuntimeObj(obj))
-	}
-
-	return unstrObj.Object, nil
-}
-
-func getObject(lister cache.GenericLister, namespace, name string) (runtime.Object, error) {
-	if namespace != "" {
-		return lister.ByNamespace(namespace).Get(name)
-	}
-	return lister.Get(name)
 }
 
 func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool {
@@ -625,22 +565,4 @@ func namedExpressionSliceToMap(slice []v1alpha1.NamedExpression) map[string]v1al
 
 func expressionPtrsEqual(e1, e2 *v1alpha1.Expression) bool {
 	return e1 == nil && e2 == nil || e1 != nil && e2 != nil && *e1 == *e2
-}
-
-// inventoryForWorkStatus returns an inventory map for the given workstatus.
-func inventoryForWorkStatus(ws *workStatus) map[string]interface{} {
-	return map[string]interface{}{
-		"name": ws.WECName,
-	}
-}
-
-func propagateMetaForWorkStatus(ws *workStatus, resolution *combinedStatusResolution) map[string]interface{} {
-	stale := true
-	if ageSecs := ws.AgeSecs(); ageSecs != nil {
-		stale = *ageSecs > resolution.stalenessThresholdSecs
-	}
-
-	return map[string]interface{}{
-		"stale": stale,
-	}
 }

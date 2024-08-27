@@ -7,7 +7,7 @@ It may make sense to expand the latter into a general feature in the future, acc
 
 ## Introduction to the General Technique
 
-The general technique involves the following ideas.
+The general technique for combining reported state from WECs is built upon the following ideas:
 
 1. The way that reported state is combined is specified by the user, in a simple but powerful way modeled on SQL. This is chosen because it is a well worked out set of ideas, is widely known, and is something that we may someday want to use in our implementation. We do not need to support anything like full SQL (for any version of SQL). This proposal only involves one particular pattern of relatively simple SELECT statement, and a different expression language (CEL, which is the most prominent expression language in the Kubernetes milieu).
 
@@ -22,6 +22,7 @@ The general technique involves the following ideas.
 1. A user can request a list without aggregation, possibly after filtering, but certainly with a limit on list length. The expectation is that such a list makes sense only if the length of the list will be modest. For users that want access to the full reported state from each WEC for a large number of WECs, KubeStellar should have an abstraction that gives the users access --- in a functional way, not by making another copy --- to that state (which is already in the mailbox namespaces).
 
 1. The reported state for a given workload object from a given WEC is implicitly augmented with metadata about the WEC and about the end-to-end propagation from WDS to that WEC. This extra information is available just like the regular contents of the object, for use in combining reported state.
+   * The specifics of queryable objects and implicit augmentations can be found in [types.go](../../../api/control/v1alpha1/types.go) and is specified in [Queryable Objects](#queryable-objects).
 
 ### Relation with SQL
 
@@ -94,6 +95,22 @@ When there are N "GROUP BY" columns, the result has a row for each tuple of valu
 
 See `types.go`.
 
+### Queryable Objects
+
+A CEL expression within a `StatusCollector` can reference the following objects:
+
+1. `inventory`: The inventory object for the workload object:
+   - `inventory.name`: The name of the inventory object.
+
+1. `obj`: The workload object from the WDS:
+   - All fields of the workload object except the status subresource.
+
+1. `returned`: The reported state from the WEC:
+   - `returned.status`: The status section of the object returned from the WEC.
+
+1. `propagation`: Metadata about the end-to-end propagation process:
+   - `propagation.lastReturnedUpdateTimestamp`: metav1.Time of last update to any returned state.
+
 ## Examples of using the general technique
 
 ### Number of WECs
@@ -113,27 +130,6 @@ SELECT COUNT(*) AS count FROM PerWEC LIMIT <something>
 ```
 
 The table resulting from this would have one column and one row. The one value in this table would be the number of WECs.
-
-### List of stale WECs
-
-This produces a list of WECs for which the core has stale information.
-
-The `StatusCollectorSpec` would look like the following.
-
-```yaml
-filter: propagation.stale
-select:
-   - name: wec
-     def: inventory.name
-```
-
-The analogous SQL statement would look something like the following.
-
-```sql
-SELECT <SQL expression for inventory.name> AS wec FROM PerWEC LIMIT <something>
-```
-
-The table resulting fro this would have one column. Each row would hold the name of a WEC from which the core does not have recent information about the workload object.
 
 ### Histogram of Pod phase
 
@@ -182,7 +178,7 @@ select:
      def: inventory.name
 ```
 
-### Full status from each WEC
+### Full status from each WEC with information retrieval time
 
 This produces a listing of object status paired with inventory object name.
 
@@ -192,6 +188,8 @@ select:
      def: inventory.name
    - name: status
      def: returned.status
+   - name: retrievalTime
+     def: propagation.lastReturnedUpdateTimestamp
 ```
 
 ## Special case for 1 WEC

@@ -86,19 +86,17 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
-                        stalenessThresholdSecs:
-                          description: '`stalenessThresholdSecs` is the threshold
-                            used to derive the `stale` bit in PropagationMeta values.
-                            The value is the minimum of the `stalenessThresholdSecs`
-                            in the tests that match the object.'
-                          format: int32
-                          type: integer
-                        statusCollectors:
-                          description: '`statusCollectors` is a list of StatusCollectors
-                            name references that are applied to the object.'
-                          items:
-                            type: string
-                          type: array
+                        statusCollection:
+                          description: '`statusCollection` holds the rules of status
+                            collection for the object.'
+                          properties:
+                            statusCollectors:
+                              description: '`statusCollectors` is a list of StatusCollectors
+                                name references to be applied.'
+                              items:
+                                type: string
+                              type: array
+                          type: object
                         version:
                           type: string
                       required:
@@ -141,19 +139,17 @@ spec:
                           description: '`resourceVersion` is the version of the resource
                             to downsync.'
                           type: string
-                        stalenessThresholdSecs:
-                          description: '`stalenessThresholdSecs` is the threshold
-                            used to derive the `stale` bit in PropagationMeta values.
-                            The value is the minimum of the `stalenessThresholdSecs`
-                            in the tests that match the object.'
-                          format: int32
-                          type: integer
-                        statusCollectors:
-                          description: '`statusCollectors` is a list of StatusCollectors
-                            name references that are applied to the object.'
-                          items:
-                            type: string
-                          type: array
+                        statusCollection:
+                          description: '`statusCollection` holds the rules of status
+                            collection for the object.'
+                          properties:
+                            statusCollectors:
+                              description: '`statusCollectors` is a list of StatusCollectors
+                                name references to be applied.'
+                              items:
+                                type: string
+                              type: array
+                          type: object
                         version:
                           type: string
                       required:

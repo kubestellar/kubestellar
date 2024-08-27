@@ -19,7 +19,6 @@ package binding
 import (
 	"context"
 	"fmt"
-	"math"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -33,8 +32,6 @@ import (
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
-
-const defaultStatusCollectionStalenessThresholdSecs = 120
 
 // when an object is updated, we iterate over all bindingpolicies and update
 // resolutions that are affected by the update. Every changed resolution leads
@@ -69,7 +66,7 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 			continue // resolution does not exist, skip
 		}
 
-		matchedAny, createOnly, stalenessThresholdSecs, matchedStatusCollectorsSet := c.testObject(ctx, objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
+		matchedAny, createOnly, matchedStatusCollectorsSet := c.testObject(ctx, objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
 		if !matchedAny {
 			// if previously selected, remove
 			if resolutionUpdated := c.bindingPolicyResolver.RemoveObjectIdentifier(bindingPolicy.GetName(),
@@ -90,8 +87,7 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 
 		// obj is selected by bindingpolicy, update the bindingpolicy resolver
 		resolutionUpdated, err := c.bindingPolicyResolver.EnsureObjectData(bindingPolicy.GetName(),
-			objIdentifier, string(objMR.GetUID()), objMR.GetResourceVersion(), createOnly, stalenessThresholdSecs,
-			matchedStatusCollectorsSet)
+			objIdentifier, string(objMR.GetUID()), objMR.GetResourceVersion(), createOnly, matchedStatusCollectorsSet)
 		if err != nil {
 			if errorIsBindingPolicyResolutionNotFound(err) {
 				// this case can occur if a bindingpolicy resolution was deleted AFTER
@@ -212,17 +208,15 @@ func (c *Controller) removeObjectFromBindingPolicies(ctx context.Context, objIde
 // The returned tuple is:
 //   - bool: whether the object matches ANY of the tests
 //   - bool: whether any test that matches the object also says CreateOnly==true
-//   - int32: the minimum staleness threshold across all tests that match the object
 //   - sets.Set[string]: the UNION of the statuscollector names that appear within
 //     EACH of the tests that the object matches
 func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
-	tests []v1alpha1.DownsyncPolicyClause) (bool, bool, int32, sets.Set[string]) {
+	tests []v1alpha1.DownsyncPolicyClause) (bool, bool, sets.Set[string]) {
 
 	logger := klog.FromContext(ctx)
 
 	matchedStatusCollectors := sets.New[string]()
 	var matched, createOnly bool
-	var minStalenessThresholdSecs int32 = math.MaxInt32
 
 	var objNS *corev1.Namespace
 	for _, test := range tests {
@@ -247,7 +241,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 		if len(test.NamespaceSelectors) > 0 && !ALabelSelectorIsEmpty(test.NamespaceSelectors...) {
 			if objNS == nil {
 				var err error
-				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(context.TODO(),
+				objNS, err = c.kubernetesClient.CoreV1().Namespaces().Get(ctx,
 					objIdentifier.ObjectName.Namespace, metav1.GetOptions{})
 				if err != nil {
 					logger.V(3).Info("Object namespace not found, assuming object does not match",
@@ -264,18 +258,12 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 		// test is a match
 		if test.StatusCollection != nil {
 			matchedStatusCollectors.Insert(test.StatusCollection.StatusCollectors...)
-			minStalenessThresholdSecs = minInt(minStalenessThresholdSecs,
-				test.StatusCollection.StalenessThresholdSecs)
 		}
 		matched = true
 		createOnly = createOnly || test.CreateOnly
 	}
 
-	if len(matchedStatusCollectors) > 0 && minStalenessThresholdSecs == math.MaxInt32 {
-		minStalenessThresholdSecs = defaultStatusCollectionStalenessThresholdSecs
-	}
-
-	return matched, createOnly, minStalenessThresholdSecs, matchedStatusCollectors
+	return matched, createOnly, matchedStatusCollectors
 }
 
 func minInt(a, b int32) int32 {

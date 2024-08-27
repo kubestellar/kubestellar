@@ -269,13 +269,6 @@ spec:
                       description: '`statusCollection` holds the rules for collecting
                         status from the WECs.'
                       properties:
-                        stalenessThresholdSecs:
-                          default: 120
-                          description: '`stalenessThresholdSecs` is the threshold
-                            used to derive the `stale` bit in PropagationMeta values.
-                            Default value is 120.'
-                          format: int32
-                          type: integer
                         statusCollectors:
                           description: '`statusCollectors` is a list of StatusCollectors
                             name references to be applied.'

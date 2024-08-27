@@ -20,7 +20,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -46,15 +45,6 @@ func (ws *workStatus) Content() map[string]interface{} {
 	return map[string]interface{}{
 		"status": ws.status,
 	}
-}
-
-func (ws *workStatus) AgeSecs() *int32 {
-	if ws.lastUpdateTime == nil {
-		return nil
-	}
-
-	ageDuration := int32(time.Since(ws.lastUpdateTime.Time).Seconds())
-	return &ageDuration
 }
 
 func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) error {
@@ -184,24 +174,25 @@ func runtimeObjectToWorkStatusRef(obj runtime.Object) (*workStatusRef, error) {
 }
 
 func getObjectStatusLastUpdateTime(metaObj metav1.Object) *metav1.Time {
-	if managedFields := metaObj.GetManagedFields(); managedFields != nil && len(managedFields) > 0 {
-		// iterate through all managedFields entries to find the one that updated the status
-		for _, field := range managedFields {
-			if field.Operation == metav1.ManagedFieldsOperationUpdate &&
-				field.FieldsType == "FieldsV1" &&
-				field.FieldsV1 != nil {
-				// parse the FieldsV1.Raw to a map to check if "f:status" is present
-				var fieldsMap map[string]interface{}
-				if err := json.Unmarshal(field.FieldsV1.Raw, &fieldsMap); err != nil {
-					continue
-				}
+	// iterate through all managedFields entries to find the one that updated the status
+	latestTime := &metav1.Time{}
 
-				if _, ok := fieldsMap["f:status"]; ok {
-					return field.Time
+	for _, field := range metaObj.GetManagedFields() {
+		if field.FieldsType == "FieldsV1" &&
+			field.FieldsV1 != nil {
+			// parse the FieldsV1.Raw to a map to check if "f:status" is present
+			var fieldsMap map[string]interface{}
+			if err := json.Unmarshal(field.FieldsV1.Raw, &fieldsMap); err != nil {
+				continue
+			}
+
+			if _, ok := fieldsMap["f:status"]; ok {
+				if field.Time.After(latestTime.Time) {
+					latestTime = field.Time
 				}
 			}
 		}
 	}
 
-	return nil
+	return latestTime
 }

@@ -17,8 +17,11 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"time"
+
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // TemplateExpansionAnnotationKey, when paired with the value "true" in an annotation of
@@ -160,11 +163,6 @@ type DownsyncPolicyClause struct {
 
 // StatusCollection holds the rules for collecting status from the WECs.
 type StatusCollection struct {
-	// `stalenessThresholdSecs` is the threshold used to derive
-	// the `stale` bit in PropagationMeta values.
-	// Default value is 120.
-	// +kubebuilder:default=120
-	StalenessThresholdSecs int32 `json:"stalenessThresholdSecs,omitempty"`
 	// `statusCollectors` is a list of StatusCollectors name references to be applied.
 	StatusCollectors []string `json:"statusCollectors,omitempty"`
 }
@@ -314,13 +312,9 @@ type NamespaceScopeDownsyncClause struct {
 	// +optional
 	CreateOnly bool `json:"createOnly,omitempty"`
 
-	// `statusCollectors` is a list of StatusCollectors name references that are applied to the object.
-	StatusCollectors []string `json:"statusCollectors,omitempty"`
-
-	// `stalenessThresholdSecs` is the threshold used to derive
-	// the `stale` bit in PropagationMeta values.
-	// The value is the minimum of the `stalenessThresholdSecs` in the tests that match the object.
-	StalenessThresholdSecs int32 `json:"stalenessThresholdSecs,omitempty"`
+	// `statusCollection` holds the rules of status collection for the object.
+	// +optional
+	StatusCollection *StatusCollection `json:"statusCollection,omitempty"`
 }
 
 // NamespaceScopeDownsyncObject references a specific namespace-scoped object to downsync,
@@ -346,13 +340,9 @@ type ClusterScopeDownsyncClause struct {
 	// +optional
 	CreateOnly bool `json:"createOnly,omitempty"`
 
-	// `statusCollectors` is a list of StatusCollectors name references that are applied to the object.
-	StatusCollectors []string `json:"statusCollectors,omitempty"`
-
-	// `stalenessThresholdSecs` is the threshold used to derive
-	// the `stale` bit in PropagationMeta values.
-	// The value is the minimum of the `stalenessThresholdSecs` in the tests that match the object.
-	StalenessThresholdSecs int32 `json:"stalenessThresholdSecs,omitempty"`
+	// `statusCollection` holds the rules of status collection for the object.
+	// +optional
+	StatusCollection *StatusCollection `json:"statusCollection,omitempty"`
 }
 
 // ClusterScopeDownsyncObject references a specific cluster-scoped object to downsync,
@@ -479,25 +469,37 @@ const (
 // Type checking errors are posted to the status.Errors of the Binding and BindingPolicy.
 type Expression string
 
-// Augmentation defines what is implicitly added to every workload object from a WEC,
-// for purposes of status collection.
-type Augmentation struct {
-	Inventory   InventoryObjectReference `json:"inventory"`
-	Propagation PropagationMeta          `json:"propagation"`
+// ExpressionContext defines what an Expression can reference regarding the workload object.
+type ExpressionContext struct {
+	// `inventory` holds the inventory record for the workload object.
+	Inventory InventoryRecord `json:"inventory"`
+
+	// `obj` holds a copy of the workload object as read from the WDS.
+	Obj runtime.RawExtension `json:"obj"`
+
+	// `returned` holds the fragment of the workload object that was returned to the core from the WEC.
+	Returned ReturnedState `json:"returned"`
+
+	// `propagation` holds data about the current state of the work on propagating
+	// the object's state from WDS to WEC and from WEC to WDS.
+	Propagation PropagatationData `json:"propagation"`
 }
 
-// InventoryObjectReference identifies an inventory object.
-// Inventory is queryable in StatusCollector expressions using the `inventory` object.
-type InventoryObjectReference struct {
-	// `name` is the inventory object's name
+// InventoryRecord is what appears in the inventory for a given WEC.
+type InventoryRecord struct {
+	// the name of the WEC.
 	Name string `json:"name"`
 }
 
-// PropagationMeta is the last reported metadata about one workload object at one WEC.
-// PropagationMeta is queryable in StatusCollector expressions using the `propagation` object.
-type PropagationMeta struct {
-	// `stale` indicates whether `infoAgeSeconds > stalenessThresholdSecs`.
-	Stale bool `json:"stale"`
+type ReturnedState struct {
+	Status runtime.RawExtension `json:"status"`
+}
+
+type PropagatationData struct {
+	// `lastReturnedUpdateTimestamp` is the time of the last update to any
+	// of the returned object state in the core.
+	// Before the first such update, this is the zero value of `time.Time`.
+	LastReturnedUpdateTimestamp time.Time `json:"lastReturnedUpdateTimestamp"`
 }
 
 // StatusCollectorStatus defines the observed state of StatusCollector.

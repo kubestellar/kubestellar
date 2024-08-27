@@ -127,10 +127,9 @@ func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) *Resoluti
 			bindingPolicyResolution.objectIdentifierToData,
 			func(data *ObjectData) ObjectData { // clone
 				return ObjectData{
-					UID:                    string(data.UID),
-					ResourceVersion:        data.ResourceVersion,
-					StatusCollectors:       data.StatusCollectors.Clone(),
-					StalenessThresholdSecs: data.StalenessThresholdSecs,
+					UID:              string(data.UID),
+					ResourceVersion:  data.ResourceVersion,
+					StatusCollectors: data.StatusCollectors.Clone(),
 				}
 			}), // while this function breaks the constraint, it maintains its own concurrency safety
 		// by using the PrimitiveMapSafeValMap which transforms a map safely using its read-lock.
