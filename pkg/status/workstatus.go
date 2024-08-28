@@ -90,17 +90,22 @@ func updateObjectStatus(ctx context.Context, objectIdentifier *util.ObjectIdenti
 	gvr := objectIdentifier.GVR()
 	lister, found := listers.Get(gvr)
 	if !found {
-		logger.V(2).Info("Could not find lister for gvr", "gvr", gvr)
+		logger.V(4).Info("Could not find lister for gvr", "gvr", gvr)
 		return nil
 	}
 
-	obj, err := lister.ByNamespace(objectIdentifier.ObjectName.Namespace).Get(objectIdentifier.ObjectName.Name)
+	var obj runtime.Object
+	var err error
+	if objectIdentifier.ObjectName.Namespace == "" {
+		obj, err = lister.Get(objectIdentifier.ObjectName.Name)
+	} else {
+		obj, err = lister.ByNamespace(objectIdentifier.ObjectName.Namespace).Get(objectIdentifier.ObjectName.Name)
+	}
 	if err != nil {
 		if errors.IsNotFound(err) {
-			logger.V(2).Info("Could not find object", "objectIdentifier", objectIdentifier)
+			logger.V(4).Info("Did not update workload object because it is not in local cache, presumably because it was recently deleted", "objectIdentifier", objectIdentifier)
 			return nil
 		}
-
 		return fmt.Errorf("failed to get object (%v): %w", objectIdentifier, err)
 	}
 
