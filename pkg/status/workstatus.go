@@ -83,7 +83,7 @@ func (c *Controller) syncSingletonWorkStatus(ctx context.Context, ref singletonW
 	return c.syncWorkStatus(ctx, workStatusRef(ref))
 }
 
-func updateObjectStatus(ctx context.Context, objectIdentifier *util.ObjectIdentifier, status map[string]interface{},
+func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentifier, status map[string]interface{},
 	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister], wdsDynClient dynamic.Interface) error {
 	logger := klog.FromContext(ctx)
 
