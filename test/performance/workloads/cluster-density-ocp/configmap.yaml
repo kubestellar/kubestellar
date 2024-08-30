@@ -1,10 +1,12 @@
 ---
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
-  name: {{.JobName}}
-data: # random string created using: openssl rand -base64 2048
-  top-secret: |
+  name: {{.Name}}
+  labels:
+    app.kubernetes.io/name: cluster-density-{{.iterations}}
+data:
+  key1: |
     ZjlWd1FLZ213NHZZK0hFR1JRditJbVN2RjR1OWt1NlBJNFZMdXhjSXNKWE1GQ3I4YWRNQW1OY3l1
     TFgzaVd2eCBsL0RuY1I5RHZNZ0RKYVRPVGR0TTcwajI3N0VEV1ladVlOc1VpKzVwZ2Z2eFNFYktR
     WU5lQmRGdnUzMXAzb3BaIFdsdzJjSGd5M3psWGVmNUFVN1lwS1BiWlpDQ1E2bnFIc3dwNXFlNW1r
@@ -50,3 +52,5 @@ data: # random string created using: openssl rand -base64 2048
     czA2WE9KWHpOdiBQSkMzZ09YSlVhbjFSSkdsWFRoSzAxM2l4QVB0cDdjd0QxTjlMOEo3ZDhBeE53
     QkhXVk1obUxNUlhjY1BPSDlpIFgvaTNJSlQ0Vk1ja2J0dXJPd0MybkxjcUZFTFVpck4xRnVzSXBv
     dDd6SGc9c2FMQUViMUQrMU9kTGR2WVJiRwo=
+
+

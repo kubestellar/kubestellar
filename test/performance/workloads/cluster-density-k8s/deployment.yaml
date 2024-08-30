@@ -2,18 +2,18 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: {{.name}}
+  name: {{.Name}}
+  labels:
+    app.kubernetes.io/name: cluster-density-{{.iterations}}
 spec:
   replicas: {{.podReplicas}}
   selector:
     matchLabels:
-      app: {{.name}}
-  strategy:
-    resources: {}
+      app: {{.BaseName}}-{{.Index}}
   template:
     metadata:
       labels:
-        app: {{.name}}
+        app: {{.BaseName}}-{{.Index}}
     spec:
       # nodeSelector:
       #   node-role.kubernetes.io/worker: ""
@@ -35,15 +35,15 @@ spec:
         ports:
          - containerPort: 8080
            protocol: TCP
-        name: {{.name}}
+        name: http
         env:
-        - name: ENVVAR1_{{.name}}
+        - name: ENVVAR1_{{.BaseName}}
           value: {{.envVar}} 
-        - name: ENVVAR2_{{.name}}
+        - name: ENVVAR2_{{.BaseName}}
           value: {{.envVar}} 
-        - name: ENVVAR3_{{.name}}
+        - name: ENVVAR3_{{.BaseName}}
           value: {{.envVar}} 
-        - name: ENVVAR4_{{.name}}
+        - name: ENVVAR4_{{.BaseName}}
           value: {{.envVar}} 
       volumes:
       - name: secret-1

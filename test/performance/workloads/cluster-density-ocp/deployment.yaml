@@ -2,16 +2,18 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: cluster-density
+  name: {{.Name}}
+  labels:
+    app.kubernetes.io/name: cluster-density-{{.iterations}}
 spec:
   replicas: {{.podReplicas}}
   selector:
     matchLabels:
-      name: cluster-density-{{.Replica}}
+      name: {{.BaseName}}-{{.Index}}
   template:
     metadata:
       labels:
-        name: cluster-density-{{.Replica}}
+        name: {{.BaseName}}-{{.Index}}
         app: cluster-density-ms
     spec:
       topologySpreadConstraints:

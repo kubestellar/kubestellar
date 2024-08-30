@@ -1,15 +1,17 @@
 {{$namespaces := DefaultParam .namespaces 1}}
 {{$namespaceNamePrefix := DefaultParam .namespaceNamePrefix "perf-exp"}}
-{{$actionName := DefaultParam .actionName "Creating"}}
-{{$waitTime := DefaultParam .waitTime "5m"}}
+{{$waitTime := DefaultParam .waitTime "10s"}}
 
-{{$KIND_CLUSTER := DefaultParam .KIND_CLUSTER true}}
+{{$K8S_CLUSTER := DefaultParam .K8S_CLUSTER true}}
 {{$OPENSHIFT_CLUSTER := DefaultParam .OPENSHIFT_CLUSTER false}}
+{{$CREATE_NS := DefaultParam .CREATE_NS true}}
+{{$tuningSet := DefaultParam .tuningSet "RandomizedLoad"}}
 
 
 name: load
 namespace:
-  number: {{$namespaces}}
+  number: 0
+  enableExistingNamespaces: true
 tuningSets:
 
 # Global100qps: use 100 qps globally:
@@ -37,31 +39,18 @@ tuningSets:
 # limit on the number running concurrently.
 - name: Sequence
   parallelismLimitedLoad:
-    parallelismLimit: 1
+    parallelismLimit: 100
 
 
-{{if $KIND_CLUSTER}}
 steps:
+{{if $CREATE_NS}}
 - module:
-    path: modules/cluster-density.yaml
+    path: modules/performance-test-module.yaml
     params:
-      actionName: {{$actionName}}
-      tuningSet: RandomizedLoad
+      actionName: "Creating"
+      tuningSet: Sequence
       namespaces: {{$namespaces}}
       namespaceNamePrefix: {{$namespaceNamePrefix}}
-{{end}}
-
-
-{{if $OPENSHIFT_CLUSTER}}
-steps:
-- module:
-    path: modules/cluster-density-ms.yaml
-    params:
-      actionName: {{$actionName}}
-      tuningSet: RandomizedLoad
-      namespaces: {{$namespaces}}
-      namespaceNamePrefix: {{$namespaceNamePrefix}}
-{{end}}
 
 - name: "Wait {{$waitTime}}"
   measurements:
@@ -69,3 +58,30 @@ steps:
       Method: Sleep
       Params:
         duration: {{$waitTime}}
+{{end}}
+
+
+{{if $K8S_CLUSTER}}
+{{range $ssIndex := Loop $namespaces}}
+- module:
+    path: modules/cluster-density-k8s.yaml
+    params:
+      actionName: "Creating"
+      tuningSet: {{$tuningSet}}
+      namespaceName: {{$namespaceNamePrefix}}-{{$ssIndex}}
+      iterations: {{$ssIndex}}
+{{end}}
+{{end}}
+
+
+{{if $OPENSHIFT_CLUSTER}}
+{{range $ssIndex := Loop $namespaces}}
+- module:
+    path: modules/cluster-density-ocp.yaml
+    params:
+      actionName: "Creating"
+      tuningSet: {{$tuningSet}}
+      namespaceName: {{$namespaceNamePrefix}}-{{$ssIndex}}
+      iterations: {{$ssIndex}}
+{{end}}
+{{end}}

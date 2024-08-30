@@ -1,0 +1,13 @@
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: {{.Name}}
+  labels:
+    app.kubernetes.io/name: cluster-density-{{.iterations}}
+spec:
+  to:
+    kind: Service
+    name: cluster-density-{{.Index}}
+  tls:
+    termination: edge

@@ -2,17 +2,15 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: cluster-density
+  name: {{.Name}}
+  labels:
+    app.kubernetes.io/name: cluster-density-{{.iterations}}
 spec:
   selector:
-    name: cluster-density
+    app: {{.BaseName}}-{{.Index}}
   ports:
   - name: http
     protocol: TCP
     port: 80
     targetPort: 8080
-  - name: https
-    protocol: TCP
-    port: 443
-    targetPort: 8443
   type: ClusterIP

@@ -1,128 +1,123 @@
-## Stress Test Experiments
+## Workload Benchmark for KubeStellar
 
+*Pre-requisite*: in order to follow the instructions below, you must have an environment with KubeStellar installed; see [KubeStellar getting started](https://docs.kubestellar.io/release-0.23.1/direct/get-started/). Alternatively, you can also use KubeStellar e2e script [run-test.sh](https://github.com/kubestellar/kubestellar/blob/main/test/e2e/run-test.sh) to setup an environment.
 
-## Generate the workload traffic
+To generate the sample workload for KubeStellar performance experiments proceed as following:
 
-1. Clone the following fork of the clusterloader2 repo: 
+### Generate the workload traffic
 
-```bash
-$ git clone -b ks-provider https://github.com/dumb0002/perf-tests.git
-```
+1. Clone the following clusterloader2 repo: 
 
-2. Configure the parameters of your experiment:  
+   ```bash
+   $ git clone -b release-1.31 https://github.com/kubernetes/perf-tests.git
+   ```
+
+   Set the variable `CL2_DIR` to the path of the subdirectory `clusterloader2/` of the cloned repo. For example: 
+
+   ```bash
+   $ export CL2_DIR=$HOME/perf-tests/clusterloader2
+   ```
+
+2. Configure clusterloader2 to generate KS performance workloads:
+
+   Starting from a local directory containing this KubeStellar git repo, run the following script based on your cluster environment:
+
+   a) cd into the `test/performance` directory from your local copy of the KubeStellar repo, for example:
+
+   ```bash
+   $ cd .$HOME/kubestellar/test/performance
+   ```
+
+   b) If using plain K8s clusters:
+
+   ```bash
+   $ ./setup-clusterloader2.sh
+   ```
+
+   c) If using OpenShift clusters: 
+
+   ```bash
+   $ ./setup-clusterloader2.sh --env ocp
+   ```
+
+3. Configure the parameters of your workload:  
 
    a) cd into the load configuration directory
 
-```bash
-$ cd  perf-tests/clusterloader2/testing/load
-```
-   b) create the `stress-test` namespace - you workload needs to be deployed into this exact namespace (temporary solution)
-
-```bash
-$ kubectl apply -f - <<EOF
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: stress-test
-  labels:
-    app.kubernetes.io/cluster: wec1
-EOF
-```
-
-   c) configure your sample workload: 
-   
-```bash
-$ vi test-workload.yaml
-```
+   ```bash
+   $ cd  $CL2_DIR/testing/load/
+   ```
   
-   d) configure the parameters to create the workload traffic (e.g., RandomizedLoad, SteppedLoad, Sequence, etc.)
+   b) configure the parameters to create the workload traffic (e.g., RandomizedLoad, SteppedLoad, Sequence, etc.)
    
-```bash
-$ vi performance-test-config.yaml
-``` 
+   ```bash
+   $ vi performance-test-config.yaml
+   ``` 
 
-To learn more about the clusterloader2 load experiments configuration parameters, see the following: [clusterloader tuningSets](https://github.com/kubernetes/perf-tests/blob/master/clusterloader2/docs/design.md#tuning-set)
+   More specifically, configure the following parameters: 
 
+   - namespaces: number of namespaces to be created in your cluster to deploy the workload defined in step-2 above (*default value: 1*). For example: if `namespaces=2`, then the following namespaces will be created: `perf-exp-0` and `perf-exp-1`
+   - K8S_CLUSTER: set to `true` for plain Kubernetes clusters (*default value: "true"*)
+   - OPENSHIFT_CLUSTER: set to `true` for Kubernetes clusters (*default value: "false"*)
+   - tuningSet: workload generation function (*default value: "RandomizedLoad"*)
 
-3. Run your first workload:
-
-
-Set ``--kubeconfig`` flag to the path of the kubeconfig file of your cluster (e.g., WDS kubeconfig) and use the newly added Kubestellar provider
-
-```bash
-$ cd perf-tests/clusterloader2/
-$ go run cmd/clusterloader.go --testconfig=./testing/load/performance-test-config.yaml --kubeconfig=<path>/wds-kubeconfig --provider=ks --v=2
-```
+   To learn more about clusterloader2 tuningSet, see the following: [tuningSets](https://github.com/kubernetes/perf-tests/blob/master/clusterloader2/docs/design.md#tuning-set) and [configurations](https://github.com/kubernetes/perf-tests/blob/fac2a5eec96fab76a4bc4858795df4544b729b0b/clusterloader2/api/types.go#L249).
 
 
-## Collect the measurements 
 
-To collect the creation and status update for a k8s object proceed as following:  
 
-1. Create a kubeconfig with contexts for the `wds1`, `its1` and `wec1`:
+4. Deploy your first workload:
 
-For example: 
+   First, use a kubeconfig that includes contexts for WDS spaces and set its current context to a target WDS space (e.g., `wds1`):
 
-```bash
-$ kubectl config get-contexts
-CURRENT   NAME     CLUSTER                                          AUTHINFO                                                                 NAMESPACE
-          its1     its1-cluster                                     its1-admin                                                                default
-          wec1     <url>:port#                                      <defaul-value>                                                            default
-*         wds1     wds1-cluster                                     wds1-admin                                                                default
-```
+   ```bash
+   $ kubectl config use-context wds1
+   Switched to context "wds1".
 
-Use the following command to rename the default context name for `wec1` workload execution cluster:
+   $ kubectl config get-contexts
+   CURRENT   NAME            CLUSTER         AUTHINFO        NAMESPACE
+             cluster1        kind-cluster1   kind-cluster1   
+             cluster2        kind-cluster2   kind-cluster2   
+             its1            its1-cluster    its1-admin      
+             kind-kubeflex   kind-kubeflex   kind-kubeflex   
+   *         wds1            wds1-cluster    wds1-admin      default
+             wds2            wds2-cluster    wds2-admin      default
+   ```
 
-```bash 
-$ kubectl config rename-context <default-wec1-context-name> wec1
-```
 
-2. Configure the following parameters in the `main` function in the `metrics_collectory.py` script
+   In the following set ``--kubeconfig`` flag to the path of the kubeconfig file of your cluster and use the newly added Kubestellar provider (`--provider=ks`) and run the following command to create your workload:
 
-```bash
-    kubeconfig = "kscore-config"  # path to the kubeconfig file
-    ns = "stress-test"  # name of the namespace where the workload are generated 
-    mypath="data/"  # path to the directory for the output files
-    run_ID="1" # run ID for your experiment 
-    freq="1"   # workload frequency parameter set in your experiment 
-    numPods=20 # total number of workload objects set in your experiment
-    method = "exp-RandomizedLoad" # clusterloader method used to generate your traffic
-    watch_interval = 3600  # watch for events that to occur within time interval threshold
-```
+   ```bash
+   $ cd $CL2_DIR
+   $ go run cmd/clusterloader.go --testconfig=./testing/load/performance-test-config.yaml --kubeconfig=<path>/wds-kubeconfig --provider=ks --v=2
+   ```
 
-3. Run the metrics collection script:
+    In plain Kubernetes environments, a modified version of the kube-burner [cluster-density](https://github.com/kube-burner/kube-burner/tree/main/examples/workloads/cluster-density) workload is generated per namespace. This workload consists of the following objects:
 
-a) Clone the KubeStellar repo:
+   - 1 deployments, with two pod replicas (pause), mounting 2 secrets, 2 config maps
+   - 3 services, the first service points to the TCP/8080 port of the deployments, respectively.
+   - 10 secrets containing a 2048-character random string.
+   - 10 config maps
 
-```bash
-$ git clone https://github.com/kubestellar/kubestellar.git
-$ cd kubestellar/test/performance
-```
+   In Openshift environments, a modified version of the kube-burner [cluster-density-ms](https://github.com/kube-burner/kube-burner-ocp/tree/478bb42e1842a94ca3210d26a08633b70a443005/cmd/config/cluster-density-ms) workload is generated per namespace. This workload consists of the following objects:
 
-b) Start collecting metrics:
+    - 1 image stream.
+    - 4 deployments, each with two pod replicas (pause), mounting 4 secrets, 4 config maps, and
+      1 downward API volume each.
+    - 2 services, each pointing to the TCP/8080 and TCP/8443 ports of the first and second
+      deployments, respectively.
+    - 1 edge route pointing to the first service.
+    - 20 secrets containing a 2048-character random string.
+    - 10 config maps containing a 2048-character random string
 
-```bash 
-$ python3 metrics_collector.py
-```
 
-Metrics will be collected for pods in `wds1`, manifestworks & workstatuses in `its1` and pods & appliedmanifestworks in `wec1` - In total 5 files will be output, for example:
 
-```bash 
-      20 exp-RandomizedLoad-freq-20-appliedmanifestwork-wec1-run1.txt
-      20 exp-RandomizedLoad-freq-20-manifestwork-its1-run1.txt
-      20 exp-RandomizedLoad-freq-20-pod-wds-kscore-stage-run1.txt
-      20 exp-RandomizedLoad-freq-20-pod-wec1-run1.txt
-      20 exp-RandomizedLoad-freq-20-workstatus-its1-run1.txt
-```
 
-The output is a file with the following structure:
+5. Clean up the generated workload Kubernetes API objects from your cluster:
 
-```bash
-<obj_name> <obj_creation_time> <obj_status_update_time> <obj_status_condition>  <obj_status_condition>  <obj_controller_manager>
-```
+   ```bash
+   $ cd $CL2_DIR
+   $ ./cleanup.sh
+   ```
 
-For example: 
-
-```bash
-stress-pod-2	2024-03-14 19:51:19+00:00	2024-03-14 19:51:44+00:00	Succeeded	controller-manager
-```
+### Collect the creation & update timestamps for workload benchmark (OPTIONAL) (TO DO: WORK-IN-PROGRESS)
