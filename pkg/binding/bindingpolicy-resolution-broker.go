@@ -22,6 +22,7 @@ import (
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/util"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 // ResolutionBroker allows for the registration of callback functions that
@@ -41,6 +42,13 @@ type ResolutionBroker interface {
 	// NotifyCallbacks calls all registered callbacks with the given bindingPolicyKey.
 	// The callbacks are called on separate goroutines.
 	NotifyCallbacks(bindingPolicyKey string)
+}
+
+type ResolutionIfc interface {
+	GetPolicyUID() string
+
+	GetDestinations() sets.Set[v1alpha1.Destination]
+	GetWorkload() map[util.ObjectIdentifier]ObjectData
 }
 
 // Resolution is a struct that represents the resolution of a binding policy.
