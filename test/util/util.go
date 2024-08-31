@@ -373,8 +373,8 @@ func CreateJob(ctx context.Context, wds *kubernetes.Clientset, ns string, name s
 }
 
 type countAndProblems struct {
-	count    int
-	problems []string
+	Count    int
+	Problems []string
 }
 
 func GetDeploymentTime(ctx context.Context, clientset *kubernetes.Clientset, ns string, name string) time.Time {
@@ -411,21 +411,24 @@ func GetManifestworkTime(ctx context.Context, ocmWorkImbs *ocmWorkClient.Clients
 // all the problemFuncs to return the empty string for every Deployment.
 func ValidateNumDeployments(ctx context.Context, wec *kubernetes.Clientset, ns string, num int, problemFuncs ...func(*appsv1.Deployment) string) {
 	ginkgo.GinkgoHelper()
+	logger := klog.FromContext(ctx)
 	gomega.Eventually(func() countAndProblems {
 		deployments, err := wec.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
 		if err != nil {
+			logger.V(2).Info("Failed to list Deployment objects", "ns", ns)
 			return countAndProblems{-1, []string{err.Error()}}
 		}
-		ans := countAndProblems{count: len(deployments.Items)}
+		ans := countAndProblems{Count: len(deployments.Items)}
 		for _, pf := range problemFuncs {
 			for _, deployment := range deployments.Items {
 				if problem := pf(&deployment); len(problem) > 0 {
-					ans.problems = append(ans.problems, fmt.Sprintf("deployment %q has a problem: %s", deployment.Name, problem))
+					ans.Problems = append(ans.Problems, fmt.Sprintf("deployment %q has a problem: %s", deployment.Name, problem))
 				}
 			}
 		}
+		logger.V(3).Info("Current Deployment survey result", "ns", ns, "result", ans)
 		return ans
-	}, timeout).Should(gomega.Equal(countAndProblems{count: num}))
+	}, timeout).Should(gomega.Equal(countAndProblems{Count: num}))
 }
 
 func ValidateNumServices(ctx context.Context, wec *kubernetes.Clientset, ns string, num int) {

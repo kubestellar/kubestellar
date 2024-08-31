@@ -732,6 +732,8 @@ func (c *Controller) GetInformers() util.ConcurrentMap[schema.GroupVersionResour
 // populateBindingPolicyResolverWithExistingBindingPolicies fills the BindingPolicyResolver
 // with entries for existing BindingPolicy objects. Any bindingpolicy name that is not
 // associated with a resolution gets associated to an empty resolution.
+// No concurrent calls allowed.
+// May not be called concurrently with Controller::reconcile.
 func (c *Controller) populateBindingPolicyResolverWithExistingBindingPolicies() error {
 	bindingpolicies, err := c.listBindingPolicies()
 	if err != nil {
