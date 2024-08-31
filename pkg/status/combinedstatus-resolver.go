@@ -193,6 +193,8 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 	if deleted {
 		logger.V(3).Info("Deleting CombinedStatus resolutions for Binding", "name", bindingName)
 		return c.deleteResolutionsForBindingWriteLocked(bindingName)
+	} else {
+		logger.V(3).Info("Noting non-deleted resolution", "bindingResolution", bindingResolution)
 	}
 
 	destinationsSet := bindingResolution.GetDestinations()

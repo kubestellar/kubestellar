@@ -124,7 +124,11 @@ func (broker *resolutionBroker) RegisterCallback(callback func(bindingPolicyKey 
 // GetResolution retrieves the resolution for a given bindingPolicyKey.
 // If no resolution is associated with the given key, nil is returned.
 func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) Resolution {
-	return broker.bindingPolicyResolutionGetter(bindingPolicyKey) //thread-safe
+	resolution := broker.bindingPolicyResolutionGetter(bindingPolicyKey) //thread-safe
+	if resolution == nil {
+		return nil
+	}
+	return resolution
 }
 
 // NotifyCallbacks calls all registered callbacks with the given bindingPolicyKey.

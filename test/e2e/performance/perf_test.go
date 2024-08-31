@@ -58,7 +58,7 @@ var _ = ginkgo.Describe("performance tests", func() {
 				map[string]string{
 					"app.kubernetes.io/name": "nginx",
 				})
-			util.ValidateNumDeployments(ctx, wec1Client, ns, 1)
+			util.ValidateNumDeployments(ctx, "wec1", wec1Client, ns, 1)
 
 			timeDeploymentWDS := int(util.GetDeploymentTime(ctx, wdsClient, ns, testName).Sub(start).Seconds())
 			timeBinding := int(util.GetBindingTime(ctx, ksWdsClient, "performance").Sub(start).Seconds())
@@ -77,7 +77,7 @@ var _ = ginkgo.Describe("performance tests", func() {
 					i, timeDeploymentWDS, timeBinding, timeManifestwork, timeDeploymentWEC, elapsed)
 			}
 			util.DeleteDeployment(ctx, wdsClient, ns, testName)
-			util.ValidateNumDeployments(ctx, wec1Client, ns, 0)
+			util.ValidateNumDeployments(ctx, "wec1", wec1Client, ns, 0)
 			util.DeleteBindingPolicy(ctx, ksWdsClient, testName)
 		}
 

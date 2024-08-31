@@ -409,10 +409,11 @@ func GetManifestworkTime(ctx context.Context, ocmWorkImbs *ocmWorkClient.Clients
 
 // ValidateNumDeployments waits a limited amount of time for the number of Deployment objects to equal the given count and
 // all the problemFuncs to return the empty string for every Deployment.
-func ValidateNumDeployments(ctx context.Context, wec *kubernetes.Clientset, ns string, num int, problemFuncs ...func(*appsv1.Deployment) string) {
+func ValidateNumDeployments(ctx context.Context, where string, wec *kubernetes.Clientset, ns string, num int, problemFuncs ...func(*appsv1.Deployment) string) {
 	ginkgo.GinkgoHelper()
 	logger := klog.FromContext(ctx)
-	gomega.Eventually(func() countAndProblems {
+	lastAns := countAndProblems{}
+	gomega.Eventually(func(ctx context.Context) countAndProblems {
 		deployments, err := wec.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			logger.V(2).Info("Failed to list Deployment objects", "ns", ns)
@@ -426,9 +427,13 @@ func ValidateNumDeployments(ctx context.Context, wec *kubernetes.Clientset, ns s
 				}
 			}
 		}
-		logger.V(3).Info("Current Deployment survey result", "ns", ns, "result", ans)
+		if ans.Count == num || ans.Count != lastAns.Count || len(ans.Problems) != len(lastAns.Problems) {
+			ginkgo.GinkgoLogr.Info("Got Deployment survey result", "where", where, "ns", ns, "expected", num, "result", ans, "now", time.Now())
+			logger.V(3).Info("Current Deployment survey result", "where", where, "ns", ns, "expected", num, "result", ans)
+		}
+		lastAns = ans
 		return ans
-	}, timeout).Should(gomega.Equal(countAndProblems{Count: num}))
+	}, timeout).WithContext(ctx).Should(gomega.Equal(countAndProblems{Count: num}))
 }
 
 func ValidateNumServices(ctx context.Context, wec *kubernetes.Clientset, ns string, num int) {
