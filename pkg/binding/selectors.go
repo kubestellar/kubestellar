@@ -23,9 +23,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 
@@ -55,11 +52,6 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 
 	objMR := obj.(mrObject)
 	objBeingDeleted := isBeingDeleted(obj)
-	objGVR := schema.GroupVersionResource{Group: objIdentifier.GVK.Group, Version: objIdentifier.GVK.Version,
-		Resource: objIdentifier.Resource,
-	}
-
-	isSelectedBySingletonBinding := false
 
 	for _, bindingPolicy := range bindingPolicies {
 		if !c.bindingPolicyResolver.ResolutionExists(bindingPolicy.GetName()) {
@@ -117,74 +109,9 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 				"resourceVersion", objMR.GetResourceVersion())
 
 		}
-
-		// make sure object has singleton status if needed
-		if !objBeingDeleted && c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicy.GetName()) {
-			if err := c.handleSingletonLabel(ctx, obj, objGVR, util.BindingPolicyLabelSingletonStatusValueSet); err != nil {
-				return fmt.Errorf("failed to add singleton label to object: %w", err)
-			}
-
-			isSelectedBySingletonBinding = true
-		}
-	}
-
-	// if the binding-policies matching cycles end and the object is not selected by a singleton binding,
-	// we need to update the singleton label value for the object.
-	// NOTE that this takes care of the case where the object was previously selected by a singleton binding
-	// and is no longer selected by any binding.
-	if !objBeingDeleted && !isSelectedBySingletonBinding {
-		if err := c.handleSingletonLabel(ctx, obj, objGVR, util.BindingPolicyLabelSingletonStatusValueUnset); err != nil {
-			return fmt.Errorf("failed to update singleton label for object: %w", err)
-		}
 	}
 
 	return nil
-}
-
-// handleSingletonLabel adds the singleton label to the object in the cluster,
-// or matches the label value to the expectedLabelValue if needed.
-//
-// The method parameter `obj` is not mutated by this function.
-func (c *Controller) handleSingletonLabel(ctx context.Context, obj runtime.Object, objGVR schema.GroupVersionResource,
-	expectedLabelValue string) error {
-	unstructuredObj, ok := obj.(*unstructured.Unstructured)
-	if !ok {
-		return fmt.Errorf("failed to convert runtime.Object to unstructured.Unstructured")
-	}
-
-	labels := unstructuredObj.GetLabels() // gets a copy of the labels
-	if labels == nil {
-		labels = make(map[string]string)
-	}
-
-	val, found := labels[util.BindingPolicyLabelSingletonStatusKey]
-
-	if !found && expectedLabelValue == util.BindingPolicyLabelSingletonStatusValueUnset {
-		return nil
-	}
-	if found && val == expectedLabelValue {
-		return nil
-	}
-	labels[util.BindingPolicyLabelSingletonStatusKey] = expectedLabelValue
-
-	unstructuredObj = unstructuredObj.DeepCopy() // avoid mutating the original object
-	unstructuredObj.SetLabels(labels)
-
-	if unstructuredObj.GetNamespace() == metav1.NamespaceNone {
-		_, err := c.dynamicClient.Resource(objGVR).Update(ctx, unstructuredObj, metav1.UpdateOptions{})
-		if errors.IsNotFound(err) {
-			return nil // object was deleted after getting into this function. This is not an error.
-		}
-		return err
-	}
-
-	_, err := c.dynamicClient.Resource(objGVR).Namespace(unstructuredObj.GetNamespace()).Update(ctx, unstructuredObj,
-		metav1.UpdateOptions{})
-	if errors.IsNotFound(err) {
-		return nil // object was deleted after getting into this function. This is not an error.
-	}
-
-	return err
 }
 
 func (c *Controller) removeObjectFromBindingPolicies(ctx context.Context, objIdentifier util.ObjectIdentifier,

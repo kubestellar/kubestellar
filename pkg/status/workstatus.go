@@ -79,13 +79,6 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 	return nil
 }
 
-func (c *Controller) syncSingletonWorkStatus(ctx context.Context, ref singletonWorkStatusRef) error {
-	if err := c.reconcileSingletonByWS(ctx, ref); err != nil {
-		return err
-	}
-	return c.syncWorkStatus(ctx, workStatusRef(ref))
-}
-
 func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentifier, status map[string]interface{},
 	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister], wdsDynClient dynamic.Interface) error {
 	logger := klog.FromContext(ctx)
