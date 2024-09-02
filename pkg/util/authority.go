@@ -17,10 +17,13 @@ limitations under the License.
 package util
 
 import (
+	coreapi "k8s.io/api/core/v1"
+	apiextapi "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 var WEC2WDSExceptions = sets.New(
-	schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Namespace"},
+	schema.GroupKind{Group: coreapi.GroupName, Kind: "Namespace"},
+	schema.GroupKind{Group: apiextapi.GroupName, Kind: "CustomResourceDefinition"},
 )
