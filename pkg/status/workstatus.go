@@ -50,6 +50,10 @@ func (ws *workStatus) Content() map[string]interface{} {
 func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) error {
 	logger := klog.FromContext(ctx)
 
+	if err := c.reconcileSingletonByWS(ctx, ref); err != nil {
+		return err
+	}
+
 	workStatus := &workStatus{
 		workStatusRef: ref, //readonly
 		status:        nil,
@@ -77,13 +81,6 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 	}
 
 	return nil
-}
-
-func (c *Controller) syncSingletonWorkStatus(ctx context.Context, ref singletonWorkStatusRef) error {
-	if err := c.reconcileSingletonByWS(ctx, ref); err != nil {
-		return err
-	}
-	return c.syncWorkStatus(ctx, workStatusRef(ref))
 }
 
 func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentifier, status map[string]interface{},
@@ -126,10 +123,10 @@ func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentif
 	unstrObj.Object["status"] = status
 
 	if objectIdentifier.ObjectName.Namespace == "" {
-		_, err = wdsDynClient.Resource(gvr).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{})
+		_, err = wdsDynClient.Resource(gvr).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{FieldManager: ControllerName})
 	} else {
 		_, err = wdsDynClient.Resource(gvr).Namespace(objectIdentifier.ObjectName.Namespace).UpdateStatus(ctx,
-			unstrObj, metav1.UpdateOptions{})
+			unstrObj, metav1.UpdateOptions{FieldManager: ControllerName})
 	}
 	if err != nil {
 		// if resource not found it may mean no status subresource - try to patch the status
