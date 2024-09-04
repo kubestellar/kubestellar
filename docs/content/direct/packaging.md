@@ -99,8 +99,7 @@ flowchart LR
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
     ocm_pch["ocm PostCreateHook"]
-    setup_ksc["example setup<br>using core"]
-    setup_steps["example setup<br>step-by-step"]
+    setup_ksc["'Getting Started' setup"]
     e2e_local["E2E setup<br>local"]
     e2e_release["E2E setup<br>release"]
     end
@@ -119,9 +118,6 @@ flowchart LR
     ksc_hc_repo -.-> osa_hc_repo
     ksc_hc_repo -.-> otp_hc_repo
     ksc_hc_repo -.-> kcm_hc_repo
-    setup_steps -.-> ocm_pch
-    setup_steps -.-> ks_pch
-    setup_steps -.-> KubeFlex
     setup_ksc -.-> ksc_hc_repo
     setup_ksc -.-> KubeFlex
     e2e_local -.-> ocm_pch
@@ -148,7 +144,6 @@ flowchart LR
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
     ocm_pch["ocm PostCreateHook"]
-    setup_steps["example setup<br>step-by-step"]
     e2e_local["E2E setup<br>local"]
     e2e_release["E2E setup<br>release"]
     end
@@ -162,8 +157,6 @@ flowchart LR
     ksc_hc_src -.-> cladm_image
     ksc_hc_repo -.-> cladm_image
     ksc_hc_repo -.-> helm_image
-    setup_steps -.-> ocm_pch
-    setup_steps -.-> ks_pch
     e2e_local -.-> ocm_pch
     e2e_release -.-> ocm_pch
     e2e_release -.-> ks_pch
@@ -364,8 +357,7 @@ flowchart LR
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
     ocm_pch["ocm PostCreateHook"]
-    setup_ksc["example setup<br>using core"]
-    setup_steps["example setup<br>step-by-step"]
+    setup_ksc["'Getting Started' setup"]
     e2e_local["E2E setup<br>local"]
     e2e_release["E2E setup<br>release"]
     end
@@ -388,9 +380,6 @@ flowchart LR
     ksc_hc_repo -.-> osa_hc_repo
     ksc_hc_repo -.-> kcm_hc_repo
     ksc_hc_repo -.-> otp_hc_repo
-    setup_steps -.-> ocm_pch
-    setup_steps -.-> ks_pch
-    setup_steps -.-> KubeFlex
     setup_ksc -.-> ksc_hc_repo
     setup_ksc -.-> KubeFlex
     e2e_local -.-> ocm_pch
