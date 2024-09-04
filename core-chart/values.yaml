@@ -57,6 +57,10 @@ status_agent:
 # Determine if the Post Create Hooks should be installed by the chart
 InstallPCHs: true
 
+# Transport controller bundling parameters
+transport_controller:
+    max_num_wrapped: 9223372036854775807
+    max_size_wrapped: 512000
 
 # List the Inventory and Transport Spaces (ITSes) to be created by the chart
 # Each ITS consists of a mandatory unique name and an optional type, which could be either host or vcluster (default to vcluster, if not specified)
