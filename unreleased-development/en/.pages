@@ -1,0 +1,8 @@
+# nav:
+# - About: index.md
+# - QuickStart: Getting-Started/quickstart/
+# - ...
+# - 'Blog': https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST
+# - GitHub: {{ config.repo_url }}
+# <!-- - Documentation: /Coding%20Milestones/PoC2023q1/outline/ -->
+# <!-- - Contributing: /Contribution%20guidelines/CONTRIBUTING/ -->

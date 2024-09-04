@@ -9,16 +9,16 @@
 <link href="../contributor/" rel="prev"/>
 <link href="../release/" rel="next"/>
 <link href="../../favicons/favicon.ico" rel="icon"/>
-<meta content="mkdocs-1.4.2, mkdocs-material-9.1.0" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.5.34" name="generator"/>
 <title>Packaging - KubeStellar</title>
-<link href="../../assets/stylesheets/main.402914a4.min.css" rel="stylesheet"/>
-<link href="../../assets/stylesheets/palette.a0c5b2b5.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/main.35f28582.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css?family=SapceMono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
 <style>:root{--md-text-font:"SapceMono";--md-code-font:"Roboto Mono"}</style>
 <link href="../../stylesheets/kubestellar.css" rel="stylesheet"/>
-<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
-<script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-SR5TD1CXY7"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-SR5TD1CXY7",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-SR5TD1CXY7",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-SR5TD1CXY7"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-SR5TD1CXY7",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-SR5TD1CXY7",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
 <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
 <meta content="QZFIkG95fMxODWgQDK2OUn73HUIu9fZmuTer-ZA4UwI" name="google-site-verification">
 <!-- Determine title -->
@@ -40,8 +40,7 @@
     href="../../assets/stylesheets/overrides.css"
   />-->
 </meta></meta></meta></head>
-<body data-md-color-accent="" data-md-color-primary="" data-md-color-scheme="default" dir="ltr">
-<script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
 <input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
@@ -54,7 +53,7 @@
 <aside class="md-banner">
 <div class="md-banner__inner md-grid md-typeset">
 <button aria-label="Don't show this again" class="md-banner__button md-icon">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
 </button>
 <!-- Extra stylesing -->
 <style>
@@ -76,7 +75,7 @@
 </p>
 </a>
 </div>
-<script>var content,el=document.querySelector("[data-md-component=announce]");el&&(content=el.querySelector(".md-typeset"),__md_hash(content.innerHTML)===__md_get("__announce")&&(el.hidden=!0))</script>
+<script>var el=document.querySelector("[data-md-component=announce]");if(el){var content=el.querySelector(".md-typeset");__md_hash(content.innerHTML)===__md_get("__announce")&&(el.hidden=!0)}</script>
 </aside>
 </div>
 <div data-md-color-scheme="default" data-md-component="outdated" hidden="">
@@ -98,7 +97,7 @@
 <img alt="logo" src="../../logo.png"/>
 </a>
 <label class="md-header__button md-icon" for="__drawer">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
 </label>
 <div class="md-header__title" data-md-component="header-title">
 <div class="md-header__ellipsis">
@@ -117,21 +116,22 @@
 </div>
 </div>
 <form class="md-header__option" data-md-component="palette">
-<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
-<label class="md-header__button md-icon" for="__palette_3" hidden="" title="Switch to dark mode">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z"></path></svg>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"></path></svg>
 </label>
-<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="" data-md-color-scheme="default" id="__palette_2" name="__palette" type="radio"/>
-<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
 </label>
-<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="cyan" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="light-blue" data-md-color-scheme="slate" id="__palette_3" name="__palette" type="radio"/>
-<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to system preference">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="cyan" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="light-blue" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to system preference">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
 </label>
 </form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
 <label class="md-header__button md-icon" for="__search">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
 </label>
 <div class="md-search" data-md-component="search" role="dialog">
 <label class="md-search__overlay" for="__search"></label>
@@ -139,17 +139,17 @@
 <form class="md-search__form" name="search">
 <input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
 <label class="md-search__icon md-icon" for="__search">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
 </label>
 <nav aria-label="Search" class="md-search__options">
 <button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
 </button>
 </nav>
 </form>
 <div class="md-search__output">
-<div class="md-search__scrollwrap" data-md-scrollfix="">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
 <div class="md-search-result" data-md-component="search-result">
 <div class="md-search-result__meta">
             Initializing search
@@ -163,7 +163,7 @@
 <div class="md-header__source">
 <a class="md-source" data-md-component="source" href="https://github.com/kubestellar/kubestellar" title="Go to repository">
 <div class="md-source__icon md-icon">
-<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"></path></svg>
 </div>
 <div class="md-source__repository">
     GitHub
@@ -186,38 +186,73 @@
 <ul class="md-tabs__list">
 <li class="md-tabs__item">
 <a class="md-tabs__link" href="../..">
-        Welcome
-      </a>
+          
+  
+    
+  
+  Welcome
+
+        </a>
 </li>
 <li class="md-tabs__item">
 <a class="md-tabs__link" href="../../readme/">
-        What is KubeStellar?
-      </a>
+          
+  
+    
+  
+  What is KubeStellar?
+
+        </a>
 </li>
 <li class="md-tabs__item">
 <a class="md-tabs__link" href="../get-started/">
-      Getting Started
-    </a>
+        
+  
+    
+  
+  Getting Started
+
+      </a>
 </li>
 <li class="md-tabs__item">
 <a class="md-tabs__link" href="../user-guide-intro/">
-        User Guide
-      </a>
+          
+  
+    
+  
+  User Guide
+
+        </a>
 </li>
-<li class="md-tabs__item">
-<a class="md-tabs__link md-tabs__link--active" href="../contribute/">
-        Contributing
-      </a>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../contribute/">
+          
+  
+    
+  
+  Contributing
+
+        </a>
 </li>
 <li class="md-tabs__item">
 <a class="md-tabs__link" href="../../Community/_index/">
-        Community
-      </a>
+          
+  
+    
+  
+  Community
+
+        </a>
 </li>
 <li class="md-tabs__item">
 <a class="md-tabs__link" href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank">
-      Blog
-    </a>
+        
+  
+    
+  
+  Blog
+
+      </a>
 </li>
 </ul>
 </div>
@@ -237,7 +272,7 @@
 <div class="md-nav__source">
 <a class="md-source" data-md-component="source" href="https://github.com/kubestellar/kubestellar" title="Go to repository">
 <div class="md-source__icon md-icon">
-<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"></path></svg>
 </div>
 <div class="md-source__repository">
     GitHub
@@ -247,14 +282,18 @@
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_1" type="checkbox"/>
-<div class="md-nav__link md-nav__link--index">
-<a href="../..">Welcome</a>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../..">
+<span class="md-ellipsis">
+    Welcome
+  </span>
+</a>
 </div>
 <nav aria-expanded="false" aria-labelledby="__nav_1_label" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_1">
 <span class="md-nav__icon md-icon"></span>
-          Welcome
-        </label>
+            Welcome
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 </ul>
 </nav>
@@ -262,133 +301,169 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
 <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-          What is KubeStellar?
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    What is KubeStellar?
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_2">
 <span class="md-nav__icon md-icon"></span>
-          What is KubeStellar?
-        </label>
+            What is KubeStellar?
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../readme/">
-        Overview
-      </a>
+<span class="md-ellipsis">
+    Overview
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../architecture/">
-        Architecture
-      </a>
+<span class="md-ellipsis">
+    Architecture
+  </span>
+</a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_2_3" type="checkbox"/>
 <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
-          Related
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Related
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_2_3_label" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_2_3">
 <span class="md-nav__icon md-icon"></span>
-          Related
-        </label>
+            Related
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../kubeflex-intro/">
-        KubeFlex
-      </a>
+<span class="md-ellipsis">
+    KubeFlex
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../galaxy-intro/">
-        KubeStellar Galaxy
-      </a>
+<span class="md-ellipsis">
+    KubeStellar Galaxy
+  </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../release-notes/">
-        Release-notes
-      </a>
+<span class="md-ellipsis">
+    Release-notes
+  </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../get-started/">
-        Getting Started
-      </a>
+<span class="md-ellipsis">
+    Getting Started
+  </span>
+</a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
-          User Guide
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    User Guide
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_4">
 <span class="md-nav__icon md-icon"></span>
-          User Guide
-        </label>
+            User Guide
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../user-guide-intro/">
-        Guide Overview
-      </a>
+<span class="md-ellipsis">
+    Guide Overview
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../get-started/">
-        Getting Started
-      </a>
+<span class="md-ellipsis">
+    Getting Started
+  </span>
+</a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_4_3" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
-          General Setup
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    General Setup
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_4_3_label" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_4_3">
 <span class="md-nav__icon md-icon"></span>
-          General Setup
-        </label>
+            General Setup
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../setup-overview/">
-        Overview
-      </a>
+<span class="md-ellipsis">
+    Overview
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../setup-limitations/">
-        Setup limitations
-      </a>
+<span class="md-ellipsis">
+    Setup limitations
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../pre-reqs/">
-        Prerequisites
-      </a>
+<span class="md-ellipsis">
+    Prerequisites
+  </span>
+</a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_4_3_4" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4_3_4" id="__nav_4_3_4_label" tabindex="0">
-          KubeFlex Hosting cluster
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    KubeFlex Hosting cluster
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_4_3_4_label" class="md-nav" data-md-level="3">
 <label class="md-nav__title" for="__nav_4_3_4">
 <span class="md-nav__icon md-icon"></span>
-          KubeFlex Hosting cluster
-        </label>
+            KubeFlex Hosting cluster
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../acquire-hosting-cluster/">
-        Acquire cluster for KubeFlex Hosting
-      </a>
+<span class="md-ellipsis">
+    Acquire cluster for KubeFlex Hosting
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../init-hosting-cluster/">
-        Initialize KubeFlex Hosting cluster
-      </a>
+<span class="md-ellipsis">
+    Initialize KubeFlex Hosting cluster
+  </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -396,54 +471,68 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_4_3_5" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4_3_5" id="__nav_4_3_5_label" tabindex="0">
-          Core Spaces
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Core Spaces
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_4_3_5_label" class="md-nav" data-md-level="3">
 <label class="md-nav__title" for="__nav_4_3_5">
 <span class="md-nav__icon md-icon"></span>
-          Core Spaces
-        </label>
+            Core Spaces
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../its/">
-        Inventory and Transport Spaces
-      </a>
+<span class="md-ellipsis">
+    Inventory and Transport Spaces
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../wds/">
-        Workload Description Spaces
-      </a>
+<span class="md-ellipsis">
+    Workload Description Spaces
+  </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../core-chart/">
-        Core Helm chart
-      </a>
+<span class="md-ellipsis">
+    Core Helm chart
+  </span>
+</a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_4_3_7" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4_3_7" id="__nav_4_3_7_label" tabindex="0">
-          Workload Execution Clusters
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Workload Execution Clusters
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_4_3_7_label" class="md-nav" data-md-level="3">
 <label class="md-nav__title" for="__nav_4_3_7">
 <span class="md-nav__icon md-icon"></span>
-          Workload Execution Clusters
-        </label>
+            Workload Execution Clusters
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../wec/">
-        About Workload Execution Clusters
-      </a>
+<span class="md-ellipsis">
+    About Workload Execution Clusters
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../wec-registration/">
-        Register a Workload Execution Cluster
-      </a>
+<span class="md-ellipsis">
+    Register a Workload Execution Cluster
+  </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -454,89 +543,113 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_4_4" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
-          Usage
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Usage
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_4_4_label" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_4_4">
 <span class="md-nav__icon md-icon"></span>
-          Usage
-        </label>
+            Usage
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../usage-limitations/">
-        Usage limitations
-      </a>
+<span class="md-ellipsis">
+    Usage limitations
+  </span>
+</a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_4_4_2" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4_4_2" id="__nav_4_4_2_label" tabindex="0">
-          KubeStellar API
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    KubeStellar API
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_4_4_2_label" class="md-nav" data-md-level="3">
 <label class="md-nav__title" for="__nav_4_4_2">
 <span class="md-nav__icon md-icon"></span>
-          KubeStellar API
-        </label>
+            KubeStellar API
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../control/">
-        Overview
-      </a>
+<span class="md-ellipsis">
+    Overview
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1">
-        API reference (new tab)
-      </a>
+<span class="md-ellipsis">
+    API reference (new tab)
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../binding/">
-        Binding
-      </a>
+<span class="md-ellipsis">
+    Binding
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../transforming/">
-        Transforming desired state
-      </a>
+<span class="md-ellipsis">
+    Transforming desired state
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../combined-status/">
-        Combining reported state
-      </a>
+<span class="md-ellipsis">
+    Combining reported state
+  </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../example-scenarios/">
-        Example Scenarios
-      </a>
+<span class="md-ellipsis">
+    Example Scenarios
+  </span>
+</a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_4_4_4" type="checkbox"/>
 <label class="md-nav__link" for="__nav_4_4_4" id="__nav_4_4_4_label" tabindex="0">
-          Third-party integrations
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Third-party integrations
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_4_4_4_label" class="md-nav" data-md-level="3">
 <label class="md-nav__title" for="__nav_4_4_4">
 <span class="md-nav__icon md-icon"></span>
-          Third-party integrations
-        </label>
+            Third-party integrations
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../argo-to-wds1/">
-        ArgoCD to WDS
-      </a>
+<span class="md-ellipsis">
+    ArgoCD to WDS
+  </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../troubleshooting/">
-        Troubleshooting
-      </a>
+<span class="md-ellipsis">
+    Troubleshooting
+  </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -544,64 +657,82 @@
 </ul>
 </nav>
 </li>
-<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
 <input checked="" class="md-nav__toggle md-toggle" id="__nav_5" type="checkbox"/>
-<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-          Contributing
-          <span class="md-nav__icon md-icon"></span>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+<span class="md-ellipsis">
+    Contributing
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="true" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_5">
 <span class="md-nav__icon md-icon"></span>
-          Contributing
-        </label>
+            Contributing
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../contribute/">
-        How to join in
-      </a>
+<span class="md-ellipsis">
+    How to join in
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Contribution%20guidelines/coc/">
-        Code of Conduct
-      </a>
+<span class="md-ellipsis">
+    Code of Conduct
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Contribution%20guidelines/LICENSE/">
-        License
-      </a>
+<span class="md-ellipsis">
+    License
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Contribution%20guidelines/governance/">
-        Governance
-      </a>
+<span class="md-ellipsis">
+    Governance
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Contribution%20guidelines/onboarding/">
-        Onboarding
-      </a>
+<span class="md-ellipsis">
+    Onboarding
+  </span>
+</a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_5_6" type="checkbox"/>
 <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
-          Website
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Website
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_5_6_label" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_5_6">
 <span class="md-nav__icon md-icon"></span>
-          Website
-        </label>
+            Website
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Contribution%20guidelines/operations/document-management/">
-        Overview
-      </a>
+<span class="md-ellipsis">
+    Overview
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Contribution%20guidelines/operations/testing-doc-prs/">
-        Testing website PRs
-      </a>
+<span class="md-ellipsis">
+    Testing website PRs
+  </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -609,24 +740,30 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_5_7" type="checkbox"/>
 <label class="md-nav__link" for="__nav_5_7" id="__nav_5_7_label" tabindex="0">
-          Security
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Security
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_5_7_label" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_5_7">
 <span class="md-nav__icon md-icon"></span>
-          Security
-        </label>
+            Security
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Contribution%20guidelines/security/security/">
-        Policy
-      </a>
+<span class="md-ellipsis">
+    Policy
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Contribution%20guidelines/security/security_contacts/">
-        Contacts
-      </a>
+<span class="md-ellipsis">
+    Contacts
+  </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -634,29 +771,37 @@
 <li class="md-nav__item md-nav__item--active md-nav__item--nested">
 <input checked="" class="md-nav__toggle md-toggle" id="__nav_5_8" type="checkbox"/>
 <label class="md-nav__link" for="__nav_5_8" id="__nav_5_8_label" tabindex="0">
-          Contribution Notes
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Contribution Notes
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="true" aria-labelledby="__nav_5_8_label" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_5_8">
 <span class="md-nav__icon md-icon"></span>
-          Contribution Notes
-        </label>
+            Contribution Notes
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../contributor/">
-        For Contributors
-      </a>
+<span class="md-ellipsis">
+    For Contributors
+  </span>
+</a>
 </li>
 <li class="md-nav__item md-nav__item--active">
 <input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
 <label class="md-nav__link md-nav__link--active" for="__toc">
-          Packaging
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Packaging
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <a class="md-nav__link md-nav__link--active" href="./">
-        Packaging
-      </a>
+<span class="md-ellipsis">
+    Packaging
+  </span>
+</a>
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">
 <span class="md-nav__icon md-icon"></span>
@@ -665,156 +810,217 @@
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#outline-of-github-repositories">
-    Outline of GitHub repositories
-  </a>
+<span class="md-ellipsis">
+      Outline of GitHub repositories
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubeflex">
-    KubeFlex
-  </a>
+<span class="md-ellipsis">
+      KubeFlex
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#ocm-status-addon">
-    OCM Status Addon
-  </a>
+<span class="md-ellipsis">
+      OCM Status Addon
+    </span>
+</a>
 <nav aria-label="OCM Status Addon" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#outline-of-ocm-status-addon-publishing">
-    Outline of OCM status addon publishing
-  </a>
+<span class="md-ellipsis">
+      Outline of OCM status addon publishing
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#ocm-status-addon-container-image">
-    OCM status addon container image
-  </a>
+<span class="md-ellipsis">
+      OCM status addon container image
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#ocm-status-addon-helm-chart">
-    OCM status addon Helm chart
-  </a>
+<span class="md-ellipsis">
+      OCM status addon Helm chart
+    </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#ocm-transport-plugin">
-    OCM Transport Plugin
-  </a>
+<span class="md-ellipsis">
+      OCM Transport Plugin
+    </span>
+</a>
 <nav aria-label="OCM Transport Plugin" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#ocm-transport-container-image">
-    OCM Transport container image
-  </a>
+<a class="md-nav__link" href="#ocm-transport-controller-container-image">
+<span class="md-ellipsis">
+      OCM Transport Controller container image
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-transport-controller-helm-chart">
+<span class="md-ellipsis">
+      OCM Transport Controller Helm chart
+    </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubestellar">
-    KubeStellar
-  </a>
+<span class="md-ellipsis">
+      KubeStellar
+    </span>
+</a>
 <nav aria-label="KubeStellar" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#warning">
-    WARNING
-  </a>
+<span class="md-ellipsis">
+      WARNING
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#outline-of-publishing">
-    Outline of publishing
-  </a>
+<span class="md-ellipsis">
+      Outline of publishing
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#local-copy-of-kubestellar-git-repo">
-    Local copy of KubeStellar git repo
-  </a>
+<span class="md-ellipsis">
+      Local copy of KubeStellar git repo
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#derived-files">
-    Derived files
-  </a>
+<span class="md-ellipsis">
+      Derived files
+    </span>
+</a>
 <nav aria-label="Derived files" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#files-generated-by-controller-gen">
-    Files generated by controller-gen
-  </a>
+<span class="md-ellipsis">
+      Files generated by controller-gen
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#files-generated-by-code-generator">
-    Files generated by code-generator
-  </a>
+<span class="md-ellipsis">
+      Files generated by code-generator
+    </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubestellar-controller-manager-container-image">
-    KubeStellar controller-manager container image
-  </a>
+<span class="md-ellipsis">
+      KubeStellar controller-manager container image
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#clusteradm-container-image">
-    clusteradm container image
-  </a>
+<span class="md-ellipsis">
+      clusteradm container image
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#helm-cli-container-image">
-    Helm CLI container image
-  </a>
+<span class="md-ellipsis">
+      Helm CLI container image
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubestellar-core-helm-chart">
-    KubeStellar core Helm chart
-  </a>
+<span class="md-ellipsis">
+      KubeStellar core Helm chart
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubestellar-controller-manager-helm-chart">
-    KubeStellar controller-manager Helm Chart
-  </a>
+<span class="md-ellipsis">
+      KubeStellar controller-manager Helm Chart
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubeflex-postcreatehooks">
-    KubeFlex PostCreateHooks
-  </a>
+<span class="md-ellipsis">
+      KubeFlex PostCreateHooks
+    </span>
+</a>
 <nav aria-label="KubeFlex PostCreateHooks" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#ocm-postcreatehook">
-    ocm PostCreateHook
-  </a>
+<span class="md-ellipsis">
+      ocm PostCreateHook
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubestellar-postcreatehook">
-    kubestellar PostCreateHook
-  </a>
+<span class="md-ellipsis">
+      kubestellar PostCreateHook
+    </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#scripts-and-instructions">
-    Scripts and instructions
-  </a>
+<span class="md-ellipsis">
+      Scripts and instructions
+    </span>
+</a>
 <nav aria-label="Scripts and instructions" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#example-setup-instructions">
-    Example setup instructions
-  </a>
+<span class="md-ellipsis">
+      Example setup instructions
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#e2e-setup-for-testing-a-release">
-    E2E setup for testing a release
-  </a>
+<span class="md-ellipsis">
+      E2E setup for testing a release
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#e2e-setup-for-testing-local-copyversion">
-    E2E setup for testing local copy/version
-  </a>
+<span class="md-ellipsis">
+      E2E setup for testing local copy/version
+    </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -824,31 +1030,41 @@
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#amalgamated-graph">
-    Amalgamated graph
-  </a>
+<span class="md-ellipsis">
+      Amalgamated graph
+    </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../release/">
-        Release Process
-      </a>
+<span class="md-ellipsis">
+    Release Process
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../release-testing/">
-        Release Testing
-      </a>
+<span class="md-ellipsis">
+    Release Testing
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Contribution%20guidelines/CONTRIBUTING/">
-        Guidelines
-      </a>
+<span class="md-ellipsis">
+    Guidelines
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../pr-signoff/">
-        Sign-off on Contributions
-      </a>
+<span class="md-ellipsis">
+    Sign-off on Contributions
+  </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -859,71 +1075,93 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_6" type="checkbox"/>
 <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
-          Community
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Community
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_6">
 <span class="md-nav__icon md-icon"></span>
-          Community
-        </label>
+            Community
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Community/_index/">
-        Get Involved
-      </a>
+<span class="md-ellipsis">
+    Get Involved
+  </span>
+</a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_6_2" type="checkbox"/>
 <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
-          Contact Us
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Contact Us
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_6_2_label" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_6_2">
 <span class="md-nav__icon md-icon"></span>
-          Contact Us
-        </label>
+            Contact Us
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://kubestellar.io/join_us">
-        Mailing List
-      </a>
+<span class="md-ellipsis">
+    Mailing List
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://kubestellar.io/agenda">
-        Community Meeting Agenda (join mailing list first)
-      </a>
+<span class="md-ellipsis">
+    Community Meeting Agenda (join mailing list first)
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://kubestellar.io/slack">
-        Slack
-      </a>
+<span class="md-ellipsis">
+    Slack
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://kubestellar.io/blog">
-        Medium Blog
-      </a>
+<span class="md-ellipsis">
+    Medium Blog
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://kubestellar.io/tv">
-        YouTube Channel
-      </a>
+<span class="md-ellipsis">
+    YouTube Channel
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://kubestellar.io/linkedin">
-        LinkedIn
-      </a>
+<span class="md-ellipsis">
+    LinkedIn
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://www.reddit.com/r/kubestellar/">
-        Reddit
-      </a>
+<span class="md-ellipsis">
+    Reddit
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS">
-        Google Drive
-      </a>
+<span class="md-ellipsis">
+    Google Drive
+  </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -931,44 +1169,58 @@
 <li class="md-nav__item md-nav__item--nested">
 <input class="md-nav__toggle md-toggle" id="__nav_6_3" type="checkbox"/>
 <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
-          Partners
-          <span class="md-nav__icon md-icon"></span>
+<span class="md-ellipsis">
+    Partners
+  </span>
+<span class="md-nav__icon md-icon"></span>
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_6_3_label" class="md-nav" data-md-level="2">
 <label class="md-nav__title" for="__nav_6_3">
 <span class="md-nav__icon md-icon"></span>
-          Partners
-        </label>
+            Partners
+          </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Community/partners/argocd/">
-        ArgoCD
-      </a>
+<span class="md-ellipsis">
+    ArgoCD
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Community/partners/turbonomic/">
-        Turbonomic
-      </a>
+<span class="md-ellipsis">
+    Turbonomic
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Community/partners/mvi/">
-        MVI
-      </a>
+<span class="md-ellipsis">
+    MVI
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Community/partners/fluxcd/">
-        FluxCD
-      </a>
+<span class="md-ellipsis">
+    FluxCD
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Community/partners/openziti/">
-        OpenZiti
-      </a>
+<span class="md-ellipsis">
+    OpenZiti
+  </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../Community/partners/kyverno/">
-        Kyverno
-      </a>
+<span class="md-ellipsis">
+    Kyverno
+  </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -978,8 +1230,10 @@
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank">
-        Blog
-      </a>
+<span class="md-ellipsis">
+    Blog
+  </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -997,156 +1251,217 @@
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#outline-of-github-repositories">
-    Outline of GitHub repositories
-  </a>
+<span class="md-ellipsis">
+      Outline of GitHub repositories
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubeflex">
-    KubeFlex
-  </a>
+<span class="md-ellipsis">
+      KubeFlex
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#ocm-status-addon">
-    OCM Status Addon
-  </a>
+<span class="md-ellipsis">
+      OCM Status Addon
+    </span>
+</a>
 <nav aria-label="OCM Status Addon" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#outline-of-ocm-status-addon-publishing">
-    Outline of OCM status addon publishing
-  </a>
+<span class="md-ellipsis">
+      Outline of OCM status addon publishing
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#ocm-status-addon-container-image">
-    OCM status addon container image
-  </a>
+<span class="md-ellipsis">
+      OCM status addon container image
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#ocm-status-addon-helm-chart">
-    OCM status addon Helm chart
-  </a>
+<span class="md-ellipsis">
+      OCM status addon Helm chart
+    </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#ocm-transport-plugin">
-    OCM Transport Plugin
-  </a>
+<span class="md-ellipsis">
+      OCM Transport Plugin
+    </span>
+</a>
 <nav aria-label="OCM Transport Plugin" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#ocm-transport-container-image">
-    OCM Transport container image
-  </a>
+<a class="md-nav__link" href="#ocm-transport-controller-container-image">
+<span class="md-ellipsis">
+      OCM Transport Controller container image
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ocm-transport-controller-helm-chart">
+<span class="md-ellipsis">
+      OCM Transport Controller Helm chart
+    </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubestellar">
-    KubeStellar
-  </a>
+<span class="md-ellipsis">
+      KubeStellar
+    </span>
+</a>
 <nav aria-label="KubeStellar" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#warning">
-    WARNING
-  </a>
+<span class="md-ellipsis">
+      WARNING
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#outline-of-publishing">
-    Outline of publishing
-  </a>
+<span class="md-ellipsis">
+      Outline of publishing
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#local-copy-of-kubestellar-git-repo">
-    Local copy of KubeStellar git repo
-  </a>
+<span class="md-ellipsis">
+      Local copy of KubeStellar git repo
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#derived-files">
-    Derived files
-  </a>
+<span class="md-ellipsis">
+      Derived files
+    </span>
+</a>
 <nav aria-label="Derived files" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#files-generated-by-controller-gen">
-    Files generated by controller-gen
-  </a>
+<span class="md-ellipsis">
+      Files generated by controller-gen
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#files-generated-by-code-generator">
-    Files generated by code-generator
-  </a>
+<span class="md-ellipsis">
+      Files generated by code-generator
+    </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubestellar-controller-manager-container-image">
-    KubeStellar controller-manager container image
-  </a>
+<span class="md-ellipsis">
+      KubeStellar controller-manager container image
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#clusteradm-container-image">
-    clusteradm container image
-  </a>
+<span class="md-ellipsis">
+      clusteradm container image
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#helm-cli-container-image">
-    Helm CLI container image
-  </a>
+<span class="md-ellipsis">
+      Helm CLI container image
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubestellar-core-helm-chart">
-    KubeStellar core Helm chart
-  </a>
+<span class="md-ellipsis">
+      KubeStellar core Helm chart
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubestellar-controller-manager-helm-chart">
-    KubeStellar controller-manager Helm Chart
-  </a>
+<span class="md-ellipsis">
+      KubeStellar controller-manager Helm Chart
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubeflex-postcreatehooks">
-    KubeFlex PostCreateHooks
-  </a>
+<span class="md-ellipsis">
+      KubeFlex PostCreateHooks
+    </span>
+</a>
 <nav aria-label="KubeFlex PostCreateHooks" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#ocm-postcreatehook">
-    ocm PostCreateHook
-  </a>
+<span class="md-ellipsis">
+      ocm PostCreateHook
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kubestellar-postcreatehook">
-    kubestellar PostCreateHook
-  </a>
+<span class="md-ellipsis">
+      kubestellar PostCreateHook
+    </span>
+</a>
 </li>
 </ul>
 </nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#scripts-and-instructions">
-    Scripts and instructions
-  </a>
+<span class="md-ellipsis">
+      Scripts and instructions
+    </span>
+</a>
 <nav aria-label="Scripts and instructions" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#example-setup-instructions">
-    Example setup instructions
-  </a>
+<span class="md-ellipsis">
+      Example setup instructions
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#e2e-setup-for-testing-a-release">
-    E2E setup for testing a release
-  </a>
+<span class="md-ellipsis">
+      E2E setup for testing a release
+    </span>
+</a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#e2e-setup-for-testing-local-copyversion">
-    E2E setup for testing local copy/version
-  </a>
+<span class="md-ellipsis">
+      E2E setup for testing local copy/version
+    </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -1156,8 +1471,10 @@
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#amalgamated-graph">
-    Amalgamated graph
-  </a>
+<span class="md-ellipsis">
+      Amalgamated graph
+    </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -1167,10 +1484,10 @@
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
 <a class="md-content__button md-icon" href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/packaging.md" title="Edit this page">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
 </a>
 <a class="md-content__button md-icon" href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/packaging.md" title="View source of this page">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
 </a>
 <h1 id="packaging-and-delivery">Packaging and Delivery<a class="headerlink" href="#packaging-and-delivery" title="Permanent link">#</a></h1>
 <h2 id="outline-of-github-repositories">Outline of GitHub repositories<a class="headerlink" href="#outline-of-github-repositories" title="Permanent link">#</a></h2>
@@ -1214,10 +1531,13 @@ prints.</p>
 <p>The OCM Status Add-On Controller is delivered by a Helm chart at <a href="https://github.com/orgs/kubestellar/packages/container/package/ocm-status-addon-chart">ghcr.io/kubestellar/ocm-status-addon-chart</a>. The chart references the container image.</p>
 <p>By our development practices and doing doing any manual hacks, we maintain the association that the OCI image tagged <code>v$VERSION</code> contains a Helm chart that declares its <code>version</code> and its <code>appVersion</code> to be <code>v$VERSION</code> and the templates in that chart include a Deployment for the OCM Status Add-On Agent using the container image <code>ghcr.io/kubestellar/ocm-status-addon:$VERSION</code>.</p>
 <h2 id="ocm-transport-plugin">OCM Transport Plugin<a class="headerlink" href="#ocm-transport-plugin" title="Permanent link">#</a></h2>
-<p>The source is the GitHub repo <a href="https://github.com/kubestellar/ocm-transport-plugin">github.com/kubestellar/ocm-transport-plugin</a></p>
-<h3 id="ocm-transport-container-image">OCM Transport container image<a class="headerlink" href="#ocm-transport-container-image" title="Permanent link">#</a></h3>
-<p>This appears at <a href="https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller">ghcr.io/kubestellar/ocm-transport-plugin/transport-controller</a>.</p>
+<p>This thing is in the midst of being moved from a separate repository into the kubestellar repository. The separate repository is <a href="https://github.com/kubestellar/ocm-transport-plugin">github.com/kubestellar/ocm-transport-plugin</a>.</p>
+<p>The primary product is the OCM Transport Controller, built from generic transport controller code plus code specific to using OCM for transport.</p>
+<h3 id="ocm-transport-controller-container-image">OCM Transport Controller container image<a class="headerlink" href="#ocm-transport-controller-container-image" title="Permanent link">#</a></h3>
+<p>This appears at <a href="https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller">ghcr.io/kubestellar/ocm-transport-plugin/transport-controller</a>. This will need to move to something like <code>ghcr.io/kubestellar/kubestellar/ocm-transport-controller</code>.</p>
 <p>TODO: document how the image is built and published, including explain versioning.</p>
+<h3 id="ocm-transport-controller-helm-chart">OCM Transport Controller Helm chart<a class="headerlink" href="#ocm-transport-controller-helm-chart" title="Permanent link">#</a></h3>
+<p>This appears at <a href="https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Fchart%2Focm-transport-plugin">ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin</a>. This will need to move to something like <code>ghcr.io/kubestellar/kubestellar/ocm-transport-controller</code>.</p>
 <h2 id="kubestellar">KubeStellar<a class="headerlink" href="#kubestellar" title="Permanent link">#</a></h2>
 <h3 id="warning">WARNING<a class="headerlink" href="#warning" title="Permanent link">#</a></h3>
 <p>Literal KubeStellar release numbers appear here, and are historical. The version of this document in a given release does not mention that release. See <a href="../release/">the release process</a> for more details on what self-references are and are not handled.</p>
@@ -1225,10 +1545,9 @@ prints.</p>
 <p>The following diagram shows most of it. For simplicity, this omits the clusteradm and the Helm CLI container images.</p>
 <div class="mermaid">flowchart LR
     osa_hc_repo[published OSA Helm Chart]
-    otp_code["OTP source in GitHub"]
     subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
-    gtc_code["generic transport<br/>controller code"]
+    otc_code[OTC source code]
     kcm_hc_src[KCM Helm chart source]
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
@@ -1245,6 +1564,7 @@ prints.</p>
     kcm_hc_repo -.-&gt; kcm_ctr_image
     ks_pch -.-&gt; kcm_hc_repo
     ks_pch -.-&gt; otp_hc_repo[published OTP Helm chart]
+    otp_hc_repo -.-&gt; otc_ctr_image_ur["OTC container image<br/>(original)"]
     ksc_hc_repo[published KS Core chart] --&gt; ksc_hc_src
     ksc_hc_src -.-&gt; osa_hc_repo
     ksc_hc_src -.-&gt; otp_hc_repo
@@ -1260,8 +1580,7 @@ prints.</p>
     e2e_local -.-&gt; ocm_pch
     e2e_local -.-&gt; kcm_code
     e2e_local -.-&gt; kcm_hc_src
-    e2e_local -.-&gt; gtc_code
-    e2e_local -.-&gt; otp_code
+    e2e_local -.-&gt; otc_code
     e2e_local -.-&gt; KubeFlex
     e2e_release -.-&gt; ocm_pch
     e2e_release -.-&gt; ks_pch
@@ -1369,7 +1688,7 @@ built from.</p>
 <p><code>its</code> defines a Job with two containers. One container uses the clusteradm container image to initialize the target cluster as an OCM "hub". The other container uses the Helm CLI container image to instantiate the <a href="#ocm-status-addon-helm-chart">OCM Status Addon Helm chart</a>. The version to use is defined in the <code>values.yaml</code> of the core chart. This PCH is used for every requested ITS.</p>
 </li>
 <li>
-<p><code>wds</code> defines a Job with two containers. One container uses the Helm CLI image to instantiate the <a href="#kubestellar-controller-manager-helm-chart">KubeStellar controller-manager Helm chart</a>. The other container uses the Helm CLI image to instantiate the OCM Transport Helm chart. For both of those subsidiary charts, the version to use is defined in the <code>values.yaml</code> of the core chart. This PCH is used for every requested WDS.</p>
+<p><code>wds</code> defines a Job with two containers. One container uses the Helm CLI image to instantiate the <a href="#kubestellar-controller-manager-helm-chart">KubeStellar controller-manager Helm chart</a>. The other container uses the Helm CLI image to instantiate the <a href="#ocm-transport-controller-helm-chart">OCM Transport Helm chart</a>. For both of those subsidiary charts, the version to use is defined in the <code>values.yaml</code> of the core chart. This PCH is used for every requested WDS.</p>
 </li>
 </ul>
 <p>By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged <code>$VERSION</code> contains a Helm chart that declares its <code>version</code> and its <code>appVersion</code> to be <code>$VERSION</code> and instantiates version <code>$VERSION</code> of <a href="#kubestellar-controller-manager-helm-chart">the KubeStellar controller-manager Helm chart</a>.</p>
@@ -1414,7 +1733,10 @@ One uses <a href="#helm-cli-container-image">the Helm CLI image</a> to instantia
 <p>Again, omitting clusteradm and Helm CLI container images for simplicity.</p>
 <p>TODO: finish this</p>
 <div class="mermaid">flowchart LR
-    otp_code["OTP source in GitHub"]
+    subgraph otp_repo["ocm-transport-plugin@GitHub"]
+    otp_code_ur["OTP source code<br/>(original)"]
+    otp_hc_src[OTC Helm chart source]
+    end
     subgraph osa_repo["ocm-status-addon@GitHub"]
     osa_code[OSA source code]
     osa_hc_src[OSA Helm chart source]
@@ -1426,6 +1748,7 @@ One uses <a href="#helm-cli-container-image">the Helm CLI image</a> to instantia
     subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
     gtc_code["generic transport<br/>controller code"]
+    otp_code["OTP source code<br/>(moved)"]
     kcm_hc_src[KCM Helm chart source]
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
@@ -1443,6 +1766,10 @@ One uses <a href="#helm-cli-container-image">the Helm CLI image</a> to instantia
     kcm_hc_repo -.-&gt; kcm_ctr_image
     ks_pch -.-&gt; kcm_hc_repo
     ks_pch -.-&gt; otp_hc_repo[published OTP Helm chart]
+    otp_hc_repo -.-&gt; otc_ctr_image_ur["OTC container image<br/>(original)"]
+    otp_hc_repo --&gt; otp_hc_src
+    otc_ctr_image_ur --&gt; gtc_code
+    otc_ctr_image_ur --&gt; otp_code_ur
     ksc_hc_repo[published KS Core chart] --&gt; ksc_hc_src
     ksc_hc_src -.-&gt; osa_hc_repo
     ksc_hc_src -.-&gt; kcm_hc_repo
@@ -1480,10 +1807,10 @@ keeping <code>main</code> always a working system?</p>
 <div class="md-feedback__inner">
 <div class="md-feedback__list">
 <button class="md-feedback__icon md-icon" data-md-value="1" title="This page was helpful" type="submit">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"></path></svg>
 </button>
 <button class="md-feedback__icon md-icon" data-md-value="0" title="This page could be improved" type="submit">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"></path></svg>
 </button>
 </div>
 <div class="md-feedback__note">
@@ -1507,34 +1834,35 @@ keeping <code>main</code> always a working system?</p>
 </form>
 </article>
 </div>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
 </div>
 </main>
 <footer class="md-footer">
 <nav aria-label="Footer" class="md-footer__inner md-grid">
-<a aria-label="Previous: For Contributors" class="md-footer__link md-footer__link--prev" href="../contributor/" rel="prev">
+<a aria-label="Previous: For Contributors" class="md-footer__link md-footer__link--prev" href="../contributor/">
 <div class="md-footer__button md-icon">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
 </div>
 <div class="md-footer__title">
-<div class="md-ellipsis">
 <span class="md-footer__direction">
-                  Previous
-                </span>
+                Previous
+              </span>
+<div class="md-ellipsis">
                 For Contributors
               </div>
 </div>
 </a>
-<a aria-label="Next: Release Process" class="md-footer__link md-footer__link--next" href="../release/" rel="next">
+<a aria-label="Next: Release Process" class="md-footer__link md-footer__link--next" href="../release/">
 <div class="md-footer__title">
-<div class="md-ellipsis">
 <span class="md-footer__direction">
-                  Next
-                </span>
+                Next
+              </span>
+<div class="md-ellipsis">
                 Release Process
               </div>
 </div>
 <div class="md-footer__button md-icon">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
 </div>
 </a>
 </nav>
@@ -1555,8 +1883,8 @@ keeping <code>main</code> always a working system?</p>
 <div class="md-dialog" data-md-component="dialog">
 <div class="md-dialog__inner md-typeset"></div>
 </div>
-<script id="__config" type="application/json">{"base": "../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
-<script src="../../assets/javascripts/bundle.ce72ebac.min.js"></script>
+<script id="__config" type="application/json">{"base": "../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+<script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
 <script src="../../js/open_in_new_tab.js"></script>
 <script type="module">import mermaid from "https://unpkg.com/mermaid@10.0.2/dist/mermaid.esm.min.mjs";
 mermaid.initialize({});</script></body>
