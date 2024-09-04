@@ -73,7 +73,7 @@ The primary product is the OCM Transport Controller, built from generic transpor
 
 For this controller, the ks/OTP repo produces a container image that appears at [ghcr.io/kubestellar/ocm-transport-plugin/transport-controller](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller).
 
-For this controller, the ks/ks repo produces a container image that appears at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller).
+For this controller, the ks/ks repo produces a container image that appears at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller). The image tag equals the KubeStellar release identifier (no leading `v`).
 
 TODO: document how the image is built and published, including explain versioning.
 
@@ -81,7 +81,7 @@ TODO: document how the image is built and published, including explain versionin
 
 The ks/OTP repo publishes this Helm chart at [ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Fchart%2Focm-transport-plugin).
 
-The ks/ks repo publishes this Helm chart at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar/ocm-transport-controller-chart).
+The ks/ks repo publishes this Helm chart at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart). The chart version equals its `appVersion`, both are the KubeStellar release identifier (no leading `v`).
 
 ## KubeStellar
 
