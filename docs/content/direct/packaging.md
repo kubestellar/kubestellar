@@ -65,13 +65,19 @@ By our development practices and doing doing any manual hacks, we maintain the a
 
 ## OCM Transport Plugin
 
-The source is the GitHub repo [github.com/kubestellar/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin)
+This thing is in the midst of being moved from a separate repository into the kubestellar repository. The separate repository is [github.com/kubestellar/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin).
 
-### OCM Transport container image
+The primary product is the OCM Transport Controller, built from generic transport controller code plus code specific to using OCM for transport.
 
-This appears at [ghcr.io/kubestellar/ocm-transport-plugin/transport-controller](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller).
+### OCM Transport Controller container image
+
+This appears at [ghcr.io/kubestellar/ocm-transport-plugin/transport-controller](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller). This will need to move to something like `ghcr.io/kubestellar/kubestellar/ocm-transport-controller`.
 
 TODO: document how the image is built and published, including explain versioning.
+
+### OCM Transport Controller Helm chart
+
+This appears at [ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Fchart%2Focm-transport-plugin). This will need to move to something like `ghcr.io/kubestellar/kubestellar/ocm-transport-controller`.
 
 ## KubeStellar
 
@@ -86,10 +92,9 @@ The following diagram shows most of it. For simplicity, this omits the clusterad
 ```mermaid
 flowchart LR
     osa_hc_repo[published OSA Helm Chart]
-    otp_code["OTP source in GitHub"]
     subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
-    gtc_code["generic transport<br>controller code"]
+    otc_code[OTC source code]
     kcm_hc_src[KCM Helm chart source]
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
@@ -106,6 +111,7 @@ flowchart LR
     kcm_hc_repo -.-> kcm_ctr_image
     ks_pch -.-> kcm_hc_repo
     ks_pch -.-> otp_hc_repo[published OTP Helm chart]
+    otp_hc_repo -.-> otc_ctr_image_ur["OTC container image<br>(original)"]
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
     ksc_hc_src -.-> osa_hc_repo
     ksc_hc_src -.-> otp_hc_repo
@@ -121,8 +127,7 @@ flowchart LR
     e2e_local -.-> ocm_pch
     e2e_local -.-> kcm_code
     e2e_local -.-> kcm_hc_src
-    e2e_local -.-> gtc_code
-    e2e_local -.-> otp_code
+    e2e_local -.-> otc_code
     e2e_local -.-> KubeFlex
     e2e_release -.-> ocm_pch
     e2e_release -.-> ks_pch
@@ -257,7 +262,7 @@ This Helm chart defines and uses two KubeFlex PostCreateHooks, as follows.
 
 - `its` defines a Job with two containers. One container uses the clusteradm container image to initialize the target cluster as an OCM "hub". The other container uses the Helm CLI container image to instantiate the [OCM Status Addon Helm chart](#ocm-status-addon-helm-chart). The version to use is defined in the `values.yaml` of the core chart. This PCH is used for every requested ITS.
 
-- `wds` defines a Job with two containers. One container uses the Helm CLI image to instantiate the [KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart). The other container uses the Helm CLI image to instantiate the OCM Transport Helm chart. For both of those subsidiary charts, the version to use is defined in the `values.yaml` of the core chart. This PCH is used for every requested WDS.
+- `wds` defines a Job with two containers. One container uses the Helm CLI image to instantiate the [KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart). The other container uses the Helm CLI image to instantiate the [OCM Transport Helm chart](#ocm-transport-controller-helm-chart). For both of those subsidiary charts, the version to use is defined in the `values.yaml` of the core chart. This PCH is used for every requested WDS.
 
 By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and instantiates version `$VERSION` of [the KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart).
 
@@ -339,7 +344,10 @@ TODO: finish this
 
 ```mermaid
 flowchart LR
-    otp_code["OTP source in GitHub"]
+    subgraph otp_repo["ocm-transport-plugin@GitHub"]
+    otp_code_ur["OTP source code<br>(original)"]
+    otp_hc_src[OTC Helm chart source]
+    end
     subgraph osa_repo["ocm-status-addon@GitHub"]
     osa_code[OSA source code]
     osa_hc_src[OSA Helm chart source]
@@ -351,6 +359,7 @@ flowchart LR
     subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
     gtc_code["generic transport<br>controller code"]
+    otp_code["OTP source code<br>(moved)"]
     kcm_hc_src[KCM Helm chart source]
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
@@ -368,6 +377,10 @@ flowchart LR
     kcm_hc_repo -.-> kcm_ctr_image
     ks_pch -.-> kcm_hc_repo
     ks_pch -.-> otp_hc_repo[published OTP Helm chart]
+    otp_hc_repo -.-> otc_ctr_image_ur["OTC container image<br>(original)"]
+    otp_hc_repo --> otp_hc_src
+    otc_ctr_image_ur --> gtc_code
+    otc_ctr_image_ur --> otp_code_ur
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
     ksc_hc_src -.-> osa_hc_repo
     ksc_hc_src -.-> kcm_hc_repo
