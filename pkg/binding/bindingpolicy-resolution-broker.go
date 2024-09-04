@@ -17,9 +17,11 @@ limitations under the License.
 package binding
 
 import (
+	"io"
 	"sync"
 
-	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
@@ -36,33 +38,41 @@ type ResolutionBroker interface {
 
 	// GetResolution retrieves the resolution for a given bindingPolicyKey.
 	// If no resolution is associated with the given key, nil is returned.
-	GetResolution(bindingPolicyKey string) *Resolution
+	GetResolution(bindingPolicyKey string) Resolution
 
 	// NotifyCallbacks calls all registered callbacks with the given bindingPolicyKey.
 	// The callbacks are called on separate goroutines.
 	NotifyCallbacks(bindingPolicyKey string)
 }
 
-// Resolution is a struct that represents the resolution of a binding policy.
-// It contains the destinations and object data for the resolution.
-type Resolution struct {
-	UID string
-	// Destinations is a list of destinations that are the "where" part of the
-	// resolution.
-	Destinations []v1alpha1.Destination
-	// ObjectIdentifierToData is a map of object identifiers to their
-	// corresponding ObjectData.
-	ObjectIdentifierToData map[util.ObjectIdentifier]ObjectData
+// Resolution is an internal representation of what a BindingPolicy is calling for.
+// A Resolution may change over time; the methods read an attribute's value at the current point in time.
+// Thread-safe.
+type Resolution interface {
+	// GetPolicyUID returns the UID of the BindingPolicy
+	// for use in constructing CombinedStatus object names.
+	GetPolicyUID() string
+
+	// GetDestinations returns a Set holding the names of the inventory objects.
+	// The returned set is immutable.
+	GetDestinations() sets.Set[string]
+
+	// GetWorkload returns a Map holding the current workload object references and
+	// associated downsyn modalities.
+	// The contents of the Map may change over time; the consumer of Iterate2 must not
+	// access the map (neither directly nor indirectly).
+	GetWorkload() abstract.Map[util.ObjectIdentifier, ObjectData]
 }
 
-func (r *Resolution) RequiresStatusCollection() bool {
-	for _, data := range r.ObjectIdentifierToData {
-		if len(data.StatusCollectors) > 0 {
-			return true
-		}
-	}
+func NonNilPointerDeference[T any](ptr *T) T { return *ptr }
 
-	return false
+func RequiresStatusCollection(r Resolution) bool {
+	return r.GetWorkload().Iterate2(func(_ util.ObjectIdentifier, data ObjectData) error {
+		if len(data.StatusCollectors) > 0 {
+			return io.EOF
+		}
+		return nil
+	}) != nil
 }
 
 // newResolutionBroker creates a new ResolutionBroker with the given
@@ -113,27 +123,12 @@ func (broker *resolutionBroker) RegisterCallback(callback func(bindingPolicyKey 
 
 // GetResolution retrieves the resolution for a given bindingPolicyKey.
 // If no resolution is associated with the given key, nil is returned.
-func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) *Resolution {
-	bindingPolicyResolution := broker.bindingPolicyResolutionGetter(bindingPolicyKey) //thread-safe
-
-	if bindingPolicyResolution == nil {
+func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) Resolution {
+	resolution := broker.bindingPolicyResolutionGetter(bindingPolicyKey) //thread-safe
+	if resolution == nil {
 		return nil
 	}
-
-	return &Resolution{
-		UID:          string(bindingPolicyResolution.ownerReference.UID), // necessarily exists
-		Destinations: bindingPolicyResolution.getDestinationsList(),
-		ObjectIdentifierToData: abstract.PrimitiveMapSafeValMap(&bindingPolicyResolution.RWMutex,
-			bindingPolicyResolution.objectIdentifierToData,
-			func(data *ObjectData) ObjectData { // clone
-				return ObjectData{
-					UID:              string(data.UID),
-					ResourceVersion:  data.ResourceVersion,
-					StatusCollectors: data.StatusCollectors.Clone(),
-				}
-			}), // while this function breaks the constraint, it maintains its own concurrency safety
-		// by using the PrimitiveMapSafeValMap which transforms a map safely using its read-lock.
-	}
+	return resolution
 }
 
 // NotifyCallbacks calls all registered callbacks with the given bindingPolicyKey.

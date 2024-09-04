@@ -373,8 +373,8 @@ func CreateJob(ctx context.Context, wds *kubernetes.Clientset, ns string, name s
 }
 
 type countAndProblems struct {
-	count    int
-	problems []string
+	Count    int
+	Problems []string
 }
 
 func GetDeploymentTime(ctx context.Context, clientset *kubernetes.Clientset, ns string, name string) time.Time {
@@ -409,23 +409,31 @@ func GetManifestworkTime(ctx context.Context, ocmWorkImbs *ocmWorkClient.Clients
 
 // ValidateNumDeployments waits a limited amount of time for the number of Deployment objects to equal the given count and
 // all the problemFuncs to return the empty string for every Deployment.
-func ValidateNumDeployments(ctx context.Context, wec *kubernetes.Clientset, ns string, num int, problemFuncs ...func(*appsv1.Deployment) string) {
+func ValidateNumDeployments(ctx context.Context, where string, wec *kubernetes.Clientset, ns string, num int, problemFuncs ...func(*appsv1.Deployment) string) {
 	ginkgo.GinkgoHelper()
-	gomega.Eventually(func() countAndProblems {
+	logger := klog.FromContext(ctx)
+	lastAns := countAndProblems{}
+	gomega.Eventually(func(ctx context.Context) countAndProblems {
 		deployments, err := wec.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
 		if err != nil {
+			logger.V(2).Info("Failed to list Deployment objects", "ns", ns)
 			return countAndProblems{-1, []string{err.Error()}}
 		}
-		ans := countAndProblems{count: len(deployments.Items)}
+		ans := countAndProblems{Count: len(deployments.Items)}
 		for _, pf := range problemFuncs {
 			for _, deployment := range deployments.Items {
 				if problem := pf(&deployment); len(problem) > 0 {
-					ans.problems = append(ans.problems, fmt.Sprintf("deployment %q has a problem: %s", deployment.Name, problem))
+					ans.Problems = append(ans.Problems, fmt.Sprintf("deployment %q has a problem: %s", deployment.Name, problem))
 				}
 			}
 		}
+		if ans.Count == num || ans.Count != lastAns.Count || len(ans.Problems) != len(lastAns.Problems) {
+			ginkgo.GinkgoLogr.Info("Got Deployment survey result", "where", where, "ns", ns, "expected", num, "result", ans, "now", time.Now())
+			logger.V(3).Info("Current Deployment survey result", "where", where, "ns", ns, "expected", num, "result", ans)
+		}
+		lastAns = ans
 		return ans
-	}, timeout).Should(gomega.Equal(countAndProblems{count: num}))
+	}, timeout).WithContext(ctx).Should(gomega.Equal(countAndProblems{Count: num}))
 }
 
 func ValidateNumServices(ctx context.Context, wec *kubernetes.Clientset, ns string, num int) {

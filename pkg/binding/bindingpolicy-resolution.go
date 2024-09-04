@@ -27,6 +27,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -36,6 +37,8 @@ import (
 type bindingPolicyResolution struct {
 	sync.RWMutex
 
+	// This map is mutable, but every `ObjectData` stored in it is immutable.
+	// No `*ObjectData` in this map is nil.
 	objectIdentifierToData map[util.ObjectIdentifier]*ObjectData
 
 	// Every Set ever stored here is immutable from the time it is stored here.
@@ -43,6 +46,8 @@ type bindingPolicyResolution struct {
 
 	// ownerReference identifies the bindingpolicy that this resolution is
 	// associated with as an owning object.
+	// This pointer is never nil (why is it a pointer?).
+	// The `metav1.OwnerReference` is immutable.
 	ownerReference *metav1.OwnerReference
 
 	// requiresSingletonReportedState indicates whether the bindingpolicy
@@ -50,20 +55,43 @@ type bindingPolicyResolution struct {
 	requiresSingletonReportedState bool
 }
 
-// ObjectData stores the UID, resource version, create-only bit,
-// and statuscollectors for an object.
+// ObjectData stores most of the downsync modalities for a given workload object
+// with respect to a given Binding.
 type ObjectData struct {
-	// UID is the UID of the object.
+	// UID is the UID of the workload object.
 	UID string
-	// ResourceVersion is the resource version of the object.
+	// ResourceVersion is the resource version of the workload object.
 	ResourceVersion string
 	// CreateOnly is a boolean that indicates whether the object was selected
 	// by at least one downsync clause with the createOnly bit set.
 	// If true, it means that the object should only be created and not
 	// maintained
 	CreateOnly bool
-	// StatusCollectors is a set of status collector names that are associated
+	// StatusCollectors is a set of status collector names that are associated.
+	// Every set ever stored here is immutable.
 	StatusCollectors sets.Set[string]
+}
+
+// Assert that `*bindingPolicyResolution` implements Resolution
+var _ Resolution = &bindingPolicyResolution{}
+
+func (resolution *bindingPolicyResolution) GetPolicyUID() string {
+	resolution.RLock()
+	defer resolution.RUnlock()
+	return string(resolution.ownerReference.UID)
+}
+
+func (resolution *bindingPolicyResolution) GetDestinations() sets.Set[string] {
+	resolution.RLock()
+	defer resolution.RUnlock()
+	return resolution.destinations
+}
+
+func (resolution *bindingPolicyResolution) GetWorkload() abstract.Map[util.ObjectIdentifier, ObjectData] {
+	m1 := abstract.AsPrimitiveMap(resolution.objectIdentifierToData)
+	m2 := abstract.NewMapLocker(&resolution.RWMutex, m1)
+	m3 := abstract.MapMapValues(m2, NonNilPointerDeference)
+	return m3
 }
 
 // ensureObjectData ensures that an object identifier exists
@@ -80,7 +108,8 @@ func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.O
 	defer resolution.Unlock()
 
 	objData := resolution.objectIdentifierToData[objIdentifier]
-	if objData == nil {
+	if objData == nil || objData.UID != objUID || objData.ResourceVersion != resourceVersion ||
+		objData.CreateOnly != createOnly || !objData.StatusCollectors.Equal(statusCollectors) {
 		resolution.objectIdentifierToData[objIdentifier] = &ObjectData{
 			UID:              objUID,
 			ResourceVersion:  resourceVersion,
@@ -90,17 +119,7 @@ func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.O
 		return true
 	}
 
-	if objData.UID == objUID && objData.ResourceVersion == resourceVersion && objData.CreateOnly == createOnly &&
-		objData.StatusCollectors.Equal(statusCollectors) {
-		return false
-	}
-
-	objData.UID = objUID
-	objData.ResourceVersion = resourceVersion
-	objData.CreateOnly = createOnly
-	objData.StatusCollectors = statusCollectors
-
-	return true
+	return false
 }
 
 // removeObjectIdentifier removes an object identifier from the resolution if it
@@ -219,6 +238,13 @@ func (resolution *bindingPolicyResolution) getDestinationsList() []v1alpha1.Dest
 	return destinationsStringSetToSortedDestinations(resolution.destinations)
 }
 
+func (resolution *bindingPolicyResolution) getWorkloadReferences() []util.ObjectIdentifier {
+	resolution.RLock()
+	defer resolution.RUnlock()
+
+	return abstract.PrimitiveMapKeySlice(resolution.objectIdentifierToData)
+}
+
 // getOwnerReference returns the owner reference of the resolution.
 func (resolution *bindingPolicyResolution) getOwnerReference() metav1.OwnerReference {
 	resolution.RLock()
@@ -227,12 +253,26 @@ func (resolution *bindingPolicyResolution) getOwnerReference() metav1.OwnerRefer
 	return *resolution.ownerReference
 }
 
-// getSingletonReportedStateReturnRequest returns what this resolution requests regarding singleton reported state return.
+func (resolution *bindingPolicyResolution) setRequestsSingletonReportedStateReturn(request bool) {
+	resolution.Lock()
+	defer resolution.Unlock()
+
+	resolution.requiresSingletonReportedState = request
+}
+
+func (resolution *bindingPolicyResolution) getRequestsSingletonReportedStateReturn() bool {
+	resolution.RLock()
+	defer resolution.RUnlock()
+
+	return resolution.requiresSingletonReportedState
+}
+
+// getSingletonReportedStateRequestForObject returns what this resolution requests regarding singleton reported state return.
 // The first returned bool reports whether this resolution matches the given workload object ID;
 // if not then the other returned values are meaningless.
 // The second returned bool indicates whether singleton reported state return is requested.
 // The returned set is the names of the matching WECs, and is immutable.
-func (resolution *bindingPolicyResolution) getSingletonReportedStateReturnRequest(objId util.ObjectIdentifier) (bool, bool, sets.Set[string]) {
+func (resolution *bindingPolicyResolution) getSingletonReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, bool, sets.Set[string]) {
 	resolution.RLock()
 	defer resolution.RUnlock()
 	if _, has := resolution.objectIdentifierToData[objId]; !has {

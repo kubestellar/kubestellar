@@ -18,6 +18,7 @@ package status
 
 import (
 	"context"
+	"fmt"
 
 	"k8s.io/klog/v2"
 )
@@ -31,6 +32,7 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 		// If a binding key gets here and no resolution exists, then isDeleted can be set to true.
 		isDeleted = true
 	}
+	logger.V(5).Info("In syncBinding", "bindingName", key, "isDeleted", isDeleted, "resolutionIsNil", resolution == nil, "resolution", resolution, "resolutionType", fmt.Sprintf("%T", resolution))
 
 	// NoteBindingResolution does not use the resolution if isDeleted is true
 	changedCombinedStatuses := c.combinedStatusResolver.NoteBindingResolution(ctx, key, resolution, isDeleted,

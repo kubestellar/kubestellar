@@ -60,10 +60,13 @@ type BindingPolicyResolver interface {
 	CompareBinding(bindingPolicyKey string,
 		bindingSpec *v1alpha1.BindingSpec) bool
 
-	// NoteBindingPolicy associates a new resolution with the given
-	// bindingpolicy, if none is associated. This method maintains the
-	// singleton status reporting requirement in the resolution.
-	// `*bindingPolicy` is immutable
+	// NoteBindingPolicy ensures that (a) the resolver has an entry whose key
+	// is the given BindingPolicy's name and (b) that entry records the
+	// value of `bindingpolicy.Spec.WantSingletonReportedState`.
+	// If an entry is introduced, it is introduced with empty destination set
+	// and no workload references.
+	// `*bindingPolicy` is immutable.
+	// Concurrent calls for the same BindingPolicy name are not allowed.
 	NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy)
 
 	// EnsureObjectData ensures that an object's identifier is
@@ -95,6 +98,8 @@ type BindingPolicyResolver interface {
 	// The given destinations set is expected not to be mutated during and
 	// after this call by the caller.
 	// If no resolution is associated with the given key, an error is returned.
+	// Must not be called concurrently with any call that can add a resolution
+	// with the same name.
 	SetDestinations(bindingPolicyKey string, destinations sets.Set[string]) error
 
 	// ResolutionExists returns true if a resolution is associated with the
@@ -175,9 +180,6 @@ func (resolver *bindingPolicyResolver) GetOwnerReference(bindingPolicyKey string
 			bindingPolicyResolutionNotFoundErrorPrefix, bindingPolicyKey)
 	}
 
-	bindingPolicyResolution.RLock()
-	defer bindingPolicyResolution.RUnlock()
-
 	return bindingPolicyResolution.getOwnerReference(), nil
 }
 
@@ -203,16 +205,14 @@ func (resolver *bindingPolicyResolver) CompareBinding(bindingPolicyKey string,
 	return bindingPolicyResolution.matchesBindingSpec(bindingSpec)
 }
 
-// NoteBindingPolicy associates a new resolution with the given
-// bindingpolicy, if none is associated. This method maintains the
-// singleton status reporting requirement in the resolution.
-// `*bindingPolicy` is immutable
 func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy) {
 	if resolution := resolver.getResolution(bindingpolicy.GetName()); resolution != nil {
-		resolution.requiresSingletonReportedState = bindingpolicy.Spec.WantSingletonReportedState
+		resolution.setRequestsSingletonReportedStateReturn(bindingpolicy.Spec.WantSingletonReportedState)
 		return
 	}
-
+	// Because concurrent calls with the same BindingPolicy name are not allowed,
+	// it is guaranteed that createResolution will not find an existing entry ---
+	// which means that we do not have to worry about updating that existing entry.
 	resolver.createResolution(bindingpolicy)
 }
 
@@ -235,6 +235,11 @@ func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string,
 			bindingPolicyKey)
 	}
 
+	// Now the resolver's mutex is not held, so the resolution just fetched could be concurrently
+	// deleted and even a replacement inserted --- causing the following code to update a positively
+	// wrong resolution. However, in that case there will be calls to `controller::reconcile` that
+	// get the replacement fully updated.
+
 	// ensureObjectIdentifier is thread-safe
 	return bindingPolicyResolution.ensureObjectData(objIdentifier, objUID, resourceVersion, createOnly, statusCollectors), nil
 }
@@ -252,6 +257,11 @@ func (resolver *bindingPolicyResolver) RemoveObjectIdentifier(bindingPolicyKey s
 	if bindingPolicyResolution == nil {
 		return false
 	}
+	// The resolver's mutex is no longer held by this goroutine, so the resolution
+	// could be concurrently deleted and even a replacement introduced --- so that
+	// the following code will update a positively wrong resolution. However, we
+	// expect that in this situation there will be later calls to
+	// `controller::reconcile` that cause complete re-evaluation of the BindingPolicy.
 
 	// removeObjectIdentifier is thread-safe
 	return bindingPolicyResolution.removeObjectIdentifier(objIdentifier)
@@ -275,15 +285,12 @@ func (resolver *bindingPolicyResolver) GetObjectIdentifiers(bindingPolicyKey str
 	return sets.KeySet(bindingPolicyResolution.objectIdentifierToData), nil
 }
 
-// SetDestinations updates the maintained bindingpolicy's
-// destinations resolution for the given bindingpolicy key.
-// The given destinations set is expected not to be mutated during and
-// after this call by the caller.
-// If no resolution is associated with the given key, an error is returned.
 func (resolver *bindingPolicyResolver) SetDestinations(bindingPolicyKey string,
 	destinations sets.Set[string]) error {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
-
+	// Now the resolver's mutex is not held, so the resolution just fetched could be removed.
+	// The prohibition against calling concurrently with methods that add a resolution ensures
+	// that the following code will not update a positively wrong resolution.
 	if bindingPolicyResolution == nil {
 		return fmt.Errorf("%s - bindingpolicy-key: %s", bindingPolicyResolutionNotFoundErrorPrefix,
 			bindingPolicyKey)
@@ -314,14 +321,14 @@ func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string)
 // requirement is effective.
 func (resolver *bindingPolicyResolver) ResolutionRequiresSingletonReportedState(bindingPolicyKey string) bool {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
-
-	if bindingPolicyResolution == nil {
-		return false
-	}
-
-	return bindingPolicyResolution.requiresSingletonReportedState
+	return bindingPolicyResolution != nil && bindingPolicyResolution.getRequestsSingletonReportedStateReturn()
 }
 
+// GetSingletonReportedStateRequestForObject returns two things.
+// First is the `bool` indicating whether any BindingPolicy requests singleton reported state return
+// for the given object.
+// If that is true then the second is the number of WECs bound to that object,
+// otherwise the second value is undefined.
 func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, int) {
 	resolver.RWMutex.RLock()
 	defer resolver.RWMutex.RUnlock()
@@ -329,7 +336,7 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject
 	// First, just compute whether singleton reported state return is requested for this object.
 	// Avoid thrashing the heap with that set collection unless it is really necessary.
 	for _, resolution := range resolver.bindingPolicyToResolution {
-		matches, thisRequest, _ := resolution.getSingletonReportedStateReturnRequest(objId)
+		matches, thisRequest, _ := resolution.getSingletonReportedStateRequestForObject(objId)
 		if matches && thisRequest {
 			requested = true
 			break
@@ -341,7 +348,7 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject
 	requested = false
 	matchingWECs := sets.New[string]()
 	for _, resolution := range resolver.bindingPolicyToResolution {
-		matches, thisRequest, thisDests := resolution.getSingletonReportedStateReturnRequest(objId)
+		matches, thisRequest, thisDests := resolution.getSingletonReportedStateRequestForObject(objId)
 		if !matches {
 			continue
 		}
@@ -356,12 +363,14 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBindi
 	defer resolver.RWMutex.RUnlock()
 
 	objIds, requests, nWECs := []util.ObjectIdentifier{}, []bool{}, []int{}
-	if !resolver.ResolutionExists(bindingPolicyKey) {
+	resolution := resolver.getResolution(bindingPolicyKey)
+	if resolution == nil {
 		return objIds, requests, nWECs
 	}
-	for objId := range resolver.getResolution(bindingPolicyKey).objectIdentifierToData {
+	objIds = resolution.getWorkloadReferences()
+	for _, objId := range objIds {
 		r, n := resolver.GetSingletonReportedStateRequestForObject(objId)
-		objIds, requests, nWECs = append(objIds, objId), append(requests, r), append(nWECs, n)
+		requests, nWECs = append(requests, r), append(nWECs, n)
 	}
 	return objIds, requests, nWECs
 }
