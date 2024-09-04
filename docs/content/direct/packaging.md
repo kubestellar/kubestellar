@@ -111,6 +111,8 @@ flowchart LR
     kcm_hc_repo -.-> kcm_ctr_image
     ks_pch -.-> kcm_hc_repo
     ks_pch -.-> otp_hc_repo[published OTP Helm chart]
+    otc_ctr_image["OTC container image<br>(moved)"]
+    otc_ctr_image --> otc_code
     otp_hc_repo -.-> otc_ctr_image_ur["OTC container image<br>(original)"]
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
     ksc_hc_src -.-> osa_hc_repo
@@ -377,6 +379,9 @@ flowchart LR
     kcm_hc_repo -.-> kcm_ctr_image
     ks_pch -.-> kcm_hc_repo
     ks_pch -.-> otp_hc_repo[published OTP Helm chart]
+    otc_ctr_image["OTC container image<br>(moved)"]
+    otc_ctr_image --> gtc_code
+    otc_ctr_image --> otp_code
     otp_hc_repo -.-> otc_ctr_image_ur["OTC container image<br>(original)"]
     otp_hc_repo --> otp_hc_src
     otc_ctr_image_ur --> gtc_code
