@@ -26,7 +26,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Edit `docs/mkdocs.yml` and update the definition of `ks_latest_release` to `$version` (e.g., `'0.23.0-rc42'`). If this is a regular release then also update the definition of `ks_latest_regular_release`.
 
-- Edit the source for the KCM+OTC PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the version used of the KubeStellar controller-manager chart and the OCM transport controller chart (they appear in the last object, a `Job`).
+- Edit the source for the KCM+OTC PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the version there for the KubeStellar controller-manager chart and the OCM transport controller chart (they appear in the last object, a `Job`).
 
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
 

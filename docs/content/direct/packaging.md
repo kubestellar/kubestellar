@@ -65,7 +65,7 @@ By our development practices and doing doing any manual hacks, we maintain the a
 
 This repository ([github.com/kubestellar/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin)) is retired. Its contents have been merged into the kubestellar repository.
 
-The primary product was the OCM Transport Controller, built from generic transport controller code plus code specific to using OCM for transport. The published artifacts, which still linger because the GitHub is all about not forgetting things, are as follows. DO NOT USE THEM.
+The primary product was the OCM Transport Controller, which is built from generic transport controller code plus code specific to using OCM for transport. This controller now comes from the ks/ks repository. The published artifacts for this controller from ks/OTP, which still linger because older releases of KubeStellar are still in use and because GitHub is all about not forgetting things, are as follows. DO NOT USE THEM with releases of KubeStellar _after_ `0.24.0-alpha.2`.
 
 - OCM Transport Controller container image. Appears at [ghcr.io/kubestellar/ocm-transport-plugin/transport-controller](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller).
 - OCM Transport Controller Helm chart. Appears at [ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Fchart%2Focm-transport-plugin).
