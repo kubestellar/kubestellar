@@ -81,7 +81,7 @@ TODO: document how the image is built and published, including explain versionin
 
 The ks/OTP repo publishes this Helm chart at [ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Fchart%2Focm-transport-plugin).
 
-The ks/ks repo publishes this Helm chart at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart). The chart version equals its `appVersion`, both are the KubeStellar release identifier (no leading `v`).
+The ks/ks repo publishes this Helm chart at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart). By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and instantiates version `$VERSION` of [OCM Transport Controller container image](#ocm-transport-container-image).
 
 ## KubeStellar
 
@@ -124,10 +124,10 @@ flowchart LR
     otc_hc_repo -.-> otc_ctr_image
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
     ksc_hc_src -.-> osa_hc_repo
-    ksc_hc_src -.-> otp_hc_repo
+    ksc_hc_src -.-> otc_hc_repo
     ksc_hc_src -.-> kcm_hc_repo
     ksc_hc_repo -.-> osa_hc_repo
-    ksc_hc_repo -.-> otp_hc_repo
+    ksc_hc_repo -.-> otc_hc_repo
     ksc_hc_repo -.-> kcm_hc_repo
     setup_ksc -.-> ksc_hc_repo
     setup_ksc -.-> KubeFlex
@@ -266,9 +266,9 @@ This Helm chart defines and uses two KubeFlex PostCreateHooks, as follows.
 
 - `its` defines a Job with two containers. One container uses the clusteradm container image to initialize the target cluster as an OCM "hub". The other container uses the Helm CLI container image to instantiate the [OCM Status Addon Helm chart](#ocm-status-addon-helm-chart). The version to use is defined in the `values.yaml` of the core chart. This PCH is used for every requested ITS.
 
-- `wds` defines a Job with two containers. One container uses the Helm CLI image to instantiate the [KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart). The other container uses the Helm CLI image to instantiate the [OCM Transport Helm chart](#ocm-transport-controller-helm-chart). For both of those subsidiary charts, the version to use is defined in the `values.yaml` of the core chart. This PCH is used for every requested WDS.
+- `wds` defines a Job with two containers. One container uses the Helm CLI image to instantiate the [KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart). The other container uses the Helm CLI image to instantiate the [OCM Transport Controller Helm chart](#ocm-transport-controller-helm-chart). For both of those subsidiary charts, the version to use is defined in the `values.yaml` of the core chart. This PCH is used for every requested WDS.
 
-By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and instantiates version `$VERSION` of [the KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart).
+By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and instantiates version `$VERSION` of [the KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart) and [the OCM Transport Controller Helm chart](#ocm-transport-controller-helm-chart).
 
 
 ### KubeStellar controller-manager Helm Chart
@@ -395,10 +395,10 @@ flowchart LR
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
     ksc_hc_src -.-> osa_hc_repo
     ksc_hc_src -.-> kcm_hc_repo
-    ksc_hc_src -.-> otp_hc_repo
+    ksc_hc_src -.-> otc_hc_repo
     ksc_hc_repo -.-> osa_hc_repo
     ksc_hc_repo -.-> kcm_hc_repo
-    ksc_hc_repo -.-> otp_hc_repo
+    ksc_hc_repo -.-> otc_hc_repo
     setup_ksc -.-> ksc_hc_repo
     setup_ksc -.-> KubeFlex
     e2e_local -.-> ocm_pch
