@@ -153,8 +153,8 @@ spec:
           image: OTC_IMAGE_PLACEHOLDER
           imagePullPolicy: IfNotPresent
           args:
-          - --metrics-bind-addr={{.Values.metrics_bind_addr}}
-          - --pprof-bind-addr={{.Values.pprof_bind_addr}}
+          - --metrics-bind-address={{.Values.metrics_bind_addr}}
+          - --pprof-bind-address={{.Values.pprof_bind_addr}}
           - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
           - --transport-qps={{.Values.transport_qps}}
           - --transport-burst={{.Values.transport_burst}}
