@@ -163,6 +163,8 @@ spec:
           - --wds-qps={{.Values.wds_qps}}
           - --wds-burst={{.Values.wds_burst}}
           - -v={{.Values.verbosity | default 4}}
+          - --max-num-wrapped={{.Values.max_num_wrapped}}
+          - --max-size-wrapped={{.Values.max_size_wrapped}}
           volumeMounts:
           - name: shared-volume
             mountPath: /mnt/shared

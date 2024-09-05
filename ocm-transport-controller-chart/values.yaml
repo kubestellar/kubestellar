@@ -34,3 +34,7 @@ transport_burst: 10
 # QPS and burst for accessing the WDS
 wds_qps: 5
 wds_burst: 10
+
+# Bundling parameters
+max_num_wrapped: 512000
+max_size_wrapped: 512000
