@@ -2,9 +2,9 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
-## 0.24.0 and its candidates and alphas
+## 0.24.0 and its candidates and their precursors
 
-The main change from 0.23.X is the completion of the status combination and introduction of the create-only feature. There is also further work on the organization of the website.
+The main functional change from 0.23.X is the completion of the status combination and introduction of the create-only feature. There is also further work on the organization of the website. There is also a major change in the GitHub repository structure: the kubestellar/ocm-transport-plugin repo's contents have been merged into the kubestellar/kubestellar repo (after `0.24.0-alpha.2`).
 
 ### 0.24.0-alpha.2
 
