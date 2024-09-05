@@ -11,16 +11,6 @@ Every release should pass all release tests before it can be officially declare 
 
 ## Step-by-Step
 
-### Reacting to a new ocm-transport-plugin release
-
-Between each release of [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin) and the next release of ks/ks, the following steps should be done in ks/ks.
-
-- Edit `scripts/deploy-transport-controller.sh`: update the tag in the default transport controller image setting (`export TRANSPORT_CONTROLLER_IMAGE...`) to the latest release of ks/OTP.
-
-- Edit `config/postcreate-hooks/kubestellar.yaml`: update the version of the OTP Helm chart.
-
-- Edit `test/e2e/common/setup-kubestellar.sh`: update the setting of `OCM_TRANSPORT_PLUGIN_RELEASE` to the latest.
-
 ### Reacting to a new ocm-status-addon release
 
 Between each release of [ks/OSA](https://github.com/kubestellar/ocm-status-addon) and the next release of ks/ks, update the references to the ocm-status-addon release in the following files.
@@ -36,7 +26,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Edit `docs/mkdocs.yml` and update the definition of `ks_latest_release` to `$version` (e.g., `'0.23.0-rc42'`). If this is a regular release then also update the definition of `ks_latest_regular_release`.
 
-- Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
+- Edit the source for the KCM+OTC PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the version used of the KubeStellar controller-manager chart and the OCM transport controller chart (they appear in the last object, a `Job`).
 
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
 

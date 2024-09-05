@@ -81,7 +81,7 @@ TODO: document how the image is built and published, including explain versionin
 
 The ks/OTP repo publishes this Helm chart at [ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Fchart%2Focm-transport-plugin).
 
-The ks/ks repo publishes this Helm chart at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart). By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and instantiates version `$VERSION` of [OCM Transport Controller container image](#ocm-transport-container-image).
+The ks/ks repo publishes this Helm chart at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart). By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and instantiates version `$VERSION` of [OCM Transport Controller container image](#ocm-transport-controller-container-image).
 
 ## KubeStellar
 
@@ -114,12 +114,10 @@ flowchart LR
     kcm_hc_src -.-> kcm_ctr_image
     kcm_hc_repo -.-> kcm_ctr_image
     ks_pch -.-> kcm_hc_repo
-    ks_pch -.-> otp_hc_repo[published OTP Helm chart]
+    ks_pch -.-> otc_hc_repo[published OTC Helm chart]
     otc_ctr_image["OTC container image<br>(moved)"]
     otc_ctr_image --> otc_code
     otc_hc_src -.-> otc_ctr_image
-    otp_hc_repo -.-> otc_ctr_image_ur["OTC container image<br>(original)"]
-    otc_hc_repo[published OTC Helm chart]
     otc_hc_repo --> otc_hc_src
     otc_hc_repo -.-> otc_ctr_image
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
@@ -380,16 +378,16 @@ flowchart LR
     kcm_hc_src -.-> kcm_ctr_image
     kcm_hc_repo -.-> kcm_ctr_image
     ks_pch -.-> kcm_hc_repo
-    ks_pch -.-> otp_hc_repo[published OTP Helm chart]
+    ks_pch -.-> otc_hc_repo[published OTC Helm chart]
     otc_ctr_image["OTC container image<br>(moved)"]
     otc_ctr_image --> gtc_code
     otc_ctr_image --> otp_code
     otc_hc_src -.-> otc_ctr_image
     otp_hc_repo -.-> otc_ctr_image_ur["OTC container image<br>(original)"]
     otp_hc_repo --> otp_hc_src
+    otp_hc_src -.-> otc_ctr_image_ur
     otc_ctr_image_ur --> gtc_code
     otc_ctr_image_ur --> otp_code_ur
-    otc_hc_repo[published OTC Helm chart]
     otc_hc_repo --> otc_hc_src
     otc_hc_repo -.-> otc_ctr_image
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
