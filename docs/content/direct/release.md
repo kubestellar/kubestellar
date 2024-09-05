@@ -1,6 +1,6 @@
 # Making KubeStellar Releases
 
-This document defines how releases of the KubeStellar repository are made. This document is a work-in-progress. In particular, the dependency cycle between the `kubestellar` and `ocm-tansport-plugin` repos is not well documented and we do not have a good way to deal with it.
+This document defines how releases of the KubeStellar repository are made. This document is a work-in-progress.
 
 This document starts with step-by-step instructions for the current procedure, then proceeds with the thinking behind them.
 
@@ -50,8 +50,6 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - If the test results are good and the release is regular (not an RC) then declare the code freeze over.
 
-- If the testing results are good, update [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin) to refer to the new ks/ks release and [make a new release of ks/OTP](https://github.com/kubestellar/ocm-transport-plugin/blob/main/docs/release.md).
-
 ## Goals and limitations
 
 The release process has the following goals.
@@ -74,7 +72,7 @@ We have the following limitations.
 
 ## Dependency cycle with ks/OTP
 
-The [ks/ks repo](https://github.com/kubestellar/kubestellar) and the [ks/OTP repo](https://github.com/kubestellar/ocm-transport-plugin) reference each other. Thus, making consistent immutable recursive-self-reference-free releases is impossible. We have to compromise somehow. There is some discussion in [ks/ks Issue 1786](https://github.com/kubestellar/kubestellar/issues/1786). We currently seem to be following the staggered release approach.
+This is a thing of the past. The kubestellar/ocm-transport-plugin repository is retired now, its contents have been moved into the kubestellar/kubestellar repository.
 
 ## Technology
 

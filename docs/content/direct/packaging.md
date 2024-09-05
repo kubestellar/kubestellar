@@ -9,8 +9,6 @@ flowchart LR
     kubestellar --> kubeflex
     kubestellar --> ocm-status-addon
     ocm-status-addon --> kubestellar
-    ocm-transport-plugin --> kubestellar
-    kubestellar --> ocm-transport-plugin
 ```
 
 The references from ocm-status-addon to kubestellar are only in documentation and are in the process of being removed (no big difficulty is anticipated).
@@ -65,23 +63,12 @@ By our development practices and doing doing any manual hacks, we maintain the a
 
 ## OCM Transport Plugin
 
-This thing is in the midst of being moved from a separate repository into the kubestellar repository. The separate repository is [github.com/kubestellar/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin).
+This repository ([github.com/kubestellar/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin)) is retired. Its contents have been merged into the kubestellar repository.
 
-The primary product is the OCM Transport Controller, built from generic transport controller code plus code specific to using OCM for transport.
+The primary product was the OCM Transport Controller, built from generic transport controller code plus code specific to using OCM for transport. The published artifacts, which still linger because the GitHub is all about not forgetting things, are as follows. DO NOT USE THEM.
 
-### OCM Transport Controller container image
-
-For this controller, the ks/OTP repo produces a container image that appears at [ghcr.io/kubestellar/ocm-transport-plugin/transport-controller](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller).
-
-For this controller, the ks/ks repo produces a container image that appears at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller). The image tag equals the KubeStellar release identifier (no leading `v`).
-
-TODO: document how the image is built and published, including explain versioning.
-
-### OCM Transport Controller Helm chart
-
-The ks/OTP repo publishes this Helm chart at [ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Fchart%2Focm-transport-plugin).
-
-The ks/ks repo publishes this Helm chart at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart). By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and instantiates version `$VERSION` of [OCM Transport Controller container image](#ocm-transport-controller-container-image).
+- OCM Transport Controller container image. Appears at [ghcr.io/kubestellar/ocm-transport-plugin/transport-controller](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Ftransport-controller).
+- OCM Transport Controller Helm chart. Appears at [ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin](https://github.com/kubestellar/ocm-transport-plugin/pkgs/container/ocm-transport-plugin%2Fchart%2Focm-transport-plugin).
 
 ## KubeStellar
 
@@ -115,7 +102,7 @@ flowchart LR
     kcm_hc_repo -.-> kcm_ctr_image
     ks_pch -.-> kcm_hc_repo
     ks_pch -.-> otc_hc_repo[published OTC Helm chart]
-    otc_ctr_image["OTC container image<br>(moved)"]
+    otc_ctr_image[OTC container image]
     otc_ctr_image --> otc_code
     otc_hc_src -.-> otc_ctr_image
     otc_hc_repo --> otc_hc_src
@@ -237,6 +224,12 @@ The [release process](release.md) builds and publishes that container image.
 `make ko-build-controller-manager-local` will make a local image for just the local
 platform. This is used in local testing.
 
+### OCM Transport Controller container image
+
+The [release process](release.md) builds and publishes this image at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller).
+
+By our development practices and not doing any manual hacking we maintain the association that the container image tagged `$VERSION` is built from the Git commit having the Git tag `v$VERSION`.
+
 ### clusteradm container image
 
 The kubestellar GitHub repository has a script,
@@ -284,6 +277,10 @@ The chart is published at the OCI repository
 
 By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and that chart has a Deployment that uses the kubestellar-controller-manager container image tagged `$VERSION`.
 
+### OCM Transport Controller Helm chart
+
+The [release process](release.md) packages and publishes this chart at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart). By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and instantiates version `$VERSION` of [OCM Transport Controller container image](#ocm-transport-controller-container-image).
+
 ### KubeFlex PostCreateHooks
 
 In addition to the two PostCreateHooks in the core Helm chart described above, there are two more PostCreateHooks defined in the `config/postcreate-hooks/` directory.
@@ -301,17 +298,17 @@ The PostCreateHook defined in `config/postcreate-hooks/ocm.yaml` gets used on an
 The PostCreateHook defined in
 `config/postcreate-hooks/kubestellar.yaml` is intended to be used in
 the hosting cluster, once per WDS, and defines a `Job` that has two containers.
-One uses [the Helm CLI image](#helm-cli-container-image) to instantiate [the KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart). The chart version appears as a literal in the PCH definition and is manually updated during the process of creating a release (see [the release process document](release.md)). The other container uses the Helm CLI image to instantiate OCM Transport Helm chart. The version to instantiate appears as a literal in the PCH definition and is manually updated after each OTP release (see [the release process doc](release.md#reacting-to-a-new-ocm-transport-plugin-release)).
+One uses [the Helm CLI image](#helm-cli-container-image) to instantiate [the KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart). The chart version appears as a literal in the PCH definition and is manually updated during the process of creating a release (see [the release process document](release.md)). The other container uses the Helm CLI image to instantiate the OCM Transport Controller Helm chart. The version to instantiate appears as a literal in the PCH definition and is also updated during the process of creating a release.
 
 ### Scripts and instructions
 
 There are instructions for using a release ([Getting Started](get-started.md) document) and a setup script for end-to-end testing(`test/e2e/common/setup-kubestellar.sh`). The end-to-end testing can either test the local copy/version of the kubestellar repo or test a release. So there are three cases to consider.
 
-#### Example setup instructions
+#### 'Getting Started' setup instructions
 
-There were two variants of the setup instructions for the examples: an older one --- which is out of service at the moment, is called "step-by-step", and uses the `ocm` and `kubestellar` PostCreateHooks --- and [Getting Started](get-started.md), which uses the [core Helm chart](#kubestellar-core-helm-chart). The latter is the preferred method, and is the only one described here.
+Although we maintained variants in the past, we now maintain just one "getting started" setup recipe. It uses the [core Helm chart](#kubestellar-core-helm-chart).
 
-The instructions are a Markdown file that displays commands for a user to execute. These start with commands that define environment variables that hold the release of ks/kubestellar and of ks/ocm-transport-plugin to use.
+The instructions are a Markdown file that displays commands for a user to execute. These start with commands that define environment variables that hold the release of ks/kubestellar to use.
 
 The instructions display a command to instantiate the core Helm chart, at the version in the relevant environment variable, requesting the creation of one ITS and one WDS.
 
@@ -333,7 +330,7 @@ The scripts builds a local kubestellar controller-manager container image from l
 
 The script temporarily updates the local kubestellar controller-manager Helm chart to reference the kubestellar controller-manager container image that was loaded into the hosting cluster. Then the script invokes the Helm CLI to instantiate that chart in the hosting cluster, configured to apply to the WDS being set up. Then the script partially undoes its temporary modification of the kubestellar controller-manager Helm chart, using `git checkout --`.
 
-The script builds a local container image for the OCM transport controller from (a) local sources for the generic part and (b) the transport plugin in a ks/ocm-transport-plugin release identified by a literal version number in the script. This version is updated as part of tracking a ks/OTP release. Then the script loads this container image into the hosting cluster. Then the setup script invokes `scripts/deploy-transport-controller.sh`, which creates a Deployment object that runs the published transport controller image using a version that appears as a literal in the script and is manually updated in the process of reacting to a new ks/OTP release.
+The script builds a local container image for the OCM transport controller from local sources for the generic part and the OCM-specific part. Then the script loads this container image into the hosting cluster. Then the setup script invokes `scripts/deploy-transport-controller.sh`, which creates a Deployment object that uses the transport controller container image reference passed on its command line.
 
 
 ## Amalgamated graph
@@ -346,10 +343,6 @@ TODO: finish this
 
 ```mermaid
 flowchart LR
-    subgraph otp_repo["ocm-transport-plugin@GitHub"]
-    otp_code_ur["OTP source code<br>(original)"]
-    otp_hc_src[OTC Helm chart source]
-    end
     subgraph osa_repo["ocm-status-addon@GitHub"]
     osa_code[OSA source code]
     osa_hc_src[OSA Helm chart source]
@@ -361,7 +354,7 @@ flowchart LR
     subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
     gtc_code["generic transport<br>controller code"]
-    otp_code["OTP source code<br>(moved)"]
+    otp_code[OTP source code]
     kcm_hc_src[KCM Helm chart source]
     otc_hc_src[OTC Helm chart source]
     ksc_hc_src[KS Core Helm chart source]
@@ -379,15 +372,10 @@ flowchart LR
     kcm_hc_repo -.-> kcm_ctr_image
     ks_pch -.-> kcm_hc_repo
     ks_pch -.-> otc_hc_repo[published OTC Helm chart]
-    otc_ctr_image["OTC container image<br>(moved)"]
+    otc_ctr_image[OTC container image]
     otc_ctr_image --> gtc_code
     otc_ctr_image --> otp_code
     otc_hc_src -.-> otc_ctr_image
-    otp_hc_repo -.-> otc_ctr_image_ur["OTC container image<br>(original)"]
-    otp_hc_repo --> otp_hc_src
-    otp_hc_src -.-> otc_ctr_image_ur
-    otc_ctr_image_ur --> gtc_code
-    otc_ctr_image_ur --> otp_code_ur
     otc_hc_repo --> otc_hc_src
     otc_hc_repo -.-> otc_ctr_image
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
