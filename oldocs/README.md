@@ -34,7 +34,7 @@ including OCM Klusterlet for the WECs.
 ## Latest release
 
 The first release using the new architecture is 0.20.0; it is feature-incomplete.
-The latest regular release is 0.23.0.
+The latest regular release is 0.24.0.
 See also [the release notes](release-notes.md).
 
 ## Architecture
