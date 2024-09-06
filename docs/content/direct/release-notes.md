@@ -6,10 +6,6 @@ The following sections list the known issues for each release. The issue list is
 
 The main functional change from 0.23.X is the completion of the status combination and introduction of the create-only feature. There is also further work on the organization of the website. There is also a major change in the GitHub repository structure: the kubestellar/ocm-transport-plugin repo's contents have been merged into the kubestellar/kubestellar repo (after `0.24.0-alpha.2`).
 
-### 0.24.0-alpha.2
-
-The first of several releases required to get the create-only feature implemented in both the ks/ks and ks/OTP repositories. The API for this feature is present but the implementation is incomplete: the `Binding` objects are correctly derived from the `BindingPolicy` objects but the transport controller does not implement the feature.
-
 ### Remaining limitations in 0.24.0
 
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
