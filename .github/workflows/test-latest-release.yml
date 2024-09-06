@@ -32,10 +32,10 @@ jobs:
       - name: Install dependencies
         run: |
           curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.4.2/kubeflex_0.4.2_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.4.2_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.6.1/kubeflex_0.6.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.6.1_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.4.2_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.6.1_linux_amd64.tar.gz
           go install github.com/onsi/ginkgo/v2/ginkgo
 
       - name: Run test
@@ -107,10 +107,10 @@ jobs:
       - name: Install dependencies
         run: |
           curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.4.2/kubeflex_0.4.2_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.4.2_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.6.1/kubeflex_0.6.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.6.1_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.4.2_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.6.1_linux_amd64.tar.gz
 
       - name: Run test
         run: |

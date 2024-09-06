@@ -32,7 +32,7 @@ jobs:
           mkdir clusteradm
           export INSTALL_DIR="$PWD/clusteradm"
           curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
-          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.4.2/kubeflex_0.4.2_linux_amd64.tar.gz --output kubeflex.tar.gz
+          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.6.1/kubeflex_0.6.1_linux_amd64.tar.gz --output kubeflex.tar.gz
           tar -xvf kubeflex.tar.gz bin/kflex
           go install github.com/onsi/ginkgo/v2/ginkgo
           curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
@@ -84,7 +84,7 @@ jobs:
           export USE_SUDO=false
           export INSTALL_DIR="$PWD/clusteradm"
           curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
-          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.4.2/kubeflex_0.4.2_linux_amd64.tar.gz --output kubeflex.tar.gz
+          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.6.1/kubeflex_0.6.1_linux_amd64.tar.gz --output kubeflex.tar.gz
           tar -xvf kubeflex.tar.gz bin/kflex
           go install github.com/onsi/ginkgo/v2/ginkgo
           curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
