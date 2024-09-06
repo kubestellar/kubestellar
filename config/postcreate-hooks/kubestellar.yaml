@@ -187,6 +187,8 @@ spec:
               - "0.24.0-experiment.5"
               - --set
               - "ControlPlaneName={{.ControlPlaneName}}"
+              - --set
+              - "ControllerManager.Verbosity={{.ControllerManagerVerbosity}}"
             env:
             - name: XDG_CACHE_HOME
               value: /tmp/helm/.cache
@@ -204,6 +206,8 @@ spec:
               - "0.24.0-experiment.5"
               - --set
               - "wds_cp_name={{.ControlPlaneName}}"
+              - --set
+              - "verbosity={{.TransportControllerVerbosity}}"
             env:
             - name: XDG_CACHE_HOME
               value: /tmp/helm/.cache

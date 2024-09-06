@@ -24,10 +24,10 @@ HOSTING_CONTEXT=kind-kubeflex
 
 while [ $# != 0 ]; do
     case "$1" in
-        (-h|--help) echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp)*"
-                    exit;;
+        (-h|--help)
+            echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp)*"
+            exit;;
         (--released)
-            wds_extra="-p kubestellar"
             use_release=true;;
         (--kubestellar-controller-manager-verbosity)
           if (( $# > 1 )); then
@@ -55,7 +55,7 @@ while [ $# != 0 ]; do
             (ocp)  CLUSTER_SOURCE=existing; HOSTING_CONTEXT=kscore;;
             (*) echo "--env must be given 'kind' or 'ocp'" >&2
                 exit 1;;
-	  esac
+          esac
           shift;;
         (*) echo "$0: unrecognized argument/flag '$1'" >&2
             exit 1
@@ -63,9 +63,19 @@ while [ $# != 0 ]; do
     shift
 done
 
-if [ "$use_release" = true ] && [ "$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY" != 2 ]
-then echo "$0: kubestellar-controller-manager-verbosity must be 2 when using --released" >&2
+if ! [[ "$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY" =~ [0-9]+ ]]
+then echo "$0: \$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY must be an integer" >&2
      exit 1
+fi
+
+if ! [[ "$TRANSPORT_CONTROLLER_VERBOSITY" =~ [0-9]+ ]]
+then echo "$0: \$TRANSPORT_CONTROLLER_VERBOSITY must be an integer" >&2
+     exit 1
+fi
+
+if [ "$use_release" = true ]
+then wds_extra="-p kubestellar --set ControllerManagerVerbosity=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY --set TransportControllerVerbosity=$TRANSPORT_CONTROLLER_VERBOSITY"
+else wds_extra=""
 fi
 
 if [[ "$KFLEX_DISABLE_CHATTY" = true ]] ; then
