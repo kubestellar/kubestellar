@@ -11,10 +11,34 @@ builds:
   - arm64
   env:
   - CGO_ENABLED=0
+- id: "ocm-transport-controller"
+  main: ./pkg/transport/ocm-transport-controller
+  binary: bin/ocm-transport-controller
+  ldflags:
+  - "{{ .Env.LDFLAGS }}"
+  goos:
+  - linux
+  goarch:
+  - amd64
+  - arm64
+  env:
+  - CGO_ENABLED=0
 kos:           
-  - repository: ghcr.io/kubestellar/kubestellar/controller-manager
-    main: ./cmd/controller-manager
+  - id: kubestellar-controller-manager
+    repository: ghcr.io/kubestellar/kubestellar/controller-manager
     build: controller-manager
+    tags:
+    - '{{.Version}}'
+    bare: true
+    preserve_import_paths: false
+    ldflags:
+    - "{{ .Env.LDFLAGS }}"
+    platforms:
+    - linux/amd64
+    - linux/arm64
+  - id: ocm-transport-controller
+    repository: ghcr.io/kubestellar/kubestellar/ocm-transport-controller
+    build: ocm-transport-controller
     tags:
     - '{{.Version}}'
     bare: true

@@ -184,7 +184,7 @@ spec:
               - kubestellar
               - oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart
               - --version
-              - "0.24.0-alpha.2"
+              - "0.24.0-experiment.5"
               - --set
               - "ControlPlaneName={{.ControlPlaneName}}"
             env:
@@ -198,10 +198,10 @@ spec:
               - --install
               - --namespace
               - "{{.Namespace}}"
-              - ocm-transport-plugin
-              - oci://ghcr.io/kubestellar/ocm-transport-plugin/chart/ocm-transport-plugin
+              - ocm-transport-controller
+              - oci://ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart
               - --version
-              - "0.1.11"
+              - "0.24.0-experiment.5"
               - --set
               - "wds_cp_name={{.ControlPlaneName}}"
             env:

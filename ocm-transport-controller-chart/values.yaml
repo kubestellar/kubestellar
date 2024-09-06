@@ -1,0 +1,40 @@
+# Copyright 2024 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Set the name of the transport control plane
+transport_cp_name: ""
+
+# Set the name of the WDS control plane
+wds_cp_name: wds1
+
+# Set the controller verbosity
+verbosity: 4
+
+# [host]:port at which to listen for HTTP GET /metrics
+metrics_bind_addr: ":8090"
+
+# [host]:port at which to listen for HTTP GET /debug/pprof
+pprof_bind_addr: ":8092"
+
+# QPS and burst for accessing the ITS
+transport_qps: 5
+transport_burst: 10
+
+# QPS and burst for accessing the WDS
+wds_qps: 5
+wds_burst: 10
+
+# Bundling parameters
+max_num_wrapped: 512000
+max_size_wrapped: 512000

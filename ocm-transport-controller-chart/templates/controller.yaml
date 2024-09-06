@@ -1,0 +1,178 @@
+# Copyright 2024 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: transport-controller
+  namespace: {{.Release.Namespace}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{.Values.wds_cp_name}}-transport-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - tenancy.kflex.kubestellar.org
+  resources:
+  - controlplanes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - tenancy.kflex.kubestellar.org
+  resources:
+  - controlplanes/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{.Values.wds_cp_name}}-transport-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{.Values.wds_cp_name}}-transport-controller
+subjects:
+  - kind: ServiceAccount
+    name: transport-controller
+    namespace: {{.Release.Namespace}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: transport-controller-config
+  namespace: {{.Release.Namespace}}
+data:
+  get-kubeconfig.sh: |
+    #!/bin/env bash
+    # Get the in-cluster kubeconfig for KubeFlex Control Planes
+    # get-kubeconfig.sh cp_name guess_its_name
+
+    # input parameters
+    cp_name="${1%"-system"}" # cp name or cp namespace
+    guess_its_name="$2" # true: try guessing the name of the ITS CP
+
+    # check if the CP name is valid or needs to be guessed
+    while [ "$cp_name" == "" ] ; do
+      if [ "$guess_its_name" == "true" ] ; then
+        cps=$(kubectl get controlplane -l 'kflex.kubestellar.io/cptype=its' 2> /dev/null | tail -n +2)
+        case $(echo -n "$cps" | grep -c '^') in
+          (0)
+            >&2 echo "Waiting for an ITS control plane to exist..."
+            sleep 10;;
+          (1)
+            cp_name="${cps%% *}"
+            break;;
+          (*)
+            >&2 echo "ERROR: found more than one Control Plane of type its!"
+            exit 1;;
+        esac
+      else
+        >&2 echo "ERROR: no Control Plane name specified!"
+        exit 3
+      fi
+    done
+
+    # wait for the CP to exists and be ready
+    while [[ $(kubectl get controlplane "$cp_name" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+      >&2 echo "Waiting for \"$cp_name\" control plane to exist and be ready..."
+      sleep 10
+    done
+
+    # determine the secret name and namespace
+    key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
+    secret_name=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
+    secret_namespace=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
+
+    # get the kubeconfig in base64
+    >&2 echo "Getting \"$key\" from \"$secret_name\" secret in \"$secret_namespace\" for control plane \"$cp_name\"..."
+    kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transport-controller
+  namespace: {{.Release.Namespace}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: transport-controller
+  template:
+    metadata:
+      labels:
+        name: transport-controller
+    spec:
+      serviceAccountName: transport-controller
+      initContainers:
+      - name: setup-wds-kubeconfig
+        image: quay.io/kubestellar/kubectl:1.27.8
+        imagePullPolicy: Always
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{.Values.wds_cp_name}}' false | base64 -d > /mnt/shared/wds-kubeconfig"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /mnt/config
+        - name: shared-volume
+          mountPath: /mnt/shared
+      - name: setup-its-kubeconfig
+        image: quay.io/kubestellar/kubectl:1.27.8
+        imagePullPolicy: Always
+        command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{.Values.transport_cp_name}}' true | base64 -d > /mnt/shared/transport-kubeconfig"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /mnt/config
+        - name: shared-volume
+          mountPath: /mnt/shared
+      containers:
+        - name: transport-controller
+          image: OTC_IMAGE_PLACEHOLDER
+          imagePullPolicy: IfNotPresent
+          args:
+          - --metrics-bind-address={{.Values.metrics_bind_addr}}
+          - --pprof-bind-address={{.Values.pprof_bind_addr}}
+          - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
+          - --transport-qps={{.Values.transport_qps}}
+          - --transport-burst={{.Values.transport_burst}}
+          - --wds-kubeconfig=/mnt/shared/wds-kubeconfig
+          - --wds-name={{.Values.wds_cp_name}}
+          - --wds-qps={{.Values.wds_qps}}
+          - --wds-burst={{.Values.wds_burst}}
+          - -v={{.Values.verbosity | default 4}}
+          - --max-num-wrapped={{.Values.max_num_wrapped}}
+          - --max-size-wrapped={{.Values.max_size_wrapped}}
+          volumeMounts:
+          - name: shared-volume
+            mountPath: /mnt/shared
+            readOnly: true
+      volumes:
+      - name: shared-volume
+        emptyDir: {}
+      - name: config-volume
+        configMap:
+          name: transport-controller-config
+          defaultMode: 0744

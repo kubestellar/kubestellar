@@ -1,6 +1,6 @@
 # Making KubeStellar Releases
 
-This document defines how releases of the KubeStellar repository are made. This document is a work-in-progress. In particular, the dependency cycle between the `kubestellar` and `ocm-tansport-plugin` repos is not well documented and we do not have a good way to deal with it.
+This document defines how releases of the KubeStellar repository are made. This document is a work-in-progress.
 
 This document starts with step-by-step instructions for the current procedure, then proceeds with the thinking behind them.
 
@@ -10,20 +10,6 @@ clues about the problem.
 Every release should pass all release tests before it can be officially declare as a new stable release. Please see the details in [release-testing](release-testing.md).
 
 ## Step-by-Step
-
-### Reacting to a new ocm-transport-plugin release
-
-Between each release of [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin) and the next release of ks/ks, the following steps should be done in ks/ks.
-
-- Edit `scripts/deploy-transport-controller.sh`: update the tag in the default transport controller image setting (`export TRANSPORT_CONTROLLER_IMAGE...`) to the latest release of ks/OTP.
-
-- Edit `config/postcreate-hooks/kubestellar.yaml`: update the version of the OTP Helm chart.
-
-- Edit `core-chart/values.yaml`: update the OTP version.
-
-- Edit `docs/content/direct/examples.md` (`docs/content/direct/common-setup-core-chart.md`, `docs/content/direct/common-setup-step-by-step.md`): update the version in the `export OCM_TRANSPORT_PLUGIN=...` statement to the latest release of ks/OTP.
-
-- Edit `test/e2e/common/setup-kubestellar.sh`: update the setting of `OCM_TRANSPORT_PLUGIN_RELEASE` to the latest.
 
 ### Reacting to a new ocm-status-addon release
 
@@ -40,7 +26,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Edit `docs/mkdocs.yml` and update the definition of `ks_latest_release` to `$version` (e.g., `'0.23.0-rc42'`). If this is a regular release then also update the definition of `ks_latest_regular_release`.
 
-- Edit the source for the KCM PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the tag in the reference to the KCM container image (it appears in the last object, a `Job`).
+- Edit the source for the KCM+OTC PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the version there for the KubeStellar controller-manager chart and the OCM transport controller chart (they appear in the last object, a `Job`).
 
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
 
@@ -64,8 +50,6 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - If the test results are good and the release is regular (not an RC) then declare the code freeze over.
 
-- If the testing results are good, update [ks/OTP](https://github.com/kubestellar/ocm-transport-plugin) to refer to the new ks/ks release and [make a new release of ks/OTP](https://github.com/kubestellar/ocm-transport-plugin/blob/main/docs/release.md).
-
 ## Goals and limitations
 
 The release process has the following goals.
@@ -88,7 +72,7 @@ We have the following limitations.
 
 ## Dependency cycle with ks/OTP
 
-The [ks/ks repo](https://github.com/kubestellar/kubestellar) and the [ks/OTP repo](https://github.com/kubestellar/ocm-transport-plugin) reference each other. Thus, making consistent immutable recursive-self-reference-free releases is impossible. We have to compromise somehow. There is some discussion in [ks/ks Issue 1786](https://github.com/kubestellar/kubestellar/issues/1786). We currently seem to be following the staggered release approach.
+This is a thing of the past. The kubestellar/ocm-transport-plugin repository is retired now, its contents have been moved into the kubestellar/kubestellar repository.
 
 ## Technology
 
