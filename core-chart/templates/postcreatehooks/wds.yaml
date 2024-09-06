@@ -215,6 +215,10 @@ spec:
             - "{{"transport_cp_name={{.ITSName}}"}}"
             - --set
             - "verbosity={{.Values.verbosity.transport | default .Values.verbosity.default | default 4 }}"
+            - --set
+            - "max_num_wrapped={{.Values.transport_controller.max_num_wrapped}}"
+            - --set
+            - "max_size_wrapped={{.Values.transport_controller.max_size_wrapped}}"
             env:
             - name: XDG_CACHE_HOME
               value: /tmp/helm/.cache
