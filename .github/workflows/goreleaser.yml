@@ -62,7 +62,7 @@ jobs:
     - name: Package and push charts
       run: |
         chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
-        make chart IMG=${{ env.REGISTRY }}/${{ env.CONTROLLER_MANAGER_IMAGE }}:${{github.ref_name}}
+        make chart CONTROLLER_MANAGER_IMAGE=${{ env.REGISTRY }}/${{ env.CONTROLLER_MANAGER_IMAGE }}:${{github.ref_name}}
         helm package ${{ env.CM_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion}
         helm push ./controller-manager-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar
         
