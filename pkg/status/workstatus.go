@@ -90,7 +90,7 @@ func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentif
 	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister], wdsDynClient dynamic.Interface) error {
 	logger := klog.FromContext(ctx)
 
-	if util.WEC2WDSExceptions.Has(objectIdentifier.GVK) {
+	if util.WEC2WDSExceptions.Has(objectIdentifier.GVK.GroupKind()) {
 		logger.V(4).Info("Status from WEC shouldn't have authority to overwrite status in WDS", "object", objectIdentifier)
 		return nil
 	}
