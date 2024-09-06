@@ -230,7 +230,7 @@ markdown_extensions:
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:mermaid2.fence_mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format         
   - attr_list
   - md_in_html
   - toc:               # Builds a table of contents 
