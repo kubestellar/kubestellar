@@ -116,12 +116,12 @@
 </div>
 </div>
 <form class="md-header__option" data-md-component="palette">
-<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
-<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"></path></svg>
 </label>
-<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
-<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to light mode">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
 </label>
 <input aria-label="Switch to system preference" class="md-option" data-md-color-accent="cyan" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="light-blue" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
@@ -1484,18 +1484,17 @@
 <h1 id="packaging-and-delivery">Packaging and Delivery<a class="headerlink" href="#packaging-and-delivery" title="Permanent link">#</a></h1>
 <h2 id="outline-of-github-repositories">Outline of GitHub repositories<a class="headerlink" href="#outline-of-github-repositories" title="Permanent link">#</a></h2>
 <p>The following is a graph of the GitHub repositories in the <code>kubestellar</code> GitHub organization and the dependencies among them. The repo at the tail of an arrow depends on the repo at the head of the arrow. These are not just build-time dependencies but any reference from one repo to another.</p>
-<div class="mermaid">flowchart LR
+<pre class="mermaid"><code>flowchart LR
     kubestellar --&gt; kubeflex
     kubestellar --&gt; ocm-status-addon
-    ocm-status-addon --&gt; kubestellar
-</div>
+    ocm-status-addon --&gt; kubestellar</code></pre>
 <p>The references from ocm-status-addon to kubestellar are only in documentation and are in the process of being removed (no big difficulty is anticipated).</p>
 <h2 id="kubeflex">KubeFlex<a class="headerlink" href="#kubeflex" title="Permanent link">#</a></h2>
 <p>See <a href="https://github.com/kubestellar/kubeflex">the GitHub repo</a>.</p>
 <h2 id="ocm-status-addon">OCM Status Addon<a class="headerlink" href="#ocm-status-addon" title="Permanent link">#</a></h2>
 <p>The <a href="https://github.com/kubestellar/ocm-status-addon">OCM Status Addon</a> repo is the source of an <a href="https://open-cluster-management.io/concepts/addon/">Open Cluster Management Addon</a>. It builds one image that has two subcommands that tell it which role to play in that framework: the controller (which runs in the OCM hub, the KubeStellar ITS) or the agent.</p>
 <h3 id="outline-of-ocm-status-addon-publishing">Outline of OCM status addon publishing<a class="headerlink" href="#outline-of-ocm-status-addon-publishing" title="Permanent link">#</a></h3>
-<div class="mermaid">flowchart LR
+<pre class="mermaid"><code>flowchart LR
     subgraph "ocm-status-addon@GitHub"
     osa_code[OSA source code]
     osa_hc_src[OSA Helm chart source]
@@ -1503,8 +1502,7 @@
     osa_ctr_image[OSA container image] --&gt; osa_code
     osa_hc_repo[published OSA Helm Chart] --&gt; osa_hc_src
     osa_hc_src -.-&gt; osa_ctr_image
-    osa_hc_repo -.-&gt; osa_ctr_image
-</div>
+    osa_hc_repo -.-&gt; osa_ctr_image</code></pre>
 <p>The dashed dependencies are at run time, not build time.</p>
 <p>"OSA" is OCM Status Addon.</p>
 <h3 id="ocm-status-addon-container-image">OCM status addon container image<a class="headerlink" href="#ocm-status-addon-container-image" title="Permanent link">#</a></h3>
@@ -1532,7 +1530,7 @@ prints.</p>
 <p>Literal KubeStellar release numbers appear here, and are historical. The version of this document in a given release does not mention that release. See <a href="../release/">the release process</a> for more details on what self-references are and are not handled.</p>
 <h3 id="outline-of-publishing">Outline of publishing<a class="headerlink" href="#outline-of-publishing" title="Permanent link">#</a></h3>
 <p>The following diagram shows most of it. For simplicity, this omits the clusteradm and the Helm CLI container images.</p>
-<div class="mermaid">flowchart LR
+<pre class="mermaid"><code>flowchart LR
     osa_hc_repo[published OSA Helm Chart]
     subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
@@ -1543,8 +1541,8 @@ prints.</p>
     ks_pch[kubestellar PostCreateHook]
     ocm_pch["ocm PostCreateHook"]
     setup_ksc["'Getting Started' setup"]
-    e2e_local["E2E setup<br/>local"]
-    e2e_release["E2E setup<br/>release"]
+    e2e_local["E2E setup&lt;br&gt;local"]
+    e2e_release["E2E setup&lt;br&gt;release"]
     end
     ocm_pch -.-&gt; osa_hc_repo
     kcm_ctr_image[KCM container image] --&gt; kcm_code
@@ -1574,10 +1572,9 @@ prints.</p>
     e2e_local -.-&gt; KubeFlex
     e2e_release -.-&gt; ocm_pch
     e2e_release -.-&gt; ks_pch
-    e2e_release -.-&gt; KubeFlex
-</div>
+    e2e_release -.-&gt; KubeFlex</code></pre>
 <p>The following diagram shows the parts involving the clusteradm and Helm CLI container images.</p>
-<div class="mermaid">flowchart LR
+<pre class="mermaid"><code>flowchart LR
     subgraph helm_repo["helm/helm@GitHub"]
     helm_src["helm source"]
     end
@@ -1588,8 +1585,8 @@ prints.</p>
     ksc_hc_src[KS Core Helm chart source]
     ks_pch[kubestellar PostCreateHook]
     ocm_pch["ocm PostCreateHook"]
-    e2e_local["E2E setup<br/>local"]
-    e2e_release["E2E setup<br/>release"]
+    e2e_local["E2E setup&lt;br&gt;local"]
+    e2e_release["E2E setup&lt;br&gt;release"]
     end
     helm_image["ks/helm image"] --&gt; helm_src
     cladm_image["ks/clusteradm image"] --&gt; cladm_src
@@ -1603,8 +1600,7 @@ prints.</p>
     ksc_hc_repo -.-&gt; helm_image
     e2e_local -.-&gt; ocm_pch
     e2e_release -.-&gt; ocm_pch
-    e2e_release -.-&gt; ks_pch
-</div>
+    e2e_release -.-&gt; ks_pch</code></pre>
 <p>The dashed dependencies are at run time, not build time.</p>
 <p>"KCM" is the KubeStellar controller-manager.</p>
 <p><strong>NOTE</strong>: among the references to published artifacts, some have a
@@ -1724,7 +1720,7 @@ One uses <a href="#helm-cli-container-image">the Helm CLI image</a> to instantia
 <p>Currently only showing kubestellar and ocm-status-addon.</p>
 <p>Again, omitting clusteradm and Helm CLI container images for simplicity.</p>
 <p>TODO: finish this</p>
-<div class="mermaid">flowchart LR
+<pre class="mermaid"><code>flowchart LR
     subgraph osa_repo["ocm-status-addon@GitHub"]
     osa_code[OSA source code]
     osa_hc_src[OSA Helm chart source]
@@ -1735,7 +1731,7 @@ One uses <a href="#helm-cli-container-image">the Helm CLI image</a> to instantia
     osa_hc_repo -.-&gt; osa_ctr_image
     subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
-    gtc_code["generic transport<br/>controller code"]
+    gtc_code["generic transport&lt;br&gt;controller code"]
     otp_code[OTP source code]
     kcm_hc_src[KCM Helm chart source]
     otc_hc_src[OTC Helm chart source]
@@ -1743,8 +1739,8 @@ One uses <a href="#helm-cli-container-image">the Helm CLI image</a> to instantia
     ks_pch[kubestellar PostCreateHook]
     ocm_pch["ocm PostCreateHook"]
     setup_ksc["'Getting Started' setup"]
-    e2e_local["E2E setup<br/>local"]
-    e2e_release["E2E setup<br/>release"]
+    e2e_local["E2E setup&lt;br&gt;local"]
+    e2e_release["E2E setup&lt;br&gt;release"]
     end
     osa_repo -.-&gt; ks_repo
     ocm_pch -.-&gt; osa_hc_repo
@@ -1777,8 +1773,7 @@ One uses <a href="#helm-cli-container-image">the Helm CLI image</a> to instantia
     e2e_local -.-&gt; KubeFlex
     e2e_release -.-&gt; ocm_pch
     e2e_release -.-&gt; ks_pch
-    e2e_release -.-&gt; KubeFlex
-</div>
+    e2e_release -.-&gt; KubeFlex</code></pre>
 <p>Every dotted line is a reference that must be versioned. How do we
 keep all those versions right?</p>
 <p>Normally a git tag is an immutable reference to an immutable git
@@ -1873,6 +1868,5 @@ keeping <code>main</code> always a working system?</p>
 <script id="__config" type="application/json">{"base": "../../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
 <script src="../../../assets/javascripts/bundle.56dfad97.min.js"></script>
 <script src="../../../js/open_in_new_tab.js"></script>
-<script type="module">import mermaid from "https://unpkg.com/mermaid@10.0.2/dist/mermaid.esm.min.mjs";
-mermaid.initialize({});</script></body>
+</body>
 </html>
