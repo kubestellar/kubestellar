@@ -30,6 +30,8 @@ DEFAULT_NAMESPACE=default
 DEFAULT_WDS_NAME=wds1
 # default kind hosting cluster name
 KIND_HOSTING_CLUSTER ?= kubeflex
+# default k3d hosting cluster name
+K3D_HOSTING_CLUSTER ?= kubeflex
 
 # We need bash for some conditional logic below.
 SHELL := /usr/bin/env bash -e
@@ -188,6 +190,11 @@ ko-build-transport-local: ## Build local transport container image with `ko`.
 .PHONY: kind-load-image
 kind-load-image:
 	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${CONTROLLER_MANAGER_IMAGE}
+
+# this is used for local testing
+.PHONY: k3d-load-image
+k3d-load-image:
+	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${K3D_HOSTING_CLUSTER}
 
 .PHONY: chart
 chart: manifests kustomize
