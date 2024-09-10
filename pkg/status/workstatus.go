@@ -126,10 +126,10 @@ func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentif
 	unstrObj.Object["status"] = status
 
 	if objectIdentifier.ObjectName.Namespace == "" {
-		_, err = wdsDynClient.Resource(gvr).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{})
+		_, err = wdsDynClient.Resource(gvr).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{FieldManager: ControllerName})
 	} else {
 		_, err = wdsDynClient.Resource(gvr).Namespace(objectIdentifier.ObjectName.Namespace).UpdateStatus(ctx,
-			unstrObj, metav1.UpdateOptions{})
+			unstrObj, metav1.UpdateOptions{FieldManager: ControllerName})
 	}
 	if err != nil {
 		// if resource not found it may mean no status subresource - try to patch the status
