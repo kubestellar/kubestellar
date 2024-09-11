@@ -668,44 +668,50 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 	// 		seperated by commas, ordered by the groupBy expressions in scData.GroupBy slice.
 	generator := 0
 	ValueToNumber := map[any]int{}
-	orderedTupleToWorkStatusGroup := map[string][]*workStatusData{}
+	idToAggregationGroup := map[string]*aggregationGroup{}
 
-	if len(scData.GroupBy) > 0 {
-		for _, wsData := range scData.wecToData {
-			valuesTuple := make([]string, 0, len(scData.GroupBy))
-			for _, groupByNamedExp := range scData.GroupBy {
-				groupByValue := wsData.groupByEval[groupByNamedExp.Name]
+	for _, wsData := range scData.wecToData {
+		valuesTuple := make([]string, 0, len(scData.GroupBy))
+		for _, groupByNamedExp := range scData.GroupBy {
+			groupByValue := wsData.groupByEval[groupByNamedExp.Name]
 
-				// ensure unique number mapping for the value
-				uid, exists := ValueToNumber[groupByValue.Value()]
-				if !exists {
-					ValueToNumber[groupByValue.Value()] = generator
-					uid = generator
-					generator++
-				}
-
-				valuesTuple = append(valuesTuple, strconv.Itoa(uid))
+			// ensure unique number mapping for the value
+			uid, exists := ValueToNumber[groupByValue.Value()]
+			if !exists {
+				ValueToNumber[groupByValue.Value()] = generator
+				uid = generator
+				generator++
 			}
 
-			key := strings.Join(valuesTuple, ",")
-			orderedTupleToWorkStatusGroup[key] = append(orderedTupleToWorkStatusGroup[key], wsData)
+			valuesTuple = append(valuesTuple, strconv.Itoa(uid))
 		}
-	} else {
-		// if there is no groupBy, create a single group with all workstatuses
-		orderedTupleToWorkStatusGroup[allValue] = make([]*workStatusData, 0, len(scData.wecToData))
-		for _, wsData := range scData.wecToData {
-			orderedTupleToWorkStatusGroup[allValue] = append(orderedTupleToWorkStatusGroup[allValue], wsData)
+
+		key := strings.Join(valuesTuple, ",")
+		ag := idToAggregationGroup[key]
+		if ag == nil {
+			ag = &aggregationGroup{GroupBy: wsData.groupByEval}
+			idToAggregationGroup[key] = ag
 		}
+		ag.Rows = append(ag.Rows, wsData.combinedFieldsEval)
 	}
 
 	// calculate the combinedFields for each group in one table
-	return calculateCombinedResult(orderedTupleToWorkStatusGroup, scName, scData)
+	return calculateCombinedResult(idToAggregationGroup, scName, scData)
+}
+
+type aggregationGroup struct {
+	// GroupBy holds the unique tuple of "GROUP BY" values that this group is associated with
+	GroupBy map[string]ref.Val
+
+	// Rows holds the rows to aggregate,
+	// each represented by a map of field name to unaggregated value.
+	Rows []map[string]ref.Val
 }
 
 // calculateCombinedResult calculates the combinedFields for each group in the
-// orderedTupleToWorkStatusGroup map and returns the result in a
+// idToAggregationGroup map and returns the result in a
 // NamedStatusCombination.
-func calculateCombinedResult(orderedTupleToWorkStatusGroup map[string][]*workStatusData,
+func calculateCombinedResult(idToAggregationGroup map[string]*aggregationGroup,
 	statusCollectorName string, statusCollectorData *statusCollectorData) *v1alpha1.NamedStatusCombination {
 	// create the named status combination
 	namedStatusCombination := v1alpha1.NamedStatusCombination{
@@ -727,11 +733,7 @@ func calculateCombinedResult(orderedTupleToWorkStatusGroup map[string][]*workSta
 			})...)
 
 	// handle combinedFields (named aggregators) per group
-	for _, wsDataGroup := range orderedTupleToWorkStatusGroup {
-		if len(wsDataGroup) == 0 {
-			continue
-		}
-
+	for _, ag := range idToAggregationGroup {
 		row := v1alpha1.StatusCombinationRow{
 			Columns: make([]v1alpha1.Value, 0,
 				len(statusCollectorData.GroupBy)+len(statusCollectorData.CombinedFields)),
@@ -739,16 +741,15 @@ func calculateCombinedResult(orderedTupleToWorkStatusGroup map[string][]*workSta
 
 		// fill groupBy values using one of the workstatuses in the group
 		if len(statusCollectorData.GroupBy) > 0 {
-			wsData := wsDataGroup[0]
 			for _, groupByNamedExp := range statusCollectorData.GroupBy {
-				groupByValue := wsData.groupByEval[groupByNamedExp.Name]
+				groupByValue := ag.GroupBy[groupByNamedExp.Name]
 				row.Columns = append(row.Columns, refValToValue(groupByValue))
 			}
 		}
 
 		// add combinedFields
 		for _, combinedFieldNamedAgg := range statusCollectorData.CombinedFields {
-			aggregation := calculateCombinedFieldAggregation(combinedFieldNamedAgg, wsDataGroup)
+			aggregation := calculateCombinedFieldAggregation(combinedFieldNamedAgg, ag.Rows)
 			row.Columns = append(row.Columns, aggregation)
 		}
 
@@ -768,16 +769,16 @@ func getStatusCombinationRowName(groupByExpName string, value any) *string {
 }
 
 func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggregator,
-	wsDataGroup []*workStatusData) v1alpha1.Value {
+	rows []map[string]ref.Val) v1alpha1.Value {
 	var numStr string
 
 	switch combinedFieldNamedAgg.Type {
 	case v1alpha1.AggregatorTypeCount:
-		numStr = strconv.Itoa(len(wsDataGroup))
+		numStr = strconv.Itoa(len(rows))
 	case v1alpha1.AggregatorTypeSum:
 		sum := 0.0
-		for _, wsData := range wsDataGroup {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, wsData)
+		for _, row := range rows {
+			subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
 			if subject == nil {
 				continue
 			}
@@ -786,21 +787,24 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 		}
 		numStr = strconv.FormatFloat(sum, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeAvg:
-		sum := 0.0
-		for _, wsData := range wsDataGroup {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, wsData)
-			if subject == nil {
-				continue
-			}
+		var avg float64 = math.NaN()
+		if count := len(rows); count > 0 {
+			sum := 0.0
+			for _, row := range rows {
+				subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+				if subject == nil {
+					continue
+				}
 
-			sum += *subject
+				sum += *subject
+			}
+			avg = sum / float64(count)
 		}
-		avg := sum / float64(len(wsDataGroup))
 		numStr = strconv.FormatFloat(avg, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeMin:
 		min := math.Inf(1)
-		for _, wsData := range wsDataGroup {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, wsData)
+		for _, row := range rows {
+			subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
 			if subject == nil {
 				continue
 			}
@@ -812,8 +816,8 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 		numStr = strconv.FormatFloat(min, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeMax:
 		max := math.Inf(-1)
-		for _, wsData := range wsDataGroup {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, wsData)
+		for _, row := range rows {
+			subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
 			if subject == nil {
 				continue
 			}
@@ -838,7 +842,9 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 // getCombinedFieldSubject returns the subject of the combinedField evaluation.
 // If the subject does not conform to the expected type, the function logs an
 // error and returns nil. TODO: handle errors
-func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, wsData *workStatusData) *float64 {
+// The given `row` map has domain = name of a NamedAggregator,
+// domain = evaluated value (before aggregation, of course) for a given WEC.
+func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row map[string]ref.Val) *float64 {
 	// NamedAggregator pairs a name with a way to aggregate over some objects.
 	//
 	// - For `type=="COUNT"`, `subject` is omitted and the aggregate is the count
@@ -849,7 +855,7 @@ func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, wsD
 	// For a string value: if it parses as an int64 or float64 then that is used.
 	// Otherwise this is an error condition: a value of 0 is used, and the error
 	// is reported in the BindingPolicyStatus.Errors (not necessarily repeated for each WEC).
-	eval := wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]
+	eval := row[combinedFieldNamedAgg.Name]
 	if eval == nil {
 		return nil
 	}

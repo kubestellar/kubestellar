@@ -438,6 +438,9 @@ type NamedAggregator struct {
 }
 
 // AggregatorType indicates what sort of aggregation is to be done.
+// The AVG of no values is NaN;
+// for the other types the aggregation of no values is the identity element of the combining operation
+// in `float64`.
 type AggregatorType string
 
 const (
