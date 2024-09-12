@@ -70,7 +70,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 		workStatus.lastUpdateTime = getObjectStatusLastUpdateTime(obj.(metav1.Object))
 	}
 
-	combinedStatusSet := c.combinedStatusResolver.NoteWorkStatus(workStatus) // nil .status is equivalent to deleted
+	combinedStatusSet := c.combinedStatusResolver.NoteWorkStatus(ctx, workStatus) // nil .status is equivalent to deleted
 	for combinedStatus := range combinedStatusSet {
 		logger.V(5).Info("Enqueuing reference to CombinedStatus while syncing WorkStatus", "combinedStatusRef", combinedStatus.ObjectName, "workStatusRef", ref)
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
