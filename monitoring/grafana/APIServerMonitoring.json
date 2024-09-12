@@ -18,12 +18,12 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 6,
+  "id": 4,
   "links": [],
   "panels": [
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -111,7 +111,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(verb, le) (rate(apiserver_request_duration_seconds_bucket{job=\"$APIService\", namespace=\"$NS\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by(verb, le) (rate(apiserver_request_duration_seconds_bucket{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}[5m])))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -126,7 +126,7 @@
     },
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -213,7 +213,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "sum(rate(apiserver_request_total{job=\"$APIService\", code=~\"[45]..\", namespace=\"$NS\"}[5m])) * 100/sum(rate(apiserver_request_total{job=\"$APIService\", namespace=\"$NS\"}[5m]))",
+          "expr": "sum(rate(apiserver_request_total{instance=\"$Instance\", job=\"$APIService\", code=~\"[45]..\", namespace=\"$NS\"}[5m])) * 100/sum(rate(apiserver_request_total{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}[5m]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -228,7 +228,7 @@
     },
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -316,7 +316,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "irate(process_cpu_seconds_total{job=~\"$APIService\", namespace=\"$NS\"}[1m])",
+          "expr": "irate(process_cpu_seconds_total{instance=\"$Instance\", job=~\"$APIService\", namespace=\"$NS\"}[1m])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -331,7 +331,7 @@
     },
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -419,7 +419,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "(rate(etcd_request_duration_seconds_sum{job=\"$APIService\", namespace=\"$NS\"}[1m])) / (rate(etcd_request_duration_seconds_count{job=\"$APIService\", namespace=\"$NS\"}[1m]))",
+          "expr": "(rate(etcd_request_duration_seconds_sum{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}[1m])) / (rate(etcd_request_duration_seconds_count{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}[1m]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -434,7 +434,7 @@
     },
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -521,7 +521,7 @@
             "uid": "prometheus-test"
           },
           "editorMode": "code",
-          "expr": "sum(rate(apiserver_request_total{job=\"$APIService\", namespace=\"$NS\", code=~\"2..\"}[5m]))",
+          "expr": "sum(rate(apiserver_request_total{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\", code=~\"2..\"}[5m]))",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -534,7 +534,7 @@
     },
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -621,7 +621,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "apiserver_storage_objects{job=\"$APIService\", namespace=\"$NS\"}",
+          "expr": "apiserver_storage_objects{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -643,51 +643,70 @@
       {
         "current": {
           "selected": false,
-          "text": "wds1-system",
-          "value": "wds1-system"
+          "text": "default",
+          "value": "default"
         },
         "hide": 0,
         "name": "NS",
         "options": [
           {
             "selected": true,
-            "text": "wds1-system",
-            "value": "wds1-system"
+            "text": "default",
+            "value": "default"
           }
         ],
-        "query": "wds1-system",
+        "query": "default",
         "skipUrlSync": false,
         "type": "textbox"
       },
       {
         "current": {
           "selected": false,
-          "text": "wds1",
-          "value": "wds1"
+          "text": "apiserver",
+          "value": "apiserver"
         },
         "hide": 0,
         "name": "APIService",
         "options": [
           {
             "selected": true,
-            "text": "wds1",
-            "value": "wds1"
+            "text": "apiserver",
+            "value": "apiserver"
           }
         ],
-        "query": "wds1",
+        "query": "apiserver",
+        "skipUrlSync": false,
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "172.18.0.2:6443",
+          "value": "172.18.0.2:6443"
+        },
+        "hide": 0,
+        "name": "Instance",
+        "options": [
+          {
+            "selected": true,
+            "text": "172.18.0.2:6443",
+            "value": "172.18.0.2:6443"
+          }
+        ],
+        "query": "172.18.0.2:6443",
         "skipUrlSync": false,
         "type": "textbox"
       }
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "API Server Monitoring",
   "uid": "bdrg7u0u4tyioc",
-  "version": 13,
+  "version": 2,
   "weekStart": ""
 }

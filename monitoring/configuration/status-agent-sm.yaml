@@ -1,7 +1,9 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: %WDS%-ks-transport-controller
+  name:  %WEC%-status-agent
+  labels:
+    app: %WEC%-status-agent
 spec:
   endpoints:
   - interval: 15s
@@ -10,7 +12,7 @@ spec:
     scheme: http
   namespaceSelector:
     matchNames:
-    - %WDS%-system
+    - open-cluster-management-agent-addon
   selector:
     matchLabels:
-      app: ks-transport-controller
+      app: status-agent
