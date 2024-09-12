@@ -105,30 +105,17 @@ type BindingPolicySpec struct {
 	// sets are combined by union.
 	Downsync []DownsyncPolicyClause `json:"downsync,omitempty"`
 
-	// WantSingletonReportedState means that for objects that are distributed --- taking
+	// WantSingletonReportedState means that for workload objects that are distributed --- taking
 	// all BindingPolicies into account --- to exactly one WEC, the object's reported state
 	// from the WEC should be written to the object in its WDS.
-	// WantSingletonReportedState connotes an expectation that indeed the object will
-	// propagate to exactly one WEC, but there is no guaranteed reaction when this
-	// expectation is not met.
+	// If any of the workload objects are distributed to more or less than 1 WEC then
+	// the `.status.errors` of this policy will report that discrepancy for
+	// some of them.
 	// +optional
 	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 }
 
 const (
-	// ExecutingCountKey is the name (AKA key) of an annotation on a workload object.
-	// This annotation is written by the KubeStellar implementation to report on
-	// the number of executing copies of that object.
-	// This annotation is maintained while that number is intended to be 1
-	// (see the `WantSingletonReportedState` field above).
-	// The value of this annotation is a string representing the number of
-	// executing copies.  While this annotation is present with the value "1",
-	// the reported state is being returned into this workload object (the design
-	// of an API object typically assumes that it is taking effect in just one cluster).
-	// For reported state from a general number of executing copies, see the
-	// mailboxwatch library and the aspiration for summarization.
-	ExecutingCountKey string = "kubestellar.io/executing-count"
-
 	ValidationErrorKeyPrefix string = "validation-error.kubestellar.io/"
 
 	// BindingPolicyConditionSatisfied means BindingPolicy requirements are satisfied.
@@ -223,9 +210,13 @@ type DownsyncObjectTest struct {
 
 // BindingPolicyStatus defines the observed state of BindingPolicy
 type BindingPolicyStatus struct {
-	Conditions         []BindingPolicyCondition `json:"conditions"`
-	ObservedGeneration int64                    `json:"observedGeneration"`
-	Errors             []string                 `json:"errors,omitempty"`
+	// +optional
+	Conditions []BindingPolicyCondition `json:"conditions"`
+
+	ObservedGeneration int64 `json:"observedGeneration"`
+
+	// +optional
+	Errors []string `json:"errors,omitempty"`
 }
 
 // +kubebuilder:object:root=true

@@ -47,7 +47,6 @@ const (
 type BindingPolicyCondition struct {
 	Type               ConditionType          `json:"type"`
 	Status             corev1.ConditionStatus `json:"status"`
-	LastUpdateTime     metav1.Time            `json:"lastUpdateTime"`
 	LastTransitionTime metav1.Time            `json:"lastTransitionTime"`
 	Reason             ConditionReason        `json:"reason"`
 	Message            string                 `json:"message"`
@@ -131,7 +130,6 @@ func ConditionCreating() BindingPolicyCondition {
 		Type:               TypeReady,
 		Status:             corev1.ConditionFalse,
 		LastTransitionTime: metav1.Now(),
-		LastUpdateTime:     metav1.Now(),
 		Reason:             ReasonCreating,
 	}
 }
@@ -143,7 +141,6 @@ func ConditionDeleting() BindingPolicyCondition {
 		Type:               TypeReady,
 		Status:             corev1.ConditionFalse,
 		LastTransitionTime: metav1.Now(),
-		LastUpdateTime:     metav1.Now(),
 		Reason:             ReasonDeleting,
 	}
 }
@@ -155,7 +152,6 @@ func ConditionAvailable() BindingPolicyCondition {
 		Type:               TypeReady,
 		Status:             corev1.ConditionTrue,
 		LastTransitionTime: metav1.Now(),
-		LastUpdateTime:     metav1.Now(),
 		Reason:             ReasonAvailable,
 	}
 }
@@ -167,7 +163,6 @@ func ConditionUnavailable() BindingPolicyCondition {
 		Type:               TypeReady,
 		Status:             corev1.ConditionFalse,
 		LastTransitionTime: metav1.Now(),
-		LastUpdateTime:     metav1.Now(),
 		Reason:             ReasonUnavailable,
 	}
 }
@@ -178,7 +173,6 @@ func ConditionReconcileSuccess() BindingPolicyCondition {
 		Type:               TypeSynced,
 		Status:             corev1.ConditionTrue,
 		LastTransitionTime: metav1.Now(),
-		LastUpdateTime:     metav1.Now(),
 		Reason:             ReasonReconcileSuccess,
 	}
 }
@@ -190,7 +184,6 @@ func ConditionReconcileError(err error) BindingPolicyCondition {
 		Type:               TypeSynced,
 		Status:             corev1.ConditionFalse,
 		LastTransitionTime: metav1.Now(),
-		LastUpdateTime:     metav1.Now(),
 		Reason:             ReasonReconcileError,
 		Message:            err.Error(),
 	}

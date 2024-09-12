@@ -123,8 +123,8 @@ type BindingPolicyResolver interface {
 
 	// GetSingletonReportedStateRequestsForBinding calls GetSingletonReportedStateRequestForObject
 	// for each of workload objects in the resolution if the resolution exists.
-	// If the resolution doesn't exist, empty slices are returned.
-	GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) ([]util.ObjectIdentifier, []bool, []int)
+	// If the resolution doesn't exist then returns `nil`.
+	GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) []SingletonReportedStateReturnStatus
 
 	// DeleteResolution deletes the resolution associated with the given key,
 	// if it exists.
@@ -132,6 +132,14 @@ type BindingPolicyResolver interface {
 
 	// Broker returns a ResolutionBroker for the resolver.
 	Broker() ResolutionBroker
+}
+
+// SingletonReportedStateReturnStatus reports the resolver's state regarding
+// requests for return of singleton reported state for a particular object.
+type SingletonReportedStateReturnStatus struct {
+	ObjectId                   util.ObjectIdentifier
+	WantSingletonReportedState bool
+	NumWECs                    int
 }
 
 func NewBindingPolicyResolver() BindingPolicyResolver {
@@ -358,21 +366,21 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject
 	return requested, matchingWECs.Len()
 }
 
-func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) ([]util.ObjectIdentifier, []bool, []int) {
+func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) []SingletonReportedStateReturnStatus {
 	resolver.RWMutex.RLock()
 	defer resolver.RWMutex.RUnlock()
 
-	objIds, requests, nWECs := []util.ObjectIdentifier{}, []bool{}, []int{}
 	resolution := resolver.getResolution(bindingPolicyKey)
 	if resolution == nil {
-		return objIds, requests, nWECs
+		return nil
 	}
-	objIds = resolution.getWorkloadReferences()
-	for _, objId := range objIds {
-		r, n := resolver.GetSingletonReportedStateRequestForObject(objId)
-		requests, nWECs = append(requests, r), append(nWECs, n)
+	objIds := resolution.getWorkloadReferences()
+	ans := make([]SingletonReportedStateReturnStatus, len(objIds))
+	for idx, objId := range objIds {
+		want, numWECs := resolver.GetSingletonReportedStateRequestForObject(objId)
+		ans[idx] = SingletonReportedStateReturnStatus{objId, want, numWECs}
 	}
-	return objIds, requests, nWECs
+	return ans
 }
 
 // DeleteResolution deletes the resolution associated with the given key,
