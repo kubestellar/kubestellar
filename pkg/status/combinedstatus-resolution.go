@@ -17,6 +17,7 @@ limitations under the License.
 package status
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -27,20 +28,18 @@ import (
 	"sync"
 	"unicode"
 
+	"github.com/go-logr/logr"
 	"github.com/google/cel-go/common/types/ref"
 
 	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/util"
-)
-
-const (
-	allValue = ""
 )
 
 // combinedStatusResolution is a struct that represents the resolution of a
@@ -66,13 +65,24 @@ const (
 type combinedStatusResolution struct {
 	sync.RWMutex
 
-	name string
-	// statusCollectorNameToData is a map of status collector names to
+	// Name of the CombinedStatus object
+	Name string
+	// StatusCollectorNameToData is a map of status collector names to
 	// their corresponding data.
-	statusCollectorNameToData map[string]*statusCollectorData
-	// collectionDestinations is a set of destinations that are expected to be
+	StatusCollectorNameToData map[string]*statusCollectorData
+	// CollectionDestinations is a set of destinations that are expected to be
 	// collected from.
-	collectionDestinations sets.Set[string]
+	CollectionDestinations sets.Set[string]
+}
+
+var _ logr.Marshaler = &combinedStatusResolution{}
+
+func (csr *combinedStatusResolution) MarshalLog() any {
+	return map[string]any{
+		"Name":                      csr.Name,
+		"StatusCollectorNameToData": csr.StatusCollectorNameToData,
+		"CollectionDestinations":    csr.CollectionDestinations.UnsortedList(),
+	}
 }
 
 // statusCollectorData is a struct that represents the data of a
@@ -114,7 +124,7 @@ func (c *combinedStatusResolution) getName() string {
 	c.RLock()
 	defer c.RUnlock()
 
-	return c.name
+	return c.Name
 }
 
 // setCollectionDestinations sets the collection destinations of the
@@ -128,16 +138,16 @@ func (c *combinedStatusResolution) setCollectionDestinations(destinationsSet set
 	c.Lock()
 	defer c.Unlock()
 
-	removedDestinations := c.collectionDestinations.Difference(destinationsSet)
-	newDestinations := destinationsSet.Difference(c.collectionDestinations)
+	removedDestinations := c.CollectionDestinations.Difference(destinationsSet)
+	newDestinations := destinationsSet.Difference(c.CollectionDestinations)
 	// if nothing changed, return
 	if len(removedDestinations) == 0 && len(newDestinations) == 0 {
 		return false, nil
 	}
 
-	c.collectionDestinations = destinationsSet
+	c.CollectionDestinations = destinationsSet
 	// trim the statuscollector data that are not relevant anymore
-	for _, data := range c.statusCollectorNameToData {
+	for _, data := range c.StatusCollectorNameToData {
 		if data.wecToData == nil {
 			continue
 		}
@@ -167,25 +177,25 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 
 	// remove statuscollector data that are not relevant anymore and update the
 	// statuscollector data that are. If one of the latter is updated, mark it as added
-	for statusCollectorName, statusCollectorData := range c.statusCollectorNameToData {
+	for statusCollectorName, statusCollectorData := range c.StatusCollectorNameToData {
 		statusCollectorSpec, ok := statusCollectorNameToSpec[statusCollectorName]
 		if !ok {
-			delete(c.statusCollectorNameToData, statusCollectorName)
+			delete(c.StatusCollectorNameToData, statusCollectorName)
 			removedSome = true
 			continue
 		}
 
 		if !statusCollectorSpecsMatch(statusCollectorData.StatusCollectorSpec, &statusCollectorSpec) {
-			c.statusCollectorNameToData[statusCollectorName].StatusCollectorSpec = &statusCollectorSpec
+			c.StatusCollectorNameToData[statusCollectorName].StatusCollectorSpec = &statusCollectorSpec
 			addedSome = true
 		}
 	}
 
 	// add new statuscollector data
 	for statusCollectorName, statusCollectorSpec := range statusCollectorNameToSpec {
-		if _, ok := c.statusCollectorNameToData[statusCollectorName]; !ok {
+		if _, ok := c.StatusCollectorNameToData[statusCollectorName]; !ok {
 			statusCollectorSpecVar := statusCollectorSpec // copy to avoid closure over the loop variable
-			c.statusCollectorNameToData[statusCollectorName] = &statusCollectorData{
+			c.StatusCollectorNameToData[statusCollectorName] = &statusCollectorData{
 				StatusCollectorSpec: &statusCollectorSpecVar,
 				wecToData:           make(map[string]*workStatusData),
 			}
@@ -207,7 +217,7 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 	c.Lock()
 	defer c.Unlock()
 
-	scData, ok := c.statusCollectorNameToData[statusCollectorName]
+	scData, ok := c.StatusCollectorNameToData[statusCollectorName]
 	if !ok {
 		return false // statusCollector is irrelevant to this combinedstatus resolution
 	}
@@ -218,7 +228,7 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 
 	// status collector clauses need to be updated, therefore update fields
 	// and invalidate all cached workstatus evaluations by resetting the map
-	c.statusCollectorNameToData[statusCollectorName] = &statusCollectorData{
+	c.StatusCollectorNameToData[statusCollectorName] = &statusCollectorData{
 		StatusCollectorSpec: statusCollectorSpec,
 		wecToData:           make(map[string]*workStatusData),
 	}
@@ -233,11 +243,11 @@ func (c *combinedStatusResolution) removeStatusCollector(statusCollectorName str
 	c.Lock()
 	defer c.Unlock()
 
-	if _, ok := c.statusCollectorNameToData[statusCollectorName]; !ok {
+	if _, ok := c.StatusCollectorNameToData[statusCollectorName]; !ok {
 		return false // statusCollector is irrelevant to this combinedstatus resolution
 	}
 
-	delete(c.statusCollectorNameToData, statusCollectorName)
+	delete(c.StatusCollectorNameToData, statusCollectorName)
 	return true
 }
 
@@ -250,18 +260,18 @@ func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 
 	combinedStatus := &v1alpha1.CombinedStatus{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      c.name,
+			Name:      c.Name,
 			Namespace: workloadObjectIdentifier.ObjectName.Namespace,
 		},
-		Results: make([]v1alpha1.NamedStatusCombination, 0, len(c.statusCollectorNameToData)),
+		Results: make([]v1alpha1.NamedStatusCombination, 0, len(c.StatusCollectorNameToData)),
 	}
 
 	if combinedStatus.Namespace == metav1.NamespaceNone {
 		combinedStatus.Namespace = util.ClusterScopedObjectsCombinedStatusNamespace
 	}
 
-	for _, scName := range sortedStringSlice(abstract.PrimitiveMapKeySlice(c.statusCollectorNameToData)) {
-		scData := c.statusCollectorNameToData[scName]
+	for _, scName := range sortedStringSlice(abstract.PrimitiveMapKeySlice(c.StatusCollectorNameToData)) {
+		scData := c.StatusCollectorNameToData[scName]
 		// the data has either select or combinedFields (with groupBy)
 		if len(scData.Select) > 0 {
 			combinedStatus.Results = append(combinedStatus.Results, *handleSelectReadLocked(scName, scData))
@@ -321,22 +331,24 @@ func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.Combin
 // if workStatusContent is nil, the function removes the workstatus data if it
 // exists.
 // TODO: handle errors
-func (c *combinedStatusResolution) evaluateWorkStatus(celEvaluator *celEvaluator,
+func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEvaluator *celEvaluator,
 	workStatusWECName string, content map[string]interface{}) bool {
 	c.Lock()
 	defer c.Unlock()
+	logger := klog.FromContext(ctx)
 
-	if !c.collectionDestinations.Has(workStatusWECName) {
+	if !c.CollectionDestinations.Has(workStatusWECName) {
+		logger.V(5).Info("WEC is not status-collected", "wecName", workStatusWECName)
 		return false // workstatus is not relevant to this combinedstatus resolution
 	}
 
 	updated := false
-	for _, scData := range c.statusCollectorNameToData {
+	for _, scData := range c.StatusCollectorNameToData {
 		changed := evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator, workStatusWECName,
 			content, scData)
-
 		updated = updated || changed
 	}
+	logger.V(5).Info("Evaluated collectors", "wecName", workStatusWECName, "numCollectors", len(c.StatusCollectorNameToData), "updated", updated)
 
 	return updated
 }
@@ -368,7 +380,7 @@ func (c *combinedStatusResolution) queryingContentRequirements() (bool, bool, bo
 		propagationMetaKeyRequired = propagationMetaKeyRequired || p
 	}
 
-	for _, scData := range c.statusCollectorNameToData {
+	for _, scData := range c.StatusCollectorNameToData {
 		if scData.Filter != nil {
 			mergeBooleans(pred((*string)(scData.Filter)))
 		}
@@ -668,44 +680,55 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 	// 		seperated by commas, ordered by the groupBy expressions in scData.GroupBy slice.
 	generator := 0
 	ValueToNumber := map[any]int{}
-	orderedTupleToWorkStatusGroup := map[string][]*workStatusData{}
+	idToAggregationGroup := map[string]*aggregationGroup{}
 
-	if len(scData.GroupBy) > 0 {
-		for _, wsData := range scData.wecToData {
-			valuesTuple := make([]string, 0, len(scData.GroupBy))
-			for _, groupByNamedExp := range scData.GroupBy {
-				groupByValue := wsData.groupByEval[groupByNamedExp.Name]
+	if len(scData.GroupBy) == 0 && len(scData.wecToData) == 0 {
+		// len(scData.GroupBy) == 0 means there is exactly one group to aggregate over.
+		// len(scData.wecToData) == 0 means that the loop below will not put the group in the map.
+		idToAggregationGroup[""] = &aggregationGroup{GroupBy: map[string]ref.Val{}}
+	}
+	for _, wsData := range scData.wecToData {
+		valuesTuple := make([]string, 0, len(scData.GroupBy))
+		for _, groupByNamedExp := range scData.GroupBy {
+			groupByValue := wsData.groupByEval[groupByNamedExp.Name]
 
-				// ensure unique number mapping for the value
-				uid, exists := ValueToNumber[groupByValue.Value()]
-				if !exists {
-					ValueToNumber[groupByValue.Value()] = generator
-					uid = generator
-					generator++
-				}
-
-				valuesTuple = append(valuesTuple, strconv.Itoa(uid))
+			// ensure unique number mapping for the value
+			uid, exists := ValueToNumber[groupByValue.Value()]
+			if !exists {
+				ValueToNumber[groupByValue.Value()] = generator
+				uid = generator
+				generator++
 			}
 
-			key := strings.Join(valuesTuple, ",")
-			orderedTupleToWorkStatusGroup[key] = append(orderedTupleToWorkStatusGroup[key], wsData)
+			valuesTuple = append(valuesTuple, strconv.Itoa(uid))
 		}
-	} else {
-		// if there is no groupBy, create a single group with all workstatuses
-		orderedTupleToWorkStatusGroup[allValue] = make([]*workStatusData, 0, len(scData.wecToData))
-		for _, wsData := range scData.wecToData {
-			orderedTupleToWorkStatusGroup[allValue] = append(orderedTupleToWorkStatusGroup[allValue], wsData)
+
+		key := strings.Join(valuesTuple, ",")
+		ag := idToAggregationGroup[key]
+		if ag == nil {
+			ag = &aggregationGroup{GroupBy: wsData.groupByEval}
+			idToAggregationGroup[key] = ag
 		}
+		ag.Rows = append(ag.Rows, wsData.combinedFieldsEval)
 	}
 
 	// calculate the combinedFields for each group in one table
-	return calculateCombinedResult(orderedTupleToWorkStatusGroup, scName, scData)
+	return calculateCombinedResult(idToAggregationGroup, scName, scData)
+}
+
+type aggregationGroup struct {
+	// GroupBy holds the unique tuple of "GROUP BY" values that this group is associated with
+	GroupBy map[string]ref.Val
+
+	// Rows holds the rows to aggregate,
+	// each represented by a map of field name to unaggregated value.
+	Rows []map[string]ref.Val
 }
 
 // calculateCombinedResult calculates the combinedFields for each group in the
-// orderedTupleToWorkStatusGroup map and returns the result in a
+// idToAggregationGroup map and returns the result in a
 // NamedStatusCombination.
-func calculateCombinedResult(orderedTupleToWorkStatusGroup map[string][]*workStatusData,
+func calculateCombinedResult(idToAggregationGroup map[string]*aggregationGroup,
 	statusCollectorName string, statusCollectorData *statusCollectorData) *v1alpha1.NamedStatusCombination {
 	// create the named status combination
 	namedStatusCombination := v1alpha1.NamedStatusCombination{
@@ -727,11 +750,7 @@ func calculateCombinedResult(orderedTupleToWorkStatusGroup map[string][]*workSta
 			})...)
 
 	// handle combinedFields (named aggregators) per group
-	for _, wsDataGroup := range orderedTupleToWorkStatusGroup {
-		if len(wsDataGroup) == 0 {
-			continue
-		}
-
+	for _, ag := range idToAggregationGroup {
 		row := v1alpha1.StatusCombinationRow{
 			Columns: make([]v1alpha1.Value, 0,
 				len(statusCollectorData.GroupBy)+len(statusCollectorData.CombinedFields)),
@@ -739,16 +758,15 @@ func calculateCombinedResult(orderedTupleToWorkStatusGroup map[string][]*workSta
 
 		// fill groupBy values using one of the workstatuses in the group
 		if len(statusCollectorData.GroupBy) > 0 {
-			wsData := wsDataGroup[0]
 			for _, groupByNamedExp := range statusCollectorData.GroupBy {
-				groupByValue := wsData.groupByEval[groupByNamedExp.Name]
+				groupByValue := ag.GroupBy[groupByNamedExp.Name]
 				row.Columns = append(row.Columns, refValToValue(groupByValue))
 			}
 		}
 
 		// add combinedFields
 		for _, combinedFieldNamedAgg := range statusCollectorData.CombinedFields {
-			aggregation := calculateCombinedFieldAggregation(combinedFieldNamedAgg, wsDataGroup)
+			aggregation := calculateCombinedFieldAggregation(combinedFieldNamedAgg, ag.Rows)
 			row.Columns = append(row.Columns, aggregation)
 		}
 
@@ -758,26 +776,17 @@ func calculateCombinedResult(orderedTupleToWorkStatusGroup map[string][]*workSta
 	return &namedStatusCombination
 }
 
-func getStatusCombinationRowName(groupByExpName string, value any) *string {
-	if groupByExpName == allValue && value == allValue {
-		return nil
-	}
-
-	rowName := fmt.Sprintf("%s.%v", groupByExpName, value)
-	return &rowName
-}
-
 func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggregator,
-	wsDataGroup []*workStatusData) v1alpha1.Value {
+	rows []map[string]ref.Val) v1alpha1.Value {
 	var numStr string
 
 	switch combinedFieldNamedAgg.Type {
 	case v1alpha1.AggregatorTypeCount:
-		numStr = strconv.Itoa(len(wsDataGroup))
+		numStr = strconv.Itoa(len(rows))
 	case v1alpha1.AggregatorTypeSum:
 		sum := 0.0
-		for _, wsData := range wsDataGroup {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, wsData)
+		for _, row := range rows {
+			subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
 			if subject == nil {
 				continue
 			}
@@ -786,21 +795,24 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 		}
 		numStr = strconv.FormatFloat(sum, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeAvg:
-		sum := 0.0
-		for _, wsData := range wsDataGroup {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, wsData)
-			if subject == nil {
-				continue
-			}
+		var avg float64 = math.NaN()
+		if count := len(rows); count > 0 {
+			sum := 0.0
+			for _, row := range rows {
+				subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+				if subject == nil {
+					continue
+				}
 
-			sum += *subject
+				sum += *subject
+			}
+			avg = sum / float64(count)
 		}
-		avg := sum / float64(len(wsDataGroup))
 		numStr = strconv.FormatFloat(avg, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeMin:
 		min := math.Inf(1)
-		for _, wsData := range wsDataGroup {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, wsData)
+		for _, row := range rows {
+			subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
 			if subject == nil {
 				continue
 			}
@@ -812,8 +824,8 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 		numStr = strconv.FormatFloat(min, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeMax:
 		max := math.Inf(-1)
-		for _, wsData := range wsDataGroup {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, wsData)
+		for _, row := range rows {
+			subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
 			if subject == nil {
 				continue
 			}
@@ -838,7 +850,9 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 // getCombinedFieldSubject returns the subject of the combinedField evaluation.
 // If the subject does not conform to the expected type, the function logs an
 // error and returns nil. TODO: handle errors
-func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, wsData *workStatusData) *float64 {
+// The given `row` map has domain = name of a NamedAggregator,
+// domain = evaluated value (before aggregation, of course) for a given WEC.
+func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row map[string]ref.Val) *float64 {
 	// NamedAggregator pairs a name with a way to aggregate over some objects.
 	//
 	// - For `type=="COUNT"`, `subject` is omitted and the aggregate is the count
@@ -849,7 +863,7 @@ func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, wsD
 	// For a string value: if it parses as an int64 or float64 then that is used.
 	// Otherwise this is an error condition: a value of 0 is used, and the error
 	// is reported in the BindingPolicyStatus.Errors (not necessarily repeated for each WEC).
-	eval := wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]
+	eval := row[combinedFieldNamedAgg.Name]
 	if eval == nil {
 		return nil
 	}

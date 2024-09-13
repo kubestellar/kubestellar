@@ -20,6 +20,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
+	"strconv"
 	"time"
 
 	"github.com/onsi/ginkgo/v2"
@@ -818,6 +820,48 @@ var _ = ginkgo.Describe("end to end testing", func() {
 
 			gomega.Expect(len(cs.Results[1].ColumnNames)).To(gomega.Equal(2))
 			gomega.Expect(len(cs.Results[1].Rows)).To(gomega.Equal(2))
+
+		})
+
+		ginkgo.It("can aggregate over zero WECs", func(ctx context.Context) {
+			exprFalse := ksapi.Expression("false")
+			expr2 := ksapi.Expression("2")
+			str0 := "0"
+			strPlusInf := strconv.FormatFloat(math.Inf(1), 'g', -1, 64)
+			strNegInf := strconv.FormatFloat(math.Inf(-1), 'g', -1, 64)
+			strNaN := strconv.FormatFloat(math.NaN(), 'g', -1, 64)
+			collectorName := "test-empty-group"
+			util.CreateStatusCollector(ctx, ksWds, collectorName,
+				ksapi.StatusCollectorSpec{
+					Filter: &exprFalse,
+					CombinedFields: []ksapi.NamedAggregator{
+						{Name: "count", Type: ksapi.AggregatorTypeCount},
+						{Name: "max", Type: ksapi.AggregatorTypeMax, Subject: &expr2},
+						{Name: "min", Type: ksapi.AggregatorTypeMin, Subject: &expr2},
+						{Name: "sum", Type: ksapi.AggregatorTypeSum, Subject: &expr2},
+						{Name: "avg", Type: ksapi.AggregatorTypeAvg, Subject: &expr2},
+					},
+					Limit: 20,
+				})
+
+			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{collectorName}
+			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
+
+			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
+
+			// Validate CombinedStatus results
+			gomega.Expect(len(cs.Results)).To(gomega.Equal(1))
+
+			gomega.Expect(cs.Results[0].ColumnNames).To(gomega.Equal([]string{"count", "max", "min", "sum", "avg"}))
+			gomega.Expect(len(cs.Results[0].Rows)).To(gomega.Equal(1))
+			expectedRow := []ksapi.Value{
+				{Type: ksapi.TypeNumber, Number: &str0},
+				{Type: ksapi.TypeNumber, Number: &strNegInf},
+				{Type: ksapi.TypeNumber, Number: &strPlusInf},
+				{Type: ksapi.TypeNumber, Number: &str0},
+				{Type: ksapi.TypeNumber, Number: &strNaN},
+			}
+			gomega.Expect(cs.Results[0].Rows[0].Columns).To(gomega.Equal(expectedRow))
 
 		})
 	})
