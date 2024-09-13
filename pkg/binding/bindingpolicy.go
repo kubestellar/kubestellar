@@ -84,15 +84,6 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 			logger.V(4).Info("No clusters are selected by BindingPolicy", "name", bindingPolicy.Name)
 		}
 
-		if bindingPolicy.Spec.WantSingletonReportedState {
-			// if the bindingpolicy requires a singleton status, then we should only
-			// have one destination
-			// TODO: this should be removed once we have proper enforcement or error reporting for this
-			if len(clusterSet) > 1 {
-				clusterSet = pickSingleDestination(clusterSet)
-			}
-		}
-
 		// set destinations and enqueue binding for syncing
 		// we can skip handling the error since the call to BindingPolicyResolver::NoteBindingPolicy above
 		// guarantees that an error won't be returned here

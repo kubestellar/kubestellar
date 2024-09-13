@@ -29,9 +29,9 @@ func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string
 	logger := klog.FromContext(ctx)
 	logger.V(4).Info("Reconciling singleton status due to binding change", "binding", bdgName)
 
-	wObjIDs, requested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestsForBinding(bdgName)
-	for i := range wObjIDs {
-		wObjID, r, n := wObjIDs[i], requested[i], nWECs[i]
+	statusPerObj := c.bindingPolicyResolver.GetSingletonReportedStateRequestsForBinding(bdgName)
+	for _, status := range statusPerObj {
+		wObjID, r, n := status.ObjectId, status.WantSingletonReportedState, status.NumWECs
 		if !r || n != 1 {
 			if err := c.reconcileSingletonWObj(ctx, wObjID, false); err != nil {
 				return err

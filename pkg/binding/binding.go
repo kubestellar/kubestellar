@@ -18,6 +18,7 @@ package binding
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -25,6 +26,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 // syncBinding syncs a binding object with what is resolved by the bindingpolicy resolver.
@@ -40,9 +42,9 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 		return nil
 	}
 
-	binding, err := c.bindingLister.Get(bindingName)
+	binding, bindingErr := c.bindingLister.Get(bindingName)
 	// `*binding` is immutable
-	if errors.IsNotFound(err) {
+	if errors.IsNotFound(bindingErr) {
 		// a resolution exists and the object is not found, therefore it is deleted and should be created
 		binding = &v1alpha1.Binding{
 			TypeMeta: metav1.TypeMeta{
@@ -51,12 +53,21 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 			ObjectMeta: metav1.ObjectMeta{
 				Name: bindingName},
 		}
-	} else if err != nil {
-		return fmt.Errorf("failed to get Binding from informer cache (name=%v): %w", bindingName, err)
+	} else if bindingErr != nil {
+		return fmt.Errorf("failed to get Binding from informer cache (name=%v): %w", bindingName, bindingErr)
 	}
 
 	// binding name matches that of the bindingpolicy 1:1, therefore its NamespacedName is the same.
 	bindingPolicyIdentifier := binding.GetName()
+
+	policy, policyErr := c.bindingPolicyLister.Get(bindingPolicyIdentifier)
+	// `*policy` is immutable
+	if errors.IsNotFound(policyErr) {
+		logger.V(2).Info("Aborting sync of Binding because the corresponding Policy is gone", "name", bindingName)
+		return nil
+	} else if policyErr != nil {
+		return fmt.Errorf("failed to get BindingPolicy from informer cache (name=%v): %w", bindingName, policyErr)
+	}
 
 	// generate binding spec from resolver
 	generatedBindingSpec := c.bindingPolicyResolver.GenerateBinding(bindingPolicyIdentifier)
@@ -65,19 +76,56 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 	}
 
 	// calculate if the resolved decision is different from the current one
-	if !c.bindingPolicyResolver.CompareBinding(bindingPolicyIdentifier, &binding.Spec) {
+	if c.bindingPolicyResolver.CompareBinding(bindingPolicyIdentifier, &binding.Spec) {
+		logger.V(4).Info("Binding is up to date", "name", binding.GetName())
+	} else {
 		// update the binding object in the cluster by updating spec
-		if err = c.updateOrCreateBinding(ctx, binding, generatedBindingSpec); err != nil {
+		if err := c.updateOrCreateBinding(ctx, binding, generatedBindingSpec); err != nil {
 			return fmt.Errorf("failed to update or create binding: %w", err)
 		}
 
 		// notify the bindingpolicy resolution broker that the binding has been updated
 		c.bindingPolicyResolver.Broker().NotifyCallbacks(bindingPolicyIdentifier)
-		return nil
+	}
+	srPerObj := c.bindingPolicyResolver.GetSingletonReportedStateRequestsForBinding(bindingPolicyIdentifier)
+	policyErrors := append([]string{}, binding.Status.Errors...)
+	badSR := []objectWithNumWECs{}
+	for _, srStatus := range srPerObj {
+		if srStatus.WantSingletonReportedState && srStatus.NumWECs != 1 {
+			badSR = append(badSR, objectWithNumWECs{srStatus.ObjectId, srStatus.NumWECs})
+			if len(badSR) > 3 {
+				break
+			}
+		}
+	}
+	if len(badSR) > 0 {
+		badSRBytes, err := json.Marshal(badSR)
+		if err != nil {
+			policyErrors = append(policyErrors, fmt.Sprintf("Failed to json.Marshal some example blighted objects (%#v): %s", badSR, err))
+		} else {
+			policyErrors = append(policyErrors, fmt.Sprintf("Singleton reported status return is requested but some objects have the wrong number of associated WECs, for example: %s", string(badSRBytes)))
+		}
+	}
+	policyWithStatus := policy.DeepCopy()
+	policyWithStatus.Status = v1alpha1.BindingPolicyStatus{
+		ObservedGeneration: policy.Generation,
+		Errors:             policyErrors,
+	}
+	policyEcho, updateErr := c.bindingPolicyClient.UpdateStatus(ctx, policyWithStatus, metav1.UpdateOptions{FieldManager: ControllerName})
+	if updateErr == nil {
+		logger.V(4).Info("Updated Status of BindingPolicy", "name", bindingPolicyIdentifier, "generation", policy.Generation, "numErrors", len(policyErrors), "resourceVersion", policyEcho.ResourceVersion)
+	} else if errors.IsNotFound(updateErr) {
+		logger.V(2).Info("Did not update Status of absent BindingPolicy", "name", bindingPolicyIdentifier)
+	} else {
+		return updateErr
 	}
 
-	logger.V(4).Info("binding is up to date", "name", binding.GetName())
 	return nil
+}
+
+type objectWithNumWECs struct {
+	ObjectID util.ObjectIdentifier
+	NumWECs  int
 }
 
 // updateOrCreateBinding updates or creates a binding object in the cluster.

@@ -279,13 +279,12 @@ spec:
                   type: object
                 type: array
               wantSingletonReportedState:
-                description: WantSingletonReportedState means that for objects that
-                  are distributed --- taking all BindingPolicies into account ---
-                  to exactly one WEC, the object's reported state from the WEC should
-                  be written to the object in its WDS. WantSingletonReportedState
-                  connotes an expectation that indeed the object will propagate to
-                  exactly one WEC, but there is no guaranteed reaction when this expectation
-                  is not met.
+                description: WantSingletonReportedState means that for workload objects
+                  that are distributed --- taking all BindingPolicies into account
+                  --- to exactly one WEC, the object's reported state from the WEC
+                  should be written to the object in its WDS. If any of the workload
+                  objects are distributed to more or less than 1 WEC then the `.status.errors`
+                  of this policy will report that discrepancy for some of them.
                 type: boolean
             type: object
           status:
@@ -299,9 +298,6 @@ spec:
                     lastTransitionTime:
                       format: date-time
                       type: string
-                    lastUpdateTime:
-                      format: date-time
-                      type: string
                     message:
                       type: string
                     reason:
@@ -312,7 +308,6 @@ spec:
                       type: string
                   required:
                   - lastTransitionTime
-                  - lastUpdateTime
                   - message
                   - reason
                   - status
@@ -327,7 +322,6 @@ spec:
                 format: int64
                 type: integer
             required:
-            - conditions
             - observedGeneration
             type: object
         type: object
