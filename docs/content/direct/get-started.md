@@ -1,6 +1,6 @@
 # Getting Started with KubeStellar
 
-This pages shows one concrete example of steps 2--7 from the [full Installation and Usage outline](user-guide-intro.md#the-full-story). This example produces a simple single-host system suitable for kicking the tires, using [kind](https://kind.sigs.k8s.io/) to create three new clusters to serve as your KubeFlex hosting cluster and two WECs. This page concludes with forwarding you to one example of the remaining steps.
+This page shows one concrete example of steps 2--7 from the [full Installation and Usage outline](user-guide-intro.md#the-full-story). This example produces a simple single-host system suitable for kicking the tires, using [kind](https://kind.sigs.k8s.io/) to create three new clusters to serve as your KubeFlex hosting cluster and two WECs. This page concludes with forwarding you to one example of the remaining steps.
 
   1. Setup
     1. Install software prerequisites
