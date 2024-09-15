@@ -50,7 +50,7 @@ func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string
 	return nil
 }
 
-func (c *Controller) reconcileSingletonByWS(ctx context.Context, ref singletonWorkStatusRef) error {
+func (c *Controller) reconcileSingletonByWS(ctx context.Context, ref workStatusRef) error {
 	logger := klog.FromContext(ctx)
 	logger.V(4).Info("Reconciling singleton status due to workstatus changes", "name", string(ref.Name))
 
