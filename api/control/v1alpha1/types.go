@@ -474,7 +474,7 @@ type ExpressionContext struct {
 
 	// `propagation` holds data about the current state of the work on propagating
 	// the object's state from WDS to WEC and from WEC to WDS.
-	Propagation PropagatationData `json:"propagation"`
+	Propagation PropagationData `json:"propagation"`
 }
 
 // InventoryRecord is what appears in the inventory for a given WEC.
@@ -487,7 +487,7 @@ type ReturnedState struct {
 	Status runtime.RawExtension `json:"status"`
 }
 
-type PropagatationData struct {
+type PropagationData struct {
 	// `lastReturnedUpdateTimestamp` is the time of the last update to any
 	// of the returned object state in the core.
 	// Before the first such update, this is the zero value of `time.Time`.
