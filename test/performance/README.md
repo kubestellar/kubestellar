@@ -9,13 +9,13 @@ To generate the sample workload for KubeStellar performance experiments proceed 
 1. Clone the following clusterloader2 repo: 
 
    ```bash
-   $ git clone -b release-1.31 https://github.com/kubernetes/perf-tests.git
+   git clone -b release-1.31 https://github.com/kubernetes/perf-tests.git
    ```
 
    Set the variable `CL2_DIR` to the path of the subdirectory `clusterloader2/` of the cloned repo. For example: 
 
    ```bash
-   $ export CL2_DIR=$HOME/perf-tests/clusterloader2
+   export CL2_DIR=$HOME/perf-tests/clusterloader2
    ```
 
 2. Configure clusterloader2 to generate KS performance workloads:
@@ -25,19 +25,19 @@ To generate the sample workload for KubeStellar performance experiments proceed 
    a) cd into the `test/performance` directory from your local copy of the KubeStellar repo, for example:
 
    ```bash
-   $ cd .$HOME/kubestellar/test/performance
+   cd .$HOME/kubestellar/test/performance
    ```
 
    b) If using plain K8s clusters:
 
    ```bash
-   $ ./setup-clusterloader2.sh
+   ./setup-clusterloader2.sh
    ```
 
    c) If using OpenShift clusters: 
 
    ```bash
-   $ ./setup-clusterloader2.sh --env ocp
+   ./setup-clusterloader2.sh --env ocp
    ```
 
 3. Configure the parameters of your workload:  
@@ -45,13 +45,13 @@ To generate the sample workload for KubeStellar performance experiments proceed 
    a) cd into the load configuration directory
 
    ```bash
-   $ cd  $CL2_DIR/testing/load/
+   cd  $CL2_DIR/testing/load/
    ```
   
    b) configure the parameters to create the workload traffic (e.g., RandomizedLoad, SteppedLoad, Sequence, etc.)
    
    ```bash
-   $ vi performance-test-config.yaml
+   vi performance-test-config.yaml
    ``` 
 
    More specifically, configure the following parameters: 
@@ -71,10 +71,21 @@ To generate the sample workload for KubeStellar performance experiments proceed 
    First, use a kubeconfig that includes contexts for WDS spaces and set its current context to a target WDS space (e.g., `wds1`):
 
    ```bash
-   $ kubectl config use-context wds1
-   Switched to context "wds1".
+   kubectl config use-context wds1
+   ```
 
-   $ kubectl config get-contexts
+   Output:
+   ```bash
+   Switched to context "wds1".
+   ```
+   
+   Optionally, check the kubeconfig contexts: 
+   ```bash
+   kubectl config get-contexts
+   ```
+   
+   Output:
+   ```bash
    CURRENT   NAME            CLUSTER         AUTHINFO        NAMESPACE
              cluster1        kind-cluster1   kind-cluster1   
              cluster2        kind-cluster2   kind-cluster2   
@@ -84,12 +95,11 @@ To generate the sample workload for KubeStellar performance experiments proceed 
              wds2            wds2-cluster    wds2-admin      default
    ```
 
-
    In the following set ``--kubeconfig`` flag to the path of the kubeconfig file of your cluster and use the newly added Kubestellar provider (`--provider=ks`) and run the following command to create your workload:
 
    ```bash
-   $ cd $CL2_DIR
-   $ go run cmd/clusterloader.go --testconfig=./testing/load/performance-test-config.yaml --kubeconfig=<path>/wds-kubeconfig --provider=ks --v=2
+   cd $CL2_DIR
+   go run cmd/clusterloader.go --testconfig=./testing/load/performance-test-config.yaml --kubeconfig=<path>/wds-kubeconfig --provider=ks --v=2
    ```
 
     In plain Kubernetes environments, a modified version of the kube-burner [cluster-density](https://github.com/kube-burner/kube-burner/tree/main/examples/workloads/cluster-density) workload is generated per namespace. This workload consists of the following objects:
@@ -122,7 +132,7 @@ To collect the creation and status_update timestamps for the benchmark workload 
    a) cd into the `test/performance` directory from your local copy of the KubeStellar repo, for example:
 
    ```bash
-   $ cd .$HOME/kubestellar/test/performance
+   cd .$HOME/kubestellar/test/performance
    ```
 
    b) Run the metrics collection script:
@@ -130,13 +140,13 @@ To collect the creation and status_update timestamps for the benchmark workload 
    NB: the execution of the following python script requires the installation of the dependencies listed in `requirements.txt`.
 
    ```bash 
-   $ python3 metrics_collector.py <kubeconfig> <wds-context-name> <its-context-name> <wec-context-name> <number-of-namespaces> <output-directory> 
+   python3 metrics_collector.py <kubeconfig> <wds-context-name> <its-context-name> <wec-context-name> <number-of-namespaces> <output-directory> 
    ```
 
    For example:
    
    ```bash 
-   $ python3 metrics_collector.py $HOME/.kube/config wds1 its1 cluster1 2 $HOME/data
+   python3 metrics_collector.py $HOME/.kube/config wds1 its1 cluster1 2 $HOME/data
    ```
 
    Below is a detailed explanation of the input parameters:
@@ -150,8 +160,12 @@ To collect the creation and status_update timestamps for the benchmark workload 
    For each namespace, the creation and status_update timestamps will be collected for the workload objects created in `wds1`, manifestwork & workstatus objects created in `its1`, and workload & appliedmanifestworks objects created in `wec1`, for example: let's assume that `num_ns=2`, then the following directories and files will be created: 
 
    ```bash 
-      $ cd $HOME/data
-      $ tree
+   cd $HOME/data
+   tree
+   ```
+
+   Output:
+   ```bash 
       .
       ├── perf-exp-0
       │   ├── appliedmanifestworks
@@ -196,6 +210,6 @@ To collect the creation and status_update timestamps for the benchmark workload 
 2. Clean up the generated workload Kubernetes API objects from your cluster:
 
    ```bash
-   $ cd $CL2_DIR
-   $ ./cleanup.sh
+   cd $CL2_DIR
+   ./cleanup.sh
    ```
