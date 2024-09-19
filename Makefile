@@ -188,13 +188,15 @@ ko-build-transport-local: ## Build local transport container image with `ko`.
 
 # this is used for local testing
 .PHONY: kind-load-image
-kind-load-image:
+kind-load-image: ko-build-controller-manager-local ko-build-transport-local
 	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${CONTROLLER_MANAGER_IMAGE}
+	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${TRANSPORT_IMAGE}
 
 # this is used for local testing
 .PHONY: k3d-load-image
-k3d-load-image:
+k3d-load-image: ko-build-controller-manager-local ko-build-transport-local
 	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${K3D_HOSTING_CLUSTER}
+	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${TRANSPORT_IMAGE}
 
 .PHONY: chart
 chart: manifests kustomize
