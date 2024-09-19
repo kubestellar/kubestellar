@@ -333,13 +333,13 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 	// add the event handler functions
 	c.workStatusInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			if shouldSkipAdd(c.wdsName, obj) {
+			if objNotInThisWDS(obj, c.wdsName) {
 				return
 			}
 			c.handleWorkStatus(ctx, obj)
 		},
 		UpdateFunc: func(old, new interface{}) {
-			if shouldSkipUpdate(c.wdsName, old, new) {
+			if objNotInThisWDS(new, c.wdsName) || shouldSkipUpdate(old, new) {
 				return
 			}
 
@@ -359,7 +359,7 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 			c.handleWorkStatus(ctx, new)
 		},
 		DeleteFunc: func(obj interface{}) {
-			if shouldSkipDelete(c.wdsName, obj) {
+			if objNotInThisWDS(obj, c.wdsName) {
 				return
 			}
 			c.handleWorkStatus(ctx, obj)
@@ -377,28 +377,11 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 	<-ctx.Done()
 }
 
-func shouldSkipAdd(wdsName string, obj interface{}) bool {
-	if objNotInThisWDS(obj, wdsName) {
-		return true
-	}
-	return false
-}
-
-func shouldSkipUpdate(wdsName string, old, new interface{}) bool {
-	if objNotInThisWDS(new, wdsName) {
-		return true
-	}
+func shouldSkipUpdate(old, new interface{}) bool {
 	oldMObj := old.(metav1.Object)
 	newMObj := new.(metav1.Object)
 	// do not enqueue update events for objects that have not changed
 	return newMObj.GetResourceVersion() == oldMObj.GetResourceVersion()
-}
-
-func shouldSkipDelete(wdsName string, obj interface{}) bool {
-	if objNotInThisWDS(obj, wdsName) {
-		return true
-	}
-	return false
 }
 
 func objNotInThisWDS(obj interface{}, thisWDS string) bool {
