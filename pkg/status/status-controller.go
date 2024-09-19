@@ -333,10 +333,13 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 	// add the event handler functions
 	c.workStatusInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
+			if objNotInThisWDS(obj, c.wdsName) {
+				return
+			}
 			c.handleWorkStatus(ctx, obj)
 		},
 		UpdateFunc: func(old, new interface{}) {
-			if shouldSkipUpdate(old, new) {
+			if objNotInThisWDS(new, c.wdsName) || shouldSkipUpdate(old, new) {
 				return
 			}
 
@@ -356,7 +359,7 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 			c.handleWorkStatus(ctx, new)
 		},
 		DeleteFunc: func(obj interface{}) {
-			if shouldSkipDelete(obj) {
+			if objNotInThisWDS(obj, c.wdsName) {
 				return
 			}
 			c.handleWorkStatus(ctx, obj)
@@ -381,7 +384,12 @@ func shouldSkipUpdate(old, new interface{}) bool {
 	return newMObj.GetResourceVersion() == oldMObj.GetResourceVersion()
 }
 
-func shouldSkipDelete(_ interface{}) bool {
+func objNotInThisWDS(obj interface{}, thisWDS string) bool {
+	if objWDS, ok := obj.(metav1.Object).GetLabels()[originWdsLabelKey]; ok {
+		if objWDS != thisWDS {
+			return true
+		}
+	}
 	return false
 }
 
