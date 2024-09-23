@@ -9,6 +9,22 @@ This page shows one concrete example of steps 2--7 from the [full Installation a
     1. Create and register two WECs.
   1. Exercise KubeStellar
 
+## Quick Start
+
+For a quick and easy setup of a KubeStellar demo environment, you can use the provided script. This script automates the process of creating a KubeStellar environment suitable for demonstration purposes. It performs the following tasks:
+
+1. Checks for required software prerequisites
+2. Cleans up any existing environment from previous runs
+3. Creates a KubeFlex hosting cluster and installs KubeStellar core components
+4. Creates and registers two Work Execution Clusters (WECs)
+
+
+To use this script, run the following command:
+```shell 
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/create-kubestellar-demo-env.sh)
+```
+
+
 ## Setup
 
 This is one way to produce a very simple system, suitable for study but not production usage. For general setup information, see [the full story](user-guide-intro.md#the-full-story).
