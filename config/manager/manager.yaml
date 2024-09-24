@@ -58,5 +58,4 @@ spec:
         - containerPort: 8082
           protocol: TCP
           name: debug-pprof
-      serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10

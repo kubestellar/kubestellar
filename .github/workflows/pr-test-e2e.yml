@@ -1,4 +1,4 @@
-name: Test end to end 
+name: Test end to end
 
 on:
   workflow_call:
@@ -18,7 +18,7 @@ on:
       - main
     paths-ignore:
       - 'docs/**'
-      - '**/*.md'  
+      - '**/*.md'
   push:
     branches:
       - main
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
-      
+
       - uses: actions/setup-go@v5
         with:
           go-version: v1.21
@@ -45,21 +45,21 @@ jobs:
         id: install
 
       - uses: ko-build/setup-ko@v0.7
-      
+
       - name: Install dependencies
         run: |
           curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.6.1/kubeflex_0.6.1_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.6.1_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.6.3/kubeflex_0.6.3_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.6.3_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.6.1_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.6.3_linux_amd64.tar.gz
           go install github.com/onsi/ginkgo/v2/ginkgo
 
       - name: Run test
         env:
           TEST_FLAGS: ${{ github.event.inputs.testFlags }}
         run: |
-          cd test/e2e/ginkgo 
+          cd test/e2e/ginkgo
           KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color $TEST_FLAGS -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
 
       - name: show kubeconfig contexts
@@ -165,7 +165,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
-      
+
       - uses: actions/setup-go@v5
         with:
           go-version: v1.21
@@ -176,20 +176,20 @@ jobs:
         id: install
 
       - uses: ko-build/setup-ko@v0.7
-      
+
       - name: Install dependencies
         run: |
           curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.6.1/kubeflex_0.6.1_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.6.1_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.6.1/kubeflex_0.6.3_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.6.3_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.6.1_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.6.3_linux_amd64.tar.gz
 
       - name: Run test
         env:
           TEST_FLAGS: ${{ github.event.inputs.testFlags }}
         run: |
-          cd test/e2e/ 
+          cd test/e2e/
           KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
 
       - name: show kubeconfig contexts

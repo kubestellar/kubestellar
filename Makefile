@@ -188,22 +188,36 @@ ko-build-transport-local: ## Build local transport container image with `ko`.
 
 # this is used for local testing
 .PHONY: kind-load-image
-kind-load-image:
+kind-load-image: ko-build-controller-manager-local ko-build-transport-local
 	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${CONTROLLER_MANAGER_IMAGE}
+	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${TRANSPORT_IMAGE}
 
 # this is used for local testing
 .PHONY: k3d-load-image
-k3d-load-image:
+k3d-load-image: ko-build-controller-manager-local ko-build-transport-local
 	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${K3D_HOSTING_CLUSTER}
+	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${TRANSPORT_IMAGE}
 
-.PHONY: chart
-chart: manifests kustomize
-	cd config/manager && $(KUSTOMIZE) edit set image controller=$(shell echo ${CONTROLLER_MANAGER_IMAGE} | sed 's/\(:.*\)v/\1/')
+.PHONY: core-chart
+core-chart: manifests kustomize
 	$(KUSTOMIZE) build config/default \
-		| yq '. | select(.kind == "ClusterRole*").metadata.name |= "{{.Values.ControlPlaneName}}-" + .' \
-		| yq '. | select(.kind == "ClusterRoleBinding").roleRef.name |= "{{.Values.ControlPlaneName}}-" + .' \
-		> chart/templates/controller-manager.yaml
+		| yq '. | select(.kind == "ClusterRole*").metadata.name |= "{{\"{{.ControlPlaneName}}\"}}-" + .' \
+		| yq '. | select(.kind == "ClusterRoleBinding").roleRef.name |= "{{\"{{.ControlPlaneName}}\"}}-" + .' \
+		| yq '[.]' \
+		| sed -e 's/^/  /' \
+		> /tmp/kubestellar-controller-manager.yaml
 	git checkout -- config/manager/kustomization.yaml
+	sed -i -e '/KUBESTELLAR_CONTROLLER_PLACEHOLDER/{r /tmp/kubestellar-controller-manager.yaml' -e 'd}' core-chart/templates/postcreatehooks/wds.yaml
+
+# If $(KUBE_CONTEXT) is set then that indicates where to install the chart; otherwise it goes to the current kubeconfig context.
+.PHONY: install-local-core-chart
+install-local-core-chart: kind-load-image core-chart
+	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install ks-core core-chart/ --dependency-update \
+		--set KUBESTELLAR_VERSION=${IMAGE_TAG} \
+		--set TRANSPORT_VERSION=${IMAGE_TAG} \
+		--set-json='ITSes=[{"name":"$(ITS_NAME)"}]' \
+		--set-json='WDSes=[{"name":"${DEFAULT_WDS_NAME}"}]' \
+		--set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY}
 
 ##@ Deployment
 
@@ -227,13 +241,6 @@ deploy: manifests kustomize ## Deploy manager to the K8s cluster specified in ~/
 .PHONY: undeploy
 undeploy: ## Undeploy manager from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
-
-# installs the chart from ./chart for local dev/testing a WDS using image loaded in kind.
-# The Helm chart should be instantiated into the KubeFlex hosting cluster.
-# If $(KUBE_CONTEXT) is set then that indicates where to install the chart; otherwise it goes to the current kubeconfig context.
-.PHONY: install-local-chart
-install-local-chart: chart kind-load-image
-	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install kubestellar -n ${DEFAULT_WDS_NAME}-system ./chart  --set ControlPlaneName=${DEFAULT_WDS_NAME} --set ControllerManager.Verbosity=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} $(if $(ITS_NAME),--set ITSName=$(ITS_NAME),)
 
 ##@ Build Dependencies
 
