@@ -212,7 +212,7 @@ core-chart: manifests kustomize
 
 # If $(KUBE_CONTEXT) is set then that indicates where to install the chart; otherwise it goes to the current kubeconfig context.
 .PHONY: install-local-core-chart
-install-local-core-chart: core-chart
+install-local-core-chart: kind-load-image core-chart
 	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install ks-core core-chart/ --dependency-update \
 		--set kubeflex-operator.install=${INSTALL_KUBEFLEX} \
 		--set KUBESTELLAR_VERSION=${IMAGE_TAG} \
