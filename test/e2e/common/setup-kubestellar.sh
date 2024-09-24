@@ -109,13 +109,14 @@ esac
 : Install the core-chart
 :
 
-pwd
+pushd "${SRC_DIR}/../../.."
 make kind-load-image
 make install-local-core-chart \
   INSTALL_KUBEFLEX=false \
   ITS_NAME=its1 \
   DEFAULT_WDS_NAME=wds1 \
   KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY
+popd
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
 
