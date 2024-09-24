@@ -19,6 +19,7 @@ TRANSPORT_CMD_NAME ?= ocm-transport-controller
 IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
 CONTROLLER_MANAGER_IMAGE ?= ${DOCKER_REGISTRY}/${CONTROLLER_MANAGER_CMD_NAME}:${IMAGE_TAG}
 TRANSPORT_IMAGE ?= ${DOCKER_REGISTRY}/${TRANSPORT_CMD_NAME}:${IMAGE_TAG}
+INSTALL_KUBEFLEX ?= true
 
 KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY ?= 2
 
@@ -213,6 +214,7 @@ core-chart: manifests kustomize
 .PHONY: install-local-core-chart
 install-local-core-chart: kind-load-image core-chart
 	helm upgrade $(if $(KUBE_CONTEXT),--kube-context $(KUBE_CONTEXT),) --install ks-core core-chart/ --dependency-update \
+		--set kubeflex-operator.install=${INSTALL_KUBEFLEX} \
 		--set KUBESTELLAR_VERSION=${IMAGE_TAG} \
 		--set TRANSPORT_VERSION=${IMAGE_TAG} \
 		--set-json='ITSes=[{"name":"$(ITS_NAME)"}]' \

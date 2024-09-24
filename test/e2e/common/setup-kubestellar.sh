@@ -106,54 +106,69 @@ esac
 
 :
 : -------------------------------------------------------------------------
-: Install the post-create-hooks for ocm and kubstellar controller manager
+: Install the core-chart
 :
-kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/ocm.yaml
-if [ "$use_release" == true ]
-then kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/kubestellar.yaml
-fi
-: 'Kubestellar post-create-hook(s) applied.'
+make install-local-core-chart \
+  INSTALL_KUBEFLEX=false \
+  ITS_NAME=its1 \
+  DEFAULT_WDS_NAME=wds1 \
+  KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY
+# :
+# : -------------------------------------------------------------------------
+# : Install the post-create-hooks for ocm and kubstellar controller manager
+# :
+# kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/ocm.yaml
+# if [ "$use_release" == true ]
+# then kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/kubestellar.yaml
+# fi
+# : 'Kubestellar post-create-hook(s) applied.'
+
+# :
+# : -------------------------------------------------------------------------
+# : 'Create an inventory & mailbox space of type vcluster running OCM (Open Cluster Management) directly in KubeFlex. Note that -p ocm runs a post-create hook on the vcluster control plane which installs OCM on it.'
+# :
+# kflex create its1 --type vcluster -p ocm $disable_chatty_status
+# : its1 created.
 
 :
-: -------------------------------------------------------------------------
-: 'Create an inventory & mailbox space of type vcluster running OCM (Open Cluster Management) directly in KubeFlex. Note that -p ocm runs a post-create hook on the vcluster control plane which installs OCM on it.'
-:
-kflex create its1 --type vcluster -p ocm $disable_chatty_status
-: its1 created.
+# : -------------------------------------------------------------------------
+# : Create a Workload Description Space wds1 directly in KubeFlex.
+# :
+# kflex create wds1 $wds_extra $disable_chatty_status
+# kubectl --context "$HOSTING_CONTEXT" label cp wds1 kflex.kubestellar.io/cptype=wds
 
-:
-: -------------------------------------------------------------------------
-: Create a Workload Description Space wds1 directly in KubeFlex.
-:
-kflex create wds1 $wds_extra $disable_chatty_status
-kubectl --context "$HOSTING_CONTEXT" label cp wds1 kflex.kubestellar.io/cptype=wds
+# if [ "$use_release" != true ]; then
+#   cd "${SRC_DIR}/../../.."
+#   pwd
+#   make ko-build-controller-manager-local
+#   make install-local-chart KUBE_CONTEXT="$HOSTING_CONTEXT" "KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY"
+#   cd -
+# fi
+# echo "wds1 created."
 
-if [ "$use_release" != true ]; then
-  cd "${SRC_DIR}/../../.."
-  pwd
-  make ko-build-controller-manager-local
-  make install-local-chart KUBE_CONTEXT="$HOSTING_CONTEXT" "KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY"
-  cd -
-fi
-echo "wds1 created."
-
-:
-: -------------------------------------------------------------------------
-: Run OCM transport controller in a pod
-:
-if [ "$use_release" != true ]; then
-  pushd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
-  OCM_TRANSPORT_PLUGIN_RELEASE=local
-  IMAGE_TAG=${OCM_TRANSPORT_PLUGIN_RELEASE} make ko-build-transport-local
-  kind load --name kubeflex docker-image ko.local/ocm-transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
-  echo "running ocm transport plugin..."
-  IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 its1 ko.local/ocm-transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} --controller-verbosity "$TRANSPORT_CONTROLLER_VERBOSITY" --context "$HOSTING_CONTEXT"
-  popd
-fi
+# :
+# : -------------------------------------------------------------------------
+# : Run OCM transport controller in a pod
+# :
+# if [ "$use_release" != true ]; then
+#   pushd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
+#   OCM_TRANSPORT_PLUGIN_RELEASE=local
+#   IMAGE_TAG=${OCM_TRANSPORT_PLUGIN_RELEASE} make ko-build-transport-local
+#   kind load --name kubeflex docker-image ko.local/ocm-transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
+#   echo "running ocm transport plugin..."
+#   IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 its1 ko.local/ocm-transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} --controller-verbosity "$TRANSPORT_CONTROLLER_VERBOSITY" --context "$HOSTING_CONTEXT"
+#   popd
+# fi
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
 
 echo "transport controller is running."
+
+kubectl config delete-context its1 || true
+kflex ctx its1
+kubectl config delete-context wds1 || true
+kflex ctx wds1
+kflex ctx
 
 wait-for-cmd 'kubectl --context its1 get ns customization-properties'
 
