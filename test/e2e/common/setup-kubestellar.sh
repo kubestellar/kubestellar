@@ -108,6 +108,8 @@ esac
 : -------------------------------------------------------------------------
 : Install the core-chart
 :
+
+make kind-load-image
 make install-local-core-chart \
   INSTALL_KUBEFLEX=false \
   ITS_NAME=its1 \

@@ -8,7 +8,7 @@ metadata:
 spec:
   templates:
 
-  # vvvv TRANSPORT PLUGIN vvvv
+  # vvvv TRANSPORT CONTROLLER vvvv
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -160,10 +160,10 @@ spec:
             configMap:
               name: transport-controller-config
               defaultMode: 0744
-  # ^^^^ TRANSPORT PLUGIN ^^^^
+  # ^^^^ TRANSPORT CONTROLLER ^^^^
 
-  # vvvv KUBESTELLAR PLUGIN vvvv
+  # vvvv KUBESTELLAR CONTROLLER vvvv
   # KUBESTELLAR_CONTROLLER_PLACEHOLDER
-  # ^^^^ KUBESTELLAR PLUGIN ^^^^
+  # ^^^^ KUBESTELLAR CONTROLLER ^^^^
 
 {{- end }}
