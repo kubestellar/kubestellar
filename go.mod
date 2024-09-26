@@ -6,7 +6,7 @@ require (
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/go-logr/logr v1.3.0
 	github.com/google/cel-go v0.16.1
-	github.com/kubestellar/kubeflex v0.6.1
+	github.com/kubestellar/kubeflex v0.6.3
 	github.com/onsi/ginkgo/v2 v2.13.0
 	github.com/onsi/gomega v1.29.0
 	github.com/prometheus/client_golang v1.16.0
