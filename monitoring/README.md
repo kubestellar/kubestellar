@@ -4,7 +4,7 @@
 
 
 ### Requirement
-To follow the instructions here you need to use KubeStellar `main` branch or any future KubeStellar release higher than `0.24.0`. Also, you need to have release `v0.2.0-rc12` or higher for the status-addon controller and agent installed in your environment. If you're using an older release, please follow these instructions to update your environment: 
+To follow the instructions here you need to use KubeStellar `main` branch or any future KubeStellar release higher than `0.24.0`. Also, you need to have release `v0.2.0-rc14` or higher for the status-addon controller and agent installed in your environment. If you're using an older release, please follow these instructions to update your environment: 
 
 1.  Remove the status-addon-controller and status-addon-agent from your current environment:
 
@@ -16,7 +16,7 @@ kubectl --context its1 -n cluster1 delete manifestwork addon-addon-status-deploy
 2. Re-deploy the status-addon controller and agents: 
 
 ```bash
-helm --kube-context its1 upgrade --install ocm-status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc12
+helm --kube-context its1 upgrade --install ocm-status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc14
 ```
 
 ### Description
@@ -27,12 +27,14 @@ This example shows how to deploy monitoring tools (Prometheus/Thanos, Grafana an
 
 Starting from a local directory containing the git repo, do the following:
 
-a) Deploy the monitoring tools in the hosting cluster (e.g., `kind-kubeflex`):
+a) Deploy the monitoring tools in a plain K8s hosting cluster (e.g., `kind-kubeflex`):
 
 ```bash
 cd monitoring
 ./install-ks-monitoring.sh --cluster-context kind-kubeflex --set core
 ```
+
+For an OpenShift cluster add the flag `--env ocp` in the commad above. 
 
 Optionally, check the deployment of the monitoring tools:
 
@@ -58,11 +60,13 @@ thanos-storegateway-0                                  1/1     Running   0      
 ```
 
 
-b) Deploy the monitoring tools in a WEC cluster (e.g., `cluster1`):
+b) Deploy the monitoring tools in a plain K8s WEC cluster (e.g., `cluster1`):
 
 ```bash
-./install-ks-monitoring.sh --cluster-context cluster1 --set wec
+./install-ks-monitoring.sh --cluster-context cluster1 --set wec --kubeflex-hosting-cluster-context kind-kubeflex
 ```
+
+For OpenShift clusters add the flags `--env ocp` in the commad above. 
 
 Optionally, check the deployment of the monitoring tools:
 
@@ -86,7 +90,7 @@ pyroscope-alloy-0                                      2/2     Running   0      
 a) WDS space:
 
 ```bash
-./configure-monitoring-wds.sh
+./configure-monitoring-wds.sh --kubeflex-hosting-cluster-context kind-kubeflex
 ```
 
 If you have more than one WDS, you can run the above script with the `--space-name` flag. For example: `./configure-monitoring-wds.sh --space-name wds2`
@@ -107,7 +111,7 @@ wds1-ks-transport-controller   64m
 b) ITS space:
 
 ```bash
-./configure-monitoring-its.sh 
+./configure-monitoring-its.sh --kubeflex-hosting-cluster-context kind-kubeflex
 ```
 
 If you have more than one ITS, you can run the above script with the `--space-name` flag. For example: `./configure-monitoring-its.sh --space-name its2`
@@ -153,6 +157,7 @@ a) Port-forward Grafana to localhost, by using the kubectl command:
 ```bash
 kubectl --context kind-kubeflex port-forward -n ks-monitoring svc/grafana 3000:80
 ```
+For OpenShift clusters get the OpenShift route for the Grafana service in the `ks-monitoring` namespace.
 
 b) Check Prometheus and Pyroscope data source configuration: in a browser, go to the Grafana server at http://localhost:3000 and on the left-hand side, go to Home > Connections > Data sources.
 

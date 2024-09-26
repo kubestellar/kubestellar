@@ -1,0 +1,32 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: thanos-ui
+spec:
+  to:
+    kind: Service
+    name: thanos-query
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: thanos-receive
+spec:
+  to:
+    kind: Service
+    name: thanos-receive
+    weight: 100
+  port:
+    targetPort: remote
+  wildcardPolicy: None
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
