@@ -7,4 +7,9 @@ pyroscope:
         bucket_name: %BUCKET%
         access_key_id: %USERNAME%
         secret_access_key: %PASSWORD%
-        insecure: true
+        insecure: %INSECURE%
+  podSecurityContext:
+    fsGroup: null
+    runAsUser: null
+    runAsNonRoot: null
+  securityContext: {}
