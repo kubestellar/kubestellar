@@ -40,7 +40,7 @@ in `spec.clusterSelectors`.
 
 The workload object selection predicate is in `spec.downsync`, which
 holds a list of `DownsyncPolicyClause`s; each includes both a workload
-object selection predicate and also two kinds of information that
+object selection predicate and also three kinds of information that
 modulate the downsync. Note that each such clause must have at least
 one field specifying part of the workload selection predicate.
 
