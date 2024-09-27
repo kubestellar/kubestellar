@@ -3,7 +3,6 @@
 Note on terminology: the general idea that we wish to address is returning reported state about a workload object to its WDS. At the current level of development, we equate reported state with the status section of an object --- while anticipating a more general treatment in the future.
 
 There are two methods of returning reported state: a general one and a special case. The general method returns reported state from any number of WECs. The special case applies when the number of WECs is exactly 1, and returns the reported state into the original object in the WDS.
-It may make sense to expand the latter into a general feature in the future, accommodating features such as scheduling.
 
 ## Introduction to the General Technique
 
@@ -194,4 +193,52 @@ select:
 
 ## Special case for 1 WEC
 
-This proposal refines the meaning of `BindingPolicySpec.WantSingletonReportedState` to request the special case when it applies.
+When a workload object is distributed from a WDS to exactly one WEC,
+the reported state from that WEC can be returned into the copy of the
+workload object in the WDS. The design of most kinds of Kubernetes API
+object implicitly assumes that the object exists and has its defined
+effect in only one cluster. That is why it makes sense to return the
+reported state from the WEC to the WDS only when the object goes to
+exactly one WEC.
+
+As mentioned above, currently KubeStellar equates "reported state"
+with the `.status` section of the API object.
+
+The user has to specifically request this last step of `.status`
+propagation. This is done in an optional boolean field, named
+`wantSingletonReportedState`, in a `DownsyncPolicyClause` in a
+`BindingPolicy`. This is one of the three kinds of downsync
+modulations that a policy clause can associate with the matching
+workload objects. In a `Binding`, this same optional boolean field
+appears in `NamespaceScopeDownsyncClause` and
+`ClusterScopeDownsyncClause`. If multiple policy clauses in a
+`BindingPolicy` match a given workload object, the settings for
+`.wantSingletonReportedState` are combined by OR to get the one
+boolean value that appears with the reference to the object in the
+corresponding `Binding`. If multiple `Binding` objects in one WDS
+reference a given workload object, there is another level of
+multiplicity to consider. Read on.
+
+For a given workload object and WDS, we say that "singleton status
+return is requested" if and only if there exists at least one
+BindingPolicy or Binding that has `wantSingletonReportedState==true`
+in a clause that matches/references the workload object.
+
+The "qualified WEC set" of a given workload object in a given WDS is
+the set of WECs that are associated with that workload object by at
+least one BindingPolicy or Binding that has
+`wantSingletonReportedState==true` in a clause that matches/references
+the workload object.
+
+For a given workload object in a given WDS, while singleton status
+return is requested, KubeStellar maintains a label on the object whose
+name (key) is `kubestellar.io/executing-count` and whose value is a
+string representation of the size of the qualified WEC set of that
+object.  While singleton status return is _not_ requested, KubeStellar
+suppresses the existence of a label with that name (key).  While
+singleton status return is requested _and_ the size of the qualified
+WEC set is 1, KubeStellar propagates the object's `.status` from that
+WEC to the `.status` section of the object in the WDS.  While either
+singleton status return is NOT requested or the size of the qualified
+WEC set is NOT 1, there is nothing in the `.status` of the object in
+the WDS that was propagated there from a WEC by KubeStellar.
