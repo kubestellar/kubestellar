@@ -12,14 +12,14 @@ on:
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
-  
+
 jobs:
   test-integration:
     name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-go@v5
         with:
           go-version: v1.21
@@ -30,7 +30,7 @@ jobs:
         id: install
 
       - uses: ko-build/setup-ko@v0.7
-      
+
       - name: Install dependencies
         run: |
           curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
