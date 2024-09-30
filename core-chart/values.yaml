@@ -57,7 +57,7 @@ status_agent:
 # Determine if the Post Create Hooks should be installed by the chart
 InstallPCHs: true
 
-# Transport controller bundling parameters
+# Transport controller parameters
 transport_controller:
   # [host]:port at which to listen for HTTP GET /metrics
   metrics_bind_addr: ":8090"
