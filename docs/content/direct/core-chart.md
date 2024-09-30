@@ -181,25 +181,6 @@ After the initial installation is completed, there are two main ways to install 
 
 ## Kubeconfig files and contexts for Control Planes
 
-Unless you are using the `kflex` CLI from release 0.6.2 or later of
-KubeFlex, before proceeding further you should wait for each of the
-new control planes whose type is not "host" to be "ready". A host type
-control plane is an alias for the hosting cluster and is born ready.
-
-The following commands will wait for every ControlPlane to be "ready".
-
-```shell
-echo "Waiting for all KubeFlex Control Planes to be Ready:"
-for cpname in `kubectl get controlplane -o name`; do
-  cpname=${cpname##*/}
-  while [[ `kubectl get cp $cpname -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}'` != "True" ]]; do
-    echo "Waiting for \"$cpname\"..."
-    sleep 5
-  done
-  echo "\"$cpname\" is ready."
-done
-```
-
 It is convenient to use one kubeconfig file that has a context for
 each of your control planes. That can be done in two ways, one using
 the `kflex` CLI and one not.
