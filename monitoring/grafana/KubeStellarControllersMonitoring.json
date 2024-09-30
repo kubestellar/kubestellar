@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 7,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -113,7 +113,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(0.99, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{namespace=\"$SpaceNS\", job=\"$KSController\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{instance=\"$Instance\", namespace=\"$NS\", job=\"$KSController\"}[5m])))",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -130,7 +130,7 @@
             "uid": "prometheus-test"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{namespace=\"$SpaceNS\", job=\"$KSController\"}[5m])))",
+          "expr": "histogram_quantile(0.75, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{instance=\"$Instance\",namespace=\"$NS\", job=\"$KSController\"}[5m])))",
           "hide": false,
           "instant": false,
           "legendFormat": "75th {{instance}} {{name}}",
@@ -143,7 +143,7 @@
             "uid": "prometheus-test"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{namespace=\"$SpaceNS\", job=\"$KSController\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{instance=\"$Instance\", namespace=\"$NS\", job=\"$KSController\"}[5m])))",
           "hide": false,
           "instant": false,
           "legendFormat": "50th {{instance}} {{name}}",
@@ -156,7 +156,7 @@
             "uid": "prometheus-test"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.25, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{namespace=\"$SpaceNS\", job=\"$KSController\"}[5m])))",
+          "expr": "histogram_quantile(0.25, sum by(instance, name, le) (rate(workqueue_queue_duration_seconds_bucket{instance=\"$Instance\",namespace=\"$NS\", job=\"$KSController\"}[5m])))",
           "hide": false,
           "instant": false,
           "legendFormat": "25th {{instance}} {{name}}",
@@ -169,7 +169,7 @@
     },
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -256,7 +256,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "workqueue_depth{job=\"$KSController\", namespace=\"$SpaceNS\"}",
+          "expr": "workqueue_depth{instance=\"$Instance\", job=\"$KSController\", namespace=\"$NS\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -271,7 +271,7 @@
     },
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -359,7 +359,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(host, le) (rate(rest_client_request_duration_seconds_bucket{job=\"$KSController\", namespace=\"$SpaceNS\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by(host, le) (rate(rest_client_request_duration_seconds_bucket{instance=\"$Instance\",job=\"$KSController\", namespace=\"$NS\"}[5m])))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -462,8 +462,8 @@
             "uid": "prometheus-test"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum(rate(rest_client_requests_total{job=\"$KSController\", code=~\"2..\", namespace=\"$SpaceNS\"}[5m]))",
+          "editorMode": "code",
+          "expr": "sum(rate(rest_client_requests_total{instance=\"$Instance\", job=\"$KSController\", code=~\"2..\", namespace=\"$NS\"}[5m]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -478,8 +478,8 @@
             "uid": "prometheus-test"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum(rate(rest_client_requests_total{job=\"$KSController\", code=~\"3..\", namespace=\"$SpaceNS\"}[5m]))",
+          "editorMode": "code",
+          "expr": "sum(rate(rest_client_requests_total{instance=\"$Instance\", job=\"$KSController\", code=~\"3..\", namespace=\"$NS\"}[5m]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -495,8 +495,8 @@
             "uid": "prometheus-test"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum(rate(rest_client_requests_total{job=\"$KSController\", code=~\"4..\", namespace=\"$SpaceNS\"}[5m]))",
+          "editorMode": "code",
+          "expr": "sum(rate(rest_client_requests_total{instance=\"$Instance\", job=\"$KSController\", code=~\"4..\", namespace=\"$NS\"}[5m]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -512,8 +512,8 @@
             "uid": "prometheus-test"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum(rate(rest_client_requests_total{job=\"$KSController\", code=~\"5..\", namespace=\"$SpaceNS\"}[5m]))",
+          "editorMode": "code",
+          "expr": "sum(rate(rest_client_requests_total{instance=\"$Instance\", job=\"$KSController\", code=~\"5..\", namespace=\"$NS\"}[5m]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -617,8 +617,8 @@
             "uid": "prometheus-test"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "rate(process_cpu_seconds_total{job=\"$KSController\", namespace=\"$SpaceNS\"}[5m])",
+          "editorMode": "code",
+          "expr": "rate(process_cpu_seconds_total{instance=\"$Instance\", job=\"$KSController\", namespace=\"$NS\"}[5m])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -633,7 +633,7 @@
     },
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -721,7 +721,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "process_resident_memory_bytes{job=\"$KSController\", namespace=\"$SpaceNS\"}",
+          "expr": "process_resident_memory_bytes{instance=\"$Instance\", job=\"$KSController\", namespace=\"$NS\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -742,12 +742,12 @@
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "wds1-system",
           "value": "wds1-system"
         },
         "hide": 0,
-        "name": "SpaceNS",
+        "name": "NS",
         "options": [
           {
             "selected": true,
@@ -761,9 +761,9 @@
       },
       {
         "current": {
-          "selected": true,
-          "text": "kubestellar-controller-manager-metrics-service",
-          "value": "kubestellar-controller-manager-metrics-service"
+          "selected": false,
+          "text": "ks-transport-controller",
+          "value": "ks-transport-controller"
         },
         "hide": 0,
         "includeAll": false,
@@ -771,12 +771,12 @@
         "name": "KSController",
         "options": [
           {
-            "selected": true,
+            "selected": false,
             "text": "kubestellar-controller-manager-metrics-service",
             "value": "kubestellar-controller-manager-metrics-service"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "ks-transport-controller",
             "value": "ks-transport-controller"
           },
@@ -784,23 +784,47 @@
             "selected": false,
             "text": "status-addon-controller",
             "value": "status-addon-controller"
+          },
+          {
+            "selected": false,
+            "text": "status-agent-controller",
+            "value": "status-agent-controller"
           }
         ],
-        "query": "kubestellar-controller-manager-metrics-service, ks-transport-controller, status-addon-controller",
+        "query": "kubestellar-controller-manager-metrics-service, ks-transport-controller, status-addon-controller,status-agent-controller",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "10.244.0.71:8090",
+          "value": "10.244.0.71:8090"
+        },
+        "hide": 0,
+        "name": "Instance",
+        "options": [
+          {
+            "selected": true,
+            "text": "10.244.0.71:8090",
+            "value": "10.244.0.71:8090"
+          }
+        ],
+        "query": "10.244.0.71:8090",
+        "skipUrlSync": false,
+        "type": "textbox"
       }
     ]
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "KubeStellar Controllers Monitoring",
   "uid": "edrgjjlt1oagwe",
-  "version": 3,
+  "version": 2,
   "weekStart": ""
 }
