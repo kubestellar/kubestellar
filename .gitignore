@@ -32,3 +32,7 @@ local-chart/
 # Core Chart generated dependencies
 core-chart/Chart.lock
 core-chart/charts/
+
+# Python local stuff associated with Braulio's monitoring
+/test/performance/.venv/
+/test/performance/__pycache__/
