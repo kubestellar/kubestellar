@@ -134,7 +134,7 @@ spec:
               mountPath: /mnt/shared
           containers:
           - name: transport-controller
-            image: ghcr.io/kubestellar/kubestellar/ocm-transport-controller:{{.Values.TRANSPORT_VERSION}}
+            image: ghcr.io/kubestellar/kubestellar/ocm-transport-controller:{{ .Values.TRANSPORT_VERSION | default .Values.KUBESTELLAR_VERSION }}
             imagePullPolicy: IfNotPresent
             args:
             - --metrics-bind-address={{.Values.transport_controller.metrics_bind_addr}}
