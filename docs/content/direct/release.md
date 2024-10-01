@@ -11,6 +11,24 @@ Every release should pass all release tests before it can be officially declare 
 
 ## Step-by-Step
 
+### Reacting to a new KubeFlex release
+
+- Update the KubeFlex release in `docs/content/direct/pre-reqs.md`
+- Update the KubeFlex release in `go.mod`
+- `go mod tidy`
+- Update the KubeFlex release in `core-chart/Chart.yaml`
+- Update the KubeFlex release everywhere it occurs in any of the `.github/workflows`:
+    - `.github/workflows/ocp-self-runner.yml`
+    - `.github/workflows/pr-test-e2e.yml`
+    - `.github/workflows/pr-test-integration.yml`
+    - `.github/workflows/test-latest-release.yml`
+
+Or you could search for appearances of the old release string yourself using a command like the following. And maybe also search for the release before that, in case it was overlooked earlier.
+
+```shell
+find * .github/workflows \( -name "*.svg" -prune \) -or \( -path "*venv" -prune \) -or \( -path hack/tools -prune \) -or \( -type f -exec fgrep 0.6.2 \{\} \; -print -exec echo \; \)
+```
+
 ### Reacting to a new ocm-status-addon release
 
 Between each release of [ks/OSA](https://github.com/kubestellar/ocm-status-addon) and the next release of ks/ks, update the references to the ocm-status-addon release in the following files.
