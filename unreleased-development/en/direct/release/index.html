@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.35f28582.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.8c3ca2c6.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
@@ -2186,6 +2186,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#reacting-to-a-new-kubeflex-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reacting to a new KubeFlex release
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#reacting-to-a-new-ocm-status-addon-release" class="md-nav__link">
     <span class="md-ellipsis">
       Reacting to a new ocm-status-addon release
@@ -2940,6 +2949,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#reacting-to-a-new-kubeflex-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reacting to a new KubeFlex release
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#reacting-to-a-new-ocm-status-addon-release" class="md-nav__link">
     <span class="md-ellipsis">
       Reacting to a new ocm-status-addon release
@@ -3096,6 +3114,23 @@
 clues about the problem.</p>
 <p>Every release should pass all release tests before it can be officially declare as a new stable release. Please see the details in <a href="../release-testing/">release-testing</a>.</p>
 <h2 id="step-by-step">Step-by-Step<a class="headerlink" href="#step-by-step" title="Permanent link">#</a></h2>
+<h3 id="reacting-to-a-new-kubeflex-release">Reacting to a new KubeFlex release<a class="headerlink" href="#reacting-to-a-new-kubeflex-release" title="Permanent link">#</a></h3>
+<ul>
+<li>Update the KubeFlex release in <code>docs/content/direct/pre-reqs.md</code></li>
+<li>Update the KubeFlex release in <code>go.mod</code></li>
+<li><code>go mod tidy</code></li>
+<li>Update the KubeFlex release in <code>core-chart/Chart.yaml</code></li>
+<li>Update the KubeFlex release everywhere it occurs in any of the <code>.github/workflows</code>:<ul>
+<li><code>.github/workflows/ocp-self-runner.yml</code></li>
+<li><code>.github/workflows/pr-test-e2e.yml</code></li>
+<li><code>.github/workflows/pr-test-integration.yml</code></li>
+<li><code>.github/workflows/test-latest-release.yml</code></li>
+</ul>
+</li>
+</ul>
+<p>Or you could search for appearances of the old release string yourself using a command like the following. And maybe also search for the release before that, in case it was overlooked earlier.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>find<span class="w"> </span>*<span class="w"> </span>.github/workflows<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.svg&quot;</span><span class="w"> </span>-prune<span class="w"> </span><span class="se">\)</span><span class="w"> </span>-or<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-path<span class="w"> </span><span class="s2">&quot;*venv&quot;</span><span class="w"> </span>-prune<span class="w"> </span><span class="se">\)</span><span class="w"> </span>-or<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-path<span class="w"> </span>hack/tools<span class="w"> </span>-prune<span class="w"> </span><span class="se">\)</span><span class="w"> </span>-or<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-exec<span class="w"> </span>fgrep<span class="w"> </span><span class="m">0</span>.6.2<span class="w"> </span><span class="se">\{\}</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span>-print<span class="w"> </span>-exec<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="se">\)</span>
+</code></pre></div>
 <h3 id="reacting-to-a-new-ocm-status-addon-release">Reacting to a new ocm-status-addon release<a class="headerlink" href="#reacting-to-a-new-ocm-status-addon-release" title="Permanent link">#</a></h3>
 <p>Between each release of <a href="https://github.com/kubestellar/ocm-status-addon">ks/OSA</a> and the next release of ks/ks, update the references to the ocm-status-addon release in the following files.</p>
 <ul>
@@ -3331,10 +3366,10 @@ clues about the problem.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.525ec568.min.js"></script>
       
         <script src="../../../js/open_in_new_tab.js"></script>
       
