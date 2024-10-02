@@ -111,11 +111,15 @@ esac
 
 pushd "${SRC_DIR}/../../.."
 make kind-load-image
-make install-local-core-chart \
-  INSTALL_KUBEFLEX=false \
-  ITS_NAME=its1 \
-  DEFAULT_WDS_NAME=wds1 \
-  KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY
+helm upgrade --install ks-core core-chart/ \
+  --dependency-update \
+  --set KUBESTELLAR_VERSION=$(git rev-parse --short HEAD) \
+  --kube-context $HOSTING_CONTEXT \
+  --set kubeflex-operator.install=false \
+  --set-json='ITSes=[{"name":"its1"}]' \
+  --set-json='WDSes=[{"name":"wds1"}]' \
+  --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
+  --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
 popd
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
