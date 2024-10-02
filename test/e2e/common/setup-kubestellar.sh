@@ -73,10 +73,6 @@ then echo "$0: \$TRANSPORT_CONTROLLER_VERBOSITY must be an integer" >&2
      exit 1
 fi
 
-if [ "$use_release" = true ]
-then wds_extra="-p kubestellar --set ControllerManagerVerbosity=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY --set TransportControllerVerbosity=$TRANSPORT_CONTROLLER_VERBOSITY"
-else wds_extra=""
-fi
 
 if [[ "$KFLEX_DISABLE_CHATTY" = true ]] ; then
    disable_chatty_status="--chatty-status=false"
@@ -110,16 +106,27 @@ esac
 :
 
 pushd "${SRC_DIR}/../../.."
-make kind-load-image
-helm upgrade --install ks-core core-chart/ \
-  --dependency-update \
-  --set KUBESTELLAR_VERSION=$(git rev-parse --short HEAD) \
-  --kube-context $HOSTING_CONTEXT \
-  --set kubeflex-operator.install=false \
-  --set-json='ITSes=[{"name":"its1"}]' \
-  --set-json='WDSes=[{"name":"wds1"}]' \
-  --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
-  --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
+if [ "$use_release" = true ] ; then
+  helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
+    --version $(yq .KUBESTELLAR_VERSION core-chart/values.yaml) \
+    --kube-context $HOSTING_CONTEXT \
+    --set kubeflex-operator.install=false \
+    --set-json='ITSes=[{"name":"its1"}]' \
+    --set-json='WDSes=[{"name":"wds1"}]' \
+    --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
+    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
+else
+  make kind-load-image
+  helm upgrade --install ks-core core-chart/ \
+    --dependency-update \
+    --set KUBESTELLAR_VERSION=$(git rev-parse --short HEAD) \
+    --kube-context $HOSTING_CONTEXT \
+    --set kubeflex-operator.install=false \
+    --set-json='ITSes=[{"name":"its1"}]' \
+    --set-json='WDSes=[{"name":"wds1"}]' \
+    --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
+    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
+  fi
 popd
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
