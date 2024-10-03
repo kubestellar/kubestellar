@@ -3131,7 +3131,7 @@ The current context will be renamed to <code>$cpname</code>, if it does not alre
 </li>
 <li>
 <p>Using <code>import-cp-contexts.sh</code> script</p>
-<p>The following covenience command can also be used to import all the KubeFlex Control Planes in the current hosting cluster as contexts of the current kubeconfig:</p>
+<p>The following covenience command can also be used to import all the KubeFlex Control Planes in the current hosting cluster as contexts of the current kubeconfig. The script involved requires that you have <a href="https://github.com/mikefarah/yq">yq</a> (also available from <a href="https://formulae.brew.sh/formula/yq">Homebrew</a>) installed.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v<span class="nv">$KUBESTELLAR_VERSION</span>/scripts/import-cp-contexts.sh<span class="o">)</span><span class="w"> </span>--merge
 </code></pre></div>
 <p>The script above only requires <code>kubectl</code> and <code>yq</code>.</p>
