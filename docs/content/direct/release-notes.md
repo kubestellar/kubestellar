@@ -2,6 +2,11 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.25.0-alpha.1.test.1
+
+This tests the release-building functionality, which has been revised in the course of merge the controller-manager and transport-controller Helm charts into the core Helm chart.
+
+
 ## 0.24.0 and its candidates and their precursors
 
 The main functional change from 0.23.X is the completion of the status combination and introduction of the create-only feature. There is also further work on the organization of the website. There is also a major change in the GitHub repository structure: the kubestellar/ocm-transport-plugin repo's contents have been merged into the kubestellar/kubestellar repo (after `0.24.0-alpha.2`).
