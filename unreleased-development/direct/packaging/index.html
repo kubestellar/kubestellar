@@ -1558,20 +1558,16 @@ prints.</p>
     otc_hc_repo -.-&gt; otc_ctr_image
     ksc_hc_repo[published KS Core chart] --&gt; ksc_hc_src
     ksc_hc_src -.-&gt; osa_hc_repo
-    ksc_hc_src -.-&gt; otc_hc_repo
-    ksc_hc_src -.-&gt; kcm_hc_repo
+    ksc_hc_src -.-&gt; otc_ctr_image
+    ksc_hc_src -.-&gt; kcm_ctr_image
     ksc_hc_repo -.-&gt; osa_hc_repo
-    ksc_hc_repo -.-&gt; otc_hc_repo
-    ksc_hc_repo -.-&gt; kcm_hc_repo
+    ksc_hc_repo -.-&gt; otc_ctr_image
+    ksc_hc_repo -.-&gt; kcm_ctr_image
     setup_ksc -.-&gt; ksc_hc_repo
     setup_ksc -.-&gt; KubeFlex
-    e2e_local -.-&gt; ocm_pch
-    e2e_local -.-&gt; kcm_code
-    e2e_local -.-&gt; kcm_hc_src
-    e2e_local -.-&gt; otc_code
+    e2e_local -.-&gt; ksc_hc_src
     e2e_local -.-&gt; KubeFlex
-    e2e_release -.-&gt; ocm_pch
-    e2e_release -.-&gt; ks_pch
+    e2e_release -.-&gt; ksc_hc_repo
     e2e_release -.-&gt; KubeFlex</code></pre>
 <p>The following diagram shows the parts involving the clusteradm and Helm CLI container images.</p>
 <pre class="mermaid"><code>flowchart LR
@@ -1598,9 +1594,8 @@ prints.</p>
     ksc_hc_src -.-&gt; cladm_image
     ksc_hc_repo -.-&gt; cladm_image
     ksc_hc_repo -.-&gt; helm_image
-    e2e_local -.-&gt; ocm_pch
-    e2e_release -.-&gt; ocm_pch
-    e2e_release -.-&gt; ks_pch</code></pre>
+    e2e_local -.-&gt; ksc_hc_src
+    e2e_release -.-&gt; ksc_hc_repo</code></pre>
 <p>The dashed dependencies are at run time, not build time.</p>
 <p>"KCM" is the KubeStellar controller-manager.</p>
 <p><strong>NOTE</strong>: among the references to published artifacts, some have a
@@ -1668,31 +1663,47 @@ built from.</p>
 <p>The container image at <code>quay.io/kubestellar/helm:3.14.0</code> was built by <code>hack/build-helm-image.sh</code>.</p>
 <h3 id="kubestellar-core-helm-chart">KubeStellar core Helm chart<a class="headerlink" href="#kubestellar-core-helm-chart" title="Permanent link">#</a></h3>
 <p>This Helm chart is instantiated in a pre-existing Kubernetes cluster and (1) makes it into a KubeFlex hosting cluster and (2) sets up a requested collection of WDSes and ITSes. See <a href="../core-chart/">the core chart doc</a>. This chart is defined in the <code>core-chart</code> directory and published to <code>ghcr.io/kubestellar/kubestellar/core-chart</code>.</p>
-<p>This Helm chart defines and uses two KubeFlex PostCreateHooks, as follows.</p>
+<p>The chart's <code>templates/</code> generate KubeFlex <code>ControlPlane</code> objects for
+the ITSes and WDSes specified in the chart's "values". These use the
+PostCreateHooks discussed below, which are also sensitive to a variety
+of settings in the chart's values. A PostCreateHook is cluster-scoped.</p>
+<p>This Helm chart defines and uses two KubeFlex PostCreateHooks in the
+KubeFlex hosting cluster, as follows.</p>
 <ul>
 <li>
 <p><code>its</code> defines a Job with two containers. One container uses the clusteradm container image to initialize the target cluster as an OCM "hub". The other container uses the Helm CLI container image to instantiate the <a href="#ocm-status-addon-helm-chart">OCM Status Addon Helm chart</a>. The version to use is defined in the <code>values.yaml</code> of the core chart. This PCH is used for every requested ITS.</p>
 </li>
 <li>
-<p><code>wds</code> defines a Job with two containers. One container uses the Helm CLI image to instantiate the <a href="#kubestellar-controller-manager-helm-chart">KubeStellar controller-manager Helm chart</a>. The other container uses the Helm CLI image to instantiate the <a href="#ocm-transport-controller-helm-chart">OCM Transport Controller Helm chart</a>. For both of those subsidiary charts, the version to use is defined in the <code>values.yaml</code> of the core chart. This PCH is used for every requested WDS.</p>
+<p><code>wds</code> defines two <code>Deployment</code> objects and supporting RBAC
+  objects. One <code>Deployment</code> runs the KubeStellar
+  controller-manager. The other runs the OCM transport
+  controller. Each uses a container image repo in
+  <code>ghcr.io/kubestellar/kubestellar</code>, with an image tag specified in
+  the chart's values. The default values identify the images built for
+  the chart's release. When setting up for local testing: a transitory
+  tag value is set, with the image being built locally and loaded into
+  the KubeFlex hosting <code>kind</code> cluster named as if it were in
+  <code>ghcr.io/kubestellar/kubestellar</code>.</p>
 </li>
 </ul>
-<p>By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged <code>$VERSION</code> contains a Helm chart that declares its <code>version</code> and its <code>appVersion</code> to be <code>$VERSION</code> and instantiates version <code>$VERSION</code> of <a href="#kubestellar-controller-manager-helm-chart">the KubeStellar controller-manager Helm chart</a> and <a href="#ocm-transport-controller-helm-chart">the OCM Transport Controller Helm chart</a>.</p>
+<p>By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged <code>$VERSION</code> contains a Helm chart that declares its <code>version</code> and its <code>appVersion</code> to be <code>$VERSION</code> and instantiates version <code>$VERSION</code> of <a href="#kubestellar-controller-manager-container-image">the KubeStellar controller-manager container image</a> and <a href="#ocm-transport-controller-container-image">the OCM Transport Controller container image</a>.</p>
 <h3 id="kubestellar-controller-manager-helm-chart">KubeStellar controller-manager Helm Chart<a class="headerlink" href="#kubestellar-controller-manager-helm-chart" title="Permanent link">#</a></h3>
+<p><strong>NOTE</strong>: This is not used for anything anymore, but the published OCI images still exist.</p>
 <p>There is a Helm chart that is designed to be instantiated in a KubeFlex hosting cluster, once per WDS. The focus of the chart is getting the KubeStellar controller-manager installed.</p>
 <p>The source for the Helm chart is in
 the <code>chart/</code> directory. <code>make chart</code> (re)derives
 it from local sources. This is not included in <code>make all-generated</code>.</p>
 <p>This chart creates (among other things) a <code>Deployment</code> object that runs a container from the <a href="#kubestellar-controller-manager-container-image">KubeStellar controller-manager container image</a>.</p>
 <p>The chart is published at the OCI repository
-<code>ghcr.io/kubestellar/kubestellar/controller-manager-chart</code>. A GitHub Actions workflow (in <code>.github/workflows/goreleaser.yml</code>) specializes and publishes this chart as part of <a href="../release/">the release process</a>.</p>
+<code>ghcr.io/kubestellar/kubestellar/controller-manager-chart</code>. A GitHub Actions workflow (in <code>.github/workflows/goreleaser.yml</code>) used to specializ and publish this chart as part of <a href="../release/">the release process</a>.</p>
 <p>By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged <code>$VERSION</code> contains a Helm chart that declares its <code>version</code> and its <code>appVersion</code> to be <code>$VERSION</code> and that chart has a Deployment that uses the kubestellar-controller-manager container image tagged <code>$VERSION</code>.</p>
 <h3 id="ocm-transport-controller-helm-chart">OCM Transport Controller Helm chart<a class="headerlink" href="#ocm-transport-controller-helm-chart" title="Permanent link">#</a></h3>
-<p>The <a href="../release/">release process</a> packages and publishes this chart at <a href="https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart">ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart</a>. By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged <code>$VERSION</code> contains a Helm chart that declares its <code>version</code> and its <code>appVersion</code> to be <code>$VERSION</code> and instantiates version <code>$VERSION</code> of <a href="#ocm-transport-controller-container-image">OCM Transport Controller container image</a>.</p>
+<p><strong>NOTE</strong>: This is not used for anything anymore, but the published OCI images still exist.</p>
+<p>The <a href="../release/">release process</a> used to package and publish this chart at <a href="https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart">ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart</a>. By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged <code>$VERSION</code> contains a Helm chart that declares its <code>version</code> and its <code>appVersion</code> to be <code>$VERSION</code> and instantiates version <code>$VERSION</code> of <a href="#ocm-transport-controller-container-image">OCM Transport Controller container image</a>.</p>
 <h3 id="kubeflex-postcreatehooks">KubeFlex PostCreateHooks<a class="headerlink" href="#kubeflex-postcreatehooks" title="Permanent link">#</a></h3>
+<p><strong>NOTE</strong>: These are not used for anything now but still exist.</p>
 <p>In addition to the two PostCreateHooks in the core Helm chart described above, there are two more PostCreateHooks defined in the <code>config/postcreate-hooks/</code> directory.</p>
 <p>These two PostCreateHooks were used in the "step-by-step" variant of the example setup instructions (which are currently out of service). Those instructions told the user to use the PCH sources from a KubeStellar release on GitHub. The version is a literal in the instructions and is updated in the process of preparing for a KubeStellar release. The step-by-step variant is intended to be deleted (in favor of using the core Helm chart) by the time the next release is made.</p>
-<p>The setup script for E2E testing (<code>test/e2e/setup-kubestellar.sh</code>) uses the local copy of the <code>ocm</code> PCH unconditionally and uses the local copy of the <code>kubestellar</code> PCH when testing a release.</p>
 <h4 id="ocm-postcreatehook">ocm PostCreateHook<a class="headerlink" href="#ocm-postcreatehook" title="Permanent link">#</a></h4>
 <p>The PostCreateHook defined in <code>config/postcreate-hooks/ocm.yaml</code> gets used on an ITS to do two things: (1) initialize that space as an OCM "hub", using the image <code>quay.io/kubestellar/clusteradm:0.8.2</code>, and (2) install KubeStellar's OCM Status Add-On Controller there. The clusteradm image (described <a href="#clusteradm-container-image">above</a>) includes the <code>clusteradm</code> CLI release <code>v0.8.2</code> which is bundled with the OCM release <code>v0.13.2</code>. Part (2) uses the Helm CLI in the container image at <code>quay.io/kubestellar/helm:v3.14.0</code> to instantiate the <a href="#ocm-status-addon-helm-chart">OCM Status Add-On Helm chart</a> that was published at <code>ghcr.io/kubestellar/ocm-status-addon-chart</code>.</p>
 <h4 id="kubestellar-postcreatehook">kubestellar PostCreateHook<a class="headerlink" href="#kubestellar-postcreatehook" title="Permanent link">#</a></h4>
@@ -1708,14 +1719,10 @@ One uses <a href="#helm-cli-container-image">the Helm CLI image</a> to instantia
 <p>The instructions display a command to instantiate the core Helm chart, at the version in the relevant environment variable, requesting the creation of one ITS and one WDS.</p>
 <p>The instructions display commands to update the user's kubeconfig file to have contexts for the ITS and the WDS created by the chart instance. These commands use the KubeFlex CLI (<code>kflex</code>). There is also a script under development that will do the job using <code>kubectl</code> instead of <code>kflex</code>; when it appears, the instructions will display a curl-to-bash command that fetches the script from GitHub using a version that appears as a literal in the instructions and gets manually updated as part of making a new release.</p>
 <h4 id="e2e-setup-for-testing-a-release">E2E setup for testing a release<a class="headerlink" href="#e2e-setup-for-testing-a-release" title="Permanent link">#</a></h4>
-<p>When setting up to test a release, the setup script uses the following KubeStellar pieces.</p>
-<p>The script creates the <code>ocm</code> and <code>kubestellar</code> PCHes from the local YAML for them. The script uses these PCHes in <code>kflex</code> commands that create one ITS and one WDS, respectively.</p>
+<p>When setting up to test a release, the setup script uses the published core Helm chart of the release being tested. That is the latest release as of the script's version.</p>
 <h4 id="e2e-setup-for-testing-local-copyversion">E2E setup for testing local copy/version<a class="headerlink" href="#e2e-setup-for-testing-local-copyversion" title="Permanent link">#</a></h4>
-<p>When setting up to test a release, the setup script uses the following KubeStellar pieces.</p>
-<p>The script creates the <code>ocm</code> PCH from the local YAML for it. The script uses this PCH in a <code>kflex</code> command that create one ITS.</p>
-<p>The scripts builds a local kubestellar controller-manager container image from local sources. Then the script loads that image into the KubeFlex hosting cluster (e.g., using <code>kind load</code>).</p>
-<p>The script temporarily updates the local kubestellar controller-manager Helm chart to reference the kubestellar controller-manager container image that was loaded into the hosting cluster. Then the script invokes the Helm CLI to instantiate that chart in the hosting cluster, configured to apply to the WDS being set up. Then the script partially undoes its temporary modification of the kubestellar controller-manager Helm chart, using <code>git checkout --</code>.</p>
-<p>The script builds a local container image for the OCM transport controller from local sources for the generic part and the OCM-specific part. Then the script loads this container image into the hosting cluster. Then the setup script invokes <code>scripts/deploy-transport-controller.sh</code>, which creates a Deployment object that uses the transport controller container image reference passed on its command line.</p>
+<p>When setting up to test the local copy/version, the setup script uses the local version of the core Helm chart.</p>
+<p>The script builds a local kubestellar controller-manager container image from local sources. Then the script loads that image into the KubeFlex hosting cluster (e.g., using <code>kind load</code>). The script does the same for the OCM transport controller. The core chart is instantiated with settings to use the images just built.</p>
 <h2 id="amalgamated-graph">Amalgamated graph<a class="headerlink" href="#amalgamated-graph" title="Permanent link">#</a></h2>
 <p>Currently only showing kubestellar and ocm-status-addon.</p>
 <p>Again, omitting clusteradm and Helm CLI container images for simplicity.</p>
@@ -1758,21 +1765,16 @@ One uses <a href="#helm-cli-container-image">the Helm CLI image</a> to instantia
     otc_hc_repo -.-&gt; otc_ctr_image
     ksc_hc_repo[published KS Core chart] --&gt; ksc_hc_src
     ksc_hc_src -.-&gt; osa_hc_repo
-    ksc_hc_src -.-&gt; kcm_hc_repo
-    ksc_hc_src -.-&gt; otc_hc_repo
+    ksc_hc_src -.-&gt; kcm_ctr_image
+    ksc_hc_src -.-&gt; otc_ctr_image
     ksc_hc_repo -.-&gt; osa_hc_repo
-    ksc_hc_repo -.-&gt; kcm_hc_repo
-    ksc_hc_repo -.-&gt; otc_hc_repo
+    ksc_hc_repo -.-&gt; kcm_ctr_image
+    ksc_hc_repo -.-&gt; otc_ctr_image
     setup_ksc -.-&gt; ksc_hc_repo
     setup_ksc -.-&gt; KubeFlex
-    e2e_local -.-&gt; ocm_pch
-    e2e_local -.-&gt; kcm_code
-    e2e_local -.-&gt; kcm_hc_src
-    e2e_local -.-&gt; gtc_code
-    e2e_local -.-&gt; otp_code
+    e2e_local -.-&gt; ksc_hc_src
     e2e_local -.-&gt; KubeFlex
-    e2e_release -.-&gt; ocm_pch
-    e2e_release -.-&gt; ks_pch
+    e2e_release -.-&gt; ksc_hc_repo
     e2e_release -.-&gt; KubeFlex</code></pre>
 <p>Every dotted line is a reference that must be versioned. How do we
 keep all those versions right?</p>
