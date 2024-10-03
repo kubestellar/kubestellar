@@ -184,7 +184,7 @@ spec:
               - kubestellar
               - oci://ghcr.io/kubestellar/kubestellar/controller-manager-chart
               - --version
-              - "0.25.0-alpha.1.test.1"
+              - "0.25.0-alpha.1.test.2"
               - --set
               - "ControlPlaneName={{.ControlPlaneName}}"
               - --set
@@ -203,7 +203,7 @@ spec:
               - ocm-transport-controller
               - oci://ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart
               - --version
-              - "0.25.0-alpha.1.test.1"
+              - "0.25.0-alpha.1.test.2"
               - --set
               - "wds_cp_name={{.ControlPlaneName}}"
               - --set
