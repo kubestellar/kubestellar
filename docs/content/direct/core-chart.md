@@ -272,7 +272,7 @@ the `kflex` CLI and one not.
 
 3. Using `import-cp-contexts.sh` script
 
-    The following covenience command can also be used to import all the KubeFlex Control Planes in the current hosting cluster as contexts of the current kubeconfig:
+    The following covenience command can also be used to import all the KubeFlex Control Planes in the current hosting cluster as contexts of the current kubeconfig. The script involved requires that you have [yq](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq)) installed.
 
     ```shell
     bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/import-cp-contexts.sh) --merge
