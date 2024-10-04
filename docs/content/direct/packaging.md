@@ -86,27 +86,14 @@ flowchart LR
     subgraph ks_repo["kubestellar@GitHub"]
     kcm_code[KCM source code]
     otc_code[OTC source code]
-    kcm_hc_src[KCM Helm chart source]
-    otc_hc_src[OTC Helm chart source]
     ksc_hc_src[KS Core Helm chart source]
-    ks_pch[kubestellar PostCreateHook]
-    ocm_pch["ocm PostCreateHook"]
     setup_ksc["'Getting Started' setup"]
     e2e_local["E2E setup<br>local"]
     e2e_release["E2E setup<br>release"]
     end
-    ocm_pch -.-> osa_hc_repo
     kcm_ctr_image[KCM container image] --> kcm_code
-    kcm_hc_repo[published KCM Helm Chart] --> kcm_hc_src
-    kcm_hc_src -.-> kcm_ctr_image
-    kcm_hc_repo -.-> kcm_ctr_image
-    ks_pch -.-> kcm_hc_repo
-    ks_pch -.-> otc_hc_repo[published OTC Helm chart]
     otc_ctr_image[OTC container image]
     otc_ctr_image --> otc_code
-    otc_hc_src -.-> otc_ctr_image
-    otc_hc_repo --> otc_hc_src
-    otc_hc_repo -.-> otc_ctr_image
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
     ksc_hc_src -.-> osa_hc_repo
     ksc_hc_src -.-> otc_ctr_image
@@ -134,16 +121,11 @@ flowchart LR
     end
     subgraph ks_repo["kubestellar@GitHub"]
     ksc_hc_src[KS Core Helm chart source]
-    ks_pch[kubestellar PostCreateHook]
-    ocm_pch["ocm PostCreateHook"]
     e2e_local["E2E setup<br>local"]
     e2e_release["E2E setup<br>release"]
     end
     helm_image["ks/helm image"] --> helm_src
     cladm_image["ks/clusteradm image"] --> cladm_src
-    ocm_pch -.-> helm_image
-    ocm_pch -.-> cladm_image
-    ks_pch -.-> helm_image
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
     ksc_hc_src -.-> helm_image
     ksc_hc_src -.-> cladm_image
@@ -238,7 +220,7 @@ also pushes the built container image to
 using a tag that equals the ocm/clusteradm version that the image was
 built from.
 
-This image is used by the [ocm PostCreateHook](#ocm-postcreatehook) to initialize an ITS as an Open Cluster Management hub.
+This image is used by the [core Helm chart](#kubestellar-core-helm-chart) to initialize an ITS as an Open Cluster Management hub.
 
 ### Helm CLI container image
 
@@ -256,7 +238,7 @@ of settings in the chart's values. A PostCreateHook is cluster-scoped.
 This Helm chart defines and uses two KubeFlex PostCreateHooks in the
 KubeFlex hosting cluster, as follows.
 
-- `its` defines a Job with two containers. One container uses the clusteradm container image to initialize the target cluster as an OCM "hub". The other container uses the Helm CLI container image to instantiate the [OCM Status Addon Helm chart](#ocm-status-addon-helm-chart). The version to use is defined in the `values.yaml` of the core chart. This PCH is used for every requested ITS.
+- `its` defines a Job with two containers. One container uses the clusteradm container image to initialize the target cluster as an OCM "hub". The other container uses the Helm CLI container image to instantiate the [OCM Status Addon Helm chart](#ocm-status-addon-helm-chart). The version to use is defined in the `values.yaml` of the core chart. This PostCreateHook is used for every requested ITS.
 
 - `wds` defines two `Deployment` objects and supporting RBAC
   objects. One `Deployment` runs the KubeStellar
@@ -274,45 +256,11 @@ By our development practices and not doing any manual hacking, we maintain the a
 
 ### KubeStellar controller-manager Helm Chart
 
-**NOTE**: This is not used for anything anymore, but the published OCI images still exist.
-
-There is a Helm chart that is designed to be instantiated in a KubeFlex hosting cluster, once per WDS. The focus of the chart is getting the KubeStellar controller-manager installed.
-
-The source for the Helm chart is in
-the `chart/` directory. `make chart` (re)derives
-it from local sources. This is not included in `make all-generated`.
-
-This chart creates (among other things) a `Deployment` object that runs a container from the [KubeStellar controller-manager container image](#kubestellar-controller-manager-container-image).
-
-The chart is published at the OCI repository
-`ghcr.io/kubestellar/kubestellar/controller-manager-chart`. A GitHub Actions workflow (in `.github/workflows/goreleaser.yml`) used to specializ and publish this chart as part of [the release process](release.md).
-
-By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and that chart has a Deployment that uses the kubestellar-controller-manager container image tagged `$VERSION`.
+**NOTE**: This is not used for anything anymore, but the published OCI images still exist at [ghcr.io/kubestellar/kubestellar/controller-manager-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Fcontroller-manager-chart).
 
 ### OCM Transport Controller Helm chart
 
-**NOTE**: This is not used for anything anymore, but the published OCI images still exist.
-
-The [release process](release.md) used to package and publish this chart at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart). By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and instantiates version `$VERSION` of [OCM Transport Controller container image](#ocm-transport-controller-container-image).
-
-### KubeFlex PostCreateHooks
-
-**NOTE**: These are not used for anything now but still exist.
-
-In addition to the two PostCreateHooks in the core Helm chart described above, there are two more PostCreateHooks defined in the `config/postcreate-hooks/` directory.
-
-These two PostCreateHooks were used in the "step-by-step" variant of the example setup instructions (which are currently out of service). Those instructions told the user to use the PCH sources from a KubeStellar release on GitHub. The version is a literal in the instructions and is updated in the process of preparing for a KubeStellar release. The step-by-step variant is intended to be deleted (in favor of using the core Helm chart) by the time the next release is made.
-
-#### ocm PostCreateHook
-
-The PostCreateHook defined in `config/postcreate-hooks/ocm.yaml` gets used on an ITS to do two things: (1) initialize that space as an OCM "hub", using the image `quay.io/kubestellar/clusteradm:0.8.2`, and (2) install KubeStellar's OCM Status Add-On Controller there. The clusteradm image (described [above](#clusteradm-container-image)) includes the `clusteradm` CLI release `v0.8.2` which is bundled with the OCM release `v0.13.2`. Part (2) uses the Helm CLI in the container image at `quay.io/kubestellar/helm:v3.14.0` to instantiate the [OCM Status Add-On Helm chart](#ocm-status-addon-helm-chart) that was published at `ghcr.io/kubestellar/ocm-status-addon-chart`.
-
-#### kubestellar PostCreateHook
-
-The PostCreateHook defined in
-`config/postcreate-hooks/kubestellar.yaml` is intended to be used in
-the hosting cluster, once per WDS, and defines a `Job` that has two containers.
-One uses [the Helm CLI image](#helm-cli-container-image) to instantiate [the KubeStellar controller-manager Helm chart](#kubestellar-controller-manager-helm-chart). The chart version appears as a literal in the PCH definition and is manually updated during the process of creating a release (see [the release process document](release.md)). The other container uses the Helm CLI image to instantiate the OCM Transport Controller Helm chart. The version to instantiate appears as a literal in the PCH definition and is also updated during the process of creating a release.
+**NOTE**: This is not used for anything anymore, but the published OCI images still exist at [ghcr.io/kubestellar/kubestellar/ocm-transport-controller-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Focm-transport-controller-chart).
 
 ### Scripts and instructions
 
@@ -361,29 +309,16 @@ flowchart LR
     kcm_code[KCM source code]
     gtc_code["generic transport<br>controller code"]
     otp_code[OTP source code]
-    kcm_hc_src[KCM Helm chart source]
-    otc_hc_src[OTC Helm chart source]
     ksc_hc_src[KS Core Helm chart source]
-    ks_pch[kubestellar PostCreateHook]
-    ocm_pch["ocm PostCreateHook"]
     setup_ksc["'Getting Started' setup"]
     e2e_local["E2E setup<br>local"]
     e2e_release["E2E setup<br>release"]
     end
     osa_repo -.-> ks_repo
-    ocm_pch -.-> osa_hc_repo
     kcm_ctr_image[KCM container image] --> kcm_code
-    kcm_hc_repo[published KCM Helm Chart] --> kcm_hc_src
-    kcm_hc_src -.-> kcm_ctr_image
-    kcm_hc_repo -.-> kcm_ctr_image
-    ks_pch -.-> kcm_hc_repo
-    ks_pch -.-> otc_hc_repo[published OTC Helm chart]
     otc_ctr_image[OTC container image]
     otc_ctr_image --> gtc_code
     otc_ctr_image --> otp_code
-    otc_hc_src -.-> otc_ctr_image
-    otc_hc_repo --> otc_hc_src
-    otc_hc_repo -.-> otc_ctr_image
     ksc_hc_repo[published KS Core chart] --> ksc_hc_src
     ksc_hc_src -.-> osa_hc_repo
     ksc_hc_src -.-> kcm_ctr_image
