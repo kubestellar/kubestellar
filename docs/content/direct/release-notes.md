@@ -2,9 +2,9 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
-## 0.25.0-alpha.1.test.1
+## 0.25.0-alpha.1 test releases
 
-This tests the release-building functionality, which has been revised in the course of merge the controller-manager and transport-controller Helm charts into the core Helm chart.
+These test the release-building functionality, which has been revised in the course of merge the controller-manager and transport-controller Helm charts into the core Helm chart.
 
 
 ## 0.24.0 and its candidates and their precursors
