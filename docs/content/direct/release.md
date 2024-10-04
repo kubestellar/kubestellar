@@ -33,7 +33,6 @@ find * .github/workflows \( -name "*.svg" -prune \) -or \( -path "*venv" -prune 
 
 Between each release of [ks/OSA](https://github.com/kubestellar/ocm-status-addon) and the next release of ks/ks, update the references to the ocm-status-addon release in the following files.
 
-- `config/postcreate-hooks/ocm.yaml`
 - `core-chart/values.yaml`
 
 ### Making a new kubestellar release
@@ -43,8 +42,6 @@ Making a new kubestellar release requires a contributor to do the following thin
 - If not already in effect, declare a code freeze. There should be nothing but bug fixes and doc improvements while working towards a regular release.
 
 - Edit `docs/mkdocs.yml` and update the definition of `ks_latest_release` to `$version` (e.g., `'0.23.0-rc42'`). If this is a regular release then also update the definition of `ks_latest_regular_release`.
-
-- Edit the source for the KCM+OTC PCH (in `config/postcreate-hooks/kubestellar.yaml`) and update the version there for the KubeStellar controller-manager chart and the OCM transport controller chart (they appear in the last object, a `Job`).
 
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
 
@@ -86,7 +83,7 @@ We have the following limitations.
 - Thus, it is necessary to keep users clearly appraised of the quality (or status of evaluating the quality) of each release.
 - Because of the lack of self references, most user instructions (e.g., examples) and tests do not have concrete release identifiers in them; instead, the user has to chose and supply the release identifier. There can also be documentation of a specific past release (e.g., the latest stable release) that uses the literal identifier for that past release.
 - **PAY ATTENTION TO THIS ONE**: Because of the prohibition of self references, **Git will not contain the exact bytes of our Helm chart definitions**. Where a Helm chart states its own version or has a container image reference to an image built from the same release, the bytes in Git have a placeholder for that image's tag and the process of creating the published release artifacts fills in that placeholder. Think of this as being analogous to the linking done when building a binary executable file.
-- The design below falls short of the goal of not putting self-references in files under Git control. One way is in the KubeFlex PostCreateHook that installs the kubestellar-controller-manager (KCM), where the version of the container image for the KCM appears. Another is in the examples document, which also holds references to its own release. Additional self-references are in the `docs/content/direct/README.md` and `docs/content/direct/deploy-on-k3d.md`.
+- The design below falls short of the goal of not putting self-references in files under Git control. One place is in the core Helm chart's `values.yaml` file. Another is in the Getting Started setup instructions.
 
 ## Dependency cycle with ks/OTP
 
@@ -101,7 +98,6 @@ For each tag `v$version` the following published artifacts will be created.
 - The container image for the kubestellar-controller-manager (KCM), at `ghcr.io/kubestellar/kubestellar/controller-manager`. Image tag will be `$version`. This GitHub "package" will be connected to the ks/ks repo (this connection is something that an admin will do once, it will stick for all versions).
 - The container image for the OCM transport-controller (OTC), at `ghcr.io/kubestellar/kubestellar/ocm-transport-controller`. Image tag will be `$version`. This GitHub "package" will be connected to the ks/ks repo (this connection is something that an admin will do once, it will stick for all versions).
 - The core Helm chart, at `ghcr.io/kubestellar/kubestellar/core-chart` with version `$version` and Helm "appVersion" `$version`. This GitHub "package" will also be connected to the ks/ks repo. The chart has a reference to container image for the KCM and that reference is `ghcr.io/kubestellar/kubestellar/controller-manager:$version`. The chart also has a reference to container image for the OTC and that reference is `ghcr.io/kubestellar/kubestellar/ocm-transport-controller:$version`. **In Git the chart has only placeholders in these places, _not_ `$version`; the `$version` is inserted into a distinct copy by the GitHub workflow, which then publishes this specialized copy.**
-- Note that there is no automation (yet) concerning the KubeFlex PostCreateHook that installs the KCM.
 
 ## Website
 
@@ -117,7 +113,7 @@ The unit tests (of which we have almost none right now), integration tests (of w
 
 The end-to-end tests include ones written in `bash`, and these are the only documentation telling a user how to use the present version of this repository. Again, these tests do not use any published artifacts from a release of this repo.
 
-We have another category of tests, _release tests_. These test a given release, using the published artifacts of that release. Currently all the release tests are a subset of the E2E tests --- those that can be told to test published artifacts. In particular, they can test the published artifacts reached through the kubestellar PostCreateHook, which contains an explicit reference to one particular release (as explained elsewhere in this document).
+We have another category of tests, _release tests_. These test a given release, using the published artifacts of that release. These differ from the non-release tests only in the setup script, where it uses the published core Helm chart instead of the local version and uses published image tags rather than ephemeral local ones.
 
 We have GitHub workflows that exercise the E2E tests, normally on the copy of the repo that the workflow applies to. However, these workflows are parameterized and can be told to test the released artifacts instead.
 
@@ -131,7 +127,7 @@ We maintain a [Getting Started](get-started.md) document that tells users how to
 
 ## Policy
 
-We aim for all regular releases to be working. In order to do that, we have to make test releases and test them. The widely recognized pattern for doing that is to make "release candidates" (i.e., releases for testing purposes) `1.2.3-rc0`, `1.2.3-rc1`, `1.2.3-rc2`, and so on, while trying to get to a quality release `1.2.3`. Once one of them is judged to be of passing quality, we make a release without the `-rc<N>` suffix. Due to the self-reference in the KCM PostCreateHook, this will involve making a new commit.
+We aim for all regular releases to be working. In order to do that, we have to make test releases and test them. The widely recognized pattern for doing that is to make "release candidates" (i.e., releases for testing purposes) `1.2.3-rc0`, `1.2.3-rc1`, `1.2.3-rc2`, and so on, while trying to get to a quality release `1.2.3`. Once one of them is judged to be of passing quality, we make a release without the `-rc<N>` suffix. Due to the self-references in the repo, this will involve making a new commit.
 
 Right after making a release we test it thoroughly.
 
