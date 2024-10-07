@@ -30,11 +30,40 @@ verbosity (`-v`) of various controllers.
 
 ## Things to look at
 
+- When basic stuff is not working, survey the Pod objects in the KubeFlex hosting cluster to look for ones that are damaged in some way. For example: you can get a summary with the command `kubectl --context kind-kubeflex get pods -A` --- adjust as necessary for the name of your kubeconfig context to use for the KubeFlex hosting cluster.
 - Remember that for each of your BindingPolicy objects, there is a corresponding Binding object that reports what is matching the policy object.
 - Although not part of the interface, when debugging you can look at the ManifestWork and WorkStatus objects in the ITS.
 - Look at logs of controllers. If they have had container restarts that look relevant, look also at the previous logs. Do not forget OCM controllers. Do not forget that some Pods have more than one interesting container.
 - If a controller's `-v` is not at least 5, increase it.
 - Remember that Kubernetes controllers tend to report transient problems as errors without making it clear that the problem is transient and tend to not make it clear if/when the problem has been resolved (sigh).
+
+## Some known problems
+
+### Config update for Kind
+
+See [the known issue for "too many open files"](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files) in `kind`.
+
+### Confusion due to hidden state in your kubeconfig
+
+The `kflex` command maintains and works with a bit of state hidden in your kubeconfig file. This is where KubeFlex stashes the name of the kubeconfig context to use for accessing the KubeFlex hosting cluster. Following is an example of examining that state.
+
+```console
+mspreitz@mjs13 kubestellar % yq .preferences ${KUBECONFIG:-$HOME/.kube/config}
+extensions:
+  - extension:
+      data:
+        kflex-initial-ctx-name: kscore-stage
+      metadata:
+        creationTimestamp: null
+        name: kflex-config-extension-name
+    name: kflex-config-extension-name
+```
+
+The `kflex ctx` commands are surprisingly hesitant to replace a bad value in there. Later releases of `kflex` are better than older ones. The following command shows a way to remove that bit of hidden state; after this, a `kflex ctx` command will succeed _if_ your current kubeconfig context is the one to use for accessing the KubeFlex hosting cluster.
+
+```shell
+yq -i 'del(.preferences)' ${KUBECONFIG:-$HOME/.kube/config}
+```
 
 ## Making a good trouble report
 
@@ -48,6 +77,7 @@ Do a simple clean demonstration of the problem, if possible.
 
 Show the particulars of something going wrong.
 
+- Show a shell session, starting from scratch
 - Report timestamps of when salient changes happened. Make it clear which timezone is involved in each one. Particularly interesting times are when KubeStellar did the wrong thing or failed to do anything at all in response to something.
 - Look at the Binding and ManifestWork and WorkStatus objects and the controller logs. Include both in a problem report. Show the relevant workload objects, from WDS and from WEC. When the problem is behavior over time, show the objects contents from before and after the misbehavior.
 - When reporting kube API object contents, include the `meta.managedFields`. For example, when using `kubectl get`, include `--show-managed-fields`.
