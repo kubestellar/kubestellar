@@ -94,12 +94,7 @@ func NewTransportController(ctx context.Context,
 	transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface,
 	maxSizeWrapped int, maxNumWrapped int, wdsName string) (*genericTransportController, error) {
-	var emptyWrappedObject runtime.Object
-	if t2, is := transportInstance.(transport.TransportWithCreateOnly); is {
-		emptyWrappedObject = t2.WrapObjectsHavingCreateOnly(make([]transport.Wrapee, 0)) // empty wrapped object to get GVR from it.
-	} else {
-		emptyWrappedObject = transportInstance.WrapObjects([]*unstructured.Unstructured{})
-	}
+	emptyWrappedObject := transportInstance.WrapObjects(make([]transport.Wrapee, 0)) // empty wrapped object to get GVR from it.
 	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
@@ -736,7 +731,7 @@ func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, bind
 		}
 		gr := metav1.GroupResource{Group: clause.GroupVersionResource.Group, Resource: clause.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		wrapees = append(wrapees, transport.Wrapee{Object: TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), CreateOnly: clause.CreateOnly})
+		wrapees = append(wrapees, transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), gr.Resource, clause.CreateOnly))
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, clause := range binding.Spec.Workload.NamespaceScope {
@@ -748,7 +743,7 @@ func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, bind
 		}
 		gr := metav1.GroupResource{Group: clause.GroupVersionResource.Group, Resource: clause.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		wrapees = append(wrapees, transport.Wrapee{Object: TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), CreateOnly: clause.CreateOnly})
+		wrapees = append(wrapees, transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), gr.Resource, clause.CreateOnly))
 	}
 
 	return wrapees, groupResources, nil
@@ -813,7 +808,7 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 	// Look through the objects to propagate to see if any needs customization.
 	// If any needs customization then catch up destToCustomizedObjects and proceed from there.
 	for objIdx, wrapee := range uncustomizedWrapees {
-		objToPropagate, createOnly := wrapee.Object, wrapee.CreateOnly
+		objToPropagate := wrapee.Object
 		objAnnotations := objToPropagate.GetAnnotations()
 		objRequestsExpansion := objAnnotations[v1alpha1.TemplateExpansionAnnotationKey] == "true"
 		customizeThisObject := false
@@ -843,7 +838,7 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 			}
 			if destToCustomizedWrapees != nil {
 				customizedObjectsSoFar := destToCustomizedWrapees[dest]
-				customizedObjectsSoFar = append(customizedObjectsSoFar, transport.Wrapee{Object: objC, CreateOnly: createOnly})
+				customizedObjectsSoFar = append(customizedObjectsSoFar, transport.NewWrapee(objC, wrapee.Resource, wrapee.CreateOnly))
 				destToCustomizedWrapees[dest] = customizedObjectsSoFar
 			}
 		}
@@ -861,13 +856,7 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 }
 
 func (c *genericTransportController) wrapBatch(batchToPropagate []transport.Wrapee, binding *v1alpha1.Binding, numShard int, isSharded bool) (*unstructured.Unstructured, error) {
-	var wrapped runtime.Object
-	if t2, is := c.transport.(transport.TransportWithCreateOnly); is {
-		wrapped = t2.WrapObjectsHavingCreateOnly(batchToPropagate)
-	} else {
-		justObjs := abstract.SliceMap(batchToPropagate, transport.Wrapee.GetObject)
-		wrapped = c.transport.WrapObjects(justObjs)
-	}
+	wrapped := c.transport.WrapObjects(batchToPropagate)
 	wrappedObject, err := convertObjectToUnstructured(wrapped)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)

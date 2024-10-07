@@ -20,7 +20,6 @@ import (
 	workv1 "open-cluster-management.io/api/work/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/kubestellar/kubestellar/pkg/transport"
@@ -38,10 +37,25 @@ func NewOCMTransport() transport.Transport {
 type ocm struct {
 }
 
-func (ocm *ocm) WrapObjects(objects []*unstructured.Unstructured) runtime.Object {
-	manifests := make([]workv1.Manifest, len(objects))
-	for i, object := range objects {
-		manifests[i].RawExtension = runtime.RawExtension{Object: object}
+var createOnlyStrategy = workv1.UpdateStrategy{Type: workv1.UpdateStrategyTypeCreateOnly}
+
+func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee) runtime.Object {
+	manifests := make([]workv1.Manifest, len(wrapees))
+	var configs []workv1.ManifestConfigOption
+	for i, wrapee := range wrapees {
+		manifests[i].RawExtension = runtime.RawExtension{Object: wrapee.Object}
+		if wrapee.CreateOnly {
+			gvk := wrapee.Object.GroupVersionKind()
+			configs = append(configs, workv1.ManifestConfigOption{
+				ResourceIdentifier: workv1.ResourceIdentifier{
+					Group:     gvk.Group,
+					Resource:  wrapee.Resource,
+					Namespace: wrapee.Object.GetNamespace(),
+					Name:      wrapee.Object.GetName(),
+				},
+				UpdateStrategy: &createOnlyStrategy,
+			})
+		}
 	}
 	return &workv1.ManifestWork{
 		TypeMeta: metav1.TypeMeta{
@@ -52,6 +66,7 @@ func (ocm *ocm) WrapObjects(objects []*unstructured.Unstructured) runtime.Object
 			Workload: workv1.ManifestsTemplate{
 				Manifests: manifests,
 			},
+			ManifestConfigs: configs,
 		},
 	}
 }
