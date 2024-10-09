@@ -1125,8 +1125,9 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 		}
 		return nil
 	}
-	// // if we reached here object already exists, try update object
+	// if we reached here object already exists, try update object
 	wrappedObject.SetResourceVersion(existingWrappedObject.GetResourceVersion())
+	wrappedObject.SetFinalizers(existingWrappedObject.GetFinalizers())
 	wrappedObject2, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{
 		FieldManager: ControllerName,
 	})
