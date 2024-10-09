@@ -503,6 +503,26 @@ func ValidateNumManifestworks(ctx context.Context, ocmWorkIts *ocmWorkClient.Cli
 	}, timeout).Should(gomega.Equal(num))
 }
 
+func GetNumDeploymentReplicas(ctx context.Context, wec *kubernetes.Clientset, ns string) int {
+	ginkgo.GinkgoHelper()
+	var replicas int = -1
+	gomega.Eventually(func() error {
+		deployments, err := wec.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
+		if err != nil {
+			return err
+		}
+		if len(deployments.Items) != 1 {
+			replicas = -2
+		} else if deployments.Items[0].Spec.Replicas == nil {
+			replicas = -3
+		} else {
+			replicas = int(*deployments.Items[0].Spec.Replicas)
+		}
+		return nil
+	}, timeout).ShouldNot(gomega.HaveOccurred())
+	return replicas
+}
+
 func ValidateNumDeploymentReplicas(ctx context.Context, wec *kubernetes.Clientset, ns string, numReplicas int) {
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() int {
