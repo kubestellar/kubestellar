@@ -503,18 +503,29 @@ func ValidateNumManifestworks(ctx context.Context, ocmWorkIts *ocmWorkClient.Cli
 	}, timeout).Should(gomega.Equal(num))
 }
 
+const (
+	// GotNot means that the attempt to list Deployments failed
+	GotNoList int = -1
+	// GotNotExactly1 means that the number of Deployments is more or less than 1
+	GotNotExactly1 int = -2
+	// GotNoReplicas means that the Deployment does not specify a number of replicas.
+	GotNoReplicas int = -3
+)
+
+// GetNumDeploymentReplicas returns the number of replicas of the one and only Deployment
+// in the given namespace, or one of the values above that explain what went wrong.
 func GetNumDeploymentReplicas(ctx context.Context, wec *kubernetes.Clientset, ns string) int {
 	ginkgo.GinkgoHelper()
-	var replicas int = -1
+	var replicas int = GotNoList
 	gomega.Eventually(func() error {
 		deployments, err := wec.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return err
 		}
 		if len(deployments.Items) != 1 {
-			replicas = -2
+			replicas = GotNotExactly1
 		} else if deployments.Items[0].Spec.Replicas == nil {
-			replicas = -3
+			replicas = GotNoReplicas
 		} else {
 			replicas = int(*deployments.Items[0].Spec.Replicas)
 		}
