@@ -246,6 +246,27 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/known-issues/</loc>
+         <lastmod>2024-10-10</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/known-issues/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/knownissue-kflex-extension/</loc>
+         <lastmod>2024-10-10</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/knownissue-kflex-extension/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/knownissue-kind-config/</loc>
+         <lastmod>2024-10-10</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/knownissue-kind-config/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/unreleased-development/direct/kubeflex-intro/</loc>
          <lastmod>2024-10-10</lastmod>
          <changefreq>daily</changefreq>
