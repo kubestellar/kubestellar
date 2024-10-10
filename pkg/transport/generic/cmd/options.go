@@ -17,8 +17,6 @@ limitations under the License.
 package cmd
 
 import (
-	"math"
-
 	"github.com/spf13/pflag"
 
 	ksopts "github.com/kubestellar/kubestellar/options"
@@ -39,12 +37,13 @@ type TransportOptions struct {
 }
 
 func NewTransportOptions() *TransportOptions {
+	maxSizeWrapped := 500 * 1024
 	return &TransportOptions{
 		Concurrency:            defaultConcurrency,
 		WdsClientOptions:       ksopts.NewClientOptions[*pflag.FlagSet]("wds", "accessing the WDS"),
 		TransportClientOptions: ksopts.NewClientOptions[*pflag.FlagSet]("transport", "accessing the ITS"),
-		MaxNumWrapped:          math.MaxInt,
-		MaxSizeWrapped:         500 * 1024,
+		MaxNumWrapped:          maxSizeWrapped,
+		MaxSizeWrapped:         maxSizeWrapped,
 		ProcessOptions: ksopts.ProcessOptions{
 			MetricsBindAddr: ":8090",
 			PProfBindAddr:   ":8092",
