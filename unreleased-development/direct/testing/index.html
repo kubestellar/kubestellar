@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/direct/contributor/">
+        <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/direct/testing/">
       
       
         <link rel="prev" href="../../Contribution%20guidelines/security/security_contacts/">
@@ -22,7 +22,7 @@
     
     
       
-        <title>For Contributors - KubeStellar</title>
+        <title>Testing - KubeStellar</title>
       
     
     
@@ -80,9 +80,9 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - For Contributors" />
+  <meta property="og:title" content="KubeStellar - Testing" />
   <meta property="og:description" content="None" />
-  <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/direct/contributor/" />
+  <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/direct/testing/" />
   <meta property="og:image" content="https://docs.kubestellar.io/unreleased-developmentassets/images/illustrations/banner.png" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1080" />
@@ -116,7 +116,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#notes-for-kubestellar-contributors" class="md-skip">
+        <a href="#testing" class="md-skip">
           Skip to content
         </a>
       
@@ -203,7 +203,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              For Contributors
+              Testing
             
           </span>
         </div>
@@ -1700,6 +1700,16 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
     
       
@@ -2035,60 +2045,6 @@
   
   
   
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_8" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_5_8" id="__nav_5_8_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    Contribution Notes
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_8_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_5_8">
-            <span class="md-nav__icon md-icon"></span>
-            Contribution Notes
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -2101,7 +2057,7 @@
           
   
   <span class="md-ellipsis">
-    For Contributors
+    Testing
   </span>
   
 
@@ -2112,7 +2068,7 @@
         
   
   <span class="md-ellipsis">
-    For Contributors
+    Testing
   </span>
   
 
@@ -2152,9 +2108,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#making-releases" class="md-nav__link">
+  <a href="#end-to-end-testing" class="md-nav__link">
     <span class="md-ellipsis">
-      Making releases
+      End-to-end testing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-releases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing releases
     </span>
   </a>
   
@@ -2269,14 +2234,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2846,9 +2803,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#making-releases" class="md-nav__link">
+  <a href="#end-to-end-testing" class="md-nav__link">
     <span class="md-ellipsis">
-      Making releases
+      End-to-end testing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-releases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing releases
     </span>
   </a>
   
@@ -2869,7 +2835,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/contributor.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/testing.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2878,16 +2844,14 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/contributor.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/testing.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="notes-for-kubestellar-contributors">Notes for KubeStellar Contributors<a class="headerlink" href="#notes-for-kubestellar-contributors" title="Permanent link">#</a></h1>
-<p>These notes are incomplete; as mentioned in the introduction, if you are interested in contributing directly to the development of KubeStellar, we recommend joining in via the <a href="https://github.com/kubestellar/kubestellar">KubeStellar github repository</a> and <a href="https://kubernetes.slack.com/archives/C058SUSL5AA/">KubeStellar Slack</a></p>
-<hr />
+<h1 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">#</a></h1>
 <p>Make sure all pre-requisites are installed as described in <a href="../pre-reqs/">pre-reqs</a>.</p>
 <h2 id="unit-testing">Unit testing<a class="headerlink" href="#unit-testing" title="Permanent link">#</a></h2>
 <p>The Makefile has a target for running all the unit tests.</p>
@@ -2907,8 +2871,10 @@ runs reliably on a large number of objects.</p>
 <p>To run one of the individual tests, issue a command like the following example.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>go<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-v<span class="w"> </span>-timeout<span class="w"> </span>60s<span class="w"> </span>-run<span class="w"> </span>^TestCRDHandling$<span class="w"> </span>./test/integration/controller-manager
 </code></pre></div>
-<h2 id="making-releases">Making releases<a class="headerlink" href="#making-releases" title="Permanent link">#</a></h2>
-<p>See <a href="../release/">the release process document</a>.</p>
+<h2 id="end-to-end-testing">End-to-end testing<a class="headerlink" href="#end-to-end-testing" title="Permanent link">#</a></h2>
+<p>See <code>test/e2e/</code> in the GitHub repository. It has a README.</p>
+<h2 id="testing-releases">Testing releases<a class="headerlink" href="#testing-releases" title="Permanent link">#</a></h2>
+<p>See <a href="../release-testing/">the release testing doc</a>.</p>
 
 
 

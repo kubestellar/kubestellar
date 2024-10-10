@@ -190,13 +190,6 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/contributor/</loc>
-         <lastmod>2024-10-10</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/contributor/"/>
-         
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/unreleased-development/direct/control/</loc>
          <lastmod>2024-10-10</lastmod>
          <changefreq>daily</changefreq>
@@ -313,6 +306,13 @@
          <lastmod>2024-10-10</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/setup-overview/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/testing/</loc>
+         <lastmod>2024-10-10</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/testing/"/>
          
     </url>
     <url>
