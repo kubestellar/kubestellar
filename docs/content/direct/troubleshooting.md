@@ -112,7 +112,7 @@ sysctl fs.inotify.max_user_watches
 sysctl fs.inotify.max_user_instances
 ```
    - Confirm if these values are below the recommended settings (524288 for max_user_watches and 512 for max_user_instances).
-3. Modify the Parameter Settings
+2. Modify the Parameter Settings
    - Setting these parameters temporarily with sysctl will revert after restarting Rancher Desktop. To persist the changes, you need to modify the configuration using an overlay file.
 Create an Override Configuration File
    - On a Mac:
@@ -131,9 +131,9 @@ provision:
     sysctl -p /etc/sysctl.d/fs.inotify.conf
 ```
      - Save the file.
-4. Restart Rancher Desktop
+3. Restart Rancher Desktop
    - Restart Rancher Desktop for the changes to take effect and ensure the new sysctl parameter values persist.
-5. Delete Existing Kind Clusters
+4. Delete Existing Kind Clusters
    - Before re-running the Kubestellar Getting Started guide, delete all previously created clusters:
 
 ```
