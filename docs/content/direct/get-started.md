@@ -62,7 +62,13 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
     --set-json='WDSes=[{"name":"wds1"}]'
 ```
 
-That command will print some notes about how to get kubeconfig "contexts" named "its1" and "wds1" defined. Do that, because those contexts are used in the following.
+That command will print some notes about how to get kubeconfig "contexts" named "its1" and "wds1" defined. Do that, because those contexts are used in the steps that follow.
+```shell
+kubectl config delete-context its1 || true
+kflex ctx its1
+kubectl config delete-context wds1 || true
+kflex ctx wds1
+```
 
 ### Create and register two workload execution cluster(s)
 
