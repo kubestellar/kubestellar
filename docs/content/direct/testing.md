@@ -1,9 +1,4 @@
-# Notes for KubeStellar Contributors
-
-These notes are incomplete; as mentioned in the introduction, if you are interested in contributing directly to the development of KubeStellar, we recommend joining in via the [KubeStellar github repository](https://github.com/kubestellar/kubestellar) and [KubeStellar Slack](https://kubernetes.slack.com/archives/C058SUSL5AA/)
-
----
-
+# Testing
 
 Make sure all pre-requisites are installed as described in [pre-reqs](pre-reqs.md).
 
@@ -39,6 +34,10 @@ To run one of the individual tests, issue a command like the following example.
 go test -v -timeout 60s -run ^TestCRDHandling$ ./test/integration/controller-manager
 ```
 
-## Making releases
+## End-to-end testing
 
-See [the release process document](release.md).
+See `test/e2e/` in the GitHub repository. It has a README.
+
+## Testing releases
+
+See [the release testing doc](release-testing.md).
