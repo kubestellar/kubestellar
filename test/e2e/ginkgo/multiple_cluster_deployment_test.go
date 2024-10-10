@@ -117,17 +117,15 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 1)
 			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 1)
 
-			if false { // TODO: enable this after the transport plugin implements create-only
-				ginkgo.By("modifying the Deployment in the WDS and expecting no change in the WECs")
-				objPatch := []byte(`{"spec":{"replicas": 2}}`)
-				_, err := wds.AppsV1().Deployments(ns).Patch(
-					ctx, "nginx", types.MergePatchType, objPatch, metav1.PatchOptions{})
-				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			ginkgo.By("modifying the Deployment in the WDS and expecting no change in the WECs")
+			objPatch := []byte(`{"spec":{"replicas": 2}}`)
+			_, err := wds.AppsV1().Deployments(ns).Patch(
+				ctx, "nginx", types.MergePatchType, objPatch, metav1.PatchOptions{})
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-				time.Sleep(30 * time.Second)
-				util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 1)
-				util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 1)
-			}
+			time.Sleep(30 * time.Second)
+			gomega.Expect(util.GetNumDeploymentReplicas(ctx, wec1, ns)).To(gomega.Equal(1))
+			gomega.Expect(util.GetNumDeploymentReplicas(ctx, wec2, ns)).To(gomega.Equal(1))
 		})
 
 		ginkgo.It("handles changes in bindingpolicy ObjectSelector", func(ctx context.Context) {
