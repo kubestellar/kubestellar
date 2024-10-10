@@ -31,6 +31,7 @@ you will first want to remove any related debris. The following
 commands tear down the state established by this recipe.
 
 ```shell
+yq -i 'del(.preferences)' ${KUBECONFIG:-$HOME/.kube/config}
 kind delete cluster --name kubeflex
 kind delete cluster --name cluster1
 kind delete cluster --name cluster2
