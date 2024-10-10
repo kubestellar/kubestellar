@@ -75,13 +75,12 @@ nav:
       - Security:
           - Policy: Contribution guidelines/security/security.md
           - Contacts: Contribution guidelines/security/security_contacts.md
-      - Contribution Notes:
-        - For Contributors: direct/contributor.md
-        - Packaging: direct/packaging.md
-        - Release Process: direct/release.md
-        - Release Testing: direct/release-testing.md
-        - Guidelines: Contribution guidelines/CONTRIBUTING.md
-        - Sign-off on Contributions: direct/pr-signoff.md
+      - Testing: direct/testing.md
+      - Packaging: direct/packaging.md
+      - Release Process: direct/release.md
+      - Release Testing: direct/release-testing.md
+      - Guidelines: Contribution guidelines/CONTRIBUTING.md
+      - Sign-off on Contributions: direct/pr-signoff.md
   - Community: 
     - Get Involved: Community/_index.md
     - Contact Us:
