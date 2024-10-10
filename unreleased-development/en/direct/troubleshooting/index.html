@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.40">
     
     
       
@@ -1723,6 +1723,84 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#potential-error-with-kubestellar-installation-related-to-issues-with-kind-backed-by-rancher-desktop" class="md-nav__link">
+    <span class="md-ellipsis">
+      Potential Error with Kubestellar Installation related to Issues with Kind backed by Rancher Desktop
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Potential Error with Kubestellar Installation related to Issues with Kind backed by Rancher Desktop">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#description-of-the-issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description of the Issue
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-message-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Message Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root-cause" class="md-nav__link">
+    <span class="md-ellipsis">
+      Root Cause
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#steps-to-reproduce-the-issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps to Reproduce the Issue
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Expected Behavior
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#steps-to-fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps to Fix
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-note-ensuring-a-clean-environment-for-reinstallation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Note: Ensuring a Clean Environment for Reinstallation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2854,6 +2932,84 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#potential-error-with-kubestellar-installation-related-to-issues-with-kind-backed-by-rancher-desktop" class="md-nav__link">
+    <span class="md-ellipsis">
+      Potential Error with Kubestellar Installation related to Issues with Kind backed by Rancher Desktop
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Potential Error with Kubestellar Installation related to Issues with Kind backed by Rancher Desktop">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#description-of-the-issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description of the Issue
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-message-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Message Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root-cause" class="md-nav__link">
+    <span class="md-ellipsis">
+      Root Cause
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#steps-to-reproduce-the-issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps to Reproduce the Issue
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Expected Behavior
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#steps-to-fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps to Fix
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-note-ensuring-a-clean-environment-for-reinstallation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Note: Ensuring a Clean Environment for Reinstallation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2932,6 +3088,97 @@ verbosity (<code>-v</code>) of various controllers.</p>
 <li>Look at the Binding and ManifestWork and WorkStatus objects and the controller logs. Include both in a problem report. Show the relevant workload objects, from WDS and from WEC. When the problem is behavior over time, show the objects contents from before and after the misbehavior.</li>
 <li>When reporting kube API object contents, include the <code>meta.managedFields</code>. For example, when using <code>kubectl get</code>, include <code>--show-managed-fields</code>.</li>
 </ul>
+<hr />
+<h2 id="potential-error-with-kubestellar-installation-related-to-issues-with-kind-backed-by-rancher-desktop">Potential Error with Kubestellar Installation related to Issues with Kind backed by Rancher Desktop<a class="headerlink" href="#potential-error-with-kubestellar-installation-related-to-issues-with-kind-backed-by-rancher-desktop" title="Permanent link">#</a></h2>
+<h3 id="description-of-the-issue">Description of the Issue<a class="headerlink" href="#description-of-the-issue" title="Permanent link">#</a></h3>
+<p>Kubestellar installation may fail for some users during the setup of the second cluster (cluster2) when running Kind with Docker provided by Rancher Desktop. The failure occurs while initializing the cluster, with an error related to kubeadm. Insufficient system parameter settings (sysctl) within the Rancher Desktop virtual machine may be causing this issue.</p>
+<h3 id="error-message-example">Error Message Example<a class="headerlink" href="#error-message-example" title="Permanent link">#</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Error: hub oriented command should not running against non-hub cluster
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Creating cluster &quot;cluster2&quot; ...
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>...
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>ERROR: failed to create cluster: failed to init node with kubeadm: command &quot;docker exec --privileged cluster2-control-plane kubeadm init --skip-phases=preflight --config=/kind/kubeadm.conf --skip-token-print --v=6&quot; failed with error: exit status 1
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Command Output: I1008 16:11:20.743111 134 initconfiguration.go:255] loading configuration from &quot;/kind/kubeadm.conf&quot;
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>...
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>[config] WARNING: Ignored YAML document with GroupVersionKind kubeadm.k8s.io/v1beta3, Kind=JoinConfiguration
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>...
+</code></pre></div>
+<h3 id="root-cause">Root Cause<a class="headerlink" href="#root-cause" title="Permanent link">#</a></h3>
+<p>The issue arises due to low default settings for certain sysctl parameters in the Rancher Desktop virtual machine. Kind requires the following minimum settings:</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>fs.inotify.max_user_watches = 524288
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>fs.inotify.max_user_instances = 512
+</code></pre></div>
+<p>If these parameters are set lower than the suggeseted values, the second cluster initialization may fail.</p>
+<h3 id="steps-to-reproduce-the-issue">Steps to Reproduce the Issue<a class="headerlink" href="#steps-to-reproduce-the-issue" title="Permanent link">#</a></h3>
+<ol>
+<li>Install Rancher Desktop</li>
+<li>Download and install Rancher Desktop from the official website.</li>
+<li>Configure it to use Docker as the container runtime (dockerd).</li>
+<li>Install Kind</li>
+<li>Follow the installation instructions provided in the Kind documentation.</li>
+<li>Install Kubestellar Prerequisites</li>
+<li>Ensure that all required dependencies for Kubestellar are installed on your system. Refer to the Kubestellar documentation for a complete list.</li>
+<li>Run the Kubestellar Getting Started Guide or Demo Environment Setup Script</li>
+<li>Follow the steps in the Kubestellar Getting Started guide or run the automated demo environment setup script.</li>
+<li>Monitor the Installation Process</li>
+<li>Confirm the successful installation of kubeflex.</li>
+<li>Ensure that ITS1 (Information Transformation Service 1) and WDS1 (Workload Distribution Service 1) are created.</li>
+<li>Verify the creation of the first cluster (cluster1).</li>
+<li>Wait for the Creation of Cluster2</li>
+<li>Allow the script to attempt the creation of the second remote cluster (cluster2).</li>
+<li>The error should occur during this step if the issue is present.</li>
+</ol>
+<h3 id="expected-behavior">Expected Behavior<a class="headerlink" href="#expected-behavior" title="Permanent link">#</a></h3>
+<p>Cluster 2 should create successfully, and the installation should complete without errors.</p>
+<h3 id="steps-to-fix">Steps to Fix<a class="headerlink" href="#steps-to-fix" title="Permanent link">#</a></h3>
+<ol>
+<li>Check Current sysctl Parameter Values</li>
+<li>Use the command rdctl shell to log in to the Rancher Desktop VM.
+Run:
+        <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sysctl fs.inotify.max_user_watches
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sysctl fs.inotify.max_user_instances
+</code></pre></div><ul>
+<li>Confirm if these values are below the recommended settings (524288 for max_user_watches and 512 for max_user_instances).</li>
+</ul>
+</li>
+<li>Modify the Parameter Settings</li>
+<li>Setting these parameters temporarily with sysctl will revert after restarting Rancher Desktop. To persist the changes, you need to modify the configuration using an overlay file.</li>
+<li>Create an Override Configuration File<ul>
+<li>On a Mac:<ul>
+<li>Open a terminal and create a new file:
+    <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>vi ~/Library/Application\ Support/rancher-desktop/lima/_config/override.yaml
+</code></pre></div></li>
+<li>Add the following content:
+    <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>provision:
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>- mode: system
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  script: |
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    #!/bin/sh
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    echo &quot;fs.inotify.max_user_watches=524288&quot; &gt; /etc/sysctl.d/fs.inotify.conf
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    echo &quot;fs.inotify.max_user_instances=512&quot; &gt;&gt; /etc/sysctl.d/fs.inotify.conf
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    sysctl -p /etc/sysctl.d/fs.inotify.conf
+</code></pre></div></li>
+<li>Save the file.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Restart Rancher Desktop</li>
+<li>Restart Rancher Desktop for the changes to take effect and ensure the new sysctl parameter values persist.</li>
+<li>Delete Existing Kind Clusters</li>
+<li>Before re-running the Kubestellar Getting Started guide, delete all previously created clusters:
+        <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kind delete cluster --name &lt;cluster-name&gt;
+</code></pre></div><ul>
+<li>Repeat for each cluster (e.g., kubeflex, cluster1, cluster2).</li>
+</ul>
+</li>
+<li>Re-run the Kubestellar Setup<ul>
+<li>With the updated configuration, run the Kubestellar Getting Started guide or the automated demo environment script again.</li>
+<li>Verify that both clusters are created successfully without errors.</li>
+</ul>
+</li>
+</ol>
+<h3 id="additional-note-ensuring-a-clean-environment-for-reinstallation">Additional Note: Ensuring a Clean Environment for Reinstallation<a class="headerlink" href="#additional-note-ensuring-a-clean-environment-for-reinstallation" title="Permanent link">#</a></h3>
+<p>Deleting all existing Kind clusters before re-running the installation ensures no leftover configurations interfere with the new setup.</p>
+<hr />
 
 
 
