@@ -52,6 +52,7 @@ Show the particulars of something going wrong.
 - Look at the Binding and ManifestWork and WorkStatus objects and the controller logs. Include both in a problem report. Show the relevant workload objects, from WDS and from WEC. When the problem is behavior over time, show the objects contents from before and after the misbehavior.
 - When reporting kube API object contents, include the `meta.managedFields`. For example, when using `kubectl get`, include `--show-managed-fields`.
 
+____
 ## Potential Error with Kubestellar Installation related to Issues with Kind backed by Rancher Desktop
 ### Description of the Issue
 
@@ -99,11 +100,11 @@ If these parameters are set lower than the suggeseted values, the second cluster
    * Allow the script to attempt the creation of the second remote cluster (cluster2).
    * The error should occur during this step if the issue is present.
 
-# Expected Behavior
+### Expected Behavior
 
 Cluster 2 should create successfully, and the installation should complete without errors.
 
-# Steps to Fix
+### Steps to Fix
 1. Check Current sysctl Parameter Values
    * Use the command rdctl shell to log in to the Rancher Desktop VM.
 Run:
@@ -143,5 +144,6 @@ Run:
     * With the updated configuration, run the Kubestellar Getting Started guide or the automated demo environment script again.
     * Verify that both clusters are created successfully without errors.
 
-# Additional Note: Ensuring a Clean Environment for Reinstallation
+### Additional Note: Ensuring a Clean Environment for Reinstallation
 Deleting all existing Kind clusters before re-running the installation ensures no leftover configurations interfere with the new setup.
+____
