@@ -120,6 +120,7 @@ Create an Override Configuration File
 ```
 vi ~/Library/Application\ Support/rancher-desktop/lima/_config/override.yaml
 ```
+
      - Add the following content:
 ```
 provision:
@@ -130,6 +131,7 @@ provision:
     echo "fs.inotify.max_user_instances=512" >> /etc/sysctl.d/fs.inotify.conf
     sysctl -p /etc/sysctl.d/fs.inotify.conf
 ```
+
      - Save the file.
 3. Restart Rancher Desktop
    - Restart Rancher Desktop for the changes to take effect and ensure the new sysctl parameter values persist.
