@@ -122,6 +122,7 @@ vi ~/Library/Application\ Support/rancher-desktop/lima/_config/override.yaml
 ```
 
      - Add the following content:
+     
 ```
 provision:
 - mode: system
@@ -133,6 +134,7 @@ provision:
 ```
 
      - Save the file.
+
 3. Restart Rancher Desktop
    - Restart Rancher Desktop for the changes to take effect and ensure the new sysctl parameter values persist.
 4. Delete Existing Kind Clusters
@@ -141,6 +143,7 @@ provision:
 ```
 kind delete cluster --name <cluster-name>
 ```
+
 Repeat for each cluster (e.g., kubeflex, cluster1, cluster2).
    - Re-run the Kubestellar Setup
      - With the updated configuration, run the Kubestellar Getting Started guide or the automated demo environment script again.
