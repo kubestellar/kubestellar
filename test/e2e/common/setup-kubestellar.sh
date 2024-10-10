@@ -85,17 +85,16 @@ source "$COMMON_SRCS/setup-shell.sh"
 
 :
 : -------------------------------------------------------------------------
-: Initialize KubeFlex, creating or using an existing hosting cluster.
+: Create the KubeFlex hosting cluster, if necessary.
 :
 case "$CLUSTER_SOURCE" in
     (kind)
-        kflex init --create-kind $disable_chatty_status
+        ${SRC_DIR}/../../../scripts/create-kind-cluster-with-SSL-passthrough.sh --name kubeflex
         : Kubeflex kind cluster created.
         ;;
     (existing)
         kubectl config use-context "$HOSTING_CONTEXT"
-        kflex init $disable_chatty_status
-        : KubeFlex initialized to use existing cluster in "$HOSTING_CONTEXT" context
+        : kubectl configured to use existing cluster in "$HOSTING_CONTEXT" context
         ;;
 esac
 
@@ -110,18 +109,16 @@ if [ "$use_release" = true ] ; then
   helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
     --version $(yq .KUBESTELLAR_VERSION core-chart/values.yaml) \
     --kube-context $HOSTING_CONTEXT \
-    --set kubeflex-operator.install=false \
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
     --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
 else
   make kind-load-image
+  helm dependency update core-chart/
   helm upgrade --install ks-core core-chart/ \
-    --dependency-update \
     --set KUBESTELLAR_VERSION=$(git rev-parse --short HEAD) \
     --kube-context $HOSTING_CONTEXT \
-    --set kubeflex-operator.install=false \
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
