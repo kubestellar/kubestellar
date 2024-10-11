@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sleep-20-sec
+  labels:
+    app.kubernetes.io/name: perf-test
+spec:
+  containers:
+  - name: aw-wait-20
+    image: ubuntu:latest
+    imagePullPolicy: IfNotPresent
+    command: [ "/bin/bash", "-c", "sleep 20" ]
+  restartPolicy: Never
+
