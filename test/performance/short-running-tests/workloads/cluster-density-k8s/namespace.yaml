@@ -4,4 +4,4 @@ metadata:
   name: {{.Name}}
   labels:
     kubestellar: performance-test
-    app.kubernetes.io/name: cluster-density-{{.Index}}
+    app.kubernetes.io/name: {{.Name}}

@@ -56,9 +56,9 @@ class Collector():
         os.remove(tmp_config)
         return core_v1_api, app_v1_api, custom_objects_api
 
-    def get_custom_objects_time(self, fname, grp, v, pl, name=None, ns=None, bindingPolicy=None, check=False, single=True):
+    def get_custom_objects_time(self, fname, grp, v, pl, name=None, ns=None, bindingPolicy=None, check=False, single=True, target_object_name=None):
         try:
-            if ns != None and bindingPolicy != None:
+            if name == None and ns != None and bindingPolicy != None:
                api_response = self.custom_objects_api.list_namespaced_custom_object(group=grp, version=v, plural=pl, namespace=ns, label_selector='transport.kubestellar.io/originOwnerReferenceBindingKey=' + bindingPolicy)
             elif name != None and ns != None and bindingPolicy == None:
                api_response = self.custom_objects_api.get_namespaced_custom_object(group=grp, version=v, namespace=ns, plural=pl, name=name)
@@ -67,7 +67,7 @@ class Collector():
             else:
                api_response = self.custom_objects_api.list_cluster_custom_object(group=grp, version=v, plural=pl)
 
-            if name == None or single == False:
+            if single == False:
                # Create the output file
                fout = open(fname + ".csv", 'a')
 
@@ -76,12 +76,46 @@ class Collector():
             else:
                object_list = [api_response]
             
+            
             if check: # temporary fix - it must be improved later to optimize performance
+                found = False
+                temp_list = []
+
                 for i in range(0, len(object_list)):
-                    temp_name = object_list[i]["metadata"]["name"]
-                    if name in temp_name:
-                        object_list = [object_list[i]]
-                        break
+                    if pl == "workstatuses":
+                       temp_name = object_list[i]["metadata"]["name"]
+                       if target_object_name in temp_name:
+                           object_list = [object_list[i]]
+                           found = True
+                           break
+
+                    elif pl == "manifestworks":
+                       manifests = object_list[i]["spec"]["workload"]["manifests"]
+                       for j in manifests:
+                          temp_name = j["metadata"]["name"] 
+                          if target_object_name == temp_name:
+                              object_list = [object_list[i]]
+                              found = True
+                              break
+
+                    elif pl == "appliedmanifestworks":
+                       temp_name = object_list[i]["spec"]["manifestWorkName"]
+
+                       if target_object_name == temp_name:
+                           object_list = [object_list[i]]
+                           break
+                       else: 
+                           appliedResources = object_list[i]["status"]["appliedResources"]
+                           for j in appliedResources:
+                               temp_name = j["namespace"] 
+                               if target_object_name == temp_name:
+                                  temp_list.append(object_list[i])
+
+                    if found == True:
+                       break
+                if len(temp_list) > 0 and pl == "appliedmanifestworks":
+                   object_list = temp_list
+                    
 
             creation_timestamp = ""
             update_timestamp = ""
@@ -132,12 +166,12 @@ class Collector():
                             continue
 
                     output=obj_name + "\t" + creation_timestamp + "\t" + update_timestamp + "\t" + status_condition + "\t" + op_manager
-                    if name != None and single == True:
+                    if single == True:
                        return output
                     else:
                        fout.write(output+ "\n")
 
-            if name == None or single == False:
+            if single == False:
                fout.flush()
                fout.close()
             return None
@@ -187,7 +221,7 @@ class Collector():
             update_timestamp = ""
             status_condition = ""
             op_manager = ""
-            manager_list = ["kube-controller-manager", "controller-manager", "ocm-status-addon", "kubelet", "k3s"]
+            manager_list = ["kube-controller-manager", "Status", "controller-manager", "ocm-status-addon", "kubelet", "k3s"]
 
             if object_list:
                 for i in range(0, len(object_list)):

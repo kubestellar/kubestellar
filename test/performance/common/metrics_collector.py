@@ -53,19 +53,19 @@ class DataParser():
             config.load_kube_config(config_file=tmp_config, context=context)
         os.remove(tmp_config)
 
-    def collect_obj_time(self, c, name, kind, fname=None, obj_ns=None, obj_grp=None, obj_v=None, obj_pl=None, bindingPolicy=None, check=False, single=True):
+    def collect_obj_time(self, c, name, kind, fname=None, obj_ns=None, obj_grp=None, obj_v=None, obj_pl=None, bindingPolicy=None, check=False, single=True, target_object_name=None):
         output=None
         if kind == "cr":       
-           if name != None and obj_ns != None and bindingPolicy != None:
-              output= c.get_custom_objects_time(None, obj_grp, obj_v, obj_pl, name, obj_ns, bindingPolicy, check)
+           if name == None and obj_ns != None and bindingPolicy != None:
+              output= c.get_custom_objects_time(fname, obj_grp, obj_v, obj_pl, name, obj_ns, bindingPolicy, check, single, target_object_name)
            elif name != None and obj_ns != None and bindingPolicy == None:
-              output= c.get_custom_objects_time(None, obj_grp, obj_v, obj_pl, name, obj_ns, None, check)
+              output= c.get_custom_objects_time(fname, obj_grp, obj_v, obj_pl, name, obj_ns, None, check)
            elif name == None and obj_ns != None and bindingPolicy != None:
               output= c.get_custom_objects_time(fname, obj_grp, obj_v, obj_pl, None, obj_ns, bindingPolicy, check)
            elif name != None and obj_ns == None and bindingPolicy != None:
-              output= c.get_custom_objects_time(fname, obj_grp, obj_v, obj_pl, name, None, bindingPolicy, check, False)
+              output= c.get_custom_objects_time(fname, obj_grp, obj_v, obj_pl, name, None, bindingPolicy, check, single)
            else:
-              output= c.get_custom_objects_time(fname, obj_grp, obj_v, obj_pl, name, None, None, check, single)
+              output= c.get_custom_objects_time(fname, obj_grp, obj_v, obj_pl, name, None, None, check, single, target_object_name)
               
         else:
            if name != None:
@@ -106,16 +106,17 @@ class DataParser():
                         output=self.collect_obj_time(self.c1, name, 'pod', None, namespace)
                         f1.write(output + "\n")
 
-                        output=self.collect_obj_time(self.c2, bindingPolicy + '-' + wds_ctx, 'cr', None, wec_ctx, "work.open-cluster-management.io", "v1", "manifestworks", bindingPolicy, True)
+                        output=self.collect_obj_time(self.c2, None, 'cr', None, wec_ctx, "work.open-cluster-management.io", "v1", "manifestworks", bindingPolicy, True, True, name)
+                        manifestwork_name = output.split("\t")[0]
                         f2.write(output + "\n")
 
-                        output=self.collect_obj_time(self.c2, 'v1-pod-' + namespace + '-' + name, 'cr', None, wec_ctx, "control.kubestellar.io", "v1alpha1", "workstatuses", bindingPolicy, True)
+                        output=self.collect_obj_time(self.c2, None, 'cr', None, wec_ctx, "control.kubestellar.io", "v1alpha1", "workstatuses", bindingPolicy, True, True, 'v1-pod-' + namespace + '-' + name)
                         f3.write(output + "\n")
 
                         output=self.collect_obj_time(self.c3, name, 'pod', None, namespace)
                         f4.write(output + "\n")
 
-                        output=self.collect_obj_time(self.c3, bindingPolicy + '-' + wds_ctx, 'cr', None, None, "work.open-cluster-management.io", "v1", "appliedmanifestworks", None, True)
+                        output=self.collect_obj_time(self.c3, None, 'cr', None, None, "work.open-cluster-management.io", "v1", "appliedmanifestworks", None, True, True, manifestwork_name)
                         f5.write(output + "\n")
                         
                         # 2) Delete pod after collection all metrics associated with it
@@ -157,9 +158,9 @@ class DataParser():
 
             # collect manifestWork, workStatus and appliedManifestWork objects    
             bindingPolicy = ns
-            self.collect_obj_time(self.c2, None, 'cr', dir_ns + "/workstatuses", wec_ctx, "control.kubestellar.io", "v1alpha1", "workstatuses", bindingPolicy)
-            self.collect_obj_time(self.c2, None, 'cr', dir_ns + "/manifestworks", wec_ctx, "work.open-cluster-management.io", "v1", "manifestworks", bindingPolicy)
-            self.collect_obj_time(self.c3, bindingPolicy + '-' + wds_ctx, 'cr', dir_ns + "/appliedmanifestworks", None, "work.open-cluster-management.io", "v1", "appliedmanifestworks", None, True, False)
+            self.collect_obj_time(self.c2, None, 'cr', dir_ns + "/workstatuses", wec_ctx, "control.kubestellar.io", "v1alpha1", "workstatuses", bindingPolicy, False, False)
+            self.collect_obj_time(self.c2, None, 'cr', dir_ns + "/manifestworks", wec_ctx, "work.open-cluster-management.io", "v1", "manifestworks", bindingPolicy, False, False)
+            self.collect_obj_time(self.c3, None, 'cr', dir_ns + "/appliedmanifestworks", None, "work.open-cluster-management.io", "v1", "appliedmanifestworks", None, True, False, ns)
 
 if __name__=="__main__": 
 
@@ -168,22 +169,17 @@ if __name__=="__main__":
     wds_ctx = str(sys.argv[2]) # name of the context for the target WDS, e.g., "wds1"
     its_ctx = str(sys.argv[3]) # name of the context for the target ITS, e.g., "its1"
     wec_ctx = str(sys.argv[4]) # name of the context for the target WEC, e.g., "cluster1"
+    num_ns = int(sys.argv[5]) # number of namespaces in created in your experiment, e.g., num_ns=2
     output_dir = str(sys.argv[6])  # path to the directory for the output files, e.g., $HOME/data/
-    #exp_type = "long_duration"
-    exp_type = "workload_generation"
-
-    # Short duration experiments parameters
-    ns_prefix = "perf-exp"  # prefix of the namespace where the workload are generated 
-    num_ns = int(sys.argv[5]) # number of namespaces in created in your experiment, e.g., num_ns=6
-   
-    # Long duration experiments parameters
-    numPods=2 # total number of workload objects set in your experiment
-    watch_interval = 60 # (unit: seconds) watch for events that to occur within time interval threshold
-    ns = "perf-exp-0" # name of the namespace where the workload are generated 
-    bindingPolicy = "perf-exp-0" # name of the bindingPolicy associated with your workload
+    exp_type =  str(sys.argv[7]) # "short_duration" or "long_duration"
 
     c = DataParser(kubeconfig, wds_ctx, its_ctx, wec_ctx)
-    if exp_type != "long_duration":
+    if exp_type != "l":
+       ns_prefix = "perf-test"  # prefix of the namespace where the workload are generated 
        c.collect_short_exp_metrics(output_dir, num_ns, ns_prefix, wds_ctx, wec_ctx)
     else:
+       numPods= int(sys.argv[8]) # total number of pods to be created in the experiment
+       watch_interval= int(sys.argv[9]) # (unit: seconds) watch for events that to occur within time interval threshold
+       ns = "perf-test" # name of the namespace where the workload are generated 
+       bindingPolicy = "perf-test-bindingpolicy" # name of the bindingPolicy associated with your workload
        c.collect_long_exp_metrics(output_dir, ns, watch_interval, numPods, bindingPolicy, wds_ctx, wec_ctx)
