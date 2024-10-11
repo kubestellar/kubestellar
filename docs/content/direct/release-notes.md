@@ -2,6 +2,17 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.25.0 and its candidates
+
+The main advance in this release is finishing the implementation of the create-only feature. It is now available for use.
+
+### Remaining limitations in 0.24.0
+
+* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+
 ## 0.25.0-alpha.1 test releases
 
 These test the release-building functionality, which has been revised in the course of merge the controller-manager and transport-controller Helm charts into the core Helm chart.

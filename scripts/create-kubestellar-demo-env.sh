@@ -17,10 +17,12 @@
 
 set -e
 
-echo -e "Checking that pre-req softwares are installed..."
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.1/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
+kubestellar_version=0.25.0-rc.1
 
-output=$(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.1/hack/check_pre_req.sh | bash -s -- -A -V kflex ocm helm kubectl docker kind
+echo -e "Checking that pre-req softwares are installed..."
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
+
+output=$(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -A -V kflex ocm helm kubectl docker kind
 )
 
 echo -e "\nStarting environment clean up..."
@@ -74,11 +76,10 @@ context_clean_up
 echo "Context space clean up completed"
 
 echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
-export KUBESTELLAR_VERSION=0.23.1
 
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443
 
-helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION --set-json='ITSes=[{"name":"its1"}]' --set-json='WDSes=[{"name":"wds1"}]'
+helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $kubestellar_version --set-json='ITSes=[{"name":"its1"}]' --set-json='WDSes=[{"name":"wds1"}]'
 
 echo -e "\nWaiting for new non-host KubeFlex Control Planes to be Ready:"
 for cpname in its1 wds1; do
