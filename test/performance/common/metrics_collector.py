@@ -169,21 +169,21 @@ if __name__=="__main__":
     its_ctx = str(sys.argv[3]) # name of the context for the target ITS, e.g., "its1"
     wec_ctx = str(sys.argv[4]) # name of the context for the target WEC, e.g., "cluster1"
     output_dir = str(sys.argv[6])  # path to the directory for the output files, e.g., $HOME/data/
-    #exp_type = "long_duration"
-    exp_type = "workload_generation"
+    exp_type =  str(sys.argv[7]) # "short_duration" or "long_duration"
 
-    # Short duration experiments parameters
     ns_prefix = "perf-exp"  # prefix of the namespace where the workload are generated 
     num_ns = int(sys.argv[5]) # number of namespaces in created in your experiment, e.g., num_ns=6
-   
-    # Long duration experiments parameters
-    numPods=2 # total number of workload objects set in your experiment
-    watch_interval = 60 # (unit: seconds) watch for events that to occur within time interval threshold
-    ns = "perf-exp-0" # name of the namespace where the workload are generated 
-    bindingPolicy = "perf-exp-0" # name of the bindingPolicy associated with your workload
+    test_type = "short_duration"
+
+    if exp_type:
+       test_type=exp_type
 
     c = DataParser(kubeconfig, wds_ctx, its_ctx, wec_ctx)
-    if exp_type != "long_duration":
+    if test_type != "long_duration":
        c.collect_short_exp_metrics(output_dir, num_ns, ns_prefix, wds_ctx, wec_ctx)
     else:
+       numPods= int(sys.argv[8]) # total number of pods to be created in the experiment
+       watch_interval= int(sys.argv[9]) # (unit: seconds) watch for events that to occur within time interval threshold
+       ns = "perf-test" # name of the namespace where the workload are generated 
+       bindingPolicy = "perf-test-bindingpolicy" # name of the bindingPolicy associated with your workload
        c.collect_long_exp_metrics(output_dir, ns, watch_interval, numPods, bindingPolicy, wds_ctx, wec_ctx)
