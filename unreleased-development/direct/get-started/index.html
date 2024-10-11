@@ -905,6 +905,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1112,6 +1121,15 @@
   <a href="#exercise-kubestellar" class="md-nav__link">
     <span class="md-ellipsis">
       Exercise KubeStellar
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
     </span>
   </a>
   
@@ -3143,6 +3161,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3177,14 +3204,15 @@
 <h1 id="getting-started-with-kubestellar">Getting Started with KubeStellar<a class="headerlink" href="#getting-started-with-kubestellar" title="Permanent link">#</a></h1>
 <p>This page shows one concrete example of steps 2--7 from the <a href="../user-guide-intro/#the-full-story">full Installation and Usage outline</a>. This example produces a simple single-host system suitable for kicking the tires, using <a href="https://kind.sigs.k8s.io/">kind</a> to create three new clusters to serve as your KubeFlex hosting cluster and two WECs. This page concludes with forwarding you to one example of the remaining steps.</p>
 <ol>
-<li>Setup<ol>
+<li><a href="#setup">Setup</a><ol>
 <li>Install software prerequisites</li>
 <li>Cleanup from previous runs</li>
 <li>Create the KubeFlex hosting cluster and Kubestellar core components</li>
 <li>Create and register two WECs.</li>
 </ol>
 </li>
-<li>Exercise KubeStellar</li>
+<li><a href="#exercise-kubestellar">Exercise KubeStellar</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
 </ol>
 <h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">#</a></h2>
 <p>This is one way to produce a very simple system, suitable for study but not production usage. For general setup information, see <a href="../user-guide-intro/#the-full-story">the full story</a>.</p>
@@ -3283,6 +3311,8 @@ commands tear down the state established by this recipe.</p>
 <a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="nv">label_query_both</span><span class="o">=</span>location-group<span class="o">=</span>edge
 <a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="nv">label_query_one</span><span class="o">=</span><span class="nv">name</span><span class="o">=</span>cluster1
 </code></pre></div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">#</a></h2>
+<p>In the event something goes wrong, check out the <a href="../troubleshooting/">troubleshooting page</a> to see if someone else has experienced the same thing</p>
 
 
 
