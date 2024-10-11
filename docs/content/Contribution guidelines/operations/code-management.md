@@ -20,16 +20,19 @@ copy the forked repo from Github to your local system by using the "git clone" c
 In your new local forked repo, set upstream to kubestellar main
 
 check what your repository's remote settings are
+
 ```
 git remote -v
 ```
 
-### Set upstream to use kubestellar: 
+### Set upstream to use kubestellar:
+
 ```
 git remote add upstream git@github.com:kubestellar/kubestellar.git
 ```
 
 For example:
+
 ```
 $ git remote -v
 origin  git@github.com:fileppb/edge-mc.git (fetch)
@@ -72,11 +75,13 @@ You can do this by opening your github repository page, check that the selected 
 Create a local branch for your work, preferably including the issue number in the branch name
 
 for example if working on issue #11187, then you might name your local branch "issue-1187"
+
 ```
 git checkout -b issue-1187
 ```
 
 ### As you work and change files, you should try to commit relatively small pieces of work, using the following commands
+
 ```
 git add (there are several options you can specify for the git add command)
 
@@ -84,6 +89,7 @@ git commit -m "your message"
 
 git push -u origin branch-name (-u sets upstream to origin which is your remote github repository)
 ```
+
 ### When you have completed your work and tested it locally, then you should perform a squash of the git commits to make the upcoming push request more manageable.
 
 To perform a squash, checkout the branch you want to squash,
@@ -97,6 +103,7 @@ To perform a squash, checkout the branch you want to squash,
 The commits will then be squashed into one commit.
 
 ### When you are done with the squash, push your changes to your remote branch. You can either:
+
 ```
 git push -u origin <branch-name>
 
@@ -104,6 +111,7 @@ or
 
 git push --force-with-lease
 ```
+
 Note: if using the git push -u origin <branch-name> command, the -u only needs to specified the first time you push. It will set tracking for subsequent pushes to the branch. On the other hand, keeping the -u in the command does no particular harm.
 
 ## Run Actions (automated workflow tests) manually in your personal Github repository

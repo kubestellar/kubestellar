@@ -100,6 +100,7 @@ EdgeSyncConfigs
 EdgeV
 Effi
 Enqueues
+FieldManager
 FieldsType
 FieldsV
 Filepp
@@ -155,6 +156,7 @@ LinkedIn
 ListMeta
 LocalSubjectAccessReview
 LogicalCluster
+MacOS
 MBWS
 MERCHANTABILITY
 MVI
@@ -222,8 +224,10 @@ Postgresql
 PriorityClass
 PriorityLevelConfiguration
 Pygments
+Pyroscope
 QEMU
 QPS
+Queryable
 QuickStart
 RandomizedLoad
 RBAC
@@ -278,6 +282,7 @@ TLF
 TMC
 TODO
 Teardown
+Thanos
 TokenReview
 Turbonomic
 TypeMeta
@@ -290,6 +295,7 @@ Upsync
 Upsynced
 Upsyncing
 VM
+VMs
 ValidatingWebhookConfiguration
 VolumeAttachment
 WDS
@@ -334,6 +340,7 @@ appwrappers
 argo
 argocd
 argoproj
+args
 aspirational
 autoscaling
 availableReplicas
@@ -396,6 +403,7 @@ csv
 ctName
 customizer
 darwin
+definitional
 denature
 denatured
 denaturing
@@ -595,6 +603,7 @@ proxying
 ps
 pwd
 px
+queryable
 quickstart
 rb
 rbac
@@ -606,6 +615,7 @@ realpath
 rebase
 reconciler
 redhat
+reinstallation
 renature
 renatured
 renaturing
@@ -656,6 +666,7 @@ subdirectories
 subdirectory
 subfolder
 sublicense
+subresource
 subresources
 substring
 subsubsections
@@ -681,6 +692,8 @@ testdata
 timeframe
 tls
 tmp
+tuningSet
+tuningSets
 tv
 txt
 ubi

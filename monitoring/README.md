@@ -4,7 +4,7 @@
 
 
 ### Requirement
-To follow the instructions here you need to use KubeStellar `main` branch or any future KubeStellar release higher than `0.24.0`. Also, you need to have release `v0.2.0-rc12` or higher for the status-addon controller and agent installed in your enviroment. If you're using an older release, please follow these instructions to update your environment: 
+To follow the instructions here you need to use KubeStellar `main` branch or any future KubeStellar release higher than `0.24.0`. Also, you need to have release `v0.2.0-rc12` or higher for the status-addon controller and agent installed in your environment. If you're using an older release, please follow these instructions to update your environment: 
 
 1.  Remove the status-addon-controller and status-addon-agent from your current environment:
 
@@ -174,47 +174,54 @@ c) Upload the dashboard JSON files from your local `./grafana` sub-directory int
 
 a) API Server Monitoring: input into the following text boxes.
 - `NS`: name of the KubeStellar space namespace, e.g., *wds1-system*, *wds2-system*, *its1-system*, etc.
-- `APIService`: name of the service for a KubeStellar space APIserver, e.g., *wds1*, *wds2*, *vcluster*, etc.
-- `Instance`: hostname and port number for the target KubeStellar space APIserver, e.g., *10.244.0.18:9444*
+- `APIService`: name of the service for a KubeStellar space apiserver, e.g., *wds1*, *wds2*, *vcluster*, etc.
+- `Instance`: hostname and port number for the target KubeStellar space apiserver, e.g., *10.244.0.18:9444*
 
     <img src="images/apiserver-monitoring.png" width="60%" height="80%" title="apiserver-monitoring"> 
 
 To monitor a WDS space (e.g., wds1) use the following combination of `NS/APIService` parameters: `NS: wds1-system` and `APIService: wds1`. Likewise, to monitor a ITS space (e.g., its1): `NS: its1-system` and `APIService: vcluster`
 
 **Note**: 
-   - You can also use the following combination of `NS/APIService` values to monitor the APIserver of the hosting cluster or a WEC cluster: `NS: default` and `APIService: apiserver`
-   - Use the following commands to obtain the Ip address of the APIServer in the hosting cluster, WDS (e.g., `wds1`) and ITS (e.g., `its1-system`) spaces:
-     ```bash
-     kubectl --context <hosting-cluster-context> get Endpoints -A | egrep "NAME| wds| vcluster |kubernetes"
-     ```
-     For example: 
-     ```bash
-     $ kubectl --context kind-kubeflex get Endpoints -A | egrep "NAME| wds| vcluster |kubernetes"
-     ```
-     Output:
-     ```bash
-     NAMESPACE         NAME                                                              ENDPOINTS                                                AGE
-     default           kubernetes                                                        172.18.0.2:6443                                          3d20h
-     its1-system       vcluster                                                          10.244.0.12:8443,10.244.0.12:8443                        3d20h
-     wds1-system       wds1                                                              10.244.0.21:9444                                         3d20h
-     ```
-     
-     Use the following command to obtain the IP address of the host container for your cluster: `kubectl --context <cluster-context> get Endpoints -n default`
+- You can also use the following combination of `NS/APIService` values to monitor the apiserver of the hosting cluster or a WEC cluster: `NS: default` and `APIService: apiserver`
+- Use the following commands to obtain the Ip address of the apiserver in the hosting cluster, WDS (e.g., `wds1`) and ITS (e.g., `its1-system`) spaces:
 
-     For example: 
-     ```bash
-     kubectl --context cluster1 get Endpoints -n default 
-     ```
+    ```bash
+    kubectl --context <hosting-cluster-context> get Endpoints -A | egrep "NAME| wds| vcluster |kubernetes"
+    ```
 
-     Output:
-     ```bash
-     NAME         ENDPOINTS         AGE
-     kubernetes   172.18.0.3:6443   4d14h
-     ```
+    For example:
 
-Here are the default port number for the APIservers: 
+    ```bash
+    $ kubectl --context kind-kubeflex get Endpoints -A | egrep "NAME| wds| vcluster |kubernetes"
+    ```
 
-| APIServer Pod | Default Port #|
+    Output:
+
+    ```bash
+    NAMESPACE         NAME                                                              ENDPOINTS                                                AGE
+    default           kubernetes                                                        172.18.0.2:6443                                          3d20h
+    its1-system       vcluster                                                          10.244.0.12:8443,10.244.0.12:8443                        3d20h
+    wds1-system       wds1                                                              10.244.0.21:9444                                         3d20h
+    ```
+
+    Use the following command to obtain the IP address of the host container for your cluster: `kubectl --context <cluster-context> get Endpoints -n default`
+
+    For example:
+ 
+    ```bash
+    kubectl --context cluster1 get Endpoints -n default 
+    ```
+
+    Output:
+
+    ```bash
+    NAME         ENDPOINTS         AGE
+    kubernetes   172.18.0.3:6443   4d14h
+    ```
+
+Here are the default port number for the apiservers: 
+
+| apiserver Pod | Default Port #|
 | ------------- | ------------- |
 | Host-cluster  |     6443      |
 | WDS space     |     6443      |
@@ -224,12 +231,12 @@ Here are the default port number for the APIservers:
 
 b) API Server Priority & Fairness: input into the following text boxes.
 - `NS`: name of the KubeStellar space namespace, e.g., *wds1-system*, *wds2-system*, *its1-system*, etc.
-- `APIService`: name of the service for a KubeStellar space APIserver, e.g., *wds1*, *wds2*, *vcluster*, etc.
-- `Instance`: hostname and port number for the target KubeStellar space APIserver, e.g., *10.244.0.18:9444*
+- `APIService`: name of the service for a KubeStellar space apiserver, e.g., *wds1*, *wds2*, *vcluster*, etc.
+- `Instance`: hostname and port number for the target KubeStellar space apiserver, e.g., *10.244.0.18:9444*
 
     <img src="images/apiserver-apf-monitoring.png" width="60%" height="80%" title="apiserver-apf-monitoring.png"> 
 
-**Note**: use the same combinations of `NS` and `APIService` parameters described in `step 5-a` to monitor the APIserver in the WDS space, ITS space, the hosting or WEC clusters. 
+**Note**: use the same combinations of `NS` and `APIService` parameters described in `step 5-a` to monitor the apiserver in the WDS space, ITS space, the hosting or WEC clusters. 
 
 
 c) KubeStellar Controllers Monitoring: input into the following text box and drop-down menu. 
@@ -276,7 +283,7 @@ Here are the default port number for the KubeStellar Controllers metrics endpoin
 
 a) Connect to Pyroscope dashboard: 
    i) Click `Connections -> Data Sources` in the primary menu
-  ii) Click `Explore` in the Pyroscope datasource selection
+  ii) Click `Explore` in the Pyroscope "datasource" selection
 
 b) Query profiles for the Kubestellar controllers in a hosting cluster: for each controller, input a profile query (see sample below) and then click the button `Run query` (on the top right).
 - kubestellar-controller-manager: query: `{service_name="wds1-system/manager"}`

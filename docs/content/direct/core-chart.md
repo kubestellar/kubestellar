@@ -37,7 +37,7 @@ This can be:
 
     If a host port number different from the expected 9443 is used for the Kind cluster, then the same port number must be specified during the chart installation by adding the following argument `--set "kubeflex-operator.externalPort=<port>"`.
 
-    By default the KubeStelalr Core chart uses a test domain `localtest.me`, which is ok for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-operator.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution CLusters (WECs).
+    By default the KubeStellar Core chart uses a test domain `localtest.me`, which is OK for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-operator.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution Clusters (WECs).
 
     For convenience, a new local **Kind** cluster that satisfies the requirements for KubeStellar setup
     and that can be used to exercises the [examples](./examples.md) can be created with the following command:
@@ -55,7 +55,7 @@ This can be:
 
 2. An **OpenShift** cluster
 
-    When using this option, one is required to explicitely set the `isOpenShift` variable to `true` by including `--set "kubeflex-operator.isOpenShift=true"` in the Helm chart installation command.
+    When using this option, one is required to explicitly set the `isOpenShift` variable to `true` by including `--set "kubeflex-operator.isOpenShift=true"` in the Helm chart installation command.
 
 ## KubeStellar Core Chart values
 
@@ -272,7 +272,7 @@ the `kflex` CLI and one not.
 
 3. Using `import-cp-contexts.sh` script
 
-    The following covenience command can also be used to import all the KubeFlex Control Planes in the current hosting cluster as contexts of the current kubeconfig. The script involved requires that you have [yq](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq)) installed.
+    The following convenience command can also be used to import all the KubeFlex Control Planes in the current hosting cluster as contexts of the current kubeconfig. The script involved requires that you have [`yq`](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq)) installed.
 
     ```shell
     bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/import-cp-contexts.sh) --merge
@@ -288,7 +288,7 @@ the `kflex` CLI and one not.
     - `--replace-localhost|-r <host>` replaces server addresses "127.0.0.1" with a desired `<host>`. This parameter is useful for making KubeFlex Control Planes of type `host` accessible from outside the machine hosting the cluster.
     - `--merge|-m` merge the kubeconfig with the contexts of the control planes with the existing cluster kubeconfig. If this flag is not specified, then only the kubeconfig with the contexts of the KubeFlex Control Planes will be produced.
     - `--output|-o <filename>|-` specify a kubeconfig file to save the kubeconfig to. Use `-` for stdout. If this argument is not provided, then the kubeconfig will be saved to the input specified kubeconfig, if provided, or to `~/.kube/config`.
-    - `--silent|-s` quiet mode, do not print informarmation. This may be useful when using `-o -`.
+    - `--silent|-s` quiet mode, do not print information. This may be useful when using `-o -`.
     - `-X` enable verbose execution of the script for debugging
 
 ## Uninstalling the KubeStellar Core chart
