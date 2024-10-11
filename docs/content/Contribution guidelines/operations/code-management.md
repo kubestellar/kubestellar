@@ -35,14 +35,14 @@ For example:
 
 ```
 $ git remote -v
-origin  git@github.com:fileppb/edge-mc.git (fetch)
-origin  git@github.com:fileppb/edge-mc.git (push)
+origin  git@github.com:fileppb/kubestellar.git (fetch)
+origin  git@github.com:fileppb/kubestellar.git (push)
 
 $ git remote add upstream git@github.com:kubestellar/kubestellar.git
 
 $ git remote -v
-origin  git@github.com:fileppb/edge-mc.git (fetch)
-origin  git@github.com:fileppb/edge-mc.git (push)
+origin  git@github.com:fileppb/kubestellar.git (fetch)
+origin  git@github.com:fileppb/kubestellar.git (push)
 upstream        git@github.com:kubestellar/kubestellar.git (fetch)
 upstream        git@github.com:kubestellar/kubestellar.git (push)
 

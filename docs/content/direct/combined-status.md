@@ -56,7 +56,7 @@ There are three forms of `StatusCollector`, equivalent to three forms of SQL sta
 
 ##### Plain selection
 
-When the `StatusCollector` has selection but no "GROUOP BY" and no aggregation, this is equivalent to the following form of SELECT statement. The [List of stale WECs example below](#list-of-stale-wecs) is an example of this form.
+When the `StatusCollector` has selection but no "GROUP BY" and no aggregation, this is equivalent to the following form of SELECT statement. The [List of stale WECs example below](#list-of-stale-wecs) is an example of this form.
 
 ```sql
 SELECT <selected columns>

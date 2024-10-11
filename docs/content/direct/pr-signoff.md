@@ -75,8 +75,8 @@ Before starting, make sure that your user email is verified on Github. To check 
     ssh-keygen -t ed25519 -C "your_email"
     ```
    
-2. Press `Enter` to select the default option if prompted to set a save-file or passphrase for the key (you may choose to enter a passphrase if desired; this will prompt you to enter the passphrase everytime you perform a DCO sign-off).
-   - The following output should generate a randomart image 
+2. Press `Enter` to select the default option if prompted to set a save-file or passphrase for the key (you may choose to enter a passphrase if desired; this will prompt you to enter the passphrase every time you perform a DCO sign-off).
+   - The following output should generate a `randomart` image 
 3. Use the following command to copy the new SSH key to your clipboard:
 
     ```shell
@@ -109,7 +109,7 @@ Whether it's editing files from Kubestellar.io or directly from the Kubestellar 
 
 1. Changes made to any file are automatically committed to a new branch in your fork.
     - When committing, make sure to specify the type of PR at the beginning of your commit message (i.e. :bug: if it addresses a bug-type issue)
-    - If the PR addresses a specific issue that has already been opened in the github, make sure to include the opened issue in **additional comments** (i.e. "fixes Issue #XXXX")
+    - If the PR addresses a specific issue that has already been opened in the github, make sure to include the opened issue in **additional comments** (i.e. `fixes Issue #XXXX`)
      
 2. Click **Propose Changes** after writing the commit message, review your changes, and then create the PR.
 3. If your PR addresses an already opened issue on the github, make sure to close the issue once your PR is approved and closed.
@@ -118,7 +118,7 @@ Whether it's editing files from Kubestellar.io or directly from the Kubestellar 
 
 ## Pull Request Sign-off
 
-**NOTE**: "sign-off" is different from "signing" a commit or tag (see [the git book](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work) about signing). The former indicates your assent to the repo's terms for contributors, the latter adds a cryptograph checksum that is rarely displayed.
+**NOTE**: "sign-off" is different from "signing" a commit or tag (see [the git book](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work) about signing). The former indicates your assent to the repository's terms for contributors, the latter adds a cryptographic checksum that is rarely displayed.
 
 Your submitted PR must pass the automated checks in order to be reviewed. This requires for you to perform a DCO sign-off for your PR. The following instructions provide a basic walk-through if you have already set up your GPG and SSH keys:
 

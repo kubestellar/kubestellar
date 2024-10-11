@@ -183,7 +183,7 @@ To monitor a WDS space (e.g., wds1) use the following combination of `NS/APIServ
 
 **Note**: 
 - You can also use the following combination of `NS/APIService` values to monitor the apiserver of the hosting cluster or a WEC cluster: `NS: default` and `APIService: apiserver`
-- Use the following commands to obtain the Ip address of the apiserver in the hosting cluster, WDS (e.g., `wds1`) and ITS (e.g., `its1-system`) spaces:
+- Use the following commands to obtain the IP address of the apiserver in the hosting cluster, WDS (e.g., `wds1`) and ITS (e.g., `its1-system`) spaces:
 
     ```bash
     kubectl --context <hosting-cluster-context> get Endpoints -A | egrep "NAME| wds| vcluster |kubernetes"
@@ -256,7 +256,7 @@ To monitor the KubeStellar controllers in a WDS space (e.g., wds1) or ITS space 
 Likewise, to monitor the KubeStellar controller in a ITS space and WEC (e.g., its1): `NS: its1-system` and `KSController: status-addon-controller` & `NS: open-cluster-management-agent-addon` and `KSController: status-agent-controller`.
 
 Note: 
-- Use the following commands to obtain the Ip address of the KubeStellar controllers in the WDS (e.g., `wds1`) and ITS (e.g., `its1-system`) spaces and WEC (e.g.,`cluster1`):
+- Use the following commands to obtain the IP address of the KubeStellar controllers in the WDS (e.g., `wds1`) and ITS (e.g., `its1-system`) spaces and WEC (e.g.,`cluster1`):
 
   ```bash
   kubectl --context kind-kubeflex -n wds1-system get Endpoints | egrep ".*controller"

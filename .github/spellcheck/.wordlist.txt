@@ -170,6 +170,7 @@ ManifestWorks
 Manroa
 Masluk
 Maximo
+MiB
 MicroShift
 MikeSpreitzer
 MinimumReplicasAvailable
@@ -331,6 +332,7 @@ apiresource
 apiresourceimports
 apis
 apiserver
+apiservers
 apiwatch
 appVersion
 appliedmanifestworks
@@ -398,11 +400,13 @@ cronSpec
 crontab
 crontabs
 crt
+cryptographic
 css
 csv
 ctName
 customizer
 darwin
+datasource
 definitional
 denature
 denatured
@@ -539,6 +543,7 @@ locationSelectors
 logfile
 loopback
 mailboxwatch
+manifestwork
 manifestworks
 matchLabels
 mb
@@ -699,6 +704,8 @@ txt
 ubi
 ubuntu
 uid
+unexpanded
+unrendered
 updatedReplicas
 upsync
 upsynced
@@ -715,6 +722,7 @@ versionPriority
 virgo
 volumeMounts
 watchall
+wds
 webhook
 webhooks
 wec
