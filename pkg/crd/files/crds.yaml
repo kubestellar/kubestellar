@@ -113,6 +113,19 @@ spec:
                   match the same workload object: the `createOnly` bits are ORed together,
                   and the StatusCollector reference sets are combined by union.'
                 items:
+                  anyOf:
+                  - required:
+                    - apiGroup
+                  - required:
+                    - resources
+                  - required:
+                    - namespaces
+                  - required:
+                    - namespaceSelectors
+                  - required:
+                    - objectSelectors
+                  - required:
+                    - objectNames
                   description: DownsyncPolicyClause identifies some objects (by a
                     predicate) and modulates how they are downsynced. One modulation
                     is specifying a set of StatusCollectors to apply to returned status.
