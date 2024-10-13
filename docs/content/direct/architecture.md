@@ -473,22 +473,22 @@ Relation "USES": has a row whenever the `Binding`'s list of workload objects use
 | column name | type | in key |
 | ----------- | ---- | ------ |
 | `bindingName` | string | yes |
-| gr | metav1.GroupResource | yes |
+| `gr` | metav1.GroupResource | yes |
 
 Relation "INSTRUCTIONS": has a row saying what to do for each `GroupResource`.
 
 | column name | type | in key |
 | ----------- | ---- | ------ |
-| gr | metav1.GroupResource | yes |
-| removes | SET(jsonpath.Query) | no |
+| `gr` | metav1.GroupResource | yes |
+| `removes` | SET(jsonpath.Query) | no |
 
 Relation "SPECS": remembers the specs of `CustomTransform` objects.
 
 | column name | type | in key |
 | ----------- | ---- | ------ |
-| ctName | string | yes |
-| gr | metav1.GroupResource | no |
-| removes | SET(string) | no |
+| `ctName` | string | yes |
+| `gr` | metav1.GroupResource | no |
+| `removes` | SET(string) | no |
 
 The cache maintains the following invariants on those relations. Note how these invariants require removal of data that is no longer interesting.
 

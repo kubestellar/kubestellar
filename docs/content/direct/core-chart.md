@@ -37,7 +37,7 @@ This can be:
 
     If a host port number different from the expected 9443 is used for the Kind cluster, then the same port number must be specified during the chart installation by adding the following argument `--set "kubeflex-operator.externalPort=<port>"`.
 
-    By default the KubeStellar Core chart uses a test domain `localtest.me`, which is OK for testing on a single host machine. However, scenarios that span more than one machine, it is necessary to set `--set "kubeflex-operator.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution Clusters (WECs).
+    By default the KubeStellar Core chart uses a test domain `localtest.me`, which is OK for testing on a single host machine. However, for scenarios that span more than one machine, it is necessary to set `--set "kubeflex-operator.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution Clusters (WECs).
 
     For convenience, a new local **Kind** cluster that satisfies the requirements for KubeStellar setup
     and that can be used to exercises the [examples](./examples.md) can be created with the following command:
