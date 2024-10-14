@@ -3115,7 +3115,7 @@ the other supports variation from WEC to WEC.</p>
 </ol>
 <p>A Binding object's <code>status</code> section has a field holding a slice of error message strings reporting user errors that arose the last time the transport controller processed that Binding, along with the <code>observedGeneration</code> reporting the <code>metadata.generation</code> that was processed. For each workload object that the Binding references: if template expansion reports errors for any destinations, the errors reported for the first such destination are included in the Binding object's status.</p>
 <p>Any failure in any template expansion for a given Binding suppresses propagation of desired state from that Binding; the previously propagated desired state from that Binding, if any, remains in place in the WEC.</p>
-<p>Template expansion can only be applied when and where the un-expanded leaf strings pass the validation that the WDS applies, and can only express substring replacements.</p>
+<p>Template expansion can only be applied when and where the unexpanded leaf strings pass the validation that the WDS applies, and can only express substring replacements.</p>
 <p>For example, consider the following example workload object.</p>
 <div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">logging.openshift.io/v1</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ClusterLogForwarder</span>

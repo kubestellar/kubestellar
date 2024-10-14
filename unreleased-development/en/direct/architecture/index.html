@@ -3531,7 +3531,7 @@ to understand). </p>
 <p>At startup, the controller code sets up the dynamic informers, the event
 handler and the work queue as follows:</p>
 <ul>
-<li>lists all API preferred resources (using discovery client's ServerPreferredResources()
+<li>lists all API preferred resources (using discovery client's <code>ServerPreferredResources()</code>
   to return only one preferred storage version for API group)</li>
 <li>Filters out some resources</li>
 <li>For each resource:<ul>
@@ -3548,12 +3548,12 @@ handler and the work queue as follows:</p>
 resources on the WDS API Server; on create/update/delete object events it
 puts a copy of the object into the local cache. The informer invokes the
 event handler. The handler implements the event handling functions
-(AddFunc, UpdateFunc, DeleteFunc)</p>
+(<code>AddFunc</code>, <code>UpdateFunc</code>, <code>DeleteFunc</code>)</p>
 <p>A typical event flow for a create/update object event will run as
 follows:</p>
 <ol>
 <li>
-<p>Informer invokes the event handler AddFunc or UpdateFunc</p>
+<p>Informer invokes the event handler <code>AddFunc</code> or <code>UpdateFunc</code></p>
 </li>
 <li>
 <p>The event handler does some filtering (for example, to ignore update
@@ -3573,7 +3573,7 @@ follows:</p>
 <ul>
 <li>Uses the GVR key to get the reference to the lister for the
     object</li>
-<li>Gets the object from the lister cache using the NamespacedName of 
+<li>Gets the object from the lister cache using the <code>NamespacedName</code> of 
    the object.</li>
 <li>If the object was not found (because it was deleted) worker returns. 
    A delete event for that object consumed by the event handler enqueues 
@@ -3595,15 +3595,15 @@ follows:</p>
 </ul>
 </li>
 </ol>
-<p><strong>WantSingletonReportedState</strong>:
+<p><code>WantSingletonReportedState</code>:
 currently it is the user's responsibility to make sure that a binding-policy that sets <code>WantSingletonReportedState</code> to
 true is not in conflict with other binding-policies that do the same, and that the binding-policy selects only a single
 cluster.</p>
-<p>There are other event flows, based on the object GVK and type of event. 
-Error conditions may cause the re-enqueing of keys, resulting in retries.
+<p>There are other event flows, based on the object <code>GroupVersionKind</code> and type of event. 
+Error conditions may cause the re-enqueuing of keys, resulting in retries.
 The following sections broadly describe these flows.</p>
 <h4 id="object-deleted">Object Deleted<a class="headerlink" href="#object-deleted" title="Permanent link">#</a></h4>
-<p>When an object is deleted from the WDS, the handler’s <em>DeleteFunc</em> is
+<p>When an object is deleted from the WDS, the handler’s <code>DeleteFunc</code> is
 invoked. A shallow copy of the object is added to a field in the key 
 before pushing it to the work queue. Then:</p>
 <ul>
@@ -3612,7 +3612,7 @@ before pushing it to the work queue. Then:</p>
 </li>
 <li>
 <p>Flow continues the same way as in the create/update scenario, however
-  the deletedObject field in the key indicates that the object has been
+  the <code>deletedObject</code> field in the key indicates that the object has been
   deleted and that it needs to be removed from all clusters.</p>
 </li>
 <li>
@@ -3657,7 +3657,7 @@ follows the flow below:</p>
 <li>If an in memory representation of the binding is not found, the worker returns.</li>
 <li>The key is used to retrieve the object from the WDS.<ul>
 <li>If the object is not found, then a <code>Binding</code> object should be created. For the convenience of the flow,
-  the worker sets the "retrived object" as an empty <code>Binding</code> object with the appropriate Meta fields,
+  the worker sets the "retrieved object" as an empty <code>Binding</code> object with the appropriate Meta fields,
   including the <code>BindingPolicy</code> object as the single owner reference.</li>
 </ul>
 </li>
@@ -3744,12 +3744,12 @@ We expect to have more transport plugin options in the future.</p>
 </thead>
 <tbody>
 <tr>
-<td>bindingName</td>
+<td><code>bindingName</code></td>
 <td>string</td>
 <td>yes</td>
 </tr>
 <tr>
-<td>gr</td>
+<td><code>gr</code></td>
 <td>metav1.GroupResource</td>
 <td>yes</td>
 </tr>
@@ -3766,12 +3766,12 @@ We expect to have more transport plugin options in the future.</p>
 </thead>
 <tbody>
 <tr>
-<td>gr</td>
+<td><code>gr</code></td>
 <td>metav1.GroupResource</td>
 <td>yes</td>
 </tr>
 <tr>
-<td>removes</td>
+<td><code>removes</code></td>
 <td>SET(jsonpath.Query)</td>
 <td>no</td>
 </tr>
@@ -3788,17 +3788,17 @@ We expect to have more transport plugin options in the future.</p>
 </thead>
 <tbody>
 <tr>
-<td>ctName</td>
+<td><code>ctName</code></td>
 <td>string</td>
 <td>yes</td>
 </tr>
 <tr>
-<td>gr</td>
+<td><code>gr</code></td>
 <td>metav1.GroupResource</td>
 <td>no</td>
 </tr>
 <tr>
-<td>removes</td>
+<td><code>removes</code></td>
 <td>SET(string)</td>
 <td>no</td>
 </tr>

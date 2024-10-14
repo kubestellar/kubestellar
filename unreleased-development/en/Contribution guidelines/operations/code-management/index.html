@@ -2976,22 +2976,22 @@ Quay.io -->
 <p>You can do this either 1: from the kubestellar Github website using the "Fork" button or 2: by using the git fork command from your local git command line interface, such as git bash.</p>
 <p>copy the forked repo from Github to your local system by using the "git clone" command or by downloading the repository's zip file.</p>
 <p>In your new local forked repo, set upstream to kubestellar main</p>
-<p>check what your repository's remote settings are
+<p>check what your repository's remote settings are</p>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git remote -v
-</code></pre></div></p>
+</code></pre></div>
 <h3 id="set-upstream-to-use-kubestellar">Set upstream to use kubestellar:<a class="headerlink" href="#set-upstream-to-use-kubestellar" title="Permanent link">#</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git remote add upstream git@github.com:kubestellar/kubestellar.git
 </code></pre></div>
-<p>For example:
+<p>For example:</p>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$ git remote -v
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>origin  git@github.com:fileppb/edge-mc.git (fetch)
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>origin  git@github.com:fileppb/edge-mc.git (push)
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>origin  git@github.com:fileppb/kubestellar.git (fetch)
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>origin  git@github.com:fileppb/kubestellar.git (push)
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>$ git remote add upstream git@github.com:kubestellar/kubestellar.git
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>$ git remote -v
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>origin  git@github.com:fileppb/edge-mc.git (fetch)
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>origin  git@github.com:fileppb/edge-mc.git (push)
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>origin  git@github.com:fileppb/kubestellar.git (fetch)
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>origin  git@github.com:fileppb/kubestellar.git (push)
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>upstream        git@github.com:kubestellar/kubestellar.git (fetch)
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>upstream        git@github.com:kubestellar/kubestellar.git (push)
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
@@ -3010,16 +3010,16 @@ Quay.io -->
 <a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>Your branch is up to date with &#39;origin/main&#39;.
 <a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>
 <a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>nothing to commit, working tree clean
-</code></pre></div></p>
+</code></pre></div>
 <h2 id="ongoing-contributions">Ongoing contributions<a class="headerlink" href="#ongoing-contributions" title="Permanent link">#</a></h2>
 <h3 id="prior-to-working-on-an-issue">Prior to working on an issue<a class="headerlink" href="#prior-to-working-on-an-issue" title="Permanent link">#</a></h3>
 <p>Ensure that you personal repository if up to date with the kubestellar repository.
 You can do this by opening your github repository page, check that the selected branch is "main", and press the "sync fork" button.</p>
 <h3 id="select-an-issue-to-work-on-and-create-a-local-branch">Select an issue to work on and create a local branch,<a class="headerlink" href="#select-an-issue-to-work-on-and-create-a-local-branch" title="Permanent link">#</a></h3>
 <p>Create a local branch for your work, preferably including the issue number in the branch name</p>
-<p>for example if working on issue #11187, then you might name your local branch "issue-1187"
+<p>for example if working on issue #11187, then you might name your local branch "issue-1187"</p>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git checkout -b issue-1187
-</code></pre></div></p>
+</code></pre></div>
 <h3 id="as-you-work-and-change-files-you-should-try-to-commit-relatively-small-pieces-of-work-using-the-following-commands">As you work and change files, you should try to commit relatively small pieces of work, using the following commands<a class="headerlink" href="#as-you-work-and-change-files-you-should-try-to-commit-relatively-small-pieces-of-work-using-the-following-commands" title="Permanent link">#</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>git add (there are several options you can specify for the git add command)
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
@@ -3038,13 +3038,13 @@ You can do this by opening your github repository page, check that the selected 
 7. Make your edits if any and save and exit the file.
 The commits will then be squashed into one commit.</p>
 <h3 id="when-you-are-done-with-the-squash-push-your-changes-to-your-remote-branch-you-can-either">When you are done with the squash, push your changes to your remote branch. You can either:<a class="headerlink" href="#when-you-are-done-with-the-squash-push-your-changes-to-your-remote-branch-you-can-either" title="Permanent link">#</a></h3>
-<p><div class="language-text highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git push -u origin &lt;branch-name&gt;
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git push -u origin &lt;branch-name&gt;
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>or 
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>git push --force-with-lease
 </code></pre></div>
-Note: if using the git push -u origin <branch-name> command, the -u only needs to specified the first time you push. It will set tracking for subsequent pushes to the branch. On the other hand, keeping the -u in the command does no particular harm.</p>
+<p>Note: if using the git push -u origin <branch-name> command, the -u only needs to specified the first time you push. It will set tracking for subsequent pushes to the branch. On the other hand, keeping the -u in the command does no particular harm.</p>
 <h2 id="run-actions-automated-workflow-tests-manually-in-your-personal-github-repository">Run Actions (automated workflow tests) manually in your personal Github repository<a class="headerlink" href="#run-actions-automated-workflow-tests-manually-in-your-personal-github-repository" title="Permanent link">#</a></h2>
 <ol>
 <li>Select the "Actions" tab toward the upper left of your github personal web page. This will cause a list of Actions to show.</li>

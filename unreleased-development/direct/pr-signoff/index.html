@@ -2987,37 +2987,50 @@
 <p><br /></p>
 <h2 id="setting-up-the-gpg-key">Setting up the GPG Key<a class="headerlink" href="#setting-up-the-gpg-key" title="Permanent link">#</a></h2>
 <ol>
-<li>Install GnuPG (the GPG command line tool).</li>
-<li>Binary releases for your specific OS can be found <a href="https://www.gnupg.org/download/">here</a> after scrolling down to the Binary Releases section (i.e. Gpg4win on Windows, Mac GPG for macOS, etc).</li>
 <li>
-<p>After downloading the installer, follow the prompts to set up GnuPG.</p>
-</li>
-<li>
-<p>Open Git Bash (or your CLI of choice) and use the following command to generate your GPG key pair: 
-   <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>gpg<span class="w"> </span>--full-generate-key
-</code></pre></div></p>
-</li>
-<li>If prompted to specify the size, type, and duration of the key that you want, press <code>Enter</code> to select the default option.</li>
-<li>Once prompted, enter your user info and a passphrase:</li>
-<li>Make sure to list your email as the same one that's verified by Github</li>
-<li>Use the following command to list the long form of your generated GPG keys:
-   <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>gpg<span class="w"> </span>--list-secret-keys<span class="w"> </span>--keyid-format<span class="o">=</span>long
-</code></pre></div></li>
-<li>Your GPG key ID should be the characters on the output line starting with <code>sec</code>, beginning directly after the <code>/</code> and ending before the listed date.<ul>
-<li>For example, in the output below (from the Github <a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key">GPG</a> setup page), the GPG key ID would be <code>3AA5C34371567BD2</code>
- <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>gpg<span class="w"> </span>--list-secret-keys<span class="w"> </span>--keyid-format<span class="o">=</span>long
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w"> </span>/Users/hubot/.gnupg/secring.gpg
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w"> </span>------------------------------------
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w"> </span>sec<span class="w">   </span>4096R/3AA5C34371567BD2<span class="w"> </span><span class="m">2016</span>-03-10<span class="w"> </span><span class="o">[</span>expires:<span class="w"> </span><span class="m">2017</span>-03-10<span class="o">]</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w"> </span>uid<span class="w">                          </span>Hubot<span class="w"> </span>&lt;hubot@example.com&gt;
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w"> </span>ssb<span class="w">   </span>4096R/4BB6D45482678BE3<span class="w"> </span><span class="m">2016</span>-03-10
-</code></pre></div></li>
+<p>Install GnuPG (the GPG command line tool).</p>
+<ul>
+<li>Binary releases for your specific OS can be found <a href="https://www.gnupg.org/download/">here</a> after scrolling down to the Binary Releases section (i.e. Gpg4win on Windows, Mac GPG for MacOS, etc).</li>
+<li>After downloading the installer, follow the prompts to set up GnuPG.</li>
 </ul>
 </li>
-<li>Copy your GPG key ID and run the command below, replacing <code>[your_GPG_key_ID]</code> with the key ID you just copied:
-   <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>gpg<span class="w"> </span>--armor<span class="w"> </span>--export<span class="w"> </span><span class="o">[</span>your_GPG_key_ID<span class="o">]</span>
-</code></pre></div></li>
-<li>This should generate an output with your GPG key. Copy the characters starting from <code>-----BEGIN PGP PUBLIC KEY BLOCK-----</code> and ending at <code>--END PGP PUBLIC KEY BLOCK-----</code> (inclusive) to your clipboard.</li>
+<li>
+<p>Open Git Bash (or your CLI of choice) and use the following command to generate your GPG key pair:</p>
+</li>
+</ol>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>gpg<span class="w"> </span>--full-generate-key
+</code></pre></div>
+<ol>
+<li>If prompted to specify the size, type, and duration of the key that you want, press <code>Enter</code> to select the default option.</li>
+<li>Once prompted, enter your user info and a passphrase:<ul>
+<li>Make sure to list your email as the same one that's verified by Github</li>
+</ul>
+</li>
+<li>Use the following command to list the long form of your generated GPG keys:</li>
+</ol>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>gpg<span class="w"> </span>--list-secret-keys<span class="w"> </span>--keyid-format<span class="o">=</span>long
+</code></pre></div>
+<div class="language-text highlight"><pre><span></span><code>- Your GPG key ID should be the characters on the output line starting with `sec`, beginning directly after the `/` and ending before the listed date.
+- For example, in the output below (from the Github [GPG](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) setup page), the GPG key ID would be `3AA5C34371567BD2`
+
+    ```shell
+    $ gpg --list-secret-keys --keyid-format=long
+     /Users/hubot/.gnupg/secring.gpg
+     ------------------------------------
+     sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2017-03-10]
+     uid                          Hubot &lt;hubot@example.com&gt;
+     ssb   4096R/4BB6D45482678BE3 2016-03-10
+    ```
+</code></pre></div>
+<ol>
+<li>
+<p>Copy your GPG key ID and run the command below, replacing <code>[your_GPG_key_ID]</code> with the key ID you just copied:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>gpg<span class="w"> </span>--armor<span class="w"> </span>--export<span class="w"> </span><span class="o">[</span>your_GPG_key_ID<span class="o">]</span>
+</code></pre></div>
+</li>
+<li>
+<p>This should generate an output with your GPG key. Copy the characters starting from <code>-----BEGIN PGP PUBLIC KEY BLOCK-----</code> and ending at <code>--END PGP PUBLIC KEY BLOCK-----</code> (inclusive) to your clipboard.</p>
+</li>
 <li>After copying or saving your GPG key, navigate to <strong>Settings</strong> in your Github</li>
 <li>Navigate to the <strong>SSH and GPG keys</strong> page under the Access section in the sidebar</li>
 <li>Under GPG keys, select <strong>New GPG key</strong><ul>
@@ -3031,39 +3044,51 @@
 <h2 id="setting-up-the-ssh-key">Setting up the SSH Key<a class="headerlink" href="#setting-up-the-ssh-key" title="Permanent link">#</a></h2>
 <ol>
 <li>
-<p>Open Git Bash (or your CLI of choice) and use the following command to generate your new SSH key (make sure to replace <code>your_email</code> with your Github-verified email address):
-   <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ed25519<span class="w"> </span>-C<span class="w"> </span><span class="s2">&quot;your_email&quot;</span>
-</code></pre></div></p>
+<p>Open Git Bash (or your CLI of choice) and use the following command to generate your new SSH key (make sure to replace <code>your_email</code> with your Github-verified email address):</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ed25519<span class="w"> </span>-C<span class="w"> </span><span class="s2">&quot;your_email&quot;</span>
+</code></pre></div>
 </li>
 <li>
-<p>Press <code>Enter</code> to select the default option if prompted to set a save-file or passphrase for the key (you may choose to enter a passphrase if desired; this will prompt you to enter the passphrase everytime you perform a DCO sign-off).</p>
+<p>Press <code>Enter</code> to select the default option if prompted to set a save-file or passphrase for the key (you may choose to enter a passphrase if desired; this will prompt you to enter the passphrase every time you perform a DCO sign-off).</p>
 </li>
-<li>The following output should generate a randomart image </li>
-<li>Use the following command to copy the new SSH key to your clipboard:
-   <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>clip<span class="w"> </span>&lt;<span class="w"> </span>~/.ssh/id_ed25519.pub
-</code></pre></div></li>
-<li>After copying or saving your SSH key, navigate to <strong>Settings</strong> in your Github.</li>
+<li>The following output should generate a <code>randomart</code> image </li>
+<li>
+<p>Use the following command to copy the new SSH key to your clipboard:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>clip<span class="w"> </span>&lt;<span class="w"> </span>~/.ssh/id_ed25519.pub
+</code></pre></div>
+</li>
+<li>
+<p>After copying or saving your SSH key, navigate to <strong>Settings</strong> in your Github.</p>
+</li>
 <li>Navigate to the <strong>SSH and GPG keys</strong> page under the Access section in the sidebar.</li>
-<li>Under SSH keys, select <strong>New SSH key</strong>.</li>
+<li>Under SSH keys, select <strong>New SSH key</strong>.<ul>
 <li>Enter a suitable name for your key under "Title"</li>
 <li>Open the dropdown menu under "Key type" and select <strong>Signing Key</strong></li>
 <li>Paste your SSH key that you copied/saved in <strong>Step 3</strong> under "Key"</li>
+</ul>
+</li>
 <li>Your new SSH key should now be displayed under SSH keys.</li>
-<li><strong>Optional</strong>: To test if your SSH key is connecting properly or not, run the following command in your CLI (more specific instructions can be found in the <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection">Github documentation</a>):
-   <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
-</code></pre></div></li>
+<li>
+<p><strong>Optional</strong>: To test if your SSH key is connecting properly or not, run the following command in your CLI (more specific instructions can be found in the <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection">Github documentation</a>):</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
+</code></pre></div>
+<ul>
 <li>If given a warning saying something like <code>The authenticity of the host '[host IP]' can't be established</code> along with a key fingerprint and a prompt to continue, verify if the provided key fingerprint matches any of those listed <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints">here</a></li>
 <li>Once you've verified the match, type <code>yes</code></li>
 <li>If the resulting message says something along the lines of <code>Hi [User]! You've successfully authenticated, but GitHub does not provide shell access.</code>, then it means your SSH key is up and ready.</li>
+</ul>
+</li>
 </ol>
 <p><br /></p>
 <h2 id="creating-pull-requests">Creating Pull Requests<a class="headerlink" href="#creating-pull-requests" title="Permanent link">#</a></h2>
 <p>Whether it's editing files from Kubestellar.io or directly from the Kubestellar Github, there are a couple steps to follow that streamlines the workflow of your PR:</p>
 <ol>
-<li>Changes made to any file are automatically committed to a new branch in your fork.</li>
-<li>When committing, make sure to specify the type of PR at the beginning of your commit message (i.e. :bug: if it addresses a bug-type issue)</li>
 <li>
-<p>If the PR addresses a specific issue that has already been opened in the github, make sure to include the opened issue in <strong>additional comments</strong> (i.e. "fixes Issue #XXXX")</p>
+<p>Changes made to any file are automatically committed to a new branch in your fork.</p>
+<ul>
+<li>When committing, make sure to specify the type of PR at the beginning of your commit message (i.e. :bug: if it addresses a bug-type issue)</li>
+<li>If the PR addresses a specific issue that has already been opened in the github, make sure to include the opened issue in <strong>additional comments</strong> (i.e. <code>fixes Issue #XXXX</code>)</li>
+</ul>
 </li>
 <li>
 <p>Click <strong>Propose Changes</strong> after writing the commit message, review your changes, and then create the PR.</p>
@@ -3072,27 +3097,35 @@
 </ol>
 <p><br /></p>
 <h2 id="pull-request-sign-off">Pull Request Sign-off<a class="headerlink" href="#pull-request-sign-off" title="Permanent link">#</a></h2>
-<p><strong>NOTE</strong>: "sign-off" is different from "signing" a commit or tag (see <a href="https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work">the git book</a> about signing). The former indicates your assent to the repo's terms for contributors, the latter adds a cryptograph checksum that is rarely displayed.</p>
-<p>Your submitted PR must pass the automated checks in order to be reviewed. This requires for you to perform a DCO sign-off for your PR. The following instructions provide a basic walkthrough if you have already set up your GPG and SSH keys:</p>
+<p><strong>NOTE</strong>: "sign-off" is different from "signing" a commit or tag (see <a href="https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work">the git book</a> about signing). The former indicates your assent to the repository's terms for contributors, the latter adds a cryptographic checksum that is rarely displayed.</p>
+<p>Your submitted PR must pass the automated checks in order to be reviewed. This requires for you to perform a DCO sign-off for your PR. The following instructions provide a basic walk-through if you have already set up your GPG and SSH keys:</p>
 <ol>
 <li>
 <p>Navigate to the <strong>Code</strong> page of the Kubestellar github.</p>
 </li>
 <li>
 <p>Click the <strong>Fork</strong> dropdown in the top right corner of the page.</p>
-</li>
+<ul>
 <li>Under "Existing Forks" click your fork (should look something like "your_username/kubestellar")</li>
-<li>Once in your fork, click the <strong>Code</strong> dropdown.</li>
+</ul>
+</li>
+<li>Once in your fork, click the <strong>Code</strong> dropdown.<ul>
 <li>Under the "Local" tab at the top of the dropdown, select the SSH tab</li>
 <li>Copy the SSH repo URL to your clipboard</li>
+</ul>
+</li>
 <li>Open Git Bash (or your CLI of choice), create or change to a different directory if desired.</li>
 <li>Clone the repository using <code>git clone</code> followed by pasting the URL you just copied.</li>
 <li>Change your directory to the Kubestellar repo using <code>cd kubestellar</code>.</li>
-<li><code>git checkout</code> to the branch in your fork where the changes were committed.</li>
+<li><code>git checkout</code> to the branch in your fork where the changes were committed.<ul>
 <li>The branch name should be written at the top of your submitted PR page and looks something like "patch-<em>X</em>" (where "X" should be the number of PRs made on your fork to date)</li>
-<li>Once in your branch, type <code>git commit -s --amend</code> to sign off your PR.</li>
+</ul>
+</li>
+<li>Once in your branch, type <code>git commit -s --amend</code> to sign off your PR.<ul>
 <li>You may replace <code>--amend</code> with a <code>-m</code> followed by a commit message if you desire; the <code>--amend</code> simply uses the same commit message as the one you wrote when initially submitting the PR</li>
 <li>If prompted with a sign-off page in your Git Bash (or alternative CLI), type <code>:wq!</code> to exit the prompt</li>
+</ul>
+</li>
 <li>Type <code>git push -f origin [branch_name]</code>, replacing <code>[branch_name]</code> with the actual name of your branch.</li>
 <li>Navigate back to your PR github page.<ul>
 <li>A green <code>dco-signoff: yes</code> label indicates that your PR is successfully signed</li>
