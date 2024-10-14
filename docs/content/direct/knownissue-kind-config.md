@@ -2,7 +2,7 @@
 
 ## Description of the Issue
 
-Kubestellar installation may fail for some users during the setup of the second cluster (cluster2) when running Kind with Docker provided by Rancher Desktop. The failure occurs while initializing the cluster, with an error related to kubeadm. Insufficient system parameter settings (sysctl) within the Rancher Desktop virtual machine may be causing this issue.
+Kubestellar installation may fail for some users during the setup of the second cluster (cluster2) when running Kind with Docker provided by Rancher Desktop. The failure occurs while initializing the cluster, with an error related to `kubeadm`. Insufficient system parameter settings (`sysctl`) within the Rancher Desktop virtual machine may be causing this issue.
 
 ## Error Message Example
 
@@ -21,7 +21,7 @@ Command Output: I1008 16:11:20.743111 134 initconfiguration.go:255] loading conf
 
 This is caused by a [known issue with kind](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
 
-When using Rancher Desktop, the Linux machine that needs to be recofigured is a virtual machine that Rancher Desktop is managing.
+When using Rancher Desktop, the Linux machine that needs to be reconfigured is a virtual machine that Rancher Desktop is managing.
 
 Kind requires the following minimum settings in the Linux machine:
 
@@ -30,12 +30,12 @@ fs.inotify.max_user_watches = 524288
 fs.inotify.max_user_instances = 512
 ```
 
-If these parameters are set lower than the suggeseted values, the second cluster initialization may fail.
+If these parameters are set lower than the suggested values, the second cluster initialization may fail.
 
 ## Steps to Reproduce the Issue
 1. Install Rancher Desktop
    * Download and install Rancher Desktop from the official website.
-   * Configure it to use Docker as the container runtime (dockerd).
+   * Configure it to use Docker as the container runtime (`dockerd`).
 2. Install Kind
    * Follow the installation instructions provided in the Kind documentation.
 3. Install Kubestellar Prerequisites
@@ -55,23 +55,26 @@ If these parameters are set lower than the suggeseted values, the second cluster
 Cluster 2 should create successfully, and the installation should complete without errors.
 
 ## Steps to Fix
-1. Check Current sysctl Parameter Values
-   * Use the command rdctl shell to log in to the Rancher Desktop VM.
-Run:
+1. Check Current `sysctl` Parameter Values
+    * Use the command `rdctl shell` to log in to the Rancher Desktop VM.
+      Run:
         ````
         sysctl fs.inotify.max_user_watches
         sysctl fs.inotify.max_user_instances
         ````
     * Confirm if these values are below the recommended settings (524288 for max_user_watches and 512 for max_user_instances).
 2. Modify the Parameter Settings
-   * Setting these parameters temporarily with sysctl will revert after restarting Rancher Desktop. To persist the changes, you need to modify the configuration using an overlay file.
+    * Setting these parameters temporarily with `sysctl` will revert after restarting Rancher Desktop. To persist the changes, you need to modify the configuration using an overlay file.
 3. Create an Override Configuration File
     - On a Mac:
         * Open a terminal and create a new file:
+
             ```
             vi ~/Library/Application\ Support/rancher-desktop/lima/_config/override.yaml
             ```
+
         * Add the following content:
+
             ```
             provision:
             - mode: system
@@ -81,14 +84,17 @@ Run:
                 echo "fs.inotify.max_user_instances=512" >> /etc/sysctl.d/fs.inotify.conf
                 sysctl -p /etc/sysctl.d/fs.inotify.conf
             ```
+
         * Save the file.
 4. Restart Rancher Desktop
-   * Restart Rancher Desktop for the changes to take effect and ensure the new sysctl parameter values persist.
+    * Restart Rancher Desktop for the changes to take effect and ensure the new `sysctl` parameter values persist.
 5. Delete Existing Kind Clusters
-   * Before re-running the Kubestellar Getting Started guide, delete all previously created clusters:
+    * Before re-running the Kubestellar Getting Started guide, delete all previously created clusters:
+
         ```
         kind delete cluster --name <cluster-name>
         ```
+
     * Repeat for each cluster (e.g., kubeflex, cluster1, cluster2).
 6. Re-run the Kubestellar Setup
     * With the updated configuration, run the Kubestellar Getting Started guide or the automated demo environment script again.

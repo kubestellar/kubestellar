@@ -1,9 +1,10 @@
 # Kubestellar performance regression testing
 This is a simple performance test that aims to identify major regressions. 
 
-The test adds a deployment to the WDS and measures the cumulative time it takes to create the WDS workload object, the Binding object, the ManifestWork object, and the deployment object on the WEC. The starting time is just prior to adding the workload to the WDS and the end time is just after the object is observed on the WEC. The timings are obtained from the objects creation timestamp which have seconds granuality. We expect this test to run on VMs and and anything below seconds is likely just noise. 
+The test adds a deployment to the WDS and measures the cumulative time it takes to create the WDS workload object, the Binding object, the ManifestWork object, and the deployment object on the WEC. The starting time is just prior to adding the workload to the WDS and the end time is just after the object is observed on the WEC. The timings are obtained from the objects creation timestamp which have seconds granularity. We expect this test to run on VMs and and anything below seconds is likely just noise. 
 
 This is what the results look like:
+
 ```shell
   Run 0: wds deployment=0, binding=1, manifestwork=1, wec deployment=1, total=2
   Run 1: wds deployment=0, binding=0, manifestwork=0, wec deployment=5, total=6

@@ -53,9 +53,9 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 
 ## Additional Software for monitoring
 
-The setup in `montoring/` additionall uses the following.
+The setup in `montoring/` additional uses the following.
 
-- [**yq**](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq))
+- [`yq`](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq))
 
 ## Additional Software For Running the Examples
 
@@ -73,7 +73,7 @@ To build and _**test**_ KubeStellar properly, you will also need
 
 - [**kind**](https://kind.sigs.k8s.io/)
 - [**OCP**](https://docs.openshift.com/container-platform/4.13/installing/index.html)
-- [**yq**](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq)) - for running tests
+- [`yq`](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq)) - for running tests
 
 <!-- start tag for check script  include -->
 

@@ -157,7 +157,7 @@ To collect the creation and status_update timestamps for the benchmark workload 
    - `number-of-namespaces`: number of namespaces created in your experiment, e.g., `2`
    - `output-directory`: path to the directory for the output data files, e.g., `$HOME/data`
 
-   For each namespace, the creation and status_update timestamps will be collected for the workload objects created in `wds1`, manifestwork & workstatus objects created in `its1`, and workload & appliedmanifestworks objects created in `wec1`, for example: let's assume that `num_ns=2`, then the following directories and files will be created: 
+   For each namespace, the creation and status_update timestamps will be collected for the workload objects created in `wds1`, `ManifestWork` & `WorkStatus` objects created in `its1`, and workload & `AppliedManifestWork` objects created in `wec1`, for example: let's assume that `num_ns=2`, then the following directories and files will be created: 
 
    ```bash 
    cd $HOME/data

@@ -96,7 +96,7 @@ A Binding object's `status` section has a field holding a slice of error message
 
 Any failure in any template expansion for a given Binding suppresses propagation of desired state from that Binding; the previously propagated desired state from that Binding, if any, remains in place in the WEC.
 
-Template expansion can only be applied when and where the un-expanded leaf strings pass the validation that the WDS applies, and can only express substring replacements.
+Template expansion can only be applied when and where the unexpanded leaf strings pass the validation that the WDS applies, and can only express substring replacements.
 
 For example, consider the following example workload object.
 

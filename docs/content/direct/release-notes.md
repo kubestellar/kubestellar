@@ -20,7 +20,7 @@ These test the release-building functionality, which has been revised in the cou
 
 ## 0.24.0 and its candidates and their precursors
 
-The main functional change from 0.23.X is the completion of the status combination and the partial introduction of the create-only feature (its API is there but its implementation is not --- DO NOT TRY TO USE THIS FEATURE). There is also further work on the organization of the website. There is also a major change in the GitHub repository structure: the kubestellar/ocm-transport-plugin repo's contents have been merged into the kubestellar/kubestellar repo (after `0.24.0-alpha.2`).
+The main functional change from 0.23.X is the completion of the status combination and the partial introduction of the create-only feature (its API is there but its implementation is not --- DO NOT TRY TO USE THIS FEATURE). There is also further work on the organization of the website. There is also a major change in the GitHub repository structure: the kubestellar/ocm-transport-plugin repository's contents have been merged into the kubestellar/kubestellar repo (after `0.24.0-alpha.2`).
 
 ### Remaining limitations in 0.24.0
 
