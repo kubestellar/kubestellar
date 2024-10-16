@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -88,7 +89,7 @@ func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentif
 	logger := klog.FromContext(ctx)
 
 	if util.WEC2WDSExceptions.Has(objectIdentifier.GVK.GroupKind()) {
-		logger.V(4).Info("Status from WEC shouldn't have authority to overwrite status in WDS", "object", objectIdentifier)
+		logger.V(4).Info("Status from WEC shouldn't have authority to overwrite status in WDS", "objectIdentifier", objectIdentifier)
 		return nil
 	}
 
@@ -119,6 +120,10 @@ func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentif
 		return fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s", util.RefToRuntimeObj(obj))
 	}
 
+	if apiequality.Semantic.DeepEqual(unstrObj.Object["status"], status) {
+		logger.V(5).Info("Workload object found to already have intended status", "objectIdentifier", objectIdentifier)
+	}
+
 	// set the status and update the object
 	unstrObj.Object["status"] = status
 
@@ -134,9 +139,9 @@ func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentif
 			return util.PatchStatus(ctx, unstrObj, status, objectIdentifier.ObjectName.Namespace, gvr, wdsDynClient)
 			// PatchStatus returns nil if the full object is not found
 		}
-		return fmt.Errorf("failed to update status: %w", err)
+		return fmt.Errorf("failed to update status of %v: %w", objectIdentifier, err)
 	}
-
+	logger.V(5).Info("Updated status of workload object", "objectIdentifier", objectIdentifier)
 	return nil
 }
 
