@@ -69,21 +69,21 @@ nav:
               - Kind needs OS reconfig: direct/knownissue-kind-config.md
   - Contributing: 
       - How to join in: direct/contribute.md
-      - Code of Conduct: Contribution guidelines/coc.md
-      - License: Contribution guidelines/LICENSE.md
-      - Governance: Contribution guidelines/governance.md
-      - Onboarding: Contribution guidelines/onboarding.md
+      - Code of Conduct: contribution-guidelines/coc.md
+      - License: contribution-guidelines/LICENSE.md
+      - Governance: contribution-guidelines/governance.md
+      - Onboarding: contribution-guidelines/onboarding.md
       - Website:
-          - Overview: Contribution guidelines/operations/document-management.md
-          - Testing website PRs: Contribution guidelines/operations/testing-doc-prs.md
+          - Docs Management Overview: contribution-guidelines/operations/document-management.md
+          - Testing website PRs: contribution-guidelines/operations/testing-doc-prs.md
       - Security:
-          - Policy: Contribution guidelines/security/security.md
-          - Contacts: Contribution guidelines/security/security_contacts.md
+          - Policy: contribution-guidelines/security/security.md
+          - Contacts: contribution-guidelines/security/security_contacts.md
       - Testing: direct/testing.md
       - Packaging: direct/packaging.md
       - Release Process: direct/release.md
       - Release Testing: direct/release-testing.md
-      - Guidelines: Contribution guidelines/CONTRIBUTING.md
+      - Guidelines: contribution-guidelines/CONTRIBUTING.md
       - Sign-off on Contributions: direct/pr-signoff.md
   - Community: 
     - Get Involved: Community/_index.md
