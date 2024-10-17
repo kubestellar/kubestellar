@@ -28,6 +28,9 @@ import (
 )
 
 const (
+	// BindingPolicyLabelSingletonStatusKey is the key for the singleton status reporting requirement.
+	BindingPolicyLabelSingletonStatusKey = "managed-by.kubestellar.io/singletonstatus"
+
 	// WorkStatusSourceRefKey is the key for the source reference in the WorkStatus.
 	WorkStatusSourceRefKey = "managed-by.kubestellar.io/sourceRef"
 )

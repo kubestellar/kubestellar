@@ -76,7 +76,7 @@ func (c *Controller) reconcileSingletonByWS(ctx context.Context, ref workStatusR
 	if status == nil {
 		return nil
 	}
-	if err := updateObjectStatus(ctx, wObjID, status, c.listers, c.wdsDynClient); err != nil {
+	if err := c.updateObjectStatus(ctx, wObjID, status, c.listers); err != nil {
 		return err
 	}
 	logger.V(4).Info("Updated singleton status for workload object",
@@ -89,8 +89,7 @@ func (c *Controller) reconcileSingletonWObj(ctx context.Context, wObjID util.Obj
 	logger.V(4).Info("Reconciling workload object for singleton status", "gvk", wObjID.GVK, "objectName", wObjID.ObjectName, "sync", sync)
 
 	if !sync {
-		emptyStatus := make(map[string]interface{})
-		return updateObjectStatus(ctx, wObjID, emptyStatus, c.listers, c.wdsDynClient)
+		return c.updateObjectStatus(ctx, wObjID, nil, c.listers)
 	}
 
 	list, _ := c.workStatusLister.ByNamespace("").List(labels.Everything())
@@ -110,7 +109,7 @@ func (c *Controller) reconcileSingletonWObj(ctx context.Context, wObjID util.Obj
 		if status == nil {
 			return nil
 		}
-		return updateObjectStatus(ctx, wsRef.SourceObjectIdentifier, status, c.listers, c.wdsDynClient)
+		return c.updateObjectStatus(ctx, wsRef.SourceObjectIdentifier, status, c.listers)
 	}
 	return nil
 }
