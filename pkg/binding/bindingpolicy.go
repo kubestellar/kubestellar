@@ -50,8 +50,6 @@ const (
 //   - requeue workload objects to account for changes in bindingpolicy
 //
 // otherwise:
-//   - if binding policy wants singleton-status reported, requeue all selected
-//     workload objects to remove the singleton label.
 //   - delete the bindingpolicy's finalizer and remove its resolution.
 func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName string) error {
 	logger := klog.FromContext(ctx)
@@ -105,18 +103,9 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 }
 
 func (c *Controller) deleteResolutionForBindingPolicy(ctx context.Context, bindingPolicyName string) error {
-	if c.bindingPolicyResolver.ResolutionRequiresSingletonReportedState(bindingPolicyName) {
-		// if the bindingpolicy required a singleton status, all selected objects should
-		// be requeued in order to remove the label
-		if err := c.requeueSelectedWorkloadObjects(ctx, bindingPolicyName); err != nil {
-			return fmt.Errorf("failed to c.requeueForBindingPolicyChanges: %w", err)
-		}
-	}
-
 	logger := klog.FromContext(ctx)
 	c.bindingPolicyResolver.DeleteResolution(bindingPolicyName)
 	logger.V(2).Info("Deleted resolution for bindingpolicy", "name", bindingPolicyName)
-
 	return nil
 }
 

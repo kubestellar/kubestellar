@@ -253,11 +253,8 @@ func PatchStatus(ctx context.Context, unstrObj *unstructured.Unstructured, statu
 		return err
 	}
 
-	if namespace != "" {
-		_, err = dynamicClient.Resource(gvr).Namespace(namespace).Patch(ctx, unstrObj.GetName(), types.MergePatchType, patchBytes, metav1.PatchOptions{})
-	} else {
-		_, err = dynamicClient.Resource(gvr).Patch(ctx, unstrObj.GetName(), types.MergePatchType, patchBytes, metav1.PatchOptions{})
-	}
+	rscIfc := DynamicForResource(dynamicClient, gvr, namespace)
+	_, err = rscIfc.Patch(ctx, unstrObj.GetName(), types.MergePatchType, patchBytes, metav1.PatchOptions{})
 
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -267,4 +264,12 @@ func PatchStatus(ctx context.Context, unstrObj *unstructured.Unstructured, statu
 	}
 
 	return err
+}
+
+func DynamicForResource(dynClient dynamic.Interface, gvr schema.GroupVersionResource, namespace string) dynamic.ResourceInterface {
+	nsblIfc := dynClient.Resource(gvr)
+	if namespace == metav1.NamespaceNone {
+		return nsblIfc
+	}
+	return nsblIfc.Namespace(namespace)
 }
