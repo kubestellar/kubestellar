@@ -15,6 +15,5 @@ roleRef:
   name: proxy-role
 subjects:
 - kind: ServiceAccount
-  name: kubestellar-controller-manager
-  namespace: "{{.Release.Namespace}}"
-
+  name: default
+  namespace: '{{"{{.Namespace}}"}}'

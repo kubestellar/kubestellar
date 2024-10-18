@@ -10,3 +10,12 @@
 - op: add
   path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/clusterSelectors/items/properties/matchExpressions/items/properties/values/items/pattern
   value: "^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$"
+- op: add
+  path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/downsync/items/anyOf
+  value:
+  - required: [apiGroup]
+  - required: [resources]
+  - required: [namespaces]
+  - required: [namespaceSelectors]
+  - required: [objectSelectors]
+  - required: [objectNames]

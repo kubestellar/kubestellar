@@ -25,7 +25,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 4,
+  "id": 2,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -122,9 +122,9 @@
             "type": "prometheus",
             "uid": "$datasource"
           },
-          "editorMode": "builder",
+          "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by (instance)(max_over_time(apiserver_current_inflight_requests{job=\"$APIService\", namespace=\"$SpaceNS\"}[$__rate_interval]))",
+          "expr": "sum by (instance)(max_over_time(apiserver_current_inflight_requests{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}[$__rate_interval]))",
           "format": "time_series",
           "instant": false,
           "interval": "$__rate_interval",
@@ -207,7 +207,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.0-191936",
+      "pluginVersion": "11.3.0-196485",
       "targets": [
         {
           "datasource": {
@@ -216,7 +216,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "max without(instance)(apiserver_flowcontrol_request_concurrency_limit{job=\"$APIService\", namespace=\"$SpaceNS\"})",
+          "expr": "max without(instance)(apiserver_flowcontrol_request_concurrency_limit{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"})",
           "instant": true,
           "interval": "",
           "intervalFactor": 1,
@@ -324,7 +324,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "100 * max by (priority_level)(apiserver_flowcontrol_current_executing_requests{job=\"$APIService\", namespace=\"$SpaceNS\"}) / max by (priority_level) (apiserver_flowcontrol_request_concurrency_limit{job=\"$APIService\", namespace=\"$SpaceNS\"}) ",
+          "expr": "100 * max by (priority_level)(apiserver_flowcontrol_current_executing_requests{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}) / max by (priority_level) (apiserver_flowcontrol_request_concurrency_limit{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}) ",
           "hide": false,
           "instant": false,
           "interval": "$__interval",
@@ -434,7 +434,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "topk(5, max without (endpoint,namespace,service) (apiserver_flowcontrol_current_executing_requests{job=\"$APIService\", namespace=\"$SpaceNS\"}))",
+          "expr": "topk(5, max without (endpoint,namespace,service) (apiserver_flowcontrol_current_executing_requests{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}))",
           "interval": "$__rate_interval",
           "legendFormat": "Flow: {{flow_schema}} --Priority Level: {{priority_level}} -- {{instance}}",
           "range": true,
@@ -539,7 +539,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.90, max without (instance) (increase(apiserver_flowcontrol_request_wait_duration_seconds_bucket{job=\"$APIService\", namespace=\"$SpaceNS\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, max without (instance) (increase(apiserver_flowcontrol_request_wait_duration_seconds_bucket{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}[$__rate_interval])))",
           "interval": "$__rate_interval",
           "legendFormat": "{{flow_schema}}",
           "range": true,
@@ -552,7 +552,7 @@
     },
     {
       "datasource": {
-        "name": "prometheus",
+        "default": true,
         "type": "prometheus",
         "uid": "prometheus-test"
       },
@@ -644,7 +644,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.90, max without (instance) (increase(apiserver_flowcontrol_request_execution_seconds_bucket{job=\"$APIService\", namespace=\"$SpaceNS\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, max without (instance) (increase(apiserver_flowcontrol_request_execution_seconds_bucket{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}[$__rate_interval])))",
           "instant": false,
           "interval": "$__rate_interval",
           "legendFormat": "{{flow_schema}} - {{priority_level}}",
@@ -749,7 +749,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "topk(5, sum by (instance,priority_level,flow_schema)(rate(apiserver_flowcontrol_request_queue_length_after_enqueue_count{job=\"$APIService\", namespace=\"$SpaceNS\"}[$__rate_interval])))",
+          "expr": "topk(5, sum by (instance,priority_level,flow_schema)(rate(apiserver_flowcontrol_request_queue_length_after_enqueue_count{instance=\"$Instance\", job=\"$APIService\", namespace=\"$NS\"}[$__rate_interval])))",
           "instant": false,
           "interval": "$__rate_interval",
           "legendFormat": "Flow: {{flow_schema}} --Priority: {{priority_level}} --{{instance}}",
@@ -770,7 +770,7 @@
       {
         "current": {
           "selected": false,
-          "text": "prometheus",
+          "text": "thanos",
           "value": "prometheus-test"
         },
         "hide": 2,
@@ -788,38 +788,57 @@
       {
         "current": {
           "selected": false,
-          "text": "wds1-system",
-          "value": "wds1-system"
+          "text": "its1-system",
+          "value": "its1-system"
         },
         "hide": 0,
-        "name": "SpaceNS",
+        "name": "NS",
         "options": [
           {
             "selected": true,
-            "text": "wds1-system",
-            "value": "wds1-system"
+            "text": "its1-system",
+            "value": "its1-system"
           }
         ],
-        "query": "wds1-system",
+        "query": "its1-system",
         "skipUrlSync": false,
         "type": "textbox"
       },
       {
         "current": {
           "selected": false,
-          "text": "wds1",
-          "value": "wds1"
+          "text": "vcluster",
+          "value": "vcluster"
         },
         "hide": 0,
         "name": "APIService",
         "options": [
           {
             "selected": true,
-            "text": "wds1",
-            "value": "wds1"
+            "text": "vcluster",
+            "value": "vcluster"
           }
         ],
-        "query": "wds1",
+        "query": "vcluster",
+        "skipUrlSync": false,
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "10.244.0.14:8443",
+          "value": "10.244.0.14:8443"
+        },
+        "hide": 0,
+        "name": "Instance",
+        "options": [
+          {
+            "selected": true,
+            "text": "10.244.0.14:8443",
+            "value": "10.244.0.14:8443"
+          }
+        ],
+        "query": "10.244.0.14:8443",
         "skipUrlSync": false,
         "type": "textbox"
       }

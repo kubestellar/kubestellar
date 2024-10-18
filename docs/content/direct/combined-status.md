@@ -56,7 +56,7 @@ There are three forms of `StatusCollector`, equivalent to three forms of SQL sta
 
 ##### Plain selection
 
-When the `StatusCollector` has selection but no "GROUOP BY" and no aggregation, this is equivalent to the following form of SELECT statement. The [List of stale WECs example below](#list-of-stale-wecs) is an example of this form.
+When the `StatusCollector` has selection but no "GROUP BY" and no aggregation, this is equivalent to the following form of SELECT statement. The [List of stale WECs example below](#list-of-stale-wecs) is an example of this form.
 
 ```sql
 SELECT <selected columns>
@@ -64,9 +64,9 @@ FROM PerWEC WHERE <filter condition>
 LIMIT <limit>
 ```
 
-##### Aggregation without GROUP BY
+##### Aggregation without `GROUP BY`
 
-When there is aggregation but no plain selection and _no_ "GROUP BY", this is equivalent to the following form of SELECT statement. The [Number of WECs example below](#number-of-wecs) is an example of this form.
+When there is aggregation but no plain selection and _no_ `GROUP BY`, this is equivalent to the following form of SELECT statement. The [Number of WECs example below](#number-of-wecs) is an example of this form.
 
 ```sql
 SELECT <aggregation columns>
@@ -74,9 +74,9 @@ FROM PerWEC WHERE <filter condition>
 LIMIT <limit>
 ```
 
-##### Aggregation with GROUP BY
+##### Aggregation with `GROUP BY`
 
-When there is "GROUP BY" and aggregation but no plain selection, this is equivalent to the following form of SELECT statement. The [Histogram of Pod phase example below](#histogram-of-pod-phase) is an example of this form.
+When there is `GROUP BY` and aggregation but no plain selection, this is equivalent to the following form of SELECT statement. The [Histogram of Pod phase example below](#histogram-of-pod-phase) is an example of this form.
 
 ```sql
 SELECT <group-by column names>, <aggregation columns>
@@ -89,7 +89,7 @@ GROUP BY <group-by column names>
 LIMIT <limit>
 ```
 
-When there are N "GROUP BY" columns, the result has a row for each tuple of values (v1, v2, ... vN) such that there exists a WEC for which (v1, v2, ... vN) are the values of the "GROUP BY" columns. The result has no more rows than that.
+When there are N `GROUP BY` columns, the result has a row for each tuple of values (v1, v2, ... v`N`) such that there exists a WEC for which (v1, v2, ... v`N`) are the values of the `GROUP BY` columns. The result has no more rows than that.
 
 ## Specification of the general technique
 

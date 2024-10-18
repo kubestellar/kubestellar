@@ -17,13 +17,39 @@ set -x # echo so that users can understand what is happening
 set -e # exit on error
 
 ns="ks-monitoring"
+ctx="kind-kubeflex"
 
-if [ "$1" == "--ns" ]; then
-    ns="$2"
-    shift 2
-fi
 
-helm delete -n $ns grafana --ignore-not-found
-helm delete -n $ns pyroscope --ignore-not-found
-helm delete -n $ns prometheus --ignore-not-found
-kubectl delete ns $ns  --ignore-not-found
+
+while [ $# != 0 ]; do
+    case "$1" in
+        (-h|--help) echo "$0 usage: (--cluster-context (e.g., --cluster-context core-cluster (default value: kind-kubeflex)) | --ns (e.g., --ns monitoring (default value: ks-monitoring)))*"
+                    exit;;
+        (--ns)
+          if (( $# > 1 )); then
+            ns="$2"
+            shift
+          else
+            echo "Missing ns value" >&2
+            exit 1;
+          fi;;
+        (--cluster-context)
+          if (( $# > 1 )); then
+            ctx="$2"
+            shift
+          else
+            echo "Missing cluster-context value" >&2
+            exit 1;
+          fi;;
+    esac
+    shift
+done
+
+helm --kube-context $ctx delete -n $ns grafana --ignore-not-found
+helm --kube-context $ctx delete -n $ns pyroscope --ignore-not-found
+helm --kube-context $ctx delete -n $ns prometheus --ignore-not-found
+helm --kube-context $ctx delete -n $ns minio --ignore-not-found
+helm --kube-context $ctx delete -n $ns thanos --ignore-not-found
+
+kubectl --context $ctx -n $ns delete pvc --all
+kubectl --context $ctx delete ns $ns  --ignore-not-found

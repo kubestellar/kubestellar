@@ -66,7 +66,7 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 			continue // resolution does not exist, skip
 		}
 
-		matchedAny, createOnly, matchedStatusCollectorsSet := c.testObject(ctx, objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
+		matchedAny, createOnly, matchedStatusCollectorsSet := c.testObject(ctx, bindingPolicy.GetName(), objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
 		if !matchedAny {
 			// if previously selected, remove
 			if resolutionUpdated := c.bindingPolicyResolver.RemoveObjectIdentifier(bindingPolicy.GetName(),
@@ -210,7 +210,7 @@ func (c *Controller) removeObjectFromBindingPolicies(ctx context.Context, objIde
 //   - bool: whether any test that matches the object also says CreateOnly==true
 //   - sets.Set[string]: the UNION of the statuscollector names that appear within
 //     EACH of the tests that the object matches
-func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
+func (c *Controller) testObject(ctx context.Context, bindingName string, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
 	tests []v1alpha1.DownsyncPolicyClause) (bool, bool, sets.Set[string]) {
 
 	logger := klog.FromContext(ctx)
@@ -245,7 +245,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 					objIdentifier.ObjectName.Namespace, metav1.GetOptions{})
 				if err != nil {
 					logger.V(3).Info("Object namespace not found, assuming object does not match",
-						"object identifier", objIdentifier)
+						"object identifier", objIdentifier, "binding", bindingName)
 					continue
 				}
 			}
@@ -254,7 +254,7 @@ func (c *Controller) testObject(ctx context.Context, objIdentifier util.ObjectId
 			}
 		}
 
-		klog.FromContext(ctx).V(5).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test)
+		klog.FromContext(ctx).V(5).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test, "binding", bindingName)
 		// test is a match
 		if test.StatusCollection != nil {
 			matchedStatusCollectors.Insert(test.StatusCollection.StatusCollectors...)

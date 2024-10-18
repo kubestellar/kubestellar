@@ -162,9 +162,8 @@ type StatusCollection struct {
 // - the `objectSelectors` criterion is satisfied.
 // At least one of the fields must make some discrimination;
 // it is not valid for every field to match all objects.
-// Validation might not be fully checked by apiservers until the Kubernetes dependency is release 1.25;
-// in the meantime validation error messages will appear
-// in annotations whose key is `validation-error.kubestellar.io/{number}`.
+// Validation might not be fully checked by apiservers;
+// if not prevented by the apiserver then violations will be reported in `.status.errors`.
 type DownsyncObjectTest struct {
 	// `apiGroup` is the API group of the referenced object, empty string for the core API group.
 	// `nil` matches every API group.

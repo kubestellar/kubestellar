@@ -1,0 +1,10 @@
+pyroscope:
+  config: |
+    storage:
+      backend: s3
+      s3:
+        endpoint: %ENDPOINT%
+        bucket_name: %BUCKET%
+        access_key_id: %USERNAME%
+        secret_access_key: %PASSWORD%
+        insecure: true

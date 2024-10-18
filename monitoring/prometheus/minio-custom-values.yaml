@@ -1,0 +1,29 @@
+replicas: 2
+
+persistence:
+  enabled: true
+  size: 2Gi
+
+resources:
+  requests:
+    memory: 2Gi
+
+ingress:
+  enabled: false
+
+service:
+  type: NodePort
+  port: "9000"
+  nodePort: 32000
+  
+buckets:
+  - name: thanos
+    policy: none
+    purge: false
+    versioning: true
+    objectlocking: false
+  - name: pyroscope
+    policy: none
+    purge: false
+    versioning: true
+    objectlocking: false

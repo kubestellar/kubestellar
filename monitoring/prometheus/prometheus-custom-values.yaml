@@ -8,4 +8,26 @@ prometheus:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 5Gi
+              storage: 1Gi
+    remoteWrite:
+      - url: "http://%THANOS_HOST%/api/v1/receive"
+  serviceMonitor:
+    selfMonitor: false
+
+prometheusOperator:
+  serviceMonitor:
+    selfMonitor: false
+kubeControllerManager:
+  enabled: true
+kubeControllerManager:
+  enabled: false
+coreDns:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubelet:
+  enabled: false

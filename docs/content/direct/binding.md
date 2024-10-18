@@ -41,7 +41,8 @@ in `spec.clusterSelectors`.
 The workload object selection predicate is in `spec.downsync`, which
 holds a list of `DownsyncPolicyClause`s; each includes both a workload
 object selection predicate and also two kinds of information that
-modulate the downsync.
+modulate the downsync. Note that each such clause must have at least
+one field specifying part of the workload selection predicate.
 
 For more definitional details about a `BindingPolicy`, see [the API reference](https://pkg.go.dev/github.com/kubestellar/kubestellar@v{{ config.ks_latest_release }}/api/control/v1alpha1#BindingPolicy){# readers of the unrendered sources should see [the Go source](../../../api/control/v1alpha1/types.go) instead #}.
 
