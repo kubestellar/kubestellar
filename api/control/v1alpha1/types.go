@@ -489,8 +489,24 @@ type ReturnedState struct {
 type PropagationData struct {
 	// `lastReturnedUpdateTimestamp` is the time of the last update to any
 	// of the returned object state in the core.
-	// Before the first such update, this is the zero value of `time.Time`.
+	// Before the first such update, this holds the zero value of `time.Time`.
 	LastReturnedUpdateTimestamp metav1.Time `json:"lastReturnedUpdateTimestamp"`
+
+	// `lastGeneration` is that last `ObjectMeta.Generation` from the WDS that
+	// propagated to the WEC. This is not to imply that it was successfully applied there;
+	// for that, see `lastGenerationIsApplied`.
+	// Zero means that none has yet propagated there.
+	LastGeneration int64 `json:"lastGeneration"`
+
+	// `lastGenerationIsApplied` indicates whether `lastGeneration` has been successfully
+	// applied in the WEC.
+	LastGenerationIsApplied bool `json:"lastGenerationIsApplied"`
+
+	// `lastCurrencyUpdateTime` is the time of the latest update to either
+	// `lastGeneration` or `lastGenerationIsApplied`. More precisely, it is
+	// the time when the core became informed of the update.
+	// Before the first such update, this holds the zero value of `time.Time`.
+	LastCurrencyUpdateTime metav1.Time `json:"lastCurrencyUpdateTime"`
 }
 
 // StatusCollectorStatus defines the observed state of StatusCollector.
