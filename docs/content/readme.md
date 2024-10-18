@@ -38,6 +38,10 @@ In a single-cluster setup, developers typically access the cluster and deploy Ku
 
 KubeStellar simplifies this process by allowing developers to define a binding policy between clusters and Kubernetes objects. It then uses your regular single-cluster tooling to deploy and configure each cluster based on these binding policies, making multi-cluster operations as straightforward as managing a single cluster. This approach enhances productivity and efficiency, making KubeStellar a valuable tool in a multi-cluster Kubernetes environment.
 
+## Getting Started
+
+See the [Getting Started setup guide](direct/get-started.md) for getting started with kicking the tires.
+
 ## Contributing
 
 We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](Contribution%20guidelines/CONTRIBUTING.md) guide.

@@ -21,7 +21,7 @@ Our documentation has remarks about using the following sorts of clusters:
 <!-- begin software prerequisites -->
 ## Software Prerequisites: for Using KubeStellar
 
-- **kubeflex** version 0.6.1 or higher
+- **kubeflex** version 0.6.3 or higher
     To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). To upgrade from an existing installation,
 follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex). At the end of the install make sure that the kubeflex CLI, kflex, is in your `$PATH`.
 
@@ -51,11 +51,17 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 - [**kind**](https://kind.sigs.k8s.io/)
 - **docker** (or compatible docker engine that works with kind)
 
+## Additional Software for monitoring
+
+The setup in `montoring/` additional uses the following.
+
+- [`yq`](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq))
+
 ## Additional Software For Running the Examples
 
 - [**argocd**](https://argo-cd.readthedocs.io/en/stable/getting_started/) - for the examples that use it
 
-## Additional Software For Building KubeStellar from Source
+## Additional Software For Building KubeStellar from Source and Testing
 
 - [**go**](https://go.dev/doc/install) version 1.21 or higher - to build Kubestellar
 - [**make**](https://www.gnu.org/software/make/) - to build Kubestellar and create the Kubestellar container images
@@ -67,6 +73,7 @@ To build and _**test**_ KubeStellar properly, you will also need
 
 - [**kind**](https://kind.sigs.k8s.io/)
 - [**OCP**](https://docs.openshift.com/container-platform/4.13/installing/index.html)
+- [`yq`](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq)) - for running tests
 
 <!-- start tag for check script  include -->
 

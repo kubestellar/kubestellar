@@ -18,6 +18,7 @@ on:
     branches:
       - main
       - "release-*"
+      - "doc-*"
     paths:
       - ".github/workflows/spellcheck_action.yml"
       - ".github/spellcheck/.spellcheck.yml"
@@ -26,13 +27,12 @@ on:
 
 jobs:
   build:
-    if: github.repository_owner == 'kubestellar'
     name: Spellcheck
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4.1.1
 
-    - uses: rojopolis/spellcheck-github-actions@0.41.0
+    - uses: rojopolis/spellcheck-github-actions@0.43.0
       name: Spellcheck
       with:
         config_path: .github/spellcheck/.spellcheck.yml
@@ -40,7 +40,7 @@ jobs:
 #         source_files: "docs/content/*"
         
     - uses: actions/upload-artifact@v4
-      if: always()
+      if: github.repository_owner == 'kubestellar'
       with:
         name: Spellcheck Output
         path: spellcheck-output.txt

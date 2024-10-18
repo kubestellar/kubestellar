@@ -256,7 +256,7 @@ to understand).
 At startup, the controller code sets up the dynamic informers, the event
 handler and the work queue as follows:
 
-- lists all API preferred resources (using discovery client's ServerPreferredResources()
+- lists all API preferred resources (using discovery client's `ServerPreferredResources()`
   to return only one preferred storage version for API group)
 - Filters out some resources
 - For each resource:
@@ -271,12 +271,12 @@ The reflector is started as part of the informer and watches specific
 resources on the WDS API Server; on create/update/delete object events it
 puts a copy of the object into the local cache. The informer invokes the
 event handler. The handler implements the event handling functions
-(AddFunc, UpdateFunc, DeleteFunc)
+(`AddFunc`, `UpdateFunc`, `DeleteFunc`)
 
 A typical event flow for a create/update object event will run as
 follows:
 
-1.  Informer invokes the event handler AddFunc or UpdateFunc
+1.  Informer invokes the event handler `AddFunc` or `UpdateFunc`
 
 2.  The event handler does some filtering (for example, to ignore update
     events where the object content is not modified) and then creates a
@@ -294,7 +294,7 @@ follows:
 
     -  Uses the GVR key to get the reference to the lister for the
         object
-    -  Gets the object from the lister cache using the NamespacedName of 
+    -  Gets the object from the lister cache using the `NamespacedName` of 
        the object.
     -  If the object was not found (because it was deleted) worker returns. 
        A delete event for that object consumed by the event handler enqueues 
@@ -312,25 +312,25 @@ follows:
        to false if the label exists.
     - Worker returns and is ready to pick other keys from the queue.
 
-**WantSingletonReportedState**:
+`WantSingletonReportedState`:
 currently it is the user's responsibility to make sure that a binding-policy that sets `WantSingletonReportedState` to
 true is not in conflict with other binding-policies that do the same, and that the binding-policy selects only a single
 cluster.
 
-There are other event flows, based on the object GVK and type of event. 
-Error conditions may cause the re-enqueing of keys, resulting in retries.
+There are other event flows, based on the object `GroupVersionKind` and type of event. 
+Error conditions may cause the re-enqueuing of keys, resulting in retries.
 The following sections broadly describe these flows.
 
 #### Object Deleted 
 
-When an object is deleted from the WDS, the handler’s *DeleteFunc* is
+When an object is deleted from the WDS, the handler’s `DeleteFunc` is
 invoked. A shallow copy of the object is added to a field in the key 
 before pushing it to the work queue. Then:
 
 - Worker pulls the key from the work queue
 
 - Flow continues the same way as in the create/update scenario, however
-  the deletedObject field in the key indicates that the object has been
+  the `deletedObject` field in the key indicates that the object has been
   deleted and that it needs to be removed from all clusters.
 
 - In-memory representations of affected bindings are updated to remove the object.
@@ -377,7 +377,7 @@ follows the flow below:
 - If an in memory representation of the binding is not found, the worker returns.
 - The key is used to retrieve the object from the WDS.
     - If the object is not found, then a `Binding` object should be created. For the convenience of the flow,
-      the worker sets the "retrived object" as an empty `Binding` object with the appropriate Meta fields,
+      the worker sets the "retrieved object" as an empty `Binding` object with the appropriate Meta fields,
       including the `BindingPolicy` object as the single owner reference.
 - The worker compares the in-memory representation of the binding with the retrieved object.
     - If the two are the same, the worker returns.
@@ -472,23 +472,23 @@ Relation "USES": has a row whenever the `Binding`'s list of workload objects use
 
 | column name | type | in key |
 | ----------- | ---- | ------ |
-| bindingName | string | yes |
-| gr | metav1.GroupResource | yes |
+| `bindingName` | string | yes |
+| `gr` | metav1.GroupResource | yes |
 
 Relation "INSTRUCTIONS": has a row saying what to do for each `GroupResource`.
 
 | column name | type | in key |
 | ----------- | ---- | ------ |
-| gr | metav1.GroupResource | yes |
-| removes | SET(jsonpath.Query) | no |
+| `gr` | metav1.GroupResource | yes |
+| `removes` | SET(jsonpath.Query) | no |
 
 Relation "SPECS": remembers the specs of `CustomTransform` objects.
 
 | column name | type | in key |
 | ----------- | ---- | ------ |
-| ctName | string | yes |
-| gr | metav1.GroupResource | no |
-| removes | SET(string) | no |
+| `ctName` | string | yes |
+| `gr` | metav1.GroupResource | no |
+| `removes` | SET(string) | no |
 
 The cache maintains the following invariants on those relations. Note how these invariants require removal of data that is no longer interesting.
 

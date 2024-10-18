@@ -261,12 +261,7 @@ type testTransport struct {
 	extra   []any
 }
 
-func (tt *testTransport) WrapObjects(objs []*unstructured.Unstructured) runtime.Object {
-	tt.t.Error("WrapObjects called instead of WrapObjectsHavingCreateOnly")
-	return objs[0]
-}
-
-func (tt *testTransport) WrapObjectsHavingCreateOnly(wrapees []transport.Wrapee) runtime.Object {
+func (tt *testTransport) WrapObjects(wrapees []transport.Wrapee) runtime.Object {
 	tt.Lock()
 	defer tt.Unlock()
 	tt.wrapped = true

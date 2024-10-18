@@ -11,10 +11,6 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  CONTROLLER_MANAGER_IMAGE: kubestellar/kubestellar/controller-manager
-  TRANSPORT_CONTROLLER_IMAGE: kubestellar/kubestellar/ocm-transport-controller
-  CM_CHART_PATH: ./chart
-  TC_CHART_PATH: ./ocm-transport-controller-chart
   CORE_CHART_PATH: ./core-chart
 
 jobs:
@@ -62,14 +58,8 @@ jobs:
     - name: Package and push charts
       run: |
         chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
-        make chart CONTROLLER_MANAGER_IMAGE=${{ env.REGISTRY }}/${{ env.CONTROLLER_MANAGER_IMAGE }}:${{github.ref_name}}
-        helm package ${{ env.CM_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion}
-        helm push ./controller-manager-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar
-        
+
         sed -i "s/^KUBESTELLAR_VERSION:.*$/KUBESTELLAR_VERSION: \"${chartVersion}\"/g" ${{ env.CORE_CHART_PATH }}/values.yaml
+
         helm package ${{ env.CORE_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
         helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar
-        
-        sed -i 's@OTC_IMAGE_PLACEHOLDER@${{ env.REGISTRY }}/${{ env.TRANSPORT_CONTROLLER_IMAGE }}:'"${chartVersion}"'@g' ${{ env.TC_CHART_PATH }}/templates/controller.yaml
-        helm package ${{ env.TC_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
-        helm push ./ocm-transport-controller-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar

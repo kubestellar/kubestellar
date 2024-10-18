@@ -80,7 +80,7 @@ func ApplyCRDs(ctx context.Context, controllerName string,
 		if err != nil {
 			return fmt.Errorf("unable to convert from Unstructured to CRD, name=%s: %w", crdU.GetName(), err)
 		}
-		_, err = clientsetExt.Create(ctx, desiredCRD, metav1.CreateOptions{FieldManager: controllerName})
+		_, err = clientsetExt.Create(ctx, desiredCRD, metav1.CreateOptions{FieldValidation: metav1.FieldValidationStrict, FieldManager: controllerName})
 		if err == nil {
 			logger.Info("Created CRD", "name", desiredCRD.Name)
 		} else if !errors.IsAlreadyExists(err) {

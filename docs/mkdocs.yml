@@ -14,7 +14,7 @@ edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: 'latest'
 ks_latest_regular_release: '0.24.0'
-ks_latest_release: '0.24.0'
+ks_latest_release: '0.25.0-rc.1'
 
 ks_kind_port_num: '1119'
 
@@ -63,6 +63,10 @@ nav:
           - Third-party integrations:
               - ArgoCD to WDS: direct/argo-to-wds1.md
           - Troubleshooting: direct/troubleshooting.md
+          - Known Issues:
+              - Overview: direct/known-issues.md
+              - Hidden state in kubeconfig: direct/knownissue-kflex-extension.md
+              - Kind needs OS reconfig: direct/knownissue-kind-config.md
   - Contributing: 
       - How to join in: direct/contribute.md
       - Code of Conduct: Contribution guidelines/coc.md
@@ -75,13 +79,12 @@ nav:
       - Security:
           - Policy: Contribution guidelines/security/security.md
           - Contacts: Contribution guidelines/security/security_contacts.md
-      - Contribution Notes:
-        - For Contributors: direct/contributor.md
-        - Packaging: direct/packaging.md
-        - Release Process: direct/release.md
-        - Release Testing: direct/release-testing.md
-        - Guidelines: Contribution guidelines/CONTRIBUTING.md
-        - Sign-off on Contributions: direct/pr-signoff.md
+      - Testing: direct/testing.md
+      - Packaging: direct/packaging.md
+      - Release Process: direct/release.md
+      - Release Testing: direct/release-testing.md
+      - Guidelines: Contribution guidelines/CONTRIBUTING.md
+      - Sign-off on Contributions: direct/pr-signoff.md
   - Community: 
     - Get Involved: Community/_index.md
     - Contact Us:

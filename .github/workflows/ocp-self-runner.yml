@@ -11,7 +11,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4.1.1
-      
+
       - uses: actions/setup-go@v5
         with:
           go-version: v1.21
@@ -32,14 +32,14 @@ jobs:
           mkdir clusteradm
           export INSTALL_DIR="$PWD/clusteradm"
           curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
-          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.6.1/kubeflex_0.6.1_linux_amd64.tar.gz --output kubeflex.tar.gz
+          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.6.3/kubeflex_0.6.3_linux_amd64.tar.gz --output kubeflex.tar.gz
           tar -xvf kubeflex.tar.gz bin/kflex
           go install github.com/onsi/ginkgo/v2/ginkgo
           curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
-          tar -xvf openshift-client-linux.tar.gz 
+          tar -xvf openshift-client-linux.tar.gz
           cp oc bin
           curl -L https://github.com/kubestellar/kubestellar/archive/refs/tags/v0.22.0.tar.gz --output kubestellar.tar.gz
-          tar -xvf kubestellar.tar.gz 
+          tar -xvf kubestellar.tar.gz
           mv kubestellar-0.22.0 kubestellar
 
       - name: Run test
@@ -55,15 +55,15 @@ jobs:
           bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/common/cleanup.sh) --env ocp
           source <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/common/setup-shell.sh)
           bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/common/setup-kubestellar-ocp.sh)
-          cd kubestellar/test/e2e/ginkgo 
-          KFLEX_DISABLE_CHATTY=true ginkgo -v --trace --no-color -- -released -skip-setup 
+          cd kubestellar/test/e2e/ginkgo
+          KFLEX_DISABLE_CHATTY=true ginkgo -v --trace --no-color -- -released -skip-setup
 
   bash-script-test:
-    name: bash script tests 
+    name: bash script tests
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4.1.1
-      
+
       - uses: actions/setup-go@v5
         with:
           go-version: v1.21
@@ -84,11 +84,11 @@ jobs:
           export USE_SUDO=false
           export INSTALL_DIR="$PWD/clusteradm"
           curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
-          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.6.1/kubeflex_0.6.1_linux_amd64.tar.gz --output kubeflex.tar.gz
+          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.6.3/kubeflex_0.6.3_linux_amd64.tar.gz --output kubeflex.tar.gz
           tar -xvf kubeflex.tar.gz bin/kflex
           go install github.com/onsi/ginkgo/v2/ginkgo
           curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
-          tar -xvf openshift-client-linux.tar.gz 
+          tar -xvf openshift-client-linux.tar.gz
           cp oc bin
 
       - name: Run test
@@ -103,5 +103,5 @@ jobs:
           export KFLEX_DISABLE_CHATTY=true
           bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/multi-cluster-deployment/run-test.sh) --env ocp --released
 
-          
+
 

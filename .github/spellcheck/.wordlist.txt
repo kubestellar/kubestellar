@@ -100,6 +100,7 @@ EdgeSyncConfigs
 EdgeV
 Effi
 Enqueues
+FieldManager
 FieldsType
 FieldsV
 Filepp
@@ -155,6 +156,7 @@ LinkedIn
 ListMeta
 LocalSubjectAccessReview
 LogicalCluster
+MacOS
 MBWS
 MERCHANTABILITY
 MVI
@@ -168,6 +170,7 @@ ManifestWorks
 Manroa
 Masluk
 Maximo
+MiB
 MicroShift
 MikeSpreitzer
 MinimumReplicasAvailable
@@ -222,8 +225,10 @@ Postgresql
 PriorityClass
 PriorityLevelConfiguration
 Pygments
+Pyroscope
 QEMU
 QPS
+Queryable
 QuickStart
 RandomizedLoad
 RBAC
@@ -278,6 +283,7 @@ TLF
 TMC
 TODO
 Teardown
+Thanos
 TokenReview
 Turbonomic
 TypeMeta
@@ -290,6 +296,7 @@ Upsync
 Upsynced
 Upsyncing
 VM
+VMs
 ValidatingWebhookConfiguration
 VolumeAttachment
 WDS
@@ -325,6 +332,7 @@ apiresource
 apiresourceimports
 apis
 apiserver
+apiservers
 apiwatch
 appVersion
 appliedmanifestworks
@@ -334,6 +342,7 @@ appwrappers
 argo
 argocd
 argoproj
+args
 aspirational
 autoscaling
 availableReplicas
@@ -391,11 +400,14 @@ cronSpec
 crontab
 crontabs
 crt
+cryptographic
 css
 csv
 ctName
 customizer
 darwin
+datasource
+definitional
 denature
 denatured
 denaturing
@@ -531,6 +543,7 @@ locationSelectors
 logfile
 loopback
 mailboxwatch
+manifestwork
 manifestworks
 matchLabels
 mb
@@ -595,6 +608,7 @@ proxying
 ps
 pwd
 px
+queryable
 quickstart
 rb
 rbac
@@ -606,6 +620,7 @@ realpath
 rebase
 reconciler
 redhat
+reinstallation
 renature
 renatured
 renaturing
@@ -656,6 +671,7 @@ subdirectories
 subdirectory
 subfolder
 sublicense
+subresource
 subresources
 substring
 subsubsections
@@ -681,11 +697,15 @@ testdata
 timeframe
 tls
 tmp
+tuningSet
+tuningSets
 tv
 txt
 ubi
 ubuntu
 uid
+unexpanded
+unrendered
 updatedReplicas
 upsync
 upsynced
@@ -702,6 +722,7 @@ versionPriority
 virgo
 volumeMounts
 watchall
+wds
 webhook
 webhooks
 wec

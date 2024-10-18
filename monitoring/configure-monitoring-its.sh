@@ -64,21 +64,11 @@ kubectl config use-context $ctx
 pod_name=$(kubectl -n $its-system get pods -o=jsonpath='{range .items..metadata}{.name}{"\n"}{end}' | grep addon-status-controller-*)
 pod_label=$(kubectl -n $its-system get pod $pod_name -o jsonpath='{.metadata.labels}' | jq | grep "status-controller" | tr "," " ")
 
-: 1. Adding declarations of the metrics port, so that addon-status service definition can refer to it by name
-kubectl --context $its -n open-cluster-management get deploy addon-status-controller -o yaml | yq '(del(.status) |.spec.template.spec.containers.[0].ports[0].name |= "metrics")' | yq '.spec.template.spec.containers.[0].ports[0].protocol |= "TCP"' | yq '.spec.template.spec.containers.[0].ports[0].containerPort |= 9280' | kubectl --context $its apply --namespace=open-cluster-management -f -
-
-: 2. Create addon-status controller service:
+: 1. Create addon-status controller service:
 sed "s^%STATUS_CTL_LABEL%^$pod_label^g" ${SCRIPT_DIR}/configuration/status-addon-ctl-svc.yaml | kubectl -n $its-system apply -f -
 
-: 3. Create the service monitor:
+: 2. Create the service monitor:
 sed s/%ITS%/$its/g ${SCRIPT_DIR}/configuration/status-addon-ctl-sm.yaml | kubectl -n $monitoring_ns apply -f -
-
-: --------------------------------------------------------------------
-: Configure addon-status controller pod for pyroscope scraping
-: --------------------------------------------------------------------
-kubectl --context $its -n open-cluster-management get deploy addon-status-controller -o yaml | yq '.spec.template.metadata.annotations."profiles.grafana.com/cpu.port" |= "9282" |  .spec.template.metadata.annotations."profiles.grafana.com/cpu.scrape"|= "true" | .spec.template.metadata.annotations."profiles.grafana.com/goroutine.port" |= "9282" | .spec.template.metadata.annotations."profiles.grafana.com/goroutine.scrape" |= "true" |
-.spec.template.metadata.annotations."profiles.grafana.com/memory.port" |= "9282" | .spec.template.metadata.annotations."profiles.grafana.com/memory.scrape" |= "true"' | kubectl --context $its apply --namespace=open-cluster-management -f -
-
 
 : --------------------------------------------------------------------
 : Configure ITS API server pod for prometheus scraping

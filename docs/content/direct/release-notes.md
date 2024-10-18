@@ -2,12 +2,29 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
-## 0.24.0 and its candidates and their precursors
+## 0.25.0 and its candidates
 
-The main functional change from 0.23.X is the completion of the status combination and introduction of the create-only feature. There is also further work on the organization of the website. There is also a major change in the GitHub repository structure: the kubestellar/ocm-transport-plugin repo's contents have been merged into the kubestellar/kubestellar repo (after `0.24.0-alpha.2`).
+The main advance in this release is finishing the implementation of the create-only feature. It is now available for use.
 
 ### Remaining limitations in 0.24.0
 
+* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+
+## 0.25.0-alpha.1 test releases
+
+These test the release-building functionality, which has been revised in the course of merge the controller-manager and transport-controller Helm charts into the core Helm chart.
+
+
+## 0.24.0 and its candidates and their precursors
+
+The main functional change from 0.23.X is the completion of the status combination and the partial introduction of the create-only feature (its API is there but its implementation is not --- DO NOT TRY TO USE THIS FEATURE). There is also further work on the organization of the website. There is also a major change in the GitHub repository structure: the kubestellar/ocm-transport-plugin repository's contents have been merged into the kubestellar/kubestellar repo (after `0.24.0-alpha.2`).
+
+### Remaining limitations in 0.24.0
+
+* Job objects are not properly supported.
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
 * Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
@@ -18,6 +35,7 @@ The main change from 0.23.0 is a re-organization of the website, which is still 
 
 ### Remaining limitations in 0.23.1
 
+* Job objects are not properly supported.
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
 * Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
@@ -32,6 +50,7 @@ This release also features better observability (`/metrics` and `/debug/pprof`) 
 
 ### Remaining limitations in 0.23.0 and its release candidates
 
+* Job objects are not properly supported.
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
 * Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
@@ -53,6 +72,7 @@ See [the changelogs on GitHub](https://github.com/kubestellar/kubestellar/releas
 
 ### Remaining limitations in 0.22.0 and its release candidates
 
+* Job objects are not properly supported.
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
 * Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
@@ -82,12 +102,14 @@ This release mainly updates the documentation exposed under kubestellar.io.
 
 ### Remaining limitations in 0.21.0 and its release candidates
 
+* Job objects are not properly supported.
 * Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
 * Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 
 ## 0.20.0 and its release candidates
 
+* Job objects are not properly supported.
 * Dynamic changes to WECs are not supported. Existing ManifestWorks will not be updated when new WECs are added or when labels are added/deleted on existing WECs
 * Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.

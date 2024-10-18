@@ -48,12 +48,13 @@ spec:
             cpu: 5m
             memory: 64Mi
       - name: manager
+        image: ghcr.io/kubestellar/kubestellar/controller-manager:{{.Values.KUBESTELLAR_VERSION}}
         args:
         - "--health-probe-bind-address=:8081"
         - "--metrics-bind-address=127.0.0.1:8080"
         - "--pprof-bind-address=:8082"
         - "--leader-elect"
-        - "--wds-name={{.Values.ControlPlaneName}}"
-        - "--its-name={{.Values.ITSName}}"
-        - "--api-groups={{.Values.APIGroups}}"
-        - -v={{.Values.ControllerManager.Verbosity}}
+        - --wds-name={{"{{.ControlPlaneName}}"}}
+        - --its-name={{"{{.ITSName}}"}}
+        - --api-groups={{"{{.APIGroups}}"}}
+        - -v={{.Values.verbosity.kubestellar | default .Values.verbosity.default | default 2 }}

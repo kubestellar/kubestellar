@@ -9,7 +9,7 @@ spec:
   - bearerTokenSecret:
       name: prometheus-%WDS%-secret
       key: token
-    interval: 5s
+    interval: 15s
     path: /metrics
     port: https
     scheme: https

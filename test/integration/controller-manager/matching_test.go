@@ -397,21 +397,12 @@ func TestMatching(t *testing.T) {
 
 var crdGVK = apiextensionsapi.SchemeGroupVersion.WithKind("CustomResourceDefinition")
 
-func createCRD(t *testing.T, ctx context.Context, kind, url string, serializer *k8sjson.Serializer, apiextClient apiextensionsclientset.Interface) error {
+func createCRD(t *testing.T, ctx context.Context, kind, url string, serializer *k8sjson.Serializer, apiextClient apiextensionsclientset.Interface) (*apiextensionsapi.CustomResourceDefinition, error) {
 	crdYAML, err := urlGet(url)
 	if err != nil {
 		t.Fatalf("Failed to read %s CRD from %s: %s", kind, url, err)
 	}
-	crdAny, _, err := serializer.Decode([]byte(crdYAML), &crdGVK, &apiextensionsapi.CustomResourceDefinition{})
-	if err != nil {
-		t.Fatalf("Failed to Decode %s CRD: %s", kind, err)
-	}
-	crd := crdAny.(*apiextensionsapi.CustomResourceDefinition)
-	_, err = apiextClient.ApiextensionsV1().CustomResourceDefinitions().Create(ctx, crd, metav1.CreateOptions{})
-	if err != nil {
-		t.Fatalf("Failed to create %s CRD: %s", kind, err)
-	}
-	return nil
+	return createCRDFromLiteral(t, ctx, kind, crdYAML, serializer, apiextClient)
 }
 
 type gvrnn struct {

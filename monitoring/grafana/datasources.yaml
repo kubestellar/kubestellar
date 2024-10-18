@@ -9,7 +9,11 @@ datasources:
   prometheus.yaml:
    apiVersion: 1
    datasources:
-   - name: prometheus
+   - name: thanos
      type: prometheus
      uid: prometheus-test
-     url: http://prometheus-kube-prometheus-prometheus.ks-monitoring.svc.cluster.local:9090
+     url: http://thanos-query.ks-monitoring.svc.cluster.local:9090
+     jsonData:
+       manageAlerts: false
+       prometheusType: Thanos #Cortex | Mimir | Prometheus | Thanos
+       prometheusVersion: 2.40.0

@@ -90,4 +90,6 @@ var _ = ginkgo.BeforeSuite(func(ctx context.Context) {
 	wec2 = util.CreateKubeClient(configWec2)
 
 	util.CreateNS(ctx, wds, ns)
+	ginkgo.GinkgoLogr.Info("Suite setup done")
+	time.Sleep(10 * time.Second)
 })

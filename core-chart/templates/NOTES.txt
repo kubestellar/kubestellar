@@ -1,17 +1,3 @@
-If you are using `kflex` from KubeFlex release 0.6.1 or earlier then
-you should wait for the KubeFlex control planes (of type other than
-"host") that you just made to become "ready". The following commands
-will do that.
-
-echo "Waiting for new non-host KubeFlex Control Planes to be Ready:"
-for cpname in {{- range $cp := (concat (.Values.ITSes | default list) (.Values.WDSes | default list) ) }}{{if ne $cp.type "host" }} {{ $cp.name }}{{end }}{{end }}; do
-  while [[ `kubectl get cp $cpname -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}'` != "True" ]]; do
-    echo "Waiting for \"$cpname\"..."
-    sleep 5
-  done
-  echo "\"$cpname\" is ready."
-done
-
 For your convenience you will probably want to add contexts to your
 kubeconfig named after the non-host-type control planes (WDSes and
 ITSes) that you just created (a host-type control plane is just an

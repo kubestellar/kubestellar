@@ -1,0 +1,42 @@
+existingObjstoreSecret: thanos-objstore
+
+query:
+  dnsDiscovery:
+    sidecarsService: "prometheus-operated"
+    sidecarsNamespace: "ks-monitoring"
+
+storegateway:
+  enabled: true
+  persistence:
+    enabled: false
+
+metrics:
+  enabled: false
+  serviceMonitor:
+    enabled: false
+
+compactor:
+  enabled: true
+  persistence:
+    enable: false
+  retentionResolutionRaw: 90d
+  retentionResolution5m: 180d
+  retentionResolution1h: 2y
+
+queryFrontend:
+  ingress:
+    enabled: true
+    hostname: thanos.example.com
+    ingressClassName: public
+
+receive:
+  enabled: true
+  replicaCount: 1
+  resourcesPreset: "medium"
+  ingress:
+    enabled: true
+    hostname: kubeflex-control-plane
+    ingressClassName: nginx
+  persistence:
+    enabled: true
+    size: 1Gi

@@ -73,10 +73,6 @@ then echo "$0: \$TRANSPORT_CONTROLLER_VERBOSITY must be an integer" >&2
      exit 1
 fi
 
-if [ "$use_release" = true ]
-then wds_extra="-p kubestellar --set ControllerManagerVerbosity=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY --set TransportControllerVerbosity=$TRANSPORT_CONTROLLER_VERBOSITY"
-else wds_extra=""
-fi
 
 if [[ "$KFLEX_DISABLE_CHATTY" = true ]] ; then
    disable_chatty_status="--chatty-status=false"
@@ -89,71 +85,56 @@ source "$COMMON_SRCS/setup-shell.sh"
 
 :
 : -------------------------------------------------------------------------
-: Initialize KubeFlex, creating or using an existing hosting cluster.
+: Create the KubeFlex hosting cluster, if necessary.
 :
 case "$CLUSTER_SOURCE" in
     (kind)
-        kflex init --create-kind $disable_chatty_status
+        ${SRC_DIR}/../../../scripts/create-kind-cluster-with-SSL-passthrough.sh --name kubeflex
         : Kubeflex kind cluster created.
         ;;
     (existing)
         kubectl config use-context "$HOSTING_CONTEXT"
-        kflex init $disable_chatty_status
-        : KubeFlex initialized to use existing cluster in "$HOSTING_CONTEXT" context
+        : kubectl configured to use existing cluster in "$HOSTING_CONTEXT" context
         ;;
 esac
 
 
 :
 : -------------------------------------------------------------------------
-: Install the post-create-hooks for ocm and kubstellar controller manager
+: Install the core-chart
 :
-kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/ocm.yaml
-if [ "$use_release" == true ]
-then kubectl apply -f ${SRC_DIR}/../../../config/postcreate-hooks/kubestellar.yaml
-fi
-: 'Kubestellar post-create-hook(s) applied.'
 
-:
-: -------------------------------------------------------------------------
-: 'Create an inventory & mailbox space of type vcluster running OCM (Open Cluster Management) directly in KubeFlex. Note that -p ocm runs a post-create hook on the vcluster control plane which installs OCM on it.'
-:
-kflex create its1 --type vcluster -p ocm $disable_chatty_status
-: its1 created.
-
-:
-: -------------------------------------------------------------------------
-: Create a Workload Description Space wds1 directly in KubeFlex.
-:
-kflex create wds1 $wds_extra $disable_chatty_status
-kubectl --context "$HOSTING_CONTEXT" label cp wds1 kflex.kubestellar.io/cptype=wds
-
-if [ "$use_release" != true ]; then
-  cd "${SRC_DIR}/../../.."
-  pwd
-  make ko-build-controller-manager-local
-  make install-local-chart KUBE_CONTEXT="$HOSTING_CONTEXT" "KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY"
-  cd -
-fi
-echo "wds1 created."
-
-:
-: -------------------------------------------------------------------------
-: Run OCM transport controller in a pod
-:
-if [ "$use_release" != true ]; then
-  pushd "${SRC_DIR}/../../.." ## go up to KubeStellar directory
-  OCM_TRANSPORT_PLUGIN_RELEASE=local
-  IMAGE_TAG=${OCM_TRANSPORT_PLUGIN_RELEASE} make ko-build-transport-local
-  kind load --name kubeflex docker-image ko.local/ocm-transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} # load local image to kubeflex
-  echo "running ocm transport plugin..."
-  IMAGE_PULL_POLICY=Never ./scripts/deploy-transport-controller.sh wds1 its1 ko.local/ocm-transport-controller:${OCM_TRANSPORT_PLUGIN_RELEASE} --controller-verbosity "$TRANSPORT_CONTROLLER_VERBOSITY" --context "$HOSTING_CONTEXT"
-  popd
-fi
+pushd "${SRC_DIR}/../../.."
+if [ "$use_release" = true ] ; then
+  helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
+    --version $(yq .KUBESTELLAR_VERSION core-chart/values.yaml) \
+    --kube-context $HOSTING_CONTEXT \
+    --set-json='ITSes=[{"name":"its1"}]' \
+    --set-json='WDSes=[{"name":"wds1"}]' \
+    --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
+    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
+else
+  make kind-load-image
+  helm dependency update core-chart/
+  helm upgrade --install ks-core core-chart/ \
+    --set KUBESTELLAR_VERSION=$(git rev-parse --short HEAD) \
+    --kube-context $HOSTING_CONTEXT \
+    --set-json='ITSes=[{"name":"its1"}]' \
+    --set-json='WDSes=[{"name":"wds1"}]' \
+    --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
+    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
+  fi
+popd
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
 
 echo "transport controller is running."
+
+kubectl config delete-context its1 || true
+kflex ctx its1
+kubectl config delete-context wds1 || true
+kflex ctx wds1
+kflex ctx
 
 wait-for-cmd 'kubectl --context its1 get ns customization-properties'
 

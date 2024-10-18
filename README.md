@@ -39,7 +39,7 @@ KubeStellar simplifies this process by allowing developers to define a binding p
 
 ## Website
 
-See [kubestellar.io](https://kubestellar.io).
+For usage, architecture, and other documentation, see [the website](https://kubestellar.io).
 
 ## Contributing
 

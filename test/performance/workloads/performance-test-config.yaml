@@ -5,7 +5,7 @@
 {{$K8S_CLUSTER := DefaultParam .K8S_CLUSTER true}}
 {{$OPENSHIFT_CLUSTER := DefaultParam .OPENSHIFT_CLUSTER false}}
 {{$CREATE_NS := DefaultParam .CREATE_NS true}}
-{{$tuningSet := DefaultParam .tuningSet "RandomizedLoad"}}
+{{$tuningSet := DefaultParam .tuningSet "PoissonLoad"}}
 
 
 name: load
@@ -41,6 +41,12 @@ tuningSets:
   parallelismLimitedLoad:
     parallelismLimit: 100
 
+# PoissonLoad defines a load with Poisson arrival time
+# for a given rate parameter ExpectedActionsPerSecond (λ in the Poisson model)
+# ExpectedActionsPerSecond: specifies the possion rate parameter per second
+- name: PoissonLoad
+  poissonLoad:
+    expectedActionsPerSecond: 0.5
 
 steps:
 {{if $CREATE_NS}}

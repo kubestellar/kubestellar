@@ -29,7 +29,7 @@ To execute these tests, issue the following command. This will make a local imag
 KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color
 ```
 
-To pass additional command line flags/args to the embedded usage of the [setup-kubestellar.sh script](../common/setup-kubestellar.sh), pass one additional flag to the test suite, where this outer flag's name is `kubestellar-setup-flags` and the outer flag's value is the space-separated concatenation of all the additional setup-kubestellar flags/args. Remember that test suite args/flags must be preceeded on the `ginkgo` command line by `--`. Following is an example.
+To pass additional command line flags/args to the embedded usage of the [setup-kubestellar.sh script](../common/setup-kubestellar.sh), pass one additional flag to the test suite, where this outer flag's name is `kubestellar-setup-flags` and the outer flag's value is the space-separated concatenation of all the additional setup-kubestellar flags/args. Remember that test suite args/flags must be preceded on the `ginkgo` command line by `--`. Following is an example.
 
 ```shell
 KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5" 

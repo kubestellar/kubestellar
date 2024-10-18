@@ -4,7 +4,7 @@ metadata:
   name: %ITS%-status-addon-controller
 spec:
   endpoints:
-  - interval: 5s
+  - interval: 15s
     path: /metrics
     port: metrics
     scheme: http

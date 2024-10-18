@@ -2,12 +2,13 @@
 
 This page shows one concrete example of steps 2--7 from the [full Installation and Usage outline](user-guide-intro.md#the-full-story). This example produces a simple single-host system suitable for kicking the tires, using [kind](https://kind.sigs.k8s.io/) to create three new clusters to serve as your KubeFlex hosting cluster and two WECs. This page concludes with forwarding you to one example of the remaining steps.
 
-  1. Setup
+  1. [Setup](#setup)
     1. Install software prerequisites
     1. Cleanup from previous runs
     1. Create the KubeFlex hosting cluster and Kubestellar core components
     1. Create and register two WECs.
-  1. Exercise KubeStellar
+  2. [Exercise KubeStellar](#exercise-kubestellar)
+  3. [Troubleshooting](#troubleshooting)
 
 
 
@@ -49,6 +50,7 @@ you will first want to remove any related debris. The following
 commands tear down the state established by this recipe.
 
 ```shell
+yq -i 'del(.preferences)' ${KUBECONFIG:-$HOME/.kube/config}
 kind delete cluster --name kubeflex
 kind delete cluster --name cluster1
 kind delete cluster --name cluster2
@@ -80,7 +82,13 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
     --set-json='WDSes=[{"name":"wds1"}]'
 ```
 
-That command will print some notes about how to get kubeconfig "contexts" named "its1" and "wds1" defined. Do that, because those contexts are used in the following.
+That command will print some notes about how to get kubeconfig "contexts" named "its1" and "wds1" defined. Do that, because those contexts are used in the steps that follow.
+```shell
+kubectl config delete-context its1 || true
+kflex ctx its1
+kubectl config delete-context wds1 || true
+kflex ctx wds1
+```
 
 #### Create and register two workload execution cluster(s)
 
@@ -106,3 +114,6 @@ wec2_context=$wec2_name
 label_query_both=location-group=edge
 label_query_one=name=cluster1
 ```
+## Troubleshooting
+
+In the event something goes wrong, check out the [troubleshooting page](troubleshooting.md) to see if someone else has experienced the same thing

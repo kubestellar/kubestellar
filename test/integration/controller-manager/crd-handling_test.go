@@ -74,9 +74,6 @@ func TestCRDHandling(t *testing.T) {
 	config4json := &configCopy
 	config4json.ContentType = "application/json"
 	logger.Info("REST config for JSON marshaling", "config", config4json)
-	if err != nil {
-		t.Fatalf("Failed to create KubeStellar client: %s", err)
-	}
 	apiextClient, err := apiextensionsclientset.NewForConfig(config)
 	if err != nil {
 		t.Fatalf("Failed to create apiextensions client: %s", err)

@@ -14,11 +14,11 @@ As we can see from the blog and the demo, Turbonomic talks to KubeStellar via Gi
 1. Turbo -> GitHub repository.
 2. GitHub repository -> KubeStellar.
 
-For the 1st step (Turbonomic -> GitHub repository), a controller named "[change reconciler](https://github.com/irfanurrehman/change-reconciler)" creates PRs against the GitHub repository, where the PRs contains changes to scheduling decisions.
+For the first step (Turbonomic -> GitHub repository), a controller named "[change reconciler](https://github.com/irfanurrehman/change-reconciler)" creates PRs against the GitHub repository, where the PRs contains changes to scheduling decisions.
 
 There's also [a piece of code](https://github.com/edge-experiments/turbonomic-integrations) which intercepts Turbonomic actions and creates CRs for the above change reconciler.
 
-For the 2nd step (GitHub repository-> KubeStellar), we can use Argo CD. The detailed procedure to integrate Argo CD with KubeStellar is documented [here](./argocd.md).
+For the second step (GitHub repository-> KubeStellar), we can use Argo CD. The detailed procedure to integrate Argo CD with KubeStellar is documented [here](./argocd.md).
 
 As we can see from the blog and the demo, Turbonomic collects data from edge clusters. This is made possible by installing [kubeturbo](https://github.com/turbonomic/kubeturbo) into each of the edge clusters.
 

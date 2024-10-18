@@ -19,12 +19,15 @@
 set -e
 
 # Check if required software is installed
+kubestellar_version=0.25.0-rc.1
+
 echo -e "Checking that pre-req softwares are installed..."
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.1/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
+
 
 # Run a more detailed check and store the output
-output=$(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v0.23.1/hack/check_pre_req.sh | bash -s -- -A -V kflex ocm helm kubectl docker kind
-)
+output=$(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -A -V kflex ocm helm kubectl docker kind
+
 
 # Start environment cleanup
 echo -e "\nStarting environment clean up..."
@@ -84,19 +87,11 @@ echo "Context space clean up completed"
 
 # Install KubeStellar core
 echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
-# Check if KUBESTELLAR_VERSION is already set, otherwise use default
-if [ -z "${KUBESTELLAR_VERSION}" ]; then
-    export KUBESTELLAR_VERSION=0.23.1
-    echo "Using default KubeStellar version: ${KUBESTELLAR_VERSION}"
-else
-    echo "Using provided KubeStellar version: ${KUBESTELLAR_VERSION}"
-fi
 
-# Create a kind cluster with SSL passthrough
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443
 
-# Install KubeStellar core using Helm
-helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION --set-json='ITSes=[{"name":"its1"}]' --set-json='WDSes=[{"name":"wds1"}]'
+helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $kubestellar_version --set-json='ITSes=[{"name":"its1"}]' --set-json='WDSes=[{"name":"wds1"}]'
+
 
 # Wait for non-host KubeFlex Control Planes to be ready
 echo -e "\nWaiting for new non-host KubeFlex Control Planes to be Ready:"
