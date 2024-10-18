@@ -19,6 +19,7 @@ package status
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -39,6 +40,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/binding"
 	ksclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
@@ -82,10 +84,23 @@ type Controller struct {
 	celEvaluator           *celEvaluator
 	bindingPolicyResolver  binding.BindingPolicyResolver
 	combinedStatusResolver CombinedStatusResolver
+
+	// workStatusToObject maps the namespace/name of WorkStatus to the ID of its workload object.
+	// This map has entries for WorkStatus objects that exist.
+	// This map is safe for concurrent access, but
+	// the Set values revealed by workStatusToObject.ReadInverse can not be retained outside of
+	// the funcs that are given them.
+	workStatusToObject abstract.MutableMapToComparable[cache.ObjectName, util.ObjectIdentifier]
+
+	mutex sync.RWMutex // used in workStatusToObject
 }
+
+type workloadObjectRef struct{ util.ObjectIdentifier }
 
 // bindingRef is a workqueue item that references a Binding
 type bindingRef string
+
+type workStatusON cache.ObjectName
 
 // workStatusRef is a workqueue item that references a WorkStatus
 type workStatusRef struct {
@@ -95,6 +110,10 @@ type workStatusRef struct {
 	WECName string
 	// SourceObjectIdentifier is the identifier of the source object
 	SourceObjectIdentifier util.ObjectIdentifier
+}
+
+func (wsr workStatusRef) ObjectName() cache.ObjectName {
+	return cache.ObjectName{Namespace: wsr.WECName, Name: wsr.Name}
 }
 
 // combinedStatusRef is a workqueue item that references a CombinedStatus
@@ -145,8 +164,35 @@ func NewController(logger logr.Logger,
 		workqueue:             workqueue.NewRateLimitingQueueWithConfig(ratelimiter, workqueue.RateLimitingQueueConfig{Name: ControllerName + "-" + wdsName}),
 		bindingPolicyResolver: bindingPolicyResolver,
 	}
+	controller.workStatusToObject = abstract.NewLockedMapToComparable(&controller.mutex,
+		abstract.NewPrimitiveMapToComparable[cache.ObjectName, util.ObjectIdentifier]())
+
+	broker := controller.bindingPolicyResolver.Broker()
+	klog.Infof("Registering callbacks with broker=%p=%v", broker, broker)
+	err = broker.RegisterCallbacks(binding.ResolutionCallbacks{
+		BindingPolicyChanged: func(bindingPolicyKey string) {
+			// add binding to workqueue
+			logger.V(5).Info("Enqueuing reference to Binding due to notification from BindingResolutionBroker", "name", bindingPolicyKey)
+			controller.workqueue.Add(bindingRef(bindingPolicyKey))
+		},
+		SingletonReportedStateRequestChanged: func(bindingPolicyKey string, objId util.ObjectIdentifier) {
+			logger.V(5).Info("Enqueuing reference to workload object due to change in singleton return request", "binding", bindingPolicyKey, "objId", objId)
+			controller.workqueue.Add(workloadObjectRef{objId})
+		}})
+	if err != nil {
+		return controller, err
+	}
+	logger.Info("Registered binding resolution broker callback")
 
 	return controller, nil
+}
+
+func (c *Controller) HandleWorkloadObjectEvent(gvr schema.GroupVersionResource, oldObj, obj util.MRObject, eventType binding.WorkloadEventType, wasDeletedFinalStateUnknown bool) {
+	objId := util.IdentifierForObject(obj, gvr.Resource)
+	labels := obj.GetLabels()
+	if _, hasLabel := labels[util.BindingPolicyLabelSingletonStatusKey]; hasLabel {
+		c.workqueue.Add(workloadObjectRef{objId})
+	}
 }
 
 // Start the status controller
@@ -202,13 +248,6 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 
 	c.celEvaluator = celEvaluator
 	c.combinedStatusResolver = NewCombinedStatusResolver(celEvaluator, c.listers)
-
-	c.bindingPolicyResolver.Broker().RegisterCallback(func(bindingPolicyKey string) {
-		// add binding to workqueue
-		logger.V(5).Info("Enqueuing reference to Binding due to notification from BindingResolutionBroker", "name", bindingPolicyKey)
-		c.workqueue.Add(bindingRef(bindingPolicyKey))
-	}) // this will have the broker call the callback for all existing resolutions
-	logger.Info("Registered binding resolution broker callback")
 
 	logger.Info("Starting workers", "count", workers)
 	for i := 0; i < workers; i++ {
@@ -374,20 +413,18 @@ func objNotInThisWDS(obj interface{}, thisWDS string) bool {
 	return false
 }
 
-// Event handler: enqueues the workstatus objects to be processed
+// Informer event handler: enqueues the workstatus objects to be processed
 // At this time it is very simple, more complex processing might be required here
 func (c *Controller) handleWorkStatus(ctx context.Context, eventType string, obj any) {
+	logger := klog.FromContext(ctx)
 	wsRef, err := runtimeObjectToWorkStatusRef(obj.(runtime.Object))
 	if err != nil {
 		utilruntime.HandleError(err)
 		return
 	}
-	logger := klog.FromContext(ctx)
-
-	logger.V(5).Info("Enqueuing reference to WorkStatus because of informer event",
+	logger.V(5).Info("Enqueuing reference to WorkStatus because of informer event", "eventType", eventType,
 		"sourceObjectName", wsRef.SourceObjectIdentifier.ObjectName,
-		"sourceObjectGVK", wsRef.SourceObjectIdentifier.GVK, "wecName", wsRef.WECName,
-		"eventType", eventType)
+		"sourceObjectGVK", wsRef.SourceObjectIdentifier.GVK, "wecName", wsRef.WECName)
 	c.workqueue.Add(*wsRef)
 }
 
@@ -443,6 +480,8 @@ func (c *Controller) reconcile(ctx context.Context, item any) error {
 	logger := klog.FromContext(ctx)
 
 	switch ref := item.(type) {
+	case workloadObjectRef:
+		return c.syncWorkloadObject(ctx, ref.ObjectIdentifier)
 	case workStatusRef:
 		return c.syncWorkStatus(ctx, ref)
 	case bindingRef:

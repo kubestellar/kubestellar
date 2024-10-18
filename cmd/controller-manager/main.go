@@ -24,10 +24,12 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/spf13/pflag"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -141,8 +143,10 @@ func main() {
 	setupLog.Info("Got config for ITS", "name", itsName)
 	itsRestConfig = itsClientLimits.LimitConfig(itsRestConfig)
 
-	// start the binding controller
-	bindingController, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName, allowedGroupsSet)
+	workloadEventRelay := &workloadEventRelay{}
+
+	// create the binding controller
+	bindingController, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName, allowedGroupsSet, workloadEventRelay)
 	if err != nil {
 		setupLog.Error(err, "unable to create binding controller")
 		os.Exit(1)
@@ -158,9 +162,41 @@ func main() {
 		os.Exit(1)
 	}
 
+	startBindingController := len(ctlrsToStart) == 0 || ctlrsToStart.Has(strings.ToLower(binding.ControllerName))
+	startStatusCtlr := len(ctlrsToStart) == 0 || ctlrsToStart.Has(strings.ToLower(status.ControllerName))
+	var statusController *status.Controller
+
+	if startStatusCtlr {
+		if !startBindingController {
+			setupLog.Error(nil, "Status controller does not work without binding controller")
+			os.Exit(1)
+		}
+		// check if status add-on present before starting the status controller
+		for i := 1; true; i++ {
+			if util.CheckWorkStatusPresence(itsRestConfig) {
+				break
+			}
+			if (i & (i - 1)) == 0 {
+				setupLog.Info("Not statrting status controller yet because WorkStatus is not defined in the ITS")
+			}
+			i++
+			time.Sleep(15 * time.Second)
+		}
+		setupLog.Info("Creating controller", "name", status.ControllerName)
+		statusController, err = status.NewController(logger, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName,
+			bindingController.GetBindingPolicyResolver())
+		if err != nil {
+			setupLog.Error(err, "unable to create status controller")
+			os.Exit(1)
+		}
+		workloadEventRelay.statusController = statusController
+	} else {
+		setupLog.Info("Not creating status controller")
+	}
+
 	cListers := make(chan interface{}, 1)
 
-	if len(ctlrsToStart) == 0 || ctlrsToStart.Has(strings.ToLower(binding.ControllerName)) {
+	if startBindingController {
 		setupLog.Info("Starting controller", "name", binding.ControllerName)
 		if err := bindingController.Start(ctx, workers, cListers); err != nil {
 			setupLog.Error(err, "error starting the binding controller")
@@ -168,17 +204,8 @@ func main() {
 		}
 	}
 
-	// check if status add-on present before starting the status controller
-	if util.CheckWorkStatusPresence(itsRestConfig) &&
-		(len(ctlrsToStart) == 0 || ctlrsToStart.Has(strings.ToLower(status.ControllerName))) {
+	if startStatusCtlr {
 		setupLog.Info("Starting controller", "name", status.ControllerName)
-		statusController, err := status.NewController(logger, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName,
-			bindingController.GetBindingPolicyResolver())
-		if err != nil {
-			setupLog.Error(err, "unable to create status controller")
-			os.Exit(1)
-		}
-
 		if err := statusController.Start(ctx, workers, cListers); err != nil {
 			setupLog.Error(err, "error starting the status controller")
 			os.Exit(1)
@@ -186,4 +213,14 @@ func main() {
 	}
 
 	select {}
+}
+
+type workloadEventRelay struct {
+	statusController *status.Controller
+}
+
+func (wer *workloadEventRelay) HandleWorkloadObjectEvent(gvr schema.GroupVersionResource, oldObj, obj util.MRObject, eventType binding.WorkloadEventType, wasDeletedFinalStateUnknown bool) {
+	if wer.statusController != nil {
+		wer.statusController.HandleWorkloadObjectEvent(gvr, oldObj, obj, eventType, wasDeletedFinalStateUnknown)
+	}
 }

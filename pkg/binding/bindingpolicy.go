@@ -25,7 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -250,10 +249,7 @@ func (c *Controller) handleBindingPolicyFinalizer(ctx context.Context, bindingPo
 	return nil
 }
 
-type mrObject interface {
-	metav1.Object
-	runtime.Object
-}
+type mrObject = util.MRObject
 
 func labelsMatchAny(logger logr.Logger, labelSet map[string]string, selectors []metav1.LabelSelector) bool {
 	for _, ls := range selectors {

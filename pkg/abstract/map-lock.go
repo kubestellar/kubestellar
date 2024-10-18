@@ -20,12 +20,48 @@ import (
 	"sync"
 )
 
+// MapToLockedLocker wraps a lock around a MapToLocked to create one
+// that is safe for concurrent access.
+// The outer Map does not allow a consumer of Iterate2 to
+// access the outer map.
+type MapToLockedLocker[Key, Val any] struct {
+	mutex *sync.RWMutex // never nil
+	inner MapToLocked[Key, Val]
+}
+
+var _ MapToLocked[func() int, func() bool] = &MapToLockedLocker[func() int, func() bool]{}
+
+func NewMapToLockedLocker[Key, Val any](mutex *sync.RWMutex, inner MapToLocked[Key, Val]) *MapToLockedLocker[Key, Val] {
+	if mutex == nil {
+		mutex = &sync.RWMutex{}
+	}
+	return &MapToLockedLocker[Key, Val]{mutex: mutex, inner: inner}
+}
+
+func (ml *MapToLockedLocker[Key, Val]) Length() int {
+	ml.mutex.RLock()
+	defer ml.mutex.RUnlock()
+	return ml.inner.Length()
+}
+
+func (ml *MapToLockedLocker[Key, Val]) ContGet(key Key, cont func(Val)) {
+	ml.mutex.RLock()
+	defer ml.mutex.RUnlock()
+	ml.inner.ContGet(key, cont)
+}
+
+func (ml *MapToLockedLocker[Key, Val]) Iterate2(yield func(Key, Val) error) error {
+	ml.mutex.RLock()
+	defer ml.mutex.RUnlock()
+	return ml.inner.Iterate2(yield)
+}
+
 // MapLocker wraps locking around an inner Map.
 // The outer Map does not allow a consumer of Iterate2 to
 // access the outer map.
 type MapLocker[Key, Val any] struct {
-	mutex *sync.RWMutex // never nil
-	inner Map[Key, Val]
+	MapToLockedLocker[Key, Val]
+	asMap Map[Key, Val]
 }
 
 // Assert that `*MapLocker` implements Map
@@ -38,23 +74,11 @@ func NewMapLocker[Key, Val any](mutex *sync.RWMutex, inner Map[Key, Val]) *MapLo
 	if mutex == nil {
 		mutex = &sync.RWMutex{}
 	}
-	return &MapLocker[Key, Val]{mutex: mutex, inner: inner}
-}
-
-func (ml *MapLocker[Key, Val]) Length() int {
-	ml.mutex.RLock()
-	defer ml.mutex.RUnlock()
-	return ml.inner.Length()
+	return &MapLocker[Key, Val]{MapToLockedLocker[Key, Val]{mutex: mutex, inner: inner}, inner}
 }
 
 func (ml *MapLocker[Key, Val]) Get(key Key) (Val, bool) {
 	ml.mutex.RLock()
 	defer ml.mutex.RUnlock()
-	return ml.inner.Get(key)
-}
-
-func (ml *MapLocker[Key, Val]) Iterate2(yield func(Key, Val) error) error {
-	ml.mutex.RLock()
-	defer ml.mutex.RUnlock()
-	return ml.inner.Iterate2(yield)
+	return ml.asMap.Get(key)
 }

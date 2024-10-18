@@ -49,8 +49,9 @@ func (ws *workStatus) Content() map[string]interface{} {
 
 func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) error {
 	logger := klog.FromContext(ctx)
+	wsON := ref.ObjectName()
 
-	if err := c.reconcileSingletonByWS(ctx, ref); err != nil {
+	if err := c.updateWorkStatusToObject(ctx, wsON); err != nil {
 		return err
 	}
 
@@ -130,17 +131,18 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 		return nil
 	}
 
-	if wantReturn {
-		if !haveReturn { // Ensure workload object is labeled as having returned reported state
-			err = c.handleSingletonLabel(ctx, unstrObj, objectIdentifier.GVR(), true)
-			if err != nil {
-				return err
-			}
+	if wantReturn && !haveReturn { // Ensure workload object is labeled as having returned reported state
+		err = c.handleSingletonLabel(ctx, unstrObj, objectIdentifier.GVR(), true)
+		if err != nil {
+			return err
 		}
-		if apiequality.Semantic.DeepEqual(unstrObj.Object["status"], status) {
-			logger.V(5).Info("Workload object found to already have intended status", "objectIdentifier", objectIdentifier)
-			return nil
-		}
+	}
+	if status == nil {
+		status = map[string]any{}
+	}
+	if apiequality.Semantic.DeepEqual(unstrObj.Object["status"], status) {
+		logger.V(5).Info("Workload object found to already have intended status", "objectIdentifier", objectIdentifier)
+	} else {
 		// set the status and update the object
 		unstrObj.Object["status"] = status
 
@@ -155,11 +157,12 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 			return fmt.Errorf("failed to update status of %v: %w", objectIdentifier, err)
 		}
 		logger.V(5).Info("Updated status of workload object", "objectIdentifier", objectIdentifier)
-		return nil
-	} else {
+	}
+	if haveReturn && !wantReturn {
 		// Need to remove the label alleging that the workload object has returned reported state
 		return c.handleSingletonLabel(ctx, unstrObj, objectIdentifier.GVR(), false)
 	}
+	return nil
 }
 
 func (c *Controller) handleSingletonLabel(ctx context.Context, unstructuredObj *unstructured.Unstructured,
