@@ -17,6 +17,7 @@ limitations under the License.
 package binding
 
 import (
+	"fmt"
 	"sync"
 
 	"golang.org/x/exp/slices"
@@ -25,6 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/abstract"
@@ -35,6 +37,10 @@ import (
 // destinations and modulations for a single bindingpolicy. The mutex should be read locked
 // before reading, and write locked before writing to any field.
 type bindingPolicyResolution struct {
+	// One immutable function that gets called synchronously whenever there is a change
+	// in the requiresSingletonReportedState setting for an object.
+	singletonRequestChangeConsumer func(util.ObjectIdentifier)
+
 	sync.RWMutex
 
 	// This map is mutable, but every `ObjectData` stored in it is immutable.
@@ -116,6 +122,10 @@ func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.O
 			CreateOnly:       createOnly,
 			StatusCollectors: statusCollectors,
 		}
+		if objData == nil && resolution.requiresSingletonReportedState {
+			klog.InfoS("Noting addition of object to resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
+			resolution.singletonRequestChangeConsumer(objIdentifier)
+		}
 		return true
 	}
 
@@ -134,6 +144,10 @@ func (resolution *bindingPolicyResolution) removeObjectIdentifier(objIdentifier 
 	}
 
 	delete(resolution.objectIdentifierToData, objIdentifier)
+	if resolution.requiresSingletonReportedState {
+		klog.InfoS("Noting removal of object from resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
+		resolution.singletonRequestChangeConsumer(objIdentifier)
+	}
 	return true
 }
 
@@ -257,7 +271,16 @@ func (resolution *bindingPolicyResolution) setRequestsSingletonReportedStateRetu
 	resolution.Lock()
 	defer resolution.Unlock()
 
+	if resolution.requiresSingletonReportedState == request {
+		klog.InfoS("No change in singleton rquest", "resolution", fmt.Sprintf("%p", resolution), "request", request, "numObjs", len(resolution.objectIdentifierToData))
+		return
+	}
+	klog.InfoS("Changed singleton rquest", "resolution", fmt.Sprintf("%p", resolution), "request", request, "numObjs", len(resolution.objectIdentifierToData))
 	resolution.requiresSingletonReportedState = request
+	for objId := range resolution.objectIdentifierToData {
+		klog.InfoS("Noting change in singleton rquest", "resolution", fmt.Sprintf("%p", resolution), "request", request, "objId", objId)
+		resolution.singletonRequestChangeConsumer(objId)
+	}
 }
 
 func (resolution *bindingPolicyResolution) getRequestsSingletonReportedStateReturn() bool {

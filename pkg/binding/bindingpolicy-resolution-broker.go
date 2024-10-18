@@ -17,10 +17,12 @@ limitations under the License.
 package binding
 
 import (
+	"fmt"
 	"io"
 	"sync"
 
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -30,19 +32,25 @@ import (
 // are called when a resolution is updated.
 // It also allows for the retrieval of resolutions for a given bindingPolicyKey.
 type ResolutionBroker interface {
-	// RegisterCallback adds a new callback function that will be called,
-	// on a separate goroutine, when a resolution is updated. The callback
-	// function should accept a bindingPolicyKey.
-	// There is no deduplication of callbacks.
-	RegisterCallback(func(bindingPolicyKey string))
+	// RegisterCallback adds a new tuple of callbacks.
+	RegisterCallbacks(ResolutionCallbacks) error
 
 	// GetResolution retrieves the resolution for a given bindingPolicyKey.
 	// If no resolution is associated with the given key, nil is returned.
 	GetResolution(bindingPolicyKey string) Resolution
 
-	// NotifyCallbacks calls all registered callbacks with the given bindingPolicyKey.
-	// The callbacks are called on separate goroutines.
-	NotifyCallbacks(bindingPolicyKey string)
+	// NotifyBindingPolicyCallbacks calls all registered callbacks with the given bindingPolicyKey.
+	// The callbacks are called the same goroutine as this call.
+	NotifyBindingPolicyCallbacks(bindingPolicyKey string)
+
+	// NotifySingletonRequestCallbacks calls all the registered callbacks for the
+	// given policy and workload object, in the same goroutine.
+	NotifySingletonRequestCallbacks(bindingPolicyKey string, objId util.ObjectIdentifier)
+}
+
+type ResolutionCallbacks struct {
+	BindingPolicyChanged                 func(bindingPolicyKey string)
+	SingletonReportedStateRequestChanged func(bindingPolicyKey string, objId util.ObjectIdentifier)
 }
 
 // Resolution is an internal representation of what a BindingPolicy is calling for.
@@ -92,7 +100,9 @@ func newResolutionBroker(bindingPolicyResolutionGetter func(bindingPolicyKey str
 // resolutions from a BindingPolicyResolver.
 type resolutionBroker struct {
 	sync.Mutex
-	callbacks []func(bindingPolicyKey string)
+
+	callbackses []ResolutionCallbacks
+
 	// bindingPolicyResolutionGetter is a function that retrieves the
 	// resolution for a given bindingPolicyKey. If no resolution is associated
 	// with the given key, nil is returned.
@@ -100,25 +110,21 @@ type resolutionBroker struct {
 	// long as only its methods are used.
 	bindingPolicyResolutionGetter func(bindingPolicyKey string) *bindingPolicyResolution
 
+	// allBindingPolicyResolutionKeysGetter returns the keys of all the currently existing resolutions.
 	allBindingPolicyResolutionKeysGetter func() []string
 }
 
-// RegisterCallback adds a new callback function that will be called, on a
-// separate goroutine, when a resolution is updated. The callback function
-// should accept a bindingPolicyKey.
-//
-// Upon registration, the callback is immediately called with all existing
-// resolutions.
+// RegisterCallbacks adds a new tuple of functions that will be called when
+// certain things change. The callbacks are done in the goroutine triggering them.
+// The broker should be empty at registration time.
 // There is no deduplication of callbacks.
-func (broker *resolutionBroker) RegisterCallback(callback func(bindingPolicyKey string)) {
+func (broker *resolutionBroker) RegisterCallbacks(callbacks ResolutionCallbacks) error {
 	broker.Lock()
 	defer broker.Unlock()
 
-	broker.callbacks = append(broker.callbacks, callback)
-
-	for _, bindingPolicyKey := range broker.allBindingPolicyResolutionKeysGetter() {
-		go callback(bindingPolicyKey)
-	}
+	broker.callbackses = append(broker.callbackses, callbacks)
+	klog.Infof("RegisterCallbacks(%p=%v)(%p); total is now %d", broker, broker, callbacks, len(broker.callbackses))
+	return nil
 }
 
 // GetResolution retrieves the resolution for a given bindingPolicyKey.
@@ -131,13 +137,25 @@ func (broker *resolutionBroker) GetResolution(bindingPolicyKey string) Resolutio
 	return resolution
 }
 
-// NotifyCallbacks calls all registered callbacks with the given bindingPolicyKey.
-// The callbacks are called on separate goroutines.
-func (broker *resolutionBroker) NotifyCallbacks(bindingPolicyKey string) {
+// NotifyBindingPolicyCallbacks calls all registered callbacks with the given bindingPolicyKey.
+// The callbacks are called synchronously.
+func (broker *resolutionBroker) NotifyBindingPolicyCallbacks(bindingPolicyKey string) {
 	broker.Lock()
 	defer broker.Unlock()
 
-	for _, callback := range broker.callbacks {
-		go callback(bindingPolicyKey)
+	for _, callbacks := range broker.callbackses {
+		callbacks.BindingPolicyChanged(bindingPolicyKey)
 	}
+}
+
+func (broker *resolutionBroker) NotifySingletonRequestCallbacks(bindingPolicyKey string, objId util.ObjectIdentifier) {
+	broker.Lock()
+	defer broker.Unlock()
+	klog.InfoS("Relaying singleton request callback", "broker", fmt.Sprintf("%p=%v", broker, broker), "binding", bindingPolicyKey, "objId", objId, "numCallbacks", len(broker.callbackses))
+
+	for idx, callbacks := range broker.callbackses {
+		klog.InfoS("Relaying singleton request callback", "binding", bindingPolicyKey, "objId", objId, "idx", idx, "callbacks", callbacks)
+		callbacks.SingletonReportedStateRequestChanged(bindingPolicyKey, objId)
+	}
+
 }

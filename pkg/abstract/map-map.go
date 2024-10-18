@@ -46,6 +46,13 @@ func (wrapper MapValueMapper[Key, Val, Mapped]) Get(key Key) (Mapped, bool) {
 	return wrapper.mapVal(val), true
 }
 
+func (wrapper MapValueMapper[Key, Val, Mapped]) ContGet(key Key, cont func(Mapped)) {
+	val, have := wrapper.inner.Get(key)
+	if have {
+		cont(wrapper.mapVal(val))
+	}
+}
+
 func (wrapper MapValueMapper[Key, Val, Mapped]) Iterate2(yield func(Key, Mapped) error) error {
 	return wrapper.inner.Iterate2(func(key Key, val Val) error {
 		mapped := wrapper.mapVal(val)
