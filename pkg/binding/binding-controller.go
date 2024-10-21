@@ -65,7 +65,15 @@ const (
 	defaultResyncPeriod = time.Duration(0)
 )
 
+// WorkloadEventHandler is like cache.ResourceEventHandler but more convenient.
+// WorkloadEventHandler is called based on notifications from one or more informers.
+// It has one method instead of three.
+// It has the GroupVersionResource already decoded.
+// The object has already been cast to metav1.Object and runtime.Object.
 type WorkloadEventHandler interface {
+	// HandleWorkloadObjectEvent is the method called when an informer reports an add, update, or delete.
+	// For add and update, oldObj is `nil`.
+	// `wasDeletedFinalStateUnknown` is meaningful only for delete.
 	HandleWorkloadObjectEvent(gvr schema.GroupVersionResource, oldObj, newObj util.MRObject, eventType WorkloadEventType, wasDeletedFinalStateUnknown bool)
 }
 
@@ -149,7 +157,9 @@ type bindingPolicyRef string
 // bindingRef is a workqueue item that references a Binding
 type bindingRef string
 
-// Create a new binding controller
+// Create a new binding controller.
+// This controller will call the given `workloadObsserver WorkloadEventHandler` for
+// every workload object event from any of the controller's informers.
 func NewController(parentLogger logr.Logger,
 	wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics,
 	wdsRestConfig *rest.Config, itsRestConfig *rest.Config,

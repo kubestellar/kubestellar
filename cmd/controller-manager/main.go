@@ -177,7 +177,7 @@ func main() {
 				break
 			}
 			if (i & (i - 1)) == 0 {
-				setupLog.Info("Not statrting status controller yet because WorkStatus is not defined in the ITS")
+				setupLog.Info("Not creating status controller yet because WorkStatus is not defined in the ITS")
 			}
 			i++
 			time.Sleep(15 * time.Second)
@@ -215,9 +215,13 @@ func main() {
 	select {}
 }
 
+// workloadEventRelay implements binding.WorkloadEventHandler and relays the notifications
+// to the status controller.
 type workloadEventRelay struct {
 	statusController *status.Controller
 }
+
+var _ binding.WorkloadEventHandler = &workloadEventRelay{}
 
 func (wer *workloadEventRelay) HandleWorkloadObjectEvent(gvr schema.GroupVersionResource, oldObj, obj util.MRObject, eventType binding.WorkloadEventType, wasDeletedFinalStateUnknown bool) {
 	if wer.statusController != nil {
