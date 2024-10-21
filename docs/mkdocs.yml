@@ -37,6 +37,7 @@ nav:
   - User Guide:
       - Guide Overview: direct/user-guide-intro.md
       - Getting Started: direct/get-started.md
+      - Getting Started from OCM: direct/start-from-ocm.md
       - General Setup:
           - Overview: direct/setup-overview.md
           - Setup limitations: direct/setup-limitations.md
