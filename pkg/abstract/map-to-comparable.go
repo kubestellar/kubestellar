@@ -90,15 +90,19 @@ func (imc *IndexedMapToComparable[Key, Val]) ReadInverse() MapToLocked[Val, sets
 }
 
 type LockedMapToComparable[Key, Val comparable] struct {
-	lock  *sync.RWMutex
-	inner MutableMapToComparable[Key, Val]
+	lock    *sync.RWMutex
+	inner   MutableMapToComparable[Key, Val]
+	inverse MapToLocked[Val, sets.Set[Key]]
 }
 
 func NewLockedMapToComparable[Key, Val comparable](lock *sync.RWMutex, inner MutableMapToComparable[Key, Val]) *LockedMapToComparable[Key, Val] {
 	if lock == nil {
 		lock = new(sync.RWMutex)
 	}
-	return &LockedMapToComparable[Key, Val]{lock, inner}
+	return &LockedMapToComparable[Key, Val]{
+		lock:    lock,
+		inner:   inner,
+		inverse: NewMapToLockedLocker(lock, inner.ReadInverse())}
 }
 
 var _ MutableMapToComparable[int, bool] = &LockedMapToComparable[int, bool]{}
@@ -140,5 +144,5 @@ func (lmc *LockedMapToComparable[Key, Val]) Delete(key Key) (Val, bool) {
 }
 
 func (lmc *LockedMapToComparable[Key, Val]) ReadInverse() MapToLocked[Val, sets.Set[Key]] {
-	return NewMapToLockedLocker(lmc.lock, lmc.inner.ReadInverse())
+	return lmc.inverse
 }
