@@ -21,12 +21,12 @@ import (
 	"encoding/json"
 	"fmt"
 
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
@@ -49,6 +49,11 @@ func (ws *workStatus) Content() map[string]interface{} {
 
 func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) error {
 	logger := klog.FromContext(ctx)
+	wsON := ref.ObjectName()
+
+	if err := c.updateWorkStatusToObject(ctx, wsON); err != nil {
+		return err
+	}
 
 	workStatus := &workStatus{
 		workStatusRef: ref, //readonly
@@ -79,19 +84,16 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 	return nil
 }
 
-func (c *Controller) syncSingletonWorkStatus(ctx context.Context, ref singletonWorkStatusRef) error {
-	if err := c.reconcileSingletonByWS(ctx, ref); err != nil {
-		return err
-	}
-	return c.syncWorkStatus(ctx, workStatusRef(ref))
-}
-
-func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentifier, status map[string]interface{},
-	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister], wdsDynClient dynamic.Interface) error {
+// updateObjectStatus puts returned `.status` into the given workload object
+// and updates the label indicating that this has been done, or
+// updates both to indicate that singleton status return has not been done.
+// `status == nil` indicates that singleton status return is not desired.
+func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentifier, status map[string]interface{},
+	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]) error {
 	logger := klog.FromContext(ctx)
 
 	if util.WEC2WDSExceptions.Has(objectIdentifier.GVK.GroupKind()) {
-		logger.V(4).Info("Status from WEC shouldn't have authority to overwrite status in WDS", "object", objectIdentifier)
+		logger.V(4).Info("Status from WEC shouldn't have authority to overwrite status in WDS", "objectIdentifier", objectIdentifier)
 		return nil
 	}
 
@@ -104,11 +106,11 @@ func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentif
 
 	var obj runtime.Object
 	var err error
-	if objectIdentifier.ObjectName.Namespace == "" {
-		obj, err = lister.Get(objectIdentifier.ObjectName.Name)
-	} else {
-		obj, err = lister.ByNamespace(objectIdentifier.ObjectName.Namespace).Get(objectIdentifier.ObjectName.Name)
+	var listerIfc cache.GenericNamespaceLister = lister
+	if objectIdentifier.ObjectName.Namespace != "" {
+		listerIfc = lister.ByNamespace(objectIdentifier.ObjectName.Namespace)
 	}
+	obj, err = listerIfc.Get(objectIdentifier.ObjectName.Name)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.V(4).Info("Did not update workload object because it is not in local cache, presumably because it was recently deleted", "objectIdentifier", objectIdentifier)
@@ -121,26 +123,78 @@ func updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentif
 	if !ok {
 		return fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s", util.RefToRuntimeObj(obj))
 	}
+	wantReturn := status != nil
+	_, haveReturn := unstrObj.GetLabels()[util.BindingPolicyLabelSingletonStatusKey]
 
-	// set the status and update the object
-	unstrObj.Object["status"] = status
-
-	if objectIdentifier.ObjectName.Namespace == "" {
-		_, err = wdsDynClient.Resource(gvr).UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{FieldManager: ControllerName})
-	} else {
-		_, err = wdsDynClient.Resource(gvr).Namespace(objectIdentifier.ObjectName.Namespace).UpdateStatus(ctx,
-			unstrObj, metav1.UpdateOptions{FieldManager: ControllerName})
+	if !(wantReturn || haveReturn) {
+		logger.V(5).Info("Workload object neither wants nor has returned status", "objectIdentifier", objectIdentifier)
+		return nil
 	}
-	if err != nil {
-		// if resource not found it may mean no status subresource - try to patch the status
-		if errors.IsNotFound(err) {
-			return util.PatchStatus(ctx, unstrObj, status, objectIdentifier.ObjectName.Namespace, gvr, wdsDynClient)
-			// PatchStatus returns nil if the full object is not found
+
+	if wantReturn && !haveReturn { // Ensure workload object is labeled as having returned reported state
+		err = c.handleSingletonLabel(ctx, unstrObj, objectIdentifier.GVR(), true)
+		if err != nil {
+			return err
 		}
-		return fmt.Errorf("failed to update status: %w", err)
 	}
+	if status == nil {
+		status = map[string]any{}
+	}
+	if apiequality.Semantic.DeepEqual(unstrObj.Object["status"], status) {
+		logger.V(5).Info("Workload object found to already have intended status", "objectIdentifier", objectIdentifier)
+	} else {
+		// set the status and update the object
+		unstrObj.Object["status"] = status
 
+		rscIfc := util.DynamicForResource(c.wdsDynClient, gvr, unstrObj.GetNamespace())
+		_, err = rscIfc.UpdateStatus(ctx, unstrObj, metav1.UpdateOptions{FieldManager: ControllerName})
+		if err != nil {
+			// if resource not found it may mean no status subresource - try to patch the status
+			if errors.IsNotFound(err) {
+				return util.PatchStatus(ctx, unstrObj, status, objectIdentifier.ObjectName.Namespace, gvr, c.wdsDynClient)
+				// PatchStatus returns nil if the full object is not found
+			}
+			return fmt.Errorf("failed to update status of %v: %w", objectIdentifier, err)
+		}
+		logger.V(5).Info("Updated status of workload object", "objectIdentifier", objectIdentifier)
+	}
+	if haveReturn && !wantReturn {
+		// Need to remove the label alleging that the workload object has returned reported state
+		return c.handleSingletonLabel(ctx, unstrObj, objectIdentifier.GVR(), false)
+	}
 	return nil
+}
+
+func (c *Controller) handleSingletonLabel(ctx context.Context, unstructuredObj *unstructured.Unstructured,
+	objGVR schema.GroupVersionResource, wantLabel bool) error {
+
+	labels := unstructuredObj.GetLabels() // gets a copy of the labels
+	_, foundLabel := labels[util.BindingPolicyLabelSingletonStatusKey]
+	if foundLabel == wantLabel {
+		return nil
+	}
+	message := "Added managed-by.kubestellar.io/singletonstatus label to workload object"
+	if wantLabel {
+		if labels == nil {
+			labels = map[string]string{}
+		}
+		labels[util.BindingPolicyLabelSingletonStatusKey] = "true"
+	} else {
+		message = "Removed managed-by.kubestellar.io/singletonstatus label from workload object"
+		delete(labels, util.BindingPolicyLabelSingletonStatusKey)
+	}
+	unstructuredObj = unstructuredObj.DeepCopy() // avoid mutating the original object
+	unstructuredObj.SetLabels(labels)
+	namespace := unstructuredObj.GetNamespace()
+	rscIfc := util.DynamicForResource(c.wdsDynClient, objGVR, namespace)
+	_, err := rscIfc.Update(ctx, unstructuredObj, metav1.UpdateOptions{FieldManager: ControllerName})
+	if errors.IsNotFound(err) {
+		return nil // object was deleted after getting into this function. This is not an error.
+	}
+	if err == nil {
+		klog.FromContext(ctx).V(5).Info(message, "gvr", objGVR, "namespace", namespace, "name", unstructuredObj.GetName())
+	}
+	return err
 }
 
 func runtimeObjectToWorkStatus(obj runtime.Object) (*workStatus, error) {
