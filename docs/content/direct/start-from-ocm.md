@@ -4,11 +4,14 @@ This page shows one concrete example of adding KubeStellar to an
 existing OCM system. In particular, a hub plus two managed clusters
 almost exactly as created by the OCM Quick Start.  In terms of the
 [full Installation and Usage outline of
-KubeStellar](user-guide-intro.md#the-full-story), the modified OCM Quick Start
-has already: established some, but not all, of the software
-prerequisites; acquired the ability to use a Kube cluster as KubeFlex
-hosting cluster; created an Inventory and Transport Space; created two
-Workload Execution Clusters (WECs) and registered them.
+KubeStellar](user-guide-intro.md#the-full-story), the modified OCM
+Quick Start has already: established some, but not all, of the
+software prerequisites; acquired the ability to use a Kube cluster as
+KubeFlex hosting cluster; created an Inventory and Transport Space;
+created two Workload Execution Clusters (WECs) and registered
+them. These are the boxes outlined in red in the following flowchart.
+
+![this copy of the general installation and usage flowchart](images/ocm-usage-outline.svg).
 
   1. [Setup](#setup)
     1. Install remaining software prerequisites
