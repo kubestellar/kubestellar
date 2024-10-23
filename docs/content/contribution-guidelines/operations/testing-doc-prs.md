@@ -1,6 +1,6 @@
 ### Testing a KubeStellar documentation PR
 
-If a contributor has _**not**_ created a sharable preview of a documentation PR [as documented in the documents management overview](/Contribution%20guidelines/operations/document-management/#serving-up-documents-globally-from-a-fork-of-the-repository-via-github) , here are the steps to checkout a git pull request for local testing.
+If a contributor has _**not**_ created a sharable preview of a documentation PR [as documented in the documents management overview](document-management.md#serving-up-documents-globally-from-a-fork-of-the-repository-via-github) , here are the steps to checkout a git pull request for local testing.
 
 **STEP-1: Checkout the Pull Request**
 

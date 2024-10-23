@@ -8,7 +8,7 @@ We have two web sites, as follows.
 - `https://kubestellar.io`. This is hosted by GoDaddy and administered by [Andy Anderson](mailto://andy@clubanderson.com). It contains a few redirects. The most important is that `https://kubestellar.io/` redirects to `https://docs.kubestellar.io/`.
 - `https://docs.kubestellar.io`. This is a GitHub pages website based on the `github.com/kubestellar/kubestellar/` repository.
 
-**A contributor may have their own copy of the website**, at `https://${repo_owner}.github.io/${fork_name}`, if they have set up the fork properly to render the webpages. See the section on **Serving up documents globally from a fork of the repo via GitHub**.
+**A contributor may have their own copy of the website**, at `https://${repo_owner}.github.io/${fork_name}`, if they have set up the fork properly to render the webpages. See the section below on **Serving up documents globally from a fork of the repo via GitHub**.
 
 ### GitHub pages
 
@@ -26,7 +26,49 @@ Our documentation is powered by [mike](https://github.com/jimporter/mike) and [M
 -----
 
 ## Rendering and Previewing modifications to the website
-You may preview possible changes to the website by either downloading and rendering the documents locally, or by rendering them globally from a fork on GitHub.
+You may preview possible changes to the website by either rendering them globally from a fork on GitHub, or by downloading and rendering the documents locally.
+
+
+### Serving up documents globally from a fork of the repository via GitHub
+You can also take advantage of the "Generate and Push Docs" Action via the github web interface to create an online, shareable rendering of the website.
+This is particularly useful for documentation PRs, as it allows you to share a preview of your proposed changes directly via a URL to a working website.
+To take advantage of this action, you must ensure that you have forked the repository properly, so your fork includes the gh-pages branch required for the Action to run properly:
+
+#### Creating a fork that can use the Generate and Push Docs Action
+
+ 1. Log into your GitHub account via webbrowser
+ 2. Navigate to github.com/kubestellar/kubestellar
+ 3. Select the **Forks** dropdown and click on the plus sign to create a new fork ![image](https://github.com/user-attachments/assets/c0b56897-c2c4-479f-ba16-c1edd4690946)
+ 4. In the resulting dialog select your account as the owner, pick a repository name for the fork, and _be sure to uncheck the_ **"copy the** main **branch only"** _box_ <br />
+![image](https://github.com/user-attachments/assets/c5909ddd-3bf6-44c2-9102-c07c7e1d6a05)
+
+#### If you already created a fork but only included the main branch
+You can remedy the problem by propagating the _gh-pages_ branch into your fork using _git_ commands
+ 
+#### Generating a website rendered from a branch of your fork
+1. Work on the documents in a branch of your fork of the repository, and commit the changes
+2. (If you have been working on a local copy of the files, push the changes to the fork, then log into the GitHub webpage for your fork)
+3. Switch to the Actions tab in the top menu bar of the repository page
+4. Select Generate and Push Docs from the list of Actions on the left
+5. Click on the Run Workflow button on the right ![image](https://github.com/user-attachments/assets/5d3d23be-6c8f-454e-bf2c-0c58c8894957)
+6. Select the branch you wish to render and click on the second Run Workflow Button ![image](https://github.com/user-attachments/assets/427b827d-555c-4d36-b9c8-485eda002428)
+7. If that workflow completes successfully, it will automatically call the **Pages build and deployment** workflow.
+8. You can observe the progress of the workflows on the Actions page; a green checkmark circle indicates successful completion.<br />![image](https://github.com/user-attachments/assets/b9ce40f8-b744-4b3c-bc20-a4814243e85e)
+9. After a minute or so, you should be able to preview your new version of the website at `https://${repo_owner}.github.io/${fork_name}/${branch_name}`
+
+#### Automatically generate webpages
+If you create a branch of your fork that begins with **doc-** (e.g. _doc-myversion_) the workflow will trigger automatically when you commit changes to the branch.
+
+#### Switching between versions
+Each branch of your fork will render as its own version. You can use the release dropdown inside the rendered pages to quickly switch between versions.
+
+Note: the **main** branch will render as `https://${repo_owner}.github.io/${fork_name}/main`, **NOT** as "unreleased-development" which is a special alias on the main kubestellar.io website.
+
+#### Removing outdated (draft branch) versions after rendering
+You can use `mike` to remove versions, or replace gh-pages with a copy of the shared version. 
+More details on these techniques will be added here soon.
+
+-----
 
 ### Serving up documents locally
 You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.
@@ -71,48 +113,6 @@ make serve-docs
 Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
 
 -----
-
-### Serving up documents globally from a fork of the repository via GitHub
-You can also take advantage of the "Generate and Push Docs" Action via the github web interface to create an online, shareable rendering of the website.
-This is particularly useful for documentation PRs, as it allows you to share a preview of your proposed changes directly via a URL to a working website.
-To take advantage of this action, you must ensure that you have forked the repository properly, so your fork includes the gh-pages branch required for the Action to run properly:
-
-#### Creating a fork that can use the Generate and Push Docs Action
-
- 1. Log into your GitHub account via webbrowser
- 2. Navigate to github.com/kubestellar/kubestellar
- 3. Select the **Forks** dropdown and click on the plus sign to create a new fork ![image](https://github.com/user-attachments/assets/c0b56897-c2c4-479f-ba16-c1edd4690946)
- 4. In the resulting dialog select your account as the owner, pick a repository name for the fork, and _be sure to uncheck the_ **"copy the** main **branch only"** _box_ <br />
-![image](https://github.com/user-attachments/assets/c5909ddd-3bf6-44c2-9102-c07c7e1d6a05)
-
-#### If you already created a fork but only included the main branch
-You can remedy the problem by propagating the _gh-pages_ branch into your fork using _git_ commands
- 
-#### Generating a website rendered from a branch of your fork
-1. Work on the documents in a branch of your fork of the repository, and commit the changes
-2. (If you have been working on a local copy of the files, push the changes to the fork, then log into the GitHub webpage for your fork)
-3. Switch to the Actions tab in the top menu bar of the repository page
-4. Select Generate and Push Docs from the list of Actions on the left
-5. Click on the Run Workflow button on the right ![image](https://github.com/user-attachments/assets/5d3d23be-6c8f-454e-bf2c-0c58c8894957)
-6. Select the branch you wish to render and click on the second Run Workflow Button ![image](https://github.com/user-attachments/assets/427b827d-555c-4d36-b9c8-485eda002428)
-7. If that workflow completes successfully, it will automatically call the **Pages build and deployment** workflow.
-8. You can observe the progress of the workflows on the Actions page; a green checkmark circle indicates successful completion.<br />![image](https://github.com/user-attachments/assets/b9ce40f8-b744-4b3c-bc20-a4814243e85e)
-9. After a minute or so, you should be able to preview your new version of the website at `https://${repo_owner}.github.io/${fork_name}/${branch_name}`
-
-#### Automatically generate webpages
-If you create a branch of your fork that begins with **doc-** (e.g. _doc-myversion_) the workflow will trigger automatically when you commit changes to the branch.
-
-#### Switching between versions
-Each branch of your fork will render as its own version. You can use the release dropdown inside the rendered pages to quickly switch between versions.
-
-Note: the **main** branch will render as `https://${repo_owner}.github.io/${fork_name}/main`, **NOT** as "unreleased-development" which is a special alias on the main kubestellar.io website.
-
-#### Removing outdated (draft branch) versions after rendering
-You can use `mike` to remove versions, or replace gh-pages with a copy of the shared version. 
-More details on these techniques will be added here soon.
-
------
-
 
 ## Supported aliases for our documentation
 
