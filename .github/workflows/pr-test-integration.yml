@@ -30,6 +30,8 @@ jobs:
         id: install
 
       - uses: ko-build/setup-ko@v0.7
+        with:
+          version: v0.16.0
 
       - name: Install dependencies
         run: |
