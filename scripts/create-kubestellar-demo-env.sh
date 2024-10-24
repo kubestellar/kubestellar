@@ -17,16 +17,27 @@
 
 set -e
 
-kubestellar_version=0.25.0-rc.1
+export kubestellar_version=0.25.0-rc.1
+echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
 curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
 
-output=$(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -A -V kflex ocm helm kubectl docker kind
-)
+output=$(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -A -V kflex ocm helm kubectl docker kind)
 
-echo -e "\nStarting environment clean up..."
-echo -e "Starting cluster clean up..."
+##########################################
+function wait-for-cmd() (
+    cmd="$@"
+    wait_counter=0
+    while ! (eval "$cmd") ; do
+        if (($wait_counter > 100)); then
+            echo "Failed to ${cmd}."
+            exit 1
+        fi
+        ((wait_counter += 1))
+        sleep 5
+    done
+)
 
 cluster_clean_up() {
     error_message=$(eval "$1" 2>&1)
@@ -35,13 +46,6 @@ cluster_clean_up() {
         echo "$error_message"
     fi
 }
-
-cluster_clean_up "kind delete cluster --name kubeflex"
-cluster_clean_up "kind delete cluster --name cluster1"
-cluster_clean_up "kind delete cluster --name cluster2"
-echo -e "Cluster space clean up has been completed"
-
-echo -e "\nStarting context clean up..."
 
 context_clean_up() {
     output=$(kubectl config get-contexts -o name)
@@ -72,45 +76,6 @@ context_clean_up() {
     done <<< "$output"
 }
 
-context_clean_up
-echo "Context space clean up completed"
-
-echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
-
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443
-
-helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $kubestellar_version --set-json='ITSes=[{"name":"its1"}]' --set-json='WDSes=[{"name":"wds1"}]'
-
-echo -e "\nWaiting for new non-host KubeFlex Control Planes to be Ready:"
-for cpname in its1 wds1; do
-  while [[ `kubectl get cp $cpname -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}'` != "True" ]]; do
-    echo "Waiting for \"$cpname\"..."
-    sleep 5
-  done
-  echo "\"$cpname\" is ready."
-done
-
-kubectl config delete-context its1 || true
-kflex ctx its1
-kubectl config delete-context wds1 || true
-kflex ctx wds1
-kflex ctx
-
-echo -e "\nCreating cluster and context for cluster 1 and 2..."
-
-# this demo environment will make sure of kind cluster and not Openshift cluster
-# : set flags to "" if you have installed KubeStellar on an OpenShift cluster
-
-flags="--force-internal-endpoint-lookup"
-clusters=(cluster1 cluster2);
-for cluster in "${clusters[@]}"; do
-   kind create cluster --name ${cluster}
-   kubectl config rename-context kind-${cluster} ${cluster}
-   clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${flags}'"}' | sh
-done
-
-echo -e "Checking that the CSR for cluster 1 and 2 appears..."
-
 checking_cluster() {
     found=false
     
@@ -139,9 +104,59 @@ checking_cluster() {
 
     done
 }
+##########################################
+
+echo -e "\nStarting environment clean up..."
+echo -e "Starting cluster clean up..."
+
+cluster_clean_up "kind delete cluster --name kubeflex"
+cluster_clean_up "kind delete cluster --name cluster1"
+cluster_clean_up "kind delete cluster --name cluster2"
+echo -e "Cluster space clean up has been completed"
+
+echo -e "\nStarting context clean up..."
+
+context_clean_up
+echo "Context space clean up completed"
+
+echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
+
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443
+
+helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
+    --version $KUBESTELLAR_VERSION \
+    --set-json='ITSes=[{"name":"its1"}]' \
+    --set-json='WDSes=[{"name":"wds1"}]' \
+    --set-json='verbosity.default=5'
+
+kubectl config delete-context its1 || true
+kflex ctx its1
+kubectl config delete-context wds1 || true
+kflex ctx wds1
+
+# switch back to its1 context to crete 2 remote clusters, add OCM agents to them, and register them back to the KubeStellar core
+kflex ctx its1
+
+echo -e "\nWaiting for OCM cluster manager to be ready..."
+
+wait-for-cmd "[[ \$(kubectl --context its1 get deployments.apps -n open-cluster-management -o jsonpath='{.status.readyReplicas}' cluster-manager 2>/dev/null) -ge 1 ]]"
+echo -e "OCM cluster manager is ready"
+
+echo -e "\nCreating cluster and context for cluster 1 and 2..."
+
+: set flags to "" if you have installed KubeStellar on an OpenShift cluster
+flags="--force-internal-endpoint-lookup"
+clusters=(cluster1 cluster2);
+for cluster in "${clusters[@]}"; do
+   kind create cluster --name ${cluster}
+   kubectl config rename-context kind-${cluster} ${cluster}
+   clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${flags}'"}' | sh
+done
+
+echo -e "Checking that the CSR for cluster 1 and 2 appears..."
 
 echo""
-echo "Approving CSR for cluster1 and cluster2..."
+echo "Waiting for cluster1 and cluster2 to be ready and then approve their CSRs"
 checking_cluster cluster1
 checking_cluster cluster2
 
@@ -150,3 +165,4 @@ echo "Checking the new clusters are in the OCM inventory and label them"
 kubectl --context its1 get managedclusters
 kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
 kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
+
