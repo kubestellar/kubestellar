@@ -19,53 +19,76 @@ package status
 import (
 	"context"
 
-	"k8s.io/apimachinery/pkg/labels"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-func (c *Controller) reconcileSingletonByBdg(ctx context.Context, bdgName string) error {
+func (c *Controller) updateWorkStatusToObject(ctx context.Context, workStatusON cache.ObjectName) error {
 	logger := klog.FromContext(ctx)
-	logger.V(4).Info("Reconciling singleton status due to binding change", "binding", bdgName)
-
-	statusPerObj := c.bindingPolicyResolver.GetSingletonReportedStateRequestsForBinding(bdgName)
-	for _, status := range statusPerObj {
-		wObjID, r, n := status.ObjectId, status.WantSingletonReportedState, status.NumWECs
-		if !r || n != 1 {
-			if err := c.reconcileSingletonWObj(ctx, wObjID, false); err != nil {
-				return err
-			}
-			logger.V(4).Info("Cleaned singleton status for workload object",
-				"gvk", wObjID.GVK, "objectName", wObjID.ObjectName,
-				"requested", r, "nWECs", n)
+	logger.V(4).Info("Reconciling singleton status due to workstatus changes", "workStatus", workStatusON)
+	wsObj, err := c.workStatusLister.ByNamespace(workStatusON.Namespace).Get(workStatusON.Name)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			wsObj = nil
 		} else {
-			if err := c.reconcileSingletonWObj(ctx, wObjID, true); err != nil {
-				return err
-			}
-			logger.V(4).Info("Updated singleton status for workload object",
-				"gvk", wObjID.GVK, "objectName", wObjID.ObjectName)
+			return err
+		}
+	}
+	if wsObj == nil {
+		objId, had := c.workStatusToObject.Delete(workStatusON)
+		if had {
+			logger.V(5).Info("Enqueuing workload object due to absense of WorkStatus", "workStatus", workStatusON, "workloadObject", objId)
+			c.workqueue.Add(workloadObjectRef{objId})
+		}
+	} else {
+		source, err := util.GetWorkStatusSourceRef(wsObj)
+		if err != nil {
+			return err
+		}
+		objId := util.ObjectIdentifierFromSourceRef(source)
+		formerSource, had := c.workStatusToObject.Put(workStatusON, objId)
+		logger.V(5).Info("Enqueuing workload object due to existence of WorkStatus", "workStatus", workStatusON, "workloadObject", objId)
+		c.workqueue.Add(workloadObjectRef{objId})
+		if had {
+			logger.V(5).Info("Enqueuing workload object due to change in WorkStatus", "workStatus", workStatusON, "workloadObject", formerSource)
+			c.workqueue.Add(workloadObjectRef{formerSource})
 		}
 	}
 	return nil
 }
 
-func (c *Controller) reconcileSingletonByWS(ctx context.Context, ref singletonWorkStatusRef) error {
+func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
-	logger.V(4).Info("Reconciling singleton status due to workstatus changes", "name", string(ref.Name))
-
-	wObjID := ref.SourceObjectIdentifier
 	requested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
-	if !requested || nWECs != 1 {
-		if err := c.reconcileSingletonWObj(ctx, wObjID, false); err != nil {
+	var wsONs [2]cache.ObjectName
+	var numWS int
+	if requested && nWECs == 1 {
+		c.workStatusToObject.ReadInverse().ContGet(wObjID, func(wsONSet sets.Set[cache.ObjectName]) {
+			numWS = wsONSet.Len()
+			var idx int
+			for it := range wsONSet {
+				wsONs[idx] = it
+				idx++
+				if idx > 1 {
+					break
+				}
+			}
+		})
+	}
+	if !requested || nWECs != 1 || numWS != 1 {
+		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
 			return err
 		}
 		logger.V(4).Info("Cleaned singleton status for workload object",
-			"gvk", ref.SourceObjectIdentifier.GVK, "objectName", ref.SourceObjectIdentifier.ObjectName,
-			"requested", requested, "nWECs", nWECs)
+			"object", wObjID, "requested", requested, "nWECs", nWECs, "numWS", numWS)
 		return nil
 	}
-	wsObj, err := c.workStatusLister.ByNamespace(ref.WECName).Get(ref.Name)
+	wsON := wsONs[0]
+	wsObj, err := c.workStatusLister.ByNamespace(wsON.Namespace).Get(wsON.Name)
 	if err != nil {
 		return err
 	}
@@ -76,41 +99,9 @@ func (c *Controller) reconcileSingletonByWS(ctx context.Context, ref singletonWo
 	if status == nil {
 		return nil
 	}
-	if err := updateObjectStatus(ctx, wObjID, status, c.listers, c.wdsDynClient); err != nil {
+	if err := c.updateObjectStatus(ctx, wObjID, status, c.listers); err != nil {
 		return err
 	}
-	logger.V(4).Info("Updated singleton status for workload object",
-		"gvk", ref.SourceObjectIdentifier.GVK, "objectName", ref.SourceObjectIdentifier.ObjectName)
-	return nil
-}
-
-func (c *Controller) reconcileSingletonWObj(ctx context.Context, wObjID util.ObjectIdentifier, sync bool) error {
-	logger := klog.FromContext(ctx)
-	logger.V(4).Info("Reconciling workload object for singleton status", "gvk", wObjID.GVK, "objectName", wObjID.ObjectName, "sync", sync)
-
-	if !sync {
-		emptyStatus := make(map[string]interface{})
-		return updateObjectStatus(ctx, wObjID, emptyStatus, c.listers, c.wdsDynClient)
-	}
-
-	list, _ := c.workStatusLister.ByNamespace("").List(labels.Everything())
-	for _, obj := range list {
-		wsRef, err := runtimeObjectToWorkStatusRef(obj)
-		if err != nil {
-			return err
-		}
-		sourceObjID := wsRef.SourceObjectIdentifier
-		if sourceObjID != wObjID {
-			continue
-		}
-		status, err := util.GetWorkStatusStatus(obj)
-		if err != nil {
-			return err
-		}
-		if status == nil {
-			return nil
-		}
-		return updateObjectStatus(ctx, wsRef.SourceObjectIdentifier, status, c.listers, c.wdsDynClient)
-	}
+	logger.V(4).Info("Updated singleton status for workload object", "objId", wObjID, "workStatus", wsON)
 	return nil
 }

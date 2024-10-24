@@ -148,7 +148,7 @@ func TestMatching(t *testing.T) {
 	createCRD(t, ctx, "ManagedCluster", managedClusterCRDURL, serializer, apiextClient)
 	createCRD(t, ctx, "ManifestWork", manifestWorkCRDURL, serializer, apiextClient)
 	time.Sleep(5 * time.Second)
-	ctlr, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, config4json, config, "test-wds", nil)
+	ctlr, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, config4json, config, "test-wds", nil, testWorkloadObserver{})
 	if err != nil {
 		t.Fatalf("Failed to create controller: %s", err)
 	}

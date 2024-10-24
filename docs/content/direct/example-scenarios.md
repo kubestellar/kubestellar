@@ -96,7 +96,7 @@ EOF
 ```
 
 Verify that *manifestworks* wrapping the objects have been created in the mailbox
-namespaces:
+namespaces with the following command. Expect to see a `ManifestWork` object named "nginx-bpolicy-wds1" in each namespace.
 
 ```shell
 kubectl --context "$its_context" get manifestworks -n "$wec1_name"

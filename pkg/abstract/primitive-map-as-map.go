@@ -16,11 +16,11 @@ limitations under the License.
 
 package abstract
 
-// PrimitiveMap is a Map implemented by a Go primitve map.
+// PrimitiveMap is a MutableMap implemented by a Go primitve map.
 type PrimitiveMap[Key comparable, Val any] map[Key]Val
 
-// Assert that PrimitiveMap implements Map
-var _ Map[int, func()] = PrimitiveMap[int, func()]{}
+// Assert that PrimitiveMap implements MutableMap
+var _ MutableMap[int, func()] = PrimitiveMap[int, func()]{}
 
 // AsPrimitiveMap makes a primitive map look like a PrimitiveMap.
 func AsPrimitiveMap[Key comparable, Val any](pm map[Key]Val) PrimitiveMap[Key, Val] {
@@ -34,6 +34,13 @@ func (pm PrimitiveMap[Key, Val]) Get(key Key) (Val, bool) {
 	return val, have
 }
 
+func (pm PrimitiveMap[Key, Val]) ContGet(key Key, cont func(Val)) {
+	val, have := pm[key]
+	if have {
+		cont(val)
+	}
+}
+
 func (pm PrimitiveMap[Key, Val]) Iterate2(yield func(Key, Val) error) error {
 	for key, val := range pm {
 		err := yield(key, val)
@@ -42,4 +49,16 @@ func (pm PrimitiveMap[Key, Val]) Iterate2(yield func(Key, Val) error) error {
 		}
 	}
 	return nil
+}
+
+func (pm PrimitiveMap[Key, Val]) Put(key Key, val Val) (Val, bool) {
+	old, had := pm[key]
+	pm[key] = val
+	return old, had
+}
+
+func (pm PrimitiveMap[Key, Val]) Delete(key Key) (Val, bool) {
+	old, had := pm[key]
+	delete(pm, key)
+	return old, had
 }
