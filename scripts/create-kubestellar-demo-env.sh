@@ -121,7 +121,31 @@ echo "Context space clean up completed"
 
 echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
 
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443
+clusters=(cluster1 cluster2)
+
+for cluster in "${clusters[@]}"; do
+   (
+     echo -e "Creating cluster ${cluster}..."
+     kind create cluster --name "${cluster}" >/dev/null 2>&1 &&
+     kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1
+     echo -e "${cluster} creation and context setup complete"
+   ) &
+done
+
+wait 
+
+echo -e "Creating KubeFlex cluster with SSL Passthrough"
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443 
+# >/dev/null 2>&1
+
+echo -e "Completed KubeFlex cluster with SSL Passthrough"
+
+(docker pull ghcr.io/loft-sh/vcluster:0.16.4 && kind load docker-image ghcr.io/loft-sh/vcluster:0.16.4 --name kubeflex) & 
+(docker pull rancher/k3s:v1.27.2-k3s1 && kind load docker-image rancher/k3s:v1.27.2-k3s1 --name kubeflex) &
+(docker pull quay.io/open-cluster-management/registration-operator:v0.13.2 && kind load docker-image quay.io/open-cluster-management/registration-operator:v0.13.2 --name kubeflex) & 
+
+# curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443
+
 
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
     --version $KUBESTELLAR_VERSION \
@@ -148,8 +172,8 @@ echo -e "\nCreating cluster and context for cluster 1 and 2..."
 flags="--force-internal-endpoint-lookup"
 clusters=(cluster1 cluster2);
 for cluster in "${clusters[@]}"; do
-   kind create cluster --name ${cluster}
-   kubectl config rename-context kind-${cluster} ${cluster}
+#    kind create cluster --name ${cluster}
+#    kubectl config rename-context kind-${cluster} ${cluster}
    clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${flags}'"}' | sh
 done
 
