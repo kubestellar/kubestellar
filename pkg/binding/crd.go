@@ -164,16 +164,24 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 		// add the event handler functions (same as those used by the startup logic)
 		informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				c.handleObject(obj, toStart.resource.Name, "add")
+				var oldObj *unstructured.Unstructured
+				c.handleObject(oldObj, obj, toStart.resource.Name, WorkloadAdd, false)
 			},
 			UpdateFunc: func(old, new interface{}) {
 				if shouldSkipUpdate(old, new) {
 					return
 				}
-				c.handleObject(new, toStart.resource.Name, "update")
+				c.handleObject(old, new, toStart.resource.Name, WorkloadUpdate, false)
 			},
 			DeleteFunc: func(obj interface{}) {
-				c.handleObject(obj, toStart.resource.Name, "delete")
+				var oldObj *unstructured.Unstructured
+				wasDeletedFinalStateUnknown := false
+				switch typed := obj.(type) {
+				case cache.DeletedFinalStateUnknown:
+					obj = typed.Obj
+					wasDeletedFinalStateUnknown = true
+				}
+				c.handleObject(oldObj, obj, toStart.resource.Name, WorkloadDelete, wasDeletedFinalStateUnknown)
 			},
 		})
 		c.informers.Set(gvr, informer)

@@ -10,7 +10,7 @@ KUBECTL_VERSION: "1.31.0"
 KUBESTELLAR_VERSION: "0.25.0-rc.1"
 # TRANSPORT_VERSION: e.g., "0.24.0"; defaults to KUBESTELLAR_VERSION value, if not defined
 CLUSTERADM_VERSION: "0.8.2"
-OCM_STATUS_ADDON_VERSION: "0.2.0-rc12"
+OCM_STATUS_ADDON_VERSION: "0.2.0-rc13"
 
 
 # Control controller log verbosity

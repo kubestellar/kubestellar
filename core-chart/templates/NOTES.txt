@@ -7,7 +7,10 @@ current one. See
 https://github.com/kubestellar/kubestellar/blob/main/docs/content/direct/core-chart.md#kubeconfig-files-and-contexts-for-control-planes
 (replace "main" with "\{\{ .Values.KUBESTELLAR_VERSION \}\}" when
 making the next release) for a way to do this without using `kflex`.
+Start by setting your current kubeconfig context to the one you used
+when installing this chart.
 
+kubectl config use-context $the_one_where_you_installed_this_chart
 {{range $cp := (concat (.Values.ITSes | default list) (.Values.WDSes | default list) ) }}
 {{- if ne $cp.type "host" }}
 kubectl config delete-context {{ $cp.name }} || true

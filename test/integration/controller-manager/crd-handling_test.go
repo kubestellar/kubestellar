@@ -35,6 +35,7 @@ import (
 
 	"github.com/kubestellar/kubestellar/pkg/binding"
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
+	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 // An integration test for the binding controller.
@@ -87,7 +88,7 @@ func TestCRDHandling(t *testing.T) {
 	createCRD(t, ctx, "ManagedCluster", managedClusterCRDURL, serializer, apiextClient)
 	createCRD(t, ctx, "ManifestWork", manifestWorkCRDURL, serializer, apiextClient)
 	time.Sleep(5 * time.Second)
-	ctlr, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, config4json, config, "test-wds", nil)
+	ctlr, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, config4json, config, "test-wds", nil, testWorkloadObserver{})
 	if err != nil {
 		t.Fatalf("Failed to create controller: %s", err)
 	}
@@ -196,6 +197,11 @@ func TestCRDHandling(t *testing.T) {
 	}
 
 	logger.Info("Success")
+}
+
+type testWorkloadObserver struct{}
+
+func (two testWorkloadObserver) HandleWorkloadObjectEvent(gvr schema.GroupVersionResource, oldObj, obj util.MRObject, eventType binding.WorkloadEventType, wasDeletedFinalStateUnknown bool) {
 }
 
 func createCRDFromLiteral(t *testing.T, ctx context.Context, kind, literal string, serializer *k8sjson.Serializer,

@@ -23,6 +23,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -390,7 +391,7 @@ func (resolver *bindingPolicyResolver) DeleteResolution(bindingPolicyKey string)
 	defer resolver.Unlock()
 
 	delete(resolver.bindingPolicyToResolution, bindingPolicyKey)
-	resolver.broker.NotifyCallbacks(bindingPolicyKey)
+	resolver.broker.NotifyBindingPolicyCallbacks(bindingPolicyKey)
 }
 
 // Broker returns a ResolutionBroker for the resolver.
@@ -435,11 +436,15 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 	ownerReference.BlockOwnerDeletion = &[]bool{false}[0]
 
 	bindingPolicyResolution := &bindingPolicyResolution{
+		singletonRequestChangeConsumer: func(objId util.ObjectIdentifier) {
+			resolver.broker.NotifySingletonRequestCallbacks(bindingpolicy.Name, objId)
+		},
 		objectIdentifierToData:         make(map[util.ObjectIdentifier]*ObjectData),
 		destinations:                   sets.New[string](),
 		ownerReference:                 ownerReference,
 		requiresSingletonReportedState: bindingpolicy.Spec.WantSingletonReportedState,
 	}
+	klog.InfoS("Created bindingPolicyResolution", "binding", bindingpolicy.Name, "resolution", fmt.Sprintf("%p", bindingPolicyResolution))
 	resolver.bindingPolicyToResolution[bindingpolicy.GetName()] = bindingPolicyResolution
 
 	return bindingPolicyResolution

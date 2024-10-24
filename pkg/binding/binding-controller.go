@@ -34,6 +34,7 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -62,6 +63,26 @@ import (
 const (
 	ControllerName      = "Binding"
 	defaultResyncPeriod = time.Duration(0)
+)
+
+// WorkloadEventHandler is like cache.ResourceEventHandler but more convenient.
+// WorkloadEventHandler is called based on notifications from one or more informers.
+// It has one method instead of three.
+// It has the GroupVersionResource already decoded.
+// The object has already been cast to metav1.Object and runtime.Object.
+type WorkloadEventHandler interface {
+	// HandleWorkloadObjectEvent is the method called when an informer reports an add, update, or delete.
+	// For add and update, oldObj is `nil`.
+	// `wasDeletedFinalStateUnknown` is meaningful only for delete.
+	HandleWorkloadObjectEvent(gvr schema.GroupVersionResource, oldObj, newObj util.MRObject, eventType WorkloadEventType, wasDeletedFinalStateUnknown bool)
+}
+
+type WorkloadEventType string
+
+const (
+	WorkloadAdd    WorkloadEventType = "add"
+	WorkloadUpdate WorkloadEventType = "update"
+	WorkloadDelete WorkloadEventType = "delete"
 )
 
 // Resource groups to exclude for watchers as they should not be delivered to other clusters
@@ -109,6 +130,7 @@ type Controller struct {
 	clusterInformer             cache.SharedIndexInformer // used for ManagedCluster in ITS
 	clusterLister               clusterlisters.ManagedClusterLister
 	dynamicClient               dynamic.Interface // used for workload
+	workloadObserver            WorkloadEventHandler
 
 	discoveryClient discovery.DiscoveryInterface                                                   // for WDS
 	namespaceClient ksmetrics.ClientModNamespace[*k8scoreapi.Namespace, *k8scoreapi.NamespaceList] // for WDS
@@ -135,11 +157,14 @@ type bindingPolicyRef string
 // bindingRef is a workqueue item that references a Binding
 type bindingRef string
 
-// Create a new binding controller
+// Create a new binding controller.
+// This controller will call the given `workloadObsserver WorkloadEventHandler` for
+// every workload object event from any of the controller's informers.
 func NewController(parentLogger logr.Logger,
 	wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics,
 	wdsRestConfig *rest.Config, itsRestConfig *rest.Config,
-	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
+	wdsName string, allowedGroupsSet sets.Set[string],
+	workloadObsserver WorkloadEventHandler) (*Controller, error) {
 	logger := parentLogger.WithName(ControllerName)
 
 	kubernetesClient, err := kubernetes.NewForConfig(wdsRestConfig)
@@ -193,7 +218,11 @@ func NewController(parentLogger logr.Logger,
 	}
 	clusterInformerFactory := clusterpkginformers.NewSharedInformerFactory(clusterClient, defaultResyncPeriod)
 
-	return makeController(logger, wdsClientMetrics, itsClientMetrics, ksClient.ControlV1alpha1(), ksInformerFactory.Start, ksInformerFactory.Control().V1alpha1(), dynamicClient, kubernetesClient, extClient, clusterClient, clusterInformerFactory.Start, clusterInformerFactory.Cluster().V1().ManagedClusters(), apiResourceLists, wdsName, allowedGroupsSet)
+	return makeController(logger, wdsClientMetrics, itsClientMetrics,
+		ksClient.ControlV1alpha1(), ksInformerFactory.Start, ksInformerFactory.Control().V1alpha1(),
+		dynamicClient, kubernetesClient, extClient, clusterClient,
+		clusterInformerFactory.Start, clusterInformerFactory.Cluster().V1().ManagedClusters(),
+		apiResourceLists, wdsName, allowedGroupsSet, workloadObsserver)
 }
 
 // doDiscovery contains the exact one occurence of ServerPreferredResources() in this repository.
@@ -255,7 +284,8 @@ func makeController(logger logr.Logger,
 	clusterInformerFactoryStart func(<-chan struct{}),
 	clusterPreInformer clusterinformers.ManagedClusterInformer, // used for ManagedCluster in ITS
 	apiResourceLists []*metav1.APIResourceList,
-	wdsName string, allowedGroupsSet sets.Set[string]) (*Controller, error) {
+	wdsName string, allowedGroupsSet sets.Set[string],
+	workloadObserver WorkloadEventHandler) (*Controller, error) {
 
 	ratelimiter := workqueue.NewMaxOfRateLimiter(
 		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
@@ -278,6 +308,7 @@ func makeController(logger logr.Logger,
 		clusterInformer:             clusterInformer,
 		clusterLister:               clusterPreInformer.Lister(),
 		dynamicClient:               dynamicClient,
+		workloadObserver:            workloadObserver,
 		discoveryClient:             kubernetesClient.Discovery(),
 		namespaceClient:             ksmetrics.NewWrappedClusterScopedClient(wdsClientMetrics, k8scoreapi.SchemeGroupVersion.WithResource("namespaces"), kubernetesClient.CoreV1().Namespaces()),
 		extClient:                   ksmetrics.NewWrappedClusterScopedClient(wdsClientMetrics, apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"), extClient.ApiextensionsV1().CustomResourceDefinitions()),
@@ -395,18 +426,26 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 
 				// add the event handler functions
 				informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+					// IMPORTANT: the loop variables `list` and `resource` cannot be used in these closures.
 					AddFunc: func(obj interface{}) {
-						// IMPORTANT: the resource loop variable cannot be used in these closures.
-						c.handleObject(obj, gvr.Resource, "add")
+						var oldObj *unstructured.Unstructured
+						c.handleObject(oldObj, obj, gvr.Resource, WorkloadAdd, false)
 					},
 					UpdateFunc: func(old, new interface{}) {
 						if shouldSkipUpdate(old, new) {
 							return
 						}
-						c.handleObject(new, gvr.Resource, "update")
+						c.handleObject(old, new, gvr.Resource, WorkloadUpdate, false)
 					},
 					DeleteFunc: func(obj interface{}) {
-						c.handleObject(obj, gvr.Resource, "delete")
+						var oldObj *unstructured.Unstructured
+						wasDeletedFinalStateUnknown := false
+						switch typed := obj.(type) {
+						case cache.DeletedFinalStateUnknown:
+							obj = typed.Obj
+							wasDeletedFinalStateUnknown = true
+						}
+						c.handleObject(oldObj, obj, gvr.Resource, WorkloadDelete, wasDeletedFinalStateUnknown)
 					},
 				})
 
@@ -590,18 +629,16 @@ func verbsSupportInformers(verbs []string) bool {
 // Event handler: enqueues the objects to be processed
 // At this time it is very simple, more complex processing might be required
 // here.
-func (c *Controller) handleObject(obj any, resource string, eventType string) {
-	wasDeletedFinalStateUnknown := false
-	switch typed := obj.(type) {
-	case cache.DeletedFinalStateUnknown:
-		obj = typed.Obj
-		wasDeletedFinalStateUnknown = true
-	}
+func (c *Controller) handleObject(oldObj, obj any, resource string, eventType WorkloadEventType, wasDeletedFinalStateUnknown bool) {
+	objMR := obj.(mrObject)
+	oldObjMR := oldObj.(mrObject)
 	c.logger.V(5).Info("Got object event", "eventType", eventType,
-		"wasDeletedFinalStateUnknown", wasDeletedFinalStateUnknown, "obj", util.RefToRuntimeObj(obj.(runtime.Object)),
+		"wasDeletedFinalStateUnknown", wasDeletedFinalStateUnknown, "obj", util.RefToRuntimeObj(objMR),
 		"resource", resource)
 
-	c.enqueueObject(obj, resource)
+	objIdentifier := util.IdentifierForObject(objMR, resource)
+	c.enqueueObjectIdentifier(objIdentifier)
+	c.workloadObserver.HandleWorkloadObjectEvent(objIdentifier.GVR(), oldObjMR, objMR, eventType, wasDeletedFinalStateUnknown)
 }
 
 // enqueueObject converts an object into an ObjectIdentifier struct which is
