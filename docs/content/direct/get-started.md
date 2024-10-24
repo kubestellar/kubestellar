@@ -16,6 +16,14 @@ This is one way to produce a very simple system, suitable for study but not prod
 
 ### Install software prerequisites
 
+If you're using WSL, it’s important to run the following commands with admin permissions to avoid permission-related issues. You can switch to root by running:
+
+```shell
+sudo su -
+```
+
+After switching to root, you’re ready to run the following prerequisite check command:
+
 The following command will check for the prerequisites that you will need for the later steps. See [the prerequisites doc](pre-reqs.md) for more details.
 
 ```shell
