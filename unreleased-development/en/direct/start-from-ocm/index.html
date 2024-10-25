@@ -3116,7 +3116,7 @@ story</a>.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">kubestellar_version</span><span class="o">=</span><span class="m">0</span>.25.0-rc.1
 </code></pre></div>
 <h3 id="ocm-quick-start-with-ingress">OCM Quick Start with Ingress<a class="headerlink" href="#ocm-quick-start-with-ingress" title="Permanent link">#</a></h3>
-<p>This recipe uses a modified version of <a href="https://raw.githubusercontent.com/open-cluster-management-io/OCM/main/solutions/setup-dev-environment/local-up.sh">the OCM Quick Start</a>. The modification is because KubeStellar needs the hosting cluster to have an Ingress controller with SSL passthrough enabled. The modified Quick Start script has the following modifications compared to the baseline.</p>
+<p>This recipe uses a modified version of <a href="https://raw.githubusercontent.com/open-cluster-management-io/OCM/v0.15.0/solutions/setup-dev-environment/local-up.sh">the OCM Quick Start</a>. The modification is because KubeStellar needs the hosting cluster to have an Ingress controller with SSL passthrough enabled. The modified Quick Start script has the following modifications compared to the baseline.</p>
 <ol>
 <li>The <code>kind</code> cluster created for the hub has an additional port mapping, where the Ingress controller listens.</li>
 <li>The script installs <a href="https://docs.nginx.com/nginx-ingress-controller/">the NGINX Ingress Controller</a> into the hub cluster, then patches the controller to enable SSL passthrough, and later waits for it to be in service.</li>
