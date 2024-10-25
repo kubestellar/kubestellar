@@ -32,11 +32,9 @@ you will first want to remove any related debris. The following
 commands tear down the state established by this recipe.
 
 ```shell
-yq -i 'del(.preferences)' ${KUBECONFIG:-$HOME/.kube/config}
 kind delete cluster --name kubeflex
 kind delete cluster --name cluster1
 kind delete cluster --name cluster2
-kubectl config delete-context kind-kubeflex
 kubectl config delete-context cluster1
 kubectl config delete-context cluster2
 ```
@@ -61,15 +59,17 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ con
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
     --version $KUBESTELLAR_VERSION \
     --set-json='ITSes=[{"name":"its1"}]' \
-    --set-json='WDSes=[{"name":"wds1"}]'
+    --set-json='WDSes=[{"name":"wds1"}]' \
+    --set-json='verbosity.default=5' # so we can debug your problem reports
 ```
 
 That command will print some notes about how to get kubeconfig "contexts" named "its1" and "wds1" defined. Do that, because those contexts are used in the steps that follow.
+
 ```shell
-kubectl config delete-context its1 || true
-kflex ctx its1
-kubectl config delete-context wds1 || true
-kflex ctx wds1
+kubectl config use-context kind-kubeflex # this is here only to remind you, it will already be the current context if you are following this recipe exactly
+kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
+kflex ctx --overwrite-existing-context wds1
+kflex ctx --overwrite-existing-context its1
 ```
 
 ### Create and register two workload execution cluster(s)
