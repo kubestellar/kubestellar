@@ -2899,7 +2899,8 @@
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="go">        name: kflex-config-extension-name</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="go">    name: kflex-config-extension-name</span>
 </code></pre></div>
-<p>The <code>kflex ctx</code> commands are surprisingly hesitant to replace a bad value in there. Later releases of <code>kflex</code> are better than older ones. The following command shows a way to remove that bit of hidden state; after this, a <code>kflex ctx</code> command will succeed <em>if</em> your current kubeconfig context is the one to use for accessing the KubeFlex hosting cluster.</p>
+<p>The <code>kflex ctx</code> commands are normally hesitant to replace a bad value in there. Later releases of <code>kflex</code> are better than older ones, and the latest releases have ways on the command line to explicitly remove this hesitancy; the KubeStellar instructions and scripts use those.</p>
+<p>Although it should no longer be necessary to use this, the following command shows a way to remove that bit of hidden state; after this, a <code>kflex ctx</code> command will succeed <em>if</em> your current kubeconfig context is the one to use for accessing the KubeFlex hosting cluster.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>yq<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;del(.preferences)&#39;</span><span class="w"> </span><span class="si">${</span><span class="nv">KUBECONFIG</span><span class="k">:-</span><span class="nv">$HOME</span><span class="p">/.kube/config</span><span class="si">}</span>
 </code></pre></div>
 

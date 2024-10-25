@@ -3249,13 +3249,11 @@ Note that <code>kind</code> does not support three or more concurrent clusters u
 <p>If you have run this recipe or any related recipe previously then
 you will first want to remove any related debris. The following
 commands tear down the state established by this recipe.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>yq<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;del(.preferences)&#39;</span><span class="w"> </span><span class="si">${</span><span class="nv">KUBECONFIG</span><span class="k">:-</span><span class="nv">$HOME</span><span class="p">/.kube/config</span><span class="si">}</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>kubeflex
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>cluster1
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>cluster2
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>kind-kubeflex
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>cluster1
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>cluster2
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>kubeflex
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>cluster1
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>cluster2
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>cluster1
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>cluster2
 </code></pre></div>
 <h3 id="set-the-version-appropriately-as-an-environment-variable">Set the Version appropriately as an environment variable<a class="headerlink" href="#set-the-version-appropriately-as-an-environment-variable" title="Permanent link">#</a></h3>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBESTELLAR_VERSION</span><span class="o">=</span><span class="m">0</span>.25.0-rc.1
@@ -3268,14 +3266,15 @@ commands tear down the state established by this recipe.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ks-core<span class="w"> </span>oci://ghcr.io/kubestellar/kubestellar/core-chart<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>--version<span class="w"> </span><span class="nv">$KUBESTELLAR_VERSION</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;ITSes=[{&quot;name&quot;:&quot;its1&quot;}]&#39;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;WDSes=[{&quot;name&quot;:&quot;wds1&quot;}]&#39;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;WDSes=[{&quot;name&quot;:&quot;wds1&quot;}]&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;verbosity.default=5&#39;</span><span class="w"> </span><span class="c1"># so we can debug your problem reports</span>
 </code></pre></div>
-<p>That command will print some notes about how to get kubeconfig "contexts" named "its1" and "wds1" defined. Do that, because those contexts are used in the steps that follow.
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>its1<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>its1
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>wds1<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>wds1
-</code></pre></div></p>
+<p>That command will print some notes about how to get kubeconfig "contexts" named "its1" and "wds1" defined. Do that, because those contexts are used in the steps that follow.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>kind-kubeflex<span class="w"> </span><span class="c1"># this is here only to remind you, it will already be the current context if you are following this recipe exactly</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>--set-current-for-hosting<span class="w"> </span><span class="c1"># make sure the KubeFlex CLI&#39;s hidden state is right for what the Helm chart just did</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>--overwrite-existing-context<span class="w"> </span>wds1
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>--overwrite-existing-context<span class="w"> </span>its1
+</code></pre></div>
 <h3 id="create-and-register-two-workload-execution-clusters">Create and register two workload execution cluster(s)<a class="headerlink" href="#create-and-register-two-workload-execution-clusters" title="Permanent link">#</a></h3>
 <!-- BEGIN INCLUDE example-wecs.md -->
 <p>The following steps show how to create two new <code>kind</code> clusters and
