@@ -44,7 +44,7 @@ kubectl config delete-context cluster2
 ### Set the Version appropriately as an environment variable
 
 ```shell
-export KUBESTELLAR_VERSION={{ config.ks_latest_release }}
+kubestellar_version={{ config.ks_latest_release }}
 ```
 
 ### Create a kind cluster to host KubeFlex
@@ -59,7 +59,7 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ con
 
 ```shell
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-    --version $KUBESTELLAR_VERSION \
+    --version $kubestellar_version \
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]'
 ```

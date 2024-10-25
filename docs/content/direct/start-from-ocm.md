@@ -51,7 +51,7 @@ yq -i 'del(.preferences)' ${KUBECONFIG:-$HOME/.kube/config}
 ### Set the Version appropriately as an environment variable
 
 ```shell
-export KUBESTELLAR_VERSION={{ config.ks_latest_release }}
+kubestellar_version={{ config.ks_latest_release }}
 ```
 
 ### OCM Quick Start with Ingress
@@ -95,7 +95,7 @@ This chart instance will do the following.
 
 ```shell
 helm --kube-context kind-hub upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-    --version $KUBESTELLAR_VERSION \
+    --version $kubestellar_version \
     --set-json='ITSes=[{"name":"its1", "type":"host"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set-json='verbosity.default=5' # so we can debug your problem reports
