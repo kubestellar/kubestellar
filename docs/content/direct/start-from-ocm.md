@@ -45,7 +45,7 @@ kubestellar_version={{ config.ks_latest_release }}
 
 ### OCM Quick Start with Ingress
 
-This recipe uses a modified version of [the OCM Quick Start](https://raw.githubusercontent.com/open-cluster-management-io/OCM/main/solutions/setup-dev-environment/local-up.sh). The modification is because KubeStellar needs the hosting cluster to have an Ingress controller with SSL passthrough enabled. The modified Quick Start script has the following modifications compared to the baseline.
+This recipe uses a modified version of [the OCM Quick Start](https://raw.githubusercontent.com/open-cluster-management-io/OCM/v0.15.0/solutions/setup-dev-environment/local-up.sh). The modification is because KubeStellar needs the hosting cluster to have an Ingress controller with SSL passthrough enabled. The modified Quick Start script has the following modifications compared to the baseline.
 
 1. The `kind` cluster created for the hub has an additional port mapping, where the Ingress controller listens.
 1. The script installs [the NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/) into the hub cluster, then patches the controller to enable SSL passthrough, and later waits for it to be in service.
