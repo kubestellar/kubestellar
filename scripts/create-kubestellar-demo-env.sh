@@ -153,9 +153,9 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set-json='verbosity.default=5'
 
-kubectl config delete-context wds1 || true
+# kubectl config delete-context wds1 || true
 kflex ctx wds1
-kubectl config delete-context its1 || true
+# kubectl config delete-context its1 || true
 kflex ctx its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
