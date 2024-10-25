@@ -3256,7 +3256,7 @@ commands tear down the state established by this recipe.</p>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>cluster2
 </code></pre></div>
 <h3 id="set-the-version-appropriately-as-an-environment-variable">Set the Version appropriately as an environment variable<a class="headerlink" href="#set-the-version-appropriately-as-an-environment-variable" title="Permanent link">#</a></h3>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBESTELLAR_VERSION</span><span class="o">=</span><span class="m">0</span>.25.0-rc.1
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">kubestellar_version</span><span class="o">=</span><span class="m">0</span>.25.0-rc.1
 </code></pre></div>
 <h3 id="create-a-kind-cluster-to-host-kubeflex">Create a kind cluster to host KubeFlex<a class="headerlink" href="#create-a-kind-cluster-to-host-kubeflex" title="Permanent link">#</a></h3>
 <p>For convenience, a new local <strong>Kind</strong> cluster that satisfies the requirements for playing the role of KubeFlex hosting cluster can be created with the following command:</p>
@@ -3264,7 +3264,7 @@ commands tear down the state established by this recipe.</p>
 </code></pre></div>
 <h3 id="use-core-helm-chart-to-initialize-kubeflex-and-create-its-and-wds">Use Core Helm chart to initialize KubeFlex and create ITS and WDS<a class="headerlink" href="#use-core-helm-chart-to-initialize-kubeflex-and-create-its-and-wds" title="Permanent link">#</a></h3>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ks-core<span class="w"> </span>oci://ghcr.io/kubestellar/kubestellar/core-chart<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>--version<span class="w"> </span><span class="nv">$KUBESTELLAR_VERSION</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>--version<span class="w"> </span><span class="nv">$kubestellar_version</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;ITSes=[{&quot;name&quot;:&quot;its1&quot;}]&#39;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;WDSes=[{&quot;name&quot;:&quot;wds1&quot;}]&#39;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;verbosity.default=5&#39;</span><span class="w"> </span><span class="c1"># so we can debug your problem reports</span>
