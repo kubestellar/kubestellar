@@ -17,13 +17,11 @@
 
 set -e
 
-export kubestellar_version=0.25.0-rc.1
+kubestellar_version=0.25.0-rc.1
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
 curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
-
-output=$(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -A -V kflex ocm helm kubectl docker kind)
 
 ##########################################
 function wait-for-cmd() (
@@ -99,7 +97,7 @@ checking_cluster() {
             
         else
             echo "$1 not found. Trying again..."
-            sleep 5
+            sleep 20
         fi
 
     done
@@ -109,20 +107,20 @@ checking_cluster() {
 echo -e "\nStarting environment clean up..."
 echo -e "Starting cluster clean up..."
 
-cluster_clean_up "kind delete cluster --name kubeflex"
-cluster_clean_up "kind delete cluster --name cluster1"
-cluster_clean_up "kind delete cluster --name cluster2"
+yq -i 'del(.preferences)' ${KUBECONFIG:-$HOME/.kube/config} 
+
+cluster_clean_up "kind delete cluster --name kubeflex" &
+cluster_clean_up "kind delete cluster --name cluster1" &
+cluster_clean_up "kind delete cluster --name cluster2" &
+wait
 echo -e "Cluster space clean up has been completed"
 
 echo -e "\nStarting context clean up..."
-
 context_clean_up
 echo "Context space clean up completed"
 
 echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
-
 clusters=(cluster1 cluster2)
-
 for cluster in "${clusters[@]}"; do
    (
      echo -e "Creating cluster ${cluster}..."
@@ -131,34 +129,33 @@ for cluster in "${clusters[@]}"; do
      echo -e "${cluster} creation and context setup complete"
    ) &
 done
-
 wait 
 
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443 
-# >/dev/null 2>&1
-
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443 
 echo -e "Completed KubeFlex cluster with SSL Passthrough"
 
-(docker pull ghcr.io/loft-sh/vcluster:0.16.4 && kind load docker-image ghcr.io/loft-sh/vcluster:0.16.4 --name kubeflex) & 
-(docker pull rancher/k3s:v1.27.2-k3s1 && kind load docker-image rancher/k3s:v1.27.2-k3s1 --name kubeflex) &
-(docker pull quay.io/open-cluster-management/registration-operator:v0.13.2 && kind load docker-image quay.io/open-cluster-management/registration-operator:v0.13.2 --name kubeflex) & 
+echo -e "\nPulling container images local..."
+images=("ghcr.io/loft-sh/vcluster:0.16.4"
+        "rancher/k3s:v1.27.2-k3s1"
+        "quay.io/open-cluster-management/registration-operator:v0.13.2"
+        "docker.io/bitnami/postgresql:16.0.0-debian-11-r13")
 
-# curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${KUBESTELLAR_VERSION}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443
-
+for image in "${images[@]}"; do
+    (
+        docker pull "$image" && kind load docker-image "$image" --name kubeflex
+    ) &
+done
 
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-    --version $KUBESTELLAR_VERSION \
+    --version $kubestellar_version \
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set-json='verbosity.default=5'
 
-kubectl config delete-context its1 || true
-kflex ctx its1
 kubectl config delete-context wds1 || true
 kflex ctx wds1
-
-# switch back to its1 context to crete 2 remote clusters, add OCM agents to them, and register them back to the KubeStellar core
+kubectl config delete-context its1 || true
 kflex ctx its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
@@ -172,8 +169,6 @@ echo -e "\nCreating cluster and context for cluster 1 and 2..."
 flags="--force-internal-endpoint-lookup"
 clusters=(cluster1 cluster2);
 for cluster in "${clusters[@]}"; do
-#    kind create cluster --name ${cluster}
-#    kubectl config rename-context kind-${cluster} ${cluster}
    clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${flags}'"}' | sh
 done
 
@@ -189,4 +184,21 @@ echo "Checking the new clusters are in the OCM inventory and label them"
 kubectl --context its1 get managedclusters
 kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
 kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
+echo "\n\nCongratulations! Your KubeStellar demo environment is now ready to use."
 
+cat <<"EOF"
+
+Be sure to execute the following commands to set the shell variables expected in the example scenarios.
+
+host_context=kind-kubeflex
+its_cp=its1
+its_context=its1
+wds_cp=wds1
+wds_context=wds1
+wec1_name=cluster1
+wec2_name=cluster2
+wec1_context=$wec1_name
+wec2_context=$wec2_name
+label_query_both=location-group=edge
+label_query_one=name=cluster1
+EOF
