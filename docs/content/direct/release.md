@@ -14,6 +14,7 @@ Every release should pass all release tests before it can be officially declare 
 ### Reacting to a new KubeFlex release
 
 - Update the KubeFlex release in `docs/content/direct/pre-reqs.md`
+- Update the "kflex" release in `hack/check_pre_req.sh`
 - Update the KubeFlex release in `go.mod`
 - `go mod tidy`
 - Update the KubeFlex release in `core-chart/Chart.yaml`
