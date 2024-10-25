@@ -37,17 +37,6 @@ The following command will check for the prerequisites that you will need for th
 bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/hack/check_pre_req.sh) kflex ocm helm kubectl docker kind
 ```
 
-### Cleanup from previous runs
-
-If you have run this recipe or used `kflex` (the KubeFlex command
-line) in any other capacity, it may have some troublesome hidden state
-in your kubeconfig file. The following command clears out that hidden
-state.
-
-```shell
-yq -i 'del(.preferences)' ${KUBECONFIG:-$HOME/.kube/config}
-```
-
 ### Set the Version appropriately as an environment variable
 
 ```shell
@@ -109,8 +98,8 @@ which is not necessarily true --- so take care for that too.
 
 ```shell
 kubectl config use-context kind-hub
-kubectl config delete-context wds1 || true
-kflex ctx wds1
+kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
+kflex ctx --overwrite-existing-context wds1
 ```
 
 For more information about this Helm chart, see [its documentation](core-chart.md).

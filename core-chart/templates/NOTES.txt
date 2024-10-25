@@ -11,12 +11,12 @@ Start by setting your current kubeconfig context to the one you used
 when installing this chart.
 
 kubectl config use-context $the_one_where_you_installed_this_chart
+kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
 {{range $cp := (concat (.Values.ITSes | default list) (.Values.WDSes | default list) ) }}
 {{- if ne $cp.type "host" }}
-kubectl config delete-context {{ $cp.name }} || true
-kflex ctx {{ $cp.name }}
+kflex ctx --overwrite-existing-context {{ $cp.name }}
 {{- end }}
 {{- end }}
 
-Finally you can use `kflex ctx` to switch back to the kubeconfig
+Finally, you can use `kflex ctx` to switch back to the kubeconfig
 context for your KubeFlex hosting cluster.

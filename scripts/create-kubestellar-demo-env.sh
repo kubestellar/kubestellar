@@ -60,15 +60,7 @@ context_clean_up() {
         elif [ "$line" == "cluster2" ]; then
             echo "Deleting cluster2 context..."
             kubectl config delete-context cluster2
-        
-        elif [ "$line" == "its1" ]; then
-            echo "Deleting its1 context..."
-            kubectl config delete-context its1
-        
-        elif [ "$line" == "wds1" ]; then
-            echo "Deleting wds1 context..."
-            kubectl config delete-context wds1
-        
+
         fi
 
     done <<< "$output"
@@ -106,8 +98,6 @@ checking_cluster() {
 
 echo -e "\nStarting environment clean up..."
 echo -e "Starting cluster clean up..."
-
-yq -i 'del(.preferences)' ${KUBECONFIG:-$HOME/.kube/config} 
 
 cluster_clean_up "kind delete cluster --name kubeflex" &
 cluster_clean_up "kind delete cluster --name cluster1" &
@@ -153,10 +143,9 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set-json='verbosity.default=5'
 
-kubectl config delete-context wds1 || true
-kflex ctx wds1
-kubectl config delete-context its1 || true
-kflex ctx its1
+kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
+kflex ctx --overwrite-existing-context wds1
+kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
 
