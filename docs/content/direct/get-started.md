@@ -7,6 +7,7 @@ There are multiple ways to get started with Kubestellar, reflecting its flexible
 2. A **quick automated setup** using our installation script, which creates a basic working environment for those who want to start experimenting right away. 
 
 Both approaches create a basic environment suitable for learning, but remember that KubeStellar supports more sophisticated configurations including:
+
 - Multiple Independent Target Spaces (ITS)
 - Multiple Workload Distribution Spaces (WDS)
 - Dynamic addition and removal of Work Execution Clusters (WECs)
