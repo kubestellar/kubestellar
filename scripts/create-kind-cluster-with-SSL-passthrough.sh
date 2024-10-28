@@ -15,6 +15,8 @@
 
 # Create a kind cluster for KubeStellar deployment
 
+set -o errexit
+
 name=kubestellar
 port=9443
 wait=true

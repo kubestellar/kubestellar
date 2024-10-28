@@ -15,6 +15,8 @@
 
 # Create a k3s cluster for KubeStellar deployment
 
+set -o errexit
+
 port=9443
 wait=true
 
