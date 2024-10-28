@@ -38,9 +38,9 @@ The KubeStellar architecture has the following main modules.
 
 - [*KubeFlex*](https://github.com/kubestellar/kubeflex/). KubeStellar builds on the services of KubeFlex, using it to keep track of, and possibly provide, the Inventory and Transport spaces and the Workload Description spaces. Each of those appears as a `ControlPlane` object in the KubeFlex hosting cluster.
 
-- *KubeStellar Controller Manager*: this module is instantiated once per WDS and is responsible for watching `BindingPolicy` objects and create from it a matching `Binding` object that contains list of references to the concrete objects and list of references to the concrete clusters, and for updating the status of objects in the WDS.
+- *KubeStellar Controller Manager*: this module is instantiated once per WDS and is responsible for watching `BindingPolicy` objects and create from it a matching `Binding` object that contains list of references to the concrete objects and list of references to the concrete clusters, and for returning reported state from the ITS into the WDS.
 
-- *Pluggable Transport Controller*: this module is instantiated once per WDS and is responsible for delivering workload objects from the WDS to the ITS according to `Binding` objects.
+- *Pluggable Transport Controller*: this module is instantiated once per WDS and is responsible for projecting KubeStellar workload and control objects of the WDS into OCM workload/control objects in the ITS.
 
 - *Space Manager*: This module manages the lifecycle of spaces.
 
@@ -61,14 +61,19 @@ and updates `WorkStatus` objects in the ITS namespace associated with the WEC.
 
 ## KubeStellar Controller Manager
 
-This module manages binding controller, and status controller. 
+This module manages the binding controller and the status controller. 
 
-* The binding controller watches `BindingPolicy` and workload objects on the Workload Definition Space (WDS), and maintains
-a `Binding` object for each `BindingPolicy` in the WDS. The `Binding` object contains references to the concrete list of
-workload objects and references to the concrete list of clusters that were selected by the `BindingPolicy` selectors.
+* The binding controller watches `BindingPolicy` and workload objects
+on the Workload Definition Space (WDS), and maintains a `Binding`
+object for each `BindingPolicy` in the WDS. A `Binding` object
+contains (a) the concrete list of references to workload objects (and
+associated modulations on downsync behavior) and (b) the concrete list
+of clusters that were selected by the `BindingPolicy` selectors.
 
-* The status controller watches for *WorkStatus* objects on the ITS and updates the
-status of objects in the WDS when singleton status is requested in the `BindingPolicy` for those objects. 
+* The status controller watches for *WorkStatus* objects on the ITS
+  and, based on the instructions in the `BindingPolicy` and
+  `StatusCollector` objects, returns reported state into the WDS in
+  [the two defined ways](combined-status.md).
 
 There is one instance of a KubeStellar Controller Manager for each WDS. 
 Currently this controller-manager runs in the KubeFlex hosting cluster and is responsible for installing the required 
@@ -77,13 +82,37 @@ More details on the internals of this module are provided in [KubeStellar Contro
 
 ## Pluggable Transport Controller
 
-* The pluggable transport controller watches `Binding` objects on the WDS, and maintains in the Inventory and Transport Space (ITS) 
-a wrapped object per `Binding` to be delivered.
-* This controller is pluggable and can potentially be implemented using different options. Currently the only option we support is based on the [Open Cluster Management Project](https://open-cluster-management.io) 
+This controller's job is to (a) get workload objects from WDS to WECs
+as prescribed by the `Binding` objects and their referenced
+`CustomTransform` objects and inventory objects and (b) get
+corresponding reported state back into `WorkStatus` objects in the
+ITS.
 
-There is one instance of the pluggable transport controller for each WDS. 
-Currently this controller runs in an executable process. This is a work in progress and we're working on running this controller in a dedicated pod.
-More details on the internals of this module are provided in [KubeStellar Controllers Architecture](#kubestellar-controllers-architecture).
+Different implementations of this controller are possible; it would be
+possible to enable even more different implementations by taking a
+more general approach to inventory.
+
+The implementations need not be in this Git repository. Currently
+there is one iimplementation, and it _is_ in this repository. This
+implementation uses [Open Cluster
+Management](https://open-cluster-management.io). The OCM Status Add-On
+Controller and Agent are part of the way this transport controller
+gets its job done.
+
+The OCM (based) Transport Controller maintains, in the ITS, a set of
+`ManifestWork` objects that constitute an OCM representation of what
+is requested by the KubeStellar workload and control objects in the
+WDS. Based on the associations in the `Binding` objects, this
+transport controller bundles workload objects from the WDS into
+`ManifestWork` objects in the ITS. The bundling is controllable, with
+configured limits on both the number of objects in a bundle and the
+size of the `ManifestWorkSpec`.
+
+There is one instance of the pluggable transport controller for each
+WDS, managed according to a `Deployment` object in the KubeFlex
+hosting cluster.  More details on the internals of this module are
+provided in [KubeStellar Controllers
+Architecture](#kubestellar-controllers-architecture).
 
 ## Space Manager
 
@@ -201,55 +230,80 @@ events, work queues for parallel processing of tasks, and a reconciler
 to ensure the actual state matches the desired state. However, that
 pattern has been extended to provide the following features:
 
-- Using dynamic informers
+- Using dynamic informers for workload objects
 - Starting informers on all API Resources (except some that do not need
   watching)
-- Informers and Listers references are maintained in a hash map and
+- Workload Informers and Listers are maintained in a hash map that is
   indexed by GVR (Group, Version, Resource) of the watched objects.
-- Using a common work queue and set of workers, where the key is defined as follows:
-    - Key is a struct instead than a string, and contains the following:
-        - GVR of the informer and lister for the object that generated the
-          event
-        - Structured Name of the object 
-        - For delete event: Shallow copy of the object being deleted. This
-          is required for objects that need to be deleted
-          from the managed clusters (WECs)
+- Using a common work queue and set of workers, multiplexing multiple types of object references into that queue.
+    - A reference to a workload object carries its API Group, Version, Resource, and Kind. No need for a `RESMapper`, the "Kind" and "Resource" are learned together from the API discovery process.
 - Starting & stopping informers dynamically based on creation or
   deletion of CRDs (which add/remove APIs on the WDS).
 - One client connected to the WDS space and one (or more in the future)
   to connect to one or more OCM shards.
     - The WDS-connected client is used to start the dynamic
-      informers/listers for most API resources in the WDS
+      informers/listers for workload and control objects in the WDS
     - The OCM-connected client is used to start informers/listers for OCM
       ManagedClusters and to copy/update/remove the wrapped objects
       into/from the OCM mailbox namespaces.
 
-There are three controllers in the KubeStellar controller manager:
+There are two controllers in the KubeStellar controller manager:
 
-- Binding Controller - one client connected to the WDS space and one
+- Binding Controller - one client connected to the WDS and one
   (or more in the future) to connect to one or more ITS shards.
     - The WDS-connected client is used to start the dynamic
-      informers/listers for most API resources in the WDS.
+      informers/listers for workload objects and KubeStellar control objects in the WDS.
     - The OCM-connected client is used to start informers/listers for OCM
       ManagedClusters. This is a temporary state until cluster inventory abstraction is implemented and decoupled from OCM (and then this client should be removed and we would need to use client to inventory space).
-- Transport controller - one client connected to the WDS space 
-  and one client (or more in the future) to connect to one or more ITS shards.
-    - The OCM-connected client is used to copy/update/remove the wrapped objects
-      into/from the OCM mailbox namespaces.
-- Status controller - TODO 
+    - This controller maintains an internal data structure called the `BindingResolver` that tracks what `Binding` _should_ correspond to each `BindingPolicy`, and uses it to make that so.
 
+- Status controller - one client connected to the WDS and one
+  connected to the ITS; also uses informer-like services from the
+  Binding Controller, regarding workload objects and
+  BindingPolicies. The Status Controller gets reported state from the
+  ITS back to the WDS, in [the two supported
+  ways](combined-status.md): combining reported state from multiple
+  WECs to a query result object, and copying status from a single WEC
+  to the original workload object.
+
+There is also a separate Transport Controller. This also has a
+WDS-connected client, used to monitor workload and control objects,
+and an ITS-connected-client, used to monitor and create/update/delete
+`ManifestWork` objects.
 
 ### Binding Controller
 
-The Binding controller is responsible for watching workload objects and 
-`BindingPolicy` objects, and maintains for each of the latter a matching `Binding` object in the WDS. 
-A `Binding` object is mapped 1:1 to a `BindingPolicy` object and contains references to the concrete list of workload 
-objects and references to the concrete list of destinations that were selected by the policy.
+The Binding controller is responsible for watching workload objects
+and `BindingPolicy` objects, and maintains for each of the latter a
+matching `Binding` object in the WDS.  A `Binding` object is mapped
+1:1 to a `BindingPolicy` object and contains the concrete list of
+references workload objects and the concrete list of references to
+inventory objects that were selected by the policy.
 
+The Binding Controller is centered on an internal data structure,
+called a `BindingResolver`, that represents the set of `Binding`
+objects that _should_ exist based on the controller's inputs. The
+controller has informers for all of its inputs: a static collection
+for the control objects (`BindingPolicy` and inventory objects) and a
+dynamic collection (based on continual API discovery) for the workload
+objects. The controller also has informers for its output objects
+(i.e., `Binding` objects). Every notification from an informer is
+handled by putting a relevant object reference into the work
+queue. Working on a reference to an input involves updating the
+`BindingResolver` and enqueuing a reference to any output object
+(`Binding`) that might need a change. Working on a reference to a
+`Binding` involves comparing what is actually in that `Binding` with
+what the `BindingResolver` says should be there, and
+creating/updating/deleting the `Binding` if there is a difference.
+
+The Binding Controller also provides two informer-like services that
+the Status Controller uses. One is notifying about any change to that
+internal data structure, and the ability to read from it. The other is
+notifying about workload object events.
 
 The architecture and the event flow of the code for create/update object events is
 illustrated in Figure 3 (some details might be omitted to make the flow easier
-to understand). 
+to understand).
 
 ![Figure 3 - Binding Controller](./images/binding-controller.svg)
 
