@@ -4,14 +4,16 @@ The following sections list the known issues for each release. The issue list is
 
 ## 0.25.0 and its candidates
 
-The main advance in this release is finishing the implementation of the create-only feature. It is now available for use.
+* The main advance in this release is finishing the implementation of the create-only feature. It is now available for use.
+* Transport controller's `max-num-wrapped` is defaulted to 1 in the core Helm chart.
 
-### Remaining limitations in 0.24.0
+### Remaining limitations in 0.25.0 and its candidates
 
 * Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
 * Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* The value of transport controller's `max-num-wrapped` flag is not handled properly, if the value leads to multiple ManifestWork objects with multiple workload objects in them.
 
 ## 0.25.0-alpha.1 test releases
 
@@ -28,6 +30,7 @@ The main functional change from 0.23.X is the completion of the status combinati
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
 * Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
 * Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* The value of transport controller's `max-num-wrapped` flag is not handled properly, if the value leads to multiple ManifestWork objects with multiple workload objects in them.
 
 ## 0.23.1
 
