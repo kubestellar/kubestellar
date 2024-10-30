@@ -771,54 +771,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#object-deleted" class="md-nav__link">
+  <a href="#sync-bindingpolicy" class="md-nav__link">
     <span class="md-ellipsis">
-      Object Deleted
+      Sync BindingPolicy
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#bindingpolicy-created-or-updated" class="md-nav__link">
+  <a href="#sync-workload-object" class="md-nav__link">
     <span class="md-ellipsis">
-      BindingPolicy Created or Updated
+      Sync Workload Object
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#bindingpolicy-deleted" class="md-nav__link">
+  <a href="#sync-binding" class="md-nav__link">
     <span class="md-ellipsis">
-      BindingPolicy Deleted
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#binding-syncing" class="md-nav__link">
-    <span class="md-ellipsis">
-      Binding Syncing
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#new-crd-added" class="md-nav__link">
-    <span class="md-ellipsis">
-      New CRD Added
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#crd-deleted" class="md-nav__link">
-    <span class="md-ellipsis">
-      CRD Deleted
+      Sync Binding
     </span>
   </a>
   
@@ -3163,54 +3136,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#object-deleted" class="md-nav__link">
+  <a href="#sync-bindingpolicy" class="md-nav__link">
     <span class="md-ellipsis">
-      Object Deleted
+      Sync BindingPolicy
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#bindingpolicy-created-or-updated" class="md-nav__link">
+  <a href="#sync-workload-object" class="md-nav__link">
     <span class="md-ellipsis">
-      BindingPolicy Created or Updated
+      Sync Workload Object
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#bindingpolicy-deleted" class="md-nav__link">
+  <a href="#sync-binding" class="md-nav__link">
     <span class="md-ellipsis">
-      BindingPolicy Deleted
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#binding-syncing" class="md-nav__link">
-    <span class="md-ellipsis">
-      Binding Syncing
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#new-crd-added" class="md-nav__link">
-    <span class="md-ellipsis">
-      New CRD Added
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#crd-deleted" class="md-nav__link">
-    <span class="md-ellipsis">
-      CRD Deleted
+      Sync Binding
     </span>
   </a>
   
@@ -3339,10 +3285,10 @@ we will not differentiate between these roles. Instead we will use the term
 <p><a href="https://github.com/kubestellar/kubeflex/"><em>KubeFlex</em></a>. KubeStellar builds on the services of KubeFlex, using it to keep track of, and possibly provide, the Inventory and Transport spaces and the Workload Description spaces. Each of those appears as a <code>ControlPlane</code> object in the KubeFlex hosting cluster.</p>
 </li>
 <li>
-<p><em>KubeStellar Controller Manager</em>: this module is instantiated once per WDS and is responsible for watching <code>BindingPolicy</code> objects and create from it a matching <code>Binding</code> object that contains list of references to the concrete objects and list of references to the concrete clusters, and for updating the status of objects in the WDS.</p>
+<p><em>KubeStellar Controller Manager</em>: this module is instantiated once per WDS and is responsible for watching <code>BindingPolicy</code> objects and create from it a matching <code>Binding</code> object that contains list of references to the concrete objects and list of references to the concrete clusters, and for returning reported state from the ITS into the WDS.</p>
 </li>
 <li>
-<p><em>Pluggable Transport Controller</em>: this module is instantiated once per WDS and is responsible for delivering workload objects from the WDS to the ITS according to <code>Binding</code> objects.</p>
+<p><em>Pluggable Transport Controller</em>: this module is instantiated once per WDS and is responsible for projecting KubeStellar workload and control objects of the WDS into OCM workload/control objects in the ITS.</p>
 </li>
 <li>
 <p><em>Space Manager</em>: This module manages the lifecycle of spaces.</p>
@@ -3370,16 +3316,21 @@ and updates <code>WorkStatus</code> objects in the ITS namespace associated with
 </figure>
 </p>
 <h2 id="kubestellar-controller-manager">KubeStellar Controller Manager<a class="headerlink" href="#kubestellar-controller-manager" title="Permanent link">#</a></h2>
-<p>This module manages binding controller, and status controller. </p>
+<p>This module manages the binding controller and the status controller. </p>
 <ul>
 <li>
-<p>The binding controller watches <code>BindingPolicy</code> and workload objects on the Workload Definition Space (WDS), and maintains
-a <code>Binding</code> object for each <code>BindingPolicy</code> in the WDS. The <code>Binding</code> object contains references to the concrete list of
-workload objects and references to the concrete list of clusters that were selected by the <code>BindingPolicy</code> selectors.</p>
+<p>The binding controller watches <code>BindingPolicy</code> and workload objects
+on the Workload Definition Space (WDS), and maintains a <code>Binding</code>
+object for each <code>BindingPolicy</code> in the WDS. A <code>Binding</code> object
+contains (a) the concrete list of references to workload objects (and
+associated modulations on downsync behavior) and (b) the concrete list
+of clusters that were selected by the <code>BindingPolicy</code> selectors.</p>
 </li>
 <li>
-<p>The status controller watches for <em>WorkStatus</em> objects on the ITS and updates the
-status of objects in the WDS when singleton status is requested in the <code>BindingPolicy</code> for those objects. </p>
+<p>The status controller watches for <em>WorkStatus</em> objects on the ITS
+  and, based on the instructions in the <code>BindingPolicy</code> and
+  <code>StatusCollector</code> objects, returns reported state into the WDS in
+  <a href="../combined-status/">the two defined ways</a>.</p>
 </li>
 </ul>
 <p>There is one instance of a KubeStellar Controller Manager for each WDS. 
@@ -3387,14 +3338,34 @@ Currently this controller-manager runs in the KubeFlex hosting cluster and is re
 CRDs in the associated WDS.
 More details on the internals of this module are provided in <a href="#kubestellar-controllers-architecture">KubeStellar Controllers Architecture</a>.</p>
 <h2 id="pluggable-transport-controller">Pluggable Transport Controller<a class="headerlink" href="#pluggable-transport-controller" title="Permanent link">#</a></h2>
-<ul>
-<li>The pluggable transport controller watches <code>Binding</code> objects on the WDS, and maintains in the Inventory and Transport Space (ITS) 
-a wrapped object per <code>Binding</code> to be delivered.</li>
-<li>This controller is pluggable and can potentially be implemented using different options. Currently the only option we support is based on the <a href="https://open-cluster-management.io">Open Cluster Management Project</a> </li>
-</ul>
-<p>There is one instance of the pluggable transport controller for each WDS. 
-Currently this controller runs in an executable process. This is a work in progress and we're working on running this controller in a dedicated pod.
-More details on the internals of this module are provided in <a href="#kubestellar-controllers-architecture">KubeStellar Controllers Architecture</a>.</p>
+<p>This controller's job is to (possibly through delegating some
+responsibilities): (a) get workload objects from WDS to WECs as
+prescribed by the <code>Binding</code> objects and their referenced
+<code>CustomTransform</code> objects and inventory objects and (b) get
+corresponding reported state back into <code>WorkStatus</code> objects in the
+ITS.</p>
+<p>Different implementations of this controller are possible; it would be
+possible to enable even more different implementations by taking a
+more general approach to inventory.</p>
+<p>The implementations need not be in this Git repository. Currently
+there is one implementation, and it <em>is</em> in this repository. This
+implementation uses <a href="https://open-cluster-management.io">Open Cluster
+Management</a>. The OCM Status Add-On
+Controller and Agent are part of the way this transport controller
+gets its job done.</p>
+<p>The OCM (based) Transport Controller maintains, in the ITS, a set of
+<code>ManifestWork</code> objects that constitute an OCM representation of what
+is requested by the KubeStellar workload and control objects in the
+WDS. Based on the associations in the <code>Binding</code> objects, this
+transport controller bundles workload objects from the WDS into
+<code>ManifestWork</code> objects in the ITS. The bundling is controllable, with
+configured limits on both the number of objects in a bundle and the
+size of the <code>ManifestWorkSpec</code>.</p>
+<p>There is one instance of the pluggable transport controller for each
+WDS, managed according to a <code>Deployment</code> object in the KubeFlex
+hosting cluster.  More details on the internals of this module are
+provided in <a href="#kubestellar-controllers-architecture">KubeStellar Controllers
+Architecture</a>.</p>
 <h2 id="space-manager">Space Manager<a class="headerlink" href="#space-manager" title="Permanent link">#</a></h2>
 <p>The Space Manager handles the lifecycle of spaces. 
 KubeStellar uses the <a href="https://github.com/kubestellar/kubeflex">KubeFlex project</a>
@@ -3492,21 +3463,13 @@ events, work queues for parallel processing of tasks, and a reconciler
 to ensure the actual state matches the desired state. However, that
 pattern has been extended to provide the following features:</p>
 <ul>
-<li>Using dynamic informers</li>
+<li>Using dynamic informers for workload objects</li>
 <li>Starting informers on all API Resources (except some that do not need
   watching)</li>
-<li>Informers and Listers references are maintained in a hash map and
+<li>Workload Informers and Listers are maintained in a hash map that is
   indexed by GVR (Group, Version, Resource) of the watched objects.</li>
-<li>Using a common work queue and set of workers, where the key is defined as follows:<ul>
-<li>Key is a struct instead than a string, and contains the following:<ul>
-<li>GVR of the informer and lister for the object that generated the
-  event</li>
-<li>Structured Name of the object </li>
-<li>For delete event: Shallow copy of the object being deleted. This
-  is required for objects that need to be deleted
-  from the managed clusters (WECs)</li>
-</ul>
-</li>
+<li>Using a common work queue and set of workers, multiplexing multiple types of object references into that queue.<ul>
+<li>A reference to a workload object carries its API Group, Version, Resource, and Kind. No need for a <code>RESMapper</code>, the "Kind" and "Resource" are learned together from the API discovery process.</li>
 </ul>
 </li>
 <li>Starting &amp; stopping informers dynamically based on creation or
@@ -3514,39 +3477,82 @@ pattern has been extended to provide the following features:</p>
 <li>One client connected to the WDS space and one (or more in the future)
   to connect to one or more OCM shards.<ul>
 <li>The WDS-connected client is used to start the dynamic
-  informers/listers for most API resources in the WDS</li>
+  informers/listers for workload and control objects in the WDS</li>
 <li>The OCM-connected client is used to start informers/listers for OCM
   ManagedClusters and to copy/update/remove the wrapped objects
   into/from the OCM mailbox namespaces.</li>
 </ul>
 </li>
 </ul>
-<p>There are three controllers in the KubeStellar controller manager:</p>
+<p>There are two controllers in the KubeStellar controller manager:</p>
 <ul>
-<li>Binding Controller - one client connected to the WDS space and one
-  (or more in the future) to connect to one or more ITS shards.<ul>
-<li>The WDS-connected client is used to start the dynamic
-  informers/listers for most API resources in the WDS.</li>
-<li>The OCM-connected client is used to start informers/listers for OCM
-  ManagedClusters. This is a temporary state until cluster inventory abstraction is implemented and decoupled from OCM (and then this client should be removed and we would need to use client to inventory space).</li>
+<li>
+<p>Binding Controller - one client connected to the WDS and one
+  (or more in the future) to connect to one or more ITS shards.</p>
+<ul>
+<li>
+<p>The WDS-connected client is used to start the dynamic
+  informers/listers for workload objects and KubeStellar control
+  objects in the WDS.</p>
+</li>
+<li>
+<p>The OCM-connected client is used to start informers/listers for
+  OCM ManagedClusters. This is a temporary state until cluster
+  inventory abstraction is implemented and decoupled from OCM (and
+  then this client should be removed and we would need to use
+  client to inventory space).</p>
+</li>
+<li>
+<p>This controller maintains an internal data structure called the
+  <code>BindingPolicyResover</code> that tracks what <code>Binding</code> <em>should</em>
+  correspond to each <code>BindingPolicy</code>, and uses it to make that so.</p>
+</li>
 </ul>
 </li>
-<li>Transport controller - one client connected to the WDS space 
-  and one client (or more in the future) to connect to one or more ITS shards.<ul>
-<li>The OCM-connected client is used to copy/update/remove the wrapped objects
-  into/from the OCM mailbox namespaces.</li>
-</ul>
+<li>
+<p>Status controller - one client connected to the WDS and one
+  connected to the ITS; also uses informer-like services from the
+  Binding Controller, regarding workload objects and
+  BindingPolicies. The Status Controller gets reported state from the
+  ITS back to the WDS, in <a href="../combined-status/">the two supported
+  ways</a>: combining reported state from multiple
+  WECs to a query result object, and copying status from a single WEC
+  to the original workload object.</p>
 </li>
-<li>Status controller - TODO </li>
 </ul>
+<p>There is also a separate Transport Controller. This also has a
+WDS-connected client, used to monitor workload and control objects,
+and an ITS-connected-client, used to monitor and create/update/delete
+<code>ManifestWork</code> objects.</p>
 <h3 id="binding-controller">Binding Controller<a class="headerlink" href="#binding-controller" title="Permanent link">#</a></h3>
-<p>The Binding controller is responsible for watching workload objects and 
-<code>BindingPolicy</code> objects, and maintains for each of the latter a matching <code>Binding</code> object in the WDS. 
-A <code>Binding</code> object is mapped 1:1 to a <code>BindingPolicy</code> object and contains references to the concrete list of workload 
-objects and references to the concrete list of destinations that were selected by the policy.</p>
+<p>The Binding controller is responsible for watching workload objects
+and <code>BindingPolicy</code> objects, and maintains for each of the latter a
+matching <code>Binding</code> object in the WDS.  A <code>Binding</code> object is mapped
+1:1 to a <code>BindingPolicy</code> object and contains the concrete list of
+references to workload objects and the concrete list of references to
+inventory objects that were selected by the policy.</p>
+<p>The Binding Controller is centered on its workqueue and an internal
+data structure, called a <code>BindingPolicyResover</code>, that represents the
+set of <code>Binding</code> objects that <em>should</em> exist based on the controller's
+inputs. The controller has informers for all of its inputs: a static
+collection for the control objects (<code>BindingPolicy</code> and inventory
+objects) and a dynamic collection (based on continual API discovery)
+for the workload objects. The controller also has informers for its
+output objects (i.e., <code>Binding</code> objects). Every notification from an
+informer is handled by putting a relevant object reference into the
+work queue. Working on a reference to an input involves updating the
+<code>BindingPolicyResover</code> and enqueuing a reference to any output object
+(<code>Binding</code>) that might need a change. Working on a reference to a
+<code>Binding</code> involves comparing what is actually in that <code>Binding</code> with
+what the <code>BindingPolicyResover</code> says should be there, and
+creating/updating/deleting the <code>Binding</code> if there is a difference.</p>
+<p>The Binding Controller also provides two informer-like services that
+the Status Controller uses. One is notifying about any change to that
+internal data structure, and the ability to read from it. The other is
+notifying about workload object events.</p>
 <p>The architecture and the event flow of the code for create/update object events is
-illustrated in Figure 3 (some details might be omitted to make the flow easier
-to understand). </p>
+illustrated in Figure 3 (some details are omitted to make the flow easier
+to understand).</p>
 <p>
 <figure><img src="../images/binding-controller.svg" /><figcaption>Figure 3 - Binding Controller</figcaption>
 </figure>
@@ -3561,169 +3567,103 @@ handler and the work queue as follows:</p>
 <li>Creates GVR key</li>
 <li>Registers Event Handler</li>
 <li>Starts Informer</li>
-<li>Indexes informer and lister in a map by GVR key</li>
+<li>Stores informer and lister in a map indexed by GVR</li>
 </ul>
 </li>
 <li>Waits for all caches to sync</li>
+<li>Gets the list of all <code>BindingPolicy</code> objects and, for each one, invokes the <code>BindingPolicyResover</code> method for the presence of the <code>BindingPolicy</code>.</li>
 <li>Starts N workers to process work queue</li>
 </ul>
-<p>The reflector is started as part of the informer and watches specific
-resources on the WDS API Server; on create/update/delete object events it
-puts a copy of the object into the local cache. The informer invokes the
-event handler. The handler implements the event handling functions
-(<code>AddFunc</code>, <code>UpdateFunc</code>, <code>DeleteFunc</code>)</p>
-<p>A typical event flow for a create/update object event will run as
-follows:</p>
+<p>The informer and watches specific resources on the WDS API Server; on
+create/update/delete object events it puts a copy of the object into
+the informer's local cache, which is what the lister reads. The
+informer invokes the event handler. The handler implements the event
+handling functions (<code>AddFunc</code>, <code>UpdateFunc</code>, <code>DeleteFunc</code>)</p>
+<h4 id="sync-bindingpolicy">Sync BindingPolicy<a class="headerlink" href="#sync-bindingpolicy" title="Permanent link">#</a></h4>
+<p>For a <code>BindingPolicy</code> that is deleted or being deleted, sync consists of the following steps.</p>
+<ol>
+<li>Ensure the absence of the KubeStellar finalizer on the <code>BindingPolicy</code>.</li>
+<li>Invoke the <code>BindingPolicyResover</code> method for the absence of the <code>BindingPolicy</code>.</li>
+</ol>
+<p>For a <code>BindingPolicy</code> that is neither deleted nor being deleted, sync consists of the following steps.</p>
+<ol>
+<li>Ensure the presence of the KubeStellar finalizer on the <code>BindingPolicy</code>.</li>
+<li>Invoke the <code>BindingPolicyResover</code> method for the presence of the <code>BindingPolicy</code>.</li>
+<li>Find all the WECs (which are represented by inventory objects) that match the <code>BindingPolicy</code>.</li>
+<li>Invoke the <code>BindingPolicyResover</code> method that associates a BindingPolicy's name with its current set of matching WECs.</li>
+<li>Enqueue a reference to every workload object.</li>
+</ol>
+<h4 id="sync-workload-object">Sync Workload Object<a class="headerlink" href="#sync-workload-object" title="Permanent link">#</a></h4>
+<p>If the workload object is a CRD then, in addition to the steps below,
+the controller makes the corresponding change in the results of API
+discovery.</p>
+<p>If the workload object is being deleted then the controller invokes
+the <code>BindingPolicyResolver</code> method that handles with the non-existence
+of an object; this completes sync in this case.</p>
+<p>Otherwise the controller proceeds as follows, independently for each
+<code>BindingPolicy</code> that exists in the informer's local cache and the
+<code>BindingPolicyResolver</code> is aware of.</p>
 <ol>
 <li>
-<p>Informer invokes the event handler <code>AddFunc</code> or <code>UpdateFunc</code></p>
+<p>The workload object is tested against the downsync policy clauses
+   of the <code>BindingPolicy</code> and results accumulated.</p>
 </li>
 <li>
-<p>The event handler does some filtering (for example, to ignore update
-    events where the object content is not modified) and then creates a
-    key to store a reference to the object in the work queue. The key
-    contains the GVR key used to retrieve a reference to the informer
-    and lister for that kind of object, and a namespace + name key to
-    retrieve the actual object. Storing the key in the work queue is a
-    common pattern in client-go as the object may have changed in the
-    cache (which is kept updated by the reflector) by the time a worker
-    gets a copy from the work queue. Workers should always receive the
-    key and use it to retrieve the object from the cache.</p>
+<p>The controller calls the <code>BindingPolicyResolver</code> method that copes
+   with the accumulated results.</p>
 </li>
 <li>
-<p>A worker pulls a key from the work queue, and then does the
-    following processing:</p>
-<ul>
-<li>Uses the GVR key to get the reference to the lister for the
-    object</li>
-<li>Gets the object from the lister cache using the <code>NamespacedName</code> of 
-   the object.</li>
-<li>If the object was not found (because it was deleted) worker returns. 
-   A delete event for that object consumed by the event handler enqueues 
-   a key for <a href="#object-deleted">Object Deleted</a>.</li>
-<li>Gets the lister for BindingPolicy objects and list all binding-policies</li>
-<li>Iterates on all binding-policies, and for each of them:<ul>
-<li>Evaluates whether the object matches the downsync selection 
-  criteria in the <code>BindingPolicy</code>.</li>
-<li>Whether the object is a match or not, the worker notes it through the in-memory representation 
-   of the relevant <code>Binding</code>. If the noting of an object results in a change in the in-memory representation of the
- <code>Binding</code>, the worker enqueues the latter for syncing.</li>
-<li>If a matched <code>BindingPolicy</code> has <code>WantSingletonReportedState</code> set to true (**see note below), the object is 
-   labeled with a special label in order to be able to track it for status reporting.</li>
-<li>If no matching <code>BindingPolicy</code> has <code>WantSingletonReportedState</code> set to true, the worker sets the label value
-   to false if the label exists.</li>
-</ul>
-</li>
-<li>Worker returns and is ready to pick other keys from the queue.</li>
-</ul>
+<p>If the resolver reported that this made a difference then the
+   controller enqueues a reference to the corresponding <code>Binding</code>
+   object.</p>
 </li>
 </ol>
-<p><code>WantSingletonReportedState</code>:
-currently it is the user's responsibility to make sure that a binding-policy that sets <code>WantSingletonReportedState</code> to
-true is not in conflict with other binding-policies that do the same, and that the binding-policy selects only a single
-cluster.</p>
-<p>There are other event flows, based on the object <code>GroupVersionKind</code> and type of event. 
-Error conditions may cause the re-enqueuing of keys, resulting in retries.
-The following sections broadly describe these flows.</p>
-<h4 id="object-deleted">Object Deleted<a class="headerlink" href="#object-deleted" title="Permanent link">#</a></h4>
-<p>When an object is deleted from the WDS, the handler’s <code>DeleteFunc</code> is
-invoked. A shallow copy of the object is added to a field in the key 
-before pushing it to the work queue. Then:</p>
-<ul>
+<h4 id="sync-binding">Sync Binding<a class="headerlink" href="#sync-binding" title="Permanent link">#</a></h4>
+<p>If the <code>BindingPolicyResover</code> is unaware of the existence of a
+corresponding <code>BindingPolicy</code> then almost nothing needs to be done:
+the <code>BindingPolicy</code> is either being created or deleted and there will
+be more syncing done due to other events. All that need be done here
+and now is have the resolver notify its registered handlers (which are
+from the Status Controller) for <code>BindingPolicy</code> events.</p>
+<p>If the corresponding <code>BindingPolicy</code> object does not exist, then
+nothing more is done.</p>
+<p>In the remaining cases, the controller takes the following steps.</p>
+<ol>
 <li>
-<p>Worker pulls the key from the work queue</p>
-</li>
-<li>
-<p>Flow continues the same way as in the create/update scenario, however
-  the <code>deletedObject</code> field in the key indicates that the object has been
-  deleted and that it needs to be removed from all clusters.</p>
-</li>
-<li>
-<p>In-memory representations of affected bindings are updated to remove the object.
-If any are indeed affected, they are enqueued for syncing.</p>
+<p>The controller generates the proper <code>BindingSpec</code> from the
+   information in the <code>BindingPolicyResover</code>. The controller compares
+   that with the <code>BindingSpec</code> (if any) from the <code>Binding</code> lister. If
+   there is a difference then the controller updates the <code>Binding</code>
+   object and has the resolver notify the registered handlers for
+   <code>BindingPolicy</code> events. When creating a <code>Binding</code> object, the
+   controller sets the corresponding <code>BindingPolicyObject</code> as a
+   controlling owner in the object metadata.</p>
 </li>
 <li>
-<p>Worker returns and is ready to pick other keys from the queue.</p>
+<p>The controller writes the <code>.status</code> of the corresponding
+   <code>BindingPolicy</code>.  This includes propagating the errors from the
+   <code>.status.errors</code> of the <code>Binding</code> and adding reports of invalid
+   requests for singleton reported state return (requests where the
+   object is not distributed to exactly 1 WEC).</p>
 </li>
-</ul>
-<h4 id="bindingpolicy-created-or-updated">BindingPolicy Created or Updated<a class="headerlink" href="#bindingpolicy-created-or-updated" title="Permanent link">#</a></h4>
-<p>Worker pulls key from queue; if it is a binding-policy and it has not been
-deleted (deletion timestamp not set) it follows the following flow:</p>
-<ul>
-<li>Re-enqueues all objects to force re-evaluation: this is done by 
-  iterating all GVR-indexed listers, listing objects for each lister
-  and re-enqueuing the key for each object.</li>
-<li>Notes the <code>BindingPolicy</code> to create an empty in-memory representation for its <code>Binding</code>.</li>
-<li>Lists ManagedClusters and finds the matching clusters using the label selector expression for clusters.</li>
-<li>If there are matching clusters, the in-memory <code>Binding</code> representation is updated with the list of clusters.</li>
-<li>Enqueues the representation of the relevant <code>Binding</code> for syncing.</li>
-</ul>
-<p>Re-enqueuing all object keys forces the re-evaluation of all objects vs.
-all binding-policies. This is a shortcut as it would be more efficient to
-re-evaluate all objects vs. the changed binding-policy only, but it saves
-some additional complexity in the code.</p>
-<h4 id="bindingpolicy-deleted">BindingPolicy Deleted<a class="headerlink" href="#bindingpolicy-deleted" title="Permanent link">#</a></h4>
-<p>When the binding controller first processes a new <code>BindingPolicy</code>, the binding 
-controller sets a finalizer on it. The Worker pulls a key from queue; if it is 
-a <code>BindingPolicy</code> and it has been deleted (deletion timestamp is set) it follows the flow below:</p>
-<ul>
-<li>Deletes the in-memory representation of the <code>Binding</code>. Note that the actual <code>Binding</code> object
-  is garbage collected due to the deletion of the <code>BindingPolicy</code> and the latter being an owner of the former (using <code>OwnerReference</code>).</li>
-<li>If the <code>BindingPolicy</code> had <code>WantSingletonReportedState</code> set to true, the worker enqueues all objects selected by the
-<code>BindingPolicy</code> for re-evaluation of the label.</li>
-<li>Deletes <code>BindingPolicy</code> finalizer.</li>
-</ul>
-<h4 id="binding-syncing">Binding Syncing<a class="headerlink" href="#binding-syncing" title="Permanent link">#</a></h4>
-<p>When a binding is enqueued for syncing, the worker pulls the key from the queue and
-follows the flow below:</p>
-<ul>
-<li>If an in memory representation of the binding is not found, the worker returns.</li>
-<li>The key is used to retrieve the object from the WDS.<ul>
-<li>If the object is not found, then a <code>Binding</code> object should be created. For the convenience of the flow,
-  the worker sets the "retrieved object" as an empty <code>Binding</code> object with the appropriate Meta fields,
-  including the <code>BindingPolicy</code> object as the single owner reference.</li>
-</ul>
-</li>
-<li>The worker compares the in-memory representation of the binding with the retrieved object.<ul>
-<li>If the two are the same, the worker returns.</li>
-<li>If the two are different, the worker updates the binding object resource to reflect the state of the
-  in-memory representation.</li>
-</ul>
-</li>
-</ul>
-<h4 id="new-crd-added">New CRD Added<a class="headerlink" href="#new-crd-added" title="Permanent link">#</a></h4>
-<p>When a new CRD is added, the binding controller needs to start a new informer to watch instances of the new CRD on the WDS.</p>
-<p>The worker pulls a key from queue and creates a GVR Key; if it is a CRD and
-not deleted:</p>
-<ul>
-<li>Checks if an informer for that GVR was already started, return if that
-  is the case.</li>
-<li>If not, creates a new informer</li>
-<li>Registers the event handler for the informer (same one used for all
-  other api resources)</li>
-<li>Starts the new informer with a stopper channel, so that it can be
-  stopped later on by closing the channel.</li>
-<li>adds informer, lister and stopper channel references to the hashmap
-  indexed by the GVR key.</li>
-</ul>
-<h4 id="crd-deleted">CRD Deleted<a class="headerlink" href="#crd-deleted" title="Permanent link">#</a></h4>
-<p>When a CRD is deleted, the controller needs to stop the informer that
-was used to watch instances of that CRD on the WDS. This is because
-informers on CRs will keep on throwing exceptions for missing CRDs.</p>
-<p>The worker pulls a key from queue and creates a GVR Key; if it is a CRD and it
-has been deleted:</p>
-<ul>
-<li>Uses the GVR key to retrieve the stopper channel for the informer.</li>
-<li>Closes the stopper channel</li>
-<li>Removes informer, lister and stopper channel references from the
-  hashmap indexed by the GVR key.</li>
-</ul>
+</ol>
 <h3 id="status-controller">Status Controller<a class="headerlink" href="#status-controller" title="Permanent link">#</a></h3>
-<p>The status controller watches for <code>Binding</code> objects in the WDS and <code>WorkStatus</code>
-objects in the ITS. For WDS objects propagated by a <code>BindingPolicy</code> with the flag
-<code>wantSingletonReportedState</code> set to true, the status controller manages the statuses of those
-objects with the corresponding statuses found in the <code>Workstatus</code> objects, if necessary.</p>
-<p>The <code>WorkStatus</code> objects are created and updated on the ITS by the OCM Status Add-On Agent described <a href="#ocm-status-add-on-agent">above</a>.</p>
+<p>The status controller implements the last stage of reported state
+propagation, from the ITS into the WDS. This includes both singleton
+reported state return into the <code>.status</code> section of workload objects
+and programmed aggregation into <code>CombinedStatus</code> objects.</p>
+<p>The <code>WorkStatus</code> objects are created, updated, and deleted in the ITS
+by the chosen transport. For the OCM transport, that is the OCM Status
+Add-On Agent described <a href="#ocm-status-add-on-agent">above</a>.</p>
+<p>The status controller has informers for its unique inputs, which are
+<code>StatusCollector</code> objects in the WDS and <code>WorkStatus</code> objects in the
+ITS. The status controller also gets informer-like services from the
+binding controller: getting notified of and being able to read the
+current state resulting from (a) workload object create/update/delete,
+(b) change in an intended <code>Binding</code>, and (c) change in whether
+singleton reported state return is requested for a workload
+object. The status controller also has informers for its unique
+outputs, which are the <code>CombinedStatus</code> objects.</p>
 <p>The high-level flow for the singleton status update is described in Figure 4.</p>
 <p>
 <figure><img src="../images/status-controller.svg" /><figcaption>Figure 4 - Status Controller</figcaption>
