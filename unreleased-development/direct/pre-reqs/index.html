@@ -3117,7 +3117,7 @@
 
 <h1 id="kubestellar-prerequisites">KubeStellar Prerequisites<a class="headerlink" href="#kubestellar-prerequisites" title="Permanent link">#</a></h1>
 <p>The following prerequisites are required.
-You can use the <a href="#automated-check-of-pre-requisites-for-kubestellar">check-pre-req</a> script, to validate if all needed prerequisites are installed.</p>
+You can use the <a href="#automated-check-of-prerequisites-for-kubestellar">check-pre-req</a> script, to validate if all needed prerequisites are installed.</p>
 <h2 id="infrastructure-clusters">Infrastructure (clusters)<a class="headerlink" href="#infrastructure-clusters" title="Permanent link">#</a></h2>
 <p>Because of its multicluster architecture, KubeStellar requires that you have the necessary privileges and infrastructure access to create and/or configure the necessary Kubernetes clusters. These are the following; see <a href="../architecture/">the architecture document</a> for more details.</p>
 <ul>
@@ -3135,12 +3135,12 @@ You can use the <a href="#automated-check-of-pre-requisites-for-kubestellar">che
 <h2 id="software-prerequisites-for-using-kubestellar">Software Prerequisites: for Using KubeStellar<a class="headerlink" href="#software-prerequisites-for-using-kubestellar" title="Permanent link">#</a></h2>
 <ul>
 <li>
-<p><strong>kubeflex</strong> version 0.7.1 or higher
+<p><strong>kubeflex</strong> version 0.7.1 or higher.
     To install kubeflex go to <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation">https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation</a>. To upgrade from an existing installation,
 follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex">these instructions</a>. At the end of the install make sure that the kubeflex CLI, kflex, is in your <code>$PATH</code>.</p>
 </li>
 <li>
-<p><strong>OCM CLI (clusteradm)</strong>
+<p><strong>OCM CLI (clusteradm)</strong> version &gt;= 0.7.
     To install OCM CLI use:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </code></pre></div>
@@ -3153,36 +3153,36 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 <p>At the end of the install make sure that the OCM CLI, clusteradm, is in your <code>$PATH</code>.</p>
 </li>
 <li>
-<p><strong>helm</strong> - to deploy the Kubestellar and kubeflex charts</p>
+<p><strong>helm</strong> version &gt;= 3 - to deploy the Kubestellar and kubeflex charts</p>
 </li>
-<li><a href="https://kubernetes.io/docs/tasks/tools/"><strong>kubectl</strong></a> - to access the kubernetes clusters</li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/"><strong>kubectl</strong></a> version &gt;= 1.27 - to access the kubernetes clusters</li>
 </ul>
 <h2 id="additional-software-for-the-getting-started-setup">Additional Software for the Getting Started setup<a class="headerlink" href="#additional-software-for-the-getting-started-setup" title="Permanent link">#</a></h2>
 <ul>
-<li><a href="https://kind.sigs.k8s.io/"><strong>kind</strong></a></li>
-<li><strong>docker</strong> (or compatible docker engine that works with kind)</li>
+<li><a href="https://kind.sigs.k8s.io/"><strong>kind</strong></a> version &gt;= 0.20</li>
+<li><strong>docker</strong> (or compatible docker engine that works with kind) (client version &gt;= 20)</li>
 </ul>
 <h2 id="additional-software-for-monitoring">Additional Software for monitoring<a class="headerlink" href="#additional-software-for-monitoring" title="Permanent link">#</a></h2>
 <p>The setup in <code>montoring/</code> additional uses the following.</p>
 <ul>
-<li><a href="https://github.com/mikefarah/yq"><code>yq</code></a> (also available from <a href="https://formulae.brew.sh/formula/yq">Homebrew</a>)</li>
+<li><a href="https://github.com/mikefarah/yq"><code>yq</code></a> (also available from <a href="https://formulae.brew.sh/formula/yq">Homebrew</a>) version &gt;= 1.5</li>
 </ul>
 <h2 id="additional-software-for-running-the-examples">Additional Software For Running the Examples<a class="headerlink" href="#additional-software-for-running-the-examples" title="Permanent link">#</a></h2>
 <ul>
-<li><a href="https://argo-cd.readthedocs.io/en/stable/getting_started/"><strong>argocd</strong></a> - for the examples that use it</li>
+<li><a href="https://argo-cd.readthedocs.io/en/stable/getting_started/"><strong>argocd</strong></a> version &gt;= 2 - for the examples that use it</li>
 </ul>
 <h2 id="additional-software-for-building-kubestellar-from-source-and-testing">Additional Software For Building KubeStellar from Source and Testing<a class="headerlink" href="#additional-software-for-building-kubestellar-from-source-and-testing" title="Permanent link">#</a></h2>
 <ul>
 <li><a href="https://go.dev/doc/install"><strong>go</strong></a> version 1.21 or higher - to build Kubestellar</li>
-<li><a href="https://www.gnu.org/software/make/"><strong>make</strong></a> - to build Kubestellar and create the Kubestellar container images</li>
-<li><a href="https://ko.build/install/"><strong>ko</strong></a> - to create some of the Kubestellar container images</li>
-<li><strong>docker</strong> (or equivalent that implements <code>docker buildx</code>) - to create other KubeStellar container images</li>
+<li><a href="https://www.gnu.org/software/make/"><strong>GNU make</strong></a> version &gt;= 3.5 - to build Kubestellar and create the Kubestellar container images</li>
+<li><a href="https://ko.build/install/"><strong>ko</strong></a> version &gt;= 0.15 - to create some of the Kubestellar container images</li>
+<li><strong>docker</strong> (or equivalent that implements <code>docker buildx</code>) (client version &gt;= 20) - to create other KubeStellar container images</li>
 </ul>
 <p>To build and <em><strong>test</strong></em> KubeStellar properly, you will also need</p>
 <ul>
-<li><a href="https://kind.sigs.k8s.io/"><strong>kind</strong></a></li>
+<li><a href="https://kind.sigs.k8s.io/"><strong>kind</strong></a> version &gt;= 0.20</li>
 <li><a href="https://docs.openshift.com/container-platform/4.13/installing/index.html"><strong>OCP</strong></a></li>
-<li><a href="https://github.com/mikefarah/yq"><code>yq</code></a> (also available from <a href="https://formulae.brew.sh/formula/yq">Homebrew</a>) - for running tests</li>
+<li><a href="https://github.com/mikefarah/yq"><code>yq</code></a> (also available from <a href="https://formulae.brew.sh/formula/yq">Homebrew</a>) version &gt;= 4 - for running tests</li>
 </ul>
 <!-- start tag for check script  include -->
 
@@ -3207,18 +3207,18 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 <p>For example, list of prerequisites required by KubeStellar can be checked with the command below (add the <code>-V</code> flag to get the version of each program and a suggestions on how to install missing prerequisites):</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>hack/check_pre_req.sh
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Checking<span class="w"> </span>pre-requisites<span class="w"> </span><span class="k">for</span><span class="w"> </span>using<span class="w"> </span>KubeStellar:
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>✔<span class="w"> </span>Docker
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>✔<span class="w"> </span>kubectl
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>✔<span class="w"> </span>KubeFlex
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>✔<span class="w"> </span>OCM<span class="w"> </span>CLI
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>✔<span class="w"> </span>Helm
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>✔<span class="w"> </span>Docker<span class="w"> </span><span class="o">(</span>Docker<span class="w"> </span>version<span class="w"> </span><span class="m">27</span>.2.1-rd,<span class="w"> </span>build<span class="w"> </span>cc0ee3e<span class="o">)</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>✔<span class="w"> </span>kubectl<span class="w"> </span><span class="o">(</span>v1.29.2<span class="o">)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>✔<span class="w"> </span>KubeFlex<span class="w"> </span><span class="o">(</span>Kubeflex<span class="w"> </span>version:<span class="w"> </span>v0.6.3.672cc8a<span class="w"> </span><span class="m">2024</span>-09-23T16:15:47Z<span class="o">)</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>✔<span class="w"> </span>OCM<span class="w"> </span>CLI<span class="w"> </span><span class="o">(</span>:v0.9.0-0-g56e1fc8<span class="o">)</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>✔<span class="w"> </span>Helm<span class="w"> </span><span class="o">(</span>v3.16.1<span class="o">)</span>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>Checking<span class="w"> </span>additional<span class="w"> </span>pre-requisites<span class="w"> </span><span class="k">for</span><span class="w"> </span>running<span class="w"> </span>the<span class="w"> </span>examples:
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>✔<span class="w"> </span>Kind
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>X<span class="w"> </span>ArgoCD<span class="w"> </span>CLI
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>✔<span class="w"> </span>Kind<span class="w"> </span><span class="o">(</span>kind<span class="w"> </span>v0.22.0<span class="w"> </span>go1.22.0<span class="w"> </span>darwin/arm64<span class="o">)</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>✔<span class="w"> </span>ArgoCD<span class="w"> </span>CLI<span class="w"> </span><span class="o">(</span>v2.10.1+a79e0ea<span class="o">)</span>
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>Checking<span class="w"> </span>pre-requisites<span class="w"> </span><span class="k">for</span><span class="w"> </span>building<span class="w"> </span>KubeStellar:
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>✔<span class="w"> </span>GNU<span class="w"> </span>Make
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>✔<span class="w"> </span>Go
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>✔<span class="w"> </span>KO
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>✔<span class="w"> </span>GNU<span class="w"> </span>Make<span class="w"> </span><span class="o">(</span>GNU<span class="w"> </span>Make<span class="w"> </span><span class="m">3</span>.81<span class="o">)</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>✔<span class="w"> </span>Go<span class="w"> </span><span class="o">(</span>go<span class="w"> </span>version<span class="w"> </span>go1.23.2<span class="w"> </span>darwin/arm64<span class="o">)</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>✔<span class="w"> </span>KO<span class="w"> </span><span class="o">(</span><span class="m">0</span>.16.0<span class="o">)</span>
 </code></pre></div>
 <!-- end tag for check-prereq script -->
 
@@ -3226,10 +3226,10 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$<span class="w"> </span>check_pre_req.sh<span class="w"> </span>--assert<span class="w"> </span>--verbose<span class="w"> </span>helm<span class="w"> </span>argo<span class="w"> </span>docker<span class="w"> </span>kind
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Checking<span class="w"> </span>KubeStellar<span class="w"> </span>pre-requisites:
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>✔<span class="w"> </span>Helm
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>version:<span class="w"> </span>version.BuildInfo<span class="o">{</span>Version:<span class="s2">&quot;v3.14.0&quot;</span>,<span class="w"> </span>GitCommit:<span class="s2">&quot;3fc9f4b2638e76f26739cd77c7017139be81d0ea&quot;</span>,<span class="w"> </span>GitTreeState:<span class="s2">&quot;clean&quot;</span>,<span class="w"> </span>GoVersion:<span class="s2">&quot;go1.21.5&quot;</span><span class="o">}</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>version<span class="w"> </span><span class="o">(</span>unstructured<span class="o">)</span>:<span class="w"> </span>version.BuildInfo<span class="o">{</span>Version:<span class="s2">&quot;v3.14.0&quot;</span>,<span class="w"> </span>GitCommit:<span class="s2">&quot;3fc9f4b2638e76f26739cd77c7017139be81d0ea&quot;</span>,<span class="w"> </span>GitTreeState:<span class="s2">&quot;clean&quot;</span>,<span class="w"> </span>GoVersion:<span class="s2">&quot;go1.21.5&quot;</span><span class="o">}</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">     </span>path:<span class="w"> </span>/usr/sbin/helm
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>X<span class="w"> </span>ArgoCD<span class="w"> </span>CLI
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span>how<span class="w"> </span>to<span class="w"> </span>install:<span class="w"> </span>https://argo-cd.readthedocs.io/en/stable/cli_installation/
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span>how<span class="w"> </span>to<span class="w"> </span>install:<span class="w"> </span>https://argo-cd.readthedocs.io/en/stable/cli_installation/<span class="p">;</span><span class="w"> </span>get<span class="w"> </span>at<span class="w"> </span>least<span class="w"> </span>version<span class="w"> </span>v2
 </code></pre></div>
 
 
