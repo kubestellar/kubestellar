@@ -152,7 +152,7 @@ echo -e "\nWaiting for OCM cluster manager to be ready..."
 wait-for-cmd "[[ \$(kubectl --context its1 get deployments.apps -n open-cluster-management -o jsonpath='{.status.readyReplicas}' cluster-manager 2>/dev/null) -ge 1 ]]"
 echo -e "OCM cluster manager is ready"
 
-echo -e "\nCreating cluster and context for cluster 1 and 2..."
+echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..."
 
 : set flags to "" if you have installed KubeStellar on an OpenShift cluster
 flags="--force-internal-endpoint-lookup"
@@ -173,7 +173,8 @@ echo "Checking the new clusters are in the OCM inventory and label them"
 kubectl --context its1 get managedclusters
 kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
 kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
-echo "\n\nCongratulations! Your KubeStellar demo environment is now ready to use."
+echo""
+echo "Congratulations! Your KubeStellar demo environment is now ready to use."
 
 cat <<"EOF"
 
