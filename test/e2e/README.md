@@ -40,6 +40,10 @@ FYI, if you need to rename a kubeconfig context in order to reach the above conf
 $ kubectl config rename-context <default-wec1-context-name> cluster1
 ```
 
+## Fail fast or run every test case
+
+For the ginkgo-based test, normally every test case is run. However, the script accepts a `--fail-fast` flag --- which will get passed on to `ginkgo`, making it stop after the first failed test case.
+
 ## Verbosity
 
 The kubestellar controller-manager will be invoked with `-v=2` unless otherwise specified on the command line with `--kubestellar-controller-manager-verbosity $number`. This verbosity can not be set to a value other than 2 when using `--released`.

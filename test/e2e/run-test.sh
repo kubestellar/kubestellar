@@ -20,11 +20,12 @@ set -x # so users can see what is going on
 
 env="kind"
 test="bash"
+fail_flag=""
 
 
 while [ $# != 0 ]; do
     case "$1" in
-        (-h|--help) echo "$0 usage: (--released | --env | --test-type | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num)*"
+        (-h|--help) echo "$0 usage: (--released | --env | --test-type | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --fail-fast)*"
                     exit;;
         (--released) setup_flags="$setup_flags $1";;
         (--kubestellar-controller-manager-verbosity|--transport-controller-verbosity)
@@ -51,6 +52,7 @@ while [ $# != 0 ]; do
             echo "Missing test type value" >&2
             exit 1;
           fi;;
+        (--fail-fast) fail_flag="--fail-fast";;
         (*) echo "$0: unrecognized argument '$1'" >&2
             exit 1
     esac
@@ -85,5 +87,5 @@ if [ $test == "bash" ];then
     "${SRC_DIR}/bash/use-kubestellar.sh" --env "$env"
 elif [ $test == "ginkgo" ];then
     GINKGO_DIR="${SRC_DIR}/ginkgo"
-    KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color $GINKGO_DIR -- -skip-setup
+    KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color $fail_flag $GINKGO_DIR -- -skip-setup
 fi
