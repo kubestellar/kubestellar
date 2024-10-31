@@ -103,11 +103,11 @@ cluster_clean_up "kind delete cluster --name kubeflex" &
 cluster_clean_up "kind delete cluster --name cluster1" &
 cluster_clean_up "kind delete cluster --name cluster2" &
 wait
-echo -e "Cluster space clean up has been completed"
+echo -e "\033[33m✔\033[0m Cluster space clean up has been completed"
 
 echo -e "\nStarting context clean up..."
 context_clean_up
-echo "Context space clean up completed"
+echo -e "\033[33m✔\033[0m Context space clean up completed"
 
 echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
 clusters=(cluster1 cluster2)
@@ -115,15 +115,30 @@ for cluster in "${clusters[@]}"; do
    (
      echo -e "Creating cluster ${cluster}..."
      kind create cluster --name "${cluster}" >/dev/null 2>&1 &&
-     kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1
-     echo -e "${cluster} creation and context setup complete"
+     echo -e "\033[33m✔\033[0m ${cluster} creation and context setup complete"
    ) &
 done
 wait 
 
+for cluster in "${clusters[@]}"; do
+   kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1
+done
+
+for cluster in "${clusters[@]}"; do
+  if kubectl config get-contexts | grep -w " ${cluster} " >/dev/null 2>&1; then
+    echo -e "\033[33m✔\033[0m $cluster context exists."
+  else
+    if kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1; then
+      echo -e "\033[33m✔\033[0m Renamed context 'kind-${cluster}' to '${cluster}'."
+    else
+      echo -e "Failed to rename context 'kind-${cluster}' to '${cluster}'. It may not exist."
+    fi
+  fi
+done
+
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
 curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443 
-echo -e "Completed KubeFlex cluster with SSL Passthrough"
+echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
 
 echo -e "\nPulling container images local..."
 images=("ghcr.io/loft-sh/vcluster:0.16.4"
@@ -150,7 +165,7 @@ kflex ctx --overwrite-existing-context its1
 echo -e "\nWaiting for OCM cluster manager to be ready..."
 
 wait-for-cmd "[[ \$(kubectl --context its1 get deployments.apps -n open-cluster-management -o jsonpath='{.status.readyReplicas}' cluster-manager 2>/dev/null) -ge 1 ]]"
-echo -e "OCM cluster manager is ready"
+echo -e "\033[33m✔\033[0m OCM cluster manager is ready"
 
 echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..."
 
@@ -174,7 +189,7 @@ kubectl --context its1 get managedclusters
 kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
 kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
 echo""
-echo "Congratulations! Your KubeStellar demo environment is now ready to use."
+echo -e "\033[33m✔\033[0m Congratulations! Your KubeStellar demo environment is now ready to use."
 
 cat <<"EOF"
 
