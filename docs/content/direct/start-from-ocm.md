@@ -34,7 +34,7 @@ story](user-guide-intro.md#the-full-story).
 The following command will check for the prerequisites that you will need for the later steps. See [the prerequisites doc](pre-reqs.md) for more details.
 
 ```shell
-bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/hack/check_pre_req.sh) kflex ocm helm kubectl docker kind
+bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/hack/check_pre_req.sh) kflex ocm helm kubectl docker kind
 ```
 
 ### Set the Version appropriately as an environment variable
@@ -53,7 +53,7 @@ This recipe uses a modified version of [the OCM Quick Start](https://raw.githubu
 You can invoke the modified OCM Quick Start as follows.
 
 ```shell
-curl -L https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/ocm-local-up-for-ingress.sh | bash
+curl -L https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/{{ config.ks_latest_release }}/scripts/ocm-local-up-for-ingress.sh | bash
 ```
 
 Like the baseline, this script creates a `kind` cluster named "hub" to
