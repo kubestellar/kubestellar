@@ -201,12 +201,12 @@ func CreateStatusCollector(ctx context.Context, wds *ksClient.Clientset, name st
 	}, timeout).Should(gomega.Not(gomega.BeNil()))
 }
 
-// GetCombinedStatus is a helper func which expects the workload object to be a Deployment.
+// WaitForCombinedStatus is a helper func which expects the workload object to be a Deployment.
 // CombinedStatus name is the concatenation of:
 // - the UID of the workload object
 // - the string "."
 // - the UID of the BindingPolicy object.
-func GetCombinedStatus(ctx context.Context, ksClient *ksClient.Clientset, kubeClient *kubernetes.Clientset, ns, objectName, policyName string) *ksapi.CombinedStatus {
+func WaitForCombinedStatus(ctx context.Context, ksClient *ksClient.Clientset, kubeClient *kubernetes.Clientset, ns, objectName, policyName string, validate func(*ksapi.CombinedStatus) error) {
 	ginkgo.GinkgoHelper()
 	var cs *ksapi.CombinedStatus
 
@@ -220,16 +220,11 @@ func GetCombinedStatus(ctx context.Context, ksClient *ksClient.Clientset, kubeCl
 
 	gomega.Eventually(func() error {
 		cs, err = ksClient.ControlV1alpha1().CombinedStatuses(ns).Get(ctx, cs_name, metav1.GetOptions{})
-		return err
+		if err != nil {
+			return err
+		}
+		return validate(cs)
 	}, timeout).ShouldNot(gomega.HaveOccurred())
-
-	// now that CombinedStatus exists, we need to wait some time for it to be completed
-	// TODO: find a way to determine completion
-	time.Sleep(40 * time.Second)
-	cs, err = ksClient.ControlV1alpha1().CombinedStatuses(ns).Get(ctx, cs_name, metav1.GetOptions{})
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
-
-	return cs
 }
 
 func DeleteDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string, name string) {
