@@ -116,6 +116,7 @@ for cluster in "${clusters[@]}"; do
      echo -e "Creating cluster ${cluster}..."
      kind create cluster --name "${cluster}" >/dev/null 2>&1 &&
      kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1
+     kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1
      echo -e "${cluster} creation and context setup complete"
    ) &
 done
