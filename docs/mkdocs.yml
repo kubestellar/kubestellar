@@ -68,6 +68,7 @@ nav:
               - Overview: direct/known-issues.md
               - Hidden state in kubeconfig: direct/knownissue-kflex-extension.md
               - Kind needs OS reconfig: direct/knownissue-kind-config.md
+              - Authorization failure in WSL while fetching Helm chart from ghcr.io: direct/knownissue-wsl-ghcr-helm.md
   - Contributing: 
       - How to join in: direct/contribute.md
       - Code of Conduct: contribution-guidelines/coc.md

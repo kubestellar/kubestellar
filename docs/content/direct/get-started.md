@@ -14,6 +14,10 @@ This page shows one concrete example of steps 2--7 from the [full Installation a
 
 This is one way to produce a very simple system, suitable for study but not production usage. For general setup information, see [the full story](user-guide-intro.md#the-full-story).
 
+### Note for Windows users
+
+For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user `root` in Linux. There is a [known issue about this](knownissue-wsl-ghcr-helm.md).
+
 ### Install software prerequisites
 
 The following command will check for the prerequisites that you will need for the later steps. See [the prerequisites doc](pre-reqs.md) for more details.
