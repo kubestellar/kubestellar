@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.43">
     
     
       
@@ -838,6 +838,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#note-for-windows-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      Note for Windows users
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#install-software-prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       Install software prerequisites
@@ -1059,6 +1068,15 @@
   
     <nav class="md-nav" aria-label="Setup">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#note-for-windows-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      Note for Windows users
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#install-software-prerequisites" class="md-nav__link">
@@ -1959,6 +1977,8 @@
       
         
       
+        
+      
     
     
       
@@ -2044,6 +2064,27 @@
   
   <span class="md-ellipsis">
     Kind needs OS reconfig
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-wsl-ghcr-helm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Authorization failure in WSL while fetching Helm chart from ghcr.io
   </span>
   
 
@@ -3117,6 +3158,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#note-for-windows-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      Note for Windows users
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#install-software-prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       Install software prerequisites
@@ -3239,6 +3289,8 @@
 </ol>
 <h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">#</a></h2>
 <p>This is one way to produce a very simple system, suitable for study but not production usage. For general setup information, see <a href="../user-guide-intro/#the-full-story">the full story</a>.</p>
+<h3 id="note-for-windows-users">Note for Windows users<a class="headerlink" href="#note-for-windows-users" title="Permanent link">#</a></h3>
+<p>For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user <code>root</code> in Linux. There is a <a href="../knownissue-wsl-ghcr-helm/">known issue about this</a>.</p>
 <h3 id="install-software-prerequisites">Install software prerequisites<a class="headerlink" href="#install-software-prerequisites" title="Permanent link">#</a></h3>
 <p>The following command will check for the prerequisites that you will need for the later steps. See <a href="../pre-reqs/">the prerequisites doc</a> for more details.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.24.0/hack/check_pre_req.sh<span class="o">)</span><span class="w"> </span>kflex<span class="w"> </span>ocm<span class="w"> </span>helm<span class="w"> </span>kubectl<span class="w"> </span>docker<span class="w"> </span>kind
