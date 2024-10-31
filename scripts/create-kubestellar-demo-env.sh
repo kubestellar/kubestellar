@@ -88,7 +88,7 @@ checking_cluster() {
             break
             
         else
-            echo "$1 not found. Trying again..."
+            echo "CSR for $1 not found. Trying again..."
             sleep 20
         fi
 
