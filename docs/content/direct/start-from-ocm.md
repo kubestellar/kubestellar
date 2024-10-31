@@ -53,7 +53,7 @@ This recipe uses a modified version of [the OCM Quick Start](https://raw.githubu
 You can invoke the modified OCM Quick Start as follows.
 
 ```shell
-curl -L https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/ocm-local-up-for-ingress.sh | bash
+curl -L https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/{{ config.ks_latest_release }}/scripts/ocm-local-up-for-ingress.sh | bash
 ```
 
 Like the baseline, this script creates a `kind` cluster named "hub" to
