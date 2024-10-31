@@ -60,7 +60,7 @@ jobs:
           TEST_FLAGS: ${{ github.event.inputs.testFlags }}
         run: |
           cd test/e2e/ginkgo
-          KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color $TEST_FLAGS -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
+          KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color --fail-fast $TEST_FLAGS -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
 
       - name: show kubeconfig contexts
         if: always()
