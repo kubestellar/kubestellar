@@ -28,11 +28,15 @@ import (
 	"github.com/onsi/gomega"
 
 	appsv1 "k8s.io/api/apps/v1"
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
+	ptr "k8s.io/utils/pointer"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/test/util"
 )
 
@@ -680,32 +684,39 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{fullStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
-			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
-
-			// Validate CombinedStatus results
-			gomega.Expect(len(cs.Results)).To(gomega.Equal(1))
-			gomega.Expect(cs.Results[0].Name).To(gomega.Equal(fullStatusCollectorName))
-
-			gomega.Expect(len(cs.Results[0].ColumnNames)).To(gomega.Equal(2))
-			gomega.Expect(cs.Results[0].ColumnNames[0]).To(gomega.Equal("wecName"))
-			gomega.Expect(cs.Results[0].ColumnNames[1]).To(gomega.Equal("status"))
-
-			gomega.Expect(len(cs.Results[0].Rows)).To(gomega.Equal(2))
-			gomega.Expect(len(cs.Results[0].Rows[0].Columns)).To(gomega.Equal(2))
-			gomega.Expect(len(cs.Results[0].Rows[1].Columns)).To(gomega.Equal(2))
-
-			// we don't know which row will hold data for which WEC
-			row0expectedWec := "cluster1"
-			row1expectedWec := "cluster2"
-			if *cs.Results[0].Rows[0].Columns[0].String != row0expectedWec {
-				row0expectedWec = "cluster2"
-				row1expectedWec = "cluster1"
-			}
-
-			gomega.Expect(*cs.Results[0].Rows[0].Columns[0].String).To(gomega.Equal(row0expectedWec))
-			gomega.Expect(cs.Results[0].Rows[0].Columns[1].Object).Should(gomega.Not(gomega.BeNil()))
-			gomega.Expect(*cs.Results[0].Rows[1].Columns[0].String).To(gomega.Equal(row1expectedWec))
-			gomega.Expect(cs.Results[0].Rows[1].Columns[1].Object).Should(gomega.Not(gomega.BeNil()))
+			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
+				if n := len(cs.Results); n != 1 {
+					return fmt.Errorf("expected 1 NamedStatusCombination but got %d", n)
+				}
+				if gotName := cs.Results[0].Name; gotName != fullStatusCollectorName {
+					return fmt.Errorf("expected combination for %q but got one for %q", fullStatusCollectorName, gotName)
+				}
+				expectedColumnNames := []string{"wecName", "status"}
+				if gotColumnNames := cs.Results[0].ColumnNames; !abstract.SliceEqual(expectedColumnNames, gotColumnNames) {
+					return fmt.Errorf("expected ColumnNames %#v but got %#v", expectedColumnNames, gotColumnNames)
+				}
+				if n := len(cs.Results[0].Rows); n != 2 {
+					return fmt.Errorf("expected 2 rows but got %d", n)
+				}
+				expectedWECs := sets.New("cluster1", "cluster2")
+				gotWECs := sets.New[string]()
+				for rowIdx := 0; rowIdx < 2; rowIdx++ {
+					if t := cs.Results[0].Rows[rowIdx].Columns[0].Type; t != ksapi.TypeString {
+						return fmt.Errorf("expected row %d column 0 to have type %q but got %q", rowIdx, ksapi.TypeString, t)
+					}
+					if cs.Results[0].Rows[rowIdx].Columns[0].String == nil {
+						return fmt.Errorf("expected row %d column 0 to have non-nil String", rowIdx)
+					}
+					gotWECs.Insert(*cs.Results[0].Rows[rowIdx].Columns[0].String)
+					if cs.Results[0].Rows[rowIdx].Columns[1].Object == nil {
+						return fmt.Errorf("expected row %d column 1 to have non-nil Object", rowIdx)
+					}
+				}
+				if !gotWECs.Equal(expectedWECs) {
+					return fmt.Errorf("expected WECs %#v but got %#v", sets.List(expectedWECs), sets.List(gotWECs))
+				}
+				return nil
+			})
 		})
 
 		ginkgo.It("can sum status.availableReplicas across WECs", func(ctx context.Context) {
@@ -723,18 +734,27 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{sumAvailableReplicasStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
-			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
-
-			// Validate CombinedStatus results
-			gomega.Expect(len(cs.Results)).To(gomega.Equal(1))
-			gomega.Expect(cs.Results[0].Name).To(gomega.Equal(sumAvailableReplicasStatusCollectorName))
-
-			gomega.Expect(len(cs.Results[0].ColumnNames)).To(gomega.Equal(1))
-			gomega.Expect(cs.Results[0].ColumnNames[0]).To(gomega.Equal("sum"))
-
-			gomega.Expect(len(cs.Results[0].Rows)).To(gomega.Equal(1))
-			gomega.Expect(len(cs.Results[0].Rows[0].Columns)).To(gomega.Equal(1))
-			gomega.Expect(*cs.Results[0].Rows[0].Columns[0].Number).To(gomega.Equal("2"))
+			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
+				if n := len(cs.Results); n != 1 {
+					return fmt.Errorf("expected 1 NamedStatusCombination but got %d", n)
+				}
+				if gotName := cs.Results[0].Name; gotName != sumAvailableReplicasStatusCollectorName {
+					return fmt.Errorf("expected combination for %q but got one for %q", sumAvailableReplicasStatusCollectorName, gotName)
+				}
+				expectedColumnNames := []string{"sum"}
+				if gotColumnNames := cs.Results[0].ColumnNames; !abstract.SliceEqual(expectedColumnNames, gotColumnNames) {
+					return fmt.Errorf("expected ColumnNames %#v but got %#v", expectedColumnNames, gotColumnNames)
+				}
+				if n := len(cs.Results[0].Rows); n != 1 {
+					return fmt.Errorf("expected 1 row but got %d", n)
+				}
+				expectedRow := []ksapi.Value{{Type: ksapi.TypeNumber, Number: ptr.String("2")}}
+				gotRow := cs.Results[0].Rows[0].Columns
+				if !apiequality.Semantic.DeepEqual(expectedRow, gotRow) {
+					return fmt.Errorf("expected row %#v but got %#v", expectedRow, gotRow)
+				}
+				return nil
+			})
 		})
 
 		ginkgo.It("can list all the WECs where the reported number of availableReplicas equals the desired number of replicas", func(ctx context.Context) {
@@ -755,26 +775,37 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{listNginxWecsStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
-			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
-
-			// Validate CombinedStatus results
-			gomega.Expect(len(cs.Results)).To(gomega.Equal(1))
-			gomega.Expect(cs.Results[0].Name).To(gomega.Equal(listNginxWecsStatusCollectorName))
-
-			gomega.Expect(len(cs.Results[0].ColumnNames)).To(gomega.Equal(1))
-			gomega.Expect(cs.Results[0].ColumnNames[0]).To(gomega.Equal("wecName"))
-
-			gomega.Expect(len(cs.Results[0].Rows)).To(gomega.Equal(2))
-
-			// we don't know which row will hold data for which WEC
-			row0expectedWec := "cluster1"
-			row1expectedWec := "cluster2"
-			if *cs.Results[0].Rows[0].Columns[0].String != row0expectedWec {
-				row0expectedWec = "cluster2"
-				row1expectedWec = "cluster1"
-			}
-			gomega.Expect(*cs.Results[0].Rows[0].Columns[0].String).To(gomega.Equal(row0expectedWec))
-			gomega.Expect(*cs.Results[0].Rows[1].Columns[0].String).To(gomega.Equal(row1expectedWec))
+			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
+				if n := len(cs.Results); n != 1 {
+					return fmt.Errorf("expected 1 NamedStatusCombination but got %d", n)
+				}
+				if gotName := cs.Results[0].Name; gotName != listNginxWecsStatusCollectorName {
+					return fmt.Errorf("expected combination for %q but got one for %q", listNginxWecsStatusCollectorName, gotName)
+				}
+				expectedColumnNames := []string{"wecName"}
+				if gotColumnNames := cs.Results[0].ColumnNames; !abstract.SliceEqual(expectedColumnNames, gotColumnNames) {
+					return fmt.Errorf("expected ColumnNames %#v but got %#v", expectedColumnNames, gotColumnNames)
+				}
+				if n := len(cs.Results[0].Rows); n != 2 {
+					return fmt.Errorf("expected 2 rows but got %d", n)
+				}
+				expectedVals := sets.New("cluster1", "cluster2")
+				gotVals := sets.New[string]()
+				for rowIdx := 0; rowIdx < 2; rowIdx++ {
+					const expectedType = ksapi.TypeString
+					if gotType := cs.Results[0].Rows[rowIdx].Columns[0].Type; gotType != expectedType {
+						return fmt.Errorf("expected row %d to have type %q but got %q", rowIdx, expectedType, gotType)
+					}
+					if cs.Results[0].Rows[rowIdx].Columns[0].String == nil {
+						return fmt.Errorf("expected row %d to have non-nil String", rowIdx)
+					}
+					gotVals.Insert(*cs.Results[0].Rows[rowIdx].Columns[0].String)
+				}
+				if !gotVals.Equal(expectedVals) {
+					return fmt.Errorf("expected results from WECs %#v but got results from %#v", sets.List(expectedVals), sets.List(gotVals))
+				}
+				return nil
+			})
 		})
 
 		ginkgo.It("can support multiple StatusCollectors", func(ctx context.Context) {
@@ -808,17 +839,24 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{selectAvailableStatusCollectorName, selectReplicasStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
-			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
-
-			// Validate CombinedStatus results
-			gomega.Expect(len(cs.Results)).To(gomega.Equal(2))
-
-			gomega.Expect(len(cs.Results[0].ColumnNames)).To(gomega.Equal(2))
-			gomega.Expect(len(cs.Results[0].Rows)).To(gomega.Equal(2))
-
-			gomega.Expect(len(cs.Results[1].ColumnNames)).To(gomega.Equal(2))
-			gomega.Expect(len(cs.Results[1].Rows)).To(gomega.Equal(2))
-
+			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
+				if n := len(cs.Results); n != 2 {
+					return fmt.Errorf("expected 2 NamedStatusCombination but got %d", n)
+				}
+				if n := len(cs.Results[0].ColumnNames); n != 2 {
+					return fmt.Errorf("expected 2 ColumNames in Results[0] but got %d", n)
+				}
+				if n := len(cs.Results[0].Rows); n != 2 {
+					return fmt.Errorf("expected 2 rows in Results[0] but got %d", n)
+				}
+				if n := len(cs.Results[1].ColumnNames); n != 2 {
+					return fmt.Errorf("expected 2 ColumNames in Results[1] but got %d", n)
+				}
+				if n := len(cs.Results[1].Rows); n != 2 {
+					return fmt.Errorf("expected 2 rows in Results[1] but got %d", n)
+				}
+				return nil
+			})
 		})
 
 		ginkgo.It("can aggregate over zero WECs", func(ctx context.Context) {
@@ -845,22 +883,30 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{collectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
-			cs := util.GetCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName)
-
-			// Validate CombinedStatus results
-			gomega.Expect(len(cs.Results)).To(gomega.Equal(1))
-
-			gomega.Expect(cs.Results[0].ColumnNames).To(gomega.Equal([]string{"count", "max", "min", "sum", "avg"}))
-			gomega.Expect(len(cs.Results[0].Rows)).To(gomega.Equal(1))
-			expectedRow := []ksapi.Value{
-				{Type: ksapi.TypeNumber, Number: &str0},
-				{Type: ksapi.TypeNumber, Number: &strNegInf},
-				{Type: ksapi.TypeNumber, Number: &strPlusInf},
-				{Type: ksapi.TypeNumber, Number: &str0},
-				{Type: ksapi.TypeNumber, Number: &strNaN},
-			}
-			gomega.Expect(cs.Results[0].Rows[0].Columns).To(gomega.Equal(expectedRow))
-
+			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
+				if n := len(cs.Results); n != 1 {
+					return fmt.Errorf("expected 1 NamedStatusCombination but got %d", n)
+				}
+				expectedColumnNames := []string{"count", "max", "min", "sum", "avg"}
+				if gotColumnNames := cs.Results[0].ColumnNames; !abstract.SliceEqual(expectedColumnNames, gotColumnNames) {
+					return fmt.Errorf("expected columnNames %#v but got %#v", expectedColumnNames, gotColumnNames)
+				}
+				if n := len(cs.Results[0].Rows); n != 1 {
+					return fmt.Errorf("expected 1 StatusCombinationRow but got %d", n)
+				}
+				expectedRow := []ksapi.Value{
+					{Type: ksapi.TypeNumber, Number: &str0},
+					{Type: ksapi.TypeNumber, Number: &strNegInf},
+					{Type: ksapi.TypeNumber, Number: &strPlusInf},
+					{Type: ksapi.TypeNumber, Number: &str0},
+					{Type: ksapi.TypeNumber, Number: &strNaN},
+				}
+				gotRow := cs.Results[0].Rows[0].Columns
+				if !apiequality.Semantic.DeepEqual(expectedRow, gotRow) {
+					return fmt.Errorf("expected row %#v but got %#v", expectedRow, gotRow)
+				}
+				return nil
+			})
 		})
 	})
 })
