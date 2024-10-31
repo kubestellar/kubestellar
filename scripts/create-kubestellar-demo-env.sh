@@ -125,7 +125,7 @@ for cluster in "${clusters[@]}"; do
 done
 
 for cluster in "${clusters[@]}"; do
-  if kubectl config get-contexts | grep -w "\b${cluster}\b" >/dev/null 2>&1; then
+  if kubectl config get-contexts | grep -w " ${cluster} " >/dev/null 2>&1; then
     echo -e "\033[33m✔\033[0m $cluster context exists."
   else
     if kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1; then
