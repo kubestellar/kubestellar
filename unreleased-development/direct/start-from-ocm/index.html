@@ -962,6 +962,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#cleanup-from-previous-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cleanup from previous runs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#set-the-version-appropriately-as-an-environment-variable" class="md-nav__link">
     <span class="md-ellipsis">
       Set the Version appropriately as an environment variable
@@ -3011,6 +3020,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#cleanup-from-previous-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cleanup from previous runs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#set-the-version-appropriately-as-an-environment-variable" class="md-nav__link">
     <span class="md-ellipsis">
       Set the Version appropriately as an environment variable
@@ -3135,8 +3153,21 @@ story</a>.</p>
 <p>The following command will check for the prerequisites that you will need for the later steps. See <a href="../pre-reqs/">the prerequisites doc</a> for more details.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.25.0-rc.2/hack/check_pre_req.sh<span class="o">)</span><span class="w"> </span>kflex<span class="w"> </span>ocm<span class="w"> </span>helm<span class="w"> </span>kubectl<span class="w"> </span>docker<span class="w"> </span>kind
 </code></pre></div>
+<h3 id="cleanup-from-previous-runs">Cleanup from previous runs<a class="headerlink" href="#cleanup-from-previous-runs" title="Permanent link">#</a></h3>
+<p>If you have run this recipe or any related recipe previously then
+you will first want to remove any related debris. The following
+commands tear down the state established by this recipe.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>hub
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>cluster1
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>cluster2
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>cluster1
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>cluster2
+</code></pre></div>
+<p>After that cleanup, you may want to <code>set -e</code> so that failures do not
+go unnoticed (the various cleanup commands may legitimately "fail" if
+there is nothing to clean up).</p>
 <h3 id="set-the-version-appropriately-as-an-environment-variable">Set the Version appropriately as an environment variable<a class="headerlink" href="#set-the-version-appropriately-as-an-environment-variable" title="Permanent link">#</a></h3>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">kubestellar_version</span><span class="o">=</span><span class="m">0</span>.25.0-rc.2
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">kubestellar_version</span><span class="o">=</span><span class="m">0</span>.25.0-rc.2
 </code></pre></div>
 <h3 id="ocm-quick-start-with-ingress">OCM Quick Start with Ingress<a class="headerlink" href="#ocm-quick-start-with-ingress" title="Permanent link">#</a></h3>
 <p>This recipe uses a modified version of <a href="https://raw.githubusercontent.com/open-cluster-management-io/OCM/v0.15.0/solutions/setup-dev-environment/local-up.sh">the OCM Quick Start</a>. The modification is because KubeStellar needs the hosting cluster to have an Ingress controller with SSL passthrough enabled. The modified Quick Start script has the following modifications compared to the baseline.</p>
@@ -3145,7 +3176,7 @@ story</a>.</p>
 <li>The script installs <a href="https://docs.nginx.com/nginx-ingress-controller/">the NGINX Ingress Controller</a> into the hub cluster, then patches the controller to enable SSL passthrough, and later waits for it to be in service.</li>
 </ol>
 <p>You can invoke the modified OCM Quick Start as follows.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/0.25.0-rc.2/scripts/ocm-local-up-for-ingress.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v0.25.0-rc.2/scripts/ocm-local-up-for-ingress.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </code></pre></div>
 <p>Like the baseline, this script creates a <code>kind</code> cluster named "hub" to
 serve as hub cluster (known in KubeStellar as an Inventory and
@@ -3156,8 +3187,8 @@ Workload Execution Clusters, WECs), and registers them in the hub.</p>
 <p>The examples will use label selectors to direct workload to WECs (in
 terms of their ManagedCluster representations). The following commands
 apply labels that will be used in the examples.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-hub<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster1<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster1
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-hub<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster2<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster2
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-hub<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster1<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster1
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-hub<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster2<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster2
 </code></pre></div>
 <h3 id="use-core-helm-chart-to-initialize-kubeflex-recognize-its-and-create-wds">Use Core Helm chart to initialize KubeFlex, recognize ITS, and create WDS<a class="headerlink" href="#use-core-helm-chart-to-initialize-kubeflex-recognize-its-and-create-wds" title="Permanent link">#</a></h3>
 <p>This chart instance will do the following.</p>
@@ -3167,41 +3198,41 @@ apply labels that will be used in the examples.</p>
 <li>Create a KubeFlex ControlPlane named "wds1" to play the role of a WDS.</li>
 <li>Install the KubeStellar core stuff in the hosting cluster.</li>
 </ul>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>kind-hub<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ks-core<span class="w"> </span>oci://ghcr.io/kubestellar/kubestellar/core-chart<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>--version<span class="w"> </span><span class="nv">$kubestellar_version</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;ITSes=[{&quot;name&quot;:&quot;its1&quot;, &quot;type&quot;:&quot;host&quot;}]&#39;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;WDSes=[{&quot;name&quot;:&quot;wds1&quot;}]&#39;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;verbosity.default=5&#39;</span><span class="w"> </span><span class="c1"># so we can debug your problem reports</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span>kind-hub<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ks-core<span class="w"> </span>oci://ghcr.io/kubestellar/kubestellar/core-chart<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span>--version<span class="w"> </span><span class="nv">$kubestellar_version</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;ITSes=[{&quot;name&quot;:&quot;its1&quot;, &quot;type&quot;:&quot;host&quot;}]&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;WDSes=[{&quot;name&quot;:&quot;wds1&quot;}]&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span>--set-json<span class="o">=</span><span class="s1">&#39;verbosity.default=5&#39;</span><span class="w"> </span><span class="c1"># so we can debug your problem reports</span>
 </code></pre></div>
 <p>That command will print some notes about how to get a kubeconfig
 "context" named "wds1" defined. Do that, because this context is used
 in the steps that follow. The notes assume that your current
 kubeconfig context is the one where the Helm chart was installed,
 which is not necessarily true --- so take care for that too.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>kind-hub
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>--set-current-for-hosting<span class="w"> </span><span class="c1"># make sure the KubeFlex CLI&#39;s hidden state is right for what the Helm chart just did</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>--overwrite-existing-context<span class="w"> </span>wds1
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>kind-hub
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>--set-current-for-hosting<span class="w"> </span><span class="c1"># make sure the KubeFlex CLI&#39;s hidden state is right for what the Helm chart just did</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>--overwrite-existing-context<span class="w"> </span>wds1
 </code></pre></div>
 <p>For more information about this Helm chart, see <a href="../core-chart/">its documentation</a>.</p>
 <h2 id="exercise-kubestellar">Exercise KubeStellar<a class="headerlink" href="#exercise-kubestellar" title="Permanent link">#</a></h2>
 <p>Use the following commands to wait for the KubeStellar core Helm chart to finish setting up the WDS, because the examples assume that this has completed.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>get<span class="w"> </span>crd<span class="w"> </span>bindingpolicies.control.kubestellar.io<span class="w"> </span>--no-headers<span class="w"> </span>-o<span class="w"> </span>name<span class="w"> </span><span class="m">2</span>&gt;<span class="w"> </span>/dev/null<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="p">;</span><span class="w">  </span><span class="k">do</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span>sleep<span class="w"> </span><span class="m">5</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">done</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="w"> </span><span class="nv">condition</span><span class="o">=</span>Established<span class="w"> </span>crd<span class="w"> </span>bindingpolicies.control.kubestellar.io
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span>get<span class="w"> </span>crd<span class="w"> </span>bindingpolicies.control.kubestellar.io<span class="w"> </span>--no-headers<span class="w"> </span>-o<span class="w"> </span>name<span class="w"> </span><span class="m">2</span>&gt;<span class="w"> </span>/dev/null<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="p">;</span><span class="w">  </span><span class="k">do</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span>sleep<span class="w"> </span><span class="m">5</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">done</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>wds1<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="w"> </span><span class="nv">condition</span><span class="o">=</span>Established<span class="w"> </span>crd<span class="w"> </span>bindingpolicies.control.kubestellar.io
 </code></pre></div>
 <p>Proceed to <a href="../example-scenarios/#scenario-1-multi-cluster-workload-deployment-with-kubectl">Scenario 1 (multi-cluster workload deployment with kubectl) in the example scenarios</a> <em>after</em> defining the shell variables that characterize the setup done above. Following are the settings for those variables, whose meanings are defined <a href="../example-scenarios/#assumptions-and-variables">at the start of the example scenarios document</a>.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">host_context</span><span class="o">=</span>kind-hub
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nv">its_cp</span><span class="o">=</span>its1
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nv">its_context</span><span class="o">=</span><span class="si">${</span><span class="nv">host_context</span><span class="si">}</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nv">wds_cp</span><span class="o">=</span>wds1
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="nv">wds_context</span><span class="o">=</span>wds1
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="nv">wec1_name</span><span class="o">=</span>cluster1
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="nv">wec2_name</span><span class="o">=</span>cluster2
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="nv">wec1_context</span><span class="o">=</span>kind-<span class="nv">$wec1_name</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="nv">wec2_context</span><span class="o">=</span>kind-<span class="nv">$wec2_name</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="nv">label_query_both</span><span class="o">=</span>location-group<span class="o">=</span>edge
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="nv">label_query_one</span><span class="o">=</span><span class="nv">name</span><span class="o">=</span>cluster1
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">host_context</span><span class="o">=</span>kind-hub
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nv">its_cp</span><span class="o">=</span>its1
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nv">its_context</span><span class="o">=</span><span class="si">${</span><span class="nv">host_context</span><span class="si">}</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nv">wds_cp</span><span class="o">=</span>wds1
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nv">wds_context</span><span class="o">=</span>wds1
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="nv">wec1_name</span><span class="o">=</span>cluster1
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="nv">wec2_name</span><span class="o">=</span>cluster2
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="nv">wec1_context</span><span class="o">=</span>kind-<span class="nv">$wec1_name</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="nv">wec2_context</span><span class="o">=</span>kind-<span class="nv">$wec2_name</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="nv">label_query_both</span><span class="o">=</span>location-group<span class="o">=</span>edge
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="nv">label_query_one</span><span class="o">=</span><span class="nv">name</span><span class="o">=</span>cluster1
 </code></pre></div>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">#</a></h2>
 <p>In the event something goes wrong, check out the <a href="../troubleshooting/">troubleshooting page</a> to see if someone else has experienced the same thing</p>

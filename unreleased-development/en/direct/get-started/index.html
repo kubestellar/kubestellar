@@ -3352,6 +3352,9 @@ commands tear down the state established by this recipe.</p>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>cluster1
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>cluster2
 </code></pre></div>
+<p>After that cleanup, you may want to <code>set -e</code> so that failures do not
+go unnoticed (the various cleanup commands may legitimately "fail" if
+there is nothing to clean up).</p>
 <h3 id="set-the-version-appropriately-as-an-environment-variable">Set the Version appropriately as an environment variable<a class="headerlink" href="#set-the-version-appropriately-as-an-environment-variable" title="Permanent link">#</a></h3>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">kubestellar_version</span><span class="o">=</span><span class="m">0</span>.25.0-rc.2
 </code></pre></div>
