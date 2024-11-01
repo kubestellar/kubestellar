@@ -76,6 +76,15 @@ kflex ctx --overwrite-existing-context wds1
 kflex ctx --overwrite-existing-context its1
 ```
 
+#### Wait for ITS to be fully initialized
+
+The Helm chart above has a Job that initializes the ITS as an OCM "hub" cluster. Helm does not have a way to wait for that initialization to finish. So you have to do the wait yourself. The following commands will do that.
+
+```shell
+kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its}=true' --timeout 90s
+kubectl --context kind-kubeflex wait -n its1-system job.batch/its --for condition=Complete --timeout 150s
+```
+
 ### Create and register two workload execution cluster(s)
 
  {%

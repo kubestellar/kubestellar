@@ -24,19 +24,6 @@ echo -e "Checking that pre-req softwares are installed..."
 curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
 
 ##########################################
-function wait-for-cmd() (
-    cmd="$@"
-    wait_counter=0
-    while ! (eval "$cmd") ; do
-        if (($wait_counter > 100)); then
-            echo "Failed to ${cmd}."
-            exit 1
-        fi
-        ((wait_counter += 1))
-        sleep 5
-    done
-)
-
 cluster_clean_up() {
     error_message=$(eval "$1" 2>&1)
     if [ $? -ne 0 ]; then
@@ -49,11 +36,7 @@ context_clean_up() {
     output=$(kubectl config get-contexts -o name)
 
     while IFS= read -r line; do
-        if [ "$line" == "kind-kubeflex" ]; then 
-            echo "Deleting kind-kubeflex context..."
-            kubectl config delete-context kind-kubeflex
-
-        elif [ "$line" == "cluster1" ]; then
+        if [ "$line" == "cluster1" ]; then
             echo "Deleting cluster1 context..."
             kubectl config delete-context cluster1
 
@@ -163,8 +146,8 @@ kflex ctx --overwrite-existing-context wds1
 kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
-
-wait-for-cmd "[[ \$(kubectl --context its1 get deployments.apps -n open-cluster-management -o jsonpath='{.status.readyReplicas}' cluster-manager 2>/dev/null) -ge 1 ]]"
+kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its}=true' --timeout 90s
+kubectl --context kind-kubeflex wait -n its1-system job.batch/its --for condition=Complete --timeout 150s
 echo -e "\033[33m✔\033[0m OCM cluster manager is ready"
 
 echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..."
