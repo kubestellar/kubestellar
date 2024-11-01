@@ -37,6 +37,24 @@ The following command will check for the prerequisites that you will need for th
 bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/hack/check_pre_req.sh) kflex ocm helm kubectl docker kind
 ```
 
+### Cleanup from previous runs
+
+If you have run this recipe or any related recipe previously then
+you will first want to remove any related debris. The following
+commands tear down the state established by this recipe.
+
+```shell
+kind delete cluster --name hub
+kind delete cluster --name cluster1
+kind delete cluster --name cluster2
+kubectl config delete-context cluster1
+kubectl config delete-context cluster2
+```
+
+After that cleanup, you may want to `set -e` so that failures do not
+go unnoticed (the various cleanup commands may legitimately "fail" if
+there is nothing to clean up).
+
 ### Set the Version appropriately as an environment variable
 
 ```shell
@@ -53,7 +71,7 @@ This recipe uses a modified version of [the OCM Quick Start](https://raw.githubu
 You can invoke the modified OCM Quick Start as follows.
 
 ```shell
-curl -L https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/{{ config.ks_latest_release }}/scripts/ocm-local-up-for-ingress.sh | bash
+curl -L https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/ocm-local-up-for-ingress.sh | bash
 ```
 
 Like the baseline, this script creates a `kind` cluster named "hub" to

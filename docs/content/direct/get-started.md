@@ -43,6 +43,10 @@ kubectl config delete-context cluster1
 kubectl config delete-context cluster2
 ```
 
+After that cleanup, you may want to `set -e` so that failures do not
+go unnoticed (the various cleanup commands may legitimately "fail" if
+there is nothing to clean up).
+
 ### Set the Version appropriately as an environment variable
 
 ```shell
