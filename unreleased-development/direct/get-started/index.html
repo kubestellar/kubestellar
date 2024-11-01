@@ -889,6 +889,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Use Core Helm chart to initialize KubeFlex and create ITS and WDS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wait-for-its-to-be-fully-initialized" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wait for ITS to be fully initialized
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1120,6 +1135,21 @@
       Use Core Helm chart to initialize KubeFlex and create ITS and WDS
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Use Core Helm chart to initialize KubeFlex and create ITS and WDS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wait-for-its-to-be-fully-initialized" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wait for ITS to be fully initialized
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -3209,6 +3239,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Use Core Helm chart to initialize KubeFlex and create ITS and WDS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wait-for-its-to-be-fully-initialized" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wait for ITS to be fully initialized
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -3327,6 +3372,11 @@ commands tear down the state established by this recipe.</p>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>--overwrite-existing-context<span class="w"> </span>wds1
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>kflex<span class="w"> </span>ctx<span class="w"> </span>--overwrite-existing-context<span class="w"> </span>its1
 </code></pre></div>
+<h4 id="wait-for-its-to-be-fully-initialized">Wait for ITS to be fully initialized<a class="headerlink" href="#wait-for-its-to-be-fully-initialized" title="Permanent link">#</a></h4>
+<p>The Helm chart above has a Job that initializes the ITS as an OCM "hub" cluster. Helm does not have a way to wait for that initialization to finish. So you have to do the wait yourself. The following commands will do that.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>controlplane.tenancy.kflex.kubestellar.org/its1<span class="w"> </span>--for<span class="w"> </span><span class="s1">&#39;jsonpath={.status.postCreateHooks.its}=true&#39;</span><span class="w"> </span>--timeout<span class="w"> </span>90s
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>-n<span class="w"> </span>its1-system<span class="w"> </span>job.batch/its<span class="w"> </span>--for<span class="w"> </span><span class="nv">condition</span><span class="o">=</span>Complete<span class="w"> </span>--timeout<span class="w"> </span>150s
+</code></pre></div>
 <h3 id="create-and-register-two-workload-execution-clusters">Create and register two workload execution cluster(s)<a class="headerlink" href="#create-and-register-two-workload-execution-clusters" title="Permanent link">#</a></h3>
 <!-- BEGIN INCLUDE example-wecs.md -->
 <p>The following steps show how to create two new <code>kind</code> clusters and
@@ -3336,36 +3386,36 @@ commands tear down the state established by this recipe.</p>
 <ol>
 <li>
 <p>Execute the following commands to create two kind clusters, named <code>cluster1</code> and <code>cluster2</code>, and register them with the OCM hub. These clusters will serve as workload clusters. If you have previously executed these commands, you might already have contexts named <code>cluster1</code> and <code>cluster2</code>. If so, you can remove these contexts using the commands <code>kubectl config delete-context cluster1</code> and <code>kubectl config delete-context cluster2</code>.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>:<span class="w"> </span><span class="nb">set</span><span class="w"> </span>flags<span class="w"> </span>to<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span>you<span class="w"> </span>have<span class="w"> </span>installed<span class="w"> </span>KubeStellar<span class="w"> </span>on<span class="w"> </span>an<span class="w"> </span>OpenShift<span class="w"> </span>cluster
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nv">flags</span><span class="o">=</span><span class="s2">&quot;--force-internal-endpoint-lookup&quot;</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nv">clusters</span><span class="o">=(</span>cluster1<span class="w"> </span>cluster2<span class="o">)</span><span class="p">;</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">for</span><span class="w"> </span>cluster<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">clusters</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">   </span>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">   </span>kubectl<span class="w"> </span>config<span class="w"> </span>rename-context<span class="w"> </span>kind-<span class="si">${</span><span class="nv">cluster</span><span class="si">}</span><span class="w"> </span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">   </span>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>token<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;^clusteradm join&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s2">&quot;s/&lt;cluster_name&gt;/</span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span><span class="s2">/&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">&#39;{print $0 &quot; --context &#39;</span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span><span class="s1">&#39; --singleton &#39;</span><span class="si">${</span><span class="nv">flags</span><span class="si">}</span><span class="s1">&#39;&quot;}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="k">done</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>:<span class="w"> </span><span class="nb">set</span><span class="w"> </span>flags<span class="w"> </span>to<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span>you<span class="w"> </span>have<span class="w"> </span>installed<span class="w"> </span>KubeStellar<span class="w"> </span>on<span class="w"> </span>an<span class="w"> </span>OpenShift<span class="w"> </span>cluster
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nv">flags</span><span class="o">=</span><span class="s2">&quot;--force-internal-endpoint-lookup&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nv">clusters</span><span class="o">=(</span>cluster1<span class="w"> </span>cluster2<span class="o">)</span><span class="p">;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">for</span><span class="w"> </span>cluster<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">clusters</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">   </span>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">   </span>kubectl<span class="w"> </span>config<span class="w"> </span>rename-context<span class="w"> </span>kind-<span class="si">${</span><span class="nv">cluster</span><span class="si">}</span><span class="w"> </span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">   </span>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>token<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;^clusteradm join&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s2">&quot;s/&lt;cluster_name&gt;/</span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span><span class="s2">/&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">&#39;{print $0 &quot; --context &#39;</span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span><span class="s1">&#39; --singleton &#39;</span><span class="si">${</span><span class="nv">flags</span><span class="si">}</span><span class="s1">&#39;&quot;}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="k">done</span>
 </code></pre></div>
 <p>The <code>clusteradm</code> command grabs a token from the hub (<code>its1</code> context), and constructs the command to apply the new cluster
  to be registered as a managed cluster on the OCM hub.</p>
 </li>
 <li>
 <p>Repeatedly issue the command:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>csr
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>csr
 </code></pre></div>
 <p>until you see that the certificate signing requests (CSR) for both cluster1 and cluster2 exist.
  Note that the CSRs condition is supposed to be <code>Pending</code> until you approve them in step 4.</p>
 </li>
 <li>
 <p>Once the CSRs are created, approve the CSRs complete the cluster registration with the command:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>cluster1
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>cluster2
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>cluster1
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>cluster2
 </code></pre></div>
 </li>
 <li>
 <p>Check the new clusters are in the OCM inventory and label them:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>managedclusters
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster1<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster1
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster2<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster2
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>managedclusters
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster1<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster1
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster2<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster2
 </code></pre></div>
 </li>
 </ol>
@@ -3373,17 +3423,17 @@ commands tear down the state established by this recipe.</p>
 
 <h2 id="exercise-kubestellar">Exercise KubeStellar<a class="headerlink" href="#exercise-kubestellar" title="Permanent link">#</a></h2>
 <p>Proceed to <a href="../example-scenarios/#scenario-1-multi-cluster-workload-deployment-with-kubectl">Scenario 1 (multi-cluster workload deployment with kubectl) in the example scenarios</a> after defining the shell variables that characterize the setup done above. Following are setting for those variables, whose meanings are defined <a href="../example-scenarios/#assumptions-and-variables">at the start of the example scenarios document</a>.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">host_context</span><span class="o">=</span>kind-kubeflex
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nv">its_cp</span><span class="o">=</span>its1
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nv">its_context</span><span class="o">=</span>its1
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="nv">wds_cp</span><span class="o">=</span>wds1
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="nv">wds_context</span><span class="o">=</span>wds1
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="nv">wec1_name</span><span class="o">=</span>cluster1
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="nv">wec2_name</span><span class="o">=</span>cluster2
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="nv">wec1_context</span><span class="o">=</span><span class="nv">$wec1_name</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="nv">wec2_context</span><span class="o">=</span><span class="nv">$wec2_name</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="nv">label_query_both</span><span class="o">=</span>location-group<span class="o">=</span>edge
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="nv">label_query_one</span><span class="o">=</span><span class="nv">name</span><span class="o">=</span>cluster1
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">host_context</span><span class="o">=</span>kind-kubeflex
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nv">its_cp</span><span class="o">=</span>its1
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nv">its_context</span><span class="o">=</span>its1
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="nv">wds_cp</span><span class="o">=</span>wds1
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="nv">wds_context</span><span class="o">=</span>wds1
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="nv">wec1_name</span><span class="o">=</span>cluster1
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="nv">wec2_name</span><span class="o">=</span>cluster2
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="nv">wec1_context</span><span class="o">=</span><span class="nv">$wec1_name</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="nv">wec2_context</span><span class="o">=</span><span class="nv">$wec2_name</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="nv">label_query_both</span><span class="o">=</span>location-group<span class="o">=</span>edge
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="nv">label_query_one</span><span class="o">=</span><span class="nv">name</span><span class="o">=</span>cluster1
 </code></pre></div>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">#</a></h2>
 <p>In the event something goes wrong, check out the <a href="../troubleshooting/">troubleshooting page</a> to see if someone else has experienced the same thing</p>
