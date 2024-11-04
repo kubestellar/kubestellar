@@ -15,8 +15,6 @@
 
 # Create a kind cluster for KubeStellar deployment
 
-cd $(dirname ${BASH_SOURCE})
-
 set -e
 
 hub=${CLUSTER1:-hub}
