@@ -2,8 +2,9 @@
 
 This page shows one concrete example of adding KubeStellar to an
 existing OCM system. In particular, a hub plus two managed clusters
-almost exactly as created by the OCM Quick Start.  In terms of the
-[full Installation and Usage outline of
+almost exactly as created by [the OCM Quick Start
+instructions](https://open-cluster-management.io/docs/getting-started/quick-start/).
+In terms of the [full Installation and Usage outline of
 KubeStellar](user-guide-intro.md#the-full-story), the modified OCM
 Quick Start has already: established some, but not all, of the
 software prerequisites; acquired the ability to use a Kube cluster as
@@ -31,7 +32,7 @@ story](user-guide-intro.md#the-full-story).
 
 ### Install software prerequisites
 
-The following command will check for the prerequisites that you will need for the later steps. See [the prerequisites doc](pre-reqs.md) for more details.
+The following command will check for the prerequisites that KubeStellar will need for the later steps. See [the prerequisites doc](pre-reqs.md) for more details.
 
 ```shell
 bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/hack/check_pre_req.sh) kflex ocm helm kubectl docker kind
@@ -63,7 +64,7 @@ kubestellar_version={{ config.ks_latest_release }}
 
 ### OCM Quick Start with Ingress
 
-This recipe uses a modified version of [the OCM Quick Start](https://raw.githubusercontent.com/open-cluster-management-io/OCM/v0.15.0/solutions/setup-dev-environment/local-up.sh). The modification is because KubeStellar needs the hosting cluster to have an Ingress controller with SSL passthrough enabled. The modified Quick Start script has the following modifications compared to the baseline.
+This recipe uses a modified version of [the OCM Quick Start script](https://raw.githubusercontent.com/open-cluster-management-io/OCM/v0.15.0/solutions/setup-dev-environment/local-up.sh). The modification is necessary because KubeStellar requires the hosting cluster to have an Ingress controller with SSL passthrough enabled. The modified Quick Start script has the following modifications compared to the baseline.
 
 1. The `kind` cluster created for the hub has an additional port mapping, where the Ingress controller listens.
 1. The script installs [the NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/) into the hub cluster, then patches the controller to enable SSL passthrough, and later waits for it to be in service.
