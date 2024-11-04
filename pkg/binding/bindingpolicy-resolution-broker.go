@@ -76,7 +76,7 @@ func NonNilPointerDeference[T any](ptr *T) T { return *ptr }
 
 func RequiresStatusCollection(r Resolution) bool {
 	return r.GetWorkload().Iterate2(func(_ util.ObjectIdentifier, data ObjectData) error {
-		if len(data.StatusCollectors) > 0 {
+		if len(data.Modulation.StatusCollectors) > 0 {
 			return io.EOF
 		}
 		return nil

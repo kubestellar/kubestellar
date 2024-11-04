@@ -227,7 +227,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 	workloadRefs.Iterate2(func(objectIdentifier util.ObjectIdentifier, objectData binding.ObjectData) error {
 
 		csResolution, exists := objectIdentifierToResolution[objectIdentifier]
-		if len(objectData.StatusCollectors) == 0 {
+		if len(objectData.Modulation.StatusCollectors) == 0 {
 			if exists { // associated resolution is no longer required
 				logger.V(3).Info("Deleting zero-collector CombinedStatus resolution", "binding", bindingName, "objectId", objectIdentifier)
 				combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(csResolution.getName(),
@@ -252,10 +252,10 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 		}
 
 		// fetch missing statuscollector specs
-		c.fetchMissingStatusCollectorSpecsLocked(statusCollectorLister, objectData.StatusCollectors)
+		c.fetchMissingStatusCollectorSpecsLocked(statusCollectorLister, objectData.Modulation.StatusCollectors)
 
 		// update statuscollectors
-		removedCollectors, addedCollectors := csResolution.setStatusCollectors(c.statusCollectorNameToSpecFromCache(objectData.StatusCollectors))
+		removedCollectors, addedCollectors := csResolution.setStatusCollectors(c.statusCollectorNameToSpecFromCache(objectData.Modulation.StatusCollectors))
 
 		// update destinations
 		removedDestinations, newDestinationsSet := csResolution.setCollectionDestinations(destinationsSet)

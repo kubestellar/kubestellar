@@ -108,7 +108,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 						Resources:       []string{"deployments"},
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx"}}},
 					},
-						CreateOnly: true},
+						DownsyncModulation: ksapi.DownsyncModulation{
+							CreateOnly: true}},
 				},
 			)
 			util.ValidateBinding(ctx, ksWds, "nginx", func(binding *ksapi.Binding) bool {
@@ -451,14 +452,11 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"name": "cluster1"}},
 				},
-				[]ksapi.DownsyncPolicyClause{
-					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
+				[]ksapi.DownsyncPolicyClause{{
+					DownsyncObjectTest: ksapi.DownsyncObjectTest{
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx-singleton"}}},
-					}},
-				},
-				func(bp *ksapi.BindingPolicy) error {
-					bp.Spec.WantSingletonReportedState = true
-					return nil
+					},
+					DownsyncModulation: ksapi.DownsyncModulation{WantSingletonReportedState: true}},
 				},
 			)
 			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
@@ -486,14 +484,11 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"name": "cluster1"}},
 				},
-				[]ksapi.DownsyncPolicyClause{
-					{DownsyncObjectTest: ksapi.DownsyncObjectTest{
+				[]ksapi.DownsyncPolicyClause{{
+					DownsyncObjectTest: ksapi.DownsyncObjectTest{
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx-singleton"}}},
-					}},
-				},
-				func(bp *ksapi.BindingPolicy) error {
-					bp.Spec.WantSingletonReportedState = true
-					return nil
+					},
+					DownsyncModulation: ksapi.DownsyncModulation{WantSingletonReportedState: true}},
 				},
 			)
 			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
@@ -658,11 +653,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		testAndStatusCollection := []ksapi.DownsyncPolicyClause{
 			{DownsyncObjectTest: ksapi.DownsyncObjectTest{
 				ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": workloadName}}},
-			},
-				StatusCollection: &ksapi.StatusCollection{
-					StatusCollectors: []string{},
-				},
-			},
+			}},
 		}
 
 		ginkgo.It("can list the full status from each WEC", func(ctx context.Context) {
@@ -681,7 +672,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					Limit: 20,
 				})
 
-			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{fullStatusCollectorName}
+			testAndStatusCollection[0].StatusCollectors = []string{fullStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
@@ -731,7 +722,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					Limit: 10,
 				})
 
-			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{sumAvailableReplicasStatusCollectorName}
+			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{sumAvailableReplicasStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
@@ -772,7 +763,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					Limit: 10,
 				})
 
-			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{listNginxWecsStatusCollectorName}
+			testAndStatusCollection[0].StatusCollectors = []string{listNginxWecsStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
@@ -836,7 +827,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					Limit: 20,
 				})
 
-			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{selectAvailableStatusCollectorName, selectReplicasStatusCollectorName}
+			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{selectAvailableStatusCollectorName, selectReplicasStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
@@ -880,7 +871,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					Limit: 20,
 				})
 
-			testAndStatusCollection[0].StatusCollection.StatusCollectors = []string{collectorName}
+			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{collectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {

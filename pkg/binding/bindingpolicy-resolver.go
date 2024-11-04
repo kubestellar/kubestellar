@@ -61,9 +61,8 @@ type BindingPolicyResolver interface {
 	CompareBinding(bindingPolicyKey string,
 		bindingSpec *v1alpha1.BindingSpec) bool
 
-	// NoteBindingPolicy ensures that (a) the resolver has an entry whose key
-	// is the given BindingPolicy's name and (b) that entry records the
-	// value of `bindingpolicy.Spec.WantSingletonReportedState`.
+	// NoteBindingPolicy ensures that the resolver has an entry whose key
+	// is the given BindingPolicy's name.
 	// If an entry is introduced, it is introduced with empty destination set
 	// and no workload references.
 	// `*bindingPolicy` is immutable.
@@ -72,16 +71,14 @@ type BindingPolicyResolver interface {
 
 	// EnsureObjectData ensures that an object's identifier is
 	// in the resolution for the given bindingpolicy key, and is associated
-	// with the given resource-version, create-only bit and statuscollectors
-	// set.
-	// The given set is expected not to be mutated during and after this call
-	// by the caller.
+	// with the given resource-version and DownsyncModulation.
+	// The modulation's StatusCollector name set is immutable.
 	//
 	// The returned bool indicates whether the bindingpolicy resolution was
 	// changed. If no resolution is associated with the given key, an error is
 	// returned.
 	EnsureObjectData(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
-		objUID, resourceVersion string, createOnly bool, statusCollectors sets.Set[string]) (bool, error)
+		objUID, resourceVersion string, modulation DownsyncModulation) (bool, error)
 	// RemoveObjectIdentifier ensures the absence of the given object
 	// identifier from the resolution for the given bindingpolicy key.
 	//
@@ -106,13 +103,6 @@ type BindingPolicyResolver interface {
 	// ResolutionExists returns true if a resolution is associated with the
 	// given bindingpolicy key.
 	ResolutionExists(bindingPolicyKey string) bool
-	// ResolutionRequiresSingletonReportedState returns true if the
-	// bindingpolicy associated with the given key requires a singleton
-	// reported state, and it satisfies the conditions on this requirement.
-	//
-	// This means that if true is returned, then the singleton status reporting
-	// requirement is effective.
-	ResolutionRequiresSingletonReportedState(bindingPolicyKey string) bool
 
 	// GetSingletonReportedStateRequestForObject returns the combined effects of all
 	// the resolutions regarding singleton reported state return for a given workload object.
@@ -133,6 +123,43 @@ type BindingPolicyResolver interface {
 
 	// Broker returns a ResolutionBroker for the resolver.
 	Broker() ResolutionBroker
+}
+
+// DownsyncModulation is a convenient internal representation of v1alpha1.DownsyncModulation
+type DownsyncModulation struct {
+	CreateOnly                 bool
+	StatusCollectors           sets.Set[string]
+	WantSingletonReportedState bool
+}
+
+func ZeroDownsyncModulation() DownsyncModulation {
+	return DownsyncModulation{StatusCollectors: sets.New[string]()}
+}
+
+func DownsyncModulationFromExternal(external v1alpha1.DownsyncModulation) DownsyncModulation {
+	return DownsyncModulation{
+		CreateOnly:                 external.CreateOnly,
+		StatusCollectors:           sets.New(external.StatusCollectors...),
+		WantSingletonReportedState: external.WantSingletonReportedState,
+	}
+}
+
+func (dm *DownsyncModulation) ToExternal() v1alpha1.DownsyncModulation {
+	return v1alpha1.DownsyncModulation{
+		CreateOnly:                 dm.CreateOnly,
+		StatusCollectors:           sets.List(dm.StatusCollectors),
+		WantSingletonReportedState: dm.WantSingletonReportedState,
+	}
+}
+
+func (left *DownsyncModulation) Equal(right DownsyncModulation) bool {
+	return left.CreateOnly == right.CreateOnly && left.WantSingletonReportedState == right.WantSingletonReportedState && left.StatusCollectors.Equal(right.StatusCollectors)
+}
+
+func (dm *DownsyncModulation) AddExternal(external v1alpha1.DownsyncModulation) {
+	dm.CreateOnly = dm.CreateOnly || external.CreateOnly
+	dm.StatusCollectors.Insert(external.StatusCollectors...)
+	dm.WantSingletonReportedState = dm.WantSingletonReportedState || external.WantSingletonReportedState
 }
 
 // SingletonReportedStateReturnStatus reports the resolver's state regarding
@@ -216,7 +243,6 @@ func (resolver *bindingPolicyResolver) CompareBinding(bindingPolicyKey string,
 
 func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1.BindingPolicy) {
 	if resolution := resolver.getResolution(bindingpolicy.GetName()); resolution != nil {
-		resolution.setRequestsSingletonReportedStateReturn(bindingpolicy.Spec.WantSingletonReportedState)
 		return
 	}
 	// Because concurrent calls with the same BindingPolicy name are not allowed,
@@ -235,7 +261,7 @@ func (resolver *bindingPolicyResolver) NoteBindingPolicy(bindingpolicy *v1alpha1
 // changed. If no resolution is associated with the given key, an error is
 // returned.
 func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string, objIdentifier util.ObjectIdentifier,
-	objUID, resourceVersion string, createOnly bool, statusCollectors sets.Set[string]) (bool, error) {
+	objUID, resourceVersion string, modulation DownsyncModulation) (bool, error) {
 	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
 
 	if bindingPolicyResolution == nil {
@@ -250,7 +276,7 @@ func (resolver *bindingPolicyResolver) EnsureObjectData(bindingPolicyKey string,
 	// get the replacement fully updated.
 
 	// ensureObjectIdentifier is thread-safe
-	return bindingPolicyResolution.ensureObjectData(objIdentifier, objUID, resourceVersion, createOnly, statusCollectors), nil
+	return bindingPolicyResolution.ensureObjectData(objIdentifier, objUID, resourceVersion, modulation), nil
 }
 
 // RemoveObjectIdentifier ensures the absence of the given object
@@ -320,17 +346,6 @@ func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string)
 	}
 
 	return true
-}
-
-// ResolutionRequiresSingletonReportedState returns true if the
-// bindingpolicy associated with the given key requires a singleton
-// reported state, and it satisfies the conditions on this requirement.
-//
-// This means that if true is returned, then the singleton status reporting
-// requirement is effective.
-func (resolver *bindingPolicyResolver) ResolutionRequiresSingletonReportedState(bindingPolicyKey string) bool {
-	bindingPolicyResolution := resolver.getResolution(bindingPolicyKey) // thread-safe
-	return bindingPolicyResolution != nil && bindingPolicyResolution.getRequestsSingletonReportedStateReturn()
 }
 
 // GetSingletonReportedStateRequestForObject returns two things.
@@ -439,10 +454,9 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 		singletonRequestChangeConsumer: func(objId util.ObjectIdentifier) {
 			resolver.broker.NotifySingletonRequestCallbacks(bindingpolicy.Name, objId)
 		},
-		objectIdentifierToData:         make(map[util.ObjectIdentifier]*ObjectData),
-		destinations:                   sets.New[string](),
-		ownerReference:                 ownerReference,
-		requiresSingletonReportedState: bindingpolicy.Spec.WantSingletonReportedState,
+		objectIdentifierToData: make(map[util.ObjectIdentifier]*ObjectData),
+		destinations:           sets.New[string](),
+		ownerReference:         ownerReference,
 	}
 	klog.InfoS("Created bindingPolicyResolution", "binding", bindingpolicy.Name, "resolution", fmt.Sprintf("%p", bindingPolicyResolution))
 	resolver.bindingPolicyToResolution[bindingpolicy.GetName()] = bindingPolicyResolution

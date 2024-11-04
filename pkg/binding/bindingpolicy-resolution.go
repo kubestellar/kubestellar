@@ -55,10 +55,6 @@ type bindingPolicyResolution struct {
 	// This pointer is never nil (why is it a pointer?).
 	// The `metav1.OwnerReference` is immutable.
 	ownerReference *metav1.OwnerReference
-
-	// requiresSingletonReportedState indicates whether the bindingpolicy
-	// that this resolution is associated with requires singleton status.
-	requiresSingletonReportedState bool
 }
 
 // ObjectData stores most of the downsync modalities for a given workload object
@@ -68,14 +64,8 @@ type ObjectData struct {
 	UID string
 	// ResourceVersion is the resource version of the workload object.
 	ResourceVersion string
-	// CreateOnly is a boolean that indicates whether the object was selected
-	// by at least one downsync clause with the createOnly bit set.
-	// If true, it means that the object should only be created and not
-	// maintained
-	CreateOnly bool
-	// StatusCollectors is a set of status collector names that are associated.
-	// Every set ever stored here is immutable.
-	StatusCollectors sets.Set[string]
+
+	Modulation DownsyncModulation
 }
 
 // Assert that `*bindingPolicyResolution` implements Resolution
@@ -109,21 +99,20 @@ func (resolution *bindingPolicyResolution) GetWorkload() abstract.Map[util.Objec
 // The returned bool indicates whether the resolution was changed.
 // This function is thread-safe.
 func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.ObjectIdentifier,
-	objUID, resourceVersion string, createOnly bool, statusCollectors sets.Set[string]) bool {
+	objUID, resourceVersion string, modulation DownsyncModulation) bool {
 	resolution.Lock()
 	defer resolution.Unlock()
 
 	objData := resolution.objectIdentifierToData[objIdentifier]
 	if objData == nil || objData.UID != objUID || objData.ResourceVersion != resourceVersion ||
-		objData.CreateOnly != createOnly || !objData.StatusCollectors.Equal(statusCollectors) {
+		!objData.Modulation.Equal(modulation) {
 		resolution.objectIdentifierToData[objIdentifier] = &ObjectData{
-			UID:              objUID,
-			ResourceVersion:  resourceVersion,
-			CreateOnly:       createOnly,
-			StatusCollectors: statusCollectors,
+			UID:             objUID,
+			ResourceVersion: resourceVersion,
+			Modulation:      modulation,
 		}
-		if objData == nil && resolution.requiresSingletonReportedState {
-			klog.InfoS("Noting addition of object to resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
+		if objData == nil && modulation.WantSingletonReportedState || objData != nil && objData.Modulation.WantSingletonReportedState != modulation.WantSingletonReportedState {
+			klog.InfoS("Noting addition/change of object to resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
 			resolution.singletonRequestChangeConsumer(objIdentifier)
 		}
 		return true
@@ -139,12 +128,13 @@ func (resolution *bindingPolicyResolution) removeObjectIdentifier(objIdentifier 
 	resolution.Lock()
 	defer resolution.Unlock()
 
-	if _, exists := resolution.objectIdentifierToData[objIdentifier]; !exists {
+	objData, exists := resolution.objectIdentifierToData[objIdentifier]
+	if !exists {
 		return false
 	}
 
 	delete(resolution.objectIdentifierToData, objIdentifier)
-	if resolution.requiresSingletonReportedState {
+	if objData.Modulation.WantSingletonReportedState {
 		klog.InfoS("Noting removal of object from resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
 		resolution.singletonRequestChangeConsumer(objIdentifier)
 	}
@@ -171,14 +161,8 @@ func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec
 					Name:                 objIdentifier.ObjectName.Name,
 					ResourceVersion:      objData.ResourceVersion,
 				},
-				CreateOnly: objData.CreateOnly,
+				DownsyncModulation: objData.Modulation.ToExternal(),
 			}
-			if objData.StatusCollectors.Len() > 0 {
-				clause.StatusCollection = &v1alpha1.StatusCollection{
-					StatusCollectors: sets.List(objData.StatusCollectors),
-				}
-			}
-
 			workload.ClusterScope = append(workload.ClusterScope, clause)
 			continue
 		}
@@ -190,12 +174,7 @@ func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec
 				Namespace:            objIdentifier.ObjectName.Namespace,
 				ResourceVersion:      objData.ResourceVersion,
 			},
-			CreateOnly: objData.CreateOnly,
-		}
-		if objData.StatusCollectors.Len() > 0 {
-			clause.StatusCollection = &v1alpha1.StatusCollection{
-				StatusCollectors: sets.List(objData.StatusCollectors),
-			}
+			DownsyncModulation: objData.Modulation.ToExternal(),
 		}
 
 		workload.NamespaceScope = append(workload.NamespaceScope, clause)
@@ -234,8 +213,7 @@ func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alp
 			ObjectName:           objIdentifier.ObjectName,
 		}]; objDataFromWorkload == nil ||
 			objData.ResourceVersion != objDataFromWorkload.ResourceVersion ||
-			objData.CreateOnly != objDataFromWorkload.CreateOnly ||
-			!objData.StatusCollectors.Equal(objDataFromWorkload.StatusCollectors) {
+			!objData.Modulation.Equal(objDataFromWorkload.Modulation) {
 			return false
 		}
 	} // this check works because both groups have unique members and are of equal size
@@ -267,29 +245,6 @@ func (resolution *bindingPolicyResolution) getOwnerReference() metav1.OwnerRefer
 	return *resolution.ownerReference
 }
 
-func (resolution *bindingPolicyResolution) setRequestsSingletonReportedStateReturn(request bool) {
-	resolution.Lock()
-	defer resolution.Unlock()
-
-	if resolution.requiresSingletonReportedState == request {
-		klog.InfoS("No change in singleton rquest", "resolution", fmt.Sprintf("%p", resolution), "request", request, "numObjs", len(resolution.objectIdentifierToData))
-		return
-	}
-	klog.InfoS("Changed singleton rquest", "resolution", fmt.Sprintf("%p", resolution), "request", request, "numObjs", len(resolution.objectIdentifierToData))
-	resolution.requiresSingletonReportedState = request
-	for objId := range resolution.objectIdentifierToData {
-		klog.InfoS("Noting change in singleton rquest", "resolution", fmt.Sprintf("%p", resolution), "request", request, "objId", objId)
-		resolution.singletonRequestChangeConsumer(objId)
-	}
-}
-
-func (resolution *bindingPolicyResolution) getRequestsSingletonReportedStateReturn() bool {
-	resolution.RLock()
-	defer resolution.RUnlock()
-
-	return resolution.requiresSingletonReportedState
-}
-
 // getSingletonReportedStateRequestForObject returns what this resolution requests regarding singleton reported state return.
 // The first returned bool reports whether this resolution matches the given workload object ID;
 // if not then the other returned values are meaningless.
@@ -298,10 +253,10 @@ func (resolution *bindingPolicyResolution) getRequestsSingletonReportedStateRetu
 func (resolution *bindingPolicyResolution) getSingletonReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, bool, sets.Set[string]) {
 	resolution.RLock()
 	defer resolution.RUnlock()
-	if _, has := resolution.objectIdentifierToData[objId]; !has {
-		return false, false, nil
+	if objData, has := resolution.objectIdentifierToData[objId]; has {
+		return true, objData.Modulation.WantSingletonReportedState, resolution.destinations
 	}
-	return true, resolution.requiresSingletonReportedState, resolution.destinations
+	return false, false, nil
 }
 
 // destinationsMatch returns true if the destinations in the resolution
@@ -329,11 +284,6 @@ func bindingObjectRefToDataFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncOb
 	bindingObjectRefToData := make(map[objectRef]*ObjectData)
 
 	for _, clusterScopeDownsyncClause := range bindingSpecWorkload.ClusterScope {
-		var statusCollectors sets.Set[string]
-		if clusterScopeDownsyncClause.StatusCollection != nil {
-			statusCollectors = sets.New(clusterScopeDownsyncClause.StatusCollection.StatusCollectors...)
-		}
-
 		bindingObjectRefToData[objectRef{
 			GroupVersionResource: schema.GroupVersionResource(clusterScopeDownsyncClause.GroupVersionResource),
 			ObjectName: cache.ObjectName{
@@ -341,18 +291,12 @@ func bindingObjectRefToDataFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncOb
 				Namespace: metav1.NamespaceNone,
 			},
 		}] = &ObjectData{
-			ResourceVersion:  clusterScopeDownsyncClause.ResourceVersion,
-			CreateOnly:       clusterScopeDownsyncClause.CreateOnly,
-			StatusCollectors: statusCollectors,
+			ResourceVersion: clusterScopeDownsyncClause.ResourceVersion,
+			Modulation:      DownsyncModulationFromExternal(clusterScopeDownsyncClause.DownsyncModulation),
 		}
 	}
 
 	for _, namespacedScopeDownsyncClause := range bindingSpecWorkload.NamespaceScope {
-		var statusCollectors sets.Set[string]
-		if namespacedScopeDownsyncClause.StatusCollection != nil {
-			statusCollectors = sets.New(namespacedScopeDownsyncClause.StatusCollection.StatusCollectors...)
-		}
-
 		bindingObjectRefToData[objectRef{
 			GroupVersionResource: schema.GroupVersionResource(namespacedScopeDownsyncClause.GroupVersionResource),
 			ObjectName: cache.ObjectName{
@@ -360,9 +304,8 @@ func bindingObjectRefToDataFromWorkload(bindingSpecWorkload *v1alpha1.DownsyncOb
 				Namespace: namespacedScopeDownsyncClause.Namespace,
 			},
 		}] = &ObjectData{
-			ResourceVersion:  namespacedScopeDownsyncClause.ResourceVersion,
-			CreateOnly:       namespacedScopeDownsyncClause.CreateOnly,
-			StatusCollectors: statusCollectors,
+			ResourceVersion: namespacedScopeDownsyncClause.ResourceVersion,
+			Modulation:      DownsyncModulationFromExternal(namespacedScopeDownsyncClause.DownsyncModulation),
 		}
 	}
 
