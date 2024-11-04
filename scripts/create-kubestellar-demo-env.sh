@@ -92,20 +92,26 @@ echo -e "\nStarting context clean up..."
 context_clean_up
 echo -e "\033[33m✔\033[0m Context space clean up completed"
 
-echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
+echo -e "\nCreating two clusters to serve as example WECs"
 clusters=(cluster1 cluster2)
+cluster_log_dir=$(mktemp -d)
+trap "rm -rf $cluster_log_dir" EXIT
 for cluster in "${clusters[@]}"; do
-   (
-     echo -e "Creating cluster ${cluster}..."
-     kind create cluster --name "${cluster}" >/dev/null 2>&1 &&
-     echo -e "\033[33m✔\033[0m ${cluster} creation and context setup complete"
-   ) &
+    kind create cluster --name "${cluster}" >"${cluster_log_dir}/${cluster}.log" 2>&1 && touch "${cluster_log_dir}/${cluster}.success" &
 done
-wait 
-
+wait
+some_failed=false
 for cluster in "${clusters[@]}"; do
-   kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1
+    if ! [ -f "${cluster_log_dir}/${cluster}.success" ]; then
+	echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
+	cat "${cluster_log_dir}/${cluster}.log" >&2
+	some_failed=true
+	continue
+    fi
+    echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
+    kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1
 done
+if [ "$some_failed" = true ]; then exit 10; fi
 
 for cluster in "${clusters[@]}"; do
   if kubectl config get-contexts | grep -w " ${cluster} " >/dev/null 2>&1; then
@@ -135,6 +141,7 @@ for image in "${images[@]}"; do
     ) &
 done
 
+echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
     --version $kubestellar_version \
     --set-json='ITSes=[{"name":"its1"}]' \
