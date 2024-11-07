@@ -17,7 +17,7 @@
 
 set -e
 
-kubestellar_version=0.25.0-rc.1
+kubestellar_version=0.25.0-rc.2
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
