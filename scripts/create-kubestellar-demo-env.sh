@@ -147,7 +147,7 @@ kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
 kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its}=true' --timeout 90s
-kubectl --context kind-kubeflex wait -n its1-system job.batch/its --for condition=Complete --timeout 150s
+kubectl --context kind-kubeflex wait -n its1-system job.batch/its --for condition=Complete --timeout 300s
 echo -e "\033[33m✔\033[0m OCM cluster manager is ready"
 
 echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..."
