@@ -21,7 +21,7 @@ kubestellar_version=0.25.0-rc.2
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/main/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
 
 ##########################################
 cluster_clean_up() {
