@@ -21,7 +21,7 @@ kubestellar_version=0.25.0-rc.2
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/main/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
 
 ##########################################
 cluster_clean_up() {
@@ -92,20 +92,34 @@ echo -e "\nStarting context clean up..."
 context_clean_up
 echo -e "\033[33m✔\033[0m Context space clean up completed"
 
-echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
+echo -e "\nCreating two clusters to serve as example WECs"
 clusters=(cluster1 cluster2)
+cluster_log_dir=$(mktemp -d)
+trap "rm -rf $cluster_log_dir" EXIT
 for cluster in "${clusters[@]}"; do
-   (
-     echo -e "Creating cluster ${cluster}..."
-     kind create cluster --name "${cluster}" >/dev/null 2>&1 &&
-     echo -e "\033[33m✔\033[0m ${cluster} creation and context setup complete"
-   ) &
+    kind create cluster --name "${cluster}" >"${cluster_log_dir}/${cluster}.log" 2>&1 && touch "${cluster_log_dir}/${cluster}.success" &
 done
-wait 
 
+echo -e "Creating KubeFlex cluster with SSL Passthrough"
+curl -s https://raw.githubusercontent.com/MikeSpreitzer/kcp-edge-mc/refs/heads/better-create-wecs/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
+: TODO: restore that URL to https://raw.githubusercontent.com/kubestellar/kubestellar/main/scripts/create-kind-cluster-with-SSL-passthrough.sh after this PR merges
+: TODO: restore that URL to https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh when making the next release
+echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
+
+wait
+kubectl config use-context kind-kubeflex
+some_failed=false
 for cluster in "${clusters[@]}"; do
-   kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1
+    if ! [ -f "${cluster_log_dir}/${cluster}.success" ]; then
+	echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
+	cat "${cluster_log_dir}/${cluster}.log" >&2
+	some_failed=true
+	continue
+    fi
+    echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
+    kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1
 done
+if [ "$some_failed" = true ]; then exit 10; fi
 
 for cluster in "${clusters[@]}"; do
   if kubectl config get-contexts | grep -w " ${cluster} " >/dev/null 2>&1; then
@@ -119,10 +133,6 @@ for cluster in "${clusters[@]}"; do
   fi
 done
 
-echo -e "Creating KubeFlex cluster with SSL Passthrough"
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443 
-echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
-
 echo -e "\nPulling container images local..."
 images=("ghcr.io/loft-sh/vcluster:0.16.4"
         "rancher/k3s:v1.27.2-k3s1"
@@ -135,6 +145,7 @@ for image in "${images[@]}"; do
     ) &
 done
 
+echo -e "\nStarting the process to install KubeStellar core: kind-kubeflex..."
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
     --version $kubestellar_version \
     --set-json='ITSes=[{"name":"its1"}]' \
@@ -148,7 +159,9 @@ kflex ctx --overwrite-existing-context its1
 echo -e "\nWaiting for OCM cluster manager to be ready..."
 kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its}=true' --timeout 90s
 kubectl --context kind-kubeflex wait -n its1-system job.batch/its --for condition=Complete --timeout 300s
-echo -e "\033[33m✔\033[0m OCM cluster manager is ready"
+echo -e "\nWaiting for OCM hub cluster-info to be updated..."
+kubectl --context kind-kubeflex wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 90s
+echo -e "\033[33m✔\033[0m OCM hub is ready"
 
 echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..."
 
