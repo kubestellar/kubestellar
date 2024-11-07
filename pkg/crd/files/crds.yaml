@@ -564,7 +564,7 @@ spec:
     - jsonPath: .metadata.labels['status\.kubestellar\.io/name']
       name: SUBJECT_NAME
       type: string
-    - jsonPath: .metadata.labels['status\.kubestellar\.io/policy']
+    - jsonPath: .metadata.labels['status\.kubestellar\.io/binding-policy']
       name: BINDINGPOLICY
       type: string
     name: v1alpha1
