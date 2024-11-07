@@ -93,7 +93,9 @@ When there are N `GROUP BY` columns, the result has a row for each tuple of valu
 
 ## Specification of the general technique
 
-See `types.go`.
+In `types.go` see (a) `StatusCollector`, (b) the references to those
+from `DownsyncPolicyClause`, `NamespaceScopeDownsyncClause`, and
+`ClusterScopeDownsyncClause`, and (c) `CombinedStatus`.
 
 ### Queryable Objects
 
@@ -115,12 +117,35 @@ A CEL expression within a `StatusCollector` can reference the following objects:
 
 ### Number of WECs
 
-The `StatusCollectorSpec` would look like the following.
+The `StatusCollector` would look like the following.
 
 ```yaml
-combinedFields:
-   - name: count
-     type: COUNT
+apiVersion: control.kubestellar.io/v1alpha1
+kind: StatusCollector
+metadata:
+  name: count-wecs
+spec:
+  combinedFields:
+     - name: count
+       type: COUNT
+  limit: 10
+```
+
+To specify using that, the `BindingSpec` would reference it from the `StatusCollection` in the relevant `DownsyncPolicyClause`(s). Following is an example.
+
+```yaml
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: example-binding-policy
+spec:
+  clusterSelectors:
+  - matchLabels: {"location-group":"edge"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name":"nginx"}
+    statusCollection:
+      statusCollectors: [ count-wecs ]
 ```
 
 The analogous SQL statement would look something like the following.
@@ -130,6 +155,34 @@ SELECT COUNT(*) AS count FROM PerWEC LIMIT <something>
 ```
 
 The table resulting from this would have one column and one row. The one value in this table would be the number of WECs.
+
+Following is an example of a consequent `CombinedStatus` object.
+
+```yaml
+apiVersion: control.kubestellar.io/v1alpha1
+kind: CombinedStatus
+metadata:
+  creationTimestamp: "2024-11-07T20:15:27Z"
+  generation: 1
+  labels:
+    status.kubestellar.io/api-group: apps
+    status.kubestellar.io/binding-policy: nginx-bindingpolicy
+    status.kubestellar.io/name: nginx-deployment
+    status.kubestellar.io/namespace: nginx
+    status.kubestellar.io/resource: deployments
+  name: 0990056b-ccbc-4c46-b0fe-366ef3a2de5e.332d2c17-7b55-44f6-9a6e-21445523c808
+  namespace: nginx
+  resourceVersion: "604"
+  uid: cc167004-073e-4a20-9857-449f692e9643
+results:
+- columnNames:
+  - count
+  name: count-wecs
+  rows:
+  - columns:
+    - float: "2"
+      type: Number
+```
 
 ### Histogram of Pod phase
 
