@@ -99,7 +99,15 @@ trap "rm -rf $cluster_log_dir" EXIT
 for cluster in "${clusters[@]}"; do
     kind create cluster --name "${cluster}" >"${cluster_log_dir}/${cluster}.log" 2>&1 && touch "${cluster_log_dir}/${cluster}.success" &
 done
+
+echo -e "Creating KubeFlex cluster with SSL Passthrough"
+curl -s https://raw.githubusercontent.com/MikeSpreitzer/kcp-edge-mc/refs/heads/better-create-wecs/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
+: TODO: restore that URL to https://raw.githubusercontent.com/kubestellar/kubestellar/main/scripts/create-kind-cluster-with-SSL-passthrough.sh after this PR merges
+: TODO: restore that URL to https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh when making the next release
+echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
+
 wait
+kubectl config use-context kind-kubeflex
 some_failed=false
 for cluster in "${clusters[@]}"; do
     if ! [ -f "${cluster_log_dir}/${cluster}.success" ]; then
@@ -124,10 +132,6 @@ for cluster in "${clusters[@]}"; do
     fi
   fi
 done
-
-echo -e "Creating KubeFlex cluster with SSL Passthrough"
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --port 9443 
-echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
 
 echo -e "\nPulling container images local..."
 images=("ghcr.io/loft-sh/vcluster:0.16.4"
