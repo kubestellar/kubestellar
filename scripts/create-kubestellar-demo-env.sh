@@ -101,8 +101,7 @@ for cluster in "${clusters[@]}"; do
 done
 
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
-curl -s https://raw.githubusercontent.com/MikeSpreitzer/kcp-edge-mc/refs/heads/better-create-wecs/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
-: TODO: restore that URL to https://raw.githubusercontent.com/kubestellar/kubestellar/main/scripts/create-kind-cluster-with-SSL-passthrough.sh after this PR merges
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/main/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
 : TODO: restore that URL to https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh when making the next release
 echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
 
