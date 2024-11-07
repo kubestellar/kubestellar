@@ -127,7 +127,7 @@ else
 popd
 
 : Waiting for OCM hub to be ready...
-kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its}=true' --timeout 90s
+kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its}=true' --timeout 200s
 kubectl wait -n its1-system job.batch/its --for condition=Complete --timeout 300s
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 90s
 
