@@ -3263,6 +3263,9 @@ clues about the problem.</p>
 <p>Update the version in the core chart defaults, <code>core-chart/values.yaml</code>.</p>
 </li>
 <li>
+<p>In <code>scripts/create-kubestellar-demo-env.sh</code>, replace the occurrences of <code>https://raw.githubusercontent.com/kubestellar/kubestellar/main/</code> with <code>https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/</code>; delete this instruction from here.</p>
+</li>
+<li>
 <p>Update the version in <code>scripts/create-kubestellar-demo-env.sh</code>.</p>
 </li>
 <li>
