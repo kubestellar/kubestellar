@@ -8,9 +8,9 @@ There are multiple ways to get started with Kubestellar, reflecting its flexible
 
 Both approaches create a basic environment suitable for learning, but remember that KubeStellar supports more sophisticated configurations including:
 
-- Multiple Independent Target Spaces (ITS)
-- Multiple Workload Distribution Spaces (WDS)
-- Dynamic addition and removal of Work Execution Clusters (WECs)
+- Multiple Inventory and Transport Spaces (ITS)
+- Multiple Workload Definition Spaces (WDS)
+- Dynamic addition and removal of Workload Execution Clusters (WECs)
 - Various deployment patterns to suit different organizational needs
 
 ## Quick Start Using the Automated Script
@@ -18,7 +18,7 @@ Both approaches create a basic environment suitable for learning, but remember t
 If you want to quickly setup a basic environment, you can use our automated installation script:
 
 ```shell
-bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/hack/check_pre_req.sh) kflex ocm helm kubectl docker kind
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/create-kubestellar-demo-env.sh)
 ```
 
 This script sets up a basic environment with one ITS, one WDS, and two WECs. While this is great for getting started, you may want to follow the manual setup below to better understand the components and prepare for more advanced configurations.
