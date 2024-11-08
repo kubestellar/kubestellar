@@ -17,37 +17,13 @@
 
 set -e
 
-echo -e "Starting Docker engine..."
-# Check if Docker is running using OS-agnostic commands
-if ! docker info >/dev/null 2>&1; then
-    case "$(uname -s)" in
-        Linux*)
-            sudo systemctl start docker
-            ;;
-        Darwin*)
-            open -a Docker
-            # Wait for Docker to start
-            echo "Waiting for Docker to start..."
-            while ! docker info >/dev/null 2>&1; do
-                sleep 2
-            done
-            ;;
-        MINGW*|CYGWIN*|MSYS*)
-            echo "Please start Docker Desktop manually if not running"
-            echo "Waiting for Docker to be available..."
-            while ! docker info >/dev/null 2>&1; do
-                sleep 2
-            done
-            ;;
-        *)
-            echo "Unknown operating system. Please ensure Docker is running manually."
-            exit 1
-            ;;
-    esac
-    echo "Docker engine started."
-else
-    echo "Docker engine is already running."
+
+echo -e "Checking container runtime..."
+if ! docker ps -q; then
+    echo "Error: The script cannot continue because Docker or Podman is not running. Please start your container runtime before running the script again."
+    exit 1
 fi
+echo "Container runtime is running."
 
 kubestellar_version=0.25.0-rc.1
 echo -e "KubeStellar Version: ${kubestellar_version}"
