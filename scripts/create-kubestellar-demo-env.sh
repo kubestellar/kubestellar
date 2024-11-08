@@ -17,11 +17,11 @@
 
 set -e
 
-kubestellar_version=0.25.0-rc.2
+kubestellar_version=0.25.0-rc.3
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/main/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
 
 ##########################################
 cluster_clean_up() {
@@ -101,7 +101,7 @@ for cluster in "${clusters[@]}"; do
 done
 
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
-curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/main/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
+curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
 : TODO: restore that URL to https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh when making the next release
 echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
 
