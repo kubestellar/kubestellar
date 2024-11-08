@@ -97,7 +97,7 @@ echotitle() {
 echostatus() {
     # $1 = status text true|false
     status="$1"
-    if [[ "${status,,}" ==  "true" || "${status,,}" == "succeeded" || "${status,,}" == "running" || "${status}" ==  "1" ]] ; then
+    if [[ "${status,,}" ==  "true" || "${status,,}" == "succeeded" || "${status,,}" == "running" || "${status,,}" == "active" || "${status}" ==  "1" ]] ; then
         echocolor ${COLOR_STATUS_TRUE} "$status"
     else
         echocolor ${COLOR_STATUS_FALSE} "$status"
@@ -232,7 +232,7 @@ is_installed 'jq' \
 ###############################################################################
 # Ensure output folder
 ###############################################################################
-if [ "$arg_logs" == "true" ] || [ "$arg_yaml" == "true"] ; then
+if [[ "$arg_logs" == "true" || "$arg_yaml" == "true" ]] ; then
     yes "yes" | rm -vRI "/tmp/kubestellar-snapshot" > /dev/null 2>&1 || true
     mkdir -p "$output_folder"
 fi
@@ -456,6 +456,7 @@ done
 # Listing Manifest Works
 ###############################################################################
 echotitle "\nManifest Works:"
+mw_n=0
 for h in "${!cp_pch[@]}" ; do
     if [[ "${cp_pch[$h]}" == "its" ]] ; then
         ns=($(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") get ns -no-headers -o name 2> /dev/null || true))
@@ -489,10 +490,52 @@ for h in "${!cp_pch[@]}" ; do
     fi
 done
 
+
+###############################################################################
+# Listing Work Statuses
+###############################################################################
+echotitle "\nWork Statuses:"
+sw_n=0
+for h in "${!cp_pch[@]}" ; do
+    if [[ "${cp_pch[$h]}" == "its" ]] ; then
+        ns=($(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") get ns -no-headers -o name 2> /dev/null || true))
+        for j in "${!ns[@]}" ; do
+            cluster=${ns[j]##*/}
+            sws=($(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses --no-headers -o name 2> /dev/null || true))
+            for i in "${!sws[@]}" ; do
+                name="${sws[i]##*/}"
+                origin="$(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses $name -o jsonpath='{.metadata.labels.transport\.kubestellar\.io\/originWdsName}' 2> /dev/null || true)"
+                if [[ "$origin" == "" ]] ; then
+                    continue
+                fi
+                sw_cp[sw_n]="${cp_name[$h]}"
+                sw_name[sw_n]="$name"
+                sw_cluster[sw_n]="$cluster"
+                sw_origin[sw_n]="$origin"
+                sw_binding[sw_n]="$(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses ${sw_name[sw_n]} -o jsonpath='{.metadata.labels.transport\.kubestellar\.io\/originOwnerReferenceBindingKey}')"
+                echo -n -e "- ${COLOR_INFO}${sw_name[sw_n]}${COLOR_NONE} in cp=${COLOR_INFO}${sw_cp[sw_n]}${COLOR_NONE}, namespace=${COLOR_INFO}${sw_cluster[sw_n]}${COLOR_NONE}, status="
+                echo -n $(echostatus $(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses $name -o jsonpath='{.status.phase}' || true))
+                echo -e ": ${COLOR_INFO}${sw_cluster[sw_n]}${COLOR_NONE} --> ${COLOR_INFO}${sw_binding[sw_n]}${COLOR_NONE} --> ${COLOR_INFO}${sw_origin[sw_n]}${COLOR_NONE}"
+                if [[ "$arg_verbose" == "true" ]] ; then
+                    echo -n -e "${COLOR_YAML}"
+                    kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses $name -o jsonpath='{.spec.sourceRef}' | jq '.' | indent || true
+                    echo -n -e "${COLOR_NONE}"
+                fi
+                if [[ "$arg_yaml" == "true" ]] ; then
+                    mkdir -p "$output_folder/${cp_name[$h]}/work-statuses/$cluster"
+                    kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses $name -o yaml > "$output_folder/${cp_name[$h]}/work-statuses/$cluster/$name.yaml"
+                fi
+                sw_n=$((sw_n+1))
+            done
+        done
+    fi
+done
+
+
 ###############################################################################
 # Create archive
 ###############################################################################
-if [ "$arg_logs" == "true" ] || [ "$arg_yaml" == "true"] ; then
+if [[ "$arg_logs" == "true" || "$arg_yaml" == "true" ]] ; then
     echov -e "\nSaving logs and/or YAML to ${COLOR_INFO}./kubestellar-snapshot.tar.gz${COLOR_NONE}"
     tar czf kubestellar-snapshot.tar.gz -C "$output_folder" .
 fi
