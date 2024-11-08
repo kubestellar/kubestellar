@@ -1,5 +1,9 @@
 # Adding KubeStellar to OCM
 
+In general, the key idea is to use the OCM hub cluster as the
+KubeStellar "Inventory and Transport Space" (ITS) and the KubeFlex
+hosting cluster.
+
 This page shows one concrete example of adding KubeStellar to an
 existing OCM system. In particular, a hub plus two managed clusters
 almost exactly as created by [the OCM Quick Start
