@@ -3211,6 +3211,7 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 
 <h2 id="automated-check-of-prerequisites-for-kubestellar">Automated Check of Prerequisites for KubeStellar<a class="headerlink" href="#automated-check-of-prerequisites-for-kubestellar" title="Permanent link">#</a></h2>
 <p>The <a href="https://github.com/kubestellar/kubestellar/blob/main/hack/check_pre_req.sh">check_pre_req</a> script offers a convenient way to check for the prerequisites needed for <a href="./">KubeStellar</a> deployment and <a href="../example-scenarios/">use</a>.</p>
+<p>This script is self-contained, so it is suitable for "curl-to-bash" style usage. The latest development version is at <a href="https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/hack/check_pre_req.sh">https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/hack/check_pre_req.sh</a>. To check the prerequisites for using a particular release of KubeStellar, you will want to use the script from that release.</p>
 <p>The script checks for a prerequisite presence in the <code>$PATH</code>, by using the <code>which</code> command, and it can optionally provide version and path information for prerequisites that are present, or installation information for missing prerequisites.</p>
 <p>We envision that this script could be useful for user-side debugging as well as for asserting the presence of prerequisites in higher-level automation scripts.</p>
 <p>The script accepts a list of optional flags and arguments.</p>
