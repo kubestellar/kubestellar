@@ -37,26 +37,15 @@ The following command will check for the prerequisites that you will need for th
 bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/hack/check_pre_req.sh) kflex ocm helm kubectl docker kind
 ```
 
-### Cleanup from previous runs
-
-If you have run this recipe or used `kflex` (the KubeFlex command
-line) in any other capacity, it may have some troublesome hidden state
-in your kubeconfig file. The following command clears out that hidden
-state.
-
-```shell
-yq -i 'del(.preferences)' ${KUBECONFIG:-$HOME/.kube/config}
-```
-
 ### Set the Version appropriately as an environment variable
 
 ```shell
-export KUBESTELLAR_VERSION={{ config.ks_latest_release }}
+kubestellar_version={{ config.ks_latest_release }}
 ```
 
 ### OCM Quick Start with Ingress
 
-This recipe uses a modified version of [the OCM Quick Start](https://raw.githubusercontent.com/open-cluster-management-io/OCM/main/solutions/setup-dev-environment/local-up.sh). The modification is because KubeStellar needs the hosting cluster to have an Ingress controller with SSL passthrough enabled. The modified Quick Start script has the following modifications compared to the baseline.
+This recipe uses a modified version of [the OCM Quick Start](https://raw.githubusercontent.com/open-cluster-management-io/OCM/v0.15.0/solutions/setup-dev-environment/local-up.sh). The modification is because KubeStellar needs the hosting cluster to have an Ingress controller with SSL passthrough enabled. The modified Quick Start script has the following modifications compared to the baseline.
 
 1. The `kind` cluster created for the hub has an additional port mapping, where the Ingress controller listens.
 1. The script installs [the NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/) into the hub cluster, then patches the controller to enable SSL passthrough, and later waits for it to be in service.
@@ -95,7 +84,7 @@ This chart instance will do the following.
 
 ```shell
 helm --kube-context kind-hub upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-    --version $KUBESTELLAR_VERSION \
+    --version $kubestellar_version \
     --set-json='ITSes=[{"name":"its1", "type":"host"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set-json='verbosity.default=5' # so we can debug your problem reports
@@ -109,8 +98,8 @@ which is not necessarily true --- so take care for that too.
 
 ```shell
 kubectl config use-context kind-hub
-kubectl config delete-context wds1 || true
-kflex ctx wds1
+kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
+kflex ctx --overwrite-existing-context wds1
 ```
 
 For more information about this Helm chart, see [its documentation](core-chart.md).
