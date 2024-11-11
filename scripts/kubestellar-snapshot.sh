@@ -284,11 +284,15 @@ for context in "${contexts[@]}" ; do # for all contexts
         helm_context=$context
         name="$(echo "$chart" | awk '{print $1}')" || true
         version="$(echo "$chart" | awk '{print $NF}')" || true
+        secret="$(k --context $helm_context get secret --all-namespaces -l "owner=helm"  --no-headers -o name 2> /dev/null | grep "$name" || true)"
+        secret="${secret##*/}"
         echo -e "- Helm chart ${COLOR_INFO}${name}${COLOR_NONE} (${COLOR_INFO}v${version}${COLOR_NONE}) in context ${COLOR_INFO}${context}${COLOR_NONE}"
+        echo -e "  - Secret=${COLOR_INFO}${secret}${COLOR_NONE}"
         if [[ "$arg_yaml" == "true" ]] ; then
-            mkdir -p "$output_folder/kubestellar"
-            k --context $helm_context get postcreatehook its -o yaml > "$output_folder/kubestellar/its-pch.yaml"
-            k --context $helm_context get postcreatehook wds -o yaml > "$output_folder/kubestellar/wds-pch.yaml"
+            mkdir -p "$output_folder/kubestellar-core-chart"
+            echo -e "$(k --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.info'     | sed -e 's/\"/"/g')" > "$output_folder/kubestellar-core-chart/info.json"
+            echo -e "$(k --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.chart'    | sed -e 's/\"/"/g')" > "$output_folder/kubestellar-core-chart/chart.json"
+            echo -e "$(k --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.manifest' | sed -e 's/\"/"/g')" > "$output_folder/kubestellar-core-chart/manifest.yaml"
         fi
         break
     fi
