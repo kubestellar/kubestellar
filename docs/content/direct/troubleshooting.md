@@ -30,10 +30,12 @@ verbosity (`-v`) of various controllers.
 
 ## Things to look at
 
+- While double-checking your input is never bad, using `kubectl get -o yaml --show-managed-fields` to examine the live API objects adds some good stuff: confirmation that your input was received and parsed as expected, display of any error messages in your API objects, timestamps in the metadata (helpful for comparing with log messages), indication of what last wrote to each part of your API objects and when.
 - When basic stuff is not working, survey the Pod objects in the KubeFlex hosting cluster to look for ones that are damaged in some way. For example: you can get a summary with the command `kubectl --context kind-kubeflex get pods -A` --- adjust as necessary for the name of your kubeconfig context to use for the KubeFlex hosting cluster.
 - Remember that for each of your BindingPolicy objects, there is a corresponding Binding object that reports what is matching the policy object.
 - Although not part of the interface, when debugging you can look at the ManifestWork and WorkStatus objects in the ITS.
 - Look at logs of controllers. If they have had container restarts that look relevant, look also at the previous logs. Do not forget OCM controllers. Do not forget that some Pods have more than one interesting container.
+    - Remember that the amount of log retained is typically a configured option in the relevant container runtime. If your logs are too short, look into increasing that log retention.
 - If a controller's `-v` is not at least 5, increase it.
 - Remember that Kubernetes controllers tend to report transient problems as errors without making it clear that the problem is transient and tend to not make it clear if/when the problem has been resolved (sigh).
 
@@ -55,5 +57,9 @@ Show the particulars of something going wrong.
 
 - Show a shell session, starting from scratch
 - Report timestamps of when salient changes happened. Make it clear which timezone is involved in each one. Particularly interesting times are when KubeStellar did the wrong thing or failed to do anything at all in response to something.
-- Look at the Binding and ManifestWork and WorkStatus objects and the controller logs. Include both in a problem report. Show the relevant workload objects, from WDS and from WEC. When the problem is behavior over time, show the objects contents from before and after the misbehavior.
+- Show the relevant API objects. When the problem is behavior over time, show the objects contents from before and after the misbehavior.
+    - In the WDS: the workload objects involved; any `BidingPolicy` involved, and the corresponding `Binding` for each; any `CustomTransform`, `StatusCollector`, or `CombinedStatus` involved.
+    - Any involved objects in the WEC(s).
+    - Implementation objects in the ITS: `ManifestWork`, `WorkStatus`.
 - When reporting kube API object contents, include the `meta.managedFields`. For example, when using `kubectl get`, include `--show-managed-fields`.
+- Show the logs from relevant controllers.
