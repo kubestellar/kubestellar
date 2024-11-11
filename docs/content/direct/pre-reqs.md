@@ -72,7 +72,8 @@ The setup in `montoring/` additional uses the following.
 To build and _**test**_ KubeStellar properly, you will also need
 
 - [**kind**](https://kind.sigs.k8s.io/) version >= 0.20
-- [**OCP**](https://docs.openshift.com/container-platform/4.13/installing/index.html)
+- [**OCP**](https://docs.openshift.com/container-platform/4.13/installing/index.html), if you are testing a scenario involving OCP
+- [**ginkgo**](https://onsi.github.io/ginkgo/), if you will run the ginkgo-based end-to-end test
 - [`yq`](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq)) version >= 4 - for running tests
 
 <!-- start tag for check script  include -->
