@@ -186,15 +186,15 @@ results:
 
 ### Histogram of Pod phase
 
-The `StatusCollectorSpec` would look like the following.
+The `spec` of the `StatusCollector` would look like the following.
 
 ```yaml
-groupBy:
-   - name: phase
-     def: returned.status.phase
-combinedFields:
-   - name: count
-     type: COUNT
+  groupBy:
+     - name: phase
+       def: returned.status.phase
+  combinedFields:
+     - name: count
+       type: COUNT
 ```
 
 The analogous SQL statement would look something like the following.
@@ -211,38 +211,41 @@ The result would have two columns, holding a phase value and a count. The number
 
 ### Histogram of number of available replicas of a Deployment
 
-This reports, for each number of available replicas, how many WECs have that number.
+This reports, for each number of available replicas, how many WECs have that number. The `spec` of the `CombinedStatus` would look like the following.
 
 ```yaml
-groupBy:
-   - name: numAvailable
-     def: returned.status.availableReplicas
-combinedFields:
-   - name: count
-     type: COUNT
+  groupBy:
+     - name: numAvailable
+       def: returned.status.availableReplicas
+  combinedFields:
+     - name: count
+       type: COUNT
 ```
 
 ### List of WECs where the Deployment is not as available as desired
 
+The `spec` of the `CombinedStatus` would look like the following.
+
 ```yaml
-filter: "obj.spec.replicas != returned.status.availableReplicas"
-select:
-   - name: wec
-     def: inventory.name
+  filter: "obj.spec.replicas != returned.status.availableReplicas"
+  select:
+     - name: wec
+       def: inventory.name
 ```
 
 ### Full status from each WEC with information retrieval time
 
+The `spec` of the `CombinedStatus` would look like the following.
 This produces a listing of object status paired with inventory object name.
 
 ```yaml
-select:
-   - name: wec
-     def: inventory.name
-   - name: status
-     def: returned.status
-   - name: retrievalTime
-     def: propagation.lastReturnedUpdateTimestamp
+  select:
+     - name: wec
+       def: inventory.name
+     - name: status
+       def: returned.status
+     - name: retrievalTime
+       def: propagation.lastReturnedUpdateTimestamp
 ```
 
 ## Special case for 1 WEC
