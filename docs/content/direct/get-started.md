@@ -1,38 +1,39 @@
 # Getting Started with KubeStellar
 
-There are multiple ways to get started with Kubestellar, reflecting its flexible architecture that supports various deployment patterns. This page presents two approaches:
+This page shows one concrete example of steps 2--7 from the [full Installation and Usage outline](user-guide-intro.md#the-full-story). This example produces a simple single-host system that is suitable for kicking the tires, using [kind](https://kind.sigs.k8s.io/) to create three new clusters to serve as your KubeFlex hosting cluster and two WECs. This page concludes with forwarding you to one example of the remaining steps. For general setup information, see [the full story](user-guide-intro.md#the-full-story).
 
-1. A **Step by step walkthrough** that demonstrates the core concepts and components, showing how to manually set up a simple single-host system.
-
-2. A **quick automated setup** using our installation script, which creates a basic working environment for those who want to start experimenting right away. 
-
-Both approaches create a basic environment suitable for learning, but remember that KubeStellar supports more sophisticated configurations including:
+This shows just one particular choice for these initial steps, intended only to produce a system suitable for initial study. This is not what you would do for a production system. Remember that KubeStellar supports more sophisticated configurations including the following.
 
 - Multiple Inventory and Transport Spaces (ITS)
 - Multiple Workload Definition Spaces (WDS)
 - Dynamic addition and removal of Workload Execution Clusters (WECs)
 - Various deployment patterns to suit different organizational needs
 
+This page is primarily organized as a sequence of steps. There is also a script that covers a subset of the steps.
+
 ## Quick Start Using the Automated Script
 
-If you want to quickly setup a basic environment, you can use our automated installation script:
+When reading through the steps in [Setup](#setup), after you have [established the software prerequisites](#install-software-prerequisites) (including making `kind` able to create _three_ clusters) you can then use our automated installation script to do the remaining [Setup](#setup) steps, from _checking_ the software prerequisites through creating the example WECs.
 
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/create-kubestellar-demo-env.sh)
 ```
 
-This script sets up a basic environment with one ITS, one WDS, and two WECs. While this is great for getting started, you may want to follow the manual setup below to better understand the components and prepare for more advanced configurations.
+If successful, the script will output the variable definitions that you would use when proceeding to the example scenarios. After successfully running the script, proceed to the [Exercise KubeStellar](#exercise-kubestellar) section below.
 
-## Detailed Step walkthrough 
-The following steps show one concrete example of steps 2--7 from the [full Installation and Usage outline](user-guide-intro.md#the-full-story). This example produces a simple single-host system suitable for kicking the tires, using [kind](https://kind.sigs.k8s.io/) to create three new clusters to serve as your KubeFlex hosting cluster and two WECs. This page concludes with forwarding you to one example of the remaining steps. For general setup information, see [the full story](user-guide-intro.md#the-full-story).
+This script does the same things as described in [Setup](#setup) but with maximum concurrency. The concurrency is there to enable the script to complete faster. This makes the script more complicated than what is presented below.
 
-  1. [Setup](#setup)
+## Detailed Step walkthrough
+
+The following steps show one concrete example of steps 2--7 from the [full Installation and Usage outline](user-guide-intro.md#the-full-story).
+
+1. [Setup](#setup)
     1. Install software prerequisites
     1. Cleanup from previous runs
     1. Create the KubeFlex hosting cluster and Kubestellar core components
     1. Create and register two WECs.
-  2. [Exercise KubeStellar](#exercise-kubestellar)
-  3. [Troubleshooting](#troubleshooting)
+2. [Exercise KubeStellar](#exercise-kubestellar)
+3. [Troubleshooting](#troubleshooting)
 
 ## Setup
 
