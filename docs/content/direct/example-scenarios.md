@@ -321,18 +321,21 @@ kubectl --context "$wec2_context" get statefulsets -n postgres-system
 Run "helm list" on the WDS:
 
 ```shell
-$ helm --kube-context "$wds_context" list -n postgres-system
+helm --kube-context "$wds_context" list -n postgres-system
+```
+
+and expect to see output like the following.
+
+```
 NAME            NAMESPACE       REVISION        UPDATED                                 STATUS       CHART                    APP VERSION
 postgres        postgres-system 1               2023-10-31 13:39:52.550071 -0400 EDT    deployed     postgresql-13.2.0        16.0.0
 ```
 
-And try that on the managed clusters
+And try that on the managed clusters; you will get empty output.
 
 ```shell
-$ helm list --kube-context "$wec1_context" -n postgres-system
-: returns empty
-$ helm list --kube-context "$wec2_context" -n postgres-system
-: returns empty
+helm list --kube-context "$wec1_context" -n postgres-system
+helm list --kube-context "$wec2_context" -n postgres-system
 ```
 
 This is because Helm creates a `Secret` object to hold its metadata about a "release" (chart instance) but Helm does not apply the usual labels to that object, so it is not selected by the `BindingPolicy` above and thus does not get delivered. The workload is functioning in the WECs, but `helm list` does not recognize its handiwork there. That labeling could be done for example with:
