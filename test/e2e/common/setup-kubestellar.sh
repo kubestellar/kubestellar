@@ -135,10 +135,11 @@ wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=co
 
 echo "transport controller is running."
 
-kubectl config delete-context its1 || true
-kflex ctx its1
-kubectl config delete-context wds1 || true
-kflex ctx wds1
+kubectl config use-context "$HOSTING_CONTEXT"
+kflex ctx --set-current-for-hosting
+kflex ctx --overwrite-existing-context wds1
+kflex ctx --overwrite-existing-context its1
+
 kflex ctx
 
 wait-for-cmd 'kubectl --context its1 get ns customization-properties'
