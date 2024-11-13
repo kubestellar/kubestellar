@@ -94,7 +94,7 @@ func NewTransportController(ctx context.Context,
 	transportClientset kubernetes.Interface,
 	transportDynamicClient dynamic.Interface,
 	maxSizeWrapped int, maxNumWrapped int, wdsName string) (*genericTransportController, error) {
-	emptyWrappedObject := transportInstance.WrapObjects(make([]transport.Wrapee, 0)) // empty wrapped object to get GVR from it.
+	emptyWrappedObject := transportInstance.WrapObjects(make([]transport.Wrapee, 0), nil) // empty wrapped object to get GVR from it.
 	wrappedObjectGVR, err := getGvrFromWrappedObject(transportClientset, emptyWrappedObject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wrapped object GVR - %w", err)
@@ -653,8 +653,13 @@ func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx contex
 }
 
 func (c *genericTransportController) deleteWrappedObject(ctx context.Context, namespace string, objectName string) error {
+	logger := klog.FromContext(ctx)
 	err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Delete(ctx, objectName, metav1.DeleteOptions{})
-	if err != nil && !errors.IsNotFound(err) { // if object is already not there, we do not report an error cause desired state was achieved.
+	if err == nil {
+		logger.V(2).Info("Successful deletion of wrapped object", "wrappedObjectName", objectName, "destination", namespace)
+	} else if errors.IsNotFound(err) {
+		logger.V(2).Info("Deletion of wrapped object was not needed because it is already gone", "wrappedObjectName", objectName, "destination", namespace)
+	} else {
 		return fmt.Errorf("failed to delete wrapped object '%s' from destination WEC mailbox namespace '%s' - %w", objectName, namespace, err)
 	}
 	return nil
@@ -684,7 +689,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 		return fmt.Errorf("failed to get current wrapped objects that are owned by Binding '%s' - %w", binding.GetName(), err)
 	}
 	// calculate desired state
-	destToDesiredWrappedObject, bindingErrors, groupResources, err := c.computeDestToWrappedObjects(ctx, binding)
+	destToDesiredWrappedObjects, kindToResource, bindingErrors, groupResources, err := c.computeDestToWrappedObjects(ctx, binding)
 	if err != nil {
 		return fmt.Errorf("failed to build wrapped object(s) from Binding '%s' - %w", binding.GetName(), err)
 	}
@@ -703,93 +708,102 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	}
 	c.customTransformCollection.setBindingGroupResources(binding.Name, groupResources)
 	// converge actual state to the desired state
-	if err := c.propagateWrappedObjectToClusters(ctx, destToDesiredWrappedObject, currentWrappedObjectList, binding.Spec.Destinations, len(bindingErrors) != 0); err != nil {
-		return fmt.Errorf("failed to propagate wrapped object(s) for binding '%s' to all required WECs - %w", binding.GetName(), err)
+	if len(bindingErrors) == 0 {
+		if err := c.propagateWrappedObjectToClusters(ctx, destToDesiredWrappedObjects, kindToResource, currentWrappedObjectList, binding.Spec.Destinations); err != nil {
+			return fmt.Errorf("failed to propagate wrapped object(s) for binding '%s' to all required WECs - %w", binding.GetName(), err)
+		}
+	} else {
+		klog.FromContext(ctx).Info("Deleting all wrapped objects in ITS because of errors in Binding", "binding", binding.Name)
 	}
-
 	// all objects that appear in the desired state were handled. need to remove wrapped objects that are not part of the desired state
-	for _, wrappedObject := range currentWrappedObjectList.Items { // objects left in currentWrappedObjectList.Items have to be deleted
-		if err := c.deleteWrappedObject(ctx, wrappedObject.GetNamespace(), wrappedObject.GetName()); err != nil {
-			return fmt.Errorf("failed to delete wrapped object from destinations that were removed from desired state - %w", err)
+	if len(currentWrappedObjectList.Items) > 0 {
+		klog.FromContext(ctx).V(4).Info("Removing unmatched wrapped objects", "binding", binding.Name, "count", len(currentWrappedObjectList.Items))
+		for _, wrappedObject := range currentWrappedObjectList.Items { // objects left in currentWrappedObjectList.Items have to be deleted
+			if err := c.deleteWrappedObject(ctx, wrappedObject.GetNamespace(), wrappedObject.GetName()); err != nil {
+				return fmt.Errorf("failed to delete wrapped object from destinations that were removed from desired state - %w", err)
+			}
 		}
 	}
-
 	return nil
 }
 
 // getWrapeesFromWDS returns a slice of Wrapee holding the objects that have been subject to destination-independent transformations
 // but not destination-dependent transformatinos (customizations).
-func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]transport.Wrapee, sets.Set[metav1.GroupResource], error) {
+func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]transport.Wrapee, func(schema.GroupKind) (string, bool), sets.Set[metav1.GroupResource], error) {
 	groupResources := sets.New[metav1.GroupResource]()
 	wrapees := make([]transport.Wrapee, 0)
+	kindToResource := map[schema.GroupKind]string{}
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clause := range binding.Spec.Workload.ClusterScope {
 		gvr := schema.GroupVersionResource(clause.GroupVersionResource)
 		object, err := c.wdsDynamicClient.Resource(gvr).Get(ctx, clause.Name, metav1.GetOptions{})
 		if err != nil {
-			return nil, groupResources, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", clause.Name, gvr, err)
+			return nil, nil, groupResources, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", clause.Name, gvr, err)
 		}
 		gr := metav1.GroupResource{Group: clause.GroupVersionResource.Group, Resource: clause.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		wrapees = append(wrapees, transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), gr.Resource, clause.CreateOnly))
+		kindToResource[object.GroupVersionKind().GroupKind()] = gvr.Resource
+		wrapees = append(wrapees, transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), clause.CreateOnly))
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, clause := range binding.Spec.Workload.NamespaceScope {
 		gvr := schema.GroupVersionResource(clause.GroupVersionResource)
 		object, err := c.wdsDynamicClient.Resource(gvr).Namespace(clause.Namespace).Get(ctx, clause.Name, metav1.GetOptions{})
 		if err != nil {
-			return nil, groupResources, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", clause.Name,
+			return nil, nil, groupResources, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", clause.Name,
 				clause.Namespace, gvr, err)
 		}
 		gr := metav1.GroupResource{Group: clause.GroupVersionResource.Group, Resource: clause.GroupVersionResource.Resource}
 		groupResources.Insert(gr)
-		wrapees = append(wrapees, transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), gr.Resource, clause.CreateOnly))
+		kindToResource[object.GroupVersionKind().GroupKind()] = gvr.Resource
+		wrapees = append(wrapees, transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), clause.CreateOnly))
 	}
 
-	return wrapees, groupResources, nil
+	return wrapees, abstract.PrimitiveMapGet(kindToResource), groupResources, nil
 }
 
-// computeDestToWrappedObjects returns the following three things.
-//   - the destToWrappedObject function. This maps a destination to the slice of wrapped customized objects
-//     that should go to that destination. This func also returns a `bool` that is false when
+// computeDestToWrappedObjects returns the following five things.
+//   - the destToWrappedObject function. This maps a destination to the slice of transportTask
+//     for that destination. This func also returns a `bool` that is false when
 //     the function has no answer for the given destination.
+//   - the function that maps every GroupKind appearing in the workload objects to the corresponding "resource".
 //   - the slice of strings describing user errors in the Binding.
+//   - the set of GroupResource that appear among the workload objects.
 //   - an error if something transient went wrong.
 func (c *genericTransportController) computeDestToWrappedObjects(ctx context.Context, binding *v1alpha1.Binding) (
-	func(v1alpha1.Destination) ([]*unstructured.Unstructured, bool), []string, sets.Set[metav1.GroupResource], error) {
-	wrapeesToPropagate, grs, err := c.getWrapeesFromWDS(ctx, binding)
+	func(v1alpha1.Destination) ([]transportTask, bool), func(schema.GroupKind) (string, bool), []string, sets.Set[metav1.GroupResource], error) {
+	wrapeesToPropagate, kindToResource, grs, err := c.getWrapeesFromWDS(ctx, binding)
 	if err != nil {
-		return nil, nil, grs, fmt.Errorf("failed to get objects to propagate to WECs from Binding object '%s' - %w", binding.GetName(), err)
+		return nil, nil, nil, grs, fmt.Errorf("failed to get objects to propagate to WECs from Binding object '%s' - %w", binding.GetName(), err)
 	}
 
 	if len(wrapeesToPropagate) == 0 {
-		return nil, nil, grs, nil // if no objects were found in the workload section, return nil so that we don't distribute an empty wrapped object.
+		return nil, nil, nil, grs, nil // if no objects were found in the workload section, return nil so that we don't distribute an empty wrapped object.
 	}
 
 	destToCustomizedObjects, bindingErrors := c.computeDestToCustomizedObjects(wrapeesToPropagate, binding)
-
 	// This will be constant if no object needed customization, otherwise a map's get func
-	var destToWrappedObject func(v1alpha1.Destination) ([]*unstructured.Unstructured, bool)
+	var destToTasks func(v1alpha1.Destination) ([]transportTask, bool)
 
 	if destToCustomizedObjects != nil {
-		asMap := map[v1alpha1.Destination][]*unstructured.Unstructured{}
+		asMap := map[v1alpha1.Destination][]transportTask{}
 		for dest, objects := range destToCustomizedObjects {
-			wrappedObject, err := c.wrap(objects, binding)
+			wrappedObjects, err := c.wrap(objects, kindToResource, binding)
 			if err != nil {
-				return nil, nil, grs, fmt.Errorf("failure wrapping for destination %q: %w", binding.Name, err)
+				return nil, nil, nil, grs, fmt.Errorf("failure wrapping for destination %q: %w", binding.Name, err)
 			}
-			asMap[dest] = wrappedObject
+			asMap[dest] = wrappedObjects
 		}
-		destToWrappedObject = abstract.PrimitiveMapGet(asMap)
+		destToTasks = abstract.PrimitiveMapGet(asMap)
 	} else {
-		wrappedObject, err := c.wrap(wrapeesToPropagate, binding)
+		wrappedObjects, err := c.wrap(wrapeesToPropagate, kindToResource, binding)
 		if err != nil {
-			return nil, nil, grs, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
+			return nil, nil, nil, grs, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 		}
-		destToWrappedObject = func(v1alpha1.Destination) ([]*unstructured.Unstructured, bool) { return wrappedObject, true }
+		destToTasks = func(v1alpha1.Destination) ([]transportTask, bool) { return wrappedObjects, true }
 	}
 
-	return destToWrappedObject, bindingErrors, grs, nil
+	return destToTasks, kindToResource, bindingErrors, grs, nil
 }
 
 // computeDestToCustomizedObjects returns the following two things.
@@ -838,7 +852,7 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 			}
 			if destToCustomizedWrapees != nil {
 				customizedObjectsSoFar := destToCustomizedWrapees[dest]
-				customizedObjectsSoFar = append(customizedObjectsSoFar, transport.NewWrapee(objC, wrapee.Resource, wrapee.CreateOnly))
+				customizedObjectsSoFar = append(customizedObjectsSoFar, transport.NewWrapee(objC, wrapee.CreateOnly))
 				destToCustomizedWrapees[dest] = customizedObjectsSoFar
 			}
 		}
@@ -855,8 +869,8 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 	return destToCustomizedWrapees, bindingErrors
 }
 
-func (c *genericTransportController) wrapBatch(batchToPropagate []transport.Wrapee, binding *v1alpha1.Binding, numShard int, isSharded bool) (*unstructured.Unstructured, error) {
-	wrapped := c.transport.WrapObjects(batchToPropagate)
+func (c *genericTransportController) wrapBatch(batchToPropagate []transport.Wrapee, kindToResource func(schema.GroupKind) (string, bool), binding *v1alpha1.Binding, numShard int) (*unstructured.Unstructured, error) {
+	wrapped := c.transport.WrapObjects(batchToPropagate, abstract.DropOK11(kindToResource))
 	wrappedObject, err := convertObjectToUnstructured(wrapped)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
@@ -865,28 +879,30 @@ func (c *genericTransportController) wrapBatch(batchToPropagate []transport.Wrap
 	// pay attention - we cannot use the Binding object name, cause we might have duplicate names coming from different WDS spaces.
 	// we add WdsName to the object name to assure name uniqueness,
 	// in order to easily get the origin Binding object name and wds, we add it as an annotations.
-	if isSharded {
-		wrappedObject.SetName(fmt.Sprintf("%s-%s-%d", binding.GetName(), c.wdsName, numShard))
-	} else {
-		wrappedObject.SetName(fmt.Sprintf("%s-%s", binding.GetName(), c.wdsName))
-	}
+	wrappedObject.SetName(fmt.Sprintf("%s-%s-%d", binding.GetName(), c.wdsName, numShard))
 	setLabel(wrappedObject, originOwnerReferenceLabel, binding.GetName())
 	setLabel(wrappedObject, originWdsLabel, c.wdsName)
 	setAnnotation(wrappedObject, originOwnerGenerationAnnotation, binding.GetGeneration())
 	return wrappedObject, err
 }
 
-func (c *genericTransportController) wrap(wrapeesToPropagate []transport.Wrapee, binding *v1alpha1.Binding) ([]*unstructured.Unstructured, error) {
-	var wrappedObjects []*unstructured.Unstructured
+// transportTask is one wrapped object and a gloss of its contents
+type transportTask struct {
+	ObjU  *unstructured.Unstructured
+	Gloss transport.Gloss
+}
+
+func (c *genericTransportController) wrap(wrapeesToPropagate []transport.Wrapee, kindToResource func(schema.GroupKind) (string, bool), binding *v1alpha1.Binding) ([]transportTask, error) {
+	var transportTasks []transportTask
 	var batchToPropagate []transport.Wrapee = nil
+	gloss := transport.Gloss{}
 	maxSize := c.MaxSizeWrapped
 	maxCount := c.MaxNumWrapped
-	isSharded := false
 	numShard := 0
 	var batchSize int = 0
 	var batchCount int = 0
-	for _, obj := range wrapeesToPropagate {
-		bytes, err := obj.Object.MarshalJSON()
+	for _, wrapee := range wrapeesToPropagate {
+		bytes, err := wrapee.Object.MarshalJSON()
 		if err != nil {
 			return nil, err
 		}
@@ -895,29 +911,30 @@ func (c *genericTransportController) wrap(wrapeesToPropagate []transport.Wrapee,
 			return nil, fmt.Errorf("failed to wrap object that is larger than max size")
 		}
 		if (objSize+batchSize >= maxSize) || (batchCount+1 > maxCount) {
-			isSharded = true
-			wrappedObject, err := c.wrapBatch(batchToPropagate, binding, numShard, isSharded)
+			wrappedObject, err := c.wrapBatch(batchToPropagate, kindToResource, binding, numShard)
 			if err != nil {
 				return nil, err
 			}
 			numShard += 1
-			wrappedObjects = append(wrappedObjects, wrappedObject)
+			transportTasks = append(transportTasks, transportTask{wrappedObject, gloss})
 			batchToPropagate = nil
+			gloss = transport.Gloss{}
 			batchSize = 0
 			batchCount = 0
 		}
-		batchToPropagate = append(batchToPropagate, obj)
+		batchToPropagate = append(batchToPropagate, wrapee)
+		gloss.Insert(wrapee.GetID())
 		batchSize += objSize
 		batchCount += 1
 	}
 	if batchToPropagate != nil {
-		wrappedObject, err := c.wrapBatch(batchToPropagate, binding, numShard, isSharded)
+		wrappedObject, err := c.wrapBatch(batchToPropagate, kindToResource, binding, numShard)
 		if err != nil {
 			return nil, err
 		}
-		wrappedObjects = append(wrappedObjects, wrappedObject)
+		transportTasks = append(transportTasks, transportTask{wrappedObject, gloss})
 	}
-	return wrappedObjects, nil
+	return transportTasks, nil
 }
 
 // getPropertiesForDestination returns the properties to use for the given destination and notes
@@ -1022,49 +1039,51 @@ func (c *genericTransportController) customizeForDestination(object *unstructure
 	return object, nil, false
 }
 
-func (c *genericTransportController) propagateWrappedObjectToClusters(ctx context.Context, destToDesiredWrappedObject func(v1alpha1.Destination) ([]*unstructured.Unstructured, bool),
-	currentWrappedObjectList *unstructured.UnstructuredList, destinations []v1alpha1.Destination, broken bool) error {
+func (c *genericTransportController) propagateWrappedObjectToClusters(ctx context.Context,
+	destToDesiredWrappedObjects func(v1alpha1.Destination) ([]transportTask, bool),
+	kindToResource func(schema.GroupKind) (string, bool),
+	currentWrappedObjectList *unstructured.UnstructuredList, destinations []v1alpha1.Destination) error {
 	// if the desired wrapped object is nil, that means we should not propagate this object.
 	// this may happen when the workload section is empty.
 	// this is not an error state but a valid scenario.
 	// return without propagating, the delete section will remove existing instances of the wrapped object from all current destinations.
-	if destToDesiredWrappedObject == nil {
+	if destToDesiredWrappedObjects == nil {
 		return nil // this is not considered an error.
 	}
-
-	c.logger.V(5).Info("In propagateWrappedObjectToClusters", "destinations", destinations)
+	logger := klog.FromContext(ctx)
+	logger.V(5).Info("In propagateWrappedObjectToClusters", "destinations", destinations)
 
 	for _, destination := range destinations {
-		// Loop until popWrappedObjectByNamespace returns nil, in case the wrapped object is sharded.
-		for {
-			currentWrappedObject := c.popWrappedObjectByNamespace(currentWrappedObjectList, destination.ClusterId)
-			if broken {
-				continue
-			}
-
-			foundMatch := false
-			desiredWrappedObjects, _ := destToDesiredWrappedObject(destination)
-			if currentWrappedObject != nil {
-				for _, desiredWrappedObject := range desiredWrappedObjects {
-					// Can't use apiequality.Semantic.DeepEqual to compare the two objects
-					if currentWrappedObject.GetAnnotations() != nil &&
-						currentWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] == desiredWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation] {
-						foundMatch = true
-						break
-					}
-				}
-			}
-			if foundMatch {
-				continue
-			}
-			// othereise, need to create or update the wrapped objects
-			for _, desiredWrappedObject := range desiredWrappedObjects {
-				if err := c.createOrUpdateWrappedObject(ctx, destination.ClusterId, desiredWrappedObject); err != nil {
-					return fmt.Errorf("failed to propagate wrapped object to cluster mailbox namespace '%s' - %w", destination.ClusterId, err)
-				}
-			}
+		tasks, _ := destToDesiredWrappedObjects(destination)
+		for _, task := range tasks {
+			wrappedID := klog.ObjectRef{Namespace: destination.ClusterId, Name: task.ObjU.GetName()}
+			currentWrappedObject := popUnstructuredByID(currentWrappedObjectList, wrappedID)
 			if currentWrappedObject == nil {
-				break
+				logger.V(5).Info("No current wrapped object has sought ID", "id", wrappedID, "currentWrappedObjectList", currentWrappedObjectList)
+			} else {
+				gloss, err := c.transport.UnwrapObjects(currentWrappedObject, kindToResource)
+				if err != nil {
+					logger.Error(err, fmt.Sprintf("Failed to unwrap %#v", currentWrappedObject))
+				}
+				desiredGeneration := task.ObjU.GetAnnotations()[originOwnerGenerationAnnotation]
+				actualGeneration := currentWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation]
+				// This test covers workload object ResourceVersion and the create-only bit.
+				// This test is also an imperfect test for consistency in customization.
+				// It does not take into account the effects of absence of, or changes in, CustomTransform objects.
+				generationMatch := actualGeneration == desiredGeneration
+				glossEqual := abstract.PrimitiveMapEqual(task.Gloss, gloss)
+				if generationMatch && glossEqual {
+					logger.V(5).Info("No need to change wrapped object", "id", wrappedID)
+					continue
+				}
+				if glossEqual {
+					logger.V(5).Info("Need to change wrapped object because of Binding generation mismatch", "id", wrappedID, "desiredGeneration", desiredGeneration, "actualGeneration", actualGeneration)
+				} else {
+					logger.V(5).Info("Need to change wrapped object because of (at least) gloss mismatch", "id", wrappedID, "desiredGeneration", desiredGeneration, "actualGeneration", actualGeneration, "desiredGloss", util.K8sSet4Log(task.Gloss), "actualGloss", util.K8sSet4Log(gloss))
+				}
+			}
+			if err := c.createOrUpdateWrappedObject(ctx, destination.ClusterId, task.ObjU); err != nil {
+				return fmt.Errorf("failed to propagate wrapped object to cluster mailbox namespace '%s' - %w", destination.ClusterId, err)
 			}
 		}
 	}
@@ -1089,6 +1108,19 @@ func (c *genericTransportController) popWrappedObjectByNamespace(list *unstructu
 		}
 	}
 
+	return nil
+}
+
+func popUnstructuredByID(list *unstructured.UnstructuredList, id klog.ObjectRef) *unstructured.Unstructured {
+	length := len(list.Items)
+	for i := 0; i < length; i++ {
+		if list.Items[i].GetName() == id.Name && list.Items[i].GetNamespace() == id.Namespace {
+			requiredObject := list.Items[i]
+			list.Items[i] = list.Items[length-1]
+			list.Items = list.Items[:length-1]
+			return &requiredObject
+		}
+	}
 	return nil
 }
 

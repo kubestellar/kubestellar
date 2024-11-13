@@ -19,23 +19,44 @@ package transport
 import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/klog/v2"
+
+	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 type Transport interface {
 	// WrapObjects gets slice of Wrapee and wraps them into a single wrapped object.
 	// In case slice is empty, the function should return an empty wrapped object (not nil).
-	WrapObjects(objects []Wrapee) runtime.Object
+	// `kindToResource` has an answer for every `GroupKind` of the wrapees.
+	// `kindToResource` can be nil if `len(objects) == 0`
+	WrapObjects(objects []Wrapee, kindToResource func(schema.GroupKind) string) runtime.Object
+
+	// UnwrapObjects extracts the Gloss for a given bundle.
+	// This almost an the inverse of WrapObjects, but does not return the full contents of each workload object.
+	// `kindToResource` is a typical Map.Get function.
+	UnwrapObjects(wrapped runtime.Object, kindToResource func(schema.GroupKind) (string, bool)) (Gloss, error)
 }
 
 // Wrapee is a workload object to wrap and its associated create-only bit
 type Wrapee struct {
 	Object     *unstructured.Unstructured
-	Resource   string // as in schema.GroupVersionResource
 	CreateOnly bool
 }
 
+// Gloss is a set of identities of workload objects
+type Gloss = sets.Set[util.GKObjRef]
+
 func (wr Wrapee) GetObject() *unstructured.Unstructured { return wr.Object }
 
-func NewWrapee(object *unstructured.Unstructured, resource string, createOnly bool) Wrapee {
-	return Wrapee{object, resource, createOnly}
+func (wr Wrapee) GetID() util.GKObjRef {
+	return util.GKObjRef{
+		GK: wr.Object.GroupVersionKind().GroupKind(),
+		OR: klog.KObj(wr.Object),
+	}
+}
+
+func NewWrapee(object *unstructured.Unstructured, createOnly bool) Wrapee {
+	return Wrapee{object, createOnly}
 }

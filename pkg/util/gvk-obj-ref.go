@@ -23,20 +23,20 @@ import (
 	"k8s.io/klog/v2"
 )
 
-type GVKObjRef struct {
+type GKObjRef struct {
 	GK schema.GroupKind
 	OR klog.ObjectRef
 }
 
-func (ref GVKObjRef) String() string {
+func (ref GKObjRef) String() string {
 	return ref.GK.String() + "(" + ref.OR.String() + ")"
 }
 
 // RefToRuntimeObj creates a GVKObjRef to a runtime.Object.
-func RefToRuntimeObj(obj runtime.Object) GVKObjRef {
+func RefToRuntimeObj(obj runtime.Object) GKObjRef {
 	gvk := obj.GetObjectKind().GroupVersionKind()
 	mObj := obj.(metav1.Object)
-	ans := GVKObjRef{
+	ans := GKObjRef{
 		GK: gvk.GroupKind(),
 		OR: klog.ObjectRef{
 			Namespace: mObj.GetNamespace(),

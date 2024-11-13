@@ -169,7 +169,7 @@ func typeMeta(kind string, groupVersion k8sschema.GroupVersion) metav1.TypeMeta 
 
 type bindingCase struct {
 	Binding      *ksapi.Binding
-	expect       map[util.GVKObjRef]jsonMapToWrap
+	expect       map[util.GKObjRef]jsonMapToWrap
 	ExpectedKeys []any // JSON equivalent of keys of expect, for logging
 }
 
@@ -228,7 +228,7 @@ func (rg *generator) generateBindingCase(name string, objs []mrObjRsc) bindingCa
 			ObjectMeta: rg.generateObjectMeta(name, nil),
 			Spec:       ksapi.BindingSpec{},
 		},
-		expect: map[util.GVKObjRef]jsonMapToWrap{},
+		expect: map[util.GKObjRef]jsonMapToWrap{},
 	}
 	for _, obj := range objs {
 		if rg.Intn(10) < 7 {
@@ -253,7 +253,7 @@ type testTransport struct {
 	ctc            customTransformCollection
 	kindToResource map[metav1.GroupKind]string
 
-	expect map[util.GVKObjRef]jsonMapToWrap
+	expect map[util.GKObjRef]jsonMapToWrap
 	sync.Mutex
 	wrapped bool
 	missed  map[string]any
@@ -261,7 +261,7 @@ type testTransport struct {
 	extra   []any
 }
 
-func (tt *testTransport) WrapObjects(wrapees []transport.Wrapee) runtime.Object {
+func (tt *testTransport) WrapObjects(wrapees []transport.Wrapee, kindToResource func(k8sschema.GroupKind) string) runtime.Object {
 	tt.Lock()
 	defer tt.Unlock()
 	tt.wrapped = true
@@ -321,6 +321,10 @@ func (tt *testTransport) WrapObjects(wrapees []transport.Wrapee) runtime.Object 
 			Name:      "bar",
 		},
 	}
+}
+
+func (tt *testTransport) UnwrapObjects(wrapped runtime.Object, kindToResource func(k8sschema.GroupKind) (string, bool)) (transport.Gloss, error) {
+	return transport.Gloss{}, nil
 }
 
 func TestGenericController(t *testing.T) {
