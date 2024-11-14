@@ -89,7 +89,7 @@ echoerr() {
 # Echo colorized title
 echotitle() {
     # $1 = message
-    echocolor ${COLOR_TITLE} "$1"
+    echocolor ${COLOR_TITLE} "\n$1"
 }
 
 
@@ -265,11 +265,14 @@ if [[ -z "${contexts[@]}" ]] ; then
     echoerr "no context(s) found in the kubeconfig file $kubeconfig!"
     exit 1
 else
-    echov -n "Using contexts(s): "
+    echov "Using contexts(s): "
     for context in "${contexts[@]}" ; do # for all contexts
-        echov -n -e "${COLOR_INFO}${context}${COLOR_NONE}, "
+        if k --context $context get pods -A  > /dev/null 2>&1 ; then
+            echov -e "${COLOR_GREEN}\xE2\x9C\x94${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
+        else
+            echov -e "${COLOR_RED}X${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
+        fi
     done
-    echov -e "\b\b  \n"
 fi
 
 
@@ -279,7 +282,7 @@ fi
 echotitle "KubeStellar:"
 helm_context=""
 for context in "${contexts[@]}" ; do # for all contexts
-    chart="$(helm --kubeconfig $kubeconfig --kube-context $context list | grep 'core-chart')" || true
+    chart="$(helm --kubeconfig $kubeconfig --kube-context $context list 2> /dev/null | grep 'core-chart' || true)"
     if [[ "$chart" != "" ]] ; then
         helm_context=$context
         name="$(echo "$chart" | awk '{print $1}')" || true
@@ -306,7 +309,7 @@ fi
 ###############################################################################
 # Look for Kubeflex deployment
 ###############################################################################
-echotitle "\nKubeFlex:"
+echotitle "KubeFlex:"
 if [ -z "$(k --context $helm_context get ns kubeflex-system --no-headers -o name 2> /dev/null || true)" ] ; then
     echoerr "KubeFlex namespace not found!"
 else
@@ -337,60 +340,66 @@ fi
 
 
 ###############################################################################
-# Listing control planes
+# Listing Control Planes
 ###############################################################################
-echotitle "\nControl Planes:"
+echotitle "Control Planes:"
 cp_n=0
 cps=($(k --context $helm_context get controlplanes -no-headers -o name 2> /dev/null || true))
 for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     name=${cps[i]##*/}
     cp_context[cp_n]=$helm_context
     cp_name[cp_n]=$name
+    cp_ns[cp_n]="${cp_name[cp_n]}-system"
     cp_type[cp_n]=$(k --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.type}')
     cp_pch[cp_n]=$(k --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.postCreateHook}')
     cp_kubeconfig[cp_n]=$(get_kubeconfig "${helm_context}" "${cp_name[cp_n]}" "${cp_type[cp_n]}")
     echo -e "- ${COLOR_INFO}${cp_name[cp_n]}${COLOR_NONE}: type=${COLOR_INFO}${cp_type[cp_n]}${COLOR_NONE}, pch=${COLOR_INFO}${cp_pch[cp_n]}${COLOR_NONE}, context=${COLOR_INFO}${cp_context[cp_n]}${COLOR_NONE}, namespace=${COLOR_INFO}${cp_name[cp_n]}-system${COLOR_NONE}"
     if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
-        its_pod=$(k --context $helm_context -n ${cp_name[cp_n]}-system get pod -l "job-name=its" -o name 2> /dev/null | cut -d'/' -f2 || true)
-        its_status=$(k --context $helm_context -n ${cp_name[cp_n]}-system get pod $its_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
-        status_pod=$(k --context $helm_context -n ${cp_name[cp_n]}-system get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
-        status_status=$(k --context $helm_context -n ${cp_name[cp_n]}-system get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
-        echo -n -e "  - Post Create Hook: pod=${COLOR_INFO}$its_pod${COLOR_NONE}, status="
+        its_pod=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=its" -o name 2> /dev/null | cut -d'/' -f2 || true)
+        its_status=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        if [[ "${cp_type[cp_n]}" == "host" ]] ; then
+            status_ns="open-cluster-management"
+        else
+            status_ns="${cp_ns[cp_n]}"
+        fi
+        status_pod=$(k --context $helm_context -n "$status_ns" get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
+        status_status=$(k --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        echo -n -e "  - Post Create Hook: pod=${COLOR_INFO}$its_pod${COLOR_NONE}, ns=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$its_status"
-        echo -n -e "  - Status addon: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, status="
+        echo -n -e "  - Status addon: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, ns=${COLOR_INFO}$status_ns${COLOR_NONE}, status="
         echostatus "$status_status"
     else
-        kubestellar_pod=$(k --context $helm_context -n ${cp_name[cp_n]}-system get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
-        kubestellar_version=$(k --context $helm_context -n ${cp_name[cp_n]}-system get pod $kubestellar_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image' | cut -d':' -f2 || true)
-        kubestellar_status=$(k --context $helm_context -n ${cp_name[cp_n]}-system get pod $kubestellar_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
-        echo -e -n "  - KubeStellar controller: version=${COLOR_INFO}$kubestellar_version${COLOR_NONE}, pod=${COLOR_INFO}$kubestellar_pod${COLOR_NONE} namespace=${COLOR_INFO}${cp_name[cp_n]}-system${COLOR_NONE}, status="
+        kubestellar_pod=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
+        kubestellar_version=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image' | cut -d':' -f2 || true)
+        kubestellar_status=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        echo -e -n "  - KubeStellar controller: version=${COLOR_INFO}$kubestellar_version${COLOR_NONE}, pod=${COLOR_INFO}$kubestellar_pod${COLOR_NONE} namespace=${COLOR_INFO}"${cp_ns[cp_n]}"${COLOR_NONE}, status="
         echostatus "$kubestellar_status"
-        trasport_pod=$(k --context $helm_context -n ${cp_name[cp_n]}-system get pod -l "name=transport-controller" -o name 2> /dev/null | cut -d'/' -f2 || true)
-        trasport_version=$(k --context $helm_context -n ${cp_name[cp_n]}-system get pod $trasport_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/ocm-transport-controller")) | .image' | cut -d':' -f2 || true)
-        trasport_status=$(k --context $helm_context -n ${cp_name[cp_n]}-system get pod $trasport_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
-        echo -e -n "  - Transport controller: version=${COLOR_INFO}$trasport_version${COLOR_NONE}, pod=${COLOR_INFO}$trasport_pod${COLOR_NONE} namespace=${COLOR_INFO}${cp_name[cp_n]}-system${COLOR_NONE}, status="
+        trasport_pod=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "name=transport-controller" -o name 2> /dev/null | cut -d'/' -f2 || true)
+        trasport_version=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/ocm-transport-controller")) | .image' | cut -d':' -f2 || true)
+        trasport_status=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        echo -e -n "  - Transport controller: version=${COLOR_INFO}$trasport_version${COLOR_NONE}, pod=${COLOR_INFO}$trasport_pod${COLOR_NONE} namespace=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$trasport_status"
     fi
     if [[ "$arg_yaml" == "true" ]] ; then
         mkdir -p "$output_folder/$name"
         k --context $helm_context get controlplane $name -o yaml > "$output_folder/$name/cp.yaml"
         if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
-            k --context $helm_context -n ${cp_name[cp_n]}-system get pod $its_pod -o yaml > "$output_folder/$name/its-job.yaml"
-            k --context $helm_context -n ${cp_name[cp_n]}-system get pod $status_pod -o yaml > "$output_folder/$name/status-addon.yaml"
+            k --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o yaml > "$output_folder/$name/its-job.yaml"
+            k --context $helm_context -n "$status_ns" get pod $status_pod -o yaml > "$output_folder/$name/status-addon.yaml"
         else
-            k --context $helm_context -n ${cp_name[cp_n]}-system get pod $kubestellar_pod -o yaml > "$output_folder/$name/kubestellar-controller.yaml"
-            k --context $helm_context -n ${cp_name[cp_n]}-system get pod $trasport_pod -o yaml > "$output_folder/$name/transport-controller.yaml"
+            k --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o yaml > "$output_folder/$name/kubestellar-controller.yaml"
+            k --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o yaml > "$output_folder/$name/transport-controller.yaml"
         fi
     fi
     if [[ "$arg_logs" == "true" ]] ; then
         mkdir -p "$output_folder/$name"
         if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
-            k --context $helm_context -n ${cp_name[cp_n]}-system logs $its_pod -c its-clusteradm > "$output_folder/$name/its-job-clusteradm.log"
-            k --context $helm_context -n ${cp_name[cp_n]}-system logs $its_pod -c its-statusaddon > "$output_folder/$name/its-job-status-addon.log"
-            k --context $helm_context -n ${cp_name[cp_n]}-system logs $status_pod -c status-controller > "$output_folder/$name/status-addon.log"
+            k --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-clusteradm > "$output_folder/$name/its-job-clusteradm.log"
+            k --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-statusaddon > "$output_folder/$name/its-job-status-addon.log"
+            k --context $helm_context -n "$status_ns" logs $status_pod -c status-controller > "$output_folder/$name/status-addon.log"
         else
-            k --context $helm_context -n ${cp_name[cp_n]}-system logs $kubestellar_pod > "$output_folder/$name/kubestellar-controller.log"
-            k --context $helm_context -n ${cp_name[cp_n]}-system logs $trasport_pod -c transport-controller > "$output_folder/$name/transport-controller.log"
+            k --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod > "$output_folder/$name/kubestellar-controller.log"
+            k --context $helm_context -n "${cp_ns[cp_n]}" logs $trasport_pod -c transport-controller > "$output_folder/$name/transport-controller.log"
         fi
     fi
     cp_n=$((cp_n+1))
@@ -400,7 +409,7 @@ done
 ###############################################################################
 # Listing managed clusters
 ###############################################################################
-echotitle "\nManaged Clusters:"
+echotitle "Managed Clusters:"
 mc_n=0
 for j in "${!cp_pch[@]}" ; do
     if [[ "${cp_pch[$j]}" == "its" ]] ; then
@@ -431,7 +440,7 @@ done
 ###############################################################################
 # Listing binding policies
 ###############################################################################
-echotitle "\nBinding Policies:"
+echotitle "Binding Policies:"
 bp_n=0
 for j in "${!cp_pch[@]}" ; do
     if [[ "${cp_pch[$j]}" == "wds" ]] ; then
@@ -459,7 +468,7 @@ done
 ###############################################################################
 # Listing Manifest Works
 ###############################################################################
-echotitle "\nManifest Works:"
+echotitle "Manifest Works:"
 mw_n=0
 for h in "${!cp_pch[@]}" ; do
     if [[ "${cp_pch[$h]}" == "its" ]] ; then
@@ -498,7 +507,7 @@ done
 ###############################################################################
 # Listing Work Statuses
 ###############################################################################
-echotitle "\nWork Statuses:"
+echotitle "Work Statuses:"
 sw_n=0
 for h in "${!cp_pch[@]}" ; do
     if [[ "${cp_pch[$h]}" == "its" ]] ; then
