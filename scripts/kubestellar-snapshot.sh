@@ -54,10 +54,10 @@ arg_verbose=false
 # Display the command line help
 display_help() {
   cat << EOF
-Usage: $0 [--kubeconfig|-K <filename>] [--context|-C <name>] [--logs|-L] [--yaml|-Y] [--verbose|-V] [--version|-v] [--help|-H] [-X]
+Usage: $0 [--kubeconfig|-K <filename>] [--context|-C <name>] [--logs|-L] [--yaml|-Y] [--verbose|-V] [--version|-v] [--help|-h] [-X]
 
---kubeconfig|-K <filename> use the specified kubeconfig
---context|-C <name>        use the specified context
+--kubeconfig|-K <filename> use the specified kubeconfig to find KubeStellar Helm chart
+--context|-C <name>        use the specified context to find KubeStellar Helm chart
 --logs|-L                  save the logs of the pods
 --yaml|-Y                  save the YAML of the resources
 --verbose|-V               output extra information
@@ -273,7 +273,7 @@ vc_n=0
 valid_context=()
 for context in "${contexts[@]}" ; do # for all contexts
     [[ -z "$context" ]] && continue
-    if k --context $context get secrets -A  > /dev/null 2>&1 ; then
+    if k --context $context get secrets -A > /dev/null 2>&1 ; then
         echov -e "${COLOR_GREEN}\xE2\x9C\x94${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
         valid_context[vc_n]="$context"
         vc_n=$((vc_n+1))
