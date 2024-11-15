@@ -3415,26 +3415,30 @@ from <code>DownsyncPolicyClause</code>, <code>NamespaceScopeDownsyncClause</code
 <h3 id="queryable-objects">Queryable Objects<a class="headerlink" href="#queryable-objects" title="Permanent link">#</a></h3>
 <p>A CEL expression within a <code>StatusCollector</code> can reference the following objects:</p>
 <ol>
-<li><code>inventory</code>: The inventory object for the workload object:</li>
 <li>
-<p><code>inventory.name</code>: The name of the inventory object.</p>
+<p><code>inventory</code>: The inventory object for the workload object:</p>
+<ul>
+<li><code>inventory.name</code>: The name of the inventory object.</li>
+</ul>
 </li>
 <li>
 <p><code>obj</code>: The workload object from the WDS:</p>
-</li>
-<li>
-<p>All fields of the workload object except the status subresource.</p>
+<ul>
+<li>All fields of the workload object except the status subresource.</li>
+</ul>
 </li>
 <li>
 <p><code>returned</code>: The reported state from the WEC:</p>
-</li>
-<li>
-<p><code>returned.status</code>: The status section of the object returned from the WEC.</p>
+<ul>
+<li><code>returned.status</code>: The status section of the object returned from the WEC.</li>
+</ul>
 </li>
 <li>
 <p><code>propagation</code>: Metadata about the end-to-end propagation process:</p>
-</li>
+<ul>
 <li><code>propagation.lastReturnedUpdateTimestamp</code>: metav1.Time of last update to any returned state.</li>
+</ul>
+</li>
 </ol>
 <h2 id="examples-of-using-the-general-technique">Examples of using the general technique<a class="headerlink" href="#examples-of-using-the-general-technique" title="Permanent link">#</a></h2>
 <h3 id="number-of-wecs">Number of WECs<a class="headerlink" href="#number-of-wecs" title="Permanent link">#</a></h3>
