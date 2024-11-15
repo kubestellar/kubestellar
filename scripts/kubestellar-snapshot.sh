@@ -160,12 +160,12 @@ get_kubeconfig() {
 ###############################################################################
 while (( $# > 0 )); do
     case "$1" in
-    (--kubeconfig|-k)
+    (--kubeconfig|-K)
         if (( $# > 1 ));
         then { arg_kubeconfig="$2"; shift; }
         else { echo "$0: missing kubeconfig filename" >&2; exit 1; }
         fi;;
-    (--context|-c)
+    (--context|-C)
         if (( $# > 1 ));
         then { arg_context="$2"; shift; }
         else { echo "$0: missing context name" >&2; exit 1; }
@@ -268,18 +268,24 @@ else
     contexts=("$arg_context")
 fi
 
+echov "Validating contexts(s): "
+vc_n=0
+valid_context=()
+for context in "${contexts[@]}" ; do # for all contexts
+    [[ -z "$context" ]] && continue
+    if k --context $context get secrets -A  > /dev/null 2>&1 ; then
+        echov -e "${COLOR_GREEN}\xE2\x9C\x94${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
+        valid_context[vc_n]="$context"
+        vc_n=$((vc_n+1))
+    else
+        echov -e "${COLOR_RED}X${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
+    fi
+done
+contexts=("${valid_context[@]}")
+
 if [[ -z "${contexts[@]}" ]] ; then
     echoerr "no context(s) found in the kubeconfig file $kubeconfig!"
     exit 1
-else
-    echov "Using contexts(s): "
-    for context in "${contexts[@]}" ; do # for all contexts
-        if k --context $context get pods -A  > /dev/null 2>&1 ; then
-            echov -e "${COLOR_GREEN}\xE2\x9C\x94${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
-        else
-            echov -e "${COLOR_RED}X${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
-        fi
-    done
 fi
 
 
