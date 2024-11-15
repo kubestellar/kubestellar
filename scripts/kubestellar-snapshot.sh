@@ -54,14 +54,21 @@ arg_verbose=false
 # Display the command line help
 display_help() {
   cat << EOF
-Usage: $0 [--kubeconfig|-K <filename>] [--context|-C <name>] [--verbose|-V] [-X]
+Usage: $0 [--kubeconfig|-K <filename>] [--context|-C <name>] [--logs|-L] [--yaml|-Y] [--verbose|-V] [--version|-v] [--help|-H] [-X]
+
 --kubeconfig|-K <filename> use the specified kubeconfig
 --context|-C <name>        use the specified context
 --logs|-L                  save the logs of the pods
 --yaml|-Y                  save the YAML of the resources
 --verbose|-V               output extra information
 --version|-v               print out the script version
--X                         enable verbose execution of the script for debugging
+--help|-h                  show this information
+-X                         enable verbose execution for debugging
+
+Note: After piping the output of the script to file use "more"
+      to inspect the file content in color. ALternatively install
+      "ansi2txt" and pipe the script through it to remove escape
+      characters and obtain a plan text report.
 EOF
 }
 
@@ -95,9 +102,9 @@ echotitle() {
 
 # Echo the status in color
 echostatus() {
-    # $1 = status text true|false
-    status="$1"
-    if [[ "${status,,}" ==  "true" || "${status,,}" == "succeeded" || "${status,,}" == "running" || "${status,,}" == "active" || "${status}" ==  "1" ]] ; then
+    # $1 = status text
+    status="$(echo $1 | tr '[:upper:]' '[:lower:]')" # lowercase
+    if [[ "true succeeded running active 1" =~  "$status" ]] ; then
         echocolor ${COLOR_STATUS_TRUE} "$status"
     else
         echocolor ${COLOR_STATUS_FALSE} "$status"
