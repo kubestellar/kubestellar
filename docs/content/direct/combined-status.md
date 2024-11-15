@@ -102,16 +102,16 @@ from `DownsyncPolicyClause`, `NamespaceScopeDownsyncClause`, and
 A CEL expression within a `StatusCollector` can reference the following objects:
 
 1. `inventory`: The inventory object for the workload object:
-   - `inventory.name`: The name of the inventory object.
+    - `inventory.name`: The name of the inventory object.
 
 1. `obj`: The workload object from the WDS:
-   - All fields of the workload object except the status subresource.
+    - All fields of the workload object except the status subresource.
 
 1. `returned`: The reported state from the WEC:
-   - `returned.status`: The status section of the object returned from the WEC.
+    - `returned.status`: The status section of the object returned from the WEC.
 
 1. `propagation`: Metadata about the end-to-end propagation process:
-   - `propagation.lastReturnedUpdateTimestamp`: metav1.Time of last update to any returned state.
+    - `propagation.lastReturnedUpdateTimestamp`: metav1.Time of last update to any returned state.
 
 ## Examples of using the general technique
 
