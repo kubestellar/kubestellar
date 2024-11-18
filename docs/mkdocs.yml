@@ -33,6 +33,7 @@ nav:
         - KubeFlex: direct/kubeflex-intro.md
         - KubeStellar Galaxy: direct/galaxy-intro.md
       - Release-notes: direct/release-notes.md
+      - Roadmap: direct/roadmap.md
   - Getting Started: direct/get-started.md
   - User Guide:
       - Guide Overview: direct/user-guide-intro.md

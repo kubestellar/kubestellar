@@ -47,6 +47,10 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 
 This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
 
+## Our Roadmap
+
+Have a look at what we are working on next, see our [Roadmap](https://docs.kubestellar.io/stable/direct/roadmap.md) 
+
 ## Getting in touch
 
 There are several ways to communicate with us:
