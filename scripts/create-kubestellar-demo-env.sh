@@ -19,7 +19,7 @@ set -e
 
 
 echo -e "Checking container runtime..."
-if ! docker ps -q; then
+if ! dunsel=$(docker ps 2>&1); then
     echo "Error: The script cannot continue because Docker or Podman is not running. Please start your container runtime before running the script again."
     exit 1
 fi
