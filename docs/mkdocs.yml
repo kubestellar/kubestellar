@@ -58,6 +58,7 @@ nav:
               - Overview: direct/control.md
               - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
               - Binding: direct/binding.md
+              - Flexible trichotomy of state: direct/trichotomy.md
               - Transforming desired state: direct/transforming.md
               - Combining reported state: direct/combined-status.md
           - Example Scenarios: direct/example-scenarios.md

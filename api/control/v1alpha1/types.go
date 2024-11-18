@@ -665,3 +665,56 @@ type CustomTransformList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []CustomTransform `json:"items"`
 }
+
+// ContentClassifier overrides the default categorization of the contents of
+// a particular resource.version.apiGroup of workload object.
+// The name of the ContentClassifier must be exactly resource.version.apiGroup
+// (resource.version when the apiGroup is the empty string).
+// This is modeled on what `kubectl` accepts.
+// Examples: pods.v1, jobs.v1.batch, networkpolicies.v1.networking.k8s.io.
+//
+// The contents of each workload object are divided into three categories:
+// desired state (which propagates from core to WEC),
+// reported state (which propagates from WEC to core),
+// and state that does not propagate (e.g., state that is cluster-specific
+// and managed by local servers/controllers).
+//
+// +genclient
+// +genclient:nonNamespaced
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:scope=Cluster,shortName={cc},categories={all}
+type ContentClassifier struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   ContentClassifierSpec   `json:"spec"`
+	Status ContentClassifierStatus `json:"status,omitempty"`
+}
+
+// ContentClassifierSpec specifies the overrides.
+// Currently there are limitations:
+// 1. You can not add to the reported state;
+// 2. You can not declare any part of `.status` to be desired state.
+// Invalid overrides will be reported in `.status.errors` and otherwise ignored.
+// Currently the overrides are expressed by identifying object parts
+// by JSON Pointers (RFC 6901).
+type ContentClassifierSpec struct {
+	DesiredStatePointers  []ParsedJSONPointer `json:"desiredStatePointers,omitempty"`
+	DontPropagatePointers []ParsedJSONPointer `json:"dontPropagatePointers,omitempty"`
+}
+
+// ParsedJSONPointer is a parsed form of JSON Pointer (RFC 6901).
+// A JSON Pointer is a sequence of strings.
+// The RFC gives a string syntax for the sequence, and the semantics.
+// A ParsedJSONPointer is the sequence of strings, after all the parsing and unescaping.
+// For example, the RFC 6901 pointer `/abc/de~1fg` parses to the Go value `[]string{"abc", "de/fg"}`.
+type ParsedJSONPointer []string
+
+type ContentClassifierStatus struct {
+	// ObservedGeneration is the value from `metadata.generation`
+	ObservedGeneration int64 `json:"observedGeneration"`
+
+	// Errors reports any user errors in the ContentClassifier.
+	Errors []string `json:"errors"`
+}
