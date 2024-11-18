@@ -148,7 +148,7 @@ is_installed_kubectl() {
     is_installed 'kubectl' \
         'kubectl' \
         'kubectl version --client | head -1' \
-        'kubectl version --client -o json 2> /dev/null | jq -r .clientVersion.gitVersion' \
+        "kubectl version --client -o json 2> /dev/null | grep gitVersion | cut '-d\"' -f4" \
         'https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/' \
         v1.27
 }

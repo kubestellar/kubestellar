@@ -93,34 +93,59 @@ When there are N `GROUP BY` columns, the result has a row for each tuple of valu
 
 ## Specification of the general technique
 
-See `types.go`.
+In `types.go` see (a) `StatusCollector`, (b) the references to those
+from `DownsyncPolicyClause`, `NamespaceScopeDownsyncClause`, and
+`ClusterScopeDownsyncClause`, and (c) `CombinedStatus`.
 
 ### Queryable Objects
 
 A CEL expression within a `StatusCollector` can reference the following objects:
 
 1. `inventory`: The inventory object for the workload object:
-   - `inventory.name`: The name of the inventory object.
+    - `inventory.name`: The name of the inventory object.
 
 1. `obj`: The workload object from the WDS:
-   - All fields of the workload object except the status subresource.
+    - All fields of the workload object except the status subresource.
 
 1. `returned`: The reported state from the WEC:
-   - `returned.status`: The status section of the object returned from the WEC.
+    - `returned.status`: The status section of the object returned from the WEC.
 
 1. `propagation`: Metadata about the end-to-end propagation process:
-   - `propagation.lastReturnedUpdateTimestamp`: metav1.Time of last update to any returned state.
+    - `propagation.lastReturnedUpdateTimestamp`: metav1.Time of last update to any returned state.
 
 ## Examples of using the general technique
 
 ### Number of WECs
 
-The `StatusCollectorSpec` would look like the following.
+The `StatusCollector` would look like the following.
 
 ```yaml
-combinedFields:
-   - name: count
-     type: COUNT
+apiVersion: control.kubestellar.io/v1alpha1
+kind: StatusCollector
+metadata:
+  name: count-wecs
+spec:
+  combinedFields:
+     - name: count
+       type: COUNT
+  limit: 10
+```
+
+To specify using that, the `BindingSpec` would reference it from the `StatusCollection` in the relevant `DownsyncPolicyClause`(s). Following is an example.
+
+```yaml
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: example-binding-policy
+spec:
+  clusterSelectors:
+  - matchLabels: {"location-group":"edge"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name":"nginx"}
+    statusCollection:
+      statusCollectors: [ count-wecs ]
 ```
 
 The analogous SQL statement would look something like the following.
@@ -131,17 +156,45 @@ SELECT COUNT(*) AS count FROM PerWEC LIMIT <something>
 
 The table resulting from this would have one column and one row. The one value in this table would be the number of WECs.
 
-### Histogram of Pod phase
-
-The `StatusCollectorSpec` would look like the following.
+Following is an example of a consequent `CombinedStatus` object.
 
 ```yaml
-groupBy:
-   - name: phase
-     def: returned.status.phase
-combinedFields:
-   - name: count
-     type: COUNT
+apiVersion: control.kubestellar.io/v1alpha1
+kind: CombinedStatus
+metadata:
+  creationTimestamp: "2024-11-07T20:15:27Z"
+  generation: 1
+  labels:
+    status.kubestellar.io/api-group: apps
+    status.kubestellar.io/binding-policy: nginx-bindingpolicy
+    status.kubestellar.io/name: nginx-deployment
+    status.kubestellar.io/namespace: nginx
+    status.kubestellar.io/resource: deployments
+  name: 0990056b-ccbc-4c46-b0fe-366ef3a2de5e.332d2c17-7b55-44f6-9a6e-21445523c808
+  namespace: nginx
+  resourceVersion: "604"
+  uid: cc167004-073e-4a20-9857-449f692e9643
+results:
+- columnNames:
+  - count
+  name: count-wecs
+  rows:
+  - columns:
+    - float: "2"
+      type: Number
+```
+
+### Histogram of Pod phase
+
+The `spec` of the `StatusCollector` would look like the following.
+
+```yaml
+  groupBy:
+     - name: phase
+       def: returned.status.phase
+  combinedFields:
+     - name: count
+       type: COUNT
 ```
 
 The analogous SQL statement would look something like the following.
@@ -158,38 +211,41 @@ The result would have two columns, holding a phase value and a count. The number
 
 ### Histogram of number of available replicas of a Deployment
 
-This reports, for each number of available replicas, how many WECs have that number.
+This reports, for each number of available replicas, how many WECs have that number. The `spec` of the `CombinedStatus` would look like the following.
 
 ```yaml
-groupBy:
-   - name: numAvailable
-     def: returned.status.availableReplicas
-combinedFields:
-   - name: count
-     type: COUNT
+  groupBy:
+     - name: numAvailable
+       def: returned.status.availableReplicas
+  combinedFields:
+     - name: count
+       type: COUNT
 ```
 
 ### List of WECs where the Deployment is not as available as desired
 
+The `spec` of the `CombinedStatus` would look like the following.
+
 ```yaml
-filter: "obj.spec.replicas != returned.status.availableReplicas"
-select:
-   - name: wec
-     def: inventory.name
+  filter: "obj.spec.replicas != returned.status.availableReplicas"
+  select:
+     - name: wec
+       def: inventory.name
 ```
 
 ### Full status from each WEC with information retrieval time
 
+The `spec` of the `CombinedStatus` would look like the following.
 This produces a listing of object status paired with inventory object name.
 
 ```yaml
-select:
-   - name: wec
-     def: inventory.name
-   - name: status
-     def: returned.status
-   - name: retrievalTime
-     def: propagation.lastReturnedUpdateTimestamp
+  select:
+     - name: wec
+       def: inventory.name
+     - name: status
+       def: returned.status
+     - name: retrievalTime
+       def: propagation.lastReturnedUpdateTimestamp
 ```
 
 ## Special case for 1 WEC

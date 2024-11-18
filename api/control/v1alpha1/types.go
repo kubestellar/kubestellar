@@ -534,7 +534,7 @@ type StatusCollectorList struct {
 // +kubebuilder:printcolumn:name="SUBJECT_RSC",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/resource']"
 // +kubebuilder:printcolumn:name="SUBJECT_NS",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/namespace']"
 // +kubebuilder:printcolumn:name="SUBJECT_NAME",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/name']"
-// +kubebuilder:printcolumn:name="BINDINGPOLICY",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/policy']"
+// +kubebuilder:printcolumn:name="BINDINGPOLICY",type="string",JSONPath=".metadata.labels['status\\.kubestellar\\.io/binding-policy']"
 type CombinedStatus struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
