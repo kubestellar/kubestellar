@@ -330,6 +330,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/roadmap/</loc>
+         <lastmod>2024-11-18</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/roadmap/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/unreleased-development/direct/setup-limitations/</loc>
          <lastmod>2024-11-18</lastmod>
          <changefreq>daily</changefreq>
