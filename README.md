@@ -123,5 +123,6 @@ Thanks go to these wonderful people:
 </td>
 <br>We are a Cloud Native Computing Foundation sandbox project.
 <br>Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF).
+<br>The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/legal/trademark-usage">Trademark Usage page</a>.
 <br>© 2022-2024. The KubeStellar Authors.
 <!--readme-for-root-end-->
