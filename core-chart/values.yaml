@@ -70,7 +70,7 @@ transport_controller:
   wds_qps: 5
   wds_burst: 10
   # Bundling parameters
-  max_num_wrapped: 1
+  max_num_wrapped: 2
   max_size_wrapped: 512000
 
 
