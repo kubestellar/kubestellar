@@ -26,6 +26,13 @@ func PrimitiveMapGet[Key comparable, Val any](rep map[Key]Val) func(Key) (Val, b
 	}
 }
 
+func DropOK11[Domain1, Range1 any](base func(Domain1) (Range1, bool)) func(Domain1) Range1 {
+	return func(dom1 Domain1) Range1 {
+		rng1, _ := base(dom1)
+		return rng1
+	}
+}
+
 func PrimitiveMapEqual[Key, Val comparable](map1, map2 map[Key]Val) bool {
 	if len(map1) != len(map2) {
 		return false

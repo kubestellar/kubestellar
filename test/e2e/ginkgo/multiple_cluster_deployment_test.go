@@ -133,6 +133,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("handles changes in bindingpolicy ObjectSelector", func(ctx context.Context) {
+			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
+			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1)
 			ginkgo.By("deleting WEC objects when bindingpolicy ObjectSelector stops matching")
 			patch := []byte(`{"spec": {"downsync": [{"objectSelectors": [{"matchLabels": {"app.kubernetes.io/name": "invalid"}}]}]}}`)
 			_, err := ksWds.ControlV1alpha1().BindingPolicies().Patch(
@@ -151,6 +153,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("handles changes in workload object labels", func(ctx context.Context) {
+			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
+			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1)
 			ginkgo.By("deleting WEC objects when workload object labels stop matching")
 			patch := []byte(`{"metadata": {"labels": {"app.kubernetes.io/name": "not-me"}}}`)
 			_, err := wds.AppsV1().Deployments("nginx").Patch(
@@ -191,12 +195,16 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("deletes WEC objects when wds deployment is deleted", func(ctx context.Context) {
+			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
+			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1)
 			util.DeleteDeployment(ctx, wds, ns, "nginx")
 			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 0)
 			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 0)
 		})
 
 		ginkgo.It("deletes WEC objects when BindingPolicy is deleted", func(ctx context.Context) {
+			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
+			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1)
 			err := ksWds.ControlV1alpha1().BindingPolicies().Delete(ctx, "nginx", metav1.DeleteOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 0)
