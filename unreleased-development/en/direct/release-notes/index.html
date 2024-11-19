@@ -3397,9 +3397,9 @@
 <ul>
 <li>Although the create-only feature can be used with Job objects to avoid trouble with <code>.spec.selector</code>, requesting singleton reported state return will still lead to a controller fight over <code>.status.replicas</code> while the Job is in progress.</li>
 <li>Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object</li>
-<li>Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.</li>
 <li>Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.</li>
-<li>The value of transport controller's <code>max-num-wrapped</code> flag is not handled properly, if the value leads to multiple ManifestWork objects with multiple workload objects in them.</li>
+<li>Creation, deletion, and modification of <code>CustomTransform</code> objects does not cause corresponding updates to the workload objects in the WECs; the current state of the <code>CustomTransform</code> objects is simply read at any moment when the objects in the WECs are being updated for other reasons.</li>
+<li>If the workload object count or volume vs the configured limits on content of a <code>ManifestWork</code> causes multiple <code>ManifestWork</code> to be created for one <code>Binding</code> (<code>BindingPolicy</code>) then there are bugs in the updating of workload objects in the WECs.</li>
 </ul>
 <h2 id="0250-alpha1-test-releases">0.25.0-alpha.1 test releases<a class="headerlink" href="#0250-alpha1-test-releases" title="Permanent link">#</a></h2>
 <p>These test the release-building functionality, which has been revised in the course of merge the controller-manager and transport-controller Helm charts into the core Helm chart.</p>
@@ -3411,7 +3411,8 @@
 <li>Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object</li>
 <li>Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.</li>
 <li>Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.</li>
-<li>The value of transport controller's <code>max-num-wrapped</code> flag is not handled properly, if the value leads to multiple ManifestWork objects with multiple workload objects in them.</li>
+<li>Creation, deletion, and modification of <code>CustomTransform</code> objects does not cause corresponding updates to the workload objects in the WECs; the current state of the <code>CustomTransform</code> objects is simply read at any moment when the objects in the WECs are being updated for other reasons.</li>
+<li>If the workload object count or volume vs the configured limits on content of a <code>ManifestWork</code> causes multiple <code>ManifestWork</code> to be created for one <code>Binding</code> (<code>BindingPolicy</code>) then there are bugs in the updating of workload objects in the WECs.</li>
 </ul>
 <h2 id="0231">0.23.1<a class="headerlink" href="#0231" title="Permanent link">#</a></h2>
 <p>The main change from 0.23.0 is a re-organization of the website, which is still a work in progress, and archival of all website content that is outdated.</p>
