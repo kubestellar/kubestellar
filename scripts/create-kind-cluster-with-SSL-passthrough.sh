@@ -101,7 +101,7 @@ if [[ "$wait" == "true" ]] ; then
   kubectl --context "kind-${name}" wait --namespace ingress-nginx \
     --for=condition=ready pod \
     --selector=app.kubernetes.io/component=controller \
-    --timeout=200s
+    --timeout=24h
 fi
 
 if [[ "$setcontext" == "true" ]] ; then
