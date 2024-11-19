@@ -11,6 +11,7 @@
 
 [![](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
 [![](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml)
+[![](https://www.bestpractices.dev/projects/8266/badge)](https://www.bestpractices.dev/projects/8266)
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
