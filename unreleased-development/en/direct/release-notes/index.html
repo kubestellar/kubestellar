@@ -805,6 +805,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0251" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.25.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.25.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remaining-limitations-in-0251" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remaining limitations in 0.25.1
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0250-and-its-candidates" class="md-nav__link">
     <span class="md-ellipsis">
       0.25.0 and its candidates
@@ -3158,6 +3182,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0251" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.25.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.25.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remaining-limitations-in-0251" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remaining limitations in 0.25.1
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0250-and-its-candidates" class="md-nav__link">
     <span class="md-ellipsis">
       0.25.0 and its candidates
@@ -3388,6 +3436,19 @@
 
 <h1 id="release-notes">Release notes<a class="headerlink" href="#release-notes" title="Permanent link">#</a></h1>
 <p>The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. </p>
+<h2 id="0251">0.25.1<a class="headerlink" href="#0251" title="Permanent link">#</a></h2>
+<p>This patch release fixes some bugs and some documentation oversights. Following are the most notable ones.</p>
+<ul>
+<li>The transport controller bugs that strike when there is more than one <code>ManifestWork</code> for a given <code>Binding</code> (<code>BindingPolicy</code>) have been fixed (we hope).</li>
+<li>The <a href="../get-started/">Getting Started document</a> has been updated to include documentation of how to use the script that does the steps listed in that document.</li>
+</ul>
+<h3 id="remaining-limitations-in-0251">Remaining limitations in 0.25.1<a class="headerlink" href="#remaining-limitations-in-0251" title="Permanent link">#</a></h3>
+<ul>
+<li>Although the create-only feature can be used with Job objects to avoid trouble with <code>.spec.selector</code>, requesting singleton reported state return will still lead to a controller fight over <code>.status.replicas</code> while the Job is in progress.</li>
+<li>Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object</li>
+<li>Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.</li>
+<li>Creation, deletion, and modification of <code>CustomTransform</code> objects does not cause corresponding updates to the workload objects in the WECs; the current state of the <code>CustomTransform</code> objects is simply read at any moment when the objects in the WECs are being updated for other reasons.</li>
+</ul>
 <h2 id="0250-and-its-candidates">0.25.0 and its candidates<a class="headerlink" href="#0250-and-its-candidates" title="Permanent link">#</a></h2>
 <ul>
 <li>The main advance in this release is finishing the implementation of the create-only feature. It is now available for use.</li>
