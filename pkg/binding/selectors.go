@@ -23,7 +23,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -58,7 +57,7 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 			continue // resolution does not exist, skip
 		}
 
-		matchedAny, createOnly, matchedStatusCollectorsSet := c.testObject(ctx, bindingPolicy.GetName(), objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
+		matchedAny, modFromPolicy := c.testObject(ctx, bindingPolicy.GetName(), objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
 		if !matchedAny {
 			// if previously selected, remove
 			if resolutionUpdated := c.bindingPolicyResolver.RemoveObjectIdentifier(bindingPolicy.GetName(),
@@ -79,7 +78,7 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 
 		// obj is selected by bindingpolicy, update the bindingpolicy resolver
 		resolutionUpdated, err := c.bindingPolicyResolver.EnsureObjectData(bindingPolicy.GetName(),
-			objIdentifier, string(objMR.GetUID()), objMR.GetResourceVersion(), createOnly, matchedStatusCollectorsSet)
+			objIdentifier, string(objMR.GetUID()), objMR.GetResourceVersion(), modFromPolicy)
 		if err != nil {
 			if errorIsBindingPolicyResolutionNotFound(err) {
 				// this case can occur if a bindingpolicy resolution was deleted AFTER
@@ -138,12 +137,12 @@ func (c *Controller) removeObjectFromBindingPolicies(ctx context.Context, objIde
 //   - sets.Set[string]: the UNION of the statuscollector names that appear within
 //     EACH of the tests that the object matches
 func (c *Controller) testObject(ctx context.Context, bindingName string, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
-	tests []v1alpha1.DownsyncPolicyClause) (bool, bool, sets.Set[string]) {
+	tests []v1alpha1.DownsyncPolicyClause) (bool, DownsyncModulation) {
 
 	logger := klog.FromContext(ctx)
 
-	matchedStatusCollectors := sets.New[string]()
-	var matched, createOnly bool
+	var matched bool
+	mod := ZeroDownsyncModulation()
 
 	var objNS *corev1.Namespace
 	for _, test := range tests {
@@ -183,14 +182,11 @@ func (c *Controller) testObject(ctx context.Context, bindingName string, objIden
 
 		klog.FromContext(ctx).V(5).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test, "binding", bindingName)
 		// test is a match
-		if test.StatusCollection != nil {
-			matchedStatusCollectors.Insert(test.StatusCollection.StatusCollectors...)
-		}
 		matched = true
-		createOnly = createOnly || test.CreateOnly
+		mod.AddExternal(test.DownsyncModulation)
 	}
 
-	return matched, createOnly, matchedStatusCollectors
+	return matched, mod
 }
 
 func minInt(a, b int32) int32 {

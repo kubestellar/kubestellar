@@ -180,7 +180,8 @@ func newClusterScope(gvr metav1.GroupVersionResource, name, resourceVersion stri
 			Name:                 name,
 			ResourceVersion:      resourceVersion,
 		},
-		CreateOnly: createOnly}
+		DownsyncModulation: ksapi.DownsyncModulation{
+			CreateOnly: createOnly}}
 }
 
 func newNamespaceScope(gvr metav1.GroupVersionResource, namespace, name, resourceVersion string, createOnly bool) ksapi.NamespaceScopeDownsyncClause {
@@ -191,7 +192,8 @@ func newNamespaceScope(gvr metav1.GroupVersionResource, namespace, name, resourc
 			Name:                 name,
 			ResourceVersion:      resourceVersion,
 		},
-		CreateOnly: createOnly}
+		DownsyncModulation: ksapi.DownsyncModulation{
+			CreateOnly: createOnly}}
 }
 
 func (bc *bindingCase) Add(obj mrObjRsc, createOnly bool) {
