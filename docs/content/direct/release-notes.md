@@ -2,6 +2,20 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.25.1
+
+This patch release fixes some bugs and some documentation oversights. Following are the most notable ones.
+
+- The transport controller bugs that strike when there is more than one `ManifestWork` for a given `Binding` (`BindingPolicy`) have been fixed (we hope).
+- The [Getting Started document](get-started.md) has been updated to include documentation of how to use the script that does the steps listed in that document.
+
+### Remaining limitations in 0.25.1
+
+* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+
 ## 0.25.0 and its candidates
 
 * The main advance in this release is finishing the implementation of the create-only feature. It is now available for use.
