@@ -149,7 +149,7 @@ The dashed dependencies are at run time, not build time.
 
 **NOTE**: Because of [a restriction in one of the code generators that
 we
-use](https://github.com/kubernetes/code-generator/blob/v0.28.2/kube_codegen.sh#L394-L395),
+use](https://github.com/kubernetes/code-generator/blob/v0.29.10/kube_codegen.sh#L394-L395),
 a contributor needs to have their local copy of the git repo in a
 directory whose pathname ends with the Go package name --- that is,
 ends with `/github.com/kubestellar/kubestellar`.
