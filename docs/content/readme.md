@@ -14,6 +14,7 @@
 [![](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml)
 [![](https://www.bestpractices.dev/projects/8266/badge)](https://www.bestpractices.dev/projects/8266)
 [![](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubestellar)](https://artifacthub.io/packages/search?repo=kubestellar)
+[![](https://api.scorecard.dev/projects/github.com/kubestellar/kubestellar/badge)](https://scorecard.dev/viewer/?uri=github.com/kubestellar/kubestellar)
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
