@@ -1,0 +1,53 @@
+header:
+  schema-version: 1.0.0
+  last-updated: '2024-11-20'
+  last-reviewed: '2024-11-20'
+  expiration-date: '2025-11-20T01:00:00.000Z'
+  project-url: https://github.com/kubestellar/kubestellar
+  project-release: '0.25.1'
+project-lifecycle:
+  status: active
+  bug-fixes-only: false
+  core-team:
+  - contact: github:clubanderson
+  - contact: github:MikeSpreitzer
+  - contact: github:pdettori
+  - contact: github:dumb0002
+  - contact: github:waltforme
+  - contact: github:ezrasilvera
+contribution-policy:
+  accepts-pull-requests: true
+  accepts-automated-pull-requests: true
+  code-of-conduct: https://github.com/kubestellar/kubestellar/blob/main/CODE_OF_CONDUCT.md
+documentation:
+- https://kubestellar.io
+distribution-points:
+- https://github.com/kubestellar/kubestellar/releases
+security-artifacts:
+  threat-model:
+    threat-model-created: true
+    evidence-url:
+    - https://github.com/kubestellar/kubestellar/blob/main/THREAT-MODEL.md
+security-testing:
+- tool-type: sca
+  tool-name: Dependabot
+  tool-version: latest
+  integration:
+    ad-hoc: false
+    ci: true
+    before-release: true
+  comment: |
+    Dependabot is enabled for this repo.
+security-contacts:
+- type: email
+  value: kubestellar-security-announce@googlegroups.com
+vulnerability-reporting:
+  accepts-vulnerability-reports: true
+  security-policy: https://github.com/kubestellar/kubestellar/blob/main/SECURITY.md
+  email-contact: kubestellar-security-announce@googlegroups.com
+  comment: |
+    The first and best way to report a vulnerability is by using private security issues in GitHub.
+dependencies:
+  third-party-packages: true
+  dependencies-lists:
+  - https://github.com/kubestellar/kubestellar/blob/main/SECURITY.md
