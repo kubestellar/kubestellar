@@ -454,7 +454,7 @@ const (
 // and https://kubernetes.io/docs/reference/using-api/cel/ about CEL's uses in Kubernetes.
 // The expression will be type-checked against the schema for the object type at hand,
 // using the Kubernetes library code for converting an OpenAPI schema to a CEL type
-// (e.g., https://github.com/kubernetes/apiserver/blob/v0.28.2/pkg/cel/common/schemas.go#L40).
+// (e.g., https://github.com/kubernetes/apiserver/blob/v0.29.10/pkg/cel/common/schemas.go#L40).
 // Parsing errors are posted to the status.Errors of the StatusCollector.
 // Type checking errors are posted to the status.Errors of the Binding and BindingPolicy.
 type Expression string
