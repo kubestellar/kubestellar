@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.44">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.45">
     
     
       
@@ -3344,8 +3344,7 @@
 
 <h1 id="combined-status-from-wecs">Combined Status from WECs<a class="headerlink" href="#combined-status-from-wecs" title="Permanent link">#</a></h1>
 <p>Note on terminology: the general idea that we wish to address is returning reported state about a workload object to its WDS. At the current level of development, we equate reported state with the status section of an object --- while anticipating a more general treatment in the future.</p>
-<p>There are two methods of returning reported state: a general one and a special case. The general method returns reported state from any number of WECs. The special case applies when the number of WECs is exactly 1, and returns the reported state into the original object in the WDS.
-It may make sense to expand the latter into a general feature in the future, accommodating features such as scheduling.</p>
+<p>There are two methods of returning reported state: a general one and a special case. The general method returns reported state from any number of WECs. The special case applies when the number of WECs is exactly 1, and returns the reported state into the original object in the WDS.</p>
 <h2 id="introduction-to-the-general-technique">Introduction to the General Technique<a class="headerlink" href="#introduction-to-the-general-technique" title="Permanent link">#</a></h2>
 <p>The general technique for combining reported state from WECs is built upon the following ideas:</p>
 <ol>
@@ -3564,7 +3563,50 @@ This produces a listing of object status paired with inventory object name.</p>
 <a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">       </span><span class="nt">def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">propagation.lastReturnedUpdateTimestamp</span>
 </code></pre></div>
 <h2 id="special-case-for-1-wec">Special case for 1 WEC<a class="headerlink" href="#special-case-for-1-wec" title="Permanent link">#</a></h2>
-<p>This proposal refines the meaning of <code>BindingPolicySpec.WantSingletonReportedState</code> to request the special case when it applies.</p>
+<p>When a workload object is distributed from a WDS to exactly one WEC,
+the reported state from that WEC can be returned into the copy of the
+workload object in the WDS. The design of most kinds of Kubernetes API
+object implicitly assumes that the object exists and has its defined
+effect in only one cluster. That is why it makes sense to return the
+reported state from the WEC to the WDS only when the object goes to
+exactly one WEC.</p>
+<p>As mentioned above, currently KubeStellar equates "reported state"
+with the <code>.status</code> section of the API object.</p>
+<p>The user has to specifically request this last step of <code>.status</code>
+propagation. This is done in an optional boolean field, named
+<code>wantSingletonReportedState</code>, in a <code>DownsyncPolicyClause</code> in a
+<code>BindingPolicy</code>. This is one of the three kinds of downsync
+modulations that a policy clause can associate with the matching
+workload objects. In a <code>Binding</code>, this same optional boolean field
+appears in <code>NamespaceScopeDownsyncClause</code> and
+<code>ClusterScopeDownsyncClause</code>. If multiple policy clauses in a
+<code>BindingPolicy</code> match a given workload object, the settings for
+<code>.wantSingletonReportedState</code> are combined by OR to get the one
+boolean value that appears with the reference to the object in the
+corresponding <code>Binding</code>. If multiple <code>Binding</code> objects in one WDS
+reference a given workload object, there is another level of
+multiplicity to consider. Read on.</p>
+<p>For a given workload object and WDS, we say that "singleton status
+return is requested" if and only if there exists at least one
+BindingPolicy or Binding that has <code>wantSingletonReportedState==true</code>
+in a clause that matches/references the workload object.</p>
+<p>The "qualified WEC set" of a given workload object in a given WDS is
+the set of WECs that are associated with that workload object by at
+least one BindingPolicy or Binding that has
+<code>wantSingletonReportedState==true</code> in a clause that matches/references
+the workload object.</p>
+<p>For a given workload object in a given WDS, while singleton status
+return is requested, KubeStellar maintains a label on the object whose
+name (key) is <code>kubestellar.io/executing-count</code> and whose value is a
+string representation of the size of the qualified WEC set of that
+object.  While singleton status return is <em>not</em> requested, KubeStellar
+suppresses the existence of a label with that name (key).  While
+singleton status return is requested <em>and</em> the size of the qualified
+WEC set is 1, KubeStellar propagates the object's <code>.status</code> from that
+WEC to the <code>.status</code> section of the object in the WDS.  While either
+singleton status return is NOT requested or the size of the qualified
+WEC set is NOT 1, there is nothing in the <code>.status</code> of the object in
+the WDS that was propagated there from a WEC by KubeStellar.</p>
 
 
 
