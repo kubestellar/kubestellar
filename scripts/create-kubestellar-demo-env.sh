@@ -59,8 +59,8 @@ echo -e "Checking that pre-req softwares are installed..."
 if [ "$k8s_platform" == "kind" ]; then
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
 else
-    # ../hack/check_pre_req.sh -V kflex ocm helm kubectl docker k3d
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker k3d
+    ../hack/check_pre_req.sh -V kflex ocm helm kubectl docker k3d
+    # curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker k3d
 fi
 
 ##########################################
