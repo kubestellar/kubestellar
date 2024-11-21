@@ -135,6 +135,14 @@ is_installed_kind() {
         'kind v0.20'
 }
 
+is_installed_k3d() {
+    is_installed 'k3d' \
+        'k3d' \
+        'k3d --version' \
+        'k3d --version' \
+        'https://k3d.io/#installation' \
+        'k3d version v5.7.4'
+}
 is_installed_ko() {
     is_installed 'KO' \
         'ko' \
@@ -183,7 +191,7 @@ is_installed_yq() {
 
 
 # Global constants
-PROGRAMS="@(argo|brew|docker|go|helm|jq|kflex|kind|ko|kubectl|make|ocm|yq)"
+PROGRAMS="@(argo|brew|docker|go|helm|jq|kflex|kind|ko|kubectl|make|ocm|yq|k3d)"
 
 # Global parameters
 assert="false"  # true => exit on missing program
