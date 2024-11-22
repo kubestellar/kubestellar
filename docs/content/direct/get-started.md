@@ -25,14 +25,14 @@ Be sure to [install the software prerequisites](pre-reqs.md) _before_ running th
 The script will check for the pre-reqs and exit if they are not present.
 
 ### Run the script!
-The script can install KubeStellar's demonstration environment on top of Kind or k3d
+The script can install KubeStellar's demonstration environment on top of kind or k3d
 
-For Kind
+For use with kind
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform kind
 ```
 
-For k3d
+For use with k3d
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform k3d
 ```
