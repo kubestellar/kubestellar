@@ -24,6 +24,7 @@ k8s_platform="kind"
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --platform) k8s_platform="$2"; shift ;;
+        -X) set -x ;;
         -h|--help)
             echo "Usage: $0 [--platform <kind|k3d>]"
             exit 0
@@ -59,8 +60,7 @@ echo -e "Checking that pre-req softwares are installed..."
 if [ "$k8s_platform" == "kind" ]; then
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
 else
-    ../hack/check_pre_req.sh -V kflex ocm helm kubectl docker k3d
-    # curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker k3d
+    curl -s https://raw.githubusercontent.com/clubanderson/kubestellar/refs/heads/add-k3d-to-create-demo-env/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker k3d
 fi
 
 ##########################################
