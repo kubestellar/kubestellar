@@ -3071,7 +3071,7 @@
 <h2 id="integration-testing">Integration testing<a class="headerlink" href="#integration-testing" title="Permanent link">#</a></h2>
 <p>There are currently three integration tests. Contributors can run them. There is also a GitHub Actions workflow (in <code>.github/workflows/pr-test-integration.yml</code>) that runs these tests.</p>
 <p>These tests require you to already have <code>etcd</code> on your <code>$PATH</code>.
-See https://github.com/kubernetes/kubernetes/blob/v1.28.2/hack/install-etcd.sh for an example of how to do that.</p>
+See https://github.com/kubernetes/kubernetes/blob/v1.29.10/hack/install-etcd.sh for an example of how to do that.</p>
 <p>To run the tests sequentially, issue a command like the following.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">CONTROLLER_TEST_NUM_OBJECTS</span><span class="o">=</span><span class="m">24</span><span class="w"> </span>go<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-v<span class="w"> </span>./test/integration/controller-manager<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/test.log
 </code></pre></div>
