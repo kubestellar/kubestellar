@@ -127,33 +127,19 @@ command_exists() {
 echo -e "\nStarting environment clean up..."
 echo -e "Starting cluster clean up..."
 
-# Check for k8s_platform and perform cleanup in the correct order
 if [ "$k8s_platform" == "kind" ]; then
-    # Check if k3d exists and delete clusters in k3d first
     if command_exists "k3d"; then
         cluster_clean_up "k3d cluster delete kubeflex" &
         cluster_clean_up "k3d cluster delete cluster1" &
         cluster_clean_up "k3d cluster delete cluster2" &
         wait
     fi
-    # Then delete clusters in kind
-    cluster_clean_up "kind delete cluster --name kubeflex" &
-    cluster_clean_up "kind delete cluster --name cluster1" &
-    cluster_clean_up "kind delete cluster --name cluster2" &
-    wait
-else
-    # Check if kind exists and delete clusters in kind first
     if command_exists "kind"; then
         cluster_clean_up "kind delete cluster --name kubeflex" &
         cluster_clean_up "kind delete cluster --name cluster1" &
         cluster_clean_up "kind delete cluster --name cluster2" &
         wait
     fi
-    # Then delete clusters in k3d
-    cluster_clean_up "k3d cluster delete kubeflex" &
-    cluster_clean_up "k3d cluster delete cluster1" &
-    cluster_clean_up "k3d cluster delete cluster2" &
-    wait
 fi
 
 wait
@@ -182,7 +168,7 @@ if [ "$k8s_platform" == "kind" ]; then
 else
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
     sleep 15
-    helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.6.1 --namespace ingress-nginx --create-namespace
+    helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.11.3 --namespace ingress-nginx --create-namespace
 fi
 echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
 
