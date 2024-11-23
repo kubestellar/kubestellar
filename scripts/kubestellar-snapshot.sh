@@ -19,13 +19,15 @@ set -e
 
 
 # Global variables
-timestamp="$(date +%F_%T)"
-output_folder="/tmp/kubestellar-snapshot"
+TIMESTAMP="$(date +%F_%T)"
+TMPFOLDER="$(mktemp -d --tmpdir "kubestellar-snapshot-XXXX")"
+trap 'rm -rf -- "$TMPFOLDER"' EXIT
+OUTPUT_FOLDER="$TMPFOLDER/kubestellar-snapshot"
 
 
 # Script info
 SCRIPT_NAME="KubeStellar Snapshot"
-SCRIPT_VERSION="0.10"
+SCRIPT_VERSION="0.2.0"
 
 
 # Colors
@@ -35,6 +37,7 @@ COLOR_GREEN="\033[1;32m"
 COLOR_BLUE="\033[94m"
 COLOR_YELLOW="\033[1;33m"
 COLOR_PURPLE="\033[1;35m"
+COLOR_WARNING="${COLOR_RED}"
 COLOR_ERROR="${COLOR_RED}"
 COLOR_STATUS_TRUE="${COLOR_GREEN}"
 COLOR_STATUS_FALSE="${COLOR_RED}"
@@ -54,8 +57,9 @@ arg_verbose=false
 # Display the command line help
 display_help() {
   cat << EOF
-Usage: $0 [--kubeconfig|-K <filename>] [--context|-C <name>] [--logs|-L] [--yaml|-Y] [--verbose|-V] [--version|-v] [--help|-h] [-X]
+Usage: $0 [options]
 
+Options:
 --kubeconfig|-K <filename> use the specified kubeconfig to find KubeStellar Helm chart
 --context|-C <name>        use the specified context to find KubeStellar Helm chart
 --logs|-L                  save the logs of the pods
@@ -65,10 +69,13 @@ Usage: $0 [--kubeconfig|-K <filename>] [--context|-C <name>] [--logs|-L] [--yaml
 --help|-h                  show this information
 -X                         enable verbose execution for debugging
 
-Note: After piping the output of the script to file use "more"
-      to inspect the file content in color. ALternatively install
-      "ansi2txt" and pipe the script through it to remove escape
-      characters and obtain a plan text report.
+Note 1: This script expects that KubeStellar was installed with its Helm chart and
+        to find the latter in the host or provided kubeconfig(s) and context(s).
+
+Note 2: After piping the output of the script to file use "more"
+        to inspect the file content in color. ALternatively install
+        "ansi2txt" and pipe the script through it to remove escape
+        characters and obtain a plan text report.
 EOF
 }
 
@@ -129,25 +136,26 @@ is_installed() {
 
 # Get the kubeconfig of a particular Control Plane
 get_kubeconfig() {
-    context="$1" # context in the kubeconfig
+    context="$1" # context in the host kubeconfig or the config passed to the script using --kubeconfig flag
     cp_name="$2" # name of the Control Plane
     cp_type="$3" # type of the Control Plane
 
-    # wait for CP ready
-    while [[ $(k --context $context get controlplane $cp_name -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-        sleep 5
-    done
+    # check if the CP is ready
+    if [[ $(kubectl --context $context get controlplane $cp_name -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; then
+        echo ""
+        return
+    fi
 
     # put into the shell variable "kubeconfig" the kubeconfig contents for use from outside of the hosting cluster
     if [[ "$cp_type" == "host" ]] ; then
-        kubeconfig=$(k --context $context config view --flatten --minify)
+        kubeconfig=$(kubectl --context $context config view --flatten --minify)
     else
         # determine the secret name and namespace
-                     key=$(k --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.key}')
-             secret_name=$(k --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
-        secret_namespace=$(k --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
+                     key=$(kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.key}')
+             secret_name=$(kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
+        secret_namespace=$(kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
         # get the kubeconfig
-        kubeconfig=$(k --context $context get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d)
+        kubeconfig=$(kubectl --context $context get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d)
     fi
 
     # return the kubeconfig file contents in YAML format
@@ -196,7 +204,7 @@ done
 
 
 ###############################################################################
-# Define alias definition
+# Alias definitions
 ###############################################################################
 # Define the echov function based on verbosity
 if [ "$arg_verbose" == "true" ]; then
@@ -205,17 +213,12 @@ else
     echov() { :; }
 fi
 
-# Define the special kubectl
-k() {
-    KUBECONFIG="$kubeconfig" kubectl $*
-}
-
 
 ###############################################################################
 # Script info
 ###############################################################################
-echov -e "${COLOR_INFO}$($0 --version)${COLOR_NONE}\n"
-echov -e "Script run on ${COLOR_INFO}$timestamp${COLOR_NONE}"
+echov -e "${COLOR_INFO}$(${BASH_SOURCE[0]} --version)${COLOR_NONE}\n"
+echov -e "Script run on ${COLOR_INFO}$TIMESTAMP${COLOR_NONE}"
 
 
 ###############################################################################
@@ -240,8 +243,7 @@ is_installed 'jq' \
 # Ensure output folder
 ###############################################################################
 if [[ "$arg_logs" == "true" || "$arg_yaml" == "true" ]] ; then
-    yes "yes" | rm -vRI "/tmp/kubestellar-snapshot" > /dev/null 2>&1 || true
-    mkdir -p "$output_folder"
+    mkdir -p "$OUTPUT_FOLDER"
 fi
 
 
@@ -249,42 +251,39 @@ fi
 # Determine the list of kubeconfigs to search
 # based on https://kubernetes.io/docs/reference/k/generated/k_config/
 ###############################################################################
-if [[ "$arg_kubeconfig" != "" ]] ; then
-    kubeconfig="$arg_kubeconfig"
-elif [[ "$KUBECONFIG" != "" ]] ; then
-    kubeconfig="$KUBECONFIG"
-else
-    kubeconfig="$HOME/.kube/config"
-fi
-echov -e "Using kubeconfig(s): ${COLOR_INFO}$kubeconfig${COLOR_NONE}"
+[[ -n "$arg_kubeconfig" ]] && export KUBECONFIG="$arg_kubeconfig"
+[[ -z "$KUBECONFIG" ]] && export KUBECONFIG="$HOME/.kube/config"
+echov -e "Using kubeconfig(s): ${COLOR_INFO}$KUBECONFIG${COLOR_NONE}"
 
 
 ###############################################################################
 # Determine the list of contexts to search
 ###############################################################################
 if [[ "$arg_context" == "" ]] ; then
-    contexts=($(k config get-contexts --no-headers -o name))
+    contexts=($(kubectl config get-contexts --no-headers -o name))
 else
     contexts=("$arg_context")
 fi
 
+if [[ -z "${contexts[@]}" ]] ; then
+    echoerr "No context(s) found in the kubeconfig file $KUBECONFIG!"
+    exit 1
+fi
+
 echov "Validating contexts(s): "
-vc_n=0
-valid_context=()
+valid_contexts=()
 for context in "${contexts[@]}" ; do # for all contexts
     [[ -z "$context" ]] && continue
-    if k --context $context get secrets -A > /dev/null 2>&1 ; then
+    if kubectl --context $context get secrets -A > /dev/null 2>&1 ; then
         echov -e "${COLOR_GREEN}\xE2\x9C\x94${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
-        valid_context[vc_n]="$context"
-        vc_n=$((vc_n+1))
+        valid_contexts+=($context)
     else
         echov -e "${COLOR_RED}X${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
     fi
 done
-contexts=("${valid_context[@]}")
 
-if [[ -z "${contexts[@]}" ]] ; then
-    echoerr "no context(s) found in the kubeconfig file $kubeconfig!"
+if [[ -z "${valid_contexts[@]}" ]] ; then
+    echoerr "No valid context(s) found in the kubeconfig file $KUBECONFIG!"
     exit 1
 fi
 
@@ -294,24 +293,30 @@ fi
 ###############################################################################
 echotitle "KubeStellar:"
 helm_context=""
-for context in "${contexts[@]}" ; do # for all contexts
-    chart="$(helm --kubeconfig $kubeconfig --kube-context $context list 2> /dev/null | grep 'core-chart' || true)"
-    if [[ "$chart" != "" ]] ; then
-        helm_context=$context
-        name="$(echo "$chart" | awk '{print $1}')" || true
-        version="$(echo "$chart" | awk '{print $NF}')" || true
-        secret="$(k --context $helm_context get secret --all-namespaces -l "owner=helm"  --no-headers -o name 2> /dev/null | grep "$name" || true)"
+for context in "${valid_contexts[@]}" ; do
+    HELM_LIST="$TMPFOLDER/helm-list.txt"
+    helm --kube-context $context list --no-headers -A 2> /dev/null > "$HELM_LIST" || true
+    while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
+        name="$(echo "$line" | awk '{print $1}')"
+        namespace="$(echo "$line" | awk '{print $2}')"
+        version="$(echo "$line" | awk '{print $NF}')"
+        secret="$(kubectl --context $context get secret -n "$namespace" -l "owner=helm,name=$name" --no-headers -o name 2> /dev/null || true)"
         secret="${secret##*/}"
-        echo -e "- Helm chart ${COLOR_INFO}${name}${COLOR_NONE} (${COLOR_INFO}v${version}${COLOR_NONE}) in context ${COLOR_INFO}${context}${COLOR_NONE}"
-        echo -e "  - Secret=${COLOR_INFO}${secret}${COLOR_NONE}"
-        if [[ "$arg_yaml" == "true" ]] ; then
-            mkdir -p "$output_folder/kubestellar-core-chart"
-            echo -e "$(k --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.info'     | sed -e 's/\"/"/g')" > "$output_folder/kubestellar-core-chart/info.json"
-            echo -e "$(k --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.chart'    | sed -e 's/\"/"/g')" > "$output_folder/kubestellar-core-chart/chart.json"
-            echo -e "$(k --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.manifest' | sed -e 's/\"/"/g')" > "$output_folder/kubestellar-core-chart/manifest.yaml"
+        if [[ ! -z "$(kubectl --context $context get secret $secret -n "$namespace" -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.chart' | grep -i "KubeStellar" 2> /dev/null || true)" ]] ; then
+            helm_context="$context"
+            echo -e "- Helm chart ${COLOR_INFO}${name}${COLOR_NONE} (${COLOR_INFO}v${version}${COLOR_NONE}) in namespace ${COLOR_INFO}${namespace}${COLOR_NONE} in context ${COLOR_INFO}${context}${COLOR_NONE}"
+            echo -e "  - Secret=${COLOR_INFO}${secret}${COLOR_NONE} in namespace ${COLOR_INFO}${namespace}${COLOR_NONE}"
+            if [[ "$arg_yaml" == "true" ]] ; then
+                mkdir -p "$OUTPUT_FOLDER/kubestellar-core-chart"
+                kubectl --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.info'      > "$OUTPUT_FOLDER/kubestellar-core-chart/info.json"
+                kubectl --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.chart'     > "$OUTPUT_FOLDER/kubestellar-core-chart/chart.json"
+                kubectl --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.manifest'  > "$OUTPUT_FOLDER/kubestellar-core-chart/manifest.yaml"
+            fi
+            break
         fi
-        break
-    fi
+    done < "$HELM_LIST"
+    [[ ! -z "$helm_context" ]] && break
 done
 if [[ "$helm_context" == "" ]] ; then
     echoerr "Helm chart was not found in any of the context(s)!"
@@ -323,30 +328,30 @@ fi
 # Look for Kubeflex deployment
 ###############################################################################
 echotitle "KubeFlex:"
-if [ -z "$(k --context $helm_context get ns kubeflex-system --no-headers -o name 2> /dev/null || true)" ] ; then
+if [[ -z "$(kubectl --context $helm_context get ns kubeflex-system --no-headers 2> /dev/null || true)" ]] ; then
     echoerr "KubeFlex namespace not found!"
 else
     echo -e "- ${COLOR_INFO}kubeflex-system${COLOR_NONE} namespace in context ${COLOR_INFO}$helm_context${COLOR_NONE}"
-    kubeflex_pod=$(k --context $helm_context -n kubeflex-system get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
-    if [ -z "$kubeflex_pod" ]; then
+    kubeflex_pod=$(kubectl --context $helm_context -n kubeflex-system get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
+    if [[ -z "$kubeflex_pod" ]]; then
         echoerr "KubeFlex pod not found!"
     else
-        kubeflex_version=$(k --context $helm_context -n kubeflex-system get pod $kubeflex_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/kubeflex/manager")) | .image' | cut -d':' -f2 || true)
-        kubeflex_status=$(k --context $helm_context -n kubeflex-system get pod $kubeflex_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        kubeflex_version=$(kubectl --context $helm_context -n kubeflex-system get pod $kubeflex_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/kubeflex/manager")) | .image' | cut -d':' -f2 || true)
+        kubeflex_status=$(kubectl --context $helm_context -n kubeflex-system get pod $kubeflex_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -n -e "- ${COLOR_INFO}controller-manager${COLOR_NONE}: version=${COLOR_INFO}$kubeflex_version${COLOR_NONE}, pod=${COLOR_INFO}$kubeflex_pod${COLOR_NONE}, status="
         echostatus "$kubeflex_status"
-        postgresql_pod=$(k --context $helm_context -n kubeflex-system get pod postgres-postgresql-0 2> /dev/null || true)
+        postgresql_pod=$(kubectl --context $helm_context -n kubeflex-system get pod postgres-postgresql-0 2> /dev/null || true)
         if [ -z "$postgresql_pod" ]; then
             echoerr "postgres-postgresql-0 pod not found!"
         else
-            postgresql_status=$(k --context $helm_context -n kubeflex-system get pod postgres-postgresql-0 -o jsonpath='{.status.phase}' 2> /dev/null || true)
+            postgresql_status=$(kubectl --context $helm_context -n kubeflex-system get pod postgres-postgresql-0 -o jsonpath='{.status.phase}' 2> /dev/null || true)
             echo -n -e "- ${COLOR_INFO}postgres-postgresql-0${COLOR_NONE}: pod=${COLOR_INFO}postgres-postgresql-0${COLOR_NONE}, status="
             echostatus "$postgresql_status"
         fi
         if [[ "$arg_logs" == "true" ]] ; then
-            mkdir -p "$output_folder/kubeflex"
-            k --context $helm_context -n kubeflex-system logs $kubeflex_pod > "$output_folder/kubeflex/kubeflex-controller.log"
-            k --context $helm_context -n kubeflex-system logs postgres-postgresql-0 > "$output_folder/kubeflex/postgresql.log"
+            mkdir -p "$OUTPUT_FOLDER/kubeflex"
+            kubectl --context $helm_context -n kubeflex-system logs $kubeflex_pod > "$OUTPUT_FOLDER/kubeflex/kubeflex-controller.log"
+            kubectl --context $helm_context -n kubeflex-system logs postgres-postgresql-0 > "$OUTPUT_FOLDER/kubeflex/postgresql.log"
         fi
     fi
 fi
@@ -357,62 +362,69 @@ fi
 ###############################################################################
 echotitle "Control Planes:"
 cp_n=0
-cps=($(k --context $helm_context get controlplanes -no-headers -o name 2> /dev/null || true))
+cps=($(kubectl --context $helm_context get controlplanes -no-headers -o name 2> /dev/null || true))
 for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     name=${cps[i]##*/}
     cp_context[cp_n]=$helm_context
     cp_name[cp_n]=$name
     cp_ns[cp_n]="${cp_name[cp_n]}-system"
-    cp_type[cp_n]=$(k --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.type}')
-    cp_pch[cp_n]=$(k --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.postCreateHook}')
-    cp_kubeconfig[cp_n]=$(get_kubeconfig "${helm_context}" "${cp_name[cp_n]}" "${cp_type[cp_n]}")
+    cp_type[cp_n]=$(kubectl --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.type}')
+    cp_pch[cp_n]=$(kubectl --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.postCreateHook}')
+    cp_kubeconfig_content=$(get_kubeconfig "${helm_context}" "${cp_name[cp_n]}" "${cp_type[cp_n]}")
     echo -e "- ${COLOR_INFO}${cp_name[cp_n]}${COLOR_NONE}: type=${COLOR_INFO}${cp_type[cp_n]}${COLOR_NONE}, pch=${COLOR_INFO}${cp_pch[cp_n]}${COLOR_NONE}, context=${COLOR_INFO}${cp_context[cp_n]}${COLOR_NONE}, namespace=${COLOR_INFO}${cp_name[cp_n]}-system${COLOR_NONE}"
+    if [[ -z "$cp_kubeconfig_content" ]] ; then
+        cp_kubeconfig[cp_n]=""
+        echo -e "  ${COLOR_WARNING}WARNING: the Control plane is no ready, the kubeconfig is not available!${COLOR_NONE}"
+    else
+        cp_kubeconfig[cp_n]="$TMPFOLDER/$name-kubeconfig"
+        echo "$cp_kubeconfig_content" > "${cp_kubeconfig[cp_n]}"
+    fi
     if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
-        its_pod=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=its" -o name 2> /dev/null | cut -d'/' -f2 || true)
-        its_status=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        its_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=its" -o name 2> /dev/null | cut -d'/' -f2 || true)
+        its_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         if [[ "${cp_type[cp_n]}" == "host" ]] ; then
             status_ns="open-cluster-management"
         else
             status_ns="${cp_ns[cp_n]}"
         fi
-        status_pod=$(k --context $helm_context -n "$status_ns" get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
-        status_status=$(k --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        status_pod=$(kubectl --context $helm_context -n "$status_ns" get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
+        status_status=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -n -e "  - Post Create Hook: pod=${COLOR_INFO}$its_pod${COLOR_NONE}, ns=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$its_status"
-        echo -n -e "  - Status addon: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, ns=${COLOR_INFO}$status_ns${COLOR_NONE}, status="
+        echo -n -e "  - Status addon controller: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, ns=${COLOR_INFO}$status_ns${COLOR_NONE}, status="
         echostatus "$status_status"
     else
-        kubestellar_pod=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
-        kubestellar_version=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image' | cut -d':' -f2 || true)
-        kubestellar_status=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
-        echo -e -n "  - KubeStellar controller: version=${COLOR_INFO}$kubestellar_version${COLOR_NONE}, pod=${COLOR_INFO}$kubestellar_pod${COLOR_NONE} namespace=${COLOR_INFO}"${cp_ns[cp_n]}"${COLOR_NONE}, status="
+        kubestellar_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
+        kubestellar_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image' | cut -d':' -f2 || true)
+        kubestellar_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        echo -e -n "  - KubeStellar controller manager: version=${COLOR_INFO}$kubestellar_version${COLOR_NONE}, pod=${COLOR_INFO}$kubestellar_pod${COLOR_NONE} namespace=${COLOR_INFO}"${cp_ns[cp_n]}"${COLOR_NONE}, status="
         echostatus "$kubestellar_status"
-        trasport_pod=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "name=transport-controller" -o name 2> /dev/null | cut -d'/' -f2 || true)
-        trasport_version=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/ocm-transport-controller")) | .image' | cut -d':' -f2 || true)
-        trasport_status=$(k --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        trasport_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "name=transport-controller" -o name 2> /dev/null | cut -d'/' -f2 || true)
+        trasport_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/ocm-transport-controller")) | .image' | cut -d':' -f2 || true)
+        trasport_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -e -n "  - Transport controller: version=${COLOR_INFO}$trasport_version${COLOR_NONE}, pod=${COLOR_INFO}$trasport_pod${COLOR_NONE} namespace=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$trasport_status"
     fi
     if [[ "$arg_yaml" == "true" ]] ; then
-        mkdir -p "$output_folder/$name"
-        k --context $helm_context get controlplane $name -o yaml > "$output_folder/$name/cp.yaml"
+        mkdir -p "$OUTPUT_FOLDER/$name"
+        kubectl --context $helm_context get controlplane $name -o yaml > "$OUTPUT_FOLDER/$name/cp.yaml"
         if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
-            k --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o yaml > "$output_folder/$name/its-job.yaml"
-            k --context $helm_context -n "$status_ns" get pod $status_pod -o yaml > "$output_folder/$name/status-addon.yaml"
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o yaml > "$OUTPUT_FOLDER/$name/its-job.yaml"
+            kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o yaml > "$OUTPUT_FOLDER/$name/status-addon.yaml"
         else
-            k --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o yaml > "$output_folder/$name/kubestellar-controller.yaml"
-            k --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o yaml > "$output_folder/$name/transport-controller.yaml"
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o yaml > "$OUTPUT_FOLDER/$name/kubestellar-controller.yaml"
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o yaml > "$OUTPUT_FOLDER/$name/transport-controller.yaml"
         fi
     fi
     if [[ "$arg_logs" == "true" ]] ; then
-        mkdir -p "$output_folder/$name"
+        mkdir -p "$OUTPUT_FOLDER/$name"
         if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
-            k --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-clusteradm > "$output_folder/$name/its-job-clusteradm.log"
-            k --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-statusaddon > "$output_folder/$name/its-job-status-addon.log"
-            k --context $helm_context -n "$status_ns" logs $status_pod -c status-controller > "$output_folder/$name/status-addon.log"
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-clusteradm > "$OUTPUT_FOLDER/$name/its-job-clusteradm.log"
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-statusaddon > "$OUTPUT_FOLDER/$name/its-job-status-addon.log"
+            kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller > "$OUTPUT_FOLDER/$name/status-addon.log"
         else
-            k --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod > "$output_folder/$name/kubestellar-controller.log"
-            k --context $helm_context -n "${cp_ns[cp_n]}" logs $trasport_pod -c transport-controller > "$output_folder/$name/transport-controller.log"
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod > "$OUTPUT_FOLDER/$name/kubestellar-controller.log"
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $trasport_pod -c transport-controller > "$OUTPUT_FOLDER/$name/transport-controller.log"
         fi
     fi
     cp_n=$((cp_n+1))
@@ -420,29 +432,29 @@ done
 
 
 ###############################################################################
-# Listing managed clusters
+# Listing Managed Clusters
 ###############################################################################
 echotitle "Managed Clusters:"
 mc_n=0
 for j in "${!cp_pch[@]}" ; do
     if [[ "${cp_pch[$j]}" == "its" ]] ; then
-        mcs=($(kubectl --kubeconfig <(echo "${cp_kubeconfig[$j]}") get managedcluster -no-headers -o name 2> /dev/null || true))
+        mcs=($(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster -no-headers -o name 2> /dev/null || true))
         for i in "${!mcs[@]}" ; do
             name=${mcs[i]##*/}
             mc_name[mc_n]=$name
-            accepted="$(kubectl --kubeconfig <(echo "${cp_kubeconfig[$j]}") get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "HubAcceptedManagedCluster") | .status' | tr -d '"')"
-            joined="$(kubectl --kubeconfig <(echo "${cp_kubeconfig[$j]}") get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "ManagedClusterJoined") | .status' | tr -d '"')"
-            available="$(kubectl --kubeconfig <(echo "${cp_kubeconfig[$j]}") get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "ManagedClusterConditionAvailable") | .status' | tr -d '"')"
-            synced="$(kubectl --kubeconfig <(echo "${cp_kubeconfig[$j]}") get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "ManagedClusterConditionClockSynced") | .status' | tr -d '"')"
+            accepted="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "HubAcceptedManagedCluster") | .status' | tr -d '"')"
+            joined="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "ManagedClusterJoined") | .status' | tr -d '"')"
+            available="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "ManagedClusterConditionAvailable") | .status' | tr -d '"')"
+            synced="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "ManagedClusterConditionClockSynced") | .status' | tr -d '"')"
             echo -e "- ${COLOR_INFO}${mc_name[mc_n]}${COLOR_NONE} in ${COLOR_INFO}${cp_name[j]}${COLOR_NONE}: accepted=$(echostatus $accepted), joined=$(echostatus $joined), available=$(echostatus $available), synced=$(echostatus $synced)"
             if [[ "$arg_verbose" == "true" ]] ; then
                 echo -n -e "${COLOR_YAML}"
-                kubectl --kubeconfig <(echo "${cp_kubeconfig[$j]}") get managedclusters $name -o jsonpath='{.metadata.labels}' | jq '. |= with_entries(select(.key|(contains("open-cluster-management")|not)))' | indent
+                KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedclusters $name -o jsonpath='{.metadata.labels}' | jq '. |= with_entries(select(.key|(contains("open-cluster-management")|not)))' | indent
                 echo -n -e "${COLOR_NONE}"
             fi
             if [[ "$arg_yaml" == "true" ]] ; then
-                mkdir -p "$output_folder/${cp_name[$j]}/managed-clusters"
-                kubectl --kubeconfig <(echo "${cp_kubeconfig[$j]}") get managedcluster $name -o yaml > "$output_folder/${cp_name[$j]}/managed-clusters/$name.yaml"
+                mkdir -p "$OUTPUT_FOLDER/${cp_name[$j]}/managed-clusters"
+                KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o yaml > "$OUTPUT_FOLDER/${cp_name[$j]}/managed-clusters/$name.yaml"
             fi
             mc_n=$((mc_n+1))
         done
@@ -451,13 +463,13 @@ done
 
 
 ###############################################################################
-# Listing binding policies
+# Listing Binding Policies
 ###############################################################################
 echotitle "Binding Policies:"
 bp_n=0
 for j in "${!cp_pch[@]}" ; do
     if [[ "${cp_pch[$j]}" == "wds" ]] ; then
-        bps=($(kubectl --kubeconfig <(echo "${cp_kubeconfig[$j]}") get bindingpolicy -no-headers -o name 2> /dev/null || true))
+        bps=($(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindingpolicy -no-headers -o name 2> /dev/null || true))
         for i in "${!bps[@]}" ; do
             name=${bps[i]##*/}
             bp_cp[bp_n]="${cp_name[$j]}"
@@ -465,12 +477,12 @@ for j in "${!cp_pch[@]}" ; do
             echo -e "- ${COLOR_INFO}${bp_name[bp_n]}${COLOR_NONE} in control plane ${COLOR_INFO}${bp_cp[bp_n]}${COLOR_NONE}"
             if [[ "$arg_verbose" == "true" ]] ; then
                 echo -n -e "${COLOR_YAML}"
-                kubectl --kubeconfig <(echo "${cp_kubeconfig[$j]}") get bindingpolicy ${bp_name[bp_n]} -o jsonpath='{.spec}' | jq '.' | indent || true
+                KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindingpolicy ${bp_name[bp_n]} -o jsonpath='{.spec}' | jq '.' | indent || true
                 echo -n -e "${COLOR_NONE}"
             fi
             if [[ "$arg_yaml" == "true" ]] ; then
-                mkdir -p "$output_folder/${bp_cp[bp_n]}/binding-politcies"
-                kubectl --kubeconfig <(echo "${cp_kubeconfig[$j]}") get bindingpolicy ${bp_name[bp_n]} -o yaml > "$output_folder/${bp_cp[bp_n]}/binding-politcies/$name.yaml"
+                mkdir -p "$OUTPUT_FOLDER/${bp_cp[bp_n]}/binding-politcies"
+                KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindingpolicy ${bp_name[bp_n]} -o yaml > "$OUTPUT_FOLDER/${bp_cp[bp_n]}/binding-politcies/$name.yaml"
             fi
             bp_n=$((bp_n+1))
         done
@@ -485,13 +497,13 @@ echotitle "Manifest Works:"
 mw_n=0
 for h in "${!cp_pch[@]}" ; do
     if [[ "${cp_pch[$h]}" == "its" ]] ; then
-        ns=($(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") get ns -no-headers -o name 2> /dev/null || true))
+        ns=($(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl get ns -no-headers -o name 2> /dev/null || true))
         for j in "${!ns[@]}" ; do
             cluster=${ns[j]##*/}
-            mws=($(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get manifestwork --no-headers -o name 2> /dev/null || true))
+            mws=($(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get manifestwork --no-headers -o name 2> /dev/null || true))
             for i in "${!mws[@]}" ; do
                 name="${mws[i]##*/}"
-                origin="$(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get manifestwork $name -o jsonpath='{.metadata.labels.transport\.kubestellar\.io\/originWdsName}' 2> /dev/null || true)"
+                origin="$(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get manifestwork $name -o jsonpath='{.metadata.labels.transport\.kubestellar\.io\/originWdsName}' 2> /dev/null || true)"
                 if [[ "$origin" == "" ]] ; then
                     continue
                 fi
@@ -499,16 +511,16 @@ for h in "${!cp_pch[@]}" ; do
                 mw_name[mw_n]="$name"
                 mw_cluster[mw_n]="$cluster"
                 mw_origin[mw_n]="$origin"
-                mw_binding[mw_n]="$(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get manifestwork ${mw_name[mw_n]} -o jsonpath='{.metadata.labels.transport\.kubestellar\.io\/originOwnerReferenceBindingKey}')"
+                mw_binding[mw_n]="$(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get manifestwork ${mw_name[mw_n]} -o jsonpath='{.metadata.labels.transport\.kubestellar\.io\/originOwnerReferenceBindingKey}')"
                 echo -e "- ${COLOR_INFO}${mw_name[mw_n]}${COLOR_NONE} in cp=${COLOR_INFO}${mw_cp[mw_n]}${COLOR_NONE}, namespace=${COLOR_INFO}${mw_cluster[mw_n]}${COLOR_NONE}: ${COLOR_INFO}${mw_origin[mw_n]}${COLOR_NONE} --> ${COLOR_INFO}${mw_binding[mw_n]}${COLOR_NONE} --> ${COLOR_INFO}${mw_cluster[mw_n]}${COLOR_NONE}"
                 if [[ "$arg_verbose" == "true" ]] ; then
                     echo -n -e "${COLOR_YAML}"
-                    kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get manifestwork $name -o jsonpath='{.spec.workload.manifests}' | jq '.[] | {"apiVersion", "kind", "metadata"} | (.name = .metadata.name) | del(.metadata)' | indent || true
+                    KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get manifestwork $name -o jsonpath='{.spec.workload.manifests}' | jq '.[] | {"apiVersion", "kind", "metadata"} | (.name = .metadata.name) | del(.metadata)' | indent || true
                     echo -n -e "${COLOR_NONE}"
                 fi
                 if [[ "$arg_yaml" == "true" ]] ; then
-                    mkdir -p "$output_folder/${cp_name[$h]}/manifest-works/$cluster"
-                    kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get manifestwork $name -o yaml > "$output_folder/${cp_name[$h]}/manifest-works/$cluster/$name.yaml"
+                    mkdir -p "$OUTPUT_FOLDER/${cp_name[$h]}/manifest-works/$cluster"
+                    KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get manifestwork $name -o yaml > "$OUTPUT_FOLDER/${cp_name[$h]}/manifest-works/$cluster/$name.yaml"
                 fi
                 mw_n=$((mw_n+1))
             done
@@ -524,13 +536,13 @@ echotitle "Work Statuses:"
 sw_n=0
 for h in "${!cp_pch[@]}" ; do
     if [[ "${cp_pch[$h]}" == "its" ]] ; then
-        ns=($(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") get ns -no-headers -o name 2> /dev/null || true))
+        ns=($(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl get ns -no-headers -o name 2> /dev/null || true))
         for j in "${!ns[@]}" ; do
             cluster=${ns[j]##*/}
-            sws=($(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses --no-headers -o name 2> /dev/null || true))
+            sws=($(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get workstatuses --no-headers -o name 2> /dev/null || true))
             for i in "${!sws[@]}" ; do
                 name="${sws[i]##*/}"
-                origin="$(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses $name -o jsonpath='{.metadata.labels.transport\.kubestellar\.io\/originWdsName}' 2> /dev/null || true)"
+                origin="$(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get workstatuses $name -o jsonpath='{.metadata.labels.transport\.kubestellar\.io\/originWdsName}' 2> /dev/null || true)"
                 if [[ "$origin" == "" ]] ; then
                     continue
                 fi
@@ -538,18 +550,18 @@ for h in "${!cp_pch[@]}" ; do
                 sw_name[sw_n]="$name"
                 sw_cluster[sw_n]="$cluster"
                 sw_origin[sw_n]="$origin"
-                sw_binding[sw_n]="$(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses ${sw_name[sw_n]} -o jsonpath='{.metadata.labels.transport\.kubestellar\.io\/originOwnerReferenceBindingKey}')"
+                sw_binding[sw_n]="$(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get workstatuses ${sw_name[sw_n]} -o jsonpath='{.metadata.labels.transport\.kubestellar\.io\/originOwnerReferenceBindingKey}')"
                 echo -n -e "- ${COLOR_INFO}${sw_name[sw_n]}${COLOR_NONE} in cp=${COLOR_INFO}${sw_cp[sw_n]}${COLOR_NONE}, namespace=${COLOR_INFO}${sw_cluster[sw_n]}${COLOR_NONE}, status="
-                echo -n $(echostatus $(kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses $name -o jsonpath='{.status.phase}' || true))
+                echo -n $(echostatus $(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get workstatuses $name -o jsonpath='{.status.phase}' || true))
                 echo -e ": ${COLOR_INFO}${sw_cluster[sw_n]}${COLOR_NONE} --> ${COLOR_INFO}${sw_binding[sw_n]}${COLOR_NONE} --> ${COLOR_INFO}${sw_origin[sw_n]}${COLOR_NONE}"
                 if [[ "$arg_verbose" == "true" ]] ; then
                     echo -n -e "${COLOR_YAML}"
-                    kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses $name -o jsonpath='{.spec.sourceRef}' | jq '.' | indent || true
+                    KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get workstatuses $name -o jsonpath='{.spec.sourceRef}' | jq '.' | indent || true
                     echo -n -e "${COLOR_NONE}"
                 fi
                 if [[ "$arg_yaml" == "true" ]] ; then
-                    mkdir -p "$output_folder/${cp_name[$h]}/work-statuses/$cluster"
-                    kubectl --kubeconfig <(echo "${cp_kubeconfig[$h]}") --namespace $cluster get workstatuses $name -o yaml > "$output_folder/${cp_name[$h]}/work-statuses/$cluster/$name.yaml"
+                    mkdir -p "$OUTPUT_FOLDER/${cp_name[$h]}/work-statuses/$cluster"
+                    KUBECONFIG="${cp_kubeconfig[$h]}" kubectl --namespace $cluster get workstatuses $name -o yaml > "$OUTPUT_FOLDER/${cp_name[$h]}/work-statuses/$cluster/$name.yaml"
                 fi
                 sw_n=$((sw_n+1))
             done
@@ -563,5 +575,5 @@ done
 ###############################################################################
 if [[ "$arg_logs" == "true" || "$arg_yaml" == "true" ]] ; then
     echov -e "\nSaving logs and/or YAML to ${COLOR_INFO}./kubestellar-snapshot.tar.gz${COLOR_NONE}"
-    tar czf kubestellar-snapshot.tar.gz -C "$output_folder" .
+    tar czf kubestellar-snapshot.tar.gz -C "$OUTPUT_FOLDER" .
 fi
