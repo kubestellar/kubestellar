@@ -23,7 +23,6 @@ matrix:
       - title      
       - text
   - pyspelling.filters.text:      
-      linebreaks: true
       encoding: utf-8
   sources:
   - '**/*.md'
