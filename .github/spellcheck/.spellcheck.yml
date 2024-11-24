@@ -7,8 +7,24 @@ matrix:
     - .github/spellcheck/.wordlist.txt
     encoding: utf-8
   pipeline:
-  - pyspelling.filters.markdown:
-  - pyspelling.filters.text:
+  - pyspelling.filters.markdown:  
+  - pyspelling.filters.html:
+      comments: false
+      ignores:
+      - code
+      - pre
+      - script
+      - style
+      - a
+      - img
+      - href
+      - meta
+      - svg
+      - title      
+      - text
+  - pyspelling.filters.text:      
+      linebreaks: true
+      encoding: utf-8
   sources:
   - '**/*.md'
   default_encoding: utf-8
