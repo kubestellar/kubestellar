@@ -22,8 +22,7 @@ matrix:
       - svg
       - title      
       - text
-  - pyspelling.filters.text:      
-      encoding: utf-8
+  - pyspelling.filters.text:
   sources:
   - '**/*.md'
   default_encoding: utf-8
