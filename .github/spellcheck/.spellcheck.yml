@@ -25,4 +25,6 @@ matrix:
   - pyspelling.filters.text:
   sources:
   - '**/*.md'
+  exclude:
+  - '**/GOVERNANCE.md'
   default_encoding: utf-8
