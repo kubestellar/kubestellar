@@ -274,11 +274,12 @@ echov "Validating contexts(s): "
 valid_contexts=()
 for context in "${contexts[@]}" ; do # for all contexts
     [[ -z "$context" ]] && continue
+    [[ "$context" == "$(kubectl config current-context || true)" ]] && cc="*" || cc=""
     if kubectl --context $context get secrets -A > /dev/null 2>&1 ; then
-        echov -e "${COLOR_GREEN}\xE2\x9C\x94${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
-        valid_contexts+=($context)
+        echov -e "${COLOR_GREEN}\xE2\x9C\x94${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE} ${COLOR_GREEN}$cc${COLOR_NONE}"
+        [[ -z "$cc" ]] && valid_contexts+=("$context") || valid_contexts=("$context" "${valid_contexts[@]}")
     else
-        echov -e "${COLOR_RED}X${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE}"
+        echov -e "${COLOR_RED}X${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE} ${COLOR_GREEN}$cc${COLOR_NONE}"
     fi
 done
 
