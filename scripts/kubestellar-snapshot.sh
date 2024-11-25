@@ -21,7 +21,7 @@ set -e
 # Global variables
 TIMESTAMP="$(date +%F_%T)"
 TMPFOLDER="$(mktemp -d -p . "kubestellar-snapshot-XXXX")"
-trap 'rm -rf -- "$TMPFOLDER"' EXIT
+trap 'rm -rf "$TMPFOLDER"' EXIT
 OUTPUT_FOLDER="$TMPFOLDER/kubestellar-snapshot"
 
 
@@ -70,10 +70,10 @@ Options:
 -X                         enable verbose execution for debugging
 
 Note 1: This script expects that KubeStellar was installed with its Helm chart and
-        to find the latter in the host or provided kubeconfig(s) and context(s).
+        tries to find the latter in a context of the relevant kubeconfig.
 
 Note 2: After piping the output of the script to file use "more"
-        to inspect the file content in color. ALternatively install
+        to inspect the file content in color. Alternatively install
         "ansi2txt" and pipe the script through it to remove escape
         characters and obtain a plan text report.
 EOF
@@ -271,10 +271,11 @@ if [[ -z "${contexts[@]}" ]] ; then
 fi
 
 echov "Validating contexts(s): "
+KURRENT_CONTEXT="$(kubectl config current-context || true)"
 valid_contexts=()
 for context in "${contexts[@]}" ; do # for all contexts
     [[ -z "$context" ]] && continue
-    [[ "$context" == "$(kubectl config current-context || true)" ]] && cc="*" || cc=""
+    [[ "$context" == "$KURRENT_CONTEXT" ]] && cc="*" || cc=""
     if kubectl --context $context get secrets -A > /dev/null 2>&1 ; then
         echov -e "${COLOR_GREEN}\xE2\x9C\x94${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE} ${COLOR_GREEN}$cc${COLOR_NONE}"
         [[ -z "$cc" ]] && valid_contexts+=("$context") || valid_contexts=("$context" "${valid_contexts[@]}")
@@ -294,9 +295,8 @@ fi
 ###############################################################################
 echotitle "KubeStellar:"
 helm_context=""
+more_than_one="false"
 for context in "${valid_contexts[@]}" ; do
-    HELM_LIST="$TMPFOLDER/helm-list.txt"
-    helm --kube-context $context list --no-headers -A 2> /dev/null > "$HELM_LIST" || true
     while IFS= read -r line; do
         [[ -z "$line" ]] && continue
         name="$(echo "$line" | awk '{print $1}')"
@@ -305,23 +305,28 @@ for context in "${valid_contexts[@]}" ; do
         secret="$(kubectl --context $context get secret -n "$namespace" -l "owner=helm,name=$name" --no-headers -o name 2> /dev/null || true)"
         secret="${secret##*/}"
         if [[ ! -z "$(kubectl --context $context get secret $secret -n "$namespace" -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.chart.metadata.description' | grep -i "KubeStellar" 2> /dev/null || true)" ]] ; then
-            helm_context="$context"
             echo -e "- Helm chart ${COLOR_INFO}${name}${COLOR_NONE} (${COLOR_INFO}v${version}${COLOR_NONE}) in namespace ${COLOR_INFO}${namespace}${COLOR_NONE} in context ${COLOR_INFO}${context}${COLOR_NONE}"
             echo -e "  - Secret=${COLOR_INFO}${secret}${COLOR_NONE} in namespace ${COLOR_INFO}${namespace}${COLOR_NONE}"
-            if [[ "$arg_yaml" == "true" ]] ; then
-                mkdir -p "$OUTPUT_FOLDER/kubestellar-core-chart"
-                kubectl --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.info'      > "$OUTPUT_FOLDER/kubestellar-core-chart/info.json"
-                kubectl --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.chart'     > "$OUTPUT_FOLDER/kubestellar-core-chart/chart.json"
-                kubectl --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.manifest'  > "$OUTPUT_FOLDER/kubestellar-core-chart/manifest.yaml"
+            if [[ -z "$helm_context" ]] ; then
+                helm_context="$context"
+                if [[ "$arg_yaml" == "true" ]] ; then
+                    mkdir -p "$OUTPUT_FOLDER/kubestellar-core-chart"
+                    kubectl --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.info'      > "$OUTPUT_FOLDER/kubestellar-core-chart/info.json"
+                    kubectl --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.chart'     > "$OUTPUT_FOLDER/kubestellar-core-chart/chart.json"
+                    kubectl --context $helm_context get secret $secret -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.manifest'  > "$OUTPUT_FOLDER/kubestellar-core-chart/manifest.yaml"
+                fi
+            else
+                more_than_one="true"
             fi
-            break
         fi
-    done < "$HELM_LIST"
-    [[ ! -z "$helm_context" ]] && break
+    done <<< "$(helm --kube-context $context list --no-headers -A 2> /dev/null || true)"
 done
-if [[ "$helm_context" == "" ]] ; then
-    echoerr "Helm chart was not found in any of the context(s)!"
+if [[ -z "$helm_context" ]] ; then
+    echoerr "KubeStellar Helm chart was not found in any of the context(s)!"
     exit 1
+elif [[ "$more_than_one" == "true" ]] ; then
+    echo -e "${COLOR_WARNING}WARNING: found more than one Helm chart for KubeStellar... using the first one!${COLOR_NONE}"
+
 fi
 
 
