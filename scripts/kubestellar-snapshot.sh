@@ -20,7 +20,7 @@ set -e
 
 # Global variables
 TIMESTAMP="$(date +%F_%T)"
-TMPFOLDER="$(mktemp -d --tmpdir "kubestellar-snapshot-XXXX")"
+TMPFOLDER="$(mktemp -d -p . "kubestellar-snapshot-XXXX")"
 trap 'rm -rf -- "$TMPFOLDER"' EXIT
 OUTPUT_FOLDER="$TMPFOLDER/kubestellar-snapshot"
 
@@ -136,7 +136,7 @@ is_installed() {
 
 # Get the kubeconfig of a particular Control Plane
 get_kubeconfig() {
-    context="$1" # context in the host kubeconfig or the config passed to the script using --kubeconfig flag
+    context="$1" # context in the relevant kubeconfig
     cp_name="$2" # name of the Control Plane
     cp_type="$3" # type of the Control Plane
 
@@ -217,7 +217,7 @@ fi
 ###############################################################################
 # Script info
 ###############################################################################
-echov -e "${COLOR_INFO}$(${BASH_SOURCE[0]} --version)${COLOR_NONE}\n"
+echov -e "${COLOR_INFO}${SCRIPT_NAME} v${SCRIPT_VERSION}{COLOR_NONE}\n"
 echov -e "Script run on ${COLOR_INFO}$TIMESTAMP${COLOR_NONE}"
 
 
@@ -303,7 +303,7 @@ for context in "${valid_contexts[@]}" ; do
         version="$(echo "$line" | awk '{print $NF}')"
         secret="$(kubectl --context $context get secret -n "$namespace" -l "owner=helm,name=$name" --no-headers -o name 2> /dev/null || true)"
         secret="${secret##*/}"
-        if [[ ! -z "$(kubectl --context $context get secret $secret -n "$namespace" -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.chart' | grep -i "KubeStellar" 2> /dev/null || true)" ]] ; then
+        if [[ ! -z "$(kubectl --context $context get secret $secret -n "$namespace" -o jsonpath='{.data.release}' | base64 -d | base64 -d | gzip -d | jq -r '.chart.metadata.description' | grep -i "KubeStellar" 2> /dev/null || true)" ]] ; then
             helm_context="$context"
             echo -e "- Helm chart ${COLOR_INFO}${name}${COLOR_NONE} (${COLOR_INFO}v${version}${COLOR_NONE}) in namespace ${COLOR_INFO}${namespace}${COLOR_NONE} in context ${COLOR_INFO}${context}${COLOR_NONE}"
             echo -e "  - Secret=${COLOR_INFO}${secret}${COLOR_NONE} in namespace ${COLOR_INFO}${namespace}${COLOR_NONE}"
@@ -374,7 +374,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     echo -e "- ${COLOR_INFO}${cp_name[cp_n]}${COLOR_NONE}: type=${COLOR_INFO}${cp_type[cp_n]}${COLOR_NONE}, pch=${COLOR_INFO}${cp_pch[cp_n]}${COLOR_NONE}, context=${COLOR_INFO}${cp_context[cp_n]}${COLOR_NONE}, namespace=${COLOR_INFO}${cp_name[cp_n]}-system${COLOR_NONE}"
     if [[ -z "$cp_kubeconfig_content" ]] ; then
         cp_kubeconfig[cp_n]=""
-        echo -e "  ${COLOR_WARNING}WARNING: the Control plane is no ready, the kubeconfig is not available!${COLOR_NONE}"
+        echo -e "  ${COLOR_WARNING}WARNING: the Control Plane is not ready, the kubeconfig is not available!${COLOR_NONE}"
     else
         cp_kubeconfig[cp_n]="$TMPFOLDER/$name-kubeconfig"
         echo "$cp_kubeconfig_content" > "${cp_kubeconfig[cp_n]}"
