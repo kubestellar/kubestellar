@@ -83,7 +83,7 @@ if [[ "$prefetch" == "true" ]] ; then
     echo -n "Prefetching image: \"${image}\"... "
     docker pull "${image}" -q &
     prefetch_pids+=("$!")
-    echo "pid=${prefetch_pids[-1]}"
+    echo "pid=${prefetch_pids[${#prefetch_pids[@]}-1]}"
   done
 fi
 
