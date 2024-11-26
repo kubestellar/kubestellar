@@ -81,7 +81,7 @@ if [[ "$prefetch" == "true" ]] ; then
   IFS=' ' read -r -a prefetch_images <<< "$(echo "$nginx_ingress" | grep 'image: ' | awk '{print $2}' | uniq | tr '\n' ' ')"
   for image in "${prefetch_images[@]}" ; do
     echo -n "Prefetching image: \"${image}\"... "
-    docker pull "${image}" > /dev/null &
+    docker pull "${image}" -q &
     prefetch_pids+=("$!")
     echo "pid=${prefetch_pids[-1]}"
   done
