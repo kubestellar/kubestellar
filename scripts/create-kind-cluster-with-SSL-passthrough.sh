@@ -17,18 +17,21 @@
 
 set -o errexit
 
+NGINX_INGRESS_URL="https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml"
 name=kubestellar
 port=9443
 wait=true
+prefetch=false
 setcontext=true
 
 display_help() {
   cat << EOF
-Usage: $0 [--name name] [--port port] [--nowait] [--nosetcontext] [-X]
+Usage: $0 [options]
 
 --name name     set a specific name of the kind cluster (default: kubestellar)
 --port port     map the specified host port to the kind cluster port 443 (default: 9443)
 --nowait        when set to true, the script proceeds without waiting for the nginx ingress patching to complete
+--prefetch      prefetch the nginx ingress images for the kind cluster while the kind cluster is being created
 --nosetcontext  when set to true, the script does not change the current kubectl context to the newly created cluster
 -X              enable verbose execution of the script for debugging
 EOF
@@ -48,6 +51,8 @@ while (( $# > 0 )); do
     fi;;
   (--nowait)
     wait=false;;
+  (--prefetch)
+    prefetch=true;;
   (--nosetcontext)
     setcontext=false;;
   (-X)
@@ -65,8 +70,29 @@ while (( $# > 0 )); do
   shift
 done
 
+
+###############################################################################
+# Prefetch the images required by nginx ingress
+###############################################################################
+prefetch_images=()
+prefetch_pids=()
+if [[ "$prefetch" == "true" ]] ; then
+  nginx_ingress="$(curl --no-progress-meter "$NGINX_INGRESS_URL" | sed 's/@sha256.*$//')"
+  IFS=' ' read -r -a prefetch_images <<< "$(echo "$nginx_ingress" | grep 'image: ' | awk '{print $2}' | uniq | tr '\n' ' ')"
+  for image in "${prefetch_images[@]}" ; do
+    echo -n "Prefetching image: \"${image}\"... "
+    docker pull "${image}" -q &
+    prefetch_pids+=("$!")
+    echo "pid=${prefetch_pids[${#prefetch_pids[@]}-1]}"
+  done
+fi
+
+
+###############################################################################
+# Create the kind cluster
+###############################################################################
 echo "Creating \"${name}\" kind cluster with SSL passthrougn and ${port} port mapping..."
-if [[ "$(kind get clusters | grep "^${name}$")" == "" ]] ; then
+if [[ -z "$(kind get clusters | grep "^${name}$")" ]] ; then
   kind create cluster --name "${name}" --config - <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -87,8 +113,34 @@ else
   echo "Skipping... \"${name}\" kind cluster already exists."
 fi
 
+
+###############################################################################
+# Waiting for prefetching to complete... load images into cluster
+###############################################################################
+if [[ "$prefetch" == "true" ]] ; then
+  for i in "${!prefetch_pids[@]}" ; do
+    echo -n "Waiting for prefetch process with pid=${prefetch_pids[i]} to complete... "
+    wait ${prefetch_pidss[i]}
+    exitcode="$?"
+    echo  "exitcode=$exitcode"
+    if [[ "$exitcode" != "0" ]] ; then
+      >&2 echo "ERROR: prefetch process failed!"
+    fi
+    echo "Loading image \"${prefetch_images[i]}\"to the cluster..."
+    kind load docker-image "${prefetch_images[i]}" --name "$name"
+  done
+fi
+
+
+###############################################################################
+# Installing nginx ingress
+###############################################################################
 echo "Installing an nginx ingress..."
-kubectl --context "kind-${name}" apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+if [[ "$prefetch" == "true" ]] ; then
+  echo "$nginx_ingress" | kubectl --context "kind-${name}" apply -f -
+else
+  kubectl --context "kind-${name}" apply -f "$NGINX_INGRESS_URL"
+fi
 
 echo "Pathcing nginx ingress to enable SSL passthrough..."
 kubectl --context "kind-${name}" patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","args":["/nginx-ingress-controller","--election-id=ingress-nginx-leader","--controller-class=k8s.io/ingress-nginx","--ingress-class=nginx","--configmap=$(POD_NAMESPACE)/ingress-nginx-controller","--validating-webhook=:8443","--validating-webhook-certificate=/usr/local/certificates/cert","--validating-webhook-key=/usr/local/certificates/key","--watch-ingress-without-class=true","--publish-status-address=localhost","--enable-ssl-passthrough"]}]}}}}'
@@ -104,6 +156,10 @@ if [[ "$wait" == "true" ]] ; then
     --timeout=24h
 fi
 
+
+###############################################################################
+# Setting context
+###############################################################################
 if [[ "$setcontext" == "true" ]] ; then
   echo "Setting context to \"kind-${name}\"..."
   kubectl config use-context "kind-${name}"
