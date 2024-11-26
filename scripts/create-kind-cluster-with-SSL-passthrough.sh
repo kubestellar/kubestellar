@@ -18,7 +18,6 @@
 set -o errexit
 
 NGINX_INGRESS_URL="https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml"
-NGINX_INGRESS_FILE="/tmp/nginx-ingress.yaml"
 name=kubestellar
 port=9443
 wait=true
@@ -78,8 +77,8 @@ done
 prefetch_images=()
 prefetch_pids=()
 if [[ "$prefetch" == "true" ]] ; then
-  curl -s "$NGINX_INGRESS_URL" | sed 's/@sha256.*$//' > "$NGINX_INGRESS_FILE"
-  IFS=' ' read -r -a prefetch_images <<< "$(cat $NGINX_INGRESS_FILE | grep 'image: ' | awk '{print $2}' | uniq | tr '\n' ' ')"
+  nginx_ingress="$(curl --no-progress-meter "$NGINX_INGRESS_URL" | sed 's/@sha256.*$//')"
+  IFS=' ' read -r -a prefetch_images <<< "$(echo "$nginx_ingress" | grep 'image: ' | awk '{print $2}' | uniq | tr '\n' ' ')"
   for image in "${prefetch_images[@]}" ; do
     echo -n "Prefetching image: \"${image}\"... "
     docker pull "${image}" > /dev/null &
@@ -93,7 +92,7 @@ fi
 # Create the kind cluster
 ###############################################################################
 echo "Creating \"${name}\" kind cluster with SSL passthrougn and ${port} port mapping..."
-if [[ "$(kind get clusters | grep "^${name}$")" == "" ]] ; then
+if [[ -z "$(kind get clusters | grep "^${name}$")" ]] ; then
   kind create cluster --name "${name}" --config - <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -138,7 +137,7 @@ fi
 ###############################################################################
 echo "Installing an nginx ingress..."
 if [[ "$prefetch" == "true" ]] ; then
-  kubectl --context "kind-${name}" apply -f "$NGINX_INGRESS_FILE"
+  echo "$nginx_ingress" | kubectl --context "kind-${name}" apply -f -
 else
   kubectl --context "kind-${name}" apply -f "$NGINX_INGRESS_URL"
 fi
