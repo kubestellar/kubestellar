@@ -1,0 +1,24 @@
+name: Add sbom
+
+on:
+    workflow_run:
+        workflows: [test-latest-release]
+        types: [completed]
+
+jobs:
+    add-sbom:
+        name: Add SBOM
+        runs-on: ubuntu-latest
+        if: ${{github.event.workflow_run.conclusion=='success'}}
+        steps:
+            - name: checkout code
+              uses: actions/checkout@v4
+
+            - uses: advanced-security/sbom-generator-action@v0.0.1
+              id: sbom
+              env: 
+                    GITHUB_TOKEN: ${{ github.token }}
+            - uses: actions/upload-artifact@v3.1.0
+              with: 
+                path: ${{steps.sbom.outputs.fileName }}
+                name: "SBOM"
