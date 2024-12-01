@@ -1,7 +1,8 @@
 name: Add sbom
 
 on:
-    workflow_run:
+  workflow_dispatch:
+  workflow_run:
         workflows: [test-latest-release]
         types: [completed]
 
