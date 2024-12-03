@@ -16,12 +16,14 @@ on:
   pull_request:
     branches:
       - main
+      - 'release-*'
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
   push:
     branches:
       - main
+      - 'release-*'
     tags:
       - 'v*'
     paths-ignore:
