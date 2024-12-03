@@ -26,6 +26,8 @@ type ConditionType string
 const (
 	TypeReady  ConditionType = "Ready"
 	TypeSynced ConditionType = "Synced"
+	// TypeStatusCollectorsAvailable indicates whether all required statuscollectors of the bindingpolicy are available.
+	TypeStatusCollectorsAvailable ConditionType = "StatusCollectorsAvailable"
 )
 
 type ConditionReason string
