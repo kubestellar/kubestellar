@@ -496,7 +496,7 @@ func (c *genericTransportController) processNextWorkItem(ctx context.Context) bo
 			logger.V(4).Info("Processed workqueue item successfully.", "item", obj, "itemType", fmt.Sprintf("%T", obj))
 		} else if retry {
 			c.workqueue.AddRateLimited(obj)
-			logger.V(4).Info("Encountered transient error while processing workqueue item; do not be alarmed, this will be retried later", "item", obj, "itemType", fmt.Sprintf("%T", obj))
+			logger.V(4).Info("Encountered transient error while processing workqueue item; do not be alarmed, this will be retried later", "item", obj, "itemType", fmt.Sprintf("%T", obj), "err", err)
 		} else {
 			c.workqueue.Forget(obj)
 			logger.Error(err, "Failed to process workqueue item", "item", obj, "itemType", fmt.Sprintf("%T", obj))
