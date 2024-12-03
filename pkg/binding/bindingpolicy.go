@@ -19,14 +19,17 @@ package binding
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/go-logr/logr"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -87,6 +90,21 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 		logger.V(5).Info("Enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
 		c.enqueueBinding(bindingPolicy.GetName())
 
+		statusCollectorNames, err := c.identifyMissingStatusCollectors(bindingPolicy)
+		if err != nil {
+			return fmt.Errorf("failed to identify missing StatusCollector(s) for BindingPolicy %s: %w", bindingPolicyName, err)
+		}
+
+		// If at least one StatusCollector object is missing, use a Condition to indicate the missing object and requeue the BindingPolicy,
+		// o.w. use the Condition to indicate all StatusCollector object(s) are available and proceed
+		if err = c.createOrUpdateStatusCollectorAvailableCondition(ctx, bindingPolicy, statusCollectorNames); err != nil {
+			return fmt.Errorf("failed to update status for BindingPolicy %s: %w", bindingPolicyName, err)
+		}
+		if len(statusCollectorNames) > 0 {
+			logger.V(4).Info("Missing StatusCollector(s)", "statusCollectorNames", statusCollectorNames, "bindingPolicyName", bindingPolicyName)
+			return fmt.Errorf("failed to sync BindingPolicy %s because StatusCollector(s) %s are missing", bindingPolicyName, statusCollectorNames)
+		}
+
 		// requeue all objects to account for changes in bindingpolicy.
 		// this does not include bindingpolicy/binding objects.
 		return c.requeueWorkloadObjects(ctx, bindingPolicy.Name)
@@ -98,6 +116,73 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 	}
 
 	return c.deleteResolutionForBindingPolicy(ctx, bindingPolicyName)
+}
+
+func (c *Controller) createOrUpdateStatusCollectorAvailableCondition(ctx context.Context, bp *v1alpha1.BindingPolicy, missingSCs []string) error {
+	// compose tentative condition where LastTransitionTime is TBD
+	conditionTentative := v1alpha1.BindingPolicyCondition{}
+	if len(missingSCs) != 0 {
+		conditionTentative = v1alpha1.BindingPolicyCondition{
+			Type:    v1alpha1.TypeStatusCollectorsAvailable,
+			Status:  corev1.ConditionFalse,
+			Reason:  v1alpha1.ReasonReconcileError,
+			Message: fmt.Sprintf("Missing StatusCollector(s) %s", missingSCs),
+		}
+	} else {
+		conditionTentative = v1alpha1.BindingPolicyCondition{
+			Type:    v1alpha1.TypeStatusCollectorsAvailable,
+			Status:  corev1.ConditionTrue,
+			Reason:  v1alpha1.ReasonReconcileSuccess,
+			Message: "All StatusCollector(s) are available",
+		}
+	}
+	// check whether bp already has a condition that is the same (excluding LastTransitionTime) as the tentative one
+	hasSame := false
+	for _, conditionActual := range bp.Status.Conditions {
+		if v1alpha1.AreConditionsEqual(conditionActual, conditionTentative) {
+			hasSame = true
+			break
+		}
+	}
+	// create or update if necessary
+	if hasSame {
+		return nil
+	}
+	conditionTentative.LastTransitionTime = metav1.Now()
+	policyWithProposedStatus := bp.DeepCopy()
+	policyWithProposedStatus.Status = v1alpha1.BindingPolicyStatus{
+		ObservedGeneration: bp.Generation,
+		Conditions:         v1alpha1.SetCondition(bp.Status.Conditions, conditionTentative),
+	}
+	if _, err := c.bindingPolicyClient.UpdateStatus(ctx, policyWithProposedStatus, metav1.UpdateOptions{FieldManager: ControllerName}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// identifyMissingStatusCollectors finds all missing StatusCollector objects for bp.
+// If an error other than "not found" occurs, identifyMissingStatusCollectors returns a nil slice and the error;
+// otherwise, identifyMissingStatusCollectors returns a slice of StatusCollector object names and a nil error.
+func (c *Controller) identifyMissingStatusCollectors(bp *v1alpha1.BindingPolicy) ([]string, error) {
+	statusCollectorNames := sets.New[string]()
+	for _, clause := range bp.Spec.Downsync {
+		for _, statusCollectorName := range clause.DownsyncModulation.StatusCollectors {
+			if _, err := c.statusCollectorLister.Get(statusCollectorName); err != nil {
+				if errors.IsNotFound(err) {
+					statusCollectorNames = statusCollectorNames.Insert(statusCollectorName)
+				} else {
+					return nil, err
+				}
+			}
+		}
+	}
+	nameList := sets.List(statusCollectorNames)
+	// Sort the names so that the string represenation of the list is deterministic,
+	// which is a useful property when comparing a tentive Condition with an existing Condition before updating.
+	// Technically, nameList is already sorted according to the doc of sets.List,
+	// but it is no harm to be defensive against possible (and out-of-control) API changes of set.List.
+	sort.Strings(nameList)
+	return nameList, nil
 }
 
 func (c *Controller) deleteResolutionForBindingPolicy(ctx context.Context, bindingPolicyName string) error {

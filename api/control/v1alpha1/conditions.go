@@ -26,6 +26,8 @@ type ConditionType string
 const (
 	TypeReady  ConditionType = "Ready"
 	TypeSynced ConditionType = "Synced"
+	// TypeStatusCollectorsAvailable indicates whether all required statuscollectors of the bindingpolicy are available.
+	TypeStatusCollectorsAvailable ConditionType = "StatusCollectorsAvailable"
 )
 
 type ConditionReason string
@@ -62,7 +64,7 @@ func AreConditionsEqual(c1, c2 BindingPolicyCondition) bool {
 	return true
 }
 
-// setCondition sets the supplied BindingPolicyCondition in
+// SetCondition sets the supplied BindingPolicyCondition in
 // the given slice of conditions, replacing any existing conditions of
 // the same type. Returns the updated slice of conditions.
 func SetCondition(conditions []BindingPolicyCondition, newCondition BindingPolicyCondition) []BindingPolicyCondition {
