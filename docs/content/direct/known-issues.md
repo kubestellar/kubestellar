@@ -1,5 +1,9 @@
 # Some known problems
 
+Here are some user and/or environment problems that we have seen.
+
+For bugs, see [the issues on GitHub](https://github.com/kubestellar/kubestellar/issues) and the [release notes](release-notes.md).
+
 ## Wrong value stuck in hidden kflex state in kubeconfig
 
 The symptom is `kflex ctx ...` commands failing. See [Confusion due to hidden state in your kubeconfig](knownissue-kflex-extension.md).
