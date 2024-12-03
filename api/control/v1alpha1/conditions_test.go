@@ -66,6 +66,31 @@ func TestSetCondition(t *testing.T) {
 	}
 }
 
+func TestUnsetCondition(t *testing.T) {
+	conditions := []BindingPolicyCondition{
+		generateCondition("ConditionTypeA", "ReasonA", "MessageA",
+			corev1.ConditionFalse, metav1.Now()),
+		generateCondition("ConditionTypeB", "ReasonB", "MessageB",
+			corev1.ConditionTrue, metav1.Now()),
+	}
+
+	unsetType := "ConditionTypeA"
+	expectedConditions := conditions[1:]
+	actualConditions := UnsetCondition(conditions, ConditionType(unsetType))
+
+	if !AreConditionSlicesSame(actualConditions, expectedConditions) {
+		t.Errorf("UnsetCondition failed: expected %+v, got %+v", expectedConditions, actualConditions)
+	}
+
+	unsetType = "ConditionTypeC"
+	expectedConditions = conditions
+	actualConditions = UnsetCondition(conditions, ConditionType(unsetType))
+
+	if !AreConditionSlicesSame(actualConditions, expectedConditions) {
+		t.Errorf("UnsetCondition failed: expected %+v, got %+v", expectedConditions, actualConditions)
+	}
+}
+
 func TestAreConditionSlicesSame(t *testing.T) {
 	// Create two slices of conditions with the same elements in different orders
 	c1 := []BindingPolicyCondition{
