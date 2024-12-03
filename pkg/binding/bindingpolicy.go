@@ -27,7 +27,6 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -281,10 +280,4 @@ func SliceContains[Elt comparable](slice []Elt, seek Elt) bool {
 		}
 	}
 	return false
-}
-
-// pickSingleDestination sorts clusters by name and picks first cluster so that the choice is deterministic based on names
-// pickSingleDestination expects a non-empty clusterSet
-func pickSingleDestination(clusterSet sets.Set[string]) sets.Set[string] {
-	return sets.New(sets.List(clusterSet)[0])
 }
