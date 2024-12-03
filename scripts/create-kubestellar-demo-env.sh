@@ -31,7 +31,7 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         *)
             echo "Unknown parameter passed: $1"
-            echo "Usage: $0 [--platform <kind|k3d>]"
+            echo "Usage: $0 [--platform <kind|k3d>] [-X] [-h|--help]"
             exit 1
             ;;
     esac
@@ -127,19 +127,17 @@ command_exists() {
 echo -e "\nStarting environment clean up..."
 echo -e "Starting cluster clean up..."
 
-if [ "$k8s_platform" == "kind" ]; then
-    if command_exists "k3d"; then
-        cluster_clean_up "k3d cluster delete kubeflex" &
-        cluster_clean_up "k3d cluster delete cluster1" &
-        cluster_clean_up "k3d cluster delete cluster2" &
-        wait
-    fi
-    if command_exists "kind"; then
-        cluster_clean_up "kind delete cluster --name kubeflex" &
-        cluster_clean_up "kind delete cluster --name cluster1" &
-        cluster_clean_up "kind delete cluster --name cluster2" &
-        wait
-    fi
+if command_exists "k3d"; then
+    cluster_clean_up "k3d cluster delete kubeflex" &
+    cluster_clean_up "k3d cluster delete cluster1" &
+    cluster_clean_up "k3d cluster delete cluster2" &
+    wait
+fi
+if command_exists "kind"; then
+    cluster_clean_up "kind delete cluster --name kubeflex" &
+    cluster_clean_up "kind delete cluster --name cluster1" &
+    cluster_clean_up "kind delete cluster --name cluster2" &
+    wait
 fi
 
 wait
@@ -208,29 +206,31 @@ images=("ghcr.io/loft-sh/vcluster:0.16.4"
 
 for image in "${images[@]}"; do
     (
-        if [ "$k8s_platform" == "kind" ]; then
-            docker pull "$image" && kind load docker-image "$image" --name kubeflex
-        else
-            docker pull "$image" && k3d image import "$image" --cluster kubeflex
-        fi
+        docker pull "$image" 
     ) &
 done
 wait
 
+for image in "${images[@]}"; do
+    if [ "$k8s_platform" == "kind" ]; then
+        kind load docker-image "$image" --name kubeflex
+    else
+        k3d image import "$image" --cluster kubeflex
+    fi
+done
+
 echo -e "\nStarting the process to install KubeStellar core: $k8s_platform-kubeflex..."
-if [ "$k8s_platform" == "kind" ]; then
-    helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-        --version $kubestellar_version \
-        --set-json='ITSes=[{"name":"its1"}]' \
-        --set-json='WDSes=[{"name":"wds1"}]' \
-        --set-json='verbosity.default=5'
-else
-    helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-        --version $kubestellar_version \
-        --set-json='ITSes=[{"name":"its1"}]' \
-        --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
-        --set "kubeflex-operator.hostContainer=k3d-kubeflex-server-0"
+k3dHostContainer=""
+if [ "$k8s_platform" == "k3d" ]; then
+        k3dHostContainer='--set "kubeflex-operator.hostContainer=k3d-kubeflex-server-0"'
 fi
+
+helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
+    --version $kubestellar_version \
+    --set-json='ITSes=[{"name":"its1"}]' \
+    --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
+    --set-json='verbosity.default=5' $k3dHostContainer
+
 
 kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
 kflex ctx --overwrite-existing-context wds1
