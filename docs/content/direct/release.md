@@ -35,6 +35,7 @@ find * .github/workflows \( -name "*.svg" -prune \) -or \( -path "*venv" -prune 
 Between each release of [ks/OSA](https://github.com/kubestellar/ocm-status-addon) and the next release of ks/ks, update the references to the ocm-status-addon release in the following files.
 
 - `core-chart/values.yaml`
+- `monitoring/README.md`
 
 ### Making a new kubestellar release
 
