@@ -2,8 +2,6 @@ module github.com/kubestellar/kubestellar
 
 go 1.22.7
 
-toolchain go1.23.2
-
 require (
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/go-logr/logr v1.4.2
