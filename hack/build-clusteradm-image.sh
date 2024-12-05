@@ -21,7 +21,7 @@
 
 set -e
 
-clusteradm_folder="$(mktemp -d -p . "clusteradm-XXXX")"
+clusteradm_folder="$(mktemp -d -p $PWD "clusteradm-XXXX")"
 trap 'rm -rf "$clusteradm_folder"' EXIT # delete the temporary folder on exit
 clusteradm_version="" # ==> latest
 registry=quay.io/kubestellar
@@ -73,9 +73,7 @@ clusteradm_version=${clusteradm_version#v}
 echo "Using clusteradm v${clusteradm_version}."
 
 git clone -b "v$clusteradm_version" --depth 1 https://github.com/open-cluster-management-io/clusteradm.git "$clusteradm_folder"
+cd "$clusteradm_folder"
 
-( # Ensure that the temprary folder is deketed even on error
-    cd "$clusteradm_folder"
-    export KO_DOCKER_REPO=$registry
-    ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform
-)
+export KO_DOCKER_REPO=$registry
+ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform
