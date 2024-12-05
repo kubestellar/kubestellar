@@ -21,7 +21,8 @@ ARG VERSION
 RUN [ "$VERSION" == "" ] && VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt) ; \
     curl \
 	-L https://storage.googleapis.com/kubernetes-release/release/v${VERSION#v}/bin/${TARGETOS}/${TARGETARCH}/kubectl \
-	-o /usr/bin/kubectl && chmod +x /usr/bin/kubectl
+	-o /usr/bin/kubectl && \
+	chmod +x /usr/bin/kubectl
 
 USER 1001
 
