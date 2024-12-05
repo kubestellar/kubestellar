@@ -166,7 +166,7 @@ if [ "$k8s_platform" == "kind" ]; then
 else
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
     sleep 15
-    helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.6.1 --namespace ingress-nginx --create-namespace
+    helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.11.3 --namespace ingress-nginx --create-namespace
 fi
 echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
 
@@ -226,7 +226,7 @@ if [ "$k8s_platform" == "k3d" ]; then
         --set-json='ITSes=[{"name":"its1"}]' \
         --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
         --set-json='verbosity.default=5' \
-        --set "kubeflex-operator.hostContainer=k3d-kubeflex-server-0"
+        --set kubeflex-operator.hostContainer=k3d-kubeflex-server-0
 else
     helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
         --version $kubestellar_version \
