@@ -30,7 +30,7 @@ while [[ "$#" -gt 0 ]]; do
             exit 0
             ;;
         *)
-            echo "Unknown parameter passed: $1"
+            echo "Unknown parameter passed: $1" >&2
             echo "Usage: $0 [--platform <kind|k3d>] [-X] [-h|--help]" >&2
             exit 1
             ;;
