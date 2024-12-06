@@ -26,12 +26,12 @@ while [[ "$#" -gt 0 ]]; do
         --platform) k8s_platform="$2"; shift ;;
         -X) set -x ;;
         -h|--help)
-            echo "Usage: $0 [--platform <kind|k3d>]"
+            echo "Usage: $0 [--platform <kind|k3d>] [-X] [-h|--help]" >&2
             exit 0
             ;;
         *)
             echo "Unknown parameter passed: $1"
-            echo "Usage: $0 [--platform <kind|k3d>] [-X] [-h|--help]"
+            echo "Usage: $0 [--platform <kind|k3d>] [-X] [-h|--help]" >&2
             exit 1
             ;;
     esac
@@ -237,9 +237,7 @@ fi
 
 kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
 kflex ctx --overwrite-existing-context wds1
-if [ "$k8s_platform" == "k3d" ]; then
-    kflex ctx --overwrite-existing-context wds2
-fi
+kflex ctx --overwrite-existing-context wds2
 kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
