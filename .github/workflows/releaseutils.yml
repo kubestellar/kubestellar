@@ -21,7 +21,7 @@ jobs:
               uses: advanced-security/sbom-generator-action@v0.0.1
               id: sbom
               env: 
-                    GITHUB_TOKEN: ${{ github.token }}
+                  GITHUB_TOKEN: ${{ github.token }}
               
             - name: Upload SBOM artefact
               uses: actions/upload-artifact@v3.1.0
