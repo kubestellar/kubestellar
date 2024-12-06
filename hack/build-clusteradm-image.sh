@@ -72,8 +72,8 @@ clusteradm_version=${clusteradm_version#v}
 
 echo "Using clusteradm v${clusteradm_version}."
 
-git clone -b "v$clusteradm_version" --depth 1 https://github.com/open-cluster-management-io/clusteradm.git "$clusteradm_folder"
 cd "$clusteradm_folder"
+git clone -b "v$clusteradm_version" --depth 1 https://github.com/open-cluster-management-io/clusteradm.git .
 
 export KO_DOCKER_REPO=$registry
 ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform
