@@ -25,7 +25,7 @@ compactor:
 
 queryFrontend:
   ingress:
-    enabled: true
+    #enabled: true
     hostname: thanos.example.com
     ingressClassName: public
 
@@ -34,9 +34,9 @@ receive:
   replicaCount: 1
   resourcesPreset: "medium"
   ingress:
-    enabled: true
+    #enabled: true
     hostname: kubeflex-control-plane
     ingressClassName: nginx
   persistence:
     enabled: true
-    size: 1Gi
+    size: 2Gi

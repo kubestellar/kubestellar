@@ -51,5 +51,6 @@ helm --kube-context $ctx delete -n $ns prometheus --ignore-not-found
 helm --kube-context $ctx delete -n $ns minio --ignore-not-found
 helm --kube-context $ctx delete -n $ns thanos --ignore-not-found
 
+kubectl --context $ctx -n $ns delete deployment minio --ignore-not-found
 kubectl --context $ctx -n $ns delete pvc --all
 kubectl --context $ctx delete ns $ns  --ignore-not-found
