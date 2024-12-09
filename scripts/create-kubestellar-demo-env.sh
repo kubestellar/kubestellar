@@ -61,6 +61,7 @@ if [ "$k8s_platform" == "kind" ]; then
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
 else
     curl -s https://raw.githubusercontent.com/clubanderson/kubestellar/refs/heads/add-k3d-to-create-demo-env/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker k3d
+    # curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- -V kflex ocm helm kubectl docker kind
 fi
 
 ##########################################
