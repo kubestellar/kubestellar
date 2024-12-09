@@ -15,6 +15,9 @@ This patch release fixes some bugs and some documentation oversights. Following 
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
 * Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 * Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+* If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. Unless you workload is very large, you can avoid this situation by setting the `transport_controller.max_num_wrapped` "value" of [the core Helm chart](core-chart.md) to a number that is larger than the number of your workload objects (double check your count in your `Binding` object).
+
 
 ## 0.25.0 and its candidates
 
@@ -28,6 +31,10 @@ This patch release fixes some bugs and some documentation oversights. Following 
 * Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 * Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
 * If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there are bugs in the updating of workload objects in the WECs.
+* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+* If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. Unless you workload is very large, you can avoid this situation by setting the `transport_controller.max_num_wrapped` "value" of [the core Helm chart](core-chart.md) to a number that is larger than the number of your workload objects (double check your count in your `Binding` object).
+
+
 
 ## 0.25.0-alpha.1 test releases
 
@@ -46,7 +53,8 @@ The main functional change from 0.23.X is the completion of the status combinati
 * Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 * Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
 * If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there are bugs in the updating of workload objects in the WECs.
-
+* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+* If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality.
 
 ## 0.23.1
 
