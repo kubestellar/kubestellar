@@ -29,7 +29,7 @@ The script can install KubeStellar's demonstration environment on top of kind or
 
 For use with kind
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/create-kubestellar-demo-env.sh) --platform kind
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform kind
 ```
 
 For use with k3d
