@@ -22,6 +22,12 @@ body:
       required: true
 
   - type: textarea
+    id: snapshot
+    attributes:
+      label: Output from KubeStellar-Snapshot.sh
+      description: Run kubestellar-snapshot.sh from the scripts directory and paste output here
+      
+  - type: textarea
     id: reproducing
     attributes:
       label: Steps To Reproduce
