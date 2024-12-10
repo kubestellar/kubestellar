@@ -29,6 +29,7 @@ body:
       Alternatively you can run the script remotely:
       bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/k
 ubestellar-snapshot.sh) -V -Y -L
+      This will create kubestellar-snapshot.tar.gz which can be dragged and dropped into this text area.
       
   - type: textarea
     id: reproducing
