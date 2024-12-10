@@ -110,7 +110,10 @@ A CEL expression within a `StatusCollector` can reference the following objects:
     - `returned.status`: The status section of the object returned from the WEC.
 
 1. `propagation`: Metadata about the end-to-end propagation process:
-    - `propagation.lastReturnedUpdateTimestamp`: metav1.Time of last update to any returned state.
+    - `propagation.lastReturnedUpdateTimestamp`: `metav1.Time` of last update to any returned object state in the core. Before the first such update, this holds the zero value of `time.Time`.
+    - `propagation.lastGeneration`: the [ObjectMeta.Generation](https://github.com/kubernetes/apimachinery/blob/v0.28.14/pkg/apis/meta/v1/types.go#L174-L177) from the latest revision of the workload object to propagate to the KubeStellar(OCM) machinery at the WEC. This is not necessarily the last revision successfully applied there. For that, see `lastGenerationIsApplied`. A value of 0 means that no revision has yet successfully gotten to the machinery in the WEC.
+    - `propagation.lastGenerationIsApplied`: `bool` indicating whether `lastGeneration` has been successfully applied. The value is `false` before any attempt has been made.
+    - `propagation.lastCurrencyUpdateTime`: `metav1.Time` of the latest update to either `lastGeneration` or `lastGenerationIsApplied`. More precisely, it is the time when the core became informed of the update. Before the first such update, this holds the zero value of `time.Time`.
 
 ## Examples of using the general technique
 
