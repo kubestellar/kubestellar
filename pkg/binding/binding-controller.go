@@ -125,6 +125,7 @@ type Controller struct {
 	bindingLister               controllisters.BindingLister
 	bindingPolicyInformer       cache.SharedIndexInformer
 	bindingPolicyLister         controllisters.BindingPolicyLister
+	statusCollectorLister       controllisters.StatusCollectorLister
 	managedClusterClient        ksmetrics.ClientModNamespace[*managedclusterapi.ManagedCluster, *managedclusterapi.ManagedClusterList]
 	clusterInformerFactoryStart func(stopCh <-chan struct{})
 	clusterInformer             cache.SharedIndexInformer // used for ManagedCluster in ITS
@@ -303,6 +304,7 @@ func makeController(logger logr.Logger,
 		bindingLister:               controlInformers.Bindings().Lister(),
 		bindingPolicyInformer:       controlInformers.BindingPolicies().Informer(),
 		bindingPolicyLister:         controlInformers.BindingPolicies().Lister(),
+		statusCollectorLister:       controlInformers.StatusCollectors().Lister(),
 		managedClusterClient:        ksmetrics.NewWrappedClusterScopedClient[*managedclusterapi.ManagedCluster, *managedclusterapi.ManagedClusterList](itsClientMetrics, managedclusterapi.SchemeGroupVersion.WithResource("manageclusters"), clusterClient.ClusterV1().ManagedClusters()),
 		clusterInformerFactoryStart: clusterInformerFactoryStart,
 		clusterInformer:             clusterInformer,
