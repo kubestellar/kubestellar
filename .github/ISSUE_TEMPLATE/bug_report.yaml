@@ -25,7 +25,10 @@ body:
     id: snapshot
     attributes:
       label: Output from KubeStellar-Snapshot.sh
-      description: Run kubestellar-snapshot.sh from the scripts directory and paste output here
+      description: Run kubestellar-snapshot.sh from the scripts directory and paste output here. 
+      Alternatively you can run the script remotely:
+      bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/k
+ubestellar-snapshot.sh) -V -Y -L
       
   - type: textarea
     id: reproducing
