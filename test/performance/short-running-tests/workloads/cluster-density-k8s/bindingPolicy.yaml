@@ -10,4 +10,4 @@ spec:
   - matchLabels: {"location-group":"edge"}
   downsync:
   - objectSelectors:
-    - matchLabels: {"app.kubernetes.io/name": cluster-density-{{.Index}} }
+    - matchLabels: {"app.kubernetes.io/name": {{.Name}} }
