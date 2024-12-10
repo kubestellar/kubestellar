@@ -3077,7 +3077,7 @@ log level that gets emitted; higher level messages are suppressed.</p>
 according to the following rules. Note that the various Kubernetes
 libraries used in these controllers also emit leveled debug log
 messages, according to their own numbering conventions. The
-KubeStellar rules are designed to not be very inconsistent with the
+KubeStellar rules are designed to be mostly consistent with the
 Kubernetes practice.</p>
 <ul>
 <li><strong>0</strong>: messages that appear O(1) times per run.</li>
@@ -3095,6 +3095,7 @@ verbosity (<code>-v</code>) of various controllers.</p>
 <li>When basic stuff is not working, survey the Pod objects in the KubeFlex hosting cluster to look for ones that are damaged in some way. For example: you can get a summary with the command <code>kubectl --context kind-kubeflex get pods -A</code> --- adjust as necessary for the name of your kubeconfig context to use for the KubeFlex hosting cluster.</li>
 <li>Remember that for each of your BindingPolicy objects, there is a corresponding Binding object that reports what is matching the policy object.</li>
 <li>Although not part of the interface, when debugging you can look at the ManifestWork and WorkStatus objects in the ITS.</li>
+<li>More broadly, remember that KubeStellar uses OCM.</li>
 <li>Look at logs of controllers. If they have had container restarts that look relevant, look also at the previous logs. Do not forget OCM controllers. Do not forget that some Pods have more than one interesting container.<ul>
 <li>Remember that the amount of log retained is typically a configured option in the relevant container runtime. If your logs are too short, look into increasing that log retention.</li>
 </ul>
@@ -3120,10 +3121,19 @@ verbosity (<code>-v</code>) of various controllers.</p>
 <li>In the WDS: the workload objects involved; any <code>BidingPolicy</code> involved, and the corresponding <code>Binding</code> for each; any <code>CustomTransform</code>, <code>StatusCollector</code>, or <code>CombinedStatus</code> involved.</li>
 <li>Any involved objects in the WEC(s).</li>
 <li>Implementation objects in the ITS: <code>ManifestWork</code>, <code>WorkStatus</code>.</li>
+<li>Here is one way to show the evolution of a relevant set of objects over time. The following command displays the <code>ManifestWork</code> objects, after creation and after each update (modulo the gaps allowed by eventual consistency), in an ITS as addressed by the kubeconfig context named <code>its1</code> --- after first listing the existing objects. Each line is prefixed with the hour:minute:second at which it appears.
+    <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>manifestworks<span class="w"> </span>-A<span class="w"> </span>--show-managed-fields<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span>--watch<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="nv">IFS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>line<span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>date<span class="w"> </span>+%T<span class="k">)</span><span class="s2">| </span><span class="nv">$line</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">done</span>
+</code></pre></div></li>
 </ul>
 </li>
 <li>When reporting kube API object contents, include the <code>meta.managedFields</code>. For example, when using <code>kubectl get</code>, include <code>--show-managed-fields</code>.</li>
-<li>Show the logs from relevant controllers.</li>
+<li>Show the logs from relevant controllers. The most active and directly relevant ones are the following.<ul>
+<li>The KubeStellar controller-manager (running in the KubeFlex hosting cluster) for the WDS</li>
+<li>KubeStellar's OCM-based transport-controller (running in the KubeFlex hosting cluster) for the WDS+ITS</li>
+<li>The OCM Status Add-On Agent in the WEC.</li>
+<li>OCM's klusterlet-agent in the WEC.</li>
+</ul>
+</li>
 </ul>
 
 
