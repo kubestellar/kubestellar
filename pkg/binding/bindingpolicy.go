@@ -19,6 +19,7 @@ package binding
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/go-logr/logr"
 
@@ -28,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -88,22 +90,22 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 		logger.V(5).Info("Enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
 		c.enqueueBinding(bindingPolicy.GetName())
 
-		statusCollectorName, err := c.identifyMissingStatusCollector(bindingPolicy)
+		statusCollectorNames, err := c.identifyMissingStatusCollectors(bindingPolicy)
 		if err != nil {
-			return fmt.Errorf("failed to list StatusCollector %s for BindingPolicy %s: %w", statusCollectorName, bindingPolicyName, err)
+			return fmt.Errorf("failed to identify missing StatusCollector(s) for BindingPolicy %s: %w", bindingPolicyName, err)
 		}
 
 		// If at least one StatusCollector object is missing, use a Condition to indicate the missing object and requeue the BindingPolicy,
 		// o.w. use the Condition to indicate all StatusCollector object(s) are available and proceed
-		if statusCollectorName != "" {
-			logger.V(4).Info("Missing StatusCollector", "statusCollectorName", statusCollectorName, "bindingPolicyName", bindingPolicyName)
+		if len(statusCollectorNames) > 0 {
+			logger.V(4).Info("Missing StatusCollector(s)", "statusCollectorNames", statusCollectorNames, "bindingPolicyName", bindingPolicyName)
 
 			scCondition := v1alpha1.BindingPolicyCondition{
 				Type:               v1alpha1.TypeStatusCollectorsAvailable,
 				Status:             corev1.ConditionFalse,
 				Reason:             v1alpha1.ReasonReconcileError,
 				LastTransitionTime: metav1.Now(),
-				Message:            fmt.Sprintf("Missing StatusCollector %s", statusCollectorName),
+				Message:            fmt.Sprintf("Missing StatusCollector(s) %s", statusCollectorNames),
 			}
 
 			policyWithProposedStatus := bindingPolicy.DeepCopy()
@@ -117,7 +119,7 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 				return fmt.Errorf("failed to update status for BindingPolicy %s: %w", bindingPolicyName, err)
 			}
 
-			return fmt.Errorf("failed to sync BindingPolicy %s because StatusCollector %s is missing", bindingPolicyName, statusCollectorName)
+			return fmt.Errorf("failed to sync BindingPolicy %s because StatusCollector(s) %s are missing", bindingPolicyName, statusCollectorNames)
 		}
 
 		scCondition := v1alpha1.BindingPolicyCondition{
@@ -150,21 +152,29 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 	return c.deleteResolutionForBindingPolicy(ctx, bindingPolicyName)
 }
 
-func (c *Controller) identifyMissingStatusCollector(bp *v1alpha1.BindingPolicy) (string, error) {
+// identifyMissingStatusCollectors finds all missing StatusCollector objects for bp.
+// If an error other than "not found" occurs, identifyMissingStatusCollectors returns a nil slice and the error;
+// otherwise, identifyMissingStatusCollectors returns a slice of StatusCollector object names and a nil error.
+func (c *Controller) identifyMissingStatusCollectors(bp *v1alpha1.BindingPolicy) ([]string, error) {
+	statusCollectorNames := sets.New[string]()
 	for _, clause := range bp.Spec.Downsync {
-		if clause.DownsyncModulation.StatusCollectors == nil {
-			continue
-		}
 		for _, statusCollectorName := range clause.DownsyncModulation.StatusCollectors {
 			if _, err := c.statusCollectorLister.Get(statusCollectorName); err != nil {
 				if errors.IsNotFound(err) {
-					return statusCollectorName, nil
+					statusCollectorNames = statusCollectorNames.Insert(statusCollectorName)
+				} else {
+					return nil, err
 				}
-				return statusCollectorName, err
 			}
 		}
 	}
-	return "", nil
+	nameList := sets.List(statusCollectorNames)
+	// Sort the names so that the string represenation of the list is deterministic,
+	// which is a useful property when comparing a tentive Condition with an existing Condition before updating.
+	// Technically, nameList is already sorted according to the doc of sets.List,
+	// but it is no harm to be defensive against possible (and out-of-control) API changes of set.List.
+	sort.Strings(nameList)
+	return nameList, nil
 }
 
 func (c *Controller) deleteResolutionForBindingPolicy(ctx context.Context, bindingPolicyName string) error {
