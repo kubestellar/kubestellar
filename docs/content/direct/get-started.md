@@ -29,12 +29,12 @@ The script can install KubeStellar's demonstration environment on top of kind or
 
 For use with kind
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform kind
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/create-kubestellar-demo-env.sh) --platform kind
 ```
 
 For use with k3d
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform k3d
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/create-kubestellar-demo-env.sh) --platform k3d
 ```
 
 If successful, the script will output the variable definitions that you would use when proceeding to the example scenarios. After successfully running the script, proceed to the [Exercise KubeStellar](#exercise-kubestellar) section below.
