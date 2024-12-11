@@ -1,0 +1,241 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    aws_region: "{{ region | default('us-east-1') }}"
+    masters: "{{ num_masters| default(1) }}"
+    workers: "{{ num_workers| default(1) }}"
+    cluster_name: "{{ k8s_cluster_name | default('ks-core') }}"
+    ec2_image: "{{ image_id| default('ami-00eb69d236edcfaf8') }}"
+    instance_type: "{{ instance_type | default('t2.micro') }}"
+    default_vpc: no
+    vpc_name:  "{{ vpc_name | default('kscore') }}"
+    aws_default_vpc_az: "{{ default_vpc_az| default('us-east-1b') }}"
+    ec2_group: "{{ vpc_name | default('kscore') }}"
+    aws_key_name: "{{ aws_key }}"
+    archt: "{{ ec2_arch| default('x86_64') }}" # e.g., x86_64 and arm64
+    os_name: "{{ image_source | default('ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-*') }}" # e.g., "RHEL-7.4*GA*"
+    owner: "{{ image_owner | default('099720109477') }}"
+  tasks:
+  - set_fact:
+      masters: 0
+      workers: "{{ wecs_hosting_instances }}"
+    when: wecs_hosting_instances is defined
+
+  - name: Get public IP address of the host of Ansible engine
+    shell: curl checkip.amazonaws.com
+    register: my_public_ip
+
+  - name: Get facts about default VPC
+    amazon.aws.ec2_vpc_net_info:
+      region: "{{ aws_region }}"
+      filters:
+        "isDefault": yes
+    register: vpc_info
+    when: default_vpc | bool
+
+  - name: Print all default VPC facts
+    ansible.builtin.debug:
+      var: aws_default_vpc_az
+    when: default_vpc | bool
+
+  - name: Set vpc_id facts for the default VPC
+    set_fact: 
+      vpc_id: "{{ vpc_info.vpcs[0].vpc_id }}"
+    when: default_vpc | bool    
+
+  - name: Get facts for public subnet associated with selected availability zone and default VPC
+    amazon.aws.ec2_vpc_subnet_info:
+      filters:
+        vpc-id: "{{ vpc_id }}"
+        availability-zone: "{{ aws_default_vpc_az }}"
+      region: "{{ aws_region }}"
+    register: subnets_info
+    when: default_vpc | bool
+
+  - name: Print all subnets available facts
+    ansible.builtin.debug:
+      var: subnets_info
+    when: default_vpc | bool
+
+  - name: Read VPC configuration data
+    include_vars: ".data/{{ aws_region }}_{{ vpc_name }}/vpc_helper_vars.yaml"
+    when: not default_vpc
+
+  - name: Set subnet id fact for default VPC
+    set_fact: 
+      public_subnet_id: "{{ subnets_info.subnets[0].id }}" 
+    when: default_vpc | bool  
+
+  - name: Create security group
+    amazon.aws.ec2_group:
+      name: "{{ ec2_group }}"
+      description: "Used for {{ cluster_name }} in VPC: {{ vpc_name }}"
+      region: "{{ aws_region }}"
+      vpc_id: "{{ vpc_id }}"
+      rules:
+        - proto: tcp
+          ports: 22
+          cidr_ip: "{{ my_public_ip.stdout }}/32"
+          rule_desc: allow SSH from machine of admin
+        - proto: tcp
+          from_port: 1
+          to_port: 65535
+          cidr_ip: "{{ my_public_ip.stdout }}/32"
+          rule_desc: allow all TCP traffic from admin machine
+        - proto: -1
+          ports: -1
+          group_name: "{{ ec2_group }}"
+          rule_desc: allow all connections from same security group
+      purge_rules: false
+    diff: false 
+
+  - name: Find ami instance-id for target instance OS
+    block:
+      - name: Find instance ami-id
+        ec2_ami_info:
+          owners: "{{ owner }}"
+          region: "{{ region }}"
+          filters:
+            architecture: "{{ archt }}"
+            name:  "{{ os_name }}"
+        register: AMIs
+
+      - name: Print out latest ec2 ami instance id
+        ansible.builtin.set_fact:
+          ec2_ami: >
+            {{ AMIs.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}
+    when: ec2_image is undefined
+
+  - name: Set ami instance-id for target instance OS
+    ansible.builtin.set_fact:
+      ec2_image: "{{ ec2_ami.image_id }}"
+    when: ec2_ami is defined
+
+  - name: Debug - Selected Image AMI
+    debug:
+      msg: "{{ ec2_image }}"
+
+  - name: Region to be selected
+    debug:
+      msg: "{{ aws_region }}"
+
+  - name: Get EC2 instances
+    amazon.aws.ec2_instance_info:
+      region: "{{ region }}"
+      filters:
+        "tag:Role": "{{ cluster_name }}"
+        "vpc-id": "{{ vpc_id }}"
+    register: ec2_instances_info
+
+  - name: Calculate number of EC2 instances
+    set_fact:
+      current_instances: "{{ (ec2_instances_info.instances | length) - masters | int }}"
+
+  - name: Check current number of instances
+    debug:
+      var: current_instances
+
+  - name: Calculate difference between available versus desired instances
+    set_fact:
+      count: "{{ workers | int - current_instances | int }}"
+
+  - name: Number of instances to be created
+    debug:
+      msg: "Need to create {{ count }} instances "
+    when: count > "0"
+
+  - name: Deleting not required EC2 instances
+    block:
+      - name: Compute the number of instances that needs to be deleted
+        set_fact:
+          ec2_num_to_delete: "{{ (workers | int ) - (current_instances  | int) | abs }}"
+      
+      - name: Delete instances if too many - case1
+        set_fact:
+          ec2_delete_list: "{{ ec2_delete_list | default([]) + [ ec2_instances_info.instances[item].instance_id ] }}"
+        loop: "{{ range(0, ec2_num_to_delete | int | abs ) }}"
+        when: wecs_hosting_instances is defined
+
+      - name: Delete instances if too many - case2
+        set_fact:
+          ec2_delete_list: "{{ ec2_delete_list | default([]) + [ ec2_instances_info.instances[item].instance_id ] }}"
+        loop: "{{ range(1, ec2_num_to_delete | int | abs + 1) }}" 
+        when: wecs_hosting_instances is undefined
+
+      - name: Number of instances to be deleted
+        debug:
+          msg: "Need to delete {{ ec2_num_to_delete | int | abs }} instances"
+
+      - name: Delete not required number of instances
+        include_role:
+          name: ec2instances
+        vars:
+          verb: delete
+          instance_ids: "{{ ec2_delete_list }}"
+    when: count < "0"
+
+  - name: Create EC2 instances
+    include_role: name=ec2instances
+    vars:
+      verb: create
+      ec2_region: "{{ aws_region }}"
+      ec2_image_id: "{{ ec2_image }}"
+      group: "{{ ec2_group }}"
+      instance_type: "{{ instance_type }}"
+      vpc_subnet_id: "{{ public_subnet_id }}"
+      key_name: "{{ aws_key_name }}"
+      node_role: "{{ cluster_name }}"
+      vpc_name: "{{ vpc_name }}"
+      workers: "{{ masters | int + count | int }}"
+    when: count > "0"
+
+  - name: Get EC2 instances
+    amazon.aws.ec2_instance_info:
+      region: "{{ region }}"
+      filters:
+        "tag:Role": "{{ cluster_name }}"
+        "vpc-id": "{{ vpc_id }}"
+    register: ec2_instances_info_updated
+
+  - name: Get private IPs
+    set_fact:
+      private_ips: "{{ ec2_instances_info_updated| community.general.json_query(query_ip) }}"
+    vars: 
+      query_ip: "instances[?instance_type=='{{ instance_type }}' ].private_ip_address"
+
+  - name: Get public IPs
+    set_fact:
+      public_ips: "{{ ec2_instances_info_updated | community.general.json_query(query_ip) }}"
+    vars: 
+      query_ip: "instances[?instance_type=='{{ instance_type }}' ].public_ip_address"
+
+  - name: Show instance data
+    debug:
+      msg:
+      - "ec2_instances = {{ ec2_instances_info_updated}}"
+      - "public_ips = {{ public_ips }}"
+      - "private_ips = {{ private_ips }}"
+
+  - name: Create a directory to persist data
+    ansible.builtin.file:
+      path: .data/{{ aws_region }}_{{ vpc_name }}
+      state: directory
+      mode: '0755'
+
+  - name: Persist instance data
+    ansible.builtin.copy:
+      content: "{{ ec2_instances_info_updated | to_nice_json }}"
+      dest: ".data/{{ aws_region }}_{{ vpc_name }}/ec2_instances_{{ cluster_name }}.json"
+
+  - name: Assign IPs for k8s masters and workers
+    split_ips:
+      cluster_name: "{{ cluster_name }}"
+      region: "{{ aws_region }}"
+      vpc_name: "{{ vpc_name }}"
+      public_ips: "{{ public_ips }}"
+      position: "{{ masters | int }}"
+    register: split
+
+  - debug:
+      var: split
