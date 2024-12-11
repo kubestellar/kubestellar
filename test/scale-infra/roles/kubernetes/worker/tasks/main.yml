@@ -1,0 +1,6 @@
+---
+# tasks file for add-worker
+- name: Join the Worker nodes to the cluster.
+  become: yes
+  shell: "{{ join_command }}"
+  register: joined_or_not
