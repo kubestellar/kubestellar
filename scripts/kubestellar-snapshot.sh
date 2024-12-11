@@ -487,8 +487,8 @@ for j in "${!cp_pch[@]}" ; do
                 echo -n -e "${COLOR_NONE}"
             fi
             if [[ "$arg_yaml" == "true" ]] ; then
-                mkdir -p "$OUTPUT_FOLDER/${bp_cp[bp_n]}/binding-politcies"
-                KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindingpolicy ${bp_name[bp_n]} -o yaml > "$OUTPUT_FOLDER/${bp_cp[bp_n]}/binding-politcies/$name.yaml"
+                mkdir -p "$OUTPUT_FOLDER/${bp_cp[bp_n]}/binding-policies"
+                KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindingpolicy ${bp_name[bp_n]} -o yaml > "$OUTPUT_FOLDER/${bp_cp[bp_n]}/binding-policies/$name.yaml"
             fi
             bp_n=$((bp_n+1))
         done
