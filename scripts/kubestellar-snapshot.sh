@@ -495,6 +495,7 @@ for j in "${!cp_pch[@]}" ; do
     fi
 done
 
+
 ###############################################################################
 # Listing Bindings
 ###############################################################################
@@ -506,18 +507,25 @@ for j in "${!cp_pch[@]}" ; do
         binding_name=${bindings[i]##*/}
         binding_cp="${cp_name[$j]}"
         spec=$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindings.control.kubestellar.io "$binding_name" -o jsonpath='{.spec}')
-        dests=$(jq .destinations <<<$spec)
-        objs=$(jq '[(.workload.clusterScope[] | .namespace=""), .workload.namespaceScope[] ]' <<<$spec)
-        if [[ "$arg_verbose" == "true" ]] ; then
-            listing=$(jq -r --argjson dests "$dests" --argjson objs "$objs" '[$dests, $objs] | combinations | .[0].clusterId+" "+.[1].resource+"."+.[1].group+"/"+.[1].version+" :"+.[1].namespace+" "+.[1].name' <<<0)
-            echo "$listing" | while read wec rsc ns name; do
-                echo -e "- wds=${COLOR_INFO}${binding_cp}${COLOR_NONE} binding=${COLOR_INFO}${binding_name}${COLOR_NONE} WEC=${COLOR_INFO}${wec}${COLOR_NONE} rsc=${COLOR_INFO}${rsc}${COLOR_NONE} ns=${COLOR_INFO}${ns:1}${COLOR_NONE} name=${COLOR_INFO}${name}${COLOR_NONE}"
-            done
-            if [[ -z "$listing" ]]; then
-                echo -e "${COLOR_RED}wds=$binding_cp binding=$binding_name has empty outer product${COLOR_NONE}"
-            fi
-        else
-            echo -e "- wds=${COLOR_INFO}${binding_cp}${COLOR_NONE} binding=${COLOR_INFO}${binding_name}${COLOR_NONE} num_wecs=${COLOR_INFO}"$(jq length <<<$dests)"${COLOR_NONE} num_objs=${COLOR_INFO}"$(jq length <<<$objs)"${COLOR_NONE}"
+        dests=$(jq '.destinations//[]' <<<$spec)
+        cobjs=$(jq '.workload.clusterScope//[]' <<<$spec)
+        nobjs=$(jq '.workload.namespaceScope//[]' <<<$spec)
+        clisting=$(jq -r --argjson dests "$dests" --argjson objs "$cobjs" '[$dests, $objs] | combinations | .[0].clusterId+" "+.[1].resource+"."+.[1].group+"/"+.[1].version+" "+.[1].name' <<<0)
+        [ -n "$clisting" ] && { echo "$clisting" | while read wec rsc name; do
+            echo -e "- wds=${COLOR_INFO}${binding_cp}${COLOR_NONE} binding=${COLOR_INFO}${binding_name}${COLOR_NONE} WEC=${COLOR_INFO}${wec}${COLOR_NONE} rsc=${COLOR_INFO}${rsc}${COLOR_NONE} name=${COLOR_INFO}${name}${COLOR_NONE}"
+        done; }
+        nlisting=$(jq -r --argjson dests "$dests" --argjson objs "$nobjs" '[$dests, $objs] | combinations | .[0].clusterId+" "+.[1].resource+"."+.[1].group+"/"+.[1].version+" "+.[1].namespace+" "+.[1].name' <<<0)
+        [ -n "$nlisting" ] && { echo "$nlisting" | while read wec rsc ns name; do
+            echo -e "- wds=${COLOR_INFO}${binding_cp}${COLOR_NONE} binding=${COLOR_INFO}${binding_name}${COLOR_NONE} WEC=${COLOR_INFO}${wec}${COLOR_NONE} rsc=${COLOR_INFO}${rsc}${COLOR_NONE} ns=${COLOR_INFO}${ns}${COLOR_NONE} name=${COLOR_INFO}${name}${COLOR_NONE}"
+        done; }
+        if [[ -z "$clisting" ]] && [[ -z "$nlisting" ]]; then
+            ndests=$(jq length <<<$dests <<<0)
+	    ncobjs=$(jq length <<<$cobjs <<<0)
+            nnobjs=$(jq length <<<$nobjs <<<0)
+            [ "$ndests" = 0 ] && colord=$COLOR_WARNING || colord=$COLOR_INFO
+            [ "$ncobjs" = 0 ] && colorc=$COLOR_WARNING || colorc=$COLOR_INFO
+            [ "$nnobjs" = 0 ] && colorn=$COLOR_WARNING || colorn=$COLOR_INFO
+            echo -e "- wds=${COLOR_INFO}${binding_cp}${COLOR_NONE} binding=${COLOR_INFO}${binding_name}${COLOR_NONE} num_wecs=${colord}${ndests}${COLOR_NONE} num_clusterScoped_objs=${colorc}${ncobjs}${COLOR_NONE} num_namespaced_objs=${colorn}${nnobjs}${COLOR_NONE}"
         fi
         if [[ "$arg_yaml" == "true" ]] ; then
             mkdir -p "$OUTPUT_FOLDER/${binding_cp}/bindings"
@@ -525,6 +533,7 @@ for j in "${!cp_pch[@]}" ; do
         fi
     done
 done
+
 
 ###############################################################################
 # Listing Manifest Works
