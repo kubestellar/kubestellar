@@ -495,6 +495,36 @@ for j in "${!cp_pch[@]}" ; do
     fi
 done
 
+###############################################################################
+# Listing Bindings
+###############################################################################
+echotitle "Bindings:"
+for j in "${!cp_pch[@]}" ; do
+    if ! [[ "${cp_pch[$j]}" == "wds" ]] ; then continue; fi
+    bindings=($(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindings.control.kubestellar.io -no-headers -o name 2> /dev/null || true))
+    for i in "${!bindings[@]}" ; do
+        binding_name=${bindings[i]##*/}
+        binding_cp="${cp_name[$j]}"
+        spec=$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindings.control.kubestellar.io "$binding_name" -o jsonpath='{.spec}')
+        dests=$(jq .destinations <<<$spec)
+        objs=$(jq '[(.workload.clusterScope[] | .namespace=""), .workload.namespaceScope[] ]' <<<$spec)
+        if [[ "$arg_verbose" == "true" ]] ; then
+            listing=$(jq -r --argjson dests "$dests" --argjson objs "$objs" '[$dests, $objs] | combinations | .[0].clusterId+" "+.[1].resource+"."+.[1].group+"/"+.[1].version+" :"+.[1].namespace+" "+.[1].name' <<<0)
+            echo "$listing" | while read wec rsc ns name; do
+                echo -e "- wds=${COLOR_INFO}${binding_cp}${COLOR_NONE} binding=${COLOR_INFO}${binding_name}${COLOR_NONE} WEC=${COLOR_INFO}${wec}${COLOR_NONE} rsc=${COLOR_INFO}${rsc}${COLOR_NONE} ns=${COLOR_INFO}${ns:1}${COLOR_NONE} name=${COLOR_INFO}${name}${COLOR_NONE}"
+            done
+            if [[ -z "$listing" ]]; then
+                echo -e "${COLOR_RED}wds=$binding_cp binding=$binding_name has empty outer product${COLOR_NONE}"
+            fi
+        else
+            echo -e "- wds=${COLOR_INFO}${binding_cp}${COLOR_NONE} binding=${COLOR_INFO}${binding_name}${COLOR_NONE} num_wecs=${COLOR_INFO}"$(jq length <<<$dests)"${COLOR_NONE} num_objs=${COLOR_INFO}"$(jq length <<<$objs)"${COLOR_NONE}"
+        fi
+        if [[ "$arg_yaml" == "true" ]] ; then
+            mkdir -p "$OUTPUT_FOLDER/${binding_cp}/bindings"
+            KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get binding.control.kubestellar.io ${binding_name} -o yaml > "$OUTPUT_FOLDER/${binding_cp}/bindings/$binding_name.yaml"
+        fi
+    done
+done
 
 ###############################################################################
 # Listing Manifest Works
