@@ -1,0 +1,33 @@
+---
+- name: Show infomation before creating ec2 instance(s)
+  debug:
+    msg: creating {{ count }} {{ instance_type }} with image {{ ec2_image_id }}
+
+- name: Create ec2 instance(s)
+  amazon.aws.ec2_instance:
+    region: "{{ ec2_region }}"
+    image_id: "{{ ec2_image_id }}"
+    instance_type: "{{ instance_type }}"
+    volumes:
+      - device_name: /dev/sda1
+        ebs:
+          volume_size: 64
+          delete_on_termination: true
+    key_name: "{{ key_name }}"
+    security_group: "{{ group }}"
+    count: "{{ count }}"
+    wait: yes
+    vpc_subnet_id: "{{ vpc_subnet_id }}"
+  register: ec2_instances
+
+- name: Get private IPs
+  set_fact:
+    private_ips: "{{ ec2_instances | community.general.json_query(query) }}"
+  vars: 
+    query: "instances[?instance_type=='{{ instance_type }}' ].private_ip_address"
+
+- name: Get public IPs
+  set_fact:
+    public_ips: "{{ ec2_instances | community.general.json_query(query) }}"
+  vars: 
+    query: "instances[?instance_type=='{{ instance_type }}' ].public_ip_address"

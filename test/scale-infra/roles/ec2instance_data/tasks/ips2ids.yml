@@ -1,0 +1,4 @@
+- ips2ids:
+    ec2_instances: "{{ ec2_instances }}"
+  register: ips2ids
+- debug: var=ips2ids

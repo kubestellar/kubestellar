@@ -1,0 +1,5 @@
+- include_tasks: create.yml
+  when: verb == "create"
+
+- include_tasks: delete.yml
+  when: verb == "delete"
