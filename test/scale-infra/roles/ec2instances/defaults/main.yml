@@ -1,0 +1,8 @@
+---
+# defaults file for ec2instances
+# region: us-east-1
+# image_id: ""
+# instance_type: t2.micro
+# key_name: ""
+# group: ec2nodes
+# count: 1
