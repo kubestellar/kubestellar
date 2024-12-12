@@ -805,19 +805,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#0260-alpha1" class="md-nav__link">
+  <a href="#0260-alpha1-0260-alpha2" class="md-nav__link">
     <span class="md-ellipsis">
-      0.26.0-alpha.1
+      0.26.0-alpha.1, 0.26.0-alpha.2
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="0.26.0-alpha.1">
+    <nav class="md-nav" aria-label="0.26.0-alpha.1, 0.26.0-alpha.2">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#remaining-limitations-in-0260-alpha1" class="md-nav__link">
+  <a href="#remaining-limitations-in-0260-alpha1-and-0260-alpha2" class="md-nav__link">
     <span class="md-ellipsis">
-      Remaining limitations in 0.26.0-alpha.1
+      Remaining limitations in 0.26.0-alpha.1 and 0.26.0-alpha.2
     </span>
   </a>
   
@@ -3206,19 +3206,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#0260-alpha1" class="md-nav__link">
+  <a href="#0260-alpha1-0260-alpha2" class="md-nav__link">
     <span class="md-ellipsis">
-      0.26.0-alpha.1
+      0.26.0-alpha.1, 0.26.0-alpha.2
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="0.26.0-alpha.1">
+    <nav class="md-nav" aria-label="0.26.0-alpha.1, 0.26.0-alpha.2">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#remaining-limitations-in-0260-alpha1" class="md-nav__link">
+  <a href="#remaining-limitations-in-0260-alpha1-and-0260-alpha2" class="md-nav__link">
     <span class="md-ellipsis">
-      Remaining limitations in 0.26.0-alpha.1
+      Remaining limitations in 0.26.0-alpha.1 and 0.26.0-alpha.2
     </span>
   </a>
   
@@ -3484,10 +3484,10 @@
 
 <h1 id="release-notes">Release notes<a class="headerlink" href="#release-notes" title="Permanent link">#</a></h1>
 <p>The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. </p>
-<h2 id="0260-alpha1">0.26.0-alpha.1<a class="headerlink" href="#0260-alpha1" title="Permanent link">#</a></h2>
+<h2 id="0260-alpha1-0260-alpha2">0.26.0-alpha.1, 0.26.0-alpha.2<a class="headerlink" href="#0260-alpha1-0260-alpha2" title="Permanent link">#</a></h2>
 <p>This release removes the thrashing of workload objects in the WEC in the case where the transport controller's <code>max-num-wrapped</code> is 1.</p>
 <p>This release changes the schema for a <code>BindingPolicy</code> so that the request for sigleton status return is made/not-made independently in each <code>DownsyncPolicyClause</code> rather than once on the whole <code>BindingPolicySpec</code>. The schema for <code>Binding</code> objects is changed correspondingly.</p>
-<h3 id="remaining-limitations-in-0260-alpha1">Remaining limitations in 0.26.0-alpha.1<a class="headerlink" href="#remaining-limitations-in-0260-alpha1" title="Permanent link">#</a></h3>
+<h3 id="remaining-limitations-in-0260-alpha1-and-0260-alpha2">Remaining limitations in 0.26.0-alpha.1 and 0.26.0-alpha.2<a class="headerlink" href="#remaining-limitations-in-0260-alpha1-and-0260-alpha2" title="Permanent link">#</a></h3>
 <ul>
 <li>Although the create-only feature can be used with Job objects to avoid trouble with <code>.spec.selector</code>, requesting singleton reported state return will still lead to a controller fight over <code>.status.replicas</code> while the Job is in progress.</li>
 <li>Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object</li>
