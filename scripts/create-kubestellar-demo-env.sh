@@ -53,7 +53,7 @@ if ! dunsel=$(docker ps 2>&1); then
 fi
 echo "Container runtime is running."
 
-kubestellar_version=0.26.0-alpha.1
+kubestellar_version=0.26.0-alpha.2
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
@@ -61,7 +61,7 @@ if [ "$k8s_platform" == "kind" ]; then
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker kind
 else
     # curl -s https://raw.githubusercontent.com/clubanderson/kubestellar/refs/heads/add-k3d-to-create-demo-env/hack/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker k3d
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/hack/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker k3d
+    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker k3d
 fi
 
 ##########################################

@@ -2,13 +2,13 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
-## 0.26.0-alpha.1
+## 0.26.0-alpha.1, 0.26.0-alpha.2
 
 This release removes the thrashing of workload objects in the WEC in the case where the transport controller's `max-num-wrapped` is 1.
 
 This release changes the schema for a `BindingPolicy` so that the request for sigleton status return is made/not-made independently in each `DownsyncPolicyClause` rather than once on the whole `BindingPolicySpec`. The schema for `Binding` objects is changed correspondingly.
 
-### Remaining limitations in 0.26.0-alpha.1
+### Remaining limitations in 0.26.0-alpha.1 and 0.26.0-alpha.2
 
 * Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
 * Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
