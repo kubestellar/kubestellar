@@ -97,46 +97,12 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 
 		// If at least one StatusCollector object is missing, use a Condition to indicate the missing object and requeue the BindingPolicy,
 		// o.w. use the Condition to indicate all StatusCollector object(s) are available and proceed
+		if err = c.createOrUpdateStatusCollectorAvailableCondition(ctx, bindingPolicy, statusCollectorNames); err != nil {
+			return fmt.Errorf("failed to update status for BindingPolicy %s: %w", bindingPolicyName, err)
+		}
 		if len(statusCollectorNames) > 0 {
 			logger.V(4).Info("Missing StatusCollector(s)", "statusCollectorNames", statusCollectorNames, "bindingPolicyName", bindingPolicyName)
-
-			scCondition := v1alpha1.BindingPolicyCondition{
-				Type:               v1alpha1.TypeStatusCollectorsAvailable,
-				Status:             corev1.ConditionFalse,
-				Reason:             v1alpha1.ReasonReconcileError,
-				LastTransitionTime: metav1.Now(),
-				Message:            fmt.Sprintf("Missing StatusCollector(s) %s", statusCollectorNames),
-			}
-
-			policyWithProposedStatus := bindingPolicy.DeepCopy()
-			policyWithProposedStatus.Status = v1alpha1.BindingPolicyStatus{
-				ObservedGeneration: bindingPolicy.Generation,
-				Conditions:         v1alpha1.SetCondition(bindingPolicy.Status.Conditions, scCondition),
-			}
-
-			_, err := c.bindingPolicyClient.UpdateStatus(ctx, policyWithProposedStatus, metav1.UpdateOptions{FieldManager: ControllerName})
-			if err != nil {
-				return fmt.Errorf("failed to update status for BindingPolicy %s: %w", bindingPolicyName, err)
-			}
-
 			return fmt.Errorf("failed to sync BindingPolicy %s because StatusCollector(s) %s are missing", bindingPolicyName, statusCollectorNames)
-		}
-
-		scCondition := v1alpha1.BindingPolicyCondition{
-			Type:               v1alpha1.TypeStatusCollectorsAvailable,
-			Status:             corev1.ConditionTrue,
-			Reason:             v1alpha1.ReasonReconcileSuccess,
-			LastTransitionTime: metav1.Now(),
-			Message:            "All StatusCollector(s) are available",
-		}
-		policyWithProposedStatus := bindingPolicy.DeepCopy()
-		policyWithProposedStatus.Status = v1alpha1.BindingPolicyStatus{
-			ObservedGeneration: bindingPolicy.Generation,
-			Conditions:         v1alpha1.SetCondition(bindingPolicy.Status.Conditions, scCondition),
-		}
-		_, err = c.bindingPolicyClient.UpdateStatus(ctx, policyWithProposedStatus, metav1.UpdateOptions{FieldManager: ControllerName})
-		if err != nil {
-			return fmt.Errorf("failed to update status for BindingPolicy %s: %w", bindingPolicyName, err)
 		}
 
 		// requeue all objects to account for changes in bindingpolicy.
@@ -150,6 +116,48 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 	}
 
 	return c.deleteResolutionForBindingPolicy(ctx, bindingPolicyName)
+}
+
+func (c *Controller) createOrUpdateStatusCollectorAvailableCondition(ctx context.Context, bp *v1alpha1.BindingPolicy, missingSCs []string) error {
+	// compose tentative condition where LastTransitionTime is TBD
+	conditionTentative := v1alpha1.BindingPolicyCondition{}
+	if len(missingSCs) != 0 {
+		conditionTentative = v1alpha1.BindingPolicyCondition{
+			Type:    v1alpha1.TypeStatusCollectorsAvailable,
+			Status:  corev1.ConditionFalse,
+			Reason:  v1alpha1.ReasonReconcileError,
+			Message: fmt.Sprintf("Missing StatusCollector(s) %s", missingSCs),
+		}
+	} else {
+		conditionTentative = v1alpha1.BindingPolicyCondition{
+			Type:    v1alpha1.TypeStatusCollectorsAvailable,
+			Status:  corev1.ConditionTrue,
+			Reason:  v1alpha1.ReasonReconcileSuccess,
+			Message: "All StatusCollector(s) are available",
+		}
+	}
+	// check whether bp already has a condition that is the same (excluding LastTransitionTime) as the tentative one
+	hasSame := false
+	for _, conditionActual := range bp.Status.Conditions {
+		if v1alpha1.AreConditionsEqual(conditionActual, conditionTentative) {
+			hasSame = true
+			break
+		}
+	}
+	// create or update if necessary
+	if hasSame {
+		return nil
+	}
+	conditionTentative.LastTransitionTime = metav1.Now()
+	policyWithProposedStatus := bp.DeepCopy()
+	policyWithProposedStatus.Status = v1alpha1.BindingPolicyStatus{
+		ObservedGeneration: bp.Generation,
+		Conditions:         v1alpha1.SetCondition(bp.Status.Conditions, conditionTentative),
+	}
+	if _, err := c.bindingPolicyClient.UpdateStatus(ctx, policyWithProposedStatus, metav1.UpdateOptions{FieldManager: ControllerName}); err != nil {
+		return err
+	}
+	return nil
 }
 
 // identifyMissingStatusCollectors finds all missing StatusCollector objects for bp.
