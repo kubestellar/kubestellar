@@ -130,7 +130,7 @@ spec:
   limit: 10
 ```
 
-To specify using that, the `BindingSpec` would reference it from the `StatusCollection` in the relevant `DownsyncPolicyClause`(s). Following is an example.
+To specify using that, the `BindingSpec` would reference it from the `statusCollectors` in the relevant `DownsyncPolicyClause`(s). Following is an example.
 
 ```yaml
 apiVersion: control.kubestellar.io/v1alpha1
@@ -143,8 +143,7 @@ spec:
   downsync:
   - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx"}
-    statusCollection:
-      statusCollectors: [ count-wecs ]
+    statusCollectors: [ count-wecs ]
 ```
 
 The analogous SQL statement would look something like the following.
