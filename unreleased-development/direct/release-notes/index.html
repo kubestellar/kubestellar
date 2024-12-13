@@ -805,6 +805,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0260-alpha3" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.26.0-alpha.3
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.26.0-alpha.3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remaining-limitations-in-0260-alpha3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remaining limitations in 0.26.0-alpha.3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0260-alpha1-0260-alpha2" class="md-nav__link">
     <span class="md-ellipsis">
       0.26.0-alpha.1, 0.26.0-alpha.2
@@ -3206,6 +3230,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0260-alpha3" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.26.0-alpha.3
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.26.0-alpha.3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remaining-limitations-in-0260-alpha3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remaining limitations in 0.26.0-alpha.3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0260-alpha1-0260-alpha2" class="md-nav__link">
     <span class="md-ellipsis">
       0.26.0-alpha.1, 0.26.0-alpha.2
@@ -3484,6 +3532,17 @@
 
 <h1 id="release-notes">Release notes<a class="headerlink" href="#release-notes" title="Permanent link">#</a></h1>
 <p>The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. </p>
+<h2 id="0260-alpha3">0.26.0-alpha.3<a class="headerlink" href="#0260-alpha3" title="Permanent link">#</a></h2>
+<p>This release adds the option for the core Helm chart to not take responsibility for running <code>clusteradm init</code> on an ITS. <strong>Somebody</strong> has to, but not necessarily this chart.</p>
+<h3 id="remaining-limitations-in-0260-alpha3">Remaining limitations in 0.26.0-alpha.3<a class="headerlink" href="#remaining-limitations-in-0260-alpha3" title="Permanent link">#</a></h3>
+<ul>
+<li>Although the create-only feature can be used with Job objects to avoid trouble with <code>.spec.selector</code>, requesting singleton reported state return will still lead to a controller fight over <code>.status.replicas</code> while the Job is in progress.</li>
+<li>Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object</li>
+<li>Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.</li>
+<li>Creation, deletion, and modification of <code>CustomTransform</code> objects does not cause corresponding updates to the workload objects in the WECs; the current state of the <code>CustomTransform</code> objects is simply read at any moment when the objects in the WECs are being updated for other reasons.</li>
+<li>It is not known what actually happens when two different <code>Binding</code> objects list the same workload object and either or both say "create only".</li>
+<li>If (a) the workload object count or volume vs the configured limits on content of a <code>ManifestWork</code> causes multiple <code>ManifestWork</code> to be created for one <code>Binding</code> (<code>BindingPolicy</code>) AND (b) the limit on number of workload objects in one <code>ManifestWork</code> is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one <code>ManifestWork</code> is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a <code>Binding</code> (do check your <code>Binding</code> objects, lest you be surprised) AND your workload is not so large that multiple <code>ManifestWork</code> are created due to the limit on their size.</li>
+</ul>
 <h2 id="0260-alpha1-0260-alpha2">0.26.0-alpha.1, 0.26.0-alpha.2<a class="headerlink" href="#0260-alpha1-0260-alpha2" title="Permanent link">#</a></h2>
 <p>This release removes the thrashing of workload objects in the WEC in the case where the transport controller's <code>max-num-wrapped</code> is 1.</p>
 <p>This release changes the schema for a <code>BindingPolicy</code> so that the request for sigleton status return is made/not-made independently in each <code>DownsyncPolicyClause</code> rather than once on the whole <code>BindingPolicySpec</code>. The schema for <code>Binding</code> objects is changed correspondingly.</p>
