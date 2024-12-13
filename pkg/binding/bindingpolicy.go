@@ -94,15 +94,14 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 		if err != nil {
 			return fmt.Errorf("failed to identify missing StatusCollector(s) for BindingPolicy %s: %w", bindingPolicyName, err)
 		}
-
-		// If at least one StatusCollector object is missing, use a Condition to indicate the missing object and requeue the BindingPolicy,
-		// o.w. use the Condition to indicate all StatusCollector object(s) are available and proceed
-		if err = c.createOrUpdateStatusCollectorAvailableCondition(ctx, bindingPolicy, statusCollectorNames); err != nil {
-			return fmt.Errorf("failed to update status for BindingPolicy %s: %w", bindingPolicyName, err)
-		}
 		if len(statusCollectorNames) > 0 {
 			logger.V(4).Info("Missing StatusCollector(s)", "statusCollectorNames", statusCollectorNames, "bindingPolicyName", bindingPolicyName)
-			return fmt.Errorf("failed to sync BindingPolicy %s because StatusCollector(s) %s are missing", bindingPolicyName, statusCollectorNames)
+		}
+
+		// If at least one StatusCollector object is missing, use a Condition to indicate the missing object,
+		// o.w. use the Condition to indicate all StatusCollector object(s) are available.
+		if err = c.createOrUpdateStatusCollectorAvailableCondition(ctx, bindingPolicy, statusCollectorNames); err != nil {
+			return fmt.Errorf("failed to update status for BindingPolicy %s: %w", bindingPolicyName, err)
 		}
 
 		// requeue all objects to account for changes in bindingpolicy.
@@ -121,6 +120,9 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 func (c *Controller) createOrUpdateStatusCollectorAvailableCondition(ctx context.Context, bp *v1alpha1.BindingPolicy, missingSCs []string) error {
 	// compose tentative condition where LastTransitionTime is TBD
 	conditionTentative := v1alpha1.BindingPolicyCondition{}
+	// Sort the names so that the string represenation of the list is deterministic,
+	// which is a useful property when comparing a tentive Condition with an existing Condition before updating.
+	sort.Strings(missingSCs)
 	if len(missingSCs) != 0 {
 		conditionTentative = v1alpha1.BindingPolicyCondition{
 			Type:    v1alpha1.TypeStatusCollectorsAvailable,
@@ -137,16 +139,13 @@ func (c *Controller) createOrUpdateStatusCollectorAvailableCondition(ctx context
 		}
 	}
 	// create or update if necessary
-	conditions, changed := v1alpha1.SetCondition(bp.Status.Conditions, conditionTentative)
+	policyWithProposedCondition := bp.DeepCopy()
+	conditions, changed := v1alpha1.SetCondition(policyWithProposedCondition.Status.Conditions, conditionTentative)
 	if !changed {
 		return nil
 	}
-	policyWithProposedStatus := bp.DeepCopy()
-	policyWithProposedStatus.Status = v1alpha1.BindingPolicyStatus{
-		ObservedGeneration: bp.Generation,
-		Conditions:         conditions,
-	}
-	if _, err := c.bindingPolicyClient.UpdateStatus(ctx, policyWithProposedStatus, metav1.UpdateOptions{FieldManager: ControllerName}); err != nil {
+	policyWithProposedCondition.Status.Conditions = conditions
+	if _, err := c.bindingPolicyClient.UpdateStatus(ctx, policyWithProposedCondition, metav1.UpdateOptions{FieldManager: ControllerName}); err != nil {
 		return err
 	}
 	return nil
@@ -169,11 +168,6 @@ func (c *Controller) identifyMissingStatusCollectors(bp *v1alpha1.BindingPolicy)
 		}
 	}
 	nameList := sets.List(statusCollectorNames)
-	// Sort the names so that the string represenation of the list is deterministic,
-	// which is a useful property when comparing a tentive Condition with an existing Condition before updating.
-	// Technically, nameList is already sorted according to the doc of sets.List,
-	// but it is no harm to be defensive against possible (and out-of-control) API changes of set.List.
-	sort.Strings(nameList)
 	return nameList, nil
 }
 

@@ -77,10 +77,11 @@ type CombinedStatusResolver interface {
 	//
 	// The function uses the workstatus indexer to update internal state.
 	//
-	// The returned set contains the identifiers of combinedstatus objects
-	// that should be queued for syncing.
+	// The returned two sets identify combinedstatus objects and binding objects
+	// that should be queued for syncing, respectively.
 	NoteStatusCollector(ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool,
-		workStatusIndexer cache.Indexer) sets.Set[util.ObjectIdentifier]
+		workStatusIndexer cache.Indexer,
+	) (sets.Set[util.ObjectIdentifier], sets.Set[string])
 
 	// NoteWorkStatus notes a workstatus in the combinedstatus resolutions
 	// associated with its source workload object.
@@ -356,10 +357,11 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus 
 //
 // The function uses the workstatus indexer to update internal state.
 //
-// The returned set contains the identifiers of combinedstatus objects
-// that should be queued for syncing.
-func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool,
-	workStatusIndexer cache.Indexer) sets.Set[util.ObjectIdentifier] {
+// The returned two sets identify combinedstatus objects and binding objects
+// that should be queued for syncing, respectively.
+func (c *combinedStatusResolver) NoteStatusCollector(
+	ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool, workStatusIndexer cache.Indexer,
+) (sets.Set[util.ObjectIdentifier], sets.Set[string]) {
 	logger := klog.FromContext(ctx)
 	c.Lock()
 	defer c.Unlock()
@@ -367,11 +369,12 @@ func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, status
 	currentSpec := c.statusCollectorNameToSpec[statusCollector.Name]
 	if !deleted && currentSpec != nil && statusCollectorSpecsMatch(currentSpec, &statusCollector.Spec) {
 		logger.V(5).Info("No change in StatusCollector", "name", statusCollector.Name)
-		return nil // already cached and the spec has not changed
+		return nil, nil // already cached and the spec has not changed
 	}
 	logger.V(5).Info("Noting StatusCollector", "name", statusCollector.Name, "numBindings", len(c.bindingNameToResolutions), "deleted", deleted)
 
 	combinedStatusIdentifiersToQueue := sets.New[util.ObjectIdentifier]()
+	bindingNamesToQueue := sets.New[string]()
 	// update resolutions that use the statuscollector
 	// this call cannot add an association that was not already present.
 	// if deleted, the association is removed.
@@ -382,6 +385,7 @@ func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, status
 				if resolution.noteStatusCollectorAbsence(statusCollector.Name) {
 					combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
 						workloadObjectIdentifier.ObjectName.Namespace))
+					bindingNamesToQueue.Insert(bindingName)
 				}
 				continue
 			}
@@ -391,6 +395,7 @@ func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, status
 				combinedStatusIdentifiersToQueue.Insert(c.evaluateWorkStatusesPerBindingReadLocked(ctx, bindingName,
 					sets.New(workloadObjectIdentifier), resolution.CollectionDestinations,
 					workStatusIndexer).UnsortedList()...)
+				bindingNamesToQueue.Insert(bindingName)
 			}
 		}
 	}
@@ -401,7 +406,7 @@ func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, status
 		delete(c.statusCollectorNameToSpec, statusCollector.Name)
 	}
 
-	return combinedStatusIdentifiersToQueue
+	return combinedStatusIdentifiersToQueue, bindingNamesToQueue
 }
 
 // ResolutionExists returns true if a combinedstatus resolution is

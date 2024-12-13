@@ -57,10 +57,14 @@ func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error 
 		}
 	}
 
-	combinedStatusSet := c.combinedStatusResolver.NoteStatusCollector(ctx, statusCollector, isDeleted, c.workStatusIndexer)
+	combinedStatusSet, bindingNameSet := c.combinedStatusResolver.NoteStatusCollector(ctx, statusCollector, isDeleted, c.workStatusIndexer)
 	for combinedStatus := range combinedStatusSet {
 		logger.V(5).Info("Enqueuing reference to CombinedStatus while syncing StatusCollector", "combinedStatusRef", combinedStatus.ObjectName, "statusCollectorName", ref)
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
+	}
+	for bindingName := range bindingNameSet {
+		logger.V(5).Info("Enqueuing reference to Binding while syncing StatusCollector", "bindingName", bindingName, "statusCollectorName", ref)
+		c.workqueue.AddAfter(bindingRef(bindingName), queueingDelay)
 	}
 
 	logger.V(5).Info("Synced StatusCollector", "ref", ref)
