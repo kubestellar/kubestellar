@@ -65,17 +65,23 @@ func AreConditionsEqual(c1, c2 BindingPolicyCondition) bool {
 }
 
 // SetCondition sets the supplied BindingPolicyCondition in
-// the given slice of conditions, replacing any existing conditions of
-// the same type. Returns the updated slice of conditions.
-func SetCondition(conditions []BindingPolicyCondition, newCondition BindingPolicyCondition) []BindingPolicyCondition {
+// the given slice of conditions, replacing any existing conditions of the same type.
+// SetCondition returns the updated slice of BindingPolicyCondition
+// and a boolean indicating whether there was change to the slice.
+func SetCondition(conditions []BindingPolicyCondition, newCondition BindingPolicyCondition) ([]BindingPolicyCondition, bool) {
 	for i, condition := range conditions {
 		if condition.Type == newCondition.Type {
+			if AreConditionsEqual(condition, newCondition) {
+				return conditions, false
+			}
+			newCondition.LastTransitionTime = metav1.Now()
 			conditions[i] = newCondition
-			return conditions
+			return conditions, true
 		}
 	}
+	newCondition.LastTransitionTime = metav1.Now()
 	conditions = append(conditions, newCondition)
-	return conditions
+	return conditions, true
 }
 
 // areConditionSlicesSame compares two slices of BindingPolicyCondition structs and returns true if they are the same (ignoring order and LastTransitionTime and LastUpdateTime), false otherwise.
@@ -122,7 +128,7 @@ func EnsureCondition(cp *BindingPolicy, newCondition BindingPolicyCondition) {
 	if cp.Status.Conditions == nil {
 		cp.Status.Conditions = []BindingPolicyCondition{}
 	}
-	cp.Status.Conditions = SetCondition(cp.Status.Conditions, newCondition)
+	cp.Status.Conditions, _ = SetCondition(cp.Status.Conditions, newCondition)
 }
 
 // Creating returns a condition that indicates the cp is currently

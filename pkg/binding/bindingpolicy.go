@@ -136,23 +136,15 @@ func (c *Controller) createOrUpdateStatusCollectorAvailableCondition(ctx context
 			Message: "All StatusCollector(s) are available",
 		}
 	}
-	// check whether bp already has a condition that is the same (excluding LastTransitionTime) as the tentative one
-	hasSame := false
-	for _, conditionActual := range bp.Status.Conditions {
-		if v1alpha1.AreConditionsEqual(conditionActual, conditionTentative) {
-			hasSame = true
-			break
-		}
-	}
 	// create or update if necessary
-	if hasSame {
+	conditions, changed := v1alpha1.SetCondition(bp.Status.Conditions, conditionTentative)
+	if !changed {
 		return nil
 	}
-	conditionTentative.LastTransitionTime = metav1.Now()
 	policyWithProposedStatus := bp.DeepCopy()
 	policyWithProposedStatus.Status = v1alpha1.BindingPolicyStatus{
 		ObservedGeneration: bp.Generation,
-		Conditions:         v1alpha1.SetCondition(bp.Status.Conditions, conditionTentative),
+		Conditions:         conditions,
 	}
 	if _, err := c.bindingPolicyClient.UpdateStatus(ctx, policyWithProposedStatus, metav1.UpdateOptions{FieldManager: ControllerName}); err != nil {
 		return err
