@@ -59,7 +59,7 @@ func TestSetCondition(t *testing.T) {
 			corev1.ConditionTrue, metav1.Now()),
 	}
 
-	actualConditions := SetCondition(conditions1, newCondition)
+	actualConditions, _ := SetCondition(conditions1, newCondition)
 
 	if !AreConditionSlicesSame(actualConditions, expectedConditions) {
 		t.Errorf("SetCondition failed: expected %+v, but got %+v", expectedConditions, actualConditions)
