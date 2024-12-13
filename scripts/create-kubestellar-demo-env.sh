@@ -92,7 +92,7 @@ context_clean_up() {
 
 checking_cluster() {
     found=false
-    
+
     while true; do
 
         output=$(kubectl --context its1 get csr)
@@ -110,7 +110,7 @@ checking_cluster() {
 
         if [ "$found" = true ]; then
             break
-            
+
         else
             echo "CSR for $1 not found. Trying again..."
             sleep 20
@@ -207,7 +207,7 @@ images=("ghcr.io/loft-sh/vcluster:0.16.4"
 
 for image in "${images[@]}"; do
     (
-        docker pull "$image" 
+        docker pull "$image"
     ) &
 done
 wait
@@ -242,8 +242,8 @@ kflex ctx --overwrite-existing-context wds2
 kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
-kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its}=true' --timeout 24h
-kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its --for condition=Complete --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 24h
 echo -e "\nWaiting for OCM hub cluster-info to be updated..."
 kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 24h
 echo -e "\033[33m✔\033[0m OCM hub is ready"

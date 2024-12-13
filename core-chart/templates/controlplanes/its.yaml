@@ -7,7 +7,7 @@ metadata:
 spec:
   backend: shared
   type: {{ $cp.type | default "vcluster" }}
-  postCreateHook: its
+  postCreateHook: {{ (eq $cp.install_clusteradm false) | ternary "its-without-clusteradm" "its-with-clusteradm" }}
   postCreateHookVars:
     ITSSecretName: {{ (eq $cp.type "host") | ternary "admin-kubeconfig" "vc-vcluster" }}
     ITSkubeconfig: {{ (eq $cp.type "host") | ternary "kubeconfig-incluster" "config-incluster" }}
