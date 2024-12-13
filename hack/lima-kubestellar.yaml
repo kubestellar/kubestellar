@@ -92,25 +92,21 @@ provision:
     wget -q https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/create-kubestellar-demo-env.sh
     chmod +x create-kubestellar-demo-env.sh
     ./create-kubestellar-demo-env.sh --platform kind
-
+  
 probes:
 - script: |
     #!/bin/bash
     set -eux -o pipefail
-    if ! timeout 30s bash -c "until command -v docker >/dev/null 2>&1; do sleep 3; done"; then
-      echo >&2 "docker is not installed yet"
+    echo "Waiting for managedcluster wds2 to become available..."
+    
+    # Loop until the managedcluster wds2 is available
+    if ! timeout 900s bash -c "until kubectl --context its1 get managedclusters | grep -q wds2; do echo 'Waiting for wds2...'; sleep 10; done"; then
+      echo >&2 "managedcluster wds2 is not available after 10 minutes."
       exit 1
     fi
-    if ! timeout 30s bash -c "until pgrep rootlesskit; do sleep 3; done"; then
-      echo >&2 "rootlesskit (used by rootless docker) is not running"
-      exit 1
-    fi
-    # TODO - Lima does not wait for KubeStellar environment to finish provisioning - need a longer timeout somehow - line below is not working 
-    if ! timeout 600s bash -c "until kubectl --context its1 get managedclusters | grep wds; do sleep 10; done"; then
-      echo >&2 "managedclusters are not available yet"
-      exit 1
-    fi
-  hint: See "/var/log/cloud-init-output.log" in the guest
+    
+    echo "managedcluster wds2 is available!"
+  hint: See "sudo tail -f /var/log/cloud-init-output.log" in the guest
 hostResolver:
   # hostResolver.hosts requires lima 0.8.3 or later. Names defined here will also
   # resolve inside containers, and not just inside the VM itself.
