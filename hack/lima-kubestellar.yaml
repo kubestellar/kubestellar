@@ -93,11 +93,47 @@ provision:
     ./create-kubestellar-demo-env.sh --platform kind
   
 probes:
-- script: |
+- description: "wait for KubeFlex to be installed"
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    if ! timeout 30s bash -c "until command -v kflex >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "KubeFlex is not installed."
+      exit 1
+    fi
+- description: "wait for KubeFlex to be available"
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    if ! timeout 30s bash -c "until kubectl config use-context kind-kubeflex >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "KubeFlex is not available."
+      exit 1
+    fi
+- description: "wait for KubeStellar Core to be available"
+  script: |
     #!/bin/bash
     set -eux -o pipefail
 
-    if ! timeout 300s bash -c "until kubectl --context its1 get managedclusters | grep -q cluster2 >/dev/null 2>&1; do sleep 10; done"; then
+    if ! timeout 300s bash -c "until kflex ctx --overwrite-existing-context its1 >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "KubeStellar Core is not available."
+      exit 1
+    fi
+- description: "wait for managedcluster cluster1 to be available"
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+
+    if ! timeout 300s bash -c "until kubectl --context its1 get managedclusters | grep -q cluster1 >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "managedcluster cluster1 is not available."
+      exit 1
+    fi
+
+- description: "wait for managedcluster cluster2 to be available"
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+
+    if ! timeout 300s bash -c "until kubectl --context its1 get managedclusters | grep -q cluster2 >/dev/null 2>&1; do sleep 3; done"; then
       echo >&2 "managedcluster cluster2 is not available."
       exit 1
     fi
