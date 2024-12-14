@@ -55,7 +55,6 @@ provision:
     echo 'fs.inotify.max_user_instances = 512' >> /etc/sysctl.conf
     sysctl --system
     snap install yq 
-    # snap install jq
     snap install kubectl --classic
     snap install helm --classic
     curl -s https://ocm.software/install.sh | sudo bash
@@ -71,11 +70,11 @@ provision:
     systemctl --user start dbus
     dockerd-rootless-setuptool.sh install
     docker context use rootless
-    
+
     echo "Adding alias for kubectl..."
     echo "alias k=kubectl" >> ~/.bashrc
     source ~/.bashrc
-
+  
     echo "Installing Kind..."
     KIND_ARCH=$(uname -m)
     case "$KIND_ARCH" in
@@ -97,16 +96,23 @@ probes:
 - script: |
     #!/bin/bash
     set -eux -o pipefail
-    echo "Waiting for managedcluster wds2 to become available..."
-    
-    # Loop until the managedcluster wds2 is available
-    if ! timeout 900s bash -c "until kubectl --context its1 get managedclusters | grep -q wds2; do echo 'Waiting for wds2...'; sleep 10; done"; then
-      echo >&2 "managedcluster wds2 is not available after 10 minutes."
+
+    # if ! timeout 200s bash -c "until command -v kflex >/dev/null 2>&1; do sleep 10"; then
+    #   echo >&2 "kflex is not available"
+    #   exit 1
+    # fi
+
+    # if ! timeout 300s bash -c "until kubectl --context kind-kubeflex wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 24h >/dev/null 2>&1; do echo 'Waiting for OCM hub cluster-info update...'; sleep 10; done"; then
+    #   echo >&2 "OCM is not available."
+    #   exit 1
+    # fi    
+
+    if ! timeout 300s bash -c "until kubectl --context its1 get managedclusters | grep -q cluster2 >/dev/null 2>&1; do sleep 10; done"; then
+      echo >&2 "managedcluster cluster2 is not available."
       exit 1
     fi
-    
-    echo "managedcluster wds2 is available!"
-  hint: See "sudo tail -f /var/log/cloud-init-output.log" in the guest
+
+  hint: Use "sudo tail -f /var/log/cloud-init-output.log" in the guest to see progress.
 hostResolver:
   # hostResolver.hosts requires lima 0.8.3 or later. Names defined here will also
   # resolve inside containers, and not just inside the VM itself.
