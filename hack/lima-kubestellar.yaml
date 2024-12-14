@@ -97,16 +97,6 @@ probes:
     #!/bin/bash
     set -eux -o pipefail
 
-    # if ! timeout 200s bash -c "until command -v kflex >/dev/null 2>&1; do sleep 10"; then
-    #   echo >&2 "kflex is not available"
-    #   exit 1
-    # fi
-
-    # if ! timeout 300s bash -c "until kubectl --context kind-kubeflex wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 24h >/dev/null 2>&1; do echo 'Waiting for OCM hub cluster-info update...'; sleep 10; done"; then
-    #   echo >&2 "OCM is not available."
-    #   exit 1
-    # fi    
-
     if ! timeout 300s bash -c "until kubectl --context its1 get managedclusters | grep -q cluster2 >/dev/null 2>&1; do sleep 10; done"; then
       echo >&2 "managedcluster cluster2 is not available."
       exit 1
