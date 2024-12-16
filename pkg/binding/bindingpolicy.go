@@ -143,16 +143,13 @@ func CreateOrUpdateStatusCollectorAvailableCondition(
 		}
 	}
 	// create or update if necessary
-	conditions, changed := v1alpha1.SetCondition(bp.Status.Conditions, conditionTentative)
+	policyWithProposedCondition := bp.DeepCopy()
+	conditions, changed := v1alpha1.SetCondition(policyWithProposedCondition.Status.Conditions, conditionTentative)
 	if !changed {
 		return nil
 	}
-	policyWithProposedStatus := bp.DeepCopy()
-	policyWithProposedStatus.Status = v1alpha1.BindingPolicyStatus{
-		ObservedGeneration: bp.Generation,
-		Conditions:         conditions,
-	}
-	if _, err := bindingPolicyClient.UpdateStatus(ctx, policyWithProposedStatus, metav1.UpdateOptions{FieldManager: ControllerName}); err != nil {
+	policyWithProposedCondition.Status.Conditions = conditions
+	if _, err := bindingPolicyClient.UpdateStatus(ctx, policyWithProposedCondition, metav1.UpdateOptions{FieldManager: ControllerName}); err != nil {
 		return err
 	}
 	return nil
