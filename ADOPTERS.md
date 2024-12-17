@@ -5,3 +5,5 @@ Listed below are organizations that have adopted KubeStellar in one way or anoth
 
 | Organization  | Description | Maturity Level | Further Information |
 | ------------- | ------------- | --- | --- |
+| Cornell University | Workload orchestration for the Software-Defined Farm (SDF) System | Workload Integration | [SDF Repo](https://github.com/Cornell-CIDA-Dev/Software-Defined-Farm) |
+| ------------- | ------------- | --- | --- |
