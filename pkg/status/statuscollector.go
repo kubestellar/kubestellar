@@ -22,12 +22,10 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/abstract"
-	"github.com/kubestellar/kubestellar/pkg/binding"
 )
 
 func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error {
@@ -59,25 +57,10 @@ func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error 
 		}
 	}
 
-	combinedStatusSet := c.combinedStatusResolver.NoteStatusCollector(ctx, statusCollector, isDeleted, c.workStatusIndexer)
+	combinedStatusSet := c.combinedStatusResolver.NoteStatusCollector(ctx, statusCollector, isDeleted, c.workStatusIndexer, c.bindingPolicyClient, c.bindingPolicyLister, c.statusCollectorLister)
 	for combinedStatus := range combinedStatusSet {
 		logger.V(5).Info("Enqueuing reference to CombinedStatus while syncing StatusCollector", "combinedStatusRef", combinedStatus.ObjectName, "statusCollectorName", ref)
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
-	}
-
-	relevantBPs, err := c.identifyRelevantBindingPolicies(ref)
-	if err != nil {
-		return err
-	}
-	for _, bp := range relevantBPs {
-		logger.V(5).Info("Checking a BindingPolicy because it requires the StatusCollector", "bindingPolicyName", bp.Name, "statusCollectorName", ref)
-		missingSCs, err := binding.IdentifyMissingStatusCollectors(c.statusCollectorLister, bp)
-		if err != nil {
-			return err
-		}
-		if err = binding.CreateOrUpdateStatusCollectorAvailableCondition(c.bindingPolicyClient, ctx, bp, missingSCs); err != nil {
-			return err
-		}
 	}
 
 	logger.V(5).Info("Synced StatusCollector", "ref", ref)
@@ -175,29 +158,4 @@ func (c *Controller) updateStatusCollectorErrors(ctx context.Context, statusColl
 	logger.V(2).Info("Updated StatusCollector status", "ns", statusCollector.Namespace,
 		"name", statusCollector.Name, "resourceVersion", scEcho.ResourceVersion)
 	return nil
-}
-
-func (c *Controller) identifyRelevantBindingPolicies(statusCollectorName string) ([]*v1alpha1.BindingPolicy, error) {
-	allBPs, err := c.bindingPolicyLister.List(labels.Everything())
-	if err != nil {
-		return nil, err
-	}
-	relevant := []*v1alpha1.BindingPolicy{}
-	for _, bp := range allBPs {
-		if bindingPolicyRequiresStatusCollector(bp, statusCollectorName) {
-			relevant = append(relevant, bp)
-		}
-	}
-	return relevant, nil
-}
-
-func bindingPolicyRequiresStatusCollector(bp *v1alpha1.BindingPolicy, requiredSC string) bool {
-	for _, clause := range bp.Spec.Downsync {
-		for _, sc := range clause.DownsyncModulation.StatusCollectors {
-			if sc == requiredSC {
-				return true
-			}
-		}
-	}
-	return false
 }
