@@ -400,10 +400,13 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         echostatus "$its_status"
         echo -n -e "  - Status addon controller: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, ns=${COLOR_INFO}$status_ns${COLOR_NONE}, version=${COLOR_INFO}$status_version${COLOR_NONE}, status="
         echostatus "$status_status"
-        ocm_pod=$(kubectl --context $helm_context -n "$status_ns" get pod -o name 2> /dev/null | egrep pod/cluster-manager-[0-9a-f]{8}- | cut -d/ -f2 || true)
-        if [ -n "$ocm_pod" ]; then
-            ocm_version=$(kubectl --context $helm_context get pod -n "$status_ns" "$ocm_pod" -o jsonpath={.spec.containers[0].image} | cut -d: -f2 | sed s/^v//)
-            echo -e "  - Open-cluster-manager version=${COLOR_INFO}$ocm_version${COLOR_NONE}"
+        if [ -n "${cp_kubeconfig[cp_n]}" ]; then
+            ocm_version=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl get deploy -n open-cluster-management cluster-manager -o jsonpath={.spec.template.spec.containers[0].image} | cut -d: -f2)
+            if [ -n "$ocm_version" ]; then
+                echo -e "  - Open-cluster-manager: version=${COLOR_INFO}$ocm_version${COLOR_NONE}"
+            else
+                echo -e "  - Open-cluster-manager: ${COLOR_ERROR}not found${COLOR_NONE}"
+            fi
         fi
     else
         kubestellar_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
