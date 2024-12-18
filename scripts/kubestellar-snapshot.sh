@@ -385,8 +385,8 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         cp_kubeconfig[cp_n]="$TMPFOLDER/$name-kubeconfig"
         echo "$cp_kubeconfig_content" > "${cp_kubeconfig[cp_n]}"
     fi
-    if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
-        its_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=its" -o name 2> /dev/null | cut -d'/' -f2 || true)
+    if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
+        its_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=${cp_pch[cp_n]}" -o name 2> /dev/null | cut -d'/' -f2 || true)
         its_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         if [[ "${cp_type[cp_n]}" == "host" ]] ; then
             status_ns="open-cluster-management"
@@ -414,7 +414,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     if [[ "$arg_yaml" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
         kubectl --context $helm_context get controlplane $name -o yaml > "$OUTPUT_FOLDER/$name/cp.yaml"
-        if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
+        if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o yaml > "$OUTPUT_FOLDER/$name/its-job.yaml"
             kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o yaml > "$OUTPUT_FOLDER/$name/status-addon.yaml"
         else
@@ -424,7 +424,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     fi
     if [[ "$arg_logs" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
-        if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
+        if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-clusteradm > "$OUTPUT_FOLDER/$name/its-job-clusteradm.log"
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-statusaddon > "$OUTPUT_FOLDER/$name/its-job-status-addon.log"
             kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller > "$OUTPUT_FOLDER/$name/status-addon.log"
@@ -443,7 +443,7 @@ done
 echotitle "Managed Clusters:"
 mc_n=0
 for j in "${!cp_pch[@]}" ; do
-    if [[ "${cp_pch[$j]}" == "its" ]] ; then
+    if [[ "${cp_pch[$j]}" =~ ^its ]] ; then
         mcs=($(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster -no-headers -o name 2> /dev/null || true))
         for i in "${!mcs[@]}" ; do
             name=${mcs[i]##*/}
@@ -541,7 +541,7 @@ done
 echotitle "Manifest Works:"
 mw_n=0
 for h in "${!cp_pch[@]}" ; do
-    if [[ "${cp_pch[$h]}" == "its" ]] ; then
+    if [[ "${cp_pch[$h]}" =~ ^its ]] ; then
         ns=($(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl get ns -no-headers -o name 2> /dev/null || true))
         for j in "${!ns[@]}" ; do
             cluster=${ns[j]##*/}
@@ -580,7 +580,7 @@ done
 echotitle "Work Statuses:"
 sw_n=0
 for h in "${!cp_pch[@]}" ; do
-    if [[ "${cp_pch[$h]}" == "its" ]] ; then
+    if [[ "${cp_pch[$h]}" =~ ^its ]] ; then
         ns=($(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl get ns -no-headers -o name 2> /dev/null || true))
         for j in "${!ns[@]}" ; do
             cluster=${ns[j]##*/}
