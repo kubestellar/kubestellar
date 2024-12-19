@@ -743,6 +743,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("can sum status.availableReplicas across WECs", func(ctx context.Context) {
+			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{sumAvailableReplicasStatusCollectorName}
+			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
+			time.Sleep(5 * time.Second)
 			availableReplicasCEL := ksapi.Expression("returned.status.availableReplicas")
 			util.CreateStatusCollector(ctx, ksWds, sumAvailableReplicasStatusCollectorName,
 				ksapi.StatusCollectorSpec{
@@ -753,9 +756,6 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					}},
 					Limit: 10,
 				})
-
-			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{sumAvailableReplicasStatusCollectorName}
-			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
 				if n := len(cs.Results); n != 1 {
@@ -781,7 +781,6 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("can list all the WECs where the reported number of availableReplicas equals the desired number of replicas", func(ctx context.Context) {
-
 			availableNginxCEL := ksapi.Expression("obj.spec.replicas == returned.status.availableReplicas")
 			util.CreateStatusCollector(ctx, ksWds, listNginxWecsStatusCollectorName,
 				ksapi.StatusCollectorSpec{
@@ -845,6 +844,11 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					Limit: 20,
 				})
 
+			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{selectAvailableStatusCollectorName, selectReplicasStatusCollectorName}
+			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
+
+			time.Sleep(5 * time.Second)
+
 			util.CreateStatusCollector(ctx, ksWds, selectReplicasStatusCollectorName,
 				ksapi.StatusCollectorSpec{
 					Select: []ksapi.NamedExpression{
@@ -858,9 +862,6 @@ var _ = ginkgo.Describe("end to end testing", func() {
 						}},
 					Limit: 20,
 				})
-
-			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{selectAvailableStatusCollectorName, selectReplicasStatusCollectorName}
-			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
 				if n := len(cs.Results); n != 2 {
@@ -890,6 +891,10 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			strNegInf := strconv.FormatFloat(math.Inf(-1), 'g', -1, 64)
 			strNaN := strconv.FormatFloat(math.NaN(), 'g', -1, 64)
 			collectorName := "test-empty-group"
+
+			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{collectorName}
+			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
+			time.Sleep(5 * time.Second)
 			util.CreateStatusCollector(ctx, ksWds, collectorName,
 				ksapi.StatusCollectorSpec{
 					Filter: &exprFalse,
@@ -902,9 +907,6 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					},
 					Limit: 20,
 				})
-
-			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{collectorName}
-			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
 				if n := len(cs.Results); n != 1 {
