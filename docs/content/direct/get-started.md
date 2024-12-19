@@ -133,7 +133,6 @@ host_context=kind-kubeflex
 its_cp=its1
 its_context=its1
 wds_cp=wds1
-wds_host=wds2
 wds_context=wds1
 wec1_name=cluster1
 wec2_name=cluster2
