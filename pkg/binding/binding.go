@@ -109,6 +109,7 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 	policyWithStatus := policy.DeepCopy()
 	policyWithStatus.Status = v1alpha1.BindingPolicyStatus{
 		ObservedGeneration: policy.Generation,
+		Conditions:         policy.Status.Conditions,
 		Errors:             policyErrors,
 	}
 	policyEcho, updateErr := c.bindingPolicyClient.UpdateStatus(ctx, policyWithStatus, metav1.UpdateOptions{FieldManager: ControllerName})
