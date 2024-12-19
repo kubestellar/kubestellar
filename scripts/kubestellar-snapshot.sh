@@ -394,11 +394,20 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
             status_ns="${cp_ns[cp_n]}"
         fi
         status_pod=$(kubectl --context $helm_context -n "$status_ns" get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
+        status_version=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.spec.containers}' | jq -r '.[].image | select(contains("status-addon"))' | cut -d: -f2 || true)
         status_status=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -n -e "  - Post Create Hook: pod=${COLOR_INFO}$its_pod${COLOR_NONE}, ns=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$its_status"
-        echo -n -e "  - Status addon controller: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, ns=${COLOR_INFO}$status_ns${COLOR_NONE}, status="
+        echo -n -e "  - Status addon controller: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, ns=${COLOR_INFO}$status_ns${COLOR_NONE}, version=${COLOR_INFO}$status_version${COLOR_NONE}, status="
         echostatus "$status_status"
+        if [ -n "${cp_kubeconfig[cp_n]}" ]; then
+            ocm_version=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl get deploy -n open-cluster-management cluster-manager -o jsonpath={.spec.template.spec.containers[0].image} | cut -d: -f2)
+            if [ -n "$ocm_version" ]; then
+                echo -e "  - Open-cluster-manager: version=${COLOR_INFO}$ocm_version${COLOR_NONE}"
+            else
+                echo -e "  - Open-cluster-manager: ${COLOR_ERROR}not found${COLOR_NONE}"
+            fi
+        fi
     else
         kubestellar_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
         kubestellar_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image' | cut -d':' -f2 || true)
