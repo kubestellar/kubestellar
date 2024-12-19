@@ -32,6 +32,7 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/binding"
 	controllisters "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
+	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
@@ -80,7 +81,10 @@ type CombinedStatusResolver interface {
 	// The returned set contains the identifiers of combinedstatus objects
 	// that should be queued for syncing.
 	NoteStatusCollector(ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool,
-		workStatusIndexer cache.Indexer) sets.Set[util.ObjectIdentifier]
+		workStatusIndexer cache.Indexer,
+		bindingPolicyClient ksmetrics.ClientModNamespace[*v1alpha1.BindingPolicy, *v1alpha1.BindingPolicyList],
+		bindingPolicyLister controllisters.BindingPolicyLister,
+		statusCollectorLister controllisters.StatusCollectorLister) sets.Set[util.ObjectIdentifier]
 
 	// NoteWorkStatus notes a workstatus in the combinedstatus resolutions
 	// associated with its source workload object.
@@ -362,7 +366,11 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus 
 // The returned set contains the identifiers of combinedstatus objects
 // that should be queued for syncing.
 func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool,
-	workStatusIndexer cache.Indexer) sets.Set[util.ObjectIdentifier] {
+	workStatusIndexer cache.Indexer,
+	bindingPolicyClient ksmetrics.ClientModNamespace[*v1alpha1.BindingPolicy, *v1alpha1.BindingPolicyList],
+	bindingPolicyLister controllisters.BindingPolicyLister,
+	statusCollectorLister controllisters.StatusCollectorLister,
+) sets.Set[util.ObjectIdentifier] {
 	c.Lock()
 	defer c.Unlock()
 
@@ -393,6 +401,14 @@ func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, status
 					workStatusIndexer).UnsortedList()...)
 			}
 		}
+
+		// TODO: change the go doc comments for NoteStatusCollector if we keep the Condition updating logic below
+		bp, _ := bindingPolicyLister.Get(bindingName)
+		if !bindingPolicyRequiresStatusCollector(bp, statusCollector.Name) {
+			continue
+		}
+		missingSCs, _ := binding.IdentifyMissingStatusCollectors(statusCollectorLister, bp)
+		binding.CreateOrUpdateStatusCollectorAvailableCondition(bindingPolicyClient, ctx, bp, missingSCs)
 	}
 
 	if !deleted {
@@ -586,4 +602,15 @@ func namedExpressionSliceToMap(slice []v1alpha1.NamedExpression) map[string]v1al
 
 func expressionPtrsEqual(e1, e2 *v1alpha1.Expression) bool {
 	return e1 == nil && e2 == nil || e1 != nil && e2 != nil && *e1 == *e2
+}
+
+func bindingPolicyRequiresStatusCollector(bp *v1alpha1.BindingPolicy, requiredSC string) bool {
+	for _, clause := range bp.Spec.Downsync {
+		for _, sc := range clause.DownsyncModulation.StatusCollectors {
+			if sc == requiredSC {
+				return true
+			}
+		}
+	}
+	return false
 }
