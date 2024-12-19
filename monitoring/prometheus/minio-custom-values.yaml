@@ -8,14 +8,22 @@ resources:
   requests:
     memory: 2Gi
 
-ingress:
-  enabled: false
+# ingress:
+#   enabled: false
 
 service:
   type: NodePort
   port: "9000"
   nodePort: 32000
-  
+
+securityContext:
+  enabled: null
+  runAsUser: null
+  runAsGroup: null
+  fsGroup: null
+  fsGroupChangePolicy: null
+  readOnlyRootFilesystem: null
+
 buckets:
   - name: thanos
     policy: none
