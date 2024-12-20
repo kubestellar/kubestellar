@@ -673,11 +673,6 @@ var _ = ginkgo.Describe("end to end testing", func() {
 	ginkgo.Context("combined status testing", func() {
 		const workloadName = "nginx"
 		const bpName = "nginx-combinedstatus"
-		const fullStatusCollectorName = "full-status"
-		const sumAvailableReplicasStatusCollectorName = "sum-available-replicas"
-		const selectAvailableStatusCollectorName = "select-available-replicas"
-		const selectReplicasStatusCollectorName = "replicas"
-		const listNginxWecsStatusCollectorName = "nginx-wecs"
 
 		clusterSelector := []metav1.LabelSelector{
 			{MatchLabels: map[string]string{"location-group": "edge"}},
@@ -689,6 +684,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		}
 
 		ginkgo.It("can list the full status from each WEC", func(ctx context.Context) {
+			const fullStatusCollectorName = "full-status"
 			util.CreateStatusCollector(ctx, ksWds, fullStatusCollectorName,
 				ksapi.StatusCollectorSpec{
 					Select: []ksapi.NamedExpression{
@@ -743,6 +739,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("can sum status.availableReplicas across WECs", func(ctx context.Context) {
+			const sumAvailableReplicasStatusCollectorName = "sum-available-replicas"
 			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{sumAvailableReplicasStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
 			time.Sleep(5 * time.Second)
@@ -781,6 +778,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("can list all the WECs where the reported number of availableReplicas equals the desired number of replicas", func(ctx context.Context) {
+			const listNginxWecsStatusCollectorName = "nginx-wecs"
 			availableNginxCEL := ksapi.Expression("obj.spec.replicas == returned.status.availableReplicas")
 			util.CreateStatusCollector(ctx, ksWds, listNginxWecsStatusCollectorName,
 				ksapi.StatusCollectorSpec{
@@ -831,6 +829,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("can support multiple StatusCollectors", func(ctx context.Context) {
+			const selectAvailableStatusCollectorName = "select-available-replicas"
+			const selectReplicasStatusCollectorName = "replicas"
 			util.CreateStatusCollector(ctx, ksWds, selectAvailableStatusCollectorName,
 				ksapi.StatusCollectorSpec{
 					Select: []ksapi.NamedExpression{
