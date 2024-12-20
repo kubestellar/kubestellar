@@ -252,7 +252,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 		}
 
 		// fetch missing statuscollector specs
-		c.fetchMissingStatusCollectorSpecsLocked(statusCollectorLister, objectData.Modulation.StatusCollectors)
+		// TODO delete this? c.fetchMissingStatusCollectorSpecsLocked(statusCollectorLister, objectData.Modulation.StatusCollectors)
 
 		// update statuscollectors
 		removedCollectors, addedCollectors := csResolution.setStatusCollectors(c.statusCollectorNameToSpecFromCache(objectData.Modulation.StatusCollectors))

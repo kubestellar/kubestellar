@@ -180,7 +180,7 @@ func (c *Controller) testObject(ctx context.Context, bindingName string, objIden
 			}
 		}
 
-		klog.FromContext(ctx).V(5).Info("Workload object matched test", "objIdentifier", objIdentifier, "objLabels", objLabels, "test", test, "binding", bindingName)
+		klog.FromContext(ctx).V(5).Info("Workload object matched clause", "objIdentifier", objIdentifier, "objLabels", objLabels, "clause", test, "binding", bindingName)
 		// test is a match
 		matched = true
 		mod.AddExternal(test.DownsyncModulation)

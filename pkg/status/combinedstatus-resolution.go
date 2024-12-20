@@ -79,6 +79,9 @@ type combinedStatusResolution struct {
 var _ logr.Marshaler = &combinedStatusResolution{}
 
 func (csr *combinedStatusResolution) MarshalLog() any {
+	if csr == nil {
+		return nil
+	}
 	return map[string]any{
 		"Name":                      csr.Name,
 		"StatusCollectorNameToData": csr.StatusCollectorNameToData,
