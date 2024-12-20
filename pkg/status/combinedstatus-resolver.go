@@ -194,7 +194,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 		logger.V(3).Info("Deleting CombinedStatus resolutions for Binding", "name", bindingName)
 		return c.deleteResolutionsForBindingWriteLocked(bindingName)
 	} else {
-		logger.V(3).Info("Noting non-deleted resolution", "bindingResolution", bindingResolution)
+		logger.V(3).Info("Noting non-deleted resolutions for Binding", "name", bindingName, "bindingResolution", bindingResolution)
 	}
 
 	destinationsSet := bindingResolution.GetDestinations()
@@ -363,26 +363,29 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus 
 // that should be queued for syncing.
 func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool,
 	workStatusIndexer cache.Indexer) sets.Set[util.ObjectIdentifier] {
+	logger := klog.FromContext(ctx)
 	c.Lock()
 	defer c.Unlock()
 
 	currentSpec := c.statusCollectorNameToSpec[statusCollector.Name]
 	if !deleted && currentSpec != nil && statusCollectorSpecsMatch(currentSpec, &statusCollector.Spec) {
+		logger.V(5).Info("No change in StatusCollector", "name", statusCollector.Name)
 		return nil // already cached and the spec has not changed
 	}
+	logger.V(5).Info("Noting StatusCollector", "name", statusCollector.Name, "numBindings", len(c.bindingNameToResolutions), "deleted", deleted)
 
 	combinedStatusIdentifiersToQueue := sets.New[util.ObjectIdentifier]()
 	// update resolutions that use the statuscollector
 	// this call cannot add an association that was not already present.
 	// if deleted, the association is removed.
 	for bindingName, resolutions := range c.bindingNameToResolutions {
+		logger.V(5).Info("Considering Binding", "statusCollectorName", statusCollector.Name, "bindingName", bindingName, "numResolutions", len(resolutions))
 		for workloadObjectIdentifier, resolution := range resolutions {
 			if deleted {
 				if resolution.removeStatusCollector(statusCollector.Name) {
 					combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
 						workloadObjectIdentifier.ObjectName.Namespace))
 				}
-
 				continue
 			}
 
@@ -431,7 +434,7 @@ func (c *combinedStatusResolver) ResolutionExists(name string) (string, util.Obj
 // fetchMissingStatusCollectorSpecs fetches the missing statuscollector specs
 // from the given lister and updates the cache.
 // The method is expected to be called with the write lock held.
-func (c *combinedStatusResolver) fetchMissingStatusCollectorSpecsLocked(statusCollectorLister controllisters.StatusCollectorLister,
+func (c *combinedStatusResolver) fetchMissingStatusCollectorSpecsLockedAndDeleteMe(statusCollectorLister controllisters.StatusCollectorLister,
 	statusCollectorNames sets.Set[string]) {
 	for statusCollectorName := range statusCollectorNames {
 		if _, exists := c.statusCollectorNameToSpec[statusCollectorName]; exists {

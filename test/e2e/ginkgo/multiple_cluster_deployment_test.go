@@ -671,13 +671,13 @@ var _ = ginkgo.Describe("end to end testing", func() {
 	})
 
 	ginkgo.Context("combined status testing", func() {
-		workloadName := "nginx"
-		bpName := "nginx-combinedstatus"
-		fullStatusCollectorName := "full-status"
-		sumAvailableReplicasStatusCollectorName := "sum-available-replicas"
-		selectAvailableStatusCollectorName := "select-available-replicas"
-		selectReplicasStatusCollectorName := "replicas"
-		listNginxWecsStatusCollectorName := "nginx-wecs"
+		const workloadName = "nginx"
+		const bpName = "nginx-combinedstatus"
+		const fullStatusCollectorName = "full-status"
+		const sumAvailableReplicasStatusCollectorName = "sum-available-replicas"
+		const selectAvailableStatusCollectorName = "select-available-replicas"
+		const selectReplicasStatusCollectorName = "replicas"
+		const listNginxWecsStatusCollectorName = "nginx-wecs"
 
 		clusterSelector := []metav1.LabelSelector{
 			{MatchLabels: map[string]string{"location-group": "edge"}},

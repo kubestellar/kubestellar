@@ -28,6 +28,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
+	"github.com/go-logr/logr"
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -70,6 +71,16 @@ type ObjectData struct {
 
 // Assert that `*bindingPolicyResolution` implements Resolution
 var _ Resolution = &bindingPolicyResolution{}
+
+var _ logr.Marshaler = &bindingPolicyResolution{}
+
+func (resolution *bindingPolicyResolution) MarshalLog() any {
+	return map[string]any{
+		"objectIdentifierToData": util.PrimitiveMap4Log(resolution.objectIdentifierToData),
+		"destinations":           resolution.destinations,
+		"ownerReference":         resolution.ownerReference,
+	}
+}
 
 func (resolution *bindingPolicyResolution) GetPolicyUID() string {
 	resolution.RLock()
