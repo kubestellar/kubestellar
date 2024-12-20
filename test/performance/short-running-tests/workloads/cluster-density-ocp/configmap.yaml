@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{.Name}}
   labels:
-    app.kubernetes.io/name: cluster-density-{{.iterations}}
+    app.kubernetes.io/name:  {{.labelPrefix}}
 data:
   key1: |
     ZjlWd1FLZ213NHZZK0hFR1JRditJbVN2RjR1OWt1NlBJNFZMdXhjSXNKWE1GQ3I4YWRNQW1OY3l1

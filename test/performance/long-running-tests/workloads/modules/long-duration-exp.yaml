@@ -1,0 +1,16 @@
+## Input params
+{{$actionName := .actionName}}
+{{$namespaces := .namespaces}}
+{{$tuningSet := .tuningSet}}
+{{$numbeOfWorkloadObjects := .numbeOfWorkloadObjects}}
+
+steps:
+- name: "{{$actionName}} workload k8s objects for long duration experiments"
+  phases:
+  - NamespaceList: 
+    - perf-test
+    replicasPerNamespace: {{$numbeOfWorkloadObjects}}
+    tuningSet: {{$tuningSet}}
+    objectBundle:
+    - basename: perf-workload
+      objectTemplatePath: long-duration-exp-workload.yaml
