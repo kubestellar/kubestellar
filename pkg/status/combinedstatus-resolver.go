@@ -251,9 +251,6 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 			c.resolutionNameToKey[csResolution.getName()] = resolutionKey{bindingName, objectIdentifier}
 		}
 
-		// fetch missing statuscollector specs
-		// TODO delete this? c.fetchMissingStatusCollectorSpecsLocked(statusCollectorLister, objectData.Modulation.StatusCollectors)
-
 		// update statuscollectors
 		removedCollectors, addedCollectors := csResolution.setStatusCollectors(c.statusCollectorNameToSpecFromCache(objectData.Modulation.StatusCollectors))
 
@@ -382,7 +379,7 @@ func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, status
 		logger.V(5).Info("Considering Binding", "statusCollectorName", statusCollector.Name, "bindingName", bindingName, "numResolutions", len(resolutions))
 		for workloadObjectIdentifier, resolution := range resolutions {
 			if deleted {
-				if resolution.removeStatusCollector(statusCollector.Name) {
+				if resolution.noteStatusCollectorAbsence(statusCollector.Name) {
 					combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
 						workloadObjectIdentifier.ObjectName.Namespace))
 				}
@@ -429,28 +426,6 @@ func (c *combinedStatusResolver) ResolutionExists(name string) (string, util.Obj
 	}
 
 	return key.bindingName, key.sourceObjectIdentifier, true
-}
-
-// fetchMissingStatusCollectorSpecs fetches the missing statuscollector specs
-// from the given lister and updates the cache.
-// The method is expected to be called with the write lock held.
-func (c *combinedStatusResolver) fetchMissingStatusCollectorSpecsLockedAndDeleteMe(statusCollectorLister controllisters.StatusCollectorLister,
-	statusCollectorNames sets.Set[string]) {
-	for statusCollectorName := range statusCollectorNames {
-		if _, exists := c.statusCollectorNameToSpec[statusCollectorName]; exists {
-			continue // this method is not responsible for keeping the cache up-to-date
-		}
-
-		statusCollector, err := statusCollectorLister.Get(statusCollectorName)
-		if err != nil {
-			// fetch error should not disturb the flow.
-			// a missing spec will be reconciled when the status collector is created/updated.
-			runtime2.HandleError(fmt.Errorf("failed to get statuscollector %s: %w", statusCollectorName, err))
-			return
-		}
-
-		c.statusCollectorNameToSpec[statusCollectorName] = &statusCollector.Spec // readonly
-	}
 }
 
 // evaluateWorkStatusesPerBindingReadLocked evaluates workstatuses associated
@@ -561,17 +536,11 @@ func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool 
 	return true
 }
 
-func (c *combinedStatusResolver) statusCollectorNameToSpecFromCache(names sets.Set[string]) map[string]v1alpha1.StatusCollectorSpec {
-	result := make(map[string]v1alpha1.StatusCollectorSpec, len(names))
+func (c *combinedStatusResolver) statusCollectorNameToSpecFromCache(names sets.Set[string]) map[string]*v1alpha1.StatusCollectorSpec {
+	result := make(map[string]*v1alpha1.StatusCollectorSpec, len(names))
 	for name := range names {
-		spec, ok := c.statusCollectorNameToSpec[name]
-		if !ok {
-			continue
-		}
-
-		result[name] = *spec
+		result[name] = c.statusCollectorNameToSpec[name]
 	}
-
 	return result
 }
 
