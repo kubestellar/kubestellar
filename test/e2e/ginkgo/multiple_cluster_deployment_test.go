@@ -121,6 +121,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			})
 			util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 1)
 			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 1)
+			dep1 := util.GetDeployment(ctx, wec1, ns, "nginx")
+			dep2 := util.GetDeployment(ctx, wec2, ns, "nginx")
 
 			ginkgo.By("modifying the Deployment in the WDS and expecting no change in the WECs")
 			objPatch := []byte(`{"spec":{"replicas": 2}}`)
@@ -131,6 +133,28 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			time.Sleep(30 * time.Second)
 			gomega.Expect(util.GetNumDeploymentReplicas(ctx, wec1, ns)).To(gomega.Equal(1))
 			gomega.Expect(util.GetNumDeploymentReplicas(ctx, wec2, ns)).To(gomega.Equal(1))
+			dep1b := util.GetDeployment(ctx, wec1, ns, "nginx")
+			dep2b := util.GetDeployment(ctx, wec2, ns, "nginx")
+			gomega.Expect(dep1b.UID).To(gomega.Equal(dep1.UID))
+			gomega.Expect(dep2b.UID).To(gomega.Equal(dep2.UID))
+
+			ginkgo.By("Adding Deployment objects to workload, expect no change to first in WECs")
+			util.CreateDeployment(ctx, wds, ns, "nginy",
+				map[string]string{
+					"app.kubernetes.io/name":         "nginx",
+					"test.kubestellar.io/test-label": "here",
+				})
+			util.CreateDeployment(ctx, wds, ns, "enginx",
+				map[string]string{
+					"app.kubernetes.io/name":         "nginx",
+					"test.kubestellar.io/test-label": "here",
+				})
+			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 3)
+			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 3)
+			dep1c := util.GetDeployment(ctx, wec1, ns, "nginx")
+			dep2c := util.GetDeployment(ctx, wec2, ns, "nginx")
+			gomega.Expect(dep1c.UID).To(gomega.Equal(dep1.UID))
+			gomega.Expect(dep2c.UID).To(gomega.Equal(dep2.UID))
 		})
 
 		ginkgo.It("handles changes in bindingpolicy ObjectSelector", func(ctx context.Context) {

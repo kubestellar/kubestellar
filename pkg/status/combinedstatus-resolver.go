@@ -472,27 +472,38 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 				runtime2.HandleError(fmt.Errorf("failed to get workstatus with indexKey %s: %w", indexKey, err))
 				continue
 			}
+			var workStat *workStatus
 
 			if len(objs) == 0 {
 				// A WorkStatus object can be missing for any of several reasons.
 				// It might not have been created yet.
 				// The workload object might have been recently deleted or retracted from the WEC.
-				logger.V(3).Info("Found no WorkStatus object", "binding", bindingName,
+				logger.V(3).Info("Found no WorkStatus object, using blank", "binding", bindingName,
 					"workloadObjIdentifier", workloadObjIdentifier, "destination", destination)
-				continue
+				workStat = &workStatus{
+					workStatusRef: workStatusRef{
+						Name:                   "",
+						WECName:                destination,
+						SourceObjectIdentifier: workloadObjIdentifier,
+					},
+				}
+			} else {
+				if len(objs) > 1 {
+					logger.V(3).Info("Found more than one WorkStatus object, using the first", "binding", bindingName,
+						"workloadObjIdentifier", workloadObjIdentifier, "destination", destination)
+				}
+				workStat, err = runtimeObjectToWorkStatus(objs[0].(runtime.Object))
+				if err != nil {
+					runtime2.HandleError(fmt.Errorf("failed to convert runtime.Object to workStatus: %w", err))
+					continue
+				}
 			}
 
-			workStatus, err := runtimeObjectToWorkStatus(objs[0].(runtime.Object))
-			if err != nil {
-				runtime2.HandleError(fmt.Errorf("failed to convert runtime.Object to workStatus: %w", err))
-				continue
-			}
-
-			csResolution := c.bindingNameToResolutions[bindingName][workStatus.SourceObjectIdentifier]
-			content := getCombinedContentMap(c.wdsListers, workStatus, csResolution)
+			csResolution := c.bindingNameToResolutions[bindingName][workStat.SourceObjectIdentifier]
+			content := getCombinedContentMap(c.wdsListers, workStat, csResolution)
 
 			// evaluate workstatus
-			if csResolution.evaluateWorkStatus(ctx, c.celEvaluator, workStatus.WECName, content) {
+			if csResolution.evaluateWorkStatus(ctx, c.celEvaluator, workStat.WECName, content) {
 				combinedStatusesToQueue.Insert(util.IdentifierForCombinedStatus(csResolution.getName(),
 					workloadObjIdentifier.ObjectName.Namespace))
 			}

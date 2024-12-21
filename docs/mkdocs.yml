@@ -14,7 +14,7 @@ edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: 'latest'
 ks_latest_regular_release: '0.25.1'
-ks_latest_release: '0.25.1'
+ks_latest_release: '0.26.0-alpha.3'
 
 ks_kind_port_num: '1119'
 

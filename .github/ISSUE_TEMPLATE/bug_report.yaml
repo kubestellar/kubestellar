@@ -15,17 +15,22 @@ body:
     id: description
     attributes:
       label: Describe the bug
-      description: Please provide a clear and concise description of the bug.
+      description: Please provide a clear and concise description of the bug. See ["Making a Good Trouble Report"](https://docs.kubestellar.io/unreleased-development/direct/troubleshooting/#making-a-good-trouble-report).
       placeholder: |
-        Add logs and screenshots if any.
-        What are the versions of the relevant things?
-        It is helpful to display obscure state, such as:
-        what is `$KUBECONFIG` set to (if it is not otherwise obvious which kubeconfig file you are using),
-        what is the current context in your kubeconfig,
-        what is in the preferences section of your kubeconfig?
+        You might also look at the rest of the "Troubleshooting" page.
     validations:
       required: true
 
+  - type: textarea
+    id: snapshot
+    attributes:
+      label: Output from KubeStellar-Snapshot.sh
+      description: | 
+        Run kubestellar-snapshot.sh from the scripts directory and paste output here.
+        Alternatively you can run the script remotely
+        bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/kubestellar-snapshot.sh) -V -Y -L
+        This will create kubestellar-snapshot.tar.gz which can be dragged and dropped into this text area.
+      
   - type: textarea
     id: reproducing
     attributes:

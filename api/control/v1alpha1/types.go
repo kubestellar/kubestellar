@@ -551,6 +551,18 @@ type NamedStatusCombination struct {
 
 	// +optional
 	Rows []StatusCombinationRow `json:"rows,omitempty"`
+
+	// RowErrors reports on some of the errors in evaluating expressions in the
+	// StatusCollectorSpec. Only a limited number of errors will appear here.
+	// For every column for which there is an error, there will be at least one
+	// entry here.
+	// In the input to aggregation operations, rows with errors are omitted.
+	// +optional
+	RowErrors []RowEvaluationError `json:"rowErrors,omitempty"`
+
+	// AggregationErrors reports errors from applying aggregation operations.
+	// +optional
+	AggregationErrors []ErrorInColumn `json:"aggregationErrors,omitempty"`
 }
 
 type StatusCombinationRow struct {
@@ -588,6 +600,25 @@ const (
 	TypeObject ValueType = "Object"
 	TypeArray  ValueType = "Array"
 )
+
+// RowEvaluationError reports an error that is specific to a WEC
+// and a column.
+type RowEvaluationError struct {
+	WEC Destination `json:"wec"`
+	// ColumnName is the empty string for the filter expression
+	ColumnName string `json:"columnName"`
+	Error      string `json:"error"`
+}
+
+// FilterColumnName is the ColumnName value used to report an evaluation error
+// in the filter expression of a StatusCollector.
+const FilterColumnName = ""
+
+// ErrorInColumn reports an error that is specific to a column.
+type ErrorInColumn struct {
+	ColumnName string `json:"columnName"`
+	Error      string `json:"error"`
+}
 
 // CombinedStatusList is the API type for a list of CombinedStatus.
 //

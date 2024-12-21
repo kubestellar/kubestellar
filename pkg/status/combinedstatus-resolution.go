@@ -29,6 +29,7 @@ import (
 	"unicode"
 
 	"github.com/go-logr/logr"
+	celtypes "github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 
 	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -90,7 +91,7 @@ func (csr *combinedStatusResolution) MarshalLog() any {
 // Making it the resolution of the tuple:
 // (binding, object, statuscollector).
 type statusCollectorData struct {
-	*v1alpha1.StatusCollectorSpec
+	collectorSpec *v1alpha1.StatusCollectorSpec
 
 	// wecToData is a map of workstatus-hosting WEC name to the
 	// evaluation of the workstatus against the statuscollector's clauses.
@@ -105,7 +106,7 @@ type statusCollectorData struct {
 // (binding, object, statuscollector, workstatus).
 type workStatusData struct {
 	// groupByEval is a map of groupBy expression names to their evaluated values.
-	groupByEval map[string]ref.Val
+	groupByEval rowFragment
 	// combinedFieldsEval is a map of combinedFields expression names to their
 	// evaluated values. CombinedField types:
 	// - COUNT: the number of workstatuses per groupBy value. If groupBy is
@@ -115,10 +116,15 @@ type workStatusData struct {
 	// - MIN: the minimum value of the workstatuses groupBy values.
 	// - MAX: the maximum value of the workstatuses groupBy values.
 	// If a combinedField's eval is nil, its TYPE is COUNT.
-	combinedFieldsEval map[string]ref.Val
+	combinedFieldsEval rowFragment
 
-	selectEval map[string]ref.Val
+	selectEval rowFragment
+
+	evalErrors []v1alpha1.ErrorInColumn
 }
+
+// rowFragment is a map from column name to value
+type rowFragment = map[string]ref.Val
 
 func (c *combinedStatusResolution) getName() string {
 	c.RLock()
@@ -185,8 +191,8 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 			continue
 		}
 
-		if !statusCollectorSpecsMatch(statusCollectorData.StatusCollectorSpec, &statusCollectorSpec) {
-			c.StatusCollectorNameToData[statusCollectorName].StatusCollectorSpec = &statusCollectorSpec
+		if !statusCollectorSpecsMatch(statusCollectorData.collectorSpec, &statusCollectorSpec) {
+			c.StatusCollectorNameToData[statusCollectorName].collectorSpec = &statusCollectorSpec
 			addedSome = true
 		}
 	}
@@ -196,8 +202,8 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 		if _, ok := c.StatusCollectorNameToData[statusCollectorName]; !ok {
 			statusCollectorSpecVar := statusCollectorSpec // copy to avoid closure over the loop variable
 			c.StatusCollectorNameToData[statusCollectorName] = &statusCollectorData{
-				StatusCollectorSpec: &statusCollectorSpecVar,
-				wecToData:           make(map[string]*workStatusData),
+				collectorSpec: &statusCollectorSpecVar,
+				wecToData:     make(map[string]*workStatusData),
 			}
 
 			addedSome = true
@@ -222,15 +228,15 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 		return false // statusCollector is irrelevant to this combinedstatus resolution
 	}
 
-	if statusCollectorSpecsMatch(scData.StatusCollectorSpec, statusCollectorSpec) {
+	if statusCollectorSpecsMatch(scData.collectorSpec, statusCollectorSpec) {
 		return false // statusCollector data is already up-to-date
 	}
 
 	// status collector clauses need to be updated, therefore update fields
 	// and invalidate all cached workstatus evaluations by resetting the map
 	c.StatusCollectorNameToData[statusCollectorName] = &statusCollectorData{
-		StatusCollectorSpec: statusCollectorSpec,
-		wecToData:           make(map[string]*workStatusData),
+		collectorSpec: statusCollectorSpec,
+		wecToData:     make(map[string]*workStatusData),
 	}
 
 	return true
@@ -273,7 +279,7 @@ func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 	for _, scName := range sortedStringSlice(abstract.PrimitiveMapKeySlice(c.StatusCollectorNameToData)) {
 		scData := c.StatusCollectorNameToData[scName]
 		// the data has either select or combinedFields (with groupBy)
-		if len(scData.Select) > 0 {
+		if len(scData.collectorSpec.Select) > 0 {
 			combinedStatus.Results = append(combinedStatus.Results, *handleSelectReadLocked(scName, scData))
 			continue
 		}
@@ -381,21 +387,21 @@ func (c *combinedStatusResolution) queryingContentRequirements() (bool, bool, bo
 	}
 
 	for _, scData := range c.StatusCollectorNameToData {
-		if scData.Filter != nil {
-			mergeBooleans(pred((*string)(scData.Filter)))
+		if scData.collectorSpec.Filter != nil {
+			mergeBooleans(pred((*string)(scData.collectorSpec.Filter)))
 		}
 
-		for _, selectNamedExp := range scData.Select {
+		for _, selectNamedExp := range scData.collectorSpec.Select {
 			mergeBooleans(pred((*string)(&selectNamedExp.Def)))
 		}
 
-		for _, combinedFieldNamedAgg := range scData.CombinedFields {
+		for _, combinedFieldNamedAgg := range scData.collectorSpec.CombinedFields {
 			if combinedFieldNamedAgg.Subject != nil {
 				mergeBooleans(pred((*string)(combinedFieldNamedAgg.Subject)))
 			}
 		}
 
-		for _, groupByNamedExp := range scData.GroupBy {
+		for _, groupByNamedExp := range scData.collectorSpec.GroupBy {
 			mergeBooleans(pred((*string)(&groupByNamedExp.Def)))
 		}
 	}
@@ -418,27 +424,26 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 		delete(scData.wecToData, workStatusWECName)
 		return exists
 	}
+	var evalErrors []v1alpha1.ErrorInColumn
 
 	// evaluate filter to determine if the workstatus is relevant
-	if scData.Filter != nil {
-		eval, err := celEvaluator.Evaluate(*scData.Filter, content)
+	if scData.collectorSpec.Filter != nil {
+		eval, err := celEvaluator.Evaluate(*scData.collectorSpec.Filter, content)
 		if err != nil {
-			runtime2.HandleError(fmt.Errorf("failed to evaluate filter expression: %w", err))
-			return false
-		}
-
-		if eval.Type().TypeName() != "bool" {
-			runtime2.HandleError(fmt.Errorf("filter expression must evaluate to a boolean"))
-			return false
-		}
-
-		if !eval.Value().(bool) { // workstatus is not relevant
-			if exists { // remove the workstatus data if it exists
-				delete(scData.wecToData, workStatusWECName)
-				return true
+			evalErrors = append(evalErrors,
+				v1alpha1.ErrorInColumn{ColumnName: v1alpha1.FilterColumnName, Error: err.Error()})
+		} else if tn := eval.Type().TypeName(); tn != "bool" && tn != "null" {
+			evalErrors = append(evalErrors,
+				v1alpha1.ErrorInColumn{ColumnName: v1alpha1.FilterColumnName,
+					Error: fmt.Sprintf("filter expression has type %s but expected bool or null", tn)})
+		} else {
+			if tn == "bool" && !eval.Value().(bool) { // workstatus is not relevant
+				if exists { // remove the workstatus data if it exists
+					delete(scData.wecToData, workStatusWECName)
+					return true
+				}
+				return false
 			}
-
-			return false
 		}
 	}
 
@@ -456,11 +461,11 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 
 	// evaluate select
 	selectEvals := make(map[string]ref.Val)
-	for _, selectNamedExp := range scData.Select {
+	for _, selectNamedExp := range scData.collectorSpec.Select {
 		eval, err := celEvaluator.Evaluate(selectNamedExp.Def, content)
 		if err != nil {
-			runtime2.HandleError(fmt.Errorf("failed to evaluate select expression: %w", err))
-			continue
+			evalErrors = append(evalErrors, v1alpha1.ErrorInColumn{ColumnName: selectNamedExp.Name, Error: err.Error()})
+			eval = celtypes.DefaultTypeAdapter.NativeToValue(err.Error())
 		}
 
 		prevVal, exists := wsData.selectEval[selectNamedExp.Name]
@@ -475,11 +480,11 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 
 	// evaluate groupBy
 	groupByEvals := make(map[string]ref.Val)
-	for _, groupByNamedExp := range scData.GroupBy {
+	for _, groupByNamedExp := range scData.collectorSpec.GroupBy {
 		eval, err := celEvaluator.Evaluate(groupByNamedExp.Def, content)
 		if err != nil {
-			runtime2.HandleError(fmt.Errorf("failed to evaluate groupBy expression: %w", err))
-			continue
+			evalErrors = append(evalErrors, v1alpha1.ErrorInColumn{ColumnName: groupByNamedExp.Name, Error: err.Error()})
+			eval = celtypes.DefaultTypeAdapter.NativeToValue(err.Error())
 		}
 
 		prevVal, exists := wsData.selectEval[groupByNamedExp.Name]
@@ -494,12 +499,11 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 
 	// evaluate combinedFields
 	combinedFieldEvals := make(map[string]ref.Val)
-	for _, combinedFieldNamedAgg := range scData.CombinedFields {
+	for _, combinedFieldNamedAgg := range scData.collectorSpec.CombinedFields {
 		if combinedFieldNamedAgg.Type == v1alpha1.AggregatorTypeCount {
 			// count does not require a subject - mark the evaluation with nil
 			currentEval, exists := wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]
 			updated = updated || !exists || currentEval != nil
-
 			combinedFieldEvals[combinedFieldNamedAgg.Name] = nil
 			continue
 		}
@@ -507,8 +511,10 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 		// evaluate subject which should not be nil since the statuscollector is valid
 		eval, err := celEvaluator.Evaluate(*combinedFieldNamedAgg.Subject, content)
 		if err != nil {
-			runtime2.HandleError(fmt.Errorf("failed to evaluate combinedFields subject expression: %w", err))
-			continue
+			eval = celtypes.DefaultTypeAdapter.NativeToValue(err.Error())
+			evalErrors = append(evalErrors, v1alpha1.ErrorInColumn{Error: err.Error(),
+				ColumnName: combinedFieldNamedAgg.Name,
+			})
 		}
 
 		prevVal, exists := wsData.selectEval[combinedFieldNamedAgg.Name]
@@ -525,7 +531,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 	wsData.selectEval = selectEvals
 	wsData.groupByEval = groupByEvals
 	wsData.combinedFieldsEval = combinedFieldEvals
-
+	wsData.evalErrors = evalErrors
 	return updated
 }
 
@@ -585,23 +591,23 @@ func validateCombinedStatusLabels(combinedStatus *v1alpha1.CombinedStatus,
 func handleSelectReadLocked(scName string, scData *statusCollectorData) *v1alpha1.NamedStatusCombination {
 	namedStatusCombination := v1alpha1.NamedStatusCombination{
 		Name:        scName,
-		ColumnNames: make([]string, 0, len(scData.Select)),
+		ColumnNames: make([]string, 0, len(scData.collectorSpec.Select)),
 		Rows:        make([]v1alpha1.StatusCombinationRow, 0, len(scData.wecToData)),
 	}
 
 	// add column names
 	namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames,
-		abstract.SliceMap(scData.Select, func(selectNamedExp v1alpha1.NamedExpression) string {
+		abstract.SliceMap(scData.collectorSpec.Select, func(selectNamedExp v1alpha1.NamedExpression) string {
 			return selectNamedExp.Name
 		})...)
 
 	// add rows for each workstatus
 	for _, wsData := range scData.wecToData {
 		row := v1alpha1.StatusCombinationRow{
-			Columns: make([]v1alpha1.Value, 0, len(scData.Select)),
+			Columns: make([]v1alpha1.Value, 0, len(scData.collectorSpec.Select)),
 		}
 
-		for _, selectNamedExp := range scData.Select {
+		for _, selectNamedExp := range scData.collectorSpec.Select {
 			row.Columns = append(row.Columns, refValToValue(wsData.selectEval[selectNamedExp.Name]))
 		}
 
@@ -682,14 +688,30 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 	ValueToNumber := map[any]int{}
 	idToAggregationGroup := map[string]*aggregationGroup{}
 
-	if len(scData.GroupBy) == 0 && len(scData.wecToData) == 0 {
+	if len(scData.collectorSpec.GroupBy) == 0 && len(scData.wecToData) == 0 {
 		// len(scData.GroupBy) == 0 means there is exactly one group to aggregate over.
 		// len(scData.wecToData) == 0 means that the loop below will not put the group in the map.
-		idToAggregationGroup[""] = &aggregationGroup{GroupBy: map[string]ref.Val{}}
+		idToAggregationGroup[""] = &aggregationGroup{GroupBy: map[string]ref.Val{},
+			Rows: map[v1alpha1.Destination]rowFragment{}}
 	}
-	for _, wsData := range scData.wecToData {
-		valuesTuple := make([]string, 0, len(scData.GroupBy))
-		for _, groupByNamedExp := range scData.GroupBy {
+	rowErrors := []v1alpha1.RowEvaluationError{}
+	coveredColumns := sets.New[string]()
+	for wecName, wsData := range scData.wecToData {
+		if len(wsData.evalErrors) > 0 {
+			for _, errIC := range wsData.evalErrors {
+				if coveredColumns.Has(errIC.ColumnName) {
+					continue
+				}
+				coveredColumns.Insert(errIC.ColumnName)
+				rowErrors = append(rowErrors, v1alpha1.RowEvaluationError{
+					WEC:        v1alpha1.Destination{ClusterId: wecName},
+					ColumnName: errIC.ColumnName,
+					Error:      errIC.Error})
+			}
+			continue // exclude WECs that have evaluation errors
+		}
+		valuesTuple := make([]string, 0, len(scData.collectorSpec.GroupBy))
+		for _, groupByNamedExp := range scData.collectorSpec.GroupBy {
 			groupByValue := wsData.groupByEval[groupByNamedExp.Name]
 
 			// ensure unique number mapping for the value
@@ -706,45 +728,46 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 		key := strings.Join(valuesTuple, ",")
 		ag := idToAggregationGroup[key]
 		if ag == nil {
-			ag = &aggregationGroup{GroupBy: wsData.groupByEval}
+			ag = &aggregationGroup{GroupBy: wsData.groupByEval, Rows: map[v1alpha1.Destination]rowFragment{}}
 			idToAggregationGroup[key] = ag
 		}
-		ag.Rows = append(ag.Rows, wsData.combinedFieldsEval)
+		ag.Rows[v1alpha1.Destination{ClusterId: wecName}] = wsData.combinedFieldsEval
 	}
 
 	// calculate the combinedFields for each group in one table
-	return calculateCombinedResult(idToAggregationGroup, scName, scData)
+	return calculateCombinedResult(idToAggregationGroup, scName, scData, rowErrors)
 }
 
 type aggregationGroup struct {
 	// GroupBy holds the unique tuple of "GROUP BY" values that this group is associated with
 	GroupBy map[string]ref.Val
 
-	// Rows holds the rows to aggregate,
-	// each represented by a map of field name to unaggregated value.
-	Rows []map[string]ref.Val
+	// Rows holds the rows to aggregate, as a map from Destination to rowFragment
+	Rows map[v1alpha1.Destination]rowFragment
 }
 
 // calculateCombinedResult calculates the combinedFields for each group in the
 // idToAggregationGroup map and returns the result in a
 // NamedStatusCombination.
 func calculateCombinedResult(idToAggregationGroup map[string]*aggregationGroup,
-	statusCollectorName string, statusCollectorData *statusCollectorData) *v1alpha1.NamedStatusCombination {
+	statusCollectorName string, statusCollectorData *statusCollectorData,
+	rowErrors []v1alpha1.RowEvaluationError) *v1alpha1.NamedStatusCombination {
 	// create the named status combination
 	namedStatusCombination := v1alpha1.NamedStatusCombination{
 		Name:        statusCollectorName,
-		ColumnNames: make([]string, 0, len(statusCollectorData.CombinedFields)),
+		ColumnNames: make([]string, 0, len(statusCollectorData.collectorSpec.CombinedFields)),
 		Rows:        []v1alpha1.StatusCombinationRow{},
+		RowErrors:   rowErrors,
 	}
 
 	// add column names: one per groupBy expression and one per combinedField
 	namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames,
-		abstract.SliceMap(statusCollectorData.GroupBy,
+		abstract.SliceMap(statusCollectorData.collectorSpec.GroupBy,
 			func(groupByNamedExp v1alpha1.NamedExpression) string {
 				return groupByNamedExp.Name
 			})...)
 	namedStatusCombination.ColumnNames = append(namedStatusCombination.ColumnNames,
-		abstract.SliceMap(statusCollectorData.CombinedFields,
+		abstract.SliceMap(statusCollectorData.collectorSpec.CombinedFields,
 			func(combinedFieldNamedAgg v1alpha1.NamedAggregator) string {
 				return combinedFieldNamedAgg.Name
 			})...)
@@ -753,21 +776,25 @@ func calculateCombinedResult(idToAggregationGroup map[string]*aggregationGroup,
 	for _, ag := range idToAggregationGroup {
 		row := v1alpha1.StatusCombinationRow{
 			Columns: make([]v1alpha1.Value, 0,
-				len(statusCollectorData.GroupBy)+len(statusCollectorData.CombinedFields)),
+				len(statusCollectorData.collectorSpec.GroupBy)+len(statusCollectorData.collectorSpec.CombinedFields)),
 		}
 
 		// fill groupBy values using one of the workstatuses in the group
-		if len(statusCollectorData.GroupBy) > 0 {
-			for _, groupByNamedExp := range statusCollectorData.GroupBy {
+		if len(statusCollectorData.collectorSpec.GroupBy) > 0 {
+			for _, groupByNamedExp := range statusCollectorData.collectorSpec.GroupBy {
 				groupByValue := ag.GroupBy[groupByNamedExp.Name]
 				row.Columns = append(row.Columns, refValToValue(groupByValue))
 			}
 		}
 
 		// add combinedFields
-		for _, combinedFieldNamedAgg := range statusCollectorData.CombinedFields {
-			aggregation := calculateCombinedFieldAggregation(combinedFieldNamedAgg, ag.Rows)
+		for _, combinedFieldNamedAgg := range statusCollectorData.collectorSpec.CombinedFields {
+			aggregation, aggErr := calculateCombinedFieldAggregation(combinedFieldNamedAgg, ag.Rows)
 			row.Columns = append(row.Columns, aggregation)
+			if aggErr != "" {
+				namedStatusCombination.AggregationErrors = append(namedStatusCombination.AggregationErrors,
+					v1alpha1.ErrorInColumn{ColumnName: combinedFieldNamedAgg.Name, Error: aggErr})
+			}
 		}
 
 		namedStatusCombination.Rows = append(namedStatusCombination.Rows, row)
@@ -777,20 +804,24 @@ func calculateCombinedResult(idToAggregationGroup map[string]*aggregationGroup,
 }
 
 func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggregator,
-	rows []map[string]ref.Val) v1alpha1.Value {
-	var numStr string
+	rows map[v1alpha1.Destination]rowFragment) (v1alpha1.Value, string) {
+	var numStr, errStr string
 
 	switch combinedFieldNamedAgg.Type {
 	case v1alpha1.AggregatorTypeCount:
 		numStr = strconv.Itoa(len(rows))
 	case v1alpha1.AggregatorTypeSum:
 		sum := 0.0
-		for _, row := range rows {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+		for dest, row := range rows {
+			subject, err1 := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+			if err1 != "" {
+				if errStr == "" {
+					errStr = fmt.Sprintf("for WEC %s, %s", dest.ClusterId, err1)
+				}
+			}
 			if subject == nil {
 				continue
 			}
-
 			sum += *subject
 		}
 		numStr = strconv.FormatFloat(sum, 'g', -1, 64)
@@ -798,25 +829,35 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 		var avg float64 = math.NaN()
 		if count := len(rows); count > 0 {
 			sum := 0.0
-			for _, row := range rows {
-				subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+			for dest, row := range rows {
+				subject, err1 := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+				if err1 != "" {
+					if errStr == "" {
+						errStr = fmt.Sprintf("for WEC %s, %s", dest.ClusterId, err1)
+					}
+				}
 				if subject == nil {
 					continue
 				}
-
 				sum += *subject
 			}
 			avg = sum / float64(count)
+		} else {
+			errStr = "no values to average"
 		}
 		numStr = strconv.FormatFloat(avg, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeMin:
 		min := math.Inf(1)
-		for _, row := range rows {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+		for dest, row := range rows {
+			subject, err1 := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+			if err1 != "" {
+				if errStr == "" {
+					errStr = fmt.Sprintf("for WEC %s, %s", dest.ClusterId, err1)
+				}
+			}
 			if subject == nil {
 				continue
 			}
-
 			if *subject < min {
 				min = *subject
 			}
@@ -824,12 +865,16 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 		numStr = strconv.FormatFloat(min, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeMax:
 		max := math.Inf(-1)
-		for _, row := range rows {
-			subject := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+		for dest, row := range rows {
+			subject, err1 := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+			if err1 != "" {
+				if errStr == "" {
+					errStr = fmt.Sprintf("for WEC %s, %s", dest.ClusterId, err1)
+				}
+			}
 			if subject == nil {
 				continue
 			}
-
 			if *subject > max {
 				max = *subject
 			}
@@ -838,13 +883,13 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 	default:
 		return v1alpha1.Value{
 			Type: v1alpha1.TypeNull,
-		}
+		}, fmt.Sprintf("unsupported aggregation type %s", combinedFieldNamedAgg.Type)
 	}
 
 	return v1alpha1.Value{
 		Type:   v1alpha1.TypeNumber,
 		Number: &numStr,
-	}
+	}, errStr
 }
 
 // getCombinedFieldSubject returns the subject of the combinedField evaluation.
@@ -852,7 +897,7 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 // error and returns nil. TODO: handle errors
 // The given `row` map has domain = name of a NamedAggregator,
 // domain = evaluated value (before aggregation, of course) for a given WEC.
-func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row map[string]ref.Val) *float64 {
+func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row map[string]ref.Val) (*float64, string) {
 	// NamedAggregator pairs a name with a way to aggregate over some objects.
 	//
 	// - For `type=="COUNT"`, `subject` is omitted and the aggregate is the count
@@ -865,28 +910,25 @@ func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row
 	// is reported in the BindingPolicyStatus.Errors (not necessarily repeated for each WEC).
 	eval := row[combinedFieldNamedAgg.Name]
 	if eval == nil {
-		return nil
+		return nil, ""
 	}
 
 	evalValue := eval.Value()
 	switch v := evalValue.(type) {
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		f := float64(v.(int64))
-		return &f
+		return &f, ""
 	case float32, float64:
 		f := v.(float64)
-		return &f
+		return &f, ""
 	case string:
 		f, err := strconv.ParseFloat(v, 64)
 		if err != nil {
-			runtime2.HandleError(fmt.Errorf("failed to parse combinedField subject as a float: %w", err))
-			return nil
+			return nil, "failed to parse combinedField subject as a float: " + err.Error()
 		}
-
-		return &f
+		return &f, ""
 	default:
-		runtime2.HandleError(fmt.Errorf("combinedField subject is not a numeric value"))
-		return nil
+		return nil, fmt.Sprintf("combinedField subject has unexpected type %T", evalValue)
 	}
 }
 

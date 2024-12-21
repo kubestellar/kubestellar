@@ -496,7 +496,7 @@ func (c *genericTransportController) processNextWorkItem(ctx context.Context) bo
 			logger.V(4).Info("Processed workqueue item successfully.", "item", obj, "itemType", fmt.Sprintf("%T", obj))
 		} else if retry {
 			c.workqueue.AddRateLimited(obj)
-			logger.V(4).Info("Encountered transient error while processing workqueue item; do not be alarmed, this will be retried later", "item", obj, "itemType", fmt.Sprintf("%T", obj))
+			logger.V(4).Info("Encountered transient error while processing workqueue item; do not be alarmed, this will be retried later", "item", obj, "itemType", fmt.Sprintf("%T", obj), "err", err)
 		} else {
 			c.workqueue.Forget(obj)
 			logger.Error(err, "Failed to process workqueue item", "item", obj, "itemType", fmt.Sprintf("%T", obj))
@@ -729,10 +729,18 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 
 // getWrapeesFromWDS returns a slice of Wrapee holding the objects that have been subject to destination-independent transformations
 // but not destination-dependent transformatinos (customizations).
-func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]transport.Wrapee, func(schema.GroupKind) (string, bool), sets.Set[metav1.GroupResource], error) {
+func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, binding *v1alpha1.Binding) ([]WrapeeWithUID, func(schema.GroupKind) (string, bool), sets.Set[metav1.GroupResource], error) {
 	groupResources := sets.New[metav1.GroupResource]()
-	wrapees := make([]transport.Wrapee, 0)
+	wrapees := make([]WrapeeWithUID, 0)
 	kindToResource := map[schema.GroupKind]string{}
+	appendObj := func(gvr metav1.GroupVersionResource, object *unstructured.Unstructured, createOnly bool) {
+		gr := metav1.GroupResource{Group: gvr.Group, Resource: gvr.Resource}
+		groupResources.Insert(gr)
+		kindToResource[object.GroupVersionKind().GroupKind()] = gvr.Resource
+		wrapees = append(wrapees, WrapeeWithUID{
+			transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), createOnly),
+			string(object.GetUID())})
+	}
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clause := range binding.Spec.Workload.ClusterScope {
 		gvr := schema.GroupVersionResource(clause.GroupVersionResource)
@@ -740,10 +748,7 @@ func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, bind
 		if err != nil {
 			return nil, nil, groupResources, fmt.Errorf("failed to get required cluster-scoped object '%s' with gvr %s from WDS - %w", clause.Name, gvr, err)
 		}
-		gr := metav1.GroupResource{Group: clause.GroupVersionResource.Group, Resource: clause.GroupVersionResource.Resource}
-		groupResources.Insert(gr)
-		kindToResource[object.GroupVersionKind().GroupKind()] = gvr.Resource
-		wrapees = append(wrapees, transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), clause.CreateOnly))
+		appendObj(clause.GroupVersionResource, object, clause.CreateOnly)
 	}
 	// add namespace-scoped objects to the 'objectsToPropagate' slice
 	for _, clause := range binding.Spec.Workload.NamespaceScope {
@@ -753,10 +758,7 @@ func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, bind
 			return nil, nil, groupResources, fmt.Errorf("failed to get required namespace-scoped object '%s' in namespace '%s' with gvr '%s' from WDS - %w", clause.Name,
 				clause.Namespace, gvr, err)
 		}
-		gr := metav1.GroupResource{Group: clause.GroupVersionResource.Group, Resource: clause.GroupVersionResource.Resource}
-		groupResources.Insert(gr)
-		kindToResource[object.GroupVersionKind().GroupKind()] = gvr.Resource
-		wrapees = append(wrapees, transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), clause.CreateOnly))
+		appendObj(clause.GroupVersionResource, object, clause.CreateOnly)
 	}
 
 	return wrapees, abstract.PrimitiveMapGet(kindToResource), groupResources, nil
@@ -813,9 +815,9 @@ func (c *genericTransportController) computeDestToWrappedObjects(ctx context.Con
 //
 // This func also updates c.bindingSensitiveDestinations for the given Binding.
 // The input Wrapees have been subject to destination-independent transformation.
-func (c *genericTransportController) computeDestToCustomizedObjects(uncustomizedWrapees []transport.Wrapee, binding *v1alpha1.Binding) (map[v1alpha1.Destination][]transport.Wrapee, []string) {
+func (c *genericTransportController) computeDestToCustomizedObjects(uncustomizedWrapees []WrapeeWithUID, binding *v1alpha1.Binding) (map[v1alpha1.Destination][]WrapeeWithUID, []string) {
 	// This will become non-nil if any object to propagate needs customization
-	var destToCustomizedWrapees map[v1alpha1.Destination][]transport.Wrapee
+	var destToCustomizedWrapees map[v1alpha1.Destination][]WrapeeWithUID
 
 	bindingErrors := []string{}
 
@@ -845,14 +847,14 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 				}
 			}
 			if customizeThisObject && destToCustomizedWrapees == nil {
-				destToCustomizedWrapees = map[v1alpha1.Destination][]transport.Wrapee{}
+				destToCustomizedWrapees = map[v1alpha1.Destination][]WrapeeWithUID{}
 				for _, dest := range binding.Spec.Destinations {
 					destToCustomizedWrapees[dest] = abstract.SliceCopy(uncustomizedWrapees[:objIdx])
 				}
 			}
 			if destToCustomizedWrapees != nil {
 				customizedObjectsSoFar := destToCustomizedWrapees[dest]
-				customizedObjectsSoFar = append(customizedObjectsSoFar, transport.NewWrapee(objC, wrapee.CreateOnly))
+				customizedObjectsSoFar = append(customizedObjectsSoFar, WrapeeWithUID{transport.NewWrapee(objC, wrapee.CreateOnly), wrapee.UID})
 				destToCustomizedWrapees[dest] = customizedObjectsSoFar
 			}
 		}
@@ -869,21 +871,36 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 	return destToCustomizedWrapees, bindingErrors
 }
 
-func (c *genericTransportController) wrapBatch(batchToPropagate []transport.Wrapee, kindToResource func(schema.GroupKind) (string, bool), binding *v1alpha1.Binding, numShard int) (*unstructured.Unstructured, error) {
+// wrapBatch invokes the transport's WrapObjects.
+// uidToPropagate is the UID (in the WDS) of one of the objects in batchToPropagate.
+func (c *genericTransportController) wrapBatch(batchToPropagate []transport.Wrapee, uidToPropagate string, kindToResource func(schema.GroupKind) (string, bool), binding *v1alpha1.Binding, numShard int) (*unstructured.Unstructured, error) {
 	wrapped := c.transport.WrapObjects(batchToPropagate, abstract.DropOK11(kindToResource))
 	wrappedObject, err := convertObjectToUnstructured(wrapped)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert wrapped object to unstructured - %w", err)
 	}
-	// wrapped object name is (Binding.GetName()-WdsName) or (Binding.GetName()-WdsName-numShard).
-	// pay attention - we cannot use the Binding object name, cause we might have duplicate names coming from different WDS spaces.
-	// we add WdsName to the object name to assure name uniqueness,
-	// in order to easily get the origin Binding object name and wds, we add it as an annotations.
-	wrappedObject.SetName(fmt.Sprintf("%s-%s-%d", binding.GetName(), c.wdsName, numShard))
+	var wrapperName string
+	if c.MaxNumWrapped == 1 {
+		// Make the name a function of the content, to get stability.
+		wrapperName = fmt.Sprintf("%s-%s-%s", binding.UID, c.wdsName, uidToPropagate)
+	} else {
+		// wrapped object name is (Binding.GetName()-WdsName-numShard).
+		// pay attention - we cannot use the Binding object name, cause we might have duplicate names coming from different WDS spaces.
+		// we add WdsName to the object name to assure name uniqueness,
+		// in order to easily get the origin Binding object name and wds, we add it as an annotations.
+		wrapperName = fmt.Sprintf("%s-%s-%d", binding.GetName(), c.wdsName, numShard)
+	}
+	wrappedObject.SetName(wrapperName)
 	setLabel(wrappedObject, originOwnerReferenceLabel, binding.GetName())
 	setLabel(wrappedObject, originWdsLabel, c.wdsName)
 	setAnnotation(wrappedObject, originOwnerGenerationAnnotation, binding.GetGeneration())
 	return wrappedObject, err
+}
+
+type WrapeeWithUID struct {
+	transport.Wrapee
+	// UID of the object in the WDS
+	UID string
 }
 
 // transportTask is one wrapped object and a gloss of its contents
@@ -892,9 +909,10 @@ type transportTask struct {
 	Gloss transport.Gloss
 }
 
-func (c *genericTransportController) wrap(wrapeesToPropagate []transport.Wrapee, kindToResource func(schema.GroupKind) (string, bool), binding *v1alpha1.Binding) ([]transportTask, error) {
+func (c *genericTransportController) wrap(wrapeesToPropagate []WrapeeWithUID, kindToResource func(schema.GroupKind) (string, bool), binding *v1alpha1.Binding) ([]transportTask, error) {
 	var transportTasks []transportTask
 	var batchToPropagate []transport.Wrapee = nil
+	var uidToPropagate string
 	gloss := transport.Gloss{}
 	maxSize := c.MaxSizeWrapped
 	maxCount := c.MaxNumWrapped
@@ -911,7 +929,7 @@ func (c *genericTransportController) wrap(wrapeesToPropagate []transport.Wrapee,
 			return nil, fmt.Errorf("failed to wrap object that is larger than max size")
 		}
 		if (objSize+batchSize >= maxSize) || (batchCount+1 > maxCount) {
-			wrappedObject, err := c.wrapBatch(batchToPropagate, kindToResource, binding, numShard)
+			wrappedObject, err := c.wrapBatch(batchToPropagate, uidToPropagate, kindToResource, binding, numShard)
 			if err != nil {
 				return nil, err
 			}
@@ -922,13 +940,14 @@ func (c *genericTransportController) wrap(wrapeesToPropagate []transport.Wrapee,
 			batchSize = 0
 			batchCount = 0
 		}
-		batchToPropagate = append(batchToPropagate, wrapee)
+		batchToPropagate = append(batchToPropagate, wrapee.Wrapee)
+		uidToPropagate = wrapee.UID
 		gloss.Insert(wrapee.GetID())
 		batchSize += objSize
 		batchCount += 1
 	}
 	if batchToPropagate != nil {
-		wrappedObject, err := c.wrapBatch(batchToPropagate, kindToResource, binding, numShard)
+		wrappedObject, err := c.wrapBatch(batchToPropagate, uidToPropagate, kindToResource, binding, numShard)
 		if err != nil {
 			return nil, err
 		}

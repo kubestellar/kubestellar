@@ -23,9 +23,9 @@ monitoring_ns="ks-monitoring"
 
 while [ $# != 0 ]; do
     case "$1" in
-        (-h|--help) echo "$0 usage: ( -h | --help | --host-cluster-context (e.g., --host-cluster-context core-cluster (default value: kind-kubeflex)) | --space-name (e.g., --space-name wds1 (default value: wds1)) | --monitoring-ns (e.g., --monitoring-ns ks-monitoring (default value: ks-monitoring)))*"
+        (-h|--help) echo "$0 usage: ( -h | --help | --kubeflex-hosting-cluster-context (e.g., --kubeflex-hosting-cluster-context core-cluster (default value: kind-kubeflex)) | --space-name (e.g., --space-name wds1 (default value: wds1)) | --monitoring-ns (e.g., --monitoring-ns ks-monitoring (default value: ks-monitoring)))*"
                     exit;;
-        (--host-cluster-context)
+        (--kubeflex-hosting-cluster-context)
           if (( $# > 1 )); then
             ctx="$2"
             shift

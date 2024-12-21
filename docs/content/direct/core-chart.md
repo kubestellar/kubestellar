@@ -86,7 +86,7 @@ InstallPCHs: true
 
 # List the Inventory and Transport Spaces (ITSes) to be created by the chart
 # Each ITS consists of a mandatory unique name and an optional type, which could be either host or vcluster (default to vcluster, if not specified)
-ITSes: # ==> installs ocm + ocm-status-addon
+ITSes: # ==> installs ocm (optional) + ocm-status-addon
 
 # List the Workload Description Spaces (WDSes) to be created by the chart
 # Each WDS consists of a mandatory unique name and several optional parameters:
@@ -112,12 +112,14 @@ The third section of the `values.yaml` file allows one to create a list of Inven
 ITSes: # all the CPs in this list will execute the its.yaml PCH
   - name: <its1>          # mandatory name of the control plane
     type: <vcluster|host> # optional type of control plane host or vcluster (default to vcluster, if not specified)
+    install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
   - name: <its2>          # mandatory name of the control plane
     type: <vcluster|host> # optional type of control plane host or vcluster (default to vcluster, if not specified)
+    install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
   ...
 ```
 
-where `name` must specify a name unique among all the control planes in that KubeFlex deployment and the optional `type` can be either vcluster (default) or host, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information.
+where `name` must specify a name unique among all the control planes in that KubeFlex deployment, the optional `type` can be either vcluster (default) or host, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information, and the optional `install_clusteradm`can be either true (default) or false to enable or disable the installation of OCM in the control plane.
 
 The fourth section of the `values.yaml` file allows one to create a list of Workload Description Spaces (WDSes). By default, this list is empty and no WDS will be created by the chart. A list of WDSes can be specified using the following format:
 

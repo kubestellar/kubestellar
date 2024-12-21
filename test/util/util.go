@@ -529,6 +529,17 @@ func GetNumDeploymentReplicas(ctx context.Context, wec *kubernetes.Clientset, ns
 	return replicas
 }
 
+func GetDeployment(ctx context.Context, wec *kubernetes.Clientset, ns, name string) *appsv1.Deployment {
+	ginkgo.GinkgoHelper()
+	var ans *appsv1.Deployment
+	gomega.Eventually(func() error {
+		var err error
+		ans, err = wec.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
+		return err
+	}, timeout).ShouldNot(gomega.HaveOccurred())
+	return ans
+}
+
 func ValidateNumDeploymentReplicas(ctx context.Context, wec *kubernetes.Clientset, ns string, numReplicas int) {
 	ginkgo.GinkgoHelper()
 	gomega.Eventually(func() int {
