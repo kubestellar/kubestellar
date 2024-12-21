@@ -66,8 +66,16 @@ if which kubectl > /dev/null ; then
     fi
 fi
 
-sudo curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable traefik,servicelb"  sh -
+# Check if k3s is already installed
+if ! command -v k3s &> /dev/null
+then
+    echo "k3s could not be found, installing..."
+    sudo curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable traefik,servicelb" sh -
+else
+    echo "k3s is already installed"
+fi
 
+mkdir -p ~/.kube
 export KUBECONFIG=~/.kube/config
 sudo kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml config view --raw > "$KUBECONFIG"
 kubectl describe endpoints kubernetes
@@ -98,5 +106,5 @@ if [[ "$wait" == "true" ]] ; then
   kubectl wait --namespace ingress-nginx \
     --for=condition=ready pod \
     --selector=app.kubernetes.io/component=controller \
-    --timeout=90s
+    --timeout=120s
 fi
