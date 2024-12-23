@@ -1,0 +1,87 @@
+---
+# tasks file for master
+# - name: Get public IP address of the node, which is used for extra Subject Alternative Names to use for the API Server serving certificate
+#   shell: curl checkip.amazonaws.com
+#   register: node_public_ip
+
+- name: Get public IP address of the node, which is used for extra Subject Alternative Names to use for the API Server serving certificate
+  shell: hostname -I | awk '{print $1}'
+  register: node_private_ip
+
+# - name: set hostname for the master node
+#   shell: |
+#          sudo hostnamectl set-hostname master-node
+#          exec bash
+#          sudo tee --append /etc/hosts <<< "{{ node_private_ip.stdout }} localhost"
+
+- name: initialize the cluster
+  shell: sudo kubeadm init --control-plane-endpoint={{ node_private_ip.stdout }}
+  args:
+    chdir: $HOME
+    creates: cluster_initialized.txt
+
+- name: create .kube directory
+  become: yes
+  file:
+    path: $HOME/.kube
+    state: directory
+    mode: 0755
+
+- name: copies admin.conf to user's kube config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    remote_src: yes
+    owner: root
+
+- name: Fetch admin.conf
+  ansible.builtin.fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: .data/
+    flat: yes
+  when: inventory_hostname == ansible_play_hosts_all[0]
+
+- name: Protect admin.conf
+  delegate_to: localhost
+  become: no
+  ansible.builtin.file:
+    mode: o-rwx
+    path: .data/admin.conf
+
+- block:
+  - name: Make admin.conf use public server address
+    delegate_to: localhost
+    become: no
+    ansible.builtin.command: "kubectl --kubeconfig .data/admin.conf config set-cluster kubernetes --server https://{{ kubehost }}:6443"
+  vars:
+    kubehost: "{{ ansible_host }}"
+  when: inventory_hostname == ansible_play_hosts_all[0]
+
+- name: Configure master node to accept pods workloads
+  become: yes
+  shell: kubectl taint nodes --all node-role.kubernetes.io/master-
+  when: singleNode | bool
+
+- name: install Pod network
+  become: yes
+  shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/calico.yaml
+  args:
+    chdir: $HOME
+
+- name: Copy install PV provisioner yaml file
+  become: yes
+  copy:
+    src: "{{ role_path }}/files/local-path-storage.yaml"
+    dest: /tmp/local-path-storage.yaml 
+
+- name: install PV provisioner
+  become: yes
+  shell: |
+         kubectl apply -f /tmp/local-path-storage.yaml
+         kubectl patch storageclass standard -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+  args:
+    chdir: $HOME
+
+
+
+
