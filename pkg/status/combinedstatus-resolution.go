@@ -69,7 +69,9 @@ type combinedStatusResolution struct {
 	// Name of the CombinedStatus object
 	Name string
 	// StatusCollectorNameToData is a map of status collector names to
-	// their corresponding data.
+	// their corresponding data. This map has an entry for every relevant
+	// StatusCollector name; the value is `nil` while the StatusCollector
+	// does not exist.
 	StatusCollectorNameToData map[string]*statusCollectorData
 	// CollectionDestinations is a set of destinations that are expected to be
 	// collected from.
@@ -79,6 +81,9 @@ type combinedStatusResolution struct {
 var _ logr.Marshaler = &combinedStatusResolution{}
 
 func (csr *combinedStatusResolution) MarshalLog() any {
+	if csr == nil {
+		return nil
+	}
 	return map[string]any{
 		"Name":                      csr.Name,
 		"StatusCollectorNameToData": csr.StatusCollectorNameToData,
@@ -91,6 +96,7 @@ func (csr *combinedStatusResolution) MarshalLog() any {
 // Making it the resolution of the tuple:
 // (binding, object, statuscollector).
 type statusCollectorData struct {
+	// Never nil
 	collectorSpec *v1alpha1.StatusCollectorSpec
 
 	// wecToData is a map of workstatus-hosting WEC name to the
@@ -154,10 +160,9 @@ func (c *combinedStatusResolution) setCollectionDestinations(destinationsSet set
 	c.CollectionDestinations = destinationsSet
 	// trim the statuscollector data that are not relevant anymore
 	for _, data := range c.StatusCollectorNameToData {
-		if data.wecToData == nil {
+		if data == nil || len(data.wecToData) == 0 {
 			continue
 		}
-
 		for clusterName := range removedDestinations {
 			delete(data.wecToData, clusterName)
 		}
@@ -168,20 +173,22 @@ func (c *combinedStatusResolution) setCollectionDestinations(destinationsSet set
 
 // setStatusCollectors sets ALL the statuscollectors relevant to the
 // combinedstatus resolution.
-// The given map is expected not to be mutated during this call, its values
-// contain valid expressions, and are immutable.
+// The given map is expected not to be mutated during this call,
+// and the specs in it are immutable.
+// The given map has an entry for every relevant StatusCollector name,
+// but a `nil` spec pointer if the collector does not exist now.
 // The function returns a tuple (removedSome, addedSome):
 //
 // - removedSome: true if one or more statuscollectors were removed.
 //
 // - addedSome: true if one or more statuscollectors were added.
-func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec map[string]v1alpha1.StatusCollectorSpec) (bool, bool) {
+func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec map[string]*v1alpha1.StatusCollectorSpec) (bool, bool) {
 	c.Lock()
 	defer c.Unlock()
 
 	removedSome, addedSome := false, false
 
-	// remove statuscollector data that are not relevant anymore and update the
+	// remove entries for collectors that are not relevant anymore and update the
 	// statuscollector data that are. If one of the latter is updated, mark it as added
 	for statusCollectorName, statusCollectorData := range c.StatusCollectorNameToData {
 		statusCollectorSpec, ok := statusCollectorNameToSpec[statusCollectorName]
@@ -191,19 +198,22 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 			continue
 		}
 
-		if !statusCollectorSpecsMatch(statusCollectorData.collectorSpec, &statusCollectorSpec) {
-			c.StatusCollectorNameToData[statusCollectorName].collectorSpec = &statusCollectorSpec
+		if statusCollectorSpec != nil && (statusCollectorData == nil || !statusCollectorSpecsMatch(statusCollectorData.collectorSpec, statusCollectorSpec)) {
+			c.StatusCollectorNameToData[statusCollectorName].collectorSpec = statusCollectorSpec
 			addedSome = true
 		}
 	}
 
-	// add new statuscollector data
+	// add new data for newly relevant StatusCollectors
 	for statusCollectorName, statusCollectorSpec := range statusCollectorNameToSpec {
 		if _, ok := c.StatusCollectorNameToData[statusCollectorName]; !ok {
-			statusCollectorSpecVar := statusCollectorSpec // copy to avoid closure over the loop variable
-			c.StatusCollectorNameToData[statusCollectorName] = &statusCollectorData{
-				collectorSpec: &statusCollectorSpecVar,
-				wecToData:     make(map[string]*workStatusData),
+			if statusCollectorSpec == nil {
+				c.StatusCollectorNameToData[statusCollectorName] = nil
+			} else {
+				c.StatusCollectorNameToData[statusCollectorName] = &statusCollectorData{
+					collectorSpec: statusCollectorSpec,
+					wecToData:     make(map[string]*workStatusData),
+				}
 			}
 
 			addedSome = true
@@ -216,8 +226,8 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 // updateStatusCollector updates the status collector data in the
 // combinedstatus resolution. If the status collector is not relevant to the
 // latter, the function returns false. The function returns true if the status
-// collector data is updated. The given spec is assumed to be valid and
-// immutable.
+// collector data is updated. The given spec pointer is not nil and
+// the spec is assumed to be valid and immutable.
 func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName string,
 	statusCollectorSpec *v1alpha1.StatusCollectorSpec) bool {
 	c.Lock()
@@ -228,7 +238,7 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 		return false // statusCollector is irrelevant to this combinedstatus resolution
 	}
 
-	if statusCollectorSpecsMatch(scData.collectorSpec, statusCollectorSpec) {
+	if scData != nil && statusCollectorSpecsMatch(scData.collectorSpec, statusCollectorSpec) {
 		return false // statusCollector data is already up-to-date
 	}
 
@@ -242,18 +252,18 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 	return true
 }
 
-// removeStatusCollector removes the status collector data from the
-// combinedstatus resolution. The function returns true if the status collector
-// data is removed.
-func (c *combinedStatusResolution) removeStatusCollector(statusCollectorName string) bool {
+// noteStatusCollectorAbsence updates the resolution, if it does not already do so,
+// to recognize that the given StatusCollector does not exist.
+// Returns true if there was a change.
+func (c *combinedStatusResolution) noteStatusCollectorAbsence(statusCollectorName string) bool {
 	c.Lock()
 	defer c.Unlock()
 
-	if _, ok := c.StatusCollectorNameToData[statusCollectorName]; !ok {
+	if oval := c.StatusCollectorNameToData[statusCollectorName]; oval == nil {
 		return false // statusCollector is irrelevant to this combinedstatus resolution
 	}
 
-	delete(c.StatusCollectorNameToData, statusCollectorName)
+	c.StatusCollectorNameToData[statusCollectorName] = nil
 	return true
 }
 
@@ -278,12 +288,14 @@ func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 
 	for _, scName := range sortedStringSlice(abstract.PrimitiveMapKeySlice(c.StatusCollectorNameToData)) {
 		scData := c.StatusCollectorNameToData[scName]
-		// the data has either select or combinedFields (with groupBy)
+		if scData == nil {
+			continue
+		}
+		// the data, if not nil, has either select or combinedFields (with groupBy)
 		if len(scData.collectorSpec.Select) > 0 {
 			combinedStatus.Results = append(combinedStatus.Results, *handleSelectReadLocked(scName, scData))
 			continue
 		}
-
 		combinedStatus.Results = append(combinedStatus.Results, *handleAggregationReadLocked(scName, scData))
 	}
 
@@ -350,6 +362,9 @@ func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEv
 
 	updated := false
 	for _, scData := range c.StatusCollectorNameToData {
+		if scData == nil {
+			continue
+		}
 		changed := evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator, workStatusWECName,
 			content, scData)
 		updated = updated || changed
@@ -387,6 +402,9 @@ func (c *combinedStatusResolution) queryingContentRequirements() (bool, bool, bo
 	}
 
 	for _, scData := range c.StatusCollectorNameToData {
+		if scData == nil {
+			continue
+		}
 		if scData.collectorSpec.Filter != nil {
 			mergeBooleans(pred((*string)(scData.collectorSpec.Filter)))
 		}
