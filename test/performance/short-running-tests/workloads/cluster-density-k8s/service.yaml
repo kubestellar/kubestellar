@@ -4,7 +4,7 @@ apiVersion: v1
 metadata:
   name: {{.Name}}
   labels:
-    app.kubernetes.io/name: cluster-density-{{.iterations}}
+    app.kubernetes.io/name: {{.labelPrefix}}
 spec:
   selector:
     app: {{.BaseName}}-{{.Index}}

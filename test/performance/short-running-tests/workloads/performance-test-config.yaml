@@ -1,9 +1,9 @@
-{{$namespaces := DefaultParam .namespaces 1}}
-{{$namespaceNamePrefix := DefaultParam .namespaceNamePrefix "perf-exp"}}
+{{$namespaces := DefaultParam .namespaces 50}}
+{{$namespaceNamePrefix := DefaultParam .namespaceNamePrefix "perf-test"}}
 {{$waitTime := DefaultParam .waitTime "10s"}}
 
-{{$K8S_CLUSTER := DefaultParam .K8S_CLUSTER true}}
-{{$OPENSHIFT_CLUSTER := DefaultParam .OPENSHIFT_CLUSTER false}}
+{{$K8S_CLUSTER := DefaultParam .K8S_CLUSTER false}}
+{{$OPENSHIFT_CLUSTER := DefaultParam .OPENSHIFT_CLUSTER true}}
 {{$CREATE_NS := DefaultParam .CREATE_NS true}}
 {{$tuningSet := DefaultParam .tuningSet "PoissonLoad"}}
 
@@ -47,6 +47,7 @@ tuningSets:
 - name: PoissonLoad
   poissonLoad:
     expectedActionsPerSecond: 0.5
+
 
 steps:
 {{if $CREATE_NS}}
