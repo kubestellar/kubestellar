@@ -334,8 +334,8 @@ kubectl --context "$wds_context" delete bindingpolicies postgres-bpolicy
 
 ## Scenario 4 - Singleton status
 
-This scenario shows how to get the full status updated when setting `wantSingletonReportedState`
-in the BindingPolicy. This still an experimental feature.
+This scenario shows how to get the full status updated, by setting `wantSingletonReportedState`
+in a `DownsyncPolicyClause`. This still an experimental feature.
 
 Apply a BindingPolicy with the `wantSingletonReportedState` flag set:
 
@@ -346,12 +346,12 @@ kind: BindingPolicy
 metadata:
   name: nginx-singleton-bpolicy
 spec:
-  wantSingletonReportedState: true
   clusterSelectors:
   - matchLabels: {"name":"cluster1"}
   downsync:
   - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx-singleton"}
+    wantSingletonReportedState: true
 EOF
 ```
 
