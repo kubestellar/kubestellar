@@ -3576,8 +3576,8 @@ helm metadata is tracked in this <a href="https://github.com/kubestellar/kubeste
 <a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>bindingpolicies<span class="w"> </span>postgres-bpolicy
 </code></pre></div>
 <h2 id="scenario-4-singleton-status">Scenario 4 - Singleton status<a class="headerlink" href="#scenario-4-singleton-status" title="Permanent link">#</a></h2>
-<p>This scenario shows how to get the full status updated when setting <code>wantSingletonReportedState</code>
-in the BindingPolicy. This still an experimental feature.</p>
+<p>This scenario shows how to get the full status updated, by setting <code>wantSingletonReportedState</code>
+in a <code>DownsyncPolicyClause</code>. This still an experimental feature.</p>
 <p>Apply a BindingPolicy with the <code>wantSingletonReportedState</code> flag set:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="s">apiVersion: control.kubestellar.io/v1alpha1</span>
@@ -3585,12 +3585,12 @@ in the BindingPolicy. This still an experimental feature.</p>
 <a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="s">  name: nginx-singleton-bpolicy</span>
 <a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="s">spec:</span>
-<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="s">  wantSingletonReportedState: true</span>
-<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="s">  clusterSelectors:</span>
-<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="s">  - matchLabels: {&quot;name&quot;:&quot;cluster1&quot;}</span>
-<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="s">  downsync:</span>
-<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="s">  - objectSelectors:</span>
-<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/name&quot;:&quot;nginx-singleton&quot;}</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="s">  clusterSelectors:</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="s">  - matchLabels: {&quot;name&quot;:&quot;cluster1&quot;}</span>
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="s">  downsync:</span>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="s">  - objectSelectors:</span>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/name&quot;:&quot;nginx-singleton&quot;}</span>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="s">    wantSingletonReportedState: true</span>
 <a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>Apply a new deployment for the singleton BindingPolicy:</p>
