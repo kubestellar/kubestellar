@@ -161,7 +161,7 @@ function add_wec() {
     clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${joinflags}'"}' | sh
 }
 
-"${SRC_DIR}/../../../hack/check_pre_req.sh" --assert --verbose ocm
+"${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose ocm
 
 kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 90s
 kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 150s
