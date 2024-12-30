@@ -75,9 +75,9 @@ set -e # exit on error
 
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 COMMON_SRCS="${SRC_DIR}/common"
-HACK_DIR="${SRC_DIR}/../../hack"
+scripts_dir="${SRC_DIR}/../../scripts"
 
-"${HACK_DIR}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
+"${scripts_dir}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
 
 "${COMMON_SRCS}/cleanup.sh" --env "$env"
 source "${COMMON_SRCS}/setup-shell.sh"

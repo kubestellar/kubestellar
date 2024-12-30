@@ -79,9 +79,9 @@ To build and _**test**_ KubeStellar properly, you will also need
 <!-- start tag for check script  include -->
 
 ## Automated Check of Prerequisites for KubeStellar
-The [check_pre_req](https://github.com/kubestellar/kubestellar/blob/main/hack/check_pre_req.sh) script offers a convenient way to check for the prerequisites needed for [KubeStellar](./pre-reqs.md) deployment and [use](./example-scenarios.md).
+The [check_pre_req](https://github.com/kubestellar/kubestellar/blob/main/scripts/check_pre_req.sh) script offers a convenient way to check for the prerequisites needed for [KubeStellar](./pre-reqs.md) deployment and [use](./example-scenarios.md).
 
-This script is self-contained, so it is suitable for "curl-to-bash" style usage. The latest development version is at [https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/hack/check_pre_req.sh](https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/hack/check_pre_req.sh). To check the prerequisites for using a particular release of KubeStellar, you will want to use the script from that release.
+This script is self-contained, so it is suitable for "curl-to-bash" style usage. The latest development version is at [https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/check_pre_req.sh](https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/check_pre_req.sh). To check the prerequisites for using a particular release of KubeStellar, you will want to use the script from that release.
 
 The script checks for a prerequisite presence in the `$PATH`, by using the `which` command, and it can optionally provide version and path information for prerequisites that are present, or installation information for missing prerequisites.
 
@@ -109,7 +109,7 @@ argo brew docker go helm jq kflex kind ko kubectl make ocm yq
 For example, list of prerequisites required by KubeStellar can be checked with the command below (add the `-V` flag to get the version of each program and a suggestions on how to install missing prerequisites):
 
 ```shell
-$ hack/check_pre_req.sh
+$ scripts/check_pre_req.sh
 Checking pre-requisites for using KubeStellar:
 ✔ Docker (Docker version 27.2.1-rd, build cc0ee3e)
 ✔ kubectl (v1.29.2)

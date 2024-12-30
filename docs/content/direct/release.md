@@ -14,7 +14,7 @@ Every release should pass all release tests before it can be officially declare 
 ### Reacting to a new KubeFlex release
 
 - Update the KubeFlex release in `docs/content/direct/pre-reqs.md`
-- Update the "kflex" release in `hack/check_pre_req.sh`
+- Update the "kflex" release in `hack/check_pre_req.sh` and `scripts/check_pre_req.sh`
 - Update the KubeFlex release in `go.mod`
 - `go mod tidy`
 - Update the KubeFlex release in `core-chart/Chart.yaml`
@@ -42,6 +42,10 @@ Between each release of [ks/OSA](https://github.com/kubestellar/ocm-status-addon
 Making a new kubestellar release requires a contributor to do the following things. Here `$version` is the semver identifier for the release (e.g., `1.2.3-rc2`).
 
 - If not already in effect, declare a code freeze. There should be nothing but bug fixes and doc improvements while working towards a regular release.
+
+- **AFTER** the next release, replace references to `hack/check_pre_req.sh` with references to `scripts/check_pre_req.sh` in:  `docs/content/direct/get-started.md`, `docs/content/direct/start-from-ocm.md`, `scripts/create-kubestellar-demo-env.sh`, and then delete this step.
+
+- **AFTER** the next regular release: delete `hack/check_pre_req.sh`, delete references to `hack/check_pre_req.sh` in this document, and delete this step.
 
 - Edit `docs/mkdocs.yml` and update the definition of `ks_latest_release` to `$version` (e.g., `'0.23.0-rc42'`). If this is a regular release then also update the definition of `ks_latest_regular_release`.
 
