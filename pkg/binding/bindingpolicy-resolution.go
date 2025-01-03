@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/go-logr/logr"
 	"golang.org/x/exp/slices"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -70,6 +71,16 @@ type ObjectData struct {
 
 // Assert that `*bindingPolicyResolution` implements Resolution
 var _ Resolution = &bindingPolicyResolution{}
+
+var _ logr.Marshaler = &bindingPolicyResolution{}
+
+func (resolution *bindingPolicyResolution) MarshalLog() any {
+	return map[string]any{
+		"objectIdentifierToData": util.PrimitiveMap4Log(resolution.objectIdentifierToData),
+		"destinations":           resolution.destinations,
+		"ownerReference":         resolution.ownerReference,
+	}
+}
 
 func (resolution *bindingPolicyResolution) GetPolicyUID() string {
 	resolution.RLock()
