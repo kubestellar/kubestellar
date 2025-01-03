@@ -123,6 +123,12 @@ checking_cluster() {
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
+
+# Function to check if a port is free
+is_port_free() {
+    ! lsof -i:9443
+}
+
 ##########################################
 
 echo -e "\nStarting environment clean up..."
@@ -141,7 +147,12 @@ if command_exists "kind"; then
     wait
 fi
 
-wait
+# Wait until port 9443 is free
+while ! is_port_free; do
+    echo "Waiting for port 9443 to be free..."
+    sleep 1
+done
+
 echo -e "\033[33m✔\033[0m Cluster space clean up has been completed"
 
 echo -e "\nStarting context clean up..."
@@ -157,9 +168,10 @@ for cluster in "${clusters[@]}"; do
         kind create cluster --name "${cluster}" >"${cluster_log_dir}/${cluster}.log" 2>&1 && touch "${cluster_log_dir}/${cluster}.success" &
     else
         k3d cluster create --network k3d-kubeflex "${cluster}" >"${cluster_log_dir}/${cluster}.log" 2>&1 && touch "${cluster_log_dir}/${cluster}.success" &
-        wait
     fi
 done
+
+wait
 
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
 if [ "$k8s_platform" == "kind" ]; then
@@ -177,10 +189,10 @@ kubectl config use-context $k8s_platform-kubeflex
 some_failed=false
 for cluster in "${clusters[@]}"; do
     if ! [ -f "${cluster_log_dir}/${cluster}.success" ]; then
-	echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
-	cat "${cluster_log_dir}/${cluster}.log" >&2
-	some_failed=true
-	continue
+    echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
+    cat "${cluster_log_dir}/${cluster}.log" >&2
+    some_failed=true
+    continue
     fi
     echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
     kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
