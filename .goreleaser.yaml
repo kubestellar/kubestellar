@@ -52,5 +52,5 @@ release:
   draft: false
   prerelease: auto
   mode: keep-existing
-
+  skip_upload: true
 
