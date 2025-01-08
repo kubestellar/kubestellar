@@ -88,7 +88,7 @@ nav:
       - Release Process: direct/release.md
       - Release Testing: direct/release-testing.md
       - Guidelines: contribution-guidelines/CONTRIBUTING.md
-      - Sign-off on Contributions: direct/pr-signoff.md
+      - Sign-off and Signing Contributions: direct/pr-signoff.md
   - Community: 
     - Get Involved: Community/_index.md
     - Contact Us:

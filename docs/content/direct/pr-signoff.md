@@ -1,8 +1,64 @@
-# How to Sign-off on Your Pull Requests
+# Git Commit Signoff and Signing
 
-In order to get your pull requests approved, you must first complete a DCO sign-off. This process is defined by the CNCF, and there are two cases: individual contributors and contributors that work for a corporate CNCF member. To do this as an individual contributor, you must have a GPG and SSH key. Basic setup instructions can be found below (For more detailed instructions, refer to the Github [GPG](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) and [SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) setup pages):
+**NOTE**: "sign-off" is different from "signing" a commit or tag.  The
+former indicates your assent to the repository's terms for
+contributors, the latter adds a cryptographic checksum that is rarely
+displayed.  See [the git
+book](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work)
+about signing. For commit signoff, do a web search on `git
+signoff`. GitHub has a concept of [a commit being
+"verified"](https://docs.github.com/en/authentication/managing-commit-signature-verification)
+that extends the Git concept of signing.
 
----
+In order to get your pull requests approved, you must first complete a
+DCO sign-off. This process is defined by the CNCF, and there are two
+cases: individual contributors and contributors that work for a
+corporate CNCF member. Both mean consent with the terms stated in the
+`DCO` file at the root of this Git repository.
+
+In the case of an individual, DCO sign-off is done with a Git "signoff".
+
+We prefer that commits contributed to this repository be signed and
+GitHub verified, but this is not strictly necessary or enforced.
+
+## Commit Sign-off
+
+Your submitted PR must pass the automated checks in order to be reviewed. One of these checks that each commit that you propose to contribute is signed-off. If you use the `git` shell command, this involves passing the `-s` flag on the command line. For other tools, consult their documentation.
+
+### Repairing non-signed-off commits
+
+If you have already created a PR that proposes to merge a branch that
+adds commits that are not signed-off then you can repair this by
+adding the signoff to each using `git commit -s --amend` on each of
+them. Following is an outline of how to do it for a branch that adds
+**exactly one** commit. If your branch adds more than one commit then
+you can extrapolate using `git cherry-pick` to build up a revised
+series of commits one-by-one.
+
+The following instructions provide a basic walk-through if you have already created your own fork of the repository but yet not made a clone on your workstation. If you have set up your SSH and GPG keys and include `-S` on the `git commit` command line or have configured automatic signing then this will also get the commits signed.
+
+1. Navigate to the **Code** page of the Kubestellar github.
+   
+2. Click the **Fork** dropdown in the top right corner of the page.
+    - Under "Existing Forks" click your fork (should look something like "your_username/kubestellar")
+3. Once in your fork, click the **Code** dropdown.
+    - Under the "Local" tab at the top of the dropdown, select the SSH tab
+    - Copy the SSH repo URL to your clipboard
+4. Open Git Bash (or your CLI of choice), create or change to a different directory if desired.
+5. Clone the repository using `git clone` followed by pasting the URL you just copied.
+6. Change your directory to the Kubestellar repo using `cd kubestellar`.
+7. `git checkout` to the branch in your fork where the changes were committed.
+    - The branch name should be written at the top of your submitted PR page and looks something like "patch-*X*" (where "X" should be the number of PRs made on your fork to date)
+8. Once in your branch, type `git commit -s --amend` to sign off your PR.
+    - You may replace `--amend` with a `-m` followed by a commit message if you desire; the `--amend` simply uses the same commit message as the one you wrote when initially submitting the PR
+    - If prompted with a sign-off page in your Git Bash (or alternative CLI), type `:wq!` to exit the prompt
+9. Type `git push -f origin [branch_name]`, replacing `[branch_name]` with the actual name of your branch.
+10. Navigate back to your PR github page.
+    - A green `dco-signoff: yes` label indicates that your PR is successfully signed
+
+## Signing Commits
+
+To sign a commit, you must have a GPG and SSH key. Basic setup instructions can be found below (For more detailed instructions, refer to the Github [GPG](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) and [SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) setup pages.)
 
 Before starting, make sure that your user email is verified on Github. To check for this:
 
@@ -103,7 +159,7 @@ Before starting, make sure that your user email is verified on Github. To check 
 
 <br />
 
-## Creating Pull Requests
+## Creating Pull Requests Using the GitHub Website
 
 Whether it's editing files from Kubestellar.io or directly from the Kubestellar Github, there are a couple steps to follow that streamlines the workflow of your PR:
 
@@ -113,39 +169,3 @@ Whether it's editing files from Kubestellar.io or directly from the Kubestellar 
      
 2. Click **Propose Changes** after writing the commit message, review your changes, and then create the PR.
 3. If your PR addresses an already opened issue on the github, make sure to close the issue once your PR is approved and closed.
-
-<br />
-
-## Pull Request Sign-off
-
-**NOTE**: "sign-off" is different from "signing" a commit or tag (see [the git book](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work) about signing). The former indicates your assent to the repository's terms for contributors, the latter adds a cryptographic checksum that is rarely displayed.
-
-Your submitted PR must pass the automated checks in order to be reviewed. This requires for you to perform a DCO sign-off for your PR. The following instructions provide a basic walk-through if you have already set up your GPG and SSH keys:
-
-1. Navigate to the **Code** page of the Kubestellar github.
-   
-2. Click the **Fork** dropdown in the top right corner of the page.
-    - Under "Existing Forks" click your fork (should look something like "your_username/kubestellar")
-3. Once in your fork, click the **Code** dropdown.
-    - Under the "Local" tab at the top of the dropdown, select the SSH tab
-    - Copy the SSH repo URL to your clipboard
-4. Open Git Bash (or your CLI of choice), create or change to a different directory if desired.
-5. Clone the repository using `git clone` followed by pasting the URL you just copied.
-6. Change your directory to the Kubestellar repo using `cd kubestellar`.
-7. `git checkout` to the branch in your fork where the changes were committed.
-    - The branch name should be written at the top of your submitted PR page and looks something like "patch-*X*" (where "X" should be the number of PRs made on your fork to date)
-8. Once in your branch, type `git commit -s --amend` to sign off your PR.
-    - You may replace `--amend` with a `-m` followed by a commit message if you desire; the `--amend` simply uses the same commit message as the one you wrote when initially submitting the PR
-    - If prompted with a sign-off page in your Git Bash (or alternative CLI), type `:wq!` to exit the prompt
-9. Type `git push -f origin [branch_name]`, replacing `[branch_name]` with the actual name of your branch.
-10. Navigate back to your PR github page.
-    - A green `dco-signoff: yes` label indicates that your PR is successfully signed
-
-
-
-
-
-
-
-
-
