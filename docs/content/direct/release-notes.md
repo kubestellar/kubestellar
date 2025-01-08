@@ -2,6 +2,10 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.26.0-alpha.4
+
+This release is intended to have the same functionality as 0.26.0-alpha.3 but test a change to the GitHub Actions workflow that makes a release; the change suppresses attachment of useless binary archives ([PR 2704](https://github.com/kubestellar/kubestellar/pull/2704)).
+
 ## 0.26.0-alpha.3
 
 This release adds the option for the core Helm chart to not take responsibility for running `clusteradm init` on an ITS. **Somebody** has to, but not necessarily this chart.
