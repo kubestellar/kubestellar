@@ -21,8 +21,9 @@
 
 set -e
 
+clusteradm_folder="$(mktemp -d -p $PWD "clusteradm-XXXX")"
+trap 'rm -rf "$clusteradm_folder"' EXIT # delete the temporary folder on exit
 clusteradm_version="" # ==> latest
-clusteradm_folder=clusteradm
 registry=quay.io/kubestellar
 platform=linux/amd64,linux/arm64,linux/ppc64le
 
@@ -76,8 +77,4 @@ git clone -b "v$clusteradm_version" --depth 1 https://github.com/open-cluster-ma
 cd "$clusteradm_folder"
 
 export KO_DOCKER_REPO=$registry
-
 ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform
-
-cd ~
-rm -rf $clusteradm_folder

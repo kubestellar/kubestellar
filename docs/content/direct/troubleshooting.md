@@ -15,7 +15,7 @@ The KubeStellar debug log messages are assigned to log levels roughly
 according to the following rules. Note that the various Kubernetes
 libraries used in these controllers also emit leveled debug log
 messages, according to their own numbering conventions. The
-KubeStellar rules are designed to not be very inconsistent with the
+KubeStellar rules are designed to be mostly consistent with the
 Kubernetes practice.
 
 - **0**: messages that appear O(1) times per run.
@@ -34,6 +34,7 @@ verbosity (`-v`) of various controllers.
 - When basic stuff is not working, survey the Pod objects in the KubeFlex hosting cluster to look for ones that are damaged in some way. For example: you can get a summary with the command `kubectl --context kind-kubeflex get pods -A` --- adjust as necessary for the name of your kubeconfig context to use for the KubeFlex hosting cluster.
 - Remember that for each of your BindingPolicy objects, there is a corresponding Binding object that reports what is matching the policy object.
 - Although not part of the interface, when debugging you can look at the ManifestWork and WorkStatus objects in the ITS.
+- More broadly, remember that KubeStellar uses OCM.
 - Look at logs of controllers. If they have had container restarts that look relevant, look also at the previous logs. Do not forget OCM controllers. Do not forget that some Pods have more than one interesting container.
     - Remember that the amount of log retained is typically a configured option in the relevant container runtime. If your logs are too short, look into increasing that log retention.
 - If a controller's `-v` is not at least 5, increase it.
@@ -61,5 +62,13 @@ Show the particulars of something going wrong.
     - In the WDS: the workload objects involved; any `BidingPolicy` involved, and the corresponding `Binding` for each; any `CustomTransform`, `StatusCollector`, or `CombinedStatus` involved.
     - Any involved objects in the WEC(s).
     - Implementation objects in the ITS: `ManifestWork`, `WorkStatus`.
+    - Here is one way to show the evolution of a relevant set of objects over time. The following command displays the `ManifestWork` objects, after creation and after each update (modulo the gaps allowed by eventual consistency), in an ITS as addressed by the kubeconfig context named `its1` --- after first listing the existing objects. Each line is prefixed with the hour:minute:second at which it appears.
+        ```shell
+        kubectl --context its1 get manifestworks -A --show-managed-fields -o yaml --watch | while IFS="" read line; do echo "$(date +%T)| $line"; done
+        ```
 - When reporting kube API object contents, include the `meta.managedFields`. For example, when using `kubectl get`, include `--show-managed-fields`.
-- Show the logs from relevant controllers.
+- Show the logs from relevant controllers. The most active and directly relevant ones are the following.
+    - The KubeStellar controller-manager (running in the KubeFlex hosting cluster) for the WDS
+    - KubeStellar's OCM-based transport-controller (running in the KubeFlex hosting cluster) for the WDS+ITS
+    - The OCM Status Add-On Agent in the WEC.
+    - OCM's klusterlet-agent in the WEC.

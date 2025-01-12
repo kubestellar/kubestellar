@@ -66,12 +66,59 @@ spec:
               description: NamedStatusCombination holds the rows that come from evaluating
                 one StatusCollector.
               properties:
+                aggregationErrors:
+                  description: AggregationErrors reports errors from applying aggregation
+                    operations.
+                  items:
+                    description: ErrorInColumn reports an error that is specific to
+                      a column.
+                    properties:
+                      columnName:
+                        type: string
+                      error:
+                        type: string
+                    required:
+                    - columnName
+                    - error
+                    type: object
+                  type: array
                 columnNames:
                   items:
                     type: string
                   type: array
                 name:
                   type: string
+                rowErrors:
+                  description: RowErrors reports on some of the errors in evaluating
+                    expressions in the StatusCollectorSpec. Only a limited number
+                    of errors will appear here. For every column for which there is
+                    an error, there will be at least one entry here. In the input
+                    to aggregation operations, rows with errors are omitted.
+                  items:
+                    description: RowEvaluationError reports an error that is specific
+                      to a WEC and a column.
+                    properties:
+                      columnName:
+                        description: ColumnName is the empty string for the filter
+                          expression
+                        type: string
+                      error:
+                        type: string
+                      wec:
+                        description: Destination wraps the identifiers required to
+                          uniquely identify a destination cluster.
+                        properties:
+                          clusterId:
+                            type: string
+                        required:
+                        - clusterId
+                        type: object
+                    required:
+                    - columnName
+                    - error
+                    - wec
+                    type: object
+                  type: array
                 rows:
                   items:
                     properties:

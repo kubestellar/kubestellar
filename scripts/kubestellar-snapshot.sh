@@ -385,8 +385,8 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         cp_kubeconfig[cp_n]="$TMPFOLDER/$name-kubeconfig"
         echo "$cp_kubeconfig_content" > "${cp_kubeconfig[cp_n]}"
     fi
-    if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
-        its_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=its" -o name 2> /dev/null | cut -d'/' -f2 || true)
+    if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
+        its_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=${cp_pch[cp_n]}" -o name 2> /dev/null | cut -d'/' -f2 || true)
         its_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         if [[ "${cp_type[cp_n]}" == "host" ]] ; then
             status_ns="open-cluster-management"
@@ -394,11 +394,20 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
             status_ns="${cp_ns[cp_n]}"
         fi
         status_pod=$(kubectl --context $helm_context -n "$status_ns" get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
+        status_version=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.spec.containers}' | jq -r '.[].image | select(contains("status-addon"))' | cut -d: -f2 || true)
         status_status=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -n -e "  - Post Create Hook: pod=${COLOR_INFO}$its_pod${COLOR_NONE}, ns=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$its_status"
-        echo -n -e "  - Status addon controller: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, ns=${COLOR_INFO}$status_ns${COLOR_NONE}, status="
+        echo -n -e "  - Status addon controller: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, ns=${COLOR_INFO}$status_ns${COLOR_NONE}, version=${COLOR_INFO}$status_version${COLOR_NONE}, status="
         echostatus "$status_status"
+        if [ -n "${cp_kubeconfig[cp_n]}" ]; then
+            ocm_version=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl get deploy -n open-cluster-management cluster-manager -o jsonpath={.spec.template.spec.containers[0].image} | cut -d: -f2)
+            if [ -n "$ocm_version" ]; then
+                echo -e "  - Open-cluster-manager: version=${COLOR_INFO}$ocm_version${COLOR_NONE}"
+            else
+                echo -e "  - Open-cluster-manager: ${COLOR_ERROR}not found${COLOR_NONE}"
+            fi
+        fi
     else
         kubestellar_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
         kubestellar_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image' | cut -d':' -f2 || true)
@@ -414,7 +423,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     if [[ "$arg_yaml" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
         kubectl --context $helm_context get controlplane $name -o yaml > "$OUTPUT_FOLDER/$name/cp.yaml"
-        if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
+        if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o yaml > "$OUTPUT_FOLDER/$name/its-job.yaml"
             kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o yaml > "$OUTPUT_FOLDER/$name/status-addon.yaml"
         else
@@ -424,7 +433,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     fi
     if [[ "$arg_logs" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
-        if [[ "${cp_pch[cp_n]}" == "its" ]] ; then
+        if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-clusteradm > "$OUTPUT_FOLDER/$name/its-job-clusteradm.log"
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-statusaddon > "$OUTPUT_FOLDER/$name/its-job-status-addon.log"
             kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller > "$OUTPUT_FOLDER/$name/status-addon.log"
@@ -443,7 +452,7 @@ done
 echotitle "Managed Clusters:"
 mc_n=0
 for j in "${!cp_pch[@]}" ; do
-    if [[ "${cp_pch[$j]}" == "its" ]] ; then
+    if [[ "${cp_pch[$j]}" =~ ^its ]] ; then
         mcs=($(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster -no-headers -o name 2> /dev/null || true))
         for i in "${!mcs[@]}" ; do
             name=${mcs[i]##*/}
@@ -487,12 +496,51 @@ for j in "${!cp_pch[@]}" ; do
                 echo -n -e "${COLOR_NONE}"
             fi
             if [[ "$arg_yaml" == "true" ]] ; then
-                mkdir -p "$OUTPUT_FOLDER/${bp_cp[bp_n]}/binding-politcies"
-                KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindingpolicy ${bp_name[bp_n]} -o yaml > "$OUTPUT_FOLDER/${bp_cp[bp_n]}/binding-politcies/$name.yaml"
+                mkdir -p "$OUTPUT_FOLDER/${bp_cp[bp_n]}/binding-policies"
+                KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindingpolicy ${bp_name[bp_n]} -o yaml > "$OUTPUT_FOLDER/${bp_cp[bp_n]}/binding-policies/$name.yaml"
             fi
             bp_n=$((bp_n+1))
         done
     fi
+done
+
+
+###############################################################################
+# Listing Bindings
+###############################################################################
+echotitle "Bindings:"
+for j in "${!cp_pch[@]}" ; do
+    if ! [[ "${cp_pch[$j]}" == "wds" ]] ; then continue; fi
+    bindings=($(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindings.control.kubestellar.io -no-headers -o name 2> /dev/null || true))
+    for i in "${!bindings[@]}" ; do
+        binding_name=${bindings[i]##*/}
+        binding_cp="${cp_name[$j]}"
+        spec=$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get bindings.control.kubestellar.io "$binding_name" -o jsonpath='{.spec}')
+        dests=$(jq '.destinations//[]' <<<$spec)
+        cobjs=$(jq '.workload.clusterScope//[]' <<<$spec)
+        nobjs=$(jq '.workload.namespaceScope//[]' <<<$spec)
+        clisting=$(jq -r --argjson dests "$dests" --argjson objs "$cobjs" '[$dests, $objs] | combinations | .[0].clusterId+" "+.[1].resource+"."+.[1].group+"/"+.[1].version+" "+.[1].name' <<<0)
+        [ -n "$clisting" ] && { echo "$clisting" | while read wec rsc name; do
+            echo -e "- wds=${COLOR_INFO}${binding_cp}${COLOR_NONE} binding=${COLOR_INFO}${binding_name}${COLOR_NONE} WEC=${COLOR_INFO}${wec}${COLOR_NONE} rsc=${COLOR_INFO}${rsc}${COLOR_NONE} name=${COLOR_INFO}${name}${COLOR_NONE}"
+        done; }
+        nlisting=$(jq -r --argjson dests "$dests" --argjson objs "$nobjs" '[$dests, $objs] | combinations | .[0].clusterId+" "+.[1].resource+"."+.[1].group+"/"+.[1].version+" "+.[1].namespace+" "+.[1].name' <<<0)
+        [ -n "$nlisting" ] && { echo "$nlisting" | while read wec rsc ns name; do
+            echo -e "- wds=${COLOR_INFO}${binding_cp}${COLOR_NONE} binding=${COLOR_INFO}${binding_name}${COLOR_NONE} WEC=${COLOR_INFO}${wec}${COLOR_NONE} rsc=${COLOR_INFO}${rsc}${COLOR_NONE} ns=${COLOR_INFO}${ns}${COLOR_NONE} name=${COLOR_INFO}${name}${COLOR_NONE}"
+        done; }
+        if [[ -z "$clisting" ]] && [[ -z "$nlisting" ]]; then
+            ndests=$(jq length <<<$dests <<<0)
+	    ncobjs=$(jq length <<<$cobjs <<<0)
+            nnobjs=$(jq length <<<$nobjs <<<0)
+            [ "$ndests" = 0 ] && colord=$COLOR_WARNING || colord=$COLOR_INFO
+            [ "$ncobjs" = 0 ] && colorc=$COLOR_WARNING || colorc=$COLOR_INFO
+            [ "$nnobjs" = 0 ] && colorn=$COLOR_WARNING || colorn=$COLOR_INFO
+            echo -e "- wds=${COLOR_INFO}${binding_cp}${COLOR_NONE} binding=${COLOR_INFO}${binding_name}${COLOR_NONE} num_wecs=${colord}${ndests}${COLOR_NONE} num_clusterScoped_objs=${colorc}${ncobjs}${COLOR_NONE} num_namespaced_objs=${colorn}${nnobjs}${COLOR_NONE}"
+        fi
+        if [[ "$arg_yaml" == "true" ]] ; then
+            mkdir -p "$OUTPUT_FOLDER/${binding_cp}/bindings"
+            KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get binding.control.kubestellar.io ${binding_name} -o yaml > "$OUTPUT_FOLDER/${binding_cp}/bindings/$binding_name.yaml"
+        fi
+    done
 done
 
 
@@ -502,7 +550,7 @@ done
 echotitle "Manifest Works:"
 mw_n=0
 for h in "${!cp_pch[@]}" ; do
-    if [[ "${cp_pch[$h]}" == "its" ]] ; then
+    if [[ "${cp_pch[$h]}" =~ ^its ]] ; then
         ns=($(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl get ns -no-headers -o name 2> /dev/null || true))
         for j in "${!ns[@]}" ; do
             cluster=${ns[j]##*/}
@@ -541,7 +589,7 @@ done
 echotitle "Work Statuses:"
 sw_n=0
 for h in "${!cp_pch[@]}" ; do
-    if [[ "${cp_pch[$h]}" == "its" ]] ; then
+    if [[ "${cp_pch[$h]}" =~ ^its ]] ; then
         ns=($(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl get ns -no-headers -o name 2> /dev/null || true))
         for j in "${!ns[@]}" ; do
             cluster=${ns[j]##*/}

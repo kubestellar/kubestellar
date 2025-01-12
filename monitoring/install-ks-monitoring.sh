@@ -20,11 +20,13 @@ set -e # exit on error
 ctx="kind-kubeflex"
 ns="ks-monitoring"
 opt="core" # (value: core or wec)
-hub_context="kind-kubeflex"
+core_context="kind-kubeflex"
+env="plain"
+
 
 while [ $# != 0 ]; do
     case "$1" in
-        (-h|--help) echo "$0 usage: (--cluster-context (e.g., --cluster-context core-cluster (default value: kind-kubeflex)) | --monitoring-ns (e.g., --monitoring-ns monitoring (default value: ks-monitoring)) | --set (e.g., --set wec (default value: core)))*"
+        (-h|--help) echo "$0 usage: (--cluster-context (e.g., --cluster-context core-cluster (default value: kind-kubeflex)) | --monitoring-ns (e.g., --monitoring-ns monitoring (default value: ks-monitoring)) | --set (e.g., --set wec (default value: core)) | --env (e.g., --env ocp (allowed values: ocp or plain)) | --kubeflex-hosting-cluster-context (e.g., --kubeflex-hosting-cluster-context kscore (default value: kind-kubeflex)) *"
                     exit;;
         (--cluster-context)
           if (( $# > 1 )); then
@@ -50,6 +52,22 @@ while [ $# != 0 ]; do
             echo "Missing set value" >&2
             exit 1;
           fi;;
+        (--env)
+          if (( $# > 1 )); then
+            env="$2"
+            shift
+          else
+            echo "Missing set value" >&2
+            exit 1;
+          fi;;
+        (--kubeflex-hosting-cluster-context)
+          if (( $# > 1 )); then
+            core_context="$2"
+            shift
+          else
+            echo "Missing set value" >&2
+            exit 1;
+          fi;;
     esac
     shift
 done
@@ -57,6 +75,12 @@ done
 case "$opt" in
     (core|wec) ;;
     (*) echo "$0: --set must be 'core' or 'wec'" >&2
+        exit 1;;
+esac
+
+case "$env" in
+    (plain|ocp) ;;
+    (*) echo "$0: --env must be 'plain' or 'ocp'" >&2
         exit 1;;
 esac
 
@@ -76,7 +100,15 @@ if [ $opt == "core" ];then
 
     : Install MinIO MinIO object storage for Thanos to store metrics
     helm repo add minio https://charts.min.io/
-    helm install minio -n $ns -f ${SCRIPT_DIR}/prometheus/minio-custom-values.yaml minio/minio  --version 5.2.0
+
+    if [ $env == "plain" ];then
+       helm install minio -n $ns -f ${SCRIPT_DIR}/prometheus/minio-custom-values.yaml minio/minio  --version 5.2.0 --set ingress.enabled=true
+
+    elif [ $env == "ocp" ];then
+       helm install minio -n $ns -f ${SCRIPT_DIR}/prometheus/minio-custom-values.yaml minio/minio  --version 5.2.0 --set ingress.enabled=false
+       kubectl -n $ns apply -f ${SCRIPT_DIR}/prometheus/minio-route.yaml
+    fi 
+
     wait-for-object $ctx $ns statefulset minio
 
     # Retrieve the MinIO credentials
@@ -84,7 +116,7 @@ if [ $opt == "core" ];then
     export ROOT_PASSWORD=$(kubectl get secret -n $ns minio -o jsonpath="{.data.rootPassword}" | base64 -d)
 
     # Create secret to allow Thanos access to object storage
-    sed -e s/%USERNAME%/$ROOT_USER/g -e s/%PASSWORD%/$ROOT_PASSWORD/g ${SCRIPT_DIR}/prometheus/objstore.yml >& /tmp/objstore.yml
+    sed -e s/%USERNAME%/$ROOT_USER/g -e s/%PASSWORD%/$ROOT_PASSWORD/g ${SCRIPT_DIR}/prometheus/objstore.yml > /tmp/objstore.yml
 
     kubectl -n $ns create secret generic thanos-objstore --from-file=/tmp/objstore.yml
     # Delete temporary file
@@ -92,7 +124,18 @@ if [ $opt == "core" ];then
 
     : Install Thanos
     helm repo add bitnami https://charts.bitnami.com/bitnami
-    helm -n $ns upgrade --install thanos bitnami/thanos --values ${SCRIPT_DIR}/prometheus/thanos-custom-values.yaml  --version 15.7.25
+
+    if [ $env == "plain" ];then
+       helm -n $ns upgrade --install thanos bitnami/thanos --values ${SCRIPT_DIR}/prometheus/thanos-custom-values.yaml  --version 15.7.25  \
+         --set queryFrontend.ingress.enabled=true  \
+         --set receive.ingress.enabled=true
+
+    elif [ $env == "ocp" ];then
+       helm -n $ns upgrade --install thanos bitnami/thanos --values ${SCRIPT_DIR}/prometheus/thanos-custom-values.yaml  --version 15.7.25 \
+         --set queryFrontend.ingress.enabled=false  \
+         --set receive.ingress.enabled=false
+       kubectl -n $ns apply -f ${SCRIPT_DIR}/prometheus/thanos-route.yaml
+    fi 
 
     wait-for-object $ctx $ns deployment thanos-compactor
     wait-for-object $ctx $ns deployment thanos-query
@@ -120,29 +163,45 @@ if [ $opt == "core" ];then
 
     wait-for-object $ctx $ns deployment grafana
 
+    if [ $env == "ocp" ];then
+         kubectl -n $ns apply -f ${SCRIPT_DIR}/grafana/grafana-route.yaml
+    fi 
+
     # Set the Thanos URL for Prometheus remote write
     export thanos_host="thanos-receive.ks-monitoring.svc.cluster.local:19291"
-    sed -e s/%THANOS_HOST%/$thanos_host/g ${SCRIPT_DIR}/prometheus/prometheus-custom-values.yaml >& /tmp/prometheus-custom-values-set.yaml
+    endpoint="http://$thanos_host"
+    sed -e s,%THANOS_HOST%,$endpoint,g -e s,%ENABLE_KUBEAPISERVER%,true,g ${SCRIPT_DIR}/prometheus/prometheus-custom-values.yaml > /tmp/prometheus-custom-values-set.yaml
 
     # Configure Pyroscope to connect to MinIO 
     export ENDPOINT="minio:9000"
     export BUCKET="pyroscope"
-    sed -e s/%ENDPOINT%/$ENDPOINT/g -e s/%BUCKET%/$BUCKET/g -e s/%USERNAME%/$ROOT_USER/g -e s/%PASSWORD%/$ROOT_PASSWORD/g ${SCRIPT_DIR}/grafana/pyroscope-config.yaml >& /tmp/pyroscope-config-values-set.yaml
-
+    export INSECURE="true"
+    sed -e s/%ENDPOINT%/$ENDPOINT/g -e s/%BUCKET%/$BUCKET/g -e s/%USERNAME%/$ROOT_USER/g -e s/%PASSWORD%/$ROOT_PASSWORD/g -e s/%INSECURE%/$INSECURE/g ${SCRIPT_DIR}/grafana/pyroscope-config.yaml > /tmp/pyroscope-config-values-set.yaml
+    
 elif [ $opt == "wec" ];then
   # Set the Thanos URL for Prometheus remote write
-  export thanos_host="kubeflex-control-plane:80"
-  sed -e s/%THANOS_HOST%/$thanos_host/g ${SCRIPT_DIR}/prometheus/prometheus-custom-values.yaml >& /tmp/prometheus-custom-values-set.yaml
+  if [ $env == "plain" ];then
+       export THANOS_ENDPOINT="http://kubeflex-control-plane:80"
+       export MinIO_ENDPOINT="kubeflex-control-plane:32000"
+       export INSECURE="true"
+
+  elif [ $env == "ocp" ];then
+       thanos_host=$(kubectl --context $core_context -n $ns get route thanos-receive -o jsonpath="{.status.ingress[0].host}")
+       export THANOS_ENDPOINT="https://$thanos_host"
+       export MinIO_ENDPOINT=$(kubectl --context $core_context -n $ns get route minio-api -o jsonpath="{.status.ingress[0].host}")
+       export INSECURE="false"
+  fi
+
+  sed -e s,%THANOS_HOST%,$THANOS_ENDPOINT,g -e s,%ENABLE_KUBEAPISERVER%,false,g ${SCRIPT_DIR}/prometheus/prometheus-custom-values.yaml > /tmp/prometheus-custom-values-set.yaml
 
   # Configure Pyroscope to connect to MinIO remote storage on the hosting cluster (hub)
   # (1) Retrieve the MinIO credentials
-  export ROOT_USER=$(kubectl --context $hub_context get secret -n $ns minio -o jsonpath="{.data.rootUser}" | base64 -d)
-  export ROOT_PASSWORD=$(kubectl --context $hub_context get secret -n $ns minio -o jsonpath="{.data.rootPassword}" | base64 -d)
-  export ENDPOINT="kubeflex-control-plane:32000"
+  export ROOT_USER=$(kubectl --context $core_context get secret -n $ns minio -o jsonpath="{.data.rootUser}" | base64 -d)
+  export ROOT_PASSWORD=$(kubectl --context $core_context get secret -n $ns minio -o jsonpath="{.data.rootPassword}" | base64 -d)
   export BUCKET="pyroscope"
-
+  
   # (2) Configure Pyroscope
-  sed -e s/%ENDPOINT%/$ENDPOINT/g -e s/%BUCKET%/$BUCKET/g -e s/%USERNAME%/$ROOT_USER/g -e s/%PASSWORD%/$ROOT_PASSWORD/g ${SCRIPT_DIR}/grafana/pyroscope-config.yaml >& /tmp/pyroscope-config-values-set.yaml
+  sed -e s/%ENDPOINT%/$MinIO_ENDPOINT/g -e s/%BUCKET%/$BUCKET/g -e s/%USERNAME%/$ROOT_USER/g -e s/%PASSWORD%/$ROOT_PASSWORD/g -e s/%INSECURE%/$INSECURE/g ${SCRIPT_DIR}/grafana/pyroscope-config.yaml > /tmp/pyroscope-config-values-set.yaml
 else
    echo "Unknown value set for parameter --set" >&2
    exit 1;

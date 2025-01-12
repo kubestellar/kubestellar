@@ -25,9 +25,16 @@ Be sure to [install the software prerequisites](pre-reqs.md) _before_ running th
 The script will check for the pre-reqs and exit if they are not present.
 
 ### Run the script!
+The script can install KubeStellar's demonstration environment on top of kind or k3d
 
+For use with kind
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh)
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform kind
+```
+
+For use with k3d
+```shell
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform k3d
 ```
 
 If successful, the script will output the variable definitions that you would use when proceeding to the example scenarios. After successfully running the script, proceed to the [Exercise KubeStellar](#exercise-kubestellar) section below.
@@ -87,16 +94,17 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ con
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
     --version $kubestellar_version \
     --set-json='ITSes=[{"name":"its1"}]' \
-    --set-json='WDSes=[{"name":"wds1"}]' \
+    --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
     --set-json='verbosity.default=5' # so we can debug your problem reports
 ```
 
-That command will print some notes about how to get kubeconfig "contexts" named "its1" and "wds1" defined. Do that, because those contexts are used in the steps that follow.
+That command will print some notes about how to get kubeconfig "contexts" named "its1", "wds1", and "wds2" defined. Do that, because those contexts are used in the steps that follow.
 
 ```shell
 kubectl config use-context kind-kubeflex # this is here only to remind you, it will already be the current context if you are following this recipe exactly
 kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
 kflex ctx --overwrite-existing-context wds1
+kflex ctx --overwrite-existing-context wds2
 kflex ctx --overwrite-existing-context its1
 ```
 
@@ -105,8 +113,8 @@ kflex ctx --overwrite-existing-context its1
 The Helm chart above has a Job that initializes the ITS as an OCM "hub" cluster. Helm does not have a way to wait for that initialization to finish. So you have to do the wait yourself. The following commands will do that.
 
 ```shell
-kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its}=true' --timeout 90s
-kubectl --context kind-kubeflex wait -n its1-system job.batch/its --for condition=Complete --timeout 150s
+kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 90s
+kubectl --context kind-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 150s
 ```
 
 ### Create and register two workload execution cluster(s)

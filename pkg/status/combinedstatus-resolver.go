@@ -194,7 +194,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 		logger.V(3).Info("Deleting CombinedStatus resolutions for Binding", "name", bindingName)
 		return c.deleteResolutionsForBindingWriteLocked(bindingName)
 	} else {
-		logger.V(3).Info("Noting non-deleted resolution", "bindingResolution", bindingResolution)
+		logger.V(3).Info("Noting non-deleted resolutions for Binding", "name", bindingName, "bindingResolution", bindingResolution)
 	}
 
 	destinationsSet := bindingResolution.GetDestinations()
@@ -250,9 +250,6 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 			objectIdentifierToResolution[objectIdentifier] = csResolution
 			c.resolutionNameToKey[csResolution.getName()] = resolutionKey{bindingName, objectIdentifier}
 		}
-
-		// fetch missing statuscollector specs
-		c.fetchMissingStatusCollectorSpecsLocked(statusCollectorLister, objectData.Modulation.StatusCollectors)
 
 		// update statuscollectors
 		removedCollectors, addedCollectors := csResolution.setStatusCollectors(c.statusCollectorNameToSpecFromCache(objectData.Modulation.StatusCollectors))
@@ -363,26 +360,29 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus 
 // that should be queued for syncing.
 func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool,
 	workStatusIndexer cache.Indexer) sets.Set[util.ObjectIdentifier] {
+	logger := klog.FromContext(ctx)
 	c.Lock()
 	defer c.Unlock()
 
 	currentSpec := c.statusCollectorNameToSpec[statusCollector.Name]
 	if !deleted && currentSpec != nil && statusCollectorSpecsMatch(currentSpec, &statusCollector.Spec) {
+		logger.V(5).Info("No change in StatusCollector", "name", statusCollector.Name)
 		return nil // already cached and the spec has not changed
 	}
+	logger.V(5).Info("Noting StatusCollector", "name", statusCollector.Name, "numBindings", len(c.bindingNameToResolutions), "deleted", deleted)
 
 	combinedStatusIdentifiersToQueue := sets.New[util.ObjectIdentifier]()
 	// update resolutions that use the statuscollector
 	// this call cannot add an association that was not already present.
 	// if deleted, the association is removed.
 	for bindingName, resolutions := range c.bindingNameToResolutions {
+		logger.V(5).Info("Considering Binding", "statusCollectorName", statusCollector.Name, "bindingName", bindingName, "numResolutions", len(resolutions))
 		for workloadObjectIdentifier, resolution := range resolutions {
 			if deleted {
-				if resolution.removeStatusCollector(statusCollector.Name) {
+				if resolution.noteStatusCollectorAbsence(statusCollector.Name) {
 					combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
 						workloadObjectIdentifier.ObjectName.Namespace))
 				}
-
 				continue
 			}
 
@@ -428,28 +428,6 @@ func (c *combinedStatusResolver) ResolutionExists(name string) (string, util.Obj
 	return key.bindingName, key.sourceObjectIdentifier, true
 }
 
-// fetchMissingStatusCollectorSpecs fetches the missing statuscollector specs
-// from the given lister and updates the cache.
-// The method is expected to be called with the write lock held.
-func (c *combinedStatusResolver) fetchMissingStatusCollectorSpecsLocked(statusCollectorLister controllisters.StatusCollectorLister,
-	statusCollectorNames sets.Set[string]) {
-	for statusCollectorName := range statusCollectorNames {
-		if _, exists := c.statusCollectorNameToSpec[statusCollectorName]; exists {
-			continue // this method is not responsible for keeping the cache up-to-date
-		}
-
-		statusCollector, err := statusCollectorLister.Get(statusCollectorName)
-		if err != nil {
-			// fetch error should not disturb the flow.
-			// a missing spec will be reconciled when the status collector is created/updated.
-			runtime2.HandleError(fmt.Errorf("failed to get statuscollector %s: %w", statusCollectorName, err))
-			return
-		}
-
-		c.statusCollectorNameToSpec[statusCollectorName] = &statusCollector.Spec // readonly
-	}
-}
-
 // evaluateWorkStatusesPerBindingReadLocked evaluates workstatuses associated
 // with the given workload identifiers and destinations.
 // The returned set contains the identifiers of combinedstatus objects that
@@ -472,27 +450,38 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 				runtime2.HandleError(fmt.Errorf("failed to get workstatus with indexKey %s: %w", indexKey, err))
 				continue
 			}
+			var workStat *workStatus
 
 			if len(objs) == 0 {
 				// A WorkStatus object can be missing for any of several reasons.
 				// It might not have been created yet.
 				// The workload object might have been recently deleted or retracted from the WEC.
-				logger.V(3).Info("Found no WorkStatus object", "binding", bindingName,
+				logger.V(3).Info("Found no WorkStatus object, using blank", "binding", bindingName,
 					"workloadObjIdentifier", workloadObjIdentifier, "destination", destination)
-				continue
+				workStat = &workStatus{
+					workStatusRef: workStatusRef{
+						Name:                   "",
+						WECName:                destination,
+						SourceObjectIdentifier: workloadObjIdentifier,
+					},
+				}
+			} else {
+				if len(objs) > 1 {
+					logger.V(3).Info("Found more than one WorkStatus object, using the first", "binding", bindingName,
+						"workloadObjIdentifier", workloadObjIdentifier, "destination", destination)
+				}
+				workStat, err = runtimeObjectToWorkStatus(objs[0].(runtime.Object))
+				if err != nil {
+					runtime2.HandleError(fmt.Errorf("failed to convert runtime.Object to workStatus: %w", err))
+					continue
+				}
 			}
 
-			workStatus, err := runtimeObjectToWorkStatus(objs[0].(runtime.Object))
-			if err != nil {
-				runtime2.HandleError(fmt.Errorf("failed to convert runtime.Object to workStatus: %w", err))
-				continue
-			}
-
-			csResolution := c.bindingNameToResolutions[bindingName][workStatus.SourceObjectIdentifier]
-			content := getCombinedContentMap(c.wdsListers, workStatus, csResolution)
+			csResolution := c.bindingNameToResolutions[bindingName][workStat.SourceObjectIdentifier]
+			content := getCombinedContentMap(c.wdsListers, workStat, csResolution)
 
 			// evaluate workstatus
-			if csResolution.evaluateWorkStatus(ctx, c.celEvaluator, workStatus.WECName, content) {
+			if csResolution.evaluateWorkStatus(ctx, c.celEvaluator, workStat.WECName, content) {
 				combinedStatusesToQueue.Insert(util.IdentifierForCombinedStatus(csResolution.getName(),
 					workloadObjIdentifier.ObjectName.Namespace))
 			}
@@ -547,17 +536,11 @@ func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool 
 	return true
 }
 
-func (c *combinedStatusResolver) statusCollectorNameToSpecFromCache(names sets.Set[string]) map[string]v1alpha1.StatusCollectorSpec {
-	result := make(map[string]v1alpha1.StatusCollectorSpec, len(names))
+func (c *combinedStatusResolver) statusCollectorNameToSpecFromCache(names sets.Set[string]) map[string]*v1alpha1.StatusCollectorSpec {
+	result := make(map[string]*v1alpha1.StatusCollectorSpec, len(names))
 	for name := range names {
-		spec, ok := c.statusCollectorNameToSpec[name]
-		if !ok {
-			continue
-		}
-
-		result[name] = *spec
+		result[name] = c.statusCollectorNameToSpec[name]
 	}
-
 	return result
 }
 

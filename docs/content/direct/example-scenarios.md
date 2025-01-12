@@ -132,26 +132,6 @@ KubeStellar can handle the case where the CRD is part of the workload,
 this example concerns the case where the CRD is established in the
 WECs by some other means.
 
-In order to run this scenario using the post-create-hook method you need
-the raise the permissions for the kubeflex controller manager (TODO 1: move this material and its undo to [the doc on WDS](wds.md); TODO 2: why is this needed? Is it needed for the core chart too? can we remove the need for this?):
-
-```shell
-kubectl --context "$host_context" apply -f - <<EOF
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: kubeflex-manager-cluster-admin-rolebinding
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-- kind: ServiceAccount
-  name: kubeflex-controller-manager
-  namespace: kubeflex-system
-EOF
-```
-
 For this example, we use the `AppWrapper` custom resource defined in the
 [multi cluster app dispatcher](https://github.com/project-codeflare/multi-cluster-app-dispatcher)
 project.
@@ -164,10 +144,6 @@ clusters=("$wds_context" "$wec1_context" "$wec2_context");
   kubectl --context ${cluster} apply -f https://raw.githubusercontent.com/project-codeflare/multi-cluster-app-dispatcher/v1.39.0/config/crd/bases/workload.codeflare.dev_appwrappers.yaml
 done
 ```
-
-If desired, you may remove the `kubeflex-manager-cluster-admin-rolebinding` after
-the kubestellar-controller-manager is started, with the command
-`kubectl --context "$host_context" delete clusterrolebinding kubeflex-manager-cluster-admin-rolebinding`
 
 Run the following command to give permission for the klusterlet to
 operate on the appwrapper cluster resource.
@@ -261,12 +237,6 @@ for cluster in "$wec1_context" "$wec2_context"; do
   kubectl --context $cluster delete clusterroles appwrappers-access
   kubectl --context $cluster delete clusterrolebindings klusterlet-appwrappers-access
 done
-```
-
-If you have not already done so, then do the following command.
-
-```shell
-kubectl --context "$host_context" delete clusterrolebinding kubeflex-manager-cluster-admin-rolebinding
 ```
 
 Delete the CRD from the WDS and the WECs.
@@ -364,8 +334,8 @@ kubectl --context "$wds_context" delete bindingpolicies postgres-bpolicy
 
 ## Scenario 4 - Singleton status
 
-This scenario shows how to get the full status updated when setting `wantSingletonReportedState`
-in the BindingPolicy. This still an experimental feature.
+This scenario shows how to get the full status updated, by setting `wantSingletonReportedState`
+in a `DownsyncPolicyClause`. This still an experimental feature.
 
 Apply a BindingPolicy with the `wantSingletonReportedState` flag set:
 
@@ -376,12 +346,12 @@ kind: BindingPolicy
 metadata:
   name: nginx-singleton-bpolicy
 spec:
-  wantSingletonReportedState: true
   clusterSelectors:
   - matchLabels: {"name":"cluster1"}
   downsync:
   - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx-singleton"}
+    wantSingletonReportedState: true
 EOF
 ```
 

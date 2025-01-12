@@ -29,6 +29,6 @@ icon: https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/favico
 # List dependencies
 dependencies:
 - name: kubeflex-operator
-  version: v0.7.1
+  version: v0.7.2
   repository: oci://ghcr.io/kubestellar/kubeflex/chart
   condition: kubeflex-operator.install

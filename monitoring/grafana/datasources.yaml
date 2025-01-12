@@ -1,3 +1,9 @@
+securityContext:
+  runAsNonRoot: null
+  runAsUser: null
+  runAsGroup: null
+  fsGroup: null
+
 datasources:
   pyroscope.yaml:
    apiVersion: 1

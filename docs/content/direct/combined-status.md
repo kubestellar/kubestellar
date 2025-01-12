@@ -21,7 +21,9 @@ The general technique for combining reported state from WECs is built upon the f
 1. A user can request a list without aggregation, possibly after filtering, but certainly with a limit on list length. The expectation is that such a list makes sense only if the length of the list will be modest. For users that want access to the full reported state from each WEC for a large number of WECs, KubeStellar should have an abstraction that gives the users access --- in a functional way, not by making another copy --- to that state (which is already in the mailbox namespaces).
 
 1. The reported state for a given workload object from a given WEC is implicitly augmented with metadata about the WEC and about the end-to-end propagation from WDS to that WEC. This extra information is available just like the regular contents of the object, for use in combining reported state.
-   * The specifics of queryable objects and implicit augmentations can be found in [types.go](../../../api/control/v1alpha1/types.go) and is specified in [Queryable Objects](#queryable-objects).
+    * The specifics of queryable objects and implicit augmentations can be found in `api/control/v1alpha1/types.go` and are specified in [Queryable Objects](#queryable-objects).
+
+1. Errors in the user-supplied expressions are reported in relevant API objects (`StatusCollector` and `CombinedStatus`). For aggregation operations, input rows with expression errors are skipped.
 
 ### Relation with SQL
 
@@ -130,7 +132,7 @@ spec:
   limit: 10
 ```
 
-To specify using that, the `BindingSpec` would reference it from the `StatusCollection` in the relevant `DownsyncPolicyClause`(s). Following is an example.
+To specify using that, the `BindingSpec` would reference it from the `statusCollectors` in the relevant `DownsyncPolicyClause`(s). Following is an example.
 
 ```yaml
 apiVersion: control.kubestellar.io/v1alpha1
@@ -143,8 +145,7 @@ spec:
   downsync:
   - objectSelectors:
     - matchLabels: {"app.kubernetes.io/name":"nginx"}
-    statusCollection:
-      statusCollectors: [ count-wecs ]
+    statusCollectors: [ count-wecs ]
 ```
 
 The analogous SQL statement would look something like the following.
