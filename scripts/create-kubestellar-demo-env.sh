@@ -123,12 +123,6 @@ checking_cluster() {
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
-
-# Function to check if a port is free
-is_port_free() {
-    ! lsof -i:9443
-}
-
 ##########################################
 
 echo -e "\nStarting environment clean up..."
@@ -138,21 +132,14 @@ if command_exists "k3d"; then
     cluster_clean_up "k3d cluster delete kubeflex" &
     cluster_clean_up "k3d cluster delete cluster1" &
     cluster_clean_up "k3d cluster delete cluster2" &
-    wait
 fi
 if command_exists "kind"; then
     cluster_clean_up "kind delete cluster --name kubeflex" &
     cluster_clean_up "kind delete cluster --name cluster1" &
     cluster_clean_up "kind delete cluster --name cluster2" &
-    wait
 fi
 
-# Wait until port 9443 is free
-while ! is_port_free; do
-    echo "Waiting for port 9443 to be free..."
-    sleep 1
-done
-
+wait
 echo -e "\033[33m✔\033[0m Cluster space clean up has been completed"
 
 echo -e "\nStarting context clean up..."
@@ -171,15 +158,13 @@ for cluster in "${clusters[@]}"; do
     fi
 done
 
-wait
-
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
 if [ "$k8s_platform" == "kind" ]; then
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
 else
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
     sleep 15
-    helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.11.3 --namespace ingress-nginx --create-namespace
+    helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.11.3 --namespace ingress-nginx --create-[...]
 fi
 echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
 
