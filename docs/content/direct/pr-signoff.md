@@ -32,8 +32,8 @@ adds commits that are not signed-off then you can repair this by
 adding the signoff to each using `git commit -s --amend` on each of
 them. Following is an outline of how to do it for a branch that adds
 **exactly one** commit. If your branch adds more than one commit then
-you can extrapolate using `git cherry-pick` to build up a revised
-series of commits one-by-one.
+you can extrapolate using `git cherry-pick -s -S` to build up a
+revised series of commits one-by-one.
 
 The following instructions provide a basic walk-through if you have already created your own fork of the repository but yet not made a clone on your workstation. If you have set up your SSH and GPG keys and include `-S` on the `git commit` command line or have configured automatic signing then this will also get the commits signed.
 
