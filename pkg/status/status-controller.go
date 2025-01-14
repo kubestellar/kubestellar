@@ -69,6 +69,7 @@ type Controller struct {
 	combinedStatusClient  ksmetrics.BasicNamespacedClient[*v1alpha1.CombinedStatus, *v1alpha1.CombinedStatusList]
 	itsDynClient          dynamic.Interface
 
+	bindingLister           controllisters.BindingLister
 	statusCollectorInformer cache.SharedIndexInformer
 	statusCollectorLister   controllisters.StatusCollectorLister
 	combinedStatusInformer  cache.SharedIndexInformer
@@ -227,6 +228,7 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	go c.runWorkStatusInformer(ctx)
 
 	ksInformerFactory := ksinformers.NewSharedInformerFactory(c.wdsKsClient, defaultResyncPeriod)
+	c.bindingLister = ksInformerFactory.Control().V1alpha1().Bindings().Lister()
 	if err := c.setupStatusCollectorInformer(ctx, ksInformerFactory); err != nil {
 		return err
 	}

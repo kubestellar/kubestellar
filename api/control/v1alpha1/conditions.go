@@ -64,8 +64,9 @@ func AreConditionsEqual(c1, c2 BindingPolicyCondition) bool {
 	return true
 }
 
-// SetCondition sets the supplied BindingPolicyCondition in
-// the given slice of conditions, replacing any existing conditions of the same type.
+// SetCondition does exactly one of the two things:
+// 1. replacing any existing condition of the same type with newCondition iff necessary;
+// 2. inserting the non-existing condition of the same type with newCondition.
 // SetCondition returns the updated slice of BindingPolicyCondition
 // and a boolean indicating whether there was change to the slice.
 func SetCondition(conditions []BindingPolicyCondition, newCondition BindingPolicyCondition) ([]BindingPolicyCondition, bool) {

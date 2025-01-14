@@ -103,6 +103,10 @@ type CombinedStatusResolver interface {
 	//
 	// The returned pointers are expected to be read-only.
 	ResolutionExists(name string) (string, util.ObjectIdentifier, bool)
+
+	// MissingStatusCollectors returns the names of StatusCollector object(s)
+	// that are required by a binding but do not exist.
+	MissingStatusCollectors(bindingName string) []string
 }
 
 // NewCombinedStatusResolver creates a new CombinedStatusResolver.
@@ -130,8 +134,9 @@ type combinedStatusResolver struct {
 
 	sync.RWMutex
 
-	// resolutions is a map of resolution keys to their
-	// combinedstatus resolutions.
+	// bindingNameToResolutions is a map, where
+	// each entry's key is the name of a binding and
+	// each entry's value is a collection of combinedstatus resolutions for all workload objects that are covered by the binding, organized in a map
 	bindingNameToResolutions map[string]map[util.ObjectIdentifier]*combinedStatusResolution
 	// resolutionNameToKey is a map of resolution names to their keys.
 	resolutionNameToKey map[string]resolutionKey
@@ -431,6 +436,24 @@ func (c *combinedStatusResolver) ResolutionExists(name string) (string, util.Obj
 	}
 
 	return key.bindingName, key.sourceObjectIdentifier, true
+}
+
+// MissingStatusCollectors returns the names of StatusCollector object(s)
+// that are required by a binding but do not exist.
+func (c *combinedStatusResolver) MissingStatusCollectors(bindingName string) []string {
+	c.RWMutex.Lock()
+	defer c.RWMutex.Unlock()
+
+	nameSet := sets.New[string]()
+	for _, combinedStatusResolution := range c.bindingNameToResolutions[bindingName] {
+		for name, data := range combinedStatusResolution.StatusCollectorNameToData {
+			if data == nil {
+				nameSet.Insert(name)
+			}
+		}
+	}
+	nameList := sets.List(nameSet)
+	return nameList
 }
 
 // evaluateWorkStatusesPerBindingReadLocked evaluates workstatuses associated
