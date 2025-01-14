@@ -577,6 +577,32 @@ spec:
             type: object
           status:
             properties:
+              conditions:
+                description: Currently Conditions is by design to be copied to BindingPolicy's
+                  Conditions.
+                items:
+                  description: BindingPolicyCondition describes the state of a bindingpolicy
+                    at a certain point.
+                  properties:
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      type: string
+                    reason:
+                      type: string
+                    status:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
               errors:
                 items:
                   type: string

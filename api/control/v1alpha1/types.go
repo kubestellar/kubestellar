@@ -225,7 +225,7 @@ type DownsyncObjectTest struct {
 // BindingPolicyStatus defines the observed state of BindingPolicy
 type BindingPolicyStatus struct {
 	// +optional
-	Conditions []BindingPolicyCondition `json:"conditions"`
+	Conditions []BindingPolicyCondition `json:"conditions,omitempty"`
 
 	ObservedGeneration int64 `json:"observedGeneration"`
 
@@ -349,6 +349,10 @@ type Destination struct {
 }
 
 type BindingStatus struct {
+	// Currently Conditions is by design to be copied to BindingPolicy's Conditions.
+	// +optional
+	Conditions []BindingPolicyCondition `json:"conditions,omitempty"`
+
 	ObservedGeneration int64    `json:"observedGeneration"`
 	Errors             []string `json:"errors,omitempty"`
 }
