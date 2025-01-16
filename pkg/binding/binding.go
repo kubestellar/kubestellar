@@ -88,7 +88,7 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 		c.bindingPolicyResolver.Broker().NotifyBindingPolicyCallbacks(bindingPolicyIdentifier)
 	}
 	srPerObj := c.bindingPolicyResolver.GetSingletonReportedStateRequestsForBinding(bindingPolicyIdentifier)
-	policyErrors := append([]string{}, binding.Status.Errors...)
+	policyErrors := []string{}
 	badSR := []objectWithNumWECs{}
 	for _, srStatus := range srPerObj {
 		if srStatus.WantSingletonReportedState && srStatus.NumWECs != 1 {
@@ -109,8 +109,8 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 	policyWithStatus := policy.DeepCopy()
 	policyWithStatus.Status = v1alpha1.BindingPolicyStatus{
 		ObservedGeneration: policy.Generation,
-		Conditions:         policy.Status.Conditions,
-		Errors:             policyErrors,
+		Conditions:         binding.Status.Conditions,
+		Errors:             append(policyErrors, binding.Status.Errors...),
 	}
 	policyEcho, updateErr := c.bindingPolicyClient.UpdateStatus(ctx, policyWithStatus, metav1.UpdateOptions{FieldManager: ControllerName})
 	if updateErr == nil {
