@@ -27,7 +27,7 @@ jobs:
         uses: azure/setup-kubectl@v4
         id: install
 
-      - uses: ko-build/setup-ko@v0.7
+      - uses: ko-build/setup-ko@v0.8
 
       - name: Install dependencies
         run: |
@@ -102,7 +102,7 @@ jobs:
         uses: azure/setup-kubectl@v4
         id: install
 
-      - uses: ko-build/setup-ko@v0.7
+      - uses: ko-build/setup-ko@v0.8
 
       - name: Install dependencies
         run: |
