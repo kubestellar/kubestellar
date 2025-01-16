@@ -55,7 +55,7 @@ release:
   skip_upload: true
 sboms:
   - id: source
-    artifacts: archive
+    artifacts: source
   - id: archive
     artifacts: archive
 
