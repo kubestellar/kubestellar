@@ -56,6 +56,4 @@ release:
 sboms:
   - id: source
     artifacts: source
-  - id: archive
-    artifacts: archive
 
