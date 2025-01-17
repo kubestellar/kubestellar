@@ -176,7 +176,7 @@ Look at the Helm chart instances in the KubeFlex hosting cluster. You
 might use a command like the following.
 
 ```shell
-mspreitz@mjs13 kubestellar % helm --kube-context $host_context list -A
+helm --kube-context $host_context list -A
 ```
 
 The output may look something like the following.
