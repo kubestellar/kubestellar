@@ -3257,8 +3257,8 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 <!-- start tag for check script  include -->
 
 <h2 id="automated-check-of-prerequisites-for-kubestellar">Automated Check of Prerequisites for KubeStellar<a class="headerlink" href="#automated-check-of-prerequisites-for-kubestellar" title="Permanent link">#</a></h2>
-<p>The <a href="https://github.com/kubestellar/kubestellar/blob/main/hack/check_pre_req.sh">check_pre_req</a> script offers a convenient way to check for the prerequisites needed for <a href="./">KubeStellar</a> deployment and <a href="../example-scenarios/">use</a>.</p>
-<p>This script is self-contained, so it is suitable for "curl-to-bash" style usage. The latest development version is at <a href="https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/hack/check_pre_req.sh">https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/hack/check_pre_req.sh</a>. To check the prerequisites for using a particular release of KubeStellar, you will want to use the script from that release.</p>
+<p>The <a href="https://github.com/kubestellar/kubestellar/blob/main/scripts/check_pre_req.sh">check_pre_req</a> script offers a convenient way to check for the prerequisites needed for <a href="./">KubeStellar</a> deployment and <a href="../example-scenarios/">use</a>.</p>
+<p>This script is self-contained, so it is suitable for "curl-to-bash" style usage. The latest development version is at <a href="https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/check_pre_req.sh">https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/check_pre_req.sh</a>. To check the prerequisites for using a particular release of KubeStellar, you will want to use the script from that release.</p>
 <p>The script checks for a prerequisite presence in the <code>$PATH</code>, by using the <code>which</code> command, and it can optionally provide version and path information for prerequisites that are present, or installation information for missing prerequisites.</p>
 <p>We envision that this script could be useful for user-side debugging as well as for asserting the presence of prerequisites in higher-level automation scripts.</p>
 <p>The script accepts a list of optional flags and arguments.</p>
@@ -3276,7 +3276,7 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 </code></pre></div>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">#</a></h3>
 <p>For example, list of prerequisites required by KubeStellar can be checked with the command below (add the <code>-V</code> flag to get the version of each program and a suggestions on how to install missing prerequisites):</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>hack/check_pre_req.sh
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>scripts/check_pre_req.sh
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Checking<span class="w"> </span>pre-requisites<span class="w"> </span><span class="k">for</span><span class="w"> </span>using<span class="w"> </span>KubeStellar:
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>✔<span class="w"> </span>Docker<span class="w"> </span><span class="o">(</span>Docker<span class="w"> </span>version<span class="w"> </span><span class="m">27</span>.2.1-rd,<span class="w"> </span>build<span class="w"> </span>cc0ee3e<span class="o">)</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>✔<span class="w"> </span>kubectl<span class="w"> </span><span class="o">(</span>v1.29.2<span class="o">)</span>
