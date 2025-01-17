@@ -434,8 +434,10 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     if [[ "$arg_logs" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
         if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
-            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-clusteradm > "$OUTPUT_FOLDER/$name/its-job-clusteradm.log"
-            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c its-statusaddon > "$OUTPUT_FOLDER/$name/its-job-status-addon.log"
+            containers=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.spec.containers[*].name}')
+            for ctr in $containers; do
+                { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c "$ctr" || true; } > "$OUTPUT_FOLDER/$name/its-job-${ctr}.log"
+            done
             kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller > "$OUTPUT_FOLDER/$name/status-addon.log"
         else
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod > "$OUTPUT_FOLDER/$name/kubestellar-controller.log"
