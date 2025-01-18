@@ -50,6 +50,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/crd"
 	ksclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	controlclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
@@ -575,14 +576,14 @@ func (c *Controller) setupBindingInformer(ctx context.Context) error {
 		AddFunc: func(obj interface{}) {
 			bdg := obj.(*v1alpha1.Binding)
 			logger.V(5).Info("Enqueuing reference to Binding because of informer add event", "name", bdg.Name, "resourceVersion", bdg.ResourceVersion)
-			c.workqueue.Add(bindingPolicyRef(bdg.Name))
+			c.workqueue.Add(bindingRef(bdg.Name))
 		},
 		UpdateFunc: func(old, new interface{}) {
 			oldBdg := old.(*v1alpha1.Binding)
 			newBdg := new.(*v1alpha1.Binding)
-			if oldBdg.Generation != newBdg.Generation {
+			if shouldQueueBindingOnUpdate(oldBdg, newBdg) {
 				logger.V(5).Info("Enqueuing reference to Binding because of informer update event", "name", newBdg.Name, "resourceVersion", newBdg.ResourceVersion)
-				c.workqueue.Add(bindingPolicyRef(newBdg.Name))
+				c.workqueue.Add(bindingRef(newBdg.Name))
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
@@ -591,7 +592,7 @@ func (c *Controller) setupBindingInformer(ctx context.Context) error {
 			}
 			bdg := obj.(*v1alpha1.Binding)
 			logger.V(5).Info("Enqueuing reference to Binding because of informer delete event", "name", bdg.Name)
-			c.workqueue.Add(bindingPolicyRef(bdg.Name))
+			c.workqueue.Add(bindingRef(bdg.Name))
 		},
 	})
 	if err != nil {
@@ -599,6 +600,22 @@ func (c *Controller) setupBindingInformer(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+func shouldQueueBindingOnUpdate(old, new *v1alpha1.Binding) bool {
+	if old.Generation != new.Generation {
+		return true
+	}
+	if len(old.Status.Conditions) != len(new.Status.Conditions) {
+		return true
+	}
+	// below are 'loose' element-by-element comparisons, without trying to recognize that reordering is insignificant
+	for i, c := range old.Status.Conditions {
+		if !v1alpha1.AreConditionsEqual(c, new.Status.Conditions[i]) {
+			return true
+		}
+	}
+	return !abstract.SliceEqual(old.Status.Errors, new.Status.Errors)
 }
 
 func shouldSkipUpdate(old, new interface{}) bool {

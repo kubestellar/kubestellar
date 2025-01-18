@@ -77,10 +77,11 @@ type CombinedStatusResolver interface {
 	//
 	// The function uses the workstatus indexer to update internal state.
 	//
-	// The returned set contains the identifiers of combinedstatus objects
-	// that should be queued for syncing.
+	// The returned two sets identify combinedstatus objects and binding objects
+	// that should be queued for syncing, respectively.
 	NoteStatusCollector(ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool,
-		workStatusIndexer cache.Indexer) sets.Set[util.ObjectIdentifier]
+		workStatusIndexer cache.Indexer,
+	) (sets.Set[util.ObjectIdentifier], sets.Set[string])
 
 	// NoteWorkStatus notes a workstatus in the combinedstatus resolutions
 	// associated with its source workload object.
@@ -102,6 +103,10 @@ type CombinedStatusResolver interface {
 	//
 	// The returned pointers are expected to be read-only.
 	ResolutionExists(name string) (string, util.ObjectIdentifier, bool)
+
+	// MissingStatusCollectors returns the names of StatusCollector object(s)
+	// that are required by a binding but do not exist.
+	MissingStatusCollectors(bindingName string) []string
 }
 
 // NewCombinedStatusResolver creates a new CombinedStatusResolver.
@@ -129,8 +134,9 @@ type combinedStatusResolver struct {
 
 	sync.RWMutex
 
-	// resolutions is a map of resolution keys to their
-	// combinedstatus resolutions.
+	// bindingNameToResolutions is a map, where
+	// each entry's key is the name of a binding and
+	// each entry's value is a collection of combinedstatus resolutions for all workload objects that are covered by the binding, organized in a map
 	bindingNameToResolutions map[string]map[util.ObjectIdentifier]*combinedStatusResolution
 	// resolutionNameToKey is a map of resolution names to their keys.
 	resolutionNameToKey map[string]resolutionKey
@@ -356,10 +362,11 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus 
 //
 // The function uses the workstatus indexer to update internal state.
 //
-// The returned set contains the identifiers of combinedstatus objects
-// that should be queued for syncing.
-func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool,
-	workStatusIndexer cache.Indexer) sets.Set[util.ObjectIdentifier] {
+// The returned two sets identify combinedstatus objects and binding objects
+// that should be queued for syncing, respectively.
+func (c *combinedStatusResolver) NoteStatusCollector(
+	ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool, workStatusIndexer cache.Indexer,
+) (sets.Set[util.ObjectIdentifier], sets.Set[string]) {
 	logger := klog.FromContext(ctx)
 	c.Lock()
 	defer c.Unlock()
@@ -367,11 +374,12 @@ func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, status
 	currentSpec := c.statusCollectorNameToSpec[statusCollector.Name]
 	if !deleted && currentSpec != nil && statusCollectorSpecsMatch(currentSpec, &statusCollector.Spec) {
 		logger.V(5).Info("No change in StatusCollector", "name", statusCollector.Name)
-		return nil // already cached and the spec has not changed
+		return nil, nil // already cached and the spec has not changed
 	}
 	logger.V(5).Info("Noting StatusCollector", "name", statusCollector.Name, "numBindings", len(c.bindingNameToResolutions), "deleted", deleted)
 
 	combinedStatusIdentifiersToQueue := sets.New[util.ObjectIdentifier]()
+	bindingNamesToQueue := sets.New[string]()
 	// update resolutions that use the statuscollector
 	// this call cannot add an association that was not already present.
 	// if deleted, the association is removed.
@@ -382,6 +390,7 @@ func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, status
 				if resolution.noteStatusCollectorAbsence(statusCollector.Name) {
 					combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
 						workloadObjectIdentifier.ObjectName.Namespace))
+					bindingNamesToQueue.Insert(bindingName)
 				}
 				continue
 			}
@@ -391,6 +400,7 @@ func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, status
 				combinedStatusIdentifiersToQueue.Insert(c.evaluateWorkStatusesPerBindingReadLocked(ctx, bindingName,
 					sets.New(workloadObjectIdentifier), resolution.CollectionDestinations,
 					workStatusIndexer).UnsortedList()...)
+				bindingNamesToQueue.Insert(bindingName)
 			}
 		}
 	}
@@ -401,7 +411,7 @@ func (c *combinedStatusResolver) NoteStatusCollector(ctx context.Context, status
 		delete(c.statusCollectorNameToSpec, statusCollector.Name)
 	}
 
-	return combinedStatusIdentifiersToQueue
+	return combinedStatusIdentifiersToQueue, bindingNamesToQueue
 }
 
 // ResolutionExists returns true if a combinedstatus resolution is
@@ -426,6 +436,24 @@ func (c *combinedStatusResolver) ResolutionExists(name string) (string, util.Obj
 	}
 
 	return key.bindingName, key.sourceObjectIdentifier, true
+}
+
+// MissingStatusCollectors returns the names of StatusCollector object(s)
+// that are required by a binding but do not exist.
+func (c *combinedStatusResolver) MissingStatusCollectors(bindingName string) []string {
+	c.RWMutex.Lock()
+	defer c.RWMutex.Unlock()
+
+	nameSet := sets.New[string]()
+	for _, combinedStatusResolution := range c.bindingNameToResolutions[bindingName] {
+		for name, data := range combinedStatusResolution.StatusCollectorNameToData {
+			if data == nil {
+				nameSet.Insert(name)
+			}
+		}
+	}
+	nameList := sets.List(nameSet)
+	return nameList
 }
 
 // evaluateWorkStatusesPerBindingReadLocked evaluates workstatuses associated
