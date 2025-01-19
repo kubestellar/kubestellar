@@ -62,3 +62,7 @@ There is also an example run through of steps 2--7 that starts with (a slightly 
 ## Troubleshooting
 
 See [the Troubleshooting guide](troubleshooting.md).
+
+## Teardown
+
+See [Teardown](teardown.md) for how to tear everything down to unadorned Kubernetes clusters.

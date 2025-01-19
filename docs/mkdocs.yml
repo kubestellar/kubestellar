@@ -71,6 +71,7 @@ nav:
               - Kind needs OS reconfig: direct/knownissue-kind-config.md
               - Authorization failure in WSL while fetching Helm chart from ghcr.io: direct/knownissue-wsl-ghcr-helm.md
               - Missing results in a CombinedStatus object: direct/knownissue-collector-miss.md
+      - Teardown: direct/teardown.md
   - Contributing: 
       - How to join in: direct/contribute.md
       - Code of Conduct: contribution-guidelines/coc.md
