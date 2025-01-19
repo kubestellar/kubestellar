@@ -53,4 +53,7 @@ release:
   prerelease: auto
   mode: keep-existing
   skip_upload: true
+sboms:
+  - id: source
+    artifacts: source
 
