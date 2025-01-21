@@ -1,4 +1,7 @@
 on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  
   push:
     branches:
       - main
