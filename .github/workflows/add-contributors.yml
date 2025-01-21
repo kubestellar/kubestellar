@@ -1,0 +1,20 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  contrib-readme-job:
+    runs-on: ubuntu-latest
+    name: A job to automate contributors in README
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Contribute List
+        uses: akhilmhdh/contributors-readme-action@v2.3.10
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

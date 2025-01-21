@@ -78,40 +78,15 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 
 Thanks go to these wonderful people:
 
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/waltforme"><img src="https://avatars.githubusercontent.com/u/8633434?v=4" width="100px;" alt=""/><br /><sub><b>Jun Duan</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Awaltforme+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/dumb0002"><img src="https://avatars.githubusercontent.com/u/25727844?v=4" width="100px;" alt=""/><br /><sub><b>Braulio Dumba</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Adumb0002+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/MikeSpreitzer"><img src="https://avatars.githubusercontent.com/u/14296719?v=4" width="100px;" alt=""/><br /><sub><b>Mike Spreitzer</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/pulls?q=is%3Apr+reviewed-by%3AMikeSpreitzer" title="Reviewed Pull Requests">👀</a></td>
-    <td align="center"><a href="https://github.com/pdettori"><img src="https://avatars.githubusercontent.com/u/6678093?v=4" width="100px;" alt=""/><br /><sub><b>Paolo Dettori</b></sub></a><br /><a href=https://github.com/kubestellar/kubestellar/issues?q=assignee%3Apdettori+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/clubanderson"><img src="https://avatars.githubusercontent.com/u/407614?v=4" width="100px;" alt=""/><br /><sub><b>Andy Anderson</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/pulls?q=is%3Apr+reviewed-by%3Aclubanderson" title="Reviewed Pull Requests">👀</a></td>
-    <td align="center"><a href="https://github.com/francostellari"><img src="https://avatars.githubusercontent.com/u/50019234?v=4" width="100px;" alt=""/><br /><sub><b>Franco Stellari</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Afrancostellari+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/ezrasilvera"><img src="https://avatars.githubusercontent.com/u/13567561?v=4" width="100px;" alt=""/><br /><sub><b>Ezra Silvera</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/pulls?q=is%3Apr+reviewed-by%3Aezrasilvera" title="Reviewed Pull Requests">👀</a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/fileppb"><img src="https://avatars.githubusercontent.com/u/124100147?v=4" width="100px;" alt=""/><br /><sub><b>Bob Filepp</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Afileppb+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/effi-ofer"><img src="https://avatars.githubusercontent.com/u/18140413?v=4" width="100px;" alt=""/><br /><sub><b>Effi Ofer</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Aeffi-ofer+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/mra-ruiz"><img src="https://avatars.githubusercontent.com/u/16118462?v=4" width="100px;" alt=""/><br /><sub><b>Maria Camila Ruiz Cardenas</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Amra-ruiz+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/andreyod"><img src="https://avatars.githubusercontent.com/u/16204273?v=4" width="100px;" alt=""/><br /><sub><b>Andrey Odarenko</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Aandreyod+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/amanroa"><img src="https://avatars.githubusercontent.com/u/26678552?v=4" width="100px;" alt=""/><br /><sub><b>Aashni Manroa</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Aamanroa+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/KPRoche"><img src="https://avatars.githubusercontent.com/u/25445603?v=4" width="100px;" alt=""/><br /><sub><b>Kevin Roche</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3AKPRoche+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/namasl"><img src="https://avatars.githubusercontent.com/u/144150872?v=4" width="100px;" alt=""/><br /><sub><b>Nick Masluk</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Anamasl+" title="Contributed PRs">👀</a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/fab7"><img src="https://avatars.githubusercontent.com/u/15231306?v=4" width="100px;" alt=""/><br /><sub><b>Francois Abel</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Afab7+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/nirrozenbaum"><img src="https://avatars.githubusercontent.com/u/19717747?v=4" width="100px;" alt=""/><br /><sub><b>Nir Rozenbaum</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Anirrozenbaum+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/vMaroon"><img src="https://avatars.githubusercontent.com/u/73340153?v=4" width="100px;" alt=""/><br /><sub><b>Maroon Ayoub</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3AvMaroon+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/grahamwhiteuk"><img src="https://avatars.githubusercontent.com/u/1632332?v=4" width="100px;" alt=""/><br /><sub><b>Graham White</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/pulls?q=is%3Apr+author%3A%40me+" title="Contributed PRs">👀</a></td>
-  </tr>
-</table>
+
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
 
-<!-- ALL-CONTRIBUTORS-LIST:END -->
 <br>
 <br>
 
