@@ -10,7 +10,7 @@ jobs:
     name: ginkgo tests
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
         with:
@@ -62,7 +62,7 @@ jobs:
     name: bash script tests
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
         with:

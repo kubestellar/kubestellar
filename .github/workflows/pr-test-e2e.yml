@@ -33,7 +33,7 @@ jobs:
     name: Tests in ginkgo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
         with:
@@ -164,7 +164,7 @@ jobs:
     name: Test in bash
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
         with:

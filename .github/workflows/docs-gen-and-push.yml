@@ -42,7 +42,7 @@ jobs:
     name: Generate and push docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
         with:
           token: ${{ github.repository_owner == 'kubestellar' && secrets.GH_ALL_PROJECT_TOKEN || github.token }}
           persist-credentials: 'true'
