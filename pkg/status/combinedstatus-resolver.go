@@ -104,8 +104,12 @@ type CombinedStatusResolver interface {
 	// The returned pointers are expected to be read-only.
 	ResolutionExists(name string) (string, util.ObjectIdentifier, bool)
 
-	// MissingStatusCollectors returns the names of StatusCollector object(s)
+	// MissingStatusCollectors returns a slice of StatusCollector object name(s)
 	// that are required by a binding but do not exist.
+	//
+	// The returned slice is sorted.
+	//
+	// The returned slice can be mutated and MissingStatusCollectors doesn't touch the slice after returning.
 	MissingStatusCollectors(bindingName string) []string
 }
 
@@ -438,8 +442,12 @@ func (c *combinedStatusResolver) ResolutionExists(name string) (string, util.Obj
 	return key.bindingName, key.sourceObjectIdentifier, true
 }
 
-// MissingStatusCollectors returns the names of StatusCollector object(s)
+// MissingStatusCollectors returns a slice of StatusCollector object name(s)
 // that are required by a binding but do not exist.
+//
+// The returned slice is sorted.
+//
+// The returned slice can be mutated and MissingStatusCollectors doesn't touch the slice after returning.
 func (c *combinedStatusResolver) MissingStatusCollectors(bindingName string) []string {
 	c.RWMutex.Lock()
 	defer c.RWMutex.Unlock()
