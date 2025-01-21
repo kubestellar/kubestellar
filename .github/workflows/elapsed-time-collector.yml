@@ -45,7 +45,7 @@ jobs:
       - run: echo "${{ github.event_name }}"
         
       - name: echo fetching push or pull_request branch
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           persist-credentials: 'false'
@@ -68,7 +68,7 @@ jobs:
           echo "$EOF" >> "$GITHUB_ENV"
         id: run_make
 
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           persist-credentials: 'false'
