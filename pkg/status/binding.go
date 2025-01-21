@@ -64,6 +64,9 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 	return nil
 }
 
+// createOrUpdateStatusCollectorAvailableCondition maintains a Condition of type StatusCollectorsAvailable
+// in a Binding object's status.
+// missingSCs, a slice of the missing StatusCollector object name(s), must be sorted.
 func (c *Controller) createOrUpdateStatusCollectorAvailableCondition(ctx context.Context, bdg *v1alpha1.Binding, missingSCs []string) error {
 	// compose tentative condition where LastTransitionTime is TBD
 	conditionTentative := v1alpha1.BindingPolicyCondition{}
