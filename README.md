@@ -46,7 +46,7 @@ For usage, architecture, and other documentation, see [the website](https://kube
 
 ## Contributing
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://docs.kubestellar.io/stable/Contribution%20guidelines/CONTRIBUTING/) guide and be sure to look at `main` or the release of interest to you.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md) guide and be sure to look at `main` or the release of interest to you.
 
 This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
 
