@@ -2,6 +2,11 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.26.0-alpha.5
+
+This release is intended to have the same functionality as 0.26.0-alpha.3 and 0.26.0-alpha.4 but test a change to the GitHub Actions workflow that makes a release; the change adds SBOM generation ([PR 2718](https://github.com/kubestellar/kubestellar/pull/2718)).
+
+
 ## 0.26.0-alpha.4
 
 This release is intended to have the same functionality as 0.26.0-alpha.3 but test a change to the GitHub Actions workflow that makes a release; the change suppresses attachment of useless binary archives ([PR 2704](https://github.com/kubestellar/kubestellar/pull/2704)).
