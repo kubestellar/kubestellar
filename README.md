@@ -239,6 +239,13 @@ Thanks go to these wonderful people:
                 </a>
             </td>
             <td align="center">
+                <a href="https://github.com/manzil-infinity180">
+                    <img src="https://avatars.githubusercontent.com/u/119070053?v=4" width="100;" alt="manzil-infinity180"/>
+                    <br />
+                    <sub><b>Rahul Vishwakarma</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/grahamwhiteuk">
                     <img src="https://avatars.githubusercontent.com/u/1632332?v=4" width="100;" alt="grahamwhiteuk"/>
                     <br />
@@ -252,6 +259,8 @@ Thanks go to these wonderful people:
                     <sub><b>Aishwarya </b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/aslom">
                     <img src="https://avatars.githubusercontent.com/u/1648338?v=4" width="100;" alt="aslom"/>
@@ -259,8 +268,6 @@ Thanks go to these wonderful people:
                     <sub><b>Aleksander Slominski</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/benzha14">
                     <img src="https://avatars.githubusercontent.com/u/93015397?v=4" width="100;" alt="benzha14"/>
@@ -296,6 +303,8 @@ Thanks go to these wonderful people:
                     <sub><b>Pratik Mahalle</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/rchen-devv">
                     <img src="https://avatars.githubusercontent.com/u/169481903?v=4" width="100;" alt="rchen-devv"/>
@@ -303,8 +312,6 @@ Thanks go to these wonderful people:
                     <sub><b>rchen-devv</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/msteinder">
                     <img src="https://avatars.githubusercontent.com/u/9352004?v=4" width="100;" alt="msteinder"/>
@@ -324,13 +331,6 @@ Thanks go to these wonderful people:
                     <img src="https://avatars.githubusercontent.com/u/9260276?v=4" width="100;" alt="tingdai"/>
                     <br />
                     <sub><b>Ting Dai</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/manzil-infinity180">
-                    <img src="https://avatars.githubusercontent.com/u/119070053?v=4" width="100;" alt="manzil-infinity180"/>
-                    <br />
-                    <sub><b>Rahul Vishwakarma</b></sub>
                 </a>
             </td>
             <td align="center">
