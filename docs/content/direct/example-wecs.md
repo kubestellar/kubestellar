@@ -1,6 +1,6 @@
 The following steps show how to create two new `kind` clusters and
 register them with the hub as described in the
-[official open cluster management docs](https://open-cluster-management.io/getting-started/installation/start-the-control-plane/).
+[official open cluster management docs](https://open-cluster-management.io/docs/getting-started/installation/start-the-control-plane/).
 
 Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
 
