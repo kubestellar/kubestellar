@@ -1,0 +1,3 @@
+[mkdocs.plugins]
+macros = mkdocs_macros.plugin:MacrosPlugin
+

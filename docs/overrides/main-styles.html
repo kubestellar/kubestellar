@@ -47,24 +47,34 @@
     }
 }
 
-.shortcut-bar-text {
-    font-size: 15px;
-    transition: color 0.3s;
-}
-.shortcut-bar-text:hover {
-    color: #0065cb 
+.main-background {
+  position: relative; /* Enable positioning */
+  top: -20px; /* Move upwards */
+  left: 20px; /* Move towards the right */
 }
 
 .shortcut-bar {
-  /* position: sticky */
-  width: 75%;
-  height: 90%;
-  position: absolute;
-  top: 8%;
-  left: 25%;
-  /* transform: translate(-25%, -50%);*/
-  text-align: center;
+  position: absolute; /* Position fixed or absolute */
+  top: 0px;
+  right: 50px;
+  display: flex; /* Use flex layout for alignment */
+  gap: 1px; /* Controlled gap between elements */
   line-height: 60px;
+  text-align: center;
+  max-width: 100%; /* Prevent overflow */
+   /* Hide overflowing elements */
+}
+
+
+.shortcut-bar-text {
+  font-size: 15px; /* Keep the text size readable */
+  padding: 0; /* Remove unnecessary padding */
+  margin: 0; /* Remove unnecessary margin */
+  transition: color 0.3s;
+}
+
+.shortcut-bar-text:hover {
+  color: grey; /* Add hover effect */
 }
 .centered {
   width: 20%;
@@ -1450,13 +1460,14 @@
     
     
         .fl-table thead th:nth-child(odd) {
-            color: #ffffff;
-            background: #181917;
-        }
-    
-        .fl-table tr:nth-child(even) {
-            background: #F8F8F8;
-        }
+    color: #ffffff;
+    background: #181917;
+}
+
+.fl-table tr:nth-child(even) {
+    background: #F8F8F8;
+}
+
     
         /* Responsive */
     
