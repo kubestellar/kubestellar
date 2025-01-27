@@ -52,14 +52,29 @@ jobs:
 
       - name: Amend Commit with Signed-off-by
         run: |
-          git checkout -B contributors-readme-action ${{ env.CURRENT_BRANCH }}
+          # Checkout the remote branch created by akhilmhdh action
+          git checkout ${{ env.CURRENT_BRANCH }}
+          
+          # Amend the last commit to add the Signed-off-by line
           git commit --amend --no-edit --signoff || echo "No changes to amend"
 
-      - name: Push Changes Back to Branch
+      - name: Push Changes Back to Remote Branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push --force-with-lease origin contributors-readme-action
+          # Push the amended commit back to the remote branch
+          git push --force-with-lease origin HEAD:${{ env.CURRENT_BRANCH }}
+          
+      # - name: Amend Commit with Signed-off-by
+      #   run: |
+      #     git checkout -B contributors-readme-action ${{ env.CURRENT_BRANCH }}
+      #     git commit --amend --no-edit --signoff || echo "No changes to amend"
+
+      # - name: Push Changes Back to Branch
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     git push --force-with-lease origin contributors-readme-action
 
       # - name: Create a Pull Request
       #   uses: peter-evans/create-pull-request@v5
