@@ -23,6 +23,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Wait for a few seconds
+        run: sleep 5
+        
       - name: Fetch All Remote Branches
         run: |
           git fetch --all
@@ -42,29 +45,29 @@ jobs:
           echo "CURRENT_BRANCH=$CURRENT_BRANCH" >> $GITHUB_ENV
           echo "Branch created by action: $CURRENT_BRANCH"
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      # - name: Configure Git
+      #   run: |
+      #     git config --global user.name "github-actions[bot]"
+      #     git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Amend Commit with Signed-off-by
-        run: |
-          git checkout -B contributors-readme-action ${{ env.CURRENT_BRANCH }}
-          git commit --amend --no-edit --signoff || echo "No changes to amend"
+      # - name: Amend Commit with Signed-off-by
+      #   run: |
+      #     git checkout -B contributors-readme-action ${{ env.CURRENT_BRANCH }}
+      #     git commit --amend --no-edit --signoff || echo "No changes to amend"
 
-      - name: Push Changes Back to Branch
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git push --force-with-lease origin contributors-readme-action
+      # - name: Push Changes Back to Branch
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     git push --force-with-lease origin contributors-readme-action
 
-      - name: Create a Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: main
-          branch: contributors-readme-action
-          title: "Update Contributors in README.md"
-          body: |
-            This PR updates the contributors list in the README.md file.
-            It was automatically created and includes a Signed-off-by line for compliance with DCO.
+      # - name: Create a Pull Request
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     base: main
+      #     branch: contributors-readme-action
+      #     title: "Update Contributors in README.md"
+      #     body: |
+      #       This PR updates the contributors list in the README.md file.
+      #       It was automatically created and includes a Signed-off-by line for compliance with DCO.
