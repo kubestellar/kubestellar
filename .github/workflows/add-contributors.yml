@@ -18,24 +18,27 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Contribute List
+      - name: Run Contributors List Action
         uses: akhilmhdh/contributors-readme-action@v2.3.10
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Detect the Branch Created by the Action
+        id: get-branch
+        run: |
+          # Find the latest branch created by the action
+          CURRENT_BRANCH=$(git branch --sort=-committerdate --format='%(refname:short)' | grep "contributors-readme-action" | head -n 1)
+          echo "CURRENT_BRANCH=$CURRENT_BRANCH" >> $GITHUB_ENV
+          echo "Branch created by action: $CURRENT_BRANCH"
 
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Find Current Branch Name
-        id: get-branch
-        run: |
-          CURRENT_BRANCH=$(git symbolic-ref --short HEAD)
-          echo "CURRENT_BRANCH=$CURRENT_BRANCH" >> $GITHUB_ENV
-
       - name: Amend Commit with Signed-off-by
         run: |
+          git checkout ${{ env.CURRENT_BRANCH }}
           git commit --amend --no-edit --signoff || echo "No changes to amend"
 
       - name: Push Changes Back to Branch
