@@ -30,7 +30,9 @@ jobs:
 
       - name: Create a new branch
         run: |
-          git checkout -b update-contributors-$(date +'%Y%m%d%H%M%S')
+          BRANCH_NAME="update-contributors-$(date +'%Y%m%d%H%M%S')"
+          git checkout -b $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
       - name: Amend Commit with Signed-off-by
         run: |
@@ -40,17 +42,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push --set-upstream origin $(git branch --show-current)
+          git push --set-upstream origin $BRANCH_NAME
 
       - name: Create a Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Update contributors in README"
-          branch: $(git branch --show-current)
-          title: "Update contributors in README"
-          body: |
-            This PR updates the contributors list in the README.
-            It is automatically created by a GitHub Action.
-
-
+          branch: ${{ env.BRANCH_NAME }}
+          title: "Update Contributors"
+          body: "This PR updates the contributors list in README.md."
