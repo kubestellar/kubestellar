@@ -42,3 +42,15 @@ jobs:
         run: |
           git push --set-upstream origin $(git branch --show-current)
 
+      - name: Create a Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update contributors in README"
+          branch: $(git branch --show-current)
+          title: "Update contributors in README"
+          body: |
+            This PR updates the contributors list in the README.
+            It is automatically created by a GitHub Action.
+
+
