@@ -9,7 +9,7 @@ on:
 
 jobs:
   contrib-readme-job:
-    if: github.event.pull_request.merged == true # Only run if the PR was merged
+    if: github.event.pull_request.merged == true && github.repository_owner == 'kubestellar' # Only run for merged PRs in 'kubestellar'
     runs-on: ubuntu-latest
     name: A job to automate contributors in README
     permissions:
