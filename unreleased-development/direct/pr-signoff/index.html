@@ -22,7 +22,7 @@
     
     
       
-        <title>Sign-off on Contributions - KubeStellar</title>
+        <title>Sign-off and Signing Contributions - KubeStellar</title>
       
     
     
@@ -80,7 +80,7 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - Sign-off on Contributions" />
+  <meta property="og:title" content="KubeStellar - Sign-off and Signing Contributions" />
   <meta property="og:description" content="None" />
   <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/direct/pr-signoff/" />
   <meta property="og:image" content="https://docs.kubestellar.io/unreleased-developmentassets/images/illustrations/banner.png" />
@@ -116,7 +116,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#how-to-sign-off-on-your-pull-requests" class="md-skip">
+        <a href="#git-commit-signoff-and-signing" class="md-skip">
           Skip to content
         </a>
       
@@ -203,7 +203,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Sign-off on Contributions
+              Sign-off and Signing Contributions
             
           </span>
         </div>
@@ -2396,7 +2396,7 @@
           
   
   <span class="md-ellipsis">
-    Sign-off on Contributions
+    Sign-off and Signing Contributions
   </span>
   
 
@@ -2407,7 +2407,7 @@
         
   
   <span class="md-ellipsis">
-    Sign-off on Contributions
+    Sign-off and Signing Contributions
   </span>
   
 
@@ -2429,6 +2429,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#commit-sign-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      Commit Sign-off
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#signing-commits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Signing Commits
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#setting-up-the-gpg-key" class="md-nav__link">
     <span class="md-ellipsis">
       Setting up the GPG Key
@@ -2447,18 +2465,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating-pull-requests" class="md-nav__link">
+  <a href="#creating-pull-requests-using-the-github-website" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating Pull Requests
+      Creating Pull Requests Using the GitHub Website
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pull-request-sign-off" class="md-nav__link">
+  <a href="#repairing-commits" class="md-nav__link">
     <span class="md-ellipsis">
-      Pull Request Sign-off
+      Repairing commits
     </span>
   </a>
   
@@ -3019,6 +3037,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#commit-sign-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      Commit Sign-off
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#signing-commits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Signing Commits
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#setting-up-the-gpg-key" class="md-nav__link">
     <span class="md-ellipsis">
       Setting up the GPG Key
@@ -3037,18 +3073,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating-pull-requests" class="md-nav__link">
+  <a href="#creating-pull-requests-using-the-github-website" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating Pull Requests
+      Creating Pull Requests Using the GitHub Website
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pull-request-sign-off" class="md-nav__link">
+  <a href="#repairing-commits" class="md-nav__link">
     <span class="md-ellipsis">
-      Pull Request Sign-off
+      Repairing commits
     </span>
   </a>
   
@@ -3085,9 +3121,38 @@
   
 
 
-<h1 id="how-to-sign-off-on-your-pull-requests">How to Sign-off on Your Pull Requests<a class="headerlink" href="#how-to-sign-off-on-your-pull-requests" title="Permanent link">#</a></h1>
-<p>In order to get your pull requests approved, you must first complete a DCO sign-off. This process is defined by the CNCF, and there are two cases: individual contributors and contributors that work for a corporate CNCF member. To do this as an individual contributor, you must have a GPG and SSH key. Basic setup instructions can be found below (For more detailed instructions, refer to the Github <a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key">GPG</a> and <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key">SSH</a> setup pages):</p>
-<hr />
+<h1 id="git-commit-signoff-and-signing">Git Commit Signoff and Signing<a class="headerlink" href="#git-commit-signoff-and-signing" title="Permanent link">#</a></h1>
+<p><strong>NOTE</strong>: "sign-off" is different from "signing" a commit.  The former
+indicates your assent to the repository's terms for contributors, the
+latter adds a cryptographic signature that is rarely displayed.  See
+<a href="https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work">the git
+book</a>
+about signing. For commit signoff, do a web search on <code>git
+signoff</code>. GitHub has a concept of <a href="https://docs.github.com/en/authentication/managing-commit-signature-verification">a commit being
+"verified"</a>
+that extends the Git concept of signing.</p>
+<p>In order to get a pull request approved, you must first complete a DCO
+sign-off for each commit that the request is asking to add to the
+repository. This process is defined by the CNCF, and there are two
+cases: individual contributors and contributors that work for a
+corporate CNCF member. Both mean consent with the terms stated in <a href="https://github.com/kubestellar/kubestellar/blob/main/DCO">the
+<code>DCO</code> file at the root of this Git
+repository</a>. In
+the case of an individual, DCO sign-off is accomplished by doing a Git
+"sign-off" on the commit.</p>
+<p>We prefer that commits contributed to this repository be signed and
+GitHub verified, but this is not strictly necessary or enforced.</p>
+<h2 id="commit-sign-off">Commit Sign-off<a class="headerlink" href="#commit-sign-off" title="Permanent link">#</a></h2>
+<p>Your submitted PR must pass the automated checks in order to be merged. One of these checks that each commit that you propose to contribute is signed-off. If you use the <code>git</code> shell command, this involves passing the <code>-s</code> flag on the command line. For example, the following command will create a signed-off commit but <em>not</em> sign it.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>commit<span class="w"> </span>-s
+</code></pre></div>
+<p>Alternatively, the following command will create a commit that is both signed-off and signed.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>commit<span class="w"> </span>-s<span class="w"> </span>-S
+</code></pre></div>
+<p>For other tools, consult their documentation.</p>
+<h2 id="signing-commits">Signing Commits<a class="headerlink" href="#signing-commits" title="Permanent link">#</a></h2>
+<p>Before signing any commits, you must have a GPG and SSH key. Basic setup instructions can be found below (For more detailed instructions, refer to the Github <a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key">GPG</a> and <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key">SSH</a> setup pages.)</p>
+<p>To sign a particular commit, you must either include <code>-S</code> on the <code>git commit</code> command line (see the command exhibited above for an example) or have configured automatic signing (see <a href="https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work#_everyone_must_sign">"Everyone Must Sign" in the Git Book</a> for a hint about that).</p>
 <p>Before starting, make sure that your user email is verified on Github. To check for this:</p>
 <ol>
 <li>Login to Github and navigate to your Github <strong>Settings</strong> page</li>
@@ -3098,7 +3163,7 @@
 <li>Navigate back to your <strong>Emails</strong> page, if the "Unverified" label is no longer there, then you're good to go!</li>
 </ol>
 <p><br /></p>
-<p><strong>Git Bash</strong> is also highly recommended.</p>
+<p>For Windows users, <strong>Git Bash</strong> is also highly recommended.</p>
 <p><br /></p>
 <h2 id="setting-up-the-gpg-key">Setting up the GPG Key<a class="headerlink" href="#setting-up-the-gpg-key" title="Permanent link">#</a></h2>
 <ol>
@@ -3113,7 +3178,7 @@
 <p>Open Git Bash (or your CLI of choice) and use the following command to generate your GPG key pair:</p>
 </li>
 </ol>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>gpg<span class="w"> </span>--full-generate-key
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>gpg<span class="w"> </span>--full-generate-key
 </code></pre></div>
 <ol>
 <li>If prompted to specify the size, type, and duration of the key that you want, press <code>Enter</code> to select the default option.</li>
@@ -3123,7 +3188,7 @@
 </li>
 <li>Use the following command to list the long form of your generated GPG keys:</li>
 </ol>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>gpg<span class="w"> </span>--list-secret-keys<span class="w"> </span>--keyid-format<span class="o">=</span>long
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>gpg<span class="w"> </span>--list-secret-keys<span class="w"> </span>--keyid-format<span class="o">=</span>long
 </code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>- Your GPG key ID should be the characters on the output line starting with `sec`, beginning directly after the `/` and ending before the listed date.
 - For example, in the output below (from the Github [GPG](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) setup page), the GPG key ID would be `3AA5C34371567BD2`
@@ -3140,7 +3205,7 @@
 <ol>
 <li>
 <p>Copy your GPG key ID and run the command below, replacing <code>[your_GPG_key_ID]</code> with the key ID you just copied:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>gpg<span class="w"> </span>--armor<span class="w"> </span>--export<span class="w"> </span><span class="o">[</span>your_GPG_key_ID<span class="o">]</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>gpg<span class="w"> </span>--armor<span class="w"> </span>--export<span class="w"> </span><span class="o">[</span>your_GPG_key_ID<span class="o">]</span>
 </code></pre></div>
 </li>
 <li>
@@ -3160,7 +3225,7 @@
 <ol>
 <li>
 <p>Open Git Bash (or your CLI of choice) and use the following command to generate your new SSH key (make sure to replace <code>your_email</code> with your Github-verified email address):</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ed25519<span class="w"> </span>-C<span class="w"> </span><span class="s2">&quot;your_email&quot;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ed25519<span class="w"> </span>-C<span class="w"> </span><span class="s2">&quot;your_email&quot;</span>
 </code></pre></div>
 </li>
 <li>
@@ -3169,7 +3234,7 @@
 <li>The following output should generate a <code>randomart</code> image </li>
 <li>
 <p>Use the following command to copy the new SSH key to your clipboard:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>clip<span class="w"> </span>&lt;<span class="w"> </span>~/.ssh/id_ed25519.pub
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>clip<span class="w"> </span>&lt;<span class="w"> </span>~/.ssh/id_ed25519.pub
 </code></pre></div>
 </li>
 <li>
@@ -3185,7 +3250,7 @@
 <li>Your new SSH key should now be displayed under SSH keys.</li>
 <li>
 <p><strong>Optional</strong>: To test if your SSH key is connecting properly or not, run the following command in your CLI (more specific instructions can be found in the <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection">Github documentation</a>):</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
 </code></pre></div>
 <ul>
 <li>If given a warning saying something like <code>The authenticity of the host '[host IP]' can't be established</code> along with a key fingerprint and a prompt to continue, verify if the provided key fingerprint matches any of those listed <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints">here</a></li>
@@ -3195,25 +3260,32 @@
 </li>
 </ol>
 <p><br /></p>
-<h2 id="creating-pull-requests">Creating Pull Requests<a class="headerlink" href="#creating-pull-requests" title="Permanent link">#</a></h2>
+<h2 id="creating-pull-requests-using-the-github-website">Creating Pull Requests Using the GitHub Website<a class="headerlink" href="#creating-pull-requests-using-the-github-website" title="Permanent link">#</a></h2>
+<p>This is not recommended for individual contributors, because the commits that it produces are not "signed-off" (as defined by Git) and thus do not carry assent to the DCO; see <a href="#repairing-commits">Repairing commits</a> below for a way to recover if you have inadvertently made such a PR. For corporate contributors the DCO assent is indicated differently.</p>
 <p>Whether it's editing files from Kubestellar.io or directly from the Kubestellar Github, there are a couple steps to follow that streamlines the workflow of your PR:</p>
 <ol>
 <li>
 <p>Changes made to any file are automatically committed to a new branch in your fork.</p>
 <ul>
-<li>When committing, make sure to specify the type of PR at the beginning of your commit message (i.e. :bug: if it addresses a bug-type issue)</li>
-<li>If the PR addresses a specific issue that has already been opened in the github, make sure to include the opened issue in <strong>additional comments</strong> (i.e. <code>fixes Issue #XXXX</code>)</li>
+<li>After clicking <strong>Commit changes...</strong>, write your commit message summary line and any extended desription that you want. Then click <strong>Propose changes</strong>, review your changes, and then create the PR.</li>
+<li>When making the PR, make sure to specify the type of PR at the beginning of the PR's title (i.e. :bug: if it addresses a bug-type issue)</li>
 </ul>
 </li>
 <li>
-<p>Click <strong>Propose Changes</strong> after writing the commit message, review your changes, and then create the PR.</p>
+<p>If the PR addresses a specific issue that has already been opened in GitHub, make sure to include the open issue number in <strong>Related Issue(s)</strong> (i.e. <code>Fixes #NNNN</code>); this will cause GitHub to automatically close the Issue once the PR is merged. If you have finished addressing an open issue without getting it automatically closed then explicitly close it.</p>
 </li>
-<li>If your PR addresses an already opened issue on the github, make sure to close the issue once your PR is approved and closed.</li>
 </ol>
-<p><br /></p>
-<h2 id="pull-request-sign-off">Pull Request Sign-off<a class="headerlink" href="#pull-request-sign-off" title="Permanent link">#</a></h2>
-<p><strong>NOTE</strong>: "sign-off" is different from "signing" a commit or tag (see <a href="https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work">the git book</a> about signing). The former indicates your assent to the repository's terms for contributors, the latter adds a cryptographic checksum that is rarely displayed.</p>
-<p>Your submitted PR must pass the automated checks in order to be reviewed. This requires for you to perform a DCO sign-off for your PR. The following instructions provide a basic walk-through if you have already set up your GPG and SSH keys:</p>
+<h2 id="repairing-commits">Repairing commits<a class="headerlink" href="#repairing-commits" title="Permanent link">#</a></h2>
+<p>If you have already created a PR that proposes to merge a branch that
+adds commits that are not signed-off then you can repair this (and
+lack of signing, if you choose) by adding the signoff to each using
+<code>git commit -s --amend</code> on each of them. If you also want those
+commits signed then you would use <code>git commit -s -S --amend</code> or
+configure automatic signing. Following is an outline of how to do it
+for a branch that adds <strong>exactly one</strong> commit. If your branch adds
+more than one commit then you can extrapolate using <code>git cherry-pick
+-s -S</code> to build up a revised series of commits one-by-one.</p>
+<p>The following instructions provide a basic walk-through if you have already created your own fork of the repository but yet not made a clone on your workstation.</p>
 <ol>
 <li>
 <p>Navigate to the <strong>Code</strong> page of the Kubestellar github.</p>
@@ -3237,8 +3309,8 @@
 </ul>
 </li>
 <li>Once in your branch, type <code>git commit -s --amend</code> to sign off your PR.<ul>
-<li>You may replace <code>--amend</code> with a <code>-m</code> followed by a commit message if you desire; the <code>--amend</code> simply uses the same commit message as the one you wrote when initially submitting the PR</li>
-<li>If prompted with a sign-off page in your Git Bash (or alternative CLI), type <code>:wq!</code> to exit the prompt</li>
+<li>The commit will also be signed if either you have set up automatic signing or both include the <code>-S</code> flag on that command and have set up your GPG key.</li>
+<li>You may extend that command with <code>-m</code> followed by a quoted commit message if you desire. Otherwise <code>git</code> will pop up an editor for you to use in making any desired adjustment to the commit message. After making any desired changes, save and exit the editor. FYI: in <code>vi</code> (which GitBash uses), when it is in Command mode (which is the normal mode, and contrasts with Insert mode) the keystrokes <code>:wq!</code> will attempt to save and then will exit no matter what.</li>
 </ul>
 </li>
 <li>Type <code>git push -f origin [branch_name]</code>, replacing <code>[branch_name]</code> with the actual name of your branch.</li>
