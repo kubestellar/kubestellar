@@ -283,33 +283,10 @@ Thanks go to these wonderful people:
                 </a>
             </td>
             <td align="center">
-                <a href="https://github.com/Mohiit70">
-                    <img src="https://avatars.githubusercontent.com/u/120316966?v=4" width="100;" alt="Mohiit70"/>
-                    <br />
-                    <sub><b>Mohit Bisht</b></sub>
-                </a>
-            </td>
-            <td align="center">
                 <a href="https://github.com/xrstf">
                     <img src="https://avatars.githubusercontent.com/u/127499?v=4" width="100;" alt="xrstf"/>
                     <br />
                     <sub><b>Christoph Mewes</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/benzha14">
-                    <img src="https://avatars.githubusercontent.com/u/93015397?v=4" width="100;" alt="benzha14"/>
-                    <br />
-                    <sub><b>Benson Zhang</b></sub>
-                </a>
-            </td>
-		</tr>
-		<tr>
-            <td align="center">
-                <a href="https://github.com/aslom">
-                    <img src="https://avatars.githubusercontent.com/u/1648338?v=4" width="100;" alt="aslom"/>
-                    <br />
-                    <sub><b>Aleksander Slominski</b></sub>
                 </a>
             </td>
             <td align="center">
@@ -326,6 +303,8 @@ Thanks go to these wonderful people:
                     <sub><b>msteinder</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/fab7">
                     <img src="https://avatars.githubusercontent.com/u/15231306?v=4" width="100;" alt="fab7"/>
@@ -347,8 +326,6 @@ Thanks go to these wonderful people:
                     <sub><b>Naveen Malik</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/mra-ruiz">
                     <img src="https://avatars.githubusercontent.com/u/16118462?v=4" width="100;" alt="mra-ruiz"/>
@@ -370,6 +347,8 @@ Thanks go to these wonderful people:
                     <sub><b>Jelmer Snoeck</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/rubambiza">
                     <img src="https://avatars.githubusercontent.com/u/11816517?v=4" width="100;" alt="rubambiza"/>
@@ -391,8 +370,6 @@ Thanks go to these wonderful people:
                     <sub><b>Constantin M. Adam</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/ncdc">
                     <img src="https://avatars.githubusercontent.com/u/354?v=4" width="100;" alt="ncdc"/>
@@ -414,6 +391,8 @@ Thanks go to these wonderful people:
                     <sub><b>Alex Rivera</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/Harmedox">
                     <img src="https://avatars.githubusercontent.com/u/23058620?v=4" width="100;" alt="Harmedox"/>
