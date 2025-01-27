@@ -1,10 +1,9 @@
-on:
-  # So we can trigger manually if needed
-  workflow_dispatch:
-  
-  push:
-    branches:
-      - main
+# So we can trigger manually if needed
+workflow_dispatch:
+
+push:
+  branches:
+    - main
 
 jobs:
   contrib-readme-job:
@@ -21,3 +20,18 @@ jobs:
         uses: akhilmhdh/contributors-readme-action@v2.3.10
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Amend Commit with Signed-off-by
+        run: |
+          git commit --amend --no-edit --signoff || echo "No changes to amend"
+
+      - name: Push Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push --force-with-lease
