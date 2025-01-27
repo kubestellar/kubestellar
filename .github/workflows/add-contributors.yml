@@ -1,3 +1,5 @@
+name: Add new contributors to readme.md
+
 # So we can trigger manually if needed
 workflow_dispatch:
 
