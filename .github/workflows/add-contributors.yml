@@ -23,32 +23,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Create a new branch
-        run: |
-          git checkout -b update-contributors-$(date +'%Y%m%d%H%M%S')
-
-      - name: Amend Commit with Signed-off-by
-        run: |
-          git commit --amend --no-edit --signoff || echo "No changes to amend"
-
-      - name: Push Changes to a New Branch
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git push --set-upstream origin $(git branch --show-current)
-
-      - name: Create a Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Update contributors in README"
-          branch: $(git branch --show-current)
-          title: "Update contributors in README"
-          body: |
-            This PR updates the contributors list in the README.
-            It is automatically created by a GitHub Action.
