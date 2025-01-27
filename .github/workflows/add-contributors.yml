@@ -40,10 +40,10 @@ jobs:
 
           # Find the branch created by the contributors-readme-action
           CURRENT_BRANCH=$(git branch --all --sort=-committerdate --format='%(refname:short)' | grep "contributors-readme-action" | head -n 1)
-
-          # Debug: Output the detected branch
-          echo "CURRENT_BRANCH=$CURRENT_BRANCH" >> $GITHUB_ENV
-          echo "Branch created by action: $CURRENT_BRANCH"
+          # Strip 'origin/' from the branch name if it exists
+          CURRENT_BRANCH_CLEAN=${CURRENT_BRANCH#origin/}
+          echo "CURRENT_BRANCH=$CURRENT_BRANCH_CLEAN" >> $GITHUB_ENV
+          echo "Branch created by action: $CURRENT_BRANCH_CLEAN"
 
       - name: Configure Git
         run: |
@@ -52,29 +52,16 @@ jobs:
 
       - name: Amend Commit with Signed-off-by
         run: |
-          # Checkout the remote branch created by akhilmhdh action
-          git checkout ${{ env.CURRENT_BRANCH }}
-          
-          # Amend the last commit to add the Signed-off-by line
+          # Checkout the branch properly
+          git checkout -B ${{ env.CURRENT_BRANCH }} origin/${{ env.CURRENT_BRANCH }}
           git commit --amend --no-edit --signoff || echo "No changes to amend"
-
+          
       - name: Push Changes Back to Remote Branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Push the amended commit back to the remote branch
-          git push --force-with-lease origin HEAD:${{ env.CURRENT_BRANCH }}
-          
-      # - name: Amend Commit with Signed-off-by
-      #   run: |
-      #     git checkout -B contributors-readme-action ${{ env.CURRENT_BRANCH }}
-      #     git commit --amend --no-edit --signoff || echo "No changes to amend"
-
-      # - name: Push Changes Back to Branch
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     git push --force-with-lease origin contributors-readme-action
+          git push --force-with-lease origin ${{ env.CURRENT_BRANCH }}
 
       # - name: Create a Pull Request
       #   uses: peter-evans/create-pull-request@v5
