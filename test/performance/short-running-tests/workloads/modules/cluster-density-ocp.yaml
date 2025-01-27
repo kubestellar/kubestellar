@@ -7,60 +7,75 @@
 {{$tuningSet := .tuningSet}}
 {{$iterations:= .iterations}}
 
-
 steps:
 - name: "{{$actionName}} Workload k8s Objects for Namespace: {{$namespaceName}}"
-  phases: 
+  phases:
+  # - NamespaceList: 
+  #   - {{$namespaceName}}
+  #   replicasPerNamespace: 1
+  #   tuningSet: {{$tuningSet}}
+  #   objectBundle:
+  #   - basename: cluster-density
+  #     objectTemplatePath: imagestream.yaml
+  #     templateFillMap:
+  #        iterations: {{$iterations}}
+  #        labelPrefix: {{$namespaceName}}
+
+
   - NamespaceList: 
     - {{$namespaceName}}
-    replicasPerNamespace: 1
+    replicasPerNamespace: 1 # changed from 4 to 1
     tuningSet: {{$tuningSet}}
     objectBundle:
-    - basename: deployment-2pod
+    - basename: cluster-density
       objectTemplatePath: deployment.yaml
       templateFillMap:
-        podReplicas: 2
-        JobName: cluster-density
+        podReplicas: 1 # changed from 2 to 1
+        JobName: cluster-density-ms
+        labelPrefix: {{$namespaceName}}
         iterations: {{$iterations}}
         envVar: 9076cbf787e95abb23c2653d1196089bd56189ababc4e332f4e70ead160e5ce9de1057724a144b65f918c47571ef82d68b596f1c0f8bd54c1415293bde30adf7bccde631f4da1f7b94569242cfc7cd2ea3de25b5a62630c22c26cc47251889d16726475124042b31af52bfdedaad08c20cce27ecb1d4c7cd113970a075930bb2d26c3cec92a58d6f2036798f265b51719ee4ef0a563fcc550659cb324dbe6c8700717f7b058e2f6b6de7f32e4680caf8872d5d98cc36ebce87025fbf5eb6f09e8fdd8057b226b09e115e883278ed6e883048f1b090ced1af36bd627f585e76c3022287466a72eb6a9f4ee2b66b3801f95c0d3a824e4977142c14b063e2b0949060f05668c34abda8a03e8bc62db9b6960d4e8e4f693aba1cdee408b721cf7e69114c2a3965b0035c38aaa1d96a4dbfed7dfd092ce7a88ff7e828733695146a95dfbb8ac6d0b98451c6e4d2fce7d045532900d257e389a3b6be6122d72a989af9142315ba73043a5f34af782ef156213ae32939cc94230b1bff4a4a5223c6af06ff89e89bbbe37576001d8d796c730804
-  
-  - NamespaceList: 
-    - {{$namespaceName}}
-    replicasPerNamespace: 1
-    tuningSet: {{$tuningSet}}
-    objectBundle:
-    - basename: deployment-2pod
-      objectTemplatePath: service.yaml
-      templateFillMap:
-        iterations: {{$iterations}}
-
+ 
   - NamespaceList: 
     - {{$namespaceName}}
     replicasPerNamespace: 2
     tuningSet: {{$tuningSet}}
     objectBundle:
-    - basename: deployment-1pod
+    - basename: cluster-density
       objectTemplatePath: service.yaml
       templateFillMap:
         iterations: {{$iterations}}
+        labelPrefix: {{$namespaceName}}
   
   - NamespaceList: 
     - {{$namespaceName}}
-    replicasPerNamespace: 10
+    replicasPerNamespace: 1
     tuningSet: {{$tuningSet}}
     objectBundle:
     - basename: cluster-density
+      objectTemplatePath: route.yaml
+      templateFillMap:
+        iterations: {{$iterations}}
+        labelPrefix: {{$namespaceName}}
+
+  - NamespaceList: 
+    - {{$namespaceName}}
+    replicasPerNamespace: 20
+    tuningSet: {{$tuningSet}}
+    objectBundle:
+    - basename: cluster-density-ms
       objectTemplatePath: secret.yaml
       templateFillMap:
         iterations: {{$iterations}}
+        labelPrefix: {{$namespaceName}}
 
   - NamespaceList: 
     - {{$namespaceName}}
     replicasPerNamespace: 10
     tuningSet: {{$tuningSet}}
     objectBundle:
-    - basename: cluster-density
+    - basename: cluster-density-ms
       objectTemplatePath: configmap.yaml
       templateFillMap:
         iterations: {{$iterations}}
-  
+        labelPrefix: {{$namespaceName}}

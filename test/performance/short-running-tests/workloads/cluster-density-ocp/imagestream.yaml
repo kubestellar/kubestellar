@@ -4,4 +4,4 @@ apiVersion: image.openshift.io/v1
 metadata:
   name: {{.Name}}
   labels:
-    app.kubernetes.io/name: cluster-density-{{.iterations}}
+    app.kubernetes.io/name:  {{.labelPrefix}}
