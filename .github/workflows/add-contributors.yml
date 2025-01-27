@@ -48,6 +48,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
           branch: ${{ env.BRANCH_NAME }}
           title: "Update Contributors"
           body: "This PR updates the contributors list in README.md."
