@@ -26,8 +26,14 @@ jobs:
       - name: Detect the Branch Created by the Action
         id: get-branch
         run: |
-          # Find the latest branch created by the action
-          CURRENT_BRANCH=$(git branch --sort=-committerdate --format='%(refname:short)' --all | grep "contributors-readme-action" | head -n 1)
+          # Debug: Show all branches to understand the issue
+          echo "Available branches:"
+          git branch --all --sort=-committerdate --format='%(refname:short)'
+
+          # Find the branch created by the contributors-readme-action
+          CURRENT_BRANCH=$(git branch --all --sort=-committerdate --format='%(refname:short)' | grep "contributors-readme-action" | head -n 1)
+
+          # Debug: Output the detected branch
           echo "CURRENT_BRANCH=$CURRENT_BRANCH" >> $GITHUB_ENV
           echo "Branch created by action: $CURRENT_BRANCH"
 
