@@ -23,6 +23,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Fetch All Remote Branches
+        run: |
+          git fetch --all
+          echo "Fetched all remote branches"
+
       - name: Detect the Branch Created by the Action
         id: get-branch
         run: |
