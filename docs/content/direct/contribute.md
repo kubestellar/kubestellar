@@ -1,5 +1,4 @@
 # Contributing to KubeStellar
-
 Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
 
 To get started, kindly read through and familiarize yourself with our [Code of Conduct](https://github.com/kubestellar/kubestellar/blob/main/CODE_OF_CONDUCT.md).
@@ -10,7 +9,6 @@ If you have any inquiries, please feel free to reach out to us on the KubeStella
 
 ## Work with us on GitHub!
 
-Full documentation on how to contribute to the development of KubeStellar is available as part of our GitHub repository. See it [here](https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/CONTRIBUTING.md).
+Full documentation on how to contribute to the development of KubeStellar is available as part of our GitHub repository. See it [there](https://github.com/kubestellar/kubestellar/blob/main/docs/content/direct/contributor.md).
 
 *We can't wait to collaborate with you!*
-
