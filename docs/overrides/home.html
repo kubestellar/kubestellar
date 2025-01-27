@@ -33,12 +33,13 @@
 	</a>
       </span>
     		   
-      <div class="conteiner-row" style="margin-top:40px;margin-bottom:10px">
+      <div class="container-row" style="position: absolute; top: 20px; left: 5px; margin-bottom: 10px;">
         <p class="h1 text-xs-center">
-          <img src="KubeStellar-with-Logo-transparent-v2.png" class="mx-3 leverage-title-logo" height="150px" alt="KubeStellar logo and banner text"/>
+          <img src="KubeStellar-with-Logo-transparent-v2.png" class="mx-3 leverage-title-logo" height="50px" alt="KubeStellar logo and banner text"/>
         </p>
       </div>
-      <div style="color:#0065cb" class="centered md-source__repository md-source__repository--active">
+      
+      <!-- <div style="color:#0065cb" class="centered md-source__repository md-source__repository--active">
         <script>
           // Fetch github counts
           fetch(`https://api.github.com/repos/{{config.repo_short_name}}`)
@@ -63,56 +64,56 @@
         </script>
         <ul class="md-source__facts">
           <!-- <li id="current-release" class="md-source__fact md-source__fact--version"></li> -->
-          <li id="star-count" class="custom-paragraph md-source__fact md-source__fact--stars"></li>
+          <!-- <li id="star-count" class="custom-paragraph md-source__fact md-source__fact--stars"></li>
           <li id="fork-count" class="custom-paragraph md-source__fact md-source__fact--forks"></li>
         </ul>
-        </div>
+        </div> --> 
       
       <p class="h3 text-xs-center">Think of KubeStellar as a post office for your Kubernetes resources. Like a post office, KubeStellar doesn't open your packages; it safely stores and delivers them to selected clusters worldwide—public clouds, private clouds, or at the edge. It's a super useful solution for spreading your Kubernetes resources wherever you need them.
-        <strong>Don't change anything, just add KubeStellar!</strong>
+        <strong>Don't change anything, just add KubeStellar! </strong>
       </p>
       <div class="conteiner-row conteiner-xs" style="z-index:100;">
 	      
-	     <div style="text-align:center; width:50%; float:left; text-size:larger;z-index:150;margin-bottom:80px">
-	        <button
-        	  type="button"
-          	  title="Documentation (docs.kubestellar.io)"
-	          onclick="location.href='readme/'"
-	          class="btn-dark btn-xl-large btn-lg-large mx-3  mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow "
-		  style="margin-left:auto;margin-right:auto;margin-bottom:20px;"
-		>
-	            Documentation
-	        </button>
-		<br />
-		<strong><a href="readme/" style="margin-bottom:20px;z-index:151">docs.kubestellar.io</a></strong><br />
-		Learn More About KubeStellar <br />
-		(Getting Started, User Guide, Architecture...)
-   	      </div>
-
-	      <div style="text-align:center; width:50%; float:right; text-size:larger;zindex:149;margin-bottom:80px" > 
-	        <button				
-	          type="button"
-        	  title="Community Access (KubeStellar Google Group)"
-	          onclick="window.open('https://kubestellar.io/joinus', '_blank')"
-	          class="btn-warning btn-xl-large btn-lg-large mx-3 mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
-		  style="margin-left:auto;margin-right:auto;margin-bottom:20px;"
-       		>
-	          Join Us
-		</button>
-		<br />
-			<strong><a href="https://www.kubestellar.io/joinus/">KubeStellar Google Group</a></strong><br />
-                        Access to our email group and community meetings
-	      </div>
-	</div>
-    </div>
-    <div class="ctx-header-img d-xl">
-      <img src="kubestellar-deploy.png" class="laverage-header-img" style="width:100%" alt="simplified graphic representing KubeStellar deploying to multiple locations"/>
-    </div>
-  </div>
-
-  <div class="d-sm-mid2">
-    <img src="kubestellar-deploy.png" class="laverage-header-img" style="width:100%" alt="simplified graphic representing KubeStellar deploying to multiple locations"/>
-  </div>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 80px;">
+          <!-- Left Button Section -->
+          <div style="text-align:center; width:45%; float:left; text-size:larger;">
+            <button
+              type="button"
+              title="Documentation (docs.kubestellar.io)"
+              onclick="location.href='readme/'"
+              class="btn-dark btn-lg mx-3 mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
+              style="margin-left:auto; margin-right:auto; margin-bottom:10px; width: 200px; font-size: 16px; padding: 8px 16px;"
+            >
+              Documentation
+            </button>
+            <br />
+            <strong><a href="readme/" style="margin-bottom:10px;">docs.kubestellar.io</a></strong><br />
+            Learn More About KubeStellar <br />
+            (Getting Started, User Guide, Architecture...)
+          </div>
+          
+          <!-- Image Section -->
+          <div style="text-align:center; width:75%; margin: 40px 0 0 0px;">
+            <img src="kubestellar-deploy.png" class="laverage-header-img" style="max-width: 800px; max-height: 500px;" alt="simplified graphic representing KubeStellar deploying to multiple locations"/>
+          </div>
+          
+          <!-- Right Button Section -->
+          <div style="text-align:center; width:45%; float:right; text-size:larger;">
+            <button
+              type="button"
+              title="Community Access (KubeStellar Google Group)"
+              onclick="window.open('https://kubestellar.io/joinus', '_blank')"
+              class="btn-warning btn-lg mx-3 mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
+              style="margin-left:auto; margin-right:auto; margin-bottom:10px; width: 200px; font-size: 16px; padding: 8px 16px;"
+            >
+              Join Us
+            </button>
+            <br />
+            <strong><a href="https://www.kubestellar.io/joinus/">KubeStellar Google Group</a></strong><br />
+            Access to our email group and community meetings
+          </div>
+        </div>
+                  
 
 </section>
 
