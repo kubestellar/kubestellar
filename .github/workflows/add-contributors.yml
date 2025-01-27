@@ -28,27 +28,18 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Create a new branch
+      - name: Find Current Branch Name
+        id: get-branch
         run: |
-          BRANCH_NAME="update-contributors-$(date +'%Y%m%d%H%M%S')"
-          git checkout -b $BRANCH_NAME
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          CURRENT_BRANCH=$(git symbolic-ref --short HEAD)
+          echo "CURRENT_BRANCH=$CURRENT_BRANCH" >> $GITHUB_ENV
 
       - name: Amend Commit with Signed-off-by
         run: |
           git commit --amend --no-edit --signoff || echo "No changes to amend"
 
-      - name: Push Changes to a New Branch
+      - name: Push Changes Back to Branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push --set-upstream origin $BRANCH_NAME
-
-      - name: Create a Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: main
-          branch: ${{ env.BRANCH_NAME }}
-          title: "Update Contributors"
-          body: "This PR updates the contributors list in README.md."
+          git push --force-with-lease origin ${{ env.CURRENT_BRANCH }}
