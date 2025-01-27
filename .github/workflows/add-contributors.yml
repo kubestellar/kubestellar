@@ -27,7 +27,7 @@ jobs:
         id: get-branch
         run: |
           # Find the latest branch created by the action
-          CURRENT_BRANCH=$(git branch --sort=-committerdate --format='%(refname:short)' | grep "contributors-readme-action" | head -n 1)
+          CURRENT_BRANCH=$(git branch --sort=-committerdate --format='%(refname:short)' --all | grep "contributors-readme-action" | head -n 1)
           echo "CURRENT_BRANCH=$CURRENT_BRANCH" >> $GITHUB_ENV
           echo "Branch created by action: $CURRENT_BRANCH"
 
