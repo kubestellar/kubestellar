@@ -62,14 +62,3 @@ jobs:
         run: |
           # Push the amended commit back to the remote branch
           git push --force-with-lease origin ${{ env.CURRENT_BRANCH }}
-
-      # - name: Create a Pull Request
-      #   uses: peter-evans/create-pull-request@v5
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     base: main
-      #     branch: contributors-readme-action
-      #     title: "Update Contributors in README.md"
-      #     body: |
-      #       This PR updates the contributors list in the README.md file.
-      #       It was automatically created and includes a Signed-off-by line for compliance with DCO.
