@@ -32,13 +32,18 @@ Your assistance in improving documentation is highly valued, regardless of your 
 To claim an issue that you are interested in, kindly leave a comment on the issue and request the maintainers to assign it to you.
 
 ### Committing
-We encourage all contributors to adopt [best practices in git commit management](https://hackmd.io/q22nrXjERBeIGb-fqwrUSg) to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.
+We encourage all contributors to adopt [best practices in git commit management](https://hackmd.io/q22nrXjERBeIGb-fqwrUSg) to facilitate efficient reviews and retrospective analysis. Note: that document was written for projects where some of the contributors are doing merges into the main branch, but in KubeStellar we have GitHub doing that for us. For the kubestellar repository, this is controlled by [Prow](https://docs.prow.k8s.io/); for the other repositories in the kubestellar organization we use the GitHub mechanisms directly.
+
+Your git commits should provide ample context for reviewers and future codebase readers.
 
 A recommended format for final commit messages is as follows:
 
 ```
 {Short Title}: {Problem this commit is solving and any important contextual information} {issue number if applicable}
 ```
+
+In conformance with CNCF expectations, we will only merge commits that indicate your agreement with the [Developer Certificate of Origin](#certificate-of-origin). The CNCF defines how to do this, and there are two cases: one for developers working for an organization that is a CNCF member, and one for contributors acting as individuals. For the latter, assent is indicated by doing a Git "sign-off" on the commit. See [Git Commit Signoff and Signing](docs/content/direct/pr-signoff.md) for more information on how to do that.
+
 ### Pull Requests
 When submitting a pull request, clear communication is appreciated. This can be achieved by providing the following information:
 
@@ -48,6 +53,16 @@ When submitting a pull request, clear communication is appreciated. This can be 
 - Updates to relevant documentation and examples, if applicable
 
 The pull request template has been designed to assist you in communicating this information effectively.
+
+We require that the title of each pull request start with a special character that classifies the request into one of the following categories.
+
+- ✨ (write `:sparkles:`) feature
+- 🐛 (write `:bug:`) bug fix
+- 📖 (write `:book:`) docs
+- 📝 (write `:memo:`)  proposal
+- ⚠️ (write `:warning:`) breaking change
+- 🌱 (write `:seedling:`) other/misc
+- ❓ (write `:question:`) requires manual review/categorization
 
 Smaller pull requests are typically easier to review and merge than larger ones. If your pull request is big, it is always recommended to collaborate with the maintainers to find the best way to divide it.
 

@@ -1,8 +1,49 @@
-# How to Sign-off on Your Pull Requests
+# Git Commit Signoff and Signing
 
-In order to get your pull requests approved, you must first complete a DCO sign-off. This process is defined by the CNCF, and there are two cases: individual contributors and contributors that work for a corporate CNCF member. To do this as an individual contributor, you must have a GPG and SSH key. Basic setup instructions can be found below (For more detailed instructions, refer to the Github [GPG](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) and [SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) setup pages):
+**NOTE**: "sign-off" is different from "signing" a commit.  The former
+indicates your assent to the repository's terms for contributors, the
+latter adds a cryptographic signature that is rarely displayed.  See
+[the git
+book](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work)
+about signing. For commit signoff, do a web search on `git
+signoff`. GitHub has a concept of [a commit being
+"verified"](https://docs.github.com/en/authentication/managing-commit-signature-verification)
+that extends the Git concept of signing.
 
----
+In order to get a pull request approved, you must first complete a DCO
+sign-off for each commit that the request is asking to add to the
+repository. This process is defined by the CNCF, and there are two
+cases: individual contributors and contributors that work for a
+corporate CNCF member. Both mean consent with the terms stated in [the
+`DCO` file at the root of this Git
+repository](https://github.com/kubestellar/kubestellar/blob/main/DCO). In
+the case of an individual, DCO sign-off is accomplished by doing a Git
+"sign-off" on the commit.
+
+We prefer that commits contributed to this repository be signed and
+GitHub verified, but this is not strictly necessary or enforced.
+
+## Commit Sign-off
+
+Your submitted PR must pass the automated checks in order to be merged. One of these checks that each commit that you propose to contribute is signed-off. If you use the `git` shell command, this involves passing the `-s` flag on the command line. For example, the following command will create a signed-off commit but _not_ sign it.
+
+```shell
+git commit -s
+```
+
+Alternatively, the following command will create a commit that is both signed-off and signed.
+
+```shell
+git commit -s -S
+```
+
+For other tools, consult their documentation.
+
+## Signing Commits
+
+Before signing any commits, you must have a GPG and SSH key. Basic setup instructions can be found below (For more detailed instructions, refer to the Github [GPG](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) and [SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) setup pages.)
+
+To sign a particular commit, you must either include `-S` on the `git commit` command line (see the command exhibited above for an example) or have configured automatic signing (see ["Everyone Must Sign" in the Git Book](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work#_everyone_must_sign) for a hint about that).
 
 Before starting, make sure that your user email is verified on Github. To check for this:
 
@@ -15,7 +56,7 @@ Before starting, make sure that your user email is verified on Github. To check 
 
 <br />
 
-**Git Bash** is also highly recommended.
+For Windows users, **Git Bash** is also highly recommended.
 
 <br />
 
@@ -103,24 +144,31 @@ Before starting, make sure that your user email is verified on Github. To check 
 
 <br />
 
-## Creating Pull Requests
+## Creating Pull Requests Using the GitHub Website
+
+This is not recommended for individual contributors, because the commits that it produces are not "signed-off" (as defined by Git) and thus do not carry assent to the DCO; see [Repairing commits](#repairing-commits) below for a way to recover if you have inadvertently made such a PR. For corporate contributors the DCO assent is indicated differently.
 
 Whether it's editing files from Kubestellar.io or directly from the Kubestellar Github, there are a couple steps to follow that streamlines the workflow of your PR:
 
 1. Changes made to any file are automatically committed to a new branch in your fork.
-    - When committing, make sure to specify the type of PR at the beginning of your commit message (i.e. :bug: if it addresses a bug-type issue)
-    - If the PR addresses a specific issue that has already been opened in the github, make sure to include the opened issue in **additional comments** (i.e. `fixes Issue #XXXX`)
-     
-2. Click **Propose Changes** after writing the commit message, review your changes, and then create the PR.
-3. If your PR addresses an already opened issue on the github, make sure to close the issue once your PR is approved and closed.
+    - After clicking **Commit changes...**, write your commit message summary line and any extended desription that you want. Then click **Propose changes**, review your changes, and then create the PR.
+    - When making the PR, make sure to specify the type of PR at the beginning of the PR's title (i.e. :bug: if it addresses a bug-type issue)
 
-<br />
+1. If the PR addresses a specific issue that has already been opened in GitHub, make sure to include the open issue number in **Related Issue(s)** (i.e. `Fixes #NNNN`); this will cause GitHub to automatically close the Issue once the PR is merged. If you have finished addressing an open issue without getting it automatically closed then explicitly close it.
 
-## Pull Request Sign-off
+## Repairing commits
 
-**NOTE**: "sign-off" is different from "signing" a commit or tag (see [the git book](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work) about signing). The former indicates your assent to the repository's terms for contributors, the latter adds a cryptographic checksum that is rarely displayed.
+If you have already created a PR that proposes to merge a branch that
+adds commits that are not signed-off then you can repair this (and
+lack of signing, if you choose) by adding the signoff to each using
+`git commit -s --amend` on each of them. If you also want those
+commits signed then you would use `git commit -s -S --amend` or
+configure automatic signing. Following is an outline of how to do it
+for a branch that adds **exactly one** commit. If your branch adds
+more than one commit then you can extrapolate using `git cherry-pick
+-s -S` to build up a revised series of commits one-by-one.
 
-Your submitted PR must pass the automated checks in order to be reviewed. This requires for you to perform a DCO sign-off for your PR. The following instructions provide a basic walk-through if you have already set up your GPG and SSH keys:
+The following instructions provide a basic walk-through if you have already created your own fork of the repository but yet not made a clone on your workstation.
 
 1. Navigate to the **Code** page of the Kubestellar github.
    
@@ -135,17 +183,8 @@ Your submitted PR must pass the automated checks in order to be reviewed. This r
 7. `git checkout` to the branch in your fork where the changes were committed.
     - The branch name should be written at the top of your submitted PR page and looks something like "patch-*X*" (where "X" should be the number of PRs made on your fork to date)
 8. Once in your branch, type `git commit -s --amend` to sign off your PR.
-    - You may replace `--amend` with a `-m` followed by a commit message if you desire; the `--amend` simply uses the same commit message as the one you wrote when initially submitting the PR
-    - If prompted with a sign-off page in your Git Bash (or alternative CLI), type `:wq!` to exit the prompt
+    - The commit will also be signed if either you have set up automatic signing or both include the `-S` flag on that command and have set up your GPG key.
+    - You may extend that command with `-m` followed by a quoted commit message if you desire. Otherwise `git` will pop up an editor for you to use in making any desired adjustment to the commit message. After making any desired changes, save and exit the editor. FYI: in `vi` (which GitBash uses), when it is in Command mode (which is the normal mode, and contrasts with Insert mode) the keystrokes `:wq!` will attempt to save and then will exit no matter what.
 9. Type `git push -f origin [branch_name]`, replacing `[branch_name]` with the actual name of your branch.
 10. Navigate back to your PR github page.
     - A green `dco-signoff: yes` label indicates that your PR is successfully signed
-
-
-
-
-
-
-
-
-
