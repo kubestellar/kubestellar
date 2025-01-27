@@ -3,12 +3,13 @@ name: Add new contributors to readme.md
 on:
   workflow_dispatch:
 
-  push:
-    branches:
-      - main
+  pull_request:
+    types:
+      - closed
 
 jobs:
   contrib-readme-job:
+    if: github.event.pull_request.merged == true # Only run if the PR was merged
     runs-on: ubuntu-latest
     name: A job to automate contributors in README
     permissions:
