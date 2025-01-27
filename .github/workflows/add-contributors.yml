@@ -49,11 +49,11 @@ jobs:
 
       - name: Amend Commit with Signed-off-by
         run: |
-          git checkout ${{ env.CURRENT_BRANCH }}
+          git checkout -B contributors-readme-action ${{ env.CURRENT_BRANCH }}
           git commit --amend --no-edit --signoff || echo "No changes to amend"
 
       - name: Push Changes Back to Branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push --force-with-lease origin ${{ env.CURRENT_BRANCH }}
+          git push --force-with-lease origin contributors-readme-action
