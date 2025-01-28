@@ -17,6 +17,8 @@
     <!-- Additional styles for landing page -->
     <style>
 
+        
+
 .section-sm {
   display: none;
   text-align: center;
@@ -34,7 +36,25 @@
         display: contents;
     }
 }
-
+@media (max-width: 768px) {
+          .container-row {
+            top: 5px;
+            left: 10px;
+          }
+          .leverage-title-logo {
+            height: 40px; /* Resize image on smaller screens */
+          }
+        }
+      
+        @media (max-width: 480px) {
+          .container-row {
+            top: 0px;
+            left: 0px;
+          }
+          .leverage-title-logo {
+            height: 30px; /* Further resize image for very small screens */
+          }
+        }
 @media (max-width: 960px) {
     .d-lg-mid {
         display:none;
@@ -46,26 +66,77 @@
         display:contents;
     }
 }
-
-.shortcut-bar-text {
-    font-size: 15px;
-    transition: color 0.3s;
-}
-.shortcut-bar-text:hover {
-    color: #0065cb 
+.main-background {
+  position: relative; /* Enable positioning */
+  top: -20px; /* Move upwards */
+  left: 20px; /* Move towards the right */
 }
 
 .shortcut-bar {
-  /* position: sticky */
-  width: 75%;
-  height: 90%;
   position: absolute;
-  top: 8%;
-  left: 25%;
-  /* transform: translate(-25%, -50%);*/
+  top: 5%;
+  right: 10%;
+  display: flex; /* Flexbox layout */
+  line-height: 10%; /* Adjust alignment vertically */
   text-align: center;
-  line-height: 60px;
 }
+
+.shortcut-bar-text {
+  font-size: 15px;
+  padding: 0;
+  margin: 0;
+  transition: color 0.3s;
+  white-space: nowrap; /* Prevent icons from wrapping to the next line */
+}
+
+.shortcut-bar-text:hover {
+  color: #a4a7aa; /* Change color on hover */
+}
+.shortcut-bar a {
+  display: inline-block; /* Make anchor tags inline */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .shortcut-bar {
+    top: 2%; /* Reduce top margin on smaller screens */
+    right: 5%; /* Adjust right margin */
+  }
+
+  .shortcut-bar-text {
+    font-size: 12px; /* Reduce font size */
+  }
+
+  /* Position icons in the shortcut bar more appropriately */
+  .shortcut-bar-text a {
+    margin: 5px; /* Add margin to the anchors */
+  }
+
+  .shortcut-bar a[style*="position: absolute"] {
+    top: -15px; /* Adjust absolute positioning for icons */
+    right: -8%; /* Adjust position for icons */
+  }
+}
+
+@media (max-width: 480px) {
+  .shortcut-bar {
+    right: 2%;
+    top: 3%;
+    justify-content: center; /* Center items on small screens */
+  }
+
+  .shortcut-bar-text {
+    font-size: 10px; /* Further reduce font size */
+    margin: 5px; /* Add margin for spacing */
+  }
+
+  .shortcut-bar a[style*="position: absolute"] {
+    top: -20px; /* Adjust position for icons */
+    right: -12%; /* Adjust position for icons */
+  }
+}
+
+
 .centered {
   width: 20%;
   height: 55%;
