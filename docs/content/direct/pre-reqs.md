@@ -21,7 +21,7 @@ Our documentation has remarks about using the following sorts of clusters:
 <!-- begin software prerequisites -->
 ## Software Prerequisites: for Using KubeStellar
 
-- **kubeflex** version 0.7.2 or higher.
+- **kubeflex** version 0.8.0 or higher.
     To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). To upgrade from an existing installation,
 follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex). At the end of the install make sure that the kubeflex CLI, kflex, is in your `$PATH`.
 
