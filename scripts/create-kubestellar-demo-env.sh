@@ -52,14 +52,11 @@ command_exists() {
 # Function to check if a port is free
 wait_for_port_free() {
     local port=$1
-    while lsof -i:$port >/dev/null 2>&1; do
+    while lsof -i $port >/dev/null 2>&1; do
         echo "Waiting for port $port to be free..."
         sleep 5
     done
 }
-
-# Wait for port 9443 to be free before proceeding
-wait_for_port_free 9443
 
 echo -e "Checking container runtime..."
 if ! dunsel=$(docker ps 2>&1); then
@@ -80,8 +77,7 @@ fi
 
 ##########################################
 cluster_clean_up() {
-    error_message=$(eval "$1" 2>&1)
-    if [ $? -ne 0 ]; then
+    if ! error_message=$(eval "$1" 2>&1); then
         echo "clean up failed. Error:"
         echo "$error_message"
     fi
@@ -137,18 +133,20 @@ echo -e "\nStarting environment clean up..."
 echo -e "Starting cluster clean up..."
 
 if command_exists "k3d"; then
-    cluster_clean_up "k3d cluster delete kubeflex" &
-    cluster_clean_up "k3d cluster delete cluster1" &
-    cluster_clean_up "k3d cluster delete cluster2" &
+    cluster_clean_up "k3d cluster delete kubeflex"
+    cluster_clean_up "k3d cluster delete cluster1"
+    cluster_clean_up "k3d cluster delete cluster2"
 fi
 if command_exists "kind"; then
-    cluster_clean_up "kind delete cluster --name kubeflex" &
-    cluster_clean_up "kind delete cluster --name cluster1" &
-    cluster_clean_up "kind delete cluster --name cluster2" &
+    cluster_clean_up "kind delete cluster --name kubeflex"
+    cluster_clean_up "kind delete cluster --name cluster1"
+    cluster_clean_up "kind delete cluster --name cluster2"
 fi
 
-wait
 echo -e "\033[33m✔\033[0m Cluster space clean up has been completed"
+
+# Wait for port 9443 to be free before proceeding
+wait_for_port_free tcp:9443
 
 echo -e "\nStarting context clean up..."
 context_clean_up
@@ -159,10 +157,19 @@ clusters=(cluster1 cluster2)
 cluster_log_dir=$(mktemp -d)
 trap "rm -rf $cluster_log_dir" EXIT
 for cluster in "${clusters[@]}"; do
-    if [ "$k8s_platform" == "kind" ]; then
-        kind create cluster --name "${cluster}" >"${cluster_log_dir}/${cluster}.log" 2>&1 && touch "${cluster_log_dir}/${cluster}.success" &
+    if {
+      if [ "$k8s_platform" == "kind" ]; then
+        kind create cluster --name "${cluster}" &>"${cluster_log_dir}/${cluster}.log"
+      else
+        k3d cluster create --network k3d-kubeflex "${cluster}" &>"${cluster_log_dir}/${cluster}.log"
+      fi
+    }; then
+        echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
+        kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
     else
-        k3d cluster create --network k3d-kubeflex "${cluster}" >"${cluster_log_dir}/${cluster}.log" 2>&1 && touch "${cluster_log_dir}/${cluster}.success" &
+        echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
+        cat "${cluster_log_dir}/${cluster}.log" >&2
+        false
     fi
 done
 
@@ -172,48 +179,20 @@ if [ "$k8s_platform" == "kind" ]; then
 else
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
     sleep 15
-    helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.11.3 --namespace ingress-nginx --create-namespace
+    helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.11.3 --namespace ingress-nginx --create-namespace --timeout 24h
 fi
 echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
 
-wait
 kubectl config use-context $k8s_platform-kubeflex
-
-some_failed=false
-for cluster in "${clusters[@]}"; do
-    if ! [ -f "${cluster_log_dir}/${cluster}.success" ]; then
-        echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
-        cat "${cluster_log_dir}/${cluster}.log" >&2
-        some_failed=true
-        continue
-    fi
-    echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
-    kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
-done
-if [ "$some_failed" = true ]; then exit 10; fi
-
-for cluster in "${clusters[@]}"; do
-  if kubectl config get-contexts | grep -w " ${cluster} " >/dev/null 2>&1; then
-    echo -e "\033[33m✔\033[0m $cluster context exists."
-  else
-    if kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1; then
-      echo -e "\033[33m✔\033[0m Renamed context '${k8s_platform}-${cluster}' to '${cluster}'."
-    else
-      echo -e "Failed to rename context '${k8s_platform}-${cluster}' to '${cluster}'. It may not exist."
-    fi
-  fi
-done
 
 echo -e "\nPulling container images local..."
 images=("ghcr.io/loft-sh/vcluster:0.16.4"
         "rancher/k3s:v1.27.2-k3s1"
-        "quay.io/open-cluster-management/registration-operator:v0.13.2"
+        "quay.io/open-cluster-management/registration-operator:v0.14.0"
         "docker.io/bitnami/postgresql:16.0.0-debian-11-r13")
 
 for image in "${images[@]}"; do
-    (
-        docker pull "$image"
-    ) &
+    docker pull "$image" &
 done
 wait
 
@@ -226,20 +205,18 @@ for image in "${images[@]}"; do
 done
 
 echo -e "\nStarting the process to install KubeStellar core: $k8s_platform-kubeflex..."
-if [ "$k8s_platform" == "k3d" ]; then
-    helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
+if [ "$k8s_platform" == "k3d" ]
+then var_flags="--set kubeflex-operator.hostContainer=k3d-kubeflex-server-0"
+else var_flags=""
+fi
+
+helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
         --version $kubestellar_version \
         --set-json='ITSes=[{"name":"its1"}]' \
         --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
         --set-json='verbosity.default=5' \
-        --set kubeflex-operator.hostContainer=k3d-kubeflex-server-0
-else
-    helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-        --version $kubestellar_version \
-        --set-json='ITSes=[{"name":"its1"}]' \
-        --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
-        --set-json='verbosity.default=5'
-fi
+        --timeout=24h \
+        $var_flags
 
 kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
 kflex ctx --overwrite-existing-context wds1
