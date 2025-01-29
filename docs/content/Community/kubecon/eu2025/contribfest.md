@@ -16,8 +16,13 @@ Whether you're new to KubeStellar or ready to dive deep, you'll have the chance 
 ### Good first issues
 Want to get started ahead of Contribfest? Here are some open issues to consider bringing to the session—or to start working on right now:
 
-[FEATURE] TODO - Enhance .... (#4521)
-[BUG] TODO - Fix ... (#4398)
+[FEATURE] - [kubeflex#307: feature: enable me to work with more than one system](https://github.com/kubestellar/kubeflex/issues/307)
+[BUG] - [kubeflex#300: bug: wait for condition not working as expected with control plane conditions](https://github.com/kubestellar/kubeflex/issues/300)
+[FEATURE] - [kubeflex#271: feature: command is called 'kflex' but brew formula is called 'kubeflex' - pick one please](https://github.com/kubestellar/kubeflex/issues/271)
+[DOCUMENTATION] - [kubeflex#270: Clarity on installation instructions](https://github.com/kubestellar/kubeflex/issues/270)
+[FEATURE] - [kubeflex#159: feature: List clusters](https://github.com/kubestellar/kubeflex/issues/159)
+[FEATURE] - [kubeflex#165: feature: Add `kflex` command/flag to get the current context](https://github.com/kubestellar/kubeflex/issues/165)
+
 Explore the complete list of issues on KubeStellar's GitHub [https://github.com/kubestellar/kubestellar/issues](https://github.com/kubestellar/kubestellar/issues).
 
 ### Join us!
