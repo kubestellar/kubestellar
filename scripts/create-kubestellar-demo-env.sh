@@ -140,6 +140,7 @@ if command_exists "k3d"; then
     cluster_clean_up "k3d cluster delete kubeflex" &
     cluster_clean_up "k3d cluster delete cluster1" &
     cluster_clean_up "k3d cluster delete cluster2" &
+    wait
 fi
 if command_exists "kind"; then
     cluster_clean_up "kind delete cluster --name kubeflex" &
