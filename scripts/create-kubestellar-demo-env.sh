@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Deploys Kubestellar environment for demo purposes on kind or k3d.
-
 set -e
 
 # Default Kubernetes platform parameter
@@ -46,6 +44,23 @@ fi
 
 echo "Selected Kubernetes platform: $k8s_platform"
 
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to check if a port is free
+wait_for_port_free() {
+    local port=$1
+    while lsof -i:$port >/dev/null 2>&1; do
+        echo "Waiting for port $port to be free..."
+        sleep 5
+    done
+}
+
+# Wait for port 9443 to be free before proceeding
+wait_for_port_free 9443
+
 echo -e "Checking container runtime..."
 if ! dunsel=$(docker ps 2>&1); then
     echo "Error: The script cannot continue because Docker or Podman is not running. Please start your container runtime before running the script again."
@@ -60,7 +75,6 @@ echo -e "Checking that pre-req softwares are installed..."
 if [ "$k8s_platform" == "kind" ]; then
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker kind
 else
-    # curl -s https://raw.githubusercontent.com/clubanderson/kubestellar/refs/heads/add-k3d-to-create-demo-env/hack/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker k3d
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/hack/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker k3d
 fi
 
@@ -119,12 +133,6 @@ checking_cluster() {
     done
 }
 
-# Function to check if a command exists
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
-##########################################
-
 echo -e "\nStarting environment clean up..."
 echo -e "Starting cluster clean up..."
 
@@ -132,13 +140,11 @@ if command_exists "k3d"; then
     cluster_clean_up "k3d cluster delete kubeflex" &
     cluster_clean_up "k3d cluster delete cluster1" &
     cluster_clean_up "k3d cluster delete cluster2" &
-    wait
 fi
 if command_exists "kind"; then
     cluster_clean_up "kind delete cluster --name kubeflex" &
     cluster_clean_up "kind delete cluster --name cluster1" &
     cluster_clean_up "kind delete cluster --name cluster2" &
-    wait
 fi
 
 wait
@@ -157,7 +163,6 @@ for cluster in "${clusters[@]}"; do
         kind create cluster --name "${cluster}" >"${cluster_log_dir}/${cluster}.log" 2>&1 && touch "${cluster_log_dir}/${cluster}.success" &
     else
         k3d cluster create --network k3d-kubeflex "${cluster}" >"${cluster_log_dir}/${cluster}.log" 2>&1 && touch "${cluster_log_dir}/${cluster}.success" &
-        wait
     fi
 done
 
@@ -177,10 +182,10 @@ kubectl config use-context $k8s_platform-kubeflex
 some_failed=false
 for cluster in "${clusters[@]}"; do
     if ! [ -f "${cluster_log_dir}/${cluster}.success" ]; then
-	echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
-	cat "${cluster_log_dir}/${cluster}.log" >&2
-	some_failed=true
-	continue
+        echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
+        cat "${cluster_log_dir}/${cluster}.log" >&2
+        some_failed=true
+        continue
     fi
     echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
     kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
