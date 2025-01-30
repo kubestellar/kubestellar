@@ -13,8 +13,8 @@ spec:
     ITSkubeconfig: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
   {{- if eq $cp.type "external" }}
   bootstrapSecretRef:
-    inClusterKey: kubeconfig-incluster
-    name: {{ $cp.name }}-bootstrap
-    namespace: default
+    name: {{ $cp.bootstrapSecret.name | default "{{ $cp.name }}-bootstrap" }}
+    namespace: {{ $cp.bootstrapSecret.namespace | default "default" }}
+    inClusterKey: {{ $cp.bootstrapSecret.key | default "kubeconfig-incluster" }}
   {{- end }}
 {{- end }}
