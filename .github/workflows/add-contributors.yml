@@ -46,20 +46,30 @@ jobs:
           echo "CURRENT_BRANCH=$CURRENT_BRANCH_CLEAN" >> $GITHUB_ENV
           echo "Branch created by action: $CURRENT_BRANCH_CLEAN"
 
+          # Stop if branch is empty
+          if [ -z "$CURRENT_BRANCH_CLEAN" ]; then
+            echo "No branch created by action. Skipping remaining steps."
+            echo "SKIP_REMAINING=true" >> $GITHUB_ENV
+          fi
+
       - name: Configure Git
+        if: env.SKIP_REMAINING != 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Amend Commit with Signed-off-by
+        if: env.SKIP_REMAINING != 'true'
         run: |
           # Checkout the branch properly
           git checkout -B ${{ env.CURRENT_BRANCH }} origin/${{ env.CURRENT_BRANCH }}
           git commit --amend --no-edit --signoff || echo "No changes to amend"
           
       - name: Push Changes Back to Remote Branch
+        if: env.SKIP_REMAINING != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Push the amended commit back to the remote branch
           git push --force-with-lease origin ${{ env.CURRENT_BRANCH }}
+      
