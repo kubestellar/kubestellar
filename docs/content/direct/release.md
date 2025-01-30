@@ -43,8 +43,6 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - If not already in effect, declare a code freeze. There should be nothing but bug fixes and doc improvements while working towards a regular release.
 
-- **AFTER** the next release, replace references to `hack/check_pre_req.sh` with references to `scripts/check_pre_req.sh` in:  `docs/content/direct/get-started.md`, `docs/content/direct/start-from-ocm.md`, `scripts/create-kubestellar-demo-env.sh`, and then delete this step.
-
 - **AFTER** the next regular release: delete `hack/check_pre_req.sh`, delete references to `hack/check_pre_req.sh` in this document, and delete this step.
 
 - Edit `docs/mkdocs.yml` and update the definition of `ks_latest_release` to `$version` (e.g., `'0.23.0-rc42'`). If this is a regular release then also update the definition of `ks_latest_regular_release`.

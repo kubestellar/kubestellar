@@ -2,6 +2,25 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.26.0 and its RCs
+
+The major changes since 0.25.1 are as follows.
+
+- Increase the Kubernetes release that kubestellar depends on, from 1.28 to 1.29.
+- The demo environment creation script is much more reliable, mainly due to no longer attempting concurrent operations. Still, external network/server hiccups can cause the script to fail.
+- This release removes the thrashing of workload objects in the WEC in the case where the transport controller's `max-num-wrapped` is 1.
+- This release adds reporting, in `BindingPolicy` and `Binding` status, of whether any of the referenced `StatusCollector` objects do not exist.
+- This release changes the schema for a `BindingPolicy` so that the request for sigleton status return is made/not-made independently in each `DownsyncPolicyClause` rather than once on the whole `BindingPolicySpec`. The schema for `Binding` objects is changed correspondingly. **This is a breaking change in the YAML schema for Binding[Policy] objects that request singleton status return.**
+
+### Remaining limitations in 0.26.0
+
+* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+* If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
+
 ## 0.26.0-alpha.5
 
 This release is intended to have the same functionality as 0.26.0-alpha.3 and 0.26.0-alpha.4 but test a change to the GitHub Actions workflow that makes a release; the change adds SBOM generation ([PR 2718](https://github.com/kubestellar/kubestellar/pull/2718)).
