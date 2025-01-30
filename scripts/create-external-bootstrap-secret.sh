@@ -41,8 +41,9 @@ COLOR_YAML="${COLOR_PURPLE}"
 
 # Command line arguments
 arg_cp=""
-arg_kubeconfig=""
+arg_kubeconfig="$HOME/.kube/config"
 arg_context=""
+arg_ns="default"
 arg_addr=""
 arg_verbose=false
 
@@ -52,10 +53,11 @@ display_help() {
   cat << EOF
 Usage: $0 [options]
 
---controlplane|-c <cpname> control plane name
+--controlplane|-c <name>   control plane name used to name the secret: <name>-bootstrap
+--namespace|-n <name>      namespace name where to create the secret, default is "default"
 --kubeconfig|-K <filename> use the specified kubeconfig
 --context|-C <name>        use the specified context
---address|-A <addr>        specify a replacement internal address
+--address|-A <addr>        specify a replacement internal address for the cluster
 --verbose|-V               output extra information
 --help|-h                  show this information
 -X                         enable verbose execution for debugging
@@ -87,6 +89,11 @@ while (( $# > 0 )); do
         if (( $# > 1 ));
         then { arg_addr="$2"; shift; }
         else { echo "$0: missing address value" >&2; exit 1; }
+        fi;;
+    (--namespace|-n)
+        if (( $# > 1 ));
+        then { arg_ns="$2"; shift; }
+        else { echo "$0: missing namespace name" >&2; exit 1; }
         fi;;
     (--controlplane|-c)
         if (( $# > 1 ));
@@ -129,22 +136,28 @@ if [[ -z "$arg_cp" ]] ; then
     $0 --help
     exit 1
 fi
-if [[ -z "$arg_kubeconfig" ]] ; then
-    arg_kubeconfig="$HOME/.kube/config"
-fi
 if [[ -z "$arg_context" ]] ; then
     contexts=($(kubectl --kubeconfig "$arg_kubeconfig" config get-contexts --no-headers -o name 2> /dev/null))
-    if [[ ${#contexts[@]} == 0 ]] ; then
+    case ${#contexts[@]} in
+    (0)
         echoerr "there are no contexts in the kubeconfig file!"
         $0 --help
-        exit 1
-    elif [[ ${#contexts[@]} > 1 ]] ; then
-        echoerr "there are multiple contexts in the kubeconfig file, specify one!"
-        $0 --help
-        exit 1
-    else
-        arg_context="${contexts[0]}"
-    fi
+        exit 1;;
+    (1)
+        arg_context="${contexts[0]}";;
+    (*)
+        for context in "${contexts[@]}" ; do # for all contexts
+            if [[ "$context" =~ "$arg_cp" ]] ; then
+                arg_context="$context"
+                break
+            fi
+        done
+        if [[ -z "$arg_context" ]] ; then
+            echoerr "there are multiple contexts in the kubeconfig file, specify one with \"--context\"!"
+            $0 --help
+            exit 1
+        fi;;
+    esac
 fi
 
 
@@ -167,6 +180,16 @@ fi
 ###############################################################################
 # Create secret
 ###############################################################################
-[[ $arg_verbose ]] && echo -e "Creating secret ${COLOR_YELLOW}${arg_cp}-bootstrap${COLOR_NONE} in namespace ${COLOR_YELLOW}kubeflex-system${COLOR_NONE}..."
-# kubectl create ns kubeflex-system 2> /dev/null || true
-kubectl create secret generic ${arg_cp}-bootstrap --from-file=kubeconfig-incluster=$BOOTSTRAP_KUBECONFIG # --namespace kubeflex-system
+create_ns=true
+for ns in $(kubectl get ns --no-headers -o name) ; do
+    if [[ "namespace/${arg_ns}" == "$ns" ]] ; then
+        create_ns=false
+        break
+    fi
+done
+if [[ $create_ns ]] ; then
+    [[ $arg_verbose ]] && echo -e "Creating namespace ${COLOR_YELLOW}${arg_ns}${COLOR_NONE}..."
+    kubectl create ns "$arg_ns"
+fi
+[[ $arg_verbose ]] && echo -e "Creating secret ${COLOR_YELLOW}${arg_cp}-bootstrap${COLOR_NONE} in namespace ${COLOR_YELLOW}${arg_ns}${COLOR_NONE}..."
+kubectl create secret generic ${arg_cp}-bootstrap --from-file=kubeconfig-incluster=$BOOTSTRAP_KUBECONFIG --namespace $arg_ns
