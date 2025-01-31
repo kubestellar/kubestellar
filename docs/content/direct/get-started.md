@@ -119,10 +119,8 @@ kubectl --context kind-kubeflex wait -n its1-system job.batch/its-with-clusterad
 
 ### Create and register two workload execution cluster(s)
 
- {%
-    include-markdown "example-wecs.md"
-    heading-offset=2
- %}
+{% include-markdown "direct/example-wecs.md" heading-offset=2 %}
+
 
 ### Variables for running the example scenarios.
 
