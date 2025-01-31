@@ -235,8 +235,14 @@ echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..
 : set flags to "" if you have installed KubeStellar on an OpenShift cluster
 flags="--force-internal-endpoint-lookup"
 clusters=(cluster1 cluster2);
+if ! joincmd=$(clusteradm --context its1 get token | grep '^clusteradm join')
+then echo -e "\033[0;31mX\033[0m get token failed!\n" >&2; echo "$joincmd" >&2; false
+fi
 for cluster in "${clusters[@]}"; do
-   clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${flags}'"}' | sh
+   if log=$(${joincmd/<cluster_name>/${cluster}} -v=6 --context ${cluster} --singleton ${flags} 2>&1)
+   then echo -e "\033[33m✔\033[0m clusteradm join of $cluster succeeded"
+   else echo -e "\033[0;31mX\033[0m clusteradm join of $cluster failed!" >&2; echo "$log" >&2; false
+   fi
 done
 
 echo -e "Checking that the CSR for cluster 1 and 2 appears..."
