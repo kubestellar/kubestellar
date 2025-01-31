@@ -1,0 +1,179 @@
+# Please edit the following configuration for Lima instance "kubestellar"
+# and an empty file will abort the edit.
+
+# A template to install and use a KubeStellar demo environment with Lima.
+# $ limactl start lima-kubestellar.yaml --name kubestellar --vm-type=vz --mount-type=virtiofs --cpus 6 --memory 32 --tty=false
+# $ limactl shell kubectl --context its1 get managedclusters
+
+# To access KubeStellar on the host (assumes kubectl is installed), run the following commands:
+# $ TODO - need something to interact with kubestellar from the host... maybe a kflex command?
+
+# This template requires Lima v0.8.0 or later
+images:
+# Try to use release-yyyyMMdd image if available. Note that release-yyyyMMdd will be removed after several months.
+- location: "https://cloud-images.ubuntu.com/releases/24.04/release-20241119/ubuntu-24.04-server-cloudimg-amd64.img"
+  arch: "x86_64"
+  digest: "sha256:b63f266fa4bdf146dea5b0938fceac694cb3393688fb12a048ba2fc72e7bfe1b"
+- location: "https://cloud-images.ubuntu.com/releases/24.04/release-20241119/ubuntu-24.04-server-cloudimg-arm64.img"
+  arch: "aarch64"
+  digest: "sha256:6e1f90d3e81b90202b46c3573590867e575e504af2c63dd5c9b529f174e3d793"
+# Fallback to the latest release image.
+# Hint: run `limactl prune` to invalidate the cache
+- location: "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img"
+  arch: "x86_64"
+- location: "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-arm64.img"
+  arch: "aarch64"
+
+mounts:
+- location: "~"
+- location: "/tmp/lima"
+  writable: true
+# containerd is managed by Docker, not by Lima, so the values are set to false here.
+containerd:
+  system: false
+  user: false
+provision:
+- mode: system
+  # This script defines the host.docker.internal hostname when hostResolver is disabled.
+  # It is also needed for lima 0.8.2 and earlier, which does not support hostResolver.hosts.
+  # Names defined in /etc/hosts inside the VM are not resolved inside containers when
+  # using the hostResolver; use hostResolver.hosts instead (requires lima 0.8.3 or later).
+  script: |
+    #!/bin/sh
+    sed -i 's/host.lima.internal.*/host.lima.internal host.docker.internal/' /etc/hosts
+- mode: system
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    command -v docker >/dev/null 2>&1 && exit 0
+    export DEBIAN_FRONTEND=noninteractive
+    curl -fsSL https://get.docker.com | sh
+    # NOTE: you may remove the lines below, if you prefer to use rootful docker, not rootless
+    systemctl disable --now docker
+    apt-get install -y uidmap dbus-user-session
+    echo 'fs.inotify.max_user_watches = 524288' >> /etc/sysctl.conf
+    echo 'fs.inotify.max_user_instances = 512' >> /etc/sysctl.conf
+    sysctl --system
+    snap install yq 
+    snap install kubectl --classic
+    snap install helm --classic
+    curl -s https://ocm.software/install.sh | sudo bash
+
+    # curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+    wget -q https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh
+    chmod +x install-kubeflex.sh
+    ./install-kubeflex.sh --ensure-folder /usr/local/bin --strip-bin
+- mode: user
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    systemctl --user start dbus
+    dockerd-rootless-setuptool.sh install
+    docker context use rootless
+
+    echo "Adding alias for kubectl..."
+    echo "alias k=kubectl" >> ~/.bashrc
+    source ~/.bashrc
+  
+    echo "Installing Kind..."
+    KIND_ARCH=$(uname -m)
+    case "$KIND_ARCH" in
+      x86_64) KIND_ARCH="amd64" ;;
+      aarch64) KIND_ARCH="arm64" ;;
+    esac
+
+    curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-${KIND_ARCH}
+    chmod +x ./kind
+    sudo mv ./kind /usr/local/bin/kind
+
+    curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+
+    wget -q https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/create-kubestellar-demo-env.sh
+    chmod +x create-kubestellar-demo-env.sh
+    ./create-kubestellar-demo-env.sh --platform kind
+  
+probes:
+- description: "wait for KubeFlex to be installed"
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    if ! timeout 30s bash -c "until command -v kflex >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "KubeFlex is not installed."
+      exit 1
+    fi
+- description: "wait for KubeFlex to be available"
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    if ! timeout 30s bash -c "until kubectl config use-context kind-kubeflex >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "KubeFlex is not available."
+      exit 1
+    fi
+- description: "wait for KubeStellar Core to be available"
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+
+    if ! timeout 300s bash -c "until kflex ctx --overwrite-existing-context its1 >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "KubeStellar Core is not available."
+      exit 1
+    fi
+- description: "wait for managedcluster cluster1 to be available"
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+
+    if ! timeout 300s bash -c "until kubectl --context its1 get managedclusters | grep -q cluster1 >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "managedcluster cluster1 is not available."
+      exit 1
+    fi
+
+- description: "wait for managedcluster cluster2 to be available"
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+
+    if ! timeout 300s bash -c "until kubectl --context its1 get managedclusters | grep -q cluster2 >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "managedcluster cluster2 is not available."
+      exit 1
+    fi
+
+  hint: Use "sudo tail -f /var/log/cloud-init-output.log" in the guest to see progress.
+hostResolver:
+  # hostResolver.hosts requires lima 0.8.3 or later. Names defined here will also
+  # resolve inside containers, and not just inside the VM itself.
+  hosts:
+    host.docker.internal: host.lima.internal
+portForwards:
+- guestSocket: "/run/user/{{.UID}}/docker.sock"
+  hostSocket: "{{.Dir}}/sock/docker.sock"
+message: |
+  ------
+  host_context=kind-kubeflex
+  its_cp=its1
+  its_context=its1
+  wds_cp=wds1
+  wds_context=wds1
+  wec1_name=cluster1
+  wec2_name=cluster2
+  wec1_context=$wec1_name
+  wec2_context=$wec2_name
+  label_query_both=location-group=edge
+  label_query_one=name=cluster1
+
+  To access the KubeStellar demo environment from the host, run the following commands:
+    kubectl config delete-context cluster1
+    kind export kubeconfig --name cluster1
+    kubectl config rename-context kind-cluster1 cluster1
+    kubectl config delete-context cluster2
+    kind export kubeconfig --name cluster2
+    kubectl config rename-context kind-cluster2 cluster2
+    kubectl config delete-context kind-kubeflex
+    kind export kubeconfig --name kubeflex
+    kflex ctx --set-current-for-hosting
+    kflex ctx --overwrite-existing-context wds1
+    kflex ctx --overwrite-existing-context wds2
+    kflex ctx --overwrite-existing-context its1
+  ------
+mountType: virtiofs
+vmType: vz
