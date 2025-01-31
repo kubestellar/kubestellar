@@ -72,3 +72,19 @@ Show the particulars of something going wrong.
     - KubeStellar's OCM-based transport-controller (running in the KubeFlex hosting cluster) for the WDS+ITS
     - The OCM Status Add-On Agent in the WEC.
     - OCM's klusterlet-agent in the WEC.
+
+### Use the snapshot script
+
+There is a script that is intended to capture a lot of relevant state;
+using it can help make a good trouble report.
+
+You can use a command like the following to invoke the script.
+
+```shell
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/kubestellar-snapshot.sh) -V -Y -L
+```
+
+Report the log of running the script.
+
+If the script is successful then it will create an archive file and
+tell you about it; include that file in your trouble report.
