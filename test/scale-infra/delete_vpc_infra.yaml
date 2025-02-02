@@ -4,7 +4,7 @@
   gather_facts: no
   vars:
     aws_region: "{{ region }}"
-    vpc_name:  "{{ name | default('ks_core') }}"
+    vpc_name:  "{{ name }}"
     nat: no
   tasks:
     - include_vars: ".data/{{ aws_region }}_{{ vpc_name }}_vpc_helper_vars.yaml"

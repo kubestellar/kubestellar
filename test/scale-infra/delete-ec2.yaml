@@ -3,7 +3,7 @@
   gather_facts: no
   vars:
     region: "{{ region }}"
-    group: "{{ sig_group | default('ks-nodes') }}"
+    group: "{{ sig_group }}"
     cluster_name: "{{ k8s_cluster_name | default('ks-core') }}"
   tasks:
   - name: Read instance data

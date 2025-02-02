@@ -40,6 +40,28 @@
              sudo apt-get update
              sudo apt-get install helm
 
+    # - name: Register a variable, ignore errors and continue
+    #   ansible.builtin.command: kubectl config use-context kscore
+    #   register: result
+    #   ignore_errors: true
+
+    # - name: install ingress controller
+    #   shell: |
+    #          kubectl config rename-context kubernetes-admin@kubernetes kscore
+    #          kubectl --context kscore label node --all ingress-ready="true"
+    #          kubectl --context kscore apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/release-0.25.1/example/kind-nginx-ingress-with-SSL-passthrough.yaml
+
+    - name: Delete old KS deployment
+      shell: |
+             kubectl config rename-context kubernetes-admin@kubernetes kscore --ignore-not-found
+             helm delete ks-core  --ignore-not-found
+             helm -n open-cluster-management delete status-addon  --ignore-not-found
+             kubectl --context kscore delete ns open-cluster-management-hub open-cluster-management  --ignore-not-found
+             kubectl config unset contexts.wds1 --ignore-not-found
+             kubectl --context kscore delete -f https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/release-"{{ ks_release }}"/example/kind-nginx-ingress-with-SSL-passthrough.yaml  --ignore-not-found
+      when: result is success
+
+    
     - name: Register a variable, ignore errors and continue
       ansible.builtin.command: kubectl config use-context kscore
       register: result
@@ -51,15 +73,6 @@
              kubectl --context kscore label node --all ingress-ready="true"
              kubectl --context kscore apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/release-0.25.1/example/kind-nginx-ingress-with-SSL-passthrough.yaml
 
-    - name: Delete old KS deployment
-      shell: |
-             kubectl config rename-context kubernetes-admin@kubernetes kscore --ignore-not-found
-             helm delete ks-core  --ignore-not-found
-             helm -n open-cluster-management delete status-addon  --ignore-not-found
-             kubectl --context kscore delete ns open-cluster-management-hub open-cluster-management  --ignore-not-found
-             kubectl config unset contexts.wds1 --ignore-not-found
-             kubectl --context kscore delete -f https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/release-"{{ ks_release }}"/example/kind-nginx-ingress-with-SSL-passthrough.yaml  --ignore-not-found
-      when: result is success
 
     - name: install KubeStellar using core helm-cart
       shell: |

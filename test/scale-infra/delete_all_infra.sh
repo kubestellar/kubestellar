@@ -60,21 +60,21 @@ fi
 
 if $hosts_wec_exist; then
     ## 1. Delete WECs:
-    ansible-playbook -i .data/hosts_wec delete-ec2.yaml -e "cluster_name=wec region=$region"
+    ansible-playbook -i .data/hosts_wec delete-ec2.yaml -e "cluster_name=wec region=$region group=$vpc_name"
 else
     echo "File 'hosts_wec' does not exist - skipping deletion of the WEC infrastructure"
 fi
 
 if $hosts_core_exist; then
     ## 2. Delete CORE:
-    ansible-playbook -i .data/hosts_core delete-ec2.yaml -e "cluster_name=core region=$region"
+    ansible-playbook -i .data/hosts_core delete-ec2.yaml -e "cluster_name=core region=$region group=$vpc_name"
 else
     echo "File 'hosts_core' does not exist - skipping deletion of the KS control plane hosting infrastructure"
 fi
 
 if $vpc_config_exist; then
     ## 3. Delete VPC:
-    ansible-playbook delete_vpc_infra.yaml -e "region=$region"
+    ansible-playbook delete_vpc_infra.yaml -e "region=$region name=$vpc_name"
 else
     echo "File with deployed AWS VPC configuration does not exist - skipping deletion of the VPC infrastructure"
 fi
