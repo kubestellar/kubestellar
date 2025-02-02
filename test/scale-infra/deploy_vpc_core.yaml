@@ -3,7 +3,7 @@
   gather_facts: no
   vars:
     region: "{{ region }}"
-    vpc_name:  "{{ name | default('ks_core') }}"
+    vpc_name:  "{{ name }}"
   tasks:
     - name: Gather information about all availability zones
       amazon.aws.aws_az_info:

@@ -15,21 +15,66 @@
 set -e
 
 region=""
+vpc_name=""
 
-while (( $# > 0 )); do
-    if [ "$1" == "--region" ]; then
-        region=$2
-        shift
-    fi 
+while [ $# != 0 ]; do
+    case "$1" in
+        (-h|--help) echo "$0 usage: (--region (e.g., us-east-1) | --vpc-name (e.g., kscore))*"
+                    exit;;
+        (--region)
+          if (( $# > 1 )); then
+            region="$2"
+            shift
+          else
+            echo "Missing region value" >&2
+            exit 1;
+          fi;;
+        (--vpc-name)
+          if (( $# > 1 )); then
+            vpc_name="$2"
+            shift
+          else
+            echo "Missing vpc name value" >&2
+            exit 1;
+          fi;;
+    esac
     shift
 done
 
+hosts_wec_exist=false
+hosts_core_exist=false
+vpc_config_exist=false
 
-## 1. Delete WECs:
-ansible-playbook -i .data/hosts_wec delete-ec2.yaml -e "cluster_name=wec region=$region"
+if [ -f ".data/hosts_wec" ]; then
+   hosts_wec_exist=true
+fi
 
-## 2. Delete CORE:
-ansible-playbook -i .data/hosts_core delete-ec2.yaml -e "cluster_name=core region=$region"
+if [ -f ".data/hosts_core" ]; then
+   hosts_core_exist=true
+fi
 
-## 3. Delete VPC:
-ansible-playbook delete_vpc_infra.yaml -e "region=$region"
+if [ -f ".data/"$region_$vpc_name"_vpc_helper_vars.yaml" ]; then
+   vpc_config_exist=true
+fi
+
+
+if $hosts_wec_exist; then
+    ## 1. Delete WECs:
+    ansible-playbook -i .data/hosts_wec delete-ec2.yaml -e "cluster_name=wec region=$region"
+else
+    echo "File 'hosts_wec' does not exist - skipping deletion of the WEC infrastructure"
+fi
+
+if $hosts_core_exist; then
+    ## 2. Delete CORE:
+    ansible-playbook -i .data/hosts_core delete-ec2.yaml -e "cluster_name=core region=$region"
+else
+    echo "File 'hosts_core' does not exist - skipping deletion of the KS control plane hosting infrastructure"
+fi
+
+if $vpc_config_exist; then
+    ## 3. Delete VPC:
+    ansible-playbook delete_vpc_infra.yaml -e "region=$region"
+else
+    echo "File with deployed AWS VPC configuration does not exist - skipping deletion of the VPC infrastructure"
+fi

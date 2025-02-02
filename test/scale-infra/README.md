@@ -28,10 +28,12 @@ Starting from a local directory containing the git repo, do the following:
 
     ```
     cd test/scale-infra
-    ./deploy_ks_cp_infra.sh --region us-east-2 --vpc_name ks-core --k8s_num_masters 1 --k8s_num_workers 2 --instances_type t2.xlarge   --aws_key_name mykey  --arch x86_64 --ec2_image_id <ami-xyz> --ks_release 0.25.1
+    ./deploy_ks_cp_infra.sh --region us-east-2 --vpc-name ks-core --k8s-num-masters 1 --k8s-num-workers 2 --instances_type t2.xlarge --aws-key-name mykey  --arch x86_64 --ec2-image-id <aws-ami> --ks-release 0.25.1
     ```
 
-    The above command creates the required AWS infrastructure including a VPC, security groups and EC2 instances. Then, it creates a Kubernetes cluster deployed using Kubeadm. Lastly, it deploys the KubeStellar core components. You can use the flag `--ks_release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/main/core-chart) configured with a ITS of type host. 
+    The above command creates the required AWS infrastructure including a VPC, security groups and EC2 instances. Then, it creates a Kubernetes cluster deployed using Kubeadm. Lastly, it deploys the KubeStellar core components. You can use the flag `--ks-release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/main/core-chart) configured with a ITS of type host. 
+
+    You can also use the flag `--vpc-name` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *we strongly recommend to use your name or AWS IAM user ID*.
 
     Upon completion of the script's execution, an Ansible inventory file containing the IP addresses of the nodes that constitute the Kubernetes cluster will be generated at the current directory at `.data/hosts_core`.
 
@@ -39,10 +41,10 @@ Starting from a local directory containing the git repo, do the following:
 2. Create WEC hosting instances:
 
     ```
-    ./deploy_wec_infra.sh --region us-east-2 --vpc_name ks-core --wecs_hosting_instances 1 --instance_type t2.2xlarge --aws_key_name  mykey  --arch x86_64 --ec2_image_id <ami-xyz>
+    ./deploy_wec_infra.sh --region us-east-2 --vpc_name ks-core --wecs_hosting_instances 1 --instance_type t2.2xlarge --aws_key_name  mykey  --arch x86_64 --ec2_image_id <aws-ami>
     ```
 
-    Use the flag `--wecs_hosting_instances` to specify the number of ec2 instances to be created to host the WECs. You must create the WEC hosting instances in the same region as the KS control plane hosting infra created a step 1 - multiple regions deployment is not supported at the moment.  
+    Use the flag `--wecs-hosting-instances` to specify the number of ec2 instances to be created to host the WECs. You must create the WEC hosting instances in the same region as the KS control plane hosting infra created a step 1 - multiple regions deployment is not supported at the moment.  
 
     Upon completion of the script's execution, an Ansible inventory file containing the IP addresses of the ec2 WEC hosting instances will be generated in the present directory at `.data/hosts_wec`.
 
@@ -83,7 +85,7 @@ Starting from a local directory containing the git repo, do the following:
 4. Destroy the infrastructure.
 
     ```
-    ./delete_all_infra.sh  --region us-east-2
+    ./delete_all_infra.sh  --region us-east-2 --vpc-name <name>
     ```
 
     As an alternative to this quick start, a step-by-step bootstrapping of all the components can be done by following the instructions [here](INSTRUCTIONS.md).

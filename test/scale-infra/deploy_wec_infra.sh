@@ -16,42 +16,78 @@ set -e
 
 region=""
 aws_key_name=""
-num_workers=""
+num_hosts=""
 instance_type=""
 archt='x86_64' # e.g., x86_64 and arm64
 num_wecs=1
 ec2_image_id=""
 vpc_name=""
 
-while (( $# > 0 )); do
-    if [ "$1" == "--region" ]; then
-        region=$2
-        shift
-    elif [ "$1" == "--vpc_name" ]; then
-        vpc_name=$2
-        shift
-    elif [ "$1" == "--aws_key_name" ]; then
-        aws_key_name=$2
-        shift
-    elif [ "$1" == "--wecs_hosting_instances" ]; then
-        num_hosts=$2
-        shift
-    elif [ "$1" == "--instance_type" ]; then
-        instance_type=$2
-        shift
-    elif [ "$1" == "--ec2_image_id" ]; then
-        ec2_image_id=$2
-        shift
-    elif [ "$1" == "--archt" ]; then
-        archt=$2
-        shift
-    fi 
+
+while [ $# != 0 ]; do
+    case "$1" in
+        (-h|--help) echo "$0 usage: (--region | --vpc-name | --aws-key-name | --wecs-hosting-instances | --instances-type | --ec2-image-id | --arch )*"
+                    exit;;
+        (--region)
+          if (( $# > 1 )); then
+            region="$2"
+            shift
+          else
+            echo "Missing region value" >&2
+            exit 1;
+          fi;;
+        (--vpc-name)
+          if (( $# > 1 )); then
+            vpc_name="$2"
+            shift
+          else
+            echo "Missing vpc name value" >&2
+            exit 1;
+          fi;;
+        (--aws-key-name)
+          if (( $# > 1 )); then
+            aws_key_name="$2"
+            shift
+          else
+            echo "Missing aws key name value" >&2
+            exit 1;
+          fi;;
+        (--wecs-hosting-instances)
+          if (( $# > 1 )); then
+            num_hosts="$2"
+            shift
+          else
+            echo "Missing number of k8s masters node value" >&2
+            exit 1;
+          fi;;
+        (--instances-type)
+          if (( $# > 1 )); then
+            instance_type="$2"
+            shift
+          else
+            echo "Missing instance type value" >&2
+            exit 1;
+          fi;;
+        (--ec2-image-id)
+          if (( $# > 1 )); then
+            ec2_image_id="$2"
+            shift
+          else
+            echo "Missing ec2 image id value" >&2
+            exit 1;
+          fi;;
+        (--arch)
+          if (( $# > 1 )); then
+            archt="$2"
+            shift
+          else
+            echo "Missing arch value" >&2
+            exit 1;
+          fi;;
+    esac
     shift
 done
 
-
-## 1. Create EC2 instances:
-#ansible-playbook create-ec2.yaml -e "cluster_name=wec region=$region aws_key_name=$aws_key_name  wecs_hosting_instances=$num_hosts instance_type=$instance_type archt=$archt image_source=ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20240423" 
-
+## Create EC2 instances:
 ansible-playbook create-ec2.yaml -e "cluster_name=wec region=$region name=$vpc_name aws_key_name=$aws_key_name  wecs_hosting_instances=$num_hosts instance_type=$instance_type arch=$arch ec2_image=$ec2_image_id" 
 

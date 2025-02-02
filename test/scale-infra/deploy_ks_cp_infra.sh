@@ -19,40 +19,89 @@ aws_key_name=""
 num_masters=""
 num_workers=""
 instance_type=""
-ks_release="0.24.0"
+ks_release=""
 archt='x86_64' # e.g., x86_64 and arm64
 ec2_image_id=""
 vpc_name=""
 
-while (( $# > 0 )); do
-    if [ "$1" == "--region" ]; then
-        region=$2
-        shift
-    elif [ "$1" == "--vpc_name" ]; then
-        vpc_name=$2
-        shift
-    elif [ "$1" == "--aws_key_name" ]; then
-        aws_key_name=$2
-        shift
-    elif [ "$1" == "--k8s_num_masters" ]; then
-        num_masters=$2
-        shift
-    elif [ "$1" == "--k8s_num_workers" ]; then
-        num_workers=$2
-        shift
-    elif [ "$1" == "--instances_type" ]; then
-        instance_type=$2
-        shift
-    elif [ "$1" == "--ec2_image_id" ]; then
-        ec2_image_id=$2
-        shift
-    elif [ "$1" == "--arch" ]; then
-        arch=$2
-        shift
-    elif [ "$1" == "--ks_release" ]; then
-        ks_release=$2
-        shift
-    fi 
+
+while [ $# != 0 ]; do
+    case "$1" in
+        (-h|--help) echo "$0 usage: (--region | --vpc-name | --aws-key-name | --k8s-num-masters |  --k8s-num-workers |  --instances-type | --ec2-image-id | --arch |  --ks-release)*"
+                    exit;;
+        (--region)
+          if (( $# > 1 )); then
+            region="$2"
+            shift
+          else
+            echo "Missing region value" >&2
+            exit 1;
+          fi;;
+        (--vpc-name)
+          if (( $# > 1 )); then
+            vpc_name="$2"
+            shift
+          else
+            echo "Missing vpc name value" >&2
+            exit 1;
+          fi;;
+        (--aws-key-name)
+          if (( $# > 1 )); then
+            aws_key_name="$2"
+            shift
+          else
+            echo "Missing aws key name value" >&2
+            exit 1;
+          fi;;
+        (--k8s-num-masters)
+          if (( $# > 1 )); then
+            num_masters="$2"
+            shift
+          else
+            echo "Missing number of k8s masters node value" >&2
+            exit 1;
+          fi;;
+        (--k8s-num-workers)
+          if (( $# > 1 )); then
+            num_workers="$2"
+            shift
+          else
+            echo "Missing number of k8s workers node value" >&2
+            exit 1;
+          fi;;
+        (--instances-type)
+          if (( $# > 1 )); then
+            instance_type="$2"
+            shift
+          else
+            echo "Missing instance type value" >&2
+            exit 1;
+          fi;;
+        (--ec2-image-id)
+          if (( $# > 1 )); then
+            ec2_image_id="$2"
+            shift
+          else
+            echo "Missing ec2 image id value" >&2
+            exit 1;
+          fi;;
+        (--arch)
+          if (( $# > 1 )); then
+            archt="$2"
+            shift
+          else
+            echo "Missing arch value" >&2
+            exit 1;
+          fi;;
+        (--ks-release)
+          if (( $# > 1 )); then
+            ks_releas="$2"
+            shift
+          else
+            echo "Missing ks release value" >&2
+            exit 1;
+          fi;;
+    esac
     shift
 done
 
@@ -60,7 +109,7 @@ done
 ansible-playbook deploy_vpc_core.yaml -e "name=$vpc_name region=$region"
 
 # 2. Deploy instances:
-ansible-playbook create-ec2.yaml -e "cluster_name=core region=$region name=$vpc_name aws_key_name=$aws_key_name  num_masters=$num_masters num_workers=$num_workers instance_type=$instance_type arch=$arch ec2_image=$ec2_image_id" 
+ansible-playbook create-ec2.yaml -e "cluster_name=core region=$region vpc_name=$vpc_name aws_key_name=$aws_key_name  num_masters=$num_masters num_workers=$num_workers instance_type=$instance_type arch=$arch ec2_image=$ec2_image_id" 
 
 # 3. Install k8s:
 ansible-playbook -i .data/hosts_core deploy-masters.yaml --ssh-common-args='-o StrictHostKeyChecking=no'
