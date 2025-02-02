@@ -8,7 +8,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     ansible-playbook deploy_vpc_core.yaml -e "region=us-east-2 name=<your-name>"
     ansible-playbook create-ec2.yaml -e "cluster_name=core region=us-east-2 vpc_name=name=<vpc_name> aws_key_name=mykey  num_masters=1 num_workers=2 instance_type=t2.xlarge arch=x86_64 ec2_image='<your-aws-ami>'"
     ```
-    
+
     Use the flag `--vpc-name` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *We highly advise utilizing your name or the AWS IAM user ID as the identifier for your VPC*. Furthermore, use the flag `--aws-ami` to specify the [Amazon machine image ID](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html), keeping in mind that it is region-specific.
 
     Upon completion of the script's execution, an Ansible inventory file containing the IP addresses of the master and worker nodes will be generated in the present directory at `.data/hosts_core`.
@@ -31,7 +31,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 4. Create the WEC hosting instances:
 
     ```bash
-    ansible-playbook create-ec2.yaml -e "cluster_name=wec region=us-east-2 vpc_name=name=<vpc_name> aws_key_name=mykey wecs_hosting_instances=1 instance_type=t2.xlarge archt=x86_64 image_source=ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20240423 ec2_image='<your-aws-ami>" 
+    ansible-playbook create-ec2.yaml -e "cluster_name=wec region=us-east-2 vpc_name=name=<vpc_name> aws_key_name=mykey wecs_hosting_instances=1 instance_type=t2.xlarge archt=x86_64 ec2_image='<your-aws-ami>" 
     ```
 
     Use the flag `--wecs_hosting_instances` to specify the number of ec2 instances to be created to host WEC kind clusters.
