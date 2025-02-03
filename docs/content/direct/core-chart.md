@@ -111,14 +111,14 @@ The third section of the `values.yaml` file allows one to create a list of Inven
 ```yaml
 ITSes: # all the CPs in this list will execute the its.yaml PCH
   - name: <its1>          # mandatory name of the control plane
-    type: <vcluster|host|external> # optional type of control plane host, vcluster, or external (default to vcluster, if not specified)
+    type: <vcluster|host|external> # optional type of control plane: host, vcluster, or external (default to vcluster, if not specified)
     install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
     bootstrapSecret: # this section is ignored unless type is "external"
       name: <secret-name> # default: "<control-plane-name>-bootstrap"
       namespace: <secret-namespace> # default: "default"
       key: <key-name> # default: "kubeconfig-incluster"
   - name: <its2>          # mandatory name of the control plane
-    type: <vcluster|host|external> # optional type of control plane host, vcluster, or external (default to vcluster, if not specified)
+    type: <vcluster|host|external> # optional type of control plane: host, vcluster, or external (default to vcluster, if not specified)
     install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
     bootstrapSecret: # this section is ignored unless type is "external"
       name: <secret-name> # default: "<control-plane-name>-bootstrap"
@@ -129,7 +129,7 @@ ITSes: # all the CPs in this list will execute the its.yaml PCH
 
 where `name` must specify a name unique among all the control planes in that KubeFlex deployment, the optional `type` can be vcluster (default), host, or external, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information, and the optional `install_clusteradm`can be either true (default) or false to enable or disable the installation of OCM in the control plane.
 
-When the ITS `type` is `external`, the `bootstrapSecret` sub-section can be used to indicate the bootstrap secret used by KubeFlex to connect to the external cluster. Specifically, it can be sued to indicate any of the optional values for the name of the secret, the namespace containing the secret, and the name of the key containg the kubeconfig of the external cluster.
+When the ITS `type` is `external`, the `bootstrapSecret` sub-section can be used to indicate the bootstrap secret used by KubeFlex to connect to the external cluster. Specifically, it can be used to indicate any of the optional values for the name of the secret, the namespace containing the secret, and the name of the key containg the kubeconfig of the external cluster.
 
 If the secret was created using the [create-external-bootstrap-secret.sh](../../../scripts/create-external-bootstrap-secret.sh) script and the value passed to the argument `--controlplane` matches the name of the Control Plane specified by the Helm chart, then the sub-section `bootstrapSecret` is not required because all default values will identify the bootstrap secret created by the script. More specifically, if an external kind cluster was created with the command `kind create cluster --name its1` and the `create-external-bootstrap-secret.sh --controlplane its1 --verbose` command was used to create the bootstrap secret, then it would be enough to inform the Helm chart with `--set-json='ITSes=[{"name":"its1","type":"external"}]'`.
 

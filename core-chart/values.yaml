@@ -79,10 +79,10 @@ transport_controller:
 # The optional boolean flag install_clusteradm can be used to determine if OCM should be installed in the CP.
 ITSes: # all the CPs in this list will execute the its.yaml PCH
   # - name: its1 # name of the control plane
-  #   type: host # optional type of control plane host, vcluster, or external (default to vcluster, if not specified)
+  #   type: host # optional type of control plane: host, vcluster, or external (default to vcluster, if not specified)
   #   install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
   # - name: its2 # name of the control plane
-  #   type: host # optional type of control plane host, vcluster, or external (default to vcluster, if not specified)
+  #   type: host # optional type of control plane: host, vcluster, or external (default to vcluster, if not specified)
   #   install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
 
 

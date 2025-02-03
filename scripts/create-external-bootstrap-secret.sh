@@ -164,7 +164,7 @@ fi
 ###############################################################################
 # Extract the external context
 ###############################################################################
-[[ $arg_verbose ]] && echo -e "Extracting context ${COLOR_YELLOW}$arg_context${COLOR_NONE} from kubeconfig ${COLOR_YELLOW}$arg_kubeconfig${COLOR_NONE}..."
+[[ $arg_verbose == true ]] && echo -e "Extracting context ${COLOR_YELLOW}$arg_context${COLOR_NONE} from kubeconfig ${COLOR_YELLOW}$arg_kubeconfig${COLOR_NONE}..."
 kubectl --kubeconfig=$arg_kubeconfig config view --minify --flatten --context=$arg_context > $BOOTSTRAP_KUBECONFIG
 
 
@@ -172,7 +172,7 @@ kubectl --kubeconfig=$arg_kubeconfig config view --minify --flatten --context=$a
 # Replace address if necessary
 ###############################################################################
 if [[ -n "$arg_addr" ]] ; then
-    [[ $arg_verbose ]] && echo -e "Setting server internal address to ${COLOR_YELLOW}$arg_addr${COLOR_NONE}..."
+    [[ $arg_verbos == true ]] && echo -e "Setting server internal address to ${COLOR_YELLOW}$arg_addr${COLOR_NONE}..."
     kubectl --kubeconfig=$BOOTSTRAP_KUBECONFIG config set-cluster $(kubectl --kubeconfig=$BOOTSTRAP_KUBECONFIG config current-context) --server=$arg_addr > /dev/null
 fi
 
@@ -187,9 +187,9 @@ for ns in $(kubectl get ns --no-headers -o name) ; do
         break
     fi
 done
-if [[ $create_ns ]] ; then
-    [[ $arg_verbose ]] && echo -e "Creating namespace ${COLOR_YELLOW}${arg_ns}${COLOR_NONE}..."
+if [[ $create_ns == true ]] ; then
+    [[ $arg_verbose == true ]] && echo -e "Creating namespace ${COLOR_YELLOW}${arg_ns}${COLOR_NONE}..."
     kubectl create ns "$arg_ns"
 fi
-[[ $arg_verbose ]] && echo -e "Creating secret ${COLOR_YELLOW}${arg_cp}-bootstrap${COLOR_NONE} in namespace ${COLOR_YELLOW}${arg_ns}${COLOR_NONE}..."
+[[ $arg_verbose == true ]] && echo -e "Creating secret ${COLOR_YELLOW}${arg_cp}-bootstrap${COLOR_NONE} in namespace ${COLOR_YELLOW}${arg_ns}${COLOR_NONE}..."
 kubectl create secret generic ${arg_cp}-bootstrap --from-file=kubeconfig-incluster=$BOOTSTRAP_KUBECONFIG --namespace $arg_ns
