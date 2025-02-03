@@ -28,7 +28,7 @@ Starting from a local directory containing the git repo, do the following:
 
     ```
     cd test/scale-infra
-    ./deploy_ks_cp_infra.sh --region us-east-2 --vpc-name <your-name> --k8s-num-masters 1 --k8s-num-workers 2 (--instances-type t2.xlarge --aws-key-name mykey  --arch x86_64 --ec2-image-id <aws-ami> --ks-release 0.25.1
+    ./deploy_ks_cp_infra.sh --region us-east-2 --vpc-name <aws-iam-user> --k8s-num-masters 1 --k8s-num-workers 2 (--instances-type t2.xlarge --aws-key-name mykey  --arch x86_64 --ec2-image-id <aws-ami> --ks-release 0.25.1
     ```
 
     The above command creates the required AWS infrastructure including a VPC, security groups and EC2 instances. Then, it creates a Kubernetes cluster deployed using Kubeadm. Lastly, it deploys the KubeStellar core components. You can use the flag `--ks-release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/main/core-chart) configured with a ITS of type host. 
@@ -41,7 +41,7 @@ Starting from a local directory containing the git repo, do the following:
 2. Create WEC hosting instances:
 
     ```
-    ./deploy_wec_infra.sh --region us-east-2 --vpc_name ks-core --wecs_hosting_instances 1 (--instances-type t2.2xlarge --aws_key_name  mykey  --arch x86_64 --ec2_image_id <aws-ami>
+    ./deploy_wec_infra.sh --region us-east-2 --vpc_name <aws-iam-user> --wecs_hosting_instances 1 --instances-type t2.2xlarge --aws_key_name  mykey  --arch x86_64 --ec2_image_id <aws-ami>
     ```
 
     Use the flag `--wecs-hosting-instances` to specify the number of ec2 instances to be created to host the WECs. You must create the WEC hosting instances in the same region as the KS control plane hosting infra created a step 1 - multiple regions deployment is not supported at the moment.  
