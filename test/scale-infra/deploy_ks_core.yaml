@@ -40,16 +40,10 @@
              sudo apt-get update
              sudo apt-get install helm
 
-    # - name: Register a variable, ignore errors and continue
-    #   ansible.builtin.command: kubectl config use-context kscore
-    #   register: result
-    #   ignore_errors: true
-
-    # - name: install ingress controller
-    #   shell: |
-    #          kubectl config rename-context kubernetes-admin@kubernetes kscore
-    #          kubectl --context kscore label node --all ingress-ready="true"
-    #          kubectl --context kscore apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/release-0.25.1/example/kind-nginx-ingress-with-SSL-passthrough.yaml
+    - name: Register a variable, ignore errors and continue
+      ansible.builtin.command: kubectl config use-context kscore
+      register: result
+      ignore_errors: true
 
     - name: Delete old KS deployment
       shell: |
@@ -61,17 +55,20 @@
              kubectl --context kscore delete -f https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/release-"{{ ks_release }}"/example/kind-nginx-ingress-with-SSL-passthrough.yaml  --ignore-not-found
       when: result is success
 
-    
-    - name: Register a variable, ignore errors and continue
-      ansible.builtin.command: kubectl config use-context kscore
-      register: result
-      ignore_errors: true
 
     - name: install ingress controller
       shell: |
              kubectl config rename-context kubernetes-admin@kubernetes kscore
              kubectl --context kscore label node --all ingress-ready="true"
-             kubectl --context kscore apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/release-0.25.1/example/kind-nginx-ingress-with-SSL-passthrough.yaml
+             kubectl --context kscore apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.0/deploy/static/provider/kind/deploy.yaml
+
+    - name: patching nginx ingress to enable SSL passthrough
+      shell: |
+             kubectl --context kscore patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","args":["/nginx-ingress-controller","--election-id=ingress-nginx-leader","--controller-class=k8s.io/ingress-nginx","--ingress-class=nginx","--configmap=$(POD_NAMESPACE)/ingress-nginx-controller","--validating-webhook=:8443","--validating-webhook-certificate=/usr/local/certificates/cert","--validating-webhook-key=/usr/local/certificates/key","--watch-ingress-without-class=true","--publish-status-address=localhost","--enable-ssl-passthrough"]}]}}}}'
+             
+    - name: extract the port number for the ingress controller
+      shell: kubectl --context kscore -n ingress-nginx get svc ingress-nginx-controller -o=jsonpath='{.spec.ports[1].nodePort}'
+      register: ingress_port
 
 
     - name: install KubeStellar using core helm-cart
@@ -81,31 +78,27 @@
              --version $KUBESTELLAR_VERSION \
              --set-json='ITSes=[{"name":"its1","type":"host"}]' \
              --set-json='WDSes=[{"name":"wds1"}]' \
-             --set-json='verbosity.default=5'
+             --set-json='verbosity.default=5' \
+             --set kubeflex-operator.externalPort={{ ingress_port.stdout }}
+
 
     - name: Get kubeconfig "context" for wds1 space
       shell: |
              kflex ctx wds1
 
-    - name: update wds1 space with the correct port for the ingress controller
-      shell: kubectl --context kscore -n ingress-nginx get svc ingress-nginx-controller -o=jsonpath='{.spec.ports[1].nodePort}'
-      register: ingress_port
+    # - name: update wds1 space with the correct port for the ingress controller
+    #   shell: kubectl --context kscore -n ingress-nginx get svc ingress-nginx-controller -o=jsonpath='{.spec.ports[1].nodePort}'
+    #   register: ingress_port
 
     # - name: Debugging message
     #   ansible.builtin.debug:
     #    msg: "{{ ingress_port.stdout }}"
 
-    - name: Replace old hostname with new hostname (requires Ansible >= 2.4)
-      ansible.builtin.replace:
-        path: /root/.kube/config
-        regexp: '(\s+)https://wds1\.localtest\.me:9443(\s+.*)?$'
-        replace: '\1https://wds1.localtest.me:{{ ingress_port.stdout }}\2'
-
-
-    - name: Sleep for 30 seconds and continue with play
-      ansible.builtin.wait_for:
-        timeout: 30
-      delegate_to: localhost
+    # - name: Replace old hostname with new hostname (requires Ansible >= 2.4)
+    #   ansible.builtin.replace:
+    #     path: /root/.kube/config
+    #     regexp: '(\s+)https://wds1\.localtest\.me:9443(\s+.*)?$'
+    #     replace: '\1https://wds1.localtest.me:{{ ingress_port.stdout }}\2'
 
     - name: Get the token to register managed clusters
       shell: clusteradm --context kscore get token | grep '^clusteradm join'

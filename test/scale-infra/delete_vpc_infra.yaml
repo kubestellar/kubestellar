@@ -76,5 +76,8 @@
 
     - name: Remove deletion helper file
       ansible.builtin.file:
-        path: ".data/{{ aws_region }}_core_vpc_helper_vars.yaml"
+        path: "{{ item }}"
         state: absent
+      with_items:
+        - ".data/{{ region }}_{{ vpc_name }}_vpc_helper_vars.yaml"
+        - ".data/admin.conf"

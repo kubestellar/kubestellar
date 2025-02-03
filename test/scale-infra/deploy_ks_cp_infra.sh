@@ -95,7 +95,7 @@ while [ $# != 0 ]; do
           fi;;
         (--ks-release)
           if (( $# > 1 )); then
-            ks_releas="$2"
+            ks_release="$2"
             shift
           else
             echo "Missing ks release value" >&2
@@ -109,7 +109,7 @@ done
 ansible-playbook deploy_vpc_core.yaml -e "name=$vpc_name region=$region"
 
 # 2. Deploy instances:
-ansible-playbook create-ec2.yaml -e "cluster_name=core region=$region vpc_name=$vpc_name aws_key_name=$aws_key_name  num_masters=$num_masters num_workers=$num_workers instance_type=$instance_type arch=$arch ec2_image=$ec2_image_id" 
+ansible-playbook create-ec2.yaml -e "cluster_name=core region=$region vpc_name=$vpc_name aws_key_name=$aws_key_name  num_masters=$num_masters num_workers=$num_workers ec2_type=$instance_type ec2_arch=$arch ec2_image=$ec2_image_id" 
 
 # 3. Install k8s:
 ansible-playbook -i .data/hosts_core deploy-masters.yaml --ssh-common-args='-o StrictHostKeyChecking=no'
