@@ -1,0 +1,71 @@
+---
+- name: Wait for target connection to become reachable/usable
+  wait_for_connection:
+  
+- name: disable swap
+  shell: |
+         sudo swapoff -a
+         sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+- name: add & configure kernel parameters
+  shell: |
+         sudo tee /etc/modules-load.d/containerd.conf <<EOF
+         overlay
+         br_netfilter
+         EOF
+         sudo modprobe overlay
+         sudo modprobe br_netfilter
+         sudo modprobe overlay
+         sudo modprobe br_netfilter
+         sudo tee /etc/sysctl.d/kubernetes.conf <<EOT
+         net.bridge.bridge-nf-call-ip6tables = 1
+         net.bridge.bridge-nf-call-iptables = 1
+         net.ipv4.ip_forward = 1
+         EOT
+         sudo sysctl --system
+
+
+- name: Install Containerd Runtime
+  shell: |
+         sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+         sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg
+         sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+         sudo apt update
+         sudo apt install -y containerd.io
+         containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+         sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+         sudo systemctl restart containerd
+         sudo systemctl enable containerd
+
+
+- name: install and configure dependencies
+  shell: |
+         sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+         curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+- name: Create kubernetes repo file
+  file:
+   path: "/etc/apt/sources.list.d/kubernetes.list"
+   state: "touch"
+- name: Add K8s Source
+  blockinfile:
+   path: "/etc/apt/sources.list.d/kubernetes.list"
+   block: |
+         deb https://apt.kubernetes.io/ kubernetes-xenial main
+
+- name: Add Software Repositories
+  shell: |
+         echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+- name: install kubernetes
+  shell: |
+         sudo apt-get update
+         sudo apt-get install -y kubelet kubeadm kubectl
+         sudo apt-mark hold kubelet kubeadm kubectl
+
+- name: Update the Kubelet configuration
+  shell: |
+         sudo sed -i '3 i\Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=cgroupfs"' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+         sudo sed -i '/$KUBELET_KUBECONFIG_ARGS/s/$/ $KUBELET_CGROUP_ARGS/' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+         sudo systemctl daemon-reload
+         sudo systemctl restart kubelet
