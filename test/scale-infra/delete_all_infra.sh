@@ -53,7 +53,7 @@ if [ -f ".data/hosts_core" ]; then
    hosts_core_exist=true
 fi
 
-if [ -f ".data/"$region_$vpc_name"_vpc_helper_vars.yaml" ]; then
+if [ -f ".data/${region}_${vpc_name}_vpc_helper_vars.yaml" ]; then
    vpc_config_exist=true
 fi
 
