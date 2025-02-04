@@ -205,10 +205,15 @@ extra:
             using our <a href="https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
 
 plugins:
-  # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
-  # Greater control over how navigation links are shown
-  - awesome-pages
-  # apidoc
+  - i18n:
+      default_language: en
+      languages:
+        en: "English"
+        fr: "Français"
+
+
+
+  # apidocs
   # - mkdocs-apidoc
   # Docs site search
   - search
@@ -221,11 +226,7 @@ plugins:
       include_dir: 'overrides'
       module_name: 'main'
   # Configure multiple language support
-  - i18n:
-      default_language: en
-      languages:
-        en:
-          name: English
+
   # - redirects:
   #       redirect_maps:
   #           'docs': 'docs/Coding%20Milestones/PoC2023q1/outline/'
