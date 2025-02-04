@@ -1,41 +1,34 @@
-### Testing a KubeStellar documentation PR
+# Testing a KubeStellar documentation PR
 
 If a contributor has _**not**_ created a sharable preview of a documentation PR [as documented in the documents management overview](document-management.md#serving-up-documents-globally-from-a-fork-of-the-repository-via-github) , here are the steps to checkout a git pull request for local testing.
 
-**STEP-1: Checkout the Pull Request**
+## STEP 1: Checkout the Pull Request**
 
 Helpers: [GitHub](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally), [DevOpsCube](https://devopscube.com/checkout-git-pull-request/)
 
-#### 1.1 Use the pull request number to fetch origin (note: be sure to check out the right branch!)
+Following is one approach to checking out the branch that a PR asks to merge. Alternatively you could use any other technique that accomplishes the same thing.
 
-&nbsp;&nbsp;&nbsp;&nbsp;Fetch the reference to the pull request based on its ID number, creating a new branch locally. Replace ID with your PR # and BRANCH_NAME with the desired branch name.
+### 1.1 Use `git fetch` to get a local copy of the PR's branch (note: be sure to check out the right PR!)
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```git fetch origin pull/ID/head:BRANCH_NAME```  
+Fetch the reference to the pull request based on its ID number, creating a new branch locally. Replace ID with your PR # and BRANCH_NAME with the desired branch name. The branch name will be used only in your local workspace; you can pick anything you like.
 
-#### 1.2 Switch to the new branch
+The following command assumes that your local workspace has a "git remote" named "upstream" that refers to the shared repository at `github.com/kubestellar/kubestellar`.
 
-&nbsp;&nbsp;&nbsp;Checkout the BRANCH_NAME where you have all the changes from the pull request.
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```git switch BRANCH_NAME```  
-
-&nbsp;&nbsp;&nbsp;&nbsp;At this point, you can do anything you want with this branch. You can run some local tests, or merge other branches into the branch.
-
-**STEP-2: Test and Build the Documentation (optional)**
-
-&nbsp;&nbsp;&nbsp;&nbsp;Use this procedure if you want to view and modify the documentation in the branch you have checked out.
-
-Helpers: [KubeStellar/docs](https://github.com/kubestellar/kubestellar/tree/main/docs), [MkDocs](https://www.mkdocs.org/user-guide/installation/)
-
-#### 2.1 Install MkDocs and its requirements
-
-```
-  cd docs
-  pip install mkdocs
-  pip install -r requirements.txt  
+```shell
+git fetch upstream pull/ID/head:BRANCH_NAME
 ```
 
-#### 2.2 Build and view the documentation
+### 1.2 Switch to the new branch
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```mkdocs serve```
+Checkout the BRANCH_NAME where you have all the changes from the pull request.
 
-&nbsp;&nbsp;&nbsp;&nbsp;Next, open a browser to [http://127.0.0.1:8000](http://127.0.0.1:8000) and review the changes.
+```shell
+git checkout BRANCH_NAME
+```
+
+At this point, you can do anything you want with this branch. You can run some local tests, or merge other branches into the branch.
+
+## STEP 2: Test and Build the Documentation (optional)**
+
+See [Serving up documents locally](document-management.md#serving-up-documents-locally) for how
+to view and modify the documentation in the branch that you have checked out.
