@@ -205,8 +205,6 @@ extra:
             using our <a href="https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
 
 plugins:
-  - search
-  - macros
   - i18n:
       default_language: en
       languages:
