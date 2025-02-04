@@ -1,0 +1,4002 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/fr/direct/example-scenarios/">
+      
+      
+        <link rel="prev" href="../combined-status/">
+      
+      
+        <link rel="next" href="../argo-to-wds1/">
+      
+      
+      <link rel="icon" href="../../../favicons/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.2">
+    
+    
+      
+        <title>Example Scenarios - KubeStellar</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.d7758b05.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=SapceMono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"SapceMono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/kubestellar.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-SR5TD1CXY7"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-SR5TD1CXY7",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-SR5TD1CXY7",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  <meta name="google-site-verification" content="QZFIkG95fMxODWgQDK2OUn73HUIu9fZmuTer-ZA4UwI" />
+
+  <!-- Determine title -->
+  
+  
+    
+  
+
+  <!-- The image needs to have an absolute URL -->
+  
+
+  <!-- Open graph meta tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="KubeStellar - Example Scenarios" />
+  <meta property="og:description" content="None" />
+  <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/fr/direct/example-scenarios/" />
+  <meta property="og:image" content="https://docs.kubestellar.io/unreleased-developmentassets/images/illustrations/banner.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1080" />
+  <meta property="og:image:height" content="568" />
+
+  <!-- google-site-verification meta-tag -->
+  <meta name="google-site-verification" content="-Rj8YMCn9uu5IwOFdC-WfAzXp4ZOMJtYKxU40ZgcJIU" />
+
+<!-- Extra stylesheets -->
+<!--  <link
+    rel="stylesheet"
+    href="../../../assets/stylesheets/overrides.css"
+  />-->
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#kubestellar-example-scenarios" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+              <button class="md-banner__button md-icon" aria-label="Don't show this again">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+              </button>
+            
+            
+  <!-- Extra stylesing -->
+  <style>
+      .md-announce a,
+      .md-announce a:focus,
+      .md-announce a:hover{color:currentColor}.md-announce
+      strong{white-space:nowrap}.md-announce
+  </style>
+
+<!--   
+  <a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
+  <p style="color: #D5EE1C">For updates follow <strong style="color: #D5EE1C">@kubestellar</strong> on
+    <strong style="color: white">LinkedIn</strong>
+  </p>
+</a> 
+-->
+
+<a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
+  <p style="color: #D5EE1C">KubeStellar is now a <strong style="color: #D5EE1C">Cloud Native Computing Foundation (CNCF) Sandbox Project</strong>. Follow us <strong style="color: #D5EE1C">@kubestellar</strong> on
+    <strong style="color: white">LinkedIn</strong>
+  </p>
+</a>
+
+          </div>
+          
+            <script>var el=document.querySelector("[data-md-component=announce]");if(el){var content=el.querySelector(".md-typeset");__md_hash(content.innerHTML)===__md_get("__announce")&&(el.hidden=!0)}</script>
+          
+        </aside>
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  You are not viewing the latest regular release.
+  <a href="../../../..">
+    <strong>Click here to go to the latest regular release.</strong>
+  </a> The <em>unreleased-development</em> release corresponds to the <em>main</em> branch of the repository.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../.."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+       
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="KubeStellar" class="md-header__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+      
+  <img src="../../../logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            KubeStellar
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Example Scenarios
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="light-blue" data-md-color-accent="cyan"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kubestellar/kubestellar" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+       <header class='md-header' data-md-component='header' style="z-index:-10;">
+	       <div class='md-header__inner md-grid' data-md-component='container'>
+	       <p class='md_container' style="font-size:larger"> 
+	       KubeStellar has multiple documentation versions to match its multiple releases.<br />
+	       Please make sure you are viewing the docs version which matches the release version of the code you are using!
+	       </p>
+	       </div>
+       </header>
+
+
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../" class="md-tabs__link">
+          
+  
+    
+  
+  Welcome
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../readme/" class="md-tabs__link">
+          
+  
+    
+  
+  What is KubeStellar?
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../get-started/" class="md-tabs__link">
+        
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../user-guide-intro/" class="md-tabs__link">
+          
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contribute/" class="md-tabs__link">
+          
+  
+    
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Community/_index/" class="md-tabs__link">
+          
+  
+    
+  
+  Community
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank" class="md-tabs__link">
+        
+  
+    
+  
+  Blog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="KubeStellar" class="md-nav__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+      
+  <img src="../../../logo.png" alt="logo">
+
+    </a>
+    KubeStellar
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kubestellar/kubestellar" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Welcome
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    What is KubeStellar?
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            What is KubeStellar?
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../readme/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Related
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Related
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubeflex-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KubeFlex
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../galaxy-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KubeStellar Galaxy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release-notes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release-notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../get-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    User Guide
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guide Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../get-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../start-from-ocm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started from OCM
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    General Setup
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            General Setup
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup-overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup-limitations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup limitations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pre-reqs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Prerequisites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4_4" id="__nav_4_4_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    KubeFlex Hosting cluster
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            KubeFlex Hosting cluster
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acquire-hosting-cluster/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acquire cluster for KubeFlex Hosting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../init-hosting-cluster/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Initialize KubeFlex Hosting cluster
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4_5" id="__nav_4_4_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Core Spaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            Core Spaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../its/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Inventory and Transport Spaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wds/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Workload Description Spaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core-chart/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Core Helm chart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4_7" id="__nav_4_4_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Workload Execution Clusters
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            Workload Execution Clusters
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wec/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    About Workload Execution Clusters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wec-registration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Register a Workload Execution Cluster
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage-limitations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Usage limitations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5_2" id="__nav_4_5_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    KubeStellar API
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            KubeStellar API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../control/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API reference (new tab)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../binding/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Binding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transforming/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transforming desired state
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../combined-status/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Combining reported state
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Example Scenarios
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Example Scenarios
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#assumptions-and-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Assumptions and variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-0-look-around" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 0 - look around
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-1-multi-cluster-workload-deployment-with-kubectl" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 1 - multi-cluster workload deployment with kubectl
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 1 - multi-cluster workload deployment with kubectl">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 1
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-2-out-of-tree-workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 2 - Out-of-tree workload
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 2 - Out-of-tree workload">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 2
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-3-multi-cluster-workload-deployment-with-helm" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 3 - multi-cluster workload deployment with helm
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 3 - multi-cluster workload deployment with helm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-propagate-helm-metadata-secret-to-managed-clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Propagate helm metadata Secret to managed clusters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-4-singleton-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 4 - Singleton status
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 4 - Singleton status">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 4
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-5-resiliency-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 5 - Resiliency testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 5 - Resiliency testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 5
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-6-multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 6
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5_4" id="__nav_4_5_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Third-party integrations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5_4">
+            <span class="md-nav__icon md-icon"></span>
+            Third-party integrations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../argo-to-wds1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ArgoCD to WDS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5_6" id="__nav_4_5_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Known Issues
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            Known Issues
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../known-issues/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-kflex-extension/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hidden state in kubeconfig
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-kind-config/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kind needs OS reconfig
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-wsl-ghcr-helm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Authorization failure in WSL while fetching Helm chart from ghcr.io
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-collector-miss/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Missing results in a CombinedStatus object
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teardown/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Teardown
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Contributing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contribute/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to join in
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/coc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Code of Conduct
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/LICENSE/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    License
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/governance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governance
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/onboarding/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Onboarding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Website
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            Website
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/operations/document-management/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docs Management Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/operations/testing-doc-prs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Testing website PRs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_7" id="__nav_5_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Security
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_7">
+            <span class="md-nav__icon md-icon"></span>
+            Security
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/security/security/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Policy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/security/security_contacts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contacts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packaging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Packaging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release Process
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release-testing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/CONTRIBUTING/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guidelines
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pr-signoff/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sign-off and Signing Contributions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Community
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Community
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/_index/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Get Involved
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Contact Us
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            Contact Us
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/join_us" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mailing List
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/agenda" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Community Meeting Agenda (join mailing list first)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/slack" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Slack
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/blog" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Medium Blog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/tv" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YouTube Channel
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/linkedin" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    LinkedIn
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.reddit.com/r/kubestellar/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reddit
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Google Drive
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Partners
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            Partners
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/argocd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ArgoCD
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/turbonomic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Turbonomic
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/mvi/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MVI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/fluxcd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FluxCD
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/openziti/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenZiti
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/kyverno/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kyverno
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#assumptions-and-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Assumptions and variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-0-look-around" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 0 - look around
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-1-multi-cluster-workload-deployment-with-kubectl" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 1 - multi-cluster workload deployment with kubectl
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 1 - multi-cluster workload deployment with kubectl">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 1
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-2-out-of-tree-workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 2 - Out-of-tree workload
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 2 - Out-of-tree workload">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 2
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-3-multi-cluster-workload-deployment-with-helm" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 3 - multi-cluster workload deployment with helm
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 3 - multi-cluster workload deployment with helm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-propagate-helm-metadata-secret-to-managed-clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Propagate helm metadata Secret to managed clusters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-4-singleton-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 4 - Singleton status
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 4 - Singleton status">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 4
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-5-resiliency-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 5 - Resiliency testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 5 - Resiliency testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 5
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-6-multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-teardown-scenario-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Optional] Teardown Scenario 6
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/example-scenarios.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/example-scenarios.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="kubestellar-example-scenarios">KubeStellar Example Scenarios<a class="headerlink" href="#kubestellar-example-scenarios" title="Permanent link">#</a></h1>
+<p>This document shows some simple examples of using the release that contains this version of this document. These scenarios can be used to test a KubeStellar installation for proper functionality. These scenarios suppose that you have done "setup". General setup instructions are outlined in <a href="../user-guide-intro/#the-full-story">the User Guide Overview</a>; a simple example setup is in <a href="../get-started/#setup">the Setup section of Getting Started</a>.</p>
+<h2 id="assumptions-and-variables">Assumptions and variables<a class="headerlink" href="#assumptions-and-variables" title="Permanent link">#</a></h2>
+<p>Each scenario supposes that one ITS and one WDS have been created, and that two WECs have been created and registered and also labeled for selection by KubeStellar control objects. These scenarios are written as shell commands (bash or zsh). These commands assume that you have defined the following shell variables to convey the needed information about that ITS and WDS and those WECs. For a concrete example of settings of these variables, see <a href="../get-started/#exercise-kubestellar">the end of Getting Started</a>.</p>
+<ul>
+<li><code>host_context</code>: the name of the kubeconfig context to use when accessing the KubeFlex hosting cluster.</li>
+<li><code>its_cp</code>: the name of the KubeFlex control plane that is playing the role of ITS.</li>
+<li><code>its_context</code>: the name of the kubeconfig context to use when accessing the ITS.</li>
+<li><code>wds_cp</code>: the name of the KubeFlex control plane that is playing the role of WDS.</li>
+<li><code>wds_context</code>: the name of the kubeconfig context to use when accessing the WDS.</li>
+<li><code>wec1_name</code>, <code>wec2_name</code>: the names of the <code>ManagedCluster</code> objects in the ITS representing the two WECs.</li>
+<li><code>wec1_context</code>, <code>wec2_context</code>: the names of the kubeconfig contexts to use when accessing the two WECs.</li>
+<li><code>label_query_both</code>: a restricted <code>kubectl</code> label query over <code>ManagedCluster</code> objects in the ITS that matches both WECs. The general form of label query usable here is a comma-separated series of <code>key=value</code> requirements.</li>
+<li><code>label_query_one</code>: a restricted <code>kubectl</code> label query over <code>ManagedCluster</code> objects that picks out just one of the WECs.</li>
+</ul>
+<p>Each example scenario concludes with instructions on how to undo its effects.</p>
+<p>There are also end-to-end (E2E) tests that are based on scenario 4 and an extended variant of scenario 1. These tests normally exercise the copy of the repo containing them (rather than a release). They can alternatively test a release. See the e2e tests (in <code>test/e2e</code>). Contributors can run these tests, and CI includes checking that these E2E tests pass. Some of these tests, and the setup for all of them, are written in <code>bash</code> so that contributors can easily follow them.</p>
+<h2 id="scenario-0-look-around">Scenario 0 - look around<a class="headerlink" href="#scenario-0-look-around" title="Permanent link">#</a></h2>
+<p>The following command will list all the <code>ManagedCluster</code> objects that will be relevant to these scenarios.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$its_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>managedclusters<span class="w"> </span>-l<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$label_query_both</span><span class="s2">&quot;</span>
+</code></pre></div>
+<p>Expect to get a listing of your two <code>ManagedCluster</code> objects.</p>
+<h2 id="scenario-1-multi-cluster-workload-deployment-with-kubectl">Scenario 1 - multi-cluster workload deployment with kubectl<a class="headerlink" href="#scenario-1-multi-cluster-workload-deployment-with-kubectl" title="Permanent link">#</a></h2>
+<p>Create a BindingPolicy to deliver an app to all clusters in the WDS:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="s">apiVersion: control.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="s">kind: BindingPolicy</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="s">  name: nginx-bpolicy</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="s">spec:</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="s">  clusterSelectors:</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail -c +3)}</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="s">  downsync:</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="s">  - objectSelectors:</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/name&quot;:&quot;nginx&quot;}</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="s">EOF</span>
+</code></pre></div>
+<p>This BindingPolicy configuration determines <strong>where</strong> to deploy the workload by using
+the label selector expressions found in <em>clusterSelectors</em>. It also specifies <strong>what</strong>
+to deploy through the downsync.labelSelectors expressions.
+Each matchLabels expression is a criterion for selecting a set of objects based on
+their labels. Other criteria can be added to filter objects based on their namespace,
+api group, resource, and name. If these criteria are not specified, all objects with
+the matching labels are selected. If an object has multiple labels, it is selected
+only if it matches all the labels in the matchLabels expression.
+If there are multiple objectSelectors, an object is selected if it matches any of them.</p>
+<p>Now deploy the app:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="s">apiVersion: v1</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="s">kind: Namespace</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s">  labels:</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="s">    app.kubernetes.io/name: nginx</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="s">  name: nginx</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="s">---</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="s">apiVersion: apps/v1</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="s">kind: Deployment</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="s">metadata:</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="s">  name: nginx-deployment</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="s">  namespace: nginx</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="s">  labels:</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="s">    app.kubernetes.io/name: nginx</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="s">spec:</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="s">  replicas: 1</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="s">  selector:</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="s">    matchLabels:</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="s">      app: nginx</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="s">  template:</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="s">    metadata:</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="s">      labels:</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="s">        app: nginx</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="s">    spec:</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="s">      containers:</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="s">      - name: nginx</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="s">        image: public.ecr.aws/nginx/nginx:latest</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="s">        ports:</span>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="s">        - containerPort: 80</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="s">EOF</span>
+</code></pre></div>
+<p>Verify that <em>manifestworks</em> wrapping the objects have been created in the mailbox
+namespaces with the following command. Expect to see a <code>ManifestWork</code> object named "nginx-bpolicy-wds1" in each namespace.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$its_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>manifestworks<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_name</span><span class="s2">&quot;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$its_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>manifestworks<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_name</span><span class="s2">&quot;</span>
+</code></pre></div>
+<p>Verify that the deployment has been created in both clusters</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-n<span class="w"> </span>nginx
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-n<span class="w"> </span>nginx
+</code></pre></div>
+<p>Please note, in line with Kubernetes’ best practices, the order in which you apply
+a BindingPolicy and the objects doesn’t affect the outcome. You can apply the BindingPolicy
+first followed by the objects, or vice versa. The result remains consistent because
+the binding controller identifies any changes in either the BindingPolicy or the objects,
+triggering the start of the reconciliation loop.</p>
+<h3 id="optional-teardown-scenario-1">[Optional] Teardown Scenario 1<a class="headerlink" href="#optional-teardown-scenario-1" title="Permanent link">#</a></h3>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>ns<span class="w"> </span>nginx
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>bindingpolicies<span class="w"> </span>nginx-bpolicy
+</code></pre></div>
+<h2 id="scenario-2-out-of-tree-workload">Scenario 2 - Out-of-tree workload<a class="headerlink" href="#scenario-2-out-of-tree-workload" title="Permanent link">#</a></h2>
+<p>This scenario is like the previous one but involves a workload whose
+kind of objects is not built into Kubernetes. Instead, the workload
+object kind is defined by a <code>CustomResourceDefinition</code> object. While
+KubeStellar can handle the case where the CRD is part of the workload,
+this example concerns the case where the CRD is established in the
+WECs by some other means.</p>
+<p>For this example, we use the <code>AppWrapper</code> custom resource defined in the
+<a href="https://github.com/project-codeflare/multi-cluster-app-dispatcher">multi cluster app dispatcher</a>
+project.</p>
+<p>Install the AppWrapper CRD in the WDS and the WECs.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">clusters</span><span class="o">=(</span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="o">)</span><span class="p">;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span>cluster<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">clusters</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/project-codeflare/multi-cluster-app-dispatcher/v1.39.0/config/crd/bases/workload.codeflare.dev_appwrappers.yaml
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">done</span>
+</code></pre></div>
+<p>Run the following command to give permission for the klusterlet to
+operate on the appwrapper cluster resource.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">clusters</span><span class="o">=(</span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="o">)</span><span class="p">;</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">for</span><span class="w"> </span>cluster<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">clusters</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="s">kind: ClusterRole</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="s">metadata:</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="s">  name: appwrappers-access</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="s">rules:</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="s">- apiGroups: [&quot;workload.codeflare.dev&quot;]</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="s">  resources: [&quot;appwrappers&quot;]</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="s">  verbs: [&quot;get&quot;, &quot;list&quot;, &quot;watch&quot;, &quot;create&quot;, &quot;update&quot;, &quot;patch&quot;]</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="s">---</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="s">kind: ClusterRoleBinding</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="s">metadata:</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="s">  name: klusterlet-appwrappers-access</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="s">roleRef:</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="s">  kind: ClusterRole</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="s">  name: appwrappers-access</span>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="s">subjects:</span>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="s">- kind: ServiceAccount</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="s">  name: klusterlet-work-sa</span>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="s">  namespace: open-cluster-management-agent</span>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="s">EOF</span>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="k">done</span>
+</code></pre></div>
+<p>This step will be eventually automated, see <a href="https://github.com/kubestellar/kubestellar/issues/1542">this issue</a>
+for more details.</p>
+<p>Next, apply an appwrapper object to the WDS:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w">  </span>https://raw.githubusercontent.com/project-codeflare/multi-cluster-app-dispatcher/v1.39.0/test/yaml/0008-aw-default.yaml
+</code></pre></div>
+<p>Label the appwrapper to match the binding policy:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>label<span class="w"> </span>appwrappers.workload.codeflare.dev<span class="w"> </span>defaultaw-schd-spec-with-timeout-1<span class="w"> </span>app.kubernetes.io/part-of<span class="o">=</span>my-appwrapper-app
+</code></pre></div>
+<p>Finally, apply the BindingPolicy:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="s">apiVersion: control.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="s">kind: BindingPolicy</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="s">  name: aw-bpolicy</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="s">spec:</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="s">  clusterSelectors:</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail -c +3)}</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="s">  downsync:</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="s">  - objectSelectors:</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/part-of&quot;:&quot;my-appwrapper-app&quot;}</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="s">EOF</span>
+</code></pre></div>
+<p>Check that the app wrapper has been delivered to both clusters:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>appwrappers
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>appwrappers
+</code></pre></div>
+<h3 id="optional-teardown-scenario-2">[Optional] Teardown Scenario 2<a class="headerlink" href="#optional-teardown-scenario-2" title="Permanent link">#</a></h3>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>bindingpolicies<span class="w"> </span>aw-bpolicy
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>appwrappers<span class="w"> </span>--all
+</code></pre></div>
+<p>Wait until the following commands show no appwrappers in the two WECs.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>appwrappers<span class="w"> </span>-A
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>appwrappers<span class="w"> </span>-A
+</code></pre></div>
+<p>Then continue.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">for</span><span class="w"> </span>cluster<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="nv">$cluster</span><span class="w"> </span>delete<span class="w"> </span>clusterroles<span class="w"> </span>appwrappers-access
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="nv">$cluster</span><span class="w"> </span>delete<span class="w"> </span>clusterrolebindings<span class="w"> </span>klusterlet-appwrappers-access
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="k">done</span>
+</code></pre></div>
+<p>Delete the CRD from the WDS and the WECs.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nv">clusters</span><span class="o">=(</span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="o">)</span><span class="p">;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span>cluster<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">clusters</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="si">${</span><span class="nv">cluster</span><span class="si">}</span><span class="w"> </span>delete<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/project-codeflare/multi-cluster-app-dispatcher/v1.39.0/config/crd/bases/workload.codeflare.dev_appwrappers.yaml
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="k">done</span>
+</code></pre></div>
+<h2 id="scenario-3-multi-cluster-workload-deployment-with-helm">Scenario 3 - multi-cluster workload deployment with helm<a class="headerlink" href="#scenario-3-multi-cluster-workload-deployment-with-helm" title="Permanent link">#</a></h2>
+<p>Create a BindingPolicy for the helm chart app:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="s">apiVersion: control.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="s">kind: BindingPolicy</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="s">  name: postgres-bpolicy</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="s">spec:</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="s">  clusterSelectors:</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail -c +3)}</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="s">  downsync:</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="s">  - objectSelectors:</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="s">    - matchLabels: {</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="s">      &quot;app.kubernetes.io/managed-by&quot;: Helm,</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="s">      &quot;app.kubernetes.io/instance&quot;: postgres}</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="s">EOF</span>
+</code></pre></div>
+<p>Note that helm sets <code>app.kubernetes.io/instance</code> to the <em>name</em> of the installed <em>release</em>.</p>
+<p>Create and label the namespace and install the chart:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>create<span class="w"> </span>ns<span class="w"> </span>postgres-system
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>label<span class="w"> </span>ns<span class="w"> </span>postgres-system<span class="w"> </span>app.kubernetes.io/managed-by<span class="o">=</span>Helm<span class="w"> </span>app.kubernetes.io/instance<span class="o">=</span>postgres
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>install<span class="w"> </span>-n<span class="w"> </span>postgres-system<span class="w"> </span>postgres<span class="w"> </span>oci://registry-1.docker.io/bitnamicharts/postgresql
+</code></pre></div>
+<p>Verify that <code>StatefulSet</code> has been created in both clusters</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>statefulsets<span class="w"> </span>-n<span class="w"> </span>postgres-system
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>statefulsets<span class="w"> </span>-n<span class="w"> </span>postgres-system
+</code></pre></div>
+<h3 id="optional-propagate-helm-metadata-secret-to-managed-clusters">[Optional] Propagate helm metadata Secret to managed clusters<a class="headerlink" href="#optional-propagate-helm-metadata-secret-to-managed-clusters" title="Permanent link">#</a></h3>
+<p>Run "helm list" on the WDS:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>list<span class="w"> </span>-n<span class="w"> </span>postgres-system
+</code></pre></div>
+<p>and expect to see output like the following.</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>NAME            NAMESPACE       REVISION        UPDATED                                 STATUS       CHART                    APP VERSION
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>postgres        postgres-system 1               2023-10-31 13:39:52.550071 -0400 EDT    deployed     postgresql-13.2.0        16.0.0
+</code></pre></div>
+<p>And try that on the managed clusters; you will get empty output.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>helm<span class="w"> </span>list<span class="w"> </span>--kube-context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>postgres-system
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>helm<span class="w"> </span>list<span class="w"> </span>--kube-context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>postgres-system
+</code></pre></div>
+<p>This is because Helm creates a <code>Secret</code> object to hold its metadata about a "release" (chart instance) but Helm does not apply the usual labels to that object, so it is not selected by the <code>BindingPolicy</code> above and thus does not get delivered. The workload is functioning in the WECs, but <code>helm list</code> does not recognize its handiwork there. That labeling could be done for example with:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>label<span class="w"> </span>secret<span class="w"> </span>-n<span class="w"> </span>postgres-system<span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>secrets<span class="w"> </span>-n<span class="w"> </span>postgres-system<span class="w"> </span>-l<span class="w"> </span><span class="nv">name</span><span class="o">=</span>postgres<span class="w"> </span>-l<span class="w"> </span><span class="nv">owner</span><span class="o">=</span>helm<span class="w">  </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="k">)</span><span class="w"> </span>app.kubernetes.io/managed-by<span class="o">=</span>Helm<span class="w"> </span>app.kubernetes.io/instance<span class="o">=</span>postgres
+</code></pre></div>
+<p>Verify that the chart shows up on the managed clusters:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>helm<span class="w"> </span>list<span class="w"> </span>--kube-context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>postgres-system
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>helm<span class="w"> </span>list<span class="w"> </span>--kube-context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>postgres-system
+</code></pre></div>
+<p>Implementing this in a controller for automated propagation of
+helm metadata is tracked in this <a href="https://github.com/kubestellar/kubestellar/issues/1543">issue</a>.</p>
+<h3 id="optional-teardown-scenario-3">[Optional] Teardown Scenario 3<a class="headerlink" href="#optional-teardown-scenario-3" title="Permanent link">#</a></h3>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>helm<span class="w"> </span>--kube-context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>uninstall<span class="w"> </span>-n<span class="w"> </span>postgres-system<span class="w"> </span>postgres
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>ns<span class="w"> </span>postgres-system
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>bindingpolicies<span class="w"> </span>postgres-bpolicy
+</code></pre></div>
+<h2 id="scenario-4-singleton-status">Scenario 4 - Singleton status<a class="headerlink" href="#scenario-4-singleton-status" title="Permanent link">#</a></h2>
+<p>This scenario shows how to get the full status updated, by setting <code>wantSingletonReportedState</code>
+in a <code>DownsyncPolicyClause</code>. This still an experimental feature.</p>
+<p>Apply a BindingPolicy with the <code>wantSingletonReportedState</code> flag set:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="s">apiVersion: control.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="s">kind: BindingPolicy</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="s">  name: nginx-singleton-bpolicy</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="s">spec:</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="s">  clusterSelectors:</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="s">  - matchLabels: {&quot;name&quot;:&quot;cluster1&quot;}</span>
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="s">  downsync:</span>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="s">  - objectSelectors:</span>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/name&quot;:&quot;nginx-singleton&quot;}</span>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="s">    wantSingletonReportedState: true</span>
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="s">EOF</span>
+</code></pre></div>
+<p>Apply a new deployment for the singleton BindingPolicy:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="s">apiVersion: apps/v1</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="s">kind: Deployment</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="s">  name: nginx-singleton-deployment</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="s">  labels:</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="s">    app.kubernetes.io/name: nginx-singleton</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="s">spec:</span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="s">  replicas: 1</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="s">  selector:</span>
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="s">    matchLabels:</span>
+<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="s">      app: nginx</span>
+<a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="s">  template:</span>
+<a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="s">    metadata:</span>
+<a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a><span class="s">      labels:</span>
+<a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a><span class="s">        app: nginx</span>
+<a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a><span class="s">    spec:</span>
+<a id="__codelineno-26-18" name="__codelineno-26-18" href="#__codelineno-26-18"></a><span class="s">      containers:</span>
+<a id="__codelineno-26-19" name="__codelineno-26-19" href="#__codelineno-26-19"></a><span class="s">      - name: nginx</span>
+<a id="__codelineno-26-20" name="__codelineno-26-20" href="#__codelineno-26-20"></a><span class="s">        image: public.ecr.aws/nginx/nginx:latest</span>
+<a id="__codelineno-26-21" name="__codelineno-26-21" href="#__codelineno-26-21"></a><span class="s">        ports:</span>
+<a id="__codelineno-26-22" name="__codelineno-26-22" href="#__codelineno-26-22"></a><span class="s">        - containerPort: 80</span>
+<a id="__codelineno-26-23" name="__codelineno-26-23" href="#__codelineno-26-23"></a><span class="s">EOF</span>
+</code></pre></div>
+<p>Verify that the status is available in the WDS for the deployment by
+running the command:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>nginx-singleton-deployment<span class="w"> </span>-o<span class="w"> </span>yaml
+</code></pre></div>
+<p>Finally, scale the deployment from 1 to 2 replicas in the WDS:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>nginx-singleton-deployment<span class="w"> </span>--replicas<span class="o">=</span><span class="m">2</span>
+</code></pre></div>
+<p>and verify that replicas has been updated in the WEC and the WDS:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>nginx-singleton-deployment
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>nginx-singleton-deployment
+</code></pre></div>
+<h3 id="optional-teardown-scenario-4">[Optional] Teardown Scenario 4<a class="headerlink" href="#optional-teardown-scenario-4" title="Permanent link">#</a></h3>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>bindingpolicies<span class="w"> </span>nginx-singleton-bpolicy
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>deployments<span class="w"> </span>nginx-singleton-deployment
+</code></pre></div>
+<h2 id="scenario-5-resiliency-testing">Scenario 5 - Resiliency testing<a class="headerlink" href="#scenario-5-resiliency-testing" title="Permanent link">#</a></h2>
+<p>This is a test that you can do after finishing Scenario 1.</p>
+<p>TODO: rewrite this so that it makes sense after Scenario 4.</p>
+<p>Bring down the control plane: stop and restart the ITS and WDS API servers,
+KubeFlex and KubeStellar controllers:</p>
+<p>First stop all:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_cp</span><span class="s2">&quot;</span>-system<span class="w"> </span>kube-apiserver<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>statefulset<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$its_cp</span><span class="s2">&quot;</span>-system<span class="w"> </span>vcluster<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>kubeflex-system<span class="w"> </span>kubeflex-controller-manager<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_cp</span><span class="s2">&quot;</span>-system<span class="w"> </span>kubestellar-controller-manager<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_cp</span><span class="s2">&quot;</span>-system<span class="w"> </span>transport-controller<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
+</code></pre></div>
+<p>Then restart all:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_cp</span><span class="s2">&quot;</span>-system<span class="w"> </span>kube-apiserver<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>statefulset<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$its_cp</span><span class="s2">&quot;</span>-system<span class="w"> </span>vcluster<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>kubeflex-system<span class="w"> </span>kubeflex-controller-manager<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_cp</span><span class="s2">&quot;</span>-system<span class="w"> </span>kubestellar-controller-manager<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span><span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_cp</span><span class="s2">&quot;</span>-system<span class="w"> </span>transport-controller<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
+</code></pre></div>
+<p>Wait for about a minute for all pods to restart, then apply a new BindingPolicy:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="s">apiVersion: control.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="s">kind: BindingPolicy</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="s">  name: nginx-res-bpolicy</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="s">spec:</span>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="s">  clusterSelectors:</span>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail -c +3)}</span>
+<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="s">  downsync:</span>
+<a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="s">  - objectSelectors:</span>
+<a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="s">    - matchLabels: {&quot;app.kubernetes.io/name&quot;:&quot;nginx-res&quot;}</span>
+<a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="s">EOF</span>
+</code></pre></div>
+<p>and a new workload:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="s">apiVersion: v1</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="s">kind: Namespace</span>
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="s">  labels:</span>
+<a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="s">    app.kubernetes.io/name: nginx-res</span>
+<a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="s">  name: nginx-res</span>
+<a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="s">---</span>
+<a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="s">apiVersion: apps/v1</span>
+<a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="s">kind: Deployment</span>
+<a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="s">metadata:</span>
+<a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a><span class="s">  name: nginx-res-deployment</span>
+<a id="__codelineno-34-13" name="__codelineno-34-13" href="#__codelineno-34-13"></a><span class="s">  namespace: nginx-res</span>
+<a id="__codelineno-34-14" name="__codelineno-34-14" href="#__codelineno-34-14"></a><span class="s">  labels:</span>
+<a id="__codelineno-34-15" name="__codelineno-34-15" href="#__codelineno-34-15"></a><span class="s">    app.kubernetes.io/name: nginx-res</span>
+<a id="__codelineno-34-16" name="__codelineno-34-16" href="#__codelineno-34-16"></a><span class="s">spec:</span>
+<a id="__codelineno-34-17" name="__codelineno-34-17" href="#__codelineno-34-17"></a><span class="s">  replicas: 1</span>
+<a id="__codelineno-34-18" name="__codelineno-34-18" href="#__codelineno-34-18"></a><span class="s">  selector:</span>
+<a id="__codelineno-34-19" name="__codelineno-34-19" href="#__codelineno-34-19"></a><span class="s">    matchLabels:</span>
+<a id="__codelineno-34-20" name="__codelineno-34-20" href="#__codelineno-34-20"></a><span class="s">      app: nginx-res</span>
+<a id="__codelineno-34-21" name="__codelineno-34-21" href="#__codelineno-34-21"></a><span class="s">  template:</span>
+<a id="__codelineno-34-22" name="__codelineno-34-22" href="#__codelineno-34-22"></a><span class="s">    metadata:</span>
+<a id="__codelineno-34-23" name="__codelineno-34-23" href="#__codelineno-34-23"></a><span class="s">      labels:</span>
+<a id="__codelineno-34-24" name="__codelineno-34-24" href="#__codelineno-34-24"></a><span class="s">        app: nginx-res</span>
+<a id="__codelineno-34-25" name="__codelineno-34-25" href="#__codelineno-34-25"></a><span class="s">    spec:</span>
+<a id="__codelineno-34-26" name="__codelineno-34-26" href="#__codelineno-34-26"></a><span class="s">      containers:</span>
+<a id="__codelineno-34-27" name="__codelineno-34-27" href="#__codelineno-34-27"></a><span class="s">      - name: nginx-res</span>
+<a id="__codelineno-34-28" name="__codelineno-34-28" href="#__codelineno-34-28"></a><span class="s">        image: public.ecr.aws/nginx/nginx:latest</span>
+<a id="__codelineno-34-29" name="__codelineno-34-29" href="#__codelineno-34-29"></a><span class="s">        ports:</span>
+<a id="__codelineno-34-30" name="__codelineno-34-30" href="#__codelineno-34-30"></a><span class="s">        - containerPort: 80</span>
+<a id="__codelineno-34-31" name="__codelineno-34-31" href="#__codelineno-34-31"></a><span class="s">EOF</span>
+</code></pre></div>
+<p>Verify that deployment has been created in both clusters</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-n<span class="w"> </span>nginx-res
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-n<span class="w"> </span>nginx-res
+</code></pre></div>
+<h3 id="optional-teardown-scenario-5">[Optional] Teardown Scenario 5<a class="headerlink" href="#optional-teardown-scenario-5" title="Permanent link">#</a></h3>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>ns<span class="w"> </span>nginx-res
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>bindingpolicies<span class="w"> </span>nginx-res-bpolicy
+</code></pre></div>
+<h2 id="scenario-6-multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd">Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD<a class="headerlink" href="#scenario-6-multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd" title="Permanent link">#</a></h2>
+<p>Before running this scenario, install ArgoCD on the hosting cluster and configure it
+work with the WDS as outlined <a href="../argo-to-wds1/">here</a>.</p>
+<p>Including a ServiceAccount tests whether there will be a controller fight over a token Secret for that ServiceAccount, which was observed in some situations with older code.</p>
+<p>Apply the following BindingPolicy to the WDS:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="s">apiVersion: control.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="s">kind: BindingPolicy</span>
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="s">  name: argocd-sa-bpolicy</span>
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="s">spec:</span>
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="s">  clusterSelectors:</span>
+<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="s">  - matchLabels: {$(echo &quot;$label_query_both&quot; | tr , $&#39;\n&#39; | while IFS=&quot;=&quot; read key val; do echo -n &quot;, \&quot;$key\&quot;: \&quot;$val\&quot;&quot;; done | tail -c +3)}</span>
+<a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a><span class="s">  downsync:</span>
+<a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a><span class="s">  - objectSelectors:</span>
+<a id="__codelineno-37-11" name="__codelineno-37-11" href="#__codelineno-37-11"></a><span class="s">    - matchLabels: {&quot;argocd.argoproj.io/instance&quot;:&quot;nginx-sa&quot;}</span>
+<a id="__codelineno-37-12" name="__codelineno-37-12" href="#__codelineno-37-12"></a><span class="s">EOF</span>
+</code></pre></div>
+<p>Switch context to hosting cluster and argocd namespace (this is required by argo to
+create an app with the CLI)</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$host_context</span><span class="s2">&quot;</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>kubectl<span class="w"> </span>config<span class="w"> </span>set-context<span class="w"> </span>--current<span class="w"> </span>--namespace<span class="o">=</span>argocd
+</code></pre></div>
+<p>Create a new application in ArgoCD:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>nginx-sa<span class="w"> </span>--repo<span class="w"> </span>https://github.com/pdettori/sample-apps.git<span class="w"> </span>--path<span class="w"> </span>nginx<span class="w"> </span>--dest-server<span class="w"> </span>https://<span class="s2">&quot;</span><span class="si">${</span><span class="nv">wds_cp</span><span class="si">}</span><span class="s2">.</span><span class="si">${</span><span class="nv">wds_cp</span><span class="si">}</span><span class="s2">-system&quot;</span><span class="w"> </span>--dest-namespace<span class="w"> </span>nginx-sa
+</code></pre></div>
+<p>Open browser to Argo UI:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>open<span class="w"> </span>https://argocd.localtest.me:9443
+</code></pre></div>
+<p>Open the app <code>nginx-sa</code> and sync it by clicking the "sync" button and then "synchronize".</p>
+<p>Alternatively, use the CLI to sync the app:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>argocd<span class="w"> </span>app<span class="w"> </span>sync<span class="w"> </span>nginx-sa
+</code></pre></div>
+<p>Finally, check if the app has been deployed to the two clusters.</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>deployments,sa,secrets
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>deployments,sa,secrets
+</code></pre></div>
+<p>Repeat multiple syncing on Argo and verify that extra secrets for the service account
+are not created in the WDS and both clusters:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>secrets
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec1_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>secrets
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wec2_context</span><span class="s2">&quot;</span><span class="w"> </span>-n<span class="w"> </span>nginx-sa<span class="w"> </span>get<span class="w"> </span>secrets
+</code></pre></div>
+<h3 id="optional-teardown-scenario-6">[Optional] Teardown Scenario 6<a class="headerlink" href="#optional-teardown-scenario-6" title="Permanent link">#</a></h3>
+<p>(Assuming that kubectl is still using the context for the hosting cluster and namespace <code>argocd</code>.)</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>argocd<span class="w"> </span>app<span class="w"> </span>delete<span class="w"> </span>nginx-sa<span class="w"> </span>--cascade
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wds_context</span><span class="s2">&quot;</span><span class="w"> </span>delete<span class="w"> </span>bindingpolicies<span class="w"> </span>argocd-sa-bpolicy
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              Thanks for your feedback! Help us improve this page by using our <a href="https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../combined-status/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Combining reported state">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Combining reported state
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../argo-to-wds1/" class="md-footer__link md-footer__link--next" aria-label="Next: ArgoCD to WDS">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                ArgoCD to WDS
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.f13b1293.min.js"></script>
+      
+    
+  </body>
+</html>

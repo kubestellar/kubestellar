@@ -1,0 +1,4111 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/fr/direct/architecture/">
+      
+      
+        <link rel="prev" href="../../readme/">
+      
+      
+        <link rel="next" href="../kubeflex-intro/">
+      
+      
+      <link rel="icon" href="../../../favicons/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.2">
+    
+    
+      
+        <title>Architecture - KubeStellar</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.d7758b05.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=SapceMono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"SapceMono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/kubestellar.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-SR5TD1CXY7"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-SR5TD1CXY7",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-SR5TD1CXY7",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  <meta name="google-site-verification" content="QZFIkG95fMxODWgQDK2OUn73HUIu9fZmuTer-ZA4UwI" />
+
+  <!-- Determine title -->
+  
+  
+    
+  
+
+  <!-- The image needs to have an absolute URL -->
+  
+
+  <!-- Open graph meta tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="KubeStellar - Architecture" />
+  <meta property="og:description" content="None" />
+  <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/fr/direct/architecture/" />
+  <meta property="og:image" content="https://docs.kubestellar.io/unreleased-developmentassets/images/illustrations/banner.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1080" />
+  <meta property="og:image:height" content="568" />
+
+  <!-- google-site-verification meta-tag -->
+  <meta name="google-site-verification" content="-Rj8YMCn9uu5IwOFdC-WfAzXp4ZOMJtYKxU40ZgcJIU" />
+
+<!-- Extra stylesheets -->
+<!--  <link
+    rel="stylesheet"
+    href="../../../assets/stylesheets/overrides.css"
+  />-->
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#kubestellar-architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+              <button class="md-banner__button md-icon" aria-label="Don't show this again">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+              </button>
+            
+            
+  <!-- Extra stylesing -->
+  <style>
+      .md-announce a,
+      .md-announce a:focus,
+      .md-announce a:hover{color:currentColor}.md-announce
+      strong{white-space:nowrap}.md-announce
+  </style>
+
+<!--   
+  <a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
+  <p style="color: #D5EE1C">For updates follow <strong style="color: #D5EE1C">@kubestellar</strong> on
+    <strong style="color: white">LinkedIn</strong>
+  </p>
+</a> 
+-->
+
+<a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
+  <p style="color: #D5EE1C">KubeStellar is now a <strong style="color: #D5EE1C">Cloud Native Computing Foundation (CNCF) Sandbox Project</strong>. Follow us <strong style="color: #D5EE1C">@kubestellar</strong> on
+    <strong style="color: white">LinkedIn</strong>
+  </p>
+</a>
+
+          </div>
+          
+            <script>var el=document.querySelector("[data-md-component=announce]");if(el){var content=el.querySelector(".md-typeset");__md_hash(content.innerHTML)===__md_get("__announce")&&(el.hidden=!0)}</script>
+          
+        </aside>
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  You are not viewing the latest regular release.
+  <a href="../../../..">
+    <strong>Click here to go to the latest regular release.</strong>
+  </a> The <em>unreleased-development</em> release corresponds to the <em>main</em> branch of the repository.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../.."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+       
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="KubeStellar" class="md-header__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+      
+  <img src="../../../logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            KubeStellar
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="light-blue" data-md-color-accent="cyan"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kubestellar/kubestellar" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+       <header class='md-header' data-md-component='header' style="z-index:-10;">
+	       <div class='md-header__inner md-grid' data-md-component='container'>
+	       <p class='md_container' style="font-size:larger"> 
+	       KubeStellar has multiple documentation versions to match its multiple releases.<br />
+	       Please make sure you are viewing the docs version which matches the release version of the code you are using!
+	       </p>
+	       </div>
+       </header>
+
+
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../" class="md-tabs__link">
+          
+  
+    
+  
+  Welcome
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../readme/" class="md-tabs__link">
+          
+  
+    
+  
+  What is KubeStellar?
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../get-started/" class="md-tabs__link">
+        
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-guide-intro/" class="md-tabs__link">
+          
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contribute/" class="md-tabs__link">
+          
+  
+    
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Community/_index/" class="md-tabs__link">
+          
+  
+    
+  
+  Community
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank" class="md-tabs__link">
+        
+  
+    
+  
+  Blog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="KubeStellar" class="md-nav__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+      
+  <img src="../../../logo.png" alt="logo">
+
+    </a>
+    KubeStellar
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kubestellar/kubestellar" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Welcome
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    What is KubeStellar?
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            What is KubeStellar?
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../readme/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-controller-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      KubeStellar Controller Manager
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pluggable-transport-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pluggable Transport Controller
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#space-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      Space Manager
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-cluster-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      OCM Cluster Manager
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      OCM Agent
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-status-add-on-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      OCM Status Add-On Controller
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-status-add-on-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      OCM Status Add-On Agent
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-controllers-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      KubeStellar Controllers Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KubeStellar Controllers Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#binding-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Binding Controller
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Binding Controller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sync-bindingpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sync BindingPolicy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sync-workload-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sync Workload Object
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sync-binding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sync Binding
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#status-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Status Controller
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transport-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transport Controller
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transport Controller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-transform-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom transform cache
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customization-properties-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customization properties cache
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Related
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Related
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubeflex-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KubeFlex
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../galaxy-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KubeStellar Galaxy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release-notes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release-notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../get-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User Guide
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guide Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../get-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../start-from-ocm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started from OCM
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    General Setup
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            General Setup
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup-overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup-limitations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup limitations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pre-reqs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Prerequisites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4_4" id="__nav_4_4_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    KubeFlex Hosting cluster
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            KubeFlex Hosting cluster
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acquire-hosting-cluster/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acquire cluster for KubeFlex Hosting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../init-hosting-cluster/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Initialize KubeFlex Hosting cluster
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4_5" id="__nav_4_4_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Core Spaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            Core Spaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../its/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Inventory and Transport Spaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wds/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Workload Description Spaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core-chart/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Core Helm chart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4_7" id="__nav_4_4_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Workload Execution Clusters
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            Workload Execution Clusters
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wec/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    About Workload Execution Clusters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wec-registration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Register a Workload Execution Cluster
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage-limitations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Usage limitations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5_2" id="__nav_4_5_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    KubeStellar API
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            KubeStellar API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../control/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API reference (new tab)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../binding/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Binding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transforming/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transforming desired state
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../combined-status/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Combining reported state
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-scenarios/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Example Scenarios
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5_4" id="__nav_4_5_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Third-party integrations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5_4">
+            <span class="md-nav__icon md-icon"></span>
+            Third-party integrations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../argo-to-wds1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ArgoCD to WDS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5_6" id="__nav_4_5_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Known Issues
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            Known Issues
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../known-issues/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-kflex-extension/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hidden state in kubeconfig
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-kind-config/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kind needs OS reconfig
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-wsl-ghcr-helm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Authorization failure in WSL while fetching Helm chart from ghcr.io
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-collector-miss/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Missing results in a CombinedStatus object
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teardown/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Teardown
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Contributing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contribute/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to join in
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/coc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Code of Conduct
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/LICENSE/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    License
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/governance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governance
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/onboarding/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Onboarding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Website
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            Website
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/operations/document-management/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docs Management Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/operations/testing-doc-prs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Testing website PRs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_7" id="__nav_5_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Security
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_7">
+            <span class="md-nav__icon md-icon"></span>
+            Security
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/security/security/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Policy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/security/security_contacts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contacts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packaging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Packaging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release Process
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release-testing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/CONTRIBUTING/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guidelines
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pr-signoff/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sign-off and Signing Contributions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Community
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Community
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/_index/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Get Involved
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Contact Us
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            Contact Us
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/join_us" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mailing List
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/agenda" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Community Meeting Agenda (join mailing list first)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/slack" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Slack
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/blog" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Medium Blog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/tv" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YouTube Channel
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/linkedin" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    LinkedIn
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.reddit.com/r/kubestellar/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reddit
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Google Drive
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Partners
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            Partners
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/argocd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ArgoCD
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/turbonomic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Turbonomic
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/mvi/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MVI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/fluxcd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FluxCD
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/openziti/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenZiti
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Community/partners/kyverno/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kyverno
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-controller-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      KubeStellar Controller Manager
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pluggable-transport-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pluggable Transport Controller
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#space-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      Space Manager
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-cluster-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      OCM Cluster Manager
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      OCM Agent
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-status-add-on-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      OCM Status Add-On Controller
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocm-status-add-on-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      OCM Status Add-On Agent
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-controllers-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      KubeStellar Controllers Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KubeStellar Controllers Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#binding-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Binding Controller
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Binding Controller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sync-bindingpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sync BindingPolicy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sync-workload-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sync Workload Object
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sync-binding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sync Binding
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#status-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Status Controller
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transport-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transport Controller
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transport Controller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-transform-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom transform cache
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customization-properties-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customization properties cache
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/direct/architecture.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/direct/architecture.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="kubestellar-architecture">KubeStellar Architecture<a class="headerlink" href="#kubestellar-architecture" title="Permanent link">#</a></h1>
+<p>KubeStellar provides multi-cluster deployment of Kubernetes objects, controlled by simple <code>BindingPolicy</code> objects, where Kubernetes objects are expressed in their native format with no wrapping or bundling. The high-level architecture for KubeStellar is illustrated in Figure 1.</p>
+<p>
+<figure><img src="../images/high-level-architecture.svg" /><figcaption>Figure 1 - High Level Architecture</figcaption>
+</figure>
+</p>
+<p>KubeStellar relies on the concept of <em>spaces</em>.<br />
+A Space is an abstraction to represent an API service that 
+behaves like a Kubernetes kube-apiserver (including the persistent storage behind it) 
+and the subset of controllers in the kube-controller-manager that are concerned with 
+API machinery generalities (not management of containerized workloads). 
+A KubeFlex <code>ControlPlane</code> is an example. A regular Kubernetes cluster is another example.
+Users can use spaces to perform these tasks:</p>
+<ol>
+<li>Create <em>Workload Definition Spaces</em> (WDSes) to store the definitions of their workloads.
+A Kubernetes workload is an application that runs on Kubernetes. A workload can be made by a 
+single Kubernetes object or several objects that work together.</li>
+<li>Create <em>Inventory and Transport Spaces</em> (ITSes) to manage the inventory of clusters and 
+the transport of workloads.</li>
+<li>Register and label Workload Execution Clusters (WECs) with the Inventory and 
+Transport Space, to keep track of the available clusters and their characteristics.</li>
+<li>Define <code>BindingPolicy</code> to specify <em>what</em> objects and <em>where</em> should be 
+deployed on the WECs.</li>
+<li>Submit objects in the native Kubernetes format to the WDSes, 
+and let the <code>BindingPolicy</code> govern which WECs should receive them.</li>
+<li>Check the status of submitted objects from the WDS.</li>
+</ol>
+<p>In KubeStellar, users can assume a variety of roles and responsibilities. 
+These roles could range from system administrators and application owners 
+to CISOs and DevOps Engineers. However, for the purpose of this document, 
+we will not differentiate between these roles. Instead we will use the term 
+'user' broadly, without attempting to make distinctions among roles.</p>
+<p>Examples of user interactions with KubeStellar are illustrated in the
+<a href="../example-scenarios/">KubeStellar Usage Example Scenarios</a> document.</p>
+<p>The KubeStellar architecture has the following main modules.</p>
+<ul>
+<li>
+<p><a href="https://github.com/kubestellar/kubeflex/"><em>KubeFlex</em></a>. KubeStellar builds on the services of KubeFlex, using it to keep track of, and possibly provide, the Inventory and Transport spaces and the Workload Description spaces. Each of those appears as a <code>ControlPlane</code> object in the KubeFlex hosting cluster.</p>
+</li>
+<li>
+<p><em>KubeStellar Controller Manager</em>: this module is instantiated once per WDS and is responsible for watching <code>BindingPolicy</code> objects and create from it a matching <code>Binding</code> object that contains list of references to the concrete objects and list of references to the concrete clusters, and for returning reported state from the ITS into the WDS.</p>
+</li>
+<li>
+<p><em>Pluggable Transport Controller</em>: this module is instantiated once per WDS and is responsible for projecting KubeStellar workload and control objects of the WDS into OCM workload/control objects in the ITS.</p>
+</li>
+<li>
+<p><em>Space Manager</em>: This module manages the lifecycle of spaces.</p>
+</li>
+<li>
+<p><em>OCM Cluster Manager</em>: This module is instantiated once per ITS and syncs objects from that ITS to the Workload Execution 
+Clusters (WECs). In the ITS, each mailbox namespace is associated with one WEC. Objects 
+that are put in a mailbox namespace are delivered to the matching WEC.</p>
+</li>
+<li>
+<p><em>OCM Agent</em>: This module registers the WEC to the OCM Hub, watches for 
+<a href="https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L17">ManifestWork.v1.work.open-cluster-management.io</a> objects and unwraps and syncs the objects into the WEC.</p>
+</li>
+<li>
+<p><em>OCM Status Add-On Controller</em>: This module is instantiated once per ITS and uses the <a href="https://open-cluster-management.io/concepts/addon/">OCM Add-on Framework</a> to get the OCM Status Add-On Agent installed in each WEC along with supporting RBAC objects.</p>
+</li>
+<li>
+<p><em>OCM Status Add-On Agent</em>: This module watches <a href="https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L528">AppliedManifestWork.v1.work.open-cluster-management.io</a> objects 
+to find objects that are synced by the OCM agent, gets their status 
+and updates <code>WorkStatus</code> objects in the ITS namespace associated with the WEC.</p>
+</li>
+</ul>
+<p>
+<figure><img src="../images/main-modules.svg" /><figcaption>Figure 2 - Main Modules</figcaption>
+</figure>
+</p>
+<h2 id="kubestellar-controller-manager">KubeStellar Controller Manager<a class="headerlink" href="#kubestellar-controller-manager" title="Permanent link">#</a></h2>
+<p>This module manages the binding controller and the status controller. </p>
+<ul>
+<li>
+<p>The binding controller watches <code>BindingPolicy</code> and workload objects
+on the Workload Definition Space (WDS), and maintains a <code>Binding</code>
+object for each <code>BindingPolicy</code> in the WDS. A <code>Binding</code> object
+contains (a) the concrete list of references to workload objects (and
+associated modulations on downsync behavior) and (b) the concrete list
+of clusters that were selected by the <code>BindingPolicy</code> selectors.</p>
+</li>
+<li>
+<p>The status controller watches for <em>WorkStatus</em> objects on the ITS
+  and, based on the instructions in the <code>BindingPolicy</code> and
+  <code>StatusCollector</code> objects, returns reported state into the WDS in
+  <a href="../combined-status/">the two defined ways</a>.</p>
+</li>
+</ul>
+<p>There is one instance of a KubeStellar Controller Manager for each WDS. 
+Currently this controller-manager runs in the KubeFlex hosting cluster and is responsible for installing the required 
+CRDs in the associated WDS.
+More details on the internals of this module are provided in <a href="#kubestellar-controllers-architecture">KubeStellar Controllers Architecture</a>.</p>
+<h2 id="pluggable-transport-controller">Pluggable Transport Controller<a class="headerlink" href="#pluggable-transport-controller" title="Permanent link">#</a></h2>
+<p>This controller's job is to (possibly through delegating some
+responsibilities): (a) get workload objects from WDS to WECs as
+prescribed by the <code>Binding</code> objects and their referenced
+<code>CustomTransform</code> objects and inventory objects and (b) get
+corresponding reported state back into <code>WorkStatus</code> objects in the
+ITS.</p>
+<p>Different implementations of this controller are possible; it would be
+possible to enable even more different implementations by taking a
+more general approach to inventory.</p>
+<p>The implementations need not be in this Git repository. Currently
+there is one implementation, and it <em>is</em> in this repository. This
+implementation uses <a href="https://open-cluster-management.io">Open Cluster
+Management</a>. The OCM Status Add-On
+Controller and Agent are part of the way this transport controller
+gets its job done.</p>
+<p>The OCM (based) Transport Controller maintains, in the ITS, a set of
+<code>ManifestWork</code> objects that constitute an OCM representation of what
+is requested by the KubeStellar workload and control objects in the
+WDS. Based on the associations in the <code>Binding</code> objects, this
+transport controller bundles workload objects from the WDS into
+<code>ManifestWork</code> objects in the ITS. The bundling is controllable, with
+configured limits on both the number of objects in a bundle and the
+size of the <code>ManifestWorkSpec</code>.</p>
+<p>There is one instance of the pluggable transport controller for each
+WDS, managed according to a <code>Deployment</code> object in the KubeFlex
+hosting cluster.  More details on the internals of this module are
+provided in <a href="#kubestellar-controllers-architecture">KubeStellar Controllers
+Architecture</a>.</p>
+<h2 id="space-manager">Space Manager<a class="headerlink" href="#space-manager" title="Permanent link">#</a></h2>
+<p>The Space Manager handles the lifecycle of spaces. 
+KubeStellar uses the <a href="https://github.com/kubestellar/kubeflex">KubeFlex project</a>
+for space management. In KubeFlex, a space is named a <code>ControlPlane</code>, and we will use 
+both terms in this document. KubeStellar currently prereqs KubeFlex to 
+provide one or more spaces. We plan to make this optional in the near future.</p>
+<p>KubeFlex is a flexible framework that supports various kinds of control planes, such
+as <em>k8s</em>, a basic Kubernetes API Server with a subset of kube controllers, and 
+<em>vcluster</em>: a virtual cluster that runs on the hosting cluster based on the
+<a href="https://www.vcluster.com">vCluster Project</a>. More detailed information
+on the different types of control planes and architecture are described
+in the <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/architecture.md">KubeFlex Architecture</a>.</p>
+<p>There are currently two roles for spaces managed by KubeFlex: Inventory and Transport Space 
+(ITS) and Workload Description Space (WDS). The former runs the <a href="#ocm-cluster-manager">OCM Cluster Manager</a> on a vcluster-type control plane, and the latter runs on a k8s-type control plane.</p>
+<p>An ITS holds the inventory and the mailbox namespaces. The inventory is anchored by <a href="https://github.com/open-cluster-management-io/api/blob/v0.12.0/cluster/v1/types.go#L33">ManagedCluster.v1.cluster.open-cluster-management.io</a> objects that describe the WECs. For each WEC there may also be a <code>ConfigMap</code> object (in the <code>customization-properties</code> namespace) that carries additional properties of that WEC; this <code>ConfigMap</code> is used in customizing the workload to the WEC. The mailbox namespaces and their contents are transport implementation details that users do not need to deal with. Each mailbox namespace corresponds 1:1 with a WEC and holds <code>ManifestWork</code> objects managed by the central KubeStellar controllers.</p>
+<p>A WDS holds user workload objects and the user's objects that form the interface to KubeStellar control. 
+Currently, the user control objects are <code>BindingPolicy</code> and <code>Binding</code> objects.
+Future development may define more kinds of control objects hosted in the WDS.</p>
+<p>KubeFlex provides the ability to start controllers connected to a
+Control Plane API Server or to deploy Helm Charts into a Control Plane
+API server with <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#post-create-hooks"><u>post-create
+hooks</u></a>.
+This feature is currently adopted for KubeStellar modules startup, as it allows to
+create a Workload Description Space (WDS) and start the KubeStellar Controller Manager, and create an Inventory and Transport Space (ITS) in a
+<code>vcluster</code> and install the <a href="https://open-cluster-management.io/"><u>Open Cluster Management
+Hub</u></a> there.</p>
+<h2 id="ocm-cluster-manager">OCM Cluster Manager<a class="headerlink" href="#ocm-cluster-manager" title="Permanent link">#</a></h2>
+<p>This module is based on the <a href="https://open-cluster-management.io">Open Cluster Management Project</a>,
+a community-driven project that focuses on multicluster and multicloud scenarios for Kubernetes apps. 
+It provides APIs for cluster registration, work distribution and much more. 
+The project is based on a hub-spoke architecture, where a single hub cluster 
+handles the distribution of workloads through manifests, and one or more spoke clusters 
+receive and apply the workload objects from the manifests. In Open Cluster Management, spoke clusters 
+are called <em>managed clusters</em>, and the component running on the hub cluster is the <em>cluster manager</em>.
+Manifests provide a summary for the status of each object, however in some use 
+cases this might not be sufficient as the full status for objects may be required. 
+OCM provides an add-on framework that allows to automatically install additional 
+agents on the managed clusters to provide specific features. This framework is used to
+install the status add-on on all managed clusters.
+KubeStellar currently exposes users directly to OCM inventory management and WEC registration.</p>
+<h2 id="ocm-agent">OCM Agent<a class="headerlink" href="#ocm-agent" title="Permanent link">#</a></h2>
+<p>The OCM Agent Module (a.k.a klusterlet) has two main controllers: the <em>registration agent</em>
+and the <em>work agent</em>. </p>
+<p>The <strong>registration agent</strong> is responsible for registering 
+a new cluster into OCM. The agent creates an unaccepted <a href="https://github.com/open-cluster-management-io/api/blob/v0.12.0/cluster/v1/types.go#L33">ManagedCluster</a> into 
+the hub cluster along with a temporary <a href="https://github.com/kubernetes/api/blob/v0.26.1/certificates/v1/types.go#L41">CertificateSigningRequest.v1.certificates</a> (CSR) object. 
+The cluster will be accepted by the hub control plane if the CSR is approved and 
+signed by any certificate provider setting filling <code>.status.certificate</code> with legit 
+X.509 certificates, and the ManagedCluster resource is approved by setting 
+<code>.spec.hubAcceptsClient</code> to true in the spec. Upon approval, the registration 
+agent observes the signed certificate and persists them as a local secret 
+named <code>hub-kubeconfig-secret</code> (by default in the <code>open-cluster-management-agent</code> namespace) 
+which will be mounted to the other fundamental components of klusterlet such as 
+the work agent. The registration process in OCM is called <em>double opt-in</em> mechanism, 
+which means that a successful cluster registration requires both sides of approval 
+and commitment from the hub cluster and the managed cluster.</p>
+<p>The <strong>work agent</strong> monitors the <code>ManifestWork</code> resource in the cluster namespace 
+on the hub cluster. The work agent tracks all the resources defined in ManifestWork 
+and updates its status. There are two types of status in ManifestWork: the <em>resourceStatus</em> 
+tracks the status of each manifest in the ManifestWork, and <em>conditions</em> reflects the overall 
+status of the ManifestWork. The work agent checks whether a resource is <em>Available</em>, 
+meaning the resource exists on the managed cluster, and <em>Applied</em>, meaning the resource 
+defined in ManifestWork has been applied to the managed cluster. To ensure the resources 
+applied by ManifestWork are reliably recorded, the work agent creates an <code>AppliedManifestWork</code> 
+on the managed cluster for each ManifestWork as an anchor for resources relating to ManifestWork. 
+When ManifestWork is deleted, the work agent runs a <em>Foreground</em> deletion, and that ManifestWork 
+will stay in deleting state until all its related resources have been fully cleaned in the managed 
+cluster.</p>
+<h2 id="ocm-status-add-on-controller">OCM Status Add-On Controller<a class="headerlink" href="#ocm-status-add-on-controller" title="Permanent link">#</a></h2>
+<p>This module automates the installation of the OCM status add-on agent 
+on all managed clusters. It is based on the 
+<a href="https://open-cluster-management.io/concepts/addon/">OCM Add-on Framework</a>, 
+which is a framework that helps developers to develop extensions 
+for working with multiple clusters in custom cases. A module based on 
+the add-on framework has two components: a controller and an 
+agent. The controller interacts with the add-on manager to register 
+the add-on, manage the distribution of the add-on to all clusters, and set 
+up the RBAC permissions required by the add-on agent to interact with the mailbox 
+namespace associated with the managed cluster. More specifically, the status 
+add-on controller sets up RBAC permissions to allow the add-on agent to 
+list and get <code>ManifestWork</code> objects and create and update <em>WorkStatus</em> objects.</p>
+<h2 id="ocm-status-add-on-agent">OCM Status Add-On Agent<a class="headerlink" href="#ocm-status-add-on-agent" title="Permanent link">#</a></h2>
+<p>The OCM Status Add-On Agent is a controller that runs alongside the OCM Agent 
+in the managed cluster. Its primary function is to track objects delivered 
+by the work agent and report the full status of those objects back to the ITS. 
+Other KubeStellar controller(s) then propagate and/or summarize that status information into the WDS. The OCM Status Add-On Agent watches <a href="https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L528">AppliedManifestWork.v1.work.open-cluster-management.io</a> objects in the WEC to observe the status reported there by the OCM Agent. Each <code>AppliedManifestWork</code> object is specific to one workload object, and holds both the local (in the WEC) status from that object and a reference to that object. For each <code>AppliedManifest</code>, the OCM Status Add-On Agent maintains a corresponding <code>WorkStatus</code> object in the relevant mailbox namespace in the ITS. Such a <code>WorkStatus</code> object also is about exactly one workload object, so that status updates for one object do not require updates of a whole bundle. A <code>WorkStatus</code> object holds the status of a workload object and a reference to that object. </p>
+<p>Installing the Status Add-On Agent in the WEC causes status to be returned to <code>WorkStatus</code> objects for all downsynced objects.</p>
+<h2 id="kubestellar-controllers-architecture">KubeStellar Controllers Architecture<a class="headerlink" href="#kubestellar-controllers-architecture" title="Permanent link">#</a></h2>
+<p>The KubeStellar controllers architecture is based on common patterns and best 
+practices for Kubernetes controllers, such as the 
+<a href="https://github.com/kubernetes/sample-controller"><u>Kubernetes Sample Controller</u></a>. 
+A Kubernetes controller uses informers to watch for changes in Kubernetes
+objects, caches to store the objects, event handlers to react to
+events, work queues for parallel processing of tasks, and a reconciler
+to ensure the actual state matches the desired state. However, that
+pattern has been extended to provide the following features:</p>
+<ul>
+<li>Using dynamic informers for workload objects</li>
+<li>Starting informers on all API Resources (except some that do not need
+  watching)</li>
+<li>Workload Informers and Listers are maintained in a hash map that is
+  indexed by GVR (Group, Version, Resource) of the watched objects.</li>
+<li>Using a common work queue and set of workers, multiplexing multiple types of object references into that queue.<ul>
+<li>A reference to a workload object carries its API Group, Version, Resource, and Kind. No need for a <code>RESMapper</code>, the "Kind" and "Resource" are learned together from the API discovery process.</li>
+</ul>
+</li>
+<li>Starting &amp; stopping informers dynamically based on creation or
+  deletion of CRDs (which add/remove APIs on the WDS).</li>
+<li>One client connected to the WDS space and one (or more in the future)
+  to connect to one or more OCM shards.<ul>
+<li>The WDS-connected client is used to start the dynamic
+  informers/listers for workload and control objects in the WDS</li>
+<li>The OCM-connected client is used to start informers/listers for OCM
+  ManagedClusters and to copy/update/remove the wrapped objects
+  into/from the OCM mailbox namespaces.</li>
+</ul>
+</li>
+</ul>
+<p>There are two controllers in the KubeStellar controller manager:</p>
+<ul>
+<li>
+<p>Binding Controller - one client connected to the WDS and one
+  (or more in the future) to connect to one or more ITS shards.</p>
+<ul>
+<li>
+<p>The WDS-connected client is used to start the dynamic
+  informers/listers for workload objects and KubeStellar control
+  objects in the WDS.</p>
+</li>
+<li>
+<p>The OCM-connected client is used to start informers/listers for
+  OCM ManagedClusters. This is a temporary state until cluster
+  inventory abstraction is implemented and decoupled from OCM (and
+  then this client should be removed and we would need to use
+  client to inventory space).</p>
+</li>
+<li>
+<p>This controller maintains an internal data structure called the
+  <code>BindingPolicyResover</code> that tracks what <code>Binding</code> <em>should</em>
+  correspond to each <code>BindingPolicy</code>, and uses it to make that so.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Status controller - one client connected to the WDS and one
+  connected to the ITS; also uses informer-like services from the
+  Binding Controller, regarding workload objects and
+  BindingPolicies. The Status Controller gets reported state from the
+  ITS back to the WDS, in <a href="../combined-status/">the two supported
+  ways</a>: combining reported state from multiple
+  WECs to a query result object, and copying status from a single WEC
+  to the original workload object.</p>
+</li>
+</ul>
+<p>There is also a separate Transport Controller. This also has a
+WDS-connected client, used to monitor workload and control objects,
+and an ITS-connected-client, used to monitor and create/update/delete
+<code>ManifestWork</code> objects.</p>
+<h3 id="binding-controller">Binding Controller<a class="headerlink" href="#binding-controller" title="Permanent link">#</a></h3>
+<p>The Binding controller is responsible for watching workload objects
+and <code>BindingPolicy</code> objects, and maintains for each of the latter a
+matching <code>Binding</code> object in the WDS.  A <code>Binding</code> object is mapped
+1:1 to a <code>BindingPolicy</code> object and contains the concrete list of
+references to workload objects and the concrete list of references to
+inventory objects that were selected by the policy.</p>
+<p>The Binding Controller is centered on its workqueue and an internal
+data structure, called a <code>BindingPolicyResover</code>, that represents the
+set of <code>Binding</code> objects that <em>should</em> exist based on the controller's
+inputs. The controller has informers for all of its inputs: a static
+collection for the control objects (<code>BindingPolicy</code> and inventory
+objects) and a dynamic collection (based on continual API discovery)
+for the workload objects. The controller also has informers for its
+output objects (i.e., <code>Binding</code> objects). Every notification from an
+informer is handled by putting a relevant object reference into the
+work queue. Working on a reference to an input involves updating the
+<code>BindingPolicyResover</code> and enqueuing a reference to any output object
+(<code>Binding</code>) that might need a change. Working on a reference to a
+<code>Binding</code> involves comparing what is actually in that <code>Binding</code> with
+what the <code>BindingPolicyResover</code> says should be there, and
+creating/updating/deleting the <code>Binding</code> if there is a difference.</p>
+<p>The Binding Controller also provides two informer-like services that
+the Status Controller uses. One is notifying about any change to that
+internal data structure, and the ability to read from it. The other is
+notifying about workload object events.</p>
+<p>The architecture and the event flow of the code for create/update object events is
+illustrated in Figure 3 (some details are omitted to make the flow easier
+to understand).</p>
+<p>
+<figure><img src="../images/binding-controller.svg" /><figcaption>Figure 3 - Binding Controller</figcaption>
+</figure>
+</p>
+<p>At startup, the controller code sets up the dynamic informers, the event
+handler and the work queue as follows:</p>
+<ul>
+<li>lists all API preferred resources (using discovery client's <code>ServerPreferredResources()</code>
+  to return only one preferred storage version for API group)</li>
+<li>Filters out some resources</li>
+<li>For each resource:<ul>
+<li>Creates GVR key</li>
+<li>Registers Event Handler</li>
+<li>Starts Informer</li>
+<li>Stores informer and lister in a map indexed by GVR</li>
+</ul>
+</li>
+<li>Waits for all caches to sync</li>
+<li>Gets the list of all <code>BindingPolicy</code> objects and, for each one, invokes the <code>BindingPolicyResover</code> method for the presence of the <code>BindingPolicy</code>.</li>
+<li>Starts N workers to process work queue</li>
+</ul>
+<p>The informer and watches specific resources on the WDS API Server; on
+create/update/delete object events it puts a copy of the object into
+the informer's local cache, which is what the lister reads. The
+informer invokes the event handler. The handler implements the event
+handling functions (<code>AddFunc</code>, <code>UpdateFunc</code>, <code>DeleteFunc</code>)</p>
+<h4 id="sync-bindingpolicy">Sync BindingPolicy<a class="headerlink" href="#sync-bindingpolicy" title="Permanent link">#</a></h4>
+<p>For a <code>BindingPolicy</code> that is deleted or being deleted, sync consists of the following steps.</p>
+<ol>
+<li>Ensure the absence of the KubeStellar finalizer on the <code>BindingPolicy</code>.</li>
+<li>Invoke the <code>BindingPolicyResover</code> method for the absence of the <code>BindingPolicy</code>.</li>
+</ol>
+<p>For a <code>BindingPolicy</code> that is neither deleted nor being deleted, sync consists of the following steps.</p>
+<ol>
+<li>Ensure the presence of the KubeStellar finalizer on the <code>BindingPolicy</code>.</li>
+<li>Invoke the <code>BindingPolicyResover</code> method for the presence of the <code>BindingPolicy</code>.</li>
+<li>Find all the WECs (which are represented by inventory objects) that match the <code>BindingPolicy</code>.</li>
+<li>Invoke the <code>BindingPolicyResover</code> method that associates a BindingPolicy's name with its current set of matching WECs.</li>
+<li>Enqueue a reference to every workload object.</li>
+</ol>
+<h4 id="sync-workload-object">Sync Workload Object<a class="headerlink" href="#sync-workload-object" title="Permanent link">#</a></h4>
+<p>If the workload object is a CRD then, in addition to the steps below,
+the controller makes the corresponding change in the results of API
+discovery.</p>
+<p>If the workload object is being deleted then the controller invokes
+the <code>BindingPolicyResolver</code> method that handles with the non-existence
+of an object; this completes sync in this case.</p>
+<p>Otherwise the controller proceeds as follows, independently for each
+<code>BindingPolicy</code> that exists in the informer's local cache and the
+<code>BindingPolicyResolver</code> is aware of.</p>
+<ol>
+<li>
+<p>The workload object is tested against the downsync policy clauses
+   of the <code>BindingPolicy</code> and results accumulated.</p>
+</li>
+<li>
+<p>The controller calls the <code>BindingPolicyResolver</code> method that copes
+   with the accumulated results.</p>
+</li>
+<li>
+<p>If the resolver reported that this made a difference then the
+   controller enqueues a reference to the corresponding <code>Binding</code>
+   object.</p>
+</li>
+</ol>
+<h4 id="sync-binding">Sync Binding<a class="headerlink" href="#sync-binding" title="Permanent link">#</a></h4>
+<p>If the <code>BindingPolicyResover</code> is unaware of the existence of a
+corresponding <code>BindingPolicy</code> then almost nothing needs to be done:
+the <code>BindingPolicy</code> is either being created or deleted and there will
+be more syncing done due to other events. All that need be done here
+and now is have the resolver notify its registered handlers (which are
+from the Status Controller) for <code>BindingPolicy</code> events.</p>
+<p>If the corresponding <code>BindingPolicy</code> object does not exist, then
+nothing more is done.</p>
+<p>In the remaining cases, the controller takes the following steps.</p>
+<ol>
+<li>
+<p>The controller generates the proper <code>BindingSpec</code> from the
+   information in the <code>BindingPolicyResover</code>. The controller compares
+   that with the <code>BindingSpec</code> (if any) from the <code>Binding</code> lister. If
+   there is a difference then the controller updates the <code>Binding</code>
+   object and has the resolver notify the registered handlers for
+   <code>BindingPolicy</code> events. When creating a <code>Binding</code> object, the
+   controller sets the corresponding <code>BindingPolicyObject</code> as a
+   controlling owner in the object metadata.</p>
+</li>
+<li>
+<p>The controller writes the <code>.status</code> of the corresponding
+   <code>BindingPolicy</code>.  This includes propagating the errors from the
+   <code>.status.errors</code> of the <code>Binding</code> and adding reports of invalid
+   requests for singleton reported state return (requests where the
+   object is not distributed to exactly 1 WEC).</p>
+</li>
+</ol>
+<h3 id="status-controller">Status Controller<a class="headerlink" href="#status-controller" title="Permanent link">#</a></h3>
+<p>The status controller implements the last stage of reported state
+propagation, from the ITS into the WDS. This includes both singleton
+reported state return into the <code>.status</code> section of workload objects
+and programmed aggregation into <code>CombinedStatus</code> objects.</p>
+<p>The <code>WorkStatus</code> objects are created, updated, and deleted in the ITS
+by the chosen transport. For the OCM transport, that is the OCM Status
+Add-On Agent described <a href="#ocm-status-add-on-agent">above</a>.</p>
+<p>The status controller has informers for its unique inputs, which are
+<code>StatusCollector</code> objects in the WDS and <code>WorkStatus</code> objects in the
+ITS. The status controller also gets informer-like services from the
+binding controller: getting notified of and being able to read the
+current state resulting from (a) workload object create/update/delete,
+(b) change in an intended <code>Binding</code>, and (c) change in whether
+singleton reported state return is requested for a workload
+object. The status controller also has informers for its unique
+outputs, which are the <code>CombinedStatus</code> objects.</p>
+<p>The high-level flow for the singleton status update is described in Figure 4.</p>
+<p>
+<figure><img src="../images/status-controller.svg" /><figcaption>Figure 4 - Status Controller</figcaption>
+</figure>
+</p>
+<h3 id="transport-controller">Transport Controller<a class="headerlink" href="#transport-controller" title="Permanent link">#</a></h3>
+<p>The transport controller is pluggable and allows the option to plug different
+implementations of the transport interface. The interface between the plugin and the generic code is a Go language interface (in <code>pkg/transport/transport.go</code>) that the plugin has to implement. This interface requires the following from the plugin.</p>
+<ul>
+<li>Upon registration of a new WEC, plugin should create a namespace for the WEC in the ITS and delete the namespace once the WEC registration goes away (mailbox namespace per WEC);</li>
+<li>Plugin must be able to wrap any number of objects into a single wrapped object;</li>
+<li>Have an agent that can be used to pull the wrapped objects from the mailbox namespace and apply them to the WEC. A single example for such an agent is an agent that runs on the WEC and watches the wrapped object in the corresponding namespace in the central hub and is able to unwrap it and apply the objects to the WEC. </li>
+<li>Have inventory representation for the clusters.</li>
+</ul>
+<p>The above list is required in order to comply with <a href="https://multicluster.sigs.k8s.io/concepts/work-api/"><u>SIG Multi-Cluster Work API</u></a>.</p>
+<p>Each plugin has an executable with a <code>main</code> function that calls the generic code (in <code>pkg/transport/cmd/generic-main.go</code>), passing the plugin object that implements the plugin interface. The generic code does the rule-based customization; the plugin is given customized objects. The generic code also ensures that the namespace named "customization-properties" exists in the ITS.</p>
+<p>KubeStellar currently has one transport plugin implementation which is based on CNCF Sandbox project <a href="https://open-cluster-management.io">Open Cluster Management</a>. OCM transport plugin implements the above interface and supplies a function to start the transport controller using the specific OCM implementation. Code is available <a href="https://github.com/kubestellar/ocm-transport-plugin">here</a>.<br />
+We expect to have more transport plugin options in the future.</p>
+<p>The following section describes how transport controller works, while the described behavior remains the same no matter which transport plugin is selected. The high level flow for the transport controller is described in Figure 5.</p>
+<p>
+<figure><img src="../images/transport-controller.svg" /><figcaption>Figure 5 - Transport Controller</figcaption>
+</figure>
+</p>
+<p>The transport controller is driven by <code>Binding</code> objects in the WDS. There is a 1:1 correspondence between <code>Binding</code> objects and <code>BindingPolicy</code> objects, but the transport controller does not care about the latter. A <code>Binding</code> object contains (a) a list of references to workload objects that are selected for distribution and (b) a list of references to the destinations for those workload objects.</p>
+<p>The transport controller watches for <code>Binding</code> objects on the WDS, using an informer. Upon every add, update, and delete event from that informer, the controller puts a reference to that <code>Binding</code> object in its work queue. The transport controller also has informers on the inventory objects (both <code>ManagedCluster</code> and their associated <code>ConfigMap</code>) and on the wrapped objects (<code>ManifestWork</code>). Forked goroutines process items from the work queue. For a reference to a control or workload object, that processing starts with retrieving the informer's cached copy of that object. </p>
+<p>The transport controller also maintains a finalizer on each Binding object. When processing a reference to a <code>Binding</code> object that no longer exists, the transport controller has nothing more to do (because it processes the deletion before removing its finalizer).</p>
+<p>When processing a reference to a <code>Binding</code> object that still exists, the transport controller looks at whether that <code>Binding</code> is in the process of being deleted. If so then the controller ensures that the corresponding wrapped object (<code>ManifestWork</code>) in the ITS no longer exists and then removes the finalizer from the <code>Binding</code>.</p>
+<p>When processing a <code>Binding</code> object that is not being deleted, the transport controller first ensures that the finalizer is on that object. Then the controller constructs an internal function from destination to the customized wrapped object for that destination. The controller then iterates over the <code>Binding</code>'s list of destinations and propagates the corresponding wrapped object (reported by the function just described) to the corresponding mailbox namespace.  Once the wrapped object is in the mailbox namespace of a cluster on the ITS, it's the agent responsibility to pull the wrapped object from there and apply/update/delete the workload objects on the WEC.</p>
+<p>To construct the function from destination to customized wrapped object, the transport controller reads the <code>Binding</code>'s list of references to workload objects. The controller reads those objects from the WDS using a Kubernetes "dynamic" client. Immediately upon reading each workload object, the controller applies the WEC-independent transforms (from the <code>CustomTransform</code> objects). After doing that for all the listed workload objects, the controller goes through those objects one-by-one and applies template expansion for each destination if the object requests template expansion. If any of those objects requests template expansion and has a string that actually involves template expansion: the controller accumulates a map from destination to slice of customized objects and then invokes the transport plugin on each of those slices, to ultimately produce the function from destination to wrapped object. If none of the selected workload objects actually involved any template expansion then the controller wraps the slice of workload objects to get one wrapped object and produces a constant function from destination to that one wrapped object. </p>
+<p>Transport controller is based on the controller design pattern and aims to bring the current state to the desired state. If a WEC was removed from the <code>Binding</code>, the transport controller will also make sure to remove the matching wrapped object(s) from the WEC's mailbox namespace.</p>
+<h4 id="custom-transform-cache">Custom transform cache<a class="headerlink" href="#custom-transform-cache" title="Permanent link">#</a></h4>
+<p>To support efficient application of the <code>CustomTransform</code> objects, the transport controller maintains a cache of the results of internalizing what the users are asking for. In relational algebra terms, that cache consists of the following relations.</p>
+<p>Relation "USES": has a row whenever the <code>Binding</code>'s list of workload objects uses the <code>GroupResource</code>.</p>
+<table>
+<thead>
+<tr>
+<th>column name</th>
+<th>type</th>
+<th>in key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bindingName</code></td>
+<td>string</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>gr</code></td>
+<td>metav1.GroupResource</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p>Relation "INSTRUCTIONS": has a row saying what to do for each <code>GroupResource</code>.</p>
+<table>
+<thead>
+<tr>
+<th>column name</th>
+<th>type</th>
+<th>in key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gr</code></td>
+<td>metav1.GroupResource</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>removes</code></td>
+<td>SET(jsonpath.Query)</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>Relation "SPECS": remembers the specs of <code>CustomTransform</code> objects.</p>
+<table>
+<thead>
+<tr>
+<th>column name</th>
+<th>type</th>
+<th>in key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ctName</code></td>
+<td>string</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>gr</code></td>
+<td>metav1.GroupResource</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>removes</code></td>
+<td>SET(string)</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>The cache maintains the following invariants on those relations. Note how these invariants require removal of data that is no longer interesting.</p>
+<ol>
+<li>INSTRUCTIONS has a row for a given <code>GroupResource</code> if and only if USES has one or more rows for that <code>GroupResource</code>.</li>
+<li>SPECS has a row for a given <code>CustomTransform</code> name if and only if that <code>CustomTransform</code> contributed to an existing row in INSTRUCTIONS.</li>
+</ol>
+<p>Whenever it removes a row from INSTRUCTIONS due to loss of confidence in that row, the cache has the controller enqueue a reference to every related <code>Binding</code> from USES, so that eventually a revised row will be derived and applied to every dependent <code>Binding</code>.</p>
+<p>The interface to the cache is <code>customTransformCollection</code> and the implementation is in a <code>*customTransformCollectionImpl</code>. This represents those relations as follows.</p>
+<ol>
+<li>USES is represented by two indices, each a map from one column value to the set of related other column values. The two indices are in <code>bindingNameToGroupResources</code> and <code>grToTransformData/bindingsThatCare</code>.</li>
+<li>INSTRUCTIONS is represented by <code>grToTransformData/removes</code>.</li>
+<li>SPECS is represented by <code>ctNameToSpec</code> and an index, <code>grToTransformData/ctNames</code>.</li>
+</ol>
+<p>The cache interface has the following methods.</p>
+<ul>
+<li>
+<p><code>getCustomTransformChanges</code> ensures that the cache has an entry for a given usage (a (<code>Binding</code>, <code>GroupResource</code>) pair) and returns the corresponding instructions (i.e., set of JSONPath to remove) for that <code>GroupResource</code>. This method sets the status of each <code>CustomTransform</code> API object that it processes.</p>
+<p>Of course this method maintains the cache's invariants. That means adding rows to SPECS as necessary. It also means removing a row from INSTRUCTIONS upon discovery that a <code>CustomTransform</code>'s Spec has changed its <code>GroupResource</code>. Note that the cache's invariants require this removal by this method, not relying on an eventual call to <code>NoteCustomTransform</code> (because the cache records at most the latest Spec for each <code>CustomTransform</code>, a later cache operation will not know about the previous <code>GroupResource</code>).</p>
+<p>Removing a row from INSTRUCTIONS also entails removing the corresponding rows from SPECS, to maintain the cache's invariants.</p>
+</li>
+<li>
+<p><code>noteCustomTransform</code> reacts to a create/update/delete of a <code>CustomTransform</code> object. In the update case, if the <code>CustomResourceSpec</code> changed its <code>GroupResource</code> then this method removes two rows from INSTRUCTIONS (if they were present): the one for the old <code>GroupResource</code> and the one for the new. In case of create, delete, or other change in Spec, this method removes the one relevant row (if present) in INSTRUCTIONS.</p>
+</li>
+<li>
+<p><code>setBindingGroupResources</code> reacts to knowing the full set of <code>GroupResource</code> that a given <code>Binding</code> uses. This removes outdated rows from USES (updates the two indices that represent it) and removes rows from INSTRUCTIONS that are no longer allowed.</p>
+</li>
+</ul>
+<h4 id="customization-properties-cache">Customization properties cache<a class="headerlink" href="#customization-properties-cache" title="Permanent link">#</a></h4>
+<p>The transport controller maintains a cached set of customization properties for each destination, and an association between <code>Binding</code> and the set of destinations that it references. When a relevant informer delivers an event about an inventory object (either a <code>ManagedCluster</code> object or a <code>ConfigMap</code> object that adds properties for that destination) the controller enqueues a work item of type <code>recollectProperties</code>. This work item carries the name of the inventory object. Processing that work item starts by re-computing the full map of properties for that destination. If the cache has an entry for that destination and the cached properties differ from the ones freshly computed, the controller updates that cache entry and enqueues a reference to every <code>Binding</code> object that depends on the properties of that destination.</p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              Thanks for your feedback! Help us improve this page by using our <a href="https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../readme/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Overview">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Overview
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../kubeflex-intro/" class="md-footer__link md-footer__link--next" aria-label="Next: KubeFlex">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                KubeFlex
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.f13b1293.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -5,6 +5,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/"/>
          
     </url>
     <url>
@@ -12,6 +13,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/readme/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/readme/"/>
          
     </url>
     <url>
@@ -19,6 +21,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/Community/_index/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/Community/_index/"/>
          
     </url>
     <url>
@@ -26,6 +29,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/Community/kubecon/eu2025/contribfest/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/Community/kubecon/eu2025/contribfest/"/>
          
     </url>
     <url>
@@ -33,6 +37,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/Community/partners/argocd/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/Community/partners/argocd/"/>
          
     </url>
     <url>
@@ -40,6 +45,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/Community/partners/fluxcd/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/Community/partners/fluxcd/"/>
          
     </url>
     <url>
@@ -47,6 +53,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/Community/partners/kyverno/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/Community/partners/kyverno/"/>
          
     </url>
     <url>
@@ -54,6 +61,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/Community/partners/mvi/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/Community/partners/mvi/"/>
          
     </url>
     <url>
@@ -61,6 +69,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/Community/partners/openziti/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/Community/partners/openziti/"/>
          
     </url>
     <url>
@@ -68,6 +77,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/Community/partners/turbonomic/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/Community/partners/turbonomic/"/>
          
     </url>
     <url>
@@ -75,6 +85,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/common-subs/coming-soon/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/common-subs/coming-soon/"/>
          
     </url>
     <url>
@@ -82,6 +93,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/common-subs/placeholder/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/common-subs/placeholder/"/>
          
     </url>
     <url>
@@ -89,6 +101,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/CONTRIBUTING/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/CONTRIBUTING/"/>
          
     </url>
     <url>
@@ -96,6 +109,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/LICENSE/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/LICENSE/"/>
          
     </url>
     <url>
@@ -103,6 +117,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/coc/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/coc/"/>
          
     </url>
     <url>
@@ -110,6 +125,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/governance/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/governance/"/>
          
     </url>
     <url>
@@ -117,6 +133,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/onboarding/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/onboarding/"/>
          
     </url>
     <url>
@@ -124,6 +141,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/operations/code-management/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/operations/code-management/"/>
          
     </url>
     <url>
@@ -131,6 +149,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/operations/document-management/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/operations/document-management/"/>
          
     </url>
     <url>
@@ -138,6 +157,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/operations/testing-doc-prs/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/operations/testing-doc-prs/"/>
          
     </url>
     <url>
@@ -145,6 +165,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/security/security/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/security/security/"/>
          
     </url>
     <url>
@@ -152,6 +173,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/security/security_contacts/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/security/security_contacts/"/>
          
     </url>
     <url>
@@ -159,6 +181,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/acquire-hosting-cluster/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/acquire-hosting-cluster/"/>
          
     </url>
     <url>
@@ -166,6 +189,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/architecture/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/architecture/"/>
          
     </url>
     <url>
@@ -173,6 +197,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/argo-to-wds1/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/argo-to-wds1/"/>
          
     </url>
     <url>
@@ -180,6 +205,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/binding/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/binding/"/>
          
     </url>
     <url>
@@ -187,6 +213,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/combined-status/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/combined-status/"/>
          
     </url>
     <url>
@@ -194,6 +221,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/contribute/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/contribute/"/>
          
     </url>
     <url>
@@ -201,6 +229,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/control/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/control/"/>
          
     </url>
     <url>
@@ -208,6 +237,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/core-chart/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/core-chart/"/>
          
     </url>
     <url>
@@ -215,6 +245,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/example-scenarios/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/example-scenarios/"/>
          
     </url>
     <url>
@@ -222,6 +253,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/example-wecs/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/example-wecs/"/>
          
     </url>
     <url>
@@ -229,6 +261,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/galaxy-intro/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/galaxy-intro/"/>
          
     </url>
     <url>
@@ -236,6 +269,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/get-started/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/get-started/"/>
          
     </url>
     <url>
@@ -243,6 +277,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/init-hosting-cluster/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/init-hosting-cluster/"/>
          
     </url>
     <url>
@@ -250,6 +285,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/its/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/its/"/>
          
     </url>
     <url>
@@ -257,6 +293,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/known-issues/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/known-issues/"/>
          
     </url>
     <url>
@@ -264,6 +301,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/knownissue-collector-miss/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/knownissue-collector-miss/"/>
          
     </url>
     <url>
@@ -271,6 +309,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/knownissue-kflex-extension/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/knownissue-kflex-extension/"/>
          
     </url>
     <url>
@@ -278,6 +317,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/knownissue-kind-config/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/knownissue-kind-config/"/>
          
     </url>
     <url>
@@ -285,6 +325,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/knownissue-wsl-ghcr-helm/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/knownissue-wsl-ghcr-helm/"/>
          
     </url>
     <url>
@@ -292,6 +333,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/kubeflex-intro/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/kubeflex-intro/"/>
          
     </url>
     <url>
@@ -299,6 +341,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/packaging/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/packaging/"/>
          
     </url>
     <url>
@@ -306,6 +349,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/pr-signoff/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/pr-signoff/"/>
          
     </url>
     <url>
@@ -313,6 +357,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/pre-reqs/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/pre-reqs/"/>
          
     </url>
     <url>
@@ -320,6 +365,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/release-notes/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/release-notes/"/>
          
     </url>
     <url>
@@ -327,6 +373,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/release-testing/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/release-testing/"/>
          
     </url>
     <url>
@@ -334,6 +381,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/release/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/release/"/>
          
     </url>
     <url>
@@ -341,6 +389,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/roadmap/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/roadmap/"/>
          
     </url>
     <url>
@@ -348,6 +397,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/setup-limitations/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/setup-limitations/"/>
          
     </url>
     <url>
@@ -355,6 +405,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/setup-overview/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/setup-overview/"/>
          
     </url>
     <url>
@@ -362,6 +413,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/start-from-ocm/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/start-from-ocm/"/>
          
     </url>
     <url>
@@ -369,6 +421,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/teardown/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/teardown/"/>
          
     </url>
     <url>
@@ -376,6 +429,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/testing/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/testing/"/>
          
     </url>
     <url>
@@ -383,6 +437,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/transforming/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/transforming/"/>
          
     </url>
     <url>
@@ -390,6 +445,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/troubleshooting/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/troubleshooting/"/>
          
     </url>
     <url>
@@ -397,6 +453,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/usage-limitations/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/usage-limitations/"/>
          
     </url>
     <url>
@@ -404,6 +461,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/user-guide-intro/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/user-guide-intro/"/>
          
     </url>
     <url>
@@ -411,6 +469,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/wds/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/wds/"/>
          
     </url>
     <url>
@@ -418,6 +477,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/wec-registration/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/wec-registration/"/>
          
     </url>
     <url>
@@ -425,6 +485,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/wec/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/wec/"/>
          
     </url>
     <url>
@@ -432,6 +493,7 @@
          <lastmod>2025-02-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/images/image-files-readme/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/images/image-files-readme/"/>
          
     </url>
 </urlset>
