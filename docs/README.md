@@ -41,7 +41,7 @@ To take advantage of this action, you must ensure that you have forked the repos
 3. Select the **Forks** dropdown and click on the plus sign to create a new fork
     ![Top of "Code" section of the shared repo](https://github.com/user-attachments/assets/c0b56897-c2c4-479f-ba16-c1edd4690946)
 
-4. In the resulting dialog select your account as the owner, pick a repository name for the fork, and _be sure to uncheck the_ **"copy the** main **branch only"** _box_
+4. In the resulting dialog select your account as the owner, pick a repository name for the fork, and _be sure to uncheck the box next to_ **"copy the** `main` **branch only"**
     ![Creating your fork](https://github.com/user-attachments/assets/c5909ddd-3bf6-44c2-9102-c07c7e1d6a05)
 
     **NOTE: If you already created a fork but only included the main branch** then you can remedy the problem by propagating the `gh-pages` branch into your fork using `git` commands
