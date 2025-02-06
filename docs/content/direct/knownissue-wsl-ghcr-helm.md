@@ -10,7 +10,7 @@ This error indicates that there was an issue fetching the OAuth token from GitHu
 
 ## Root Cause
 
-The issue is caused by missing or misconfigured credentials for `ghcr.io` in the Docker configuration. Docker fails to authenticate and retrieve the necessary OAuth token from GitHub's container registry.
+The issue is caused by missing or misconfigured credentials for `ghcr.io` in the Docker configuration. Docker fails to authenticate & retrieve the necessary OAuth token from GitHub's container registry.
 ## Workaround
 
 To bypass this issue, follow these steps:
