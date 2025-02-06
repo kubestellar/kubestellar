@@ -26,6 +26,14 @@ func PrimitiveMapGet[Key comparable, Val any](rep map[Key]Val) func(Key) (Val, b
 	}
 }
 
+// PrimitiveMapHas exposes a fragment of the indexing functionality of a primitive map as a func
+func PrimitiveMapHas[Key comparable, Val any](rep map[Key]Val) func(Key) bool {
+	return func(key Key) bool {
+		_, has := rep[key]
+		return has
+	}
+}
+
 func DropOK11[Domain1, Range1 any](base func(Domain1) (Range1, bool)) func(Domain1) Range1 {
 	return func(dom1 Domain1) Range1 {
 		rng1, _ := base(dom1)
