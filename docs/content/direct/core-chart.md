@@ -24,9 +24,9 @@ to join Workload Execution Clusters (WECs) (_e.g._, clusteradm),
 and to interact with Control Planes (_e.g._, kubectl), _etc_.
 For such purpose, a full list of executable that may be required can be found [here](./pre-reqs.md).
 
-The setup of KubeStellar via the Core chart requires the existence of a KubeFlex hosting cluster.
+The setup of KubeStellar via the Core chart requires the existence of a Kubernetes hosting cluster.
 
-This can be:
+While not a complete list of supported hosting clusters, we systematically test our releases using:
 
 1. A local **Kind** or **k3s** cluster with an ingress with SSL passthrough and a mapping to host port 9443
 
