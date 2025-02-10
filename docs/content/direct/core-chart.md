@@ -200,7 +200,7 @@ After the initial installation is completed, there are two main ways to install 
       --set-json='WDSes=[{name":"wds2"}]'
     ```
 
-The core chart also supports the use of external clusters as ITS Control Planes. A specific application is to connect to existing OCM clusters. As an exmaple, create a first local kind cluster with OCM installed in it:
+The core chart also supports the use of external clusters as ITS Control Planes. A specific application is to connect to existing OCM clusters. As an example, create a first local kind cluster with OCM installed in it:
 
 ```shell
 kind create cluster --name ext1
@@ -216,7 +216,7 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBES
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/create-external-bootstrap-secret.sh) --controlplane its1 --context kind-ext1 --address https://ext1-control-plane:6443 --verbose
 ```
 
-Note the above command creates a secret named `its1-bootstrap` will be created in the `default` namespace of the `kind-kubeflex` cluster. Finally, install the core chart using the `ext1` cluster as ITS:
+Note the above command creates a secret named `its1-bootstrap` in the `default` namespace of the `kind-kubeflex` cluster. Finally, install the core chart using the `ext1` cluster as ITS:
 
 ```shell
 helm upgrade --install core-chart oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
