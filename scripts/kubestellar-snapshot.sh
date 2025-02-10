@@ -21,7 +21,7 @@ set -e
 # Global variables
 TIMESTAMP="$(date +%F_%T)"
 TMPFOLDER="$(mktemp -d -p . "kubestellar-snapshot-XXXX")"
-trap 'rm -rf "$TMPFOLDER"' EXIT
+trap on_exit EXIT
 OUTPUT_FOLDER="$TMPFOLDER/kubestellar-snapshot"
 
 
@@ -163,6 +163,22 @@ get_kubeconfig() {
 }
 
 
+# This function is called when the script exists normally or on error
+on_exit() {
+    echotitle "Completing tasks before exiting:"
+
+    # Create archive
+    if [[ "$arg_logs" == "true" || "$arg_yaml" == "true" ]] ; then
+        echov -e "Saving logs and/or YAML from ${COLOR_INFO}$OUTPUT_FOLDER${COLOR_NONE} to ${COLOR_INFO}./kubestellar-snapshot.tar.gz${COLOR_NONE}"
+        tar czf kubestellar-snapshot.tar.gz -C "$OUTPUT_FOLDER" .
+    fi
+
+    # Cleaning up
+    echov -e "Removing temporary folder: ${COLOR_INFO}$TMPFOLDER${COLOR_NONE}"
+    rm -rf "$TMPFOLDER"
+}
+
+
 ###############################################################################
 # Parse command line arguments
 ###############################################################################
@@ -217,7 +233,7 @@ fi
 ###############################################################################
 # Script info
 ###############################################################################
-echov -e "${COLOR_INFO}${SCRIPT_NAME} v${SCRIPT_VERSION}{COLOR_NONE}\n"
+echov -e "${COLOR_INFO}${SCRIPT_NAME} v${SCRIPT_VERSION}${COLOR_NONE}\n"
 echov -e "Script run on ${COLOR_INFO}$TIMESTAMP${COLOR_NONE}"
 
 
@@ -349,6 +365,13 @@ else
         postgresql_pod=$(kubectl --context $helm_context -n kubeflex-system get pod postgres-postgresql-0 2> /dev/null || true)
         if [ -z "$postgresql_pod" ]; then
             echoerr "postgres-postgresql-0 pod not found!"
+            postgresql_job=$(kubectl --context $helm_context -n kubeflex-system get pod --no-headers -o name | grep "install-postgres" | head -n 2> /dev/null || true)
+            if [ -n "$postgresql_job" ]; then
+                echo -e "Found at least one ${COLOR_INFO}postgresql${COLOR_NONE} installation job that did not complete: ${COLOR_INFO}$postgresql_job${COLOR_NONE}"
+                if kubectl --context $helm_context -n kubeflex-system logs $postgresql_job | grep "toomanyrequests" ; then
+                    echoerr "there may be an issue pulling the postgresql image from Docker Hub."
+                fi
+            fi
         else
             postgresql_status=$(kubectl --context $helm_context -n kubeflex-system get pod postgres-postgresql-0 -o jsonpath='{.status.phase}' 2> /dev/null || true)
             echo -n -e "- ${COLOR_INFO}postgres-postgresql-0${COLOR_NONE}: pod=${COLOR_INFO}postgres-postgresql-0${COLOR_NONE}, status="
@@ -356,8 +379,8 @@ else
         fi
         if [[ "$arg_logs" == "true" ]] ; then
             mkdir -p "$OUTPUT_FOLDER/kubeflex"
-            kubectl --context $helm_context -n kubeflex-system logs $kubeflex_pod > "$OUTPUT_FOLDER/kubeflex/kubeflex-controller.log"
-            kubectl --context $helm_context -n kubeflex-system logs postgres-postgresql-0 > "$OUTPUT_FOLDER/kubeflex/postgresql.log"
+            kubectl --context $helm_context -n kubeflex-system logs $kubeflex_pod > "$OUTPUT_FOLDER/kubeflex/kubeflex-controller.log" 2> /dev/null || true
+            kubectl --context $helm_context -n kubeflex-system logs postgres-postgresql-0 > "$OUTPUT_FOLDER/kubeflex/postgresql.log" 2> /dev/null || true
         fi
     fi
 fi
@@ -624,12 +647,3 @@ for h in "${!cp_pch[@]}" ; do
         done
     fi
 done
-
-
-###############################################################################
-# Create archive
-###############################################################################
-if [[ "$arg_logs" == "true" || "$arg_yaml" == "true" ]] ; then
-    echov -e "\nSaving logs and/or YAML to ${COLOR_INFO}./kubestellar-snapshot.tar.gz${COLOR_NONE}"
-    tar czf kubestellar-snapshot.tar.gz -C "$OUTPUT_FOLDER" .
-fi
