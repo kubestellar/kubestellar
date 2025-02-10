@@ -377,6 +377,14 @@ else
             echo -n -e "- ${COLOR_INFO}postgres-postgresql-0${COLOR_NONE}: pod=${COLOR_INFO}postgres-postgresql-0${COLOR_NONE}, status="
             echostatus "$postgresql_status"
         fi
+        for crd in controlplanes.tenancy.kflex.kubestellar.org postcreatehooks.tenancy.kflex.kubestellar.org ; do
+            echo -n -e "- CRD ${COLOR_INFO}$crd${COLOR_NONE} "
+            if [ -n "$(kubectl --context $helm_context get crd $crd --no-headers -o name 2> /dev/null || true)" ] ; then
+                echo -e "${COLOR_STATUS_TRUE}found${COLOR_NONE}"
+            else
+                echo -e "${COLOR_STATUS_FALSE}not found${COLOR_NONE}"
+            fi
+        done
         if [[ "$arg_logs" == "true" ]] ; then
             mkdir -p "$OUTPUT_FOLDER/kubeflex"
             kubectl --context $helm_context -n kubeflex-system logs $kubeflex_pod > "$OUTPUT_FOLDER/kubeflex/kubeflex-controller.log" 2> /dev/null || true
@@ -431,6 +439,14 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
                 echo -e "  - Open-cluster-manager: ${COLOR_ERROR}not found${COLOR_NONE}"
             fi
         fi
+        for crd in workstatuses.control.kubestellar.io  clustermanagers.operator.open-cluster-management.io clustermanagementaddons.addon.open-cluster-management.io managedclusters.cluster.open-cluster-management.io managedclustersets.cluster.open-cluster-management.io manifestworks.work.open-cluster-management.io manifestworkreplicasets.work.open-cluster-management.io  managedclusteraddons.addon.open-cluster-management.io  managedclustersetbindings.cluster.open-cluster-management.io placements.cluster.open-cluster-management.io addondeploymentconfigs.addon.open-cluster-management.io addontemplates.addon.open-cluster-management.io placementdecisions.cluster.open-cluster-management.io addonplacementscores.cluster.open-cluster-management.io ; do
+            echo -n -e "  - CRD ${COLOR_INFO}$crd${COLOR_NONE} "
+            if [ -n "$(kubectl --kubeconfig  ${cp_kubeconfig[cp_n]} get crd $crd --no-headers -o name 2> /dev/null || true)" ] ; then
+                echo -e "${COLOR_STATUS_TRUE}found${COLOR_NONE}"
+            else
+                echo -e "${COLOR_STATUS_FALSE}not found${COLOR_NONE}"
+            fi
+        done
     else
         kubestellar_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
         kubestellar_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image' | cut -d':' -f2 || true)
@@ -442,6 +458,14 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         trasport_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -e -n "  - Transport controller: version=${COLOR_INFO}$trasport_version${COLOR_NONE}, pod=${COLOR_INFO}$trasport_pod${COLOR_NONE} namespace=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$trasport_status"
+        for crd in bindingpolicies.control.kubestellar.io bindings.control.kubestellar.io combinedstatuses.control.kubestellar.io customtransforms.control.kubestellar.io statuscollectors.control.kubestellar.io ; do
+            echo -n -e "  - CRD ${COLOR_INFO}$crd${COLOR_NONE} "
+            if [ -n "$(kubectl --kubeconfig  ${cp_kubeconfig[cp_n]} get crd $crd --no-headers -o name 2> /dev/null || true)" ] ; then
+                echo -e "${COLOR_STATUS_TRUE}found${COLOR_NONE}"
+            else
+                echo -e "${COLOR_STATUS_FALSE}not found${COLOR_NONE}"
+            fi
+        done
     fi
     if [[ "$arg_yaml" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
