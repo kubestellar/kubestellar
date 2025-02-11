@@ -147,8 +147,19 @@ kubectl --context "kind-${name}" patch deployment ingress-nginx-controller -n in
 
 if [[ "$wait" == "true" ]] ; then
   echo "Waiting for nginx ingress with SSL passthrough to be ready..."
-  while [ -z "$(kubectl --context kind-${name} get pod --namespace ingress-nginx --selector=app.kubernetes.io/component=controller --no-headers -o name 2> /dev/null)" ] ;  do
+  while true; do
       sleep 5
+      pods=$(kubectl --context kind-${name} get pod -n ingress-nginx -l app.kubernetes.io/component=controller -o jsonpath='{.items[*].metadata.name}')
+      if [ -z "$pods" ]; then continue; fi
+      if [[ "$pods" =~ [[:space:]] ]]
+      then # both pre-patch and post-patch Pods are present
+          continue
+      fi
+      args=$(kubectl --context kind-${name} get pod -n ingress-nginx -l app.kubernetes.io/component=controller -o jsonpath='{.items[0].spec.containers[0].args}')
+      if [[ $args =~ enable-ssl-passthrough ]]
+      then break
+      # Otherwise this Pod is from before the patch
+      fi
   done
   kubectl --context "kind-${name}" wait --namespace ingress-nginx \
     --for=condition=ready pod \
