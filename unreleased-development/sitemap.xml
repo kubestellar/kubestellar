@@ -25,6 +25,14 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/Community/gsoc/2025/ideas/</loc>
+         <lastmod>2025-02-11</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/Community/gsoc/2025/ideas/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/Community/gsoc/2025/ideas/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/unreleased-development/Community/gsoc2025/ideas/</loc>
          <lastmod>2025-02-11</lastmod>
          <changefreq>daily</changefreq>
