@@ -21,7 +21,6 @@ set -e
 # Global variables
 TIMESTAMP="$(date +%F_%T)"
 TMPFOLDER="$(mktemp -d -p . "kubestellar-snapshot-XXXX")"
-trap on_exit EXIT
 OUTPUT_FOLDER="$TMPFOLDER/kubestellar-snapshot"
 
 
@@ -169,10 +168,10 @@ list_crds() {
     pattern="$2" # matching pattern
     indent="$3" # indentation
 
-    echo "$indent- Found CRDs:"
+    echo "$indent- CRDs:"
 
     kubectl $modifier get crds --no-headers -o name | grep "$pattern" | while read -r crd; do
-        echo -n -e "$indent  - ${COLOR_INFO}${crd##*/}crd${COLOR_NONE}: established="
+        echo -n -e "$indent  - ${COLOR_INFO}${crd##*/}${COLOR_NONE}: established="
         echostatus $(kubectl $modifier get $crd -o jsonpath='{.status.conditions[?(@.type=="Established")].status}')
     done
 }
@@ -180,7 +179,7 @@ list_crds() {
 
 # This function is called when the script exists normally or on error
 on_exit() {
-    [[ "$arg_verbose" == "true" ]] &&  echotitle "Completing tasks before exiting:"
+    echov ""
 
     # Create archive
     if [[ "$arg_logs" == "true" || "$arg_yaml" == "true" ]] ; then
@@ -192,6 +191,9 @@ on_exit() {
     echov -e "Removing temporary folder: ${COLOR_INFO}$TMPFOLDER${COLOR_NONE}"
     rm -rf "$TMPFOLDER"
 }
+
+
+trap on_exit EXIT
 
 
 ###############################################################################
@@ -392,7 +394,7 @@ else
             echo -n -e "- ${COLOR_INFO}postgres-postgresql-0${COLOR_NONE}: pod=${COLOR_INFO}postgres-postgresql-0${COLOR_NONE}, status="
             echostatus "$postgresql_status"
         fi
-        list_crds "--context $helm_context" "kubestellar" ""
+        list_crds "--context $helm_context" "kflex" ""
         if [[ "$arg_logs" == "true" ]] ; then
             mkdir -p "$OUTPUT_FOLDER/kubeflex"
             kubectl --context $helm_context -n kubeflex-system logs $kubeflex_pod &> "$OUTPUT_FOLDER/kubeflex/kubeflex-controller.log" || true
@@ -477,12 +479,12 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
             containers=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.spec.containers[*].name}')
             for ctr in $containers; do
-                { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c "$ctr" 2> /dev/null || true; } > "$OUTPUT_FOLDER/$name/its-job-${ctr}.log"
+                { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c "$ctr" || true; } &> "$OUTPUT_FOLDER/$name/its-job-${ctr}.log"
             done
-            kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller > "$OUTPUT_FOLDER/$name/status-addon.log" 2> /dev/null || true
+            kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller &> "$OUTPUT_FOLDER/$name/status-addon.log" || true
         else
-            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod > "$OUTPUT_FOLDER/$name/kubestellar-controller.log" 2> /dev/null || true
-            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $trasport_pod -c transport-controller > "$OUTPUT_FOLDER/$name/transport-controller.log" 2> /dev/null || true
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod &> "$OUTPUT_FOLDER/$name/kubestellar-controller.log" || true
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $trasport_pod -c transport-controller &> "$OUTPUT_FOLDER/$name/transport-controller.log" || true
         fi
     fi
     cp_n=$((cp_n+1))
