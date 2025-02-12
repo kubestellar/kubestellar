@@ -218,6 +218,13 @@ Thanks go to these wonderful people:
 		</tr>
 		<tr>
             <td align="center">
+                <a href="https://github.com/pratik-mahalle">
+                    <img src="https://avatars.githubusercontent.com/u/124587957?v=4" width="100;" alt="pratik-mahalle"/>
+                    <br />
+                    <sub><b>Pratik Mahalle</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/JonathanWentaoBao">
                     <img src="https://avatars.githubusercontent.com/u/171893847?v=4" width="100;" alt="JonathanWentaoBao"/>
                     <br />
@@ -239,10 +246,26 @@ Thanks go to these wonderful people:
                 </a>
             </td>
             <td align="center">
+                <a href="https://github.com/Shruti78">
+                    <img src="https://avatars.githubusercontent.com/u/104200088?v=4" width="100;" alt="Shruti78"/>
+                    <br />
+                    <sub><b>Shruti Murthy</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/manzil-infinity180">
                     <img src="https://avatars.githubusercontent.com/u/119070053?v=4" width="100;" alt="manzil-infinity180"/>
                     <br />
                     <sub><b>Rahul Vishwakarma</b></sub>
+                </a>
+            </td>
+		</tr>
+		<tr>
+            <td align="center">
+                <a href="https://github.com/Mohiit70">
+                    <img src="https://avatars.githubusercontent.com/u/120316966?v=4" width="100;" alt="Mohiit70"/>
+                    <br />
+                    <sub><b>Mohit Bisht</b></sub>
                 </a>
             </td>
             <td align="center">
@@ -259,41 +282,11 @@ Thanks go to these wonderful people:
                     <sub><b>Aishwarya </b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
-                <a href="https://github.com/pratik-mahalle">
-                    <img src="https://avatars.githubusercontent.com/u/124587957?v=4" width="100;" alt="pratik-mahalle"/>
+                <a href="https://github.com/aslom">
+                    <img src="https://avatars.githubusercontent.com/u/1648338?v=4" width="100;" alt="aslom"/>
                     <br />
-                    <sub><b>Pratik Mahalle</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/yuji-watanabe-jp">
-                    <img src="https://avatars.githubusercontent.com/u/26372857?v=4" width="100;" alt="yuji-watanabe-jp"/>
-                    <br />
-                    <sub><b>Yuji Watanabe</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/RealRTorres">
-                    <img src="https://avatars.githubusercontent.com/u/72537940?v=4" width="100;" alt="RealRTorres"/>
-                    <br />
-                    <sub><b>RealRTorres</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/Mohiit70">
-                    <img src="https://avatars.githubusercontent.com/u/120316966?v=4" width="100;" alt="Mohiit70"/>
-                    <br />
-                    <sub><b>Mohit Bisht</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/xrstf">
-                    <img src="https://avatars.githubusercontent.com/u/127499?v=4" width="100;" alt="xrstf"/>
-                    <br />
-                    <sub><b>Christoph Mewes</b></sub>
+                    <sub><b>Aleksander Slominski</b></sub>
                 </a>
             </td>
             <td align="center">
@@ -303,13 +296,27 @@ Thanks go to these wonderful people:
                     <sub><b>Benson Zhang</b></sub>
                 </a>
             </td>
+            <td align="center">
+                <a href="https://github.com/xrstf">
+                    <img src="https://avatars.githubusercontent.com/u/127499?v=4" width="100;" alt="xrstf"/>
+                    <br />
+                    <sub><b>Christoph Mewes</b></sub>
+                </a>
+            </td>
 		</tr>
 		<tr>
             <td align="center">
-                <a href="https://github.com/aslom">
-                    <img src="https://avatars.githubusercontent.com/u/1648338?v=4" width="100;" alt="aslom"/>
+                <a href="https://github.com/RealRTorres">
+                    <img src="https://avatars.githubusercontent.com/u/72537940?v=4" width="100;" alt="RealRTorres"/>
                     <br />
-                    <sub><b>Aleksander Slominski</b></sub>
+                    <sub><b>RealRTorres</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/yuji-watanabe-jp">
+                    <img src="https://avatars.githubusercontent.com/u/26372857?v=4" width="100;" alt="yuji-watanabe-jp"/>
+                    <br />
+                    <sub><b>Yuji Watanabe</b></sub>
                 </a>
             </td>
             <td align="center">
@@ -340,6 +347,8 @@ Thanks go to these wonderful people:
                     <sub><b>Ting Dai</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/jewzaam">
                     <img src="https://avatars.githubusercontent.com/u/480388?v=4" width="100;" alt="jewzaam"/>
@@ -347,8 +356,6 @@ Thanks go to these wonderful people:
                     <sub><b>Naveen Malik</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/mra-ruiz">
                     <img src="https://avatars.githubusercontent.com/u/16118462?v=4" width="100;" alt="mra-ruiz"/>
@@ -384,6 +391,8 @@ Thanks go to these wonderful people:
                     <sub><b>eaepstein</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/cmadam">
                     <img src="https://avatars.githubusercontent.com/u/19595758?v=4" width="100;" alt="cmadam"/>
@@ -391,8 +400,6 @@ Thanks go to these wonderful people:
                     <sub><b>Constantin M. Adam</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/ncdc">
                     <img src="https://avatars.githubusercontent.com/u/354?v=4" width="100;" alt="ncdc"/>
