@@ -48,7 +48,7 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 
 ## Additional Software for the Getting Started setup
 
-- [**kind**](https://kind.sigs.k8s.io/) version >= 0.20
+- [**kind**](https://kind.sigs.k8s.io/) version >= 0.20 and configured to be able to run at least 3 clusters (see the `kind` "known issue" named [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files) and note that it is NOT about `ulimit -n`)
 - **docker** (or compatible docker engine that works with kind) (client version >= 20)
 
 ## Additional Software for monitoring
@@ -71,7 +71,7 @@ The setup in `montoring/` additional uses the following.
 
 To build and _**test**_ KubeStellar properly, you will also need
 
-- [**kind**](https://kind.sigs.k8s.io/) version >= 0.20
+- [**kind**](https://kind.sigs.k8s.io/) version >= 0.20 and, if you want the demo setup or any other with three or more clusters, configured to be able to run at least 3 clusters (see the `kind` "known issue" named [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files) and note that it is NOT about `ulimit -n`)
 - [**OCP**](https://docs.openshift.com/container-platform/4.13/installing/index.html), if you are testing a scenario involving OCP
 - [**ginkgo**](https://onsi.github.io/ginkgo/), if you will run the ginkgo-based end-to-end test
 - [`yq`](https://github.com/mikefarah/yq) (also available from [Homebrew](https://formulae.brew.sh/formula/yq)) version >= 4 - for running tests
@@ -118,6 +118,8 @@ Checking pre-requisites for using KubeStellar:
 ✔ Helm (v3.16.1)
 Checking additional pre-requisites for running the examples:
 ✔ Kind (kind v0.22.0 go1.22.0 darwin/arm64)
+✔ fs.inotify.max_user_watches is 524288
+✔ fs.inotify.max_user_instances is 512
 ✔ ArgoCD CLI (v2.10.1+a79e0ea)
 Checking pre-requisites for building KubeStellar:
 ✔ GNU Make (GNU Make 3.81)

@@ -57,6 +57,24 @@ is_installed() {
     fi
 }
 
+check_sysctl() {
+    name="$1"
+    minval="$2"
+    # because the OS running this script might not be the Linux that runs the containers, use `docker run` to interrogate that Linux
+    if report=$(docker run --rm busybox sysctl "$name"); then
+        val=$(cut -d= -f2 <<<$report | awk '{ print $1 }')
+        if [[ $val -ge "$minval" ]]; then
+            echo -e "\033[0;32m\xE2\x9C\x94\033[0m $name is $val"
+        else
+            echo -e "\033[0;31mX\033[0m sysctl ${name} is only $val but must be at least $minval (see https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files)" >&2
+            exit 4
+        fi
+    else
+        echo -e "\033[0;31mX\033[0m Failed to extract sysctl ${name}" >&2
+        exit 3
+    fi
+}
+
 is_installed_argo() {
     is_installed 'ArgoCD CLI' \
         'argocd' \
@@ -136,6 +154,8 @@ is_installed_kind() {
         'kind version' \
         'https://kind.sigs.k8s.io/docs/user/quick-start/#installation' \
         'kind v0.20'
+    check_sysctl fs.inotify.max_user_watches 524288
+    check_sysctl fs.inotify.max_user_instances 512
 }
 
 is_installed_k3d() {
