@@ -21,7 +21,6 @@ set -e
 # Global variables
 TIMESTAMP="$(date +%F_%T)"
 TMPFOLDER="$(mktemp -d -p . "kubestellar-snapshot-XXXX")"
-trap 'rm -rf "$TMPFOLDER"' EXIT
 OUTPUT_FOLDER="$TMPFOLDER/kubestellar-snapshot"
 
 
@@ -163,6 +162,40 @@ get_kubeconfig() {
 }
 
 
+# List all CRDs of interest
+list_crds() {
+    modifier="$1" # kubeconfig modifier
+    pattern="$2" # matching pattern
+    indent="$3" # indentation
+
+    echo "$indent- CRDs:"
+
+    kubectl $modifier get crds --no-headers -o name | grep "$pattern" | while read -r crd; do
+        echo -n -e "$indent  - ${COLOR_INFO}${crd##*/}${COLOR_NONE}: established="
+        echostatus $(kubectl $modifier get $crd -o jsonpath='{.status.conditions[?(@.type=="Established")].status}')
+    done
+}
+
+
+# This function is called when the script exists normally or on error
+on_exit() {
+    echov ""
+
+    # Create archive
+    if [[ "$arg_logs" == "true" || "$arg_yaml" == "true" ]] ; then
+        echov -e "Saving logs and/or YAML from ${COLOR_INFO}$OUTPUT_FOLDER${COLOR_NONE} to ${COLOR_INFO}./kubestellar-snapshot.tar.gz${COLOR_NONE}"
+        tar czf kubestellar-snapshot.tar.gz -C "$OUTPUT_FOLDER" .
+    fi
+
+    # Cleaning up
+    echov -e "Removing temporary folder: ${COLOR_INFO}$TMPFOLDER${COLOR_NONE}"
+    rm -rf "$TMPFOLDER"
+}
+
+
+trap on_exit EXIT
+
+
 ###############################################################################
 # Parse command line arguments
 ###############################################################################
@@ -217,7 +250,7 @@ fi
 ###############################################################################
 # Script info
 ###############################################################################
-echov -e "${COLOR_INFO}${SCRIPT_NAME} v${SCRIPT_VERSION}{COLOR_NONE}\n"
+echov -e "${COLOR_INFO}${SCRIPT_NAME} v${SCRIPT_VERSION}${COLOR_NONE}\n"
 echov -e "Script run on ${COLOR_INFO}$TIMESTAMP${COLOR_NONE}"
 
 
@@ -349,15 +382,23 @@ else
         postgresql_pod=$(kubectl --context $helm_context -n kubeflex-system get pod postgres-postgresql-0 2> /dev/null || true)
         if [ -z "$postgresql_pod" ]; then
             echoerr "postgres-postgresql-0 pod not found!"
+            postgresql_install_pod=$(kubectl --context $helm_context -n kubeflex-system get pod --no-headers -o name | grep "install-postgres" | head -1 | cut -d'/' -f2 2> /dev/null || true)
+            if [ -n "$postgresql_install_pod" ]; then
+                echo -e "Found at least one ${COLOR_INFO}postgresql${COLOR_NONE} installation pod that did not complete: ${COLOR_INFO}$postgresql_install_pod${COLOR_NONE}"
+                if kubectl --context $helm_context -n kubeflex-system logs $postgresql_install_pod | grep "toomanyrequests" ; then
+                    echoerr "there may be an issue pulling the postgresql image from Docker Hub."
+                fi
+            fi
         else
             postgresql_status=$(kubectl --context $helm_context -n kubeflex-system get pod postgres-postgresql-0 -o jsonpath='{.status.phase}' 2> /dev/null || true)
             echo -n -e "- ${COLOR_INFO}postgres-postgresql-0${COLOR_NONE}: pod=${COLOR_INFO}postgres-postgresql-0${COLOR_NONE}, status="
             echostatus "$postgresql_status"
         fi
+        list_crds "--context $helm_context" "kflex" ""
         if [[ "$arg_logs" == "true" ]] ; then
             mkdir -p "$OUTPUT_FOLDER/kubeflex"
-            kubectl --context $helm_context -n kubeflex-system logs $kubeflex_pod > "$OUTPUT_FOLDER/kubeflex/kubeflex-controller.log"
-            kubectl --context $helm_context -n kubeflex-system logs postgres-postgresql-0 > "$OUTPUT_FOLDER/kubeflex/postgresql.log"
+            kubectl --context $helm_context -n kubeflex-system logs $kubeflex_pod &> "$OUTPUT_FOLDER/kubeflex/kubeflex-controller.log" || true
+            kubectl --context $helm_context -n kubeflex-system logs postgres-postgresql-0 &> "$OUTPUT_FOLDER/kubeflex/postgresql.log" || true
         fi
     fi
 fi
@@ -408,6 +449,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
                 echo -e "  - Open-cluster-manager: ${COLOR_ERROR}not found${COLOR_NONE}"
             fi
         fi
+        list_crds "--kubeconfig ${cp_kubeconfig[cp_n]}" "kubestellar\|open-cluster-management" "  "
     else
         kubestellar_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
         kubestellar_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image' | cut -d':' -f2 || true)
@@ -419,6 +461,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         trasport_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -e -n "  - Transport controller: version=${COLOR_INFO}$trasport_version${COLOR_NONE}, pod=${COLOR_INFO}$trasport_pod${COLOR_NONE} namespace=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$trasport_status"
+        list_crds "--kubeconfig ${cp_kubeconfig[cp_n]}" "kubestellar" "  "
     fi
     if [[ "$arg_yaml" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
@@ -436,12 +479,12 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
             containers=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.spec.containers[*].name}')
             for ctr in $containers; do
-                { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c "$ctr" || true; } > "$OUTPUT_FOLDER/$name/its-job-${ctr}.log"
+                { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c "$ctr" || true; } &> "$OUTPUT_FOLDER/$name/its-job-${ctr}.log"
             done
-            kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller > "$OUTPUT_FOLDER/$name/status-addon.log"
+            kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller &> "$OUTPUT_FOLDER/$name/status-addon.log" || true
         else
-            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod > "$OUTPUT_FOLDER/$name/kubestellar-controller.log"
-            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $trasport_pod -c transport-controller > "$OUTPUT_FOLDER/$name/transport-controller.log"
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod &> "$OUTPUT_FOLDER/$name/kubestellar-controller.log" || true
+            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $trasport_pod -c transport-controller &> "$OUTPUT_FOLDER/$name/transport-controller.log" || true
         fi
     fi
     cp_n=$((cp_n+1))
@@ -624,12 +667,3 @@ for h in "${!cp_pch[@]}" ; do
         done
     fi
 done
-
-
-###############################################################################
-# Create archive
-###############################################################################
-if [[ "$arg_logs" == "true" || "$arg_yaml" == "true" ]] ; then
-    echov -e "\nSaving logs and/or YAML to ${COLOR_INFO}./kubestellar-snapshot.tar.gz${COLOR_NONE}"
-    tar czf kubestellar-snapshot.tar.gz -C "$OUTPUT_FOLDER" .
-fi
