@@ -116,6 +116,7 @@ Checking pre-requisites for using KubeStellar:
 ✔ KubeFlex (Kubeflex version: v0.6.3.672cc8a 2024-09-23T16:15:47Z)
 ✔ OCM CLI (:v0.9.0-0-g56e1fc8)
 ✔ Helm (v3.16.1)
+✔ helm can fetch public charts
 Checking additional pre-requisites for running the examples:
 ✔ Kind (kind v0.22.0 go1.22.0 darwin/arm64)
 ✔ fs.inotify.max_user_watches is 524288
