@@ -3337,7 +3337,7 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 </ul>
 <h2 id="additional-software-for-the-getting-started-setup">Additional Software for the Getting Started setup<a class="headerlink" href="#additional-software-for-the-getting-started-setup" title="Permanent link">#</a></h2>
 <ul>
-<li><a href="https://kind.sigs.k8s.io/"><strong>kind</strong></a> version &gt;= 0.20</li>
+<li><a href="https://kind.sigs.k8s.io/"><strong>kind</strong></a> version &gt;= 0.20 and configured to be able to run at least 3 clusters (see the <code>kind</code> "known issue" named <a href="https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files">Pod errors due to “too many open files”</a> and note that it is NOT about <code>ulimit -n</code>)</li>
 <li><strong>docker</strong> (or compatible docker engine that works with kind) (client version &gt;= 20)</li>
 </ul>
 <h2 id="additional-software-for-monitoring">Additional Software for monitoring<a class="headerlink" href="#additional-software-for-monitoring" title="Permanent link">#</a></h2>
@@ -3358,7 +3358,7 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 </ul>
 <p>To build and <em><strong>test</strong></em> KubeStellar properly, you will also need</p>
 <ul>
-<li><a href="https://kind.sigs.k8s.io/"><strong>kind</strong></a> version &gt;= 0.20</li>
+<li><a href="https://kind.sigs.k8s.io/"><strong>kind</strong></a> version &gt;= 0.20 and, if you want the demo setup or any other with three or more clusters, configured to be able to run at least 3 clusters (see the <code>kind</code> "known issue" named <a href="https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files">Pod errors due to “too many open files”</a> and note that it is NOT about <code>ulimit -n</code>)</li>
 <li><a href="https://docs.openshift.com/container-platform/4.13/installing/index.html"><strong>OCP</strong></a>, if you are testing a scenario involving OCP</li>
 <li><a href="https://onsi.github.io/ginkgo/"><strong>ginkgo</strong></a>, if you will run the ginkgo-based end-to-end test</li>
 <li><a href="https://github.com/mikefarah/yq"><code>yq</code></a> (also available from <a href="https://formulae.brew.sh/formula/yq">Homebrew</a>) version &gt;= 4 - for running tests</li>
@@ -3394,11 +3394,13 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>✔<span class="w"> </span>Helm<span class="w"> </span><span class="o">(</span>v3.16.1<span class="o">)</span>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>Checking<span class="w"> </span>additional<span class="w"> </span>pre-requisites<span class="w"> </span><span class="k">for</span><span class="w"> </span>running<span class="w"> </span>the<span class="w"> </span>examples:
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>✔<span class="w"> </span>Kind<span class="w"> </span><span class="o">(</span>kind<span class="w"> </span>v0.22.0<span class="w"> </span>go1.22.0<span class="w"> </span>darwin/arm64<span class="o">)</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>✔<span class="w"> </span>ArgoCD<span class="w"> </span>CLI<span class="w"> </span><span class="o">(</span>v2.10.1+a79e0ea<span class="o">)</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>Checking<span class="w"> </span>pre-requisites<span class="w"> </span><span class="k">for</span><span class="w"> </span>building<span class="w"> </span>KubeStellar:
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>✔<span class="w"> </span>GNU<span class="w"> </span>Make<span class="w"> </span><span class="o">(</span>GNU<span class="w"> </span>Make<span class="w"> </span><span class="m">3</span>.81<span class="o">)</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>✔<span class="w"> </span>Go<span class="w"> </span><span class="o">(</span>go<span class="w"> </span>version<span class="w"> </span>go1.23.2<span class="w"> </span>darwin/arm64<span class="o">)</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>✔<span class="w"> </span>KO<span class="w"> </span><span class="o">(</span><span class="m">0</span>.16.0<span class="o">)</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>✔<span class="w"> </span>fs.inotify.max_user_watches<span class="w"> </span>is<span class="w"> </span><span class="m">524288</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>✔<span class="w"> </span>fs.inotify.max_user_instances<span class="w"> </span>is<span class="w"> </span><span class="m">512</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>✔<span class="w"> </span>ArgoCD<span class="w"> </span>CLI<span class="w"> </span><span class="o">(</span>v2.10.1+a79e0ea<span class="o">)</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>Checking<span class="w"> </span>pre-requisites<span class="w"> </span><span class="k">for</span><span class="w"> </span>building<span class="w"> </span>KubeStellar:
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>✔<span class="w"> </span>GNU<span class="w"> </span>Make<span class="w"> </span><span class="o">(</span>GNU<span class="w"> </span>Make<span class="w"> </span><span class="m">3</span>.81<span class="o">)</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>✔<span class="w"> </span>Go<span class="w"> </span><span class="o">(</span>go<span class="w"> </span>version<span class="w"> </span>go1.23.2<span class="w"> </span>darwin/arm64<span class="o">)</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>✔<span class="w"> </span>KO<span class="w"> </span><span class="o">(</span><span class="m">0</span>.16.0<span class="o">)</span>
 </code></pre></div>
 <!-- end tag for check-prereq script -->
 
