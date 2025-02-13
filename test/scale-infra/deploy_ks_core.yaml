@@ -1,0 +1,104 @@
+---
+- hosts: masters
+  remote_user: ubuntu
+  become: yes
+  gather_facts: no
+  vars:
+    ks_release:  "{{ ks_release }}"
+  tasks:
+    - name: install jq and make
+      shell: |
+             sudo apt update
+             sudo apt install jq make -y
+
+    - name: install golang
+      shell: |
+             curl -LO https://go.dev/dl/go1.23.5.linux-amd64.tar.gz
+             rm -rf /usr/local/go && tar -C /usr/local -xzf go1.23.5.linux-amd64.tar.gz
+             export PATH=$PATH:/usr/local/go/bin
+             go version
+                  
+    - name: install yq
+      shell: |
+             sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+             sudo chmod a+x /usr/local/bin/yq
+
+    - name: install OCM CLI
+      shell: curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+        
+    - name: install KubeFlex
+      shell: |
+             sudo su <<EOF
+             bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin
+             EOF
+
+    - name: install Helm
+      shell: |
+             curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+             sudo apt-get install apt-transport-https --yes
+             echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+             sudo apt-get update
+             sudo apt-get install helm
+
+    - name: Register a variable, ignore errors and continue
+      ansible.builtin.command: kubectl config use-context kscore
+      register: result
+      ignore_errors: true
+
+    - name: Delete old KS deployment
+      shell: |
+             kubectl config rename-context kubernetes-admin@kubernetes kscore --ignore-not-found
+             helm delete ks-core  --ignore-not-found
+             helm -n open-cluster-management delete status-addon  --ignore-not-found
+             kubectl --context kscore delete ns open-cluster-management-hub open-cluster-management  --ignore-not-found
+             kubectl config unset contexts.wds1 --ignore-not-found
+             kubectl --context kscore delete -f https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/release-"{{ ks_release }}"/example/kind-nginx-ingress-with-SSL-passthrough.yaml  --ignore-not-found
+      when: result is success
+
+
+    - name: install ingress controller
+      shell: |
+             kubectl config rename-context kubernetes-admin@kubernetes kscore
+             kubectl --context kscore label node --all ingress-ready="true"
+             kubectl --context kscore apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.0/deploy/static/provider/kind/deploy.yaml
+
+    - name: patching nginx ingress to enable SSL passthrough
+      shell: |
+             kubectl --context kscore patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","args":["/nginx-ingress-controller","--election-id=ingress-nginx-leader","--controller-class=k8s.io/ingress-nginx","--ingress-class=nginx","--configmap=$(POD_NAMESPACE)/ingress-nginx-controller","--validating-webhook=:8443","--validating-webhook-certificate=/usr/local/certificates/cert","--validating-webhook-key=/usr/local/certificates/key","--watch-ingress-without-class=true","--publish-status-address=localhost","--enable-ssl-passthrough"]}]}}}}'
+
+    - name: extract the port number for the ingress controller
+      shell: kubectl --context kscore -n ingress-nginx get svc ingress-nginx-controller -o=jsonpath='{.spec.ports[1].nodePort}'
+      register: ingress_port
+
+    - name: install KubeStellar using core helm-cart
+      shell: |
+             export KUBESTELLAR_VERSION="{{ ks_release }}"
+             helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
+             --version $KUBESTELLAR_VERSION \
+             --set-json='ITSes=[{"name":"its1","type":"host"}]' \
+             --set-json='WDSes=[{"name":"wds1"}]' \
+             --set-json='verbosity.default=5' \
+             --set kubeflex-operator.externalPort={{ ingress_port.stdout }}
+
+    - name: Get kubeconfig "context" for wds1 space
+      shell: |
+             kflex ctx wds1
+
+    - name: Get the token to register managed clusters
+      shell: clusteradm --context kscore get token | grep '^clusteradm join'
+      register: wec_join_command
+      until: "wec_join_command is not failed"
+      retries: 5
+      delay: 15
+    
+    - name: Set some environment configurations for the end user
+      shell: |
+             alias k="kubectl"
+             k config use-context kscore
+             
+    - name: Copy join command to local file (Ansible control node)
+      local_action: copy content="{{ wec_join_command.stdout }}" dest="/tmp/wec_join_command" mode=0777
+            
+    
+
+
