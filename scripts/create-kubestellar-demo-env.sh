@@ -65,7 +65,7 @@ if ! dunsel=$(docker ps 2>&1); then
 fi
 echo "Container runtime is running."
 
-kubestellar_version=0.26.0-rc.1
+kubestellar_version=0.26.0-rc.2
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
