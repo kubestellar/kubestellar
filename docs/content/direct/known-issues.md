@@ -12,9 +12,9 @@ The symptom is `kflex ctx ...` commands failing. See [Confusion due to hidden st
 
 The symptom is `kind` cluster(s) that get created but fail to get their job done. See [Potential Error with Kubestellar Installation related to Issues with Kind backed by Rancher Desktop](knownissue-kind-config.md).
 
-## Authorization fail for WSL fetching Helm chart from ghcr
+## Authorization fail for Helm fetching chart from ghcr
 
-The symptom is that attempting to instantiate the core Helm chart gets an authorization failure, for a user running a Linux distro using WSL. See [Authorization failure in WSL while fetching Helm chart from ghcr.io](knownissue-wsl-ghcr-helm.md).
+The symptom is that attempting to instantiate the core Helm chart gets an authorization failure. See [Authorization failure while fetching Helm chart from ghcr.io](knownissue-helm-ghcr.md).
 
 ## Missing results in a CombinedStatus object
 

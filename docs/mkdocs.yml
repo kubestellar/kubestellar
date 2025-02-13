@@ -69,7 +69,7 @@ nav:
               - Overview: direct/known-issues.md
               - Hidden state in kubeconfig: direct/knownissue-kflex-extension.md
               - Kind needs OS reconfig: direct/knownissue-kind-config.md
-              - Authorization failure in WSL while fetching Helm chart from ghcr.io: direct/knownissue-wsl-ghcr-helm.md
+              - Authorization failure while fetching Helm chart from ghcr.io: direct/knownissue-helm-ghcr.md
               - Missing results in a CombinedStatus object: direct/knownissue-collector-miss.md
       - Teardown: direct/teardown.md
   - Contributing: 
