@@ -112,12 +112,22 @@ is_installed_go() {
 }
 
 is_installed_helm() {
+    local log
     is_installed 'Helm' \
         'helm' \
         'helm version' \
         'helm version --template={{.Version}}' \
         'https://helm.sh/docs/intro/install/' \
         'v3'
+    if log=$(helm show chart oci://ghcr.io/kubestellar/kubestellar/core-chart 2>&1)
+    then echo -e "\033[0;32m\xE2\x9C\x94\033[0m helm can fetch public charts"
+    else
+        echo "$log" >&2
+        echo >&2
+        echo -e "\033[0;31mX\033[0m helm can not fetch public charts!" >&2
+        exit 5
+    fi
+    
 }
 
 is_installed_jq() {
