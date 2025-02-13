@@ -3,7 +3,7 @@ name: goreleaser
 on:
   push:
     tags:
-    - 'v*'
+      - 'v*'
 
 permissions:
   contents: write
@@ -31,6 +31,9 @@ jobs:
 
     - name: Set LDFLAGS
       run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
+
+    - name: Install syft binary executable
+      uses: anchore/sbom-action/download-syft@v0.18.0
 
     - name: Run GoReleaser on tag
       uses: goreleaser/goreleaser-action@v6
