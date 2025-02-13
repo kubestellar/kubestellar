@@ -43,7 +43,7 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
 
     At the end of the install make sure that the OCM CLI, clusteradm, is in your `$PATH`.
 
-- **helm** version >= 3 - to deploy the Kubestellar and kubeflex charts
+- **helm** version >= 3 - to deploy the Kubestellar and kubeflex charts. Your `helm` command must not be broken; see [](knownissue-helm-ghcr.md).
 - [**kubectl**](https://kubernetes.io/docs/tasks/tools/) version >= 1.27 - to access the kubernetes clusters
 
 ## Additional Software for the Getting Started setup
