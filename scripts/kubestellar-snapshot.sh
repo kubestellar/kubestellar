@@ -26,7 +26,7 @@ OUTPUT_FOLDER="$TMPFOLDER/kubestellar-snapshot"
 
 # Script info
 SCRIPT_NAME="KubeStellar Snapshot"
-SCRIPT_VERSION="0.2.0"
+SCRIPT_VERSION="0.3.0"
 
 
 # Colors
@@ -276,6 +276,7 @@ is_installed 'jq' \
 # Ensure output folder
 ###############################################################################
 if [[ "$arg_logs" == "true" || "$arg_yaml" == "true" ]] ; then
+    echov -e "Creating temporary folder: ${COLOR_INFO}$TMPFOLDER${COLOR_NONE}"
     mkdir -p "$OUTPUT_FOLDER"
 fi
 
@@ -397,8 +398,8 @@ else
         list_crds "--context $helm_context" "kflex" ""
         if [[ "$arg_logs" == "true" ]] ; then
             mkdir -p "$OUTPUT_FOLDER/kubeflex"
-            kubectl --context $helm_context -n kubeflex-system logs $kubeflex_pod &> "$OUTPUT_FOLDER/kubeflex/kubeflex-controller.log" || true
-            kubectl --context $helm_context -n kubeflex-system logs postgres-postgresql-0 &> "$OUTPUT_FOLDER/kubeflex/postgresql.log" || true
+            [ -n "$kubeflex_pod" ] && kubectl --context $helm_context -n kubeflex-system logs $kubeflex_pod &> "$OUTPUT_FOLDER/kubeflex/kubeflex-controller.log" || true
+            [ -n "$postgresql_pod" ] && kubectl --context $helm_context -n kubeflex-system logs postgres-postgresql-0 &> "$OUTPUT_FOLDER/kubeflex/postgresql.log" || true
         fi
     fi
 fi
@@ -448,8 +449,8 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
             else
                 echo -e "  - Open-cluster-manager: ${COLOR_ERROR}not found${COLOR_NONE}"
             fi
+            list_crds "--kubeconfig ${cp_kubeconfig[cp_n]}" "kubestellar\|open-cluster-management" "  "
         fi
-        list_crds "--kubeconfig ${cp_kubeconfig[cp_n]}" "kubestellar\|open-cluster-management" "  "
     else
         kubestellar_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
         kubestellar_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image' | cut -d':' -f2 || true)
@@ -461,7 +462,9 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         trasport_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -e -n "  - Transport controller: version=${COLOR_INFO}$trasport_version${COLOR_NONE}, pod=${COLOR_INFO}$trasport_pod${COLOR_NONE} namespace=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$trasport_status"
-        list_crds "--kubeconfig ${cp_kubeconfig[cp_n]}" "kubestellar" "  "
+        if [ -n "${cp_kubeconfig[cp_n]}" ]; then
+            list_crds "--kubeconfig ${cp_kubeconfig[cp_n]}" "kubestellar" "  "
+        fi
     fi
     if [[ "$arg_yaml" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
@@ -477,14 +480,16 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     if [[ "$arg_logs" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
         if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
-            containers=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.spec.containers[*].name}')
-            for ctr in $containers; do
-                { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c "$ctr" || true; } &> "$OUTPUT_FOLDER/$name/its-job-${ctr}.log"
-            done
-            kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller &> "$OUTPUT_FOLDER/$name/status-addon.log" || true
+            if [ -n "$its_pod" ] ; then
+                containers=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.spec.containers[*].name}')
+                for ctr in $containers; do
+                    { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c "$ctr" || true; } &> "$OUTPUT_FOLDER/$name/its-job-${ctr}.log"
+                done
+            fi
+            [ -n "$status_pod" ] && kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller &> "$OUTPUT_FOLDER/$name/status-addon.log" || true
         else
-            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod &> "$OUTPUT_FOLDER/$name/kubestellar-controller.log" || true
-            kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $trasport_pod -c transport-controller &> "$OUTPUT_FOLDER/$name/transport-controller.log" || true
+            [ -n "$kubestellar_pod" ] && kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod &> "$OUTPUT_FOLDER/$name/kubestellar-controller.log" || true
+            [ -n "$trasport_pod" ] && kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $trasport_pod -c transport-controller &> "$OUTPUT_FOLDER/$name/transport-controller.log" || true
         fi
     fi
     cp_n=$((cp_n+1))
