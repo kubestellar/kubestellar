@@ -313,6 +313,14 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/unreleased-development/direct/knownissue-helm-ghcr/</loc>
+         <lastmod>2025-02-13</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/knownissue-helm-ghcr/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/knownissue-helm-ghcr/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/unreleased-development/direct/knownissue-kflex-extension/</loc>
          <lastmod>2025-02-13</lastmod>
          <changefreq>daily</changefreq>
@@ -326,14 +334,6 @@
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/knownissue-kind-config/"/>
          <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/knownissue-kind-config/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/knownissue-wsl-ghcr-helm/</loc>
-         <lastmod>2025-02-13</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/knownissue-wsl-ghcr-helm/"/>
-         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/knownissue-wsl-ghcr-helm/"/>
          
     </url>
     <url>
