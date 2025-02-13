@@ -22,7 +22,7 @@ require (
 	k8s.io/code-generator v0.29.10
 	k8s.io/component-base v0.29.10
 	k8s.io/klog/v2 v2.120.1
-	k8s.io/kubernetes v1.29.10
+	k8s.io/kubernetes v1.29.14
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
 	open-cluster-management.io/api v0.13.0
 	sigs.k8s.io/controller-runtime v0.17.6
