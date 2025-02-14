@@ -7,7 +7,7 @@
 # please do not change them unless you know what you are doing.
 HELM_VERSION: "3.16.1"
 KUBECTL_VERSION: "1.31.0"
-KUBESTELLAR_VERSION: "0.26.0-rc.2"
+KUBESTELLAR_VERSION: "0.26.0"
 # TRANSPORT_VERSION: e.g., "0.24.0"; defaults to KUBESTELLAR_VERSION value, if not defined
 CLUSTERADM_VERSION: "0.9.0"
 OCM_STATUS_ADDON_VERSION: "0.2.0-rc14"
