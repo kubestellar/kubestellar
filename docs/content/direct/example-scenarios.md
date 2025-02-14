@@ -95,14 +95,6 @@ spec:
 EOF
 ```
 
-Verify that *manifestworks* wrapping the objects have been created in the mailbox
-namespaces with the following command. Expect to see a `ManifestWork` object named "nginx-bpolicy-wds1" in each namespace.
-
-```shell
-kubectl --context "$its_context" get manifestworks -n "$wec1_name"
-kubectl --context "$its_context" get manifestworks -n "$wec2_name"
-```
-
 Verify that the deployment has been created in both clusters
 
 ```shell
