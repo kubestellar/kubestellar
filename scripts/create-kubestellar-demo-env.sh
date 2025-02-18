@@ -210,13 +210,26 @@ then var_flags="--set kubeflex-operator.hostContainer=k3d-kubeflex-server-0"
 else var_flags=""
 fi
 
-helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
+if helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
         --version $kubestellar_version \
         --set-json='ITSes=[{"name":"its1"}]' \
         --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
         --set-json='verbosity.default=5' \
         --timeout=24h \
         $var_flags
+then : success
+else
+    if [ "$(kubectl get job -n kubeflex-system   ks-core-install-postgresql -o 'jsonpath={.status.conditions[?(@.type=="Failed")].reason}')" == BackoffLimitExceeded; then
+        echo "KubeFlex was unable to install postgresql" >& 2
+        pod=$(kubectl get pods -n kubeflex-system -l batch.kubernetes.io/job-name=ks-core-install-postgresql -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp --no-headers | sort -b -k2 | head -1 | awk '{ print $1 }')
+        if kubectl logs -n kubeflex-system $pod | grep toomanyrequests;
+        then
+            echo "DockerHub refused pull of postgresql image due to rate limiting" >&2
+        fi
+    fi
+    false
+fi
+
 
 kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
 kflex ctx --overwrite-existing-context wds1
