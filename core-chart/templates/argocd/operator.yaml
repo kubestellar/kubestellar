@@ -1,0 +1,151 @@
+{{- if index .Values "argo-cd" "install" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-kubestellar-operator
+data:
+  # k logs $(k get pods -l job-name=argocd-kubestellar-operator -o 'jsonpath={.items[0].metadata.name}')
+  # k delete -f /vagrant/add-wds-clusters-job.yaml ; k apply -f /vagrant/add-wds-clusters-job.yaml && sleep $WAIT_BEFORE_RETRY ; k logs $(k get pods -l job-name=argocd-kubestellar-operator -o 'jsonpath={.items[0].metadata.name}')
+  argocd-kubestellar-operator.sh: |
+    #!/bin/env bash
+    set -e
+
+    WAIT_BEFORE_RETRY=5
+    NS={{ .Release.Namespace }}
+
+    echo "Using namespace: $NS"
+
+    echo "Getting Argo CD pod name..."
+    ARGOCD_POD=""
+    while [ -z "$ARGOCD_POD" ]; do
+        ARGOCD_POD=$(kubectl -n $NS get pods -l app.kubernetes.io/name=argocd-server -o 'jsonpath={.items[0].metadata.name}' 2> /dev/null || true)
+        if [ -z "$ARGOCD_POD" ]; then
+            >&2 echo "==> ERROR: Argo CD pod not found! ...retrying in $WAIT_BEFORE_RETRY seconds..."
+            sleep $WAIT_BEFORE_RETRY
+        fi
+    done
+    echo "==> Argo CD pod found: $ARGOCD_POD"
+
+    echo "Waiting for Argo CD pod to be ready..."
+    kubectl -n $NS wait --for=condition=Ready pod/$ARGOCD_POD
+    echo "==> Argo CD show condition Ready."
+
+    echo "Getting Argo CD admin password..."
+    ARGOCD_PASSWD=""
+    while [ -z "$ARGOCD_PASSWD" ]; do
+        ARGOCD_PASSWD=$(kubectl -n $NS get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" 2> /dev/null || true)
+        if [ -z "$ARGOCD_PASSWD" ]; then
+            >&2 echo "==> ERROR: Argo CD password secret not found! ...retrying in $WAIT_BEFORE_RETRY seconds..."
+            sleep $WAIT_BEFORE_RETRY
+        fi
+    done
+    echo "==> Argo CD admin password retrieved."
+
+    echo "Logging into Argo CD cli..."
+    while ! kubectl -n $NS exec $ARGOCD_POD -- argocd login argocd-server.$NS --username admin --password $(echo $ARGOCD_PASSWD | base64 -d) --insecure ; do
+        >&2 echo "==> ERROR: Argo CD login failed! ...retrying in $WAIT_BEFORE_RETRY seconds..."
+        sleep $WAIT_BEFORE_RETRY
+    done
+    echo "==> Argo CD login succesful."
+
+    echo "Adding WDS clusters..."
+    {{- range $cp := .Values.WDSes }}
+
+        cp_name={{ $cp.name }}
+
+        echo "==> Looking for Control Plane \"$cp_name\"..."
+        # Wait for the CP to exists and be ready
+        while [[ $(kubectl get controlplane $cp_name -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+            >&2 echo "==> ERROR: Control Plane \"$cp_name\" is not ready! ...retrying in $WAIT_BEFORE_RETRY seconds..."
+            sleep $WAIT_BEFORE_RETRY
+        done
+        echo "==> Control Plane \"$cp_name\" is ready."
+
+        # determine the secret name and namespace
+        key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
+        secret_name=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
+        secret_namespace=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
+
+        kubeconfig="/tmp/${cp_name}.kubeconfig"
+
+        echo "==> Getting \"$key\" from \"$secret_name\" secret in \"$secret_namespace\" for control plane \"$cp_name\"... \"$kubeconfig\""
+        kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d > "$kubeconfig"
+
+        echo "==> Copying kubeconfig \"${cp_name}.kubeconfig\" to Argo CD pod \"$ARGOCD_POD\"..."
+        kubectl cp "$kubeconfig" -n $NS ${ARGOCD_POD}:/tmp
+
+        echo "==> Registering Control Plane \"$cp_name\" as an Argo CD cluster..."
+        kubectl exec $ARGOCD_POD -- argocd cluster add ${cp_name} -y --kubeconfig $kubeconfig
+
+    {{- end }}
+
+    echo "Creating applications..."
+    {{- range $app := (index .Values "argo-cd" "applications") }}
+
+        echo "==> Creating application \"{{ $app.name }}\":"
+        echo "    - project=\"{{ $app.project | default "default" }}\""
+        echo "    - repoURL=\"{{ $app.repoURL }}\""
+        echo "    - targetRevision=\"{{ $app.targetRevision | default "HEAD" }}\""
+        echo "    - path=\"{{ $app.path }}\""
+        echo "    - destinationWDS=\"{{ $app.destinationWDS }}\""
+        echo "    - destinationNamespace=\"{{ $app.destinationNamespace | default "default" }}\""
+
+        kubectl exec $ARGOCD_POD -- argocd app create {{ $app.name }} \
+          --project {{ $app.project | default "default" }} \
+          --repo {{ $app.repoURL }} \
+          --revision {{ $app.targetRevision | default "HEAD" }} \
+          --path {{ $app.path }} \
+          --dest-name {{ $app.destinationWDS }} \
+          --dest-namespace {{ $app.destinationNamespace | default "default" }} || true
+
+    {{- end }}
+
+    echo "Done."
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argocd-kubestellar-operator
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-weight": "5" # IMPORTANT: set this weight higher than KubeFlex post-install hook, otherwise postgresql will not install
+    "helm.sh/hook-delete-policy": before-hook-creation, hook-succeeded
+spec:
+  template:
+    metadata:
+      name: argocd-kubestellar-operator
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      restartPolicy: Nevegit a
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: argocd-kubestellar-operator
+      containers:
+      - name: add-wdses-clusters
+        image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+        command: [ "/bin/bash", "/mnt/script/argocd-kubestellar-operator.sh" ]
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+        volumeMounts:
+        - name: script
+          mountPath: /mnt/script
+          readOnly: true
+      volumes:
+      - name: script
+        configMap:
+          name: argocd-kubestellar-operator
+          defaultMode: 0744
+{{- end }}

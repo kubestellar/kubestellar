@@ -1,0 +1,22 @@
+{{- if and (index .Values "argo-cd" "install") (not (index .Values "argo-cd" "openshift" "enabled")) }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ index .Values "argo-cd" "global" "domain" | default "argocd.localtest.me" }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: argocd-server
+            port:
+              name: https
+{{- end }}
