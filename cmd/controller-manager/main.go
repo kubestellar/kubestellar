@@ -44,6 +44,7 @@ import (
 	clientopts "github.com/kubestellar/kubestellar/options"
 	"github.com/kubestellar/kubestellar/pkg/binding"
 	ksctlr "github.com/kubestellar/kubestellar/pkg/controller"
+	"github.com/kubestellar/kubestellar/pkg/ctrlutil"
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/status"
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -125,7 +126,7 @@ func main() {
 
 	// get the config for WDS
 	setupLog.Info("Getting config for WDS", "name", wdsName)
-	wdsRestConfig, wdsName, err := util.GetWDSKubeconfig(setupLog, wdsName)
+	wdsRestConfig, wdsName, err := ctrlutil.GetWDSKubeconfig(setupLog, wdsName)
 	if err != nil {
 		setupLog.Error(err, "unable to get WDS kubeconfig")
 		os.Exit(1)
@@ -135,7 +136,7 @@ func main() {
 
 	// get the config for ITS
 	setupLog.Info("Getting config for ITS")
-	itsRestConfig, itsName, err := util.GetITSKubeconfig(setupLog, itsName)
+	itsRestConfig, itsName, err := ctrlutil.GetITSKubeconfig(setupLog, itsName)
 	if err != nil {
 		setupLog.Error(err, "unable to get ITS kubeconfig")
 		os.Exit(1)
