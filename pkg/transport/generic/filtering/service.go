@@ -49,7 +49,7 @@ func cleanService(object *unstructured.Unstructured) {
 		}
 	}
 
-	// Set the nodePort to an empty string unelss the annotation "kubestellar.io/annotations/preserve=nodeport" is present
+	// Set the nodePort to an empty string unelss the annotation "control.kubestellar.io/preserve=nodeport" is present
 	if !(object.GetAnnotations() != nil && object.GetAnnotations()[preserveFieldAnnotation] == preserveNodePortValue) {
 		if ports, found, _ := unstructured.NestedSlice(object.Object, "spec", "ports"); found {
 			for i, port := range ports {

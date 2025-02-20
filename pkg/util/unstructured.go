@@ -60,9 +60,6 @@ const (
 	CombinedStatusResource = "combinedstatuses"
 	CombinedStatusGroup    = "control.kubestellar.io"
 	CombinedStatusVersion  = "v1alpha1"
-
-	AnnotationToPreserveValuesKey = "annotations.kubestellar.io/preserve"
-	PreserveNodePortValue         = "nodeport"
 )
 
 // this type is used in status-addon, which we cannot import due to conflicting versions
