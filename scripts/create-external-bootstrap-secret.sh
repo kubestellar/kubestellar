@@ -41,7 +41,7 @@ COLOR_YAML="${COLOR_PURPLE}"
 
 # Command line arguments
 arg_cp=""
-arg_kubeconfig="$HOME/.kube/config"
+arg_kubeconfig="${KUBECONFIG:-$HOME/.kube/config}"
 arg_context=""
 arg_ns="default"
 arg_addr=""
@@ -180,14 +180,7 @@ fi
 ###############################################################################
 # Create secret
 ###############################################################################
-create_ns=true
-for ns in $(kubectl get ns --no-headers -o name) ; do
-    if [[ "namespace/${arg_ns}" == "$ns" ]] ; then
-        create_ns=false
-        break
-    fi
-done
-if [[ $create_ns == true ]] ; then
+if ! kubectl get ns "$arg_ns" &> /dev/null ; then
     [[ $arg_verbose == true ]] && echo -e "Creating namespace ${COLOR_YELLOW}${arg_ns}${COLOR_NONE}..."
     kubectl create ns "$arg_ns"
 fi
