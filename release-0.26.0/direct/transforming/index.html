@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3260,7 +3260,7 @@ the other supports variation from WEC to WEC.</p>
 <p>In a <code>Service</code> (core API group) object:</p>
 <ol>
 <li>
-<p>remove the following fields from <code>spec</code>: <code>ipFamilies</code>, <code>externalTrafficPolicy</code>, <code>internalTrafficPolicy</code>, <code>ipFamilyPolicy</code>, <code>sessionAffinity</code>. Also remove the <code>nodePort</code> field from every port unless the annotation <code>kubestellar.io/annotations/preserve=nodeport</code> is present;</p>
+<p>remove the following fields from <code>spec</code>: <code>ipFamilies</code>, <code>externalTrafficPolicy</code>, <code>internalTrafficPolicy</code>, <code>ipFamilyPolicy</code>, <code>sessionAffinity</code>. Also remove the <code>nodePort</code> field from every port unless the annotation <code>control.kubestellar.io/preserve=nodeport</code> is present.</p>
 </li>
 <li>
 <p>in the <code>spec</code> remove the field <code>clusterIP</code> unless it is present with value "None".</p>
