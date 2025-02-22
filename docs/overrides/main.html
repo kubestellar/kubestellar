@@ -33,31 +33,6 @@
   />-->
 {% endblock %}
 
-<!-- Announcement bar -->
-{% block announce %}
-  <!-- Extra stylesing -->
-  <style>
-      .md-announce a,
-      .md-announce a:focus,
-      .md-announce a:hover{color:currentColor}.md-announce
-      strong{white-space:nowrap}.md-announce
-  </style>
-
-<!--   
-  <a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
-  <p style="color: #D5EE1C">For updates follow <strong style="color: #D5EE1C">@kubestellar</strong> on
-    <strong style="color: white">LinkedIn</strong>
-  </p>
-</a> 
--->
-
-<a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
-  <p style="color: #D5EE1C">KubeStellar is now a <strong style="color: #D5EE1C">Cloud Native Computing Foundation (CNCF) Sandbox Project</strong>. Follow us <strong style="color: #D5EE1C">@kubestellar</strong> on
-    <strong style="color: white">LinkedIn</strong>
-  </p>
-</a>
-{% endblock %}
-
 {% block outdated %}
   You are not viewing the latest regular release.
   <a href="{{ '../' ~ base_url }}">
