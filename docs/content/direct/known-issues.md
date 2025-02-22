@@ -16,6 +16,10 @@ The symptom is `kind` cluster(s) that get created but fail to get their job done
 
 The symptom is that attempting to instantiate the core Helm chart gets an authorization failure. See [Authorization failure while fetching Helm chart from ghcr.io](knownissue-helm-ghcr.md).
 
+## KubeFlex install fails due to DockerHub rate limit on pulling postgresql
+
+The symptom is a failure to instantiate the KubeStellar Helm chart or any other that uses postgresql. See [KubeFlex install fails due to DockerHub rate limit on pulling postgresql](knownissue-postgress-ratelimit.md).
+
 ## Missing results in a CombinedStatus object
 
 The symptom is a missing entry in the `results` of a `CombinedStatus` object. See [Missing results in a CombinedStatus object](knownissue-collector-miss.md).
