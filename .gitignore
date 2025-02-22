@@ -36,3 +36,6 @@ core-chart/charts/
 # Python local stuff associated with KubeStellar performance tests
 /test/performance/common/.venv/
 /test/performance/common/__pycache__/
+
+# Data created when deploy the large-scale test infra
+/test/scale-infra/.data/
