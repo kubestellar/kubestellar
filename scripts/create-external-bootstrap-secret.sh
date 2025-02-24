@@ -35,14 +35,16 @@ COLOR_ERROR="${COLOR_RED}"
 COLOR_STATUS_TRUE="${COLOR_GREEN}"
 COLOR_STATUS_FALSE="${COLOR_RED}"
 COLOR_INFO="${COLOR_BLUE}"
-COLOR_TITLE="${COLOR_YELLOW}"
+COLOR_TITLE="${COLOR_BLUE}"
 COLOR_YAML="${COLOR_PURPLE}"
 
 
 # Command line arguments
 arg_cp=""
-arg_kubeconfig="${KUBECONFIG:-$HOME/.kube/config}"
+KUBECONFIG="${KUBECONFIG:-$HOME/.kube/config}"
 arg_context=""
+arg_source_kubeconfig=""
+arg_source_context=""
 arg_ns="default"
 arg_addr=""
 arg_verbose=false
@@ -53,14 +55,16 @@ display_help() {
   cat << EOF
 Usage: $0 [options]
 
---controlplane|-c <name>   control plane name used to name the secret: <name>-bootstrap
---namespace|-n <name>      namespace name where to create the secret, default is "default"
---kubeconfig|-K <filename> use the specified kubeconfig
---context|-C <name>        use the specified context
---address|-A <addr>        specify a replacement internal address for the cluster
---verbose|-V               output extra information
---help|-h                  show this information
--X                         enable verbose execution for debugging
+--controlplane|-c <name>       control plane name used to name the secret: <name>-bootstrap
+--namespace|-n <name>          namespace name where to create the secret, default is "default"
+--kubeconfig|-K <filename>     use the specified kubeconfig used to generate the bootstrat secret
+--context|-C <name>            use the specified context used to generate the bootstrat secret
+--source-kubeconfig <filename> use the specified kubeconfig used to get the bootstrat secret data
+--source-context <name>        use the specified context used to get the bootstrat secret data
+--address|-A <addr>            specify a replacement internal address for the cluster
+--verbose|-V                   output extra information
+--help|-h                      show this information
+-X                             enable verbose execution for debugging
 EOF
 }
 
@@ -90,6 +94,16 @@ while (( $# > 0 )); do
         then { arg_addr="$2"; shift; }
         else { echo "$0: missing address value" >&2; exit 1; }
         fi;;
+    (--kubeconfig|-K)
+        if (( $# > 1 ));
+        then { KUBECONFIG="$2"; shift; }
+        else { echo "$0: missing kubeconfig filename" >&2; exit 1; }
+        fi;;
+    (--context|-C)
+        if (( $# > 1 ));
+        then { arg_context="$2"; shift; }
+        else { echo "$0: missing context name" >&2; exit 1; }
+        fi;;
     (--namespace|-n)
         if (( $# > 1 ));
         then { arg_ns="$2"; shift; }
@@ -100,15 +114,15 @@ while (( $# > 0 )); do
         then { arg_cp="$2"; shift; }
         else { echo "$0: missing control plane name" >&2; exit 1; }
         fi;;
-    (--kubeconfig|-K)
+    (--source-kubeconfig)
         if (( $# > 1 ));
-        then { arg_kubeconfig="$2"; shift; }
-        else { echo "$0: missing kubeconfig filename" >&2; exit 1; }
+        then { arg_source_kubeconfig="$2"; shift; }
+        else { echo "$0: missing source kubeconfig filename" >&2; exit 1; }
         fi;;
-    (--context|-C)
+    (--source-context)
         if (( $# > 1 ));
-        then { arg_context="$2"; shift; }
-        else { echo "$0: missing context name" >&2; exit 1; }
+        then { arg_source_context="$2"; shift; }
+        else { echo "$0: missing source context name" >&2; exit 1; }
         fi;;
     (--verbose|-V)
         arg_verbose=true;;
@@ -132,30 +146,40 @@ done
 # Check arguments
 ###############################################################################
 if [[ -z "$arg_cp" ]] ; then
-    echoerr "a control plane name is required!"
-    $0 --help
+    echoerr "a Control Plane name is required!"
+    display_help
     exit 1
 fi
 if [[ -z "$arg_context" ]] ; then
-    contexts=($(kubectl --kubeconfig "$arg_kubeconfig" config get-contexts --no-headers -o name 2> /dev/null))
+    arg_context=$(kubectl config current-context 2> /dev/null)
+fi
+if [[ -z "$arg_source_kubeconfig" ]] ; then
+    arg_source_kubeconfig=$KUBECONFIG
+fi
+if [[ -z "$arg_source_context" ]] ; then
+    contexts=($(kubectl --kubeconfig "$arg_source_kubeconfig" config get-contexts --no-headers -o name 2> /dev/null))
     case ${#contexts[@]} in
     (0)
         echoerr "there are no contexts in the kubeconfig file!"
-        $0 --help
-        exit 1;;
+        display_help
+        exit 2;;
     (1)
-        arg_context="${contexts[0]}";;
+        arg_source_context="${contexts[0]}";;
     (*)
         for context in "${contexts[@]}" ; do # for all contexts
             if [[ "$context" =~ "$arg_cp" ]] ; then
-                arg_context="$context"
-                break
+                if [[ -n "$arg_source_context" ]] ; then
+                    echoerr "there are multiple matching contexts in the source kubeconfig file, specify one with \"--source-context\"!"
+                    display_help
+                    exit 3
+                fi
+                arg_source_context="$context"
             fi
         done
-        if [[ -z "$arg_context" ]] ; then
-            echoerr "there are multiple contexts in the kubeconfig file, specify one with \"--context\"!"
-            $0 --help
-            exit 1
+        if [[ -z "$arg_source_context" ]] ; then
+            echoerr "there are multiple contexts in the source kubeconfig file, specify one with \"--source-context\"!"
+            display_help
+            exit 4
         fi;;
     esac
 fi
@@ -164,15 +188,15 @@ fi
 ###############################################################################
 # Extract the external context
 ###############################################################################
-[[ $arg_verbose == true ]] && echo -e "Extracting context ${COLOR_YELLOW}$arg_context${COLOR_NONE} from kubeconfig ${COLOR_YELLOW}$arg_kubeconfig${COLOR_NONE}..."
-kubectl --kubeconfig=$arg_kubeconfig config view --minify --flatten --context=$arg_context > $BOOTSTRAP_KUBECONFIG
+[[ $arg_verbose == true ]] && echo -e "Extracting context ${COLOR_BLUE}$arg_source_context${COLOR_NONE} from kubeconfig ${COLOR_BLUE}$arg_source_kubeconfig${COLOR_NONE}..."
+kubectl --kubeconfig=$arg_source_kubeconfig --context=$arg_source_context config view --minify --flatten > $BOOTSTRAP_KUBECONFIG
 
 
 ###############################################################################
 # Replace address if necessary
 ###############################################################################
 if [[ -n "$arg_addr" ]] ; then
-    [[ $arg_verbos == true ]] && echo -e "Setting server internal address to ${COLOR_YELLOW}$arg_addr${COLOR_NONE}..."
+    [[ $arg_verbose == true ]] && echo -e "Setting server internal address to ${COLOR_BLUE}$arg_addr${COLOR_NONE}..."
     kubectl --kubeconfig=$BOOTSTRAP_KUBECONFIG config set-cluster $(kubectl --kubeconfig=$BOOTSTRAP_KUBECONFIG config current-context) --server=$arg_addr > /dev/null
 fi
 
@@ -180,9 +204,9 @@ fi
 ###############################################################################
 # Create secret
 ###############################################################################
-if ! kubectl get ns "$arg_ns" &> /dev/null ; then
-    [[ $arg_verbose == true ]] && echo -e "Creating namespace ${COLOR_YELLOW}${arg_ns}${COLOR_NONE}..."
-    kubectl create ns "$arg_ns"
+if ! kubectl --context="$arg_context" get ns "$arg_ns" &> /dev/null ; then
+    [[ $arg_verbose == true ]] && echo -e "Creating namespace ${COLOR_BLUE}${arg_ns}${COLOR_NONE}..."
+    kubectl --context="$arg_context" create ns "$arg_ns"
 fi
-[[ $arg_verbose == true ]] && echo -e "Creating secret ${COLOR_YELLOW}${arg_cp}-bootstrap${COLOR_NONE} in namespace ${COLOR_YELLOW}${arg_ns}${COLOR_NONE}..."
-kubectl create secret generic ${arg_cp}-bootstrap --from-file=kubeconfig-incluster=$BOOTSTRAP_KUBECONFIG --namespace $arg_ns
+[[ $arg_verbose == true ]] && echo -e "Creating secret ${COLOR_BLUE}${arg_cp}-bootstrap${COLOR_NONE} in namespace ${COLOR_BLUE}${arg_ns}${COLOR_NONE}..."
+kubectl --context="$arg_context" create secret generic ${arg_cp}-bootstrap --from-file=kubeconfig-incluster=$BOOTSTRAP_KUBECONFIG --namespace $arg_ns
