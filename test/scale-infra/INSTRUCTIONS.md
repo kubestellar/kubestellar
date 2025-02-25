@@ -84,13 +84,13 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 
     a) Delete WECs infra:
     ```bash
-    ansible-playbook -i .data/hosts_wec delete-ec2.yaml -e "cluster_name=wec region=us-east-2 group=<aws-iam-user>"
+    ansible-playbook -i .data/hosts_wec delete-ec2.yaml -e "cluster_name=wec region=us-east-2 group=<vpc_name>"
     ```
 
     b) Delete KubeStellar core infra: 
 
     ```bash
-    ansible-playbook -i .data/hosts_core delete-ec2.yaml -e "cluster_name=core region=us-east-2 group=<aws-iam-user>"
+    ansible-playbook -i .data/hosts_core delete-ec2.yaml -e "cluster_name=core region=us-east-2 group=<vpc_name>"
     ```
 
     c) Delete VPC:
