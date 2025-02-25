@@ -40,7 +40,7 @@
              sudo apt-get update
              sudo apt-get install helm
 
-    - name: Register a variable, ignore errors and continue
+    - name: Check if kscore context exists, ignore errors and continue
       ansible.builtin.command: kubectl config use-context kscore
       register: result
       ignore_errors: true

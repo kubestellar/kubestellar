@@ -2,8 +2,8 @@
 - hosts: localhost
   gather_facts: no
   vars:
-    region: "{{ region }}"
-    vpc_name:  "{{ name }}"
+    region: "{{ region | default('us-east-1') }}"
+    vpc_name:  "{{ vpc_name | default('kscore') }}"
   tasks:
     - name: Gather information about all availability zones
       amazon.aws.aws_az_info:

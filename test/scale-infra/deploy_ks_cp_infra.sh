@@ -14,15 +14,15 @@
 # limitations under the License.
 set -e
 
-region=""
+region="us-east-1"
 aws_key_name=""
-num_masters=""
-num_workers=""
-instance_type=""
+num_masters=1
+num_workers=1
+instance_type="t2.micro"
 ks_release=""
 archt='x86_64' # e.g., x86_64 and arm64
-ec2_image_id=""
-vpc_name=""
+ec2_image_id="ami-00eb69d236edcfaf8"
+vpc_name="kscore"
 
 
 while [ $# != 0 ]; do
@@ -105,8 +105,22 @@ while [ $# != 0 ]; do
     shift
 done
 
+
+if [ $ks_release == "" ];then
+   echo "KubeStellar release version is empty"
+   exit 1;
+fi
+
+if [ $aws_key_name == "" ];then
+   echo "AWS ssh public key name is empty."
+   exit 1;
+fi
+
+
+
+
 # 1. Deploy vpc:
-ansible-playbook deploy_vpc_core.yaml -e "name=$vpc_name region=$region"
+ansible-playbook deploy_vpc_core.yaml -e "vpc_name=$vpc_name region=$region"
 
 # 2. Deploy instances:
 ansible-playbook create-ec2.yaml -e "cluster_name=core region=$region vpc_name=$vpc_name aws_key_name=$aws_key_name  num_masters=$num_masters num_workers=$num_workers ec2_type=$instance_type ec2_arch=$arch ec2_image=$ec2_image_id" 

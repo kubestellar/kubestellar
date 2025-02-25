@@ -14,14 +14,14 @@
 # limitations under the License.
 set -e
 
-region=""
+region="us-east-1"
 aws_key_name=""
-num_hosts=""
-instance_type=""
+num_hosts=1
+instance_type="t2.micro"
 archt='x86_64' # e.g., x86_64 and arm64
 num_wecs=1
-ec2_image_id=""
-vpc_name=""
+ec2_image_id="ami-00eb69d236edcfaf8"
+vpc_name="kscore"
 
 
 while [ $# != 0 ]; do
@@ -87,6 +87,12 @@ while [ $# != 0 ]; do
     esac
     shift
 done
+
+
+if [ $aws_key_name == "" ];then
+   echo "AWS ssh public key name is empty."
+   exit 1;
+fi
 
 ## Create EC2 instances:
 ansible-playbook create-ec2.yaml -e "cluster_name=wec region=$region vpc_name=$vpc_name aws_key_name=$aws_key_name  wecs_hosting_instances=$num_hosts ec2_type=$instance_type ec2_arch=$arch ec2_image=$ec2_image_id"
