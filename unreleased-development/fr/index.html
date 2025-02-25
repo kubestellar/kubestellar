@@ -116,43 +116,6 @@
     </div>
     <div data-md-component="announce">
       
-        <aside class="md-banner">
-          <div class="md-banner__inner md-grid md-typeset">
-            
-              <button class="md-banner__button md-icon" aria-label="Don't show this again">
-                
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-              </button>
-            
-            
-  <!-- Extra stylesing -->
-  <style>
-      .md-announce a,
-      .md-announce a:focus,
-      .md-announce a:hover{color:currentColor}.md-announce
-      strong{white-space:nowrap}.md-announce
-  </style>
-
-<!--   
-  <a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
-  <p style="color: #D5EE1C">For updates follow <strong style="color: #D5EE1C">@kubestellar</strong> on
-    <strong style="color: white">LinkedIn</strong>
-  </p>
-</a> 
--->
-
-<a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
-  <p style="color: #D5EE1C">KubeStellar is now a <strong style="color: #D5EE1C">Cloud Native Computing Foundation (CNCF) Sandbox Project</strong>. Follow us <strong style="color: #D5EE1C">@kubestellar</strong> on
-    <strong style="color: white">LinkedIn</strong>
-  </p>
-</a>
-
-          </div>
-          
-            <script>var el=document.querySelector("[data-md-component=announce]");if(el){var content=el.querySelector(".md-typeset");__md_hash(content.innerHTML)===__md_get("__announce")&&(el.hidden=!0)}</script>
-          
-        </aside>
-      
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
@@ -465,6 +428,20 @@
     
     <!-- Additional styles for landing page -->
     <style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+:root {
+  --font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", 
+                 "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+}
+
+h1, h2, h3, h4, h5, h6, p, span, a, li, div {
+  font-family: var(--font-family);
+}
 
 .section-sm {
   display: none;
@@ -2561,199 +2538,643 @@
     </style>
     
 
-<!--kubestellar-->
-<!-- <section class="main-background" name="top nav"> -->
-<section class="main-background">
-  <div class="md-grid conteiner-row pt-1 pt-lg-5 my-4">
-    <div class="px-1 ctx-header-text conteiner">
-      	      
-	    <span class="shortcut-bar Space-Bd-BT" style="height:20%;margin-top:20px;">
-        <a class="shortcut-bar-text" href="direct/get-started/" title="Get Started">START</a>&nbsp;&nbsp;&nbsp;
-        <a class="shortcut-bar-text" href="readme/" title="KubeStellar Architecture">ABOUT</a>&nbsp;&nbsp;&nbsp;
-        <a class="shortcut-bar-text" href="direct/user-guide-intro/" title="User Guide">USE</a>&nbsp;&nbsp;&nbsp;
-        <a class="shortcut-bar-text" href="direct/contribute/" title="Contributing to KubeStellar">CONTRIBUTE</a>&nbsp;&nbsp;&nbsp;&nbsp;
-        <a class="shortcut-bar-text" href="https://kubestellar.io/blog" title="KubeStellar blog on Medium">BLOG</a>&nbsp;&nbsp;&nbsp;&nbsp;
-        <a class="shortcut-bar-text" href="https://kubestellar.io/tv" title="KubeStellar channel on Youtube">YOUTUBE</a>&nbsp;&nbsp;&nbsp;&nbsp;
-        <a class="shortcut-bar-text" href="https://kubestellar.io/joinus" title="Community Access">JOIN</a>&nbsp;&nbsp;&nbsp;&nbsp;
-        <a class="shortcut-bar-text" href="https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?usp=share_link" title="KubeStellar Community Meetings">MEETINGS</a>&nbsp;&nbsp;&nbsp;&nbsp;        
-        <a style="position: relative;top: 6px;" href="https://github.com/kubestellar/kubestellar" aria-label="github" target="_blank" rel="noopener noreferrer" title="Follow us on GitHub" class="shortcut-bar-text">
-		<svg class="w-auto h-8 lg:h-6" width="31" height="22" viewBox="0 0 31 32" fill="none" aria-labelledby="gitub octocat">
-			<path d="M10.3687 24.8375C10.3687 24.9625 10.225 25.0625 10.0437 25.0625C9.8375 25.0813 9.69375 24.9813 9.69375 24.8375C9.69375 24.7125 9.8375 24.6125 10.0188 24.6125C10.2063 24.5938 10.3687 24.6938 10.3687 24.8375ZM8.425 24.5563C8.38125 24.6813 8.50625 24.825 8.69375 24.8625C8.85625 24.925 9.04375 24.8625 9.08125 24.7375C9.11875 24.6125 9 24.4688 8.8125 24.4125C8.65 24.3688 8.46875 24.4313 8.425 24.5563ZM11.1875 24.45C11.0062 24.4938 10.8812 24.6125 10.9 24.7563C10.9187 24.8813 11.0813 24.9625 11.2688 24.9188C11.45 24.875 11.575 24.7563 11.5562 24.6313C11.5375 24.5125 11.3688 24.4313 11.1875 24.45ZM15.3 0.5C6.63125 0.5 0 7.08125 0 15.75C0 22.6813 4.3625 28.6125 10.5938 30.7C11.3938 30.8438 11.675 30.35 11.675 29.9438C11.675 29.5563 11.6562 27.4188 11.6562 26.1063C11.6562 26.1063 7.28125 27.0438 6.3625 24.2438C6.3625 24.2438 5.65 22.425 4.625 21.9563C4.625 21.9563 3.19375 20.975 4.725 20.9938C4.725 20.9938 6.28125 21.1188 7.1375 22.6063C8.50625 25.0188 10.8 24.325 11.6938 23.9125C11.8375 22.9125 12.2438 22.2188 12.6938 21.8063C9.2 21.4188 5.675 20.9125 5.675 14.9C5.675 13.1813 6.15 12.3188 7.15 11.2188C6.9875 10.8125 6.45625 9.1375 7.3125 6.975C8.61875 6.56875 11.625 8.6625 11.625 8.6625C12.875 8.3125 14.2188 8.13125 15.55 8.13125C16.8813 8.13125 18.225 8.3125 19.475 8.6625C19.475 8.6625 22.4813 6.5625 23.7875 6.975C24.6438 9.14375 24.1125 10.8125 23.95 11.2188C24.95 12.325 25.5625 13.1875 25.5625 14.9C25.5625 20.9313 21.8813 21.4125 18.3875 21.8063C18.9625 22.3 19.45 23.2375 19.45 24.7063C19.45 26.8125 19.4312 29.4188 19.4312 29.9313C19.4312 30.3375 19.7188 30.8313 20.5125 30.6875C26.7625 28.6125 31 22.6813 31 15.75C31 7.08125 23.9688 0.5 15.3 0.5ZM6.075 22.0563C5.99375 22.1188 6.0125 22.2625 6.11875 22.3813C6.21875 22.4813 6.3625 22.525 6.44375 22.4438C6.525 22.3813 6.50625 22.2375 6.4 22.1188C6.3 22.0188 6.15625 21.975 6.075 22.0563ZM5.4 21.55C5.35625 21.6313 5.41875 21.7313 5.54375 21.7938C5.64375 21.8563 5.76875 21.8375 5.8125 21.75C5.85625 21.6688 5.79375 21.5688 5.66875 21.5063C5.54375 21.4688 5.44375 21.4875 5.4 21.55ZM7.425 23.775C7.325 23.8563 7.3625 24.0438 7.50625 24.1625C7.65 24.3063 7.83125 24.325 7.9125 24.225C7.99375 24.1438 7.95625 23.9563 7.83125 23.8375C7.69375 23.6938 7.50625 23.675 7.425 23.775ZM6.7125 22.8563C6.6125 22.9188 6.6125 23.0813 6.7125 23.225C6.8125 23.3688 6.98125 23.4313 7.0625 23.3688C7.1625 23.2875 7.1625 23.125 7.0625 22.9813C6.975 22.8375 6.8125 22.775 6.7125 22.8563Z" fill="currentColor"></path>
-		</svg
-	></a>  
-        <a style="position: relative;right: -10px;top: 5px;" class="shortcut-bar-text" href="https://kubestellar.io/slack" title="KubeStellar Slack">
-		<svg class="w-auto h-8 lg:h-6" width="21" height="21" aria-labelledby="Slack Icon" viewBox="0 0 60 60" fill="none">
-			<path fill-rule="evenodd" clip-rule="evenodd" d="M21.9545 0C18.6444 0.00244648 15.9655 2.68869 15.9679 5.99878C15.9655 9.30887 18.6468 11.9951 21.9569 11.9976H27.9459V6.00122C27.9484 2.69113 25.267 0.00489297 21.9545 0C21.9569 0 21.9569 0 21.9545 0V0ZM21.9545 16H5.98872C2.67863 16.0025 -0.00271446 18.6887 -0.000267972 21.9988C-0.00516094 25.3089 2.67618 27.9951 5.98628 28H21.9545C25.2646 27.9976 27.9459 25.3113 27.9435 22.0012C27.9459 18.6887 25.2646 16.0025 21.9545 16Z" fill="currentColor"></path>
-			<path fill-rule="evenodd" clip-rule="evenodd" d="M59.8802 21.9988C59.8826 18.6887 57.2013 16.0025 53.8912 16C50.5811 16.0025 47.8997 18.6887 47.9022 21.9988V28H53.8912C57.2013 27.9976 59.8826 25.3113 59.8802 21.9988ZM43.9119 21.9988V5.99878C43.9144 2.69113 41.2355 0.00489297 37.9254 0C34.6153 0.00244648 31.934 2.68869 31.9364 5.99878V21.9988C31.9315 25.3089 34.6129 27.9951 37.923 28C41.233 27.9976 43.9144 25.3113 43.9119 21.9988Z" fill="currentColor"></path>
-			<path fill-rule="evenodd" clip-rule="evenodd" d="M37.9229 60C41.233 59.9976 43.9144 57.3113 43.9119 54.0012C43.9144 50.6912 41.233 48.0049 37.9229 48.0025H31.9339V54.0012C31.9315 57.3089 34.6128 59.9951 37.9229 60ZM37.9229 43.9976H53.8911C57.2012 43.9951 59.8826 41.3089 59.8801 37.9988C59.885 34.6887 57.2037 32.0025 53.8936 31.9976H37.9254C34.6153 32 31.9339 34.6862 31.9364 37.9963C31.9339 41.3089 34.6128 43.9951 37.9229 43.9976Z" fill="currentColor"></path>
-			<path fill-rule="evenodd" clip-rule="evenodd" d="M1.67281e-06 37.9988C-0.00244481 41.3089 2.6789 43.9951 5.98899 43.9976C9.29908 43.9951 11.9804 41.3089 11.978 37.9988V32H5.98899C2.6789 32.0024 -0.00244481 34.6887 1.67281e-06 37.9988ZM15.9682 37.9988V53.9988C15.9633 57.3089 18.6447 59.9951 21.9547 60C25.2648 59.9975 27.9462 57.3113 27.9437 54.0012V38.0037C27.9486 34.6936 25.2673 32.0073 21.9572 32.0024C18.6447 32.0024 15.9658 34.6887 15.9682 37.9988C15.9682 38.0012 15.9682 37.9988 15.9682 37.9988Z" fill="currentColor"></path>
-		</svg>
-	</a>
-      </span>
-    		   
-      <div class="conteiner-row" style="margin-top:40px;margin-bottom:10px">
-        <p class="h1 text-xs-center">
-          <img src="KubeStellar-with-Logo-transparent-v2.png" class="mx-3 leverage-title-logo" height="150px" alt="KubeStellar logo and banner text"/>
+<!-- =========================
+     TOP BANNER
+============================ -->
+<div id="top-banner" style="background:#3B82F6; color:white; text-align:center; padding:8px 16px; position:relative;">
+  <span>KubeStellar is now a Cloud Native Computing Foundation sandbox project! 🎉 Follow us</span>
+  <a href="https://www.linkedin.com/company/kubestellar/" target="_blank" rel="noopener noreferrer"
+     style="color:white; text-decoration:underline; margin-left:4px;">
+    @kubestellar on LinkedIn
+  </a>
+  <button onclick="document.getElementById('top-banner').style.display='none'"
+          aria-label="Close banner"
+          style="position:absolute; right:16px; top:50%; transform:translateY(-50%); background:none; border:none; color:white; cursor:pointer; font-size:1.25rem;">
+    &times;
+  </button>
+</div>
+
+<!-- =========================
+     NAVBAR
+============================ -->
+<style>
+  .navbar-container {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f3f4f6;  
+    color: #111;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .nav-links {
+    display: flex; 
+    gap: 1.2rem;
+    font-size:0.9rem;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .nav-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  /* MOBILE MENU */
+    #mobile-menu {
+    display: none;
+    flex-direction: column;
+    background:#f3f4f6;
+    color:#111;
+    padding:0.5rem 1rem;
+    text-align: center;
+    align-items: center;
+    gap: 0.5rem;  
+  }
+  #mobile-menu a {
+    text-decoration:none;
+    color:inherit;
+    padding:0.5rem 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  /* Style for action buttons in mobile menu */
+  #mobile-menu a.mobile-action {
+    padding: 8px 16px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    margin: 4px 0;
+    gap: 8px;  /* Space between icon and text */
+  }
+  #menu-btn {
+    display: none; /* Hidden by default */
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  @media only screen 
+  and (min-width: 1024px) 
+  and (max-width: 1024px) 
+  and (min-height: 1366px) {
+    .nav-links { display: none; }
+    .nav-actions { display: none; }
+    #menu-btn {
+      display: block !important;
+      font-size: 1.5rem;
+      color: inherit;
+    }
+  }
+
+  /* General tablet styles */
+  @media (max-width: 1024px) {
+    .nav-links { display: none; }
+    .nav-actions { display: none; }
+    #menu-btn {
+      display: block !important;
+      font-size: 1.5rem;
+      color: inherit;
+    }
+  }
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .nav-links {
+      font-size: 0.8rem;  /* Slightly smaller font */
+      gap: 0.8rem;  /* Reduced gap */
+    }
+
+    .nav-actions {
+      gap: 0.5rem;  /* Reduced gap */
+    }
+
+    .nav-actions a {
+      padding: 4px 6px !important;  /* Smaller padding */
+      font-size: 0.8rem;  /* Smaller font */
+    }
+
+    .nav-actions img {
+      height: 16px !important;  /* Smaller icons */
+    }
+  }
+
+  /* Large Tablet Styles (1024px to 1180px) */
+  @media (min-width: 1024px) and (max-width: 1180px) {
+    .nav-links {
+      font-size: 0.85rem;
+      gap: 1rem;
+    }
+
+    .nav-actions {
+      gap: 0.6rem;
+    }
+
+    .nav-actions a {
+      padding: 4px 8px !important;
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Mobile Styles (below 768px) */
+  @media (max-width: 767px) {
+    .nav-links { display: none; }
+    .nav-actions { display: none; }
+    #menu-btn {
+      display: block !important;
+      font-size: 1.5rem;
+      color: inherit;
+    }
+  }
+
+  /* Ensure menu button is visible on tablets when needed */
+  @media (max-width: 1024px) {
+    /* If content starts to overflow, switch to hamburger menu */
+    @media (max-width: 920px) {
+      .nav-links { display: none; }
+      .nav-actions { display: none; }
+      #menu-btn {
+        display: block !important;
+        font-size: 1.5rem;
+        color: inherit;
+      }
+    }
+  }
+
+  /* Mobile menu styling */
+  #mobile-menu a {
+    text-decoration: none;
+    color: inherit;
+    padding: 0.5rem 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #mobile-menu a.mobile-action {
+    padding: 8px 16px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    margin: 4px 0;
+    gap: 8px;
+  }
+</style>
+
+
+<div id="navbar" class="navbar-container">
+  <!-- Left side - Logo -->
+  <div style="display:flex; align-items:center; gap:1rem;">
+    <!-- Replace with your actual logo if needed -->
+    <img src="../images/KubeStellar-with-Logo-transparent-v2.png" alt="KubeStellar Logo" style="height:60px; width:auto;">
+  </div>
+
+  <!-- Center - Desktop Nav Links -->
+  <div class="nav-links">
+    <a href="direct/get-started/">Start</a>
+    <a href="readme/">About</a>
+    <a href="direct/user-guide-intro/">User Guide</a>
+    <a href="direct/contribute/">Contribute</a>
+    <a href="https://kubestellar.io/blog" target="_blank">Blog</a>
+    <a href="https://kubestellar.io/tv" target="_blank">Youtube</a>
+    <a href="https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?tab=t.0" target="_blank">Meetings</a>
+  </div>
+
+  <!-- Right side - Desktop actions -->
+  <div class="nav-actions">
+    <!-- Star on GitHub -->
+    <a href="https://github.com/kubestellar/kubestellar"
+       style="padding:4px 8px; border-radius:4px; background:#e5e7eb; color:#111; text-decoration:none; display:flex; align-items:center; gap:4px;"
+       target="_blank" rel="noopener noreferrer">
+       <img src="../icons/github.svg" alt="GitHub" style="height:20px; width:auto;">
+       Star on GitHub
+    </a>
+    <!-- Join Us -->
+    <a href="https://kubestellar.io/joinus"
+       style="padding:4px 8px; border-radius:4px; background:#e5e7eb; color:#111; text-decoration:none; display:flex; align-items:center; gap:4px;">
+       <img src="../icons/sign-in.svg" alt="Join" style="height:20px; width:auto;">
+       Join Us
+    </a>
+    <!-- Slack -->
+    <a href="https://kubestellar.io/slack"
+       style="padding:4px 8px; border-radius:4px; background:#e5e7eb; color:#111; text-decoration:none; display:flex; align-items:center; gap:4px;"
+       target="_blank" rel="noopener noreferrer">
+       <img src="../icons/slack.svg" alt="Slack" style="height:20px; width:auto;">
+       Slack
+    </a>
+  </div>
+
+  <!-- Mobile Menu Button -->
+  <button id="menu-btn" onclick="toggleMenu()">
+    <img src="../icons/hamburger.svg" alt="Menu" style="height:20px; width:auto;">
+  </button>
+</div>
+
+<!-- Mobile Nav Menu -->
+<div id="mobile-menu">
+  <a href="direct/get-started/">Start</a>
+  <a href="readme/">About</a>
+  <a href="direct/user-guide-intro/">User Guide</a>
+  <a href="direct/contribute/">Contribute</a>
+  <a href="https://kubestellar.io/blog" target="_blank">Blog</a>
+  <a href="https://kubestellar.io/tv" target="_blank">Youtube</a>
+  <a href="https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?tab=t.0" target="_blank">Meetings</a>
+  <a href="https://github.com/kubestellar/kubestellar" target="_blank" class="mobile-action">
+    <img src="../icons/github.svg" alt="GitHub" style="height:20px; width:auto;">
+    Star on GitHub
+  </a>
+  <a href="https://kubestellar.io/joinus" class="mobile-action">
+    <img src="../icons/sign-in.svg" alt="Join" style="height:20px; width:auto;">
+    Join Us
+  </a>
+  <a href="https://kubestellar.io/slack" target="_blank" class="mobile-action">
+    <img src="../icons/slack.svg" alt="Slack" style="height:20px; width:auto;">
+    Slack
+  </a>
+</div>
+
+<script>
+  function toggleMenu(){
+    const menu = document.getElementById('mobile-menu');
+    if(menu.style.display === 'flex'){
+      menu.style.display = 'none';
+    } else {
+      menu.style.display = 'flex';
+    }
+  }
+</script>
+<!-- =========================
+     HERO SECTION
+============================ -->
+<style>
+  /* SVG color override */
+  .hero-button img {
+    filter: brightness(0) invert(1); /* Makes SVGs white */
+  }
+  
+  /* Hero content responsive styling */
+  .hero-title {
+    font-size: 1.75rem;
+    white-space: nowrap; /* Keeps text in one line */
+    margin-bottom: 0.5rem;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .hero-title {
+      font-size: 1.0rem;
+      white-space: normal; /* Allows wrapping on smaller screens */
+    }
+  }
+  
+  /* Button styling */
+  .hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    gap: 12px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: transform 0.2s;
+    min-width: 200px; /* Ensure equal width */
+  }
+  
+  .hero-button:hover {
+    transform: translateY(-2px);
+  }
+</style>
+
+<!-- =========================
+     HERO SECTION
+============================ -->
+<div class="hero-container" style="
+  position: relative; 
+  min-height: 80vh; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+">
+  <img src="../images/background.png" alt="Background Image" style="
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  ">
+  <div class="hero-overlay" style="
+    position:absolute; 
+    inset:0; 
+    background:rgba(0,0,0,0.2);
+  "></div>
+  <div class="hero-content" style="
+    position:relative; 
+    z-index:2; 
+    max-width:1000px; /* Increased for title */
+    width:90%; 
+    background:rgba(0,0,0,0.5); 
+    backdrop-filter:blur(4px); 
+    border-radius:40px; 
+    color:#fff; 
+    text-align:center; 
+    padding:2rem; 
+    margin:1rem;
+  ">
+    <h1 class="hero-title">
+      Don't change anything, just add
+    </h1>
+    <img src="KubeStellar-with-Logo-transparent-v2.png" alt="KubeStellar" style="
+      width: 100%;
+      max-width: 800px; /* Increased logo size */
+      height: auto;
+      margin: 1rem 0;
+    " />
+    <p style="margin-bottom:2rem; text-shadow:1px 1px 3px rgba(0,0,0,0.7); font-size: 1rem; line-height: 1.2;">
+      Think of KubeStellar as a post office for your Kubernetes resources. Like a post office, KubeStellar doesn't open your packages; it safely stores and delivers them to selected clusters worldwide—public clouds, private clouds, or at the edge. It's a super useful solution for spreading your Kubernetes resources wherever you need them.
+    </p>
+    <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center;">
+      <a href="https://docs.kubestellar.io/release-0.26.0/readme/"
+         class="hero-button"
+         style="background:#000; color:#fff;">
+        <img src="../icons/book.svg" alt="Docs" style="width:24px; height:auto;">
+        Documentation
+      </a>
+      <a href="https://kubestellar.io/joinus"
+         class="hero-button"
+         style="background:#3B82F6; color:#fff;">
+        <img src="../icons/sign-in.svg" alt="Join" style="width:24px; height:auto;">
+        Join Us
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Common section styling */
+  .sections-container {
+    background: #f8f9fa; /* Very light gray background */
+    padding: 2rem 0; /* Add some vertical padding */
+    margin-bottom: 0;
+  }
+  .section-card {
+    background: #fff;
+    color: #000;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.5rem;
+    margin: 2rem auto;
+    max-width: 1400px; 
+  }
+  .section-card:last-child {
+    margin-bottom: 0;
+  }
+  .section-title {
+    font-size: 1.5rem; 
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+
+  .section-text {
+    font-size: 0.8rem; 
+    line-height: 1.625;
+  }
+
+  .checkmark {
+    color: green;
+    font-size: 1.25rem; /* Reduced from 1.5rem */
+  }
+
+  /* GitHub icon in white */
+  .github-button img {
+    filter: brightness(0) invert(1);
+    width: 20px;
+    height: auto;
+  }
+
+  /* Image container specific styling */
+  .image-container {
+    flex: 1 1 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .image-container img {
+    border-radius: 8px;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  @media (max-width: 768px) {
+    html, body, .md-main, .md-main__inner, .md-content, .md-content__inner {
+      background: #fff !important;
+    }
+  }
+  .checkmark {
+    width: 22px;
+    height: 22px; 
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(90%) contrast(80%);
+  }
+</style>
+
+<!-- HOW IT WORKS -->
+<div class="sections-container">
+  <section class="section-card">
+    <div class="how-it-works" style="display: flex; align-items: center; gap: 2rem;">
+      <div class="image-container" style="flex: 1 1 50%;">
+        <img src="../images/kubestellar-deploy.png" alt="How It Works">
+      </div>
+      <div style="flex: 1 1 50%; display: flex; flex-direction: column; justify-content: center;">
+        <h3 class="section-title">How it works?</h3>
+        <p class="section-text">
+          Like a post office, <strong>KubeStellar</strong> doesn't open your <strong>resources</strong>. 
+          It safely stores and delivers them to selected clusters worldwide — 
+          <strong>public clouds</strong>, <strong>private clouds</strong>, or at the <strong>edge</strong>. 
+          It's a super useful solution for spreading your Kubernetes resources wherever you need them. 
+          Don't change anything, just add <strong>KubeStellar</strong>!
         </p>
       </div>
-      <div style="color:#0065cb" class="centered md-source__repository md-source__repository--active">
-        <script>
-          // Fetch github counts
-          fetch(`https://api.github.com/repos/kubestellar/kubestellar`)
-            .then((response) => response.json())
-            .then((data) => {
-              const starCount = data.stargazers_count;
-              if (typeof starCount !== 'undefined') {
-                document.getElementById('star-count').setAttribute('hasInfo','true');
-                document.getElementById('star-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${starCount}</a>`;
-              }
-              const forkCount = data.forks_count;
-              if (typeof forkCount !== 'undefined') {
-                document.getElementById('fork-count').setAttribute('hasInfo','true');
-                document.getElementById('fork-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${forkCount}</a>`;
-                // const releaseName = data.name;
-                // document.getElementById('current-release').textContent = `${releaseName}`;
-              }
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        </script>
-        <ul class="md-source__facts">
-          <!-- <li id="current-release" class="md-source__fact md-source__fact--version"></li> -->
-          <li id="star-count" class="custom-paragraph md-source__fact md-source__fact--stars"></li>
-          <li id="fork-count" class="custom-paragraph md-source__fact md-source__fact--forks"></li>
+    </div>
+  </section>
+
+  <!-- CREATE ONCE, DEPLOY MANY -->
+  <section class="section-card">
+    <h3 class="section-title" style="width:100%; text-align:center;">
+      Create once, Deploy many
+    </h3>
+    <ul style="text-align:left; margin:0 auto; max-width:1000px; list-style:none; padding:0;">
+      <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text"><strong>Centrally</strong> apply Kubernetes resources for selective deployment across multiple clusters</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text">Use <strong>standard Kubernetes-native deployment tools</strong> (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text">Make <strong>disconnected</strong> cluster operation possible</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text"><strong>Scale</strong> with 1:many or many:1 scenarios</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text"><strong>Remain compatible</strong> with cloud-native solutions</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text">Easy to install with <strong>Helm</strong></span>
+      </li>
+    </ul>
+    <div style="margin-top:1.5rem; width:100%; text-align:center;">
+      <a href="https://github.com/kubestellar/kubestellar"
+        class="github-button"
+        style="display:inline-flex; align-items:center; background:#3B82F6; color:#fff; padding:0.75rem 1.5rem; border-radius:4px; text-decoration:none; gap:8px; font-size:1rem;">
+        <img src="../icons/github.svg" alt="GitHub">
+        Contribute on GitHub
+      </a>
+    </div>
+  </section>
+</div>
+<!-- =========================
+     FOOTER
+============================ -->
+<style>
+  /* Footer styling */
+  .footer-wrapper {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 0.1;
+  }
+
+  .footer-columns {
+    display: flex;
+    gap: 4rem;
+    flex-wrap: wrap;
+    flex: 1 1 50%;
+    padding-top:2rem;
+    justify-content: center;
+  }
+
+  .footer-section {
+    min-width: 200px;
+    flex: 0 1 auto;
+  }
+  .footer-right {
+    max-width: 400px;
+    flex: 1 1 40%;  /* Adjusted from 35% */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;  /* Align content to the left */
+  }
+
+  .footer-title {
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+  }
+
+  .footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.7rem;
+  }
+
+  .footer-list li {
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-list a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .footer-disclaimer {
+    font-size: 0.75rem; /* Smaller text */
+    line-height: 1.4;
+  }
+
+  .footer-logo {
+    width: 240px; /* Increased from 200px */
+    height: auto;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .footer-columns {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      flex: 1 1 100%;
+      gap: 2rem;
+    }
+    
+    .footer-section {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+</style>
+
+<footer style="background:#e5e7eb; color:#111; padding:2rem; margin-top:0px;">
+  <div class="footer-wrapper">
+    <!-- Left columns: Resources + Community -->
+    <div class="footer-columns">
+      <div class="footer-section">
+        <h4 class="footer-title">Resources</h4>
+        <ul class="footer-list">
+          <li><a href="direct/get-started/">Getting Started</a></li>
+          <li><a href="readme/">About Us</a></li>
+          <li><a href="direct/user-guide-intro/">User Guide</a></li>
+          <li><a href="direct/contribute/">Contributing</a></li>
+          <li><a href="https://kubestellar.io/blog">Blog</a></li>
         </ul>
-        </div>
-      
-      <p class="h3 text-xs-center">Think of KubeStellar as a post office for your Kubernetes resources. Like a post office, KubeStellar doesn't open your packages; it safely stores and delivers them to selected clusters worldwide—public clouds, private clouds, or at the edge. It's a super useful solution for spreading your Kubernetes resources wherever you need them.
-        <strong>Don't change anything, just add KubeStellar!</strong>
-      </p>
-      <div class="conteiner-row conteiner-xs" style="z-index:100;">
-	      
-	     <div style="text-align:center; width:50%; float:left; text-size:larger;z-index:150;margin-bottom:80px">
-	        <button
-        	  type="button"
-          	  title="Documentation (docs.kubestellar.io)"
-	          onclick="location.href='readme/'"
-	          class="btn-dark btn-xl-large btn-lg-large mx-3  mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow "
-		  style="margin-left:auto;margin-right:auto;margin-bottom:20px;"
-		>
-	            Documentation
-	        </button>
-		<br />
-		<strong><a href="readme/" style="margin-bottom:20px;z-index:151">docs.kubestellar.io</a></strong><br />
-		Learn More About KubeStellar <br />
-		(Getting Started, User Guide, Architecture...)
-   	      </div>
-
-	      <div style="text-align:center; width:50%; float:right; text-size:larger;zindex:149;margin-bottom:80px" > 
-	        <button				
-	          type="button"
-        	  title="Community Access (KubeStellar Google Group)"
-	          onclick="window.open('https://kubestellar.io/joinus', '_blank')"
-	          class="btn-warning btn-xl-large btn-lg-large mx-3 mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
-		  style="margin-left:auto;margin-right:auto;margin-bottom:20px;"
-       		>
-	          Join Us
-		</button>
-		<br />
-			<strong><a href="https://www.kubestellar.io/joinus">KubeStellar Google Group</a></strong><br />
-                        Access to our email group and community meetings
-	      </div>
-	</div>
-    </div>
-    <div class="ctx-header-img d-xl">
-      <img src="kubestellar-deploy.png" class="laverage-header-img" style="width:100%" alt="simplified graphic representing KubeStellar deploying to multiple locations"/>
-    </div>
-  </div>
-
-  <div class="d-sm-mid2">
-    <img src="kubestellar-deploy.png" class="laverage-header-img" style="width:100%" alt="simplified graphic representing KubeStellar deploying to multiple locations"/>
-  </div>
-
-</section>
-
-
-<section class="blue-background w-100">
-  <div class="md-grid conteiner-row pt-4 my-4">
-    <div class="card-white py-3 mx-xs-3 mx-sm-3 mx-4 mx-xl-0 ">
-      <div class="conteiner-row">      
-        <div class="conteiner ctx-card-white-1 pt-4">
-          
-          <div class="d-sm text-align-center">
-            <p class="display-4 Telegraf-UltraBold text-dark mx-auto mt-4">Create once</p>
-            <p class="display-4 Telegraf-UltraBold text-blue mx-auto my-4">Deploy many</p>
-          </div>
-
-          <div class="d-sm-mid">
-            <p class="display-4 Telegraf-UltraBold text-dark mx-auto mt-4">Create once</p>
-            <p class="display-4 Telegraf-UltraBold text-blue mx-auto my-4">Deploy many</p>
-          </div>
-
-          	<button
-	            onclick="window.open('https://github.com/kubestellar/kubestellar', '_blank')"
-        	    title="Contribute to KubeStellar via its GitHub repository"
-	            type="button"
-        	    class="btn-white btn-xl-large btn-lg-large box-shadow mx-auto my-4"
-		    style="z-index:95"
-	          >
-        	    Contribute on GitHub
-	        </button>
-		<div class="text-dark" style="text-size:larger;text-align:center" style="z-index:96">
-			<strong><a href="https://github.com/kubestellar/kubestellar">
-			  Contribute to KubeStellar via GitHub
-			</a></strong>	  
-		</div>
-          <div class="text-dark h3 section-sm">
-          </br></br>
-            <ul>
-              <li>- <b>Centrally</b> apply Kubernetes resources f
-		      or selective deployment across multiple clusters</li>
-            </br>          
-              <li>- Use <b>standard Kubernetes-native deployment tools</b> (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required</li>
-            </br>
-              <li>- Make <b>disconnected</b> cluster operation possible</li>
-            </br>
-              <li>- <b>Scale</b> with 1:many and many:1 scenarios</li>
-            </br>
-              <li>- <b>Remain compatible</b> with cloud-native solutions</li>
-            </br>
-	    <li>- Easy to install with <b>Helm</b><!-- and <b>Brew</b>--></li>
-            </ul>
-          </div>
-        </div>
-        <div class="conteiner ctx-card-white-1 text-dark h3 d-lg">
-          <ul>
-            <li>- <b>Centrally</b> apply Kubernetes resources for selective deployment across multiple clusters</li>
-          </br>          
-            <li>- Use <b>standard Kubernetes-native deployment tools</b> (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required</li>
-          </br>
-            <li>- Make <b>disconnected</b> cluster operation possible</li>
-          </br>
-            <li>- <b>Scale</b> with 1:many and many:1 scenarios</li>
-          </br>
-            <li>- <b>Remain compatible</b> with cloud-native solutions</li>
-          </br>
-            <li>- Easy to install with <b>Helm</b><!-- and <b>Brew</b>--></li>
-          </ul>
-    </div>
+      </div>
+      <div class="footer-section">
+        <h4 class="footer-title">Community</h4>
+        <ul class="footer-list">
+          <li><a href="https://github.com/kubestellar/kubestellar">GitHub</a></li>
+          <li><a href="https://kubestellar.io/slack">Slack</a></li>
+          <li><a href="https://kubestellar.io/tv">YouTube</a></li>
+          <li><a href="https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?tab=t.0">Meetings</a></li>
+          <li><a href="https://kubestellar.io/joinus">Join Us</a></li>
+        </ul>
       </div>
     </div>
-  </div>
 
-</section>
-
-<section class="blue-background w-100">
-    <div class="md-grid conteiner-row pt-4 my-4">
-        <div class="md:max-w-sm" style="color:black"><img style="max-width:300px" src="images/cncf-color.png" alt="Cloud Native Computing Foundation Logo">
-        <p class="text-xs-center" style="color:black">We are a Cloud Native Computing Foundation sandbox project.</p>
-        <p class="text-xs-center" style="color:black">Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF).</p>
-        <p class="text-xs-center" style="color:black">The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/legal/trademark-usage">Trademark Usage page</a>.</p>
-        <p class="text-xs-center" style="color:black">© 2022-2024. The KubeStellar Authors.</p>
-      </div>
+    <!-- Right disclaimers + CNCF -->
+    <div class="footer-right">
+      <img src="../images/cncf-black.svg" alt="Cloud Native Computing Foundation"
+           style="width:300px; height:auto; margin-bottom:1.5rem;">
+           <p class="footer-disclaimer">
+            We are a <strong>Cloud Native Computing Foundation</strong>  sandbox project. Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF). The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our
+            <a href="https://www.linuxfoundation.org/legal/trademark-usage" 
+               style="text-decoration:underline; color:inherit;">
+              Trademark Usage page
+            </a>.<br>
+            © 2022-2024 The KubeStellar Authors.
+          </p>
     </div>
-</section>
+  </div>
+</footer>
 
 
       <main class="md-main" data-md-component="main">
