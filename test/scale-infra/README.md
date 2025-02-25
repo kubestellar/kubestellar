@@ -12,7 +12,7 @@ In order to follow the instructions below, you must have [python3](https://www.p
 cd kubestellar/test/scale-infra 
 python3 -m venv .venv
 . .venv/bin/activate
-pip install --upgrade pip
+pip3 install --upgrade pip
 pip3 install -r requirements.txt
 ```
 
@@ -46,6 +46,8 @@ Starting from a local directory containing the git repo, do the following:
     The above command creates the required AWS infrastructure including a VPC, security groups and EC2 instances. Then, it creates a Kubernetes cluster deployed using Kubeadm. Lastly, it deploys the KubeStellar core components. You can use the flag `--ks-release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/release-0.26.0/core-chart) configured with a ITS of type host. 
 
     Use the flag `--vpc-name` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *We highly advise utilizing a unique name or the AWS IAM user ID as the identifier for your VPC*. Furthermore, use the flag `--aws-ami` to specify the [Amazon machine image ID](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html), keeping in mind that it is region-specific.
+
+    Also, use the flag `--aws-key-name` to specify the name of the uploaded public ssh key to your AWS account in the target region. 
 
     Upon completion of the script's execution, an Ansible inventory file containing the IP addresses of the nodes that constitute the Kubernetes cluster will be generated at the current directory at `.data/hosts_core`.
 

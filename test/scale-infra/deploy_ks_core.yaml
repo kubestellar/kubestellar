@@ -29,7 +29,7 @@
     - name: install KubeFlex
       shell: |
              sudo su <<EOF
-             bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin
+             bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin --version v0.8.0
              EOF
 
     - name: install Helm
