@@ -6,14 +6,14 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     ```bash
     cd test/scale-infra
     ansible-playbook deploy_vpc_core.yaml -e "region=us-east-2 name=<aws-iam-user>"
-    ansible-playbook create-ec2.yaml -e "cluster_name=core region=us-east-2 vpc_name=name=<vpc_name> aws_key_name=mykey  num_masters=1 num_workers=2 instance_type=t2.xlarge arch=x86_64 ec2_image='<your-aws-ami>'"
+    ansible-playbook create-ec2.yaml -e "cluster_name=core region=us-east-2 vpc_name=<vpc_name> aws_key_name=mykey  num_masters=1 num_workers=2 instance_type=t2.xlarge arch=x86_64 ec2_image='<your-aws-ami>'"
     ```
 
-    Use the flag `--vpc-name` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *We highly advise utilizing your name or the AWS IAM user ID as the identifier for your VPC*. Furthermore, use the flag `--aws-ami` to specify the [Amazon machine image ID](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html), keeping in mind that it is region-specific.
+    Use the variable `vpc-name` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *We highly advise utilizing your name or the AWS IAM user ID as the identifier for your VPC*. Furthermore, use the flag `--aws-ami` to specify the [Amazon machine image ID](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html), keeping in mind that it is region-specific.
 
     Upon completion of the script's execution, an Ansible inventory file containing the IP addresses of the master and worker nodes will be generated in the present directory at `.data/hosts_core`.
 
-2. Deploy Kubernetes clusters:
+2. Deploy a Kubernetes cluster:
 
     ```bash
     ansible-playbook -i .data/hosts_core deploy-masters.yaml --ssh-common-args='-o StrictHostKeyChecking=no'
@@ -26,7 +26,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     ansible-playbook -i .data/hosts_core deploy_ks_core.yaml --ssh-common-args='-o StrictHostKeyChecking=no' -e 'ks_release=0.25.1'
     ```
 
-    You can use the flag `--ks_release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/main/core-chart) configured with a ITS of type host. 
+    You can use the variable `ks_release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/main/core-chart) configured with a ITS of type host. 
 
 4. Create the WEC hosting instances:
 
@@ -34,7 +34,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     ansible-playbook create-ec2.yaml -e "cluster_name=wec region=us-east-2 vpc_name=<aws-iam-user> aws_key_name=mykey wecs_hosting_instances=1 instance_type=t2.xlarge archt=x86_64 ec2_image='<your-aws-ami>" 
     ```
 
-    Use the flag `--wecs_hosting_instances` to specify the number of ec2 instances to be created to host WEC kind clusters.
+    Use the variable `wecs_hosting_instances` to specify the number of ec2 instances to be created to host WEC kind clusters.
     
     Upon completion of the script's execution, an Ansible inventory file containing the IP addresses of the ec2 WEC hosting instances will be generated in the present directory at `.data/hosts_wec`.
 

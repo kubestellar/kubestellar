@@ -17,8 +17,8 @@ pip3 install -r requirements.txt
 
 Additionally, you must have the following:
 
-- AWS CLI [see](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-- AWS access key ID and AWS secret access key (to configure AWS CLI [see](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html#cli-configure-files-methods))
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- AWS access key ID and AWS secret access key (to configure AWS CLI follow instructions [here](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html#cli-configure-files-methods))
 - An SSH "keypair" registered with EC2
 
 

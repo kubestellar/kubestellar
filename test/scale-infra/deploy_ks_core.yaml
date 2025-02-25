@@ -75,7 +75,7 @@
              export KUBESTELLAR_VERSION="{{ ks_release }}"
              helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
              --version $KUBESTELLAR_VERSION \
-             --set-json='ITSes=[{"name":"its1"}]' \
+             --set-json='ITSes=[{"name":"its1","type":"host"}]' \
              --set-json='WDSes=[{"name":"wds1"}]' \
              --set-json='verbosity.default=5' \
              --set kubeflex-operator.externalPort={{ ingress_port.stdout }}
