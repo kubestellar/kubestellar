@@ -96,5 +96,5 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     c) Delete VPC:
 
     ```bash
-    ansible-playbook delete_vpc_infra.yaml -e "region=us-east-2  name=<aws-iam-user>"
+    ansible-playbook delete_vpc_infra.yaml -e "region=us-east-2  vpc_name=<vpc_name>"
     ```

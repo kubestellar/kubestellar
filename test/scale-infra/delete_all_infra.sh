@@ -85,7 +85,7 @@ fi
 
 if $vpc_config_exist; then
     ## 3. Delete VPC:
-    ansible-playbook delete_vpc_infra.yaml -e "region=$region name=$vpc_name"
+    ansible-playbook delete_vpc_infra.yaml -e "region=$region vpc_name=$vpc_name"
 else
     echo "File with deployed AWS VPC configuration does not exist - skipping deletion of the VPC infrastructure"
 fi
