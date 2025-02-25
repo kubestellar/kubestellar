@@ -3,13 +3,24 @@ A scalable Kubernetes-based testbed for KubeStellar Performance Tests
 
 <img src="images/ks-scale-test-infra.drawio.svg" width="60%" height="60%" title="ks-scale-test-infra">
 
+
 ### Prerequisites
-- Ansible, with 
-  - the `amazon.aws` collection installed (see, e.g., https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_instance_module.html), and
-  - [PyPI package boto3](https://pypi.org/project/boto/) installed for the Python interpreter that Ansible uses on your machine;
-- AWS CLI;
+
+In order to follow the instructions below, you must have [python3](https://www.python.org/downloads/) with all the dependencies listed [here](common/requirements.txt) installed. We recommend to create a python virtual environment `.venv` under `kubestellar/test/scale-infra`, for example: 
+
+```bash
+cd kubestellar/test/scale-infra 
+python3 -m venv .venv
+. .venv/bin/activate
+pip3 install -r requirements.txt
+```
+
+Additionally, you must have the following:
+
+- AWS CLI [see](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - AWS access key ID and AWS secret access key (to configure AWS CLI [see](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html#cli-configure-files-methods))
 - An SSH "keypair" registered with EC2
+
 
 ### Overview
 

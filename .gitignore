@@ -39,3 +39,5 @@ core-chart/charts/
 
 # Data created when deploy the large-scale test infra
 /test/scale-infra/.data/
+/test/scale-infra/.venv/
+/test/scale-infra/__pycache__/
