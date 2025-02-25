@@ -45,6 +45,17 @@ hosts_wec_exist=false
 hosts_core_exist=false
 vpc_config_exist=false
 
+if [ $region == "" ];then
+   echo "AWS region name is empty."
+   exit 1;
+fi
+
+if [ $vpc_name == "" ];then
+   echo "VPC name is empty."
+   exit 1;
+fi
+
+
 if [ -f ".data/hosts_wec" ]; then
    hosts_wec_exist=true
 fi

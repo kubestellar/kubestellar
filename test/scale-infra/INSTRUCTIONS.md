@@ -23,10 +23,10 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 3. Deploy KubeStellar in the hosting cluster:
 
     ```bash
-    ansible-playbook -i .data/hosts_core deploy_ks_core.yaml --ssh-common-args='-o StrictHostKeyChecking=no' -e 'ks_release=0.25.1'
+    ansible-playbook -i .data/hosts_core deploy_ks_core.yaml --ssh-common-args='-o StrictHostKeyChecking=no' -e 'ks_release=0.26.0'
     ```
 
-    You can use the variable `ks_release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/main/core-chart) configured with a ITS of type host. 
+    You can use the variable `ks_release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/release-0.26.0/core-chart) configured with a ITS of type host. 
 
 4. Create the WEC hosting instances:
 

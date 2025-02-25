@@ -12,6 +12,7 @@ In order to follow the instructions below, you must have [python3](https://www.p
 cd kubestellar/test/scale-infra 
 python3 -m venv .venv
 . .venv/bin/activate
+pip install --upgrade pip
 pip3 install -r requirements.txt
 ```
 
@@ -19,7 +20,7 @@ Additionally, you must have the following:
 
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - AWS access key ID and AWS secret access key (to configure AWS CLI follow instructions [here](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html#cli-configure-files-methods))
-- An SSH "keypair" registered with EC2
+- An SSH "keypair" registered with EC2 in the region that you will be using. 
 
 
 ### Overview
@@ -39,10 +40,10 @@ Starting from a local directory containing the git repo, do the following:
 
     ```
     cd test/scale-infra
-    ./deploy_ks_cp_infra.sh --region us-east-2 --vpc-name <aws-iam-user> --k8s-num-masters 1 --k8s-num-workers 2 --instances-type t2.xlarge --aws-key-name mykey  --arch x86_64 --ec2-image-id <aws-ami> --ks-release 0.25.1
+    ./deploy_ks_cp_infra.sh --region us-east-2 --vpc-name <aws-iam-user> --k8s-num-masters 1 --k8s-num-workers 2 --instances-type t2.xlarge --aws-key-name mykey  --arch x86_64 --ec2-image-id <aws-ami> --ks-release 0.26.0
     ```
 
-    The above command creates the required AWS infrastructure including a VPC, security groups and EC2 instances. Then, it creates a Kubernetes cluster deployed using Kubeadm. Lastly, it deploys the KubeStellar core components. You can use the flag `--ks-release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/main/core-chart) configured with a ITS of type host. 
+    The above command creates the required AWS infrastructure including a VPC, security groups and EC2 instances. Then, it creates a Kubernetes cluster deployed using Kubeadm. Lastly, it deploys the KubeStellar core components. You can use the flag `--ks-release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/release-0.26.0/core-chart) configured with a ITS of type host. 
 
     Use the flag `--vpc-name` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *We highly advise utilizing a unique name or the AWS IAM user ID as the identifier for your VPC*. Furthermore, use the flag `--aws-ami` to specify the [Amazon machine image ID](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html), keeping in mind that it is region-specific.
 
