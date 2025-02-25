@@ -133,7 +133,7 @@ ITSes: # all the CPs in this list will execute the its.yaml PCH
 
 where `name` must specify a name unique among all the control planes in that KubeFlex deployment, the optional `type` can be vcluster (default), host, or external, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information, and the optional `install_clusteradm`can be either true (default) or false to enable or disable the installation of OCM in the control plane.
 
-When the ITS `type` is `external`, the `bootstrapSecret` sub-section can be used to indicate the bootstrap secret used by KubeFlex to connect to the external cluster. Specifically, it can be used to change any combination of (a) the name of the secret, (b) the namespace containing the secret, and (c) the name of the key containg the kubeconfig of the external cluster from their default value.
+When the ITS `type` is `external`, the `bootstrapSecret` sub-section can be used to indicate the bootstrap secret used by KubeFlex to connect to the external cluster. Specifically, it can be used to specify any combination of (a) the name of the secret, (b) the namespace containing the secret, and (c) the name of the key containg the kubeconfig of the external cluster if they need to be different from their default value.
 
 If the secret was created using the [create-external-bootstrap-secret.sh](https://github.com/kubestellar/kubestellar/tree/v{{ config.ks_latest_release }}/scripts/create-external-bootstrap-secret.sh) script and the value passed to the argument `--controlplane` matches the name of the Control Plane specified by the Helm chart, then the sub-section `bootstrapSecret` is not required because all default values will identify the bootstrap secret created by the script. More specifically, if an external kind cluster was created with the command `kind create cluster --name its1` and the `create-external-bootstrap-secret.sh --controlplane its1 --verbose` command was used to create the bootstrap secret, then it would be enough to inform the Helm chart with `--set-json='ITSes=[{"name":"its1","type":"external"}]'`.
 
@@ -160,7 +160,7 @@ The local copy of the core chart can be installed in an existing cluster using t
 
 ```shell
 helm dependency update core-chart
-helm upgrade --install core-chart
+helm upgrade --install ks-core core-chart
 ```
 
 Alternatively, a specific version of the KubeStellar core chart can be simply installed in an existing cluster using the following command:
@@ -199,7 +199,7 @@ Then, create a second kind cluster suitable for KubeStellar installation and cre
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
 
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/create-external-bootstrap-secret.sh) --controlplane its1 --context kind-ext1 --address https://ext1-control-plane:6443 --verbose
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/create-external-bootstrap-secret.sh) --controlplane its1 --source-context kind-ext1 --address https://ext1-control-plane:6443 --verbose
 ```
 
 Note that the last command above creates a secret named `its1-bootstrap` in the `default` namespace of the `kind-kubeflex` cluster.

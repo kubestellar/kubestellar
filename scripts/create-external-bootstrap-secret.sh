@@ -57,8 +57,8 @@ Usage: $0 [options]
 
 --controlplane|-c <name>       control plane name used to name the secret: <name>-bootstrap
 --namespace|-n <name>          namespace name where to create the secret, default is "default"
---kubeconfig|-K <filename>     use the specified kubeconfig used to generate the bootstrat secret
---context|-C <name>            use the specified context used to generate the bootstrat secret
+--kubeconfig|-K <filename>     use the specified kubeconfig used to store the bootstrat secret
+--context|-C <name>            use the specified context used to store the bootstrat secret
 --source-kubeconfig <filename> use the specified kubeconfig used to get the bootstrat secret data
 --source-context <name>        use the specified context used to get the bootstrat secret data
 --address|-A <addr>            specify a replacement internal address for the cluster
