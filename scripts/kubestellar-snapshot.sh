@@ -79,10 +79,15 @@ EOF
 }
 
 
+# Define default behavior
+echov() { :; }
+
+
 # Indent JSON
 indent() {
     sed 's/^/  /'
 }
+
 
 # Echo in color
 echocolor() {
@@ -239,12 +244,8 @@ done
 ###############################################################################
 # Alias definitions
 ###############################################################################
-# Define the echov function based on verbosity
-if [ "$arg_verbose" == "true" ]; then
-    echov() { echo "$@" ; }
-else
-    echov() { :; }
-fi
+# Redefine the echov function based on verbosity
+[ "$arg_verbose" == "true" ] && echov() { echo "$@" ; }
 
 
 ###############################################################################
