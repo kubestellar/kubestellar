@@ -14,7 +14,7 @@ spec:
   {{- if eq $cp.type "external" }}
   bootstrapSecretRef:
     name: {{ ($cp.bootstrapSecret).name | default (printf "%s-bootstrap" $cp.name) }}
-    namespace: {{ ($cp.bootstrapSecret).namespace | default "default" }}
+    namespace: {{ ($cp.bootstrapSecret).namespace | default $.Release.Namespace }}
     inClusterKey: {{ ($cp.bootstrapSecret).key | default "kubeconfig-incluster" }}
   {{- end }}
 {{- end }}

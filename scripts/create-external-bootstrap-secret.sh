@@ -45,7 +45,7 @@ KUBECONFIG="${KUBECONFIG:-$HOME/.kube/config}"
 arg_context=""
 arg_source_kubeconfig=""
 arg_source_context=""
-arg_ns="default"
+arg_ns=""
 arg_addr=""
 arg_verbose=false
 
@@ -65,6 +65,9 @@ Usage: $0 [options]
 --verbose|-V                   output extra information
 --help|-h                      show this information
 -X                             enable verbose execution for debugging
+
+Note: if "--source-context" is not specified, the script will attempt to find a context
+with a name containing the name of the specified Control Plane.
 EOF
 }
 
@@ -204,9 +207,14 @@ fi
 ###############################################################################
 # Create secret
 ###############################################################################
-if ! kubectl --context="$arg_context" get ns "$arg_ns" &> /dev/null ; then
-    [[ $arg_verbose == true ]] && echo -e "Creating namespace ${COLOR_BLUE}${arg_ns}${COLOR_NONE}..."
-    kubectl --context="$arg_context" create ns "$arg_ns"
+if [[ -z "$arg_ns" ]] ; then
+    [[ $arg_verbose == true ]] && echo -e "Creating secret ${COLOR_BLUE}${arg_cp}-bootstrap${COLOR_NONE}..."
+    kubectl --context="$arg_context" create secret generic ${arg_cp}-bootstrap --from-file=kubeconfig-incluster=$BOOTSTRAP_KUBECONFIG
+else
+    if ! kubectl --context="$arg_context" get ns "$arg_ns" &> /dev/null ; then
+        [[ $arg_verbose == true ]] && echo -e "Creating namespace ${COLOR_BLUE}${arg_ns}${COLOR_NONE}..."
+        kubectl --context="$arg_context" create ns "$arg_ns"
+    fi
+    [[ $arg_verbose == true ]] && echo -e "Creating secret ${COLOR_BLUE}${arg_cp}-bootstrap${COLOR_NONE} in namespace ${COLOR_BLUE}${arg_ns}${COLOR_NONE}..."
+    kubectl --context="$arg_context" create secret generic ${arg_cp}-bootstrap --from-file=kubeconfig-incluster=$BOOTSTRAP_KUBECONFIG --namespace $arg_ns
 fi
-[[ $arg_verbose == true ]] && echo -e "Creating secret ${COLOR_BLUE}${arg_cp}-bootstrap${COLOR_NONE} in namespace ${COLOR_BLUE}${arg_ns}${COLOR_NONE}..."
-kubectl --context="$arg_context" create secret generic ${arg_cp}-bootstrap --from-file=kubeconfig-incluster=$BOOTSTRAP_KUBECONFIG --namespace $arg_ns

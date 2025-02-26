@@ -119,14 +119,14 @@ ITSes: # all the CPs in this list will execute the its.yaml PCH
     install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
     bootstrapSecret: # this section is ignored unless type is "external"
       name: <secret-name> # default: "<control-plane-name>-bootstrap"
-      namespace: <secret-namespace> # default: "default"
+      namespace: <secret-namespace> # default: Helm chart installation namespace
       key: <key-name> # default: "kubeconfig-incluster"
   - name: <its2>          # mandatory name of the control plane
     type: <vcluster|host|external> # optional type of control plane: host, vcluster, or external (default to vcluster, if not specified)
     install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
     bootstrapSecret: # this section is ignored unless type is "external"
       name: <secret-name> # default: "<control-plane-name>-bootstrap"
-      namespace: <secret-namespace> # default: "default"
+      namespace: <secret-namespace> # default: Helm chart installation namespace
       key: <key-name> # default: "kubeconfig-incluster"
   ...
 ```
@@ -202,7 +202,7 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBES
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/create-external-bootstrap-secret.sh) --controlplane its1 --source-context kind-ext1 --address https://ext1-control-plane:6443 --verbose
 ```
 
-Note that the last command above creates a secret named `its1-bootstrap` in the `default` namespace of the `kind-kubeflex` cluster.
+Note that the last command above creates a secret named `its1-bootstrap` in the Helm chart installation namespace of the `kind-kubeflex` cluster.
 
 The `--address` URL needs to be one that the KubeFlex controller can use to open a connection to the external cluster's Kubernetes apiserver(s). In this example, the external cluster is a kind cluster with one kube-apiserver and it listens on port 6443 in its node's network namespace. This example relies on the DNS resolver in Docker networking to map the domain name `ext1-control-plane` to the Docker network address of the container of that same name.
 
@@ -214,7 +214,7 @@ helm upgrade --install core-chart oci://ghcr.io/kubestellar/kubestellar/core-cha
   --set-json='WDSes=[{"name":"wds1"}]'
 ```
 
-Note that by default, the `its1` Control Plane of type `external` will look for a secret named `its1-bootstrap` in the `default` namespace. Additionally the `"install_clusteradm":false` value is specified to avoid reinstalling OCM in the `ext1` cluster.
+Note that by default, the `its1` Control Plane of type `external` will look for a secret named `its1-bootstrap` in the Helm chart installation namespace. Additionally the `"install_clusteradm":false` value is specified to avoid reinstalling OCM in the `ext1` cluster.
 
 After the initial installation is completed, there are two main ways to install additional control planes (_e.g._, create a second `wds2` WDS):
 

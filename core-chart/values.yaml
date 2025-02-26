@@ -92,7 +92,7 @@ ITSes: # all the CPs in this list will execute the its.yaml PCH
   #   install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
   #   bootstrapSecret: # this section is ignored unless type is "external"
   #     name: <secret-name> # default: "<control-plane-name>-bootstrap"
-  #     namespace: <secret-namespace> # default: "default"
+  #     namespace: <secret-namespace> # default: Helm chart installation namespace
   #     key: <key-name> # default: "kubeconfig-incluster"
 
 
