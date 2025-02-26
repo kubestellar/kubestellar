@@ -221,6 +221,7 @@ while (( $# > 0 )); do
     (--yaml|-Y)
         arg_yaml=true;;
     (--verbose|-V)
+        echov() { echo "$@" ; }
         arg_verbose=true;;
     (--version|-v)
         echo "${SCRIPT_NAME} v${SCRIPT_VERSION}"
@@ -239,13 +240,6 @@ while (( $# > 0 )); do
     esac
     shift
 done
-
-
-###############################################################################
-# Alias definitions
-###############################################################################
-# Redefine the echov function based on verbosity
-[ "$arg_verbose" == "true" ] && echov() { echo "$@" ; }
 
 
 ###############################################################################
