@@ -26,7 +26,7 @@
     - name: install OCM CLI
       shell: curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
         
-    - name: install KubeFlex
+    - name: installing the KubeFlex CLI
       shell: |
              sudo su <<EOF
              bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin --version v0.8.0
