@@ -232,10 +232,10 @@ while (( $# > 0 )); do
         display_help
         exit 0;;
     (-*)
-        echo "$0: unknown flag" >&2
+        echo "$0: unknown flag \"$1\"" >&2
         exit 1;;
     (*)
-        echo "$0: unknown positional argument" >&2
+        echo "$0: unknown positional argument \"$1\"" >&2
         exit 1;;
     esac
     shift
