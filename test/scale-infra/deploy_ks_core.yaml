@@ -90,15 +90,24 @@
       until: "wec_join_command is not failed"
       retries: 5
       delay: 15
+             
+    # - name: Copy join command to local file (Ansible control node)
+    #   local_action: copy content="{{ wec_join_command.stdout }}" dest="/tmp/wec_join_command" mode=0777
+
+    -  name: write wec_join_command to file
+       ansible.builtin.copy:
+         content: "{{ wec_join_command.stdout }}"
+         dest:  /tmp/wec_join_command
     
+    - name: Copy join command to local file (Ansible control node)
+      ansible.builtin.fetch:
+        src: /tmp/wec_join_command
+        dest: /tmp/
+        flat: yes
+
     - name: Set some environment configurations for the end user
       shell: |
              alias k="kubectl"
              k config use-context kscore
-             
-    - name: Copy join command to local file (Ansible control node)
-      local_action: copy content="{{ wec_join_command.stdout }}" dest="/tmp/wec_join_command" mode=0777
-            
-    
 
 

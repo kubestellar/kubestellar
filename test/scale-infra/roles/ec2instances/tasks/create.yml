@@ -22,12 +22,12 @@
 
 - name: Get private IPs
   set_fact:
-    private_ips: "{{ ec2_instances | community.general.json_query(query) }}"
+    private_ips: "{{ ec2_instances | community.general.json_query(query_ip) }}"
   vars: 
-    query: "instances[?instance_type=='{{ instance_type }}' ].private_ip_address"
+    query_ip: "instances[?instance_type=='{{ instance_type }}' ].private_ip_address"
 
 - name: Get public IPs
   set_fact:
-    public_ips: "{{ ec2_instances | community.general.json_query(query) }}"
+    public_ips: "{{ ec2_instances | community.general.json_query(query_ip) }}"
   vars: 
-    query: "instances[?instance_type=='{{ instance_type }}' ].public_ip_address"
+    query_ip: "instances[?instance_type=='{{ instance_type }}' ].public_ip_address"
