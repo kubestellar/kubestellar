@@ -159,10 +159,16 @@
     #     msg: "{{ item  }}"
     #   with_items: "{{ wec_list }}"
 
-    - name: Sleep for 60 seconds and continue with play
-      ansible.builtin.wait_for:
-        timeout: 60
-      delegate_to: localhost
+    - name: Wait for csrs in its1
+      shell: |
+             c=$(kubectl --context kscore get csr | grep -c Pending)
+             b={{ num_wecs }}
+             if [ $((c)) -ge $((b)) ]; then echo "true"; else echo "false"; fi
+      register: wait_for_csrs
+      until: wait_for_csrs.stdout != "false"
+      retries: "{{ num_wecs | int + 5 }}"
+      delay: 15
+
 
     - name: approve CSRs to complete the WEC cluster registration
       shell: |
