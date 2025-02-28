@@ -47,7 +47,7 @@ Starting from a local directory containing the git repo, do the following:
 
     Use the flag `--vpc-name` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *We highly advise utilizing a unique name or the AWS IAM user ID as the identifier for your VPC*. Furthermore, use the flag `--aws-ami` to specify the [Amazon machine image ID](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html), keeping in mind that it is region-specific.
 
-    We advise utilizing the subsequent command to acquire the ami ("ImageId") value for a specific region:
+    We advise utilizing the subsequent command to acquire the AMI ("ImageId") value for a specific region:
 
     ```bash
     aws ec2 describe-images --region <region_name> --filters "Name=architecture,Values=x86_64" "Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-*"
