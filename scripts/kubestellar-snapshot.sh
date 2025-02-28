@@ -150,8 +150,12 @@ get_kubeconfig() {
         kubeconfig=$(kubectl --context $context config view --flatten --minify)
     else
         # determine the secret name and namespace
-                     key=$(kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.key}')
-             secret_name=$(kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
+        if [[ "$cp_type" == "external" ]] ; then
+            key=$(kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
+        else
+            key=$(kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.key}')
+        fi
+        secret_name=$(kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
         secret_namespace=$(kubectl --context $context get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
         # get the kubeconfig
         kubeconfig=$(kubectl --context $context get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d)
@@ -226,10 +230,10 @@ while (( $# > 0 )); do
         display_help
         exit 0;;
     (-*)
-        echo "$0: unknown flag" >&2
+        echo "$0: unknown flag \"$1\"" >&2
         exit 1;;
     (*)
-        echo "$0: unknown positional argument" >&2
+        echo "$0: unknown positional argument \"$1\"" >&2
         exit 1;;
     esac
     shift
@@ -271,6 +275,10 @@ is_installed 'jq' \
     'jq' \
     'jq --version'
 
+is_installed 'yq' \
+    'yq' \
+    'yq --version'
+
 
 ###############################################################################
 # Ensure output folder
@@ -305,11 +313,11 @@ if [[ -z "${contexts[@]}" ]] ; then
 fi
 
 echov "Validating contexts(s): "
-KURRENT_CONTEXT="$(kubectl config current-context || true)"
+CURRENT_CONTEXT="$(kubectl config current-context || true)"
 valid_contexts=()
 for context in "${contexts[@]}" ; do # for all contexts
     [[ -z "$context" ]] && continue
-    [[ "$context" == "$KURRENT_CONTEXT" ]] && cc="*" || cc=""
+    [[ "$context" == "$CURRENT_CONTEXT" ]] && cc="*" || cc=""
     if kubectl --context $context get secrets -A > /dev/null 2>&1 ; then
         echov -e "${COLOR_GREEN}\xE2\x9C\x94${COLOR_NONE} ${COLOR_INFO}${context}${COLOR_NONE} ${COLOR_GREEN}$cc${COLOR_NONE}"
         [[ -z "$cc" ]] && valid_contexts+=("$context") || valid_contexts=("$context" "${valid_contexts[@]}")
@@ -430,14 +438,29 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
         its_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=${cp_pch[cp_n]}" -o name 2> /dev/null | cut -d'/' -f2 || true)
         its_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
-        if [[ "${cp_type[cp_n]}" == "host" ]] ; then
+        if [[ "${cp_type[cp_n]}" != "vcluster" ]] ; then
             status_ns="open-cluster-management"
         else
             status_ns="${cp_ns[cp_n]}"
         fi
-        status_pod=$(kubectl --context $helm_context -n "$status_ns" get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
-        status_version=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.spec.containers}' | jq -r '.[].image | select(contains("status-addon"))' | cut -d: -f2 || true)
-        status_status=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        if [[ "${cp_type[cp_n]}" == "external" ]] ; then
+            if ! KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl get secrets -A > /dev/null 2>&1 ; then
+                cp_cluster="$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl config view --minify | yq '.contexts[0].context.cluster')"
+                for context in "${valid_contexts[@]}" ; do
+                    if [[ "$(kubectl --context $context config view --minify | yq '.contexts[0].context.cluster')" == "$cp_cluster" ]] ; then
+                        echo "$(kubectl --context $context config view --minify --flatten)" > "${cp_kubeconfig[cp_n]}"
+                        break
+                    fi
+                done
+            fi
+            status_pod=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
+            status_version=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" get pod $status_pod -o jsonpath='{.spec.containers}' | jq -r '.[].image | select(contains("status-addon"))' | cut -d: -f2 || true)
+            status_status=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        else
+            status_pod=$(kubectl --context $helm_context -n "$status_ns" get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
+            status_version=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.spec.containers}' | jq -r '.[].image | select(contains("status-addon"))' | cut -d: -f2 || true)
+            status_status=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
+        fi
         echo -n -e "  - Post Create Hook: pod=${COLOR_INFO}$its_pod${COLOR_NONE}, ns=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$its_status"
         echo -n -e "  - Status addon controller: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, ns=${COLOR_INFO}$status_ns${COLOR_NONE}, version=${COLOR_INFO}$status_version${COLOR_NONE}, status="
@@ -471,7 +494,11 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         kubectl --context $helm_context get controlplane $name -o yaml > "$OUTPUT_FOLDER/$name/cp.yaml"
         if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o yaml > "$OUTPUT_FOLDER/$name/its-job.yaml"
-            kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o yaml > "$OUTPUT_FOLDER/$name/status-addon.yaml"
+            if [[ "${cp_type[cp_n]}" == "external" ]] ; then
+                KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" get pod $status_pod -o yaml > "$OUTPUT_FOLDER/$name/status-addon.yaml"
+            else
+                kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o yaml > "$OUTPUT_FOLDER/$name/status-addon.yaml"
+            fi
         else
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o yaml > "$OUTPUT_FOLDER/$name/kubestellar-controller.yaml"
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o yaml > "$OUTPUT_FOLDER/$name/transport-controller.yaml"
@@ -486,7 +513,13 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
                     { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c "$ctr" || true; } &> "$OUTPUT_FOLDER/$name/its-job-${ctr}.log"
                 done
             fi
-            [ -n "$status_pod" ] && kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller &> "$OUTPUT_FOLDER/$name/status-addon.log" || true
+            if [[ -n "$status_pod" ]] ; then
+                if [[ "${cp_type[cp_n]}" == "external" ]] ; then
+                    KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" logs $status_pod -c status-controller &> "$OUTPUT_FOLDER/$name/status-addon.log" || true
+                else
+                    kubectl --context $helm_context -n "$status_ns" logs $status_pod -c status-controller &> "$OUTPUT_FOLDER/$name/status-addon.log" || true
+                fi
+            fi
         else
             [ -n "$kubestellar_pod" ] && kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $kubestellar_pod &> "$OUTPUT_FOLDER/$name/kubestellar-controller.log" || true
             [ -n "$trasport_pod" ] && kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $trasport_pod -c transport-controller &> "$OUTPUT_FOLDER/$name/transport-controller.log" || true

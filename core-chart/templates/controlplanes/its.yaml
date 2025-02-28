@@ -9,6 +9,12 @@ spec:
   type: {{ $cp.type | default "vcluster" }}
   postCreateHook: {{ (eq $cp.install_clusteradm false) | ternary "its-without-clusteradm" "its-with-clusteradm" }}
   postCreateHookVars:
-    ITSSecretName: {{ (eq $cp.type "host") | ternary "admin-kubeconfig" "vc-vcluster" }}
-    ITSkubeconfig: {{ (eq $cp.type "host") | ternary "kubeconfig-incluster" "config-incluster" }}
+    ITSSecretName: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "admin-kubeconfig" "vc-vcluster" }}
+    ITSkubeconfig: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
+  {{- if eq $cp.type "external" }}
+  bootstrapSecretRef:
+    name: {{ ($cp.bootstrapSecret).name | default (printf "%s-bootstrap" $cp.name) }}
+    namespace: {{ ($cp.bootstrapSecret).namespace | default $.Release.Namespace }}
+    inClusterKey: {{ ($cp.bootstrapSecret).key | default "kubeconfig-incluster" }}
+  {{- end }}
 {{- end }}
