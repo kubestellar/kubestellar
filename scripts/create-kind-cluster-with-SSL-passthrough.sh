@@ -17,6 +17,9 @@
 
 set -o errexit
 
+# Script info
+SCRIPT_NAME="Create Kind Cluster with SSL Passthrough"
+
 NGINX_INGRESS_URL="https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.0/deploy/static/provider/kind/deploy.yaml"
 name=kubestellar
 port=9443
@@ -24,9 +27,10 @@ wait=true
 prefetch=false
 setcontext=true
 
+
 display_help() {
   cat << EOF
-Usage: $0 [options]
+Usage: ${SCRIPT_NAME} [options]
 
 --name name     set a specific name of the kind cluster (default: kubestellar)
 --port port     map the specified host port to the kind cluster port 443 (default: 9443)
@@ -42,12 +46,12 @@ while (( $# > 0 )); do
   (-n|--name)
     if (( $# > 1 ));
     then { name="$2"; shift; }
-    else { echo "$0: missing name for the kind cluster" >&2; exit 1; }
+    else { echo "${SCRIPT_NAME}: missing name for the kind cluster" >&2; exit 1; }
     fi;;
   (-p|--port)
     if (( $# > 1 ));
     then { port="$2"; shift; }
-    else { echo "$0: missing port number" >&2; exit 1; }
+    else { echo "$: missing port number" >&2; exit 1; }
     fi;;
   (--nowait)
     wait=false;;
@@ -61,10 +65,10 @@ while (( $# > 0 )); do
     display_help
     exit 0;;
   (-*)
-    echo "$0: unknown flag" >&2
+    echo "${SCRIPT_NAME}: unknown flag" >&2
     exit 1;;
   (*)
-    echo "$0: unknown positional argument" >&2
+    echo "${SCRIPT_NAME}: unknown positional argument" >&2
     exit 1;;
   esac
   shift

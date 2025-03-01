@@ -17,12 +17,15 @@
 
 set -o errexit
 
+# Script info
+SCRIPT_NAME="Create K3s Cluster with SSL Passthrough" 
+
 port=9443
 wait=true
 
 display_help() {
   cat << EOF
-Usage: $0 [--port port] [--nowait][-X]
+Usage: ${SCRIPT_NAME} [--port port] [--nowait][-X]
 
 --port port     map the specified host port to the kind cluster port 443 (default: 9443)
 --nowait        when set to true, the script proceeds without waiting for the nginx ingress patching to complete
@@ -35,7 +38,7 @@ while (( $# > 0 )); do
         (-p|--port)
             if (( $# > 1 ));
             then { port="$2"; shift; }
-            else { echo "$0: missing port number" >&2; exit 1; }
+            else { echo "${SCRIPT_NAME}: missing port number" >&2; exit 1; }
             fi;;
         (--nowait)
             wait=false;;
@@ -45,10 +48,10 @@ while (( $# > 0 )); do
             display_help
             exit 0;;
         (-*)
-            echo "$0: unknown flag" >&2
+            echo "${SCRIPT_NAME}: unknown flag" >&2
             exit 1;;
         (*)
-            echo "$0: unknown positional argument" >&2
+            echo "${SCRIPT_NAME}: unknown positional argument" >&2
             exit 1;;
     esac
     shift
