@@ -25,7 +25,7 @@ OUTPUT_FOLDER="$TMPFOLDER/kubestellar-snapshot"
 
 
 # Script info
-SCRIPT_NAME="KubeStellar Snapshot"
+SCRIPT_NAME="kubestellar-snapshot.sh"
 SCRIPT_VERSION="0.3.0"
 
 

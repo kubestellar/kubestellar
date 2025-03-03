@@ -18,7 +18,7 @@
 set -o errexit
 
 # Script info
-SCRIPT_NAME="Create K3s Cluster with SSL Passthrough" 
+SCRIPT_NAME="create-k3s-cluster-with-SSL-passthrough.sh" 
 
 port=9443
 wait=true

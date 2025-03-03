@@ -16,7 +16,7 @@
 set -e
 
 # Script info
-SCRIPT_NAME="Create KubeStellar Demo Environment"
+SCRIPT_NAME="create-kubestellar-demo-env.sh"
 
 # Default Kubernetes platform parameter
 k8s_platform="kind"

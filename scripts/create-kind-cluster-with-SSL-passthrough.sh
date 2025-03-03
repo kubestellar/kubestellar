@@ -18,7 +18,7 @@
 set -o errexit
 
 # Script info
-SCRIPT_NAME="Create Kind Cluster with SSL Passthrough"
+SCRIPT_NAME="Ccreate-kind-cluster-with-SSL-passthrough.sh"
 
 NGINX_INGRESS_URL="https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.0/deploy/static/provider/kind/deploy.yaml"
 name=kubestellar
