@@ -79,10 +79,15 @@ EOF
 }
 
 
+# Define default behavior
+echov() { :; }
+
+
 # Indent JSON
 indent() {
     sed 's/^/  /'
 }
+
 
 # Echo in color
 echocolor() {
@@ -220,6 +225,7 @@ while (( $# > 0 )); do
     (--yaml|-Y)
         arg_yaml=true;;
     (--verbose|-V)
+        echov() { echo "$@" ; }
         arg_verbose=true;;
     (--version|-v)
         echo "${SCRIPT_NAME} v${SCRIPT_VERSION}"
@@ -238,17 +244,6 @@ while (( $# > 0 )); do
     esac
     shift
 done
-
-
-###############################################################################
-# Alias definitions
-###############################################################################
-# Define the echov function based on verbosity
-if [ "$arg_verbose" == "true" ]; then
-    echov() { echo "$@" ; }
-else
-    echov() { :; }
-fi
 
 
 ###############################################################################
