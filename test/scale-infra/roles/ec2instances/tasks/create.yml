@@ -17,6 +17,8 @@
     security_group: "{{ group }}"
     count: "{{ count }}"
     wait: yes
+    tags:
+      Role: "{{ cluster_name }}"
     vpc_subnet_id: "{{ vpc_subnet_id }}"
   register: ec2_instances
 

@@ -1,21 +1,38 @@
 ### Examples of Individual Steps
 As an alternative to the quick-start deployment bootstrapping instructions, you can also run the individual steps starting from a local directory containing the git repo as follows:
 
-1. Create the KubeStellar core infra on AWS. The infrastructure includes a VPC, security groups, EC2 instances, etc.
+
+## Deployment
+1. Create the KubeStellar core infra on AWS:
+
+    First, set the following env variables:
+
+    ```bash
+    REGION="us-east-2"
+    VPC="<vpc_name>"
+    CLUSTER_NAME="core"
+    EC2_SSH_PUBLIC_KEY="mykey"
+    NUM_WORKER_NODES=2
+    EC2_INSTANCE_TYPE="t2.xlarge"
+    ARCH="x86_64"
+    EC2_AMI="<your-aws-ami>"
+    ```
+
+    Then, deploy the core infrastructure which includes a VPC, security groups, EC2 instances, etc.
 
     ```bash
     cd test/scale-infra
-    ansible-playbook deploy_vpc_core.yaml -e "region=us-east-2 vpc_name=<vpc_name>"
-    ansible-playbook create-ec2.yaml -e "cluster_name=core region=us-east-2 vpc_name=<vpc_name> aws_key_name=mykey  num_masters=1 num_workers=2 instance_type=t2.xlarge arch=x86_64 ec2_image='<your-aws-ami>'"
+    ansible-playbook deploy_vpc_core.yaml -e "region=$REGION vpc_name=$VPC"
+    ansible-playbook create-ec2.yaml -e "cluster_name=$CLUSTER region=$REGION vpc_name=$VPC aws_key_name=$EC2_SSH_PUBLIC_KEY num_workers=$NUM_WORKER_NODES instance_type=$EC2_INSTANCE_TYPE arch=$ARCH ec2_image=$EC2_AMI"
     ```
 
-    Use the variable `vpc_name` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *We highly advise utilizing a unique name or the AWS IAM user ID as the identifier for your VPC*. Furthermore, use the variable `ec2_image` to specify the [Amazon machine image ID](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html), keeping in mind that it is region-specific.
+    Use the variable `VPC` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *We highly advise utilizing a unique name or the AWS IAM user ID as the identifier for your VPC*. Furthermore, use the variable `EC2_AMI` to specify the [Amazon machine image ID](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html), keeping in mind that it is region-specific.
 
     
-    We advise utilizing the subsequent command to acquire the AMI ("ImageId") value for a specific region:
+    We advise utilizing the following command to acquire the AMI ("ImageId") value for a specific region:
 
     ```bash
-    aws ec2 describe-images --region <region_name> --filters "Name=architecture,Values=x86_64" "Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-*"
+    aws ec2 describe-images --region $REGION --filters "Name=architecture,Values=x86_64" "Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-*"
     ```
 
     Upon completion of the script's execution, an Ansible inventory file containing the IP addresses of the master and worker nodes will be generated in the present directory at `.data/hosts_core`.
@@ -37,11 +54,24 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 
 4. Create the WEC hosting instances:
 
-    ```bash
-    ansible-playbook create-ec2.yaml -e "cluster_name=wec region=us-east-2 vpc_name=<vpc_name> aws_key_name=mykey wecs_hosting_instances=1 instance_type=t2.xlarge archt=x86_64 ec2_image='<your-aws-ami>" 
+    Set the following env variables:
+
+     ```bash
+    CLUSTER_NAME="wec"
+    EC2_SSH_PUBLIC_KEY="mykey"
+    NUM_HOSTING_INSTANCES=2
+    EC2_INSTANCE_TYPE="t2.xlarge"
+    ARCH="x86_64"
+    EC2_AMI="<your-aws-ami>"
     ```
 
-    Use the variable `wecs_hosting_instances` to specify the number of ec2 instances to be created to host WEC kind clusters.
+    Then, deploy the WEC infra:
+
+    ```bash
+    ansible-playbook create-ec2.yaml -e "cluster_name=$CLUSTER_NAME region=$REGION vpc_name=$VPC aws_key_name=$EC2_SSH_PUBLIC_KEY wecs_hosting_instances=$NUM_HOSTING_INSTANCES instance_type=$EC2_INSTANCE_TYPE archt=$ARCH ec2_image=$EC2_AMI" 
+    ```
+
+    Use the variable `NUM_HOSTING_INSTANCES` to specify the number of ec2 instances to be created to host WEC kind clusters.
     
     Upon completion of the script's execution, an Ansible inventory file containing the IP addresses of the ec2 WEC hosting instances will be generated in the present directory at `.data/hosts_wec`.
 
@@ -78,7 +108,9 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 
     Use the input paramater `num_wecs` to specify the number of kind clusters to be created for each WEC Hosting Instances. The above command creates kind WEC clusters and connects them to the KubeStellar core cluster created in step 1. Furthermore, it attaches a [KWOK](https://github.com/kubernetes-sigs/kwok) fake node to each kind cluster.
 
-6. (Optional) Delete worker nodes from the cluster.
+## Uninstall
+
+1. (Optional) Delete worker nodes from the cluster.
     Edit `.data/hosts_core` by adding the corresponding entries in the `[remove_workers]` Ansible inventory group.
     Edit `delete-worker.yaml` by changing the `node_name`, which is shown by `kubectl get nodes`.
     Run the playbook:
@@ -87,21 +119,30 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     ansible-playbook -i .data/hosts_core delete-worker.yaml
     ```
 
-7. Destroy the infrastructure.
+2. Destroy the infrastructure.
+   
+   Set the following env variables to specify the region and vpc name:
+
+   ```
+   REGION="us-east-2"
+   VPC="<vpc_name>"
+   ```
+
+   Then, delete the deployed infra:
 
     a) Delete WECs infra:
     ```bash
-    ansible-playbook -i .data/hosts_wec delete-ec2.yaml -e "cluster_name=wec region=us-east-2 group=<vpc_name>"
+    ansible-playbook -i .data/hosts_wec delete-ec2.yaml -e "cluster_name=wec region=$VPC group=$REGION"
     ```
 
     b) Delete KubeStellar core infra: 
 
     ```bash
-    ansible-playbook -i .data/hosts_core delete-ec2.yaml -e "cluster_name=core region=us-east-2 group=<vpc_name>"
+    ansible-playbook -i .data/hosts_core delete-ec2.yaml -e "cluster_name=core region=$VPC group=$REGION"
     ```
 
     c) Delete VPC:
 
     ```bash
-    ansible-playbook delete_vpc_infra.yaml -e "region=us-east-2  vpc_name=<vpc_name>"
+    ansible-playbook delete_vpc_infra.yaml -e "region=$REGION  vpc_name=$VPC"
     ```

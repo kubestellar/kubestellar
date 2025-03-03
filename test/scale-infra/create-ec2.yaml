@@ -132,6 +132,7 @@
       instance_type: "{{ ec2_instance_type }}"
       vpc_subnet_id: "{{ public_subnet_id }}"
       key_name: "{{ aws_key_name }}"
+      node_role: "{{ cluster_name }}"
       count: "{{ masters | int + workers | int }}"
 
   - name: Show instance data

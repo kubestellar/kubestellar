@@ -26,7 +26,7 @@
     - name: install OCM CLI
       shell: curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
         
-    - name: installing the KubeFlex CLI
+    - name: install the KubeFlex CLI
       shell: |
              sudo su <<EOF
              bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin --version v0.8.0
@@ -99,7 +99,7 @@
     - name: Copy join command to local file (Ansible control node)
       ansible.builtin.fetch:
         src: /tmp/wec_join_command
-        dest: /tmp/
+        dest: .data/
         flat: yes
 
     - name: Set some environment configurations for the end user
