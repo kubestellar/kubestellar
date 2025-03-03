@@ -7,7 +7,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 
     First, set the following env variables:
 
-    ```bash
+    ```console
     REGION="us-east-2"
     VPC="<vpc_name>"
     CLUSTER_NAME="core"
@@ -56,7 +56,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 
     Set the following env variables:
 
-     ```bash
+     ```console
     CLUSTER_NAME="wec"
     EC2_SSH_PUBLIC_KEY="mykey"
     NUM_HOSTING_INSTANCES=2
@@ -123,7 +123,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
    
    Set the following env variables to specify the region and vpc name:
 
-   ```
+   ```console
    REGION="us-east-2"
    VPC="<vpc_name>"
    ```
