@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
     
     
       
@@ -3328,7 +3328,7 @@ Please remember to add <code>--set "kubeflex-operator.isOpenShift=true"</code>, 
 <p>Install a new chart with a different name. This choice does not requires to relist the existing control planes, but requires to disable the reinstallation of KubeFlex and PCHes:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>add-wds2<span class="w"> </span>oci://ghcr.io/kubestellar/kubestellar/core-chart<span class="w"> </span>--version<span class="w"> </span><span class="nv">$KUBESTELLAR_VERSION</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span>--set<span class="o">=</span><span class="s1">&#39;kubeflex-operator.install=false,InstallPCHs=false&#39;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span>--set-json<span class="o">=</span><span class="s1">&#39;WDSes=[{name&quot;:&quot;wds2&quot;}]&#39;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span>--set-json<span class="o">=</span><span class="s1">&#39;WDSes=[{&quot;name&quot;:&quot;wds2&quot;}]&#39;</span>
 </code></pre></div>
 </li>
 </ol>
@@ -3561,7 +3561,7 @@ The current context will be renamed to <code>$cpname</code>, if it does not alre
     <script id="__config" type="application/json">{"base": "../../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.f1b6f286.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.c8b220af.min.js"></script>
       
     
   </body>
