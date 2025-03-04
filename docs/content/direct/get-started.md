@@ -88,7 +88,7 @@ For convenience, a new local **Kind** cluster that satisfies the requirements fo
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
 ```
 
-### Use Core Helm chart to initialize KubeFlex and create ITS and WDS
+### Use Core Helm chart to initialize KubeFlex and create ITS and WDS (*[Learn more about the Core Helm Chart](./core-chart.md)* )
 
 ```shell
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
