@@ -25,7 +25,7 @@ OUTPUT_FOLDER="$TMPFOLDER/kubestellar-snapshot"
 
 
 # Script info
-SCRIPT_NAME="KubeStellar Snapshot"
+SCRIPT_NAME="kubestellar-snapshot.sh"
 SCRIPT_VERSION="0.3.0"
 
 
@@ -56,7 +56,7 @@ arg_verbose=false
 # Display the command line help
 display_help() {
   cat << EOF
-Usage: $0 [options]
+Usage: ${SCRIPT_NAME} [options]
 
 Options:
 --kubeconfig|-K <filename> use the specified kubeconfig to find KubeStellar Helm chart
@@ -213,12 +213,12 @@ while (( $# > 0 )); do
     (--kubeconfig|-K)
         if (( $# > 1 ));
         then { arg_kubeconfig="$2"; shift; }
-        else { echo "$0: missing kubeconfig filename" >&2; exit 1; }
+        else { echo "${SCRIPT_NAME}: missing kubeconfig filename" >&2; exit 1; }
         fi;;
     (--context|-C)
         if (( $# > 1 ));
         then { arg_context="$2"; shift; }
-        else { echo "$0: missing context name" >&2; exit 1; }
+        else { echo "${SCRIPT_NAME}: missing context name" >&2; exit 1; }
         fi;;
     (--logs|-L)
         arg_logs=true;;
@@ -236,10 +236,10 @@ while (( $# > 0 )); do
         display_help
         exit 0;;
     (-*)
-        echo "$0: unknown flag \"$1\"" >&2
+        echo "${SCRIPT_NAME}: unknown flag \"$1\"" >&2
         exit 1;;
     (*)
-        echo "$0: unknown positional argument \"$1\"" >&2
+        echo "${SCRIPT_NAME}: unknown positional argument \"$1\"" >&2
         exit 1;;
     esac
     shift

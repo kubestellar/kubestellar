@@ -15,6 +15,9 @@
 
 set -e
 
+# Script info
+SCRIPT_NAME="create-kubestellar-demo-env.sh"
+
 # Default Kubernetes platform parameter
 k8s_platform="kind"
 
@@ -24,12 +27,12 @@ while [[ "$#" -gt 0 ]]; do
         --platform) k8s_platform="$2"; shift ;;
         -X) set -x ;;
         -h|--help)
-            echo "Usage: $0 [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [-X] [-h|--help]" >&2
             exit 0
             ;;
         *)
             echo "Unknown parameter passed: $1" >&2
-            echo "Usage: $0 [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [-X] [-h|--help]" >&2
             exit 1
             ;;
     esac
