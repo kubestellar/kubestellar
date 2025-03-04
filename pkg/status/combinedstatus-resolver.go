@@ -23,6 +23,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	machtypes "k8s.io/apimachinery/pkg/types"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/cache"
@@ -255,6 +256,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 			logger.V(3).Info("Introducing CombinedStatus resolution", "binding", bindingName, "objectId", objectIdentifier)
 			csResolution = &combinedStatusResolution{
 				Name:                      getCombinedStatusName(policyUID, objectData.UID),
+				workloadObjectUID:         machtypes.UID(objectData.UID),
 				StatusCollectorNameToData: make(map[string]*statusCollectorData),
 			}
 			objectIdentifierToResolution[objectIdentifier] = csResolution

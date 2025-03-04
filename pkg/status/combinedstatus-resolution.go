@@ -34,6 +34,7 @@ import (
 
 	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	machtypes "k8s.io/apimachinery/pkg/types"
 	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
@@ -68,6 +69,8 @@ type combinedStatusResolution struct {
 
 	// Name of the CombinedStatus object
 	Name string
+	// UID of the workload object
+	workloadObjectUID machtypes.UID
 	// StatusCollectorNameToData is a map of status collector names to
 	// their corresponding data. This map has an entry for every relevant
 	// StatusCollector name; the value is `nil` while the StatusCollector
@@ -86,6 +89,7 @@ func (csr *combinedStatusResolution) MarshalLog() any {
 	}
 	return map[string]any{
 		"Name":                      csr.Name,
+		"WorkloadObjectUID":         string(csr.workloadObjectUID),
 		"StatusCollectorNameToData": csr.StatusCollectorNameToData,
 		"CollectionDestinations":    csr.CollectionDestinations.UnsortedList(),
 	}
@@ -278,6 +282,12 @@ func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      c.Name,
 			Namespace: workloadObjectIdentifier.ObjectName.Namespace,
+			OwnerReferences: []metav1.OwnerReference{{
+				APIVersion: workloadObjectIdentifier.GVK.GroupVersion().String(),
+				Kind:       workloadObjectIdentifier.GVK.Kind,
+				Name:       workloadObjectIdentifier.ObjectName.Name,
+				UID:        c.workloadObjectUID,
+			}},
 		},
 		Results: make([]v1alpha1.NamedStatusCombination, 0, len(c.StatusCollectorNameToData)),
 	}
