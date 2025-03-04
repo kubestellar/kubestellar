@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sysctl-check
+spec:
+  template:
+    spec:
+      containers:
+      - name: sysctl-check
+        image: busybox
+        command: ["sh", "-c", "sysctl fs.inotify.max_user_watches; sysctl fs.inotify.max_user_instances"]
+        securityContext:
+          privileged: true
+      restartPolicy: OnFailure
