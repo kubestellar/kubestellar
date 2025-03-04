@@ -231,7 +231,7 @@ After the initial installation is completed, there are two main ways to install 
     ```shell
     helm upgrade --install add-wds2 oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
       --set='kubeflex-operator.install=false,InstallPCHs=false' \
-      --set-json='WDSes=[{name":"wds2"}]'
+      --set-json='WDSes=[{"name":"wds2"}]'
     ```
 
 ## Kubeconfig files and contexts for Control Planes
