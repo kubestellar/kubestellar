@@ -5,7 +5,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 ## Deployment
 1. Create the KubeStellar core infra on AWS:
 
-    First, set the following env variables:
+    First, set the following variables:
 
     ```console
     REGION="us-east-2"
@@ -23,7 +23,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     ```bash
     cd test/scale-infra
     ansible-playbook deploy_vpc_core.yaml -e "region=$REGION vpc_name=$VPC"
-    ansible-playbook create-ec2.yaml -e "cluster_name=$CLUSTER region=$REGION vpc_name=$VPC aws_key_name=$EC2_SSH_PUBLIC_KEY num_workers=$NUM_WORKER_NODES instance_type=$EC2_INSTANCE_TYPE arch=$ARCH ec2_image=$EC2_AMI"
+    ansible-playbook create-ec2.yaml -e "cluster_name=$CLUSTER_NAME region=$REGION vpc_name=$VPC aws_key_name=$EC2_SSH_PUBLIC_KEY num_workers=$NUM_WORKER_NODES instance_type=$EC2_INSTANCE_TYPE arch=$ARCH ec2_image=$EC2_AMI"
     ```
 
     Use the variable `VPC` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *We highly advise utilizing a unique name or the AWS IAM user ID as the identifier for your VPC*. Furthermore, use the variable `EC2_AMI` to specify the [Amazon machine image ID](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html), keeping in mind that it is region-specific.
@@ -54,7 +54,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 
 4. Create the WEC hosting instances:
 
-    Set the following env variables:
+    Set the following variables:
 
      ```console
     CLUSTER_NAME="wec"
@@ -121,7 +121,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 
 2. Destroy the infrastructure.
    
-   Set the following env variables to specify the region and vpc name:
+   Set the following variables to specify the region and vpc name:
 
    ```console
    REGION="us-east-2"

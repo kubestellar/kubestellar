@@ -5,20 +5,21 @@
 
 - name: Create ec2 instance(s)
   amazon.aws.ec2_instance:
+    name: "{{ node_role }}"
     region: "{{ ec2_region }}"
     image_id: "{{ ec2_image_id }}"
     instance_type: "{{ instance_type }}"
     volumes:
       - device_name: /dev/sda1
         ebs:
-          volume_size: 64
+          volume_size: 100
           delete_on_termination: true
     key_name: "{{ key_name }}"
     security_group: "{{ group }}"
     count: "{{ count }}"
     wait: yes
     tags:
-      Role: "{{ cluster_name }}"
+      Role: "{{ node_role }}"
     vpc_subnet_id: "{{ vpc_subnet_id }}"
   register: ec2_instances
 

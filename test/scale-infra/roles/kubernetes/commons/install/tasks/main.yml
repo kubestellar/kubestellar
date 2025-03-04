@@ -28,7 +28,7 @@
 - name: Install Containerd Runtime
   shell: |
          sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
-         sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg
+         sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg --yes
          sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
          sudo apt update
          sudo apt install -y containerd.io
@@ -41,7 +41,7 @@
 - name: install and configure dependencies
   shell: |
          sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl gpg
-         curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+         curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg --yes
 
 - name: Create kubernetes repo file
   file:
