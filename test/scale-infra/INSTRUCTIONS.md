@@ -11,11 +11,11 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     REGION="us-east-2"
     VPC="<vpc_name>"
     CLUSTER_NAME="core"
-    EC2_SSH_PUBLIC_KEY="mykey"
+    EC2_SSH_PUBLIC_KEY="<mykey>"
     NUM_WORKER_NODES=2
     EC2_INSTANCE_TYPE="t2.xlarge"
     ARCH="x86_64"
-    EC2_AMI="<your-aws-ami>"
+    EC2_AMI="<aws-ami>"
     ```
 
     Then, deploy the core infrastructure which includes a VPC, security groups, EC2 instances, etc.
@@ -29,11 +29,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     Use the variable `VPC` to specify the name for the [AWS virtual private cloud](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to deploy your infrastructure in a logically isolated virtual network: *We highly advise utilizing a unique name or the AWS IAM user ID as the identifier for your VPC*. Furthermore, use the variable `EC2_AMI` to specify the [Amazon machine image ID](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html), keeping in mind that it is region-specific.
 
     
-    We advise utilizing the following command to acquire the AMI ("ImageId") value for a specific region:
-
-    ```bash
-    aws ec2 describe-images --region $REGION --filters "Name=architecture,Values=x86_64" "Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-*"
-    ```
+    We advise to use the Ubuntu Amazon EC2 AMI Locator to acquire the AMI value for a specific region: https://cloud-images.ubuntu.com/locator/ec2/
 
     Upon completion of the script's execution, an Ansible inventory file containing the IP addresses of the master and worker nodes will be generated in the present directory at `.data/hosts_core`.
 
@@ -58,11 +54,11 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 
      ```console
     CLUSTER_NAME="wec"
-    EC2_SSH_PUBLIC_KEY="mykey"
+    EC2_SSH_PUBLIC_KEY="<mykey>"
     NUM_HOSTING_INSTANCES=2
     EC2_INSTANCE_TYPE="t2.xlarge"
     ARCH="x86_64"
-    EC2_AMI="<your-aws-ami>"
+    EC2_AMI="<aws-ami>"
     ```
 
     Then, deploy the WEC infra:
