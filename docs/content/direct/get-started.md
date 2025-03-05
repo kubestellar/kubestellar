@@ -88,7 +88,7 @@ For convenience, a new local **Kind** cluster that satisfies the requirements fo
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
 ```
 
-### Use Core Helm chart to initialize KubeFlex and create ITS and WDS (*[Learn more about the Core Helm Chart](./core-chart.md)* )
+### Use Core Helm chart to initialize KubeFlex and create ITS and WDS
 
 ```shell
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
@@ -116,6 +116,8 @@ The Helm chart above has a Job that initializes the ITS as an OCM "hub" cluster.
 kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 90s
 kubectl --context kind-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 150s
 ```
+
+*To learn more about the Core Helm Chart, refer to the [Core Helm Chart documentation](./core-chart.md)*
 
 ### Create and register two workload execution cluster(s)
 {% include-markdown "direct/example-wecs.md" heading-offset=2 %}
