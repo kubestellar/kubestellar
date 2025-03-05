@@ -2,11 +2,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: argocd-kubestellar-operator
+  name: "{{ .Release.Name }}-argocd-kubestellar-operator"
 data:
-  # k logs $(k get pods -l job-name=argocd-kubestellar-operator -o 'jsonpath={.items[0].metadata.name}')
-  # k delete -f /vagrant/add-wds-clusters-job.yaml ; k apply -f /vagrant/add-wds-clusters-job.yaml && sleep $WAIT_BEFORE_RETRY ; k logs $(k get pods -l job-name=argocd-kubestellar-operator -o 'jsonpath={.items[0].metadata.name}')
-  argocd-kubestellar-operator.sh: |
+  # This script by the "{{ .Release.Name }}-argocd-kubestellar-operator" job to
+  # 1. register KubeStellar WDSes as Argo CD target clusters
+  # 2. create any Argo CD application listed in KubeStelar values
+  argocd-operator.sh: |
     #!/bin/env bash
     set -e
 
@@ -28,7 +29,7 @@ data:
 
     echo "Waiting for Argo CD pod to be ready..."
     kubectl -n $NS wait --for=condition=Ready pod/$ARGOCD_POD
-    echo "==> Argo CD show condition Ready."
+    echo "==> Argo CD shows condition Ready."
 
     echo "Getting Argo CD admin password..."
     ARGOCD_PASSWD=""
@@ -42,7 +43,7 @@ data:
     echo "==> Argo CD admin password retrieved."
 
     echo "Logging into Argo CD cli..."
-    while ! kubectl -n $NS exec $ARGOCD_POD -- argocd login argocd-server.$NS --username admin --password $(echo $ARGOCD_PASSWD | base64 -d) --insecure ; do
+    while ! kubectl -n $NS exec $ARGOCD_POD -- argocd login "{{ .Release.Name }}-argocd-server.$NS" --username admin --password $(echo $ARGOCD_PASSWD | base64 -d) --insecure ; do
         >&2 echo "==> ERROR: Argo CD login failed! ...retrying in $WAIT_BEFORE_RETRY seconds..."
         sleep $WAIT_BEFORE_RETRY
     done
@@ -73,9 +74,11 @@ data:
 
         echo "==> Copying kubeconfig \"${cp_name}.kubeconfig\" to Argo CD pod \"$ARGOCD_POD\"..."
         kubectl cp "$kubeconfig" -n $NS ${ARGOCD_POD}:/tmp
+        rm "$kubeconfig"
 
         echo "==> Registering Control Plane \"$cp_name\" as an Argo CD cluster..."
-        kubectl exec $ARGOCD_POD -- argocd cluster add ${cp_name} -y --kubeconfig $kubeconfig
+        kubectl exec $ARGOCD_POD -- argocd cluster add ${cp_name} -y --kubeconfig "$kubeconfig"
+        kubectl exec $ARGOCD_POD -- rm "$kubeconfig"
 
     {{- end }}
 
@@ -105,7 +108,7 @@ data:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: argocd-kubestellar-operator
+  name: "{{ .Release.Name }}-argocd-kubestellar-operator"
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -116,24 +119,23 @@ metadata:
     # job is considered part of the release.
     "helm.sh/hook": post-install, post-upgrade
     "helm.sh/hook-weight": "5" # IMPORTANT: set this weight higher than KubeFlex post-install hook, otherwise postgresql will not install
-    "helm.sh/hook-delete-policy": before-hook-creation, hook-succeeded
+    "helm.sh/hook-delete-policy": before-hook-creation #, hook-succeeded
 spec:
   template:
     metadata:
-      name: argocd-kubestellar-operator
       labels:
         app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
-      restartPolicy: Nevegit a
+      restartPolicy: Never # OnFailure
       securityContext:
         runAsNonRoot: true
-      serviceAccountName: argocd-kubestellar-operator
+      serviceAccountName: "{{ .Release.Name }}-argocd-kubestellar-operator"
       containers:
       - name: add-wdses-clusters
         image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
-        command: [ "/bin/bash", "/mnt/script/argocd-kubestellar-operator.sh" ]
+        command: [ "/bin/bash", "/mnt/script/argocd-operator.sh" ]
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -146,6 +148,6 @@ spec:
       volumes:
       - name: script
         configMap:
-          name: argocd-kubestellar-operator
+          name: "{{ .Release.Name }}-argocd-kubestellar-operator"
           defaultMode: 0744
 {{- end }}
