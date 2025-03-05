@@ -117,6 +117,8 @@ kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/
 kubectl --context kind-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 150s
 ```
 
+*To learn more about the Core Helm Chart, refer to the [Core Helm Chart documentation](./core-chart.md)*
+
 ### Create and register two workload execution cluster(s)
 {% include-markdown "direct/example-wecs.md" heading-offset=2 %}
 
