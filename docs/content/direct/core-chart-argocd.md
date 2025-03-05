@@ -1,15 +1,16 @@
 # Using Argo CD with KubeStellar Core chart
 
-This documents explains how to use KubeStellar Core chart to:
+This documents explains how to use the KubeStellar core Helm chart to:
 
-- Deploy an instance of Argo CD using KubeStellar Core chart that automatically lists the WDSes as desitnation clusters
-- Automatically crete Argo CD applications, including scenarios examples
+- deploy Argo CD in the KubeFlex hosting cluster;
+- register every WDS as a target cluster in Argo CD; and
+- create Argo CD applications as specified by the chart values.
 
 ## Pre-requisites
 
-The prerequisites are the same of [installing KubeStellar using the Core chart](./core-chart.md#pre-requisites).
+The prerequisites are the same as [installing KubeStellar using the Core chart](core-chart.md#pre-requisites).
 
-The settings described in this document are an extesnion of the KubeStellar Core chart settings described [here](./core-chart.md#kubestellar-core-chart-values).
+The settings described in this document are an extesnion of the KubeStellar Core chart settings described [here](core-chart.md#kubestellar-core-chart-values).
 
 ## Installing Argo CD using KubeStellar Core chart
 
@@ -19,7 +20,7 @@ When deploying in an **OpenShift** cluster, add the flag `--set "argo-cd.openshi
 
 When deploying in a **Kubernetes** cluster, use the flag `--set "argo-cd.global.domain=<url>"` to provide the URL for the **nginx** ingress, default `argocd.localtest.me`.
 
-Note that when creating a local **Kubernetes** cluster using our scripts for **Kind** or **k3s**, the **nginx** ingress will be accessible on port `9443`; therefore the Argo CD UI can be accessed at the address `https://argocd.localtest.me:9443`.
+Note that when creating a local **Kubernetes** cluster using our scripts for **Kind** or **k3s**, the **nginx** ingress will be accessible on host port `9443`; therefore the Argo CD UI can be accessed at the address `https://argocd.localtest.me:9443`.
 
 The initial password for the `admin` user can be retrieved using the command:
 
@@ -29,7 +30,7 @@ kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | 
 
 ## Deploying Argo CD applications
 
-KubeStellar Core chart can also be used to automatically deploy Argo CD applications. The example below show an example deploying an application to corresponding to `scenario 1` in [KubeStellar docs](./example-scenarios.md#scenario-1---multi-cluster-workload-deployment-with-kubectl).
+The KubeStellar Core chart can also be used to deploy Argo CD applications as specified by chart values. The example below show the relevant fragment of the chart values that could be used to deploying an application corresponding to `scenario 1` in [KubeStellar docs](example-scenarios.md#scenario-1---multi-cluster-workload-deployment-with-kubectl).
 
 ```yaml
 argo-cd:

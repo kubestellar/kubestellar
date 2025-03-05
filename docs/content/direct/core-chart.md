@@ -346,6 +346,10 @@ the `kflex` CLI and one not.
     - `--silent|-s` quiet mode, do not print information. This may be useful when using `-o -`.
     - `-X` enable verbose execution of the script for debugging
 
+## Argo CD integration
+
+KubeStellar Core Helm chart allows to deploy ArgoCD in the KubeFlex hosting cluster, register every WDS as a target cluster in Argo CD, and create Argo CD applications as specified by chart values, as asxplained [here](core-chart-argocd.md).
+
 ## Uninstalling the KubeStellar Core chart
 
 The chart can be uninstalled using the command:
