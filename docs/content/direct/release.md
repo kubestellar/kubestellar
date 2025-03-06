@@ -13,8 +13,6 @@ Every release should pass all release tests before it can be officially declare 
 
 ### Reacting to a new KubeFlex release
 
-- Update the KubeFlex release in `docs/content/direct/pre-reqs.md`
-- Update the "kflex" release in `scripts/check_pre_req.sh`
 - Update the KubeFlex release in `go.mod`
 - `go mod tidy`
 - Update the KubeFlex release in `core-chart/Chart.yaml`
@@ -29,6 +27,11 @@ Or you could search for appearances of the old release string yourself using a c
 ```shell
 find * .github/workflows \( -name "*.svg" -prune \) -or \( -path "*venv" -prune \) -or \( -path hack/tools -prune \) -or \( -type f -exec fgrep 0.6.2 \{\} \; -print -exec echo \; \)
 ```
+
+#### To increase the lower bound on KubeFlex release
+
+- Update the KubeFlex release in `docs/content/direct/pre-reqs.md`
+- Update the "kflex" release in `scripts/check_pre_req.sh`
 
 ### Reacting to a new ocm-status-addon release
 
