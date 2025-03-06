@@ -2408,6 +2408,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Reacting to a new KubeFlex release">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to-increase-the-lower-bound-on-kubeflex-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      To increase the lower bound on KubeFlex release
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -3185,6 +3200,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Reacting to a new KubeFlex release">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to-increase-the-lower-bound-on-kubeflex-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      To increase the lower bound on KubeFlex release
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -3347,8 +3377,6 @@ clues about the problem.</p>
 <h2 id="step-by-step">Step-by-Step<a class="headerlink" href="#step-by-step" title="Permanent link">#</a></h2>
 <h3 id="reacting-to-a-new-kubeflex-release">Reacting to a new KubeFlex release<a class="headerlink" href="#reacting-to-a-new-kubeflex-release" title="Permanent link">#</a></h3>
 <ul>
-<li>Update the KubeFlex release in <code>docs/content/direct/pre-reqs.md</code></li>
-<li>Update the "kflex" release in <code>scripts/check_pre_req.sh</code></li>
 <li>Update the KubeFlex release in <code>go.mod</code></li>
 <li><code>go mod tidy</code></li>
 <li>Update the KubeFlex release in <code>core-chart/Chart.yaml</code></li>
@@ -3363,6 +3391,11 @@ clues about the problem.</p>
 <p>Or you could search for appearances of the old release string yourself using a command like the following. And maybe also search for the release before that, in case it was overlooked earlier.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>find<span class="w"> </span>*<span class="w"> </span>.github/workflows<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.svg&quot;</span><span class="w"> </span>-prune<span class="w"> </span><span class="se">\)</span><span class="w"> </span>-or<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-path<span class="w"> </span><span class="s2">&quot;*venv&quot;</span><span class="w"> </span>-prune<span class="w"> </span><span class="se">\)</span><span class="w"> </span>-or<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-path<span class="w"> </span>hack/tools<span class="w"> </span>-prune<span class="w"> </span><span class="se">\)</span><span class="w"> </span>-or<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-exec<span class="w"> </span>fgrep<span class="w"> </span><span class="m">0</span>.6.2<span class="w"> </span><span class="se">\{\}</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span>-print<span class="w"> </span>-exec<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="se">\)</span>
 </code></pre></div>
+<h4 id="to-increase-the-lower-bound-on-kubeflex-release">To increase the lower bound on KubeFlex release<a class="headerlink" href="#to-increase-the-lower-bound-on-kubeflex-release" title="Permanent link">#</a></h4>
+<ul>
+<li>Update the KubeFlex release in <code>docs/content/direct/pre-reqs.md</code></li>
+<li>Update the "kflex" release in <code>scripts/check_pre_req.sh</code></li>
+</ul>
 <h3 id="reacting-to-a-new-ocm-status-addon-release">Reacting to a new ocm-status-addon release<a class="headerlink" href="#reacting-to-a-new-ocm-status-addon-release" title="Permanent link">#</a></h3>
 <p>Between each release of <a href="https://github.com/kubestellar/ocm-status-addon">ks/OSA</a> and the next release of ks/ks, update the references to the ocm-status-addon release in the following files.</p>
 <ul>
