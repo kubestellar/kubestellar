@@ -192,7 +192,7 @@ echo -e "\nPulling container images local..."
 images=("ghcr.io/loft-sh/vcluster:0.16.4"
         "rancher/k3s:v1.27.2-k3s1"
         "quay.io/open-cluster-management/registration-operator:v0.14.0"
-        "docker.io/bitnami/postgresql:16.0.0-debian-11-r13")
+        "quay.io/kubestellar/postgresql:16.0.0-debian-11-r13")
 
 for image in "${images[@]}"; do
     docker pull "$image" &
