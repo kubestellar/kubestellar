@@ -3888,7 +3888,7 @@
 <h2 id="rendering-and-previewing-modifications-to-the-website">Rendering and Previewing modifications to the website<a class="headerlink" href="#rendering-and-previewing-modifications-to-the-website" title="Permanent link">#</a></h2>
 <p>You may preview possible changes to the website by either rendering them globally from a fork on GitHub, or by downloading and rendering the documents locally.</p>
 <h3 id="serving-up-documents-globally-from-a-fork-of-the-repository-via-github">Serving up documents globally from a fork of the repository via GitHub<a class="headerlink" href="#serving-up-documents-globally-from-a-fork-of-the-repository-via-github" title="Permanent link">#</a></h3>
-<p>You can take advantage of <a href="https://github.com/kubestellar/kubestellar/blob/v0.26.0/.github/workflows/docs-gen-and-push.yml">the "Generate and Push Docs" GitHub Actions workflow</a>---invoked either explicitly in the GitHub web UI or implicitly by a branch naming convention---to create an online, shareable rendering of the website.
+<p>You can take advantage of <a href="https://github.com/kubestellar/kubestellar/blob/v0.27.0-rc.1/.github/workflows/docs-gen-and-push.yml">the "Generate and Push Docs" GitHub Actions workflow</a>---invoked either explicitly in the GitHub web UI or implicitly by a branch naming convention---to create an online, shareable rendering of the website.
 This is particularly useful for documentation PRs, as it allows you to share a preview of your proposed changes directly via a URL to a working website.
 To take advantage of this action, you must ensure that you have forked the repository properly. This entails two things: having a version of the branch named <code>gh-pages</code>, and configuring GitHub to publish a website based on that branch.</p>
 <h4 id="creating-a-fork-that-can-use-the-generate-and-push-docs-action">Creating a fork that can use the Generate and Push Docs Action<a class="headerlink" href="#creating-a-fork-that-can-use-the-generate-and-push-docs-action" title="Permanent link">#</a></h4>
@@ -4064,7 +4064,7 @@ scripts in <code>hack</code>).</p>
 - ks_branch: main
 - ks_tag: latest
 - ks_latest_regular_release: 0.26.0
-- ks_latest_release: 0.26.0
+- ks_latest_release: 0.27.0-rc.1
 </code></pre></div>
 <p>to use a variables/macro in your documentation reference like this:</p>
 <p>{{ config.&lt;var_name&gt; }}</p>
