@@ -2,6 +2,13 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.27.0 and its RCs
+
+The major changes since 0.26.0 are as follows.
+
+- Adding the ability to use a pre-existing cluster as an ITS.
+- Reliability improvement: The core Helm chart now uses KubeFlex release 0.8.1, which avoids pulling from DockerHub (which is rate-limited).
+
 ## 0.26.0 and its RCs
 
 The major changes since 0.25.1 are as follows.
