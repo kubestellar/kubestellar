@@ -1,0 +1,11 @@
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: nginx-bpolicy
+spec:
+  clusterSelectors:
+  # - matchLabels: {"location-group":"edge"}
+  - matchLabels: {"name":"cluster1"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name":"nginx"}
