@@ -218,6 +218,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
         --set-json='ITSes=[{"name":"its1"}]' \
         --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
         --set-json='verbosity.default=5' \
+        --set-json='kubeflex-operator.verbosity=5' \
         --timeout=24h \
         $var_flags
 
