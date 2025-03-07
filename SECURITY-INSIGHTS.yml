@@ -1,10 +1,9 @@
 header:
-  schema-version: 1.0.0
-  last-updated: '2024-11-20'
-  last-reviewed: '2024-11-20'
-  expiration-date: '2025-11-20T01:00:00.000Z'
+  last-updated: '2025-03-07'
+  last-reviewed: '2025-03-07'
+  expiration-date: '2026-12-01T01:00:00.000Z'
   project-url: https://github.com/kubestellar/kubestellar
-  project-release: '0.25.1'
+  project-release: '0.27.0-rc.1'
 project-lifecycle:
   status: active
   bug-fixes-only: false
