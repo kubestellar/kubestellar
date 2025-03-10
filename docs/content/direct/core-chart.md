@@ -348,7 +348,7 @@ the `kflex` CLI and one not.
 
 ## Argo CD integration
 
-KubeStellar Core Helm chart allows to deploy ArgoCD in the KubeFlex hosting cluster, register every WDS as a target cluster in Argo CD, and create Argo CD applications as specified by chart values, as asxplained [here](core-chart-argocd.md).
+KubeStellar Core Helm chart allows to deploy ArgoCD in the KubeFlex hosting cluster, register every WDS as a target cluster in Argo CD, and create Argo CD applications as specified by chart values, as explained [here](core-chart-argocd.md).
 
 ## Uninstalling the KubeStellar Core chart
 

@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: "{{ .Release.Name }}-argocd-kubestellar-operator"
 data:
-  # This script by the "{{ .Release.Name }}-argocd-kubestellar-operator" job to
+  # This script is used by the "{{ .Release.Name }}-argocd-kubestellar-operator" job to
   # 1. register KubeStellar WDSes as Argo CD target clusters
   # 2. create any Argo CD application listed in KubeStelar values
   argocd-operator.sh: |
@@ -14,53 +14,57 @@ data:
     WAIT_BEFORE_RETRY=5
     NS={{ .Release.Namespace }}
 
-    echo "Using namespace: $NS"
+    timestamped_echo() {
+      echo "[$(date +"%Y-%m-%d %H:%M:%S")] $1"
+    }
 
-    echo "Getting Argo CD pod name..."
+    timestamped_echo "Using namespace: $NS"
+
+    timestamped_echo "Getting Argo CD pod name..."
     ARGOCD_POD=""
     while [ -z "$ARGOCD_POD" ]; do
         ARGOCD_POD=$(kubectl -n $NS get pods -l app.kubernetes.io/name=argocd-server -o 'jsonpath={.items[0].metadata.name}' 2> /dev/null || true)
         if [ -z "$ARGOCD_POD" ]; then
-            >&2 echo "==> ERROR: Argo CD pod not found! ...retrying in $WAIT_BEFORE_RETRY seconds..."
+            >&2 timestamped_echo "==> ERROR: Argo CD pod not found! ...retrying in $WAIT_BEFORE_RETRY seconds..."
             sleep $WAIT_BEFORE_RETRY
         fi
     done
-    echo "==> Argo CD pod found: $ARGOCD_POD"
+    timestamped_echo "==> Argo CD pod found: $ARGOCD_POD"
 
-    echo "Waiting for Argo CD pod to be ready..."
+    timestamped_echo "Waiting for Argo CD pod to be ready..."
     kubectl -n $NS wait --for=condition=Ready pod/$ARGOCD_POD
-    echo "==> Argo CD shows condition Ready."
+    timestamped_echo "==> Argo CD shows condition Ready."
 
-    echo "Getting Argo CD admin password..."
+    timestamped_echo "Getting Argo CD admin password..."
     ARGOCD_PASSWD=""
     while [ -z "$ARGOCD_PASSWD" ]; do
         ARGOCD_PASSWD=$(kubectl -n $NS get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" 2> /dev/null || true)
         if [ -z "$ARGOCD_PASSWD" ]; then
-            >&2 echo "==> ERROR: Argo CD password secret not found! ...retrying in $WAIT_BEFORE_RETRY seconds..."
+            >&2 timestamped_echo "==> ERROR: Argo CD password secret not found! ...retrying in $WAIT_BEFORE_RETRY seconds..."
             sleep $WAIT_BEFORE_RETRY
         fi
     done
-    echo "==> Argo CD admin password retrieved."
+    timestamped_echo "==> Argo CD admin password retrieved."
 
-    echo "Logging into Argo CD cli..."
+    timestamped_echo "Logging into Argo CD cli..."
     while ! kubectl -n $NS exec $ARGOCD_POD -- argocd login "{{ .Release.Name }}-argocd-server.$NS" --username admin --password $(echo $ARGOCD_PASSWD | base64 -d) --insecure ; do
-        >&2 echo "==> ERROR: Argo CD login failed! ...retrying in $WAIT_BEFORE_RETRY seconds..."
+        >&2 timestamped_echo "==> ERROR: Argo CD login failed! ...retrying in $WAIT_BEFORE_RETRY seconds..."
         sleep $WAIT_BEFORE_RETRY
     done
-    echo "==> Argo CD login succesful."
+    timestamped_echo "==> Argo CD login succesful."
 
-    echo "Adding WDS clusters..."
+    timestamped_echo "Adding WDS clusters..."
     {{- range $cp := .Values.WDSes }}
 
         cp_name={{ $cp.name }}
 
-        echo "==> Looking for Control Plane \"$cp_name\"..."
+        timestamped_echo "==> Looking for Control Plane \"$cp_name\"..."
         # Wait for the CP to exists and be ready
         while [[ $(kubectl get controlplane $cp_name -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-            >&2 echo "==> ERROR: Control Plane \"$cp_name\" is not ready! ...retrying in $WAIT_BEFORE_RETRY seconds..."
+            >&2 timestamped_echo "==> ERROR: Control Plane \"$cp_name\" is not ready! ...retrying in $WAIT_BEFORE_RETRY seconds..."
             sleep $WAIT_BEFORE_RETRY
         done
-        echo "==> Control Plane \"$cp_name\" is ready."
+        timestamped_echo "==> Control Plane \"$cp_name\" is ready."
 
         # determine the secret name and namespace
         key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
@@ -69,41 +73,42 @@ data:
 
         kubeconfig="/tmp/${cp_name}.kubeconfig"
 
-        echo "==> Getting \"$key\" from \"$secret_name\" secret in \"$secret_namespace\" for control plane \"$cp_name\"... \"$kubeconfig\""
+        timestamped_echo "==> Getting \"$key\" from \"$secret_name\" secret in \"$secret_namespace\" for control plane \"$cp_name\"... \"$kubeconfig\""
         kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d > "$kubeconfig"
 
-        echo "==> Copying kubeconfig \"${cp_name}.kubeconfig\" to Argo CD pod \"$ARGOCD_POD\"..."
-        kubectl cp "$kubeconfig" -n $NS ${ARGOCD_POD}:/tmp
+        timestamped_echo "==> Copying kubeconfig \"${cp_name}.kubeconfig\" to Argo CD pod \"$ARGOCD_POD\"..."
+        kubectl -n $NS cp "$kubeconfig" ${ARGOCD_POD}:/tmp
         rm "$kubeconfig"
 
-        echo "==> Registering Control Plane \"$cp_name\" as an Argo CD cluster..."
-        kubectl exec $ARGOCD_POD -- argocd cluster add ${cp_name} -y --kubeconfig "$kubeconfig"
-        kubectl exec $ARGOCD_POD -- rm "$kubeconfig"
+        timestamped_echo "==> Registering Control Plane \"$cp_name\" as an Argo CD cluster..."
+        kubectl -n $NS exec $ARGOCD_POD -- argocd cluster add ${cp_name} -y --kubeconfig "$kubeconfig"
+        kubectl -n $NS exec $ARGOCD_POD -- rm "$kubeconfig"
 
     {{- end }}
 
-    echo "Creating applications..."
+    timestamped_echo "Creating applications..."
     {{- range $app := (index .Values "argo-cd" "applications") }}
 
-        echo "==> Creating application \"{{ $app.name }}\":"
-        echo "    - project=\"{{ $app.project | default "default" }}\""
-        echo "    - repoURL=\"{{ $app.repoURL }}\""
-        echo "    - targetRevision=\"{{ $app.targetRevision | default "HEAD" }}\""
-        echo "    - path=\"{{ $app.path }}\""
-        echo "    - destinationWDS=\"{{ $app.destinationWDS }}\""
-        echo "    - destinationNamespace=\"{{ $app.destinationNamespace | default "default" }}\""
+        timestamped_echo "==> Creating application \"{{ $app.name }}\":"
+        timestamped_echo "    - project=\"{{ $app.project | default "default" }}\""
+        timestamped_echo "    - repoURL=\"{{ $app.repoURL }}\""
+        timestamped_echo "    - targetRevision=\"{{ $app.targetRevision | default "HEAD" }}\""
+        timestamped_echo "    - path=\"{{ $app.path | default "/" }}\""
+        timestamped_echo "    - destinationWDS=\"{{ $app.destinationWDS }}\""
+        timestamped_echo "    - destinationNamespace=\"{{ $app.destinationNamespace | default "default" }}\""
 
         kubectl exec $ARGOCD_POD -- argocd app create {{ $app.name }} \
           --project {{ $app.project | default "default" }} \
           --repo {{ $app.repoURL }} \
           --revision {{ $app.targetRevision | default "HEAD" }} \
-          --path {{ $app.path }} \
+          --path {{ $app.path | default "/" }} \
           --dest-name {{ $app.destinationWDS }} \
-          --dest-namespace {{ $app.destinationNamespace | default "default" }} || true
+          --dest-namespace {{ $app.destinationNamespace | default "default" }} \
+          --sync-option CreateNamespace=true || true
 
     {{- end }}
 
-    echo "Done."
+    timestamped_echo "Done."
 ---
 apiVersion: batch/v1
 kind: Job
@@ -119,7 +124,7 @@ metadata:
     # job is considered part of the release.
     "helm.sh/hook": post-install, post-upgrade
     "helm.sh/hook-weight": "5" # IMPORTANT: set this weight higher than KubeFlex post-install hook, otherwise postgresql will not install
-    "helm.sh/hook-delete-policy": before-hook-creation #, hook-succeeded
+    "helm.sh/hook-delete-policy": before-hook-creation, hook-succeeded
 spec:
   template:
     metadata:
