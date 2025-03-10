@@ -30,29 +30,22 @@ kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | 
 
 ## Deploying Argo CD applications
 
-The KubeStellar Core chart can also be used to deploy Argo CD applications as specified by chart values. The example below show the relevant fragment of the chart values that could be used to deploying an application corresponding to `scenario 1` in [KubeStellar docs](example-scenarios.md#scenario-1---multi-cluster-workload-deployment-with-kubectl).
+The KubeStellar Core chart can also be used to deploy Argo CD applications as specified by chart values. The example below shows the relevant fragment of the chart values that could be used to deploying an application corresponding to `scenario-6` in [KubeStellar docs](example-scenarios.md#scenario-6---multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd).
 
 ```yaml
 argo-cd:
   applications: # list of Argo CD applications to be create
-  - name: scenario-1 # required, must be unique
+  - name: scenario-6 # required, must be unique
     project: default # default: default
-    repoURL: https://github.com/kubestellar/kubestellar
+    repoURL: https://github.com/pdettori/sample-apps.git
     targetRevision: HEAD # default: HEAD
-    path: config/argocd/scenario-1
+    path: nginx
     destinationWDS: wds1
-    destinationNamespace: default # default: default
+    destinationNamespace: nginx-sa # default: default
 ```
 
 Alternatively, the same result can be achieved from Helm CLI by using the followig minimal argument (note that the default values are not explicitely set):
 
 ```shell
---set-json='argo-cd.applications=[ \
-    { \
-      "name": "scenario-1", \
-      "repoURL": "https://github.com/kubestellar/kubestellar", \
-      "path": "config/argocd/scenario-1", \
-      "destinationWDS": wds1" \
-    }\
-  ]'
+--set-json='argo-cd.applications=[ { "name": "scenario-6", "repoURL": "https://github.com/pdettori/sample-apps.git", "path": "nginx", "destinationWDS": wds1", "destinationNamespace": "nginx-sa" } ]'
 ```
