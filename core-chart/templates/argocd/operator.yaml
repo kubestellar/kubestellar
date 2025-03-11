@@ -108,7 +108,8 @@ data:
         --path {{ $app.path | default "/" }} \
         --dest-name {{ $app.destinationWDS }} \
         --dest-namespace {{ $app.destinationNamespace | default "default" }} \
-        --sync-option CreateNamespace=true || true
+        --sync-option CreateNamespace=true \
+        --sync-policy {{ $app.syncPolicy | default "manual" }} || true
 
     {{- end }}
 
