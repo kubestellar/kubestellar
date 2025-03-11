@@ -52,6 +52,7 @@ argo-cd:
   #   path: config/argocd/scenario-1 # source repo path to the application YAML
   #   destinationWDS: wds1
   #   destinationNamespace: default # default: default
+  #   syncPolicy: auto # default: manual
 
 
 # Configuration for the OCM Status Add-On Controller.

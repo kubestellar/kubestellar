@@ -42,6 +42,7 @@ argo-cd:
     path: nginx
     destinationWDS: wds1
     destinationNamespace: nginx-sa # default: default
+    syncPolicy: auto # default: manual
 ```
 
 Alternatively, the same result can be achieved from Helm CLI by using the followig minimal argument (note that the default values are not explicitely set):
