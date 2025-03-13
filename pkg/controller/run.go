@@ -22,14 +22,65 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
 	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/klog/v2"
+	"github.com/prometheus/client_golang/prometheus"
 
 	ksopts "github.com/kubestellar/kubestellar/options"
 )
+
+// Define Prometheus metrics for API server requests/responses
+var (
+	apiServerRequestsTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "generic_transport_apiserver_requests_total",
+			Help: "Total number of API server requests",
+		},
+		[]string{"method", "endpoint", "status"},
+	)
+
+	apiServerRequestDuration = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    "generic_transport_apiserver_request_duration_seconds",
+			Help:    "Duration of API server requests",
+			Buckets: prometheus.DefBuckets,
+		},
+		[]string{"method", "endpoint"},
+	)
+)
+
+func init() {
+	// Register Prometheus metrics
+	prometheus.MustRegister(apiServerRequestsTotal)
+	prometheus.MustRegister(apiServerRequestDuration)
+}
+
+// InstrumentedTransport wraps the HTTP client to track metrics
+type instrumentedTransport struct {
+	transport http.RoundTripper
+}
+
+func (t *instrumentedTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	start := time.Now()
+
+	// Make the API server request
+	resp, err := t.transport.RoundTrip(req)
+
+	// Record metrics
+	duration := time.Since(start).Seconds()
+	apiServerRequestDuration.WithLabelValues(req.Method, req.URL.Path).Observe(duration)
+	if err != nil {
+		apiServerRequestsTotal.WithLabelValues(req.Method, req.URL.Path, "error").Inc()
+	} else {
+		apiServerRequestsTotal.WithLabelValues(req.Method, req.URL.Path, resp.Status).Inc()
+	}
+
+	return resp, err
+}
 
 func InitialContext() (context.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -46,6 +97,10 @@ func InitialContext() (context.Context, func()) {
 
 func Start(ctx context.Context, processOpts ksopts.ProcessOptions) {
 	logger := klog.FromContext(ctx)
+
+	// Replace the default HTTP client with the instrumented one
+	http.DefaultTransport = &instrumentedTransport{transport: http.DefaultTransport}
+
 	if processOpts.HealthProbeBindAddr != "" {
 		go func() {
 			err := http.ListenAndServe(processOpts.HealthProbeBindAddr, http.HandlerFunc(HappyDumbHandler))
@@ -54,8 +109,8 @@ func Start(ctx context.Context, processOpts ksopts.ProcessOptions) {
 				panic(err)
 			}
 		}()
-
 	}
+
 	go func() {
 		err := http.ListenAndServe(processOpts.MetricsBindAddr, legacyregistry.Handler())
 		if err != nil {
