@@ -28,6 +28,14 @@ Want to get started ahead of Contribfest? Here are some open issues to consider 
 
 Explore the complete list of issues on KubeStellar's GitHub [https://github.com/kubestellar/kubestellar/issues](https://github.com/kubestellar/kubestellar/issues).
 
+### Help wanted
+Help us improve KubeStellar by contribution to upstream projects:
+
+- **[FEATURE]** - [HELM: Introduce an annotation that would make Helm wait for user-specified resources](https://github.com/helm/helm/issues/30669)
+- **[FEATURE]** - [HELM: Introduce priority/coordination of Helm resource creation](https://github.com/helm/helm/issues/30670)
+- **[FEATURE]** - [HELM: Introduce an alternative path for dependence chart override values](https://github.com/helm/helm/issues/30671))
+- **[FEATURE]** - [HELM: Introduce a mechanism for a chart to require a specified Helm min version or range](https://github.com/helm/helm/issues/30672))
+
 ### Join us!
 If you’re in London, join us for Contribfest on Thursday, April 3, 2025, from 4:00pm to 5:15pm BST in ExCeL London, Level 3 | ICC Capital Suite 1.
 
