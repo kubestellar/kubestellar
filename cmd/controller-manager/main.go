@@ -22,12 +22,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/spf13/pflag"
-
+	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -52,6 +53,23 @@ import (
 
 var (
 	scheme = runtime.NewScheme()
+
+	apiServerRequestsTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "kubestellar_apiserver_requests_total",
+			Help: "Total number of API server requests",
+		},
+		[]string{"method", "endpoint", "status"},
+	)
+
+	apiServerRequestDuration = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    "kubestellar_apiserver_request_duration_seconds",
+			Help:    "Duration of API server requests",
+			Buckets: prometheus.DefBuckets,
+		},
+		[]string{"method", "endpoint"},
+	)
 )
 
 const (
@@ -64,9 +82,37 @@ func init() {
 
 	utilruntime.Must(v1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
+
+	// Register Prometheus metrics
+	prometheus.MustRegister(apiServerRequestsTotal)
+	prometheus.MustRegister(apiServerRequestDuration)
+}
+
+type instrumentedTransport struct {
+	transport http.RoundTripper
+}
+
+func (t *instrumentedTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	start := time.Now()
+
+	// Make the API server request
+	resp, err := t.transport.RoundTrip(req)
+
+	// Record metrics
+	duration := time.Since(start).Seconds()
+	apiServerRequestDuration.WithLabelValues(req.Method, req.URL.Path).Observe(duration)
+	if err != nil {
+		apiServerRequestsTotal.WithLabelValues(req.Method, req.URL.Path, "error").Inc()
+	} else {
+		apiServerRequestsTotal.WithLabelValues(req.Method, req.URL.Path, resp.Status).Inc()
+	}
+
+	return resp, err
 }
 
 func main() {
+	// Wrap the default HTTP client to track metrics
+	http.DefaultTransport = &instrumentedTransport{transport: http.DefaultTransport}
 	processOpts := clientopts.ProcessOptions{
 		MetricsBindAddr:     ":8080",
 		HealthProbeBindAddr: ":8081",
