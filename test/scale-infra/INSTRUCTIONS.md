@@ -50,7 +50,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
 
     You can use the variable `ks_release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/release-0.26.0/core-chart) configured with a ITS of type host. 
 
-    Upon completion of the script's execution, a kubeconfig file is generated at `.data/admin.conf` to access the Kubernetes cluster and the control plane components for KubeStellar, for example:
+    Upon completion of the script's execution, a kubeconfig file is generated at `.data/${REGION}_${VPC}/admin.conf` to access the Kubernetes cluster and the control plane components for KubeStellar, for example:
     
     Check the created kubeconfig contexts:
 
