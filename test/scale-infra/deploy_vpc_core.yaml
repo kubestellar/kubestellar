@@ -1,0 +1,107 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    region: "{{ region | default('us-east-1') }}"
+    vpc_name:  "{{ vpc_name | default('kscore') }}"
+  tasks:
+    - name: Gather information about all availability zones
+      amazon.aws.aws_az_info:
+        region: "{{ region }}"
+      register: aws_zones
+      when: availability_zone is undefined
+
+    - name: Select an availability zone
+      ansible.builtin.set_fact:
+        availability_zone: "{{ aws_zones.availability_zones[0].zone_name }}"
+      when: aws_zones is defined
+
+    - name: Print selected availability zone
+      debug:
+        var: availability_zone
+
+    # Constructing the VPC and subnets
+    - name: Create VPC
+      amazon.aws.ec2_vpc_net:
+        name:           "{{ vpc_name }}"
+        cidr_block:     '192.168.0.0/16'
+        region:         "{{ region }}"
+      register: result_vpc
+
+    - name: Print the Create VPC
+      ansible.builtin.debug:
+        msg: "{{ result_vpc }}"
+
+    - name: Create public subnet
+      amazon.aws.ec2_vpc_subnet:
+        state:            'present'
+        vpc_id:           "{{ result_vpc.vpc.id }}"
+        cidr:             '192.168.1.0/24'
+        az:               "{{ availability_zone }}"
+        region:           "{{ region }}"
+        map_public:       yes
+      register: result_public_subnet
+
+    - name: Debug Public Subnet
+      ansible.builtin.debug:
+        msg: "{{ result_public_subnet }}"
+
+
+    - name: Create private subnet
+      amazon.aws.ec2_vpc_subnet:
+        state:            'present'
+        vpc_id:           "{{ result_vpc.vpc.id }}"
+        cidr:             '192.168.3.0/24'
+        az:               "{{ availability_zone }}"
+        region:           "{{ region }}"
+        map_public:       no
+      register: result_private_subnet
+
+    - name: Debug Private Subnet
+      ansible.builtin.debug:
+        msg: "{{ result_private_subnet }}"
+
+
+    # Construct the gateways
+    - name: Create Internet Gateway for VPC
+      amazon.aws.ec2_vpc_igw:
+        state:           'present'
+        vpc_id:          "{{ result_vpc.vpc.id }}"
+        region:          "{{ region }}"
+      register: result_igw
+
+
+    - name: Debug Internet Gateway 
+      ansible.builtin.debug:
+        msg: "{{ result_igw }}"
+
+
+
+    # Create the routing tables
+    - name: Set up the public subnet route table
+      ec2_vpc_route_table:
+        vpc_id:           "{{ result_vpc.vpc.id }}"
+        region:           "{{ region }}"
+        subnets:          "{{ result_public_subnet.subnet.id }}"
+        tags:
+          Name: "{{ vpc_name }}"
+        routes:
+        - dest:         '0.0.0.0/0'
+          gateway_id:   "{{ result_igw.gateway_id }}"
+      register: result_public_route
+
+    - name: Debug Public Subnet Route Table
+      ansible.builtin.debug:
+        msg: "{{ result_public_route }}"
+        
+    - name: Create a directory to persist VPC data if it does not exist
+      ansible.builtin.file:
+        path: .data/{{ region }}_{{ vpc_name }}
+        state: directory
+        mode: '0755'
+
+    - name: Create vars file to help with deletion of resources
+      ansible.builtin.copy:
+        content: "vpc_name: {{ vpc_name }}\nvpc_id: {{ result_vpc.vpc.id }}\nvpc_cidr_block: {{ result_vpc.vpc.cidr_block}}\npublic_subnet_id: {{ result_public_subnet.subnet.id }}\nprivate_subnet_id: {{ result_private_subnet.subnet.id }}\nroute_table_list: [{{ result_public_route.route_table.route_table_id }}]\ncidr_list: [{{ result_public_subnet.subnet.cidr_block }}, {{ result_private_subnet.subnet.cidr_block }}]"
+        dest: ".data/{{ region }}_{{ vpc_name }}/vpc_helper_vars.yaml"
+   
