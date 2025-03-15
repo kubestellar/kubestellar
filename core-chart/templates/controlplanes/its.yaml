@@ -16,5 +16,9 @@ spec:
     name: {{ ($cp.bootstrapSecret).name | default (printf "%s-bootstrap" $cp.name) }}
     namespace: {{ ($cp.bootstrapSecret).namespace | default $.Release.Namespace }}
     inClusterKey: {{ ($cp.bootstrapSecret).key | default "kubeconfig-incluster" }}
+  ports:
+    - name: pprof
+      containerPort: 8082
+      protocol: TCP
   {{- end }}
 {{- end }}

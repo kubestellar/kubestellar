@@ -24,6 +24,9 @@ verbosity:
   # status_agent: 6 DEPRECATED
   # transport: 6
 
+# Configuration for the controller-manager
+controller_manager:
+  pprof_bind_addr: ":8082"  # Port for pprof debugging
 
 # KubeFlex override values
 kubeflex-operator:
