@@ -11,7 +11,7 @@ To resolve this error, you need to increase the value of `fs.inotify.max_user_wa
 #### For Rancher Desktop
 1. Open the configuration file:
    ```sh
-   vi ~/Library/Application\\ Support/rancher-desktop/lima/_config/override.yaml
+   vi "~/Library/Application Support/rancher-desktop/lima/_config/override.yaml"
    ```
 
 2. Add the following script to the `provision` section:
