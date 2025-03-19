@@ -1,6 +1,7 @@
 site_name: KubeStellar
 repo_url: https://github.com/kubestellar/kubestellar
-site_url: https://docs.kubestellar.io/
+# site_url: https://docs.kubestellar.io/
+site_url: https://letsgetstartedwithbub.github.io/kubestellar/
 
 repo_short_name: kubestellar/kubestellar
 repo_default_file_path: kubestellar
