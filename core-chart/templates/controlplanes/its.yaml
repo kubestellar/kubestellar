@@ -17,4 +17,7 @@ spec:
     namespace: {{ ($cp.bootstrapSecret).namespace | default $.Release.Namespace }}
     inClusterKey: {{ ($cp.bootstrapSecret).key | default "kubeconfig-incluster" }}
   {{- end }}
+  env:
+    - name: PPROF_BIND_ADDR
+      value: {{ $.Values.status_controller.pprof_bind_addr | default ":8081" }}
 {{- end }}
