@@ -38,7 +38,7 @@ To claim an issue that you are interested in, kindly leave a comment on the issu
 ### Committing
 We encourage all contributors to adopt [best practices in git commit management](https://hackmd.io/q22nrXjERBeIGb-fqwrUSg) to facilitate efficient reviews and retrospective analysis. Note: that document was written for projects where some of the contributors are doing merges into the main branch, but in KubeStellar we have GitHub doing that for us. For the kubestellar repository, this is controlled by [Prow](https://docs.prow.k8s.io/); for the other repositories in the kubestellar organization we use the GitHub mechanisms directly.
 
- Your git commits should provide ample context for reviewers and future codebase readers.
+Your git commits should provide ample context for reviewers and future codebase readers.
 
 A recommended format for final commit messages is as follows:
 
@@ -50,7 +50,7 @@ In conformance with CNCF expectations, we will only merge commits that indicate 
 See [Git Commit Signoff and Signing](../direct/pr-signoff.md) for more information on how to do that.
 
 <!--end-second-include-->
-(If you are viewing this file in the repository, the [pre-req listing is in the docs subfolder](./docs/content/direct/pre-reqs.md))
+(If you are viewing this file in the repository, the [Git Signoff information is the docs subfolder](./docs/content/direct/pr-signoff.md))
 <!--start-third-include-->
 
 
@@ -67,17 +67,17 @@ When submitting a pull request, clear communication is appreciated. This can be 
 The pull request template has been designed to assist you in communicating this information effectively.
 
 #### Titling Pull Requests
-We require that the title of each pull request start with a special character (emoji) that classifies the request into one of the following categories. 
+We require that the title of each pull request start with a special nickname character (emoji) that classifies the request into one of the following categories. 
 
-The characters to use for different PRs are as follows
+The nickname characters to use for different PRs are as follows
 
-- ✨ (write `:sparkles:`) feature
-- 🐛 (write `:bug:`) bug fix
-- 📖 (write `:book:`) docs
-- 📝 (write `:memo:`)  proposal
-- ⚠️ (write `:warning:`) breaking change
-- 🌱 (write `:seedling:`) other/misc
-- ❓ (write `:question:`) requires manual review/categorization
+- ✨ (nickname `:sparkles:`) feature
+- 🐛 (nickname `:bug:`) bug fix
+- 📖 (nickname `:book:`) docs
+- 📝 (nickname `:memo:`)  proposal
+- ⚠️ (nickname `:warning:`) breaking change
+- 🌱 (nickname `:seedling:`) other/misc
+- ❓ (nickname `:question:`) requires manual review/categorization
 
 ---
 
@@ -104,18 +104,16 @@ If you have any questions about contributing, don't hesitate to reach out to us 
 
 Our [Getting Started](../direct/get-started.md) guide shows a user how to install a simple "kick the tires" instance of KubeStellar using a helm chart and kind.
 
-The helm chart offers many options, but as a contributor you may  want a different setup flow, including `git clone` of this repo instead of fetching and unpacking a release archive.  
-Follow the links in ["The Full Story"](../direct/user-guide-intro.md#the-full-story) section of the User Guide introduction to better inform your installation.
-
-Several [example scenarios](../direct/example-scenarios.md) are available to test your system once it is setup.
+To set up and test a development system, please refer to the _test/e2e/README.md_ file in the GitHub repository.
+After running any of those e2e (end to end) tests you will be left with a running system that can be exercised further.
 
 <!--end-third-include-->
-(If you are viewing this file in the repository, the [Getting Started guide is here](./docs/content/direct/get-started.md) and the User Guide Introduction section is here ["The Full Story"](./docs/content/direct/user-guide-intro.md#the-full-story) )
+(If you are viewing this file in the repository, the [Getting Started guide is here](./docs/content/direct/get-started.md) and the [End to End (E2E) testing section is here"](./test/e2e/README.md) )
 <!--start-fourth-include-->
 
-### Testing changes to the helm script
+### Testing changes to the helm chart
 
-If you are interested in modifying the helm script itself, look at the User Guide page on the [Core Helm Script](../direct/core-chart.md) for more information on its many options before you begin, notably on how to specify using a local version of the script.
+If you are interested in modifying the Helm chart itself, look at the User Guide page on the [Core Helm chart](../direct/core-chart.md) for more information on its many options before you begin, notably on how to specify using a local version of the script.
 
 <!--end-fourth-include-->
 If you are viewing this page directly in the repository the helm chart documentation is [here in the documentation tree](./docs/content/direct/core-chart.md)
@@ -125,7 +123,7 @@ If you are viewing this page directly in the repository the helm chart documenta
 ### Testing the script against an upcoming release
 
 Prior to making a new release, there needs to be testing that the
-current helm script works with the executable behavior that will
+current Helm chart works with the executable behavior that will
 appear in the new release.  
 
 ## Licensing
