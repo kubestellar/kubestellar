@@ -16,6 +16,9 @@
 
 # NOTE WELL: Two copies of this file exist, one in kubestellar/hack/
 # and one in kubestellar/scripts/ . Keep them both up-to-date.
+BASE_URL="https://docs.kubestellar.io"
+VERSION="release-0.27.0"
+INSTALLATION_ERROR_URL="${BASE_URL}/${VERSION}/direct/installation-errors#pod-errors-due-to-too-many-open-files"
 
 set -e # exit on error
 
@@ -67,6 +70,7 @@ check_sysctl() {
             echo -e "\033[0;32m\xE2\x9C\x94\033[0m $name is $val"
         else
             echo -e "\033[0;31mX\033[0m sysctl ${name} is only $val but must be at least $minval (see https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files)" >&2
+             echo -e "\033[0;31mX\033[0m sysctl ${name} is only $val but must be at least $minval (see $INSTALLATION_ERROR_URL#pod-errors-due-to-too-many-open-files)" >&2 
             [ "$assert" == "true" ] && exit 4
         fi
     else
