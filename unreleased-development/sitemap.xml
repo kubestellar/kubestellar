@@ -105,43 +105,43 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/CONTRIBUTING/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/coc-inc/</loc>
          <lastmod>2025-03-21</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/CONTRIBUTING/"/>
-         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/CONTRIBUTING/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/coc-inc/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/coc-inc/"/>
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/LICENSE/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/contributing-inc/</loc>
          <lastmod>2025-03-21</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/LICENSE/"/>
-         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/LICENSE/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/contributing-inc/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/contributing-inc/"/>
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/coc/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/governance-inc/</loc>
          <lastmod>2025-03-21</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/coc/"/>
-         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/coc/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/governance-inc/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/governance-inc/"/>
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/governance/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/license-inc/</loc>
          <lastmod>2025-03-21</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/governance/"/>
-         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/governance/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/license-inc/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/license-inc/"/>
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/onboarding/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/onboarding-inc/</loc>
          <lastmod>2025-03-21</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/onboarding/"/>
-         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/onboarding/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/onboarding-inc/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/onboarding-inc/"/>
          
     </url>
     <url>
@@ -169,19 +169,19 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/security/security/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/security/security-inc/</loc>
          <lastmod>2025-03-21</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/security/security/"/>
-         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/security/security/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/security/security-inc/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/security/security-inc/"/>
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/security/security_contacts/</loc>
+         <loc>https://docs.kubestellar.io/unreleased-development/contribution-guidelines/security/security_contacts-inc/</loc>
          <lastmod>2025-03-21</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/security/security_contacts/"/>
-         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/security/security_contacts/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/contribution-guidelines/security/security_contacts-inc/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/contribution-guidelines/security/security_contacts-inc/"/>
          
     </url>
     <url>
