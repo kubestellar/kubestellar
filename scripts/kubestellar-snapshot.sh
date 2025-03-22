@@ -379,7 +379,7 @@ else
     if [[ -z "$kubeflex_pod" ]]; then
         echoerr "KubeFlex pod not found!"
     else
-        kubeflex_version=$(kubectl --context $helm_context -n kubeflex-system get pod $kubeflex_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/kubeflex/manager")) | .image' | cut -d':' -f2 || true)
+        kubeflex_version=$(kubectl --context $helm_context -n kubeflex-system get pod $kubeflex_pod -o json 2> /dev/null | jq -r 'try (.spec.containers[] | select(.image | contains("kubestellar/kubeflex/manager")) | .image) catch ""' | cut -d':' -f2 || true)
         kubeflex_status=$(kubectl --context $helm_context -n kubeflex-system get pod $kubeflex_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -n -e "- ${COLOR_INFO}controller-manager${COLOR_NONE}: version=${COLOR_INFO}$kubeflex_version${COLOR_NONE}, pod=${COLOR_INFO}$kubeflex_pod${COLOR_NONE}, status="
         echostatus "$kubeflex_status"
@@ -449,11 +449,11 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
                 done
             fi
             status_pod=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
-            status_version=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" get pod $status_pod -o jsonpath='{.spec.containers}' | jq -r '.[].image | select(contains("status-addon"))' | cut -d: -f2 || true)
+            status_version=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" get pod $status_pod -o jsonpath='{.spec.containers}' | jq -r 'try (.[].image | select(contains("status-addon"))) catch ""' | cut -d: -f2 || true)
             status_status=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         else
             status_pod=$(kubectl --context $helm_context -n "$status_ns" get pod -o name 2> /dev/null | grep addon-status-controller | cut -d'/' -f2 || true)
-            status_version=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.spec.containers}' | jq -r '.[].image | select(contains("status-addon"))' | cut -d: -f2 || true)
+            status_version=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.spec.containers}' | jq -r 'try (.[].image | select(contains("status-addon"))) catch ""' | cut -d: -f2 || true)
             status_status=$(kubectl --context $helm_context -n "$status_ns" get pod $status_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         fi
         echo -n -e "  - Post Create Hook: pod=${COLOR_INFO}$its_pod${COLOR_NONE}, ns=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
@@ -471,12 +471,12 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         fi
     else
         kubestellar_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "control-plane=controller-manager" -o name 2> /dev/null | cut -d'/' -f2 || true)
-        kubestellar_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image' | cut -d':' -f2 || true)
+        kubestellar_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o json 2> /dev/null | jq -r 'try (.spec.containers[] | select(.image | contains("kubestellar/controller-manager")) | .image) catch ""' | cut -d':' -f2 || true)
         kubestellar_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $kubestellar_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -e -n "  - KubeStellar controller manager: version=${COLOR_INFO}$kubestellar_version${COLOR_NONE}, pod=${COLOR_INFO}$kubestellar_pod${COLOR_NONE} namespace=${COLOR_INFO}"${cp_ns[cp_n]}"${COLOR_NONE}, status="
         echostatus "$kubestellar_status"
         trasport_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "name=transport-controller" -o name 2> /dev/null | cut -d'/' -f2 || true)
-        trasport_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o json 2> /dev/null | jq -r '.spec.containers[] | select(.image | contains("kubestellar/ocm-transport-controller")) | .image' | cut -d':' -f2 || true)
+        trasport_version=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o json 2> /dev/null | jq -r 'try (.spec.containers[] | select(.image | contains("kubestellar/ocm-transport-controller")) | .image) catch ""' | cut -d':' -f2 || true)
         trasport_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $trasport_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         echo -e -n "  - Transport controller: version=${COLOR_INFO}$trasport_version${COLOR_NONE}, pod=${COLOR_INFO}$trasport_pod${COLOR_NONE} namespace=${COLOR_INFO}${cp_ns[cp_n]}${COLOR_NONE}, status="
         echostatus "$trasport_status"
@@ -535,10 +535,10 @@ for j in "${!cp_pch[@]}" ; do
         for i in "${!mcs[@]}" ; do
             name=${mcs[i]##*/}
             mc_name[mc_n]=$name
-            accepted="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "HubAcceptedManagedCluster") | .status' | tr -d '"')"
-            joined="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "ManagedClusterJoined") | .status' | tr -d '"')"
-            available="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "ManagedClusterConditionAvailable") | .status' | tr -d '"')"
-            synced="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq '.[] | select(.type == "ManagedClusterConditionClockSynced") | .status' | tr -d '"')"
+            accepted="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq 'try (.[] | select(.type == "HubAcceptedManagedCluster") | .status) catch ""' | tr -d '"')"
+            joined="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq 'try (.[] | select(.type == "ManagedClusterJoined") | .status) catch ""' | tr -d '"')"
+            available="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq 'try (.[] | select(.type == "ManagedClusterConditionAvailable") | .status) catch ""' | tr -d '"')"
+            synced="$(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster $name -o jsonpath='{.status.conditions}' | jq 'try (.[] | select(.type == "ManagedClusterConditionClockSynced") | .status) catch ""' | tr -d '"')"
             echo -e "- ${COLOR_INFO}${mc_name[mc_n]}${COLOR_NONE} in ${COLOR_INFO}${cp_name[j]}${COLOR_NONE}: accepted=$(echostatus $accepted), joined=$(echostatus $joined), available=$(echostatus $available), synced=$(echostatus $synced)"
             if [[ "$arg_verbose" == "true" ]] ; then
                 echo -n -e "${COLOR_YAML}"
