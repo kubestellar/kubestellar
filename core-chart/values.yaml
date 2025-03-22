@@ -54,6 +54,12 @@ status_agent:
   # v: 0 # Level number for the log level verbosity on the agent
   vmodule: "" # pattern=N,... comma-separated list of pattern=N settings for file-filtered logging (only works for text log format) on the agent
 
+# Configuration for the OCM Status Add-On Controller.
+# v here takes precedence over verbosity.status_controller
+status_controller:
+  pprof_bind_addr: ":8081" # string [host]:port at which to listen for HTTP requests for go /debug/pprof requests on the controller
+  # v: 2
+
 # Determine if the Post Create Hooks should be installed by the chart
 InstallPCHs: true
 
