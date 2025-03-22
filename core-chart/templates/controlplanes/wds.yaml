@@ -11,4 +11,8 @@ spec:
   postCreateHookVars:
     ITSName: "{{ $cp.ITSName | default "" }}"
     APIGroups: "{{ $cp.APIGroups | default "" }}"
+  ports:
+    - name: pprof
+      containerPort: 8082
+      protocol: TCP
 {{- end }}

@@ -22,6 +22,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"strings"
 	"time"
@@ -101,6 +103,16 @@ func main() {
 	pflag.VisitAll(func(flg *pflag.Flag) {
 		setupLog.Info("Command line flag", "name", flg.Name, "value", flg.Value)
 	})
+
+	// Enable pprof if PProfBindAddr is set
+	if processOpts.PProfBindAddr != "" {
+		go func() {
+			setupLog.Info("Starting pprof server", "address", processOpts.PProfBindAddr)
+			if err := http.ListenAndServe(processOpts.PProfBindAddr, nil); err != nil {
+				setupLog.Error(err, "pprof server failed")
+			}
+		}()
+	}
 
 	// parse allowed resources string
 	allowedGroupsSet := util.ParseAPIGroupsString(allowedGroupsString)
