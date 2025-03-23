@@ -19,6 +19,8 @@ package cmd
 import (
 	"context"
 	"flag"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"time"
 
@@ -58,6 +60,11 @@ const (
 )
 
 func GenericMain(transportImplementation transport.Transport) {
+
+	go func() {
+		http.ListenAndServe("localhost:6061", nil)
+	}()
+
 	logger := klog.Background().WithName(transportgeneric.ControllerName)
 	ctx := klog.NewContext(context.Background(), logger)
 

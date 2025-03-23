@@ -22,6 +22,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"strings"
 	"time"
@@ -67,6 +69,11 @@ func init() {
 }
 
 func main() {
+
+	go func() {
+		http.ListenAndServe("localhost:6060", nil)
+	}()
+
 	processOpts := clientopts.ProcessOptions{
 		MetricsBindAddr:     ":8080",
 		HealthProbeBindAddr: ":8081",

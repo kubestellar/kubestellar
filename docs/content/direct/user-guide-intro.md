@@ -66,3 +66,13 @@ See [the Troubleshooting guide](troubleshooting.md).
 ## Teardown
 
 See [Teardown](teardown.md) for how to tear everything down to unadorned Kubernetes clusters.
+
+### Debugging with pprof
+To debug performance issues, you can use the pprof tool by accessing the debug ports:
+- Controller Manager: `localhost:6060`
+- Generic Transport Controller: `localhost:6061`
+
+Example usage:
+```bash
+go tool pprof http://localhost:6060/debug/pprof/profile
+go tool pprof http://localhost:6061/debug/pprof/profile

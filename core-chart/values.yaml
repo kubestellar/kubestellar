@@ -106,3 +106,9 @@ WDSes: # all the CPs in this list will execute the wds.yaml PCH
   #   type: host # optional type of control plane host or k8s (default to k8s, if not specified)
   #   APIGroups: "" # optional string holding a comma-separated list of APIGroups
   #   ITSName: its1 # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCH starts
+
+controllerManager:
+  debugPort: 6060
+
+transportController:
+  debugPort: 6061
