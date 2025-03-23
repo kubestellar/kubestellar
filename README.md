@@ -87,6 +87,10 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 <br>
 <br>
 
+[![CLOMonitor report summary](https://clomonitor.io/api/projects/cncf/kubestellar/report-summary?theme=light)](https://clomonitor.io/projects/cncf/kubestellar)
+<br>
+<br>
+
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkubestellar%2Fkubestellar.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkubestellar%2Fkubestellar?ref=badge_large&issueType=license)
 <br>
 <br>
