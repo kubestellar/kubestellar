@@ -31,7 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
           wget https://github.com/kubestellar/kubeflex/releases/download/v0.8.2/kubeflex_0.8.2_linux_amd64.tar.gz
           tar -xvf kubeflex_0.8.2_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
@@ -106,7 +106,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
           wget https://github.com/kubestellar/kubeflex/releases/download/v0.8.2/kubeflex_0.8.2_linux_amd64.tar.gz
           tar -xvf kubeflex_0.8.2_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
