@@ -54,7 +54,7 @@ This has been tested with version 5.6.0 of [k3d](https://k3d.io).
 1. Create a K3D hosting cluster with nginx ingress controller:
     ```shell
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
-    helm install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --version 4.6.1 --namespace ingress-nginx --create-namespace
+    helm install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --version 4.12.1 --namespace ingress-nginx --create-namespace
     ```
 
 1. When we use kind, the name of the container is kubeflex-control-plane and that is what we use 
