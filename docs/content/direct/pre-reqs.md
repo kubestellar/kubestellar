@@ -25,7 +25,7 @@ Our documentation has remarks about using the following sorts of clusters:
     To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). To upgrade from an existing installation,
 follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex). At the end of the install make sure that the kubeflex CLI, kflex, is in your `$PATH`.
 
-- **OCM CLI (clusteradm)** version >= 0.7.
+- **OCM CLI (clusteradm)** 0.7 <= version < 0.11.
     To install OCM CLI use:
 
     ```shell
