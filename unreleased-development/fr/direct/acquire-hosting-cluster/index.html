@@ -3260,7 +3260,7 @@ as a KubeFlex hosting cluster. This is not an exhaustive list.</p>
 <li>
 <p>Create a K3D hosting cluster with nginx ingress controller:
     <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>k3d<span class="w"> </span>cluster<span class="w"> </span>create<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;9443:443@loadbalancer&quot;</span><span class="w"> </span>--k3s-arg<span class="w"> </span><span class="s2">&quot;--disable=traefik@server:*&quot;</span><span class="w"> </span>kubeflex
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>helm<span class="w"> </span>install<span class="w"> </span>ingress-nginx<span class="w"> </span>ingress-nginx<span class="w"> </span>--repo<span class="w"> </span>https://kubernetes.github.io/ingress-nginx<span class="w"> </span>--version<span class="w"> </span><span class="m">4</span>.6.1<span class="w"> </span>--namespace<span class="w"> </span>ingress-nginx<span class="w"> </span>--create-namespace
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>helm<span class="w"> </span>install<span class="w"> </span>ingress-nginx<span class="w"> </span>ingress-nginx<span class="w"> </span>--repo<span class="w"> </span>https://kubernetes.github.io/ingress-nginx<span class="w"> </span>--version<span class="w"> </span><span class="m">4</span>.12.1<span class="w"> </span>--namespace<span class="w"> </span>ingress-nginx<span class="w"> </span>--create-namespace
 </code></pre></div></p>
 </li>
 <li>
