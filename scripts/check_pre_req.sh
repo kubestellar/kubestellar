@@ -17,7 +17,7 @@
 # NOTE WELL: Two copies of this file exist, one in kubestellar/hack/
 # and one in kubestellar/scripts/ . Keep them both up-to-date.
 BASE_URL="https://docs.kubestellar.io"
-VERSION="release-0.27.0"
+VERSION="release-0.27.1"
 INSTALLATION_ERROR_URL="${BASE_URL}/${VERSION}/direct/installation-errors#pod-errors-due-to-too-many-open-files"
 
 set -e # exit on error
