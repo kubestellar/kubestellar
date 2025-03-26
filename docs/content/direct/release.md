@@ -48,6 +48,8 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Edit `docs/mkdocs.yml` and update the definition of `ks_latest_release` to `$version` (e.g., `'0.23.0-rc42'`). If this is a regular release then also update the definition of `ks_latest_regular_release`.
 
+- Update the version in `scripts/check_pre_req.sh`.
+
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
 
 - Update the version in `scripts/create-kubestellar-demo-env.sh`. Note: merging this change will cause the script to be broken until the release is made.

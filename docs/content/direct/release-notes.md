@@ -2,6 +2,12 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.27.1
+
+Bumps version of ingrex-nginx used to 0.12.1, to avoid recently disclosed vulnerabilities in older versions.
+
+Avoids use of release 0.11 of clusteradm, which introduced an incompatible change in the name of a ServiceAccount.
+
 ## 0.27.0 and its RCs
 
 The major changes since 0.26.0 are as follows.
