@@ -33,16 +33,20 @@ is_installed() {
     # $4 == command to get the version for lexicographic comparison
     # $5 == help
     # $6 == min required version
-    # (optional) $7 == another min version (covering case of roll from 9 to 10)
+    # (optional) $7 == another, numerically higher lexically lower, min version (covering case of roll from 9 to 10)
+    # (optional) $8 == exclusive upper bound on version (required if $7 given)
     wantver="$6"
     addlver="$7"
+    exclver="$8"
     if which $2 > /dev/null ; then
         if [ $# -gt 2 ]; then
             gotver=$(eval "$4" 2> /dev/null)
             echo -e "\033[0;32m\xE2\x9C\x94\033[0m $1 ($gotver)"
             echov "  version (unstructured): $(eval "$3" 2> /dev/null)"
-            if [[ "$gotver" < "$wantver" ]] && { [ -z "$addlver" ] || [[ "$gotver" < "$addlver" ]]; } ; then
-                echo "  structured version '$gotver' is less than required minimum '$wantver'" $([ -z "$addlver" ] || echo or "'$addlver'") >&2
+            if ! [[ "$gotver" < "$wantver" ]]; then : OK, easy case
+            elif [ -n "$exclver" ] && [[ "$gotver" < "$exclver" ]] && ! [[ "$gotver" < "$addlver" ]]; then : OK, hard case
+            else
+                echo "  structured version '$gotver' is less than required minimum '$wantver'" $([ -z "$addlver" ] || echo or "'$addlver' but less than '$exclver'") >&2
                 exit 2
             fi
         else
@@ -214,7 +218,8 @@ is_installed_ocm() {
         "clusteradm version 2> /dev/null | grep ^client | awk '"'{ print $3 }'"'" \
         'curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash' \
         :v0.7 \
-        :v0.10
+        :v0.10 \
+        :v0.11
 }
 
 is_installed_yq() {
