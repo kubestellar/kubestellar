@@ -13,8 +13,8 @@ repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: 'latest'
-ks_latest_regular_release: '0.27.1'
-ks_latest_release: '0.27.1'
+ks_latest_regular_release: '0.27.0'
+ks_latest_release: '0.27.0'
 
 ks_kind_port_num: '1119'
 
@@ -30,6 +30,7 @@ nav:
       - Overview: readme.md
       - Architecture: direct/architecture.md
       - Related:
+        - KubeStellar UI: direct/ui-intro.md
         - KubeFlex: direct/kubeflex-intro.md
         - KubeStellar Galaxy: direct/galaxy-intro.md
       - Release-notes: direct/release-notes.md
@@ -72,6 +73,7 @@ nav:
               - Authorization failure while fetching Helm chart from ghcr.io: direct/knownissue-helm-ghcr.md
               - Missing results in a CombinedStatus object: direct/knownissue-collector-miss.md
               - Increase Inotify Watches: direct/installation-errors.md
+      - UI (User Interface): ui-docs/ui-overview.md
       - Teardown: direct/teardown.md
   - Contributing: 
       - Overview (How to join in): direct/contribute.md
