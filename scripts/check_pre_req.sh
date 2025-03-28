@@ -216,7 +216,7 @@ is_installed_ocm() {
         'clusteradm' \
         'clusteradm version 2> /dev/null | grep ^client' \
         "clusteradm version 2> /dev/null | grep ^client | awk '"'{ print $3 }'"'" \
-        'curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash' \
+        'bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh) 0.10.1' \
         :v0.7 \
         :v0.10 \
         :v0.11
