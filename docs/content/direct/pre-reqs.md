@@ -25,11 +25,11 @@ Our documentation has remarks about using the following sorts of clusters:
     To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). To upgrade from an existing installation,
 follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex). At the end of the install make sure that the kubeflex CLI, kflex, is in your `$PATH`.
 
-- **OCM CLI (clusteradm)** 0.7 <= version < 0.11.
-    To install OCM CLI use:
+- **OCM CLI (clusteradm)** 0.7 <= version **< 0.11**.
+    To install the latest acceptable version of the OCM CLI use:
 
     ```shell
-    curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+    bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh) 0.10.1
     ```
 
     Note that the default installation of clusteradm will install in /usr/local/bin which will require root access. If you prefer to avoid root, you can specify an alternative installation location using the INSTALL_DIR environment variable, as follows:
@@ -37,13 +37,13 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
     ```shell
     mkdir -p ocm
     export INSTALL_DIR="$PWD/ocm"
-    curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+    bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh) 0.10.1
     export PATH=$PWD/ocm:$PATH
     ```
 
     At the end of the install make sure that the OCM CLI, clusteradm, is in your `$PATH`.
 
-- **helm** version >= 3 - to deploy the Kubestellar and kubeflex charts. Your `helm` command must not be broken; see [](knownissue-helm-ghcr.md).
+- **helm** version >= 3. To deploy the Kubestellar and kubeflex charts. Your `helm` command must not be broken; see [the known issue](knownissue-helm-ghcr.md).
 - [**kubectl**](https://kubernetes.io/docs/tasks/tools/) version >= 1.27 - to access the kubernetes clusters
 
 ## Additional Software for the Getting Started setup

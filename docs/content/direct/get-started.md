@@ -53,6 +53,18 @@ The following command will check for the prerequisites that you will need for th
 bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_release }}/scripts/check_pre_req.sh) kflex ocm helm kubectl docker kind
 ```
 
+If that script complains then take it seriously! For example, the following indicates that you have a version of clusteradm that KubeStellar cannot use.
+
+```console
+$ bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v0.27.1/scripts/check_pre_req.sh) kflex ocm helm kubectl docker kind
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  9278  100  9278    0     0   135k      0 --:--:-- --:--:-- --:--:--  137k
+✔ KubeFlex (Kubeflex version: v0.8.2.5fd5f9c 2025-03-10T14:58:02Z)
+✔ OCM CLI (:v0.11.0-0-g73281f6)
+  structured version ':v0.11.0-0-g73281f6' is less than required minimum ':v0.7' or ':v0.10' but less than ':v0.11'
+```
+
 This setup recipe uses [kind](https://kind.sigs.k8s.io/) to create three Kubernetes clusters on your machine.
 Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
 
