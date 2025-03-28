@@ -30,6 +30,7 @@ verbosity (`-v`) of various controllers.
 
 ## Things to look at
 
+- Existence and version of dependencies. There is [a document](pre-reqs.md) and a checking script (`scripts/check_pre_req.sh`).
 - While double-checking your input is never bad, using `kubectl get -o yaml --show-managed-fields` to examine the live API objects adds some good stuff: confirmation that your input was received and parsed as expected, display of any error messages in your API objects, timestamps in the metadata (helpful for comparing with log messages), indication of what last wrote to each part of your API objects and when.
 - When basic stuff is not working, survey the Pod objects in the KubeFlex hosting cluster to look for ones that are damaged in some way. For example: you can get a summary with the command `kubectl --context kind-kubeflex get pods -A` --- adjust as necessary for the name of your kubeconfig context to use for the KubeFlex hosting cluster.
 - Remember that for each of your BindingPolicy objects, there is a corresponding Binding object that reports what is matching the policy object.
@@ -56,7 +57,8 @@ Do a simple clean demonstration of the problem, if possible.
 
 Show the particulars of something going wrong.
 
-- Show a shell session, starting from scratch
+- Show a shell session, starting from scratch.
+- Show a run of `scripts/check_pre_req.sh`.
 - Report timestamps of when salient changes happened. Make it clear which timezone is involved in each one. Particularly interesting times are when KubeStellar did the wrong thing or failed to do anything at all in response to something.
 - Show the relevant API objects. When the problem is behavior over time, show the objects contents from before and after the misbehavior.
     - In the WDS: the workload objects involved; any `BidingPolicy` involved, and the corresponding `Binding` for each; any `CustomTransform`, `StatusCollector`, or `CombinedStatus` involved.
@@ -76,7 +78,7 @@ Show the particulars of something going wrong.
 ### Use the snapshot script
 
 There is a script that is intended to capture a lot of relevant state;
-using it can help make a good trouble report.
+using it can **help** make a good trouble report (but remember all of the ideas above).
 
 You can use a command like the following to invoke the script.
 
