@@ -3305,20 +3305,20 @@ You can use the <a href="#automated-check-of-prerequisites-for-kubestellar">chec
 follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex">these instructions</a>. At the end of the install make sure that the kubeflex CLI, kflex, is in your <code>$PATH</code>.</p>
 </li>
 <li>
-<p><strong>OCM CLI (clusteradm)</strong> 0.7 &lt;= version &lt; 0.11.
-    To install OCM CLI use:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+<p><strong>OCM CLI (clusteradm)</strong> 0.7 &lt;= version <strong>&lt; 0.11</strong>.
+    To install the latest acceptable version of the OCM CLI use:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh<span class="o">)</span><span class="w"> </span><span class="m">0</span>.10.1
 </code></pre></div>
 <p>Note that the default installation of clusteradm will install in /usr/local/bin which will require root access. If you prefer to avoid root, you can specify an alternative installation location using the INSTALL_DIR environment variable, as follows:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>ocm
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">/ocm&quot;</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh<span class="o">)</span><span class="w"> </span><span class="m">0</span>.10.1
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PWD</span>/ocm:<span class="nv">$PATH</span>
 </code></pre></div>
 <p>At the end of the install make sure that the OCM CLI, clusteradm, is in your <code>$PATH</code>.</p>
 </li>
 <li>
-<p><strong>helm</strong> version &gt;= 3 - to deploy the Kubestellar and kubeflex charts. Your <code>helm</code> command must not be broken; see <a href="../knownissue-helm-ghcr/"></a>.</p>
+<p><strong>helm</strong> version &gt;= 3. To deploy the Kubestellar and kubeflex charts. Your <code>helm</code> command must not be broken; see <a href="../knownissue-helm-ghcr/">the known issue</a>.</p>
 </li>
 <li><a href="https://kubernetes.io/docs/tasks/tools/"><strong>kubectl</strong></a> version &gt;= 1.27 - to access the kubernetes clusters</li>
 </ul>

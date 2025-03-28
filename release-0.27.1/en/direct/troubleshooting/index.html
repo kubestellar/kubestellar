@@ -3217,6 +3217,7 @@ Kubernetes practice.</p>
 verbosity (<code>-v</code>) of various controllers.</p>
 <h2 id="things-to-look-at">Things to look at<a class="headerlink" href="#things-to-look-at" title="Permanent link">#</a></h2>
 <ul>
+<li>Existence and version of dependencies. There is <a href="../pre-reqs/">a document</a> and a checking script (<code>scripts/check_pre_req.sh</code>).</li>
 <li>While double-checking your input is never bad, using <code>kubectl get -o yaml --show-managed-fields</code> to examine the live API objects adds some good stuff: confirmation that your input was received and parsed as expected, display of any error messages in your API objects, timestamps in the metadata (helpful for comparing with log messages), indication of what last wrote to each part of your API objects and when.</li>
 <li>When basic stuff is not working, survey the Pod objects in the KubeFlex hosting cluster to look for ones that are damaged in some way. For example: you can get a summary with the command <code>kubectl --context kind-kubeflex get pods -A</code> --- adjust as necessary for the name of your kubeconfig context to use for the KubeFlex hosting cluster.</li>
 <li>Remember that for each of your BindingPolicy objects, there is a corresponding Binding object that reports what is matching the policy object.</li>
@@ -3241,7 +3242,8 @@ verbosity (<code>-v</code>) of various controllers.</p>
 <p>Do a simple clean demonstration of the problem, if possible.</p>
 <p>Show the particulars of something going wrong.</p>
 <ul>
-<li>Show a shell session, starting from scratch</li>
+<li>Show a shell session, starting from scratch.</li>
+<li>Show a run of <code>scripts/check_pre_req.sh</code>.</li>
 <li>Report timestamps of when salient changes happened. Make it clear which timezone is involved in each one. Particularly interesting times are when KubeStellar did the wrong thing or failed to do anything at all in response to something.</li>
 <li>Show the relevant API objects. When the problem is behavior over time, show the objects contents from before and after the misbehavior.<ul>
 <li>In the WDS: the workload objects involved; any <code>BidingPolicy</code> involved, and the corresponding <code>Binding</code> for each; any <code>CustomTransform</code>, <code>StatusCollector</code>, or <code>CombinedStatus</code> involved.</li>
@@ -3263,7 +3265,7 @@ verbosity (<code>-v</code>) of various controllers.</p>
 </ul>
 <h3 id="use-the-snapshot-script">Use the snapshot script<a class="headerlink" href="#use-the-snapshot-script" title="Permanent link">#</a></h3>
 <p>There is a script that is intended to capture a lot of relevant state;
-using it can help make a good trouble report.</p>
+using it can <strong>help</strong> make a good trouble report (but remember all of the ideas above).</p>
 <p>You can use a command like the following to invoke the script.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/kubestellar-snapshot.sh<span class="o">)</span><span class="w"> </span>-V<span class="w"> </span>-Y<span class="w"> </span>-L
 </code></pre></div>
