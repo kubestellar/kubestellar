@@ -46,7 +46,7 @@ is_installed() {
             if ! [[ "$gotver" < "$wantver" ]]; then : OK, easy case
             elif [ -n "$exclver" ] && [[ "$gotver" < "$exclver" ]] && ! [[ "$gotver" < "$addlver" ]]; then : OK, hard case
             else
-                echo "  structured version '$gotver' is less than required minimum '$wantver'" $([ -z "$addlver" ] || echo or "'$addlver' but less than '$exclver'") >&2
+                echo -e "\033[0;31mX\033[0m  structured version '$gotver' is less than required minimum '$wantver'" $([ -z "$addlver" ] || echo or "'$addlver' but less than '$exclver'") >&2
                 exit 2
             fi
         else
@@ -216,7 +216,7 @@ is_installed_ocm() {
         'clusteradm' \
         'clusteradm version 2> /dev/null | grep ^client' \
         "clusteradm version 2> /dev/null | grep ^client | awk '"'{ print $3 }'"'" \
-        'curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash' \
+        'bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh) 0.10.1' \
         :v0.7 \
         :v0.10 \
         :v0.11
