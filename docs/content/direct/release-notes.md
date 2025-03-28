@@ -2,11 +2,17 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.27.2
+
+Fixes `scripts/check_pre_req.sh` so that when it objects to the version of `clusteradm`, this is more obvious (restores the RED X that was inadvertently removed in the previous patch release).
+
+Also some doc improvements, and bumps to some build-time dependencies.
+
 ## 0.27.1
 
 Bumps version of ingrex-nginx used to 0.12.1, to avoid recently disclosed vulnerabilities in older versions.
 
-Avoids use of release 0.11 of clusteradm, which introduced an incompatible change in the name of a ServiceAccount.
+Avoids use of release 0.11 of clusteradm, **which introduced an incompatible change in the name of a ServiceAccount**.
 
 ## 0.27.0 and its RCs
 
