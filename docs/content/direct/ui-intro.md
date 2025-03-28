@@ -7,8 +7,3 @@ With its web-based interface, you can view and manage your Workload Definition S
 The Kubestellar UI has [its own section in our User Guide](../ui-docs/ui-overview.md)
 
 To explore more fully under the covers, [visit the UI repository at https://github.com/kubestellar/ui](https://github.com/kubestellar/ui)
-
-There is also a [introductory video about KubeFlex](https://youtu.be/vI2O0L5ijVU?si=p32OUaQU96JOs5iH) on the KubeStellar YouTube Channel
-
-
-
