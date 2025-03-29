@@ -32,3 +32,7 @@ dependencies:
   version: v0.8.3
   repository: oci://ghcr.io/kubestellar/kubeflex/chart
   condition: kubeflex-operator.install
+- name: argo-cd
+  version: 7.8.5
+  repository: oci://ghcr.io/argoproj/argo-helm
+  condition: argo-cd.install
