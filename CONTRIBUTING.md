@@ -15,7 +15,7 @@ Please read the following guidelines if you're interested in contributing to Kub
 
 ### Contributing Code -- Prerequisites
 
-Please make sure that your environment has all the necessary versions as spelled out in the prerequisites section of our [user guide](../direct/pre-reqs.md)
+Please make sure that your environment has all the necessary versions as spelled out in the prerequisites section of our [user guide](./docs/content/direct/pre-reqs.md)
 <!--end-first-include-->
 (If you are viewing this file in the repository, the [pre-req listing is in the docs subfolder](./docs/content/direct/pre-reqs.md))
 <!--start-second-include-->
@@ -47,7 +47,7 @@ A recommended format for final commit messages is as follows:
 ```
 In conformance with CNCF expectations, we will only merge commits that indicate your agreement with the [Developer Certificate of Origin](#certificate-of-origin). The CNCF defines how to do this, and there are two cases: one for developers working for an organization that is a CNCF member, and one for contributors acting as individuals. For the latter, assent is indicated by doing a Git "sign-off" on the commit. 
 
-See [Git Commit Signoff and Signing](../direct/pr-signoff.md) for more information on how to do that.
+See [Git Commit Signoff and Signing](./docs/content/direct/pr-signoff.md) for more information on how to do that.
 
 <!--end-second-include-->
 (If you are viewing this file in the repository, the [Git Signoff information is the docs subfolder](./docs/content/direct/pr-signoff.md))
@@ -113,7 +113,7 @@ After running any of those e2e (end to end) tests you will be left with a runnin
 
 ### Testing changes to the helm chart
 
-If you are interested in modifying the Helm chart itself, look at the User Guide page on the [Core Helm chart](../direct/core-chart.md) for more information on its many options before you begin, notably on how to specify using a local version of the script.
+If you are interested in modifying the Helm chart itself, look at the User Guide page on the [Core Helm chart](./docs/content/direct/core-chart.md) for more information on its many options before you begin, notably on how to specify using a local version of the script.
 
 <!--end-fourth-include-->
 If you are viewing this page directly in the repository the helm chart documentation is [here in the documentation tree](./docs/content/direct/core-chart.md)
