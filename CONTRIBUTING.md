@@ -102,7 +102,7 @@ If you have any questions about contributing, don't hesitate to reach out to us 
 
 ## Testing Locally
 
-Our [Getting Started](../direct/get-started.md) guide shows a user how to install a simple "kick the tires" instance of KubeStellar using a helm chart and kind.
+Our [Getting Started](./docs/content/direct/get-started.md) guide shows a user how to install a simple "kick the tires" instance of KubeStellar using a helm chart and kind.
 
 To set up and test a development system, please refer to the _test/e2e/README.md_ file in the GitHub repository.
 After running any of those e2e (end to end) tests you will be left with a running system that can be exercised further.
