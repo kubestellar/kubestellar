@@ -67,7 +67,7 @@ This release adds the option for the core Helm chart to not take responsibility 
 
 This release removes the thrashing of workload objects in the WEC in the case where the transport controller's `max-num-wrapped` is 1.
 
-This release changes the schema for a `BindingPolicy` so that the request for sigleton status return is made/not-made independently in each `DownsyncPolicyClause` rather than once on the whole `BindingPolicySpec`. The schema for `Binding` objects is changed correspondingly.
+This release changes the schema for a `BindingPolicy` so that the request for singleton status return is made/not-made independently in each `DownsyncPolicyClause` rather than once on the whole `BindingPolicySpec`. The schema for `Binding` objects is changed correspondingly.
 
 ### Remaining limitations in 0.26.0-alpha.1 and 0.26.0-alpha.2
 

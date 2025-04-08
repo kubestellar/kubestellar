@@ -66,7 +66,7 @@ b) Deploy the monitoring tools in a plain K8s WEC cluster (e.g., `cluster1`):
 ./install-ks-monitoring.sh --cluster-context cluster1 --set wec --kubeflex-hosting-cluster-context kind-kubeflex
 ```
 
-For OpenShift clusters add the flags `--env ocp` in the commad above. 
+For OpenShift clusters add the flags `--env ocp` in the command above. 
 
 Optionally, check the deployment of the monitoring tools:
 

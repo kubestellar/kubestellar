@@ -27,6 +27,7 @@ AppWrapper
 AppliedManifestWork
 ArgoCD
 Ayoub
+BST
 Backend
 BindingPolicies
 BindingPolicy
@@ -40,6 +41,7 @@ CISOs
 CLI
 CNAME
 CNCF
+CPs
 CR
 CRD
 CRDs
@@ -87,6 +89,7 @@ DeprecatedClusterName
 Dettori
 DevOpsCube
 DevOps
+Docker's
 Dockerfile
 DockerHub
 Downsync
@@ -204,6 +207,7 @@ OCM
 OCM's
 OCP
 OLM
+ONNX
 OSA
 OSSF
 OSTYPE
@@ -338,6 +342,7 @@ WorkspaceType
 Youtube
 aarch
 addon
+addons
 admissionregistration
 afterall
 allclusters
@@ -410,6 +415,7 @@ commonName
 commond
 commonname
 commonstuff
+conf
 config
 configMap
 configmap
@@ -486,6 +492,7 @@ finalizer
 flowcontrol
 francostellari
 frontend
+fs
 fullyLabeledReplicas
 george
 gh
@@ -524,6 +531,7 @@ idempotent
 ie
 imw
 init
+inotify
 inspectable
 installPostgreSQL
 instanceSelector
