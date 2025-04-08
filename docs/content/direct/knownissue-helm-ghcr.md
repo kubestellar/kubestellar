@@ -7,7 +7,7 @@ When following the
 the command to instantiate KubeStellar's core Helm chart. The error
 message is as follows.
 
-> Error: failed to authorize: failed to fetch oauth token: unexpected status from GET request to https://ghcr.io/token?scope=repository%3Akubestellar%2Fkubestellar%2Fcore-chart%3Apull&service=ghcr.io: 403 Fobidden
+> Error: failed to authorize: failed to fetch oauth token: unexpected status from GET request to https://ghcr.io/token?scope=repository%3Akubestellar%2Fkubestellar%2Fcore-chart%3Apull&service=ghcr.io: 403 Forbidden
 
 This is [Issue 2544](https://github.com/kubestellar/kubestellar/issues/2544).
 

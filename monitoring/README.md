@@ -34,7 +34,7 @@ cd monitoring
 ./install-ks-monitoring.sh --cluster-context kind-kubeflex --set core
 ```
 
-For an OpenShift cluster add the flag `--env ocp` in the commad above. 
+For an OpenShift cluster add the flag `--env ocp` in the command above. 
 
 Optionally, check the deployment of the monitoring tools:
 

@@ -8,7 +8,7 @@ The two ways to create this simple configuration are as follows.
 
 1. A [quick automated setup](#quick-start-using-the-automated-script) using our demo setup script, which creates a basic working environment for those who want to start experimenting right away.
 
-2. A [Step by step walkthrough](#step-by-step-setup) that demonstrates the core concepts and components, showing how to manually set up a simple single-host system.
+2. A [Step by step walk through](#step-by-step-setup) that demonstrates the core concepts and components, showing how to manually set up a simple single-host system.
 
 ### Note for Windows users
 

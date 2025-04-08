@@ -170,7 +170,7 @@ KubeStellar core Helm chart.
 
 ## Deleting Remaining Stuff in the KubeFlex hosting cluster
 
-### Delete Helm chart instances in the KubeFlex hosting cluter
+### Delete Helm chart instances in the KubeFlex hosting cluster
 
 Look at the Helm chart instances in the KubeFlex hosting cluster. You
 might use a command like the following.
@@ -194,7 +194,7 @@ more instances of it will be in that list. In this case you can simply
 delete those Helm chart instances. If the core chart was not used to
 install KubeFlex in its hosting cluster then you will need to delete
 the `kubeflex-system` Helm chart instance. That will probably not
-delete the postgress chart instance. If that remains, delete it too.
+delete the Postgres chart instance. If that remains, delete it too.
 
 Following is an example of a command that deletes a Helm chart
 instance.
