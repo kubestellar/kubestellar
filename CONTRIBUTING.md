@@ -1,4 +1,9 @@
 # Contributing to KubeStellar
+
+_Note to contributors: the contents of this file are incorporated in sections into the KubeStellar website via the file [contributing-inc](./docs/content/contribution-guidelines/contributing-inc.md). **If you add or modify links in this file you will also need to update that file**_
+
+---
+
 <!--guidelines-start-->
 Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
 
@@ -14,10 +19,8 @@ Please read the following guidelines if you're interested in contributing to Kub
 ## General practices in the KubeStellar GitHub Project
 
 ### Contributing Code -- Prerequisites
-
-Please make sure that your environment has all the necessary versions as spelled out in the prerequisites section of our [user guide](../direct/pre-reqs.md)
 <!--end-first-include-->
-(If you are viewing this file in the repository, the [pre-req listing is in the docs subfolder](./docs/content/direct/pre-reqs.md))
+Please make sure that your environment has all the necessary versions as spelled out in the prerequisites section of our [user guide](./docs/content/direct/pre-reqs.md)
 <!--start-second-include-->
 
 ### Issues
@@ -47,12 +50,9 @@ A recommended format for final commit messages is as follows:
 ```
 In conformance with CNCF expectations, we will only merge commits that indicate your agreement with the [Developer Certificate of Origin](#certificate-of-origin). The CNCF defines how to do this, and there are two cases: one for developers working for an organization that is a CNCF member, and one for contributors acting as individuals. For the latter, assent is indicated by doing a Git "sign-off" on the commit. 
 
-See [Git Commit Signoff and Signing](../direct/pr-signoff.md) for more information on how to do that.
-
 <!--end-second-include-->
-(If you are viewing this file in the repository, the [Git Signoff information is the docs subfolder](./docs/content/direct/pr-signoff.md))
+See [Git Commit Signoff and Signing](./docs/content/direct/pr-signoff.md)) for more information on how to do that.
 <!--start-third-include-->
-
 
 ### Pull Requests
 [View active Pull Requests on GitHub](https://github.com/kubestellar/kubestellar/pulls)
@@ -101,22 +101,18 @@ If you have any questions about contributing, don't hesitate to reach out to us 
 
 
 ## Testing Locally
-
-Our [Getting Started](../direct/get-started.md) guide shows a user how to install a simple "kick the tires" instance of KubeStellar using a helm chart and kind.
-
-To set up and test a development system, please refer to the _test/e2e/README.md_ file in the GitHub repository.
-After running any of those e2e (end to end) tests you will be left with a running system that can be exercised further.
-
 <!--end-third-include-->
-(If you are viewing this file in the repository, the [Getting Started guide is here](./docs/content/direct/get-started.md) and the [End to End (E2E) testing section is here"](./test/e2e/README.md) )
+Our [Getting Started](./docs/content/direct/get-started.md) guide shows a user how to install a simple "kick the tires" instance of KubeStellar using a helm chart and kind.
+
+To set up and test a development system, please refer to the [_test/e2e/README.md_](./test/e2e/README.md) file in the GitHub repository. After running any of those e2e (end to end) tests you will be left with a running system that can be exercised further.
+
 <!--start-fourth-include-->
 
 ### Testing changes to the helm chart
 
-If you are interested in modifying the Helm chart itself, look at the User Guide page on the [Core Helm chart](../direct/core-chart.md) for more information on its many options before you begin, notably on how to specify using a local version of the script.
-
 <!--end-fourth-include-->
-If you are viewing this page directly in the repository the helm chart documentation is [here in the documentation tree](./docs/content/direct/core-chart.md)
+If you are interested in modifying the Helm chart itself, look at the User Guide page on the [Core Helm chart](./docs/content/direct/core-chart.md) for more information on its many options before you begin, notably on how to specify using a local version of the script.
+
 <!--start-fifth-include-->
 
 
@@ -127,10 +123,9 @@ current Helm chart works with the executable behavior that will
 appear in the new release.  
 
 ## Licensing
-KubeStellar is [Apache 2.0 licensed](./license-inc.md) and we accept contributions via GitHub pull requests.
-
 <!--end-fifth-include-->
-The license is also accessible in the [root of the repository](./LICENSE)
+KubeStellar is [Apache 2.0 licensed](./LICENSE) and we accept contributions via GitHub pull requests.
+
 <!--start-sixth-include-->
 
 
