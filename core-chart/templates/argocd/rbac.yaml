@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: "{{ .Release.Name }}-argocd-kubestellar-operator"
+  name: "{{ .Release.Name }}-argocd-kubestellar-setup"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: "{{ .Release.Name }}-argocd-kubestellar-operator"
+  name: "{{ .Release.Name }}-argocd-kubestellar-setup"
 rules:
 - apiGroups:
   - ""
@@ -40,13 +40,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: "{{ .Release.Name }}-argocd-kubestellar-operator"
+  name: "{{ .Release.Name }}-argocd-kubestellar-setup"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: "{{ .Release.Name }}-argocd-kubestellar-operator"
+  name: "{{ .Release.Name }}-argocd-kubestellar-setup"
 subjects:
 - kind: ServiceAccount
-  name: "{{ .Release.Name }}-argocd-kubestellar-operator"
+  name: "{{ .Release.Name }}-argocd-kubestellar-setup"
   namespace: {{ .Release.Namespace }}
 {{- end }}
