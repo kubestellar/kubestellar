@@ -8,7 +8,7 @@ data:
   # 1. register KubeStellar WDSes as Argo CD target clusters
   # 2. create any Argo CD application listed in KubeStelar values
   argocd-operator.sh: |
-    #!/bin/env bash
+    #!/usr/bin/env bash
     set -e
 
     WAIT_BEFORE_RETRY=5
@@ -37,7 +37,7 @@ data:
     do
       >&2 timestamped_echo "==> ERROR: Argo CD pod is not ready yet! ...retrying..."
     done
-    timestamped_echo "==> Argo CD shows condition Ready."
+    timestamped_echo "==> Argo CD pod shows condition Ready."
 
     timestamped_echo "Getting Argo CD admin password..."
     ARGOCD_PASSWD=""
@@ -77,10 +77,10 @@ data:
 
       kubeconfig="/tmp/${cp_name}.kubeconfig"
 
-      timestamped_echo "==> Getting \"$key\" from \"$secret_name\" secret in \"$secret_namespace\" for control plane \"$cp_name\"... \"$kubeconfig\""
+      timestamped_echo "==> Populating \"$kubeconfig\" from key \"$key\" in secret \"$secret_name\" in namespace \"$secret_namespace\" for control plane \"$cp_name\""
       kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d > "$kubeconfig"
 
-      timestamped_echo "==> Copying kubeconfig \"${cp_name}.kubeconfig\" to Argo CD pod \"$ARGOCD_POD\"..."
+      timestamped_echo "==> Copying kubeconfig \"$kubeconfig\" to Argo CD pod \"$ARGOCD_POD\"..."
       kubectl -n $NS cp "$kubeconfig" ${ARGOCD_POD}:/tmp
       rm "$kubeconfig"
 
@@ -100,16 +100,17 @@ data:
       timestamped_echo "    - path=\"{{ $app.path | default "/" }}\""
       timestamped_echo "    - destinationWDS=\"{{ $app.destinationWDS }}\""
       timestamped_echo "    - destinationNamespace=\"{{ $app.destinationNamespace | default "default" }}\""
+      timestamped_echo "    - syncPolicy=\"{{ $app.syncPolicy | default "manual" }}\""
 
-      kubectl exec $ARGOCD_POD -- argocd app create {{ $app.name }} \
-        --project {{ $app.project | default "default" }} \
-        --repo {{ $app.repoURL }} \
-        --revision {{ $app.targetRevision | default "HEAD" }} \
-        --path {{ $app.path | default "/" }} \
-        --dest-name {{ $app.destinationWDS }} \
-        --dest-namespace {{ $app.destinationNamespace | default "default" }} \
+      kubectl exec $ARGOCD_POD -- argocd app create "{{ $app.name }}" \
+        --project "{{ $app.project | default "default" }}" \
+        --repo "{{ $app.repoURL }}" \
+        --revision "{{ $app.targetRevision | default "HEAD" }}" \
+        --path "{{ $app.path | default "/" }}" \
+        --dest-name "{{ $app.destinationWDS }}" \
+        --dest-namespace "{{ $app.destinationNamespace | default "default" }}" \
         --sync-option CreateNamespace=true \
-        --sync-policy {{ $app.syncPolicy | default "manual" }} || true
+        --sync-policy "{{ $app.syncPolicy | default "manual" }}" || true
 
     {{- end }}
 
@@ -143,7 +144,7 @@ spec:
         runAsNonRoot: true
       serviceAccountName: "{{ .Release.Name }}-argocd-kubestellar-operator"
       containers:
-      - name: add-wdses-clusters
+      - name: add-wds-clusters
         image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
         command: [ "/bin/bash", "/mnt/script/argocd-operator.sh" ]
         securityContext:
