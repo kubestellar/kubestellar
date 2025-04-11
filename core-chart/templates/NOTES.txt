@@ -17,5 +17,10 @@ kflex ctx --overwrite-existing-context {{ $cp.name }}
 {{- end }}
 {{- end }}
 
+To debug the Kubestellar controller-manager using `pprof`, forward the debug port (default: 6060) and access it:
+```bash
+kubectl port-forward <controller-manager-pod> 6060:6060
+go tool pprof http://localhost:6060/debug/pprof/profile
+
 Finally, you can use `kflex ctx` to switch back to the kubeconfig
 context for your KubeFlex hosting cluster.

@@ -106,3 +106,9 @@ WDSes: # all the CPs in this list will execute the wds.yaml PCH
   #   type: host # optional type of control plane host or k8s (default to k8s, if not specified)
   #   APIGroups: "" # optional string holding a comma-separated list of APIGroups
   #   ITSName: its1 # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCH starts
+
+# Add this section for the controller-manager configuration
+controllerManager:
+  debugPort: 6060  # Default debug port for pprof
+  pprof_bind_addr: ":6060"  # Bind address for pprof
+  metrics_bind_addr: ":8080"  # Optional: Bind address for metrics (if not already defined)
