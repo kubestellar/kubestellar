@@ -16,7 +16,7 @@ It may also be a good idea to do a bit of cleanup first. See how it is done in t
 
 ## Create a Kind cluster
 
-The setup of KubStellar via the Core chart requires the existance of at least one cluster
+The setup of KubeStellar via the Core chart requires the existence of at least one cluster
 to be used for the deployment of the chart.
 
 For convenience, a new local Kind cluster that satisfies the requirements for KubeStellar setup
@@ -50,7 +50,7 @@ kflex ctx wds1
 kflex ctx # switch back to the initial context
 ```
 
-Afterwards the content of a Control Plane `<cpname>` can be accessed by specifing its context:
+Afterwards the content of a Control Plane `<cpname>` can be accessed by specifying its context:
 
 ```shell
 kubectl --context <cpname> ...
