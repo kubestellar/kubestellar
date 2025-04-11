@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{ .Release.Name }}-argocd-kubestellar-operator"
+  name: "{{ .Release.Name }}-argocd-kubestellar-setup"
 data:
-  # This script is used by the "{{ .Release.Name }}-argocd-kubestellar-operator" job to
+  # This script is used by the "{{ .Release.Name }}-argocd-kubestellar-setup" job to
   # 1. register KubeStellar WDSes as Argo CD target clusters
   # 2. create any Argo CD application listed in KubeStelar values
-  argocd-operator.sh: |
+  argocd-setup.sh: |
     #!/usr/bin/env bash
     set -e
 
@@ -119,7 +119,7 @@ data:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-argocd-kubestellar-operator"
+  name: "{{ .Release.Name }}-argocd-kubestellar-setup"
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -142,11 +142,11 @@ spec:
       restartPolicy: Never # OnFailure
       securityContext:
         runAsNonRoot: true
-      serviceAccountName: "{{ .Release.Name }}-argocd-kubestellar-operator"
+      serviceAccountName: "{{ .Release.Name }}-argocd-kubestellar-setup"
       containers:
       - name: add-wds-clusters
         image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
-        command: [ "/bin/bash", "/mnt/script/argocd-operator.sh" ]
+        command: [ "/bin/bash", "/mnt/script/argocd-setup.sh" ]
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -159,6 +159,6 @@ spec:
       volumes:
       - name: script
         configMap:
-          name: "{{ .Release.Name }}-argocd-kubestellar-operator"
+          name: "{{ .Release.Name }}-argocd-kubestellar-setup"
           defaultMode: 0744
 {{- end }}

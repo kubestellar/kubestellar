@@ -45,11 +45,11 @@ argo-cd:
     domain: argocd.localtest.me # When using the "create-kind-cluster-with-SSL-passthrough.sh" script, Argo UI will be accessible from the host at https://argocd.localtest.me:9443
   applications: # list of Argo CD applications to be create
   # Uncomment the lines below to deploy an application for the scenario-6 example in KubeStellar docs
-  # - name: scenario-1 # Argo CD application name required, must be unique
+  # - name: scenario-6 # Argo CD application name required, must be unique
   #   project: default # Argo CD project (application group), default: default
   #   repoURL: https://github.com/francostellari/kubestellar # source repo url
   #   targetRevision: argocd # default: HEAD # source repo branch
-  #   path: config/argocd/scenario-1 # source repo path to the application YAML
+  #   path: config/argocd/scenario-6 # source repo path to the application YAML
   #   destinationWDS: wds1
   #   destinationNamespace: default # default: default
   #   syncPolicy: auto # default: manual
