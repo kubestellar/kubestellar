@@ -35,10 +35,31 @@ kubeflex-operator:
   # hostContainer: kubeflex-control-plane # used to set the name of the container that runs the KubeFlex hosting cluster
   # verbosity: 0 $ used to set the verbosity of KubeFlex controller (this is not impacted by the global VERBOSITY value)
 
+
+# Argo CD values
+argo-cd:
+  install: false # enable/disaple the installation of Argo CD
+  # openshift:
+  #   enabled: true
+  global:
+    domain: argocd.localtest.me # When using the "create-kind-cluster-with-SSL-passthrough.sh" script, Argo UI will be accessible from the host at https://argocd.localtest.me:9443
+  applications: # list of Argo CD applications to be create
+  # Uncomment the lines below to deploy an application for the scenario-6 example in KubeStellar docs
+  # - name: scenario-6 # Argo CD application name required, must be unique
+  #   project: default # Argo CD project (application group), default: default
+  #   repoURL: https://github.com/francostellari/kubestellar # source repo url
+  #   targetRevision: argocd # default: HEAD # source repo branch
+  #   path: config/argocd/scenario-6 # source repo path to the application YAML
+  #   destinationWDS: wds1
+  #   destinationNamespace: default # default: default
+  #   syncPolicy: auto # default: manual
+
+
 # Configuration for the OCM Status Add-On Controller.
 # v here takes precedence over verbosity.status_controller
 status_controller: {}
   # v: 2
+
 
 # Configuration for the OCM Status Add-On Agent.
 # v here takes precedence over verbosity.status_agent.
@@ -54,8 +75,6 @@ status_agent:
   # v: 0 # Level number for the log level verbosity on the agent
   vmodule: "" # pattern=N,... comma-separated list of pattern=N settings for file-filtered logging (only works for text log format) on the agent
 
-# Determine if the Post Create Hooks should be installed by the chart
-InstallPCHs: true
 
 # Transport controller parameters
 transport_controller:
@@ -72,6 +91,10 @@ transport_controller:
   # Bundling parameters
   max_num_wrapped: 1
   max_size_wrapped: 512000
+
+
+# Determine if the Post Create Hooks should be installed by the chart
+InstallPCHs: true
 
 
 # List the Inventory and Transport Spaces (ITSes) to be created by the chart
