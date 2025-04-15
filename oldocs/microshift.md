@@ -1,4 +1,4 @@
-# This work in progress document explains how to deploy KubeStellar Core to a MicroShift on a Raspebrry PI
+# This work in progress document explains how to deploy KubeStellar Core to a MicroShift on a Raspberry PI
 
 This documents explains how to use KubeStellar Core chart in MicroShift.
 
@@ -10,15 +10,15 @@ export KUBESTELLAR_VERSION={{ config.ks_latest_release }}
 
 ## Pre-requisites
 
-In this exxample we assume to have two Raspberry Pi running a MicroShift cluster. Detailed informations on how to setup MicroShift on the Raspberry Pi can be found [here](https://community.ibm.com/community/user/cloud/blogs/alexei-karve/2021/11/28/microshift-4). The first Raspberry Pi (_e.g._, core.local) will be used to deploy the KubeStellar Core, while the second Raspberry Pi (_e.g._, wec.local) will be used as a Workload Execution Cluster.
+In this example we assume to have two Raspberry Pi running a MicroShift cluster. Detailed information on how to setup MicroShift on the Raspberry Pi can be found [here](https://community.ibm.com/community/user/cloud/blogs/alexei-karve/2021/11/28/microshift-4). The first Raspberry Pi (_e.g._, core.local) will be used to deploy the KubeStellar Core, while the second Raspberry Pi (_e.g._, wec.local) will be used as a Workload Execution Cluster.
 
 The WEC Raspberry Pi must be able to reach the Core Raspberry Pi, _e.g._, `ping core.local` should succeed.
 
 The Core Raspberry Pi must open port `6443` on its firewall.
 
-The Core Rasperry Pi will need `kubectl`, `helm`, and `clusteradm`.
+The Core Raspberry Pi will need `kubectl`, `helm`, and `clusteradm`.
 
-The WEC Rasperry Pi will need `kubectl` and `clusteradm`.
+The WEC Raspberry Pi will need `kubectl` and `clusteradm`.
 
 ## Setting up KubeStellar Core
 
@@ -32,12 +32,12 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 ```
 
 Note that:
--  the ITS `its0` must be set to type `host` so that it can be reached from other machines on the network using the doman or IP address of the Core Raspberry Pi
--  the WDS `wds0` must be set to type `host` becase of an issue in KubeFlex that has not been resolved yet
+-  the ITS `its0` must be set to type `host` so that it can be reached from other machines on the network using the domain or IP address of the Core Raspberry Pi
+-  the WDS `wds0` must be set to type `host` because of an issue in KubeFlex that has not been resolved yet
 
 ## Joining the WEC raspberry Pi
 
-After all the pods are ready retrieve the cluster adm join command using:
+After all the pods are ready retrieve the clusteradm join command using:
 
 ```shell
 clusteradm get token
@@ -50,7 +50,7 @@ clusteradm join --core-token ... --hub-apiserver https://127.0.0.1:6443 --cluste
 ```
 
 On the WEC Raspberry Pi, execute the above command after replacing:
-- the ip address `127.0.0.1` with the ip address or domanin of the Core Raspberry Pi, _e.g._, `core.local`
+- the ip address `127.0.0.1` with the ip address or domain of the Core Raspberry Pi, _e.g._, `core.local`
 - the `<cluster_name>` with the name to be assigned to the WEC Raspberry Pi, _e.g._, `wec`
 
 In summary, on the WEC Raspberry Pi, the join command may look like:

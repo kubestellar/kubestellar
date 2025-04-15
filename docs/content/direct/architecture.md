@@ -290,7 +290,7 @@ matching `Binding` object in the WDS.  A `Binding` object is mapped
 references to workload objects and the concrete list of references to
 inventory objects that were selected by the policy.
 
-The Binding Controller is centered on its workqueue and an internal
+The Binding Controller is centered on its work queue and an internal
 data structure, called a `BindingPolicyResover`, that represents the
 set of `Binding` objects that _should_ exist based on the controller's
 inputs. The controller has informers for all of its inputs: a static
