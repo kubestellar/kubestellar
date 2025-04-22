@@ -11,8 +11,16 @@ matrix:
   - pyspelling.filters.html:
       comments: false
       ignores:
-      - code
-      - pre
+        - code
+        - pre
+        - style
+        - script
+        - head
+        - noscript
+      ignore_classes:
+        - hidden
+        - sr-only
+        - copy-button
   sources:
   - '**/*.md'
   default_encoding: utf-8
