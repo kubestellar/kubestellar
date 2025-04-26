@@ -1,0 +1,51 @@
+actions/checkout:
+  commit-sha: 11bd71901bbe5b1630ceea73d27597364c9af683
+  tag: v4
+actions/add-to-project:
+  tag: v1.0.2
+  commit-sha: 244f685bbc3b7adfa8466e08b698b5577571133e
+titoportas/update-project-fields:
+  tag: v0.1.0
+  commit-sha: 421a54430b3cdc9eefd8f14f9ce0142ab7678751
+ScholliYT/Broken-Links-Crawler-Action:
+  commit-sha: a074e6a0c83f29560300752af773c7356041ceb4
+  tag: fix-http-redirects
+JasonEtco/create-an-issue:
+  commit-sha: 1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
+  tag: v2
+actions/setup-python:
+  commit-sha: a26af69be951a213d495a4c3e4e4022e16d87065
+  tag: v5
+actions/setup-go:
+  commit-sha: 0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
+  tag: v5
+anchore/sbom-action/download-syft:
+  commit-sha: 9f7302141466aa6482940f15371237e9d9f4c34a
+  tag: v0.19.0
+goreleaser/goreleaser-action:
+  commit-sha: 9c156ee8a17a598857849441385a2041ef570552
+  tag: v6
+azure/setup-helm:
+  commit-sha: 37dd2562cae2f186a3dc13f2bb5d4abe08dbfec4
+  tag: v4
+docker/login-action:
+  commit-sha: 74a5d142397b4f367a81961eba4e8cd7edddf772
+  tag: v3
+actions/first-interaction:
+  commit-sha: fb2402657b4a28582200150d0a145671d0e50597
+  tag: v1
+azure/setup-kubectl:
+  commit-sha: 3e0aec4d80787158d308d7b364cb1b702e7feb7f
+  tag: v4
+ko-build/setup-ko:
+  commit-sha: d006021bd0c28d1ce33a07e7943d48b079944c8d
+  tag: v0.9
+technote-space/assign-author:
+  commit-sha: 9558557c5c4816f38bd06176fbc324ba14bb3160
+  tag: v1.6.2
+rojopolis/spellcheck-github-actions:
+  commit-sha: 23dc186319866e1de224f94fe1d31b72797aeec7
+  tag: 0.48.0
+actions/upload-artifact:
+  commit-sha: ea165f8d65b6e75b540449e92b4886f43607fa02
+  tag: v4
