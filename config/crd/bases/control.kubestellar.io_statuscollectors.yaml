@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: statuscollectors.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -19,19 +19,25 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: StatusCollector defines one way to collect status about a given
-          workload object from the set of WECs that it propagates to. This is modeled
-          after an SQL SELECT statement that does aggregation.
+        description: |-
+          StatusCollector defines one way to collect status about a given workload object from
+          the set of WECs that it propagates to.
+          This is modeled after an SQL SELECT statement that does aggregation.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -39,38 +45,43 @@ spec:
             description: StatusCollectorSpec defines the desired state of StatusCollector.
             properties:
               combinedFields:
-                description: '`combinedFields` defines the aggregations to do, if
-                  any. `combinedFields` must be empty if `select` is not.'
+                description: |-
+                  `combinedFields` defines the aggregations to do, if any.
+                  `combinedFields` must be empty if `select` is not.
                 items:
-                  description: "NamedAggregator pairs a name with a way to aggregate
-                    over some objects. \n - For `type==\"COUNT\"`, `subject` is omitted
-                    and the aggregate is the count of those objects that are not `null`.
-                    \n - For the other types, `subject` is required and SHOULD evaluate
-                    to a numeric value; exceptions are handled as follows. For a string
-                    value: if it parses as an int64 or float64 then that is used.
-                    Otherwise this is an error condition: a value of 0 is used, and
-                    the error is reported in the BindingPolicyStatus.Errors (not necessarily
-                    repeated for each WEC)."
+                  description: |-
+                    NamedAggregator pairs a name with a way to aggregate over some objects.
+
+
+                    - For `type=="COUNT"`, `subject` is omitted and the aggregate is the count
+                    of those objects that are not `null`.
+
+
+                    - For the other types, `subject` is required and SHOULD
+                    evaluate to a numeric value; exceptions are handled as follows.
+                    For a string value: if it parses as an int64 or float64 then that is used.
+                    Otherwise this is an error condition: a value of 0 is used, and the error
+                    is reported in the BindingPolicyStatus.Errors (not necessarily repeated for each WEC).
                   properties:
                     name:
                       type: string
                     subject:
-                      description: Expression is written in the [Common Expression
-                        Language](https://cel.dev/). See github.com/google/cel-go
-                        for the Go implementation used in Kubernetes, and https://kubernetes.io/docs/reference/using-api/cel/
-                        about CEL's uses in Kubernetes. The expression will be type-checked
-                        against the schema for the object type at hand, using the
-                        Kubernetes library code for converting an OpenAPI schema to
-                        a CEL type (e.g., https://github.com/kubernetes/apiserver/blob/v0.29.10/pkg/cel/common/schemas.go#L40).
+                      description: |-
+                        Expression is written in the [Common Expression Language](https://cel.dev/).
+                        See github.com/google/cel-go for the Go implementation used in Kubernetes,
+                        and https://kubernetes.io/docs/reference/using-api/cel/ about CEL's uses in Kubernetes.
+                        The expression will be type-checked against the schema for the object type at hand,
+                        using the Kubernetes library code for converting an OpenAPI schema to a CEL type
+                        (e.g., https://github.com/kubernetes/apiserver/blob/v0.29.10/pkg/cel/common/schemas.go#L40).
                         Parsing errors are posted to the status.Errors of the StatusCollector.
-                        Type checking errors are posted to the status.Errors of the
-                        Binding and BindingPolicy.
+                        Type checking errors are posted to the status.Errors of the Binding and BindingPolicy.
                       type: string
                     type:
-                      description: AggregatorType indicates what sort of aggregation
-                        is to be done. The AVG of no values is NaN; for the other
-                        types the aggregation of no values is the identity element
-                        of the combining operation in `float64`.
+                      description: |-
+                        AggregatorType indicates what sort of aggregation is to be done.
+                        The AVG of no values is NaN;
+                        for the other types the aggregation of no values is the identity element of the combining operation
+                        in `float64`.
                       type: string
                   required:
                   - name
@@ -78,29 +89,30 @@ spec:
                   type: object
                 type: array
               filter:
-                description: '`filter`, if given, is applied first. It must evaluate
-                  to a boolean or null (which is treated as false). This is like the
-                  WHERE clause in an SQL SELECT statement.'
+                description: |-
+                  `filter`, if given, is applied first.
+                  It must evaluate to a boolean or null (which is treated as false).
+                  This is like the WHERE clause in an SQL SELECT statement.
                 type: string
               groupBy:
-                description: '`groupBy` says how to group workload objects for aggregation
-                  (if there is any). Each expression must evaluate to an atomic value.
-                  `groupBy` must be empty if `combinedFields` is.'
+                description: |-
+                  `groupBy` says how to group workload objects for aggregation (if there is any).
+                  Each expression must evaluate to an atomic value.
+                  `groupBy` must be empty if `combinedFields` is.
                 items:
                   description: NamedExpression pairs a name with a way of extracting
                     a value from a JSON object.
                   properties:
                     def:
-                      description: Expression is written in the [Common Expression
-                        Language](https://cel.dev/). See github.com/google/cel-go
-                        for the Go implementation used in Kubernetes, and https://kubernetes.io/docs/reference/using-api/cel/
-                        about CEL's uses in Kubernetes. The expression will be type-checked
-                        against the schema for the object type at hand, using the
-                        Kubernetes library code for converting an OpenAPI schema to
-                        a CEL type (e.g., https://github.com/kubernetes/apiserver/blob/v0.29.10/pkg/cel/common/schemas.go#L40).
+                      description: |-
+                        Expression is written in the [Common Expression Language](https://cel.dev/).
+                        See github.com/google/cel-go for the Go implementation used in Kubernetes,
+                        and https://kubernetes.io/docs/reference/using-api/cel/ about CEL's uses in Kubernetes.
+                        The expression will be type-checked against the schema for the object type at hand,
+                        using the Kubernetes library code for converting an OpenAPI schema to a CEL type
+                        (e.g., https://github.com/kubernetes/apiserver/blob/v0.29.10/pkg/cel/common/schemas.go#L40).
                         Parsing errors are posted to the status.Errors of the StatusCollector.
-                        Type checking errors are posted to the status.Errors of the
-                        Binding and BindingPolicy.
+                        Type checking errors are posted to the status.Errors of the Binding and BindingPolicy.
                       type: string
                     name:
                       type: string
@@ -110,28 +122,29 @@ spec:
                   type: object
                 type: array
               limit:
-                description: '`limit` limits the number of rows returned. The default
-                  value is 20.'
+                description: |-
+                  `limit` limits the number of rows returned.
+                  The default value is 20.
                 format: int64
                 type: integer
               select:
-                description: '`select` defines named values to extract from each object.
-                  `select` must be empty when `combinedFields` is not.'
+                description: |-
+                  `select` defines named values to extract from each object.
+                  `select` must be empty when `combinedFields` is not.
                 items:
                   description: NamedExpression pairs a name with a way of extracting
                     a value from a JSON object.
                   properties:
                     def:
-                      description: Expression is written in the [Common Expression
-                        Language](https://cel.dev/). See github.com/google/cel-go
-                        for the Go implementation used in Kubernetes, and https://kubernetes.io/docs/reference/using-api/cel/
-                        about CEL's uses in Kubernetes. The expression will be type-checked
-                        against the schema for the object type at hand, using the
-                        Kubernetes library code for converting an OpenAPI schema to
-                        a CEL type (e.g., https://github.com/kubernetes/apiserver/blob/v0.29.10/pkg/cel/common/schemas.go#L40).
+                      description: |-
+                        Expression is written in the [Common Expression Language](https://cel.dev/).
+                        See github.com/google/cel-go for the Go implementation used in Kubernetes,
+                        and https://kubernetes.io/docs/reference/using-api/cel/ about CEL's uses in Kubernetes.
+                        The expression will be type-checked against the schema for the object type at hand,
+                        using the Kubernetes library code for converting an OpenAPI schema to a CEL type
+                        (e.g., https://github.com/kubernetes/apiserver/blob/v0.29.10/pkg/cel/common/schemas.go#L40).
                         Parsing errors are posted to the status.Errors of the StatusCollector.
-                        Type checking errors are posted to the status.Errors of the
-                        Binding and BindingPolicy.
+                        Type checking errors are posted to the status.Errors of the Binding and BindingPolicy.
                       type: string
                     name:
                       type: string

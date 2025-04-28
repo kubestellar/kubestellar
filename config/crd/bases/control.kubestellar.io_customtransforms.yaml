@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: customtransforms.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -28,46 +28,54 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: CustomTransform describes how to select and transform some objects
-          on their way from WDS to WEC, without regard to the WEC (i.e., not changes
-          that are specific to the individual WEC). The transformation specified here
-          is in addition to, and follows, whatever is built into KubeStellar for that
-          object.
+        description: |-
+          CustomTransform describes how to select and transform some objects
+          on their way from WDS to WEC, without regard to the WEC (i.e.,
+          not changes that are specific to the individual WEC).
+          The transformation specified here is in addition to, and follows,
+          whatever is built into KubeStellar for that object.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
           spec:
-            description: CustomTransformSpec selects some objects and describes how
-              to transform them. The selected objects are those that match the `apiGroup`
-              and `resource` fields.
+            description: |-
+              CustomTransformSpec selects some objects and describes how to transform them.
+              The selected objects are those that match the `apiGroup` and `resource` fields.
             properties:
               apiGroup:
                 description: '`apiGroup` holds just the group, not also the version'
                 type: string
               remove:
-                description: '`remove` is a list of JSONPath expressions (https://goessner.net/articles/JsonPath/)
-                  that identify part of the object to remove if present. Only a subset
-                  of JSONPath is supported. The expression used in a filter must be
-                  a conjunction of field == literal tests. Examples: - "$.spec.resources.GenericItems[*].generictemplate.metadata.resourceVersion"
-                  - "$.store.book[?(@.author == ''Kilgore Trout'' && @.category ==
-                  ''fiction'')].price"'
+                description: |-
+                  `remove` is a list of JSONPath expressions (https://goessner.net/articles/JsonPath/)
+                  that identify part of the object to remove if present.
+                  Only a subset of JSONPath is supported.
+                  The expression used in a filter must be a conjunction of field == literal tests.
+                  Examples:
+                  - "$.spec.resources.GenericItems[*].generictemplate.metadata.resourceVersion"
+                  - "$.store.book[?(@.author == 'Kilgore Trout' && @.category == 'fiction')].price"
                 items:
                   type: string
                 type: array
               resource:
-                description: '`resource` is the lowercase plural way of identifying
-                  a sort of object. "subresources" can not be directly bound to, only
-                  whole (top-level) objects.'
+                description: |-
+                  `resource` is the lowercase plural way of identifying a sort of object.
+                  "subresources" can not be directly bound to, only whole (top-level) objects.
                 type: string
             required:
             - apiGroup
