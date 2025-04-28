@@ -25,7 +25,7 @@ Our documentation has remarks about using the following sorts of clusters:
     To install kubeflex go to [https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#installation). To upgrade from an existing installation,
 follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex). At the end of the install make sure that the kubeflex CLI, kflex, is in your `$PATH`.
 
-- **OCM CLI (clusteradm)** 0.7 <= version **< 0.11**.
+- **OCM CLI (clusteradm)** 0.10 <= version **< 0.11**.
     To install the latest acceptable version of the OCM CLI use:
 
     ```shell
@@ -44,7 +44,7 @@ follow [these instructions](https://github.com/kubestellar/kubeflex/blob/main/do
     At the end of the install make sure that the OCM CLI, clusteradm, is in your `$PATH`.
 
 - **helm** version >= 3. To deploy the Kubestellar and kubeflex charts. Your `helm` command must not be broken; see [the known issue](knownissue-helm-ghcr.md).
-- [**kubectl**](https://kubernetes.io/docs/tasks/tools/) version >= 1.27 - to access the kubernetes clusters
+- [**kubectl**](https://kubernetes.io/docs/tasks/tools/) version >= 1.29 - to access the kubernetes clusters
 
 ## Additional Software for the Getting Started setup
 
@@ -63,7 +63,7 @@ The setup in `montoring/` additional uses the following.
 
 ## Additional Software For Building KubeStellar from Source and Testing
 
-- [**go**](https://go.dev/doc/install) version 1.21 or higher - to build Kubestellar
+- [**go**](https://go.dev/doc/install) version 1.23 or higher - to build Kubestellar
 - [**GNU make**](https://www.gnu.org/software/make/) version >= 3.5 - to build Kubestellar and create the Kubestellar container images
 - [**ko**](https://ko.build/install/) version >= 0.15 - to create some of the Kubestellar container images
 - **docker** (or equivalent that implements `docker buildx`) (client version >= 20) - to create other KubeStellar container images

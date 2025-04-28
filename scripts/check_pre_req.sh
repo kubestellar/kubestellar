@@ -116,7 +116,7 @@ is_installed_go() {
         'go version' \
         'go version' \
         'https://go.dev/doc/install' \
-        'go version 1.21'
+        'go version 1.23'
 }
 
 is_installed_helm() {
@@ -199,7 +199,7 @@ is_installed_kubectl() {
         'kubectl version --client | head -1' \
         "kubectl version --client -o json 2> /dev/null | grep gitVersion | cut '-d\"' -f4" \
         'https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/' \
-        v1.27
+        v1.29
 }
 
 is_installed_make() {
@@ -217,7 +217,7 @@ is_installed_ocm() {
         'clusteradm version 2> /dev/null | grep ^client' \
         "clusteradm version 2> /dev/null | grep ^client | awk '"'{ print $3 }'"'" \
         'bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh) 0.10.1' \
-        :v0.7 \
+        :v0.10 \
         :v0.10 \
         :v0.11
 }
