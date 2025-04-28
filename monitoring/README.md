@@ -4,7 +4,7 @@
 
 
 ### Requirement
-To follow the instructions here you need to use KubeStellar `main` branch or any future KubeStellar release higher than `0.24.0`. Also, you need to have release `v0.2.0-rc14` or higher for the status-addon controller and agent installed in your environment. If you're using an older release, please follow these instructions to update your environment: 
+To follow the instructions here you need to use KubeStellar `main` branch or any future KubeStellar release higher than `0.24.0`. Also, you need to have release `v0.2.0-rc15` or higher for the status-addon controller and agent installed in your environment. If you're using an older release, please follow these instructions to update your environment: 
 
 1.  Remove the status-addon-controller and status-addon-agent from your current environment:
 
@@ -16,7 +16,7 @@ kubectl --context its1 -n cluster1 delete manifestwork addon-addon-status-deploy
 2. Re-deploy the status-addon controller and agents: 
 
 ```bash
-helm --kube-context its1 upgrade --install ocm-status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc14
+helm --kube-context its1 upgrade --install ocm-status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc15
 ```
 
 ### Description
