@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: bindings.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -19,30 +19,37 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Binding is mapped 1:1 to a single BindingPolicy object. Binding
-          reflects the resolution of the BindingPolicy's selectors, and explicitly
-          reflects which objects should go to what destinations.
+        description: |-
+          Binding is mapped 1:1 to a single BindingPolicy object.
+          Binding reflects the resolution of the BindingPolicy's selectors,
+          and explicitly reflects which objects should go to what destinations.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
           spec:
-            description: '`spec` explicitly describes a desired binding between workloads
-              and Locations. It reflects the resolution of a BindingPolicy''s selectors.'
+            description: |-
+              `spec` explicitly describes a desired binding between workloads and Locations.
+              It reflects the resolution of a BindingPolicy's selectors.
             properties:
               destinations:
-                description: '`destinations` is a list of cluster-identifiers that
-                  the objects should be propagated to. No duplications are allowed
-                  in this list.'
+                description: |-
+                  `destinations` is a list of cluster-identifiers that the objects should be propagated to.
+                  No duplications are allowed in this list.
                 items:
                   description: Destination wraps the identifiers required to uniquely
                     identify a destination cluster.
@@ -57,23 +64,24 @@ spec:
                 - clusterId
                 x-kubernetes-list-type: map
               workload:
-                description: '`workload` is a collection of namespaced and cluster
-                  scoped object references and their associated data - resource versions,
-                  create-only bits, and statuscollectors - to be propagated to destination
-                  clusters.'
+                description: |-
+                  `workload` is a collection of namespaced and cluster scoped object references and their associated
+                  data - resource versions, create-only bits, and statuscollectors - to be propagated to destination clusters.
                 properties:
                   clusterScope:
-                    description: '`clusterScope` holds a list of references to cluster-scoped
-                      objects to downsync and how the downsync is to be modulated.
-                      No duplications.'
+                    description: |-
+                      `clusterScope` holds a list of references to cluster-scoped objects to downsync and how the
+                      downsync is to be modulated.
+                      No duplications.
                     items:
-                      description: ClusterScopeDownsyncClause references a specific
-                        cluster-scoped object to downsync, and the downsync modulation
-                        to apply.
+                      description: |-
+                        ClusterScopeDownsyncClause references a specific cluster-scoped object to downsync,
+                        and the downsync modulation to apply.
                       properties:
                         createOnly:
-                          description: '`createOnly` indicates that in a given WEC,
-                            the object is not to be updated if it already exists.'
+                          description: |-
+                            `createOnly` indicates that in a given WEC, the object is not to be updated
+                            if it already exists.
                           type: boolean
                         group:
                           type: string
@@ -95,33 +103,38 @@ spec:
                         version:
                           type: string
                         wantSingletonReportedState:
-                          description: "WantSingletonReportedState, in short, indicates
-                            an expectation that the matching workload objects are
-                            distributed to exactly one WEC and requests that the `.status`
-                            of such objects propagate from the WEC to the WDS. \n
+                          description: |-
+                            WantSingletonReportedState, in short, indicates an expectation
+                            that the matching workload objects are distributed to exactly one WEC
+                            and requests that the `.status` of such objects propagate from the WEC
+                            to the WDS.
+
+
                             For a precise description, start with a couple of definitions.
-                            For a given workload object, _singleton status return
-                            is requested_ if and only if there exists at least one
-                            BindingPolicy or Binding that has `wantSingletonReportedState==true`
-                            in a clause that matches/references the workload object.
-                            \n The _qualified WEC set_ of a workload object is the
-                            set of WECs that are associated with that workload object
-                            by at least one BindingPolicy or Binding that has `wantSingletonReportedState==true`
-                            in a clause that matches/references the workload object.
-                            \n For a given workload object, while singleton status
-                            return is requested, KubeStellar maintains a label on
-                            the object whose name (key) is `kubestellar.io/executing-count`
-                            and whose value is a string representation of the size
-                            of the qualified WEC set of that object. While singleton
-                            status return is _not_ requested, KubeStellar suppresses
-                            the existence of a label with that name (key). While singleton
-                            status return is requested _and_ the size of the qualified
-                            WEC set is 1, KubeStellar propagates the object's `.status`
-                            from that WEC to the `.status` section of the object in
-                            the WDS. While either singleton status return is NOT requested
-                            or the size of the qualified WEC set is NOT 1, there is
-                            nothing in the `.status` of the object in the WDS that
-                            was propagated there from a WEC by KubeStellar."
+                            For a given workload object, _singleton status return is requested_
+                            if and only if there exists at least one BindingPolicy or Binding
+                            that has `wantSingletonReportedState==true` in a clause that
+                            matches/references the workload object.
+
+
+                            The _qualified WEC set_ of a workload object is the set of WECs that are
+                            associated with that workload object by at least one BindingPolicy or Binding
+                            that has `wantSingletonReportedState==true` in a clause that
+                            matches/references the workload object.
+
+
+                            For a given workload object, while singleton status return is requested,
+                            KubeStellar maintains a label on the object whose name (key) is
+                            `kubestellar.io/executing-count` and whose value is a string representation
+                            of the size of the qualified WEC set of that object.
+                            While singleton status return is _not_ requested, KubeStellar suppresses
+                            the existence of a label with that name (key).
+                            While singleton status return is requested _and_ the size of the qualified
+                            WEC set is 1, KubeStellar propagates the object's `.status` from that WEC
+                            to the `.status` section of the object in the WDS.
+                            While either singleton status return is NOT requested or the size of the
+                            qualified WEC set is NOT 1, there is nothing in the `.status` of the object
+                            in the WDS that was propagated there from a WEC by KubeStellar.
                           type: boolean
                       required:
                       - group
@@ -137,17 +150,19 @@ spec:
                     - name
                     x-kubernetes-list-type: map
                   namespaceScope:
-                    description: '`namespaceScope` holds a list of references to namsepace-scoped
-                      objects to downsync and how the downsync is to be modulated.
-                      No duplications.'
+                    description: |-
+                      `namespaceScope` holds a list of references to namsepace-scoped objects to downsync and how the
+                      downsync is to be modulated.
+                      No duplications.
                     items:
-                      description: NamespaceScopeDownsyncClause references a specific
-                        namespace-scoped object to downsync, and the downsync modulation
-                        to apply.
+                      description: |-
+                        NamespaceScopeDownsyncClause references a specific namespace-scoped object to downsync,
+                        and the downsync modulation to apply.
                       properties:
                         createOnly:
-                          description: '`createOnly` indicates that in a given WEC,
-                            the object is not to be updated if it already exists.'
+                          description: |-
+                            `createOnly` indicates that in a given WEC, the object is not to be updated
+                            if it already exists.
                           type: boolean
                         group:
                           type: string
@@ -172,33 +187,38 @@ spec:
                         version:
                           type: string
                         wantSingletonReportedState:
-                          description: "WantSingletonReportedState, in short, indicates
-                            an expectation that the matching workload objects are
-                            distributed to exactly one WEC and requests that the `.status`
-                            of such objects propagate from the WEC to the WDS. \n
+                          description: |-
+                            WantSingletonReportedState, in short, indicates an expectation
+                            that the matching workload objects are distributed to exactly one WEC
+                            and requests that the `.status` of such objects propagate from the WEC
+                            to the WDS.
+
+
                             For a precise description, start with a couple of definitions.
-                            For a given workload object, _singleton status return
-                            is requested_ if and only if there exists at least one
-                            BindingPolicy or Binding that has `wantSingletonReportedState==true`
-                            in a clause that matches/references the workload object.
-                            \n The _qualified WEC set_ of a workload object is the
-                            set of WECs that are associated with that workload object
-                            by at least one BindingPolicy or Binding that has `wantSingletonReportedState==true`
-                            in a clause that matches/references the workload object.
-                            \n For a given workload object, while singleton status
-                            return is requested, KubeStellar maintains a label on
-                            the object whose name (key) is `kubestellar.io/executing-count`
-                            and whose value is a string representation of the size
-                            of the qualified WEC set of that object. While singleton
-                            status return is _not_ requested, KubeStellar suppresses
-                            the existence of a label with that name (key). While singleton
-                            status return is requested _and_ the size of the qualified
-                            WEC set is 1, KubeStellar propagates the object's `.status`
-                            from that WEC to the `.status` section of the object in
-                            the WDS. While either singleton status return is NOT requested
-                            or the size of the qualified WEC set is NOT 1, there is
-                            nothing in the `.status` of the object in the WDS that
-                            was propagated there from a WEC by KubeStellar."
+                            For a given workload object, _singleton status return is requested_
+                            if and only if there exists at least one BindingPolicy or Binding
+                            that has `wantSingletonReportedState==true` in a clause that
+                            matches/references the workload object.
+
+
+                            The _qualified WEC set_ of a workload object is the set of WECs that are
+                            associated with that workload object by at least one BindingPolicy or Binding
+                            that has `wantSingletonReportedState==true` in a clause that
+                            matches/references the workload object.
+
+
+                            For a given workload object, while singleton status return is requested,
+                            KubeStellar maintains a label on the object whose name (key) is
+                            `kubestellar.io/executing-count` and whose value is a string representation
+                            of the size of the qualified WEC set of that object.
+                            While singleton status return is _not_ requested, KubeStellar suppresses
+                            the existence of a label with that name (key).
+                            While singleton status return is requested _and_ the size of the qualified
+                            WEC set is 1, KubeStellar propagates the object's `.status` from that WEC
+                            to the `.status` section of the object in the WDS.
+                            While either singleton status return is NOT requested or the size of the
+                            qualified WEC set is NOT 1, there is nothing in the `.status` of the object
+                            in the WDS that was propagated there from a WEC by KubeStellar.
                           type: boolean
                       required:
                       - group

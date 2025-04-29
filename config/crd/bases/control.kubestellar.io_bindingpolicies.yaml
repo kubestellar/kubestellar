@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: bindingpolicies.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -36,14 +36,19 @@ spec:
           and the destinations ('where') are bound together.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -51,97 +56,101 @@ spec:
             description: BindingPolicySpec defines the desired state of BindingPolicy
             properties:
               clusterSelectors:
-                description: '`clusterSelectors` identifies the relevant Cluster objects
-                  in terms of their labels. A Cluster is relevant if and only if it
-                  passes any of the LabelSelectors in this field.'
+                description: |-
+                  `clusterSelectors` identifies the relevant Cluster objects in terms of their labels.
+                  A Cluster is relevant if and only if it passes any of the LabelSelectors in this field.
                 items:
-                  description: A label selector is a label query over a set of resources.
-                    The result of matchLabels and matchExpressions are ANDed. An empty
-                    label selector matches all objects. A null label selector matches
-                    no objects.
+                  description: |-
+                    A label selector is a label query over a set of resources. The result of matchLabels and
+                    matchExpressions are ANDed. An empty label selector matches all objects. A null
+                    label selector matches no objects.
                   properties:
                     matchExpressions:
                       description: matchExpressions is a list of label selector requirements.
                         The requirements are ANDed.
                       items:
-                        description: A label selector requirement is a selector that
-                          contains values, a key, and an operator that relates the
-                          key and values.
+                        description: |-
+                          A label selector requirement is a selector that contains values, a key, and an operator that
+                          relates the key and values.
                         properties:
                           key:
                             description: key is the label key that the selector applies
                               to.
                             type: string
                           operator:
-                            description: operator represents a key's relationship
-                              to a set of values. Valid operators are In, NotIn, Exists
-                              and DoesNotExist.
+                            description: |-
+                              operator represents a key's relationship to a set of values.
+                              Valid operators are In, NotIn, Exists and DoesNotExist.
                             type: string
                           values:
-                            description: values is an array of string values. If the
-                              operator is In or NotIn, the values array must be non-empty.
-                              If the operator is Exists or DoesNotExist, the values
-                              array must be empty. This array is replaced during a
-                              strategic merge patch.
+                            description: |-
+                              values is an array of string values. If the operator is In or NotIn,
+                              the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                              the values array must be empty. This array is replaced during a strategic
+                              merge patch.
                             items:
                               type: string
                             type: array
+                            x-kubernetes-list-type: atomic
                         required:
                         - key
                         - operator
                         type: object
                       type: array
+                      x-kubernetes-list-type: atomic
                     matchLabels:
                       additionalProperties:
                         type: string
-                      description: matchLabels is a map of {key,value} pairs. A single
-                        {key,value} in the matchLabels map is equivalent to an element
-                        of matchExpressions, whose key field is "key", the operator
-                        is "In", and the values array contains only "value". The requirements
-                        are ANDed.
+                      description: |-
+                        matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                        map is equivalent to an element of matchExpressions, whose key field is "key", the
+                        operator is "In", and the values array contains only "value". The requirements are ANDed.
                       type: object
                   type: object
                   x-kubernetes-map-type: atomic
                 type: array
               downsync:
-                description: '`downsync` selects the objects to bind with the selected
-                  WECs for downsync, and modulates their downsync. An object is selected
-                  if it matches at least one member of this list. When multiple DownsyncPolicyClause
-                  match the same workload object: the `createOnly` bits are ORed together,
-                  and the StatusCollector reference sets are combined by union.'
+                description: |-
+                  `downsync` selects the objects to bind with the selected WECs for downsync,
+                  and modulates their downsync.
+                  An object is selected if it matches at least one member of this list.
+                  When multiple DownsyncPolicyClause match the same workload object:
+                  the `createOnly` bits are ORed together, and the StatusCollector reference
+                  sets are combined by union.
                 items:
-                  description: DownsyncPolicyClause identifies some objects (by a
-                    predicate) and modulates how they are downsynced.
+                  description: |-
+                    DownsyncPolicyClause identifies some objects (by a predicate)
+                    and modulates how they are downsynced.
                   properties:
                     apiGroup:
-                      description: '`apiGroup` is the API group of the referenced
-                        object, empty string for the core API group. `nil` matches
-                        every API group.'
+                      description: |-
+                        `apiGroup` is the API group of the referenced object, empty string for the core API group.
+                        `nil` matches every API group.
                       type: string
                     createOnly:
-                      description: '`createOnly` indicates that in a given WEC, the
-                        object is not to be updated if it already exists.'
+                      description: |-
+                        `createOnly` indicates that in a given WEC, the object is not to be updated
+                        if it already exists.
                       type: boolean
                     namespaceSelectors:
-                      description: '`namespaceSelectors` a list of label selectors.
-                        For a namespaced object, at least one of these label selectors
-                        has to match the labels of the Namespace object that defines
-                        the namespace of the object that this DownsyncObjectTest is
-                        testing. For a cluster-scoped object, at least one of these
-                        label selectors must be `{}`. Empty list is a special case,
-                        it matches every object.'
+                      description: |-
+                        `namespaceSelectors` a list of label selectors.
+                        For a namespaced object, at least one of these label selectors has to match
+                        the labels of the Namespace object that defines the namespace of the object that this DownsyncObjectTest is testing.
+                        For a cluster-scoped object, at least one of these label selectors must be `{}`.
+                        Empty list is a special case, it matches every object.
                       items:
-                        description: A label selector is a label query over a set
-                          of resources. The result of matchLabels and matchExpressions
-                          are ANDed. An empty label selector matches all objects.
-                          A null label selector matches no objects.
+                        description: |-
+                          A label selector is a label query over a set of resources. The result of matchLabels and
+                          matchExpressions are ANDed. An empty label selector matches all objects. A null
+                          label selector matches no objects.
                         properties:
                           matchExpressions:
                             description: matchExpressions is a list of label selector
                               requirements. The requirements are ANDed.
                             items:
-                              description: A label selector requirement is a selector
-                                that contains values, a key, and an operator that
+                              description: |-
+                                A label selector requirement is a selector that contains values, a key, and an operator that
                                 relates the key and values.
                               properties:
                                 key:
@@ -149,71 +158,73 @@ spec:
                                     applies to.
                                   type: string
                                 operator:
-                                  description: operator represents a key's relationship
-                                    to a set of values. Valid operators are In, NotIn,
-                                    Exists and DoesNotExist.
+                                  description: |-
+                                    operator represents a key's relationship to a set of values.
+                                    Valid operators are In, NotIn, Exists and DoesNotExist.
                                   type: string
                                 values:
-                                  description: values is an array of string values.
-                                    If the operator is In or NotIn, the values array
-                                    must be non-empty. If the operator is Exists or
-                                    DoesNotExist, the values array must be empty.
-                                    This array is replaced during a strategic merge
-                                    patch.
+                                  description: |-
+                                    values is an array of string values. If the operator is In or NotIn,
+                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                    the values array must be empty. This array is replaced during a strategic
+                                    merge patch.
                                   items:
                                     type: string
                                   type: array
+                                  x-kubernetes-list-type: atomic
                               required:
                               - key
                               - operator
                               type: object
                             type: array
+                            x-kubernetes-list-type: atomic
                           matchLabels:
                             additionalProperties:
                               type: string
-                            description: matchLabels is a map of {key,value} pairs.
-                              A single {key,value} in the matchLabels map is equivalent
-                              to an element of matchExpressions, whose key field is
-                              "key", the operator is "In", and the values array contains
-                              only "value". The requirements are ANDed.
+                            description: |-
+                              matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                              map is equivalent to an element of matchExpressions, whose key field is "key", the
+                              operator is "In", and the values array contains only "value". The requirements are ANDed.
                             type: object
                         type: object
                         x-kubernetes-map-type: atomic
                       type: array
                     namespaces:
-                      description: '`namespaces` is a list of acceptable names for
-                        the object''s namespace. An entry of `"*"` means that any
-                        namespace is acceptable; this is the only way to match a cluster-scoped
-                        object. If this list contains `"*"` then it should contain
-                        nothing else. Empty list is a special case, it matches every
-                        object.'
+                      description: |-
+                        `namespaces` is a list of acceptable names for the object's namespace.
+                        An entry of `"*"` means that any namespace is acceptable;
+                        this is the only way to match a cluster-scoped object.
+                        If this list contains `"*"` then it should contain nothing else.
+                        Empty list is a special case, it matches every object.
                       items:
                         type: string
                       type: array
                     objectNames:
-                      description: '`objectNames` is a list of object names that match.
-                        An entry of `"*"` means that all match. If this list contains
-                        `"*"` then it should contain nothing else. Empty list is a
-                        special case, it matches every object.'
+                      description: |-
+                        `objectNames` is a list of object names that match.
+                        An entry of `"*"` means that all match.
+                        If this list contains `"*"` then it should contain nothing else.
+                        Empty list is a special case, it matches every object.
                       items:
                         type: string
                       type: array
                     objectSelectors:
-                      description: '`objectSelectors` is a list of label selectors.
-                        At least one of them must match the labels of the object being
-                        tested. Empty list is a special case, it matches every object.'
+                      description: |-
+                        `objectSelectors` is a list of label selectors.
+                        At least one of them must match the labels of the object being tested.
+                        Empty list is a special case, it matches every object.
                       items:
-                        description: A label selector is a label query over a set
-                          of resources. The result of matchLabels and matchExpressions
-                          are ANDed. An empty label selector matches all objects.
-                          A null label selector matches no objects.
+                        description: |-
+                          A label selector is a label query over a set of resources. The result of matchLabels and
+                          matchExpressions are ANDed. An empty label selector matches all objects. A null
+                          label selector matches no objects.
                         properties:
                           matchExpressions:
                             description: matchExpressions is a list of label selector
                               requirements. The requirements are ANDed.
                             items:
-                              description: A label selector requirement is a selector
-                                that contains values, a key, and an operator that
+                              description: |-
+                                A label selector requirement is a selector that contains values, a key, and an operator that
                                 relates the key and values.
                               properties:
                                 key:
@@ -221,43 +232,43 @@ spec:
                                     applies to.
                                   type: string
                                 operator:
-                                  description: operator represents a key's relationship
-                                    to a set of values. Valid operators are In, NotIn,
-                                    Exists and DoesNotExist.
+                                  description: |-
+                                    operator represents a key's relationship to a set of values.
+                                    Valid operators are In, NotIn, Exists and DoesNotExist.
                                   type: string
                                 values:
-                                  description: values is an array of string values.
-                                    If the operator is In or NotIn, the values array
-                                    must be non-empty. If the operator is Exists or
-                                    DoesNotExist, the values array must be empty.
-                                    This array is replaced during a strategic merge
-                                    patch.
+                                  description: |-
+                                    values is an array of string values. If the operator is In or NotIn,
+                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                    the values array must be empty. This array is replaced during a strategic
+                                    merge patch.
                                   items:
                                     type: string
                                   type: array
+                                  x-kubernetes-list-type: atomic
                               required:
                               - key
                               - operator
                               type: object
                             type: array
+                            x-kubernetes-list-type: atomic
                           matchLabels:
                             additionalProperties:
                               type: string
-                            description: matchLabels is a map of {key,value} pairs.
-                              A single {key,value} in the matchLabels map is equivalent
-                              to an element of matchExpressions, whose key field is
-                              "key", the operator is "In", and the values array contains
-                              only "value". The requirements are ANDed.
+                            description: |-
+                              matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                              map is equivalent to an element of matchExpressions, whose key field is "key", the
+                              operator is "In", and the values array contains only "value". The requirements are ANDed.
                             type: object
                         type: object
                         x-kubernetes-map-type: atomic
                       type: array
                     resources:
-                      description: '`resources` is a list of lowercase plural names
-                        for the sorts of objects to match. An entry of `"*"` means
-                        that all match. If this list contains `"*"` then it should
-                        contain nothing else. Empty list is a special case, it matches
-                        every object.'
+                      description: |-
+                        `resources` is a list of lowercase plural names for the sorts of objects to match.
+                        An entry of `"*"` means that all match.
+                        If this list contains `"*"` then it should contain nothing else.
+                        Empty list is a special case, it matches every object.
                       items:
                         type: string
                       type: array
@@ -268,32 +279,38 @@ spec:
                         type: string
                       type: array
                     wantSingletonReportedState:
-                      description: "WantSingletonReportedState, in short, indicates
-                        an expectation that the matching workload objects are distributed
-                        to exactly one WEC and requests that the `.status` of such
-                        objects propagate from the WEC to the WDS. \n For a precise
-                        description, start with a couple of definitions. For a given
-                        workload object, _singleton status return is requested_ if
-                        and only if there exists at least one BindingPolicy or Binding
+                      description: |-
+                        WantSingletonReportedState, in short, indicates an expectation
+                        that the matching workload objects are distributed to exactly one WEC
+                        and requests that the `.status` of such objects propagate from the WEC
+                        to the WDS.
+
+
+                        For a precise description, start with a couple of definitions.
+                        For a given workload object, _singleton status return is requested_
+                        if and only if there exists at least one BindingPolicy or Binding
                         that has `wantSingletonReportedState==true` in a clause that
-                        matches/references the workload object. \n The _qualified
-                        WEC set_ of a workload object is the set of WECs that are
-                        associated with that workload object by at least one BindingPolicy
-                        or Binding that has `wantSingletonReportedState==true` in
-                        a clause that matches/references the workload object. \n For
-                        a given workload object, while singleton status return is
-                        requested, KubeStellar maintains a label on the object whose
-                        name (key) is `kubestellar.io/executing-count` and whose value
-                        is a string representation of the size of the qualified WEC
-                        set of that object. While singleton status return is _not_
-                        requested, KubeStellar suppresses the existence of a label
-                        with that name (key). While singleton status return is requested
-                        _and_ the size of the qualified WEC set is 1, KubeStellar
-                        propagates the object's `.status` from that WEC to the `.status`
-                        section of the object in the WDS. While either singleton status
-                        return is NOT requested or the size of the qualified WEC set
-                        is NOT 1, there is nothing in the `.status` of the object
-                        in the WDS that was propagated there from a WEC by KubeStellar."
+                        matches/references the workload object.
+
+
+                        The _qualified WEC set_ of a workload object is the set of WECs that are
+                        associated with that workload object by at least one BindingPolicy or Binding
+                        that has `wantSingletonReportedState==true` in a clause that
+                        matches/references the workload object.
+
+
+                        For a given workload object, while singleton status return is requested,
+                        KubeStellar maintains a label on the object whose name (key) is
+                        `kubestellar.io/executing-count` and whose value is a string representation
+                        of the size of the qualified WEC set of that object.
+                        While singleton status return is _not_ requested, KubeStellar suppresses
+                        the existence of a label with that name (key).
+                        While singleton status return is requested _and_ the size of the qualified
+                        WEC set is 1, KubeStellar propagates the object's `.status` from that WEC
+                        to the `.status` section of the object in the WDS.
+                        While either singleton status return is NOT requested or the size of the
+                        qualified WEC set is NOT 1, there is nothing in the `.status` of the object
+                        in the WDS that was propagated there from a WEC by KubeStellar.
                       type: boolean
                   type: object
                 type: array

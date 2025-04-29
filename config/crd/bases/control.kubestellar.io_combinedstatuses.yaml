@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: combinedstatuses.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -35,28 +35,35 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: 'CombinedStatus holds the combined status from the WECs for one
-          particular (workload object, BindingPolicy) pair. The namespace of the CombinedStatus
-          object is the namespace of the workload object, or "kubestellar-report"
-          if the workload object has no namespace. The name of the CombinedStatus
-          object is the concatenation of: - the UID of the workload object - the string
-          "." - the UID of the BindingPolicy object. The CombinedStatus object has
-          the following labels: - "status.kubestellar.io/api-group" holding the API
-          Group (not verison) of the workload object; - "status.kubestellar.io/resource"
-          holding the resource (lowercase plural) of the workload object; - "status.kubestellar.io/namespace"
-          holding the namespace of the workload object; - "status.kubestellar.io/name"
-          holding the name of the workload object; - "status.kubestellar.io/binding-policy"
-          holding the name of the BindingPolicy object.'
+        description: |-
+          CombinedStatus holds the combined status from the WECs for one particular (workload object, BindingPolicy) pair.
+          The namespace of the CombinedStatus object is the namespace of the workload object,
+          or "kubestellar-report" if the workload object has no namespace.
+          The name of the CombinedStatus object is the concatenation of:
+          - the UID of the workload object
+          - the string "."
+          - the UID of the BindingPolicy object.
+          The CombinedStatus object has the following labels:
+          - "status.kubestellar.io/api-group" holding the API Group (not verison) of the workload object;
+          - "status.kubestellar.io/resource" holding the resource (lowercase plural) of the workload object;
+          - "status.kubestellar.io/namespace" holding the namespace of the workload object;
+          - "status.kubestellar.io/name" holding the name of the workload object;
+          - "status.kubestellar.io/binding-policy" holding the name of the BindingPolicy object.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -89,14 +96,16 @@ spec:
                 name:
                   type: string
                 rowErrors:
-                  description: RowErrors reports on some of the errors in evaluating
-                    expressions in the StatusCollectorSpec. Only a limited number
-                    of errors will appear here. For every column for which there is
-                    an error, there will be at least one entry here. In the input
-                    to aggregation operations, rows with errors are omitted.
+                  description: |-
+                    RowErrors reports on some of the errors in evaluating expressions in the
+                    StatusCollectorSpec. Only a limited number of errors will appear here.
+                    For every column for which there is an error, there will be at least one
+                    entry here.
+                    In the input to aggregation operations, rows with errors are omitted.
                   items:
-                    description: RowEvaluationError reports an error that is specific
-                      to a WEC and a column.
+                    description: |-
+                      RowEvaluationError reports an error that is specific to a WEC
+                      and a column.
                     properties:
                       columnName:
                         description: ColumnName is the empty string for the filter

@@ -34,11 +34,13 @@ fi
 
 source "${CODE_GEN_DIR}/kube_codegen.sh"
 
+PKG_ROOT="github.com/kubestellar/kubestellar"
+
 rm -rf "${SCRIPT_ROOT}/pkg/generated"
 
 kube::codegen::gen_client \
     --with-watch \
-    --input-pkg-root github.com/kubestellar/kubestellar/api \
-    --output-pkg-root github.com/kubestellar/kubestellar/pkg/generated \
-    --output-base "${SCRIPT_ROOT}/../../.." \
-    --boilerplate "${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt"
+    --output-dir "${SCRIPT_ROOT}/pkg/generated" \
+    --output-pkg    "${PKG_ROOT}/pkg/generated" \
+    --boilerplate "${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt" \
+    ${SCRIPT_ROOT}/api
