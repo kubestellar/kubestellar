@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2afb09e1.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -3500,7 +3500,7 @@ You can use the <a href="#automated-check-of-prerequisites-for-kubestellar">chec
 follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#upgrading-kubeflex">these instructions</a>. At the end of the install make sure that the kubeflex CLI, kflex, is in your <code>$PATH</code>.</p>
 </li>
 <li>
-<p><strong>OCM CLI (clusteradm)</strong> 0.7 &lt;= version <strong>&lt; 0.11</strong>.
+<p><strong>OCM CLI (clusteradm)</strong> 0.10 &lt;= version <strong>&lt; 0.11</strong>.
     To install the latest acceptable version of the OCM CLI use:</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh<span class="o">)</span><span class="w"> </span><span class="m">0</span>.10.1
 </code></pre></div>
@@ -3515,7 +3515,7 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 <li>
 <p><strong>helm</strong> version &gt;= 3. To deploy the Kubestellar and kubeflex charts. Your <code>helm</code> command must not be broken; see <a href="../knownissue-helm-ghcr/">the known issue</a>.</p>
 </li>
-<li><a href="https://kubernetes.io/docs/tasks/tools/"><strong>kubectl</strong></a> version &gt;= 1.27 - to access the kubernetes clusters</li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/"><strong>kubectl</strong></a> version &gt;= 1.29 - to access the kubernetes clusters</li>
 </ul>
 <h2 id="additional-software-for-the-getting-started-setup">Additional Software for the Getting Started setup<a class="headerlink" href="#additional-software-for-the-getting-started-setup" title="Permanent link">#</a></h2>
 <ul>
@@ -3533,7 +3533,7 @@ follow <a href="https://github.com/kubestellar/kubeflex/blob/main/docs/users.md#
 </ul>
 <h2 id="additional-software-for-building-kubestellar-from-source-and-testing">Additional Software For Building KubeStellar from Source and Testing<a class="headerlink" href="#additional-software-for-building-kubestellar-from-source-and-testing" title="Permanent link">#</a></h2>
 <ul>
-<li><a href="https://go.dev/doc/install"><strong>go</strong></a> version 1.21 or higher - to build Kubestellar</li>
+<li><a href="https://go.dev/doc/install"><strong>go</strong></a> version 1.23 or higher - to build Kubestellar</li>
 <li><a href="https://www.gnu.org/software/make/"><strong>GNU make</strong></a> version &gt;= 3.5 - to build Kubestellar and create the Kubestellar container images</li>
 <li><a href="https://ko.build/install/"><strong>ko</strong></a> version &gt;= 0.15 - to create some of the Kubestellar container images</li>
 <li><strong>docker</strong> (or equivalent that implements <code>docker buildx</code>) (client version &gt;= 20) - to create other KubeStellar container images</li>
