@@ -26,7 +26,7 @@ registry=quay.io/kubestellar
 platform=linux/amd64,linux/arm64,linux/ppc64le
 
 get_latest_version() {
-    curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt
+    curl -sL https://dl.k8s.io/release/stable.txt
 }
 
 while (( $# > 0 )); do
