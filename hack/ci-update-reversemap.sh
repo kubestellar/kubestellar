@@ -1,9 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# author: @rxinui
+# Copyright 2025 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Purpose: update the reverse map $REVERSEMAP_FILE from actions used in $GITHUB_WORKFLOWS_PATH
+
+# Usage: $0
+# Working directory does not matter.
 
 # Define the required version of yq
-GITHUB_PAT=
+GITHUB_PAT=                                                 # API GITHUB TOKEN
 GITHUB_WORKFLOWS_PATH="./.github/workflows/"
 REVERSEMAP_FILE="./.github/.reversemap.yml"
 YQ_REQUIRED_VERSION="v4.45.1"
