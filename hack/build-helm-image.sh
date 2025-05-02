@@ -75,6 +75,12 @@ git clone -b "v$helm_version" --depth 1 https://github.com/helm/helm.git "$helm_
 
 cd "$helm_folder"
 
+case "$helm_version" in
+    (3.16.*)
+	go get golang.org/x/net@v0.38.0 github.com/containerd/containerd@v1.7.27
+	go mod tidy;;
+esac
+
 export KO_DOCKER_REPO=$registry
 
 ko build -B ./cmd/helm -t $helm_version --sbom=none --platform $platform
