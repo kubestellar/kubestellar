@@ -1,0 +1,85 @@
+actions/checkout:
+  sha: 11bd71901bbe5b1630ceea73d27597364c9af683
+  sha-url: https://github.com/actions/checkout/commit/11bd71901bbe5b1630ceea73d27597364c9af683
+  tag: v4.2.2
+  tag-url: https://github.com/actions/checkout/tree/v4.2.2
+actions/add-to-project:
+  sha: 244f685bbc3b7adfa8466e08b698b5577571133e
+  sha-url: https://github.com/actions/add-to-project/commit/244f685bbc3b7adfa8466e08b698b5577571133e
+  tag: v1.0.2
+  tag-url: https://github.com/actions/add-to-project/tree/v1.0.2
+titoportas/update-project-fields:
+  sha: 421a54430b3cdc9eefd8f14f9ce0142ab7678751
+  sha-url: https://github.com/titoportas/update-project-fields/commit/421a54430b3cdc9eefd8f14f9ce0142ab7678751
+  tag: v0.1.0
+  tag-url: https://github.com/titoportas/update-project-fields/tree/v0.1.0
+ScholliYT/Broken-Links-Crawler-Action:
+  sha: b3fb123879e5a6a854d6fda5c33df2d94d41092c
+  sha-url: https://github.com/ScholliYT/Broken-Links-Crawler-Action/commit/b3fb123879e5a6a854d6fda5c33df2d94d41092c
+  tag: v3.3.1
+  tag-url: https://github.com/ScholliYT/Broken-Links-Crawler-Action/tree/v3.3.1
+JasonEtco/create-an-issue:
+  sha: 1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
+  sha-url: https://github.com/JasonEtco/create-an-issue/commit/1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
+  tag: v2
+  tag-url: https://github.com/JasonEtco/create-an-issue/tree/v2
+actions/setup-python:
+  sha: a26af69be951a213d495a4c3e4e4022e16d87065
+  sha-url: https://github.com/actions/setup-python/commit/a26af69be951a213d495a4c3e4e4022e16d87065
+  tag: v5
+  tag-url: https://github.com/actions/setup-python/tree/v5
+actions/setup-go:
+  sha: 0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
+  sha-url: https://github.com/actions/setup-go/commit/0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
+  tag: v5
+  tag-url: https://github.com/actions/setup-go/tree/v5
+anchore/sbom-action/download-syft:
+  sha: 9f7302141466aa6482940f15371237e9d9f4c34a
+  sha-url: https://github.com/anchore/sbom-action/commit/9f7302141466aa6482940f15371237e9d9f4c34a
+  tag: v0.19.0
+  tag-url: https://github.com/anchore/sbom-action/tree/v0.19.0
+goreleaser/goreleaser-action:
+  sha: 9c156ee8a17a598857849441385a2041ef570552
+  sha-url: https://github.com/goreleaser/goreleaser-action/commit/9c156ee8a17a598857849441385a2041ef570552
+  tag: v6
+  tag-url: https://github.com/goreleaser/goreleaser-action/tree/v6
+azure/setup-helm:
+  sha: 29960d0f5f19214b88e1d9ba750a9914ab0f1a2f
+  sha-url: https://github.com/azure/setup-helm/commit/29960d0f5f19214b88e1d9ba750a9914ab0f1a2f
+  tag: v4
+  tag-url: https://github.com/azure/setup-helm/tree/v4
+docker/login-action:
+  sha: 74a5d142397b4f367a81961eba4e8cd7edddf772
+  sha-url: https://github.com/docker/login-action/commit/74a5d142397b4f367a81961eba4e8cd7edddf772
+  tag: v3
+  tag-url: https://github.com/docker/login-action/tree/v3
+actions/first-interaction:
+  sha: 3c71ce730280171fd1cfb57c00c774f8998586f7
+  sha-url: https://github.com/actions/first-interaction/commit/3c71ce730280171fd1cfb57c00c774f8998586f7
+  tag: v1
+  tag-url: https://github.com/actions/first-interaction/tree/v1
+azure/setup-kubectl:
+  sha: 3e0aec4d80787158d308d7b364cb1b702e7feb7f
+  sha-url: https://github.com/azure/setup-kubectl/commit/3e0aec4d80787158d308d7b364cb1b702e7feb7f
+  tag: v4
+  tag-url: https://github.com/azure/setup-kubectl/tree/v4
+ko-build/setup-ko:
+  sha: d006021bd0c28d1ce33a07e7943d48b079944c8d
+  sha-url: https://github.com/ko-build/setup-ko/commit/d006021bd0c28d1ce33a07e7943d48b079944c8d
+  tag: v0.9
+  tag-url: https://github.com/ko-build/setup-ko/tree/v0.9
+technote-space/assign-author:
+  sha: 9558557c5c4816f38bd06176fbc324ba14bb3160
+  sha-url: https://github.com/technote-space/assign-author/commit/9558557c5c4816f38bd06176fbc324ba14bb3160
+  tag: v1.6.2
+  tag-url: https://github.com/technote-space/assign-author/tree/v1.6.2
+rojopolis/spellcheck-github-actions:
+  sha: 23dc186319866e1de224f94fe1d31b72797aeec7
+  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/23dc186319866e1de224f94fe1d31b72797aeec7
+  tag: 0.48.0
+  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.48.0
+actions/upload-artifact:
+  sha: ea165f8d65b6e75b540449e92b4886f43607fa02
+  sha-url: https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02
+  tag: v4
+  tag-url: https://github.com/actions/upload-artifact/tree/v4

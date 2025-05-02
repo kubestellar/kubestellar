@@ -68,7 +68,7 @@ jobs:
             echo workflow_dispatch - running on version ${{ steps.extract_branch.outputs.version }}
         if: github.event_name != 'pull_request' && github.event_name != 'push'
 
-      - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
+      - uses: ScholliYT/Broken-Links-Crawler-Action@b3fb123879e5a6a854d6fda5c33df2d94d41092c 
         with:
           website_url: https://${{ steps.extract_branch.outputs.site }}/${{ steps.extract_branch.outputs.version }}
           include_url_prefix: https://${{ steps.extract_branch.outputs.site }}/${{ steps.extract_branch.outputs.version }}
@@ -86,7 +86,7 @@ jobs:
         if: github.event_name == 'pull_request' 
 #         $GITHUB_BASE_REF
 
-      - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
+      - uses: ScholliYT/Broken-Links-Crawler-Action@b3fb123879e5a6a854d6fda5c33df2d94d41092c 
         with:
           website_url: https://docs.kubestellar.io/${{ github.event.pull_request.base.ref }}
           include_url_prefix: https://docs.kubestellar.io/${{ github.event.pull_request.base.ref }}
@@ -103,7 +103,7 @@ jobs:
         run: echo push - running on branch ${{ github.event.push.base.ref }}
         if: github.event_name == 'push' 
 
-      - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
+      - uses: ScholliYT/Broken-Links-Crawler-Action@b3fb123879e5a6a854d6fda5c33df2d94d41092c 
         with:
           website_url: https://docs.kubestellar.io/${{ github.event.push.base.ref }}
           include_url_prefix: https://docs.kubestellar.io/${{ github.event.push.base.ref }}
