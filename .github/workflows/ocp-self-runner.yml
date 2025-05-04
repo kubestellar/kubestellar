@@ -10,20 +10,20 @@ jobs:
     name: ginkgo tests
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
 
-      - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
+      - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b 
         with:
           go-version: v1.22
           cache: true
 
       - name: Set up Helm
-        uses: azure/setup-helm@37dd2562cae2f186a3dc13f2bb5d4abe08dbfec4
+        uses: azure/setup-helm@37dd2562cae2f186a3dc13f2bb5d4abe08dbfec4 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f
+        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f 
         id: install
 
       - name: Install dependencies
@@ -62,20 +62,20 @@ jobs:
     name: bash script tests
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
 
-      - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
+      - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b 
         with:
           go-version: v1.22
           cache: true
 
       - name: Set up Helm
-        uses: azure/setup-helm@37dd2562cae2f186a3dc13f2bb5d4abe08dbfec4
+        uses: azure/setup-helm@37dd2562cae2f186a3dc13f2bb5d4abe08dbfec4 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f
+        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f 
         id: install
 
       - name: Install dependencies
