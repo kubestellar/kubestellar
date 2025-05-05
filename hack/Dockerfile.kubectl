@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal
+FROM registry.access.redhat.com/ubi9/ubi-minimal
 
 ARG TARGETOS
 ARG TARGETARCH
 ARG VERSION
 
 RUN [ "$VERSION" == "" ] && VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt) ; \
-    curl \
-	-L https://storage.googleapis.com/kubernetes-release/release/v${VERSION#v}/bin/${TARGETOS}/${TARGETARCH}/kubectl \
+    curl -L \
+        "https://dl.k8s.io/release/v${VERSION#v}/bin/${TARGETOS}/${TARGETARCH}/kubectl" \
 	-o /usr/bin/kubectl && \
 	chmod +x /usr/bin/kubectl
 

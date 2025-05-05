@@ -75,7 +75,6 @@ docker buildx create --name kubestellar --platform ${platform} --use
 docker buildx build . \
     --push \
     --platform ${platform} \
-    --tag quay.io/kubestellar/kubectl:${version#v} \
     --build-arg version=${version#v} \
     --tag quay.io/kubestellar/kubectl:${version#v} \
     -f "$(dirname "$0")/Dockerfile.kubectl"
