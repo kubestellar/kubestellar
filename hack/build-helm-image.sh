@@ -76,7 +76,7 @@ git clone -b "v$helm_version" --depth 1 https://github.com/helm/helm.git "$helm_
 cd "$helm_folder"
 
 case "$helm_version" in
-    (3.16.*)
+    (3.1[56].*)
 	go get golang.org/x/net@v0.38.0 github.com/containerd/containerd@v1.7.27 golang.org/x/oauth2@v0.30.0
 	go mod tidy;;
 esac
