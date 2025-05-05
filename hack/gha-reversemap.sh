@@ -20,11 +20,12 @@
 # Working directory must be the project root
 
 # Define the required version of yq
-GITHUB_TOKEN=
+# GITHUB_TOKEN=
 GITHUB_WORKFLOWS_PATH="./.github/workflows"
 REVERSEMAP_FILE=".gha-reversemap.yml"
 YQ_REQUIRED_VERSION="v4.45.1"
 GIT_COMMITSHA_LENGTH=40
+TMP_OUTPUT="/tmp/$(date -u -Iseconds | cut -d '+' -f1).json"
 
 ERR_YQ_DOWNLOAD_FAILED=50
 ERR_YQ_NOT_INSTALLED=60
@@ -43,22 +44,15 @@ Example:
     $0  update actions/checkout
 
 Operations:
-    apply-reversemap        [...WORKFLOW_FILE]          -   Apply the commit sha of every actions listed in the reversemap 
-                                                            as the version to use in all github workflows
+    apply-reversemap        [WORKFLOW_FILE...]          -   Update the given workflow files with the information in the reversemap
+                                                            file; if no workflow files are given then all are updated
 
-    update-action-version   ACTION_REF [...ACTION_REF]  -   Update the version of the given action reference within the reversemap
+    update-action-version   ACTION_REF...               -   Update the version of the given action reference within the reversemap
                                                             (sha, tag, urls) to its latest regular release tag
 
-    update-reversemap       [...WORKFLOW_FILE]          -   Update the reverse map values (sha, tag, urls) from the 
-                                                            actions' version used in the github workflows
-
-Arguments:
-    apply-reversemap:
-        WORKFLOW_FILE                      -   Path of the workflow file. Must be *.yml
-    update-action-version:
-        ACTION_REF                         -   Expected to be formatted as "{gh_owner}/{gh_repo}"    
-    update-reversemap:
-        WORKFLOW_FILE                      -   Path of the workflow file. Must be *.yml
+    update-reversemap       [WORKFLOW_FILE...]          -   Update the reverse map values (sha, tag, urls) with the information 
+                                                            in the github workflow; if no workflow files are specified then 
+                                                            all workflows are used
 
 EOF
 }
@@ -91,36 +85,11 @@ _check_yq_version() {
     fi
 }
 
-# Function to download and install yq
-_install_yq() {
-    os=$(uname | tr '[:upper:]' '[:lower:]')
-    arch=$(uname -m)
-
-    if [[ "$arch" == "x86_64" ]]; then
-        arch="amd64"
-    elif [[ "$arch" == "aarch64" ]]; then
-        arch="arm64"
-    elif [[ "$arch" == "arm64" ]]; then
-        arch="arm64"
-    else
-        _exit_with_error $ERR_ARCH_UNSUPPORTED "Unsupported architecture: $arch"
+# Check github token
+_check_github_token(){
+    if [[ -z $GITHUB_TOKEN ]]; then
+        _exit_with_error $ERR_GITHUB_TOKEN_INVALID "environment variable GITHUB_TOKEN is not set."
     fi
-
-    yq_binary="yq_${os}_${arch}"
-    yq_binary_url="https://github.com/mikefarah/yq/releases/download/${YQ_REQUIRED_VERSION}/${yq_binary}.tar.gz"
-
-    _loginfo "Downloading yq $YQ_REQUIRED_VERSION for $os/$arch ..."
-    curl -L -o "/tmp/${yq_binary}.tar.gz" "$yq_binary_url"
-
-    if [[ $? -ne 0 ]]; then
-        _exit_with_error $ERR_YQ_DOWNLOAD_FAILED "Failed to download yq."
-    fi
-
-    tar xzf "/tmp/${yq_binary}.tar.gz" -C /tmp
-    sudo chmod +x "/tmp/${yq_binary}"
-    sudo mv "/tmp/${yq_binary}" /usr/local/bin/yq
-
-    echo "yq $YQ_REQUIRED_VERSION installed successfully."
 }
 
 # Get commitsha from an action ref upstream
@@ -128,7 +97,6 @@ _fetch_sha_from_upstream_ref() {
     action_ref=$1
     tag_or_branch=$2
     action_ref_safe=$(echo "$action_ref" | cut -d '/' -f 1,2)
-    TMP_OUTPUT=/tmp/output.json
     API_GITHUB_BRANCH="https://api.github.com/repos/${action_ref_safe}/git/refs/heads/${tag_or_branch}"
     API_GITHUB_TAG="https://api.github.com/repos/${action_ref_safe}/git/refs/tags/${tag_or_branch}"
     HTTP_STATUS=$(curl -o "$TMP_OUTPUT" -s -w "%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" "$API_GITHUB_TAG")
@@ -196,12 +164,12 @@ _get_sha_from_reversemap() {
     action_ref=$1
     query=$(yq ".\"$action_ref\".sha" $REVERSEMAP_FILE)
     if [[ $? -ne 0 ]]; then
-        _exit_with_error "$query"
+        _exit_with_error "no sha has been found for $action_ref in $REVERSEMAP_FILE"
     fi
     _return "$query"
 }
 
-# Apply the commit sha of every actions listed in the reversemap as the version to use in all github workflows
+# Apply the commit sha of every action listed in the reversemap as the version to use in all github workflows
 run_apply_reversemap() {
     files=$@
     for file in $files; do
@@ -240,8 +208,12 @@ run_update_reversemap() {
 run_cli() {
     operation_arg=$1
     case $operation_arg in
+    "help")
+        help
+        ;;
     "apply-reversemap")
         shift
+        _check_yq_version
         files=$@
         if [[ "$#" -eq 0 ]]; then
             files="$GITHUB_WORKFLOWS_PATH/*.yml"
@@ -251,6 +223,8 @@ run_cli() {
         ;;
     "update-action-version")
         shift
+        _check_github_token
+        _check_yq_version
         action_refs=$@
         if [[ "$#" -eq 0 ]]; then
             _exit_with_error 1 "missing action ref to update. Format must be '{gh_owner}/{gh_repo}'"
@@ -260,6 +234,8 @@ run_cli() {
         ;;
     "update-reversemap")
         shift
+        _check_github_token
+        _check_yq_version
         files=$@
         if [[ "$#" -eq 0 ]]; then
             files="$GITHUB_WORKFLOWS_PATH/*.yml"
@@ -276,15 +252,4 @@ run_cli() {
 }
 
 # Execute the main program
-main() {
-    if [[ -z $GITHUB_TOKEN ]]; then
-        _exit_with_error $ERR_GITHUB_TOKEN_INVALID "environment variable GITHUB_TOKEN is not set."
-    fi
-    _check_yq_version
-    if [[ $? -eq $ERR_YQ_NOT_INSTALLED ]]; then
-        _install_yq
-    fi
-    run_cli $@
-}
-
-main $@
+run_cli $@

@@ -1,8 +1,8 @@
-actions/checkout:
+  actions/checkout:
   sha: 11bd71901bbe5b1630ceea73d27597364c9af683
   sha-url: https://github.com/actions/checkout/commit/11bd71901bbe5b1630ceea73d27597364c9af683
-  tag: v4
-  tag-url: https://github.com/actions/checkout/tree/v4
+  tag: v4.2.2
+  tag-url: https://github.com/actions/checkout/tree/v4.2.2
 actions/add-to-project:
   sha: 244f685bbc3b7adfa8466e08b698b5577571133e
   sha-url: https://github.com/actions/add-to-project/commit/244f685bbc3b7adfa8466e08b698b5577571133e
@@ -14,10 +14,10 @@ titoportas/update-project-fields:
   tag: v0.1.0
   tag-url: https://github.com/titoportas/update-project-fields/tree/v0.1.0
 ScholliYT/Broken-Links-Crawler-Action:
-  sha: a074e6a0c83f29560300752af773c7356041ceb4
-  sha-url: https://github.com/ScholliYT/Broken-Links-Crawler-Action/commit/a074e6a0c83f29560300752af773c7356041ceb4
-  tag: fix-http-redirects
-  tag-url: https://github.com/ScholliYT/Broken-Links-Crawler-Action/tree/fix-http-redirects
+  sha: b3fb123879e5a6a854d6fda5c33df2d94d41092c
+  sha-url: https://github.com/ScholliYT/Broken-Links-Crawler-Action/commit/b3fb123879e5a6a854d6fda5c33df2d94d41092c
+  tag: v3.3.1
+  tag-url: https://github.com/ScholliYT/Broken-Links-Crawler-Action/tree/v3.3.1
 JasonEtco/create-an-issue:
   sha: 1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
   sha-url: https://github.com/JasonEtco/create-an-issue/commit/1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
@@ -44,8 +44,8 @@ goreleaser/goreleaser-action:
   tag: v6
   tag-url: https://github.com/goreleaser/goreleaser-action/tree/v6
 azure/setup-helm:
-  sha: 37dd2562cae2f186a3dc13f2bb5d4abe08dbfec4
-  sha-url: https://github.com/azure/setup-helm/commit/37dd2562cae2f186a3dc13f2bb5d4abe08dbfec4
+  sha: 29960d0f5f19214b88e1d9ba750a9914ab0f1a2f
+  sha-url: https://github.com/azure/setup-helm/commit/29960d0f5f19214b88e1d9ba750a9914ab0f1a2f
   tag: v4
   tag-url: https://github.com/azure/setup-helm/tree/v4
 docker/login-action:
@@ -54,8 +54,8 @@ docker/login-action:
   tag: v3
   tag-url: https://github.com/docker/login-action/tree/v3
 actions/first-interaction:
-  sha: fb2402657b4a28582200150d0a145671d0e50597
-  sha-url: https://github.com/actions/first-interaction/commit/fb2402657b4a28582200150d0a145671d0e50597
+  sha: 3c71ce730280171fd1cfb57c00c774f8998586f7
+  sha-url: https://github.com/actions/first-interaction/commit/3c71ce730280171fd1cfb57c00c774f8998586f7
   tag: v1
   tag-url: https://github.com/actions/first-interaction/tree/v1
 azure/setup-kubectl:
