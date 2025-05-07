@@ -51,7 +51,7 @@ jobs:
             echo workflow_dispatch - running on branch ${{ steps.extract_branch.outputs.branch }}
             echo workflow_dispatch - running on version ${{ steps.extract_branch.outputs.version }}
 
-      - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
+      - uses: ScholliYT/Broken-Links-Crawler-Action@b3fb123879e5a6a854d6fda5c33df2d94d41092c 
         with:
           website_url: https://${{ steps.extract_branch.outputs.site }}/${{ steps.extract_branch.outputs.version }}
           include_url_prefix: "https:"
