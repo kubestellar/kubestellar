@@ -1,14 +1,33 @@
-# Installation Errors and Solutions
+# Kind host not configured for more than two clusters
 
-## Error: `sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288`
+[Kind](https://kind.sigs.k8s.io/) uses a docker-in-docker technique to
+create multiple Kubernetes clusters on your host. But, in order for
+this to work for three or more clusters, the host running Docker
+typically needs an expanded configuration. This is mostly described in
+[a known issue of
+kind](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files). However,
+that document does not mention the additional complexity that arises
+when your host is a Mac, which does not natively run containers and so
+uses a virtual machine with a Linux guest OS.
 
-### Cause
-This error occurs because the current value of `fs.inotify.max_user_watches` is too low. This setting controls the maximum number of file watches that a user can create.
+## Symptoms
 
-### Solution
-To resolve this error, you need to increase the value of `fs.inotify.max_user_watches`. Follow the steps below:
+Many KubeStellar setup paths check for the needed configuration. When
+the check fails, you get an error message like the following.
 
-#### For Rancher Desktop
+```
+sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288
+```
+
+If you avoid the check but the configuration is not expanded then the
+symptom will most likely be setup ceasing to make progress at some
+point. Or maybe other errors about things not happening or things not
+existing.
+
+## Solution
+To resolve this error, you need to increase the value of `fs.inotify.max_user_watches` and/or `fs.inotify.max_user_instances`. Follow the steps below:
+
+### For Rancher Desktop
 1. Open the configuration file:
    ```sh
    vi "~/Library/Application Support/rancher-desktop/lima/_config/override.yaml"
@@ -20,14 +39,16 @@ To resolve this error, you need to increase the value of `fs.inotify.max_user_wa
    - mode: system
      script: |
        #!/bin/sh
-       echo "fs.inotify.max_user_watches=1048576" > /etc/sysctl.d/fs.inotify.conf
-       echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.d/fs.inotify.conf
-       sysctl -p /etc/sysctl.d/fs.inotify.conf
+       sysctl fs.inotify.max_user_watches=524288
+       sysctl fs.inotify.max_user_instances=512
    ```
 
 3. Restart Rancher Desktop.
 
-#### For Docker Runtimes
+### Docker on Linux
+
+The resolution in the [kind known issue](https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files) can be used directly.
+
 1. Create a new configuration file:
    ```sh
    sudo vi /etc/sysctl.d/99-sysctl.conf
@@ -43,5 +64,3 @@ To resolve this error, you need to increase the value of `fs.inotify.max_user_wa
    ```sh
    sudo sysctl -p /etc/sysctl.d/99-sysctl.conf
    ```
-
-More details can be found [here](https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files).

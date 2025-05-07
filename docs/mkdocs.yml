@@ -73,7 +73,8 @@ nav:
               - Kind needs OS reconfig: direct/knownissue-kind-config.md
               - Authorization failure while fetching Helm chart from ghcr.io: direct/knownissue-helm-ghcr.md
               - Missing results in a CombinedStatus object: direct/knownissue-collector-miss.md
-              - Increase Inotify Watches: direct/installation-errors.md
+              - Kind host not configured for more than two clusters: direct/installation-errors.md
+              - Insufficient CPU for your clusters: direct/knownissue-cpu-insufficient-for-its1.md
       - UI (User Interface): ui-docs/ui-overview.md
       - Teardown: direct/teardown.md
   - Contributing:
