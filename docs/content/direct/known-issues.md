@@ -19,3 +19,7 @@ The symptom is that attempting to instantiate the core Helm chart gets an author
 ## Missing results in a CombinedStatus object
 
 The symptom is a missing entry in the `results` of a `CombinedStatus` object. See [Missing results in a CombinedStatus object](knownissue-collector-miss.md).
+
+## Insufficient CPU for its1 on KinD cluster
+
+The symptom is kind cluster resource capacity being insufficient for its1's `vcluster-0` pod to be scheduled. See [cpu insufficient for its1](knownissue-cpu-insufficient-fort-its1.md)
