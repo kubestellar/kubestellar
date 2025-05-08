@@ -44,10 +44,10 @@ goreleaser/goreleaser-action:
   tag: v6
   tag-url: https://github.com/goreleaser/goreleaser-action/tree/v6
 azure/setup-helm:
-  sha: 29960d0f5f19214b88e1d9ba750a9914ab0f1a2f
-  sha-url: https://github.com/azure/setup-helm/commit/29960d0f5f19214b88e1d9ba750a9914ab0f1a2f
-  tag: v4
-  tag-url: https://github.com/azure/setup-helm/tree/v4
+  sha: b9e51907a09c216f16ebe8536097933489208112
+  sha-url: https://github.com/azure/setup-helm/commit/b9e51907a09c216f16ebe8536097933489208112
+  tag: v4.3.0
+  tag-url: https://github.com/azure/setup-helm/tree/v4.3.0
 docker/login-action:
   sha: 74a5d142397b4f367a81961eba4e8cd7edddf772
   sha-url: https://github.com/docker/login-action/commit/74a5d142397b4f367a81961eba4e8cd7edddf772

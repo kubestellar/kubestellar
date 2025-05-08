@@ -47,7 +47,7 @@ jobs:
         EMAIL: ${{ github.actor}}@users.noreply.github.com
 
     - name: Set up Helm
-      uses: azure/setup-helm@37dd2562cae2f186a3dc13f2bb5d4abe08dbfec4 
+      uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112 
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
