@@ -103,7 +103,7 @@ BINDING                                       ROLE                              
 
 The columns are as follows.
 
-- **BINDING:** The namespace/name for the `ClusterRoleBinding` or `RoleBinding`; namespace is empty fo a `ClusterRoleBinding`.
+- **BINDING:** The namespace/name for the `ClusterRoleBinding` or `RoleBinding`; namespace is empty for a `ClusterRoleBinding`.
 - **ROLE:** The name of the `ClusterRole` or `Role` object referenced by the BINDING.
 - **SUBJECT:** A slightly compacted representation of the `rbac.Subject`.
 - **VERB**
