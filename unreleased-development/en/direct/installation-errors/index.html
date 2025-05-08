@@ -14,7 +14,7 @@
         <link rel="prev" href="../knownissue-collector-miss/">
       
       
-        <link rel="next" href="../../ui-docs/ui-overview/">
+        <link rel="next" href="../knownissue-cpu-insufficient-for-its1/">
       
       
       <link rel="icon" href="../../../favicons/favicon.ico">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Increase Inotify Watches - KubeStellar</title>
+        <title>Kind host not configured for more than two clusters - KubeStellar</title>
       
     
     
@@ -80,7 +80,7 @@
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KubeStellar - Increase Inotify Watches" />
+  <meta property="og:title" content="KubeStellar - Kind host not configured for more than two clusters" />
   <meta property="og:description" content="None" />
   <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/en/direct/installation-errors/" />
   <meta property="og:image" content="https://docs.kubestellar.io/unreleased-developmentassets/images/illustrations/banner.png" />
@@ -116,7 +116,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installation-errors-and-solutions" class="md-skip">
+        <a href="#kind-host-not-configured-for-more-than-two-clusters" class="md-skip">
           Skip to content
         </a>
       
@@ -166,7 +166,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Increase Inotify Watches
+              Kind host not configured for more than two clusters
             
           </span>
         </div>
@@ -1860,6 +1860,8 @@
       
         
       
+        
+      
     
     
     
@@ -2030,7 +2032,7 @@
   
   
   <span class="md-ellipsis">
-    Increase Inotify Watches
+    Kind host not configured for more than two clusters
     
   </span>
   
@@ -2043,7 +2045,7 @@
   
   
   <span class="md-ellipsis">
-    Increase Inotify Watches
+    Kind host not configured for more than two clusters
     
   </span>
   
@@ -2066,25 +2068,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#error-sysctl-fsinotifymax_user_watches-is-only-155693-but-must-be-at-least-524288" class="md-nav__link">
+  <a href="#symptoms" class="md-nav__link">
     <span class="md-ellipsis">
-      Error: sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Error: sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cause" class="md-nav__link">
-    <span class="md-ellipsis">
-      Cause
+      Symptoms
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#solution" class="md-nav__link">
     <span class="md-ellipsis">
       Solution
@@ -2104,16 +2096,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#for-docker-runtimes" class="md-nav__link">
+  <a href="#docker-on-linux" class="md-nav__link">
     <span class="md-ellipsis">
-      For Docker Runtimes
+      Docker on Linux
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2126,6 +2113,29 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-cpu-insufficient-for-its1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Insufficient CPU for your clusters
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -3311,25 +3321,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#error-sysctl-fsinotifymax_user_watches-is-only-155693-but-must-be-at-least-524288" class="md-nav__link">
+  <a href="#symptoms" class="md-nav__link">
     <span class="md-ellipsis">
-      Error: sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Error: sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cause" class="md-nav__link">
-    <span class="md-ellipsis">
-      Cause
+      Symptoms
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#solution" class="md-nav__link">
     <span class="md-ellipsis">
       Solution
@@ -3349,16 +3349,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#for-docker-runtimes" class="md-nav__link">
+  <a href="#docker-on-linux" class="md-nav__link">
     <span class="md-ellipsis">
-      For Docker Runtimes
+      Docker on Linux
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -3399,54 +3394,69 @@
   
 
 
-<h1 id="installation-errors-and-solutions">Installation Errors and Solutions<a class="headerlink" href="#installation-errors-and-solutions" title="Permanent link">#</a></h1>
-<h2 id="error-sysctl-fsinotifymax_user_watches-is-only-155693-but-must-be-at-least-524288">Error: <code>sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288</code><a class="headerlink" href="#error-sysctl-fsinotifymax_user_watches-is-only-155693-but-must-be-at-least-524288" title="Permanent link">#</a></h2>
-<h3 id="cause">Cause<a class="headerlink" href="#cause" title="Permanent link">#</a></h3>
-<p>This error occurs because the current value of <code>fs.inotify.max_user_watches</code> is too low. This setting controls the maximum number of file watches that a user can create.</p>
-<h3 id="solution">Solution<a class="headerlink" href="#solution" title="Permanent link">#</a></h3>
-<p>To resolve this error, you need to increase the value of <code>fs.inotify.max_user_watches</code>. Follow the steps below:</p>
-<h4 id="for-rancher-desktop">For Rancher Desktop<a class="headerlink" href="#for-rancher-desktop" title="Permanent link">#</a></h4>
+<h1 id="kind-host-not-configured-for-more-than-two-clusters">Kind host not configured for more than two clusters<a class="headerlink" href="#kind-host-not-configured-for-more-than-two-clusters" title="Permanent link">#</a></h1>
+<p><a href="https://kind.sigs.k8s.io/">Kind</a> uses a docker-in-docker technique to
+create multiple Kubernetes clusters on your host. But, in order for
+this to work for three or more clusters, the host running Docker
+typically needs an expanded configuration. This is mostly described in
+<a href="https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files">a known issue of
+kind</a>. However,
+that document does not mention the additional complexity that arises
+when the OS running the containers is the guest OS inside a virtual
+machine on your host (e.g., a Mac, which does not natively run
+containers and so uses a virtual machine with a Linux guest OS).</p>
+<h2 id="symptoms">Symptoms<a class="headerlink" href="#symptoms" title="Permanent link">#</a></h2>
+<p>Many KubeStellar setup paths check for the needed configuration. When
+the check fails, you get an error message like the following.</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288
+</code></pre></div>
+<p>If you avoid the check but the configuration is not expanded then the
+symptom will most likely be setup ceasing to make progress at some
+point. Or maybe other errors about things not happening or things not
+existing.</p>
+<h2 id="solution">Solution<a class="headerlink" href="#solution" title="Permanent link">#</a></h2>
+<p>To resolve this error, you need to increase the value of <code>fs.inotify.max_user_watches</code> and/or <code>fs.inotify.max_user_instances</code>. Follow the steps below:</p>
+<h3 id="for-rancher-desktop">For Rancher Desktop<a class="headerlink" href="#for-rancher-desktop" title="Permanent link">#</a></h3>
 <ol>
 <li>
 <p>Open the configuration file:
-   <div class="language-sh highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>vi<span class="w"> </span><span class="s2">&quot;~/Library/Application Support/rancher-desktop/lima/_config/override.yaml&quot;</span>
+   <div class="language-sh highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>vi<span class="w"> </span><span class="s2">&quot;~/Library/Application Support/rancher-desktop/lima/_config/override.yaml&quot;</span>
 </code></pre></div></p>
 </li>
 <li>
 <p>Add the following script to the <code>provision</code> section:
-   <div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">provision</span><span class="p">:</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="no">#!/bin/sh</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="no">echo &quot;fs.inotify.max_user_watches=1048576&quot; &gt; /etc/sysctl.d/fs.inotify.conf</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="no">echo &quot;fs.inotify.max_user_instances=1024&quot; &gt;&gt; /etc/sysctl.d/fs.inotify.conf</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="no">sysctl -p /etc/sysctl.d/fs.inotify.conf</span>
+   <div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">provision</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="no">#!/bin/sh</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="no">sysctl fs.inotify.max_user_watches=524288</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="no">sysctl fs.inotify.max_user_instances=512</span>
 </code></pre></div></p>
 </li>
 <li>
 <p>Restart Rancher Desktop.</p>
 </li>
 </ol>
-<h4 id="for-docker-runtimes">For Docker Runtimes<a class="headerlink" href="#for-docker-runtimes" title="Permanent link">#</a></h4>
+<h3 id="docker-on-linux">Docker on Linux<a class="headerlink" href="#docker-on-linux" title="Permanent link">#</a></h3>
+<p>The resolution in the <a href="https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files">kind known issue</a> can be used directly.</p>
 <ol>
 <li>
 <p>Create a new configuration file:
-   <div class="language-sh highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>vi<span class="w"> </span>/etc/sysctl.d/99-sysctl.conf
+   <div class="language-sh highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>vi<span class="w"> </span>/etc/sysctl.d/99-sysctl.conf
 </code></pre></div></p>
 </li>
 <li>
 <p>Add the following lines:
-   <div class="language-sh highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>fs.inotify.max_user_watches<span class="o">=</span><span class="m">1048576</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>fs.inotify.max_user_instances<span class="o">=</span><span class="m">1024</span>
+   <div class="language-sh highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>fs.inotify.max_user_watches<span class="o">=</span><span class="m">1048576</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>fs.inotify.max_user_instances<span class="o">=</span><span class="m">1024</span>
 </code></pre></div></p>
 </li>
 <li>
 <p>Apply the changes:
-   <div class="language-sh highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>sysctl<span class="w"> </span>-p<span class="w"> </span>/etc/sysctl.d/99-sysctl.conf
+   <div class="language-sh highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>sysctl<span class="w"> </span>-p<span class="w"> </span>/etc/sysctl.d/99-sysctl.conf
 </code></pre></div></p>
 </li>
 </ol>
-<p>More details can be found <a href="https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files">here</a>.</p>
 
 
 
@@ -3545,13 +3555,13 @@
         
         
           
-          <a href="../../ui-docs/ui-overview/" class="md-footer__link md-footer__link--next" aria-label="Next: UI (User Interface)">
+          <a href="../knownissue-cpu-insufficient-for-its1/" class="md-footer__link md-footer__link--next" aria-label="Next: Insufficient CPU for your clusters">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                UI (User Interface)
+                Insufficient CPU for your clusters
               </div>
             </div>
             <div class="md-footer__button md-icon">

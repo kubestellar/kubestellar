@@ -1860,6 +1860,8 @@
       
         
       
+        
+      
     
     
     
@@ -1987,9 +1989,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#insufficient-cpu-for-its1-on-kind-cluster" class="md-nav__link">
+  <a href="#kind-host-not-configured-for-more-than-two-clusters" class="md-nav__link">
     <span class="md-ellipsis">
-      Insufficient CPU for its1 on KinD cluster
+      Kind host not configured for more than two clusters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#insufficient-cpu-for-your-clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Insufficient CPU for your clusters
     </span>
   </a>
   
@@ -2108,7 +2119,30 @@
   
   
   <span class="md-ellipsis">
-    Increase Inotify Watches
+    Kind host not configured for more than two clusters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knownissue-cpu-insufficient-for-its1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Insufficient CPU for your clusters
     
   </span>
   
@@ -3335,9 +3369,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#insufficient-cpu-for-its1-on-kind-cluster" class="md-nav__link">
+  <a href="#kind-host-not-configured-for-more-than-two-clusters" class="md-nav__link">
     <span class="md-ellipsis">
-      Insufficient CPU for its1 on KinD cluster
+      Kind host not configured for more than two clusters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#insufficient-cpu-for-your-clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Insufficient CPU for your clusters
     </span>
   </a>
   
@@ -3386,8 +3429,10 @@
 <p>The symptom is that attempting to instantiate the core Helm chart gets an authorization failure. See <a href="../knownissue-helm-ghcr/">Authorization failure while fetching Helm chart from ghcr.io</a>.</p>
 <h2 id="missing-results-in-a-combinedstatus-object">Missing results in a CombinedStatus object<a class="headerlink" href="#missing-results-in-a-combinedstatus-object" title="Permanent link">#</a></h2>
 <p>The symptom is a missing entry in the <code>results</code> of a <code>CombinedStatus</code> object. See <a href="../knownissue-collector-miss/">Missing results in a CombinedStatus object</a>.</p>
-<h2 id="insufficient-cpu-for-its1-on-kind-cluster">Insufficient CPU for its1 on KinD cluster<a class="headerlink" href="#insufficient-cpu-for-its1-on-kind-cluster" title="Permanent link">#</a></h2>
-<p>The symptom is kind cluster resource capacity being insufficient for its1's <code>vcluster-0</code> pod to be scheduled. See <a href="knownissue-cpu-insufficient-fort-its1.md">cpu insufficient for its1</a></p>
+<h2 id="kind-host-not-configured-for-more-than-two-clusters">Kind host not configured for more than two clusters<a class="headerlink" href="#kind-host-not-configured-for-more-than-two-clusters" title="Permanent link">#</a></h2>
+<p>This can arise when using <code>kind</code> inside a virtual machine (e.g., when using Docker on a Mac). The symptom is either a complaint from KubeStellar setup that <code>sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288</code> or setup grinding to a halt. See <a href="../installation-errors/">Kind host not configured for more than two clusters</a>.</p>
+<h2 id="insufficient-cpu-for-your-clusters">Insufficient CPU for your clusters<a class="headerlink" href="#insufficient-cpu-for-your-clusters" title="Permanent link">#</a></h2>
+<p>This can happen when you are using a docker-in-docker technique. The symptom is that setup stops making progress at some point. See <a href="knownissue-cpu-insufficient-fort-its1.md">Insufficient CPU for your clusters</a></p>
 
 
 
