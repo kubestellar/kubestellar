@@ -20,6 +20,10 @@ The symptom is that attempting to instantiate the core Helm chart gets an author
 
 The symptom is a missing entry in the `results` of a `CombinedStatus` object. See [Missing results in a CombinedStatus object](knownissue-collector-miss.md).
 
-## Insufficient CPU for its1 on KinD cluster
+## Kind host not configured for more than two clusters
 
-The symptom is kind cluster resource capacity being insufficient for its1's `vcluster-0` pod to be scheduled. See [cpu insufficient for its1](knownissue-cpu-insufficient-fort-its1.md)
+This can arise when using `kind` inside a virtual machine (e.g., when using Docker on a Mac). The symptom is either a complaint from KubeStellar setup that `sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288` or setup grinding to a halt. See [Kind host not configured for more than two clusters](installation-errors.md).
+
+## Insufficient CPU for your clusters
+
+This can happen when you are using a docker-in-docker technique. The symptom is that setup stops making progress at some point. See [Insufficient CPU for your clusters](knownissue-cpu-insufficient-fort-its1.md)

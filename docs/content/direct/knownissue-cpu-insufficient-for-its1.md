@@ -1,18 +1,29 @@
-## Description of the issue
+# Insufficient CPU for your clusters
 
- When following [Getting Started(https://docs.kubestellar.io/release-0.25.1/direct/get-started/), the step at "Use Core Helm chart to initialize KubeFlex, recognize ITS, and create WDS step." may produce the following error
+When following [Getting Started](get-started.md), you may find that it hangs at some point --- simply stops making progress. For example: after instantiating [the core Helm chart](core-chart.md), a `kflex ctx` command may grind to a halt with the following output and no more.
 
-`no kubeconfig context for its1 was found: context its1 not found for control plane its1`
+```console
+$ kflex ctx --overwrite-existing-context its1
+no kubeconfig context for its1 was found: context its1 not found for control plane its1
+✔ Overwriting existing context for control plane
+trying to load new context its1 from server...
+```
 
 ## Root cause
 
-There is insufficiant CPU resources allocated.
+You are using `kind`, `k3d`, GitHub Codespaces, or any other docker-in-docker based technique and your host does not have enough CPU for all of your clusters.
+
+## Resolution
+
+### General
+
+Stop any irrelevant containers.
 
 ### MacOS
 
-On Mac computers equipped with M1 and onwards, docker needs to make use of either **Docker Desktop** or **colima** when only its agent is installed.
+On Mac computers, Docker runs all of your containers in a virtual machine. Examples of things that do this include Docker Desktop, Rancher desktop, and colima. You may need to increase the CPU allocated to this virtual machine.
 
-In the latter case, colima default VM is configured to use `--cpu 2 --memory 4`, which is insufficient for Kubestellar components on KinD clusters. In fact, KinD inherit **colima** resources when created.
+For example, the colima default VM is configured to use `--cpu 2 --memory 4` --- which is insufficient for Kubestellar components on KinD clusters. In fact, KinD inherit **colima** resources when created.
 
 To solve this issue, increase colima resource capacity to increase KinD clusters resource capcity:
 
