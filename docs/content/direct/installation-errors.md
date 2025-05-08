@@ -7,8 +7,9 @@ typically needs an expanded configuration. This is mostly described in
 [a known issue of
 kind](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files). However,
 that document does not mention the additional complexity that arises
-when your host is a Mac, which does not natively run containers and so
-uses a virtual machine with a Linux guest OS.
+when the OS running the containers is the guest OS inside a virtual
+machine on your host (e.g., a Mac, which does not natively run
+containers and so uses a virtual machine with a Linux guest OS).
 
 ## Symptoms
 

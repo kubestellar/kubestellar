@@ -22,7 +22,7 @@ The symptom is a missing entry in the `results` of a `CombinedStatus` object. Se
 
 ## Kind host not configured for more than two clusters
 
-This can happen when you are using a docker-in-docker technique. The symptom is either a complaint from KubeStellar setup that `sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288` or setup grinding to a halt. See [Kind host not configured for more than two clusters](installation-errors.md).
+This can arise when using `kind` inside a virtual machine (e.g., when using Docker on a Mac). The symptom is either a complaint from KubeStellar setup that `sysctl fs.inotify.max_user_watches is only 155693 but must be at least 524288` or setup grinding to a halt. See [Kind host not configured for more than two clusters](installation-errors.md).
 
 ## Insufficient CPU for your clusters
 
