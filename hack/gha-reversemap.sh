@@ -25,7 +25,7 @@ set -e
 
 GITHUB_WORKFLOWS_PATH="./.github/workflows"
 REVERSEMAP_FILE=".gha-reversemap.yml"
-YQ_REQUIRED_VERSION="v4.45.1"
+YQ_REQUIRED_VERSION="v4.45"
 GIT_COMMITSHA_LENGTH=40
 TMP_OUTPUT="/tmp/$(date -u -Iseconds | cut -d '+' -f1).json"
 
