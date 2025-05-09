@@ -29,8 +29,8 @@ actions/setup-python:
   tag: v5
   tag-url: https://github.com/actions/setup-python/tree/v5
 actions/setup-go:
-  sha: 0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
-  sha-url: https://github.com/actions/setup-go/commit/0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
+  sha: d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+  sha-url: https://github.com/actions/setup-go/commit/d35c59abb061a4a6fb18e82ac0862c26744d6ab5
   tag: v5
   tag-url: https://github.com/actions/setup-go/tree/v5
 anchore/sbom-action/download-syft:
