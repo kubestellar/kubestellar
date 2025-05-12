@@ -34,10 +34,10 @@ jobs:
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.8.5/kubeflex_0.8.5_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.8.5_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.8.6/kubeflex_0.8.6_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.8.6_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.8.5_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.8.6_linux_amd64.tar.gz
 
       - name: Run test
         env:

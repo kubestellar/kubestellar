@@ -18,10 +18,11 @@ package binding
 
 import (
 	"fmt"
+	"slices"
+	"strings"
 	"sync"
 
 	"github.com/go-logr/logr"
-	"golang.org/x/exp/slices"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -335,25 +336,25 @@ func destinationsStringSetToSortedDestinations(destinationsStringSet sets.Set[st
 
 func sortBindingWorkloadObjects(bindingWorkload *v1alpha1.DownsyncObjectClauses) {
 	// sort clusterScopeDownsyncObjects
-	slices.SortFunc(bindingWorkload.ClusterScope, func(a, b v1alpha1.ClusterScopeDownsyncClause) bool {
-		if a.GroupVersionResource.String() != b.GroupVersionResource.String() {
-			return a.GroupVersionResource.String() < b.GroupVersionResource.String()
+	slices.SortFunc(bindingWorkload.ClusterScope, func(a, b v1alpha1.ClusterScopeDownsyncClause) int {
+		if cmp := strings.Compare(a.GroupVersionResource.String(), b.GroupVersionResource.String()); cmp != 0 {
+			return cmp
 		}
-		if a.Name != b.Name {
-			return a.Name < b.Name
+		if cmp := strings.Compare(a.Name, b.Name); cmp != 0 {
+			return cmp
 		}
-		return a.ResourceVersion < b.ResourceVersion
+		return strings.Compare(a.ResourceVersion, b.ResourceVersion)
 	})
 	// sort namespaceScopeDownsyncObjects
-	slices.SortFunc(bindingWorkload.NamespaceScope, func(a, b v1alpha1.NamespaceScopeDownsyncClause) bool {
-		if a.GroupVersionResource.String() != b.GroupVersionResource.String() {
-			return a.GroupVersionResource.String() < b.GroupVersionResource.String()
+	slices.SortFunc(bindingWorkload.NamespaceScope, func(a, b v1alpha1.NamespaceScopeDownsyncClause) int {
+		if cmp := strings.Compare(a.GroupVersionResource.String(), b.GroupVersionResource.String()); cmp != 0 {
+			return cmp
 		}
 		objectNameA := cache.NewObjectName(a.Namespace, a.Name).String()
 		objectNameB := cache.NewObjectName(b.Namespace, b.Name).String()
-		if objectNameA != objectNameB {
-			return objectNameA < objectNameB
+		if cmp := strings.Compare(objectNameA, objectNameB); cmp != 0 {
+			return cmp
 		}
-		return a.ResourceVersion < b.ResourceVersion
+		return strings.Compare(a.ResourceVersion, b.ResourceVersion)
 	})
 }
