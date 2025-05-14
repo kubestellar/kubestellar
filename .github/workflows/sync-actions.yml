@@ -1,0 +1,46 @@
+name: sync-actions
+on:
+  workflow_dispatch:
+    inputs:
+      cmd:
+        description: "specify the command of gha-reversemap.sh to execute"
+        required: true
+        type: choice
+        options:
+        - apply-reversemap
+        - update-action-version
+        - update-reversemap
+      args:
+        description: "arguments to selected command"
+        required: true
+        default: ""
+        type: string
+jobs:
+  trigger-gha-reversemap:
+    # only collaborators can trigger the workflow
+    if: contains(github.event.repository.collaborators, github.actor)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+    - name: Checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+    - name: Execute gha-reversemap.sh
+      run: ./hack/gha-reversemap.sh ${{ inputs.cmd }} ${{ inputs.args }}
+
+    - name: Raise a PR to apply the changes
+      uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "ci: applying gha-reversemap.sh ${{ inputs.cmd }} ${{ inputs.args }}"
+        title: "Automated: applying gha-reversemap.sh"
+        labels: area/dependency
+        branch: ci/gha-reversemap
+        sign-commits: true
+        reviewers: clubanderson,MikeSpreitzer 
+        
