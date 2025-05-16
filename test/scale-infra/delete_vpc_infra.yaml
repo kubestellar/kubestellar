@@ -1,0 +1,86 @@
+---
+- hosts: localhost
+  #become: yes
+  gather_facts: no
+  vars:
+    aws_region: "{{ region }}"
+    vpc_name:  "{{ vpc_name }}"
+    nat: no
+  tasks:
+    - include_vars: ".data/{{ aws_region }}_{{ vpc_name }}/vpc_helper_vars.yaml"
+
+    - name: Delete NAT Gateway and release EIP
+      amazon.aws.ec2_vpc_nat_gateway:
+        state: 'absent'
+        region: "{{ aws_region }}"
+        subnet_id: "{{ public_subnet_id }}"
+        nat_gateway_id: "{{ nat_id }}"
+        release_eip: true
+        wait: yes
+        wait_timeout: 300
+      when: nat | bool   
+
+    - name: Delete Internet Gateway for VPC
+      amazon.aws.ec2_vpc_igw:
+        state: 'absent'
+        region: "{{ aws_region }}"
+        vpc_id: "{{ vpc_id }}"
+        
+    - name: Delete VPC subnets
+      amazon.aws.ec2_vpc_subnet:
+        state: absent
+        region: "{{ aws_region }}"
+        vpc_id: "{{ vpc_id }}"
+        cidr: "{{ item }}"
+      with_items: '{{ cidr_list }}'
+      register: subnet_delete
+      until: "subnet_delete is not failed"
+      retries: 5
+      delay: 5
+
+    - name: Get all route tables associated with the VPC
+      amazon.aws.ec2_vpc_route_table_info:
+        filters:
+          vpc-id: "{{ vpc_id }}"
+          tag:Name: "{{ vpc_name }}"
+        region: "{{ aws_region }}"
+      register: route_tables
+
+    - name: Delete each route table
+      community.aws.ec2_vpc_route_table:
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ aws_region }}"
+        route_table_id: "{{ item.id }}"
+        lookup: id
+        state: 'absent'
+      with_items: '{{ route_tables.route_tables }}'
+      register: rtb_delete
+      until: "rtb_delete is not failed"
+      retries: 5
+      delay: 5
+
+    - name: Sleep for 60 seconds and continue with play
+      ansible.builtin.wait_for:
+        timeout: 60
+      delegate_to: localhost
+
+    - name: Delete VPC
+      amazon.aws.ec2_vpc_net:
+        state: absent
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ aws_region }}"
+      register: vcp_delete
+      until: "vcp_delete is not failed"
+      retries: 7
+      delay: 10
+
+    - name: Remove deletion helper file
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - ".data/{{ region }}_{{ vpc_name }}/vpc_helper_vars.yaml"
+        - ".data/{{ region }}_{{ vpc_name }}/admin.conf"
+        - ".data/{{ region }}_{{ vpc_name }}/wecs_config"
+        - ".data/{{ region }}_{{ vpc_name }}/wec_join_command"
+        - ".data/{{ region }}_{{ vpc_name }}"
