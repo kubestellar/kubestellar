@@ -2,6 +2,21 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.28.0-alpha.1
+
+The main changes are moving from Kubernetes 1.29 to 1.30, and picking
+up advances in other dependencies (but staying limited to Kubernetes
+1.30).
+
+### Remaining limitations in 0.28.0
+
+* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+* If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
+
 ## 0.27.2
 
 Fixes `scripts/check_pre_req.sh` so that when it objects to the version of `clusteradm`, this is more obvious (restores the RED X that was inadvertently removed in the previous patch release).
