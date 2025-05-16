@@ -37,7 +37,7 @@ kubeflex-operator:
 
 
 # Argo CD values
-argo-cd:
+argocd:
   install: false # enable/disaple the installation of Argo CD
   # openshift:
   #   enabled: true

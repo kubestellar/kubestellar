@@ -1,4 +1,4 @@
-{{- if index .Values "argo-cd" "install" }}
+{{- if index .Values "argocd" "install" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -91,7 +91,7 @@ data:
     {{- end }}
 
     timestamped_echo "Creating applications..."
-    {{- range $app := (index .Values "argo-cd" "applications") }}
+    {{- range $app := (index .Values "argocd" "applications") }}
 
       timestamped_echo "==> Creating application \"{{ $app.name }}\":"
       timestamped_echo "    - project=\"{{ $app.project | default "default" }}\""
