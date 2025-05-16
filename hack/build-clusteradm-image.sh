@@ -76,5 +76,29 @@ git clone -b "v$clusteradm_version" --depth 1 https://github.com/open-cluster-ma
 
 cd "$clusteradm_folder"
 
+case "$clusteradm_version" in
+    (0.10.*)
+        go get github.com/docker/docker@v25.0.10 \
+               github.com/containerd/containerd@v1.7.27 \
+               golang.org/x/crypto@v0.36.0 \
+               golang.org/x/net@v0.38.0 \
+               golang.org/x/oauth2@v0.30.0 \
+               helm.sh/helm/v3@v3.15.4
+        go mod tidy
+        go mod vendor
+        ;;
+    (0.11.0)
+        go get github.com/docker/docker@v27.5.1 \
+               github.com/containerd/containerd@v1.7.27 \
+               golang.org/x/crypto@v0.36.0 \
+               golang.org/x/net@v0.38.0 \
+               golang.org/x/oauth2@v0.30.0 \
+               helm.sh/helm/v3@v3.16.4
+        go mod tidy
+        go mod vendor
+        ;;
+esac
+
+
 export KO_DOCKER_REPO=$registry
 ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform
