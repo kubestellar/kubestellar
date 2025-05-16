@@ -35,4 +35,5 @@ dependencies:
 - name: argo-cd
   version: 7.8.5
   repository: oci://ghcr.io/argoproj/argo-helm
-  condition: argo-cd.install
+  condition: argocd.install
+  alias: argocd
