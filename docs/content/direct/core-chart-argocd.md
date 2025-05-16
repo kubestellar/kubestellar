@@ -14,11 +14,11 @@ The settings described in this document are an extesnion of the KubeStellar Core
 
 ## Installing Argo CD using KubeStellar Core chart
 
-To enable the installation of Argo CD by the KubeStellar Core chart, use the flag `--set argo-cd.install=true`. Besides deploying an instance of Argo CD, KubeStellar Core chart will take care of registering all the WDSes installed by the chart as Argo CD target clusters.
+To enable the installation of Argo CD by the KubeStellar Core chart, use the flag `--set argocd.install=true`. Besides deploying an instance of Argo CD, KubeStellar Core chart will take care of registering all the WDSes installed by the chart as Argo CD target clusters.
 
-When deploying in an **OpenShift** cluster, add the flag `--set argo-cd.openshift.enabled=true`.
+When deploying in an **OpenShift** cluster, add the flag `--set argocd.openshift.enabled=true`.
 
-When deploying in a **Kubernetes** cluster, use the flag `--set argo-cd.global.domain=<url>` to provide the URL for the **nginx** ingress, which defaults to `argocd.localtest.me`.
+When deploying in a **Kubernetes** cluster, use the flag `--set argocd.global.domain=<url>` to provide the URL for the **nginx** ingress, which defaults to `argocd.localtest.me`.
 
 Note that when creating a local **Kubernetes** cluster using our scripts for **Kind** or **k3s**, the **nginx** ingress will be accessible on host port `9443`; therefore the Argo CD UI can be accessed at the address `https://argocd.localtest.me:9443`.
 
@@ -33,7 +33,7 @@ kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | 
 The KubeStellar Core chart can also be used to deploy Argo CD applications as specified by chart values. The example below shows the relevant fragment of the chart values that could be used for deploying an application corresponding to `scenario-6` in [KubeStellar docs](example-scenarios.md#scenario-6---multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd).
 
 ```yaml
-argo-cd:
+argocd:
   applications: # list of Argo CD applications to be create
   - name: scenario-6 # required, must be unique
     project: default # default: default
@@ -48,5 +48,5 @@ argo-cd:
 Alternatively, the same result can be achieved from Helm CLI by using the followig minimal argument (note that the default values are not explicitely set):
 
 ```shell
---set-json='argo-cd.applications=[ { "name": "scenario-6", "repoURL": "https://github.com/pdettori/sample-apps.git", "path": "nginx", "destinationWDS": "wds1", "destinationNamespace": "nginx-sa" } ]'
+--set-json='argocd.applications=[ { "name": "scenario-6", "repoURL": "https://github.com/pdettori/sample-apps.git", "path": "nginx", "destinationWDS": "wds1", "destinationNamespace": "nginx-sa" } ]'
 ```
