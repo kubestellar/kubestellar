@@ -1,4 +1,4 @@
-{{- if and (index .Values "argo-cd" "install") (not (index .Values "argo-cd" "openshift" "enabled")) }}
+{{- if and .Values.argocd.install (not .Values.argocd.openshift.enabled) }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: {{ index .Values "argo-cd" "global" "domain" | default "argocd.localtest.me" }}
+  - host: {{ .Values.argocd.global.domain | default "argocd.localtest.me" }}
     http:
       paths:
       - path: /
