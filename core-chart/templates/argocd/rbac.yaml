@@ -1,4 +1,4 @@
-{{- if index .Values "argocd" "install" }}
+{{- if .Values.argocd.install }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
