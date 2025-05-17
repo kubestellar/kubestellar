@@ -20,9 +20,9 @@ kflex ctx --overwrite-existing-context {{ $cp.name }}
 Finally, you can use `kflex ctx` to switch back to the kubeconfig
 context for your KubeFlex hosting cluster.
 
-{{- if (index .Values "argocd" "install") }}
+{{- if .Values.argocd.install }}
 
-Access Argo CD UI at https://{{ index .Values "argocd" "global" "domain" }} (append :9443 for Kind or k3s installations).
+Access Argo CD UI at https://{{ .Values.argocd.global.domain }} (append :9443 for Kind or k3s installations).
 
 Obtain Argo CD admin password using the command:
 kubectl -n {{ .Release.Namespace }} get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
