@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.13">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -828,6 +828,30 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0280-alpha1" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.28.0-alpha.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.28.0-alpha.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remaining-limitations-in-0280" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remaining limitations in 0.28.0
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#0272" class="md-nav__link">
@@ -3614,6 +3638,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0280-alpha1" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.28.0-alpha.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.28.0-alpha.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remaining-limitations-in-0280" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remaining limitations in 0.28.0
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0272" class="md-nav__link">
     <span class="md-ellipsis">
       0.27.2
@@ -3986,6 +4034,19 @@
 
 <h1 id="release-notes">Release notes<a class="headerlink" href="#release-notes" title="Permanent link">#</a></h1>
 <p>The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. </p>
+<h2 id="0280-alpha1">0.28.0-alpha.1<a class="headerlink" href="#0280-alpha1" title="Permanent link">#</a></h2>
+<p>The main changes are moving from Kubernetes 1.29 to 1.30, and picking
+up advances in other dependencies (but staying limited to Kubernetes
+1.30).</p>
+<h3 id="remaining-limitations-in-0280">Remaining limitations in 0.28.0<a class="headerlink" href="#remaining-limitations-in-0280" title="Permanent link">#</a></h3>
+<ul>
+<li>Although the create-only feature can be used with Job objects to avoid trouble with <code>.spec.selector</code>, requesting singleton reported state return will still lead to a controller fight over <code>.status.replicas</code> while the Job is in progress.</li>
+<li>Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object</li>
+<li>Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.</li>
+<li>Creation, deletion, and modification of <code>CustomTransform</code> objects does not cause corresponding updates to the workload objects in the WECs; the current state of the <code>CustomTransform</code> objects is simply read at any moment when the objects in the WECs are being updated for other reasons.</li>
+<li>It is not known what actually happens when two different <code>Binding</code> objects list the same workload object and either or both say "create only".</li>
+<li>If (a) the workload object count or volume vs the configured limits on content of a <code>ManifestWork</code> causes multiple <code>ManifestWork</code> to be created for one <code>Binding</code> (<code>BindingPolicy</code>) AND (b) the limit on number of workload objects in one <code>ManifestWork</code> is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one <code>ManifestWork</code> is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a <code>Binding</code> (do check your <code>Binding</code> objects, lest you be surprised) AND your workload is not so large that multiple <code>ManifestWork</code> are created due to the limit on their size.</li>
+</ul>
 <h2 id="0272">0.27.2<a class="headerlink" href="#0272" title="Permanent link">#</a></h2>
 <p>Fixes <code>scripts/check_pre_req.sh</code> so that when it objects to the version of <code>clusteradm</code>, this is more obvious (restores the RED X that was inadvertently removed in the previous patch release).</p>
 <p>Also some doc improvements, and bumps to some build-time dependencies.</p>
