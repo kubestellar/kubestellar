@@ -324,8 +324,8 @@ nav:
   - Home: index.md
   - QuickStart: Getting-Started/quickstart.md
   - Contributing: 
-      - Guidelines: Contribution guidelines/CONTRIBUTING.md
-```
+      - Guidelines: contribution-guidelines/contributing-inc.md
+
 ````
 <b>as seen by reader:</b>
 ```yaml
@@ -333,7 +333,8 @@ nav:
   - Home: index.md
   - QuickStart: Getting-Started/quickstart.md
   - Contributing: 
-      - Guidelines: Contribution guidelines/CONTRIBUTING.md
+     - Guidelines: contribution-guidelines/contributing-inc.md
+
 ```
 <br/>
 
