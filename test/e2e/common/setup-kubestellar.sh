@@ -127,9 +127,9 @@ else
 popd
 
 : Waiting for OCM hub to be ready...
-kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
-kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 300s
-kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 90s
+kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
+kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
+kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
 
@@ -163,8 +163,8 @@ function add_wec() {
 
 "${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose ocm
 
-kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 90s
-kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 150s
+kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
+kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
 
 add_wec cluster1
 add_wec cluster2
