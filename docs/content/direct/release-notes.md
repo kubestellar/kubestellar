@@ -2,6 +2,10 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
+## 0.28.0-alpha.2
+
+The main change is advancing the version of the kube-rbac-proxy image used, from 0.18.0 (which is based on Kubernetes 1.30) to 0.19.1 (which is based on Kubernetes 1.31). Depending on a later minor release of Kubernetes is generally risky, but expected to work OK in this case.
+
 ## 0.28.0-alpha.1
 
 The main changes are moving from Kubernetes 1.29 to 1.30, and picking
