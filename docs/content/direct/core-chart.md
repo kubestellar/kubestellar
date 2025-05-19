@@ -181,9 +181,9 @@ User defined control planes can be added using additional value files of `--set`
 A KubeStellar Core installation that is consistent with [Getting Started](get-started.md) and and supports [the example scenarios](./example-scenarios.md) could be achieved with the following command:
 
 ```shell
-helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
-  --set-json='ITSes=[{"name":"its1"}]' \
-  --set-json='WDSes=[{"name":"wds1"}]'
+helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version "$KUBESTELLAR_VERSION" \
+  --set-json ITSes='[{"name":"its1"}]' \
+  --set-json WDSes='[{"name":"wds1"}]'
 ```
 
 The core chart also supports the use of a pre-existing cluster (or any space, really) as an ITS. A specific application is to connect to existing OCM clusters. As an example, create a first local kind cluster with OCM installed in it:
