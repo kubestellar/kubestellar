@@ -48,7 +48,7 @@ See the [Getting Started setup guide](direct/get-started.md) for getting started
 ## Contributing
 
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](/direct/contribute) guide.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](contribution-guidelines/contributing-inc.md) guide.
 
 ## Getting in touch
 
