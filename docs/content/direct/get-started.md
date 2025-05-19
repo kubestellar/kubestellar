@@ -104,10 +104,10 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ con
 
 ```shell
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-    --version $kubestellar_version \
-    --set-json='ITSes=[{"name":"its1"}]' \
-    --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
-    --set-json='verbosity.default=5' # so we can debug your problem reports
+    --version "$kubestellar_version" \
+    --set-json ITSes='[{"name":"its1"}]' \
+    --set-json WDSes='[{"name":"wds1"},{"name":"wds2","type":"host"}]' \
+    --set verbosity.default=5  # so we can debug your problem reports
 ```
 
 That command will print some notes about how to get kubeconfig "contexts" named "its1", "wds1", and "wds2" defined. Do that, because those contexts are used in the steps that follow.
