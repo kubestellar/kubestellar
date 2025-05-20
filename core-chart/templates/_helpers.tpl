@@ -67,3 +67,12 @@ Expand ITS PCH statusaddon container.
     mountPath: "/etc/kube"
     readOnly: true
 {{- end }}
+
+{{/*
+  Expand controller-manager arguments.
+  */}}
+  {{- define "controller-manager.args" -}}
+  - "--pprof"
+  - "--debug-port={{ .Values.controllerManager.debugPort }}"
+  - "--metrics-bind-addr={{ .Values.controllerManager.metrics_bind_addr }}"
+{{- end }}
