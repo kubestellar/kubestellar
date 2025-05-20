@@ -17,4 +17,8 @@ spec:
     namespace: {{ ($cp.bootstrapSecret).namespace | default $.Release.Namespace }}
     inClusterKey: {{ ($cp.bootstrapSecret).key | default "kubeconfig-incluster" }}
   {{- end }}
+  ports:
+    - containerPort: {{ .Values.controllerManager.debugPort }}
+      name: debug
+      protocol: TCP
 {{- end }}
