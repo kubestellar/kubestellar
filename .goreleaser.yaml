@@ -63,3 +63,6 @@ sboms:
     documents:
       - "{{ .Binary }}_{{ .Os }}_{{ .Arch }}.sbom"
 
+signs:
+  - artifacts: all
+  

@@ -35,6 +35,13 @@ jobs:
     - name: Install syft binary executable
       uses: anchore/sbom-action/download-syft@9f7302141466aa6482940f15371237e9d9f4c34a 
 
+    - name: Import GPG Key
+      id: import_gpg
+      uses: crazy-max/ghaction-import-gpg@v6
+      with:
+        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+
     - name: Run GoReleaser on tag
       uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 
       with:
