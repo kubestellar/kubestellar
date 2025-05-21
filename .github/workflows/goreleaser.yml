@@ -52,6 +52,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         USER: ${{ github.actor }}
         EMAIL: ${{ github.actor}}@users.noreply.github.com
+        GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
 
     - name: Set up Helm
       uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112 
