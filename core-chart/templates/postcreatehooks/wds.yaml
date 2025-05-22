@@ -1,4 +1,4 @@
-{{- if .Values.InstallPCHs }}
+{{- if (not (lookup "tenancy.kflex.kubestellar.org/v1alpha1" "PostCreateHook" "" "wds")) }}
 apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
 kind: PostCreateHook
 metadata:

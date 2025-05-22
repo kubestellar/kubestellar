@@ -93,10 +93,6 @@ transport_controller:
   max_size_wrapped: 512000
 
 
-# Determine if the Post Create Hooks should be installed by the chart
-InstallPCHs: true
-
-
 # List the Inventory and Transport Spaces (ITSes) to be created by the chart
 # Each ITS consists of:
 # - a mandatory unique name
