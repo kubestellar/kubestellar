@@ -25,7 +25,7 @@ import (
 	"os"
 	"strings"
 	"time"
-
+    _ "net/http/pprof"
 	"github.com/spf13/pflag"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -72,6 +72,8 @@ func main() {
 		HealthProbeBindAddr: ":8081",
 		PProfBindAddr:       ":8082",
 	}
+	initMetrics()  
+	startMetricsServer()
 	var enableLeaderElection bool
 	var itsName string
 	var wdsName string
