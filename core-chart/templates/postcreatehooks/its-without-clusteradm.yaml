@@ -1,4 +1,4 @@
-{{- if (not (lookup "tenancy.kflex.kubestellar.org/v1alpha1" "PostCreateHook" "" "its-without-clusteradm")) }}
+{{- if and (not .Values.DisablePCHs) (or .Values.ForcePCHs (not (lookup "tenancy.kflex.kubestellar.org/v1alpha1" "PostCreateHook" "" "its-without-clusteradm"))) }}
 apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
 kind: PostCreateHook
 metadata:

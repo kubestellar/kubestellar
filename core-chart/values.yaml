@@ -93,6 +93,11 @@ transport_controller:
   max_size_wrapped: 512000
 
 
+# Advanced option: Used only in special cases to override the default PCH management
+# - Force reinstalling PCHs even if they exist (used for upgrades): ForcePCHs: true
+# - Completely disable PCHs installation even for first install: DisablePCHs: true
+
+
 # List the Inventory and Transport Spaces (ITSes) to be created by the chart
 # Each ITS consists of:
 # - a mandatory unique name
