@@ -2,16 +2,27 @@
 
 ## Problem Statement
 
-KubeStellar faces complex dependency management issues:
-- Multiple initContainers with security vulnerabilities
-- Complex RBAC requirements for kubectl containers
-- No native "wait for resource" capability in Helm
-- Need for priority-based resource creation
-- Conditional resource creation based on states
+KubeStellar faces critical dependency management and security issues:
+
+- **Security Vulnerabilities**: Multiple initContainers using outdated kubectl images introduce CVEs and security risks
+- **Complex RBAC Requirements**: Current approach requires excessive privileges for initialization containers
+- **Missing Helm Capabilities**: No native "wait for resource existence/state" or "create if not exists" functionality
+- **Resource Monitoring Limitations**: Current snapshot-based approach instead of continuous watch/informer pattern
+- **Inter-Chart Dependencies**: Problems with Helm chart dependencies and "null value" issues
+- **Conditional Resource Creation**: No declarative way to create resources based on state of other resources
+- **Pre-install Hook Limitations**: Limited ability to check for existing resources before installation
+
+These issues create significant operational risks:
+- Security vulnerabilities from outdated kubectl images
+- Fragile bash scripts managing critical infrastructure
+- Excessive RBAC permissions granted to initialization containers
+- Delayed detection of deployment issues
+- Difficult troubleshooting when resources fail to initialize properly
+- Complex rollback procedures when dependency chains break
 
 ## Solution: Dependency Management Operator
 
-A Kubernetes-native operator that handles resource dependencies, priority-based creation, and state waiting - eliminating the need for initContainers and kubectl images.
+A Kubernetes-native operator that handles resource dependencies, priority-based creation, and state waiting - eliminating the need for initContainers and kubectl images while providing continuous monitoring capabilities.
 
 ---
 
@@ -30,11 +41,11 @@ spec:
   
   # Dependencies to wait for
   dependencies:
-    - resource: "namespace/kflex-system"
+    - resource: "namespace/kubestellar-system"
       timeout: "2m"
       priority: 1
-    - resource: "deployment/kflex-controller"
-      namespace: "kflex-system"
+    - resource: "deployment/kubeflex-controller-manager"
+      namespace: "kubeflex-system"
       state: "Ready"
       minReplicas: 1
       timeout: "5m"
@@ -51,8 +62,8 @@ spec:
         apiVersion: "v1"
         kind: "ConfigMap"
         metadata:
-          name: "bootstrap-config"
-          namespace: "kflex-system"
+          name: "kubestellar-bootstrap-status"
+          namespace: "kubestellar-system"
         data:
           phase: "dependencies-ready"
           timestamp: "{{ .Now }}"
@@ -64,7 +75,7 @@ spec:
         kind: Secret
         metadata:
           name: kubestellar-bootstrap
-          namespace: {{ .Dependencies.namespace_kflex_system.Name }}
+          namespace: {{ .Dependencies.namespace_kubestellar_system.Name }}
         data:
           config: {{ .Values.bootstrapConfig | b64enc }}
 
@@ -238,11 +249,11 @@ func (r *ResourceDependencyReconciler) executeAction(ctx context.Context, action
 
 ## Implementation Strategy
 
-### Phase 1: Core Operator Structure
+### Phase 1: Core Operator Structure (Week 1-2)
 
 ```bash
 # Initialize project
-kubebuilder init --domain kubestellar.io --repo github.com/yourusername/resource-dependency-operator
+kubebuilder init --domain kubestellar.io --repo github.com/kubestellar/resource-dependency-operator
 
 # Create main API
 kubebuilder create api --group tools --version v1 --kind ResourceDependency --resource --controller
@@ -251,163 +262,105 @@ kubebuilder create api --group tools --version v1 --kind ResourceDependency --re
 kubebuilder create api --group tools --version v1 --kind DependencyGroup --resource --controller
 ```
 
-### Phase 2: Custom Resources Definition
+**Deliverables:**
+- Basic project structure with kubebuilder
+- Initial CRD definitions
+- Controller scaffolding
+- Unit test framework
 
-#### **Main Resource: ResourceDependency**
+### Phase 2: Dependency Checking Engine (Week 3-4)
 
-```go
-type ResourceDependencySpec struct {
-    // Priority for this dependency group (lower = higher priority)
-    Priority int `json:"priority,omitempty"`
-    
-    // Dependencies to wait for
-    Dependencies []Dependency `json:"dependencies"`
-    
-    // Actions to execute when dependencies are met
-    Actions []Action `json:"actions,omitempty"`
-    
-    // Failure handling
-    OnFailure []FailureAction `json:"onFailure,omitempty"`
-    
-    // Global timeout for all dependencies
-    GlobalTimeout *metav1.Duration `json:"globalTimeout,omitempty"`
-    
-    // Retry configuration
-    RetryPolicy *RetryPolicy `json:"retryPolicy,omitempty"`
-}
+**Focus Areas:**
+- Resource existence validation
+- Resource state validation for standard Kubernetes resources
+- Timeout and retry logic
+- Status reporting
+- Watch/informer pattern implementation for continuous monitoring
 
-type Dependency struct {
-    // Resource reference (kind/name or kind/name/namespace)
-    Resource string `json:"resource"`
-    
-    // Namespace (optional)
-    Namespace string `json:"namespace,omitempty"`
-    
-    // State to wait for
-    State string `json:"state,omitempty"`
-    
-    // Priority within this dependency group
-    Priority int `json:"priority,omitempty"`
-    
-    // Timeout for this specific dependency
-    Timeout *metav1.Duration `json:"timeout,omitempty"`
-    
-    // Custom conditions
-    Conditions []DependencyCondition `json:"conditions,omitempty"`
-    
-    // Minimum replicas (for Deployments, StatefulSets)
-    MinReplicas *int32 `json:"minReplicas,omitempty"`
-    
-    // Labels selector for additional filtering
-    LabelSelector *metav1.LabelSelector `json:"labelSelector,omitempty"`
-}
+**Deliverables:**
+- Complete dependency checking implementation
+- Support for all standard Kubernetes resources
+- Full unit test coverage for validation functions
+- Integration tests with real Kubernetes resources
+- Continuous watching for resource state changes
 
-type DependencyCondition struct {
-    Type     string `json:"type"`     // "Ready", "Available", "Custom"
-    Status   string `json:"status"`   // "True", "False", "Unknown"
-    Reason   string `json:"reason,omitempty"`
-    JSONPath string `json:"jsonPath,omitempty"` // For custom conditions
-    Value    string `json:"value,omitempty"`    // Expected value
-}
+### Phase 3: Action Execution Engine (Week 5-6)
 
-type Action struct {
-    Priority int    `json:"priority,omitempty"`
-    Type     string `json:"type"` // "create", "template", "patch", "delete", "wait", "exec"
-    
-    // Different action types
-    Resource *unstructured.Unstructured `json:"resource,omitempty"`
-    Template string                     `json:"template,omitempty"`
-    Patch    *PatchAction              `json:"patch,omitempty"`
-    Delete   *DeleteAction             `json:"delete,omitempty"`
-    Wait     *metav1.Duration          `json:"wait,omitempty"`
-    Exec     *ExecAction               `json:"exec,omitempty"`
-    
-    // Action modifiers
-    FailFast     bool                `json:"failFast,omitempty"`
-    DelayAfter   *metav1.Duration    `json:"delayAfter,omitempty"`
-    Condition    *ActionCondition    `json:"condition,omitempty"`
-}
-```
+**Focus Areas:**
+- Priority-based action execution
+- Template processing engine
+- Patch/create/delete implementations
+- Conditional execution logic
+- "Create if not exists" pattern implementation
 
-### Phase 3: Controller Implementation
+**Deliverables:**
+- Complete action execution implementation
+- Go templating with dependency data injection
+- Error handling and recovery mechanisms
+- Integration tests for all action types
+- Support for conditional resource creation
 
-#### **Main Reconciliation Logic**
+### Phase 4: KubeStellar Integration (Week 7-8)
 
-```go
-func (r *ResourceDependencyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-    log := log.FromContext(ctx)
-    
-    // 1. Fetch ResourceDependency
-    var resDep toolsv1.ResourceDependency
-    if err := r.Get(ctx, req.NamespacedName, &resDep); err != nil {
-        return ctrl.Result{}, client.IgnoreNotFound(err)
-    }
-    
-    // 2. Check if already completed
-    if resDep.Status.Phase == "Completed" {
-        return ctrl.Result{}, nil
-    }
-    
-    // 3. Sort dependencies by priority
-    deps := make([]toolsv1.Dependency, len(resDep.Spec.Dependencies))
-    copy(deps, resDep.Spec.Dependencies)
-    sort.Slice(deps, func(i, j int) bool {
-        return deps[i].Priority < deps[j].Priority
-    })
-    
-    // 4. Check dependencies in priority order
-    depStatus := make(map[string]DependencyStatus)
-    allReady := true
-    anyFailed := false
-    
-    for _, dep := range deps {
-        status := r.checkDependency(ctx, dep)
-        depStatus[dep.Resource] = status
-        
-        switch status.State {
-        case "Ready":
-            continue
-        case "TimedOut", "Failed":
-            anyFailed = true
-            allReady = false
-        default:
-            allReady = false
-        }
-        
-        // If high priority dependency isn't ready, wait before checking lower priority ones
-        if dep.Priority < 5 && status.State != "Ready" {
-            break
-        }
-    }
-    
-    // 5. Handle different states
-    if anyFailed {
-        return r.handleFailure(ctx, &resDep, depStatus)
-    }
-    
-    if !allReady {
-        r.updateStatus(ctx, &resDep, "Waiting", "Dependencies not yet ready", depStatus)
-        return ctrl.Result{RequeueAfter: r.calculateBackoff(resDep.Status.RetryCount)}, nil
-    }
-    
-    // 6. Execute actions
-    if err := r.executeActions(ctx, resDep.Spec.Actions, depStatus); err != nil {
-        r.updateStatus(ctx, &resDep, "ActionFailed", err.Error(), depStatus)
-        return ctrl.Result{RequeueAfter: time.Minute}, err
-    }
-    
-    // 7. Mark as completed
-    r.updateStatus(ctx, &resDep, "Completed", "All dependencies met and actions executed", depStatus)
-    
-    return ctrl.Result{}, nil
-}
-```
+**Focus Areas:**
+- Custom validators for KubeStellar-specific resources (ControlPlane, WDS, ITS)
+- Migration plan from initContainers to operator
+- Example ResourceDependency objects for common KubeStellar patterns
+- Documentation and usage examples
+- Support for inter-chart dependencies
 
-### Phase 4: KubeStellar Integration Examples
+**Deliverables:**
+- KubeStellar-specific extensions
+- End-to-end tests with KubeStellar components
+- Migration guides and examples
+- Performance testing and optimization
+- Pre-install hook replacement patterns
 
-#### **Example 1: KubeFlex Bootstrap**
+### Phase 5: Advanced Features & Stabilization (Week 9-10)
+
+**Focus Areas:**
+- DependencyGroup implementation
+- Advanced conditional logic
+- Performance optimization
+- Documentation and examples
+- Helm chart for operator deployment
+
+**Deliverables:**
+- Complete user documentation
+- Advanced usage examples
+- Performance benchmarks
+- Production readiness review
+- Helm chart for easy deployment
+
+## KubeStellar-Specific Integration Examples
+
+### Example 1: KubeFlex Bootstrap Without InitContainers
+
+#### **Current Pattern with InitContainers**
 
 ```yaml
+# Current approach with InitContainer
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubeflex-controller-manager
+  namespace: kubeflex-system
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: wait-for-namespace
+        image: bitnami/kubectl:1.25.8
+        command: ['sh', '-c', 'until kubectl get namespace kubeflex-system; do echo "Waiting for namespace"; sleep 2; done']
+      - name: wait-for-crds
+        image: bitnami/kubectl:1.25.8
+        command: ['sh', '-c', 'until kubectl get crd controlplanes.kubeflex.kubestellar.io; do echo "Waiting for CRDs"; sleep 2; done']
+```
+
+#### **New Pattern with ResourceDependency**
+
+```yaml
+# New approach with ResourceDependency operator
 apiVersion: tools.kubestellar.io/v1
 kind: ResourceDependency
 metadata:
@@ -426,17 +379,6 @@ spec:
     - resource: "crd/controlplanes.kubeflex.kubestellar.io"
       priority: 1
       timeout: "2m"
-    
-    # Priority 2: Controllers
-    - resource: "deployment/kubeflex-controller-manager"
-      namespace: "kubeflex-system"
-      state: "Ready"
-      minReplicas: 1
-      priority: 2
-      timeout: "5m"
-      conditions:
-        - type: "Available"
-          status: "True"
   
   actions:
     - priority: 1
@@ -445,42 +387,66 @@ spec:
         apiVersion: v1
         kind: ConfigMap
         metadata:
-          name: kubeflex-ready
+          name: kubeflex-prerequisites-ready
           namespace: kubeflex-system
         data:
           status: "ready"
-          phase: "bootstrap-complete"
+          timestamp: "{{ .Now }}"
     
     - priority: 2
-      type: "template"
-      template: |
-        apiVersion: kubeflex.kubestellar.io/v1alpha1
-        kind: ControlPlane
-        metadata:
-          name: {{ .Values.itsName | default "its1" }}
-        spec:
-          type: vcluster
+      type: "patch"
+      patch:
+        target:
+          kind: "Deployment"
+          name: "kubeflex-controller-manager"
+          namespace: "kubeflex-system"
+        patchType: "strategic"
+        patch: |
+          {"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"{{ .Now }}"}}}}}}
 ```
 
-#### **Example 2: WDS Setup with ITS Dependency**
+### Example 2: ITS to WDS Dependency Chain
+
+#### **Current Pattern with InitContainers**
 
 ```yaml
+# Current approach with initContainers
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wds-controller
+  namespace: kubestellar-system
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: wait-for-its
+        image: bitnami/kubectl:1.25.8
+        command: ['sh', '-c', 'until kubectl get controlplane its1 -o jsonpath="{.status.phase}" | grep Running; do echo "Waiting for ITS"; sleep 5; done']
+      - name: wait-for-ocm
+        image: bitnami/kubectl:1.25.8
+        command: ['sh', '-c', 'until kubectl get deployment -n its1 cluster-manager -o jsonpath="{.status.readyReplicas}" | grep 1; do echo "Waiting for OCM"; sleep 5; done']
+```
+
+#### **New Pattern with ResourceDependency**
+
+```yaml
+# New approach with ResourceDependency operator
 apiVersion: tools.kubestellar.io/v1
 kind: ResourceDependency
 metadata:
-  name: wds-setup
+  name: wds-prerequisites
+  namespace: kubestellar-system
 spec:
   priority: 2
   
   dependencies:
     # Wait for ITS to be ready
-    - resource: "controlplane/its1"
+    - resource: "controlplane.kubeflex.kubestellar.io/its1"
       state: "Ready"
       priority: 1
       timeout: "8m"
       conditions:
-        - type: "Ready"
-          status: "True"
         - jsonPath: ".status.phase"
           value: "Running"
     
@@ -490,99 +456,365 @@ spec:
       state: "Ready"
       priority: 2
       timeout: "5m"
+      minReplicas: 1
   
   actions:
     - priority: 1
-      type: "template"
-      template: |
-        apiVersion: kubeflex.kubestellar.io/v1alpha1
-        kind: ControlPlane
-        metadata:
-          name: {{ .Values.wdsName | default "wds1" }}
-        spec:
-          type: k8s
-    
-    - priority: 2
-      type: "wait"
-      wait: "30s"  # Wait for WDS to initialize
-    
-    - priority: 3
       type: "template"
       template: |
         apiVersion: v1
         kind: Secret
         metadata:
           name: wds-its-connection
-          namespace: {{ .Values.wdsName | default "wds1" }}
+          namespace: kubestellar-system
         data:
-          its-endpoint: {{ .Dependencies.controlplane_its1.Status.APIEndpoint | b64enc }}
+          its-endpoint: {{ .Dependencies.controlplane_its1.Status.Endpoint | b64enc }}
+          its-kubeconfig: {{ .Dependencies.controlplane_its1.Status.Kubeconfig | b64enc }}
+    
+    - priority: 2
+      type: "patch"
+      patch:
+        target:
+          kind: "Deployment" 
+          name: "wds-controller"
+          namespace: "kubestellar-system"
+        patchType: "strategic"
+        patch: |
+          {"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"{{ .Now }}"}}}}}}
 ```
 
-### Phase 5: Advanced Features
+### Example 3: Conditional Resource Creation for PostgreSQL
 
-#### **Conditional Actions**
+#### **Current Pattern with Bash Scripts**
 
 ```yaml
-actions:
-  - priority: 1
-    type: "create"
-    condition:
-      type: "dependency"
-      dependency: "deployment/postgres"
-      state: "Ready"
-    resource:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: app-config
-      data:
-        db_ready: "true"
+# Current approach with bash scripts
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-setup
+  namespace: kubestellar-system
+spec:
+  template:
+    spec:
+      containers:
+      - name: setup
+        image: bitnami/kubectl:1.25.8
+        command:
+        - /bin/bash
+        - -c
+        - |
+          if ! kubectl get statefulset postgres -n kubestellar-system; then
+            kubectl apply -f /manifests/postgres.yaml
+            until kubectl get pod postgres-0 -n kubestellar-system -o jsonpath="{.status.phase}" | grep Running; do
+              echo "Waiting for PostgreSQL"
+              sleep 5
+            done
+            kubectl apply -f /manifests/database-init.yaml
+          fi
 ```
 
-#### **Dependency Groups**
+#### **New Pattern with ResourceDependency**
+
+```yaml
+# New approach with ResourceDependency operator
+apiVersion: tools.kubestellar.io/v1
+kind: ResourceDependency
+metadata:
+  name: postgres-setup
+  namespace: kubestellar-system
+spec:
+  priority: 1
+  
+  dependencies:
+    # Check if PostgreSQL already exists (optional dependency)
+    - resource: "statefulset/postgres"
+      namespace: "kubestellar-system"
+      priority: 1
+      timeout: "1m"
+      optional: true  # This dependency is optional
+  
+  actions:
+    # Create PostgreSQL if it doesn't exist
+    - priority: 1
+      type: "create"
+      condition:
+        type: "dependency"
+        dependency: "statefulset/postgres"
+        state: "NotFound"
+      resource:
+        apiVersion: apps/v1
+        kind: StatefulSet
+        metadata:
+          name: postgres
+          namespace: kubestellar-system
+        spec:
+          serviceName: postgres
+          replicas: 1
+          # ... rest of StatefulSet definition ...
+    
+    # Wait for PostgreSQL to be ready
+    - priority: 2
+      type: "wait"
+      wait: "10s"
+      condition:
+        type: "dependency" 
+        dependency: "statefulset/postgres"
+        state: "NotFound"
+        negate: true
+    
+    # Create initialization job
+    - priority: 3
+      type: "create"
+      condition:
+        type: "dependency"
+        dependency: "statefulset/postgres" 
+        state: "Ready"
+      resource:
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: postgres-init
+          namespace: kubestellar-system
+        spec:
+          # ... database initialization job ...
+```
+
+### Example 4: Resource Processing Example (Watch/Informer Pattern)
+
+```yaml
+# Resource processing example
+apiVersion: tools.kubestellar.io/v1
+kind: ResourceDependency
+metadata:
+  name: its-wds-binding
+  namespace: kubestellar-system
+spec:
+  # Enable continuous watching instead of one-time check
+  watchMode: true
+  
+  dependencies:
+    - resource: "controlplane.kubeflex.kubestellar.io/its1"
+      state: "Ready"
+      watchEvents: ["update", "create"]  # Watch for these events
+      
+    - resource: "controlplane.kubeflex.kubestellar.io/wds1"
+      state: "Ready"
+      watchEvents: ["update", "create"]  # Watch for these events
+  
+  actions:
+    - priority: 1
+      type: "template"
+      template: |
+        apiVersion: kubestellar.io/v1alpha1
+        kind: ITSWDSBinding
+        metadata:
+          name: its1-wds1-binding
+          namespace: kubestellar-system
+        spec:
+          itsName: its1
+          wdsName: wds1
+          itsEndpoint: {{ .Dependencies.controlplane_its1.Status.Endpoint }}
+          wdsEndpoint: {{ .Dependencies.controlplane_wds1.Status.Endpoint }}
+      # This action will be re-executed whenever dependencies change
+      runOnChanges: true
+```
+
+### Example 5: Helm Pre-Install Hook Replacement
+
+```yaml
+# Replaces Helm pre-install hooks with a more powerful pattern
+apiVersion: tools.kubestellar.io/v1
+kind: ResourceDependency
+metadata:
+  name: kubestellar-prereq-check
+  namespace: kubestellar-system
+  annotations:
+    "helm.sh/hook": "pre-install"
+spec:
+  priority: 1
+  
+  dependencies:
+    # Check for Kubernetes version
+    - resource: "version/kubernetes"
+      conditions:
+        - jsonPath: ".major"
+          value: "1"
+          operator: "gte"
+        - jsonPath: ".minor" 
+          value: "24"
+          operator: "gte"
+    
+    # Check if namespace exists
+    - resource: "namespace/kubestellar-system"
+      optional: true
+  
+  actions:
+    # Create namespace if it doesn't exist
+    - priority: 1
+      type: "create"
+      condition:
+        type: "dependency"
+        dependency: "namespace/kubestellar-system"
+        state: "NotFound"
+      resource:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: kubestellar-system
+          labels:
+            app.kubernetes.io/managed-by: kubestellar
+    
+    # Update Helm values based on environment
+    - priority: 2
+      type: "template"
+      template: |
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: kubestellar-helm-values
+          namespace: kubestellar-system
+        data:
+          overrideValues.yaml: |
+            global:
+              kubernetesVersion: {{ .Dependencies.version_kubernetes.Status.version }}
+              namespaceExists: {{ if eq .Dependencies.namespace_kubestellar_system.State "Ready" }}true{{ else }}false{{ end }}
+```
+
+### Example 6: Complete KubeStellar Deployment Chain
 
 ```yaml
 apiVersion: tools.kubestellar.io/v1
 kind: DependencyGroup
 metadata:
-  name: kubestellar-full-stack
+  name: kubestellar-full-deployment
+  namespace: kubestellar-system
 spec:
   groups:
-    - name: "infrastructure"
+    # Phase 1: Infrastructure
+    - name: "core-infrastructure"
       priority: 1
       dependencies:
-        - "namespace/kubeflex-system"
-        - "crd/controlplanes.kubeflex.kubestellar.io"
+        - name: "kubestellar-namespaces"
+          resource: "namespace/kubestellar-system"
+        - name: "kubeflex-namespaces"
+          resource: "namespace/kubeflex-system"
+        - name: "kubeflex-crds"
+          resource: "crd/controlplanes.kubeflex.kubestellar.io"
+        - name: "kubestellar-crds"
+          resource: "crd/workloadclusters.kubestellar.io"
     
-    - name: "control-planes"
+    # Phase 2: Operators
+    - name: "operators"
       priority: 2
-      dependsOn: ["infrastructure"]
+      dependsOn: ["core-infrastructure"]
       dependencies:
-        - "controlplane/its1"
-        - "controlplane/wds1"
+        - name: "kubeflex-controller"
+          resource: "deployment/kubeflex-controller-manager"
+          namespace: "kubeflex-system"
+          state: "Ready"
+          minReplicas: 1
     
-    - name: "applications"
+    # Phase 3: Control Planes
+    - name: "control-planes"
       priority: 3
+      dependsOn: ["operators"]
+      dependencies:
+        - name: "its-controlplane"
+          resource: "controlplane.kubeflex.kubestellar.io/its1"
+          state: "Ready"
+          conditions:
+            - jsonPath: ".status.phase"
+              value: "Running"
+        - name: "ocm-controller"
+          resource: "deployment/cluster-manager"
+          namespace: "its1"
+          state: "Ready"
+    
+    # Phase 4: WDS Setup
+    - name: "wds-setup"
+      priority: 4
       dependsOn: ["control-planes"]
       dependencies:
-        - "deployment/kubestellar-controller"
+        - name: "wds-controlplane"
+          resource: "controlplane.kubeflex.kubestellar.io/wds1"
+          state: "Ready"
+          conditions:
+            - jsonPath: ".status.phase"
+              value: "Running"
+    
+    # Phase 5: KubeStellar Controllers
+    - name: "kubestellar-controllers"
+      priority: 5
+      dependsOn: ["wds-setup"]
+      dependencies:
+        - name: "kubestellar-controller"
+          resource: "deployment/kubestellar-controller"
+          namespace: "kubestellar-system"
+          state: "Ready"
+          minReplicas: 1
 ```
 
----
+## How This Solution Addresses Franco's Specific Concerns
+
+| Franco's Concern | How Our Solution Addresses It |
+|------------------|-------------------------------|
+| Security Issues with InitContainers | Completely eliminates the need for kubectl images and privilege escalation in initContainers |
+| Resource Waiting | Provides a declarative way to wait for resources with specific states and timeout handling |
+| Resource Processing | Implements watch/informer pattern with the `watchMode` and `runOnChanges` features |
+| Pre-install Hooks Enhancement | Offers conditional resource creation and checking capabilities that go beyond Helm's hook system |
+| Chart Dependencies | Solves inter-chart dependencies through ResourceDependency objects that can be included in charts |
+| "Ensure a resource exists" | Implements the "create if not exists" pattern through conditional actions |
+| "Wait for resource existence/state" | Core feature of the dependency checking algorithm |
+| "If resource A has state B, then do this" | Implemented through conditional actions based on dependency states |
+
+## Testing Strategy
+
+### 1. Unit Tests
+
+- Test dependency validation functions for each resource type
+- Test template processing with dependency injection
+- Test conditional logic for actions
+- Test priority sorting and execution
+
+### 2. Integration Tests
+
+- Test complete ResourceDependency processing
+- Test with real Kubernetes resources in a test cluster
+- Test timeout and retry mechanisms
+- Test error handling and recovery
+- Test watch/informer pattern implementation
+
+### 3. End-to-End Tests
+
+- Replace actual KubeStellar initContainers with ResourceDependency
+- Validate complete deployment chain
+- Test failure scenarios and recovery
+- Performance testing with large dependency chains
+- Test inter-chart dependencies
+
+### 4. Chaos Testing
+
+- Test resilience to API server unavailability
+- Test handling of resource deletion during reconciliation
+- Test concurrent ResourceDependency processing
+- Test recovery from controller pod restarts
 
 ## Benefits for KubeStellar
 
 ### 1. **Eliminates Current Pain Points**
-- ❌ **No more initContainers**
-- ❌ **No kubectl container images**
-- ❌ **No complex RBAC for hooks**
-- ❌ **No security vulnerabilities**
+- ❌ **No more initContainers with security risks**
+- ❌ **No kubectl container images to maintain**
+- ❌ **No complex RBAC for hook containers**
+- ❌ **No bash scripts handling critical infrastructure**
+- ❌ **No manual dependency tracking**
 
 ### 2. **Kubernetes-Native Solution**
 - ✅ **Declarative resource management**
 - ✅ **Built-in retry and backoff**
 - ✅ **Proper status reporting**
 - ✅ **Event-driven reconciliation**
+- ✅ **Standard Kubernetes patterns**
 
 ### 3. **Advanced Capabilities**
 - ✅ **Priority-based execution**
@@ -590,10 +822,27 @@ spec:
 - ✅ **Template-based resource creation**
 - ✅ **Conditional actions**
 - ✅ **Timeout and failure handling**
+- ✅ **Dynamic data injection from dependencies**
+- ✅ **Continuous watching with informer pattern**
 
-### 4. **Reusability**
+### 4. **Security Enhancements**
+- ✅ **No privileged containers**
+- ✅ **No cluster-admin RBAC for initialization**
+- ✅ **No exposed kubectl images**
+- ✅ **Fine-grained permissions model**
+- ✅ **Audit trail through Kubernetes events**
+
+### 5. **Developer Experience**
+- ✅ **Clear visibility into deployment status**
+- ✅ **Predictable behavior across environments**
+- ✅ **Simplified debugging with detailed status**
+- ✅ **Reusable patterns across KubeStellar components**
+- ✅ **Self-documenting deployment dependencies**
+
+### 6. **Reusability**
 - ✅ **Works across all KubeStellar components**
 - ✅ **Can be used by other projects**
 - ✅ **Reduces code duplication**
+- ✅ **Potential for community contribution**
 
-This operator will transform KubeStellar's deployment model from script-based to fully declarative, Kubernetes-native dependency management.
+This operator will transform KubeStellar's deployment model from script-based to fully declarative, Kubernetes-native dependency management, dramatically improving security, reliability, and maintainability while providing a reference implementation for the broader Kubernetes community.
