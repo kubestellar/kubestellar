@@ -793,12 +793,6 @@ spec:
 - Performance testing with large dependency chains
 - Test inter-chart dependencies
 
-### 4. Chaos Testing
-
-- Test resilience to API server unavailability
-- Test handling of resource deletion during reconciliation
-- Test concurrent ResourceDependency processing
-- Test recovery from controller pod restarts
 
 ## Benefits for KubeStellar
 
