@@ -88,51 +88,7 @@ spec:
 ```
 
 ### 2. **Core Reconciliation Algorithm**
-
-```
-┌─────────────────────────────────────────┐
-│          RECONCILIATION LOOP            │
-└─────────────────┬───────────────────────┘
-                  │
-┌─────────────────▼───────────────────────┐
-│  1. FETCH ResourceDependency Object     │
-└─────────────────┬───────────────────────┘
-                  │
-┌─────────────────▼───────────────────────┐
-│  2. SORT Dependencies by Priority       │
-│     (Lower number = Higher priority)    │
-└─────────────────┬───────────────────────┘
-                  │
-┌─────────────────▼───────────────────────┐
-│  3. CHECK Dependencies in Order         │
-│     For each dependency:                │
-│     ├─ Check if resource exists         │
-│     ├─ Validate required state         │
-│     ├─ Check timeout constraints        │
-│     └─ Mark as Ready/NotReady/Failed    │
-└─────────────────┬───────────────────────┘
-                  │
-┌─────────────────▼───────────────────────┐
-│  4. EVALUATE Overall Status             │
-│     ├─ All Ready → Execute Actions      │
-│     ├─ Some Pending → Wait & Requeue    │
-│     └─ Any Timeout → Execute onFailure  │
-└─────────────────┬───────────────────────┘
-                  │
-┌─────────────────▼───────────────────────┐
-│  5. EXECUTE Actions (if ready)          │
-│     Sort actions by priority            │
-│     Execute in priority order           │
-│     Update status for each action       │
-└─────────────────┬───────────────────────┘
-                  │
-┌─────────────────▼───────────────────────┐
-│  6. UPDATE Status & Requeue             │
-│     ├─ Update ResourceDependency status │
-│     ├─ Emit Kubernetes events           │
-│     └─ Schedule next reconciliation     │
-└─────────────────────────────────────────┘
-```
+![alt text](image.png)
 
 ### 3. **Dependency Checking Algorithm**
 
