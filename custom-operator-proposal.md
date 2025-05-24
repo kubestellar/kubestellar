@@ -711,9 +711,9 @@ spec:
           minReplicas: 1
 ```
 
-## How This Solution Addresses Franco's Specific Concerns
+## How This Solution Addresses KS's Specific Concerns
 
-| Franco's Concern | How Our Solution Addresses It |
+| KS's Concern | How Our Solution Addresses It |
 |------------------|-------------------------------|
 | Security Issues with InitContainers | Completely eliminates the need for kubectl images and privilege escalation in initContainers |
 | Resource Waiting | Provides a declarative way to wait for resources with specific states and timeout handling |
