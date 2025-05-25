@@ -51,6 +51,9 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 
 This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
 
+## Windows Native Installation Guide
+[Windows Native Installation Guide](./docs/setup-windows.md)
+
 ## Our Roadmap
 Have a look at what we are working on next, see our [Roadmap](docs/content/direct/roadmap.md) 
 
