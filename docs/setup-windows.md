@@ -41,7 +41,6 @@ Invoke-WebRequest -Uri "https://dl.k8s.io/release/v1.32.2/bin/windows/amd64/kube
   * Add: `C:\Users\<YourUsername>\` to `Path`
 
 * Test:
-
 ```powershell
 kubectl version --client
 ```
@@ -64,7 +63,6 @@ Move-Item "$env:USERPROFILE\kind.exe" "C:\Program Files\kind.exe"
 * Add to PATH or run directly from folder
 
 * Test:
-
 ```powershell
 kind version
 ```
@@ -133,5 +131,5 @@ curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/main/scripts/c
 kind create cluster --name kubestellar
 kubectl cluster-info --context kind-kubestellar
 ```
-
+---
 
