@@ -19,6 +19,16 @@ You need to install the following tools:
 
 ###  Step-by-Step Windows Installation
 
+### Invoke-WebRequest -> This is a built-in PowerShell command used to download files or access web pages. It's similar to curl or wget in Linux/macOS
+
+### -Uri -> This specifies the URL you want to request/download from
+
+### -OutFile -> This specifies where to save the downloaded file on your computer
+
+### "$env:USERPROFILE\kind.exe"  -> This uses an environment variable $env:USERPROFILE to refer to your Windows user folder (like C:\Users\YourName), and saves the file there as kind.exe
+
+
+
 #### 1. Install kubectl
 
 ```powershell
