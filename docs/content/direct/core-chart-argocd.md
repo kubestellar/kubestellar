@@ -164,7 +164,7 @@ lxyMWsIcdtoUY3Py
 
 - **URL**: `https://argocd.localtest.me:9443`
 - **Username**: `admin`
-- **Password**: `lxyMWsIcdtoUY3Py` (from the command above)
+- **Password**: `lxyMWsIcdtoUY3Py` (change this with yours)
 
 > **Note:** All Argo CD components are installed in the `kubeflex-system` namespace rather than a dedicated `argocd` namespace. This is the expected behavior when using the KubeStellar Core chart with Argo CD integration.
 
