@@ -21,11 +21,12 @@ set -x # so users can see what is going on
 env="kind"
 test="bash"
 fail_flag=""
-
+setup_flags=""
+existing_wec_contexts=""
 
 while [ $# != 0 ]; do
     case "$1" in
-        (-h|--help) echo "$0 usage: (--released | --env | --test-type | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --fail-fast)*"
+        (-h|--help) echo "$0 usage: (--released | --env $kind_or_ocp | --test-type $bash_or_ginkgo | --kubestellar-controller-manager-verbosity $num | --transport-controller-verbosity $num | --fail-fast | --existing-wec-contexts $context1,$context2,...)*"
                     exit;;
         (--released) setup_flags="$setup_flags $1";;
         (--kubestellar-controller-manager-verbosity|--transport-controller-verbosity)
@@ -53,6 +54,14 @@ while [ $# != 0 ]; do
             exit 1;
           fi;;
         (--fail-fast) fail_flag="--fail-fast";;
+        (--existing-wec-contexts)
+          if (( $# > 1 )); then
+            existing_wec_contexts="$2"
+            shift
+          else
+            echo "Missing existing WEC contexts value" >&2
+            exit 1;
+          fi;;
         (*) echo "$0: unrecognized argument '$1'" >&2
             exit 1
     esac
@@ -81,7 +90,7 @@ scripts_dir="${SRC_DIR}/../../scripts"
 
 "${COMMON_SRCS}/cleanup.sh" --env "$env"
 source "${COMMON_SRCS}/setup-shell.sh"
-"${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env"
+"${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env" $([ -n "$existing_wec_contexts" ] && echo "--existing-wec-contexts $existing_wec_contexts")
 
 if [ $test == "bash" ];then
     "${SRC_DIR}/bash/use-kubestellar.sh" --env "$env"
