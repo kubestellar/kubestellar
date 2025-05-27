@@ -20,19 +20,25 @@ SCRIPT_NAME="create-kubestellar-demo-env.sh"
 
 # Default Kubernetes platform parameter
 k8s_platform="kind"
+single_cp=false
+wds_context=""
+its_context=""
 
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --platform) k8s_platform="$2"; shift ;;
+        --single-cp) single_cp=true ;;
+        --wds-context) wds_context="$2"; shift ;;
+        --its-context) its_context="$2"; shift ;;
         -X) set -x ;;
         -h|--help)
-            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [--single-cp] [--wds-context <context>] [--its-context <context>] [-X] [-h|--help]" >&2
             exit 0
             ;;
         *)
             echo "Unknown parameter passed: $1" >&2
-            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [--single-cp] [--wds-context <context>] [--its-context <context>] [-X] [-h|--help]" >&2
             exit 1
             ;;
     esac
@@ -43,6 +49,13 @@ if [[ "$k8s_platform" != "kind" && "$k8s_platform" != "k3d" ]]; then
     echo "Invalid platform specified: $k8s_platform"
     echo "Supported platforms are: kind, k3d"
     exit 1
+fi
+
+if [[ -n "$wds_context" || -n "$its_context" ]]; then
+    echo "Using existing clusters: WDS context='$wds_context', ITS context='$its_context'"
+fi
+if [[ "$single_cp" == true ]]; then
+    echo "Using a single ControlPlane for both ITS and WDS roles."
 fi
 
 echo "Selected Kubernetes platform: $k8s_platform"
@@ -155,26 +168,31 @@ echo -e "\nStarting context clean up..."
 context_clean_up
 echo -e "\033[33m✔\033[0m Context space clean up completed"
 
-echo -e "\nCreating two $k8s_platform clusters to serve as example WECs"
-clusters=(cluster1 cluster2)
-cluster_log_dir=$(mktemp -d)
-trap "rm -rf $cluster_log_dir" EXIT
-for cluster in "${clusters[@]}"; do
-    if {
-      if [ "$k8s_platform" == "kind" ]; then
-        kind create cluster --name "${cluster}" &>"${cluster_log_dir}/${cluster}.log"
-      else
-        k3d cluster create --network k3d-kubeflex "${cluster}" &>"${cluster_log_dir}/${cluster}.log"
-      fi
-    }; then
-        echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
-        kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
-    else
-        echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
-        cat "${cluster_log_dir}/${cluster}.log" >&2
-        false
-    fi
-done
+# Create clusters only if not using existing contexts
+if [[ -z "$wds_context" && -z "$its_context" ]]; then
+    echo -e "\nCreating two $k8s_platform clusters to serve as example WECs"
+    clusters=(cluster1 cluster2)
+    cluster_log_dir=$(mktemp -d)
+    trap "rm -rf $cluster_log_dir" EXIT
+    for cluster in "${clusters[@]}"; do
+        if {
+          if [ "$k8s_platform" == "kind" ]; then
+            kind create cluster --name "${cluster}" &>"${cluster_log_dir}/${cluster}.log"
+          else
+            k3d cluster create --network k3d-kubeflex "${cluster}" &>"${cluster_log_dir}/${cluster}.log"
+          fi
+        }; then
+            echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
+            kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
+        else
+            echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
+            cat "${cluster_log_dir}/${cluster}.log" >&2
+            false
+        fi
+    done
+else
+    echo "Skipping cluster creation; using provided contexts."
+fi
 
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
 if [ "$k8s_platform" == "kind" ]; then
@@ -213,14 +231,39 @@ then var_flags="--set kubeflex-operator.hostContainer=k3d-kubeflex-server-0"
 else var_flags=""
 fi
 
-helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
+# Helm install logic for KubeStellar core
+if [[ -n "$its_context" ]]; then
+    its_cp="$its_context"
+else
+    its_cp="its1"
+fi
+if [[ -n "$wds_context" ]]; then
+    wds_cp="$wds_context"
+else
+    wds_cp="wds1"
+fi
+
+if [[ "$single_cp" == true ]]; then
+    # Use one ControlPlane for both ITS and WDS
+    helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
         --version $kubestellar_version \
-        --set-json='ITSes=[{"name":"its1"}]' \
-        --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
+        --set-json="ITSes=[{\"name\":\"$its_cp\"}]" \
+        --set-json="WDSes=[{\"name\":\"$wds_cp\"}]" \
         --set-json='verbosity.default=5' \
         --set-json='kubeflex-operator.verbosity=5' \
         --timeout=24h \
         $var_flags
+else
+    # Default: separate ITS and WDS
+    helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
+        --version $kubestellar_version \
+        --set-json="ITSes=[{\"name\":\"$its_cp\"}]" \
+        --set-json="WDSes=[{\"name\":\"wds1\"},{\"name\":\"wds2\", \"type\":\"host\"}]" \
+        --set-json='verbosity.default=5' \
+        --set-json='kubeflex-operator.verbosity=5' \
+        --timeout=24h \
+        $var_flags
+fi
 
 kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
 kflex ctx --overwrite-existing-context wds1
@@ -269,14 +312,14 @@ cat <<EOF
 Be sure to execute the following commands to set the shell variables expected in the example scenarios.
 
 host_context=${k8s_platform}-kubeflex
-its_cp=its1
-its_context=its1
-wds_cp=wds1
-wds_context=wds1
+its_cp=$its_cp
+its_context=$its_cp
+wds_cp=$wds_cp
+wds_context=$wds_cp
 wec1_name=cluster1
 wec2_name=cluster2
-wec1_context=\$wec1_name
-wec2_context=\$wec2_name
+wec1_context=$wec1_name
+wec2_context=$wec2_name
 label_query_both=location-group=edge
 label_query_one=name=cluster1
 EOF
