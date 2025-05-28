@@ -13,7 +13,7 @@ Before you start contributing, familiarize yourself with our community [Code of 
 
 ## Collaborate with us on GitHub!
 
-Visit the [GitHub repository](https://github.com/kubestellar/kubestellar) to gain access to information on the different KubeStellar project areas and how you can start contributing.
+Visit the [GitHub repository](https://github.com/kubestellar/kubestellar) to gain access to information on the different KubeStellar project areas and how you can start contributing to each of them.
 
 ## Contribution Resources
 
