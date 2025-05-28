@@ -1,24 +1,24 @@
 # Contributing to KubeStellar
-Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
+Welcome to the KubeStellar Contribution Guide! We are excited to have you here.
 
-To get started, kindly read through familiarize yourself with our [code of conduct](../contribution-guidelines/coc.md).
+This section provides information on the Code of Conduct, guidelines, terms, and conditions that define the KubeStellar contribution processes. By contributing, you are enabling the success of KubeStellar users, and that goes a long way to make everyone happier, including you. We welcome individuals who are new to open-source contributions.
 
-## Talk to us on Slack!
+There are different ways you can contribute to the KubeStellar development:
 
-If you have any inquiries, please feel free to reach out to us on the KubeStellar-dev [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/).
+- **Documentation:** Enhance the documentation by fixing typos, enabling semantic clarity, adding links, updating information on changelogs and release versions, and implementing content strategy.
+  
+- **Code:** Indicate your interest in developing new features, modifying existing features, raising concerns, or fixing bugs.
 
-## Work with us on GitHub!
+Before you start contributing, familiarize yourself with our community [Code of Conduct](../contribution-guidelines/coc-inc.md).
 
-More documentation and the actual management of contributions to the development of KubeStellar are done [via our GitHub repository.](https://github.com/kubestellar/kubestellar).
+## Collaborate with us on GitHub!
 
-*We can't wait to collaborate with you!*
+Visit the [GitHub repository](https://github.com/kubestellar/kubestellar) to gain access to information on the different KubeStellar project areas and how you can start contributing.
 
-## What else is here: more details about contributing 
+## Contribution Resources
 
-In addition to the Code of Conduct, there are a number of terms, conditions and processes that define our open-source process. They are explained in full detail on the pages in this section of the website:
+Read the resources to gain a better understanding of the contribution processes.
 
-- **[Code of Conduct](../contribution-guidelines/coc-inc.md)** The CNCF code of conduct for the KubeStellar community
-- **[Guidelines](../contribution-guidelines/contributing-inc.md)** General Guidelines for our Github processes
 - **[License](../contribution-guidelines/license-inc.md)** The Apache 2.0 license under which KubeStellar is published
 - **[Governance](../contribution-guidelines/governance-inc.md)** The protocols under which the KubeStellar project is run
 - **[Onboarding](../contribution-guidelines/onboarding-inc.md)** The procedures for adding/removing members of our Github organization
