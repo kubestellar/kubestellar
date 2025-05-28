@@ -11,9 +11,17 @@ There are different ways you can contribute to the KubeStellar development:
 
 Before you start contributing, familiarize yourself with our community [Code of Conduct](../contribution-guidelines/coc-inc.md).
 
-## Collaborate with us on GitHub!
+## Visit the GitHub repository
 
-Visit the [GitHub repository](https://github.com/kubestellar/kubestellar) to gain access to information on the different KubeStellar project areas and how you can start contributing to each of them.
+The KubeStellar [base repository](https://github.com/kubestellar) is a collection of the different KubeStellar projects' repositories that you can start contributing to.
+
+## Contributing
+
+Ensure that you consent to the Developer Certificate of Origin (DCO).
+
+If you are contributing via the GitHub web interface, navigate to the **Settings** section of your forked repository and enable the **Require contributors to sign off on web-based commits** form as shown in the image below:
+
+
 
 ## Contribution Resources
 
