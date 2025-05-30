@@ -19,7 +19,7 @@ The KubeStellar [base repository](https://github.com/kubestellar) is a collectio
 
 ### Sign off your contribution
 
-Ensure that you comply with the rules and policy guiding the repository contribution indicated in the [Developer Certificate of Origin (DCO)](). 
+Ensure that you comply with the rules and policy guiding the repository contribution indicated in the [Developer Certificate of Origin (DCO)](https://github.com/kubestellar/kubestellar/blob/main/DCO). 
 
 If you are contributing via the GitHub web interface, navigate to the **Settings** section of your forked repository and enable the **Require contributors to sign off on web-based commits** setting. This will allow you to automatically sign off your commits via GitHub directly as shown below.
 
