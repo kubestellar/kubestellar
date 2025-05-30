@@ -17,17 +17,16 @@ Before you start contributing, familiarize yourself with our community [Code of 
 
 The KubeStellar [base repository](https://github.com/kubestellar) is a collection of the different KubeStellar repositories that you can start contributing to.
 
-## Contributing
-
-### Sign off and sign contributions
+### Sign off your contribution
 
 Ensure that you comply with the rules and policy guiding the repository contribution indicated in the [Developer Certificate of Origin (DCO)](). 
 
-**To sign-off your contribution:**
+If you are contributing via the GitHub web interface, navigate to the **Settings** section of your forked repository and enable the **Require contributors to sign off on web-based commits** setting. This will allow you to automatically sign off your commits via GitHub directly as shown below.
 
-If you are contributing via the GitHub web interface, navigate to the **Settings** section of your forked repository and enable the **Require contributors to sign off on web-based commits** setting. This will allow you to automatically sign off your commits via GitHub directly. If you are contributing via the terminal, run the `git commit --signoff --message [commit message]` or `git commit -s -m [commit message]` command when making each commit.
+![signoff-via-github-ui](https://github.com/user-attachments/assets/ddfd3988-142e-4380-a738-1a767b1aaba6)
 
-**To sign your contribution:**
+If you are contributing via the command line terminal, run the `git commit --signoff --message [commit message]` or `git commit -s -m [commit message]` command when making each commit.
+
 
 
 ## Contribution Resources
