@@ -33,6 +33,7 @@ If you are contributing via the command line terminal, run the `git commit --sig
 
 Read the resources to gain a better understanding of the contribution processes.
 
+- **[Code of Conduct](../contribution-guidelines/coc-inc.md)** The CNCF code of conduct for the KubeStellar community
 - **[License](../contribution-guidelines/license-inc.md)** The Apache 2.0 license under which KubeStellar is published
 - **[Governance](../contribution-guidelines/governance-inc.md)** The protocols under which the KubeStellar project is run
 - **[Onboarding](../contribution-guidelines/onboarding-inc.md)** The procedures for adding/removing members of our Github organization
