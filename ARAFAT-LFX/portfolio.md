@@ -6,7 +6,7 @@
 
 ## Product Design Projects
 
-- **[Design System with Figma]()**: This is a Work in Progress. I am currently learning how to build design system with Figma.
+- **[Design System with Figma](https://www.figma.com/community/file/1510702919750165936)**: This is a Work in Progress. I am currently learning how to build design system with Figma.
 
 ## Technical Writing Projects
 - **[Next.Js Unit Testing and End-to-End Testing with Vitest and Playwright](https://strapi.io/blog/nextjs-testing-guide-unit-and-e2e-tests-with-vitest-and-playwright)**: In this article, readers will learn how to write unit tests for their synchronous server components using Vitest and React Testing Library, and end-to-end tests for their async server components using Playwright. I like this article because of the method I used to explain the APIs while equally using Olympics and Cuisines as interactive learning aid for the web app.
