@@ -15,13 +15,13 @@ Before you start contributing, familiarize yourself with our community [Code of 
 
 ## Visit the GitHub repository
 
-The KubeStellar [base repository](https://github.com/kubestellar) is a collection of the different KubeStellar repositories that you can start contributing to.
+The KubeStellar [GitHub organization](https://github.com/kubestellar) is a collection of the different KubeStellar repositories that you can start contributing to.
 
 ### Sign off your contribution
 
 Ensure that you comply with the rules and policy guiding the repository contribution indicated in the [Developer Certificate of Origin (DCO)](https://github.com/kubestellar/kubestellar/blob/main/DCO). 
 
-If you are contributing via the GitHub web interface, navigate to the **Settings** section of your forked repository and enable the **Require contributors to sign off on web-based commits** setting. This will allow you to automatically sign off your commits via GitHub directly as shown below.
+If you are contributing via the GitHub web interface, navigate to the **Settings** section of your forked repository and enable the **Require contributors to sign off on web-based commits** setting. This will allow you to automatically sign off your commits via GitHub directly, as shown below.
 
 ![signoff-via-github-ui](https://github.com/user-attachments/assets/ddfd3988-142e-4380-a738-1a767b1aaba6)
 
@@ -34,6 +34,7 @@ If you are contributing via the command line terminal, run the `git commit --sig
 Read the resources to gain a better understanding of the contribution processes.
 
 - **[Code of Conduct](../contribution-guidelines/coc-inc.md)** The CNCF code of conduct for the KubeStellar community
+- **[Contribution Guidelines](../contribution-guidelines/contributing-inc.md)** General Guidelines for our Github processes
 - **[License](../contribution-guidelines/license-inc.md)** The Apache 2.0 license under which KubeStellar is published
 - **[Governance](../contribution-guidelines/governance-inc.md)** The protocols under which the KubeStellar project is run
 - **[Onboarding](../contribution-guidelines/onboarding-inc.md)** The procedures for adding/removing members of our Github organization
