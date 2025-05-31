@@ -15,7 +15,7 @@
 
 - **[What exactly is UX/UI design? Beyond the buzz buzz Figma Design](https://arafatsalam.hashnode.dev/what-exactly-is-uxui-beyond-the-buzz-buzz-figma-design)**: In this article, readers will learn the principles of user experience and user interface design from the design thinking perspective. I like this article because the first touchpoint in my career was Product Design, and that has formed a solid foundation in my career progression.
 
-- **[The Software Engineering Guide to the Psychology of Learning]()**: This article deeply explains the principles of career growth in software engineering. It is intended for all categories of individuals, newbies and experts inclusive. I like this article because the title resonates with my undergraduate course in Psychology. More so, it is a reflection of my career growth, and I still reference the article when I need to do some deep work.
+- **[The Software Engineering Guide to the Psychology of Learning](https://medium.com/@ArafatAbdussalam/on-starting-again-the-software-engineering-guide-to-the-psychology-of-learning-f974f64f650d)**: This article deeply explains the principles of career growth in software engineering. It is intended for all categories of individuals, newbies and experts inclusive. I like this article because the title resonates with my undergraduate course in Psychology. More so, it is a reflection of my career growth, and I still reference the article when I need to do some deep work.
 
 ## Speaking Engagements
 
