@@ -76,8 +76,8 @@ nav:
               - Kind host not configured for more than two clusters: direct/installation-errors.md
               - Insufficient CPU for your clusters: direct/knownissue-cpu-insufficient-for-its1.md
       - UI (User Interface): ui-docs/ui-overview.md
-      - Teardown: direct/teardown.md
-  - Windows Setup Guide: windows-setup-guide.md 
+      - Windows Setup Guide: windows-setup-guide.md
+      - Teardown: direct/teardown.md 
   - Contributing:
       - Overview (How to join in): direct/contribute.md
       - Code of Conduct: contribution-guidelines/coc-inc.md
