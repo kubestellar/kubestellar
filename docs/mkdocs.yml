@@ -75,8 +75,8 @@ nav:
               - Missing results in a CombinedStatus object: direct/knownissue-collector-miss.md
               - Kind host not configured for more than two clusters: direct/installation-errors.md
               - Insufficient CPU for your clusters: direct/knownissue-cpu-insufficient-for-its1.md
+          - Windows Setup Guide: windows-setup-guide.md    
       - UI (User Interface): ui-docs/ui-overview.md
-      - Windows Setup Guide: windows-setup-guide.md
       - Teardown: direct/teardown.md 
   - Contributing:
       - Overview (How to join in): direct/contribute.md
