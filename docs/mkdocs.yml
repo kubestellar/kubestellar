@@ -44,6 +44,7 @@ nav:
           - Overview: direct/setup-overview.md
           - Setup limitations: direct/setup-limitations.md
           - Prerequisites: direct/pre-reqs.md
+          - Windows Setup Guide: direct/windows-setup-guide.md 
           - KubeFlex Hosting cluster:
             - Acquire cluster for KubeFlex Hosting: direct/acquire-hosting-cluster.md
             - Initialize KubeFlex Hosting cluster: direct/init-hosting-cluster.md
@@ -54,7 +55,7 @@ nav:
           - Argo CD integration with Core Helm chart: direct/core-chart-argocd.md
           - Workload Execution Clusters:
             - About Workload Execution Clusters: direct/wec.md
-            - Register a Workload Execution Cluster: direct/wec-registration.md
+            - Register a Workload Execution Cluster: direct/wec-registration.md  
       - Usage:
           - Usage limitations: direct/usage-limitations.md
           - KubeStellar API:
@@ -74,8 +75,7 @@ nav:
               - Authorization failure while fetching Helm chart from ghcr.io: direct/knownissue-helm-ghcr.md
               - Missing results in a CombinedStatus object: direct/knownissue-collector-miss.md
               - Kind host not configured for more than two clusters: direct/installation-errors.md
-              - Insufficient CPU for your clusters: direct/knownissue-cpu-insufficient-for-its1.md
-          - Windows Setup Guide: windows-setup-guide.md    
+              - Insufficient CPU for your clusters: direct/knownissue-cpu-insufficient-for-its1.md   
       - UI (User Interface): ui-docs/ui-overview.md
       - Teardown: direct/teardown.md 
   - Contributing:
