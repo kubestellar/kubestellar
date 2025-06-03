@@ -4,7 +4,6 @@
 - [Overview](#overview)
 - [Pre-requisites](#pre-requisites)
 - [Installing Argo CD using KubeStellar Core chart](#installing-argo-cd-using-kubestellar-core-chart)
-- [Step-by-Step Installation Example](#step-by-step-installation-example)
 - [Deploying Argo CD applications](#deploying-argo-cd-applications)
 
 ## Overview
@@ -14,6 +13,8 @@ This documents explains how to use the KubeStellar core Helm chart to:
 - deploy Argo CD in KubeFlex hosting cluster;
 - register every WDS as a target cluster in Argo CD; and
 - create Argo CD applications as specified by the chart values.
+
+For a detailed step-by-step installation guide with expected outputs, see [Step-by-Step Installation Guide](core-chart-step-by-step-installation.md).
 
 ## Pre-requisites
 
@@ -31,49 +32,37 @@ When deploying in a **Kubernetes** cluster, use the flag `--set argocd.global.do
 
 Note that when creating a local **Kubernetes** cluster using our scripts for **Kind** or **k3s**, the **nginx** ingress will be accessible on host port `9443`; therefore the Argo CD UI can be accessed at the address `https://argocd.localtest.me:9443`.
 
-The initial password for the `admin` user can be retrieved using the command:
-
-```shell
-kubectl -n kubeflex-system get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-```
-
-## Step-by-Step Installation Example
-
-This section shows how to add Argo CD to an existing KubeStellar installation with actual command outputs.
-
-### Prerequisites
-
-Ensure you have a working KubeStellar installation as described in the [core chart documentation](core-chart.md). Make sure you're in the correct kubectl context:
+**Make sure you're in the correct context before running commands:**
 
 ```bash
 kubectl config use-context kind-kubeflex
 ```
 
-**Output:**
+**Expected output:**
 ```
 Switched to context "kind-kubeflex".
 ```
 
-### Step 1: Upgrade KubeStellar with Argo CD
+The initial password for the `admin` user can be retrieved using the command:
 
-```bash
-helm upgrade --install ks-core ./core-chart \
-  --namespace kubeflex-system \
-  --set "kubeflex-operator.hostContainer=kubeflex-control-plane" \
-  --set "kubeflex-operator.externalPort=9443" \
-  --set-json='ITSes=[{"name":"its1"}]' \
-  --set-json='WDSes=[{"name":"wds1","ITSName":"its1"}]' \
-  --set argocd.install=true
+```shell
+kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
-**Output:**
+**Example installation with Argo CD:**
+
+```bash
+helm upgrade --install ks-core ./core-chart --set argocd.install=true
+```
+
+**Expected output (similar to):**
 ```
 Release "ks-core" has been upgraded. Happy Helming!
 NAME: ks-core
-LAST DEPLOYED: Sun May 25 11:15:52 2025
-NAMESPACE: kubeflex-system
+LAST DEPLOYED: Tue Jun  3 11:28:26 2025
+NAMESPACE: default
 STATUS: deployed
-REVISION: 2
+REVISION: 3
 TEST SUITE: None
 NOTES:
 For your convenience you will probably want to add contexts to your
@@ -90,83 +79,48 @@ when installing this chart.
 kubectl config use-context $the_one_where_you_installed_this_chart
 kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
 
-kflex ctx --overwrite-existing-context its1
-kflex ctx --overwrite-existing-context wds1
-
 Finally, you can use `kflex ctx` to switch back to the kubeconfig
 context for your KubeFlex hosting cluster.
 
 Access Argo CD UI at https://argocd.localtest.me (append :9443 for Kind or k3s installations).
 Obtain Argo CD admin password using the command:
-kubectl -n kubeflex-system get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
-### Step 2: Verify Argo CD Installation
+**Verify Argo CD installation:**
 
-Check for Argo CD namespaces:
 ```bash
-kubectl get namespaces | grep -i argo
+kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
-**Output:**
+**Expected output (similar to):**
 ```
-(No dedicated argocd namespace - Argo CD is installed in kubeflex-system)
+SYttSMZy6TQ2-alF
 ```
 
-Check Argo CD pods across all namespaces:
 ```bash
 kubectl get pods -A | grep -i argo
 ```
 
-**Output:**
+**Expected output (similar to):**
 ```
-kubeflex-system      ks-core-argocd-application-controller-0                           1/1     Running     0             2m5s
-kubeflex-system      ks-core-argocd-applicationset-controller-68dd5f4859-dvvcp         1/1     Running     0             2m6s
-kubeflex-system      ks-core-argocd-dex-server-844d5898ff-f8v9h                        1/1     Running     0             2m6s
-kubeflex-system      ks-core-argocd-notifications-controller-844596b886-l4nqs          1/1     Running     0             2m6s
-kubeflex-system      ks-core-argocd-redis-76c6b4db57-qw25s                             1/1     Running     0             2m6s
-kubeflex-system      ks-core-argocd-repo-server-655684556b-jdsxl                       1/1     Running     0             2m6s
-kubeflex-system      ks-core-argocd-server-c46b7d8f6-8dv9b                             1/1     Running     0             2m6s
-```
-
-Check all pods in the kubeflex-system namespace:
-```bash
-kubectl get pods -n kubeflex-system
+default              ks-core-argocd-application-controller-0                     1/1     Running     0          15m
+default              ks-core-argocd-applicationset-controller-6669c9f789-wd5h7   1/1     Running     0          15m
+default              ks-core-argocd-dex-server-8464bc64b9-dplv5                  1/1     Running     0          15m
+default              ks-core-argocd-notifications-controller-66b8ccc4c7-8mjdx    1/1     Running     0          15m
+default              ks-core-argocd-redis-76c6b4db57-7cfrs                       1/1     Running     0          15m
+default              ks-core-argocd-repo-server-6774bd65db-rxmtz                 1/1     Running     0          15m
+default              ks-core-argocd-server-84cbbd8cbd-bpl92                      1/1     Running     0          15m
 ```
 
-**Output:**
-```
-NAME                                                        READY   STATUS      RESTARTS   AGE
-ks-core-argocd-application-controller-0                     1/1     Running     0          2m31s
-ks-core-argocd-applicationset-controller-68dd5f4859-dvvcp   1/1     Running     0          2m32s
-ks-core-argocd-dex-server-844d5898ff-f8v9h                  1/1     Running     0          2m32s
-ks-core-argocd-notifications-controller-844596b886-l4nqs    1/1     Running     0          2m32s
-ks-core-argocd-redis-76c6b4db57-qw25s                       1/1     Running     0          2m32s
-ks-core-argocd-repo-server-655684556b-jdsxl                 1/1     Running     0          2m32s
-ks-core-argocd-server-c46b7d8f6-8dv9b                       1/1     Running     0          2m32s
-ks-core-k46jt                                               0/1     Completed   0          81m
-kubeflex-controller-manager-6c7f49588-h24d7                 2/2     Running     0          81m
-postgres-postgresql-0                                       1/1     Running     0          81m
-```
+**Access Argo CD UI:**
 
-### Step 3: Get Argo CD Admin Password
+Open your browser and navigate to: `https://argocd.localtest.me:9443/`
 
-```bash
-kubectl -n kubeflex-system get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-```
-
-**Output:**
-```
-lxyMWsIcdtoUY3Py
-```
-
-### Step 4: Access Argo CD UI
-
-- **URL**: `https://argocd.localtest.me:9443`
 - **Username**: `admin`
-- **Password**: `lxyMWsIcdtoUY3Py` (change this with yours)
+- **Password**: Use the password obtained from the previous command (e.g., `SYttSMZy6TQ2-alF`)
 
-> **Note:** All Argo CD components are installed in the `kubeflex-system` namespace rather than a dedicated `argocd` namespace. This is the expected behavior when using the KubeStellar Core chart with Argo CD integration.
+> **Note:** If you encounter SSL certificate warnings in your browser, proceed with "Advanced" → "Proceed to argocd.localtest.me (unsafe)" or similar option, as this is expected for local development setups.
 
 ## Deploying Argo CD applications
 
