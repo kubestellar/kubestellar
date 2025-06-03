@@ -14,7 +14,7 @@ This documents explains how to use the KubeStellar core Helm chart to:
 - register every WDS as a target cluster in Argo CD; and
 - create Argo CD applications as specified by the chart values.
 
-For a detailed step-by-step installation guide with expected outputs, see [Step-by-Step Installation Guide](core-chart-step-by-step-installation.md).
+For a detailed step-by-step installation guide with expected outputs, see [Step-by-Step Installation Guide](core-chart.md).
 
 ## Pre-requisites
 
@@ -121,6 +121,7 @@ Open your browser and navigate to: `https://argocd.localtest.me:9443/`
 - **Password**: Use the password obtained from the previous command (e.g., `SYttSMZy6TQ2-alF`)
 
 > **Note:** If you encounter SSL certificate warnings in your browser, proceed with "Advanced" → "Proceed to argocd.localtest.me (unsafe)" or similar option, as this is expected for local development setups.
+![alt text](images/argo-cd-signin-page.png)
 
 ## Deploying Argo CD applications
 
