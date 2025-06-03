@@ -145,3 +145,6 @@ Alternatively, the same result can be achieved from Helm CLI by using the follow
 ```shell
 --set-json='argocd.applications=[ { "name": "scenario-6", "repoURL": "https://github.com/pdettori/sample-apps.git", "path": "nginx", "destinationWDS": "wds1", "destinationNamespace": "nginx-sa" } ]'
 ```
+
+![alt text](images/argocd-application.png)
+> **Important**: Currently, the KubeStellar controller does not return resource status correctly to Argo CD. This means that deployed applications may not show as "Healthy" or green in the Argo CD UI, even when they are actually running correctly on the workload execution clusters. This is a known limitation and does not indicate that your deployment has failed.
