@@ -90,6 +90,12 @@ spec:
 ### 2. **Core Reconciliation Algorithm**
 ![alt text](image.png)
 
+**Types of Actions:**
+- **create** - Create new Kubernetes resources
+- **template** - Create resources using data from dependencies  
+- **patch** - Update existing resources
+- **delete** - Remove resources
+
 ### 3. **Dependency Checking Algorithm**
 
 ```go
