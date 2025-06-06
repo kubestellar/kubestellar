@@ -1,10 +1,20 @@
 # Using Argo CD with KubeStellar Core chart
 
+## Table of Contents
+- [Overview](#overview)
+- [Pre-requisites](#pre-requisites)
+- [Installing Argo CD using KubeStellar Core chart](#installing-argo-cd-using-kubestellar-core-chart)
+- [Deploying Argo CD applications](#deploying-argo-cd-applications)
+
+## Overview
+
 This documents explains how to use the KubeStellar core Helm chart to:
 
 - deploy Argo CD in KubeFlex hosting cluster;
 - register every WDS as a target cluster in Argo CD; and
 - create Argo CD applications as specified by the chart values.
+
+For a detailed step-by-step installation guide with expected outputs, see [Step-by-Step Installation Guide](core-chart.md).
 
 ## Pre-requisites
 
@@ -22,11 +32,96 @@ When deploying in a **Kubernetes** cluster, use the flag `--set argocd.global.do
 
 Note that when creating a local **Kubernetes** cluster using our scripts for **Kind** or **k3s**, the **nginx** ingress will be accessible on host port `9443`; therefore the Argo CD UI can be accessed at the address `https://argocd.localtest.me:9443`.
 
+**Make sure you're in the correct context before running commands:**
+
+```bash
+kubectl config use-context kind-kubeflex
+```
+
+**Expected output:**
+```
+Switched to context "kind-kubeflex".
+```
+
 The initial password for the `admin` user can be retrieved using the command:
 
 ```shell
 kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
+
+**Example installation with Argo CD:**
+
+```bash
+helm upgrade --install ks-core ./core-chart --set argocd.install=true
+```
+
+**Expected output (similar to):**
+```
+Release "ks-core" has been upgraded. Happy Helming!
+NAME: ks-core
+LAST DEPLOYED: Tue Jun  3 11:28:26 2025
+NAMESPACE: default
+STATUS: deployed
+REVISION: 3
+TEST SUITE: None
+NOTES:
+For your convenience you will probably want to add contexts to your
+kubeconfig named after the non-host-type control planes (WDSes and
+ITSes) that you just created (a host-type control plane is just an
+alias for the KubeFlex hosting cluster). You can do that with the
+following `kflex` commands; each creates a context and makes it the
+current one. See
+https://github.com/kubestellar/kubestellar/blob/0.28.0-alpha.2/docs/content/direct/core-chart.md#kubeconfig-files-and-contexts-for-control-planes
+for a way to do this without using `kflex`.
+Start by setting your current kubeconfig context to the one you used
+when installing this chart.
+
+kubectl config use-context $the_one_where_you_installed_this_chart
+kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
+
+Finally, you can use `kflex ctx` to switch back to the kubeconfig
+context for your KubeFlex hosting cluster.
+
+Access Argo CD UI at https://argocd.localtest.me (append :9443 for Kind or k3s installations).
+Obtain Argo CD admin password using the command:
+kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+```
+
+**Verify Argo CD installation:**
+
+```bash
+kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+```
+
+**Expected output (similar to):**
+```
+SYttSMZy6TQ2-alF
+```
+
+```bash
+kubectl get pods -A | grep -i argo
+```
+
+**Expected output (similar to):**
+```
+default              ks-core-argocd-application-controller-0                     1/1     Running     0          15m
+default              ks-core-argocd-applicationset-controller-6669c9f789-wd5h7   1/1     Running     0          15m
+default              ks-core-argocd-dex-server-8464bc64b9-dplv5                  1/1     Running     0          15m
+default              ks-core-argocd-notifications-controller-66b8ccc4c7-8mjdx    1/1     Running     0          15m
+default              ks-core-argocd-redis-76c6b4db57-7cfrs                       1/1     Running     0          15m
+default              ks-core-argocd-repo-server-6774bd65db-rxmtz                 1/1     Running     0          15m
+default              ks-core-argocd-server-84cbbd8cbd-bpl92                      1/1     Running     0          15m
+```
+
+**Access Argo CD UI:**
+
+Open your browser and navigate to: `https://argocd.localtest.me:9443/`
+
+- **Username**: `admin`
+- **Password**: Use the password obtained from the previous command (e.g., `SYttSMZy6TQ2-alF`)
+
+> **Note:** If you encounter SSL certificate warnings in your browser, proceed with "Advanced" → "Proceed to argocd.localtest.me (unsafe)" or similar option, as this is expected for local development setups.
+![alt text](images/argo-cd-signin-page.png)
 
 ## Deploying Argo CD applications
 
@@ -50,3 +145,6 @@ Alternatively, the same result can be achieved from Helm CLI by using the follow
 ```shell
 --set-json='argocd.applications=[ { "name": "scenario-6", "repoURL": "https://github.com/pdettori/sample-apps.git", "path": "nginx", "destinationWDS": "wds1", "destinationNamespace": "nginx-sa" } ]'
 ```
+
+![alt text](images/argocd-application.png)
+> **Important**: Currently, the KubeStellar controller does not return resource status correctly to Argo CD. This means that deployed applications may not show as "Healthy" or green in the Argo CD UI, even when they are actually running correctly on the workload execution clusters. This is a known limitation and does not indicate that your deployment has failed.
