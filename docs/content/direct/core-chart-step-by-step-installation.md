@@ -18,8 +18,8 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBES
 ```
 Or if you have local codebase then 
 ```bash
-    cd scripts/
-    ./create-kind-cluster-with-SSL-passthrough.sh --name kubeflex --port 9443
+cd scripts/
+./create-kind-cluster-with-SSL-passthrough.sh --name kubeflex --port 9443
 ```
 
 **Expected output :**
