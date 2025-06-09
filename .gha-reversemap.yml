@@ -34,10 +34,10 @@ actions/setup-go:
   tag: v5
   tag-url: https://github.com/actions/setup-go/tree/v5
 anchore/sbom-action/download-syft:
-  sha: 9f7302141466aa6482940f15371237e9d9f4c34a
-  sha-url: https://github.com/anchore/sbom-action/commit/9f7302141466aa6482940f15371237e9d9f4c34a
-  tag: v0.19.0
-  tag-url: https://github.com/anchore/sbom-action/tree/v0.19.0
+  sha: e11c554f704a0b820cbf8c51673f6945e0731532
+  sha-url: https://github.com/anchore/sbom-action/commit/e11c554f704a0b820cbf8c51673f6945e0731532
+  tag: v0.20.0
+  tag-url: https://github.com/anchore/sbom-action/tree/v0.20.0
 goreleaser/goreleaser-action:
   sha: 9c156ee8a17a598857849441385a2041ef570552
   sha-url: https://github.com/goreleaser/goreleaser-action/commit/9c156ee8a17a598857849441385a2041ef570552
