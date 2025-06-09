@@ -62,7 +62,7 @@ To take advantage of this action, you must ensure that you have forked the repos
 5. Click on the Run Workflow button on the right !["Run workflow" button](https://github.com/user-attachments/assets/5d3d23be-6c8f-454e-bf2c-0c58c8894957)
 6. Select the branch you wish to render and click on the second Run Workflow Button ![Selecting the branch to render](https://github.com/user-attachments/assets/427b827d-555c-4d36-b9c8-485eda002428)
 7. If that workflow completes successfully, it will automatically call the **Pages build and deployment** workflow.
-8. You can observe the progress of the workflows on the Actions page; a green checkmark circle indicates successful completion.<br />![Relevant workflow runs](https://github.com/user-attachments/assets/b9ce40f8-b744-4b3c-bc20-a4814243e85e)
+8. You can observe the progress of the workflows on the Actions page; a green check mark circle indicates successful completion.<br />![Relevant workflow runs](https://github.com/user-attachments/assets/b9ce40f8-b744-4b3c-bc20-a4814243e85e)
 9. After a minute or so, you should be able to preview your new version of the website at `https://${repo_owner}.github.io/${fork_name}/${branch_name}`
 
 #### Automatically generate webpages

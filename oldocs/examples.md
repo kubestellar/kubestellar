@@ -214,7 +214,7 @@ If desired, you may remove the `kubeflex-manager-cluster-admin-rolebinding` afte
 the kubestellar-controller-manager is started, with the command
 `kubectl --context kind-kubeflex delete clusterrolebinding kubeflex-manager-cluster-admin-rolebinding`
 
-Run the following comamand to give permission for the Klusterlet to
+Run the following command to give permission for the Klusterlet to
 operate on the appwrapper cluster resource.
 
 ```shell
@@ -649,7 +649,7 @@ kubectl --context cluster1 -n nginx-sa get deployments,sa,secrets
 kubectl --context cluster2 -n nginx-sa get deployments,sa,secrets
 ```
 
-Repeat multiple syncing on Argo and verify that extra secrets for the service acccount
+Repeat multiple syncing on Argo and verify that extra secrets for the service account
 are not created both wds1 and clusters:
 
 ```shell
