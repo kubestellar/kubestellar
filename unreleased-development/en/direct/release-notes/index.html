@@ -830,6 +830,25 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0280" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.28.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.28.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0280-rc1" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.28.0-rc.1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#0280-alpha2" class="md-nav__link">
     <span class="md-ellipsis">
       0.28.0-alpha.2
@@ -837,16 +856,15 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#0280-alpha1" class="md-nav__link">
     <span class="md-ellipsis">
       0.28.0-alpha.1
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="0.28.0-alpha.1">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#remaining-limitations-in-0280" class="md-nav__link">
@@ -3647,6 +3665,25 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0280" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.28.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.28.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0280-rc1" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.28.0-rc.1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#0280-alpha2" class="md-nav__link">
     <span class="md-ellipsis">
       0.28.0-alpha.2
@@ -3654,16 +3691,15 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#0280-alpha1" class="md-nav__link">
     <span class="md-ellipsis">
       0.28.0-alpha.1
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="0.28.0-alpha.1">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#remaining-limitations-in-0280" class="md-nav__link">
@@ -4052,9 +4088,15 @@
 
 <h1 id="release-notes">Release notes<a class="headerlink" href="#release-notes" title="Permanent link">#</a></h1>
 <p>The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. </p>
-<h2 id="0280-alpha2">0.28.0-alpha.2<a class="headerlink" href="#0280-alpha2" title="Permanent link">#</a></h2>
+<h2 id="0280">0.28.0<a class="headerlink" href="#0280" title="Permanent link">#</a></h2>
+<h3 id="0280-rc1">0.28.0-rc.1<a class="headerlink" href="#0280-rc1" title="Permanent link">#</a></h3>
+<p>There is one breaking change for users: in the "values" for the core
+Helm chart, the name of the subobject for ArgoCD has changed from
+<code>argo-cd</code> to <code>argocd</code>.</p>
+<p>There have been minor fixups, including to the website.</p>
+<h3 id="0280-alpha2">0.28.0-alpha.2<a class="headerlink" href="#0280-alpha2" title="Permanent link">#</a></h3>
 <p>The main change is advancing the version of the kube-rbac-proxy image used, from 0.18.0 (which is based on Kubernetes 1.30) to 0.19.1 (which is based on Kubernetes 1.31). Depending on a later minor release of Kubernetes is generally risky, but expected to work OK in this case.</p>
-<h2 id="0280-alpha1">0.28.0-alpha.1<a class="headerlink" href="#0280-alpha1" title="Permanent link">#</a></h2>
+<h3 id="0280-alpha1">0.28.0-alpha.1<a class="headerlink" href="#0280-alpha1" title="Permanent link">#</a></h3>
 <p>The main changes are moving from Kubernetes 1.29 to 1.30, and picking
 up advances in other dependencies (but staying limited to Kubernetes
 1.30).</p>
