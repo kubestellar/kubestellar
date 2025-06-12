@@ -18,9 +18,14 @@ For a detailed step-by-step installation guide with expected outputs, see [Step-
 
 ## Pre-requisites
 
-The prerequisites are the same as [installing KubeStellar using the Core chart](core-chart.md#pre-requisites).
+Before installing Argo CD with KubeStellar Core chart, ensure you have:
 
-The settings described in this document are an extesnion of the KubeStellar Core chart settings described [here](core-chart.md#kubestellar-core-chart-values).
+- All prerequisites from [installing KubeStellar using the Core chart](core-chart.md#pre-requisites)
+- A properly configured KubeFlex hosting cluster
+- Helm installed and configured
+- kubectl access to your cluster
+
+The settings described in this document are an extension of the KubeStellar Core chart settings described [here](core-chart.md#kubestellar-core-chart-values).
 
 ## Installing Argo CD using KubeStellar Core chart
 
@@ -32,34 +37,18 @@ When deploying in a **Kubernetes** cluster, use the flag `--set argocd.global.do
 
 Note that when creating a local **Kubernetes** cluster using our scripts for **Kind** or **k3s**, the **nginx** ingress will be accessible on host port `9443`; therefore the Argo CD UI can be accessed at the address `https://argocd.localtest.me:9443`.
 
-**Make sure you're in the correct context before running commands:**
+### Example installation with Argo CD
 
 ```bash
-kubectl config use-context kind-kubeflex
+helm upgrade --install ks-core core-chart \
+  --set argocd.install=true
 ```
 
 **Expected output:**
 ```
-Switched to context "kind-kubeflex".
-```
-
-The initial password for the `admin` user can be retrieved using the command:
-
-```shell
-kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-```
-
-**Example installation with Argo CD:**
-
-```bash
-helm upgrade --install ks-core ./core-chart --set argocd.install=true
-```
-
-**Expected output (similar to):**
-```
 Release "ks-core" has been upgraded. Happy Helming!
 NAME: ks-core
-LAST DEPLOYED: Tue Jun  3 11:28:26 2025
+LAST DEPLOYED: Thu Jun 12 11:02:16 2025
 NAMESPACE: default
 STATUS: deployed
 REVISION: 3
@@ -84,19 +73,25 @@ context for your KubeFlex hosting cluster.
 
 Access Argo CD UI at https://argocd.localtest.me (append :9443 for Kind or k3s installations).
 Obtain Argo CD admin password using the command:
-kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+kubectl -n default get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
-**Verify Argo CD installation:**
+### Retrieve Argo CD admin password
+
+The initial password for the `admin` user can be retrieved using the following command:
 
 ```bash
-kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+kubectl -n default get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
-**Expected output (similar to):**
+**Expected output(similar):**
 ```
-SYttSMZy6TQ2-alF
+EpQ2-OMgvfdHiMiD
 ```
+
+### Verify Argo CD installation
+
+Verify that all Argo CD components are running:
 
 ```bash
 kubectl get pods -A | grep -i argo
@@ -113,12 +108,13 @@ default              ks-core-argocd-repo-server-6774bd65db-rxmtz                
 default              ks-core-argocd-server-84cbbd8cbd-bpl92                      1/1     Running     0          15m
 ```
 
-**Access Argo CD UI:**
+### Access Argo CD UI
 
 Open your browser and navigate to: `https://argocd.localtest.me:9443/`
 
+**Login credentials:**
 - **Username**: `admin`
-- **Password**: Use the password obtained from the previous command (e.g., `SYttSMZy6TQ2-alF`)
+- **Password**: Use the password obtained from the previous command (e.g., `EpQ2-OMgvfdHiMiD`)
 
 > **Note:** If you encounter SSL certificate warnings in your browser, proceed with "Advanced" → "Proceed to argocd.localtest.me (unsafe)" or similar option, as this is expected for local development setups.
 ![alt text](images/argo-cd-signin-page.png)
