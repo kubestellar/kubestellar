@@ -186,7 +186,7 @@ Deleting outdated charts
 ```shell
 helm upgrade --install ks-core core-chart
 ```
-Output:
+**Output:**
 Release "ks-core" does not exist. Installing it now.
 NAME: ks-core
 LAST DEPLOYED: Thu Jun 12 09:58:44 2025
@@ -228,7 +228,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
   --set-json ITSes='[{"name":"its1"}]' \
   --set-json WDSes='[{"name":"wds1"}]'
 ```
-output:
+**output:**
 Release "ks-core" has been upgraded. Happy Helming!
 NAME: ks-core
 LAST DEPLOYED: Thu Jun 12 10:08:50 2025
