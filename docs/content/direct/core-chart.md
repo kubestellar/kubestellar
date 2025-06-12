@@ -166,11 +166,45 @@ where `name` must specify a name unique among all the control planes in that Kub
 ## KubeStellar Core Chart step by step
 
 The local copy of the core chart can be installed in an existing cluster using the commands:
-
+```shell
+git clone https://github.com/kubestellar/kubestellar.git
+cd kubestellar
+```
 ```shell
 helm dependency update core-chart
+```
+Output(similar):
+Saving 2 charts
+Downloading kubeflex-operator from repo oci://ghcr.io/kubestellar/kubeflex/chart
+Pulled: ghcr.io/kubestellar/kubeflex/chart/kubeflex-operator:v0.8.9
+Digest: sha256:2be43de71425ad682edca6544f6c3a5864afbfad09a4b7e1e57bde6dae664334
+Downloading argo-cd from repo oci://ghcr.io/argoproj/argo-helm
+Pulled: ghcr.io/argoproj/argo-helm/argo-cd:7.8.5
+Digest: sha256:662f4687e8e525f86ff9305020632b337a09ffacb7b61b7c42a841922c91da7b
+Deleting outdated charts
+
+```shell
 helm upgrade --install ks-core core-chart
 ```
+Output:
+Release "ks-core" does not exist. Installing it now.
+NAME: ks-core
+LAST DEPLOYED: Thu Jun 12 09:58:44 2025
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+For your convenience you will probably want to add contexts to your kubeconfig named after the non-host-type control planes (WDSes and ITSes) that you just created (a host-type control plane is just an alias for the KubeFlex hosting cluster). You can do that with the following `kflex` commands; each creates a context and makes it the current one.
+
+See https://github.com/kubestellar/kubestellar/blob/0.28.0-alpha.2/docs/content/direct/core-chart.md#kubeconfig-files-and-contexts-for-control-planes for a way to do this without using `kflex`.
+
+Start by setting your current kubeconfig context to the one you used when installing this chart.
+
+kubectl config use-context $the_one_where_you_installed_this_chart
+kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
+
+Finally, you can use `kflex ctx` to switch back to the kubeconfig context for your KubeFlex hosting cluster.
 
 Alternatively, a specific version of the KubeStellar core chart can be simply installed in an existing cluster using the following command:
 
@@ -194,6 +228,34 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
   --set-json ITSes='[{"name":"its1"}]' \
   --set-json WDSes='[{"name":"wds1"}]'
 ```
+output:
+Release "ks-core" has been upgraded. Happy Helming!
+NAME: ks-core
+LAST DEPLOYED: Thu Jun 12 10:08:50 2025
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NOTES:
+For your convenience you will probably want to add contexts to your
+kubeconfig named after the non-host-type control planes (WDSes and
+ITSes) that you just created (a host-type control plane is just an
+alias for the KubeFlex hosting cluster). You can do that with the
+following `kflex` commands; each creates a context and makes it the
+current one. See
+https://github.com/kubestellar/kubestellar/blob/0.28.0-alpha.2/docs/content/direct/core-chart.md#kubeconfig-files-and-contexts-for-control-planes
+for a way to do this without using `kflex`.
+Start by setting your current kubeconfig context to the one you used
+when installing this chart.
+
+kubectl config use-context $the_one_where_you_installed_this_chart
+kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
+
+kflex ctx --overwrite-existing-context its1
+kflex ctx --overwrite-existing-context wds1
+
+Finally, you can use `kflex ctx` to switch back to the kubeconfig
+context for your KubeFlex hosting cluster.
 
 The core chart also supports the use of a pre-existing cluster (or any space, really) as an ITS. A specific application is to connect to existing OCM clusters. As an example, create a first local kind cluster with OCM installed in it:
 
