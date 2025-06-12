@@ -173,7 +173,8 @@ cd kubestellar
 ```shell
 helm dependency update core-chart
 ```
-Output(similar):
+**Output(similar):**
+```
 Saving 2 charts
 Downloading kubeflex-operator from repo oci://ghcr.io/kubestellar/kubeflex/chart
 Pulled: ghcr.io/kubestellar/kubeflex/chart/kubeflex-operator:v0.8.9
@@ -182,7 +183,7 @@ Downloading argo-cd from repo oci://ghcr.io/argoproj/argo-helm
 Pulled: ghcr.io/argoproj/argo-helm/argo-cd:7.8.5
 Digest: sha256:662f4687e8e525f86ff9305020632b337a09ffacb7b61b7c42a841922c91da7b
 Deleting outdated charts
-
+```
 ```shell
 helm upgrade --install ks-core core-chart
 ```
