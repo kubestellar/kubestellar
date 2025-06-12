@@ -217,7 +217,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 
 Either of the previous ways of installing KubeStellar core chart will install KubeFlex and the Post Create Hooks, but it will not create any Control Plane.
 
-Please remember to add `--set "kubeflex-operator.isOpenShift=true"` when installing into an OpenShift cluster.
+Please remember to add `--set "kubeflex-operator.isOpenShift=true"` when installing/updating into an OpenShift cluster.
 
 User defined control planes can be added using additional values files or `--set` arguments, _e.g._:
 
