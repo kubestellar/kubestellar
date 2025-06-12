@@ -4,7 +4,7 @@
 
 - [Pre-requisites](#pre-requisites)
 - [KubeStellar Core Chart values](#kubestellar-core-chart-values)
-- [KubeStellar Core Chart Step-by-Step](#kubestellar-core-chart-step-by-step)
+- [KubeStellar Core Chart Step-by-Step](#kubestellar-core-chart-usage-step-by-step)
 - [Kubeconfig Files and Contexts for Control Planes](#kubeconfig-files-and-contexts-for-control-planes)
 - [Argo CD Integration](#argo-cd-integration)
 - [Uninstalling the KubeStellar Core Chart](#uninstalling-the-kubestellar-core-chart)
@@ -163,7 +163,7 @@ WDSes: # all the CPs in this list will execute the wds.yaml PCH
 
 where `name` must specify a name unique among all the control planes in that KubeFlex deployment (note that this must be unique among both ITSes and WDSes), the optional `type` can be either k8s (default) or host, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information, the optional `APIGroups` provides a list of APIGroups, see [here](https://docs.kubestellar.io/release-{{ config.ks_latest_release }}/direct/examples/#scenario-2-using-the-hosting-cluster-as-wds-to-deploy-a-custom-resource) for more information, and `ITSName` specify the ITS connected to the new WDS being created (this parameter MUST be specified if more that one ITS exists in the cluster, if no value is specified and only one ITS exists in the cluster, then it will be automatically selected).
 
-## KubeStellar Core Chart step by step
+## KubeStellar Core Chart usage step by step
 
 The local copy of the core chart can be installed in an existing cluster using the commands:
 ```shell
@@ -173,7 +173,7 @@ cd kubestellar
 ```shell
 helm dependency update core-chart
 ```
-**Output(similar):**
+Output(similar):
 ```
 Saving 2 charts
 Downloading kubeflex-operator from repo oci://ghcr.io/kubestellar/kubeflex/chart
@@ -187,7 +187,7 @@ Deleting outdated charts
 ```shell
 helm upgrade --install ks-core core-chart
 ```
-**Output:**
+Output:
 ```
 Release "ks-core" does not exist. Installing it now.
 NAME: ks-core
@@ -215,10 +215,11 @@ Alternatively, a specific version of the KubeStellar core chart can be simply in
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION
 ```
 
-Either if of the previous way of installing KubeStellar chart will install KubeFlex and the Post Create Hooks, but no Control Planes.
-Please remember to add `--set "kubeflex-operator.isOpenShift=true"`, when installing into an OpenShift cluster.
+Either of the previous ways of installing KubeStellar core chart will install KubeFlex and the Post Create Hooks, but it will not create any Control Plane.
 
-User defined control planes can be added using additional value files of `--set` arguments, _e.g._:
+Please remember to add `--set "kubeflex-operator.isOpenShift=true"` when installing into an OpenShift cluster.
+
+User defined control planes can be added using additional values files or `--set` arguments, _e.g._:
 
 - add a single ITS named its1 of default vcluster type: `--set-json='ITSes=[{"name":"its1"}]'`
 - add two ITSes named its1 and its2 of of type vcluster and host, respectively: `--set-json='ITSes=[{"name":"its1"},{"name":"its2","type":"host"}]'`
@@ -231,7 +232,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
   --set-json ITSes='[{"name":"its1"}]' \
   --set-json WDSes='[{"name":"wds1"}]'
 ```
-**output:**
+Output:
 ```
 Release "ks-core" has been upgraded. Happy Helming!
 NAME: ks-core
