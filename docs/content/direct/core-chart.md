@@ -4,7 +4,7 @@
 
 - [Pre-requisites](#pre-requisites)
 - [KubeStellar Core Chart values](#kubestellar-core-chart-values)
-- [KubeStellar Core Chart Step-by-Step](#kubestellar-core-chart-usage-step-by-step)
+- [KubeStellar Core Chart Usage Step-by-Step](#kubestellar-core-chart-usage-step-by-step)
 - [Kubeconfig Files and Contexts for Control Planes](#kubeconfig-files-and-contexts-for-control-planes)
 - [Argo CD Integration](#argo-cd-integration)
 - [Uninstalling the KubeStellar Core Chart](#uninstalling-the-kubestellar-core-chart)
