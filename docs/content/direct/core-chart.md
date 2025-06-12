@@ -1,16 +1,13 @@
-# KubeStellar Core chart usage
+# KubeStellar Core Chart Documentation
 
-## Table of Contents
-- [Overview](#overview)
+## 📚 Table of Contents
+
 - [Pre-requisites](#pre-requisites)
 - [KubeStellar Core Chart values](#kubestellar-core-chart-values)
-- [KubeStellar Core Chart usage](#kubestellar-core-chart-usage)
-- [Step-by-Step Installation Example](#step-by-step-installation-example)
-- [Kubeconfig files and contexts for Control Planes](#kubeconfig-files-and-contexts-for-control-planes)
-- [Argo CD integration](#argo-cd-integration)
-- [Uninstalling the KubeStellar Core chart](#uninstalling-the-kubestellar-core-chart)
-
-## Overview
+- [KubeStellar Core Chart Step-by-Step](#kubestellar-core-chart-step-by-step)
+- [Kubeconfig Files and Contexts for Control Planes](#kubeconfig-files-and-contexts-for-control-planes)
+- [Argo CD Integration](#argo-cd-integration)
+- [Uninstalling the KubeStellar Core Chart](#uninstalling-the-kubestellar-core-chart)
 
 This documents explains how to use KubeStellar Core chart to do three
 of the 11 installation and usage steps; please see [the
@@ -166,7 +163,7 @@ WDSes: # all the CPs in this list will execute the wds.yaml PCH
 
 where `name` must specify a name unique among all the control planes in that KubeFlex deployment (note that this must be unique among both ITSes and WDSes), the optional `type` can be either k8s (default) or host, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information, the optional `APIGroups` provides a list of APIGroups, see [here](https://docs.kubestellar.io/release-{{ config.ks_latest_release }}/direct/examples/#scenario-2-using-the-hosting-cluster-as-wds-to-deploy-a-custom-resource) for more information, and `ITSName` specify the ITS connected to the new WDS being created (this parameter MUST be specified if more that one ITS exists in the cluster, if no value is specified and only one ITS exists in the cluster, then it will be automatically selected).
 
-## KubeStellar Core Chart usage
+## KubeStellar Core Chart step by step
 
 The local copy of the core chart can be installed in an existing cluster using the commands:
 
@@ -197,9 +194,6 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
   --set-json ITSes='[{"name":"its1"}]' \
   --set-json WDSes='[{"name":"wds1"}]'
 ```
-
-## Step-by-Step Installation Example
-For a detailed step-by-step installation guide with expected outputs, see [Step-by-Step Installation Guide](core-chart-step-by-step-installation.md).
 
 The core chart also supports the use of a pre-existing cluster (or any space, really) as an ITS. A specific application is to connect to existing OCM clusters. As an example, create a first local kind cluster with OCM installed in it:
 
