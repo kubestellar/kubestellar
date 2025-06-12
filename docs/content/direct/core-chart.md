@@ -188,6 +188,7 @@ Deleting outdated charts
 helm upgrade --install ks-core core-chart
 ```
 **Output:**
+```
 Release "ks-core" does not exist. Installing it now.
 NAME: ks-core
 LAST DEPLOYED: Thu Jun 12 09:58:44 2025
@@ -206,6 +207,7 @@ kubectl config use-context $the_one_where_you_installed_this_chart
 kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
 
 Finally, you can use `kflex ctx` to switch back to the kubeconfig context for your KubeFlex hosting cluster.
+```
 
 Alternatively, a specific version of the KubeStellar core chart can be simply installed in an existing cluster using the following command:
 
@@ -230,6 +232,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
   --set-json WDSes='[{"name":"wds1"}]'
 ```
 **output:**
+```
 Release "ks-core" has been upgraded. Happy Helming!
 NAME: ks-core
 LAST DEPLOYED: Thu Jun 12 10:08:50 2025
@@ -257,7 +260,7 @@ kflex ctx --overwrite-existing-context wds1
 
 Finally, you can use `kflex ctx` to switch back to the kubeconfig
 context for your KubeFlex hosting cluster.
-
+```
 The core chart also supports the use of a pre-existing cluster (or any space, really) as an ITS. A specific application is to connect to existing OCM clusters. As an example, create a first local kind cluster with OCM installed in it:
 
 ```shell
