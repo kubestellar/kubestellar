@@ -27,6 +27,9 @@ Before installing Argo CD with KubeStellar Core chart, ensure you have:
 
 The settings described in this document are an extension of the KubeStellar Core chart settings described [here](core-chart.md#kubestellar-core-chart-values).
 
+> The KubeStellar core chart can optionally be used to install Argo CD in the KubeFlex hosting cluster and register each KubeStellar WDS as an Argo CD target cluster. The core chart also has the option to define some Argo CD Applications.  
+> This section will cover installing Argo CD and mapping WDSes to target clusters; the next section will show how to also define some Applications.
+
 ## Installing Argo CD using KubeStellar Core chart
 
 To enable the installation of Argo CD by the KubeStellar Core chart, use the flag `--set argocd.install=true`. Besides deploying an instance of Argo CD, KubeStellar Core chart will take care of registering all the WDSes installed by the chart as Argo CD target clusters.
