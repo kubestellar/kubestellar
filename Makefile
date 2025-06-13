@@ -178,10 +178,14 @@ run: manifests generate fmt vet ## Run a controller from your host.
 	go run ./cmd/controller-manager/main.go $(ARGS)
 
 .PHONY: ko-build-controller-manager-local
-ko-build-controller-manager-local: ## Build local controller manager container image with ko
-	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CONTROLLER_MANAGER_CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
-	docker tag ko.local/${CONTROLLER_MANAGER_CMD_NAME}:${IMAGE_TAG} ${CONTROLLER_MANAGER_IMAGE} || \
- 		echo "[WARN] Failed to tag image. This might be due to a Docker context mismatch or missing tag '${IMAGE_TAG}'. Try setting: export DOCKER_HOST=unix:///home/$(shell whoami)/.docker/desktop/docker.sock"
+ko-build-controller-manager-local:
+	@KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CONTROLLER_MANAGER_CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
+	@if docker image inspect ko.local/${CONTROLLER_MANAGER_CMD_NAME}:${IMAGE_TAG} > /dev/null 2>&1; then \
+		docker tag ko.local/${CONTROLLER_MANAGER_CMD_NAME}:${IMAGE_TAG} ${CONTROLLER_MANAGER_IMAGE}; \
+	else \
+		echo "[WARN] Failed to tag image. This might be due to a Docker context mismatch or missing tag '${IMAGE_TAG}'. Try setting: export DOCKER_HOST=unix:///home/$(shell whoami)/.docker/desktop/docker.sock"; \
+	fi
+
 
 .PHONY: ko-build-transport-local
 ko-build-transport-local: ## Build local transport container image with `ko`.
