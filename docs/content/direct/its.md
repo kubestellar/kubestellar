@@ -1,5 +1,12 @@
 # Inventory and Transport Spaces
 
+- [What is an ITS?](#what-is-an-its)
+- [Creating an ITS](#creating-an-its)
+  - [Using the KubeStellar Core Helm Chart](#using-the-kubestellar-core-helm-chart)
+  - [Using the KubeFlex CLI](#using-the-kubeflex-cli)
+- [KubeFlex Hosting Cluster as ITS](#kubeflex-hosting-cluster-as-its)
+- [Important Note on ITS Registration](#important-note-on-its-registration)
+- [Architecture and Components](#architecture-and-components)
 An Inventory and Transport Space (ITS) is a core component of the KubeStellar architecture that serves two primary functions:
 
 1. **Inventory Management**: It maintains a registry of all Workload Execution Clusters (WECs) available in the system.
@@ -68,20 +75,3 @@ The ITS runs the OCM Cluster Manager, which:
 - Manages the distribution of workloads to WECs
 - Maintains status information from the WECs
 - Creates and manages mailbox namespaces for each registered WEC
-
-## Transport Implementation
-
-The current implementation uses [Open Cluster Management](https://open-cluster-management.io), but the architecture is designed to be pluggable, allowing for different transport mechanisms in the future.
-
-The OCM-based Transport Controller in the ITS:
-- Maintains a set of `ManifestWork` objects that represent the KubeStellar workload
-- Bundles workload objects from the WDS into `ManifestWork` objects
-- Delivers these objects to the appropriate WECs
-- Collects status information from the WECs
-
-## Next Steps
-
-After creating an ITS, you'll need to:
-1. [Create a Workload Description Space (WDS)](wds.md)
-2. [Create and register Workload Execution Clusters (WECs)](wec.md)
-3. [Create BindingPolicies](binding.md) to associate workloads with WECs

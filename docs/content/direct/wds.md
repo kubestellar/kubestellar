@@ -1,5 +1,14 @@
 # Workload Description Spaces
 
+- [What is a WDS?](#what-is-a-wds)
+- [Creating a WDS](#creating-a-wds)
+  - [Using the KubeFlex CLI](#using-the-kubeflex-cli)
+- [KubeFlex Hosting Cluster as WDS](#kubeflex-hosting-cluster-as-wds)
+- [WDS vs. ControlPlane Registration](#wds-vs-controlplane-registration)
+- [Controllers Running in a WDS](#controllers-running-in-a-wds)
+- [Working with a WDS](#working-with-a-wds)
+  - [Accessing the WDS](#accessing-the-wds)
+
 A Workload Description Space (WDS) is a core component of the KubeStellar architecture that serves as the primary interface for users to define and manage workloads for multi-cluster deployment.
 
 ## What is a WDS?
@@ -94,10 +103,3 @@ kflex ctx --overwrite-existing-context wds1
 # Switch to the WDS context
 kubectl config use-context wds1
 ```
-
-## Next Steps
-
-After creating a WDS, you'll need to:
-1. [Register Workload Execution Clusters (WECs)](wec-registration.md) with your ITS
-2. Create and apply [BindingPolicies](binding.md) to associate workloads with WECs
-3. Deploy workload objects to your WDS

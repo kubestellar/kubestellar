@@ -1,5 +1,15 @@
 # Workload Execution Clusters
-
+- [What is a WEC?](#what-is-a-wec)
+- [Creating a WEC](#creating-a-wec)
+  - [Using Kind (for development/testing)](#using-kind-for-developmenttesting)
+  - [Using K3d (for development/testing)](#using-k3d-for-developmenttesting)
+  - [Using MicroShift (for edge deployments)](#using-microshift-for-edge-deployments)
+  - [Using Production Kubernetes Distributions](#using-production-kubernetes-distributions)
+- [Registering a WEC](#registering-a-wec)
+- [Labeling WECs](#labeling-wecs)
+- [WEC Customization Properties](#wec-customization-properties)
+- [WEC Status and Monitoring](#wec-status-and-monitoring)
+- [Workload Transformation](#workload-transformation)
 Workload Execution Clusters (WECs) are the Kubernetes clusters where KubeStellar deploys and runs the workloads defined in the Workload Description Spaces (WDSes).
 
 ## What is a WEC?
@@ -34,7 +44,7 @@ kubectl config rename-context kind-cluster1 cluster1
 ### Using K3d (for development/testing)
 
 ```shell
-k3d cluster create -p "31080:80@loadbalancer" cluster1
+k3d cluster create -p "9443:443@loadbalancer" cluster1
 kubectl config rename-context k3d-cluster1 cluster1
 ```
 
@@ -110,11 +120,3 @@ KubeStellar performs transformations on workloads before they are deployed to WE
 2. **Rule-based customizations** that adapt workloads to specific WEC characteristics
 
 For more information, see [Transforming Desired State](transforming.md).
-
-## Next Steps
-
-After setting up and registering your WECs, you can:
-
-1. [Create BindingPolicies](binding.md) to associate workloads with your WECs
-2. Deploy workload objects to your WDS, which will be distributed to the appropriate WECs
-3. [Monitor the status](combined-status.md) of your deployed workloads
