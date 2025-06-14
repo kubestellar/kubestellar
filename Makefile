@@ -179,34 +179,11 @@ run: manifests generate fmt vet ## Run a controller from your host.
 
 .PHONY: ko-build-controller-manager-local
 ko-build-controller-manager-local: ## Build local controller manager container image with ko
-	@echo "Building controller manager image..."
-	@# Try standard ko build first (case 1: simple Docker setup)
-	@if KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CONTROLLER_MANAGER_CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH} > /dev/null 2>&1; then \
-		echo "Build successful with standard Docker setup"; \
-	elif docker version 2>/dev/null | grep -qi podman; then \
-		echo "Podman detected, retrying with Podman socket..."; \
-		if DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CONTROLLER_MANAGER_CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH} > /dev/null 2>&1; then \
-			echo "Build successful with Podman setup"; \
-		else \
-			echo "[ERROR] Ko build failed even with Podman configuration"; \
-			exit 1; \
-		fi; \
-	else \
-		echo "[ERROR] Ko build failed with standard Docker setup"; \
-		echo "[WARN] This might be due to a Docker context mismatch. Try one of:"; \
-		echo "  - export DOCKER_HOST=unix:///home/$$(whoami)/.docker/desktop/docker.sock"; \
-		echo "  - docker context list (to see available contexts)"; \
-		echo "  - docker context use <context-name>"; \
-		exit 1; \
-	fi
-	@# Tag the image if it exists
+	$(shell (docker version | { ! grep -qi podman; } ) || echo "DOCKER_HOST=unix://$$HOME/.local/share/containers/podman/machine/qemu/podman.sock ") KO_DOCKER_REPO=ko.local ko build -B ./cmd/${CONTROLLER_MANAGER_CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
 	@if docker image inspect ko.local/${CONTROLLER_MANAGER_CMD_NAME}:${IMAGE_TAG} > /dev/null 2>&1; then \
 		docker tag ko.local/${CONTROLLER_MANAGER_CMD_NAME}:${IMAGE_TAG} ${CONTROLLER_MANAGER_IMAGE}; \
-		echo "Successfully tagged image as ${CONTROLLER_MANAGER_IMAGE}"; \
 	else \
-		echo "[WARN] Built image not found for tagging. Image may have been created with different tag."; \
-		echo "Available images:"; \
-		docker images | grep -E "(ko\.local|${CONTROLLER_MANAGER_CMD_NAME})" || echo "No matching images found"; \
+		echo "[WARN] Failed to tag image. This might be due to a Docker context mismatch or missing tag '${IMAGE_TAG}'. Try setting: export DOCKER_HOST=unix:///home/$(shell whoami)/.docker/desktop/docker.sock"; \
 	fi
 
 
