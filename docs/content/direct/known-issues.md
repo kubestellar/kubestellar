@@ -27,3 +27,12 @@ This can arise when using `kind` inside a virtual machine (e.g., when using Dock
 ## Insufficient CPU for your clusters
 
 This can happen when you are using a docker-in-docker technique. The symptom is that setup stops making progress at some point. See [Insufficient CPU for your clusters](knownissue-cpu-insufficient-fort-its1.md)
+
+## StorageClass resources fail to sync to WEC clusters
+
+The symptom is StorageClass resources defined in a KubeStellar WDS failing to sync to Workload Edge Clusters (WECs) with an error like:
+```
+Failed to apply manifest: storageclasses.storage.k8s.io "local-storage" is forbidden: User "system:serviceaccount:open-cluster-management-agent:klusterlet-work-sa" cannot get resource "storageclasses" in API group "storage.k8s.io" at the cluster scope
+```
+
+This happens because the OCM agent service account (`klusterlet-work-sa`) doesn't have permission to manage StorageClass resources by default. See [StorageClass Permissions Issue](knownissue-storage-class-permissions.md) for details and solution.
