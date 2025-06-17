@@ -1386,6 +1386,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pre-requisites" class="md-nav__link">
     <span class="md-ellipsis">
       Pre-requisites
@@ -1400,6 +1418,48 @@
       Installing Argo CD using KubeStellar Core chart
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Installing Argo CD using KubeStellar Core chart">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-installation-with-argo-cd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example installation with Argo CD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retrieve-argo-cd-admin-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      Retrieve Argo CD admin password
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-argo-cd-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify Argo CD installation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#access-argo-cd-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      Access Argo CD UI
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3304,6 +3364,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pre-requisites" class="md-nav__link">
     <span class="md-ellipsis">
       Pre-requisites
@@ -3318,6 +3396,48 @@
       Installing Argo CD using KubeStellar Core chart
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Installing Argo CD using KubeStellar Core chart">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-installation-with-argo-cd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example installation with Argo CD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retrieve-argo-cd-admin-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      Retrieve Argo CD admin password
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-argo-cd-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify Argo CD installation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#access-argo-cd-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      Access Argo CD UI
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3363,39 +3483,127 @@
 
 
 <h1 id="using-argo-cd-with-kubestellar-core-chart">Using Argo CD with KubeStellar Core chart<a class="headerlink" href="#using-argo-cd-with-kubestellar-core-chart" title="Permanent link">#</a></h1>
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#pre-requisites">Pre-requisites</a></li>
+<li><a href="#installing-argo-cd-using-kubestellar-core-chart">Installing Argo CD using KubeStellar Core chart</a></li>
+<li><a href="#deploying-argo-cd-applications">Deploying Argo CD applications</a></li>
+</ul>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">#</a></h2>
 <p>This documents explains how to use the KubeStellar core Helm chart to:</p>
 <ul>
 <li>deploy Argo CD in KubeFlex hosting cluster;</li>
 <li>register every WDS as a target cluster in Argo CD; and</li>
 <li>create Argo CD applications as specified by the chart values.</li>
 </ul>
+<p>For a detailed step-by-step installation guide with expected outputs, see <a href="../core-chart/">Step-by-Step Installation Guide</a>.</p>
 <h2 id="pre-requisites">Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permanent link">#</a></h2>
-<p>The prerequisites are the same as <a href="../core-chart/#pre-requisites">installing KubeStellar using the Core chart</a>.</p>
-<p>The settings described in this document are an extesnion of the KubeStellar Core chart settings described <a href="../core-chart/#kubestellar-core-chart-values">here</a>.</p>
+<p>Before installing Argo CD with KubeStellar Core chart, ensure you have:</p>
+<ul>
+<li>All prerequisites from <a href="../core-chart/#pre-requisites">installing KubeStellar using the Core chart</a></li>
+<li>A properly configured KubeFlex hosting cluster</li>
+<li>Helm installed and configured</li>
+<li>kubectl access to your cluster</li>
+</ul>
+<p>The settings described in this document are an extension of the KubeStellar Core chart settings described <a href="../core-chart/#kubestellar-core-chart-values">here</a>.</p>
+<blockquote>
+<p>The KubeStellar core chart can optionally be used to install Argo CD in the KubeFlex hosting cluster and register each KubeStellar WDS as an Argo CD target cluster. The core chart also has the option to define some Argo CD Applications.<br />
+This section will cover installing Argo CD and mapping WDSes to target clusters; the next section will show how to also define some Applications.</p>
+</blockquote>
 <h2 id="installing-argo-cd-using-kubestellar-core-chart">Installing Argo CD using KubeStellar Core chart<a class="headerlink" href="#installing-argo-cd-using-kubestellar-core-chart" title="Permanent link">#</a></h2>
 <p>To enable the installation of Argo CD by the KubeStellar Core chart, use the flag <code>--set argocd.install=true</code>. Besides deploying an instance of Argo CD, KubeStellar Core chart will take care of registering all the WDSes installed by the chart as Argo CD target clusters.</p>
 <p>When deploying in an <strong>OpenShift</strong> cluster, add the flag <code>--set argocd.openshift.enabled=true</code>.</p>
 <p>When deploying in a <strong>Kubernetes</strong> cluster, use the flag <code>--set argocd.global.domain=&lt;url&gt;</code> to provide the URL for the <strong>nginx</strong> ingress, which defaults to <code>argocd.localtest.me</code>.</p>
 <p>Note that when creating a local <strong>Kubernetes</strong> cluster using our scripts for <strong>Kind</strong> or <strong>k3s</strong>, the <strong>nginx</strong> ingress will be accessible on host port <code>9443</code>; therefore the Argo CD UI can be accessed at the address <code>https://argocd.localtest.me:9443</code>.</p>
-<p>The initial password for the <code>admin</code> user can be retrieved using the command:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>argocd-initial-admin-secret<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{.data.password}&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d
+<h3 id="example-installation-with-argo-cd">Example installation with Argo CD<a class="headerlink" href="#example-installation-with-argo-cd" title="Permanent link">#</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ks-core<span class="w"> </span>core-chart<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>--set<span class="w"> </span>argocd.install<span class="o">=</span><span class="nb">true</span>
 </code></pre></div>
+<p><strong>Expected output:</strong>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Release &quot;ks-core&quot; has been upgraded. Happy Helming!
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>NAME: ks-core
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>LAST DEPLOYED: Thu Jun 12 11:02:16 2025
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>NAMESPACE: default
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>STATUS: deployed
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>REVISION: 3
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>TEST SUITE: None
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>NOTES:
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>For your convenience you will probably want to add contexts to your
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>kubeconfig named after the non-host-type control planes (WDSes and
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>ITSes) that you just created (a host-type control plane is just an
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>alias for the KubeFlex hosting cluster). You can do that with the
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>following `kflex` commands; each creates a context and makes it the
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>current one. See
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>https://github.com/kubestellar/kubestellar/blob/0.28.0-alpha.2/docs/content/direct/core-chart.md#kubeconfig-files-and-contexts-for-control-planes
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>for a way to do this without using `kflex`.
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>Start by setting your current kubeconfig context to the one you used
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>when installing this chart.
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>kubectl config use-context $the_one_where_you_installed_this_chart
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI&#39;s hidden state is right for what the Helm chart just did
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>Finally, you can use `kflex ctx` to switch back to the kubeconfig
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>context for your KubeFlex hosting cluster.
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>Access Argo CD UI at https://argocd.localtest.me (append :9443 for Kind or k3s installations).
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>Obtain Argo CD admin password using the command:
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>kubectl -n default get secret argocd-initial-admin-secret -o jsonpath=&quot;{.data.password}&quot; | base64 -d
+</code></pre></div></p>
+<h3 id="retrieve-argo-cd-admin-password">Retrieve Argo CD admin password<a class="headerlink" href="#retrieve-argo-cd-admin-password" title="Permanent link">#</a></h3>
+<p>The initial password for the <code>admin</code> user can be retrieved using the following command:</p>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>default<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>argocd-initial-admin-secret<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{.data.password}&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d
+</code></pre></div>
+<p><strong>Expected output(similar):</strong>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>EpQ2-OMgvfdHiMiD
+</code></pre></div></p>
+<h3 id="verify-argo-cd-installation">Verify Argo CD installation<a class="headerlink" href="#verify-argo-cd-installation" title="Permanent link">#</a></h3>
+<p>Verify that all Argo CD components are running:</p>
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>argo
+</code></pre></div>
+<p><strong>Expected output (similar to):</strong>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>default              ks-core-argocd-application-controller-0                     1/1     Running     0          15m
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>default              ks-core-argocd-applicationset-controller-6669c9f789-wd5h7   1/1     Running     0          15m
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>default              ks-core-argocd-dex-server-8464bc64b9-dplv5                  1/1     Running     0          15m
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>default              ks-core-argocd-notifications-controller-66b8ccc4c7-8mjdx    1/1     Running     0          15m
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>default              ks-core-argocd-redis-76c6b4db57-7cfrs                       1/1     Running     0          15m
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>default              ks-core-argocd-repo-server-6774bd65db-rxmtz                 1/1     Running     0          15m
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>default              ks-core-argocd-server-84cbbd8cbd-bpl92                      1/1     Running     0          15m
+</code></pre></div></p>
+<h3 id="access-argo-cd-ui">Access Argo CD UI<a class="headerlink" href="#access-argo-cd-ui" title="Permanent link">#</a></h3>
+<p>Open your browser and navigate to: <code>https://argocd.localtest.me:9443/</code></p>
+<p><strong>Login credentials:</strong>
+- <strong>Username</strong>: <code>admin</code>
+- <strong>Password</strong>: Use the password obtained from the previous command (e.g., <code>EpQ2-OMgvfdHiMiD</code>)</p>
+<blockquote>
+<p><strong>Note:</strong> If you encounter SSL certificate warnings in your browser, proceed with "Advanced" → "Proceed to argocd.localtest.me (unsafe)" or similar option, as this is expected for local development setups.
+<figure><img src="../images/argo-cd-signin-page.png" /><figcaption>alt text</figcaption>
+</figure>
+</p>
+</blockquote>
 <h2 id="deploying-argo-cd-applications">Deploying Argo CD applications<a class="headerlink" href="#deploying-argo-cd-applications" title="Permanent link">#</a></h2>
 <p>The KubeStellar Core chart can also be used to deploy Argo CD applications as specified by chart values. The example below shows the relevant fragment of the chart values that could be used for deploying an application corresponding to <code>scenario-6</code> in <a href="../example-scenarios/#scenario-6---multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd">KubeStellar docs</a>.</p>
-<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">argocd</span><span class="p">:</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">applications</span><span class="p">:</span><span class="w"> </span><span class="c1"># list of Argo CD applications to be create</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scenario-6</span><span class="w"> </span><span class="c1"># required, must be unique</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nt">project</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"> </span><span class="c1"># default: default</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nt">repoURL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/pdettori/sample-apps.git</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="nt">targetRevision</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HEAD</span><span class="w"> </span><span class="c1"># default: HEAD</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="nt">destinationWDS</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wds1</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">destinationNamespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx-sa</span><span class="w"> </span><span class="c1"># default: default</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="nt">syncPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span><span class="w"> </span><span class="c1"># default: manual</span>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">argocd</span><span class="p">:</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">applications</span><span class="p">:</span><span class="w"> </span><span class="c1"># list of Argo CD applications to be create</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scenario-6</span><span class="w"> </span><span class="c1"># required, must be unique</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nt">project</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"> </span><span class="c1"># default: default</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nt">repoURL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/pdettori/sample-apps.git</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">targetRevision</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HEAD</span><span class="w"> </span><span class="c1"># default: HEAD</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="nt">destinationWDS</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wds1</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="nt">destinationNamespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx-sa</span><span class="w"> </span><span class="c1"># default: default</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="nt">syncPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span><span class="w"> </span><span class="c1"># default: manual</span>
 </code></pre></div>
 <p>Alternatively, the same result can be achieved from Helm CLI by using the followig minimal argument (note that the default values are not explicitely set):</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>--set-json<span class="o">=</span><span class="s1">&#39;argocd.applications=[ { &quot;name&quot;: &quot;scenario-6&quot;, &quot;repoURL&quot;: &quot;https://github.com/pdettori/sample-apps.git&quot;, &quot;path&quot;: &quot;nginx&quot;, &quot;destinationWDS&quot;: &quot;wds1&quot;, &quot;destinationNamespace&quot;: &quot;nginx-sa&quot; } ]&#39;</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>--set-json<span class="o">=</span><span class="s1">&#39;argocd.applications=[ { &quot;name&quot;: &quot;scenario-6&quot;, &quot;repoURL&quot;: &quot;https://github.com/pdettori/sample-apps.git&quot;, &quot;path&quot;: &quot;nginx&quot;, &quot;destinationWDS&quot;: &quot;wds1&quot;, &quot;destinationNamespace&quot;: &quot;nginx-sa&quot; } ]&#39;</span>
 </code></pre></div>
+<p>
+<figure><img src="../images/argocd-application.png" /><figcaption>alt text</figcaption>
+</figure>
+</p>
+<blockquote>
+<p><strong>Important</strong>: Currently, the KubeStellar controller does not return resource status correctly to Argo CD. This means that deployed applications may not show as "Healthy" or green in the Argo CD UI, even when they are actually running correctly on the workload execution clusters. This is a known limitation and does not indicate that your deployment has failed.</p>
+</blockquote>
 
 
 
