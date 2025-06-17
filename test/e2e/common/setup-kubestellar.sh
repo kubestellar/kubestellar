@@ -21,11 +21,12 @@ KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=5
 TRANSPORT_CONTROLLER_VERBOSITY=5
 CLUSTER_SOURCE=kind
 HOSTING_CONTEXT=kind-kubeflex
+TEST_SCENARIO="default"
 
 while [ $# != 0 ]; do
     case "$1" in
         (-h|--help)
-            echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp)*"
+            echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp | --scenario \$scenario_name)*"
             exit;;
         (--released)
             use_release=true;;
@@ -57,6 +58,14 @@ while [ $# != 0 ]; do
                 exit 1;;
           esac
           shift;;
+        (--scenario)
+          if (( $# > 1 )); then
+            TEST_SCENARIO="$2"
+            shift
+          else
+            echo "Missing scenario name" >&2
+            exit 1;
+          fi;;
         (*) echo "$0: unrecognized argument/flag '$1'" >&2
             exit 1
     esac
@@ -73,7 +82,6 @@ then echo "$0: \$TRANSPORT_CONTROLLER_VERBOSITY must be an integer" >&2
      exit 1
 fi
 
-
 if [[ "$KFLEX_DISABLE_CHATTY" = true ]] ; then
    disable_chatty_status="--chatty-status=false"
    echo "disable_chatty_status = $disable_chatty_status"
@@ -82,6 +90,21 @@ fi
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 COMMON_SRCS="${SRC_DIR}/../common"
 source "$COMMON_SRCS/setup-shell.sh"
+source "$COMMON_SRCS/test-configs.sh"
+
+# Get scenario configuration
+scenario_config=($(get_scenario_config "$TEST_SCENARIO"))
+if [ $? -ne 0 ]; then
+    echo "Invalid scenario: $TEST_SCENARIO" >&2
+    list_scenarios
+    exit 1
+fi
+
+# Parse scenario configuration
+declare -A config
+for i in "${!scenario_config[@]}"; do
+    config[$i]="${scenario_config[$i]}"
+done
 
 :
 : -------------------------------------------------------------------------
@@ -98,19 +121,42 @@ case "$CLUSTER_SOURCE" in
         ;;
 esac
 
-
 :
 : -------------------------------------------------------------------------
-: Install the core-chart
+: Install the core-chart with scenario-specific configuration
 :
 
 pushd "${SRC_DIR}/../../.."
+
+# Prepare ITS and WDS configurations based on scenario
+ITS_CONFIG=""
+WDS_CONFIG=""
+
+if [ "${config[combined_control_plane]}" = "true" ]; then
+    # Combined control plane scenario
+    ITS_CONFIG='[{"name":"combined-cp"}]'
+    WDS_CONFIG='[{"name":"combined-cp"}]'
+else
+    # Separate control planes
+    if [ "${config[wds_type]}" = "hosting" ]; then
+        WDS_CONFIG='[{"name":"wds1","hosting":true}]'
+    else
+        WDS_CONFIG='[{"name":"wds1"}]'
+    fi
+
+    if [ "${config[its_type]}" = "hosting" ]; then
+        ITS_CONFIG='[{"name":"its1","hosting":true}]'
+    else
+        ITS_CONFIG='[{"name":"its1"}]'
+    fi
+fi
+
 if [ "$use_release" = true ] ; then
   helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
     --version $(yq .KUBESTELLAR_VERSION core-chart/values.yaml) \
     --kube-context $HOSTING_CONTEXT \
-    --set-json='ITSes=[{"name":"its1"}]' \
-    --set-json='WDSes=[{"name":"wds1"}]' \
+    --set-json="ITSes=${ITS_CONFIG}" \
+    --set-json="WDSes=${WDS_CONFIG}" \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
     --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
 else
@@ -119,11 +165,11 @@ else
   helm upgrade --install ks-core core-chart/ \
     --set KUBESTELLAR_VERSION=$(git rev-parse --short HEAD) \
     --kube-context $HOSTING_CONTEXT \
-    --set-json='ITSes=[{"name":"its1"}]' \
-    --set-json='WDSes=[{"name":"wds1"}]' \
+    --set-json="ITSes=${ITS_CONFIG}" \
+    --set-json="WDSes=${WDS_CONFIG}" \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
     --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
-  fi
+fi
 popd
 
 : Waiting for OCM hub to be ready...

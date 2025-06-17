@@ -26,9 +26,20 @@ existing_wec_contexts=""
 
 while [ $# != 0 ]; do
     case "$1" in
-        (-h|--help) echo "$0 usage: (--released | --env $kind_or_ocp | --test-type $bash_or_ginkgo | --kubestellar-controller-manager-verbosity $num | --transport-controller-verbosity $num | --fail-fast | --existing-wec-contexts $context1,$context2,...)*"
+        (-h|--help) echo "$0 usage: (--released | --env \$kind_or_ocp | --test-type \$bash_or_ginkgo | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --fail-fast | --existing-wec-contexts \$context1,\$context2,...)*"
+                    echo "where:"
+                    echo "  \$kind_or_ocp: 'kind' or 'ocp'"
+                    echo "  \$bash_or_ginkgo: 'bash' or 'ginkgo'"
+                    echo "  \$num: integer verbosity level"
+                    echo "  \$context1,\$context2,...: comma-separated list of existing WEC contexts"
                     exit;;
-        (--released) setup_flags="$setup_flags $1";;
+        (--released|--scenario)
+          if [ "$1" = "--scenario" ] && (( $# > 1 )); then
+            setup_flags="$setup_flags $1 $2"
+            shift
+          else
+            setup_flags="$setup_flags $1"
+          fi;;
         (--kubestellar-controller-manager-verbosity|--transport-controller-verbosity)
           if (( $# > 1 )); then
             setup_flags="$setup_flags $1 $2"
@@ -90,7 +101,7 @@ scripts_dir="${SRC_DIR}/../../scripts"
 
 "${COMMON_SRCS}/cleanup.sh" --env "$env"
 source "${COMMON_SRCS}/setup-shell.sh"
-"${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env" $([ -n "$existing_wec_contexts" ] && echo "--existing-wec-contexts $existing_wec_contexts")
+"${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env"
 
 if [ $test == "bash" ];then
     "${SRC_DIR}/bash/use-kubestellar.sh" --env "$env"
