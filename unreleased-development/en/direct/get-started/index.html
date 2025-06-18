@@ -1009,7 +1009,7 @@
           <li class="md-nav__item">
   <a href="#create-and-register-two-workload-execution-clusters" class="md-nav__link">
     <span class="md-ellipsis">
-      Create and register two workload execution cluster(s)
+      Create and register two workload execution clusters
     </span>
   </a>
   
@@ -1335,7 +1335,7 @@
           <li class="md-nav__item">
   <a href="#create-and-register-two-workload-execution-clusters" class="md-nav__link">
     <span class="md-ellipsis">
-      Create and register two workload execution cluster(s)
+      Create and register two workload execution clusters
     </span>
   </a>
   
@@ -3802,7 +3802,7 @@
           <li class="md-nav__item">
   <a href="#create-and-register-two-workload-execution-clusters" class="md-nav__link">
     <span class="md-ellipsis">
-      Create and register two workload execution cluster(s)
+      Create and register two workload execution clusters
     </span>
   </a>
   
@@ -3926,7 +3926,7 @@
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="go">  structured version &#39;:v0.11.0-0-g73281f6&#39; is less than required minimum &#39;:v0.7&#39; or &#39;:v0.10&#39; but less than &#39;:v0.11&#39;</span>
 </code></pre></div>
 <p>This setup recipe uses <a href="https://kind.sigs.k8s.io/">kind</a> to create three Kubernetes clusters on your machine.
-Note that <code>kind</code> does not support three or more concurrent clusters unless you raise some limits as described in this <code>kind</code> "known issue": <a href="https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files">Pod errors due to “too many open files”</a>.</p>
+Note that <code>kind</code> does not support three or more concurrent clusters unless you raise some limits as described in this <code>kind</code> "known issue": <a href="https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files">Pod errors due to "too many open files"</a>.</p>
 <h3 id="cleanup-from-previous-runs">Cleanup from previous runs<a class="headerlink" href="#cleanup-from-previous-runs" title="Permanent link">#</a></h3>
 <p>If you have run this recipe or any related recipe previously then
 you will first want to remove any related debris. The following
@@ -3967,11 +3967,11 @@ there is nothing to clean up).</p>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>-n<span class="w"> </span>its1-system<span class="w"> </span>job.batch/its-with-clusteradm<span class="w"> </span>--for<span class="w"> </span><span class="nv">condition</span><span class="o">=</span>Complete<span class="w"> </span>--timeout<span class="w"> </span>150s
 </code></pre></div>
 <p><em>To learn more about the Core Helm Chart, refer to the <a href="../core-chart/">Core Helm Chart documentation</a></em></p>
-<h3 id="create-and-register-two-workload-execution-clusters">Create and register two workload execution cluster(s)<a class="headerlink" href="#create-and-register-two-workload-execution-clusters" title="Permanent link">#</a></h3>
+<h3 id="create-and-register-two-workload-execution-clusters">Create and register two workload execution clusters<a class="headerlink" href="#create-and-register-two-workload-execution-clusters" title="Permanent link">#</a></h3>
 <p>The following steps show how to create two new <code>kind</code> clusters and
 register them with the hub as described in the
 <a href="https://open-cluster-management.io/docs/getting-started/installation/start-the-control-plane/">official open cluster management docs</a>.</p>
-<p>Note that <code>kind</code> does not support three or more concurrent clusters unless you raise some limits as described in this <code>kind</code> "known issue": <a href="https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files">Pod errors due to “too many open files”</a>.</p>
+<p>Note that <code>kind</code> does not support three or more concurrent clusters unless you raise some limits as described in this <code>kind</code> "known issue": <a href="https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files">Pod errors due to "too many open files"</a>.</p>
 <ol>
 <li>
 <p>Execute the following commands to create two kind clusters, named <code>cluster1</code> and <code>cluster2</code>, and register them with the OCM hub. These clusters will serve as workload clusters. If you have previously executed these commands, you might already have contexts named <code>cluster1</code> and <code>cluster2</code>. If so, you can remove these contexts using the commands <code>kubectl config delete-context cluster1</code> and <code>kubectl config delete-context cluster2</code>.</p>

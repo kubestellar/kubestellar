@@ -265,14 +265,6 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/unreleased-development/direct/example-wecs/</loc>
-         <lastmod>2025-06-18</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/unreleased-development/en/direct/example-wecs/"/>
-         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/unreleased-development/fr/direct/example-wecs/"/>
-         
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/unreleased-development/direct/galaxy-intro/</loc>
          <lastmod>2025-06-18</lastmod>
          <changefreq>daily</changefreq>
