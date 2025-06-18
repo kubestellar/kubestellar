@@ -1,0 +1,192 @@
+/* @font-face {
+    font-family: "SpaceMono";
+    src:url(https://fonts.cdnfonts.com/css/space-mono) ;
+} */
+
+@font-face {
+    font-family: 'Space Bd BT';
+    src: url('../fonts/space_bd_bt/tt1254m_.ttf');
+}
+  
+.Space-Bd-BT {
+    font-family: 'Space Bd BT', sans-serif;
+}
+
+:root {
+    --md-primary-fg-color: #06c;
+}
+
+.md-typeset h1 {
+    font-size: 22px;
+    font-weight: 700;
+    /* color: #06c; */
+}
+.md-typeset h2 {
+    font-size: 20px;
+    font-weight: 700;
+    /* color: #06c; */
+}
+
+.md-typeset h3 {
+    font-size: 18px;
+    font-weight: 700;
+    /* color: #06c; */
+}
+
+.md-typeset h4 {
+    font-size: 16px;
+    /* font-weight: 200; */
+    /* color: #06c; */
+}
+
+.hide-me {
+    display: none;
+}
+
+.md-sidebar--primary .md-sidebar__scrollwrap {
+    border-right: 1px solid gainsboro;
+}
+
+.md-sidebar--secondary .md-sidebar__scrollwrap {
+    border-left: 1px solid gainsboro;
+}
+
+.td-navbar {
+    padding-top: 0;
+    padding-bottom: 0;
+    min-height: 48px;
+}
+
+.td-toc {
+    padding-top: 40px;
+}
+
+.navbar-brand {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+table tr th:empty {
+    display: none;
+}
+
+/* Styles for the CRD schema reference documentation */
+/* Taken from https://github.com/giantswarm/docs/blob/main/src/static/css/crd.css */
+
+ul.crd-index {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.crd-index .tag {
+    background-color: #ccc;
+    padding: 2px 7px;
+    font-size: 14px;
+    border-radius: 3px;
+}
+
+.crd-index .tag-provider {
+    text-transform: uppercase;
+}
+
+.crd-index .tag-provider-aws {
+    background-color: #ed9235;
+    color: #232f3b;
+}
+
+.crd-index .tag-provider-azure {
+    background-color: #1773bd;
+    color: #fff;
+}
+
+.crd-index .tag-topic {
+    background-color: #5eaebb;
+    color: #fff;
+}
+
+dl.crd-meta {
+    display: flex;
+    flex-flow: row wrap;
+    border-bottom: 1px solid #999;
+}
+
+.crd-meta dt {
+    flex-basis: 20%;
+    margin: 0;
+    padding: 4px;
+    border-top: 1px solid #999;
+    font-weight: bold;
+}
+
+.crd-meta dd {
+    flex-basis: 70%;
+    flex-grow: 1;
+    margin: 0;
+    padding: 4px;
+    border-top: 1px solid #999;
+}
+
+.crd-meta a.version {
+    margin-right: 10px;
+}
+
+.crd-schema-version {
+    border-top: 1px solid #ccc;
+}
+
+.property {
+    margin-bottom: 1em;
+}
+
+.property-header h3 {
+    font-size: 22px;
+    margin: 0 0 0 -0.1em;
+}
+
+.property-description,
+.property-meta {
+    margin: 5px 0
+}
+
+.property-type {
+    background-color: #cacaca;
+    font-size: 14px;
+    line-height: 22px;
+    padding: 3px 6px;
+    text-transform: uppercase;
+}
+
+.property-required {
+    background-color: #f5bfbf;
+    font-size: 14px;
+    line-height: 22px;
+    padding: 3px 6px;
+    text-transform: uppercase;
+}
+
+@media (min-width: 992px) {
+    .td-content>.crd-meta,
+    .td-content>.crd-description,
+    .td-content>.crd-schema-version {
+        max-width: 80%;
+    }
+
+}
+
+.md-nav__link--active {
+    background-color: var(--md-code-bg-color);
+    border-radius: 0.2em;
+    padding: 0.2em;
+    outline: 0.1em solid;
+  }
+  
+  /* Additional styling to fix glitches */
+  
+  .md-sidebar__inner {
+    padding-top: 0.1em;
+  }
+  
+  .md-nav--lifted > .md-nav__list > .md-nav__item--active > .md-nav__link {
+    box-shadow: initial;
+  }
+  
