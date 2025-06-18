@@ -66,7 +66,7 @@ $ bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v0.27.1/
 ```
 
 This setup recipe uses [kind](https://kind.sigs.k8s.io/) to create three Kubernetes clusters on your machine.
-Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
+Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to "too many open files"](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
 
 ### Cleanup from previous runs
 
@@ -131,7 +131,7 @@ kubectl --context kind-kubeflex wait -n its1-system job.batch/its-with-clusterad
 
 *To learn more about the Core Helm Chart, refer to the [Core Helm Chart documentation](./core-chart.md)*
 
-### Create and register two workload execution cluster(s)
+### Create and register two workload execution clusters
 {% include-markdown "direct/example-wecs.md" heading-offset=2 %}
 
 
