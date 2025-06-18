@@ -4,6 +4,13 @@ The following sections list the known issues for each release. The issue list is
 
 ## 0.28.0
 
+Helm chart, the name of the subobject for ArgoCD has changed from
+`argo-cd` to `argocd`.
+
+There have been minor fixups, including to the website.
+
+We have advanced the version of the kube-rbac-proxy image used, from 0.18.0 (which is based on Kubernetes 1.30) to 0.19.1 (which is based on Kubernetes 1.31). Depending on a later minor release of Kubernetes is generally risky, but expected to work OK in this case.
+
 ### 0.28.0-rc.1
 
 There is one breaking change for users: in the "values" for the core
