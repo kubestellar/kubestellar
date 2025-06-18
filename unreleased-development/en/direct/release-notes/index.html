@@ -4089,6 +4089,10 @@
 <h1 id="release-notes">Release notes<a class="headerlink" href="#release-notes" title="Permanent link">#</a></h1>
 <p>The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. </p>
 <h2 id="0280">0.28.0<a class="headerlink" href="#0280" title="Permanent link">#</a></h2>
+<p>Helm chart, the name of the subobject for ArgoCD has changed from
+<code>argo-cd</code> to <code>argocd</code>.</p>
+<p>There have been minor fixups, including to the website.</p>
+<p>We have advanced the version of the kube-rbac-proxy image used, from 0.18.0 (which is based on Kubernetes 1.30) to 0.19.1 (which is based on Kubernetes 1.31). Depending on a later minor release of Kubernetes is generally risky, but expected to work OK in this case.</p>
 <h3 id="0280-rc1">0.28.0-rc.1<a class="headerlink" href="#0280-rc1" title="Permanent link">#</a></h3>
 <p>There is one breaking change for users: in the "values" for the core
 Helm chart, the name of the subobject for ArgoCD has changed from
