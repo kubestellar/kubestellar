@@ -10,6 +10,7 @@ on:
       - "release-*"
       - "doc-*"
       - main
+      - windows-setup-guide
     paths:
       - "docs/**"
       - "*.md"
