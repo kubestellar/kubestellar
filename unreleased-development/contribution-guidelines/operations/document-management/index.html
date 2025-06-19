@@ -116,7 +116,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#kubestellar-website-build-overview" class="md-skip">
+        <a href="#kubestellar-website-overview" class="md-skip">
           Skip to content
         </a>
       
@@ -2431,19 +2431,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#kubestellar-website-build-overview" class="md-nav__link">
+  <a href="#kubestellar-website-overview" class="md-nav__link">
     <span class="md-ellipsis">
-      Kubestellar Website Build Overview
+      Kubestellar Website Overview
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Kubestellar Website Build Overview">
+    <nav class="md-nav" aria-label="Kubestellar Website Overview">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#websites" class="md-nav__link">
     <span class="md-ellipsis">
       Websites
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dual-use-documentation-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dual-use documentation sources
     </span>
   </a>
   
@@ -2499,6 +2508,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#automatically-render-the-website" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatically render the website
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#creating-a-fork-that-can-use-the-generate-and-push-docs-action" class="md-nav__link">
     <span class="md-ellipsis">
       Creating a fork that can use the Generate and Push Docs Action
@@ -2511,15 +2529,6 @@
   <a href="#manually-generating-a-website-rendered-from-a-branch-of-your-fork" class="md-nav__link">
     <span class="md-ellipsis">
       Manually generating a website rendered from a branch of your fork
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#automatically-generate-webpages" class="md-nav__link">
-    <span class="md-ellipsis">
-      Automatically generate webpages
     </span>
   </a>
   
@@ -3688,19 +3697,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#kubestellar-website-build-overview" class="md-nav__link">
+  <a href="#kubestellar-website-overview" class="md-nav__link">
     <span class="md-ellipsis">
-      Kubestellar Website Build Overview
+      Kubestellar Website Overview
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Kubestellar Website Build Overview">
+    <nav class="md-nav" aria-label="Kubestellar Website Overview">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#websites" class="md-nav__link">
     <span class="md-ellipsis">
       Websites
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dual-use-documentation-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dual-use documentation sources
     </span>
   </a>
   
@@ -3756,6 +3774,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#automatically-render-the-website" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatically render the website
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#creating-a-fork-that-can-use-the-generate-and-push-docs-action" class="md-nav__link">
     <span class="md-ellipsis">
       Creating a fork that can use the Generate and Push Docs Action
@@ -3768,15 +3795,6 @@
   <a href="#manually-generating-a-website-rendered-from-a-branch-of-your-fork" class="md-nav__link">
     <span class="md-ellipsis">
       Manually generating a website rendered from a branch of your fork
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#automatically-generate-webpages" class="md-nav__link">
-    <span class="md-ellipsis">
-      Automatically generate webpages
     </span>
   </a>
   
@@ -4138,21 +4156,35 @@
 
   <h1>Docs Management Overview</h1>
 
-<h2 id="kubestellar-website-build-overview">Kubestellar Website Build Overview<a class="headerlink" href="#kubestellar-website-build-overview" title="Permanent link">#</a></h2>
+<h2 id="kubestellar-website-overview">Kubestellar Website Overview<a class="headerlink" href="#kubestellar-website-overview" title="Permanent link">#</a></h2>
 <h3 id="websites">Websites<a class="headerlink" href="#websites" title="Permanent link">#</a></h3>
 <p>We have two web sites, as follows.</p>
 <ul>
 <li><code>https://kubestellar.io</code>. This is hosted by GoDaddy and administered by <a href="mailto://andy@clubanderson.com">Andy Anderson</a>. It contains a few redirects. The most important is that <code>https://kubestellar.io/</code> redirects to <code>https://docs.kubestellar.io/</code>.</li>
 <li><code>https://docs.kubestellar.io</code>. This is a GitHub pages website based on the <code>github.com/kubestellar/kubestellar/</code> repository.</li>
 </ul>
-<p><strong>A contributor may have their own copy of the website</strong>, at <code>https://${repo_owner}.github.io/${fork_name}</code>, if they have set up the fork properly to render the webpages. This is useful for generating previews of changes before they are merged into the <code>main</code> branch of the shared repository. See the section below on <strong>Serving up documents globally from a fork of the repo via GitHub</strong>.</p>
+<p><strong>A contributor may have their own copy of the latter website</strong>, at <code>https://${repo_owner}.github.io/${fork_name}</code>, if they have <a href="#creating-a-fork-that-can-use-the-generate-and-push-docs-action">set up the fork properly to render the webpages</a>. This is useful for generating previews of changes before they are merged into the <code>main</code> branch of the shared repository. <strong>A PR that modifies the website should include such a preview.</strong> See the section below on <a href="#serving-up-documents-globally-from-a-fork-of-the-repository-via-github">Serving up documents globally from a fork of the repo via GitHub</a>.</p>
+<h3 id="dual-use-documentation-sources">Dual-use documentation sources<a class="headerlink" href="#dual-use-documentation-sources" title="Permanent link">#</a></h3>
+<p>The documentation that is rendered to the website (as described in the
+rest of this page) is designed so that it can also be usefully viewed
+directly at GitHub. For example, you can view this page both (a) on
+the website at
+<a href="https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/">https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/</a>
+and (b) directly in GitHub at
+<a href="https://github.com/kubestellar/kubestellar/blob/main/docs/README.md">https://github.com/kubestellar/kubestellar/blob/main/docs/README.md</a>. Unfortunately,
+those two uses interpret the documentation sources a bit
+differently. To the degree possible, we choose to write the
+documentation sources in a way that is rendered consistently in those
+two views (for example: indenting with four spaces instead of
+three). When that is not possible, considerations for the website
+rendering take precedence.</p>
 <h3 id="github-pages">GitHub pages<a class="headerlink" href="#github-pages" title="Permanent link">#</a></h3>
 <p>Our documentation is powered by <a href="https://github.com/jimporter/mike">mike</a> and <a href="https://www.mkdocs.org/">MkDocs</a>. MkDocs is powered by <a href="https://pypi.org/project/Markdown/">Python-Markdown</a>. These are immensely configurable and extensible. You can see our MkDocs configuration in <code>docs/mkdocs.yml</code>. Following are some of the choices we have made.</p>
 <ul>
 <li>The MkDocs theme is <a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a>.</li>
 <li>MkDocs plugin <a href="https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin">awesome-pages</a> for greater control over how navigation links are shown.</li>
 <li>MkDocs plugin <a href="https://mkdocs-macros-plugin.readthedocs.io/en/latest/">macros</a>.</li>
-<li><a href="https://github.com/clubanderson/mkdocs-include-markdown-plugin">Our own slightly improved vintage</a> of the <code>include-markdown</code> MkDocs plugin, allowing the source to be factored into re-used files.</li>
+<li>MkDocs plugin <a href="https://pypi.org/project/mkdocs-include-markdown-plugin/">include-markdown</a>, allowing the source to be factored into re-used files.</li>
 <li>Python-Markdown extension <a href="https://facelessuser.github.io/pymdown-extensions/extensions/superfences/">SuperFences</a>, supporting fenced code blocks that play nice with other markdown features.</li>
 <li>Python-Markdown extension <a href="https://facelessuser.github.io/pymdown-extensions/extensions/highlight/">Highlight</a>, for syntax highlighting of fenced code.</li>
 <li><a href="https://pypi.org/project/Pygments/">Pygments</a> for even fancier code highlighting.</li>
@@ -4162,11 +4194,28 @@
 <p>There are several places where pages in the website are generated by including a file in the root of the repository by wrapping it in a short file in the docs file tree via an include directive. This is especially used for including assorted REQUIRED files from the root (denoted by all-caps filenames). For ease of navigation <em>during the editing process</em> such wrapper files should be indicated by including <strong>-inc</strong> or <strong>-include</strong> as part of their filename. This will reduce the chance of a future documentation contributor editing the wrong file.</p>
 <hr />
 <h2 id="rendering-and-previewing-modifications-to-the-website">Rendering and Previewing modifications to the website<a class="headerlink" href="#rendering-and-previewing-modifications-to-the-website" title="Permanent link">#</a></h2>
-<p>You may preview possible changes to the website by either rendering them globally from a fork on GitHub, or by downloading and rendering the documents locally.</p>
+<p>You may preview possible changes to the website either
+(a) by downloading and rendering the documents locally, or
+(b) letting GitHub render a revised website from a branch in your fork of the kubestellar repository (which is highly recommended when making a PR that modifies the website).</p>
 <h3 id="serving-up-documents-globally-from-a-fork-of-the-repository-via-github">Serving up documents globally from a fork of the repository via GitHub<a class="headerlink" href="#serving-up-documents-globally-from-a-fork-of-the-repository-via-github" title="Permanent link">#</a></h3>
 <p>You can take advantage of <a href="https://github.com/kubestellar/kubestellar/blob/v0.28.0/.github/workflows/docs-gen-and-push.yml">the "Generate and Push Docs" GitHub Actions workflow</a>---invoked either explicitly in the GitHub web UI or implicitly by a branch naming convention---to create an online, shareable rendering of the website.
 This is particularly useful for documentation PRs, as it allows you to share a preview of your proposed changes directly via a URL to a working website.
 To take advantage of this action, you must ensure that you have forked the repository properly. This entails two things: having a version of the branch named <code>gh-pages</code>, and configuring GitHub to publish a website based on that branch.</p>
+<p>The name of your branch equals the "version" of the website where the rendering appears.</p>
+<h4 id="automatically-render-the-website">Automatically render the website<a class="headerlink" href="#automatically-render-the-website" title="Permanent link">#</a></h4>
+<p>The website rendering workflow will trigger automatically whenever you
+commit changes to a branch whose name begins with <code>doc-</code>
+(e.g. <code>doc-myversion</code>).  If you have <a href="#creating-a-fork-that-can-use-the-generate-and-push-docs-action">prepared your fork for GitHub
+Pages
+rendering</a>
+then the workflow will succeed to create/update a website rendering in
+the GitHub Pages of your fork. For example: if you name your branch
+<code>doc-holliday</code> then the GitHub pages for your fork will get a website
+version named <code>doc-holliday</code>.</p>
+<p>When preparing a PR that modifies the website, it is <strong>strongly
+recommended</strong> that you take advantage of this to get a preview
+automatically created, and include a URL for the preview in a comment
+in your PR.</p>
 <h4 id="creating-a-fork-that-can-use-the-generate-and-push-docs-action">Creating a fork that can use the Generate and Push Docs Action<a class="headerlink" href="#creating-a-fork-that-can-use-the-generate-and-push-docs-action" title="Permanent link">#</a></h4>
 <ol>
 <li>Log into your GitHub account via webbrowser</li>
@@ -4209,8 +4258,6 @@ To take advantage of this action, you must ensure that you have forked the repos
 </li>
 <li>After a minute or so, you should be able to preview your new version of the website at <code>https://${repo_owner}.github.io/${fork_name}/${branch_name}</code></li>
 </ol>
-<h4 id="automatically-generate-webpages">Automatically generate webpages<a class="headerlink" href="#automatically-generate-webpages" title="Permanent link">#</a></h4>
-<p>If you create a branch of your fork that begins with <strong>doc-</strong> (e.g. <code>doc-myversion</code>) the workflow will trigger automatically when you commit changes to the branch.</p>
 <h4 id="switching-between-versions">Switching between versions<a class="headerlink" href="#switching-between-versions" title="Permanent link">#</a></h4>
 <p>Each branch of your fork will render as its own version. You can use the release dropdown inside the rendered pages to quickly switch between versions.</p>
 <p>Note: the <strong>main</strong> branch will render as <code>https://${repo_owner}.github.io/${fork_name}/main</code>, <strong>NOT</strong> as "unreleased-development" which is a special alias on the main kubestellar.io website.</p>
