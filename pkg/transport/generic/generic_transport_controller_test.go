@@ -46,7 +46,9 @@ import (
 	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
+	ctrl "sigs.k8s.io/controller-runtime"
 
+	"github.com/go-logr/logr"
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	ksclientfake "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/fake"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
@@ -57,6 +59,8 @@ import (
 
 func TestMain(m *testing.M) {
 	klog.InitFlags(nil)
+	// Use a no-op logr logger to satisfy controller-runtime
+	ctrl.SetLogger(logr.Discard())
 	os.Exit(m.Run())
 }
 
