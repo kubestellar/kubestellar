@@ -47,8 +47,35 @@ presubmits:
             - test
           env:
             - name: USE_GOTESTSUM
-              value: '1'
+              value: "1"
           resources:
             requests:
               memory: 4Gi
               cpu: 2
+
+# Simple Tide configuration to prevent premature merges
+tide:
+  queries:
+    - repos:
+        - kubestellar/kubestellar
+      labels:
+        - lgtm
+        - approved
+      missingLabels:
+        - do-not-merge
+        - do-not-merge/hold
+        - do-not-merge/work-in-progress
+        - needs-rebase
+
+  # Required contexts - block merge until ALL tests pass
+  context_options:
+    required-contexts:
+      # Prow presubmits
+      - pull-kubestellar-verify
+      - pull-kubestellar-lint
+      - pull-kubestellar-test-unit
+      # GitHub Actions workflows
+      - "Test end to end / Tests in ginkgo"
+      - "Test end to end / Test in bash"
+      - "Run integration tests / Test"
+      - "PR Title Verifier / verify"
