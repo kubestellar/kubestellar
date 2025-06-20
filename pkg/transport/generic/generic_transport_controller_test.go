@@ -25,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-logr/logr"
 	clusterclientfake "open-cluster-management.io/api/client/cluster/clientset/versioned/fake"
 	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 	clusterapi "open-cluster-management.io/api/cluster/v1"
@@ -48,7 +49,6 @@ import (
 	"k8s.io/klog/v2/ktesting"
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	"github.com/go-logr/logr"
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	ksclientfake "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/fake"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions"
