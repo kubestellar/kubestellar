@@ -32,7 +32,7 @@ jobs:
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
 
-    - uses: rojopolis/spellcheck-github-actions@584b2ae95998967a53af7fbfb7f5b15352c38748 
+    - uses: rojopolis/spellcheck-github-actions@63aba9473ee34d681dd48dee26b3d43ea0bbc462 
       name: Spellcheck
       with:
         config_path: .github/spellcheck/.spellcheck.yml
