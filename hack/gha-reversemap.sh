@@ -146,7 +146,8 @@ _update_reversemap_with() {
 _fetch_latest_tag() {
     local latest latest_json
     action_ref=$1
-    API_GITHUB_LATEST_RELEASE=https://api.github.com/repos/$action_ref/releases/latest
+    action_ref_safe=$(echo "$action_ref" | cut -d '/' -f 1,2)
+    API_GITHUB_LATEST_RELEASE=https://api.github.com/repos/${action_ref_safe}/releases/latest
     latest_json=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_GITHUB_LATEST_RELEASE")
     if [ -z "$latest_json" ]; then
 	_exit_with_error $ERR_NO_LATEST "GitHub returned empty response to query for latest"
