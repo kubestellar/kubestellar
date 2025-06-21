@@ -38,6 +38,7 @@ nav:
   - Getting Started: direct/get-started.md
   - User Guide:
       - Guide Overview: direct/user-guide-intro.md
+      - Observability: direct/observability.md
       - Getting Started: direct/get-started.md
       - Getting Started from OCM: direct/start-from-ocm.md
       - General Setup:
@@ -86,7 +87,6 @@ nav:
       - Onboarding: contribution-guidelines/onboarding-inc.md
       - Website:
           - Docs Management Overview: contribution-guidelines/operations/document-management.md
-          - Testing website PRs: contribution-guidelines/operations/testing-doc-prs.md
       - Security:
           - Policy: contribution-guidelines/security/security-inc.md
           - Contacts: contribution-guidelines/security/security_contacts-inc.md

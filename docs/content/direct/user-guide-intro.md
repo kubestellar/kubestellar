@@ -59,6 +59,10 @@ You can find an example run through of steps 2--7 in [Getting Started](get-start
 
 There is also an example run through of steps 2--7 that starts with (a slightly modified version of) the OCM Quick Start and also dovetails with the example scenarios. See [here](start-from-ocm.md).
 
+## Observability and Monitoring
+
+KubeStellar provides several endpoints and integrations for observability, including Prometheus metrics and debug endpoints. See the [Observability](observability.md) page for details on available metrics, endpoints, and how to access them.
+
 ## Troubleshooting
 
 See [the Troubleshooting guide](troubleshooting.md).
