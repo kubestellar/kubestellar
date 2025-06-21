@@ -6,45 +6,45 @@ on:
   workflow_dispatch:
     inputs:
       testFlags:
-        description: 'Command line flags for run-test.sh'
+        description: "Command line flags for run-test.sh"
         required: false
-        default: ''
+        default: ""
         type: choice
         options:
-        - ''
-        - '--released'
+          - ""
+          - "--released"
   pull_request:
     branches:
       - main
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
+      - "docs/**"
+      - "**/*.md"
   push:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
+      - "docs/**"
+      - "**/*.md"
 
 jobs:
   ginkgo-test:
     name: Tests in ginkgo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
-      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
           go-version: 1.24
           cache: true
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f 
+        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f
         id: install
 
-      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d 
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
 
       - name: Install dependencies
         run: |
@@ -164,18 +164,18 @@ jobs:
     name: Test in bash
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
-      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
           go-version: 1.24
           cache: true
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f 
+        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f
         id: install
 
-      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d 
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
 
       - name: Install dependencies
         run: |
@@ -289,3 +289,22 @@ jobs:
           sleep 10
           curl http://localhost:8080/metrics
           kill %
+
+  # Consolidation job that ensures ALL tests pass before allowing merge
+  all-tests-complete:
+    name: All Tests Complete
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: [ginkgo-test, test-bash]
+    steps:
+      - name: Check all tests passed
+        run: |
+          echo "✅ All end-to-end tests have completed successfully!"
+          echo "🎉 This PR is ready for merge once other required checks pass:"
+          echo "   • pull-kubestellar-verify (Prow)"
+          echo "   • pull-kubestellar-lint (Prow)"
+          echo "   • pull-kubestellar-test-unit (Prow)"
+          echo "   • Run integration tests / Test"
+          echo "   • PR Title Verifier / verify"  
+          echo ""
+          echo "🔒 This consolidated check prevents premature merging."
