@@ -20,12 +20,14 @@ package main
 // to ensure that exec-entrypoint and run can make use of them.
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/go-logr/logr"
 	"github.com/spf13/pflag"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -34,6 +36,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/rest"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	_ "k8s.io/component-base/metrics/prometheus/version"
@@ -122,8 +125,6 @@ func main() {
 	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
 	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
 
-	// TODO: engage leader election if requested
-
 	// get the config for WDS
 	setupLog.Info("Getting config for WDS", "name", wdsName)
 	wdsRestConfig, wdsName, err := ctrlutil.GetWDSKubeconfig(setupLog, wdsName)
@@ -144,10 +145,54 @@ func main() {
 	setupLog.Info("Got config for ITS", "name", itsName)
 	itsRestConfig = itsClientLimits.LimitConfig(itsRestConfig)
 
+	// Start controllers based on leader election setting
+	if enableLeaderElection {
+		setupLog.Info("Starting with leader election enabled")
+		startControllersWithLeaderElection(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
+	} else {
+		setupLog.Info("Starting without leader election")
+		startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
+	}
+
+	select {}
+}
+
+// startControllersWithLeaderElection starts controllers only after becoming the leader
+func startControllersWithLeaderElection(ctx context.Context, setupLog logr.Logger, wdsRestConfig, itsRestConfig *rest.Config, wdsName, itsName string, allowedGroupsSet sets.Set[string], ctlrsToStart sets.Set[string], wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics) {
+	// Create a manager with leader election enabled
+	mgr, err := ctrl.NewManager(wdsRestConfig, ctrl.Options{
+		Scheme:                     scheme,
+		LeaderElection:             true,
+		LeaderElectionID:           "kubestellar-controller-manager",
+		LeaderElectionNamespace:    wdsName + "-system", // Use the WDS name to determine namespace
+		LeaderElectionResourceLock: "leases",
+		LeaderElectionReleaseOnCancel: true,
+	})
+	if err != nil {
+		setupLog.Error(err, "unable to create manager")
+		os.Exit(1)
+	}
+
+	// Start controllers in a goroutine that only runs when we become leader
+	go func() {
+		<-mgr.Elected()
+		setupLog.Info("Became leader, starting controllers")
+		startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
+	}()
+
+	// Start the manager (this will handle leader election)
+	if err := mgr.Start(ctx); err != nil {
+		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+}
+
+// startControllersDirectly starts controllers immediately without leader election
+func startControllersDirectly(ctx context.Context, setupLog logr.Logger, wdsRestConfig, itsRestConfig *rest.Config, wdsName, itsName string, allowedGroupsSet sets.Set[string], ctlrsToStart sets.Set[string], wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics) {
 	workloadEventRelay := &workloadEventRelay{}
 
 	// create the binding controller
-	bindingController, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName, allowedGroupsSet, workloadEventRelay)
+	bindingController, err := binding.NewController(setupLog, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName, allowedGroupsSet, workloadEventRelay)
 	if err != nil {
 		setupLog.Error(err, "unable to create binding controller")
 		os.Exit(1)
@@ -184,7 +229,7 @@ func main() {
 			time.Sleep(15 * time.Second)
 		}
 		setupLog.Info("Creating controller", "name", status.ControllerName)
-		statusController, err = status.NewController(logger, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName,
+		statusController, err = status.NewController(setupLog, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName,
 			bindingController.GetBindingPolicyResolver())
 		if err != nil {
 			setupLog.Error(err, "unable to create status controller")
@@ -212,8 +257,6 @@ func main() {
 			os.Exit(1)
 		}
 	}
-
-	select {}
 }
 
 // workloadEventRelay implements binding.WorkloadEventHandler and relays the notifications
