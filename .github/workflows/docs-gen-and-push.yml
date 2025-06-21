@@ -42,14 +42,14 @@ jobs:
     name: Generate and push docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           token: ${{ github.repository_owner == 'kubestellar' && secrets.GH_ALL_PROJECT_TOKEN || github.token }}
           persist-credentials: 'true'
   
       - run: git fetch origin gh-pages
 
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.10'
           cache: 'pip'
