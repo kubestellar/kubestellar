@@ -32,6 +32,7 @@ TMP_OUTPUT="/tmp/$(date -u -Iseconds | cut -d '+' -f1).json"
 ERR_YQ_DOWNLOAD_FAILED=50
 ERR_YQ_NOT_INSTALLED=60
 ERR_GITHUB_TOKEN_INVALID=70
+ERR_NO_SHA=79
 ERR_ARCH_UNSUPPORTED=80
 ERR_NO_LATEST=86
 ERR_NO_TAG=87
@@ -178,7 +179,7 @@ _get_sha_from_reversemap() {
     action_ref=$1
     query=$(yq ".\"$action_ref\".sha" $REVERSEMAP_FILE)
     if [[ $? -ne 0 ]]; then
-        _exit_with_error "no sha has been found for $action_ref in $REVERSEMAP_FILE"
+        _exit_with_error $ERR_NO_SHA "no sha has been found for $action_ref in $REVERSEMAP_FILE"
     fi
     _return "$query"
 }
