@@ -27,7 +27,7 @@
         "type": "prometheus",
         "uid": "prometheus-test"
       },
-      "description": "averaged over the last 5 minutes",
+      "description": "averaged over the last 5 minutes\n\nBucket boundaries: ≤0.05s, ≤0.1s, ≤0.15s, ≤0.2s, ≤0.25s, ≤0.3s, ≤0.35s, ≤0.4s, ≤0.45s, ≤0.5s, ≤0.6s, ≤0.7s, ≤0.8s, ≤0.9s, ≤1s, ≤1.25s, ≤1.5s, ≤1.75s, ≤2s, ≤2.5s, ≤3s, ≤3.5s, ≤4s, ≤4.5s, ≤5s, ≤6s, ≤7s, ≤8s, ≤9s, ≤10s, ≤15s, ≤20s, ≤25s, ≤30s, ≤40s, ≤50s, ≤60s, +Inf\n\nNote: histogram_quantile() uses linear interpolation within buckets, assuming uniform distribution of observations. The displayed value represents the estimated quantile position within the bucket containing the actual quantile.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -122,6 +122,7 @@
         }
       ],
       "title": "99th Percentile of Request Duration",
+      "description": "Response latency distribution for API server requests\n\nBucket boundaries: ≤0.05s, ≤0.1s, ≤0.15s, ≤0.2s, ≤0.25s, ≤0.3s, ≤0.35s, ≤0.4s, ≤0.45s, ≤0.5s, ≤0.6s, ≤0.7s, ≤0.8s, ≤0.9s, ≤1s, ≤1.25s, ≤1.5s, ≤1.75s, ≤2s, ≤2.5s, ≤3s, ≤3.5s, ≤4s, ≤4.5s, ≤5s, ≤6s, ≤7s, ≤8s, ≤9s, ≤10s, ≤15s, ≤20s, ≤25s, ≤30s, ≤40s, ≤50s, ≤60s, +Inf\n\nNote: histogram_quantile() uses linear interpolation within buckets, assuming uniform distribution of observations. The displayed value represents the estimated quantile position within the bucket containing the actual quantile.",
       "type": "timeseries"
     },
     {
