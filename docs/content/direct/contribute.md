@@ -22,4 +22,3 @@ We welcome your contributions! Whether you want to report a bug, improve documen
 ---
 
 *This page is now focused on direct contribution steps. For broader community info, visit the Community section.*
-
