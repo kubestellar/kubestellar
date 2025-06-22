@@ -1,36 +1,25 @@
 # Contributing to KubeStellar
-Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
 
-To get started, kindly read through familiarize yourself with our [code of conduct](../contribution-guidelines/coc.md).
+We welcome your contributions! Whether you want to report a bug, improve documentation, fix issues, or add new features, your help is valuable.
 
-## Talk to us on Slack!
+## How to Contribute
 
-If you have any inquiries, please feel free to reach out to us on the KubeStellar-dev [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/).
+1. **Read the [Contribution Guidelines](../contribution-guidelines/CONTRIBUTING.md)**
+   - Follow our code of conduct and review the process for submitting issues and pull requests.
+2. **Join the Conversation**
+   - Chat with us on the [#kubestellar-dev Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA).
+   - Join our [developer mailing list](https://groups.google.com/g/kubestellar-dev).
+3. **Find an Issue**
+   - Look for issues labeled `good first issue` or `help wanted` in our [GitHub repository](https://github.com/kubestellar/kubestellar).
+4. **Submit Your Contribution**
+   - Fork the repository, create a branch, and open a pull request with a clear description of your changes.
+   - Sign your commits as described in our [sign-off guide](../contribution-guidelines/pr-signoff.md).
 
-## Work with us on GitHub!
+## Community and Support
+- For questions or help, see the [Community section](../Community/_index.md).
+- For governance, security, and release process, see the [contribution-guidelines](../contribution-guidelines/).
 
-More documentation and the actual management of contributions to the development of KubeStellar are done [via our GitHub repository.](https://github.com/kubestellar/kubestellar).
+---
 
-*We can't wait to collaborate with you!*
-
-## What else is here: more details about contributing 
-
-In addition to the Code of Conduct, there are a number of terms, conditions and processes that define our open-source process. They are explained in full detail on the pages in this section of the website:
-
-- **[Code of Conduct](../contribution-guidelines/coc-inc.md)** The CNCF code of conduct for the KubeStellar community
-- **[Guidelines](../contribution-guidelines/contributing-inc.md)** General Guidelines for our Github processes
-- **[License](../contribution-guidelines/license-inc.md)** The Apache 2.0 license under which KubeStellar is published
-- **[Governance](../contribution-guidelines/governance-inc.md)** The protocols under which the KubeStellar project is run
-- **[Onboarding](../contribution-guidelines/onboarding-inc.md)** The procedures for adding/removing members of our Github organization
-- **Website**
-    - **[Build Overview](../contribution-guidelines/operations/document-management.md)** How our website is built and how to collaboratively work on changes to it using Github staging
-    - **[Testing website PRs](../contribution-guidelines/operations/testing-doc-prs.md)** how to test website changes using only your local workstation
-- **Security**
-    - **[Policy](../contribution-guidelines/security/security-inc.md)** Security Policies
-    - **[Contacts](../contribution-guidelines/security/security_contacts-inc.md)** Who to contact with security concerns
-- **[Testing](testing.md)** How to use the preconfigured tests in the repository
-- **[Packaging](packaging.md)** How the components of KubeStellar are organized
-- **[Release Process](release.md)** All the steps involved in creating and publishing a new release of KubeStellar
-- **[Release Testing](release-testing.md)** Steps involved in testing a release or release candidate before merging it into the main branch.
-- **[Sign-off and Signing Contributions](pr-signoff.md)** How to properly configure your commits so they are both signed and "signed off" (and how those terms differ)
+*This page is now focused on direct contribution steps. For broader community info, visit the Community section.*
 
