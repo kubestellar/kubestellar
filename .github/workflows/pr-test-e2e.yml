@@ -289,22 +289,3 @@ jobs:
           sleep 10
           curl http://localhost:8080/metrics
           kill %
-
-  # Consolidation job that ensures ALL tests pass before allowing merge
-  all-tests-complete:
-    name: All Tests Complete
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    needs: [ginkgo-test, test-bash]
-    steps:
-      - name: Check all tests passed
-        run: |
-          echo "✅ All end-to-end tests have completed successfully!"
-          echo "🎉 This PR is ready for merge once other required checks pass:"
-          echo "   • pull-kubestellar-verify (Prow)"
-          echo "   • pull-kubestellar-lint (Prow)"
-          echo "   • pull-kubestellar-test-unit (Prow)"
-          echo "   • Run integration tests / Test"
-          echo "   • PR Title Verifier / verify"  
-          echo ""
-          echo "🔒 This consolidated check prevents premature merging."
