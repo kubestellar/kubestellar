@@ -27,7 +27,7 @@
         "type": "prometheus",
         "uid": "prometheus-test"
       },
-      "description": "averaged over the last 5 minutes\n\nBucket boundaries: ≤0.001s, ≤0.01s, ≤0.1s, ≤1s, ≤10s, +Inf\n\nNote: histogram_quantile() uses linear interpolation within buckets, assuming uniform distribution of observations. The displayed value represents the estimated quantile position within the bucket containing the actual quantile.",
+      "description": "Averaged over the last 5 minutes\n\nBucket boundaries: 0.001s, 0.01s, 0.1s, 1s, 10s, +Inf\n\nSee https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile for details on histogram_quantile function.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -165,7 +165,7 @@
         }
       ],
       "title": "Percentile of Sync Duration for Items in the Workqueue",
-      "description": "Time taken for items to be processed from the workqueue\n\nBucket boundaries: ≤0.001s, ≤0.01s, ≤0.1s, ≤1s, ≤10s, +Inf\n\nNote: histogram_quantile() uses linear interpolation within buckets, assuming uniform distribution of observations. The displayed value represents the estimated quantile position within the bucket containing the actual quantile.",
+      "description": "Bucket boundaries: 0.001s, 0.01s, 0.1s, 1s, 10s, +Inf\n\nSee https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile for details on histogram_quantile function.",
       "type": "timeseries"
     },
     {
@@ -371,7 +371,7 @@
         }
       ],
       "title": "99th Percentile of Latencies on Requests to the API server",
-      "description": "averaged over the last 5 minutes\n\nBucket boundaries: ≤0.005s, ≤0.025s, ≤0.1s, ≤0.25s, ≤0.5s, ≤1s, ≤2s, ≤4s, ≤8s, ≤15s, ≤30s, ≤60s, +Inf\n\nNote: histogram_quantile() uses linear interpolation within buckets, assuming uniform distribution of observations. The displayed value represents the estimated quantile position within the bucket containing the actual quantile.",
+      "description": "Averaged over the last 5 minutes\n\nBucket boundaries: 0.005s, 0.025s, 0.1s, 0.25s, 0.5s, 1s, 2s, 4s, 8s, 15s, 30s, 60s, +Inf\n\nSee https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile for details on histogram_quantile function.",
       "type": "timeseries"
     },
     {
