@@ -1,0 +1,46 @@
+# This workflow checks that PRs modifying website docs include a preview link in the PR description.
+# It enforces KubeStellar's documentation PR best practices.
+
+name: Check Docs PR Preview Link
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+    paths:
+      - 'docs/content/**'
+      - 'docs/README.md'
+      - 'docs/mkdocs.yml'
+      - 'docs/overrides/**'
+      - 'docs/scripts/**'
+      - 'docs/requirements.txt'
+      - 'docs/main.py'
+
+jobs:
+  check-preview-link:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for Preview Link in PR Description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const branch = pr.head.ref;
+            const body = pr.body || '';
+            const docBranchRegex = /^doc-/;
+            const githubPagesUrl = `https://${pr.head.repo.owner.login}.github.io/${pr.head.repo.name}/${branch}`;
+            
+            const previewLine = (body.match(/^\s*Preview.*https?:\/\/\S+/im) || [])[0];
+            const hasPreview = !!previewLine;
+            const hasDocBranch = docBranchRegex.test(branch);
+
+            if (hasPreview) {
+              if (hasDocBranch && previewLine.includes(githubPagesUrl)) {
+                console.log('✅ Docs PR: doc- branch and valid preview link present.');
+              } else if (!hasDocBranch) {
+                core.warning('⚠️ Docs PR: Preview link found, but branch does not start with doc-. Please consider using a doc- branch for automatic previews.');
+              } else {
+                core.warning('⚠️ Docs PR: Preview link found, but it may not point to the expected GitHub Pages URL.');
+              }
+            } else {
+              core.setFailed('❌ Docs PR: No preview link found. Please include a line starting with "Preview" and a valid GitHub Pages URL for your changes.');
+            }
