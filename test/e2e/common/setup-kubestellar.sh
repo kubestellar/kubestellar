@@ -181,6 +181,10 @@ kubectl --context its1 create cm -n customization-properties cluster1 --from-lit
 kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2 region=west
 kubectl --context its1 create cm -n customization-properties cluster2 --from-literal clusterURL=https://my.clusters/2002-cdef
 
+# Apply necessary storage permissions to WECs to enable StorageClass management
+"${SRC_DIR}/../../../scripts/apply-ocm-storage-permission.sh" --context cluster1
+"${SRC_DIR}/../../../scripts/apply-ocm-storage-permission.sh" --context cluster2
+
 :
 : -------------------------------------------------------------------------
 : Get all deployments and statefulsets running in the hosting cluster.
