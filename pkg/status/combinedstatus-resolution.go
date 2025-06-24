@@ -943,11 +943,41 @@ func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row
 
 	evalValue := eval.Value()
 	switch v := evalValue.(type) {
-	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-		f := float64(v.(int64))
+	case int:
+		f := float64(v)
 		return &f, ""
-	case float32, float64:
-		f := v.(float64)
+	case int8:
+		f := float64(v)
+		return &f, ""
+	case int16:
+		f := float64(v)
+		return &f, ""
+	case int32:
+		f := float64(v)
+		return &f, ""
+	case int64:
+		f := float64(v)
+		return &f, ""
+	case uint:
+		f := float64(v)
+		return &f, ""
+	case uint8:
+		f := float64(v)
+		return &f, ""
+	case uint16:
+		f := float64(v)
+		return &f, ""
+	case uint32:
+		f := float64(v)
+		return &f, ""
+	case uint64:
+		f := float64(v)
+		return &f, ""
+	case float32:
+		f := float64(v)
+		return &f, ""
+	case float64:
+		f := v
 		return &f, ""
 	case string:
 		f, err := strconv.ParseFloat(v, 64)
