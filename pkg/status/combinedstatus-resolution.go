@@ -988,6 +988,53 @@ func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row
 	default:
 		return nil, fmt.Sprintf("combinedField subject has unexpected type %T", evalValue)
 	}
+}evalValue := eval.Value()
+	switch v := evalValue.(type) {
+	case int:
+		f := float64(v)
+		return &f, ""
+	case int8:
+		f := float64(v)
+		return &f, ""
+	case int16:
+		f := float64(v)
+		return &f, ""
+	case int32:
+		f := float64(v)
+		return &f, ""
+	case int64:
+		f := float64(v)
+		return &f, ""
+	case uint:
+		f := float64(v)
+		return &f, ""
+	case uint8:
+		f := float64(v)
+		return &f, ""
+	case uint16:
+		f := float64(v)
+		return &f, ""
+	case uint32:
+		f := float64(v)
+		return &f, ""
+	case uint64:
+		f := float64(v)
+		return &f, ""
+	case float32:
+		f := float64(v)
+		return &f, ""
+	case float64:
+		f := v
+		return &f, ""
+	case string:
+		f, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			return nil, "failed to parse combinedField subject as a float: " + err.Error()
+		}
+		return &f, ""
+	default:
+		return nil, fmt.Sprintf("combinedField subject has unexpected type %T", evalValue)
+	}
 }
 
 func statusCombinationEqual(a, b *v1alpha1.NamedStatusCombination) bool {
