@@ -23,8 +23,7 @@ In addition to the Code of Conduct, there are a number of terms, conditions and 
 - **[Governance](../contribution-guidelines/governance-inc.md)** The protocols under which the KubeStellar project is run
 - **[Onboarding](../contribution-guidelines/onboarding-inc.md)** The procedures for adding/removing members of our Github organization
 - **Website**
-    - **[Build Overview](../contribution-guidelines/operations/document-management.md)** How our website is built and how to collaboratively work on changes to it using Github staging
-    - **[Testing website PRs](../contribution-guidelines/operations/testing-doc-prs.md)** how to test website changes using only your local workstation
+    - **[Documentation Management Overview](../contribution-guidelines/operations/document-management.md)** How our website is built, how to preview and test changes, and how to contribute documentation effectively
 - **Security**
     - **[Policy](../contribution-guidelines/security/security-inc.md)** Security Policies
     - **[Contacts](../contribution-guidelines/security/security_contacts-inc.md)** Who to contact with security concerns
