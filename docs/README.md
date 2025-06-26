@@ -3,14 +3,6 @@
 
 **This section has been moved to a dedicated page for better organization and maintenance.**
 
-For comprehensive information about contributing to the KubeStellar website, including:
-- Website overview and technology stack
-- How to preview changes (global and local)
-- Testing documentation PRs
-- Website structure and configuration
-- Publishing and versioning
-- Shortcut URLs
-
-Please see: **[Documentation Management Overview](../contribution-guidelines/operations/document-management.md)**
+For comprehensive information about contributing to the KubeStellar website, please see: **[Documentation Management Overview](https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/operations/document-management.md)**
 
 <!--readme-for-documentation-end-->
