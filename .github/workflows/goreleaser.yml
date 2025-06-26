@@ -18,11 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       with:
         fetch-depth: 0
 
-    - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 
+    - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
       with:
         go-version: 1.24
          
@@ -33,10 +33,10 @@ jobs:
       run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
 
     - name: Install syft binary executable
-      uses: anchore/sbom-action/download-syft@9f7302141466aa6482940f15371237e9d9f4c34a 
+      uses: anchore/sbom-action/download-syft@9246b90769f852b3a8921f330c59e0b3f439d6e9
 
     - name: Run GoReleaser on tag
-      uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 
+      uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552
       with:
         distribution: goreleaser
         version: latest
@@ -47,12 +47,12 @@ jobs:
         EMAIL: ${{ github.actor}}@users.noreply.github.com
 
     - name: Set up Helm
-      uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112 
+      uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Login to registry
-      uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 
+      uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}

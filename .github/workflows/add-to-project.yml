@@ -19,7 +19,7 @@ jobs:
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
         
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           persist-credentials: 'false'
@@ -30,7 +30,7 @@ jobs:
           github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
         id: add-project
       
-      - uses: titoportas/update-project-fields@421a54430b3cdc9eefd8f14f9ce0142ab7678751 
+      - uses: titoportas/update-project-fields@421a54430b3cdc9eefd8f14f9ce0142ab7678751
         with:
           project-url: https://github.com/orgs/kubestellar/projects/5
           github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}

@@ -32,7 +32,10 @@ TMP_OUTPUT="/tmp/$(date -u -Iseconds | cut -d '+' -f1).json"
 ERR_YQ_DOWNLOAD_FAILED=50
 ERR_YQ_NOT_INSTALLED=60
 ERR_GITHUB_TOKEN_INVALID=70
+ERR_NO_SHA=79
 ERR_ARCH_UNSUPPORTED=80
+ERR_NO_LATEST=86
+ERR_NO_TAG=87
 
 help() {
     cat <<EOF
@@ -142,9 +145,19 @@ _update_reversemap_with() {
 
 # Fetch latest release tag of an action upstream
 _fetch_latest_tag() {
+    local latest latest_json
     action_ref=$1
-    API_GITHUB_LATEST_RELEASE=https://api.github.com/repos/$action_ref/releases/latest
-    _return "$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_GITHUB_LATEST_RELEASE" | jq -r '.tag_name')"
+    action_ref_safe=$(echo "$action_ref" | cut -d '/' -f 1,2)
+    API_GITHUB_LATEST_RELEASE=https://api.github.com/repos/${action_ref_safe}/releases/latest
+    latest_json=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_GITHUB_LATEST_RELEASE")
+    if [ -z "$latest_json" ]; then
+	_exit_with_error $ERR_NO_LATEST "GitHub returned empty response to query for latest"
+    fi
+    latest=$(jq -r .tag_name <<<"$latest_json")
+    if [ -z "$latest" ] || [ "$latest" = null ]; then
+        _exit_with_error $ERR_NO_TAG "Latest release information for ${action_ref} lacks tag_name: ${latest_json}"
+    fi
+    _return "$latest"
 }
 
 # Update action version within a file
@@ -152,7 +165,7 @@ _update_action_version_infile() {
     file=$1
     action_ref=$2
     action_sha=$3
-    sed_replace_expr="s;(uses:) $action_ref@[a-zA-Z0-9 \._\-]+;\1 $action_ref@$action_sha ;g"
+    sed_replace_expr="s;(uses:) $action_ref@[a-zA-Z0-9\._\-]+;\1 $action_ref@$action_sha;g"
     if [[ "$(uname -s)" = "Darwin" ]]; then
         # MacOS sed usage of -i option differs from Linux version.
         sed -E -i '' "$sed_replace_expr" "$file"
@@ -166,7 +179,7 @@ _get_sha_from_reversemap() {
     action_ref=$1
     query=$(yq ".\"$action_ref\".sha" $REVERSEMAP_FILE)
     if [[ $? -ne 0 ]]; then
-        _exit_with_error "no sha has been found for $action_ref in $REVERSEMAP_FILE"
+        _exit_with_error $ERR_NO_SHA "no sha has been found for $action_ref in $REVERSEMAP_FILE"
     fi
     _return "$query"
 }
