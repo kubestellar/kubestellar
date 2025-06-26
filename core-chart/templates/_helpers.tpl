@@ -3,10 +3,10 @@ Expand ITS PCH custeradm container.
 */}}
 
 {{/*
-ITS clusteradmin container for PostCreateHook
+Container for initializing the cluster as an OCM hub using clusteradm init.
 */}}
 {{- define "pch.its.custeradm" -}}
-- name: "{{"{{.HookName}}-clusteradm"}}"
+- name: "{{"{{.HookName}}-hub-init"}}"
   image: quay.io/kubestellar/clusteradm:{{.Values.CLUSTERADM_VERSION}}
   args:
   - init
@@ -22,10 +22,10 @@ ITS clusteradmin container for PostCreateHook
 {{- end }}
 
 {{/*
-ITS statusaddon container for PostCreateHook
+Container for installing the OCM status add-on using Helm.
 */}}
 {{- define "pch.its.statusaddon" -}}
-- name: "{{"{{.HookName}}-statusaddon"}}"
+- name: "{{"{{.HookName}}-status-addon"}}"
   image: quay.io/kubestellar/helm:{{.Values.HELM_VERSION}}
   args:
   - upgrade
