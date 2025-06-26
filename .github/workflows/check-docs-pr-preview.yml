@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@cfd007d6b1c1b4c2e6e6e2e3e6e6e2e3e6e6e2e3 
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Check for Preview Link in PR Description (bash)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
