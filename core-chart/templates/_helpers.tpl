@@ -1,6 +1,10 @@
 {{/*
 Expand ITS PCH custeradm container.
 */}}
+
+{{/*
+ITS clusteradmin container for PostCreateHook
+*/}}
 {{- define "pch.its.custeradm" -}}
 - name: "{{"{{.HookName}}-clusteradm"}}"
   image: quay.io/kubestellar/clusteradm:{{.Values.CLUSTERADM_VERSION}}
@@ -18,7 +22,7 @@ Expand ITS PCH custeradm container.
 {{- end }}
 
 {{/*
-Expand ITS PCH statusaddon container.
+ITS statusaddon container for PostCreateHook
 */}}
 {{- define "pch.its.statusaddon" -}}
 - name: "{{"{{.HookName}}-statusaddon"}}"

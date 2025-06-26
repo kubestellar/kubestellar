@@ -1,0 +1,25 @@
+{{- if .Values.InstallPCHs }}
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: its-clusteradmin
+  labels:
+    kflex.kubestellar.io/cptype: its
+spec:
+  templates:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: "{{"{{.HookName}}"}}"
+    spec:
+      template:
+        spec:
+          containers:
+{{ include "pch.its.custeradm" . | indent 10 }}
+          volumes:
+          - name: kubeconfig
+            secret:
+              secretName: "{{"{{.ITSSecretName}}"}}"
+          restartPolicy: Never
+      backoffLimit: 1
+{{- end }}
