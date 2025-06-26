@@ -39,7 +39,7 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/ta
 
 If successful, the script will output the variable definitions that you would use when proceeding to the example scenarios. After successfully running the script, proceed to the [Exercise KubeStellar](#exercise-kubestellar) section below.
 
-_Note: the script does the same things as described in the [Step by Step Setup](#step-by-step-setup) but with maximum concurrency, so it can complete faster. This makes the script actually more complicated than the step-by-step process below. While this is great for getting started quickly with a demo system, you may want to follow the manual setup below to better understand the components and how to create a [configuration that meets your needs](#next-steps)._
+---
 
 ## Step by Step Setup
 
@@ -85,6 +85,24 @@ kubectl config delete-context cluster2
 After that cleanup, you may want to `set -e` so that failures do not
 go unnoticed (the various cleanup commands may legitimately "fail" if
 there is nothing to clean up).
+
+### Define environment variables (set these first)
+
+Set the following environment variables at the start. These will be referenced throughout the setup steps and in example scenarios:
+
+```shell
+host_context=kind-kubeflex
+its_cp=its1
+its_context=its1
+wds_cp=wds1
+wds_context=wds1
+wec1_name=cluster1
+wec2_name=cluster2
+wec1_context=$wec1_name
+wec2_context=$wec2_name
+label_query_both=location-group=edge
+label_query_one=name=cluster1
+```
 
 ### Set the Version appropriately as an environment variable
 
