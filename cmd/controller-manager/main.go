@@ -23,8 +23,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -67,6 +69,8 @@ const (
 	// number of workers to run the reconciliation loop
 	workers = 4
 )
+
+var readyFlag atomic.Bool
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
@@ -169,6 +173,20 @@ func main() {
 		startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
 	}
 
+	// Start /readyz endpoint
+	go func() {
+		http.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
+			if readyFlag.Load() {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte("ok"))
+			} else {
+				w.WriteHeader(http.StatusServiceUnavailable)
+				w.Write([]byte("not ready"))
+			}
+		})
+		http.ListenAndServe(":8081", nil)
+	}()
+
 	select {}
 }
 
@@ -225,6 +243,7 @@ func startControllersWithLeaderElection(ctx context.Context, setupLog logr.Logge
 			OnStartedLeading: func(ctx context.Context) {
 				setupLog.Info("Became leader, starting controllers")
 				startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
+				readyFlag.Store(true)
 			},
 			OnStoppedLeading: func() {
 				setupLog.Info("Lost leadership, stopping controllers")
