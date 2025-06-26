@@ -1,5 +1,9 @@
 # Workload Description Spaces
 
+> **Note**: This documentation is being improved in PR #3002 by @Tob-iee.
+> 
+> For the latest information about Workload Description Spaces, please refer to that PR.
+
 This document will tell users what they need to know about these.
 
 Including the fact that the KubeFlex hosting cluster can play the role
