@@ -124,7 +124,7 @@ fi
 if [[ "$prefetch" == "true" ]] ; then
   for i in "${!prefetch_pids[@]}" ; do
     echo -n "Waiting for prefetch process with pid=${prefetch_pids[i]} to complete... "
-    wait ${prefetch_pidss[i]}
+    wait ${prefetch_pids[i]}
     exitcode="$?"
     echo  "exitcode=$exitcode"
     if [[ "$exitcode" != "0" ]] ; then

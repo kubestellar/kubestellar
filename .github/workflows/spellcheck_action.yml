@@ -30,16 +30,16 @@ jobs:
     name: Spellcheck
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
-    - uses: rojopolis/spellcheck-github-actions@23dc186319866e1de224f94fe1d31b72797aeec7 
+    - uses: rojopolis/spellcheck-github-actions@63aba9473ee34d681dd48dee26b3d43ea0bbc462
       name: Spellcheck
       with:
         config_path: .github/spellcheck/.spellcheck.yml
         output_file: spellcheck-output.txt
 #         source_files: "docs/content/*"
         
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: success() || failure()
       with:
         name: Spellcheck Output
