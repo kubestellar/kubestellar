@@ -30,13 +30,19 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/spf13/pflag"
 
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/leaderelection"
+	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	_ "k8s.io/component-base/metrics/prometheus/version"
@@ -67,6 +73,15 @@ func init() {
 
 	utilruntime.Must(v1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
+}
+
+// getUniqueIdentity returns a unique identifier for leader election
+func getUniqueIdentity() string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = "unknown"
+	}
+	return fmt.Sprintf("%s-%d", hostname, os.Getpid())
 }
 
 func main() {
@@ -157,34 +172,72 @@ func main() {
 	select {}
 }
 
-// startControllersWithLeaderElection starts controllers only after becoming the leader
+// startControllersWithLeaderElection uses client-go leader election instead of controller-runtime
 func startControllersWithLeaderElection(ctx context.Context, setupLog logr.Logger, wdsRestConfig, itsRestConfig *rest.Config, wdsName, itsName string, allowedGroupsSet sets.Set[string], ctlrsToStart sets.Set[string], wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics) {
-	// Create a manager with leader election enabled
-	mgr, err := ctrl.NewManager(wdsRestConfig, ctrl.Options{
-		Scheme:                     scheme,
-		LeaderElection:             true,
-		LeaderElectionID:           "kubestellar-controller-manager",
-		LeaderElectionNamespace:    wdsName + "-system", // Use the WDS name to determine namespace
-		LeaderElectionResourceLock: "leases",
-		LeaderElectionReleaseOnCancel: true,
-	})
+	// Create WDS client for leader election
+	wdsClient, err := kubernetes.NewForConfig(wdsRestConfig)
 	if err != nil {
-		setupLog.Error(err, "unable to create manager")
+		setupLog.Error(err, "unable to create WDS client for leader election")
 		os.Exit(1)
 	}
 
-	// Start controllers in a goroutine that only runs when we become leader
-	go func() {
-		<-mgr.Elected()
-		setupLog.Info("Became leader, starting controllers")
-		startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
-	}()
-
-	// Start the manager (this will handle leader election)
-	if err := mgr.Start(ctx); err != nil {
-		setupLog.Error(err, "unable to start manager")
-		os.Exit(1)
+	// Ensure the namespace exists for leader election
+	namespace := wdsName + "-system"
+	_, err = wdsClient.CoreV1().Namespaces().Get(ctx, namespace, metav1.GetOptions{})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			setupLog.Info("Creating namespace for leader election", "namespace", namespace)
+			_, err = wdsClient.CoreV1().Namespaces().Create(ctx, &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}, metav1.CreateOptions{})
+			if err != nil {
+				setupLog.Error(err, "unable to create namespace for leader election")
+				os.Exit(1)
+			}
+		} else {
+			setupLog.Error(err, "unable to check namespace for leader election")
+			os.Exit(1)
+		}
 	}
+
+	// Create resource lock for leader election
+	lock := &resourcelock.LeaseLock{
+		LeaseMeta: metav1.ObjectMeta{
+			Name:      "kubestellar-controller-manager",
+			Namespace: namespace,
+		},
+		Client: wdsClient.CoordinationV1(),
+		LockConfig: resourcelock.ResourceLockConfig{
+			Identity: getUniqueIdentity(),
+		},
+	}
+
+	// Configure leader election
+	lec := leaderelection.LeaderElectionConfig{
+		Lock:            lock,
+		ReleaseOnCancel: true,
+		LeaseDuration:   15 * time.Second,
+		RenewDeadline:   10 * time.Second,
+		RetryPeriod:     2 * time.Second,
+		Callbacks: leaderelection.LeaderCallbacks{
+			OnStartedLeading: func(ctx context.Context) {
+				setupLog.Info("Became leader, starting controllers")
+				startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
+			},
+			OnStoppedLeading: func() {
+				setupLog.Info("Lost leadership, stopping controllers")
+				// Controllers will be stopped when the context is cancelled
+			},
+			OnNewLeader: func(identity string) {
+				setupLog.Info("New leader elected", "identity", identity)
+			},
+		},
+	}
+
+	// Start leader election
+	leaderelection.RunOrDie(ctx, lec)
 }
 
 // startControllersDirectly starts controllers immediately without leader election
