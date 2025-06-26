@@ -1,0 +1,52 @@
+# This workflow checks that PRs modifying website docs include a preview link in the PR description.
+# It enforces KubeStellar's documentation PR best practices.
+
+name: Check Docs PR Preview Link
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+    paths:
+      - 'docs/content/**'
+      - 'docs/README.md'
+      - 'docs/mkdocs.yml'
+      - 'docs/overrides/**'
+      - 'docs/scripts/**'
+      - 'docs/requirements.txt'
+      - 'docs/main.py'
+
+jobs:
+  check-preview-link:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@cfd007d6b1c1b4c2e6e6e2e3e6e6e2e3e6e6e2e3 
+      - name: Check for Preview Link in PR Description (bash)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          set -e
+          BODY=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json body -q '.body')
+          DOC_BRANCH_REGEX='^doc-'
+          GITHUB_PAGES_URL="https://$(echo "$REPO" | cut -d'/' -f1).github.io/$(echo "$REPO" | cut -d'/' -f2)/$BRANCH"
+          PREVIEW_LINE=$(echo "$BODY" | grep -iE '^\s*Preview.*https?://')
+          GREEN='\033[0;32m'
+          RED='\033[0;31m'
+          YELLOW='\033[1;33m'
+          NC='\033[0m' # No Color
+          if [ -n "$PREVIEW_LINE" ]; then
+            if [[ "$BRANCH" =~ $DOC_BRANCH_REGEX ]] && [[ "$PREVIEW_LINE" == *"$GITHUB_PAGES_URL"* ]]; then
+              echo -e "${GREEN}[OK] Docs PR: doc- branch and valid preview link present.${NC}"
+            elif [[ ! "$BRANCH" =~ $DOC_BRANCH_REGEX ]]; then
+              echo -e "${YELLOW}[WARN] Docs PR: Preview link found, but branch does not start with doc-. Please consider using a doc- branch for automatic previews.${NC}"
+            else
+              echo -e "${YELLOW}[WARN] Docs PR: Preview link found, but it may not point to the expected GitHub Pages URL.${NC}"
+            fi
+          else
+            echo -e "${RED}[ERROR] Docs PR: No preview link found. Please include a line starting with 'Preview' and a valid GitHub Pages URL for your changes.\n${NC}"
+            exit 1
+          fi
+          echo  # Ensure the last output always ends with a newline
