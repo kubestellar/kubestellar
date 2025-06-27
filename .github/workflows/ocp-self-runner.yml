@@ -5,6 +5,9 @@ on:
   # So we can trigger manually if needed
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   ginkgo-test:
     name: ginkgo tests
@@ -102,6 +105,3 @@ jobs:
           export PATH=~/oc:$PATH
           export KFLEX_DISABLE_CHATTY=true
           bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/multi-cluster-deployment/run-test.sh) --env ocp --released
-
-
-
