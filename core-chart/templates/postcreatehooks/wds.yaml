@@ -1,4 +1,4 @@
-{{- if and (not .Values.DisablePCHs) (or .Values.ForcePCHs (not (lookup "tenancy.kflex.kubestellar.org/v1alpha1" "PostCreateHook" "" "wds"))) }}
+{{- if (.Values.InstallPCHs | default (not (lookup "tenancy.kflex.kubestellar.org/v1alpha1" "PostCreateHook" "" "wds"))) }}
 apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
 kind: PostCreateHook
 metadata:
