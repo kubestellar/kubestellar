@@ -102,10 +102,7 @@
       "id": 64,
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max"
-          ],
+          "calcs": ["lastNotNull", "max"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -197,9 +194,7 @@
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": [
-            "max"
-          ],
+          "calcs": ["max"],
           "fields": "",
           "values": false
         },
@@ -303,10 +298,7 @@
       "maxDataPoints": 500,
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max"
-          ],
+          "calcs": ["lastNotNull", "max"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -344,7 +336,7 @@
         "type": "prometheus",
         "uid": "prometheus-test"
       },
-      "description": "Number of requests in initial (for a WATCH) or any (for a non-WATCH) execution stage in the API Priority and Fairness subsystem",
+      "description": "Initial (for a WATCH) or any (for a non-WATCH) execution stage in the API Priority and Fairness subsystem",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -412,9 +404,7 @@
       "maxDataPoints": 500,
       "options": {
         "legend": {
-          "calcs": [
-            "max"
-          ],
+          "calcs": ["max"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true,
@@ -451,7 +441,7 @@
         "type": "prometheus",
         "uid": "$datasource"
       },
-      "description": "Length of time a request spent waiting in its queue - Max of APIservers",
+      "description": "Max of APIservers\n\nBucket boundaries: 0.001s, 0.003s, 0.01s, 0.02s, 0.05s, 0.1s, 0.2s, 0.5s, 1s, 2s, 5s, 10s, 15s, +Inf\n\nSee https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile for details on histogram_quantile function.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -519,9 +509,7 @@
       "maxDataPoints": 500,
       "options": {
         "legend": {
-          "calcs": [
-            "max"
-          ],
+          "calcs": ["max"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -556,7 +544,7 @@
         "type": "prometheus",
         "uid": "prometheus-test"
       },
-      "description": "Duration of initial stage (for a WATCH) or any (for a non-WATCH) stage of request execution in the API Priority and Fairness subsystem",
+      "description": "Duration of initial stage (for a WATCH) or any (for a non-WATCH) stage in the API Priority and Fairness subsystem\n\nBucket boundaries: 0.005s, 0.025s, 0.1s, 0.25s, 0.5s, 1s, 2.5s, 5s, 10s, 15s, 30s, +Inf\n\nSee https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile for details on histogram_quantile function.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -620,10 +608,7 @@
       "maxDataPoints": 400,
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max"
-          ],
+          "calcs": ["lastNotNull", "max"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true,
@@ -653,6 +638,7 @@
         }
       ],
       "title": "Flowcontrol request execution time p90 - Top Instance",
+      "description": "Duration of initial stage (for a WATCH) or any (for a non-WATCH) stage in the API Priority and Fairness subsystem\n\nBucket boundaries: 0.005s, 0.025s, 0.1s, 0.25s, 0.5s, 1s, 2.5s, 5s, 10s, 15s, 30s, +Inf\n\nSee https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile for details on histogram_quantile function.",
       "transparent": true,
       "type": "timeseries"
     },
@@ -725,10 +711,7 @@
       "maxDataPoints": 400,
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max"
-          ],
+          "calcs": ["lastNotNull", "max"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
@@ -851,10 +834,7 @@
   "timepicker": {
     "hidden": false,
     "nowDelay": "",
-    "refresh_intervals": [
-      "2m",
-      "5m"
-    ]
+    "refresh_intervals": ["2m", "5m"]
   },
   "timezone": "browser",
   "title": "API Server Priority & Fairness",
