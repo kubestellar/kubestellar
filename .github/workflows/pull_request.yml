@@ -5,17 +5,19 @@ on:
     types: [opened]
 
 permissions:
-  contents: write
-  
+  contents: read
+
 jobs:
   assignAuthor:
     if: github.repository_owner == 'kubestellar'
     name: Assign author to PR
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Assign author to PR
         uses: technote-space/assign-author@9558557c5c4816f38bd06176fbc324ba14bb3160
-        
+
       # - name: Get current date
       #   id: date
       #   run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT

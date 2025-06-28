@@ -9,7 +9,7 @@ on:
   workflow_call:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   debug-event:
@@ -26,93 +26,94 @@ jobs:
     name: broken-links-crawler
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      contents: write
     steps:
       - name: set variables and check timing
         shell: bash
         run: |
-            branch="${GITHUB_REF##*/}"
-            echo "branch=$branch" >> $GITHUB_OUTPUT
-            if [ "$branch" == main ]
-            then version=unreleased-development
-            else version="$branch"
-            fi
-            echo "version=$version" >> $GITHUB_OUTPUT
-            if [ "$GITHUB_REPOSITORY_OWNER" == kubestellar ]
-            then site=docs.kubestellar.io
-            else site=${GITHUB_REPOSITORY/\//.github.io/}
-            fi
-            site="${site,,}"
-            echo "site=$site" >>$GITHUB_OUTPUT
-            echo "site=<$site> version=<$version>"
-            sleep 30
-            cat <<EOF
-            Because the website does not actually get updated until after the
-            completion of an asynchronous workflow named
-            'pages build and deployment', you should check that the website was
-            updated after that workflow started.
-            BTW, the time is now $(date).
-            Following is the last run of 'pages build and deployment';
-            note created_at and updated_at.
-            EOF
-            curl -L -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?per_page=10" | jq '[ .workflow_runs[] | select(.name == "pages build and deployment") ] | .[0]'
-            echo "HEAD of https://${site}/${version}/ (compare last-modified):"
-            curl -IL "https://${site}/${version}/"
+          branch="${GITHUB_REF##*/}"
+          echo "branch=$branch" >> $GITHUB_OUTPUT
+          if [ "$branch" == main ]
+          then version=unreleased-development
+          else version="$branch"
+          fi
+          echo "version=$version" >> $GITHUB_OUTPUT
+          if [ "$GITHUB_REPOSITORY_OWNER" == kubestellar ]
+          then site=docs.kubestellar.io
+          else site=${GITHUB_REPOSITORY/\//.github.io/}
+          fi
+          site="${site,,}"
+          echo "site=$site" >>$GITHUB_OUTPUT
+          echo "site=<$site> version=<$version>"
+          sleep 30
+          cat <<EOF
+          Because the website does not actually get updated until after the
+          completion of an asynchronous workflow named
+          'pages build and deployment', you should check that the website was
+          updated after that workflow started.
+          BTW, the time is now $(date).
+          Following is the last run of 'pages build and deployment';
+          note created_at and updated_at.
+          EOF
+          curl -L -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?per_page=10" | jq '[ .workflow_runs[] | select(.name == "pages build and deployment") ] | .[0]'
+          echo "HEAD of https://${site}/${version}/ (compare last-modified):"
+          curl -IL "https://${site}/${version}/"
 
         id: extract_branch
         if: github.event_name != 'pull_request' && github.event_name != 'push'
 
       - name: echo workflow_dispatch branch name et cetera
         run: |
-            echo workflow_dispatch - runhing on site ${{ steps.extract_branch.outputs.site }}
-            echo workflow_dispatch - running on branch ${{ steps.extract_branch.outputs.branch }}
-            echo workflow_dispatch - running on version ${{ steps.extract_branch.outputs.version }}
+          echo workflow_dispatch - runhing on site ${{ steps.extract_branch.outputs.site }}
+          echo workflow_dispatch - running on branch ${{ steps.extract_branch.outputs.branch }}
+          echo workflow_dispatch - running on version ${{ steps.extract_branch.outputs.version }}
         if: github.event_name != 'pull_request' && github.event_name != 'push'
 
       - uses: ScholliYT/Broken-Links-Crawler-Action@b3fb123879e5a6a854d6fda5c33df2d94d41092c
         with:
           website_url: https://${{ steps.extract_branch.outputs.site }}/${{ steps.extract_branch.outputs.version }}
           include_url_prefix: https://${{ steps.extract_branch.outputs.site }}/${{ steps.extract_branch.outputs.version }}
-          exclude_url_prefix: 'mailto:,https://drive.google.com'
-          exclude_url_contained: '#__,/.,.svg'
-          resolve_before_filtering: 'true'
-          verbose: 'true'
+          exclude_url_prefix: "mailto:,https://drive.google.com"
+          exclude_url_contained: "#__,/.,.svg"
+          resolve_before_filtering: "true"
+          verbose: "true"
           max_retry_time: 30
           max_retries: 5
           max_depth: 4
         if: github.event_name != 'pull_request' && github.event_name != 'push'
-        
+
       - name: echo pull_request branch name
         run: echo pull_request - running on branch ${{ github.event.pull_request.base.ref }}
-        if: github.event_name == 'pull_request' 
-#         $GITHUB_BASE_REF
+        if: github.event_name == 'pull_request'
+      #         $GITHUB_BASE_REF
 
       - uses: ScholliYT/Broken-Links-Crawler-Action@b3fb123879e5a6a854d6fda5c33df2d94d41092c
         with:
           website_url: https://docs.kubestellar.io/${{ github.event.pull_request.base.ref }}
           include_url_prefix: https://docs.kubestellar.io/${{ github.event.pull_request.base.ref }}
-          exclude_url_prefix: 'mailto:,https://drive.google.com'
-          exclude_url_contained: '#__,/.,.svg'
-          resolve_before_filtering: 'true'
-          verbose: 'true'
+          exclude_url_prefix: "mailto:,https://drive.google.com"
+          exclude_url_contained: "#__,/.,.svg"
+          resolve_before_filtering: "true"
+          verbose: "true"
           max_retry_time: 30
           max_retries: 5
           max_depth: 4
-        if: github.event_name == 'pull_request' 
+        if: github.event_name == 'pull_request'
 
       - name: echo push branch name
         run: echo push - running on branch ${{ github.event.push.base.ref }}
-        if: github.event_name == 'push' 
+        if: github.event_name == 'push'
 
       - uses: ScholliYT/Broken-Links-Crawler-Action@b3fb123879e5a6a854d6fda5c33df2d94d41092c
         with:
           website_url: https://docs.kubestellar.io/${{ github.event.push.base.ref }}
           include_url_prefix: https://docs.kubestellar.io/${{ github.event.push.base.ref }}
-          exclude_url_prefix: 'mailto:,https://drive.google.com'
-          exclude_url_contained: '#__,/.,.svg'
-          resolve_before_filtering: 'true'
-          verbose: 'true'
+          exclude_url_prefix: "mailto:,https://drive.google.com"
+          exclude_url_contained: "#__,/.,.svg"
+          resolve_before_filtering: "true"
+          verbose: "true"
           max_retry_time: 30
           max_retries: 5
           max_depth: 4
         if: github.event_name == 'push'
-          

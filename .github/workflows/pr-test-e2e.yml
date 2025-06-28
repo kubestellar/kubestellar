@@ -28,6 +28,9 @@ on:
       - "docs/**"
       - "**/*.md"
 
+permissions:
+  contents: read
+
 jobs:
   ginkgo-test:
     name: Tests in ginkgo
