@@ -71,6 +71,7 @@ const (
 )
 
 var readyFlag atomic.Bool
+var itsConnectedFlag atomic.Bool
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
@@ -154,28 +155,35 @@ func main() {
 	setupLog.Info("Got config for WDS", "name", wdsName)
 	wdsRestConfig = wdsClientLimits.LimitConfig(wdsRestConfig)
 
-	// get the config for ITS
+	// get the config for ITS with retry for resiliency
 	setupLog.Info("Getting config for ITS")
-	itsRestConfig, itsName, err := ctrlutil.GetITSKubeconfig(setupLog, itsName)
-	if err != nil {
-		setupLog.Error(err, "unable to get ITS kubeconfig")
+	var itsRestConfig *rest.Config
+	var err2 error
+	
+	// Retry getting ITS config for up to 2 minutes to handle temporary unavailability
+	for i := 0; i < 24; i++ { // 24 * 5 seconds = 2 minutes
+		itsRestConfig, itsName, err2 = ctrlutil.GetITSKubeconfig(setupLog, itsName)
+		if err2 == nil {
+			break
+		}
+		setupLog.Info("ITS not available yet, retrying", "attempt", i+1, "error", err2)
+		time.Sleep(5 * time.Second)
+	}
+	
+	if err2 != nil {
+		setupLog.Error(err2, "unable to get ITS kubeconfig after retries")
 		os.Exit(1)
 	}
 	setupLog.Info("Got config for ITS", "name", itsName)
 	itsRestConfig = itsClientLimits.LimitConfig(itsRestConfig)
 
-	// Start controllers based on leader election setting
-	if enableLeaderElection {
-		setupLog.Info("Starting with leader election enabled")
-		startControllersWithLeaderElection(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
-	} else {
-		setupLog.Info("Starting without leader election")
-		startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
-	}
-
-	// Start /readyz endpoint
+	// Start /readyz endpoint - be resilient to ITS connection issues
 	go func() {
 		http.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
+			// Controller-manager is ready if:
+			// 1. It has become leader (readyFlag is true)
+			// 2. OR it's running without leader election (readyFlag is true)
+			// 3. AND it has successfully connected to WDS at least once
 			if readyFlag.Load() {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte("ok"))
@@ -186,6 +194,15 @@ func main() {
 		})
 		http.ListenAndServe(":8081", nil)
 	}()
+
+	// Start controllers based on leader election setting
+	if enableLeaderElection {
+		setupLog.Info("Starting with leader election enabled")
+		startControllersWithLeaderElection(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
+	} else {
+		setupLog.Info("Starting without leader election")
+		startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
+	}
 
 	select {}
 }
@@ -329,6 +346,10 @@ func startControllersDirectly(ctx context.Context, setupLog logr.Logger, wdsRest
 			os.Exit(1)
 		}
 	}
+
+	// Mark as ready after controllers are started
+	readyFlag.Store(true)
+	setupLog.Info("Controllers started successfully, marking as ready")
 }
 
 // workloadEventRelay implements binding.WorkloadEventHandler and relays the notifications
