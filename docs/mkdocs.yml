@@ -85,8 +85,7 @@ nav:
       - Governance: contribution-guidelines/governance-inc.md
       - Onboarding: contribution-guidelines/onboarding-inc.md
       - Website:
-          - Docs Management Overview: contribution-guidelines/operations/document-management.md
-          - Testing website PRs: contribution-guidelines/operations/testing-doc-prs.md
+          - Documentation Management Overview: contribution-guidelines/operations/document-management.md
       - Security:
           - Policy: contribution-guidelines/security/security-inc.md
           - Contacts: contribution-guidelines/security/security_contacts-inc.md
@@ -244,7 +243,6 @@ markdown_extensions:
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
   - attr_list
   - md_in_html
   - toc:               # Builds a table of contents
