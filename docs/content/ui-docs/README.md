@@ -1,7 +1,7 @@
 
-# KubestellarUI Setup Guide
+# KubeStellarUI Setup Guide
 
-Welcome to **KubestellarUI**! This guide will help you set up the KubestellarUI application on your local machine after cloning the repository for development. The application consists of two main parts:
+Welcome to **KubeStellarUI**! This guide will help you set up the KubeStellarUI application on your local machine after cloning the repository for development. The application consists of two main parts:
 
 1. **Frontend**: Built with React and TypeScript
 2. **Backend**: Built with Golang using the Gin framework.
@@ -80,7 +80,7 @@ VITE_GIT_COMMIT_HASH=$GIT_COMMIT_HASH
 
 ##### Tracking Application Version and Git Commit Hash
 
-KubestellarUI uses environment variables to track the app version and the current Git commit hash.  
+KubeStellarUI uses environment variables to track the app version and the current Git commit hash.  
 
 **Environment Variables**  
 
@@ -93,7 +93,7 @@ KubestellarUI uses environment variables to track the app version and the curren
 
 #### Step 2: Run Redis Container (Optional)
 
-KubestellarUI uses Redis for caching real-time WebSocket updates to prevent excessive Kubernetes API calls.  
+KubeStellarUI uses Redis for caching real-time WebSocket updates to prevent excessive Kubernetes API calls.  
 
 Run Redis using Docker:  
 
@@ -233,7 +233,7 @@ make lint
 
 ### Docker Image Versioning and Pulling
 
-If you'd like to work with the Docker images for the **KubestellarUI** project, here's how you can use the `latest` and versioned tags:
+If you'd like to work with the Docker images for the **KubeStellarUI** project, here's how you can use the `latest` and versioned tags:
 
 1. **Frontend Image**:
    - Tag: `quay.io/kubestellar/ui:frontend`
