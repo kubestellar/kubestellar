@@ -59,10 +59,10 @@ actions/first-interaction:
   tag: v1
   tag-url: https://github.com/actions/first-interaction/tree/v1
 azure/setup-kubectl:
-  sha: 3e0aec4d80787158d308d7b364cb1b702e7feb7f
-  sha-url: https://github.com/azure/setup-kubectl/commit/3e0aec4d80787158d308d7b364cb1b702e7feb7f
-  tag: v4
-  tag-url: https://github.com/azure/setup-kubectl/tree/v4
+  sha: 776406bce94f63e41d621b960d78ee25c8b76ede
+  sha-url: https://github.com/azure/setup-kubectl/commit/776406bce94f63e41d621b960d78ee25c8b76ede
+  tag: v4.0.1
+  tag-url: https://github.com/azure/setup-kubectl/tree/v4.0.1
 ko-build/setup-ko:
   sha: d006021bd0c28d1ce33a07e7943d48b079944c8d
   sha-url: https://github.com/ko-build/setup-ko/commit/d006021bd0c28d1ce33a07e7943d48b079944c8d
