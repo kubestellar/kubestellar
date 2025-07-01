@@ -193,12 +193,11 @@ _get_sha_from_reversemap() {
 # For each one, check that every "uses:" entry in a job step references
 # the action by commit hash and that is the commit hash in the reversemap file.
 run_verify_mapusage() {
-    local files shadict action version goodsha
+    local files failed shadict action version goodsha
     files=$@
     failed=false
     shadict=$(yq -o json 'map_values(.sha)' $REVERSEMAP_FILE)
     for file in $files; do
-#        yq '.jobs.[].steps.[].uses?' "$file" | while read ref; do
         for ref in $(yq '.jobs.[].steps.[].uses?' "$file"); do
             if [ "$ref" == null ]; then continue; fi
             action=$( echo "$ref" | cut -d@ -f1)

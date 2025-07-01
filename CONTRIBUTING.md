@@ -68,6 +68,8 @@ Following are a few more things to keep in mind when making a pull request.
 
 - Smaller pull requests are typically easier to review and merge than larger ones. If your pull request is big, it is always recommended to collaborate with the maintainers to find the best way to divide it.
 - Do not make a PR from your `main` branch. Your life will be much easier if the `main` branch in your fork tracks the `main` branch in the shared repository.
+- Learn to use `git rebase`. It is your friend. It is one of your most helpful friends. It is how you can cope when other changes merge while you are in the midst of working on your PR.
+- There are, broadly speaking, two styles of using Git history: keeping an accurate record of your development process, or producing a simple explanation of the end result. We aim for the latter. Squash out uninteresting intermediate commits.
 - Do not merge from `main` into your PR's branch. That makes a tangled Git history, and we prefer to keep it simple. Instead, rebase your PR's branch onto the latest edition of `main`.
 - When adding/updating a GitHub Actions workflow, be aware of the [action reference discipline](#github-action-reference-discipline).
 - For a PR that modifies the website, include a preview. That gets much easier if you follow the documentation about setting up for that (i.e., properly create your `gh-pages` branch) and make the name of your PR's branch start with "doc-". If you already have a PR with a different sort of name, you can explicitly invoke the rendering workflow --- unless your branch name has a slash or other exotic character in it; stick to alphanumerics plus dash and dot. You can not change the name of the branch in a PR, but you can close a PR and open an equivalent one using a branch with a good name.
@@ -111,7 +113,7 @@ directory](https://github.com/kubestellar/kubestellar/tree/main/.github/workflow
 
 For the sake of supply chain security, every reference from a workflow
 to an action identifies the action's version by a commit hash. In
-particular, there [a
+particular, there is [a
 file](https://github.com/kubestellar/kubestellar/blob/main/.gha-reversemap.yml)
 that lists the approved commit hash for each action. The file should
 be updated/extended only when you have confidence in the new/added
