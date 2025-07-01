@@ -15,6 +15,8 @@ jobs:
   debug-event:
     name: debug-event-contents
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - run: echo "event name is:" ${{ github.event_name }}
       - run: echo "event type is:" ${{ github.event.action }}
@@ -25,8 +27,6 @@ jobs:
   broken-links-crawler:
     name: broken-links-crawler
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: get workflow_dispatch branch name
         shell: bash
