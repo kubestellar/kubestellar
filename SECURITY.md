@@ -3,6 +3,15 @@
 
 Join the [kubestellar-security-announce](https://groups.google.com/u/1/g/kubestellar-security-announce) group for emails about security and major API announcements.
 
+## Dependencies Policy
+
+KubeStellar manages its dependencies with the following policy:
+
+- **Automated Updates:** We use [Dependabot](https://github.com/dependabot) to automatically check for and propose updates to dependencies in Go modules, Python requirements, Dockerfiles, and Helm charts. Dependabot PRs are reviewed and merged by maintainers.
+- **Review Process:** All dependency update pull requests are subject to the same review process as other code changes. Maintainers verify that updates do not introduce breaking changes or known vulnerabilities before merging.
+- **Security Best Practices:** We avoid using unmaintained or deprecated dependencies, and monitor for security advisories affecting our dependencies. Vulnerabilities in dependencies are prioritized for prompt remediation.
+- **Documentation:** The dependency update process is documented in the repository's README and CONTRIBUTING guidelines.
+
 ## Report a Vulnerability
 
 We're extremely grateful for security researchers and users that report vulnerabilities to the KubeStellar Open Source Community. All reports are thoroughly investigated by a set of community volunteers.
