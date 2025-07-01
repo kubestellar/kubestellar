@@ -59,5 +59,7 @@ jobs:
       - run: make deploy-docs
 
   call-crawl:
+    permissions:
+      contents: write
     needs: generate-and-push
     uses: ./.github/workflows/broken-links-crawler.yml
