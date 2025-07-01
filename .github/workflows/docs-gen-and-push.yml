@@ -16,7 +16,7 @@ on:
       - ".github/workflows/docs-gen-and-push.yaml"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}
@@ -25,6 +25,8 @@ jobs:
   debug:
     name: print relevant info
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - run: |
           echo "github.actor=${{ github.actor }}"
