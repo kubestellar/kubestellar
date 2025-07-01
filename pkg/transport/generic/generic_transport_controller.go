@@ -1072,6 +1072,30 @@ func (c *genericTransportController) propagateWrappedObjectToClusters(ctx contex
 	logger := klog.FromContext(ctx)
 	logger.V(5).Info("In propagateWrappedObjectToClusters", "destinations", destinations)
 
+	// --- Duplicate Detection Logic Start ---
+	// Map: object identifier (group, version, kind, name, namespace) -> WDS name
+	objectIDToWDS := make(map[string]string)
+	for _, destination := range destinations {
+		tasks, _ := destToDesiredWrappedObjects(destination)
+		for _, task := range tasks {
+			obj := task.ObjU
+			gk := obj.GroupVersionKind().GroupKind()
+			gv := obj.GroupVersionKind().Version
+			name := obj.GetName()
+			namespace := obj.GetNamespace()
+			wdsName := obj.GetLabels()[originWdsLabel]
+			// Compose a unique key for the object identifier
+			idKey := fmt.Sprintf("%s|%s|%s|%s|%s", gk.Group, gv, gk.Kind, namespace, name)
+			if prevWDS, exists := objectIDToWDS[idKey]; exists && prevWDS != wdsName {
+				logger.Error(nil, "Duplicate object identifier detected across WDSes", "group", gk.Group, "version", gv, "kind", gk.Kind, "name", name, "namespace", namespace, "wds1", prevWDS, "wds2", wdsName)
+				// Optionally: skip propagation for this object
+				continue
+			}
+			objectIDToWDS[idKey] = wdsName
+		}
+	}
+	// --- Duplicate Detection Logic End ---
+
 	for _, destination := range destinations {
 		tasks, _ := destToDesiredWrappedObjects(destination)
 		for _, task := range tasks {
