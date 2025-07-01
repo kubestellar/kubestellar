@@ -102,6 +102,10 @@ in your PR.
 8. You can observe the progress of the workflows on the Actions page; a green checkmark circle indicates successful completion.<br />![Relevant workflow runs](https://github.com/user-attachments/assets/b9ce40f8-b744-4b3c-bc20-a4814243e85e)
 9. After a minute or so, you should be able to preview your new version of the website at `https://${repo_owner}.github.io/${fork_name}/${branch_name}`
 
+#### Informational Errors
+
+The "Generate and push docs" workflow triggers the broken links crawler workflow, which will fail when there are broken links. This failure also marks the "Generate and push docs" workflow as failed, even though it did not actually fail to generate and push. Do not be discouraged by these informational failures.
+
 #### Switching between versions
 Each branch of your fork will render as its own version. You can use the release dropdown inside the rendered pages to quickly switch between versions.
 
