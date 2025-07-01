@@ -9,12 +9,14 @@ on:
     - cron: "0 9 * * 5"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   debug-event:
     name: debug-event-contents
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - run: echo "event name is:" ${{ github.event_name }}
       - run: echo "event type is:" ${{ github.event.action }}
@@ -29,36 +31,36 @@ jobs:
       - name: get workflow_dispatch branch name
         shell: bash
         run: |
-            branch="${GITHUB_REF##*/}"
-            echo "branch=$branch" >> $GITHUB_OUTPUT
-            if [ "$branch" == main ]
-            then version=unreleased-development
-            else version="$branch"
-            fi
-            echo "version=$version" >> $GITHUB_OUTPUT
-            if [ "$GITHUB_REPOSITORY_OWNER" == kubestellar ]
-            then site=docs.kubestellar.io
-            else site=${GITHUB_REPOSITORY/\//.github.io/}
-            fi
-            site="${site,,}"
-            echo "site=$site" >>$GITHUB_OUTPUT
+          branch="${GITHUB_REF##*/}"
+          echo "branch=$branch" >> $GITHUB_OUTPUT
+          if [ "$branch" == main ]
+          then version=unreleased-development
+          else version="$branch"
+          fi
+          echo "version=$version" >> $GITHUB_OUTPUT
+          if [ "$GITHUB_REPOSITORY_OWNER" == kubestellar ]
+          then site=docs.kubestellar.io
+          else site=${GITHUB_REPOSITORY/\//.github.io/}
+          fi
+          site="${site,,}"
+          echo "site=$site" >>$GITHUB_OUTPUT
 
         id: extract_branch
 
       - name: echo workflow_dispatch branch name
         run: |
-            echo workflow_dispatch - runhing on site ${{ steps.extract_branch.outputs.site }}
-            echo workflow_dispatch - running on branch ${{ steps.extract_branch.outputs.branch }}
-            echo workflow_dispatch - running on version ${{ steps.extract_branch.outputs.version }}
+          echo workflow_dispatch - runhing on site ${{ steps.extract_branch.outputs.site }}
+          echo workflow_dispatch - running on branch ${{ steps.extract_branch.outputs.branch }}
+          echo workflow_dispatch - running on version ${{ steps.extract_branch.outputs.version }}
 
       - uses: ScholliYT/Broken-Links-Crawler-Action@b3fb123879e5a6a854d6fda5c33df2d94d41092c
         with:
           website_url: https://${{ steps.extract_branch.outputs.site }}/${{ steps.extract_branch.outputs.version }}
           include_url_prefix: "https:"
-          exclude_url_prefix: 'mailto:,https://drive.google.com'
-          exclude_url_contained: '#__,/.,.svg'
-          resolve_before_filtering: 'true'
-          verbose: 'true'
+          exclude_url_prefix: "mailto:,https://drive.google.com"
+          exclude_url_contained: "#__,/.,.svg"
+          resolve_before_filtering: "true"
+          verbose: "true"
           max_retry_time: 30
           max_retries: 5
           max_depth: 4

@@ -3,11 +3,11 @@ name: goreleaser
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
-  contents: write
-  packages: write
+  contents: read
+  packages: read
 
 env:
   REGISTRY: ghcr.io
@@ -16,53 +16,56 @@ env:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     steps:
-    - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
 
-    - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
-      with:
-        go-version: 1.24
-         
-    - name: Delete non-semver tags
-      run: 'git tag -d $(git tag -l | grep -v "^v")'
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: 1.24
 
-    - name: Set LDFLAGS
-      run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
+      - name: Delete non-semver tags
+        run: 'git tag -d $(git tag -l | grep -v "^v")'
 
-    - name: Install syft binary executable
-      uses: anchore/sbom-action/download-syft@9246b90769f852b3a8921f330c59e0b3f439d6e9
+      - name: Set LDFLAGS
+        run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
 
-    - name: Run GoReleaser on tag
-      uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552
-      with:
-        distribution: goreleaser
-        version: latest
-        args: release --timeout 60m --clean
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        USER: ${{ github.actor }}
-        EMAIL: ${{ github.actor}}@users.noreply.github.com
+      - name: Install syft binary executable
+        uses: anchore/sbom-action/download-syft@9246b90769f852b3a8921f330c59e0b3f439d6e9
 
-    - name: Set up Helm
-      uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run GoReleaser on tag
+        uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --timeout 60m --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USER: ${{ github.actor }}
+          EMAIL: ${{ github.actor}}@users.noreply.github.com
 
-    - name: Login to registry
-      uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Helm
+        uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Package and push charts
-      run: |
-        chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
+      - name: Login to registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-        sed -i "s/^KUBESTELLAR_VERSION:.*$/KUBESTELLAR_VERSION: \"${chartVersion}\"/g" ${{ env.CORE_CHART_PATH }}/values.yaml
+      - name: Package and push charts
+        run: |
+          chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
 
-        helm package ${{ env.CORE_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
-        helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar
+          sed -i "s/^KUBESTELLAR_VERSION:.*$/KUBESTELLAR_VERSION: \"${chartVersion}\"/g" ${{ env.CORE_CHART_PATH }}/values.yaml
+
+          helm package ${{ env.CORE_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
+          helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar
