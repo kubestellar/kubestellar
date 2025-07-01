@@ -64,7 +64,15 @@ When submitting a pull request, clear communication is appreciated. This can be 
 - Information on how you tested and validated your solution
 - Updates to relevant documentation and examples, if applicable
 
-The pull request template has been designed to assist you in communicating this information effectively.
+Following are a few more things to keep in mind when making a pull request.
+
+- Smaller pull requests are typically easier to review and merge than larger ones. If your pull request is big, it is always recommended to collaborate with the maintainers to find the best way to divide it.
+- Do not make a PR from your `main` branch. Your life will be much easier if the `main` branch in your fork tracks the `main` branch in the shared repository.
+- Do not merge from `main` into your PR's branch. That makes a tangled Git history, and we prefer to keep it simple. Instead, rebase your PR's branch onto the latest edition of `main`.
+- When adding/updating a GitHub Actions workflow, be aware of the [action reference discipline](#github-action-reference-discipline).
+- For a PR that modifies the website, include a preview. That gets much easier if you follow the documentation about setting up for that (i.e., properly create your `gh-pages` branch) and make the name of your PR's branch start with "doc-". If you already have a PR with a different sort of name, you can explicitly invoke the rendering workflow --- unless your branch name has a slash or other exotic character in it; stick to alphanumerics plus dash and dot. You can not change the name of the branch in a PR, but you can close a PR and open an equivalent one using a branch with a good name.
+- For a PR that modifies the website, remember that the doc source files are viewed two ways (see the website documentation); make them work in both views.
+- If you mix pervasive changes to whitespace with substantial changes, you risk GitHub's display of the diff becoming confused. DO check that. If the diff display is confused, it makes reviewing much harder. Have mercy on your reviewers; skip the pervasive whitespace changes if they confuse GitHub's diff. BTW, did you really intend to make all those whitespace changes, or are they an unintended gift from your IDE? Don't make changes that you do not really intend.
 
 #### Titling Pull Requests
 We require that the title of each pull request start with a special nickname character (emoji) that classifies the request into one of the following categories. 
@@ -89,10 +97,32 @@ _Note: The GitHub web interface will assist you with adding the character; while
 - _Just click on the correct one to insert it in the title_
 - _Add at least one space after the special character._
 
-#### Pull Request Process
-Smaller pull requests are typically easier to review and merge than larger ones. If your pull request is big, it is always recommended to collaborate with the maintainers to find the best way to divide it.
+#### Continuous Integration
 
-Approvers will review your PR within a business day. A PR requires both an /lgtm and then an /approve in order to get merged. You may /approve your own PR but you may not /lgtm it. Automation will add the PR it to the OpenShift PR merge queue. The OpenShift Tide bot will automatically merge your work when it is available, and you will be notified:
+Pull requests are subjected to checking by a collection of [GitHub
+Actions](https://docs.github.com/en/actions) workflows and
+[Prow](https://docs.prow.k8s.io/docs/overview/) jobs. The [infra
+repo](https://github.com/kubestellar/infra/) defines the Prow instance
+used for KubeStellar. The GitHub Actions workflows are found in [the
+.github/workflows
+directory](https://github.com/kubestellar/kubestellar/tree/main/.github/workflows).
+
+##### GitHub Action reference discipline
+
+For the sake of supply chain security, every reference from a workflow
+to an action identifies the action's version by a commit hash. In
+particular, there [a
+file](https://github.com/kubestellar/kubestellar/blob/main/.gha-reversemap.yml)
+that lists the approved commit hash for each action. The file should
+be updated/extended only when you have confidence in the new/added
+version. There is [a
+script](https://github.com/kubestellar/kubestellar/blob/main/hack/gha-reversemap.sh)
+for updating and checking this stuff. There is a workflow that checks
+that every workflow follows the discipline here.
+
+#### Review and Approval Process
+
+Reviewers will review your PR within a business day. A PR requires both an `/lgtm` and then an `/approve` in order to get merged. These are commands to Prow, each appearing alone on a line in a comment of the PR. You may `/approve` your own PR but you may not `/lgtm` it. Once both forms of assent have been given and the other gating checks have passed, the PR will go into the Prow merge queue and eventually be merged. Once that happens, you will be notified:
 
 _Congratulations! Your pull request has been successfully merged!_ 👏
 
