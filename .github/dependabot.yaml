@@ -5,32 +5,3 @@ updates:
   directory: "/"
   schedule:
     interval: "daily"
-# Maintain dependencies for Go modules
-- package-ecosystem: "gomod"
-  directory: "/"
-  schedule:
-    interval: "weekly"
-# Maintain dependencies for Python requirements (docs)
-- package-ecosystem: "pip"
-  directory: "/docs/"
-  schedule:
-    interval: "weekly"
-# Maintain dependencies for Python requirements (performance tests)
-- package-ecosystem: "pip"
-  directory: "/test/performance/common/"
-  schedule:
-    interval: "weekly"
-# Maintain dependencies for Dockerfiles
-- package-ecosystem: "docker"
-  directory: "/"
-  schedule:
-    interval: "weekly"
-- package-ecosystem: "docker"
-  directory: "/hack/"
-  schedule:
-    interval: "weekly"
-# Maintain dependencies for Helm charts
-- package-ecosystem: "helm"
-  directory: "/core-chart/"
-  schedule:
-    interval: "weekly"
