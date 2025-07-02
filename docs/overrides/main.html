@@ -41,14 +41,40 @@
 {% endblock %}
 
 {% block header %}
-       {{ super() }}
-       <header class='md-header' data-md-component='header' style="z-index:-10;">
-	       <div class='md-header__inner md-grid' data-md-component='container'>
-	       <p class='md_container' style="font-size:larger"> 
-	       KubeStellar has multiple documentation versions to match its multiple releases.<br />
-	       Please make sure you are viewing the docs version which matches the release version of the code you are using!
-	       </p>
-	       </div>
-       </header>
+  {{ super() }}
+  <header id="ks-info-banner" class="md-header" data-md-component="header" style="z-index:-10;">
+    <div class="md-header__inner md-grid" data-md-component="container">
+      <p class="md_container" style="font-size:larger"> 
+        KubeStellar has multiple documentation versions to match its multiple releases.<br />
+        Please make sure you are viewing the docs version which matches the release version of the code you are using!
+      </p>
+    </div>
+  </header>
 
-{% endblock %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const banner = document.getElementById("ks-info-banner");
+      let lastScroll = window.scrollY;
+  
+      function handleScroll() {
+        const currentScroll = window.scrollY;
+        const isMobile = window.innerWidth <= 768;
+  
+        if (!isMobile) {
+          banner.style.transform = "none";
+          return;
+        }
+  
+        if (currentScroll > lastScroll) {
+          banner.style.transform = "translateY(-100%)";
+        } else {
+          banner.style.transform = "translateY(0)";
+        }
+        lastScroll = currentScroll;
+      }
+  
+      banner.style.transition = "transform 0.3s ease";
+      window.addEventListener("scroll", handleScroll);
+    });
+  </script>
+{% endblock %}  
