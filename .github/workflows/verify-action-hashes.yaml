@@ -11,17 +11,23 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - '.github/workflows/*'
-      - '*.gha-reversemap.yml'
+      - ".github/workflows/*"
+      - "*.gha-reversemap.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/*"
+      - "*.gha-reversemap.yml"
+
+permissions:
+  contents: read
 
 jobs:
   verify-hashes:
     name: Verify
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Run test
         run: |
-          hack/gha-reversemap.sh apply-reversemap
-          ! git status | fgrep .github/workflows
+          hack/gha-reversemap.sh verify-mapusage

@@ -658,20 +658,74 @@ func refValToValue(val ref.Val) v1alpha1.Value {
 			Type:   v1alpha1.TypeString,
 			String: &v,
 		}
-	case int, int8, int16, int32, int64:
-		numStr := strconv.Itoa(int(v.(int64)))
+	case int:
+		numStr := strconv.FormatInt(int64(v), 10)
 		return v1alpha1.Value{
 			Type:   v1alpha1.TypeNumber,
 			Number: &numStr,
 		}
-	case uint, uint8, uint16, uint32, uint64:
-		numStr := strconv.FormatUint(v.(uint64), 10)
+	case int8:
+		numStr := strconv.FormatInt(int64(v), 10)
 		return v1alpha1.Value{
 			Type:   v1alpha1.TypeNumber,
 			Number: &numStr,
 		}
-	case float32, float64:
-		numStr := strconv.FormatFloat(v.(float64), 'g', -1, 64)
+	case int16:
+		numStr := strconv.FormatInt(int64(v), 10)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case int32:
+		numStr := strconv.FormatInt(int64(v), 10)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case int64:
+		numStr := strconv.FormatInt(v, 10)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case uint:
+		numStr := strconv.FormatUint(uint64(v), 10)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case uint8:
+		numStr := strconv.FormatUint(uint64(v), 10)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case uint16:
+		numStr := strconv.FormatUint(uint64(v), 10)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case uint32:
+		numStr := strconv.FormatUint(uint64(v), 10)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case uint64:
+		numStr := strconv.FormatUint(v, 10)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case float32:
+		numStr := strconv.FormatFloat(float64(v), 'g', -1, 64)
+		return v1alpha1.Value{
+			Type:   v1alpha1.TypeNumber,
+			Number: &numStr,
+		}
+	case float64:
+		numStr := strconv.FormatFloat(v, 'g', -1, 64)
 		return v1alpha1.Value{
 			Type:   v1alpha1.TypeNumber,
 			Number: &numStr,
@@ -932,7 +986,7 @@ func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row
 	// of those objects that are not `null`.
 	//
 	// - For the other types, `subject` is required and SHOULD
-	// evaluate to a numeric value; exceptions are handled as follows.
+	// evaluate to a numeric value; exceptions are handled in the following way.
 	// For a string value: if it parses as an int64 or float64 then that is used.
 	// Otherwise this is an error condition: a value of 0 is used, and the error
 	// is reported in the BindingPolicyStatus.Errors (not necessarily repeated for each WEC).
@@ -943,11 +997,41 @@ func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row
 
 	evalValue := eval.Value()
 	switch v := evalValue.(type) {
-	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-		f := float64(v.(int64))
+	case int:
+		f := float64(v)
 		return &f, ""
-	case float32, float64:
-		f := v.(float64)
+	case int8:
+		f := float64(v)
+		return &f, ""
+	case int16:
+		f := float64(v)
+		return &f, ""
+	case int32:
+		f := float64(v)
+		return &f, ""
+	case int64:
+		f := float64(v)
+		return &f, ""
+	case uint:
+		f := float64(v)
+		return &f, ""
+	case uint8:
+		f := float64(v)
+		return &f, ""
+	case uint16:
+		f := float64(v)
+		return &f, ""
+	case uint32:
+		f := float64(v)
+		return &f, ""
+	case uint64:
+		f := float64(v)
+		return &f, ""
+	case float32:
+		f := float64(v)
+		return &f, ""
+	case float64:
+		f := v
 		return &f, ""
 	case string:
 		f, err := strconv.ParseFloat(v, 64)

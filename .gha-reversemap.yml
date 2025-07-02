@@ -59,10 +59,10 @@ actions/first-interaction:
   tag: v1
   tag-url: https://github.com/actions/first-interaction/tree/v1
 azure/setup-kubectl:
-  sha: 3e0aec4d80787158d308d7b364cb1b702e7feb7f
-  sha-url: https://github.com/azure/setup-kubectl/commit/3e0aec4d80787158d308d7b364cb1b702e7feb7f
-  tag: v4
-  tag-url: https://github.com/azure/setup-kubectl/tree/v4
+  sha: 776406bce94f63e41d621b960d78ee25c8b76ede
+  sha-url: https://github.com/azure/setup-kubectl/commit/776406bce94f63e41d621b960d78ee25c8b76ede
+  tag: v4.0.1
+  tag-url: https://github.com/azure/setup-kubectl/tree/v4.0.1
 ko-build/setup-ko:
   sha: d006021bd0c28d1ce33a07e7943d48b079944c8d
   sha-url: https://github.com/ko-build/setup-ko/commit/d006021bd0c28d1ce33a07e7943d48b079944c8d
@@ -74,10 +74,10 @@ technote-space/assign-author:
   tag: v1.6.2
   tag-url: https://github.com/technote-space/assign-author/tree/v1.6.2
 rojopolis/spellcheck-github-actions:
-  sha: 63aba9473ee34d681dd48dee26b3d43ea0bbc462
-  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/63aba9473ee34d681dd48dee26b3d43ea0bbc462
-  tag: 0.50.0
-  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.50.0
+  sha: 35a02bae020e6999c5c37fabaf447f2eb8822ca7
+  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/35a02bae020e6999c5c37fabaf447f2eb8822ca7
+  tag: 0.51.0
+  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.51.0
 actions/upload-artifact:
   sha: ea165f8d65b6e75b540449e92b4886f43607fa02
   sha-url: https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02

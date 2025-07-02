@@ -5,6 +5,9 @@ on:
   # So we can trigger manually if needed
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   ginkgo-test:
     name: ginkgo tests
@@ -23,7 +26,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
         id: install
 
       - name: Install dependencies
@@ -75,7 +78,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
         id: install
 
       - name: Install dependencies
@@ -102,6 +105,3 @@ jobs:
           export PATH=~/oc:$PATH
           export KFLEX_DISABLE_CHATTY=true
           bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/release-$KUBESTELLAR_VERSION/test/e2e/multi-cluster-deployment/run-test.sh) --env ocp --released
-
-
-

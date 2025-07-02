@@ -16,7 +16,7 @@ on:
       - ".github/workflows/docs-gen-and-push.yaml"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}
@@ -41,6 +41,8 @@ jobs:
     if: github.repository_owner == 'kubestellar' || github.repository_owner == github.actor
     name: Generate and push docs
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
@@ -57,5 +59,7 @@ jobs:
       - run: make deploy-docs
 
   call-crawl:
+    permissions:
+      contents: write
     needs: generate-and-push
     uses: ./.github/workflows/broken-links-crawler.yml
