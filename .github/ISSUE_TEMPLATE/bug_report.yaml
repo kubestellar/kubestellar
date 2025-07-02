@@ -8,6 +8,9 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+
+        Before opening a new issue, look for an overlapping issue that
+        you could contribute to.
         
         Here is how you can help us serve you better:
 
