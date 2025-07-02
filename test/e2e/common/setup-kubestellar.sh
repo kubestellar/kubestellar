@@ -90,7 +90,6 @@ fi
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 COMMON_SRCS="${SRC_DIR}/../common"
 source "$COMMON_SRCS/setup-shell.sh"
-source "$COMMON_SRCS/test-configs.sh"
 
 # Get scenario configuration
 scenario_config=($(get_scenario_config "$TEST_SCENARIO"))
