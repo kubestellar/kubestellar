@@ -98,7 +98,7 @@ InstallPCHs: true
 # - a mandatory unique name
 # - an optional type, which could be host, vcluster, or external (default to vcluster, if not specified)
 # - an optional install_clusteradm flag, which could be true  or false  (default to true) to enable/disable the installation of OCM in the control plane
-# - an optional bootstrapSecret secion to be used for Control Plabes of type external (more details below)
+# - an optional bootstrapSecret section to be used for Control Planes of type external (more details below)
 ITSes: # ==> installs ocm (optional) + ocm-status-addon
 
 # List the Workload Description Spaces (WDSes) to be created by the chart
@@ -142,7 +142,7 @@ ITSes: # all the CPs in this list will execute the its.yaml PCH
 
 where `name` must specify a name unique among all the control planes in that KubeFlex deployment, the optional `type` can be vcluster (default), host, or external, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information, and the optional `install_clusteradm`can be either true (default) or false to enable or disable the installation of OCM in the control plane.
 
-When the ITS `type` is `external`, the `bootstrapSecret` sub-section can be used to indicate the bootstrap secret used by KubeFlex to connect to the external cluster. Specifically, it can be used to specify any combination of (a) the name of the secret, (b) the namespace containing the secret, and (c) the name of the key containg the kubeconfig of the external cluster if they need to be different from their default value.
+When the ITS `type` is `external`, the `bootstrapSecret` sub-section can be used to indicate the bootstrap secret used by KubeFlex to connect to the external cluster. Specifically, it can be used to specify any combination of (a) the name of the secret, (b) the namespace containing the secret, and (c) the name of the key containing the kubeconfig of the external cluster if they need to be different from their default value.
 
 If the secret was created using the [create-external-bootstrap-secret.sh](https://github.com/kubestellar/kubestellar/tree/v{{ config.ks_latest_release }}/scripts/create-external-bootstrap-secret.sh) script and the value passed to the argument `--controlplane` matches the name of the Control Plane specified by the Helm chart, then the sub-section `bootstrapSecret` is not required because all default values will identify the bootstrap secret created by the script. More specifically, if an external kind cluster was created with the command `kind create cluster --name its1` and the `create-external-bootstrap-secret.sh --controlplane its1 --verbose` command was used to create the bootstrap secret, then it would be enough to inform the Helm chart with `--set-json='ITSes=[{"name":"its1","type":"external"}]'`.
 
