@@ -7,7 +7,9 @@ metadata:
 spec:
   backend: shared
   type: {{ $cp.type | default "k8s" }}
-  postCreateHook: wds
+  postCreateHooks:
+    - name: wds-transport
+    - name: wds-kubestellar
   postCreateHookVars:
     ITSName: "{{ $cp.ITSName | default "" }}"
     APIGroups: "{{ $cp.APIGroups | default "" }}"

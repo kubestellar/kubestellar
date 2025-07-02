@@ -26,7 +26,7 @@ A WDS can be created in several ways:
 
 ### Using the KubeStellar Core Helm Chart
 
-The recommended approach is to use the KubeStellar Core Chart:
+The recommended approach is to use the KubeStellar Core Chart, which now leverages multiple Post Create Hooks (PCHs) for each WDS. Specifically, both the `wds-transport` and `wds-kubestellar` controllers are deployed using the new `postCreateHooks` array in the ControlPlane template:
 
 ```shell
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
@@ -40,6 +40,8 @@ You can customize your WDS by specifying:
   - `host`: Uses the KubeFlex hosting cluster itself
 - `APIGroups`: A comma-separated list of API Groups to include
 - `ITSName`: The name of the ITS to be used by this WDS (required if multiple ITSes exist)
+
+> **Note:** As of KubeFlex v0.8.9 and later, each WDS ControlPlane will execute both the `wds-transport` and `wds-kubestellar` PCHs for proper operation. This replaces the previous single-hook approach and enables a more modular controller deployment.
 
 ### Using the KubeFlex CLI
 
@@ -76,11 +78,11 @@ When using the Core Helm Chart or KubeFlex CLI with appropriate parameters, both
 
 ## Controllers Running in a WDS
 
-When a space is configured as a WDS, the following controllers are deployed:
+When a space is configured as a WDS, the following controllers are deployed (via separate PCHs):
 
-1. **KubeStellar Controller Manager**: Watches `BindingPolicy` objects and creates corresponding `Binding` objects that contain references to concrete workload objects and destination clusters.
+1. **KubeStellar Controller Manager**: Watches `BindingPolicy` objects and creates corresponding `Binding` objects that contain references to concrete workload objects and destination clusters. (Deployed by the `wds-kubestellar` PCH)
 
-2. **Transport Controller**: Projects KubeStellar workload and control objects from the WDS into the Inventory and Transport Space (ITS).
+2. **Transport Controller**: Projects KubeStellar workload and control objects from the WDS into the Inventory and Transport Space (ITS). (Deployed by the `wds-transport` PCH)
 
 These controllers are managed as Deployment objects in the KubeFlex hosting cluster.
 

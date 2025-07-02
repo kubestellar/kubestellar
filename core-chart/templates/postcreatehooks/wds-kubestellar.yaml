@@ -1,0 +1,109 @@
+{{- if .Values.InstallPCHs }}
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: wds-kubestellar
+  labels:
+    kflex.kubestellar.io/cptype: wds-kubestellar
+spec:
+  templates:
+    # vvvv KUBESTELLAR CONTROLLER vvvv
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: kubestellar-leader-election-role
+      rules:
+        # ...existing code for kubestellar controller Role...
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        creationTimestamp: null
+        name: '{{"{{.ControlPlaneName}}"}}-kubestellar-manager-role'
+      rules:
+        # ...existing code for kubestellar controller ClusterRole...
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        name: '{{"{{.ControlPlaneName}}"}}-kubestellar-metrics-reader'
+      rules:
+        # ...existing code for kubestellar controller metrics reader...
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        labels:
+          app.kubernetes.io/component: kube-rbac-proxy
+          app.kubernetes.io/created-by: kubestellar
+          app.kubernetes.io/instance: proxy-role
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: clusterrole
+          app.kubernetes.io/part-of: kubestellar
+        name: '{{"{{.ControlPlaneName}}"}}-kubestellar-proxy-role'
+      rules:
+        # ...existing code for kubestellar controller proxy role...
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: kubestellar-leader-election-rolebinding
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: Role
+        name: kubestellar-leader-election-role
+      subjects:
+        # ...existing code for kubestellar controller RoleBinding...
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        labels:
+          app.kubernetes.io/component: rbac
+          app.kubernetes.io/created-by: kubestellar
+          app.kubernetes.io/instance: manager-rolebinding
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: clusterrolebinding
+          app.kubernetes.io/part-of: kubestellar
+        name: '{{"{{.ControlPlaneName}}"}}-kubestellar-manager-rolebinding'
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: '{{"{{.ControlPlaneName}}"}}-kubestellar-manager-role'
+      subjects:
+        # ...existing code for kubestellar controller manager rolebinding...
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        labels:
+          app.kubernetes.io/component: kube-rbac-proxy
+          app.kubernetes.io/created-by: kubestellar
+          app.kubernetes.io/instance: proxy-rolebinding
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: clusterrolebinding
+          app.kubernetes.io/part-of: kubestellar
+        name: '{{"{{.ControlPlaneName}}"}}-kubestellar-proxy-rolebinding'
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: '{{"{{.ControlPlaneName}}"}}-kubestellar-proxy-role'
+      subjects:
+        # ...existing code for kubestellar controller proxy rolebinding...
+    - apiVersion: v1
+      data: {}
+      kind: ConfigMap
+      metadata:
+        name: kubestellar-config
+    - apiVersion: v1
+      kind: Service
+      metadata:
+        labels:
+          control-plane: controller-manager
+        name: kubestellar-controller-manager-metrics-service
+      spec:
+        # ...existing code for kubestellar controller metrics service...
+    - apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        labels:
+          control-plane: controller-manager
+        name: kubestellar-controller-manager
+      spec:
+        # ...existing code for kubestellar controller Deployment...
+  # ^^^^ KUBESTELLAR CONTROLLER ^^^^
+{{- end }}

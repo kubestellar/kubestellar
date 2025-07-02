@@ -1,0 +1,42 @@
+{{- if .Values.InstallPCHs }}
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: wds-transport
+  labels:
+    kflex.kubestellar.io/cptype: wds-transport
+spec:
+  templates:
+    # vvvv TRANSPORT CONTROLLER vvvv
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        name: "{{"{{.ControlPlaneName}}-transport-controller"}}"
+      rules:
+        # ...existing code for transport controller ClusterRole...
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: "{{"{{.ControlPlaneName}}"}}-transport-controller"
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: "{{"{{.ControlPlaneName}}"}}-transport-controller"
+      subjects:
+        # ...existing code for transport controller ClusterRoleBinding...
+    - apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: transport-controller-config
+      data:
+        get-kubeconfig.sh: |
+          #!/bin/env bash
+          # ...existing code for get-kubeconfig.sh...
+    - apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: transport-controller
+      spec:
+        # ...existing code for transport controller Deployment...
+  # ^^^^ TRANSPORT CONTROLLER ^^^^
+{{- end }}

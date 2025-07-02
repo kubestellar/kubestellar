@@ -146,18 +146,20 @@ When the ITS `type` is `external`, the `bootstrapSecret` sub-section can be used
 
 If the secret was created using the [create-external-bootstrap-secret.sh](https://github.com/kubestellar/kubestellar/tree/v{{ config.ks_latest_release }}/scripts/create-external-bootstrap-secret.sh) script and the value passed to the argument `--controlplane` matches the name of the Control Plane specified by the Helm chart, then the sub-section `bootstrapSecret` is not required because all default values will identify the bootstrap secret created by the script. More specifically, if an external kind cluster was created with the command `kind create cluster --name its1` and the `create-external-bootstrap-secret.sh --controlplane its1 --verbose` command was used to create the bootstrap secret, then it would be enough to inform the Helm chart with `--set-json='ITSes=[{"name":"its1","type":"external"}]'`.
 
-The fourth section of the `values.yaml` file allows one to create a list of Workload Description Spaces (WDSes). By default, this list is empty and no WDS will be created by the chart. A list of WDSes can be specified using the following format:
+The fourth section of the `values.yaml` file allows one to create a list of Workload Description Spaces (WDSes). By default, this list is empty and no WDS will be created by the chart. With the new KubeFlex multi-PCH feature, each WDS now uses multiple Post Create Hooks (PCHs) via the `postCreateHooks` array, specifically `wds-transport` and `wds-kubestellar`. This enables a more modular and flexible setup for WDS controllers.
+
+A list of WDSes can be specified using the following format:
 
 ```yaml
-WDSes: # all the CPs in this list will execute the wds.yaml PCH
+WDSes: # each WDS ControlPlane will execute both the wds-transport and wds-kubestellar PCHs
   - name: <wds1>     # mandatory name of the control plane
     type: <host|k8s> # optional type of control plane host or k8s (default to k8s, if not specified)
     APIGroups: ""    # optional string holding a comma-separated list of APIGroups
-    ITSName: <its1>  # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCH starts
+    ITSName: <its1>  # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCHs start
   - name: <wds2>     # mandatory name of the control plane
     type: <host|k8s> # optional type of control plane host or k8s (default to k8s, if not specified)
     APIGroups: ""    # optional string holding a comma-separated list of APIGroups
-    ITSName: <its2>  # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCH starts
+    ITSName: <its2>  # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCHs start
   ...
 ```
 
