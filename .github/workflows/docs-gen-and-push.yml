@@ -16,7 +16,7 @@ on:
       - ".github/workflows/docs-gen-and-push.yaml"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}
@@ -30,7 +30,7 @@ jobs:
           echo "github.actor=${{ github.actor }}"
           echo "github.action_ref=${{ github.action_ref }}"
           echo "github.event_name=${{ github.event_name }}"
-          echo "github.head_ref=${{ github.head_ref }}"
+          echo "github.head_ref=$GITHUB_HEAD_REF"
           echo "github.ref=${{ github.ref }}"
           echo "github.ref_name=${{ github.ref_name }}"
           echo "github.repository_owner=${{ github.repository_owner }}"
@@ -41,21 +41,25 @@ jobs:
     if: github.repository_owner == 'kubestellar' || github.repository_owner == github.actor
     name: Generate and push docs
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           token: ${{ github.repository_owner == 'kubestellar' && secrets.GH_ALL_PROJECT_TOKEN || github.token }}
-          persist-credentials: 'true'
-  
+          persist-credentials: "true"
+
       - run: git fetch origin gh-pages
 
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
-          python-version: '3.10'
-          cache: 'pip'
+          python-version: "3.10"
+          cache: "pip"
 
       - run: make deploy-docs
 
   call-crawl:
+    permissions:
+      contents: write
     needs: generate-and-push
     uses: ./.github/workflows/broken-links-crawler.yml

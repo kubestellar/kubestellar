@@ -1,0 +1,33 @@
+# The purpose of this workflow is to verify consistency between the
+# `.gha-reversemap.yml` file and the `uses:` lines in the workflows.
+# In particular, this workflow checks that `hack/gha-reversemap.sh
+# apply-reversemap` makes no change.
+
+name: Verify Action Hashes
+
+on:
+  workflow_call:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/*"
+      - "*.gha-reversemap.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/*"
+      - "*.gha-reversemap.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-hashes:
+    name: Verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Run test
+        run: |
+          hack/gha-reversemap.sh verify-mapusage

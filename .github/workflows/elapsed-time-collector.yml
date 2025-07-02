@@ -2,10 +2,10 @@ name: elapsed time collector
 run-name: elapsed time collector - ${{ github.ref_name }}
 
 on:
-    schedule:
-      - cron: "0 0 * * *"
-    # So we can trigger manually if needed
-    workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+  # So we can trigger manually if needed
+  workflow_dispatch:
 #   # To confirm any changes to docs build successfully, without deploying them
 #   push:
 #     branches:
@@ -20,15 +20,17 @@ on:
 
 env:
   GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
-  
+
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   elapsed-time-collector:
     if: github.repository_owner == 'kubestellar'
     name: elapsed time collector
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       fail-fast: true
       max-parallel: 1
@@ -43,23 +45,23 @@ jobs:
     steps:
       - run: echo "${{ matrix.manifest }}"
       - run: echo "${{ github.event_name }}"
-        
+
       - name: echo fetching push or pull_request branch
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
-          persist-credentials: 'false'
+          persist-credentials: "false"
           ref: ${{ github.ref_name }}
           # run: echo running on branch ${{ github.ref_name }}
-    #     if: github.event_name == 'push' || github.event_name == 'pull_request'
+      #     if: github.event_name == 'push' || github.event_name == 'pull_request'
 
-    #   - name: echo fetching workflow_dispatch branch
-    #     uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
-    #     with:
-    #         ref: ${GITHUB_REF##*/} 
-    #     if: github.event_name == 'workflow_dispatch'
+      #   - name: echo fetching workflow_dispatch branch
+      #     uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      #     with:
+      #         ref: ${GITHUB_REF##*/}
+      #     if: github.event_name == 'workflow_dispatch'
 
-      - run: git rev-parse --abbrev-ref HEAD 
+      - run: git rev-parse --abbrev-ref HEAD
 
       - run: |
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
@@ -68,14 +70,14 @@ jobs:
           echo "$EOF" >> "$GITHUB_ENV"
         id: run_make
 
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
-          persist-credentials: 'false'
+          persist-credentials: "false"
           ref: gh-pages
 
-    #   - run: |
-    #       echo ${{ env.MD_CONTENT }}
+      #   - run: |
+      #       echo ${{ env.MD_CONTENT }}
 
       - run: |
           cat <<EOF > elapsed-time/${{ matrix.manifest }}.dmd
@@ -83,5 +85,5 @@ jobs:
           EOF
           echo "cat elapsed-time/${{ matrix.manifest }}.dmd"
           cat elapsed-time/${{ matrix.manifest }}.dmd
-        
+
       - run: git config --global user.email "kubestellar@kubestellar-dev@google.groups.com" && git config --global user.name "KubeStellar" && git add . && git commit -m "Add changes" && git push origin gh-pages || true

@@ -25,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-logr/logr"
 	clusterclientfake "open-cluster-management.io/api/client/cluster/clientset/versioned/fake"
 	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 	clusterapi "open-cluster-management.io/api/cluster/v1"
@@ -46,6 +47,7 @@ import (
 	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
+	ctrl "sigs.k8s.io/controller-runtime"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	ksclientfake "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/fake"
@@ -57,6 +59,8 @@ import (
 
 func TestMain(m *testing.M) {
 	klog.InitFlags(nil)
+	// Use a no-op logr logger to satisfy controller-runtime
+	ctrl.SetLogger(logr.Discard())
 	os.Exit(m.Run())
 }
 

@@ -4,26 +4,29 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Validate PR Title Format
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: |
           set -euo pipefail
-          
+
           # Check if the PR title is empty
           if [ -z "${TITLE}" ]; then
             echo "❌ Error: PR title cannot be empty."
             exit 1
           fi
-          
+
           # Define allowed emoji prefixes
           if ! printf '%s' "$TITLE" | grep -qE '^(⚠|✨|🐛|📖|🚀|🌱)'; then
             echo "❌ Error: Invalid PR title format."
