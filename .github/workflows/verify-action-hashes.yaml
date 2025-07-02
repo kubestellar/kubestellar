@@ -13,6 +13,10 @@ on:
     paths:
       - ".github/workflows/*"
       - "*.gha-reversemap.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/*"
+      - "*.gha-reversemap.yml"
 
 permissions:
   contents: read
@@ -26,5 +30,4 @@ jobs:
 
       - name: Run test
         run: |
-          hack/gha-reversemap.sh apply-reversemap
-          ! git status | fgrep .github/workflows
+          hack/gha-reversemap.sh verify-mapusage
