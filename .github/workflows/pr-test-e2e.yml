@@ -19,7 +19,10 @@ on:
     paths-ignore:
       - "docs/**"
       - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/**"
       - "**/*.md"
+    paths:
+      - ".github/workflows/pr-test-e2e.yml"
   push:
     branches:
       - main
@@ -28,7 +31,10 @@ on:
     paths-ignore:
       - "docs/**"
       - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/**"
       - "**/*.md"
+    paths:
+      - ".github/workflows/pr-test-e2e.yml"
 
 permissions:
   contents: read

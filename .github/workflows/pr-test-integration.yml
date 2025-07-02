@@ -8,12 +8,18 @@ on:
     paths-ignore:
       - "docs/**"
       - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/**"
       - "**/*.md"
+    paths:
+      - ".github/workflows/pr-test-integration.yml"
   push:
     paths-ignore:
       - "docs/**"
       - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/**"
       - "**/*.md"
+    paths:
+      - ".github/workflows/pr-test-integration.yml"
 
 permissions:
   contents: read
