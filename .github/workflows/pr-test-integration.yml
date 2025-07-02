@@ -7,10 +7,12 @@ on:
   pull_request:
     paths-ignore:
       - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
       - "**/*.md"
   push:
     paths-ignore:
       - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
       - "**/*.md"
 
 permissions:

@@ -18,6 +18,7 @@ on:
       - main
     paths-ignore:
       - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
       - "**/*.md"
   push:
     branches:
@@ -26,6 +27,7 @@ on:
       - "v*"
     paths-ignore:
       - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
       - "**/*.md"
 
 permissions:
