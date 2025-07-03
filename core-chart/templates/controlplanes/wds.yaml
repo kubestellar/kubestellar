@@ -1,3 +1,5 @@
+# Based on KubeFlex PR #384 - Correct format for multiple PostCreateHooks
+
 {{- range .Values.WDSes }}
 ---
 apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
@@ -8,9 +10,14 @@ spec:
   backend: shared
   type: {{ .type | default "k8s" }}
   postCreateHooks:
-    - transport-controller
-    - kubestellar-controller
-  postCreateHookVars:
-    ITSName: {{ .ITSName | default "" }}
-    APIGroups: {{ .APIGroups | default "" }}
+    - hookName: transport-controller
+      vars:
+        ControlPlaneName: {{ .name }}
+        ITSName: {{ .ITSName | default "" }}
+        APIGroups: {{ .APIGroups | default "" }}
+    - hookName: kubestellar-controller  
+      vars:
+        ControlPlaneName: {{ .name }}
+        ITSName: {{ .ITSName | default "" }}
+        APIGroups: {{ .APIGroups | default "" }}
 {{- end }}
