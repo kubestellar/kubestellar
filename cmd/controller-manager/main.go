@@ -68,6 +68,10 @@ var (
 const (
 	// number of workers to run the reconciliation loop
 	workers = 4
+	// getUniqueIdentity returns a unique identifier for leader election
+	lockNamespace      = "kubestellar-system"
+	lockName           = "kubestellar-controller-manager"
+	fieldManagerName   = "kubestellar-controller-manager"
 )
 
 var readyFlag atomic.Bool
@@ -86,7 +90,7 @@ func getUniqueIdentity() string {
 	if err != nil {
 		hostname = "unknown"
 	}
-	return fmt.Sprintf("%s-%d", hostname, os.Getpid())
+	return fmt.Sprintf("%s-%d-%d", hostname, os.Getpid(), time.Now().UnixNano())
 }
 
 func main() {
@@ -216,17 +220,15 @@ func startControllersWithLeaderElection(ctx context.Context, setupLog logr.Logge
 		os.Exit(1)
 	}
 
-	// Ensure the namespace exists for leader election
-	namespace := wdsName + "-system"
-	_, err = wdsClient.CoreV1().Namespaces().Get(ctx, namespace, metav1.GetOptions{})
+	_, err = wdsClient.CoreV1().Namespaces().Get(ctx, lockNamespace, metav1.GetOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
-			setupLog.Info("Creating namespace for leader election", "namespace", namespace)
+			setupLog.Info("Creating namespace for leader election", "namespace", lockNamespace)
 			_, err = wdsClient.CoreV1().Namespaces().Create(ctx, &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: namespace,
+					Name: lockNamespace,
 				},
-			}, metav1.CreateOptions{})
+			}, metav1.CreateOptions{FieldManager: fieldManagerName})
 			if err != nil {
 				setupLog.Error(err, "unable to create namespace for leader election")
 				os.Exit(1)
@@ -240,8 +242,8 @@ func startControllersWithLeaderElection(ctx context.Context, setupLog logr.Logge
 	// Create resource lock for leader election
 	lock := &resourcelock.LeaseLock{
 		LeaseMeta: metav1.ObjectMeta{
-			Name:      "kubestellar-controller-manager",
-			Namespace: namespace,
+			Name:      lockName,
+			Namespace: lockNamespace,
 		},
 		Client: wdsClient.CoordinationV1(),
 		LockConfig: resourcelock.ResourceLockConfig{
@@ -258,7 +260,7 @@ func startControllersWithLeaderElection(ctx context.Context, setupLog logr.Logge
 		RetryPeriod:     2 * time.Second,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(ctx context.Context) {
-				setupLog.Info("Became leader, starting controllers")
+				setupLog.Info("Acquired leadership, starting controllers and workers")
 				startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
 				readyFlag.Store(true)
 			},
@@ -272,7 +274,7 @@ func startControllersWithLeaderElection(ctx context.Context, setupLog logr.Logge
 		},
 	}
 
-	// Start leader election
+	// Start leader election and block until leadership is acquired
 	leaderelection.RunOrDie(ctx, lec)
 }
 
