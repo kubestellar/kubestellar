@@ -25,6 +25,8 @@ jobs:
   debug:
     name: print relevant info
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - run: |
           echo "github.actor=${{ github.actor }}"

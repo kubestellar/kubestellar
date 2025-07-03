@@ -30,4 +30,5 @@ jobs:
 
       - name: Run test
         run: |
+
           hack/gha-reversemap.sh verify-mapusage
