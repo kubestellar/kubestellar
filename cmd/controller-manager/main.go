@@ -69,9 +69,9 @@ const (
 	// number of workers to run the reconciliation loop
 	workers = 4
 	// getUniqueIdentity returns a unique identifier for leader election
-	lockNamespace      = "kubestellar-system"
-	lockName           = "kubestellar-controller-manager"
-	fieldManagerName   = "kubestellar-controller-manager"
+	lockNamespace    = "kubestellar-system"
+	lockName         = "kubestellar-controller-manager"
+	fieldManagerName = "kubestellar-controller-manager"
 )
 
 var readyFlag atomic.Bool
@@ -163,7 +163,7 @@ func main() {
 	setupLog.Info("Getting config for ITS")
 	var itsRestConfig *rest.Config
 	var err2 error
-	
+
 	// Retry getting ITS config for up to 2 minutes to handle temporary unavailability
 	for i := 0; i < 24; i++ { // 24 * 5 seconds = 2 minutes
 		itsRestConfig, itsName, err2 = ctrlutil.GetITSKubeconfig(setupLog, itsName)
@@ -173,7 +173,7 @@ func main() {
 		setupLog.Info("ITS not available yet, retrying", "attempt", i+1, "error", err2)
 		time.Sleep(5 * time.Second)
 	}
-	
+
 	if err2 != nil {
 		setupLog.Error(err2, "unable to get ITS kubeconfig after retries")
 		os.Exit(1)
