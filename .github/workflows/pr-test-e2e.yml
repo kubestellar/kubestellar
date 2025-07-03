@@ -20,9 +20,8 @@ on:
       - "docs/**"
       - ".github/ISSUE_TEMPLATE/**"
       - ".github/workflows/**"
+      - "!.github/workflows/pr-test-e2e.yml"
       - "**/*.md"
-    paths:
-      - ".github/workflows/pr-test-e2e.yml"
   push:
     branches:
       - main
@@ -32,9 +31,8 @@ on:
       - "docs/**"
       - ".github/ISSUE_TEMPLATE/**"
       - ".github/workflows/**"
+      - "!.github/workflows/pr-test-e2e.yml"
       - "**/*.md"
-    paths:
-      - ".github/workflows/pr-test-e2e.yml"
 
 permissions:
   contents: read
