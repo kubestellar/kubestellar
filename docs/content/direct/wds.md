@@ -14,7 +14,7 @@
 
 ## What is a WDS?
 
-A Workload Description Space (WDS) is a space in the [KubeStellar architecture](user-guide-intro.md) that serves as the primary interface for users to define and manage workloads for multi-cluster deployment. The WDS constitue of a Kubernetes API server with storage that:
+A Workload Description Space (WDS) is a space in the [KubeStellar architecture](architecture.md) that serves as the primary interface for users to define and manage workloads for multi-cluster deployment. The WDS constitue of a Kubernetes API server with storage that:
 
 - Stores the definitions of workloads in their native Kubernetes format
 - Hosts the control objects (`BindingPolicy`, `Binding`, `Status Collector`, `CombinedStatus` and `CustomTransform`) that define how workloads are distributed
