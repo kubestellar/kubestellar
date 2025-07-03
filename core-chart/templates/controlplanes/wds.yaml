@@ -1,14 +1,23 @@
-{{- range $cp := .Values.WDSes }}
+# Based on KubeFlex PR #384 - Correct format for multiple PostCreateHooks
+
+{{- range .Values.WDSes }}
 ---
 apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
 kind: ControlPlane
 metadata:
-  name: {{ $cp.name }}
+  name: {{ .name }}
 spec:
   backend: shared
-  type: {{ $cp.type | default "k8s" }}
-  postCreateHook: wds
-  postCreateHookVars:
-    ITSName: "{{ $cp.ITSName | default "" }}"
-    APIGroups: "{{ $cp.APIGroups | default "" }}"
+  type: {{ .type | default "k8s" }}
+  postCreateHooks:
+    - hookName: transport-controller
+      vars:
+        ControlPlaneName: {{ .name }}
+        ITSName: {{ .ITSName | default "" }}
+        APIGroups: {{ .APIGroups | default "" }}
+    - hookName: kubestellar-controller  
+      vars:
+        ControlPlaneName: {{ .name }}
+        ITSName: {{ .ITSName | default "" }}
+        APIGroups: {{ .APIGroups | default "" }}
 {{- end }}
