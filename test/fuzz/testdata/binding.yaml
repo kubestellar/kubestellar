@@ -1,0 +1,13 @@
+apiVersion: control.kubestellar.io/v1alpha1
+kind: Binding
+metadata:
+  name: test-binding
+  namespace: default
+spec:
+  bindingPolicyRef: test-binding-policy
+  workloadSelector:
+    apiGroup: ""
+    resource: "pods"
+    namespace: "default"
+    name: "test-pod"
+  singletonStatus: true 

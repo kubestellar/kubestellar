@@ -1,0 +1,31 @@
+apiVersion: control.kubestellar.io/v1alpha1
+kind: StatusCollector
+metadata:
+  name: test-status-collector
+  namespace: default
+spec:
+  limit: 20
+  filter: object.metadata.labels['app'] == 'test'
+  select:
+    - name: podName
+      def: object.metadata.name
+    - name: podStatus
+      def: object.status.phase
+    - name: podIP
+      def: object.status.podIP
+    - name: nodeName
+      def: object.spec.nodeName
+  groupBy:
+    - name: namespace
+      def: object.metadata.namespace
+    - name: app
+      def: object.metadata.labels['app']
+  combinedFields:
+    - name: totalPods
+      type: Count
+    - name: avgCPU
+      type: Avg
+      subject: object.spec.containers[0].resources.requests['cpu']
+    - name: maxMemory
+      type: Max
+      subject: object.spec.containers[0].resources.requests['memory'] 
