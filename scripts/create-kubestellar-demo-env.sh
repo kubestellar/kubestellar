@@ -213,6 +213,8 @@ then var_flags="--set kubeflex-operator.hostContainer=k3d-kubeflex-server-0"
 else var_flags=""
 fi
 
+RELEASE_NAME=${RELEASE_NAME:-ks-core}
+
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
         --version $kubestellar_version \
         --set-json='ITSes=[{"name":"its1"}]' \
@@ -228,8 +230,12 @@ kflex ctx --overwrite-existing-context wds2
 kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
-kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 24h
-kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for "jsonpath={.status.postCreateHooks.${RELEASE_NAME}-its-with-clusteradm}=true" --timeout 24h || {
+  echo "DEBUG: postCreateHooks status:";
+  kubectl --context $k8s_platform-kubeflex get controlplane.tenancy.kflex.kubestellar.org/its1 -o json | jq '.status.postCreateHooks';
+  exit 1;
+}
+kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/${RELEASE_NAME}-its-with-clusteradm --for condition=Complete --timeout 24h
 echo -e "\nWaiting for OCM hub cluster-info to be updated..."
 kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 24h
 echo -e "\033[33m✔\033[0m OCM hub is ready"
