@@ -90,20 +90,23 @@ fi
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 COMMON_SRCS="${SRC_DIR}/../common"
 source "$COMMON_SRCS/setup-shell.sh"
+source "$COMMON_SRCS/test-configs.sh"
 
 # Get scenario configuration
-scenario_config=($(get_scenario_config "$TEST_SCENARIO"))
+scenario_config=( $(get_scenario_config "$TEST_SCENARIO") )
 if [ $? -ne 0 ]; then
     echo "Invalid scenario: $TEST_SCENARIO" >&2
     list_scenarios
     exit 1
 fi
 
-# Parse scenario configuration
-declare -A config
-for i in "${!scenario_config[@]}"; do
-    config[$i]="${scenario_config[$i]}"
-done
+# Instead of associative array, parse scenario_config into variables
+config_name="${scenario_config[0]}"
+config_description="${scenario_config[1]}"
+config_wds_type="${scenario_config[2]}"
+config_its_type="${scenario_config[3]}"
+config_cluster_source="${scenario_config[4]}"
+config_combined_control_plane="${scenario_config[5]}"
 
 :
 : -------------------------------------------------------------------------
@@ -131,19 +134,17 @@ pushd "${SRC_DIR}/../../.."
 ITS_CONFIG=""
 WDS_CONFIG=""
 
-if [ "${config[combined_control_plane]}" = "true" ]; then
-    # Combined control plane scenario
+if [ "$config_combined_control_plane" = "true" ]; then
     ITS_CONFIG='[{"name":"combined-cp"}]'
     WDS_CONFIG='[{"name":"combined-cp"}]'
 else
-    # Separate control planes
-    if [ "${config[wds_type]}" = "hosting" ]; then
+    if [ "$config_wds_type" = "hosting" ]; then
         WDS_CONFIG='[{"name":"wds1","hosting":true}]'
     else
         WDS_CONFIG='[{"name":"wds1"}]'
     fi
 
-    if [ "${config[its_type]}" = "hosting" ]; then
+    if [ "$config_its_type" = "hosting" ]; then
         ITS_CONFIG='[{"name":"its1","hosting":true}]'
     else
         ITS_CONFIG='[{"name":"its1"}]'

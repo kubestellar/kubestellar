@@ -26,19 +26,22 @@ existing_wec_contexts=""
 
 while [ $# != 0 ]; do
     case "$1" in
-        (-h|--help) echo "$0 usage: (--released | --env \$kind_or_ocp | --test-type \$bash_or_ginkgo | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --fail-fast | --existing-wec-contexts \$context1,\$context2,...)*"
+        (-h|--help) echo "$0 usage: (--released | --env (kind|ocp) | --test-type (bash|ginkgo) | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --fail-fast | --existing-wec-contexts \$context1,\$context2,... | --scenario \$scenario_name)*"
                     echo "where:"
-                    echo "  \$kind_or_ocp: 'kind' or 'ocp'"
-                    echo "  \$bash_or_ginkgo: 'bash' or 'ginkgo'"
                     echo "  \$num: integer verbosity level"
                     echo "  \$context1,\$context2,...: comma-separated list of existing WEC contexts"
+                    echo "  \$scenario_name: scenario to use (default, wds-on-host, its-on-host, combined)"
                     exit;;
-        (--released|--scenario)
-          if [ "$1" = "--scenario" ] && (( $# > 1 )); then
+        (--released)
+          setup_flags="$setup_flags $1"
+          ;;
+        (--scenario)
+          if (( $# > 1 )); then
             setup_flags="$setup_flags $1 $2"
             shift
           else
-            setup_flags="$setup_flags $1"
+            echo "Missing scenario name" >&2
+            exit 1
           fi;;
         (--kubestellar-controller-manager-verbosity|--transport-controller-verbosity)
           if (( $# > 1 )); then
