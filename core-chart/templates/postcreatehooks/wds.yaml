@@ -2,7 +2,7 @@
 apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
 kind: PostCreateHook
 metadata:
-  name: wds
+  name: {{ .Release.Name }}-wds
   labels:
     kflex.kubestellar.io/cptype: wds
 spec:
