@@ -122,11 +122,13 @@ kflex ctx --overwrite-existing-context its1
 
 #### Wait for ITS to be fully initialized
 
-The Helm chart above has a Job that initializes the ITS as an OCM "hub" cluster. Helm does not have a way to wait for that initialization to finish. So you have to do the wait yourself. The following commands will do that.
+The Helm chart above has Jobs that initialize the ITS as an OCM "hub" cluster and install the status addon. Helm does not have a way to wait for that initialization to finish. So you have to do the wait yourself. The following commands will do that.
 
 ```shell
-kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 90s
-kubectl --context kind-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 150s
+kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 90s
+kubectl --context kind-kubeflex wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 150s
+kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 90s
+kubectl --context kind-kubeflex wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 150s
 ```
 
 *To learn more about the Core Helm Chart, refer to the [Core Helm Chart documentation](./core-chart.md)*
