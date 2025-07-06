@@ -2,7 +2,7 @@
 apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
 kind: PostCreateHook
 metadata:
-  name: {{ .Release.Name }}-its-without-clusteradm
+  name: its-without-clusteradm
   labels:
     kflex.kubestellar.io/cptype: its
 spec:

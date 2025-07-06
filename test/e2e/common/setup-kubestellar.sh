@@ -21,7 +21,6 @@ KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=5
 TRANSPORT_CONTROLLER_VERBOSITY=5
 CLUSTER_SOURCE=kind
 HOSTING_CONTEXT=kind-kubeflex
-RELEASE_NAME=${RELEASE_NAME:-ks-core}
 
 while [ $# != 0 ]; do
     case "$1" in
@@ -128,12 +127,8 @@ else
 popd
 
 : Waiting for OCM hub to be ready...
-kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for "jsonpath={.status.postCreateHooks.${RELEASE_NAME}-its-with-clusteradm}=true" --timeout 400s || {
-  echo "DEBUG: postCreateHooks status:";
-  kubectl get controlplane.tenancy.kflex.kubestellar.org/its1 -o json | jq '.status.postCreateHooks';
-  exit 1;
-}
-kubectl wait -n its1-system job.batch/${RELEASE_NAME}-its-with-clusteradm --for condition=Complete --timeout 400s
+kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
+kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
@@ -168,12 +163,8 @@ function add_wec() {
 
 "${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose ocm
 
-kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for "jsonpath={.status.postCreateHooks.${RELEASE_NAME}-its-with-clusteradm}=true" --timeout 200s || {
-  echo "DEBUG: postCreateHooks status:";
-  kubectl --context $HOSTING_CONTEXT get controlplane.tenancy.kflex.kubestellar.org/its1 -o json | jq '.status.postCreateHooks';
-  exit 1;
-}
-kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/${RELEASE_NAME}-its-with-clusteradm --for condition=Complete --timeout 400s
+kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
+kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
 
 add_wec cluster1
 add_wec cluster2
