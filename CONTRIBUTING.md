@@ -128,6 +128,18 @@ Reviewers will review your PR within a business day. A PR requires both an `/lgt
 
 _Congratulations! Your pull request has been successfully merged!_ 👏
 
+#### Vulnerability Checking for Dependency Updates
+For dependency update pull requests, maintainers perform additional security assessments:
+
+- **Security Scanning:** Use available security scanning tools to check for known vulnerabilities in new dependency versions
+- **Security Advisories:** Review security advisories and release notes for the updated dependencies
+- **Breaking Changes:** Verify that updates do not introduce breaking changes or compatibility issues
+- **GitHub Actions:** For GitHub Actions specifically, ensure updates follow our [GitHub Action Reference Discipline](#github-action-reference-discipline) and use approved commit hashes. The [verify-action-hashes workflow](https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/verify-action-hashes.yaml) automatically checks that each GitHub Action reference uses an approved commit hash.
+- **SBOM Generation:** Generate Software Bill of Materials (SBOM) using [Anchore's syft tool](https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/goreleaser.yml) during releases to identify and track dependencies for security analysis
+- **Testing:** Run comprehensive tests to ensure the updated dependencies work correctly with the codebase
+
+This process helps prevent the introduction of security vulnerabilities and ensures the stability of the KubeStellar project.
+
 If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/).
 
 
@@ -153,6 +165,20 @@ If you are interested in modifying the Helm chart itself, look at the User Guide
 Prior to making a new release, there needs to be testing that the
 current Helm chart works with the executable behavior that will
 appear in the new release.  
+
+## GitHub Action Reference Discipline
+
+KubeStellar maintains strict control over GitHub Action versions to ensure security and reproducibility:
+
+- **Pinned Commit Hashes:** All GitHub Actions in workflows use pinned commit hashes instead of tags or branches
+- **Centralized Management:** Action versions are managed through the `.gha-reversemap.yml` file and `hack/gha-reversemap.sh` script
+- **Automated Verification:** The [verify-action-hashes workflow](https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/verify-action-hashes.yaml) ensures workflow files use the approved commit hashes
+- **Update Process:** To update an action version:
+  1. Use `hack/gha-reversemap.sh update-action-version <action-ref>` to update the reversemap
+  2. Use `hack/gha-reversemap.sh apply-reversemap` to update all workflow files
+  3. Submit a PR with the changes for review
+
+This discipline prevents supply chain attacks and ensures consistent behavior across all CI/CD runs.
 
 ## Licensing
 <!--end-fifth-include-->

@@ -54,4 +54,4 @@ dependencies:
   env-dependencies-policy:
     policy-url: https://github.com/kubestellar/kubestellar/blob/main/SECURITY.md#dependencies-policy
     comment: |
-      KubeStellar uses Dependabot for automated dependency updates and follows the policy described in SECURITY.md.
+      KubeStellar uses Dependabot for detecting dependency updates and follows the policy described in SECURITY.md.
