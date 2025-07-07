@@ -55,7 +55,7 @@ You may preview possible changes to the website either
 ### Serving up documents globally from a fork of the repository via GitHub
 You can take advantage of [the "Generate and Push Docs" GitHub Actions workflow](https://github.com/kubestellar/kubestellar/blob/v{{ config.ks_latest_release }}/.github/workflows/docs-gen-and-push.yml)---invoked either explicitly in the GitHub web UI or implicitly by a branch naming convention---to create an online, shareable rendering of the website.
 This is particularly useful for documentation PRs, as it allows you to share a preview of your proposed changes directly via a URL to a working website.
-To take advantage of this action, you must ensure that you have forked the repository properly. This entails two things: having a version of the branch named `gh-pages`, and configuring GitHub to publish a website based on that branch.
+To take advantage of this action, you must (a) limit the character set used in the name of your branch and (b) ensure that your fork is properly set up for using [GitHub Pages](https://pages.github.com/). Your branch name should consist only of alphanumerics and dashes and dots. Fork setup for GitHub Pages entails two things: having a version of the branch named `gh-pages`, and configuring GitHub to publish a website based on that branch.
 
 The name of your branch equals the "version" of the website where the rendering appears.
 
@@ -66,6 +66,8 @@ commit changes to a branch whose name begins with `doc-`
 (e.g. `doc-myversion`).  If you have [prepared your fork for GitHub
 Pages
 rendering](#creating-a-fork-that-can-use-the-generate-and-push-docs-action)
+and restricted the name of your branch as described
+[above](#serving-up-documents-globally-from-a-fork-of-the-repository-via-github)
 then the workflow will succeed to create/update a website rendering in
 the GitHub Pages of your fork. For example: if you name your branch
 `doc-holliday` then the GitHub pages for your fork will get a website
@@ -90,7 +92,18 @@ in your PR.
 
 5. Go to the Settings tab of your fork, select "Pages" in the navigation panel on the left, and make sure that you have told GitHub to publish your site based on the contents of the `gh-pages` branch in your fork. It will look something like the following
     ![Configure publishing your GitHub pages](content/direct/images/github-pages-config-example.png)
- 
+
+#### Enabling GitHub pages for a fork that already exists
+
+1. Using the Git command line, and assuming that you have a "remote" named "origin" that points to your fork and a remote named "upstream" that points to https://github.com/kubestellar/kubestellar, do the following commands.
+
+    ```shell
+    git checkout upstream/gh-pages
+    git push -f origin gh-pages
+    ```
+
+2. Adjust the Settings of your fork as described in the section [above](#creating-a-fork-that-can-use-the-generate-and-push-docs-action).
+
 #### Manually generating a website rendered from a branch of your fork
 1. Work on the documents in a branch of your fork of the repository, and commit the changes
 2. (If you have been working on a local copy of the files, push the changes to the fork, then log into the GitHub webpage for your fork)
