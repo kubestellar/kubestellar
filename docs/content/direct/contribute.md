@@ -44,7 +44,7 @@ Read the resources to gain a better understanding of the contribution processes.
 - **Security**
     - **[Policy](../contribution-guidelines/security/security-inc.md)** Security Policies
     - **[Contacts](../contribution-guidelines/security/security_contacts-inc.md)** Who to contact with security concerns
-- **[Testing](testing.md)** How to use the preconfigured tests in the repository
+- **[Testing](testing.md)** How to use the pre-configured tests in the repository
 - **[Packaging](packaging.md)** How the components of KubeStellar are organized
 - **[Release Process](release.md)** All the steps involved in creating and publishing a new release of KubeStellar
 - **[Release Testing](release-testing.md)** Steps involved in testing a release or release candidate before merging it into the main branch.

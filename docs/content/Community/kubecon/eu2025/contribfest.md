@@ -2,7 +2,7 @@
 
 ![KubeStellar Contribfest KubeCon EU 2025 London, UK](./contribfest-2025.jpg)
 
-We’re thrilled to be hosting a Contribfest session at KubeCon + CloudNativeCon Europe 2025 in London, UK! Join us on Thursday, April 3, 2025, from 4:00pm to 5:15pm BST in ExceL London, Level 3 | ICC Capital Suite 1.
+We’re thrilled to be hosting a Contribfest session at KubeCon + CloudNativeCon Europe 2025 in London, UK! Join us on Thursday, April 3, 2025, from 4:00pm to 5:15pm BST in ExCeL London, Level 3 | ICC Capital Suite 1.
 
 As a Sandbox CNCF project, KubeStellar is at an exciting stage of growth, and there’s never been a better time to get involved as an open-source contributor. In this post, we’ll explain what Contribfest is, highlight some beginner-friendly issues, and show you how you can join the fun, whether you're attending in London or contributing remotely.
 

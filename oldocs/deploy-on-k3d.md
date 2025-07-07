@@ -51,9 +51,9 @@ In addition to [pre-reqs](pre-reqs.md), install k3d v5.6.0 (only k3d version tes
     ```
 
 1. Install kubestellar controller and OCM space:
-   We are using nginx ingress with tls passthru.
+   We are using nginx ingress with tls pass through.
    The current install for kubeflex installs also nginx ingress but specifically for kind.
-   To specify passthru for K3D, edit the ingress placement controller with the following command and add `--enable-ssl-passthrough` to the list of args for the container
+   To specify pass through for K3D, edit the ingress placement controller with the following command and add `--enable-ssl-passthrough` to the list of args for the container
     ```shell
     kubectl edit deployment ingress-nginx-controller -n ingress-nginx  
     ```
@@ -164,4 +164,4 @@ statefulset `vcluster` in the `its1-system` namespace, both fully ready.
     its1-system       statefulset.apps/vcluster              1/1     5m17s
     ```
 
-You may now proceed with Sceario 1 and others in [the examples](examples.md) (do not do the "Common Setup", that is written for `kind` rather than `k3d`).
+You may now proceed with Scenario 1 and others in [the examples](examples.md) (do not do the "Common Setup", that is written for `kind` rather than `k3d`).

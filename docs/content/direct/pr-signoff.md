@@ -151,7 +151,7 @@ This is not recommended for individual contributors, because the commits that it
 Whether it's editing files from Kubestellar.io or directly from the Kubestellar Github, there are a couple steps to follow that streamlines the workflow of your PR:
 
 1. Changes made to any file are automatically committed to a new branch in your fork.
-    - After clicking **Commit changes...**, write your commit message summary line and any extended desription that you want. Then click **Propose changes**, review your changes, and then create the PR.
+    - After clicking **Commit changes...**, write your commit message summary line and any extended description that you want. Then click **Propose changes**, review your changes, and then create the PR.
     - When making the PR, make sure to specify the type of PR at the beginning of the PR's title (i.e. :bug: if it addresses a bug-type issue)
 
 1. If the PR addresses a specific issue that has already been opened in GitHub, make sure to include the open issue number in **Related Issue(s)** (i.e. `Fixes #NNNN`); this will cause GitHub to automatically close the Issue once the PR is merged. If you have finished addressing an open issue without getting it automatically closed then explicitly close it.
