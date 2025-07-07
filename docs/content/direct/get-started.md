@@ -162,11 +162,9 @@ Note that `kind` does not support three or more concurrent clusters unless you r
     ```
 
     until you see that the certificate signing requests (CSR) for both cluster1 and cluster2 exist.
+    Sometimes it can take a little while for the CSRs to appear after running the join commands, so if you do not see them immediately, wait a few seconds and try again.
     Note that the CSRs condition is supposed to be `Pending` until you approve them in step 4.
 
-    **If you do not see the CSRs immediately, wait a few seconds and try again.**
-    Sometimes it can take a little while for the CSRs to appear after running the join commands.
-    
     For convenience, you can use a shell loop to automatically check every few seconds:
     
     ```shell
