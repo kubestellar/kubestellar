@@ -6,10 +6,14 @@ This document explains how to register a Workload Execution Cluster (WEC) with a
 
 Registering a WEC in an ITS is the same process as registering a managed cluster with an OCM hub cluster. KubeStellar uses Open Cluster Management (OCM) for cluster registration and management.
 
-**Terminology Mapping:**
-- **OCM Hub** → **KubeStellar ITS** (Inventory and Transport Space)
-- **OCM Managed Cluster** → **KubeStellar WEC** (Workload Execution Cluster)
-- **OCM Agent** → **OCM Agent** (same component, installed on WEC)
+
+### Terminology Mapping
+
+| OCM Term             | KubeStellar Equivalent                        |
+|----------------------|-----------------------------------------------|
+| **OCM Hub**          | **KubeStellar ITS** (Inventory and Transport Space) |
+| **OCM Managed Cluster** | **KubeStellar WEC** (Workload Execution Cluster) |
+| **OCM Agent**        | **OCM Agent** (same component, installed on WEC) |
 
 For the complete OCM registration process, refer to the [official Open Cluster Management documentation](https://open-cluster-management.io/docs/getting-started/installation/register-a-cluster/).
 
@@ -162,30 +166,8 @@ These properties can be used for rule-based transformations when workloads are d
 
 ### Local Development Clusters (Kind/K3d)
 
-For local development with Kind or K3d clusters:
-
-```shell
-# Create Kind cluster (context renaming is optional but convenient)
-kind create cluster --name cluster1
-kubectl config rename-context kind-cluster1 cluster1
-
-# Register with ITS (note the --force-internal-endpoint-lookup flag)
-clusteradm --context its1 get token | grep '^clusteradm join' | \
-  sed "s/<cluster_name>/cluster1/" | \
-  awk '{print $0 " --context cluster1 --singleton --force-internal-endpoint-lookup"}' | sh
-
-# Wait for CSR to appear, then accept registration
-clusteradm --context its1 accept --clusters cluster1
-```
-
-For K3d clusters, the process is identical except for the cluster creation:
-```shell
-# Create K3d cluster with port mapping
-k3d cluster create -p "9443:443@loadbalancer" cluster1
-kubectl config rename-context k3d-cluster1 cluster1
-
-# Then follow the same registration steps as above
-```
+For instructions on creating and registering local development clusters (Kind or K3d), refer to the  
+[Create and Register Two Workload Execution Clusters guide](https://docs.kubestellar.io/unreleased-development/direct/get-started/#create-and-register-two-workload-execution-clusters).
 
 ### OpenShift Clusters
 
