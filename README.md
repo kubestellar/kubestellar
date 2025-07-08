@@ -1,7 +1,7 @@
 <!-- KubeStellar Docs README -->
 
 <p align="center">
-  <img src="KubeStellar-with-Logo.png" width="400" alt="KubeStellar Logo" />
+  <img src="./docs/overrides/favicons/android-72x72.png"alt="KubeStellar Logo" />
 </p>
 
 <h1 align="center">KubeStellar Documentation</h1>
@@ -69,6 +69,50 @@ We aim to deliver well-organized, consistent, and comprehensive documentation to
 - 🧑‍💻 **Contributing**: [CONTRIBUTING.md](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md)
 - 📜 **Code of Conduct**: [CODE_OF_CONDUCT.md](https://github.com/kubestellar/kubestellar/blob/main/CODE_OF_CONDUCT.md)
 - 📅 **Join us**: [http://kubestellar.io/joinus](http://kubestellar.io/joinus)
+
+---
+
+## 🛠️ Local Development (Next.js)
+
+Follow these steps to set up and run the Next.js site locally:
+
+1. Ensure you have **Node.js v18+** installed. Confirm with:
+
+   ```bash
+   node --version
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+   or with Yarn:
+
+   ```bash
+   yarn
+   ```
+
+3. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+   Visit `http://localhost:3000` in your browser. The server supports hot-reload.
+
+4. Build the production bundle:
+
+   ```bash
+   npm run build
+   ```
+
+5. (Optional) Preview the production build locally:
+
+   ```bash
+   npm start
+   ```
 
 ---
 
