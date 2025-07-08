@@ -38,7 +38,7 @@ Usage: $0 [--kubeconfig <filename>] [--context <name>] [--names <list of names>]
 --silent                   no information output
 -X                         enable verbose execution of the script for debugging
 
-Note: if multiple KubeFlex Control Planes with the same names are found, only the last one found will be 
+Note: if multiple KubeFlex Control Planes with the same names are found, only the last one found will be used in the resulting kubeconfig
 EOF
 }
 

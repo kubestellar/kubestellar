@@ -110,7 +110,7 @@ For each tag `v$version` the following published artifacts will be created.
 
 ## Website
 
-We use `mike` and `MkDocs` to derive and publish GitHub pages. See `docs/README.md` for details.
+We use `mike` and `MkDocs` to derive and publish GitHub pages. See [the website documentation](../contribution-guidelines/operations/document-management.md) for details.
 
 The published GitHub pages are organized into "releases".  Each release in the GitHub pages corresponds to a git branch whose name begins with "release-" or is "main".
 

@@ -5,7 +5,10 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 8 * * 4"
-    
+
+permissions:
+  contents: read
+
 jobs:
   issue:
     runs-on: ubuntu-latest
@@ -23,13 +26,14 @@ jobs:
           else
             echo "run_workflow=false" >> $GITHUB_OUTPUT
           fi
-          
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+
+      # This is the resolved checkout step
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
-          persist-credentials: 'false'
-          
-      - uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 
+          persist-credentials: "false"
+
+      - uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
         if: steps.check_condition.outputs.run_workflow == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
