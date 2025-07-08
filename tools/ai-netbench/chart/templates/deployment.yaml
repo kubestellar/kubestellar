@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-netbench
+spec:
+  replicas: {{ .Values.nodeCount }}
+  selector:
+    matchLabels:
+      app: ai-netbench
+  template:
+    metadata:
+      labels:
+        app: ai-netbench
+    spec:
+      containers:
+      - name: agent
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        args:
+          - "--mode={{ .Values.mode }}"
+          - "--data-size={{ .Values.dataSize }}"
+          - "--rounds={{ .Values.rounds }}"
+        ports:
+        - containerPort: 8080

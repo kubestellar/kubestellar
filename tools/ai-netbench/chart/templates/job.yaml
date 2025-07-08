@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ai-netbench-controller
+spec:
+  template:
+    spec:
+      containers:
+      - name: controller
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        args:
+          - "--mode={{ .Values.mode }}"
+          - "--data-size={{ .Values.dataSize }}"
+          - "--rounds={{ .Values.rounds }}"
+      restartPolicy: Never
