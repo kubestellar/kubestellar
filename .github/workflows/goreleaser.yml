@@ -122,3 +122,4 @@ jobs:
       digest: ${{ needs.goreleaser.outputs[format('digest-{0}', matrix.target)] }}
     secrets:
       registry-password: ${{ secrets.GITHUB_TOKEN }}
+      
