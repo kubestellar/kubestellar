@@ -420,7 +420,11 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     cp_name[cp_n]=$name
     cp_ns[cp_n]="${cp_name[cp_n]}-system"
     cp_type[cp_n]=$(kubectl --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.type}')
-    cp_pch[cp_n]=$(kubectl --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.postCreateHook}')
+    # Check for new postCreateHooks array structure first, fallback to old postCreateHook
+    cp_pch[cp_n]=$(kubectl --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.postCreateHooks[0].hookName}')
+    if [[ -z "${cp_pch[cp_n]}" ]]; then
+        cp_pch[cp_n]=$(kubectl --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.postCreateHook}')
+    fi
     cp_kubeconfig_content=$(get_kubeconfig "${helm_context}" "${cp_name[cp_n]}" "${cp_type[cp_n]}")
     echo -e "- ${COLOR_INFO}${cp_name[cp_n]}${COLOR_NONE}: type=${COLOR_INFO}${cp_type[cp_n]}${COLOR_NONE}, pch=${COLOR_INFO}${cp_pch[cp_n]}${COLOR_NONE}, context=${COLOR_INFO}${cp_context[cp_n]}${COLOR_NONE}, namespace=${COLOR_INFO}${cp_name[cp_n]}-system${COLOR_NONE}"
     if [[ -z "$cp_kubeconfig_content" ]] ; then
@@ -431,7 +435,13 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         echo "$cp_kubeconfig_content" > "${cp_kubeconfig[cp_n]}"
     fi
     if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
-        its_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=${cp_pch[cp_n]}" -o name 2> /dev/null | cut -d'/' -f2 || true)
+        # For ITS control planes, look for both install-status-addon and its-hub-init jobs
+        status_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=install-status-addon" -o name 2> /dev/null | cut -d'/' -f2 || true)
+        hub_init_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=its-hub-init" -o name 2> /dev/null | cut -d'/' -f2 || true)
+        its_pod="$status_pod"
+        if [[ -n "$hub_init_pod" ]]; then
+            its_pod="$hub_init_pod"
+        fi
         its_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         if [[ "${cp_type[cp_n]}" != "vcluster" ]] ; then
             status_ns="open-cluster-management"
@@ -488,7 +498,12 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         mkdir -p "$OUTPUT_FOLDER/$name"
         kubectl --context $helm_context get controlplane $name -o yaml > "$OUTPUT_FOLDER/$name/cp.yaml"
         if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
-            kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o yaml > "$OUTPUT_FOLDER/$name/its-job.yaml"
+            if [ -n "$status_pod" ]; then
+                kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $status_pod -o yaml > "$OUTPUT_FOLDER/$name/install-status-addon.yaml"
+            fi
+            if [ -n "$hub_init_pod" ]; then
+                kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $hub_init_pod -o yaml > "$OUTPUT_FOLDER/$name/its-hub-init.yaml"
+            fi
             if [[ "${cp_type[cp_n]}" == "external" ]] ; then
                 KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" get pod $status_pod -o yaml > "$OUTPUT_FOLDER/$name/status-addon.yaml"
             else
@@ -502,10 +517,17 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     if [[ "$arg_logs" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
         if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
-            if [ -n "$its_pod" ] ; then
-                containers=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.spec.containers[*].name}')
+            # Capture logs from both PCHs if they exist
+            if [ -n "$status_pod" ] ; then
+                containers=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $status_pod -o jsonpath='{.spec.containers[*].name}')
                 for ctr in $containers; do
-                    { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $its_pod -c "$ctr" || true; } &> "$OUTPUT_FOLDER/$name/its-job-${ctr}.log"
+                    { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $status_pod -c "$ctr" || true; } &> "$OUTPUT_FOLDER/$name/install-status-addon-${ctr}.log"
+                done
+            fi
+            if [ -n "$hub_init_pod" ] ; then
+                containers=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $hub_init_pod -o jsonpath='{.spec.containers[*].name}')
+                for ctr in $containers; do
+                    { kubectl --context $helm_context -n "${cp_ns[cp_n]}" logs $hub_init_pod -c "$ctr" || true; } &> "$OUTPUT_FOLDER/$name/its-hub-init-${ctr}.log"
                 done
             fi
             if [[ -n "$status_pod" ]] ; then
