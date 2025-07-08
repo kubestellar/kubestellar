@@ -3725,7 +3725,7 @@ clues about the problem.</p>
 <li>The core Helm chart, at <code>ghcr.io/kubestellar/kubestellar/core-chart</code> with version <code>$version</code> and Helm "appVersion" <code>$version</code>. This GitHub "package" will also be connected to the ks/ks repo. The chart has a reference to container image for the KCM and that reference is <code>ghcr.io/kubestellar/kubestellar/controller-manager:$version</code>. The chart also has a reference to container image for the OTC and that reference is <code>ghcr.io/kubestellar/kubestellar/ocm-transport-controller:$version</code>. <strong>In Git the chart has only placeholders in these places, <em>not</em> <code>$version</code>; the <code>$version</code> is inserted into a distinct copy by the GitHub workflow, which then publishes this specialized copy.</strong></li>
 </ul>
 <h2 id="website">Website<a class="headerlink" href="#website" title="Permanent link">#</a></h2>
-<p>We use <code>mike</code> and <code>MkDocs</code> to derive and publish GitHub pages. See <code>docs/README.md</code> for details.</p>
+<p>We use <code>mike</code> and <code>MkDocs</code> to derive and publish GitHub pages. See <a href="../../contribution-guidelines/operations/document-management/">the website documentation</a> for details.</p>
 <p>The published GitHub pages are organized into "releases".  Each release in the GitHub pages corresponds to a git branch whose name begins with "release-" or is "main".</p>
 <p>Our documentation is, mostly, viewable in either of two ways. The source documents can be viewed directly through GitHub's web UI for files. The other way is through the website.</p>
 <h2 id="testing-and-examples">Testing and Examples<a class="headerlink" href="#testing-and-examples" title="Permanent link">#</a></h2>

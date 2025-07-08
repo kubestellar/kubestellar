@@ -4207,7 +4207,7 @@ directly at GitHub. For example, you can view this page both (a) on
 the website at
 <a href="https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/">https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/</a>
 and (b) directly in GitHub at
-<a href="https://github.com/kubestellar/kubestellar/blob/main/docs/README.md">https://github.com/kubestellar/kubestellar/blob/main/docs/README.md</a>. Unfortunately,
+<a href="https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/operations/document-management.md">https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/operations/document-management.md</a>. Unfortunately,
 those two uses interpret the documentation sources a bit
 differently. To the degree possible, we choose to write the
 documentation sources in a way that is rendered consistently in those
@@ -4461,11 +4461,11 @@ The section which begins with <strong>nav:</strong> lays out the navigation stru
 <h3 id="including-external-markdown">Including external markdown<a class="headerlink" href="#including-external-markdown" title="Permanent link">#</a></h3>
 <p>We make extensive use of 'include-markdown' to help us keep our documentation modular and up-to-date.  To use 'include-markdown' you must add a block in your document that refers to a block in your external document content:</p>
 <p>In your original markdown document, add a block that refers to the external markdown you want to include:
-<figure><img src="../../Contribution%20guidelines/operations/include-markdown-example.png" /><figcaption>Include Markdown</figcaption>
+<figure><img src="../include-markdown-example.png" /><figcaption>Include Markdown</figcaption>
 </figure>
 </p>
 <p>In the document you want to include, add the start and end tags you configured in the include-markdown block in your original document:
-<figure><img src="../../Contribution%20guidelines/operations/included-markdown-example.png" /><figcaption>Included Markdown</figcaption>
+<figure><img src="../included-markdown-example.png" /><figcaption>Included Markdown</figcaption>
 </figure>
 </p>
 <p>for more information on the 'include-markdown' plugin for mkdocs look <a href="https://github.com/mondeja/mkdocs-include-markdown-plugin">here</a></p>
@@ -4621,8 +4621,8 @@ The section which begins with <strong>nav:</strong> lays out the navigation stru
 <h4 id="indexhtml-and-homehtml">index.html and home.html<a class="headerlink" href="#indexhtml-and-homehtml" title="Permanent link">#</a></h4>
 <p>These appear in the branch named <code>gh-pages</code> and redirect from the root to the version named <code>latest</code>. The one named <code>index.html</code> is managed by <code>mike set-default</code>. The other should be kept consistent.</p>
 <ul>
-<li><a href="../../../https://github.com/kubestellar/kubestellar/blob/gh-pages/home.html">https://github.com/kubestellar/kubestellar/blob/gh-pages/home.html</a></li>
-<li><a href="../../../https://github.com/kubestellar/kubestellar/blob/gh-pages/index.html">https://github.com/kubestellar/kubestellar/blob/gh-pages/index.html</a></li>
+<li><a href="https://github.com/kubestellar/kubestellar/blob/gh-pages/home.html">https://github.com/kubestellar/kubestellar/blob/gh-pages/home.html</a></li>
+<li><a href="https://github.com/kubestellar/kubestellar/blob/gh-pages/index.html">https://github.com/kubestellar/kubestellar/blob/gh-pages/index.html</a></li>
 </ul>
 <p>both files have content similar to:
 <div class="language-html highlight"><span class="filename">index.html and home.html</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
@@ -4682,7 +4682,6 @@ The section which begins with <strong>nav:</strong> lays out the navigation stru
 <h2 id="publishing-workflow">Publishing Workflow<a class="headerlink" href="#publishing-workflow" title="Permanent link">#</a></h2>
 <p>All documentation building and publishing is done using GitHub Actions in
 <code>.github/workflows/docs-gen-and-push.yml</code>. This workflow is triggered either manually or by a push to a branch named <code>main</code> or <code>release-&lt;something&gt;</code> or <code>doc-&lt;something&gt;</code>. This workflow will actually do something <em>ONLY</em> if either (a) it is acting on the shared GitHub repository at <code>github.com/kubestellar/kubestellar</code> and on behalf of the repository owner or (b) it is acting on a contributor's fork of that repo and on behalf of that same contributor. The published site appears at <code>https://pages.github.io/kubestellar/${branch}</code> in case (a) and at <code>https://${repo_owner}.github.io/${fork_name}/${branch}</code> in case (b). This workflow will build and publish a website <em>version</em> whose name is the same as the name of the branch that it is working on. This workflow will also update the relevant <code>mike</code> alias, if necessary.</p>
-<p><em>*Note that this particular page is rendered from the README.md file in the kubestellar/docs folder, but it is served here on the website at via an include directive</em></p>
 
 
 
