@@ -4,29 +4,28 @@ This document explains how to register a Workload Execution Cluster (WEC) with a
 
 ## Overview
 
-Registering a WEC in an ITS is the same process as registering a managed cluster with an OCM hub cluster. KubeStellar uses Open Cluster Management (OCM) for cluster registration and management.
+Registering a WEC with an ITS follows the same process as registering a managed cluster with an OCM hub. KubeStellar uses Open Cluster Management (OCM) for cluster registration and management.
 
+For the complete OCM registration process, refer to the [official Open Cluster Management documentation](https://open-cluster-management.io/docs/getting-started/installation/register-a-cluster/). The instructions below provide a complete registration process that is more focused on KubeStellar-specific considerations.
 
 ### Terminology Mapping
 
 | OCM Term             | KubeStellar Equivalent                        |
 |----------------------|-----------------------------------------------|
-| **OCM Hub**          | **KubeStellar ITS** (Inventory and Transport Space) |
-| **OCM Managed Cluster** | **KubeStellar WEC** (Workload Execution Cluster) |
-| **OCM Agent**        | **OCM Agent** (same component, installed on WEC) |
-
-For the complete OCM registration process, refer to the [official Open Cluster Management documentation](https://open-cluster-management.io/docs/getting-started/installation/register-a-cluster/).
+| **OCM Hub**          | **ITS** (Inventory and Transport Space) |
+| **OCM Managed Cluster** | **WEC** (Workload Execution Cluster) |
+| **Klusterlet**       | **Klusterlet** |
 
 ## Prerequisites
 
 Before registering a WEC, ensure you have:
 
 1. **A running Kubernetes cluster** that will serve as the WEC
-2. **Network connectivity** between the WEC and the ITS
+2. **Network connectivity** from the WEC to the KubeFlex hosting cluster (HTTPS connections must be possible)
 3. **`kubectl` access** to both the WEC and ITS
-4. **`clusteradm` CLI tool** installed ([installation guide](https://open-cluster-management.io/docs/getting-started/installation/start-the-control-plane/))
+4. **`clusteradm` CLI tool** installed on the machine where you'll run the registration commands ([installation guide](https://open-cluster-management.io/docs/getting-started/installation/start-the-control-plane/))
 5. **An existing ITS** with OCM cluster manager running
-6. **Sufficient permissions** to create resources in both clusters
+6. **Sufficient permissions** to create resources in both clusters (typically cluster-admin or equivalent)
 
 To verify your ITS is ready for WEC registration:
 
@@ -34,7 +33,7 @@ To verify your ITS is ready for WEC registration:
 # Check if the ITS is accessible (this returns a short result)
 kubectl --context <its-context> get ServiceAccount default
 
-# Verify OCM cluster manager is running (look for pods in Running state)
+# Verify OCM cluster manager is running (look for absence of Pending or failing Pods)
 kubectl --context <its-context> get pods -n open-cluster-management-hub
 
 # Check for the customization-properties namespace
@@ -59,7 +58,7 @@ This command outputs a `clusteradm join` command that you'll use in the next ste
 Execute the join command on the WEC to initiate the registration process:
 
 ```shell
-# Basic join command
+# Basic join command (additional flags may be required based on your environment)
 clusteradm join --hub-token <token> --hub-apiserver <api-server-url> --cluster-name <your-wec-name> --context <wec-context>
 ```
 
@@ -90,6 +89,15 @@ kubectl --context <its-context> get csr
 
 You should see a CSR with your WEC name and status `Pending`. This CSR is created by the OCM registration agent running on your WEC.
 
+**Wait for CSR to appear:**
+```shell
+# Wait for CSR to be created (this may take a few moments)
+while [ -z "$(kubectl --context <its-context> get csr | grep <your-wec-name>)" ]; do
+    echo "Waiting for CSR to appear..."
+    sleep 5
+done
+```
+
 ### Step 4: Accept the Registration
 
 Approve the registration request from the ITS side:
@@ -115,13 +123,13 @@ kubectl --context <its-context> get managedclusters
 # Check the status of your specific WEC
 kubectl --context <its-context> get managedcluster <your-wec-name> -o yaml
 
-# Verify the OCM agent is running on the WEC (look for pods in Running state)
+# Verify the klusterlet is running on the WEC (look for absence of Pending or failing Pods)
 kubectl --context <wec-context> get pods -n open-cluster-management-agent
 ```
 
 A successfully registered WEC will show:
 - Status: `Available` and `Joined`
-- OCM agent pods running in the `open-cluster-management-agent` namespace
+- Klusterlet pods running in the `open-cluster-management-agent` namespace
 - A corresponding mailbox namespace in the ITS
 
 ## Post-Registration Configuration
@@ -200,60 +208,6 @@ clusteradm join --hub-token <token> --hub-apiserver <its-api-server> \
 clusteradm --context <its-context> accept --clusters <cloud-cluster-name>
 ```
 
-## Troubleshooting
-
-### Common Issues and Solutions
-
-**1. CSR not appearing**
-```shell
-# Check if the join command completed successfully (look for Running pods)
-kubectl --context <wec-context> get pods -n open-cluster-management-agent
-
-# Verify network connectivity
-kubectl --context <wec-context> get events --all-namespaces | grep -i error
-```
-
-**2. CSR stuck in Pending state**
-```shell
-# Check CSR details
-kubectl --context <its-context> get csr <csr-name> -o yaml
-
-# Manually approve if needed
-kubectl --context <its-context> certificate approve <csr-name>
-```
-
-**3. ManagedCluster shows as Unknown**
-```shell
-# Check OCM agent logs
-kubectl --context <wec-context> logs -n open-cluster-management-agent deployment/klusterlet-registration-agent
-
-# Verify ITS connectivity
-kubectl --context <wec-context> get events -n open-cluster-management-agent
-```
-
-**4. Network connectivity issues**
-```shell
-# Test connectivity from WEC to ITS
-kubectl --context <wec-context> run test-connectivity --image=curlimages/curl --rm -it -- curl -k <its-api-server>
-
-# Check firewall rules and security groups
-```
-
-### Diagnostic Commands
-
-```shell
-# Check OCM components status
-kubectl --context <its-context> get pods -n open-cluster-management-hub
-kubectl --context <wec-context> get pods -n open-cluster-management-agent
-
-# Verify ManagedCluster resource
-kubectl --context <its-context> describe managedcluster <wec-name>
-
-# Check agent logs
-kubectl --context <wec-context> logs -n open-cluster-management-agent deployment/klusterlet-registration-agent
-kubectl --context <wec-context> logs -n open-cluster-management-agent deployment/klusterlet-work-agent
-```
-
 ## Managing Registered WECs
 
 ### Viewing WEC Status
@@ -295,6 +249,15 @@ kubectl --context <wec-context> delete namespace open-cluster-management-agent
 kubectl --context <wec-context> delete namespace open-cluster-management-agent-addon
 ```
 
+## Troubleshooting
+
+For troubleshooting WEC registration issues, see the [general troubleshooting guide](troubleshooting.md). Common issues include:
+
+- Certificate Signing Requests not appearing
+- Network connectivity problems
+- Klusterlet agent failures
+- Registration acceptance issues
+
 ## Next Steps
 
 After successfully registering your WEC, you can:
@@ -305,3 +268,5 @@ After successfully registering your WEC, you can:
 4. **Register additional WECs** to scale your deployment
 
 For more information on using WECs with KubeStellar, see the [example scenarios](example-scenarios.md) and [BindingPolicy documentation](binding-policies.md).
+
+For the complete picture of how WEC registration fits into the overall KubeStellar architecture, see [The Full Story](user-guide-intro.md#the-full-story).
