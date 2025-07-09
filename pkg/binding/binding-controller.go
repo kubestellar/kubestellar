@@ -33,8 +33,10 @@ import (
 	k8scoreapi "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -364,6 +366,12 @@ func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan
 	if ok := cache.WaitForCacheSync(ctx.Done(), c.bindingPolicyInformer.HasSynced, c.bindingInformer.HasSynced); !ok {
 		return fmt.Errorf("failed to wait for KubeStellar informers to sync")
 	}
+
+	// Startup orphan cleanup: delete WEC objects with no parent BindingPolicy or workload
+	go func() {
+		c.logger.Info("Starting orphan cleanup on controller startup")
+		c.cleanupOrphanedWECObjects(ctx)
+	}()
 
 	errChan := make(chan error, 1)
 	go func() {
@@ -799,4 +807,50 @@ func (c *Controller) populateBindingPolicyResolverWithExistingBindingPolicies() 
 	}
 
 	return nil
+}
+
+// cleanupOrphanedWECObjects deletes WEC objects that no longer have a parent BindingPolicy or workload
+func (c *Controller) cleanupOrphanedWECObjects(ctx context.Context) {
+	// For each workload lister (skip control objects)
+	_ = c.listers.Iterator(func(gvr schema.GroupVersionResource, lister cache.GenericLister) error {
+		if gvr == util.GetBindingPolicyGVR() || gvr == util.GetBindingGVR() {
+			return nil
+		}
+		objs, err := lister.List(labels.Everything())
+		if err != nil {
+			c.logger.Error(err, "Failed to list objects for orphan cleanup", "gvr", gvr)
+			return nil
+		}
+		for _, obj := range objs {
+			objMeta := obj.(metav1.Object)
+			// Construct ObjectIdentifier using util.IdentifierForObject
+			objId := util.IdentifierForObject(obj.(util.MRObject), gvr.Resource)
+			// Check if this object is referenced by any BindingPolicy resolution
+			found := false
+			bindingPolicies, err := c.listBindingPolicies()
+			if err != nil {
+				c.logger.Error(err, "Failed to list binding policies during orphan cleanup")
+				continue
+			}
+			for _, bp := range bindingPolicies {
+				if c.bindingPolicyResolver.ResolutionExists(bp.GetName()) {
+					objIds, err := c.bindingPolicyResolver.GetObjectIdentifiers(bp.GetName())
+					if err == nil && objIds.Has(objId) {
+						found = true
+						break
+					}
+				}
+			}
+			if !found {
+				// Orphaned: delete it
+				c.logger.Info("Deleting orphaned WEC object", "gvr", gvr, "name", objMeta.GetName(), "namespace", objMeta.GetNamespace())
+				// Use dynamic client for deletion
+				err := c.dynamicClient.Resource(gvr).Namespace(objMeta.GetNamespace()).Delete(ctx, objMeta.GetName(), metav1.DeleteOptions{})
+				if err != nil && !errors.IsNotFound(err) {
+					c.logger.Error(err, "Failed to delete orphaned WEC object", "gvr", gvr, "name", objMeta.GetName(), "namespace", objMeta.GetNamespace())
+				}
+			}
+		}
+		return nil
+	})
 }
