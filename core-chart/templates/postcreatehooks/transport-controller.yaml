@@ -7,8 +7,6 @@ metadata:
     kflex.kubestellar.io/cptype: wds
 spec:
   templates:
-
-  # vvvv TRANSPORT CONTROLLER vvvv
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -160,6 +158,4 @@ spec:
             configMap:
               name: transport-controller-config
               defaultMode: 0744
-  # ^^^^ TRANSPORT CONTROLLER ^^^^
-
 {{- end }} 

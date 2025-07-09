@@ -7,8 +7,6 @@ metadata:
     kflex.kubestellar.io/cptype: wds
 spec:
   templates:
-
-  # vvvv KUBESTELLAR CONTROLLER vvvv
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
@@ -278,6 +276,5 @@ spec:
           securityContext:
             runAsNonRoot: true
           terminationGracePeriodSeconds: 10
-  # ^^^^ KUBESTELLAR CONTROLLER ^^^^
 
 {{- end }} 
