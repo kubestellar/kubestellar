@@ -162,7 +162,7 @@ is_installed_kflex() {
         'kflex version | head -1' \
         'kflex version | head -1' \
         'https://github.com/kubestellar/kubeflex' \
-        'Kubeflex version: v0.9.0'
+        'Kubeflex version: v0.8.0'
 }
 
 is_installed_kind() {
