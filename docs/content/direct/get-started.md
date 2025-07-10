@@ -14,6 +14,17 @@ The two ways to create this simple configuration are as follows.
 
 For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user `root` in Linux. There is a [known issue about this](knownissue-wsl-ghcr-helm.md).
 
+### Important: Shell Variables for Example Scenarios
+
+After completing the setup, you will need to define several shell variables to run the example scenarios. The meanings of these variables are defined [at the start of the example scenarios document](example-scenarios.md#assumptions-and-variables). What is shown later in this document are the specific values that are correct for the setup procedure described in this guide.
+
+The key variables you'll need are:
+
+- `host_context`, `its_cp`, `its_context` - for accessing the hosting cluster and ITS
+- `wds_cp`, `wds_context` - for accessing the WDS
+- `wec1_name`, `wec2_name`, `wec1_context`, `wec2_context` - for accessing the workload execution clusters
+- `label_query_both`, `label_query_one` - for cluster selection in scenarios
+
 ## Quick Start Using the Automated Script
 
 If you want to quickly setup a basic environment, you can use our automated installation script.
@@ -24,22 +35,27 @@ Be sure to [install the software prerequisites](pre-reqs.md) _before_ running th
 
 The script will check for the pre-reqs and exit if they are not present.
 
-### Run the script!
+### Run the script
+
 The script can install KubeStellar's demonstration environment on top of kind or k3d
 
 For use with kind
+
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform kind
 ```
 
 For use with k3d
+
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform k3d
 ```
 
 If successful, the script will output the variable definitions that you would use when proceeding to the example scenarios. After successfully running the script, proceed to the [Exercise KubeStellar](#exercise-kubestellar) section below.
 
-_Note: the script does the same things as described in the [Step by Step Setup](#step-by-step-setup) but with maximum concurrency, so it can complete faster. This makes the script actually more complicated than the step-by-step process below. While this is great for getting started quickly with a demo system, you may want to follow the manual setup below to better understand the components and how to create a [configuration that meets your needs](#next-steps)._
+_Note: the script does the same things as described in the [Step by Step Setup](#step-by-step-setup) but with a little more concurrency, so it can complete a bit faster. While this is great for getting started quickly with a demo system, you may want to follow the manual setup below to better understand the components and how to create a [configuration that meets your needs](#next-steps)._
+
+---
 
 ## Step by Step Setup
 
@@ -179,9 +195,9 @@ Note that `kind` does not support three or more concurrent clusters unless you r
     kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
     ```
 
-### Variables for running the example scenarios.
+### Variables for running the example scenarios
 
-Before moving on to try exercising KubeStellar, you will need the following shell variable settings to inform the scenario commands about the configuration.
+**Important**: Before moving on to try exercising KubeStellar, you will need the following shell variable settings to inform the scenario commands about the configuration.
 
 ```shell
 host_context=kind-kubeflex
@@ -197,11 +213,13 @@ label_query_both=location-group=edge
 label_query_one=name=cluster1
 ```
 
+**Note**: These variable values are specific to the setup described in this guide. If you followed a different setup procedure, you will need to adjust these values accordingly.
+
 ## Exercise KubeStellar
 
 Now that your system is running, you can try some example scenarios
 
-1. Define the needed shell variables, using either the settings output as the script completes or the settings shown just above from the step-by-step instructions. Their meanings are defined [at the start of the example scenarios document](example-scenarios.md#assumptions-and-variables).
+1. **Define the needed shell variables** using the settings from the [Variables for running the example scenarios](#variables-for-running-the-example-scenarios) section above. If you used the automated script, use the settings it output. The meanings of these variables are defined [at the start of the example scenarios document](example-scenarios.md#assumptions-and-variables).
 
 2. Proceed to [Scenario 1 (multi-cluster workload deployment with kubectl) in the example scenarios](example-scenarios.md#scenario-1-multi-cluster-workload-deployment-with-kubectl) and/or other examples on the same page, after defining the shell variables that characterize the configuration created above.
 
