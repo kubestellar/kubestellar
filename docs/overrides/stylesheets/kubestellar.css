@@ -189,4 +189,16 @@ dl.crd-meta {
   .md-nav--lifted > .md-nav__list > .md-nav__item--active > .md-nav__link {
     box-shadow: initial;
   }
+  /* Smooth transition for all elements */
+* {
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  /* Smooth effect for the theme toggle button */
+  [data-md-color-switch] {
+    transition: transform 0.2s;
+  }
+  [data-md-color-switch]:hover {
+    transform: scale(1.08);
+  }
   
