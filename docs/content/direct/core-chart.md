@@ -106,7 +106,16 @@ ITSes: # ==> installs ocm (optional) + ocm-status-addon
 # - type: host or k8s (default to k8s, if not specified)
 # - APIGroups: a comma separated list of APIGroups
 # - ITSName: the name of the ITS control plane to be used by the WDS. Note that the ITSName MUST be specified if more than one ITS exists.
-WDSes: # ==> installs kubestellar + ocm-transport-plugin
+WDSes: # all the CPs in this list will execute the transport-controller.yaml and kubestellar-controller.yaml PCHs
+  - name: <wds1>     # mandatory name of the control plane
+    type: <host|k8s> # optional type of control plane host or k8s (default to k8s, if not specified)
+    APIGroups: ""    # optional string holding a comma-separated list of APIGroups
+    ITSName: <its1>  # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCH starts
+  - name: <wds2>     # mandatory name of the control plane
+    type: <host|k8s> # optional type of control plane host or k8s (default to k8s, if not specified)
+    APIGroups: ""    # optional string holding a comma-separated list of APIGroups
+    ITSName: <its2>  # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCH starts
+  ...
 ```
 
 The first section of the `values.yaml` file refers to parameters that are specific to the KubeFlex installation, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information.
@@ -149,7 +158,7 @@ If the secret was created using the [create-external-bootstrap-secret.sh](https:
 The fourth section of the `values.yaml` file allows one to create a list of Workload Description Spaces (WDSes). By default, this list is empty and no WDS will be created by the chart. A list of WDSes can be specified using the following format:
 
 ```yaml
-WDSes: # all the CPs in this list will execute the wds.yaml PCH
+WDSes: # all the CPs in this list will execute the transport-controller.yaml and kubestellar-controller.yaml PCHs
   - name: <wds1>     # mandatory name of the control plane
     type: <host|k8s> # optional type of control plane host or k8s (default to k8s, if not specified)
     APIGroups: ""    # optional string holding a comma-separated list of APIGroups

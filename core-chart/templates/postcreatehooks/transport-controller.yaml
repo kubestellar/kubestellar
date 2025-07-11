@@ -1,0 +1,161 @@
+{{- if .Values.InstallPCHs }}
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: transport-controller
+  labels:
+    kflex.kubestellar.io/cptype: wds
+spec:
+  templates:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: "{{"{{.ControlPlaneName}}-transport-controller"}}"
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - secrets
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - tenancy.kflex.kubestellar.org
+      resources:
+      - controlplanes
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - tenancy.kflex.kubestellar.org
+      resources:
+      - controlplanes/status
+      verbs:
+      - get
+      - patch
+      - update
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: "{{"{{.ControlPlaneName}}"}}-transport-controller"
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: "{{"{{.ControlPlaneName}}"}}-transport-controller"
+    subjects:
+    - kind: ServiceAccount
+      name: default
+      namespace: "{{"{{.Namespace}}"}}"
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: transport-controller-config
+    data:
+      get-kubeconfig.sh: |
+        #!/bin/env bash
+        # Get the in-cluster kubeconfig for KubeFlex Control Planes
+        # get-kubeconfig.sh cp_name guess_its_name
+
+        # input parameters
+        cp_name="${1%"-system"}" # cp name or cp namespace
+        guess_its_name="$2" # true: try guessing the name of the ITS CP
+
+        # check if the CP name is valid or needs to be guessed
+        while [ "$cp_name" == "" ] ; do
+          if [ "$guess_its_name" == "true" ] ; then
+            cps=$(kubectl get controlplane -l 'kflex.kubestellar.io/cptype=its' 2> /dev/null | tail -n +2)
+            case $(echo -n "$cps" | grep -c '^') in
+              (0)
+                >&2 echo "Waiting for an ITS control plane to exist..."
+                sleep 10;;
+              (1)
+                cp_name="${cps%% *}"
+                break;;
+              (*)
+                >&2 echo "ERROR: found more than one Control Plane of type its!"
+                exit 1;;
+            esac
+          else
+            >&2 echo "ERROR: no Control Plane name specified!"
+            exit 3
+          fi
+        done
+
+        # wait for the CP to exists and be ready
+        while [[ $(kubectl get controlplane "$cp_name" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+          >&2 echo "Waiting for \"$cp_name\" control plane to exist and be ready..."
+          sleep 10
+        done
+
+        # determine the secret name and namespace
+        key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
+        secret_name=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
+        secret_namespace=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
+
+        # get the kubeconfig in base64
+        >&2 echo "Getting \"$key\" from \"$secret_name\" secret in \"$secret_namespace\" for control plane \"$cp_name\"..."
+        kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}"
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: transport-controller
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          name: transport-controller
+      template:
+        metadata:
+          labels:
+            name: transport-controller
+        spec:
+          initContainers:
+          - name: setup-wds-kubeconfig
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            imagePullPolicy: IfNotPresent
+            command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{"{{.ControlPlaneName}}"}}' false | base64 -d > /mnt/shared/wds-kubeconfig" ]
+            volumeMounts:
+            - name: config-volume
+              mountPath: /mnt/config
+            - name: shared-volume
+              mountPath: /mnt/shared
+          - name: setup-its-kubeconfig
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            imagePullPolicy: IfNotPresent
+            command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{.ITSName}}' true | base64 -d > /mnt/shared/transport-kubeconfig" ]
+            volumeMounts:
+            - name: config-volume
+              mountPath: /mnt/config
+            - name: shared-volume
+              mountPath: /mnt/shared
+          containers:
+          - name: transport-controller
+            image: ghcr.io/kubestellar/kubestellar/ocm-transport-controller:{{ .Values.TRANSPORT_VERSION | default .Values.KUBESTELLAR_VERSION }}
+            imagePullPolicy: IfNotPresent
+            args:
+            - --metrics-bind-address={{.Values.transport_controller.metrics_bind_addr}}
+            - --pprof-bind-address={{.Values.transport_controller.pprof_bind_addr}}
+            - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
+            - --transport-qps={{.Values.transport_controller.transport_qps}}
+            - --transport-burst={{.Values.transport_controller.transport_burst}}
+            - --wds-kubeconfig=/mnt/shared/wds-kubeconfig
+            - --wds-name={{"{{.ControlPlaneName}}"}}
+            - --wds-qps={{.Values.transport_controller.wds_qps}}
+            - --wds-burst={{.Values.transport_controller.wds_burst}}
+            - -v={{.Values.verbosity.transport | default .Values.verbosity.default | default 4 }}
+            - --max-num-wrapped={{.Values.transport_controller.max_num_wrapped}}
+            - --max-size-wrapped={{.Values.transport_controller.max_size_wrapped}}
+            volumeMounts:
+            - name: shared-volume
+              mountPath: /mnt/shared
+              readOnly: true
+          volumes:
+          - name: shared-volume
+            emptyDir: {}
+          - name: config-volume
+            configMap:
+              name: transport-controller-config
+              defaultMode: 0744
+{{- end }} 
