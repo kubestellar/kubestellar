@@ -1,0 +1,300 @@
+name: Test KubeFlex-KubeStellar Compatibility
+
+on: 
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      kubeflexVersion:
+        description: "KubeFlex version to test against (e.g., v0.8.9)"
+        required: false
+        default: "v0.8.9"
+        type: string
+      testFlags:
+        description: "Command line flags for run-test.sh"
+        required: false
+        default: ""
+        type: choice
+        options:
+          - ""
+          - "--released"
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+
+permissions:
+  contents: read
+
+jobs:
+  ginkgo-kubeflex-compatibility-test:
+    name: Ginkgo Tests with KubeFlex Compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: 1.24
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        id: install
+
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
+
+      - name: Install dependencies
+        run: |\
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          KUBEFLEX_VERSION=${{ github.event.inputs.kubeflexVersion }}
+          wget https://github.com/kubestellar/kubeflex/releases/download/${KUBEFLEX_VERSION}/kubeflex_${KUBEFLEX_VERSION#v}_linux_amd64.tar.gz
+          tar -xvf kubeflex_${KUBEFLEX_VERSION#v}_linux_amd64.tar.gz bin/kflex
+          mv bin/kflex /usr/local/bin
+          rm -fr bin kubeflex_${KUBEFLEX_VERSION#v}_linux_amd64.tar.gz
+          go install github.com/onsi/ginkgo/v2/ginkgo
+
+      - name: Run test
+        env:
+          TEST_FLAGS: ${{ github.event.inputs.testFlags }}
+        run: |\
+          cd test/e2e/ginkgo
+          KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color --fail-fast $TEST_FLAGS -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
+
+      - name: show kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
+      - name: show pods in hosting cluster
+        if: always()
+        run: |\
+          date
+          kubectl --context kind-kubeflex get pods -A
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+
+      - name: show previous logs in hosting cluster
+        if: always()
+        run: |\
+          date
+          kubectl --context kind-kubeflex get pods -A | grep -v NAME | while read ns name ready status restarts rest; do if [ $restarts != 0 ]; then echo; echo For $ns/$name; kubectl --context kind-kubeflex logs -p -n $ns $name || true; fi; done;
+
+      - name: show Deployment objects in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get deployments -A
+
+      - name: show Deployment objects in its1
+        if: always()
+        run: kubectl --context its1 get deployments -A
+
+      - name: show kubestellar controller manager log
+        if: always()
+        run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
+
+      - name: show transport controller log
+        if: always()
+        run: kubectl --context kind-kubeflex -n wds1-system logs $(kubectl --context kind-kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}')
+
+      - name: show bindingpolicies
+        if: always()
+        run: kubectl --context wds1 get bindingpolicies.control.kubestellar.io -o yaml
+
+      - name: show deployments in wds1
+        if: always()
+        run: kubectl --context wds1 get deployments -A -o yaml
+
+      - name: show bindings
+        if: always()
+        run: kubectl --context wds1 get bindings.control.kubestellar.io -o yaml
+
+      - name: show deployments in cluster1
+        if: always()
+        run: kubectl --context cluster1 get deployments -A -o yaml
+
+      - name: show deployments in cluster2
+        if: always()
+        run: kubectl --context cluster2 get deployments -A -o yaml
+
+      - name: show manifestworks
+        if: always()
+        run: kubectl --context its1 get manifestworks -A -o yaml
+
+      - name: show workstatuses
+        if: always()
+        run: kubectl --context its1 get workstatuses -A -o yaml
+
+      - name: show combinedstatuses
+        if: always()
+        run: kubectl --context wds1 get combinedstatuses -A -o yaml
+
+      - name: scrape kubestellar controller-manager
+        if: always()
+        run: |\
+          kubectl --context kind-kubeflex port-forward -n wds1-system deploy/kubestellar-controller-manager 8080 &
+          sleep 10
+          curl http://localhost:8080/metrics
+          kill %
+
+      - name: scrape transport controller
+        if: always()
+        run: |\
+          kubectl --context kind-kubeflex port-forward -n wds1-system deploy/transport-controller 8090 &
+          sleep 10
+          curl http://localhost:8090/metrics
+          kill %
+
+      - name: scrape OCM Status Add-On Controller
+        if: always()
+        run: |\
+          kubectl --context its1 port-forward -n open-cluster-management deploy/addon-status-controller 9280 &
+          sleep 10
+          curl http://localhost:9280/metrics
+          kill %
+          sleep 1
+
+      - name: scrape OCM Status Add-On Agent
+        if: always()
+        run: |\
+          kubectl --context cluster1 port-forward -n open-cluster-management-agent-addon deploy/status-agent 8080 &
+          sleep 10
+          curl http://localhost:8080/metrics
+          kill %
+
+  bash-kubeflex-compatibility-test:
+    name: Bash Tests with KubeFlex Compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: 1.24
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        id: install
+
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
+
+      - name: Install dependencies
+        run: |\
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          KUBEFLEX_VERSION=${{ github.event.inputs.kubeflexVersion }}
+          wget https://github.com/kubestellar/kubeflex/releases/download/${KUBEFLEX_VERSION}/kubeflex_${KUBEFLEX_VERSION#v}_linux_amd64.tar.gz
+          tar -xvf kubeflex_${KUBEFLEX_VERSION#v}_linux_amd64.tar.gz bin/kflex
+          mv bin/kflex /usr/local/bin
+          rm -fr bin kubeflex_${KUBEFLEX_VERSION#v}_linux_amd64.tar.gz
+
+      - name: Run test
+        env:
+          TEST_FLAGS: ${{ github.event.inputs.testFlags }}
+        run: |\
+          cd test/e2e/
+          KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
+
+      - name: show kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
+      - name: show pods in hosting cluster
+        if: always()
+        run: |\
+          date
+          kubectl --context kind-kubeflex get pods -A
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -p -n $ns $name || true; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+
+      - name: show previous logs in hosting cluster
+        if: always()
+        run: |\
+          date
+          kubectl --context kind-kubeflex get pods -A | grep -v NAME | while read ns name ready status restarts rest; do if [ $restarts != 0 ]; then echo; echo For $ns/$name; kubectl --context kind-kubeflex logs -p -n $ns $name || true; fi; done;
+
+      - name: show Deployment objects in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get deployments -A
+
+      - name: show Deployment objects in its1
+        if: always()
+        run: kubectl --context its1 get deployments -A
+
+      - name: show kubestellar controller manager log
+        if: always()
+        run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}')
+
+      - name: show transport controller log
+        if: always()
+        run: kubectl --context kind-kubeflex -n wds1-system logs $(kubectl --context kind-kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}')
+
+      - name: show bindingpolicies
+        if: always()
+        run: kubectl --context wds1 get bindingpolicies.control.kubestellar.io -o yaml
+
+      - name: show deployments in wds1
+        if: always()
+        run: kubectl --context wds1 get deployments -A -o yaml
+
+      - name: show bindings
+        if: always()
+        run: kubectl --context wds1 get bindings.control.kubestellar.io -o yaml
+
+      - name: show deployments in cluster1
+        if: always()
+        run: kubectl --context cluster1 get deployments -A -o yaml
+
+      - name: show deployments in cluster2
+        if: always()
+        run: kubectl --context cluster2 get deployments -A -o yaml
+
+      - name: show manifestworks
+        if: always()
+        run: kubectl --context its1 get manifestworks -A -o yaml
+
+      - name: show workstatuses
+        if: always()
+        run: kubectl --context its1 get workstatuses -A -o yaml
+
+      - name: show combinedstatuses
+        if: always()
+        run: kubectl --context wds1 get combinedstatuses -A -o yaml
+
+      - name: scrape kubestellar controller-manager
+        if: always()
+        run: |\
+          kubectl --context kind-kubeflex port-forward -n wds1-system deploy/kubestellar-controller-manager 8080 &
+          sleep 10
+          curl http://localhost:8080/metrics
+          kill %
+
+      - name: scrape transport controller
+        if: always()
+        run: |\
+          kubectl --context kind-kubeflex port-forward -n wds1-system deploy/transport-controller 8090 &
+          sleep 10
+          curl http://localhost:8090/metrics
+          kill %
+
+      - name: scrape OCM Status Add-On Controller
+        if: always()
+        run: |\
+          kubectl --context its1 port-forward -n open-cluster-management deploy/addon-status-controller 9280 &
+          sleep 10
+          curl http://localhost:9280/metrics
+          kill %
+          sleep 1
+
+      - name: scrape OCM Status Add-On Agent
+        if: always()
+        run: |\
+          kubectl --context cluster1 port-forward -n open-cluster-management-agent-addon deploy/status-agent 8080 &
+          sleep 10
+          curl http://localhost:8080/metrics
+          kill %
