@@ -93,8 +93,12 @@ transport_controller:
   max_size_wrapped: 512000
 
 
-# Determine if the Post Create Hooks should be installed by the chart
-InstallPCHs: true
+# Post Create Hooks (PCHs) are automatically managed by the chart.
+# - On first install: PCHs are installed because they don't exist
+# - On additional installs: PCHs are not installed because they already exist
+# - Override behavior: set InstallPCHs=false to explicitly disable PCH installation
+# - Force reinstall: set InstallPCHs=true to force PCH installation (useful for upgrades)
+# InstallPCHs: true
 
 
 # List the Inventory and Transport Spaces (ITSes) to be created by the chart
