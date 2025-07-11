@@ -24,31 +24,32 @@ builds:
   - arm64
   env:
   - CGO_ENABLED=0
-kos:           
-  - id: kubestellar-controller-manager
-    repository: ghcr.io/antedotee/kubestellar/controller-manager
-    build: controller-manager
-    tags:
-    - '{{.Version}}'
-    bare: true
-    preserve_import_paths: false
-    ldflags:
-    - "{{ .Env.LDFLAGS }}"
-    platforms:
-    - linux/amd64
-    - linux/arm64
-  - id: ocm-transport-controller
-    repository: ghcr.io/antedotee/kubestellar/ocm-transport-controller
-    build: ocm-transport-controller
-    tags:
-    - '{{.Version}}'
-    bare: true
-    preserve_import_paths: false
-    ldflags:
-    - "{{ .Env.LDFLAGS }}"
-    platforms:
-    - linux/amd64
-    - linux/arm64
+# Temporarily disabled container publishing to test SLSA provenance
+# kos:           
+#   - id: kubestellar-controller-manager
+#     repository: ghcr.io/antedotee/kubestellar/controller-manager
+#     build: controller-manager
+#     tags:
+#     - '{{.Version}}'
+#     bare: true
+#     preserve_import_paths: false
+#     ldflags:
+#     - "{{ .Env.LDFLAGS }}"
+#     platforms:
+#     - linux/amd64
+#     - linux/arm64
+#   - id: ocm-transport-controller
+#     repository: ghcr.io/antedotee/kubestellar/ocm-transport-controller
+#     build: ocm-transport-controller
+#     tags:
+#     - '{{.Version}}'
+#     bare: true
+#     preserve_import_paths: false
+#     ldflags:
+#     - "{{ .Env.LDFLAGS }}"
+#     platforms:
+#     - linux/amd64
+#     - linux/arm64
 release:
   draft: false
   prerelease: auto
