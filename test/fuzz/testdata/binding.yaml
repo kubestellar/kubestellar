@@ -11,3 +11,4 @@ spec:
     namespace: "default"
     name: "test-pod"
   singletonStatus: true 
+  
