@@ -68,7 +68,7 @@ jobs:
           sed -i "s/^KUBESTELLAR_VERSION:.*$/KUBESTELLAR_VERSION: \"${chartVersion}\"/g" ${{ env.CORE_CHART_PATH }}/values.yaml
 
           helm package ${{ env.CORE_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
-          helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar
+          helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/antedotee/kubestellar
 
   # Generate hashes for binary artifacts for SLSA provenance
   combine_hashes:
@@ -117,7 +117,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
     with:
-      image: ghcr.io/kubestellar/kubestellar/${{ matrix.target }}
+      image: ghcr.io/antedotee/kubestellar/${{ matrix.target }}
       registry-username: ${{ github.actor }}
       digest: ${{ needs.goreleaser.outputs[format('digest-{0}', matrix.target)] }}
     secrets:

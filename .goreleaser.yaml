@@ -26,7 +26,7 @@ builds:
   - CGO_ENABLED=0
 kos:           
   - id: kubestellar-controller-manager
-    repository: ghcr.io/kubestellar/kubestellar/controller-manager
+    repository: ghcr.io/antedotee/kubestellar/controller-manager
     build: controller-manager
     tags:
     - '{{.Version}}'
@@ -38,7 +38,7 @@ kos:
     - linux/amd64
     - linux/arm64
   - id: ocm-transport-controller
-    repository: ghcr.io/kubestellar/kubestellar/ocm-transport-controller
+    repository: ghcr.io/antedotee/kubestellar/ocm-transport-controller
     build: ocm-transport-controller
     tags:
     - '{{.Version}}'
