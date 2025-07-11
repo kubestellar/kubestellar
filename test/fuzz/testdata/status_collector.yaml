@@ -29,4 +29,3 @@ spec:
     - name: maxMemory
       type: Max
       subject: object.spec.containers[0].resources.requests['memory'] 
-      
