@@ -21,13 +21,28 @@ set -x # so users can see what is going on
 env="kind"
 test="bash"
 fail_flag=""
-
+setup_flags=""
+existing_wec_contexts=""
 
 while [ $# != 0 ]; do
     case "$1" in
-        (-h|--help) echo "$0 usage: (--released | --env | --test-type | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --fail-fast)*"
+        (-h|--help) echo "$0 usage: (--released | --env (kind|ocp) | --test-type (bash|ginkgo) | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --fail-fast | --existing-wec-contexts \$context1,\$context2,... | --scenario \$scenario_name)*"
+                    echo "where:"
+                    echo "  \$num: integer verbosity level"
+                    echo "  \$context1,\$context2,...: comma-separated list of existing WEC contexts"
+                    echo "  \$scenario_name: scenario to use (default, wds-on-host, its-on-host, combined)"
                     exit;;
-        (--released) setup_flags="$setup_flags $1";;
+        (--released)
+          setup_flags="$setup_flags $1"
+          ;;
+        (--scenario)
+          if (( $# > 1 )); then
+            setup_flags="$setup_flags $1 $2"
+            shift
+          else
+            echo "Missing scenario name" >&2
+            exit 1
+          fi;;
         (--kubestellar-controller-manager-verbosity|--transport-controller-verbosity)
           if (( $# > 1 )); then
             setup_flags="$setup_flags $1 $2"
@@ -53,6 +68,14 @@ while [ $# != 0 ]; do
             exit 1;
           fi;;
         (--fail-fast) fail_flag="--fail-fast";;
+        (--existing-wec-contexts)
+          if (( $# > 1 )); then
+            existing_wec_contexts="$2"
+            shift
+          else
+            echo "Missing existing WEC contexts value" >&2
+            exit 1;
+          fi;;
         (*) echo "$0: unrecognized argument '$1'" >&2
             exit 1
     esac
