@@ -178,7 +178,24 @@ Note that `kind` does not support three or more concurrent clusters unless you r
     ```
 
     until you see that the certificate signing requests (CSR) for both cluster1 and cluster2 exist.
+    Sometimes it can take a little while for the CSRs to appear after running the join commands, so if you do not see them immediately, wait a few seconds and try again.
     Note that the CSRs condition is supposed to be `Pending` until you approve them in step 4.
+
+    For convenience, you can use a shell loop to automatically check every few seconds:
+    
+    ```shell
+    # This will check every 10 seconds until both CSRs are present
+    while true; do
+      kubectl --context its1 get csr
+      # Replace 2 with the number of clusters you are registering if different
+      if [ $(kubectl --context its1 get csr | grep -c Pending) -ge 2 ]; then
+        echo "Both CSRs found."
+        break
+      fi
+      echo "Waiting for CSRs to appear..."
+      sleep 10
+    done
+    ```
 
 3. Once the CSRs are created, approve the CSRs complete the cluster registration with the command:
 
