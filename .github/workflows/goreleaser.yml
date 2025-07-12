@@ -27,6 +27,8 @@ jobs:
     outputs:
       digest-controller-manager: ${{ steps.build-images.outputs.digest-controller-manager }}
       digest-ocm-transport-controller: ${{ steps.build-images.outputs.digest-ocm-transport-controller }}
+      image-controller-manager: ${{ steps.build-images.outputs.image-controller-manager }}
+      image-ocm-transport-controller: ${{ steps.build-images.outputs.image-ocm-transport-controller }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -71,7 +73,7 @@ jobs:
 
       # Build and push container images via ko; capture digests for SLSA provenance
       - name: Set up ko
-        uses: ko-build/setup-ko@v0.6
+        uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
 
       - name: Build & push controller images (ko)
         id: build-images
@@ -82,13 +84,17 @@ jobs:
           # Publish controller-manager
           CM_REF=$(ko publish ./cmd/controller-manager --tags "${{ env.VERSION }}")
           CM_DIGEST=${CM_REF##*@}
+          CM_IMAGE_PATH=${CM_REF%@*}
 
           # Publish ocm-transport-controller
           OT_REF=$(ko publish ./pkg/transport/ocm-transport-controller --tags "${{ env.VERSION }}")
           OT_DIGEST=${OT_REF##*@}
+          OT_IMAGE_PATH=${OT_REF%@*}
 
           echo "digest-controller-manager=${CM_DIGEST}" >> "$GITHUB_OUTPUT"
           echo "digest-ocm-transport-controller=${OT_DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "image-controller-manager=${CM_IMAGE_PATH}" >> "$GITHUB_OUTPUT"
+          echo "image-ocm-transport-controller=${OT_IMAGE_PATH}" >> "$GITHUB_OUTPUT"
 
       - name: Package and push charts
         run: |
@@ -153,7 +159,7 @@ jobs:
     if: always()
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
     with:
-      image: ghcr.io/${{ github.repository_owner }}/kubestellar/${{ matrix.target }}
+      image: ${{ needs.goreleaser.outputs[format('image-{0}', matrix.target)] }}
       registry-username: ${{ github.actor }}
       digest: ${{ needs.goreleaser.outputs[format('digest-{0}', matrix.target)] }}
     secrets:
