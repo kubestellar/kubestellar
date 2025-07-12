@@ -4,11 +4,6 @@ on:
   workflow_call:
   workflow_dispatch:
     inputs:
-      kubeflexVersion:
-        description: "KubeFlex version to test against (e.g., v0.8.9)"
-        required: false
-        default: "v0.8.9"
-        type: string
       testFlags:
         description: "Command line flags for run-test.sh"
         required: false
@@ -37,8 +32,11 @@ permissions:
 
 jobs:
   ginkgo-kubeflex-compatibility-test:
-    name: Ginkgo Tests with KubeFlex Compatibility
+    name: Ginkgo Tests with KubeFlex Compatibility (KubeFlex ${{ matrix.kubeflexVersion }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kubeflexVersion: ["v0.8.0", "v0.8.9", "v0.9.0"]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
@@ -56,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: |\
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          KUBEFLEX_VERSION=${{ github.event.inputs.kubeflexVersion }}
+          KUBEFLEX_VERSION=${{ matrix.kubeflexVersion }}
           wget https://github.com/kubestellar/kubeflex/releases/download/${KUBEFLEX_VERSION}/kubeflex_${KUBEFLEX_VERSION#v}_linux_amd64.tar.gz
           tar -xvf kubeflex_${KUBEFLEX_VERSION#v}_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
@@ -169,8 +167,11 @@ jobs:
           kill %
 
   bash-kubeflex-compatibility-test:
-    name: Bash Tests with KubeFlex Compatibility
+    name: Bash Tests with KubeFlex Compatibility (KubeFlex ${{ matrix.kubeflexVersion }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kubeflexVersion: ["v0.8.0", "v0.8.9", "v0.9.0"]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
@@ -188,7 +189,7 @@ jobs:
       - name: Install dependencies
         run: |\
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          KUBEFLEX_VERSION=${{ github.event.inputs.kubeflexVersion }}
+          KUBEFLEX_VERSION=${{ matrix.kubeflexVersion }}
           wget https://github.com/kubestellar/kubeflex/releases/download/${KUBEFLEX_VERSION}/kubeflex_${KUBEFLEX_VERSION#v}_linux_amd64.tar.gz
           tar -xvf kubeflex_${KUBEFLEX_VERSION#v}_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
