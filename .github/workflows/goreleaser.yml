@@ -4,14 +4,19 @@ on:
   push:
     tags:
       - "v*"
+  # Allow manual or branch-triggered runs without tags
+  workflow_dispatch:
 
 permissions:
   contents: read
   packages: read
 
+# Global environment variables
 env:
   REGISTRY: ghcr.io
   CORE_CHART_PATH: ./core-chart
+  # Use tag when present, else fall back to commit SHA for prerelease versioning
+  VERSION: ${{ github.ref_type == 'tag' && github.ref_name || format('0.0.0-{0}', github.sha) }}
 
 jobs:
   goreleaser:
@@ -19,6 +24,9 @@ jobs:
     permissions:
       contents: write
       packages: write
+    outputs:
+      digest-controller-manager: ${{ steps.build-images.outputs.digest-controller-manager }}
+      digest-ocm-transport-controller: ${{ steps.build-images.outputs.digest-ocm-transport-controller }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -61,14 +69,38 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Build and push container images via ko; capture digests for SLSA provenance
+      - name: Set up ko
+        uses: ko-build/setup-ko@v0.6
+
+      - name: Build & push controller images (ko)
+        id: build-images
+        run: |
+          set -euo pipefail
+          CM_IMAGE=${{ env.REGISTRY }}/${{ github.repository_owner }}/kubestellar/controller-manager
+          OT_IMAGE=${{ env.REGISTRY }}/${{ github.repository_owner }}/kubestellar/ocm-transport-controller
+
+          CM_DIGEST=$(ko publish ./cmd/controller-manager --tags "${VERSION}" "${CM_IMAGE}")
+          OT_DIGEST=$(ko publish ./pkg/transport/ocm-transport-controller --tags "${VERSION}" "${OT_IMAGE}")
+
+          echo "digest-controller-manager=${CM_DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "digest-ocm-transport-controller=${OT_DIGEST}" >> "$GITHUB_OUTPUT"
+
       - name: Package and push charts
         run: |
-          chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
+          sed -i "s/^KUBESTELLAR_VERSION:.*$/KUBESTELLAR_VERSION: \"${VERSION}\"/g" ${{ env.CORE_CHART_PATH }}/values.yaml
 
-          sed -i "s/^KUBESTELLAR_VERSION:.*$/KUBESTELLAR_VERSION: \"${chartVersion}\"/g" ${{ env.CORE_CHART_PATH }}/values.yaml
+          helm package ${{ env.CORE_CHART_PATH }} --destination . --version ${VERSION} --app-version ${VERSION} --dependency-update
+          helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/kubestellar
 
-          helm package ${{ env.CORE_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
-          helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/antedotee/kubestellar
+      # Upload the GoReleaser distribution so downstream jobs (hash combiner & provenance gen)
+      # can fetch it by name "goreleaser-dist". We pin to the major version for security & updates.
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: goreleaser-dist
+          path: dist/
+          retention-days: 7
 
   # Generate hashes for binary artifacts for SLSA provenance
   combine_hashes:
@@ -114,10 +146,10 @@ jobs:
       actions: read
       id-token: write
       packages: write
-    if: startsWith(github.ref, 'refs/tags/')
+    if: always()
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
     with:
-      image: ghcr.io/antedotee/kubestellar/${{ matrix.target }}
+      image: ghcr.io/${{ github.repository_owner }}/kubestellar/${{ matrix.target }}
       registry-username: ${{ github.actor }}
       digest: ${{ needs.goreleaser.outputs[format('digest-{0}', matrix.target)] }}
     secrets:
