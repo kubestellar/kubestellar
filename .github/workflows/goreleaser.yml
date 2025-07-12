@@ -137,6 +137,7 @@ jobs:
   # Generate SLSA provenance for binary artifacts
   provenance:
     needs: [combine_hashes]
+    if: ${{ needs.combine_hashes.outputs.hashes != '' }}
     permissions:
       actions: read
       id-token: write
