@@ -75,13 +75,17 @@ jobs:
 
       - name: Build & push controller images (ko)
         id: build-images
+        env:
+          KO_DOCKER_REPO: ghcr.io/${{ github.repository_owner }}/kubestellar
         run: |
           set -euo pipefail
-          CM_IMAGE=${{ env.REGISTRY }}/${{ github.repository_owner }}/kubestellar/controller-manager
-          OT_IMAGE=${{ env.REGISTRY }}/${{ github.repository_owner }}/kubestellar/ocm-transport-controller
+          # Publish controller-manager
+          CM_REF=$(ko publish ./cmd/controller-manager --tags "${{ env.VERSION }}")
+          CM_DIGEST=${CM_REF##*@}
 
-          CM_DIGEST=$(ko publish ./cmd/controller-manager --tags "${VERSION}" "${CM_IMAGE}")
-          OT_DIGEST=$(ko publish ./pkg/transport/ocm-transport-controller --tags "${VERSION}" "${OT_IMAGE}")
+          # Publish ocm-transport-controller
+          OT_REF=$(ko publish ./pkg/transport/ocm-transport-controller --tags "${{ env.VERSION }}")
+          OT_DIGEST=${OT_REF##*@}
 
           echo "digest-controller-manager=${CM_DIGEST}" >> "$GITHUB_OUTPUT"
           echo "digest-ocm-transport-controller=${OT_DIGEST}" >> "$GITHUB_OUTPUT"

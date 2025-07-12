@@ -25,7 +25,7 @@ set -e
 
 GITHUB_WORKFLOWS_PATH="./.github/workflows"
 REVERSEMAP_FILE=".gha-reversemap.yml"
-YQ_REQUIRED_VERSION="v4.45"
+YQ_MIN_VERSION="4.45"
 GIT_COMMITSHA_LENGTH=40
 TMP_OUTPUT="/tmp/$(date -u -Iseconds | cut -d '+' -f1).json"
 
@@ -86,9 +86,12 @@ _return() {
 # Function to check if yq is installed and has the required version
 _check_yq_version() {
     if command -v yq >/dev/null 2>&1; then
-        INSTALLED_VERSION=$(yq --version 2>/dev/null)
-        if ! [[ "$INSTALLED_VERSION" =~ $YQ_REQUIRED_VERSION ]]; then
-            _exit_with_error $ERR_YQ_NOT_INSTALLED "yq is installed but the version is $INSTALLED_VERSION. Required version is $YQ_REQUIRED_VERSION."
+        local ver
+        ver=$(yq --version 2>/dev/null | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+" | sed 's/^v//')
+        # Compare versions (requires sort -V which is available on GNU and busybox)
+        local required="$YQ_MIN_VERSION"
+        if [[ $(printf '%s\n' "$required" "$ver" | sort -V | head -n1) != "$required" ]]; then
+            _exit_with_error $ERR_YQ_NOT_INSTALLED "yq version $ver is older than required >=$required"
         fi
     else
         _exit_with_error $ERR_YQ_NOT_INSTALLED "yq is not installed."
