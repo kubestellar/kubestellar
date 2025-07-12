@@ -733,13 +733,29 @@ func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, bind
 	groupResources := sets.New[metav1.GroupResource]()
 	wrapees := make([]WrapeeWithUID, 0)
 	kindToResource := map[schema.GroupKind]string{}
+
+	// Map from UID to list of object references (for duplicate detection)
+	uidToRefs := make(map[string][]string)
+	logger := klog.FromContext(ctx)
+
 	appendObj := func(gvr metav1.GroupVersionResource, object *unstructured.Unstructured, createOnly bool) {
 		gr := metav1.GroupResource{Group: gvr.Group, Resource: gvr.Resource}
 		groupResources.Insert(gr)
 		kindToResource[object.GroupVersionKind().GroupKind()] = gvr.Resource
+		uid := string(object.GetUID())
+		objRef := fmt.Sprintf("%s/%s/%s", object.GetKind(), object.GetNamespace(), object.GetName())
+		if refs, found := uidToRefs[uid]; found {
+			refs = append(refs, objRef)
+			uidToRefs[uid] = refs
+			if len(refs) == 2 { // Only warn on first duplicate
+				logger.V(1).Info("Duplicate object UID detected across WDSes", "uid", uid, "objectRefs", refs, "wdsName", c.wdsName)
+			}
+		} else {
+			uidToRefs[uid] = []string{objRef}
+		}
 		wrapees = append(wrapees, WrapeeWithUID{
 			transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), createOnly),
-			string(object.GetUID())})
+			uid})
 	}
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clause := range binding.Spec.Workload.ClusterScope {
