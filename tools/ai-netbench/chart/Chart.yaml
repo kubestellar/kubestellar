@@ -1,0 +1,4 @@
+apiVersion: v2
+name: ai-netbench
+version: 0.1.0
+description: Distributed AI/ML network benchmarking suite for KubeStellar

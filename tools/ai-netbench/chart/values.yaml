@@ -1,0 +1,10 @@
+mode: allreduce
+nodeCount: 4
+dataSize: 1048576   # 1MB per message
+rounds: 10
+topology: ring      # or tree
+psCount: 1
+bulkTransfer: false
+image:
+  repository: ghcr.io/kubestellar/ai-netbench
+  tag: latest
