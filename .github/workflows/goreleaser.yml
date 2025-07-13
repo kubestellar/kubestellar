@@ -25,6 +25,12 @@ jobs:
       contents: write
       packages: write
     outputs:
+      # Hash outputs for binary artifacts (following KubeEdge pattern)
+      hash-controller-manager-linux-amd64: ${{ steps.hash.outputs.hash-controller-manager-linux-amd64 }}
+      hash-controller-manager-linux-arm64: ${{ steps.hash.outputs.hash-controller-manager-linux-arm64 }}
+      hash-ocm-transport-controller-linux-amd64: ${{ steps.hash.outputs.hash-ocm-transport-controller-linux-amd64 }}
+      hash-ocm-transport-controller-linux-arm64: ${{ steps.hash.outputs.hash-ocm-transport-controller-linux-arm64 }}
+      # Container digest outputs
       digest-controller-manager: ${{ steps.build-images.outputs.digest-controller-manager }}
       digest-ocm-transport-controller: ${{ steps.build-images.outputs.digest-ocm-transport-controller }}
       image-controller-manager: ${{ steps.build-images.outputs.image-controller-manager }}
@@ -59,6 +65,35 @@ jobs:
           USER: ${{ github.actor }}
           EMAIL: ${{ github.actor}}@users.noreply.github.com
 
+      - name: Generate hashes for binary artifacts (KubeEdge pattern)
+        id: hash
+        run: |
+          # Generate hashes for controller-manager archives
+          if [ -f "dist/controller-manager_${{ env.VERSION }}_linux_amd64.tar.gz" ]; then
+            echo "hash-controller-manager-linux-amd64=$( \
+              sha256sum dist/controller-manager_${{ env.VERSION }}_linux_amd64.tar.gz | base64 -w0 \
+            )" >> "$GITHUB_OUTPUT"
+          fi
+          
+          if [ -f "dist/controller-manager_${{ env.VERSION }}_linux_arm64.tar.gz" ]; then
+            echo "hash-controller-manager-linux-arm64=$( \
+              sha256sum dist/controller-manager_${{ env.VERSION }}_linux_arm64.tar.gz | base64 -w0 \
+            )" >> "$GITHUB_OUTPUT"
+          fi
+          
+          # Generate hashes for ocm-transport-controller archives
+          if [ -f "dist/ocm-transport-controller_${{ env.VERSION }}_linux_amd64.tar.gz" ]; then
+            echo "hash-ocm-transport-controller-linux-amd64=$( \
+              sha256sum dist/ocm-transport-controller_${{ env.VERSION }}_linux_amd64.tar.gz | base64 -w0 \
+            )" >> "$GITHUB_OUTPUT"
+          fi
+          
+          if [ -f "dist/ocm-transport-controller_${{ env.VERSION }}_linux_arm64.tar.gz" ]; then
+            echo "hash-ocm-transport-controller-linux-arm64=$( \
+              sha256sum dist/ocm-transport-controller_${{ env.VERSION }}_linux_arm64.tar.gz | base64 -w0 \
+            )" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set up Helm
         uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112
         env:
@@ -78,15 +113,6 @@ jobs:
 
           helm package ${{ env.CORE_CHART_PATH }} --destination . --version ${VERSION} --app-version ${VERSION} --dependency-update
           helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/kubestellar
-
-      # Upload the GoReleaser distribution so downstream jobs (hash combiner & provenance gen)
-      # can fetch it by name "goreleaser-dist". We pin to the major version for security & updates.
-      - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: goreleaser-dist
-          path: dist/
-          retention-days: 7
 
       # Build and push container images via ko; capture digests for SLSA provenance
       - name: Set up ko
@@ -113,25 +139,19 @@ jobs:
           echo "image-controller-manager=${CM_IMAGE_PATH}" >> "$GITHUB_OUTPUT"
           echo "image-ocm-transport-controller=${OT_IMAGE_PATH}" >> "$GITHUB_OUTPUT"
 
-  # Generate hashes for binary artifacts for SLSA provenance
+  # Generate hashes for binary artifacts for SLSA provenance (KubeEdge pattern)
   combine_hashes:
     needs: [goreleaser]
     runs-on: ubuntu-latest
     outputs:
       hashes: ${{ steps.hashes.outputs.hashes }}
+    env:
+      HASHES: ${{ toJSON(needs.goreleaser.outputs) }}
     steps:
-      - name: Download release artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          name: goreleaser-dist
-          path: dist
-
       - id: hashes
         run: |
-          # Find all binary artifacts and generate base64-encoded hashes
-          find dist -name "*.tar.gz" -o -name "*.zip" | while read file; do
-            echo "$(basename "$file")=$(sha256sum "$file" | cut -d' ' -f1 | base64 -w0)"
-          done > hashes.txt
+          # Following KubeEdge's exact pattern
+          echo "$HASHES" | jq -r '.[] | @base64d' | sed "/^$/d" > hashes.txt
           echo "hashes=$(cat hashes.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
 
   # Generate SLSA provenance for binary artifacts

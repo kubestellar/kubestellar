@@ -24,6 +24,25 @@ builds:
   - arm64
   env:
   - CGO_ENABLED=0
+
+archives:
+- id: "controller-manager"
+  builds:
+  - "controller-manager"
+  format: tar.gz
+  name_template: "controller-manager_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  files:
+  - "README.md"
+  - "LICENSE"
+- id: "ocm-transport-controller"
+  builds:
+  - "ocm-transport-controller"
+  format: tar.gz
+  name_template: "ocm-transport-controller_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  files:
+  - "README.md"
+  - "LICENSE"
+
 kos:
 - id: kubestellar-controller-manager
   repository: ghcr.io/antedotee/kubestellar/controller-manager
@@ -49,10 +68,12 @@ kos:
   platforms:
   - linux/amd64
   - linux/arm64
+
 release:
   draft: false
   prerelease: auto
   mode: keep-existing
+
 sboms:
 - id: source
   artifacts: source
