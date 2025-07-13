@@ -25,16 +25,13 @@ jobs:
       contents: write
       packages: write
     outputs:
-      # Hash outputs for binary artifacts (following KubeEdge pattern)
-      hash-controller-manager-linux-amd64: ${{ steps.hash.outputs.hash-controller-manager-linux-amd64 }}
-      hash-controller-manager-linux-arm64: ${{ steps.hash.outputs.hash-controller-manager-linux-arm64 }}
-      hash-ocm-transport-controller-linux-amd64: ${{ steps.hash.outputs.hash-ocm-transport-controller-linux-amd64 }}
-      hash-ocm-transport-controller-linux-arm64: ${{ steps.hash.outputs.hash-ocm-transport-controller-linux-arm64 }}
       # Container digest outputs
       digest-controller-manager: ${{ steps.build-images.outputs.digest-controller-manager }}
       digest-ocm-transport-controller: ${{ steps.build-images.outputs.digest-ocm-transport-controller }}
       image-controller-manager: ${{ steps.build-images.outputs.image-controller-manager }}
       image-ocm-transport-controller: ${{ steps.build-images.outputs.image-ocm-transport-controller }}
+      # Binary hash outputs (will be populated dynamically)
+      hash-outputs: ${{ steps.hash.outputs.hash-outputs }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -68,31 +65,42 @@ jobs:
       - name: Generate hashes for binary artifacts (KubeEdge pattern)
         id: hash
         run: |
-          # Generate hashes for controller-manager archives
-          if [ -f "dist/controller-manager_${{ env.VERSION }}_linux_amd64.tar.gz" ]; then
-            echo "hash-controller-manager-linux-amd64=$( \
-              sha256sum dist/controller-manager_${{ env.VERSION }}_linux_amd64.tar.gz | base64 -w0 \
-            )" >> "$GITHUB_OUTPUT"
-          fi
+          # Debug: List all files in dist directory
+          echo "Files in dist directory:"
+          ls -la dist/
           
-          if [ -f "dist/controller-manager_${{ env.VERSION }}_linux_arm64.tar.gz" ]; then
-            echo "hash-controller-manager-linux-arm64=$( \
-              sha256sum dist/controller-manager_${{ env.VERSION }}_linux_arm64.tar.gz | base64 -w0 \
-            )" >> "$GITHUB_OUTPUT"
-          fi
+          # Track if we generated any hashes
+          hash_count=0
           
-          # Generate hashes for ocm-transport-controller archives
-          if [ -f "dist/ocm-transport-controller_${{ env.VERSION }}_linux_amd64.tar.gz" ]; then
-            echo "hash-ocm-transport-controller-linux-amd64=$( \
-              sha256sum dist/ocm-transport-controller_${{ env.VERSION }}_linux_amd64.tar.gz | base64 -w0 \
-            )" >> "$GITHUB_OUTPUT"
-          fi
+          # Generate hashes for all tar.gz files found (dynamic approach)
+          for file in dist/*.tar.gz; do
+            if [ -f "$file" ]; then
+              filename=$(basename "$file")
+              # Extract component, version, os, arch from filename
+              # Expected format: controller-manager_v0.0.12-test_linux_amd64.tar.gz
+              if [[ "$filename" =~ ^([^_]+)_.*_([^_]+)_([^_]+)\.tar\.gz$ ]]; then
+                component="${BASH_REMATCH[1]}"
+                os="${BASH_REMATCH[2]}"
+                arch="${BASH_REMATCH[3]}"
+                
+                # Generate hash in KubeEdge format
+                hash_value=$(sha256sum "$file" | base64 -w0)
+                hash_key="hash-${component}-${os}-${arch}"
+                
+                echo "Generated hash for $filename: $hash_key"
+                echo "${hash_key}=${hash_value}" >> "$GITHUB_OUTPUT"
+                hash_count=$((hash_count + 1))
+              fi
+            fi
+          done
           
-          if [ -f "dist/ocm-transport-controller_${{ env.VERSION }}_linux_arm64.tar.gz" ]; then
-            echo "hash-ocm-transport-controller-linux-arm64=$( \
-              sha256sum dist/ocm-transport-controller_${{ env.VERSION }}_linux_arm64.tar.gz | base64 -w0 \
-            )" >> "$GITHUB_OUTPUT"
+          # Set flag indicating if we have hashes
+          if [ $hash_count -gt 0 ]; then
+            echo "hash-outputs=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "hash-outputs=false" >> "$GITHUB_OUTPUT"
           fi
+          echo "Generated $hash_count hashes"
 
       - name: Set up Helm
         uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112
@@ -150,14 +158,29 @@ jobs:
     steps:
       - id: hashes
         run: |
-          # Following KubeEdge's exact pattern
-          echo "$HASHES" | jq -r '.[] | @base64d' | sed "/^$/d" > hashes.txt
-          echo "hashes=$(cat hashes.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
+          # Debug: Print the raw HASHES JSON
+          echo "Raw HASHES JSON:"
+          echo "$HASHES"
+          
+          # Following KubeEdge's exact pattern, but filter for hash- outputs only
+          echo "$HASHES" | jq -r 'to_entries | map(select(.key | startswith("hash-"))) | map(.value) | .[] | @base64d' | sed "/^$/d" > hashes.txt
+          
+          # Debug: Print the processed hashes
+          echo "Processed hashes:"
+          cat hashes.txt
+          
+          # Always output something, even if empty, to prevent job skipping
+          if [ -s hashes.txt ]; then
+            echo "hashes=$(cat hashes.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
+          else
+            echo "hashes=" >> "$GITHUB_OUTPUT"
+          fi
 
   # Generate SLSA provenance for binary artifacts
   provenance:
     needs: [combine_hashes]
-    if: ${{ needs.combine_hashes.outputs.hashes != '' }}
+    # Only run if we have hash outputs from the goreleaser job
+    if: ${{ needs.goreleaser.outputs.hash-outputs == 'true' }}
     permissions:
       actions: read
       id-token: write
