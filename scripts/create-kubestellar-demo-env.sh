@@ -104,32 +104,37 @@ context_clean_up() {
 }
 
 checking_cluster() {
-    found=false
-
-    while true; do
-
-        output=$(kubectl --context its1 get csr)
-
-        while IFS= read -r line; do
-
-            if echo "$line" | grep -q $1; then
-                echo "$1 has been found, approving CSR"
-                clusteradm --context its1 accept --clusters "$1"
-                found=true
+    local cluster_name="$1"
+    echo "Waiting for CSR for $cluster_name..."
+    
+    # Wait for CSR to be created with cluster label
+    # OCM creates CSRs with specific labels for cluster identification
+    echo "Waiting for CSR creation for cluster $cluster_name..."
+    kubectl --context its1 wait --for=create csr \
+      -l cluster.open-cluster-management.io/clustername=$cluster_name \
+      --timeout=300s || {
+        # Fallback: wait for any CSR containing the cluster name
+        echo "Specific label not found, waiting for CSR with cluster name pattern..."
+        local timeout=300
+        local elapsed=0
+        while [ $elapsed -lt $timeout ]; do
+            if kubectl --context its1 get csr --no-headers | grep -q "$cluster_name"; then
+                echo "CSR for $cluster_name found"
                 break
             fi
-
-        done <<< "$output"
-
-        if [ "$found" = true ]; then
-            break
-
-        else
-            echo "CSR for $1 not found. Trying again..."
-            sleep 20
+            echo "Waiting for CSR for $cluster_name... (${elapsed}s/${timeout}s)"
+            sleep 10
+            elapsed=$((elapsed + 10))
+        done
+        
+        if [ $elapsed -ge $timeout ]; then
+            echo "Timeout waiting for CSR for $cluster_name"
+            return 1
         fi
-
-    done
+    }
+    
+    echo "$cluster_name CSR found, approving..."
+    clusteradm --context its1 accept --clusters "$cluster_name"
 }
 
 echo -e "\nStarting environment clean up..."
@@ -169,6 +174,10 @@ for cluster in "${clusters[@]}"; do
     }; then
         echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
         kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
+        
+        # Wait for cluster to be ready before proceeding
+        echo "Waiting for cluster $cluster nodes to be ready..."
+        kubectl --context "${cluster}" wait --for=condition=ready nodes --all --timeout=300s
     else
         echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
         cat "${cluster_log_dir}/${cluster}.log" >&2
