@@ -14,6 +14,17 @@ The two ways to create this simple configuration are as follows.
 
 For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user `root` in Linux. There is a [known issue about this](knownissue-wsl-ghcr-helm.md).
 
+### Important: Shell Variables for Example Scenarios
+
+After completing the setup, you will need to define several shell variables to run the example scenarios. The meanings of these variables are defined [at the start of the example scenarios document](example-scenarios.md#assumptions-and-variables). What is shown later in this document are the specific values that are correct for the setup procedure described in this guide.
+
+The key variables you'll need are:
+
+- `host_context`, `its_cp`, `its_context` - for accessing the hosting cluster and ITS
+- `wds_cp`, `wds_context` - for accessing the WDS
+- `wec1_name`, `wec2_name`, `wec1_context`, `wec2_context` - for accessing the workload execution clusters
+- `label_query_both`, `label_query_one` - for cluster selection in scenarios
+
 ## Quick Start Using the Automated Script
 
 If you want to quickly setup a basic environment, you can use our automated installation script.
@@ -24,22 +35,27 @@ Be sure to [install the software prerequisites](pre-reqs.md) _before_ running th
 
 The script will check for the pre-reqs and exit if they are not present.
 
-### Run the script!
+### Run the script
+
 The script can install KubeStellar's demonstration environment on top of kind or k3d
 
 For use with kind
+
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform kind
 ```
 
 For use with k3d
+
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/create-kubestellar-demo-env.sh) --platform k3d
 ```
 
 If successful, the script will output the variable definitions that you would use when proceeding to the example scenarios. After successfully running the script, proceed to the [Exercise KubeStellar](#exercise-kubestellar) section below.
 
-_Note: the script does the same things as described in the [Step by Step Setup](#step-by-step-setup) but with maximum concurrency, so it can complete faster. This makes the script actually more complicated than the step-by-step process below. While this is great for getting started quickly with a demo system, you may want to follow the manual setup below to better understand the components and how to create a [configuration that meets your needs](#next-steps)._
+_Note: the script does the same things as described in the [Step by Step Setup](#step-by-step-setup) but with a little more concurrency, so it can complete a bit faster. While this is great for getting started quickly with a demo system, you may want to follow the manual setup below to better understand the components and how to create a [configuration that meets your needs](#next-steps)._
+
+---
 
 ## Step by Step Setup
 
@@ -66,7 +82,7 @@ $ bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v0.27.1/
 ```
 
 This setup recipe uses [kind](https://kind.sigs.k8s.io/) to create three Kubernetes clusters on your machine.
-Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to “too many open files”](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
+Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to "too many open files"](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
 
 ### Cleanup from previous runs
 
@@ -104,10 +120,10 @@ bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ con
 
 ```shell
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-    --version $kubestellar_version \
-    --set-json='ITSes=[{"name":"its1"}]' \
-    --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
-    --set-json='verbosity.default=5' # so we can debug your problem reports
+    --version "$kubestellar_version" \
+    --set-json ITSes='[{"name":"its1"}]' \
+    --set-json WDSes='[{"name":"wds1"},{"name":"wds2","type":"host"}]' \
+    --set verbosity.default=5  # so we can debug your problem reports
 ```
 
 That command will print some notes about how to get kubeconfig "contexts" named "its1", "wds1", and "wds2" defined. Do that, because those contexts are used in the steps that follow.
@@ -131,13 +147,57 @@ kubectl --context kind-kubeflex wait -n its1-system job.batch/its-with-clusterad
 
 *To learn more about the Core Helm Chart, refer to the [Core Helm Chart documentation](./core-chart.md)*
 
-### Create and register two workload execution cluster(s)
-{% include-markdown "direct/example-wecs.md" heading-offset=2 %}
+### Create and register two workload execution clusters
 
+The following steps show how to create two new `kind` clusters and
+register them with the hub as described in the
+[official open cluster management docs](https://open-cluster-management.io/docs/getting-started/installation/start-the-control-plane/).
 
-### Variables for running the example scenarios.
+Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this `kind` "known issue": [Pod errors due to "too many open files"](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
 
-Before moving on to try exercising KubeStellar, you will need the following shell variable settings to inform the scenario commands about the configuration.
+1. Execute the following commands to create two kind clusters, named `cluster1` and `cluster2`, and register them with the OCM hub. These clusters will serve as workload clusters. If you have previously executed these commands, you might already have contexts named `cluster1` and `cluster2`. If so, you can remove these contexts using the commands `kubectl config delete-context cluster1` and `kubectl config delete-context cluster2`.
+
+    ```shell
+    : set flags to "" if you have installed KubeStellar on an OpenShift cluster
+    flags="--force-internal-endpoint-lookup"
+    clusters=(cluster1 cluster2);
+    for cluster in "${clusters[@]}"; do
+       kind create cluster --name ${cluster}
+       kubectl config rename-context kind-${cluster} ${cluster}
+       clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${flags}'"}' | sh
+    done
+    ```
+
+    The `clusteradm` command grabs a token from the hub (`its1` context), and constructs the command to apply the new cluster
+    to be registered as a managed cluster on the OCM hub.
+
+2. Repeatedly issue the command:
+
+    ```shell
+    kubectl --context its1 get csr
+    ```
+
+    until you see that the certificate signing requests (CSR) for both cluster1 and cluster2 exist.
+    Note that the CSRs condition is supposed to be `Pending` until you approve them in step 4.
+
+3. Once the CSRs are created, approve the CSRs complete the cluster registration with the command:
+
+    ```shell
+    clusteradm --context its1 accept --clusters cluster1
+    clusteradm --context its1 accept --clusters cluster2
+    ```
+
+4. Check the new clusters are in the OCM inventory and label them:
+
+    ```shell
+    kubectl --context its1 get managedclusters
+    kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
+    kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
+    ```
+
+### Variables for running the example scenarios
+
+**Important**: Before moving on to try exercising KubeStellar, you will need the following shell variable settings to inform the scenario commands about the configuration.
 
 ```shell
 host_context=kind-kubeflex
@@ -153,11 +213,13 @@ label_query_both=location-group=edge
 label_query_one=name=cluster1
 ```
 
+**Note**: These variable values are specific to the setup described in this guide. If you followed a different setup procedure, you will need to adjust these values accordingly.
+
 ## Exercise KubeStellar
 
 Now that your system is running, you can try some example scenarios
 
-1. Define the needed shell variables, using either the settings output as the script completes or the settings shown just above from the step-by-step instructions. Their meanings are defined [at the start of the example scenarios document](example-scenarios.md#assumptions-and-variables).
+1. **Define the needed shell variables** using the settings from the [Variables for running the example scenarios](#variables-for-running-the-example-scenarios) section above. If you used the automated script, use the settings it output. The meanings of these variables are defined [at the start of the example scenarios document](example-scenarios.md#assumptions-and-variables).
 
 2. Proceed to [Scenario 1 (multi-cluster workload deployment with kubectl) in the example scenarios](example-scenarios.md#scenario-1-multi-cluster-workload-deployment-with-kubectl) and/or other examples on the same page, after defining the shell variables that characterize the configuration created above.
 

@@ -6,53 +6,62 @@ on:
   workflow_dispatch:
     inputs:
       testFlags:
-        description: 'Command line flags for run-test.sh'
+        description: "Command line flags for run-test.sh"
         required: false
-        default: ''
+        default: ""
         type: choice
         options:
-        - ''
-        - '--released'
+          - ""
+          - "--released"
   pull_request:
     branches:
       - main
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/**"
+      - "!.github/workflows/pr-test-e2e.yml"
+      - "**/*.md"
   push:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/**"
+      - "!.github/workflows/pr-test-e2e.yml"
+      - "**/*.md"
+
+permissions:
+  contents: read
 
 jobs:
   ginkgo-test:
     name: Tests in ginkgo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
-      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
           go-version: 1.24
           cache: true
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f 
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
         id: install
 
-      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d 
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
 
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.8.8/kubeflex_0.8.8_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.8.8_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.0/kubeflex_0.9.0_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.0_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.8.8_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.9.0_linux_amd64.tar.gz
           go install github.com/onsi/ginkgo/v2/ginkgo
 
       - name: Run test
@@ -164,26 +173,26 @@ jobs:
     name: Test in bash
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
-      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
           go-version: 1.24
           cache: true
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@3e0aec4d80787158d308d7b364cb1b702e7feb7f 
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
         id: install
 
-      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d 
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
 
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.8.8/kubeflex_0.8.8_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.8.8_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.0/kubeflex_0.9.0_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.0_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.8.8_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.9.0_linux_amd64.tar.gz
 
       - name: Run test
         env:

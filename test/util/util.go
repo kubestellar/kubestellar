@@ -17,7 +17,6 @@ limitations under the License.
 package util
 
 import (
-	"bytes"
 	"context"
 	goerrors "errors"
 	"fmt"
@@ -112,21 +111,15 @@ func CreateNS(ctx context.Context, client *kubernetes.Clientset, name string) {
 
 func Cleanup(ctx context.Context) {
 	ginkgo.GinkgoHelper()
-	var e, o bytes.Buffer
 	cmd := exec.CommandContext(ctx, "../common/cleanup.sh")
-	cmd.Stderr = &e
-	cmd.Stdout = &o
+	cmd.Stderr = ginkgo.GinkgoWriter
+	cmd.Stdout = ginkgo.GinkgoWriter
 	err := cmd.Run()
-	if err != nil {
-		fmt.Fprintf(ginkgo.GinkgoWriter, "%s", o.String())
-		fmt.Fprintf(ginkgo.GinkgoWriter, "%s", e.String())
-	}
 	gomega.Expect(err).To(gomega.Succeed())
 }
 
 func SetupKubestellar(ctx context.Context, releasedFlag bool, otherFlags ...string) {
 	ginkgo.GinkgoHelper()
-	var e, o bytes.Buffer
 	var args []string
 	if releasedFlag {
 		args = []string{"--released"}
@@ -135,13 +128,9 @@ func SetupKubestellar(ctx context.Context, releasedFlag bool, otherFlags ...stri
 	commandName := "../common/setup-kubestellar.sh"
 	ginkgo.By(fmt.Sprintf("Execing command %#v", append([]string{commandName}, args...)))
 	cmd := exec.CommandContext(ctx, commandName, args...)
-	cmd.Stderr = &e
-	cmd.Stdout = &o
+	cmd.Stderr = ginkgo.GinkgoWriter
+	cmd.Stdout = ginkgo.GinkgoWriter
 	err := cmd.Run()
-	if err != nil {
-		fmt.Fprintf(ginkgo.GinkgoWriter, "%s", o.String())
-		fmt.Fprintf(ginkgo.GinkgoWriter, "%s", e.String())
-	}
 	gomega.Expect(err).To(gomega.Succeed())
 }
 

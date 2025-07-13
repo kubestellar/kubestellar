@@ -8,7 +8,7 @@ body:
     id: problem
     attributes:
       label: Feature Description
-      description: Is your feature request related to a problem? A clear and concise description of what the problem is.
+      description: "Is your feature request related to a problem? A clear and concise description of what the problem is. Also: before opening a new issue, look for an overlapping issue that you could contribute to instead."
       placeholder: I'm always frustrated when [...]
     validations:
       required: true
