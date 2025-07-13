@@ -81,6 +81,29 @@ fi
 mkdir -p ~/.kube
 export KUBECONFIG=~/.kube/config
 sudo kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml config view --raw > "$KUBECONFIG"
+
+# Wait for k3s service to be ready and kubectl to work
+echo "Waiting for k3s service to be ready..."
+timeout=300
+elapsed=0
+while [ $elapsed -lt $timeout ]; do
+    if sudo systemctl is-active --quiet k3s && kubectl get nodes >/dev/null 2>&1; then
+        echo "k3s service is ready!"
+        break
+    fi
+    echo "k3s service not ready yet, waiting... (${elapsed}s/${timeout}s)"
+    sleep 5
+    elapsed=$((elapsed + 5))
+done
+
+if [ $elapsed -ge $timeout ]; then
+    echo "Timeout waiting for k3s service to be ready"
+    exit 1
+fi
+
+echo "Waiting for k3s cluster nodes to be ready..."
+kubectl wait --for=condition=ready nodes --all --timeout=300s
+
 kubectl describe endpoints kubernetes
 
 echo "Installing an nginx ingress with SSL passthrough enabled..."
@@ -103,9 +126,16 @@ helm upgrade --install ingress-nginx ingress-nginx \
 
 if [[ "$wait" == "true" ]] ; then
   echo "Waiting for nginx ingress with SSL passthrough to complete..."
-  while [ -z "$(kubectl get pod --namespace ingress-nginx --selector=app.kubernetes.io/component=controller --no-headers -o name 2> /dev/null)" ] ;  do
-      sleep 5
-  done
+  
+  # Wait for nginx ingress controller pod to be created
+  echo "Waiting for nginx ingress controller pod to be created..."
+  kubectl wait --namespace ingress-nginx \
+    --for=create pod \
+    --selector=app.kubernetes.io/component=controller \
+    --timeout=300s
+  
+  # Wait for the pod to be ready
+  echo "Waiting for nginx ingress controller pod to be ready..."
   kubectl wait --namespace ingress-nginx \
     --for=condition=ready pod \
     --selector=app.kubernetes.io/component=controller \
