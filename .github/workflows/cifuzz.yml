@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - fuzzing-implementation
       - release-*
     paths-ignore:
       - '**.md'
@@ -53,4 +52,5 @@ jobs:
         if: failure() && steps.build.outcome == 'success'
         with:
           name: fuzzing-artifacts
-          path: ./out/artifacts 
+          path: ./out/artifacts
+ 
