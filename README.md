@@ -49,6 +49,11 @@ For usage, architecture, and other documentation, see [the website](https://kube
 
 We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md) guide and be sure to look at `main` or the release of interest to you.
 
+**Fuzzing in CI:**
+- KubeStellar runs automated fuzzing tests in CI on every pull request and push, using OSS-Fuzz and GitHub Actions.
+- If a fuzzing job fails, please review the crash artifacts and help fix the underlying bug or improve the fuzzer.
+- See [test/fuzz/README.md](test/fuzz/README.md) for details on how to add new fuzzers and interpret CI results.
+
 This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
 
 ## Our Roadmap

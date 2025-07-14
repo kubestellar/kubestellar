@@ -1,0 +1,56 @@
+name: CIFuzz
+
+on:
+  push:
+    branches:
+      - main
+      - fuzzing-implementation
+      - release-*
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '**/OWNERS'
+      - '**/MAINTAINERS'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '**/OWNERS'
+      - '**/MAINTAINERS'
+
+jobs:
+  Fuzzing:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.22.x
+
+      - name: Build Fuzzers
+        id: build
+        uses: google/oss-fuzz/infra/cifuzz/actions/build_fuzzers@master
+        with:
+          oss-fuzz-project-name: 'kubestellar'
+          dry-run: false
+          language: go
+
+      - name: Run Fuzzers
+        uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
+        with:
+          oss-fuzz-project-name: 'kubestellar'
+          fuzz-seconds: 1200
+          dry-run: false
+          language: go
+
+      - name: Upload Crash Artifacts
+        uses: actions/upload-artifact@v4
+        if: failure() && steps.build.outcome == 'success'
+        with:
+          name: fuzzing-artifacts
+          path: ./out/artifacts 
