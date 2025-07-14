@@ -1,0 +1,343 @@
+---
+name: "Security Scanning"
+
+on:
+  push:
+    branches:
+      - "main"
+      - "release-*"
+      - "sast-scan-fix"
+  pull_request:
+    branches:
+      - "main"
+      - "release-*"
+      - "sast-scan-fix"
+  schedule:
+    - cron: '0 12 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  codeql:
+    name: "CodeQL SAST Analysis"
+    runs-on: 'ubuntu-22.04'
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [go]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.24.1'
+          cache: true
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@39edc492dbe16b1465b0cafca41432d857bdb31a
+        with:
+          languages: ${{ matrix.language }}
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@39edc492dbe16b1465b0cafca41432d857bdb31a
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@39edc492dbe16b1465b0cafca41432d857bdb31a
+        with:
+          category: "/language:${{matrix.language}}"
+          upload: true
+
+  osv-scanner:
+    name: "OSV Vulnerability Scan"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: '1.24.1'
+          cache: true
+      - name: Generate SBOM
+        run: |
+          go mod tidy
+          go mod download
+          go install github.com/CycloneDX/cyclonedx-gomod/cmd/cyclonedx-gomod@latest
+          if [ -f "go.mod" ]; then
+            echo "Generating SBOM from go.mod..."
+            cyclonedx-gomod mod -output bom.xml || {
+              echo "SBOM generation failed, trying alternative approach..."
+              go list -mod=readonly -m -json all > modules.json || echo "Module listing failed"
+              if [ -f "modules.json" ]; then
+                echo "Generated modules.json as fallback"
+              fi
+            }
+          else
+            echo "No go.mod found, skipping SBOM generation"
+          fi
+      - name: Install OSV Scanner
+        run: |
+          go install github.com/google/osv-scanner/cmd/osv-scanner@latest
+      - name: Cache OSV database
+        run: |
+          mkdir -p ~/.cache/osv
+          echo "OSV scanner will update database automatically during scan"
+        continue-on-error: true
+      - name: Run OSV Scanner
+        run: |
+          if [ -f "bom.xml" ]; then
+            echo "Using generated SBOM for OSV scanning"
+            osv-scanner scan --format sarif --output osv-report.sarif bom.xml || {
+              echo "OSV scanner found vulnerabilities in SBOM (exit code: $?)"
+              echo "This is expected behavior - vulnerabilities will be reported in SARIF"
+            }
+          elif [ -f "modules.json" ]; then
+            echo "Using modules.json for OSV scanning"
+            osv-scanner scan --format sarif --output osv-report.sarif modules.json || {
+              echo "OSV scanner found vulnerabilities in modules.json (exit code: $?)"
+              echo "This is expected behavior - vulnerabilities will be reported in SARIF"
+            }
+          else
+            echo "No SBOM found, scanning entire repository"
+            osv-scanner scan --format sarif --output osv-report.sarif . || {
+              echo "OSV scanner found vulnerabilities (exit code: $?)"
+              echo "This is expected behavior - vulnerabilities will be reported in SARIF"
+            }
+          fi
+        continue-on-error: true
+      - name: Check for OSV scan results
+        run: |
+          if [ -f "osv-report.sarif" ]; then
+            echo "Found OSV scan results, will upload"
+            echo "OSV_FILES_EXIST=true" >> $GITHUB_ENV
+          else
+            echo "No OSV scan results found, skipping upload"
+            echo "OSV_FILES_EXIST=false" >> $GITHUB_ENV
+          fi
+        continue-on-error: true
+      - name: Upload OSV results
+        if: env.OSV_FILES_EXIST == 'true'
+        uses: github/codeql-action/upload-sarif@39edc492dbe16b1465b0cafca41432d857bdb31a
+        with:
+          sarif_file: osv-report.sarif
+      - name: Security Policy Check
+        run: |
+          echo "=== Security Policy and Documentation Check ==="
+          if [ -f ".github/SECURITY.md" ]; then
+            echo "✅ Security policy found at .github/SECURITY.md"
+          elif [ -f "SECURITY.md" ]; then
+            echo "✅ Security policy found at SECURITY.md"
+          else
+            echo "⚠️  Warning: No security policy found"
+            echo "   Consider creating SECURITY.md or .github/SECURITY.md"
+          fi
+          if [ -f "docs/SECURITY.md" ]; then
+            echo "✅ Security documentation found at docs/SECURITY.md"
+          elif [ -f "docs/security.md" ]; then
+            echo "✅ Security documentation found at docs/security.md"
+          else
+            echo "ℹ️  No security documentation found in docs/"
+          fi
+          web_files=$(find . -name "*.html" -o -name "*.js" | head -3)
+          if [ -n "$web_files" ]; then
+            echo "ℹ️  Found web assets, consider adding security headers"
+          fi
+          echo "ℹ️  Consider running git-secrets for additional security checks"
+          echo "=== Security Policy Check Complete ==="
+        continue-on-error: true
+      - name: Check for critical/high vulnerabilities
+        if: env.OSV_FILES_EXIST == 'true'
+        run: |
+          if grep -q '"level":"error"' osv-report.sarif; then
+            echo "Critical/High severity vulnerabilities found - failing security scan"
+            echo "Please review and fix the vulnerabilities listed above"
+            exit 1
+          else
+            echo "No critical/high severity vulnerabilities found - security scan passed"
+          fi
+
+  trivy:
+    name: "Trivy Vulnerability Scan"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37
+        continue-on-error: true
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+      - name: Upload Trivy results as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-results
+          path: trivy-results.sarif
+      - name: Check for critical/high vulnerabilities in filesystem scan
+        run: |
+          if [ -f "trivy-results.sarif" ]; then
+            if grep -q '"level":"error"' trivy-results.sarif; then
+              echo "Critical/High severity vulnerabilities found in filesystem scan - failing security scan"
+              echo "Please review and fix the vulnerabilities listed above"
+              exit 1
+            else
+              echo "No critical/high severity vulnerabilities found in filesystem scan - security scan passed"
+            fi
+          else
+            echo "No Trivy filesystem scan results found"
+          fi
+
+  trivy-config:
+    name: "Trivy Config Scan"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [codeql, osv-scanner]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Trivy
+        uses: aquasecurity/setup-trivy@v0.4.0
+      - name: Cache Trivy database
+        run: |
+          trivy image --download-db-only || echo "Database download failed, continuing with cached data"
+        continue-on-error: true
+      - name: Scan all container files
+        run: |
+          find . -name "Dockerfile*" -type f | while read dockerfile; do
+            echo "Scanning Dockerfile: $dockerfile"
+            trivy config --format sarif --output "trivy-$(basename $dockerfile).sarif" "$dockerfile" || echo "Failed to scan $dockerfile"
+          done
+          find . -name "docker-compose*.yml" -o -name "docker-compose*.yaml" | while read compose_file; do
+            echo "Scanning docker-compose: $compose_file"
+            trivy config --format sarif --output "trivy-$(basename $compose_file).sarif" "$compose_file" || echo "Failed to scan $compose_file"
+          done
+          find . -name "*.yaml" -o -name "*.yml" | grep -E "(deployment|service|configmap|secret)" | while read k8s_file; do
+            echo "Scanning Kubernetes manifest: $k8s_file"
+            trivy config --format sarif --output "trivy-$(basename $k8s_file).sarif" "$k8s_file" || echo "Failed to scan $k8s_file"
+          done
+        continue-on-error: true
+      - name: Check for container scan results
+        run: |
+          if ls trivy-*.sarif 1> /dev/null 2>&1; then
+            echo "Found container scan results, will upload"
+            echo "CONTAINER_FILES_EXIST=true" >> $GITHUB_ENV
+          else
+            echo "No container scan results found, skipping upload"
+            echo "CONTAINER_FILES_EXIST=false" >> $GITHUB_ENV
+          fi
+        continue-on-error: true
+      - name: Upload container scan artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-container-results
+          path: trivy-*.sarif
+      - name: Check for critical/high vulnerabilities in container scans
+        run: |
+          critical_found=false
+          for sarif_file in trivy-*.sarif; do
+            if [ -f "$sarif_file" ]; then
+              if grep -q '"level":"error"' "$sarif_file"; then
+                echo "Critical/High severity vulnerabilities found in $sarif_file"
+                critical_found=true
+              fi
+            fi
+          done
+          if [ "$critical_found" = true ]; then
+            echo "Critical/High severity vulnerabilities found in container scans - failing security scan"
+            echo "Please review and fix the vulnerabilities listed above"
+            exit 1
+          else
+            echo "No critical/high severity vulnerabilities found in container scans - security scan passed"
+          fi
+      - name: Ensure container scan results exist
+        run: |
+          if ! ls trivy-*.sarif 1> /dev/null 2>&1; then
+            echo "Trivy container scan did not produce results. Failing job."
+            exit 1
+          fi
+
+  trivy-helm:
+    name: "Trivy Helm Chart Scan"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [codeql, osv-scanner]
+    outputs:
+      found: ${{ steps.find_helm_charts.outputs.found }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Find Helm charts
+        id: find_helm_charts
+        run: |
+          if find . -name "Chart.yaml" | grep -q .; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Set up Trivy
+        if: steps.find_helm_charts.outputs.found == 'true'
+        uses: aquasecurity/setup-trivy@v0.4.0
+      - name: Find and scan Helm charts
+        if: steps.find_helm_charts.outputs.found == 'true'
+        run: |
+          find . -name "Chart.yaml" -type f | while read chart_file; do
+            chart_dir=$(dirname "$chart_file")
+            chart_name=$(basename "$chart_dir")
+            echo "Scanning Helm chart: $chart_name in $chart_dir"
+            trivy config --format sarif --output "trivy-helm-${chart_name}.sarif" "$chart_dir" || echo "Failed to scan $chart_name, continuing..."
+          done
+        continue-on-error: true
+      - name: Check for Helm scan results
+        if: steps.find_helm_charts.outputs.found == 'true'
+        run: |
+          if ls trivy-helm-*.sarif 1> /dev/null 2>&1; then
+            echo "Found Helm scan results, will upload"
+            echo "FILES_EXIST=true" >> $GITHUB_ENV
+          else
+            echo "No Helm scan results found, skipping upload"
+            echo "FILES_EXIST=false" >> $GITHUB_ENV
+          fi
+        continue-on-error: true
+      - name: Upload Helm chart artifacts
+        if: steps.find_helm_charts.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-helm-results
+          path: trivy-helm-*.sarif
+      - name: Check for critical/high vulnerabilities in Helm charts
+        if: steps.find_helm_charts.outputs.found == 'true'
+        run: |
+          critical_found=false
+          for sarif_file in trivy-helm-*.sarif; do
+            if [ -f "$sarif_file" ]; then
+              if grep -q '"level":"error"' "$sarif_file"; then
+                echo "Critical/High severity vulnerabilities found in $sarif_file"
+                critical_found=true
+              fi
+            fi
+          done
+          if [ "$critical_found" = true ]; then
+            echo "Critical/High severity vulnerabilities found in Helm charts - failing security scan"
+            echo "Please review and fix the vulnerabilities listed above"
+            exit 1
+          else
+            echo "No critical/high severity vulnerabilities found in Helm charts - security scan passed"
+          fi
+      - name: Ensure Helm chart scan results exist
+        if: steps.find_helm_charts.outputs.found == 'true'
+        run: |
+          if ! ls trivy-helm-*.sarif 1> /dev/null 2>&1; then
+            echo "Trivy Helm chart scan did not produce results. Failing job."
+            exit 1
+          fi 

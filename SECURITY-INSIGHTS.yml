@@ -38,6 +38,39 @@ security-testing:
     before-release: true
   comment: |
     Dependabot is enabled for this repo.
+- tool-type: sast
+  tool-name: CodeQL
+  tool-version: v3.29.1
+  integration:
+    ad-hoc: false
+    ci: true
+    before-release: true
+  evidence-url:
+    - https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/codeql.yml
+  comment: |
+    CodeQL SAST analysis is implemented for Go code security scanning.
+- tool-type: sca
+  tool-name: OSV Scanner
+  tool-version: v2.0.3
+  integration:
+    ad-hoc: false
+    ci: true
+    before-release: true
+  evidence-url:
+    - https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/osv-scanner.yml
+  comment: |
+    OSV Scanner detects known vulnerabilities in dependencies and generates SBOM.
+- tool-type: artifact
+  tool-name: Trivy
+  tool-version: v0.31.0
+  integration:
+    ad-hoc: false
+    ci: true
+    before-release: true
+  evidence-url:
+    - https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/trivy.yml
+  comment: |
+    Trivy scans for container and file system vulnerabilities.
 security-contacts:
 - type: email
   value: kubestellar-security-announce@googlegroups.com
