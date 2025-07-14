@@ -117,7 +117,6 @@ else
   echo "Skipping... \"${name}\" kind cluster already exists."
 fi
 
-# Wait for cluster to be ready
 echo "Waiting for cluster nodes to be ready..."
 kubectl --context "kind-${name}" wait --for=condition=ready nodes --all --timeout=300s
 
@@ -150,7 +149,6 @@ else
   kubectl --context "kind-${name}" apply -f "$NGINX_INGRESS_URL"
 fi
 
-# Wait for nginx ingress deployment to be created
 echo "Waiting for nginx ingress deployment to be created..."
 kubectl --context "kind-${name}" wait --for=create deployment/ingress-nginx-controller \
   --namespace ingress-nginx --timeout=300s
@@ -161,13 +159,11 @@ kubectl --context "kind-${name}" patch deployment ingress-nginx-controller -n in
 if [[ "$wait" == "true" ]] ; then
   echo "Waiting for nginx ingress with SSL passthrough to be ready..."
   
-  # Wait for the deployment to roll out with the new configuration
   echo "Waiting for nginx ingress controller deployment to be rolled out..."
   kubectl --context "kind-${name}" rollout status deployment/ingress-nginx-controller \
     --namespace ingress-nginx \
     --timeout=300s
   
-  # Wait for the new pod to be ready
   echo "Waiting for nginx ingress controller pod to be ready..."
   kubectl --context "kind-${name}" wait --namespace ingress-nginx \
     --for=condition=ready pod \
