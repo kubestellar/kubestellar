@@ -6,12 +6,10 @@ on:
     branches:
       - "main"
       - "release-*"
-      - "sast-scan-fix"
   pull_request:
     branches:
       - "main"
       - "release-*"
-      - "sast-scan-fix"
   schedule:
     - cron: '0 12 * * 1'
 
@@ -340,4 +338,4 @@ jobs:
           if ! ls trivy-helm-*.sarif 1> /dev/null 2>&1; then
             echo "Trivy Helm chart scan did not produce results. Failing job."
             exit 1
-          fi 
+          fi
