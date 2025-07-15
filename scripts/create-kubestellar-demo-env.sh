@@ -104,37 +104,26 @@ context_clean_up() {
 }
 
 checking_cluster() {
-    local cluster_name="$1"
-    echo "Waiting for CSR for $cluster_name..."
-    
-    # Wait for CSR to be created with cluster label
-    # OCM creates CSRs with specific labels for cluster identification
-    echo "Waiting for CSR creation for cluster $cluster_name..."
-    kubectl --context its1 wait --for=create csr \
-      -l cluster.open-cluster-management.io/clustername=$cluster_name \
-      --timeout=300s || {
-        # Fallback: wait for any CSR containing the cluster name
-        echo "Specific label not found, waiting for CSR with cluster name pattern..."
-        local timeout=300
-        local elapsed=0
-        while [ $elapsed -lt $timeout ]; do
-            if kubectl --context its1 get csr --no-headers | grep -q "$cluster_name"; then
-                echo "CSR for $cluster_name found"
+    found=false
+    while true; do
+        output=$(kubectl --context its1 get csr)
+        while IFS= read -r line; do
+
+            if echo "$line" | grep -q $1; then
+                echo "$1 has been found, approving CSR"
+                clusteradm --context its1 accept --clusters "$1"
+                found=true
                 break
             fi
-            echo "Waiting for CSR for $cluster_name... (${elapsed}s/${timeout}s)"
-            sleep 10
-            elapsed=$((elapsed + 10))
-        done
-        
-        if [ $elapsed -ge $timeout ]; then
-            echo "Timeout waiting for CSR for $cluster_name"
-            return 1
+        done <<< "$output"
+
+        if [ "$found" = true ]; then
+            break
+        else
+            echo "CSR for $1 not found. Trying again..."
+            sleep 20
         fi
-    }
-    
-    echo "$cluster_name CSR found, approving..."
-    clusteradm --context its1 accept --clusters "$cluster_name"
+    done
 }
 
 echo -e "\nStarting environment clean up..."
