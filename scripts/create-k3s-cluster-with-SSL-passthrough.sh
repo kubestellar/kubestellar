@@ -83,21 +83,21 @@ export KUBECONFIG=~/.kube/config
 sudo kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml config view --raw > "$KUBECONFIG"
 
 # Wait for k3s service to be ready and kubectl to work
-echo "Waiting for k3s service to be ready..."
+echo "Waiting for k3s service to be ready via socket file..."
 timeout=300
 elapsed=0
 while [ $elapsed -lt $timeout ]; do
-    if sudo systemctl is-active --quiet k3s && kubectl get nodes >/dev/null 2>&1; then
-        echo "k3s service is ready!"
+    if [ -S /run/k3s/containerd/containerd.sock ] && kubectl get nodes >/dev/null 2>&1; then
+        echo " K3s socket exists and kubectl is working! (${elapsed}s)"
         break
     fi
-    echo "k3s service not ready yet, waiting... (${elapsed}s/${timeout}s)"
+    echo "⌛ K3s not ready yet, waiting... (${elapsed}s/${timeout}s)"
     sleep 5
     elapsed=$((elapsed + 5))
 done
 
 if [ $elapsed -ge $timeout ]; then
-    echo "Timeout waiting for k3s service to be ready"
+    echo "❌ Timed out waiting for K3s to be ready."
     exit 1
 fi
 
