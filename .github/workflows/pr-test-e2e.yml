@@ -22,6 +22,10 @@ on:
       - ".github/workflows/**"
       - "!.github/workflows/pr-test-e2e.yml"
       - "**/*.md"
+      - ".gha-reversemap.yml"
+      - "hack/verify-*"
+      - "hack/boilerplate/*"
+      - "hack/gha-reversemap.sh"
   push:
     branches:
       - main
@@ -33,6 +37,10 @@ on:
       - ".github/workflows/**"
       - "!.github/workflows/pr-test-e2e.yml"
       - "**/*.md"
+      - ".gha-reversemap.yml"
+      - "hack/verify-*"
+      - "hack/boilerplate/*"
+      - "hack/gha-reversemap.sh"
 
 permissions:
   contents: read
