@@ -105,8 +105,11 @@ context_clean_up() {
 
 checking_cluster() {
     found=false
+
     while true; do
+
         output=$(kubectl --context its1 get csr)
+
         while IFS= read -r line; do
 
             if echo "$line" | grep -q $1; then
@@ -115,14 +118,17 @@ checking_cluster() {
                 found=true
                 break
             fi
+
         done <<< "$output"
 
         if [ "$found" = true ]; then
             break
+
         else
             echo "CSR for $1 not found. Trying again..."
             sleep 20
         fi
+
     done
 }
 
