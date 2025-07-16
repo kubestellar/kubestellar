@@ -6,7 +6,7 @@ This document explains how to register a Workload Execution Cluster (WEC) with a
 
 Registering a WEC with an ITS follows the same process as registering a managed cluster with an OCM hub. KubeStellar uses Open Cluster Management (OCM) for cluster registration and management.
 
-For the complete OCM registration process, refer to the [official Open Cluster Management documentation](https://open-cluster-management.io/docs/getting-started/installation/register-a-cluster/). The instructions below provide a complete registration process that is more focused on KubeStellar-specific considerations.
+The instructions below provide a comprehensive registration process focused on KubeStellar-specific considerations. For additional OCM registration details, refer to the [official Open Cluster Management documentation](https://open-cluster-management.io/docs/getting-started/installation/register-a-cluster/).
 
 ### Terminology Mapping
 
@@ -20,12 +20,14 @@ For the complete OCM registration process, refer to the [official Open Cluster M
 
 Before registering a WEC, ensure you have:
 
-1. **A running Kubernetes cluster** that will serve as the WEC
-2. **Network connectivity** from the WEC to the KubeFlex hosting cluster (HTTPS connections must be possible)
-3. **`kubectl` access** to both the WEC and ITS
-4. **`clusteradm` CLI tool** installed on the machine where you'll run the registration commands ([installation guide](https://open-cluster-management.io/docs/getting-started/installation/start-the-control-plane/))
-5. **An existing ITS** with OCM cluster manager running
+1. **An existing ITS** with OCM cluster manager running
+2. **A running Kubernetes cluster** that will serve as the WEC
+3. **Network connectivity** from the WEC to the ITS (HTTPS connections must be possible)
+4. **`kubectl` access** to both the WEC and ITS
+5. **`clusteradm` CLI tool** installed on the machine where you will run the registration commands ([installation guide](https://open-cluster-management.io/docs/getting-started/installation/start-the-control-plane/))
 6. **Sufficient permissions** to create resources in both clusters (typically cluster-admin or equivalent)
+
+For a complete understanding of how WEC registration fits into the overall KubeStellar architecture, see [The Full Story](user-guide-intro.md#the-full-story).
 
 To verify your ITS is ready for WEC registration:
 
@@ -51,11 +53,13 @@ Obtain a registration token from the ITS:
 clusteradm --context <its-context> get token
 ```
 
-This command outputs a `clusteradm join` command that you'll use in the next step.
+This command outputs a `clusteradm join` command that you will use in the next step. The token and apiserver URL from this command will be used in the join command.
 
 ### Step 2: Join the WEC to the ITS
 
-Execute the join command on the WEC to initiate the registration process:
+**Important:** Before executing the join command, determine if you need additional flags based on your environment. The basic command below may not work for all cluster types.
+
+Execute the join command on the WEC to initiate the registration process. The exact command depends on your environment:
 
 ```shell
 # Basic join command (additional flags may be required based on your environment)
@@ -66,7 +70,7 @@ clusteradm join --hub-token <token> --hub-apiserver <api-server-url> --cluster-n
 - `--cluster-name`: Choose a unique name for your WEC
 - `--context`: Specify the kubectl context for your WEC
 - `--singleton`: Use this flag if the WEC is a single-node cluster
-- `--force-internal-endpoint-lookup`: Required for Kind clusters and other local development setups
+- `--force-internal-endpoint-lookup`: Required for Kind clusters and other clusters with internal-only API server endpoints
 
 **Example for Kind clusters:**
 ```shell
@@ -87,9 +91,12 @@ After the join command completes, wait for a Certificate Signing Request (CSR) t
 kubectl --context <its-context> get csr
 ```
 
-You should see a CSR with your WEC name and status `Pending`. This CSR is created by the OCM registration agent running on your WEC.
+The first few attempts might not show the CSR with your WEC name and status `Pending`. Continue checking until the CSR appears. This CSR is created by the OCM registration agent running on your WEC.
 
-**Wait for CSR to appear:**
+#### Loop that waits for Certificate Signing Request
+
+The following bash loop automates the waiting described just above:
+
 ```shell
 # Wait for CSR to be created (this may take a few moments)
 while [ -z "$(kubectl --context <its-context> get csr | grep <your-wec-name>)" ]; do
@@ -157,7 +164,7 @@ kubectl --context <its-context> label managedcluster <wec-name> team=platform bu
 
 ### Customization Properties
 
-You can define additional properties for each WEC using ConfigMaps in the `customization-properties` namespace:
+You can define additional properties for a WEC using ConfigMaps in the `customization-properties` namespace:
 
 ```shell
 # Create customization properties
