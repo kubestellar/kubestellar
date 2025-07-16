@@ -4029,35 +4029,49 @@ to be registered as a managed cluster on the OCM hub.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>csr
 </code></pre></div>
 <p>until you see that the certificate signing requests (CSR) for both cluster1 and cluster2 exist.
+Sometimes it can take a little while for the CSRs to appear after running the join commands, so if you do not see them immediately, wait a few seconds and try again.
 Note that the CSRs condition is supposed to be <code>Pending</code> until you approve them in step 4.</p>
+<p>For convenience, you can use a shell loop to automatically check every few seconds:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># This will check every 10 seconds until both CSRs are present</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>csr
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="c1"># Replace 2 with the number of clusters you are registering if different</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>csr<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-c<span class="w"> </span>Pending<span class="k">)</span><span class="w"> </span>-ge<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Both CSRs found.&quot;</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="k">break</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">  </span><span class="k">fi</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Waiting for CSRs to appear...&quot;</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="k">done</span>
+</code></pre></div>
 </li>
 <li>
 <p>Once the CSRs are created, approve the CSRs complete the cluster registration with the command:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>cluster1
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>cluster2
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>cluster1
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>clusteradm<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>accept<span class="w"> </span>--clusters<span class="w"> </span>cluster2
 </code></pre></div>
 </li>
 <li>
 <p>Check the new clusters are in the OCM inventory and label them:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>managedclusters
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster1<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster1
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster2<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster2
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>get<span class="w"> </span>managedclusters
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster1<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster1
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>its1<span class="w"> </span>label<span class="w"> </span>managedcluster<span class="w"> </span>cluster2<span class="w"> </span>location-group<span class="o">=</span>edge<span class="w"> </span><span class="nv">name</span><span class="o">=</span>cluster2
 </code></pre></div>
 </li>
 </ol>
 <h3 id="variables-for-running-the-example-scenarios">Variables for running the example scenarios<a class="headerlink" href="#variables-for-running-the-example-scenarios" title="Permanent link">#</a></h3>
 <p><strong>Important</strong>: Before moving on to try exercising KubeStellar, you will need the following shell variable settings to inform the scenario commands about the configuration.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nv">host_context</span><span class="o">=</span>kind-kubeflex
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nv">its_cp</span><span class="o">=</span>its1
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="nv">its_context</span><span class="o">=</span>its1
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="nv">wds_cp</span><span class="o">=</span>wds1
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="nv">wds_context</span><span class="o">=</span>wds1
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="nv">wec1_name</span><span class="o">=</span>cluster1
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="nv">wec2_name</span><span class="o">=</span>cluster2
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="nv">wec1_context</span><span class="o">=</span><span class="nv">$wec1_name</span>
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="nv">wec2_context</span><span class="o">=</span><span class="nv">$wec2_name</span>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="nv">label_query_both</span><span class="o">=</span>location-group<span class="o">=</span>edge
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="nv">label_query_one</span><span class="o">=</span><span class="nv">name</span><span class="o">=</span>cluster1
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nv">host_context</span><span class="o">=</span>kind-kubeflex
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nv">its_cp</span><span class="o">=</span>its1
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="nv">its_context</span><span class="o">=</span>its1
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="nv">wds_cp</span><span class="o">=</span>wds1
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="nv">wds_context</span><span class="o">=</span>wds1
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="nv">wec1_name</span><span class="o">=</span>cluster1
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="nv">wec2_name</span><span class="o">=</span>cluster2
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="nv">wec1_context</span><span class="o">=</span><span class="nv">$wec1_name</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="nv">wec2_context</span><span class="o">=</span><span class="nv">$wec2_name</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="nv">label_query_both</span><span class="o">=</span>location-group<span class="o">=</span>edge
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="nv">label_query_one</span><span class="o">=</span><span class="nv">name</span><span class="o">=</span>cluster1
 </code></pre></div>
 <p><strong>Note</strong>: These variable values are specific to the setup described in this guide. If you followed a different setup procedure, you will need to adjust these values accordingly.</p>
 <h2 id="exercise-kubestellar">Exercise KubeStellar<a class="headerlink" href="#exercise-kubestellar" title="Permanent link">#</a></h2>
