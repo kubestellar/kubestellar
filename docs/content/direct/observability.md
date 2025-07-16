@@ -12,13 +12,13 @@ KubeStellar controllers expose Prometheus-compatible metrics endpoints. These en
 | Controller                    | Protocol | Port  | Path     | AuthN/AuthZ | Notes |
 |-------------------------------|----------|-------|----------|-------------|-------|
 | kubestellar-controller-manager | HTTPS    | 8443  | /metrics | Kubernetes client authentication required when using the Service | Service: `kubestellar-controller-manager-metrics-service` (default port, configurable via Helm values). |
-| kubestellar-controller-manager | HTTPS    | 8443  | /metrics | Kubernetes client authentication required even for Pod access | Access via Pod port 8443; HTTPS and authentication are always required. Default port, configurable via Helm values. |
+| kubestellar-controller-manager | HTTPS    | 8443  | /metrics | Kubernetes client authentication and authorization required even for Pod access | Access via Pod port 8443; HTTPS and authentication are always required. Default port, configurable via Helm values. |
 | kubestellar-controller-manager | HTTP     | 8080  | /metrics | None (direct pod access) | Debug endpoint access without auth; typically disabled in production. |
 | ks-transport-controller       | HTTP     | 8090  | /metrics | None (in-cluster) | Default port, configurable via Helm values. |
 | status-addon-controller       | HTTP     | 9280  | /metrics | None (in-cluster) | Default port, configurable via Helm values. |
-| status-agent-controller       | HTTP     | 8080  | /metrics | None (in-cluster) | Default port, configurable via Helm values. |
+| status-addon-agent            | HTTP     | 8080  | /metrics | None (in-cluster) | Default port, configurable via Helm values. |
 
-**Note:** The listed ports are defaults. Currently, only the `ks-transport-controller` and `status-agent-controller` ports are configurable via Helm values (see issue #2158). When using the Service for `kubestellar-controller-manager`, protocol is HTTPS and Kubernetes client authentication is required. Direct pod access may use HTTP.
+**Note:** The listed ports are defaults. Currently, only the `ks-transport-controller` and `status-addon-agent` ports are configurable via Helm values (see [issue #2158](https://github.com/kubestellar/kubestellar/issues/2158)). When using the Service for `kubestellar-controller-manager`, protocol is HTTPS and Kubernetes client authentication is required. Direct pod access may use HTTP.
 
 ## Debug/Profiling Endpoints
 
@@ -31,12 +31,14 @@ Some KubeStellar components expose Go's built-in pprof debug endpoints for profi
 | kubestellar-controller-manager   | HTTP     | 8082  | /debug/pprof/   | None        |  |
 | ks-transport-controller         | HTTP     | 8092  | /debug/pprof/   | None        |  |
 | status-addon-controller         | HTTP     | 9282  | /debug/pprof/   | None        |  |
-| status-agent-controller         | HTTP     | 8083  | /debug/pprof/   | None        |  |
+| status-addon-agent              | HTTP     | 8082  | /debug/pprof/   | None        |  |
+
+**Note:** The listed ports are defaults. Currently, only the `ks-transport-controller` and `status-addon-agent` pprof ports are configurable via Helm values.
 
 ## Example: Accessing KubeStellar Controller Metrics and Debug Endpoints
 
 
-**Note:** The following example assumes you have a running KubeStellar controller-manager pod (not any other controller) and access to the appropriate Kubernetes context and namespace. The Deployment name is always `kubestellar-controller-manager`, but you may need to adjust the context and namespace for your environment.
+**Note:** The following example assumes you have a running KubeStellar controller-manager pod and access to the appropriate Kubernetes context and namespace. The Deployment name is always `kubestellar-controller-manager`, but you may need to adjust the context and namespace for your environment.
 
 
 ```sh
