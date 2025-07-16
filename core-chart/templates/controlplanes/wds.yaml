@@ -8,11 +8,12 @@ spec:
   backend: shared
   type: {{ .type | default "k8s" }}
   postCreateHooks:
-    - hookName: transport-controller
     - hookName: kubestellar-controller
       vars:
-        APIGroups: {{ .APIGroups | default "" }}
+        APIGroups: "{{ .APIGroups | default "" }}"
+        ITSName: "{{ .ITSName | default "" }}"
+    - hookName: transport-controller
   globalVars:
     ControlPlaneName: {{ .name }}
-    ITSName: {{ .ITSName | default "" }}
+    ITSName: "{{ .ITSName | default "" }}"
 {{- end }}
