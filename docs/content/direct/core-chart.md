@@ -90,8 +90,12 @@ kubeflex-operator:
   externalPort: 9443 # used to set the port to access the Control Planes API (default: 9443)
   hostContainer: kubeflex-control-plane # used to set the name of the container that runs the KubeFlex hosting cluster (default: kubeflex-control-plane, which corresponds to a Kind cluster with name kubeflex)
 
-# Determine if the Post Create Hooks should be installed by the chart
-InstallPCHs: true
+# Post Create Hooks (PCHs) are automatically managed by the chart
+# - First install: PCHs are installed automatically because they don't exist
+# - Additional installs: PCHs are skipped automatically because they already exist
+# - Override: set InstallPCHs=true to force reinstall PCHs (useful for upgrades)
+# - Legacy: set InstallPCHs=false for backward compatibility
+# InstallPCHs: true
 
 # List the Inventory and Transport Spaces (ITSes) to be created by the chart
 # Each ITS consists of:
@@ -115,11 +119,18 @@ In particular:
 - `kubeflex-operator.install` accepts a boolean value to enable/disable the installation of KubeFlex into the cluster by the chart
 - `kubeflex-operator.isOpenShift` must be set to true by the user when installing the chart into a OpenShift cluster
 
-By default, the chart will install the KubeFlex and its PostgreSQL dependency.
+By default, the chart will install KubeFlex and its PostgreSQL dependency. Post Create Hooks (PCHs) needed for creating ITSes and WDSes control planes are automatically managed using intelligent detection:
 
-The second section allows a user of the chart to determine if Post Create Hooks (PCHes) needed for creating ITSes and WDSes control planes should be installed by the chart. By default `InstallPCHs` is set to `true` to enable the installation of the PCHes, however one may want to set this value to `false` when installing multiple copies of the chart to avoid conflicts. A single copy of the PCHes is required and allowed per cluster.
+**Automatic PCH Management:**
+- **First install**: PCHs are installed automatically because they don't exist in the cluster
+- **Additional deployments**: PCHs are skipped automatically because they already exist
+- **No manual configuration needed** - the chart detects what's appropriate
 
-The third section of the `values.yaml` file allows one to create a list of Inventory and Transport Spaces (ITSes). By default, this list is empty and no ITS will be created by the chart. A list of ITSes can be specified using the following format:
+**Advanced PCH Control:**
+- Set `InstallPCHs=true` to force reinstall PCHs (useful for chart upgrades)
+- Set `InstallPCHs=false` for backward compatibility with older deployments
+
+The next section of the `values.yaml` file allows one to create a list of Inventory and Transport Spaces (ITSes). By default, this list is empty and no ITS will be created by the chart. A list of ITSes can be specified using the following format:
 
 ```yaml
 ITSes: # all the CPs in this list will execute the its.yaml PCH
@@ -146,7 +157,7 @@ When the ITS `type` is `external`, the `bootstrapSecret` sub-section can be used
 
 If the secret was created using the [create-external-bootstrap-secret.sh](https://github.com/kubestellar/kubestellar/tree/v{{ config.ks_latest_release }}/scripts/create-external-bootstrap-secret.sh) script and the value passed to the argument `--controlplane` matches the name of the Control Plane specified by the Helm chart, then the sub-section `bootstrapSecret` is not required because all default values will identify the bootstrap secret created by the script. More specifically, if an external kind cluster was created with the command `kind create cluster --name its1` and the `create-external-bootstrap-secret.sh --controlplane its1 --verbose` command was used to create the bootstrap secret, then it would be enough to inform the Helm chart with `--set-json='ITSes=[{"name":"its1","type":"external"}]'`.
 
-The fourth section of the `values.yaml` file allows one to create a list of Workload Description Spaces (WDSes). By default, this list is empty and no WDS will be created by the chart. A list of WDSes can be specified using the following format:
+The final section of the `values.yaml` file allows one to create a list of Workload Description Spaces (WDSes). By default, this list is empty and no WDS will be created by the chart. A list of WDSes can be specified using the following format:
 
 ```yaml
 WDSes: # all the CPs in this list will execute the wds.yaml PCH
@@ -214,10 +225,8 @@ Alternatively, a specific version of the KubeStellar core chart can be simply in
 ```shell
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION
 ```
-
-Either of the previous ways of installing KubeStellar core chart will install KubeFlex and the Post Create Hooks, but it will not create any Control Plane.
-
-Please remember to add `--set "kubeflex-operator.isOpenShift=true"` when installing/updating into an OpenShift cluster.
+Either of the previous ways of installing KubeStellar chart will install KubeFlex and the Post Create Hooks automatically, but no Control Planes.
+Please remember to add `--set "kubeflex-operator.isOpenShift=true"` when installing into an OpenShift cluster.
 
 User defined control planes can be added using additional values files or `--set` arguments, _e.g._:
 
@@ -294,21 +303,49 @@ Note that by default, the `its1` Control Plane of type `external` will look for 
 
 After the initial installation is completed, there are two main ways to install additional control planes (_e.g._, create a second `wds2` WDS):
 
-1. Upgrade the initial chart. This choice requires to relist the existing control planes, which would otherwise be deleted:
+### 1. Upgrade existing chart (recommended)
 
-    ```shell
-    helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
-      --set-json='ITSes=[{"name":"its1"}]' \
-      --set-json='WDSes=[{"name":"wds1"},{"name":"wds2"}]'
-    ```
+This approach requires relisting existing control planes to prevent deletion:
 
-2. Install a new chart with a different name. This choice does not requires to relist the existing control planes, but requires to disable the reinstallation of KubeFlex and PCHes:
+```shell
+helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
+  --set-json='ITSes=[{"name":"its1"}]' \
+  --set-json='WDSes=[{"name":"wds1"},{"name":"wds2"}]'
+```
 
-    ```shell
-    helm upgrade --install add-wds2 oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
-      --set='kubeflex-operator.install=false,InstallPCHs=false' \
-      --set-json='WDSes=[{"name":"wds2"}]'
-    ```
+### 2. Install additional chart with different name
+
+This approach doesn't require relisting existing control planes:
+
+```shell
+helm upgrade --install add-wds2 oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
+  --set='kubeflex-operator.install=false' \
+  --set-json='WDSes=[{"name":"wds2"}]'
+```
+
+Post Create Hooks are automatically managed and won't be reinstalled since they already exist.
+
+### 3. Force PCH reinstall during upgrades
+
+When upgrading chart versions that include PCH changes, force reinstall:
+
+```shell
+helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
+  --set='InstallPCHs=true' \
+  --set-json='ITSes=[{"name":"its1"}]' \
+  --set-json='WDSes=[{"name":"wds1"}]'
+```
+
+### 4. Backward compatibility
+
+For deployments using older chart versions, maintain compatibility:
+
+```shell
+helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart --version $KUBESTELLAR_VERSION \
+  --set='InstallPCHs=false' \
+  --set-json='ITSes=[{"name":"its1"}]' \
+  --set-json='WDSes=[{"name":"wds1"}]'
+```
 
 ## Kubeconfig files and contexts for Control Planes
 
