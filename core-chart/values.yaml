@@ -124,7 +124,7 @@ ITSes: # all the CPs in this list will execute the its.yaml PCH
 # - type: host or k8s (default to k8s, if not specified)
 # - APIGroups: string holding a comma-separated list of APIGroups
 # - ITSName: the name of the ITS control plane to be used by the WDS. Note that the ITSName MUST be specified if more than one ITS exists at the moment the WDS PCH starts.
-WDSes: # all the CPs in this list will execute the wds.yaml PCH
+WDSes: # all the CPs in this list will execute the transport-controller.yaml and kubestellar-controller.yaml PCHs
   # - name: wds1 # name of the control plane
   #   type: host # optional type of control plane host or k8s (default to k8s, if not specified)
   #   APIGroups: "" # optional string holding a comma-separated list of APIGroups
