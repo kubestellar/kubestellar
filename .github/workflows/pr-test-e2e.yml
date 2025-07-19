@@ -132,6 +132,14 @@ jobs:
         if: always()
         run: kubectl --context cluster2 get deployments -A -o yaml
 
+      - name: show jobs in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get jobs -A -o yaml
+
+      - name: show jobs in its1
+        if: always()
+        run: kubectl --context its1 get jobs -A -o yaml
+
       - name: show manifestworks
         if: always()
         run: kubectl --context its1 get manifestworks -A -o yaml
@@ -261,6 +269,14 @@ jobs:
       - name: show deployments in cluster2
         if: always()
         run: kubectl --context cluster2 get deployments -A -o yaml
+
+      - name: show jobs in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get jobs -A -o yaml
+
+      - name: show jobs in its1
+        if: always()
+        run: kubectl --context its1 get jobs -A -o yaml
 
       - name: show manifestworks
         if: always()
