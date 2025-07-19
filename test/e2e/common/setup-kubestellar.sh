@@ -130,10 +130,7 @@ popd
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
 
 # Robust wait for job.batch/its-with-clusteradm
-if ! kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s; then
-    echo "ERROR: Timed out waiting for job.batch/its-with-clusteradm to complete. The E2E workflow will provide pod logs and status." >&2
-    exit 1
-fi
+kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
 
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
