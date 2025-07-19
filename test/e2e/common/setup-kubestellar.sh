@@ -126,15 +126,6 @@ else
   fi
 popd
 
-# Check required kubeconfig contexts exist
-REQUIRED_CONTEXTS=("$HOSTING_CONTEXT" "its1" "wds1")
-for ctx in "${REQUIRED_CONTEXTS[@]}"; do
-    if ! kubectl config get-contexts "$ctx" >/dev/null 2>&1; then
-        echo "ERROR: kubeconfig context '$ctx' does not exist. Exiting." >&2
-        exit 1
-    fi
-done
-
 : Waiting for OCM hub to be ready...
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
 
@@ -163,6 +154,15 @@ kflex ctx --overwrite-existing-context wds1
 kflex ctx --overwrite-existing-context its1
 
 kflex ctx
+
+# Check required kubeconfig contexts exist after they are created
+REQUIRED_CONTEXTS=("$HOSTING_CONTEXT" "its1" "wds1")
+for ctx in "${REQUIRED_CONTEXTS[@]}"; do
+    if ! kubectl config get-contexts "$ctx" >/dev/null 2>&1; then
+        echo "ERROR: kubeconfig context '$ctx' does not exist. Exiting." >&2
+        exit 1
+    fi
+done
 
 wait-for-cmd 'kubectl --context its1 get ns customization-properties'
 
