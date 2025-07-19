@@ -16,6 +16,10 @@
 set -x # echo so that users can understand what is happening
 set -e # exit on error
 
+# Source the setup-shell.sh to get wait-for-cmd function
+SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
+source "$SRC_DIR/../common/setup-shell.sh"
+
 env="kind"
 
 if [ "$1" == "--env" ]; then

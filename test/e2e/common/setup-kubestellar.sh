@@ -126,9 +126,31 @@ else
   fi
 popd
 
+# Check required kubeconfig contexts exist
+REQUIRED_CONTEXTS=("$HOSTING_CONTEXT" "its1" "wds1")
+for ctx in "${REQUIRED_CONTEXTS[@]}"; do
+    if ! kubectl config get-contexts "$ctx" >/dev/null 2>&1; then
+        echo "ERROR: kubeconfig context '$ctx' does not exist. Exiting." >&2
+        exit 1
+    fi
+done
+
 : Waiting for OCM hub to be ready...
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
-kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
+
+# Robust wait for job.batch/its-with-clusteradm
+if ! kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s; then
+    echo "ERROR: Timed out waiting for job.batch/its-with-clusteradm to complete. Dumping job and pod status for debugging..." >&2
+    kubectl get job -n its1-system its-with-clusteradm -o yaml || true
+    echo "--- Pods for job its-with-clusteradm ---"
+    kubectl get pods -n its1-system -l job-name=its-with-clusteradm -o wide || true
+    for pod in $(kubectl get pods -n its1-system -l job-name=its-with-clusteradm -o jsonpath='{.items[*].metadata.name}'); do
+        echo "--- Logs for pod $pod ---"
+        kubectl logs -n its1-system "$pod" || true
+    done
+    exit 1
+fi
+
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
