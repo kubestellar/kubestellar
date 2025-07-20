@@ -28,5 +28,5 @@ and Argo Workflows + KubeStellar integration.
 
 # Learn More
 
-To learn more [visit the repository at https://github.com/kubestellar/galaxy](https://github.com/kubestellar/gala)
+To learn more [visit the repository at https://github.com/kubestellar/galaxy](https://github.com/kubestellar/galaxy)
 **_Note that all the code in the galaxy repo is experimental and is available on an as-is basis **
