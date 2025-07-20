@@ -158,7 +158,7 @@ Note that `kind` does not support three or more concurrent clusters unless you r
 1. Execute the following commands to create two kind clusters, named `cluster1` and `cluster2`, and register them with the OCM hub. These clusters will serve as workload clusters. If you have previously executed these commands, you might already have contexts named `cluster1` and `cluster2`. If so, you can remove these contexts using the commands `kubectl config delete-context cluster1` and `kubectl config delete-context cluster2`.
 
     ```shell
-    # set flags to "" if you have installed KubeStellar on an OpenShift cluster
+    : set flags to "" if you have installed KubeStellar on an OpenShift cluster
     flags="--force-internal-endpoint-lookup"
     clusters=(cluster1 cluster2);
     for cluster in "${clusters[@]}"; do
