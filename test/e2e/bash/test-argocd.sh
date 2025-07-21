@@ -26,7 +26,7 @@ SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 COMMON_SRCS="${SRC_DIR}/../common"
 source "$COMMON_SRCS/setup-shell.sh"
 
-"${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose kind kubectl helm
+"${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose kind kubectl helm ko
 
 source "$COMMON_SRCS/setup-kubestellar.sh" --env "$env" --argocd
 
