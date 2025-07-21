@@ -103,11 +103,25 @@ helm upgrade --install ingress-nginx ingress-nginx \
 
 if [[ "$wait" == "true" ]] ; then
   echo "Waiting for nginx ingress with SSL passthrough to complete..."
+  max_attempts=60  # 5 minutes if sleep=5
+  attempt=0
   while [ -z "$(kubectl get pod --namespace ingress-nginx --selector=app.kubernetes.io/component=controller --no-headers -o name 2> /dev/null)" ] ;  do
       sleep 5
+      attempt=$((attempt+1))
+      if [ $attempt -ge $max_attempts ]; then
+        echo "ERROR: Timed out waiting for nginx ingress controller pod to appear."
+        kubectl get pods -n ingress-nginx -o wide || true
+        exit 1
+      fi
   done
-  kubectl wait --namespace ingress-nginx \
+  if ! kubectl wait --namespace ingress-nginx \
     --for=condition=ready pod \
     --selector=app.kubernetes.io/component=controller \
-    --timeout=90s
+    --timeout=90s; then
+    echo "ERROR: nginx ingress controller pod did not become ready in time."
+    kubectl get pods -n ingress-nginx -o wide || true
+    kubectl describe pods -n ingress-nginx || true
+    kubectl logs -n ingress-nginx -l app.kubernetes.io/component=controller || true
+    exit 1
+  fi
 fi

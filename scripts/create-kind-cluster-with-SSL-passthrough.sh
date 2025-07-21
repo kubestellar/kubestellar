@@ -151,24 +151,49 @@ kubectl --context "kind-${name}" patch deployment ingress-nginx-controller -n in
 
 if [[ "$wait" == "true" ]] ; then
   echo "Waiting for nginx ingress with SSL passthrough to be ready..."
+  max_attempts=60  # 5 minutes if sleep=5
+  attempt=0
   while true; do
       sleep 5
+      attempt=$((attempt+1))
       pods=$(kubectl --context kind-${name} get pod -n ingress-nginx -l app.kubernetes.io/component=controller -o jsonpath='{.items[*].metadata.name}')
-      if [ -z "$pods" ]; then continue; fi
-      if [[ "$pods" =~ [[:space:]] ]]
-      then # both pre-patch and post-patch Pods are present
-          continue
+      if [ -z "$pods" ]; then 
+        if [ $attempt -ge $max_attempts ]; then
+          echo "ERROR: Timed out waiting for nginx ingress controller pod to appear."
+          kubectl --context kind-${name} get pods -n ingress-nginx -o wide || true
+          exit 1
+        fi
+        continue
+      fi
+      if [[ "$pods" =~ [[:space:]] ]]; then
+        if [ $attempt -ge $max_attempts ]; then
+          echo "ERROR: Timed out waiting for old nginx ingress pods to terminate after patch."
+          kubectl --context kind-${name} get pods -n ingress-nginx -o wide || true
+          exit 1
+        fi
+        continue
       fi
       args=$(kubectl --context kind-${name} get pod -n ingress-nginx -l app.kubernetes.io/component=controller -o jsonpath='{.items[0].spec.containers[0].args}')
-      if [[ $args =~ enable-ssl-passthrough ]]
-      then break
-      # Otherwise this Pod is from before the patch
+      if [[ $args =~ enable-ssl-passthrough ]]; then
+        break
+      fi
+      if [ $attempt -ge $max_attempts ]; then
+        echo "ERROR: Timed out waiting for nginx ingress controller pod to be patched with --enable-ssl-passthrough."
+        kubectl --context kind-${name} get pods -n ingress-nginx -o wide || true
+        kubectl --context kind-${name} describe pods -n ingress-nginx || true
+        exit 1
       fi
   done
-  kubectl --context "kind-${name}" wait --namespace ingress-nginx \
+  if ! kubectl --context "kind-${name}" wait --namespace ingress-nginx \
     --for=condition=ready pod \
     --selector=app.kubernetes.io/component=controller \
-    --timeout=24h
+    --timeout=90s; then
+    echo "ERROR: nginx ingress controller pod did not become ready in time."
+    kubectl --context kind-${name} get pods -n ingress-nginx -o wide || true
+    kubectl --context kind-${name} describe pods -n ingress-nginx || true
+    kubectl --context kind-${name} logs -n ingress-nginx -l app.kubernetes.io/component=controller || true
+    exit 1
+  fi
 fi
 
 
