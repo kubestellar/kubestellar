@@ -120,6 +120,60 @@ spec:
 EOF
 ```
 
+### Pods
+
+Apply pods to generate observable latency metrics:
+
+```bash
+# Pod 1
+kubectl --context "$wds_context" apply -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  namespace: default
+  labels:
+    app.kubernetes.io/name: nginx-singleton
+spec:
+  containers:
+  - name: nginx
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 5
+EOF
+```
+
+```bash
+# Pod 2 (variation)
+kubectl --context "$wds_context" apply -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-2
+  namespace: default
+  labels:
+    app.kubernetes.io/name: nginx-singleton
+spec:
+  containers:
+  - name: nginx
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 5
+EOF
+```
+
 ## 🛠️ Build & Run
 
 Build

@@ -17,14 +17,15 @@ limitations under the License.
 package main
 
 import (
-	"crypto/tls"
 	"flag"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/spf13/pflag"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -32,6 +33,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -45,8 +47,33 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 )
 
+// Resource groups to exclude for watchers as they should not be delivered to other clusters
+var excludedGroups = map[string]bool{
+	"flowcontrol.apiserver.k8s.io": true,
+	"discovery.k8s.io":             true,
+	"apiregistration.k8s.io":       true,
+	"coordination.k8s.io":          true,
+	"control.kubestellar.io":       true,
+}
+
+// Resource names to exclude for watchers as they should not be delivered to other clusters
+var excludedResourceNames = map[string]bool{
+	"events":               true,
+	"nodes":                true,
+	"csistoragecapacities": true,
+	"csinodes":             true,
+	"endpoints":            true,
+	"workstatuses":         true,
+}
+
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
+	// Allow Unstructured (and lists) in v1 core
+	gv := schema.GroupVersion{Group: "", Version: "v1"}
+	scheme.AddKnownTypes(gv,
+		&unstructured.Unstructured{},
+		&unstructured.UnstructuredList{},
+	)
 }
 
 func main() {
@@ -64,15 +91,19 @@ func main() {
 		kubeconfigPath     string
 		monitoredNamespace string
 		bindingName        string
+		excludedResources  string
+		includedGroups     string
 	)
 
-	// Add WDS context flag
+	// Add flags
 	pflag.StringVar(&wdsContext, "wds-context", "wds1", "Context name for WDS cluster in kubeconfig")
 	pflag.StringVar(&itsContext, "its-context", "its1", "Context name for ITS cluster in kubeconfig")
 	pflag.StringVar(&wecContexts, "wec-contexts", "cluster1", "Comma-separated context names for WEC clusters in kubeconfig")
 	pflag.StringVar(&kubeconfigPath, "kubeconfig", "~/.kube/config", "Path to kubeconfig file")
-	pflag.StringVar(&monitoredNamespace, "monitored-namespace", "default", "Namespace of the deployment to monitor")
-	pflag.StringVar(&bindingName, "binding-name", "nginx-singleton-bpolicy", "Name of the binding policy for the monitored deployment")
+	pflag.StringVar(&monitoredNamespace, "monitored-namespace", "default", "Namespace of the resources to monitor")
+	pflag.StringVar(&bindingName, "binding-name", "nginx-singleton-bpolicy", "Name of the binding policy for the monitored resources")
+	pflag.StringVar(&excludedResources, "excluded-resources", "events,nodes,componentstatuses,endpoints,persistentvolumes,clusterroles,clusterrolebindings", "Comma-separated list of resource types to exclude from monitoring")
+	pflag.StringVar(&includedGroups, "included-groups", "", "Comma-separated list of API groups to include (empty means all groups)")
 
 	// Existing flags
 	pflag.StringVar(&metricsAddr, "metrics-bind-address", ":2222", "The address the metric endpoint binds to.")
@@ -93,38 +124,36 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
-	// Disable HTTP/2 if not enabled
-	disableHTTP2 := func(c *tls.Config) {
-		setupLog.Info("disabling http/2")
-		c.NextProtos = []string{"http/1.1"}
-	}
-
-	tlsOpts := []func(*tls.Config){}
-	if !enableHTTP2 {
-		tlsOpts = append(tlsOpts, disableHTTP2)
-	}
-
-	webhookServer := webhook.NewServer(webhook.Options{
-		TLSOpts: tlsOpts,
-	})
-
-	// Create manager
+	// Create manager with unstructured cache support
 	mgrCfg := buildClusterConfig(kubeconfigPath, wdsContext)
-
 	mgr, err := ctrl.NewManager(mgrCfg, ctrl.Options{
 		Scheme: scheme,
 		Metrics: metricsserver.Options{
 			BindAddress:   metricsAddr,
 			SecureServing: secureMetrics,
-			TLSOpts:       tlsOpts,
 		},
-		WebhookServer:          webhookServer,
+		WebhookServer:          webhook.NewServer(webhook.Options{}),
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "34020a28.kubestellar.io",
+
+		// FIXED: Properly configure client with unstructured cache support
+		Client: client.Options{
+			Cache: &client.CacheOptions{
+				DisableFor:   []client.Object{},
+				Unstructured: true, // Enable unstructured caching
+			},
+		},
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+
+	// Discover available resources
+	discoveredResources, err := discoverResources(mgrCfg, excludedResources, includedGroups)
+	if err != nil {
+		setupLog.Error(err, "unable to discover resources")
 		os.Exit(1)
 	}
 
@@ -176,21 +205,23 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Initialize Reconciler with dependencies
-	r := &controller.LatencyCollectorReconciler{
-		Client:             mgr.GetClient(),
-		Scheme:             mgr.GetScheme(),
-		WdsClient:          wdsClient,
-		WecClients:         wecClients,
-		WdsDynamic:         wdsDynamic,
-		ItsDynamic:         itsDynamic,
-		WecDynamics:        wecDynamics,
-		MonitoredNamespace: monitoredNamespace,
-		BindingName:        bindingName,
+	// Initialize Generic Reconciler with dependencies
+	r := &controller.GenericLatencyCollectorReconciler{
+		Client:              mgr.GetClient(),
+		Scheme:              mgr.GetScheme(),
+		WdsClient:           wdsClient,
+		WecClients:          wecClients,
+		WdsDynamic:          wdsDynamic,
+		ItsDynamic:          itsDynamic,
+		WecDynamics:         wecDynamics,
+		MonitoredNamespace:  monitoredNamespace,
+		BindingName:         bindingName,
+		DiscoveredResources: discoveredResources,
 	}
+
 	r.RegisterMetrics()
 	if err := r.SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Deployment")
+		setupLog.Error(err, "unable to create controller", "controller", "GenericLatencyCollector")
 		os.Exit(1)
 	}
 
@@ -208,6 +239,100 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+// Update the discoverResources function to return GVK instead of GVR
+func discoverResources(config *rest.Config, excludedResources, includedGroups string) ([]schema.GroupVersionKind, error) {
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+
+	discoveryClient := clientset.Discovery()
+
+	// Get all API resources
+	serverResources, err := discoveryClient.ServerPreferredResources()
+	if err != nil {
+		return nil, err
+	}
+
+	var resources []schema.GroupVersionKind
+	excludedSet := make(map[string]bool)
+	includedGroupsSet := make(map[string]bool)
+
+	// Parse excluded resources
+	if excludedResources != "" {
+		for _, res := range strings.Split(excludedResources, ",") {
+			excludedSet[strings.TrimSpace(res)] = true
+		}
+	}
+
+	// Parse included groups
+	if includedGroups != "" {
+		for _, group := range strings.Split(includedGroups, ",") {
+			includedGroupsSet[strings.TrimSpace(group)] = true
+		}
+	}
+
+	for _, group := range serverResources {
+		gv, err := schema.ParseGroupVersion(group.GroupVersion)
+		if err != nil {
+			continue
+		}
+		if excludedGroups[gv.Group] {
+			continue
+		}
+		for _, resource := range group.APIResources {
+			// Skip subresources
+			if strings.Contains(resource.Name, "/") {
+				continue
+			}
+
+			// Skip by resource-name exclusion
+			if excludedResourceNames[resource.Name] {
+				continue
+			}
+
+			// Skip excluded resources
+			if excludedSet[resource.Name] {
+				continue
+			}
+
+			// Parse group and version
+			gv, err := schema.ParseGroupVersion(group.GroupVersion)
+			if err != nil {
+				continue
+			}
+
+			// Filter by included groups if specified
+			if len(includedGroupsSet) > 0 && !includedGroupsSet[gv.Group] {
+				continue
+			}
+
+			// Only include namespaced resources that support list and watch
+			if resource.Namespaced && containsVerb(resource.Verbs, "list") && containsVerb(resource.Verbs, "watch") {
+				kind := resource.Kind
+				gvk := schema.GroupVersionKind{
+					Group:   gv.Group,
+					Version: gv.Version,
+					Kind:    kind,
+				}
+				resources = append(resources, gvk)
+			}
+		}
+	}
+
+	setupLog.Info("Discovered resources", "count", len(resources))
+	return resources, nil
+}
+
+func containsVerb(verbs []string, verb string) bool {
+	for _, v := range verbs {
+		if v == verb {
+			return true
+		}
+	}
+	return false
 }
 
 func buildClusterConfig(kubeconfigPath, context string) *rest.Config {
