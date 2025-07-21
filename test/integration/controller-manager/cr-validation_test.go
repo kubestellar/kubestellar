@@ -89,9 +89,12 @@ func TestBindingPolicyValidation(t *testing.T) {
 		specJSON string
 		expectOK bool
 	}{
-		{name: "junk-field-in-spec", specJSON: `{"junk": 1}`, expectOK: false},
+		{name: "junk-field-in-spec", specJSON: `{"junk": 1}`},
 		{name: "junk-field-in-policy", specJSON: `{"downsync": [{"junq": true}]}`},
-		{name: "no-test-in-policy", specJSON: `{"downsync": [{"createOnly": true, "statusCollection": {"statusCollectors": ["phred"]}}]}`},
+		// Test: empty ObjectTest (no selector fields, valid fields only)
+		{name: "empty-object-test", specJSON: `{"downsync": [{"createOnly": true}]}`},
+		// Test: use of now-invalid 'statusCollection' field (should fail OpenAPI validation)
+		{name: "invalid-statusCollection-field", specJSON: `{"downsync": [{"statusCollection": {"statusCollectors": ["phred"]}}]}`},
 		{name: "match-all-resources", specJSON: `{"downsync": [{"resources": ["*"]}]}`, expectOK: true},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {

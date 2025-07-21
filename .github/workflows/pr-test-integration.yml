@@ -11,6 +11,10 @@ on:
       - ".github/workflows/**"
       - "!.github/workflows/pr-test-e2e.yml"
       - "**/*.md"
+      - ".gha-reversemap.yml"
+      - "hack/verify-*"
+      - "hack/boilerplate/*"
+      - "hack/gha-reversemap.sh"
   push:
     paths-ignore:
       - "docs/**"
@@ -18,6 +22,10 @@ on:
       - ".github/workflows/**"
       - "!.github/workflows/pr-test-e2e.yml"
       - "**/*.md"
+      - ".gha-reversemap.yml"
+      - "hack/verify-*"
+      - "hack/boilerplate/*"
+      - "hack/gha-reversemap.sh"
 
 permissions:
   contents: read
