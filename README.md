@@ -23,9 +23,7 @@
 
 KubeStellar is particularly beneficial if you're currently deploying in a single cluster and are looking to expand to multiple clusters, or if you're already using multiple clusters and are seeking a more streamlined developer experience.
 
-
 ![KubeStellar High Level View](docs/content/images/kubestellar-high-level.png)
-
 
 The use of multiple clusters offers several advantages, including:
 
@@ -48,6 +46,8 @@ For usage, architecture, and other documentation, see [the website](https://kube
 ## Contributing
 
 We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md) guide and be sure to look at `main` or the release of interest to you.
+
+> 💡 **Pro Tip:** If you're new, start with issues labeled as `good first issue` — they're beginner‑friendly and a great way to get involved!
 
 This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
 
@@ -73,7 +73,6 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 - Follow us on:
    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
-
 
 <div>
 <h2><font size="6"><img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Red%20Heart.png" alt="Red Heart" width="40" height="40" /> Contributors </font></h2>
