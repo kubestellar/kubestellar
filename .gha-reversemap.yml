@@ -54,10 +54,10 @@ docker/login-action:
   tag: v3
   tag-url: https://github.com/docker/login-action/tree/v3
 actions/first-interaction:
-  sha: 3c71ce730280171fd1cfb57c00c774f8998586f7
-  sha-url: https://github.com/actions/first-interaction/commit/3c71ce730280171fd1cfb57c00c774f8998586f7
-  tag: v1
-  tag-url: https://github.com/actions/first-interaction/tree/v1
+  sha: 2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
+  sha-url: https://github.com/actions/first-interaction/commit/2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
+  tag: v2.0.0
+  tag-url: https://github.com/actions/first-interaction/tree/v2.0.0
 azure/setup-kubectl:
   sha: 776406bce94f63e41d621b960d78ee25c8b76ede
   sha-url: https://github.com/azure/setup-kubectl/commit/776406bce94f63e41d621b960d78ee25c8b76ede

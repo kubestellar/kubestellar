@@ -18,7 +18,7 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/first-interaction@3c71ce730280171fd1cfb57c00c774f8998586f7
+      - uses: actions/first-interaction@2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           issue-message: "Thank you for contributing your first Issue to KubeStellar. We are delighted to have you in our Universe!"
