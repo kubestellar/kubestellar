@@ -4,12 +4,16 @@ kind: ConfigMap
 metadata:
   name: "{{ .Release.Name }}-argocd-kubestellar-setup"
 data:
-  # Simplified script - most waiting logic moved to initContainers
+  # This script is used by the "{{ .Release.Name }}-argocd-kubestellar-setup" job to:
+  # 1. Register KubeStellar WDSes as Argo CD target clusters
+  # 2. Create any Argo CD applications listed in KubeStellar values
+  # Note: Waiting logic for dependencies moved to initContainers for better reliability
   argocd-setup.sh: |
     #!/usr/bin/env bash
     set -e
 
     NS={{ .Release.Namespace }}
+    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Getting ArgoCD pod and credentials..."
     ARGOCD_POD=$(kubectl -n $NS get pods -l app.kubernetes.io/name=argocd-server -o 'jsonpath={.items[0].metadata.name}')
     ARGOCD_PASSWD=$(kubectl -n $NS get secret argocd-initial-admin-secret -o jsonpath="{.data.password}")
 
@@ -19,6 +23,7 @@ data:
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Adding WDS clusters..."
     {{- range $cp := .Values.WDSes }}
     cp_name={{ $cp.name }}
+    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Processing WDS cluster: $cp_name"
     
     # Get kubeconfig for the control plane
     key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
@@ -62,7 +67,7 @@ metadata:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
   annotations:
     "helm.sh/hook": post-install, post-upgrade
-    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-weight": "5"  # IMPORTANT: set this weight higher than KubeFlex post-install hook, otherwise postgresql will not install
     "helm.sh/hook-delete-policy": before-hook-creation, hook-succeeded
 spec:
   template:
@@ -77,12 +82,12 @@ spec:
         runAsNonRoot: true
       serviceAccountName: "{{ .Release.Name }}-argocd-kubestellar-setup"
       
-      # INIT CONTAINERS - Handle all the waiting logic
+      # INIT CONTAINERS - Handle all the waiting logic to ensure proper sequencing
       initContainers:
       
       # INIT CONTAINER 1: Wait for ArgoCD Pod Creation
       - name: wait-argocd-pod-create
-        image: quay.io/kubestellar/kubectl:{{ .Values.KUBECTL_VERSION | default "1.30.12" }}
+        image: quay.io/kubestellar/kubectl:{{ .Values.KUBECTL_VERSION }}
         command: 
         - kubectl
         - wait
@@ -101,7 +106,7 @@ spec:
       
       # INIT CONTAINER 2: Wait for ArgoCD Pod Ready
       - name: wait-argocd-pod-ready
-        image: quay.io/kubestellar/kubectl:{{ .Values.KUBECTL_VERSION | default "1.30.12" }}
+        image: quay.io/kubestellar/kubectl:{{ .Values.KUBECTL_VERSION }}
         command:
         - kubectl
         - wait
@@ -120,7 +125,7 @@ spec:
       
       # INIT CONTAINER 3: Wait for ArgoCD Secret Creation
       - name: wait-argocd-secret-create
-        image: quay.io/kubestellar/kubectl:{{ .Values.KUBECTL_VERSION | default "1.30.12" }}
+        image: quay.io/kubestellar/kubectl:{{ .Values.KUBECTL_VERSION }}
         command:
         - kubectl
         - wait
@@ -138,7 +143,7 @@ spec:
       # INIT CONTAINER 4-N: Wait for Each Control Plane (Dynamic Loop)
       {{- range $cp := .Values.WDSes }}
       - name: wait-cp-{{ $cp.name }}-create
-        image: quay.io/kubestellar/kubectl:{{ $.Values.KUBECTL_VERSION | default "1.30.12" }}
+        image: quay.io/kubestellar/kubectl:{{ $.Values.KUBECTL_VERSION }}
         command:
         - kubectl
         - wait
@@ -152,7 +157,7 @@ spec:
               - ALL
       
       - name: wait-cp-{{ $cp.name }}-ready
-        image: quay.io/kubestellar/kubectl:{{ $.Values.KUBECTL_VERSION | default "1.30.12" }}
+        image: quay.io/kubestellar/kubectl:{{ $.Values.KUBECTL_VERSION }}
         command:
         - kubectl
         - wait
@@ -169,7 +174,7 @@ spec:
       # MAIN CONTAINER - Simplified logic after initContainers guarantee readiness
       containers:
       - name: add-wds-clusters
-        image: quay.io/kubestellar/kubectl:{{ .Values.KUBECTL_VERSION | default "1.30.12" }}
+        image: quay.io/kubestellar/kubectl:{{ .Values.KUBECTL_VERSION }}
         command: [ "/bin/bash", "/mnt/script/argocd-setup.sh" ]
         securityContext:
           allowPrivilegeEscalation: false
