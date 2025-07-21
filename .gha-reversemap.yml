@@ -83,3 +83,13 @@ actions/upload-artifact:
   sha-url: https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02
   tag: v4
   tag-url: https://github.com/actions/upload-artifact/tree/v4
+actions/download-artifact:
+  sha: 65a9edc5881444af0b9093a5e628f2fe47ea3b2e
+  sha-url: https://github.com/actions/download-artifact/commit/65a9edc5881444af0b9093a5e628f2fe47ea3b2e
+  tag: v4.1.7
+  tag-url: https://github.com/actions/download-artifact/tree/v4.1.7
+github/codeql-action/upload-sarif:
+  sha: f7f3afe1fd8c725c2e15ec8c95b3f0d928b12988
+  sha-url: https://github.com/github/codeql-action/commit/f7f3afe1fd8c725c2e15ec8c95b3f0d928b12988
+  tag: v3
+  tag-url: https://github.com/github/codeql-action/tree/v3
