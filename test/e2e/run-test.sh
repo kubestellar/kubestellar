@@ -25,7 +25,7 @@ fail_flag=""
 
 while [ $# != 0 ]; do
     case "$1" in
-        (-h|--help) echo "$0 usage: (--released | --env | --test-type | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --fail-fast)*"
+        (-h|--help) echo "$0 usage: (--released | --env | --test-type | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --fail-fast | --kubeconfig-path \$path)*"
                     exit;;
         (--released) setup_flags="$setup_flags $1";;
         (--kubestellar-controller-manager-verbosity|--transport-controller-verbosity)
@@ -53,6 +53,14 @@ while [ $# != 0 ]; do
             exit 1;
           fi;;
         (--fail-fast) fail_flag="--fail-fast";;
+        (--kubeconfig-path)
+          if (( $# > 1 )); then
+            kubeconfig_path="$2"
+            shift
+          else
+            echo "Missing --kubeconfig-path value" >&2
+            exit 1;
+          fi;;
         (*) echo "$0: unrecognized argument '$1'" >&2
             exit 1
     esac
@@ -81,7 +89,7 @@ scripts_dir="${SRC_DIR}/../../scripts"
 
 "${COMMON_SRCS}/cleanup.sh" --env "$env"
 source "${COMMON_SRCS}/setup-shell.sh"
-"${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env"
+"${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env" --kubeconfig-path "$kubeconfig_path"
 
 if [ $test == "bash" ];then
     "${SRC_DIR}/bash/use-kubestellar.sh" --env "$env"

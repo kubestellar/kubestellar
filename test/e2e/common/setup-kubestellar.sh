@@ -25,7 +25,7 @@ HOSTING_CONTEXT=kind-kubeflex
 while [ $# != 0 ]; do
     case "$1" in
         (-h|--help)
-            echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp)*"
+            echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp | --kubeconfig-path \$path)*"
             exit;;
         (--released)
             use_release=true;;
@@ -57,6 +57,14 @@ while [ $# != 0 ]; do
                 exit 1;;
           esac
           shift;;
+        (--kubeconfig-path)
+          if (( $# > 1 )); then
+            KUBECONFIG="$2"
+            shift
+          else
+            echo "Missing --kubeconfig-path value" >&2
+            exit 1;
+          fi;;
         (*) echo "$0: unrecognized argument/flag '$1'" >&2
             exit 1
     esac
@@ -93,7 +101,7 @@ case "$CLUSTER_SOURCE" in
         : Kubeflex kind cluster created.
         ;;
     (existing)
-        kubectl config use-context "$HOSTING_CONTEXT"
+        KUBECONFIG=$KUBECONFIG kubectl config use-context "$HOSTING_CONTEXT"
         : kubectl configured to use existing cluster in "$HOSTING_CONTEXT" context
         ;;
 esac
@@ -107,7 +115,7 @@ esac
 pushd "${SRC_DIR}/../../.."
 if [ "$use_release" = true ] ; then
   helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-    --version $(yq .KUBESTELLAR_VERSION core-chart/values.yaml) \
+    --version $(KUBECONFIG=$KUBECONFIG yq .KUBESTELLAR_VERSION core-chart/values.yaml) \
     --kube-context $HOSTING_CONTEXT \
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
@@ -117,7 +125,7 @@ else
   make kind-load-image
   helm dependency update core-chart/
   helm upgrade --install ks-core core-chart/ \
-    --set KUBESTELLAR_VERSION=$(git rev-parse --short HEAD) \
+    --set KUBESTELLAR_VERSION=$(KUBECONFIG=$KUBECONFIG git rev-parse --short HEAD) \
     --kube-context $HOSTING_CONTEXT \
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
@@ -127,31 +135,31 @@ else
 popd
 
 echo "Waiting for wds1-system namespace and kubestellar-controller-manager deployment to be ready..."
-kubectl --context "$HOSTING_CONTEXT" wait --for=jsonpath='{.status.phase}'=Active namespace/wds1-system --timeout=300s
-kubectl --context "$HOSTING_CONTEXT" wait --for=condition=Available deployment/kubestellar-controller-manager -n wds1-system --timeout=300s
+KUBECONFIG=$KUBECONFIG kubectl --context "$HOSTING_CONTEXT" wait --for=jsonpath='{.status.phase}'=Active namespace/wds1-system --timeout=300s
+KUBECONFIG=$KUBECONFIG kubectl --context "$HOSTING_CONTEXT" wait --for=condition=Available deployment/kubestellar-controller-manager -n wds1-system --timeout=300s
 echo "wds1-system namespace and kubestellar-controller-manager deployment are ready."
 
 : Waiting for OCM hub to be ready...
-kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
-kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
-kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
+KUBECONFIG=$KUBECONFIG kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
+KUBECONFIG=$KUBECONFIG kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
+KUBECONFIG=$KUBECONFIG kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
-wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
+wait-for-cmd "(KUBECONFIG=$KUBECONFIG kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(KUBECONFIG=$KUBECONFIG kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
 
 echo "transport controller is running."
 
-kubectl config use-context "$HOSTING_CONTEXT"
-kflex ctx --set-current-for-hosting
-kflex ctx --overwrite-existing-context wds1
-kflex ctx --overwrite-existing-context its1
+KUBECONFIG=$KUBECONFIG kubectl config use-context "$HOSTING_CONTEXT"
+KUBECONFIG=$KUBECONFIG kflex ctx --set-current-for-hosting
+KUBECONFIG=$KUBECONFIG kflex ctx --overwrite-existing-context wds1
+KUBECONFIG=$KUBECONFIG kflex ctx --overwrite-existing-context its1
 
 echo "--- Kubeconfig contexts after kflex ctx ---"
-kubectl config get-contexts
+KUBECONFIG=$KUBECONFIG kubectl config get-contexts
 echo "------------------------------------------"
 
-kflex ctx
+KUBECONFIG=$KUBECONFIG kflex ctx
 
-wait-for-cmd 'kubectl --context its1 get ns customization-properties'
+wait-for-cmd 'KUBECONFIG=$KUBECONFIG kubectl --context its1 get ns customization-properties'
 
 :
 : -------------------------------------------------------------------------
@@ -162,33 +170,33 @@ function add_wec() {
     case "$CLUSTER_SOURCE" in
         (kind)
             kind create cluster --name $cluster
-            kubectl config rename-context kind-${cluster} $cluster
+            KUBECONFIG=$KUBECONFIG kubectl config rename-context kind-${cluster} $cluster
             joinflags="--force-internal-endpoint-lookup";;
         (existing)
             joinflags="";;
     esac
-    clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${joinflags}'"}' | sh
+    KUBECONFIG=$KUBECONFIG clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${joinflags}'"}' | sh
 }
 
 "${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose ocm
 
-kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
-kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
+KUBECONFIG=$KUBECONFIG kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
+KUBECONFIG=$KUBECONFIG kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
 
 add_wec cluster1
 add_wec cluster2
 
 : Wait for csrs in its1
-wait-for-cmd '(($(kubectl --context its1 get csr 2>/dev/null | grep -c Pending) >= 2))'
+wait-for-cmd '(($(KUBECONFIG=$KUBECONFIG kubectl --context its1 get csr 2>/dev/null | grep -c Pending) >= 2))'
 
-clusteradm --context its1 accept --clusters cluster1
-clusteradm --context its1 accept --clusters cluster2
+KUBECONFIG=$KUBECONFIG clusteradm --context its1 accept --clusters cluster1
+KUBECONFIG=$KUBECONFIG clusteradm --context its1 accept --clusters cluster2
 
-kubectl --context its1 get managedclusters
-kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1 region=east
-kubectl --context its1 create cm -n customization-properties cluster1 --from-literal clusterURL=https://my.clusters/1001-abcd
-kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2 region=west
-kubectl --context its1 create cm -n customization-properties cluster2 --from-literal clusterURL=https://my.clusters/2002-cdef
+KUBECONFIG=$KUBECONFIG kubectl --context its1 get managedclusters
+KUBECONFIG=$KUBECONFIG kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1 region=east
+KUBECONFIG=$KUBECONFIG kubectl --context its1 create cm -n customization-properties cluster1 --from-literal clusterURL=https://my.clusters/1001-abcd
+KUBECONFIG=$KUBECONFIG kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2 region=west
+KUBECONFIG=$KUBECONFIG kubectl --context its1 create cm -n customization-properties cluster2 --from-literal clusterURL=https://my.clusters/2002-cdef
 
 :
 : -------------------------------------------------------------------------
@@ -196,13 +204,13 @@ kubectl --context its1 create cm -n customization-properties cluster2 --from-lit
 : Expect to see the wds1 kubestellar-controller-manager and transport-controller created in the wds1-system
 : namespace and the its1 statefulset created in the its1-system namespace.
 :
-wait-for-cmd "((\$(kubectl --context '$HOSTING_CONTEXT' get deployments,statefulsets --all-namespaces | grep -e wds1 -e its1 | wc -l) == 5))"
+wait-for-cmd "((\$(KUBECONFIG=$KUBECONFIG kubectl --context '$HOSTING_CONTEXT' get deployments,statefulsets --all-namespaces | grep -e wds1 -e its1 | wc -l) == 5))"
 
 :
 : -------------------------------------------------------------------------
 : "Get available clusters with label location-group=edge and check there are two of them"
 :
-if ! expect-cmd-output 'kubectl --context its1 get managedclusters -l location-group=edge' 'wc -l | grep -wq 3'
+if ! expect-cmd-output 'KUBECONFIG=$KUBECONFIG kubectl --context its1 get managedclusters -l location-group=edge' 'wc -l | grep -wq 3'
 then
     echo "Failed to see two clusters."
     exit 1
