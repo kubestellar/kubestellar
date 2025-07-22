@@ -124,7 +124,7 @@ is_installed_helm() {
     is_installed 'Helm' \
         'helm' \
         'helm version' \
-        'helm version --template={{.Version}}' \
+        'echo "v$(helm version --template={{.Version}})"' \
         'https://helm.sh/docs/intro/install/' \
         'v3'
     if log=$(helm show chart oci://ghcr.io/kubestellar/kubestellar/core-chart 2>&1)
