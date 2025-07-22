@@ -17,6 +17,8 @@ set -x # echo so users can understand what is happening
 set -e # exit on error
 
 use_release=false
+argocd_install=false
+argocd_domain="argocd.localtest.me"
 KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=5
 TRANSPORT_CONTROLLER_VERBOSITY=5
 CLUSTER_SOURCE=kind
@@ -25,10 +27,20 @@ HOSTING_CONTEXT=kind-kubeflex
 while [ $# != 0 ]; do
     case "$1" in
         (-h|--help)
-            echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp)*"
+            echo "$0 usage: (--released | --argocd | --argocd-domain \$domain | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp)*"
             exit;;
         (--released)
             use_release=true;;
+        (--argocd)
+            argocd_install=true;;
+        (--argocd-domain)
+            if (( $# > 1 )); then
+                argocd_domain="$2"
+                shift
+            else
+                echo "Missing argocd-domain value" >&2
+                exit 1;
+            fi;;
         (--kubestellar-controller-manager-verbosity)
           if (( $# > 1 )); then
             KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY="$2"
@@ -73,7 +85,6 @@ then echo "$0: \$TRANSPORT_CONTROLLER_VERBOSITY must be an integer" >&2
      exit 1
 fi
 
-
 if [[ "$KFLEX_DISABLE_CHATTY" = true ]] ; then
    disable_chatty_status="--chatty-status=false"
    echo "disable_chatty_status = $disable_chatty_status"
@@ -98,11 +109,32 @@ case "$CLUSTER_SOURCE" in
         ;;
 esac
 
-
 :
 : -------------------------------------------------------------------------
-: Install the core-chart
+: Install the core-chart with optional ArgoCD
 :
+
+# Build ArgoCD configuration parameters if ArgoCD installation is requested
+ARGOCD_PARAMS=""
+if [ "$argocd_install" = true ]; then
+    ARGOCD_PARAMS="--set argocd.install=true"
+    
+    case "$CLUSTER_SOURCE" in
+        (kind)
+            ARGOCD_PARAMS="$ARGOCD_PARAMS --set argocd.global.domain=$argocd_domain"
+            ;;
+        (existing)
+            # For OpenShift environments
+            if [ "$HOSTING_CONTEXT" = "kscore" ]; then
+                ARGOCD_PARAMS="$ARGOCD_PARAMS --set argocd.openshift.enabled=true"
+            else
+                ARGOCD_PARAMS="$ARGOCD_PARAMS --set argocd.global.domain=$argocd_domain"
+            fi
+            ;;
+    esac
+    
+    echo "ArgoCD installation enabled with parameters: $ARGOCD_PARAMS"
+fi
 
 pushd "${SRC_DIR}/../../.."
 if [ "$use_release" = true ] ; then
@@ -112,7 +144,8 @@ if [ "$use_release" = true ] ; then
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
-    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
+    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY} \
+    $ARGOCD_PARAMS
 else
   make kind-load-image
   helm dependency update core-chart/
@@ -122,7 +155,8 @@ else
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
-    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
+    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY} \
+    $ARGOCD_PARAMS
   fi
 popd
 
@@ -143,6 +177,21 @@ kflex ctx --overwrite-existing-context its1
 kflex ctx
 
 wait-for-cmd 'kubectl --context its1 get ns customization-properties'
+
+:
+: -------------------------------------------------------------------------
+: Wait for ArgoCD to be ready (if installed)
+:
+if [ "$argocd_install" = true ]; then
+    echo "Waiting for ArgoCD components to be ready..."
+    wait-for-cmd 'kubectl --context '"$HOSTING_CONTEXT"' get pods -A | grep argocd-server | grep Running | wc -l | grep -v ^0$'
+    wait-for-cmd 'kubectl --context '"$HOSTING_CONTEXT"' get pods -A | grep argocd-application-controller | grep Running | wc -l | grep -v ^0$'
+    wait-for-cmd 'kubectl --context '"$HOSTING_CONTEXT"' get pods -A | grep argocd-repo-server | grep Running | wc -l | grep -v ^0$'
+    
+    echo "ArgoCD installation completed successfully"
+    echo "ArgoCD UI available at: https://$argocd_domain$([ "$CLUSTER_SOURCE" = "kind" ] && echo ":9443")"
+    echo "To get ArgoCD admin password: kubectl -n default get secret argocd-initial-admin-secret -o jsonpath=\"{.data.password}\" | base64 -d"
+fi
 
 :
 : -------------------------------------------------------------------------
@@ -187,7 +236,12 @@ kubectl --context its1 create cm -n customization-properties cluster2 --from-lit
 : Expect to see the wds1 kubestellar-controller-manager and transport-controller created in the wds1-system
 : namespace and the its1 statefulset created in the its1-system namespace.
 :
-wait-for-cmd "((\$(kubectl --context '$HOSTING_CONTEXT' get deployments,statefulsets --all-namespaces | grep -e wds1 -e its1 | wc -l) == 5))"
+expected_count=5
+if [ "$argocd_install" = true ]; then
+    expected_count=8  # Additional ArgoCD deployments
+fi
+
+wait-for-cmd "((\$(kubectl --context '$HOSTING_CONTEXT' get deployments,statefulsets --all-namespaces | grep -e wds1 -e its1 -e argocd | wc -l) >= $expected_count))"
 
 :
 : -------------------------------------------------------------------------
@@ -197,4 +251,9 @@ if ! expect-cmd-output 'kubectl --context its1 get managedclusters -l location-g
 then
     echo "Failed to see two clusters."
     exit 1
+fi
+
+echo "KubeStellar setup completed successfully!"
+if [ "$argocd_install" = true ]; then
+    echo "ArgoCD has been installed and configured with KubeStellar WDSes"
 fi
