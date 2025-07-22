@@ -140,6 +140,10 @@ kflex ctx --set-current-for-hosting
 kflex ctx --overwrite-existing-context wds1
 kflex ctx --overwrite-existing-context its1
 
+echo "--- Kubeconfig contexts after kflex ctx ---"
+kubectl config get-contexts
+echo "------------------------------------------"
+
 kflex ctx
 
 wait-for-cmd 'kubectl --context its1 get ns customization-properties'
