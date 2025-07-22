@@ -160,6 +160,14 @@ jobs:
           curl http://localhost:8090/metrics
           kill %
 
+      - name: Debug - Show Kubeconfig file
+        if: always()
+        run: cat ~/.kube/config
+
+      - name: Debug - List Kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
       - name: scrape OCM Status Add-On Controller
         if: always()
         run: |
@@ -289,6 +297,14 @@ jobs:
           sleep 10
           curl http://localhost:8090/metrics
           kill %
+
+      - name: Debug - Show Kubeconfig file
+        if: always()
+        run: cat ~/.kube/config
+
+      - name: Debug - List Kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
 
       - name: scrape OCM Status Add-On Controller
         if: always()
