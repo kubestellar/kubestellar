@@ -82,16 +82,7 @@ spec:
           - name: wait-for-its-controlplane
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             imagePullPolicy: IfNotPresent
-            command: ["kubectl", "wait", "--for=condition=Ready", "controlplane/{{.ITSName}}", "--timeout=5m"]
-            {{- if not .ITSName }}
-            # If ITSName is not provided, this init container should not run
-            # This is a workaround as `kubectl wait` does not support conditional execution
-            # The command will fail if ITSName is empty, but the pod will eventually start
-            # if the transport controller does not require ITS.
-            # A better solution would be to use a custom init container that checks for ITSName
-            # before attempting to wait.
-            command: ["sh", "-c", "if [ -z "{{.ITSName}}" ]; then exit 0; else kubectl wait --for=condition=Ready controlplane/{{.ITSName}} --timeout=5m; fi"]
-            {{- end }}
+            command: ["sh", "-c", "if [ -z "{{.ITSName}}" ]; then echo "ITSName not provided, skipping wait for ITS controlplane."; else kubectl wait --for=condition=Ready controlplane/{{.ITSName}} --timeout=5m; fi"]
           - name: setup-its-kubeconfig
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             imagePullPolicy: IfNotPresent
