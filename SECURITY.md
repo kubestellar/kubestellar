@@ -3,6 +3,23 @@
 
 Join the [kubestellar-security-announce](https://groups.google.com/u/1/g/kubestellar-security-announce) group for emails about security and major API announcements.
 
+## Dependencies Policy
+
+KubeStellar manages its dependencies with the following policy:
+
+- **Dependency Detection:** We use [Dependabot](https://github.com/dependabot) to automatically check for and propose updates to dependencies in Go modules, Python requirements, Dockerfiles, and Helm charts. Dependabot PRs serve as prompts but are not automatically accepted.
+- **Update Process:** After Dependabot creates a PR, maintainers wait for potential issues to surface before proceeding. They then create their own PR that follows our [GitHub Action reference discipline](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#github-action-reference-discipline) and other established practices.
+- **Review Process:** All dependency update pull requests are subject to the same [review process](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#pull-requests) as other code changes. Maintainers verify that updates do not introduce breaking changes or known vulnerabilities before merging.
+- **Vulnerability Checking:** Before merging dependency updates, maintainers perform comprehensive security assessments:
+  - **Security Scanning:** Use available security scanning tools to check for known vulnerabilities in new dependency versions
+  - **Security Advisories:** Review security advisories and release notes for the updated dependencies
+  - **Breaking Changes:** Verify that updates do not introduce breaking changes or compatibility issues
+  - **GitHub Actions:** For GitHub Actions specifically, ensure updates follow our [GitHub Action Reference Discipline](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#github-action-reference-discipline) and use approved commit hashes. The [verify-action-hashes workflow](https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/verify-action-hashes.yaml) automatically checks that each GitHub Action reference uses an approved commit hash.
+  - **SBOM Generation:** Generate Software Bill of Materials (SBOM) using [Anchore's syft tool](https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/goreleaser.yml) during releases to identify and track dependencies for security analysis
+  - **Testing:** Run comprehensive tests to ensure the updated dependencies work correctly with the codebase
+- **Security Best Practices:** We avoid using unmaintained or deprecated dependencies, and monitor for security advisories affecting our dependencies. Vulnerabilities in dependencies are prioritized for prompt remediation.
+- **Documentation:** The dependency update process is documented in the repository's README and CONTRIBUTING guidelines.
+
 ## Report a Vulnerability
 
 We're extremely grateful for security researchers and users that report vulnerabilities to the KubeStellar Open Source Community. All reports are thoroughly investigated by a set of community volunteers.
