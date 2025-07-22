@@ -126,6 +126,11 @@ else
   fi
 popd
 
+echo "Waiting for wds1-system namespace and kubestellar-controller-manager deployment to be ready..."
+kubectl --context "$HOSTING_CONTEXT" wait --for=jsonpath='{.status.phase}'=Active namespace/wds1-system --timeout=300s
+kubectl --context "$HOSTING_CONTEXT" wait --for=condition=Available deployment/kubestellar-controller-manager -n wds1-system --timeout=300s
+echo "wds1-system namespace and kubestellar-controller-manager deployment are ready."
+
 : Waiting for OCM hub to be ready...
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
 kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
