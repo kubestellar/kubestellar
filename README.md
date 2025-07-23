@@ -105,4 +105,8 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 <br>Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF).
 <br>The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/legal/trademark-usage">Trademark Usage page</a>.
 <br>© 2022-2025. The KubeStellar Authors.
+
+## AI/ML Network Benchmarking Suite
+
+A new benchmarking suite for distributed AI/ML network patterns (AllReduce, Parameter Server, Bulk Transfer) is being developed under `tools/ai-netbench/`. It is designed for multi-cluster benchmarking in KubeStellar environments and is deployable via Helm. See the `tools/ai-netbench/README.md` for details.
 <!--readme-for-root-end-->
