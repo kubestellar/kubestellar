@@ -142,6 +142,28 @@ We welcome all contributors! Whether you're fixing a typo or writing new docs, y
 
 ---
 
+## Getting in touch
+
+There are several ways to communicate with us:
+
+Instantly get access to our documents and meeting invites at http://kubestellar.io/joinus
+
+- The [`#kubestellar-dev` channel](https://kubernetes.slack.com/archives/C058SUSL5AA) in the [Kubernetes Slack workspace](https://slack.k8s.io)
+- Our mailing lists:
+    - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
+    - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
+- Subscribe to the [community meeting calendar](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MWM4a2loZDZrOWwzZWQzZ29xanZwa3NuMWdfMjAyMzA1MThUMTQwMDAwWiBiM2Q2NWM5MmJlZDdhOTg4NGVmN2ZlOWUzZjZjOGZlZDE2ZjZmYjJmODExZjU3NTBmNTQ3NTY3YTVkZDU4ZmVkQGc&tmsrc=b3d65c92bed7a9884ef7fe9e3f6c8fed16f6fb2f811f5750f547567a5dd58fed%40group.calendar.google.com&scp=ALL) for community meetings and events
+    - The [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list is subscribed to this calendar
+- See recordings of past KubeStellar community meetings on [YouTube](https://www.youtube.com/@kubestellar)
+- See [upcoming](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
+- Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
+    - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
+- Follow us on:
+   - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
+   - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
+
+---
+
 ## 📊 Project Badges & Compliance
 
 [![CLOMonitor](https://clomonitor.io/api/projects/cncf/kubestellar/report-summary?theme=light)](https://clomonitor.io/projects/cncf/kubestellar)  
