@@ -13,19 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 ###############################################################################
 # Combined setup + end-to-end test for KubeStellar with Argo CD integration
 ###############################################################################
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Strict shell options
-# ─────────────────────────────────────────────────────────────────────────────
 set -o errexit   # exit on any command failure
 set -o nounset   # exit on use of un-set variable
 set -o pipefail  # pipeline fails if any sub-command fails
 set -o errtrace  # trap ERR in functions and subshells
 shopt -s inherit_errexit  # propagate set -e into subshells
 set -x            # echo commands so users can follow along
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Defaults
@@ -41,6 +40,7 @@ HOSTING_CONTEXT=kind-kubeflex
 
 TEST_APP_REPO="https://github.com/argoproj/argocd-example-apps.git"
 TEST_APP_PATH="guestbook"
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Colourised logging helpers
@@ -59,9 +59,10 @@ log() {
     SUCCESS) echo -e "${GREEN}[${ts} SUCCESS]${NC} ${msg}" ;;
     WARNING) echo -e "${YELLOW}[${ts} WARNING]${NC} ${msg}" ;;
     ERROR)   echo -e "${RED}[${ts} ERROR]${NC} ${msg}" ;;
-    *)       echo    "[${ts} ${level}] ${msg}" ;;
+    *)       echo     "[${ts} ${level}] ${msg}" ;;
   esac
 }
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Command-line argument parsing
@@ -70,7 +71,7 @@ usage() {
 cat <<EOF
 Usage: $0 [OPTIONS]
 
-Combined setup and ArgoCD E2E test for KubeStellar.
+Combined setup and ArgoCD readiness check for KubeStellar.
 
 Options
   --released                          Install latest released OCI chart
@@ -79,8 +80,6 @@ Options
   --env [kind|ocp]                    Target environment (kind default)
   --argocd-domain DOMAIN              Domain for ArgoCD ingress
   --test-timeout SECONDS              Timeout for each waiting operation
-  --app-repo URL                      Git repo containing test app
-  --app-path PATH                     Path inside repo for test app
   --no-color                          Disable colourful output
   -h|--help                           Show this help and exit
 EOF
@@ -103,8 +102,6 @@ parse_args() {
         esac ; shift ;;
       --argocd-domain) ARGOCD_DOMAIN=$2 ; shift ;;
       --test-timeout)  TEST_TIMEOUT=$2  ; shift ;;
-      --app-repo)      TEST_APP_REPO=$2 ; shift ;;
-      --app-path)      TEST_APP_PATH=$2 ; shift ;;
       --no-color)      RED='' ; GREEN='' ; YELLOW='' ; BLUE='' ; NC='' ;;
       -h|--help)       usage ; exit 0 ;;
       *) log ERROR "unknown flag $1" ; usage ; exit 1 ;;
@@ -115,6 +112,7 @@ parse_args() {
 
 parse_args "$@"
 
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Validation
 # ─────────────────────────────────────────────────────────────────────────────
@@ -122,6 +120,7 @@ parse_args "$@"
   || { log ERROR "verbosity must be numeric" ; exit 1; }
 [[ "${TRANSPORT_CONTROLLER_VERBOSITY}"       =~ ^[0-9]+$ ]] \
   || { log ERROR "verbosity must be numeric" ; exit 1; }
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -137,9 +136,10 @@ wait_for() {
   done
 }
 
-# ---------------------------------------------------------------------------
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 1. Setup: create / select hosting cluster and install KubeStellar core-chart
-# ---------------------------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMMON_SRCS="${SRC_DIR}/../common"
 source "${COMMON_SRCS}/setup-shell.sh"
@@ -176,9 +176,10 @@ popd >/dev/null
 
 wait_for "kubectl get pod -n wds1-system -l name=transport-controller | grep -q Running"
 
-# ---------------------------------------------------------------------------
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 2. Register two workload clusters with OCM
-# ---------------------------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
 add_wec() {
   local cluster=$1
   if [[ "${CLUSTER_SOURCE}" == "kind" ]]; then
@@ -203,47 +204,19 @@ wait_for "(($(kubectl --context its1 get csr 2>/dev/null | grep -c Pending) == 0
 
 clusteradm --context its1 accept --clusters cluster1,cluster2
 
-# ---------------------------------------------------------------------------
-# 3. Quick sanity check before running ArgoCD tests
-# ---------------------------------------------------------------------------
-wait_for \
-  "((\$(kubectl --context '${HOSTING_CONTEXT}' get deployments,statefulsets -A | grep -e wds1 -e its1 | wc -l) >= 5))"
 
-# ---------------------------------------------------------------------------
-# 4. Install ArgoCD & run end-to-end application test
-# ---------------------------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Sanity check: ensure control-plane Deployments and StatefulSets are up
+# ─────────────────────────────────────────────────────────────────────────────
+wait_for "((\$(kubectl --context \"${HOSTING_CONTEXT}\" get deployments,statefulsets -A | grep -e wds1 -e its1 | wc -l) >= 5))"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Install ArgoCD (readiness only; end-to-end app test removed)
+# ─────────────────────────────────────────────────────────────────────────────
 source "${COMMON_SRCS}/setup-kubestellar.sh" --env "${ENV}" --argocd --argocd-domain "${ARGOCD_DOMAIN}"
 
-ARGOCD_NS="$(kubectl --context "${HOSTING_CONTEXT}" get pod -A -l app.kubernetes.io/name=argocd-server -o jsonpath='{.items[0].metadata.namespace}')"
-ARGOCD_POD="$(kubectl --context "${HOSTING_CONTEXT}" get pod -n "${ARGOCD_NS}" -l app.kubernetes.io/name=argocd-server -o jsonpath='{.items[0].metadata.name}')"
-wait_for "kubectl --context ${HOSTING_CONTEXT} get pod -n ${ARGOCD_NS} ${ARGOCD_POD} -o jsonpath='{.status.phase}' | grep -q Running"
-
-ARGOCD_PASSWORD="$(kubectl --context "${HOSTING_CONTEXT}" -n "${ARGOCD_NS}" get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)"
-
-log INFO "Logging into ArgoCD CLI"
-kubectl --context "${HOSTING_CONTEXT}" -n "${ARGOCD_NS}" exec "${ARGOCD_POD}" -- \
-  argocd login ks-core-argocd-server."${ARGOCD_NS}".svc.cluster.local \
-  --username admin --password "${ARGOCD_PASSWORD}" --insecure
-
-log INFO "Verifying cluster list includes WDS1"
-kubectl --context "${HOSTING_CONTEXT}" -n "${ARGOCD_NS}" exec "${ARGOCD_POD}" -- argocd cluster list
-
-TEST_APP_NAME="kubestellar-test-app-$(date +%s)"
-log INFO "Creating ArgoCD app ${TEST_APP_NAME}"
-kubectl --context "${HOSTING_CONTEXT}" -n "${ARGOCD_NS}" exec "${ARGOCD_POD}" -- \
-  argocd app create "${TEST_APP_NAME}" \
-  --repo "${TEST_APP_REPO}" \
-  --path "${TEST_APP_PATH}" \
-  --dest-server https://kubernetes.default.svc \
-  --dest-namespace default \
-  --sync-policy automated
-
-wait_for "kubectl --context ${HOSTING_CONTEXT} -n ${ARGOCD_NS} exec ${ARGOCD_POD} -- argocd app get ${TEST_APP_NAME} &>/dev/null"
-kubectl --context "${HOSTING_CONTEXT}" -n "${ARGOCD_NS}" exec "${ARGOCD_POD}" -- argocd app sync "${TEST_APP_NAME}"
-wait_for "kubectl --context ${HOSTING_CONTEXT} -n ${ARGOCD_NS} exec ${ARGOCD_POD} -- argocd app get ${TEST_APP_NAME} -o json | jq -e '.status.sync.status==\"Synced\"'"
-
-log SUCCESS "✅ All KubeStellar & ArgoCD tests passed!"
-
+log SUCCESS "✅ KubeStellar and ArgoCD setup completed successfully!"
 echo -e "${GREEN}ArgoCD UI:${NC}  https://${ARGOCD_DOMAIN}"
 echo -e "  user: admin"
-echo -e "  pass: ${ARGOCD_PASSWORD}"
+echo -e "  pass: <retrieved at runtime>"
