@@ -1,4 +1,4 @@
-<!--readme-for-root-start-->
+<!-- Note that this repo has two readme files, with content that is as nearly identical as is practical: `/README.md` and `/docs/content/readme.md` -->
 
 <img alt="" width="500px" align="left" src="../KubeStellar-with-Logo.png" />
 
@@ -110,4 +110,3 @@ Thanks go to these wonderful people:
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-<!--readme-for-root-end-->
