@@ -22,36 +22,36 @@ data:
 
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Adding WDS clusters..."
     {{- range $cp := .Values.WDSes }}
-    cp_name={{ $cp.name }}
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Processing WDS cluster: $cp_name"
-    
-    # Get kubeconfig for the control plane
-    key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
-    secret_name=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
-    secret_namespace=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
-    kubeconfig="/tmp/${cp_name}.kubeconfig"
-    
-    kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d > "$kubeconfig"
-    kubectl -n $NS cp "$kubeconfig" ${ARGOCD_POD}:/tmp
-    rm "$kubeconfig"
-    
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Registering Control Plane \"$cp_name\"..."
-    kubectl -n $NS exec $ARGOCD_POD -- argocd cluster add ${cp_name} -y --kubeconfig "$kubeconfig"
-    kubectl -n $NS exec $ARGOCD_POD -- rm "$kubeconfig"
+      cp_name={{ $cp.name }}
+      echo "[$(date +"%Y-%m-%d %H:%M:%S")] Processing WDS cluster: $cp_name"
+      
+      # Get kubeconfig for the control plane
+      key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
+      secret_name=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
+      secret_namespace=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
+      kubeconfig="/tmp/${cp_name}.kubeconfig"
+      
+      kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d > "$kubeconfig"
+      kubectl -n $NS cp "$kubeconfig" ${ARGOCD_POD}:/tmp
+      rm "$kubeconfig"
+      
+      echo "[$(date +"%Y-%m-%d %H:%M:%S")] Registering Control Plane \"$cp_name\"..."
+      kubectl -n $NS exec $ARGOCD_POD -- argocd cluster add ${cp_name} -y --kubeconfig "$kubeconfig"
+      kubectl -n $NS exec $ARGOCD_POD -- rm "$kubeconfig"
     {{- end }}
 
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating applications..."
     {{- range $app := .Values.argocd.applications }}
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating application \"{{ $app.name }}\""
-    kubectl -n $NS exec $ARGOCD_POD -- argocd app create "{{ $app.name }}" \
-      --project "{{ $app.project | default "default" }}" \
-      --repo "{{ $app.repoURL }}" \
-      --revision "{{ $app.targetRevision | default "HEAD" }}" \
-      --path "{{ $app.path | default "/" }}" \
-      --dest-name "{{ $app.destinationWDS }}" \
-      --dest-namespace "{{ $app.destinationNamespace | default "default" }}" \
-      --sync-option CreateNamespace=true \
-      --sync-policy "{{ $app.syncPolicy | default "manual" }}" || true
+      echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating application \"{{ $app.name }}\""
+      kubectl -n $NS exec $ARGOCD_POD -- argocd app create "{{ $app.name }}" \
+        --project "{{ $app.project | default "default" }}" \
+        --repo "{{ $app.repoURL }}" \
+        --revision "{{ $app.targetRevision | default "HEAD" }}" \
+        --path "{{ $app.path | default "/" }}" \
+        --dest-name "{{ $app.destinationWDS }}" \
+        --dest-namespace "{{ $app.destinationNamespace | default "default" }}" \
+        --sync-option CreateNamespace=true \
+        --sync-policy "{{ $app.syncPolicy | default "manual" }}" || true
     {{- end }}
 
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Done."
