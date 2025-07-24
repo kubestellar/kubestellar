@@ -15,11 +15,26 @@ spec:
       template:
         spec:
           containers:
-{{ include "pch.its.statusaddon" . | indent 10 }}
+            - name: status-addon
+              image: "quay.io/kubestellar/status-addon:latest"
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: KUBECONFIG
+                  value: "/etc/kube/{{ .globalVars.ITSkubeconfig }}"
+              volumeMounts:
+                - name: kubeconfig
+                  mountPath: /etc/kube
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
           volumes:
           - name: kubeconfig
             secret:
-              secretName: "{{"{{.ITSSecretName}}"}}"
+              secretName: "{{"{{.globalVars.ITSSecretName}}"}}"
           restartPolicy: Never
       backoffLimit: 1
 {{- end }}

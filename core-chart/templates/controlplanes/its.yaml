@@ -7,16 +7,13 @@ metadata:
 spec:
   backend: shared
   type: {{ $cp.type | default "vcluster" }}
+  globalVars:
+    ITSSecretName: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "admin-kubeconfig" "vc-vcluster" }}
+    ITSkubeconfig: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
   postCreateHooks:
     - hookName: its-status
-      vars:
-        ITSSecretName: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "admin-kubeconfig" "vc-vcluster" }}
-        ITSkubeconfig: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
     {{- if or (not (hasKey $cp "install_clusteradm")) (eq $cp.install_clusteradm true) }}
     - hookName: its-clusteradmin
-      vars:
-        ITSSecretName: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "admin-kubeconfig" "vc-vcluster" }}
-        ITSkubeconfig: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
     {{- end }}
   {{- if eq $cp.type "external" }}
   bootstrapSecretRef:
