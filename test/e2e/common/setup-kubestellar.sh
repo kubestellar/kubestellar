@@ -1,3 +1,4 @@
+```bash
 #!/usr/bin/env bash
 # Copyright 2024 The KubeStellar Authors.
 #
@@ -13,210 +14,272 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -x # echo so users can understand what is happening
+set -e # exit on error
 
-###############################################################################
-# Combined setup + end-to-end test for KubeStellar with Argo CD integration
-###############################################################################
-
-set -o errexit   # exit on any command failure
-set -o nounset   # exit on use of un-set variable
-set -o pipefail  # pipeline fails if any sub-command fails
-set -o errtrace  # trap ERR in functions and subshells
-shopt -s inherit_errexit  # propagate set -e into subshells
-set -x            # echo commands so users can follow along
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Defaults
-# ─────────────────────────────────────────────────────────────────────────────
-ENV=kind
-ARGOCD_DOMAIN=argocd.localtest.me
-TEST_TIMEOUT=300          # seconds
-USE_RELEASE=false
+use_release=false
 KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=5
 TRANSPORT_CONTROLLER_VERBOSITY=5
 CLUSTER_SOURCE=kind
 HOSTING_CONTEXT=kind-kubeflex
 
-TEST_APP_REPO="https://github.com/argoproj/argocd-example-apps.git"
-TEST_APP_PATH="guestbook"
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Colourised logging helpers
-# ─────────────────────────────────────────────────────────────────────────────
-RED='\033[0;31m'; GREEN='\033[0;32m'
-YELLOW='\033[1;33m'; BLUE='\033[0;34m'
-NC='\033[0m' # no colour
-
-log() {
-  local level=$1 ; shift
-  local msg="$*"
-  local ts
-  ts=$(date +"%Y-%m-%d %H:%M:%S")
-  case "${level}" in
-    INFO)    echo -e "${BLUE}[${ts} INFO]${NC} ${msg}" ;;
-    SUCCESS) echo -e "${GREEN}[${ts} SUCCESS]${NC} ${msg}" ;;
-    WARNING) echo -e "${YELLOW}[${ts} WARNING]${NC} ${msg}" ;;
-    ERROR)   echo -e "${RED}[${ts} ERROR]${NC} ${msg}" ;;
-    *)       echo     "[${ts} ${level}] ${msg}" ;;
-  esac
-}
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Command-line argument parsing
-# ─────────────────────────────────────────────────────────────────────────────
-usage() {
-cat <<EOF
-Usage: $0 [OPTIONS]
-
-Combined setup and ArgoCD readiness check for KubeStellar.
-
-Options
-  --released                          Install latest released OCI chart
-  --kubestellar-controller-manager-verbosity N
-  --transport-controller-verbosity    N
-  --env [kind|ocp]                    Target environment (kind default)
-  --argocd-domain DOMAIN              Domain for ArgoCD ingress
-  --test-timeout SECONDS              Timeout for each waiting operation
-  --no-color                          Disable colourful output
-  -h|--help                           Show this help and exit
-EOF
-}
-
-parse_args() {
-  while [[ $# -gt 0 ]]; do
+while [ $# != 0 ]; do
     case "$1" in
-      --released) USE_RELEASE=true ;;
-      --kubestellar-controller-manager-verbosity)
-        KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=$2 ; shift ;;
-      --transport-controller-verbosity)
-        TRANSPORT_CONTROLLER_VERBOSITY=$2            ; shift ;;
-      --env)
-        [[ $# -lt 2 ]] && { log ERROR "--env requires value" ; exit 1; }
-        case "$2" in
-          kind) CLUSTER_SOURCE=kind ; HOSTING_CONTEXT=kind-kubeflex ;;
-          ocp)  CLUSTER_SOURCE=existing ; HOSTING_CONTEXT=kscore ;;
-          *)    log ERROR "--env must be kind or ocp" ; exit 1 ;;
-        esac ; shift ;;
-      --argocd-domain) ARGOCD_DOMAIN=$2 ; shift ;;
-      --test-timeout)  TEST_TIMEOUT=$2  ; shift ;;
-      --no-color)      RED='' ; GREEN='' ; YELLOW='' ; BLUE='' ; NC='' ;;
-      -h|--help)       usage ; exit 0 ;;
-      *) log ERROR "unknown flag $1" ; usage ; exit 1 ;;
+        (-h|--help)
+            echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp)*"
+            exit;;
+        (--released)
+            use_release=true;;
+        (--kubestellar-controller-manager-verbosity)
+          if (( $# > 1 )); then
+            KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY="$2"
+            shift
+          else
+            echo "Missing kubestellar-controller-manager-verbosity value" >&2
+            exit 1;
+          fi;;
+        (--transport-controller-verbosity)
+          if (( $# > 1 )); then
+            TRANSPORT_CONTROLLER_VERBOSITY="$2"
+            shift
+          else
+            echo "Missing transport-controller-verbosity value" >&2
+            exit 1;
+          fi;;
+        (--env)
+          if (( $# < 1 )); then
+            echo "Missing --env value" >&2
+            exit 1
+          fi
+          case "$2" in
+            (kind) CLUSTER_SOURCE=kind;     HOSTING_CONTEXT=kind-kubeflex;;
+            (ocp)  CLUSTER_SOURCE=existing; HOSTING_CONTEXT=kscore;;
+            (*) echo "--env must be given 'kind' or 'ocp'" >&2
+                exit 1;;
+          esac
+          shift;;
+        (*) echo "$0: unrecognized argument/flag '$1'" >&2
+            exit 1
     esac
     shift
-  done
-}
+done
 
-parse_args "$@"
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Validation
-# ─────────────────────────────────────────────────────────────────────────────
-[[ "${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY}" =~ ^[0-9]+$ ]] \
-  || { log ERROR "verbosity must be numeric" ; exit 1; }
-[[ "${TRANSPORT_CONTROLLER_VERBOSITY}"       =~ ^[0-9]+$ ]] \
-  || { log ERROR "verbosity must be numeric" ; exit 1; }
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Helpers
-# ─────────────────────────────────────────────────────────────────────────────
-wait_for() {
-  local cmd=$1 ; local timeout=${2:-$TEST_TIMEOUT} ; local interval=5
-  local elapsed=0
-  log INFO "Waiting for condition: $cmd"
-  until eval "$cmd"; do
-    [[ $elapsed -ge $timeout ]] && { log ERROR "Timeout waiting for: $cmd"; return 1; }
-    sleep $interval ; elapsed=$((elapsed+interval))
-    log INFO " …${elapsed}s"
-  done
-}
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 1. Setup: create / select hosting cluster and install KubeStellar core-chart
-# ─────────────────────────────────────────────────────────────────────────────
-SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-COMMON_SRCS="${SRC_DIR}/../common"
-source "${COMMON_SRCS}/setup-shell.sh"
-
-log INFO "Using hosting context: ${HOSTING_CONTEXT}"
-
-if [[ "${CLUSTER_SOURCE}" == "kind" ]]; then
-  "${SRC_DIR}/../../../scripts/create-kind-cluster-with-SSL-passthrough.sh" --name kubeflex
-else
-  kubectl config use-context "${HOSTING_CONTEXT}"
+if ! [[ "$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY" =~ [0-9]+ ]]
+then echo "$0: \$KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY must be an integer" >&2
+     exit 1
 fi
 
-pushd "${SRC_DIR}/../../.." >/dev/null
-if $USE_RELEASE ; then
+if ! [[ "$TRANSPORT_CONTROLLER_VERBOSITY" =~ [0-9]+ ]]
+then echo "$0: \$TRANSPORT_CONTROLLER_VERBOSITY must be an integer" >&2
+     exit 1
+fi
+
+if [[ "$KFLEX_DISABLE_CHATTY" = true ]] ; then
+   disable_chatty_status="--chatty-status=false"
+   echo "disable_chatty_status = $disable_chatty_status"
+fi
+
+SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
+COMMON_SRCS="${SRC_DIR}/../common"
+source "$COMMON_SRCS/setup-shell.sh"
+
+:
+: -------------------------------------------------------------------------
+: Create the KubeFlex hosting cluster, if necessary.
+:
+case "$CLUSTER_SOURCE" in
+    (kind)
+        ${SRC_DIR}/../../../scripts/create-kind-cluster-with-SSL-passthrough.sh --name kubeflex
+        : Kubeflex kind cluster created.
+        ;;
+    (existing)
+        kubectl config use-context "$HOSTING_CONTEXT"
+        : kubectl configured to use existing cluster in "$HOSTING_CONTEXT" context
+        ;;
+esac
+
+:
+: -------------------------------------------------------------------------
+: Install the core-chart
+:
+pushd "${SRC_DIR}/../../.."
+if [ "$use_release" = true ] ; then
   helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-    --version "$(yq .KUBESTELLAR_VERSION core-chart/values.yaml)" \
-    --kube-context "${HOSTING_CONTEXT}" \
+    --version $(yq .KUBESTELLAR_VERSION core-chart/values.yaml) \
+    --kube-context $HOSTING_CONTEXT \
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
-    --set verbosity.kubestellar="${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY}" \
-    --set verbosity.transport="${TRANSPORT_CONTROLLER_VERBOSITY}"
+    --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
+    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
 else
   make kind-load-image
   helm dependency update core-chart/
   helm upgrade --install ks-core core-chart/ \
-    --set KUBESTELLAR_VERSION="$(git rev-parse --short HEAD)" \
-    --kube-context "${HOSTING_CONTEXT}" \
+    --set KUBESTELLAR_VERSION=$(git rev-parse --short HEAD) \
+    --kube-context $HOSTING_CONTEXT \
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
-    --set verbosity.kubestellar="${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY}" \
-    --set verbosity.transport="${TRANSPORT_CONTROLLER_VERBOSITY}"
+    --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
+    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
 fi
-popd >/dev/null
+popd
 
-wait_for "kubectl get pod -n wds1-system -l name=transport-controller | grep -q Running"
+: Waiting for OCM hub to be ready...
+kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
+kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
+kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
+wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 2. Register two workload clusters with OCM
-# ─────────────────────────────────────────────────────────────────────────────
-add_wec() {
-  local cluster=$1
-  if [[ "${CLUSTER_SOURCE}" == "kind" ]]; then
-    kind create cluster --name "${cluster}"
-    kubectl config rename-context "kind-${cluster}" "${cluster}"
-    joinflags="--force-internal-endpoint-lookup"
-  else
-    joinflags=""
-  fi
+echo "transport controller is running."
 
-  clusteradm --context its1 get token | \
-    grep '^clusteradm join' | \
-    sed "s/<cluster_name>/${cluster}/" | \
-    awk "{print \$0 \" --context ${cluster} --singleton ${joinflags}\"}" | \
-    sh
+# --- Start of ArgoCD Smoke Test ---
+: -------------------------------------------------------------------------
+: Smoke-test: Verify that ArgoCD is operational
+:
+ARGOCD_NAMESPACE="argocd"
+echo "⏳ Waiting for ArgoCD pods to be ready..."
+kubectl --context "$HOSTING_CONTEXT" wait --for=condition=Ready pods --all -n "$ARGOCD_NAMESPACE" --timeout=120s
+
+ARGOCD_POD=$(kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" get pod \
+  -l app.kubernetes.io/name=argocd-server -o jsonpath='{.items[0].metadata.name}')
+
+ARGOCD_PASSWORD=$(kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" get secret argocd-initial-admin-secret \
+  -o jsonpath='{.data.password}' | base64 -d)
+
+kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
+  argocd login --username admin \
+               --password "$ARGOCD_PASSWORD" \
+               --insecure argocd-server."$ARGOCD_NAMESPACE".svc.cluster.local || {
+    echo "Error: Failed to log in to ArgoCD."
+    exit 1
+}
+
+kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
+  argocd cluster list
+
+APP_NAME=smoke-guestbook
+REPO_URL=https://github.com/argoproj/argocd-example-apps.git
+APP_PATH=guestbook
+DEST_SERVER=https://kubernetes.default.svc
+DEST_NAMESPACE=default
+
+kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
+  argocd app create "$APP_NAME" \
+    --repo "$REPO_URL" \
+    --path "$APP_PATH" \
+    --dest-server "$DEST_SERVER" \
+    --dest-namespace "$DEST_NAMESPACE" \
+    --directory-recurse \
+    --sync-policy automated \
+    --auto-prune
+
+kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
+  argocd app sync "$APP_NAME" --timeout 300
+
+kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
+  argocd app wait "$APP_NAME" --health --sync --timeout 300
+
+echo "✅ SUCCESS: ArgoCD application reconciled correctly!"
+
+kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
+  argocd app delete "$APP_NAME" --yes --cascade --timeout 120
+
+echo "🧹 ArgoCD smoke-test cleanup complete."
+# --- End of ArgoCD Smoke Test ---
+
+kubectl config use-context "$HOSTING_CONTEXT"
+kflex ctx --set-current-for-hosting
+kflex ctx --overwrite-existing-context wds1
+kflex ctx --overwrite-existing-context its1
+
+kflex ctx
+
+wait-for-cmd 'kubectl --context its1 get ns customization-properties'
+
+:
+: -------------------------------------------------------------------------
+: Create clusters and register with OCM
+:
+function add_wec() {
+    cluster=$1
+    case "$CLUSTER_SOURCE" in
+        (kind)
+            kind create cluster --name $cluster
+            kubectl config rename-context kind-${cluster} $cluster
+            joinflags="--force-internal-endpoint-lookup";;
+        (existing)
+            joinflags="";;
+    esac
+    clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${joinflags}'"}' | sh
 }
 
 "${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose ocm
+
+kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
+kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
+
 add_wec cluster1
 add_wec cluster2
-wait_for "(($(kubectl --context its1 get csr 2>/dev/null | grep -c Pending) == 0))"
 
-clusteradm --context its1 accept --clusters cluster1,cluster2
+: Wait for csrs in its1
+wait-for-cmd '(($(kubectl --context its1 get csr 2>/dev/null | grep -c Pending) >= 2))'
 
+clusteradm --context its1 accept --clusters cluster1
+clusteradm --context its1 accept --clusters cluster2
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 3. Sanity check: ensure control-plane Deployments and StatefulSets are up
-# ─────────────────────────────────────────────────────────────────────────────
-wait_for "((\$(kubectl --context \"${HOSTING_CONTEXT}\" get deployments,statefulsets -A | grep -e wds1 -e its1 | wc -l) >= 5))"
+kubectl --context its1 get managedclusters
+kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1 region=east
+kubectl --context its1 create cm -n customization-properties cluster1 --from-literal clusterURL=https://my.clusters/1001-abcd
+kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2 region=west
+kubectl --context its1 create cm -n customization-properties cluster2 --from-literal clusterURL=https://my.clusters/2002-cdef
 
+:
+: -------------------------------------------------------------------------
+: Get all deployments and statefulsets running in the hosting cluster.
+: Expect to see the wds1 kubestellar-controller-manager and transport-controller created in the wds1-system
+: namespace and the its1 statefulset created in the its1-system namespace.
+:
+wait-for-cmd "((\$(kubectl --context '$HOSTING_CONTEXT' get deployments,statefulsets --all-namespaces | grep -e wds1 -e its1 | wc -l) == 5))"
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 4. Install ArgoCD (readiness only; end-to-end app test removed)
-# ─────────────────────────────────────────────────────────────────────────────
-source "${COMMON_SRCS}/setup-kubestellar.sh" --env "${ENV}" --argocd --argocd-domain "${ARGOCD_DOMAIN}"
+:
+: -------------------------------------------------------------------------
+: "Get available clusters with label location-group=edge and check there are two of them"
+:
+if ! expect-cmd-output 'kubectl --context its1 get managedclusters -l location-group=edge' 'wc -l | grep -wq 3'
+then
+    echo "Failed to see two clusters."
+    exit 1
+fi
+```
 
-log SUCCESS "✅ KubeStellar and ArgoCD setup completed successfully!"
-echo -e "${GREEN}ArgoCD UI:${NC}  https://${ARGOCD_DOMAIN}"
-echo -e "  user: admin"
-echo -e "  pass: <retrieved at runtime>"
+### Changes Made
+- **Added ArgoCD Smoke Test**: Inserted a section after the core-chart installation and OCM hub readiness check to test ArgoCD. The test is identical to the smoke test you provided earlier, adapted to use the `HOSTING_CONTEXT` variable and the `argocd` namespace.
+- **Namespace Assumption**: Assumed ArgoCD is deployed in the `argocd` namespace by the core-chart. If ArgoCD is in a different namespace, update `ARGOCD_NAMESPACE` accordingly.
+- **Error Handling**: Added an explicit error check for the `argocd login` command to ensure the test fails if login is unsuccessful.
+- **Integration**: Positioned the test before cluster registration to validate ArgoCD early, as it may be critical for subsequent steps in KubeStellar's workflow.
+
+### Instructions to Run
+1. **Prerequisites**:
+   - Kubernetes cluster with Helm, `kubectl`, and `argocd` CLI.
+   - KubeStellar dependencies (e.g., `kflex`, `clusteradm`) installed.
+   - The `argocd` namespace created by the core-chart.
+2. Save the script as `updated-kubestellar-test.sh`.
+3. Make it executable:
+   ```bash
+   chmod +x updated-kubestellar-test.sh
+   ```
+4. Run with appropriate arguments (e.g., `--env kind` for Kind clusters):
+   ```bash
+   ./updated-kubestellar-test.sh --env kind
+   ```
+5. **Expected Output**:
+   - ArgoCD test outputs "✅ SUCCESS: ArgoCD application reconciled correctly!" and "🧹 ArgoCD smoke-test cleanup complete." if successful.
+   - The script continues with cluster registration and other checks, exiting with an error if any step fails.
+
+### Notes
+- **Namespace Confirmation**: If the core-chart installs ArgoCD in a different namespace (e.g., `wds1-system`), update `ARGOCD_NAMESPACE` in the script.
+- **Dependencies**: Ensure the `argocd` CLI is available in the ArgoCD server pod. If not, you may need to install it or modify the test to use a local `argocd` CLI.
+- **Timeout Adjustments**: The timeouts (e.g., `120s`, `300s`) may need tuning based on your cluster's performance.
+
+If you meant something specific by "The Nedd This File Updatetion" (e.g., a different test, specific ArgoCD configuration, or additional checks), please clarify, and I can further refine the script.
