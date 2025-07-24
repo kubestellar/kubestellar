@@ -420,7 +420,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     cp_name[cp_n]=$name
     cp_ns[cp_n]="${cp_name[cp_n]}-system"
     cp_type[cp_n]=$(kubectl --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.type}')
-    cp_pch[cp_n]=$(kubectl --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.postCreateHook}')
+    cp_pch[cp_n]=$(kubectl --context $helm_context get controlplane ${cp_name[cp_n]} -o jsonpath='{.spec.postCreateHooks[*].hookName}')
     cp_kubeconfig_content=$(get_kubeconfig "${helm_context}" "${cp_name[cp_n]}" "${cp_type[cp_n]}")
     echo -e "- ${COLOR_INFO}${cp_name[cp_n]}${COLOR_NONE}: type=${COLOR_INFO}${cp_type[cp_n]}${COLOR_NONE}, pch=${COLOR_INFO}${cp_pch[cp_n]}${COLOR_NONE}, context=${COLOR_INFO}${cp_context[cp_n]}${COLOR_NONE}, namespace=${COLOR_INFO}${cp_name[cp_n]}-system${COLOR_NONE}"
     if [[ -z "$cp_kubeconfig_content" ]] ; then
@@ -430,7 +430,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         cp_kubeconfig[cp_n]="$TMPFOLDER/$name-kubeconfig"
         echo "$cp_kubeconfig_content" > "${cp_kubeconfig[cp_n]}"
     fi
-    if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
+    if [[ "${cp_pch[cp_n]}" =~ install-status-addon ]] || [[ "${cp_pch[cp_n]}" =~ its-hub-init ]] ; then
         its_pod=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod -l "job-name=${cp_pch[cp_n]}" -o name 2> /dev/null | cut -d'/' -f2 || true)
         its_status=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.status.phase}' 2> /dev/null || true)
         if [[ "${cp_type[cp_n]}" != "vcluster" ]] ; then
@@ -487,7 +487,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     if [[ "$arg_yaml" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
         kubectl --context $helm_context get controlplane $name -o yaml > "$OUTPUT_FOLDER/$name/cp.yaml"
-        if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
+        if [[ "${cp_pch[cp_n]}" =~ install-status-addon ]] || [[ "${cp_pch[cp_n]}" =~ its-hub-init ]] ; then
             kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o yaml > "$OUTPUT_FOLDER/$name/its-job.yaml"
             if [[ "${cp_type[cp_n]}" == "external" ]] ; then
                 KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl -n "$status_ns" get pod $status_pod -o yaml > "$OUTPUT_FOLDER/$name/status-addon.yaml"
@@ -501,7 +501,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
     fi
     if [[ "$arg_logs" == "true" ]] ; then
         mkdir -p "$OUTPUT_FOLDER/$name"
-        if [[ "${cp_pch[cp_n]}" =~ ^its ]] ; then
+        if [[ "${cp_pch[cp_n]}" =~ install-status-addon ]] || [[ "${cp_pch[cp_n]}" =~ its-hub-init ]] ; then
             if [ -n "$its_pod" ] ; then
                 containers=$(kubectl --context $helm_context -n "${cp_ns[cp_n]}" get pod $its_pod -o jsonpath='{.spec.containers[*].name}')
                 for ctr in $containers; do
@@ -530,7 +530,7 @@ done
 echotitle "Managed Clusters:"
 mc_n=0
 for j in "${!cp_pch[@]}" ; do
-    if [[ "${cp_pch[$j]}" =~ ^its ]] ; then
+    if [[ "${cp_pch[$j]}" =~ install-status-addon ]] || [[ "${cp_pch[$j]}" =~ its-hub-init ]] ; then
         mcs=($(KUBECONFIG="${cp_kubeconfig[$j]}" kubectl get managedcluster -no-headers -o name 2> /dev/null || true))
         for i in "${!mcs[@]}" ; do
             name=${mcs[i]##*/}
@@ -628,7 +628,7 @@ done
 echotitle "Manifest Works:"
 mw_n=0
 for h in "${!cp_pch[@]}" ; do
-    if [[ "${cp_pch[$h]}" =~ ^its ]] ; then
+    if [[ "${cp_pch[$h]}" =~ install-status-addon ]] || [[ "${cp_pch[$h]}" =~ its-hub-init ]] ; then
         ns=($(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl get ns -no-headers -o name 2> /dev/null || true))
         for j in "${!ns[@]}" ; do
             cluster=${ns[j]##*/}
@@ -667,7 +667,7 @@ done
 echotitle "Work Statuses:"
 sw_n=0
 for h in "${!cp_pch[@]}" ; do
-    if [[ "${cp_pch[$h]}" =~ ^its ]] ; then
+    if [[ "${cp_pch[$h]}" =~ install-status-addon ]] || [[ "${cp_pch[$h]}" =~ its-hub-init ]] ; then
         ns=($(KUBECONFIG="${cp_kubeconfig[$h]}" kubectl get ns -no-headers -o name 2> /dev/null || true))
         for j in "${!ns[@]}" ; do
             cluster=${ns[j]##*/}

@@ -2,10 +2,13 @@
 apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
 kind: PostCreateHook
 metadata:
-  name: its-status
+  name: install-status-addon
   labels:
     kflex.kubestellar.io/cptype: its
 spec:
+  globalVars:
+    ITSSecretName: {{ .globalVars.ITSSecretName }}
+    ITSkubeconfig: {{ .globalVars.ITSkubeconfig }}
   templates:
   - apiVersion: batch/v1
     kind: Job
@@ -32,9 +35,9 @@ spec:
                   cpu: 100m
                   memory: 128Mi
           volumes:
-          - name: kubeconfig
-            secret:
-              secretName: "{{"{{.globalVars.ITSSecretName}}"}}"
+            - name: kubeconfig
+              secret:
+                secretName: "{{ .globalVars.ITSSecretName }}"
           restartPolicy: Never
       backoffLimit: 1
 {{- end }}

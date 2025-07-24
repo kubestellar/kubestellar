@@ -2,7 +2,7 @@
 apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
 kind: PostCreateHook
 metadata:
-  name: its-clusteradmin
+  name: its-hub-init
   labels:
     kflex.kubestellar.io/cptype: its
 spec:
@@ -20,7 +20,7 @@ spec:
               imagePullPolicy: IfNotPresent
               env:
                 - name: KUBECONFIG
-                  value: "/etc/kube/{{ .globalVars.ITSkubeconfig }}"
+                  value: "/etc/kube/{{ .ITSkubeconfig }}"
               volumeMounts:
                 - name: kubeconfig
                   mountPath: /etc/kube
@@ -34,7 +34,7 @@ spec:
           volumes:
           - name: kubeconfig
             secret:
-              secretName: "{{"{{.ITSSecretName}}"}}"
+              secretName: "{{ .ITSSecretName }}"
           restartPolicy: Never
       backoffLimit: 1
 {{- end }}

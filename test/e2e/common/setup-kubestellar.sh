@@ -127,8 +127,8 @@ else
 popd
 
 : Waiting for OCM hub to be ready...
-kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-status}=true' --timeout 400s
-kubectl wait -n its1-system job.batch/its-status --for condition=Complete --timeout 400s
+kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 400s
+kubectl wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-clusteradmin}=true' --timeout 400s
 kubectl wait -n its1-system job.batch/its-clusteradmin --for condition=Complete --timeout 400s
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
@@ -165,8 +165,8 @@ function add_wec() {
 
 "${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose ocm
 
-kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-status}=true' --timeout 200s
-kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-status --for condition=Complete --timeout 400s
+kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 200s
+kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s
 kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-clusteradmin}=true' --timeout 200s
 kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-clusteradmin --for condition=Complete --timeout 400s
 

@@ -228,8 +228,8 @@ kflex ctx --overwrite-existing-context wds2
 kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
-kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-status}=true' --timeout 24h
-kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its-status --for condition=Complete --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 24h
 kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-clusteradmin}=true' --timeout 24h
 kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its-clusteradmin --for condition=Complete --timeout 24h
 echo -e "\nWaiting for OCM hub cluster-info to be updated..."
