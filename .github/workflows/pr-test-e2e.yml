@@ -215,7 +215,7 @@ jobs:
           TEST_FLAGS: ${{ github.event.inputs.testFlags }}
         run: |
           cd test/e2e/
-          KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
+          KFLEX_DISABLE_CHATTY=true ./run-test.sh ${TEST_FLAGS:+$TEST_FLAGS}
 
       - name: show kubeconfig contexts
         if: always()
