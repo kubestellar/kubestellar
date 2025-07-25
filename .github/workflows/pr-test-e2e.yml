@@ -315,10 +315,15 @@ jobs:
           kill %
           sleep 1
 
-      - name: scrape OCM Status Add-On Agent
-        if: always()
-        run: |
-          kubectl --context cluster1 port-forward -n open-cluster-management-agent-addon deploy/status-agent 8080 &
-          sleep 10
-          curl http://localhost:8080/metrics
-          kill %
+          - name: scrape OCM Status Add-On Agent
+          if: always()
+          run: |
+            if kubectl config get-contexts cluster1 >/dev/null 2>&1; then
+              echo "✅ Context cluster1 exists. Scraping metrics..."
+              kubectl --context cluster1 port-forward -n open-cluster-management-agent-addon deploy/status-agent 8080 &
+              sleep 10
+              curl http://localhost:8080/metrics || true
+              kill %
+            else
+              echo "⚠️ Skipping: context cluster1 does not exist yet."
+            fi
