@@ -15,7 +15,7 @@
 set -euo pipefail
 set -x
 
-CONTEXT="kind-argocd"       # 🔁 Replace with your kube context
+CONTEXT="kind-kubeflex"     
 NAMESPACE="argocd"
 
 echo "⏳ Waiting for Argo CD pods to be ready..."

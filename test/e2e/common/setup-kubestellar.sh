@@ -1,4 +1,3 @@
-```bash
 #!/usr/bin/env bash
 # Copyright 2024 The KubeStellar Authors.
 #
@@ -74,6 +73,7 @@ then echo "$0: \$TRANSPORT_CONTROLLER_VERBOSITY must be an integer" >&2
      exit 1
 fi
 
+
 if [[ "$KFLEX_DISABLE_CHATTY" = true ]] ; then
    disable_chatty_status="--chatty-status=false"
    echo "disable_chatty_status = $disable_chatty_status"
@@ -98,10 +98,12 @@ case "$CLUSTER_SOURCE" in
         ;;
 esac
 
+
 :
 : -------------------------------------------------------------------------
 : Install the core-chart
 :
+
 pushd "${SRC_DIR}/../../.."
 if [ "$use_release" = true ] ; then
   helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
@@ -121,7 +123,7 @@ else
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
     --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
-fi
+  fi
 popd
 
 : Waiting for OCM hub to be ready...
@@ -132,61 +134,6 @@ kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Comple
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
 
 echo "transport controller is running."
-
-# --- Start of ArgoCD Smoke Test ---
-: -------------------------------------------------------------------------
-: Smoke-test: Verify that ArgoCD is operational
-:
-ARGOCD_NAMESPACE="argocd"
-echo "⏳ Waiting for ArgoCD pods to be ready..."
-kubectl --context "$HOSTING_CONTEXT" wait --for=condition=Ready pods --all -n "$ARGOCD_NAMESPACE" --timeout=120s
-
-ARGOCD_POD=$(kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" get pod \
-  -l app.kubernetes.io/name=argocd-server -o jsonpath='{.items[0].metadata.name}')
-
-ARGOCD_PASSWORD=$(kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" get secret argocd-initial-admin-secret \
-  -o jsonpath='{.data.password}' | base64 -d)
-
-kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
-  argocd login --username admin \
-               --password "$ARGOCD_PASSWORD" \
-               --insecure argocd-server."$ARGOCD_NAMESPACE".svc.cluster.local || {
-    echo "Error: Failed to log in to ArgoCD."
-    exit 1
-}
-
-kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
-  argocd cluster list
-
-APP_NAME=smoke-guestbook
-REPO_URL=https://github.com/argoproj/argocd-example-apps.git
-APP_PATH=guestbook
-DEST_SERVER=https://kubernetes.default.svc
-DEST_NAMESPACE=default
-
-kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
-  argocd app create "$APP_NAME" \
-    --repo "$REPO_URL" \
-    --path "$APP_PATH" \
-    --dest-server "$DEST_SERVER" \
-    --dest-namespace "$DEST_NAMESPACE" \
-    --directory-recurse \
-    --sync-policy automated \
-    --auto-prune
-
-kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
-  argocd app sync "$APP_NAME" --timeout 300
-
-kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
-  argocd app wait "$APP_NAME" --health --sync --timeout 300
-
-echo "✅ SUCCESS: ArgoCD application reconciled correctly!"
-
-kubectl --context "$HOSTING_CONTEXT" -n "$ARGOCD_NAMESPACE" exec "$ARGOCD_POD" -- \
-  argocd app delete "$APP_NAME" --yes --cascade --timeout 120
-
-echo "🧹 ArgoCD smoke-test cleanup complete."
-# --- End of ArgoCD Smoke Test ---
 
 kubectl config use-context "$HOSTING_CONTEXT"
 kflex ctx --set-current-for-hosting
@@ -251,35 +198,3 @@ then
     echo "Failed to see two clusters."
     exit 1
 fi
-```
-
-### Changes Made
-- **Added ArgoCD Smoke Test**: Inserted a section after the core-chart installation and OCM hub readiness check to test ArgoCD. The test is identical to the smoke test you provided earlier, adapted to use the `HOSTING_CONTEXT` variable and the `argocd` namespace.
-- **Namespace Assumption**: Assumed ArgoCD is deployed in the `argocd` namespace by the core-chart. If ArgoCD is in a different namespace, update `ARGOCD_NAMESPACE` accordingly.
-- **Error Handling**: Added an explicit error check for the `argocd login` command to ensure the test fails if login is unsuccessful.
-- **Integration**: Positioned the test before cluster registration to validate ArgoCD early, as it may be critical for subsequent steps in KubeStellar's workflow.
-
-### Instructions to Run
-1. **Prerequisites**:
-   - Kubernetes cluster with Helm, `kubectl`, and `argocd` CLI.
-   - KubeStellar dependencies (e.g., `kflex`, `clusteradm`) installed.
-   - The `argocd` namespace created by the core-chart.
-2. Save the script as `updated-kubestellar-test.sh`.
-3. Make it executable:
-   ```bash
-   chmod +x updated-kubestellar-test.sh
-   ```
-4. Run with appropriate arguments (e.g., `--env kind` for Kind clusters):
-   ```bash
-   ./updated-kubestellar-test.sh --env kind
-   ```
-5. **Expected Output**:
-   - ArgoCD test outputs "✅ SUCCESS: ArgoCD application reconciled correctly!" and "🧹 ArgoCD smoke-test cleanup complete." if successful.
-   - The script continues with cluster registration and other checks, exiting with an error if any step fails.
-
-### Notes
-- **Namespace Confirmation**: If the core-chart installs ArgoCD in a different namespace (e.g., `wds1-system`), update `ARGOCD_NAMESPACE` in the script.
-- **Dependencies**: Ensure the `argocd` CLI is available in the ArgoCD server pod. If not, you may need to install it or modify the test to use a local `argocd` CLI.
-- **Timeout Adjustments**: The timeouts (e.g., `120s`, `300s`) may need tuning based on your cluster's performance.
-
-If you meant something specific by "The Nedd This File Updatetion" (e.g., a different test, specific ArgoCD configuration, or additional checks), please clarify, and I can further refine the script.
