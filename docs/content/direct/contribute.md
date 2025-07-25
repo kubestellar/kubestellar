@@ -41,6 +41,7 @@ Read the resources to gain a better understanding of the contribution processes.
 - **[Onboarding](../contribution-guidelines/onboarding-inc.md)** The procedures for adding/removing members of our Github organization
 - **Website**
     - **[Build Overview](../contribution-guidelines/operations/document-management.md)** How our website is built and how to collaboratively work on changes to it using Github staging
+    - **[Style Guide](../contribution-guidelines/operations/docs-styleguide.md)** Guidelines on writing the prose parts of our documentation/website
     - **[Testing website PRs](../contribution-guidelines/operations/testing-doc-prs.md)** how to test website changes using only your local workstation
 - **Security**
     - **[Policy](../contribution-guidelines/security/security-inc.md)** Security Policies
