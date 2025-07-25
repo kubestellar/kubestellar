@@ -87,7 +87,7 @@ echo "Waiting for k3s service to be ready via socket file..."
 timeout=300
 elapsed=0
 while [ $elapsed -lt $timeout ]; do
-    if [ -S /run/k3s/containerd/containerd.sock ] && kubectl get nodes >/dev/null 2>&1; then
+    if kubectl get nodes >/dev/null 2>&1; then
         echo " K3s socket exists and kubectl is working! (${elapsed}s)"
         break
     fi
@@ -100,9 +100,6 @@ if [ $elapsed -ge $timeout ]; then
     echo "❌ Timed out waiting for K3s to be ready."
     exit 1
 fi
-
-echo "Waiting for k3s cluster nodes to be ready..."
-kubectl wait --for=condition=ready nodes --all --timeout=300s
 
 kubectl describe endpoints kubernetes
 
