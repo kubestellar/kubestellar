@@ -1035,9 +1035,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-accessing-metrics-and-debug-endpoints" class="md-nav__link">
+  <a href="#example-accessing-kubestellar-controller-metrics-and-debug-endpoints" class="md-nav__link">
     <span class="md-ellipsis">
-      Example: Accessing Metrics and Debug Endpoints
+      Example: Accessing KubeStellar Controller Metrics and Debug Endpoints
     </span>
   </a>
   
@@ -2482,6 +2482,8 @@
       
         
       
+        
+      
     
     
     
@@ -2529,6 +2531,29 @@
   
   <span class="md-ellipsis">
     Docs Management Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribution-guidelines/operations/testing-doc-prs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing website PRs
     
   </span>
   
@@ -3398,9 +3423,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-accessing-metrics-and-debug-endpoints" class="md-nav__link">
+  <a href="#example-accessing-kubestellar-controller-metrics-and-debug-endpoints" class="md-nav__link">
     <span class="md-ellipsis">
-      Example: Accessing Metrics and Debug Endpoints
+      Example: Accessing KubeStellar Controller Metrics and Debug Endpoints
     </span>
   </a>
   
@@ -3478,16 +3503,16 @@
 <td>HTTPS</td>
 <td>8443</td>
 <td>/metrics</td>
-<td>Kubernetes client authentication required when using the Service</td>
-<td>Service: <code>kubestellar-controller-manager-metrics-service</code> (default port, configurable via Helm values).</td>
+<td>Kubernetes client authentication required (Service or Pod)</td>
+<td>Service: <code>kubestellar-controller-manager-metrics-service</code>.</td>
 </tr>
 <tr>
 <td>kubestellar-controller-manager</td>
-<td>HTTPS</td>
-<td>8443</td>
+<td>HTTP</td>
+<td>8080</td>
 <td>/metrics</td>
-<td>None (direct pod access)</td>
-<td>Access via Pod port 8443 (default, configurable via Helm values).</td>
+<td>None (debug; not recommended for production)</td>
+<td>Debug endpoint; typically disabled in production.</td>
 </tr>
 <tr>
 <td>ks-transport-controller</td>
@@ -3495,7 +3520,7 @@
 <td>8090</td>
 <td>/metrics</td>
 <td>None (in-cluster)</td>
-<td>Default port, configurable via Helm values.</td>
+<td>Port configurable via Helm values.</td>
 </tr>
 <tr>
 <td>status-addon-controller</td>
@@ -3503,19 +3528,19 @@
 <td>9280</td>
 <td>/metrics</td>
 <td>None (in-cluster)</td>
-<td>Default port, configurable via Helm values.</td>
+<td></td>
 </tr>
 <tr>
-<td>status-agent-controller</td>
+<td>status-addon-agent</td>
 <td>HTTP</td>
 <td>8080</td>
 <td>/metrics</td>
 <td>None (in-cluster)</td>
-<td>Default port, configurable via Helm values.</td>
+<td>Port configurable via Helm values.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Note:</strong> The ports listed above are defaults. In the core Helm chart, the ports to use are configured in the chart's values. When using the Service for <code>kubestellar-controller-manager</code>, protocol is HTTPS and Kubernetes client authentication is required. Direct pod access may use HTTP.</p>
+<p><strong>Note:</strong> The listed ports are defaults. Only the <code>ks-transport-controller</code> and <code>status-addon-agent</code> metrics ports are configurable via Helm values (see <a href="https://github.com/kubestellar/kubestellar/issues/2158">issue #2158</a>).</p>
 <h2 id="debugprofiling-endpoints">Debug/Profiling Endpoints<a class="headerlink" href="#debugprofiling-endpoints" title="Permanent link">#</a></h2>
 <p>Some KubeStellar components expose Go's built-in pprof debug endpoints for profiling and troubleshooting.</p>
 <h3 id="pprof-endpoint-table">pprof Endpoint Table<a class="headerlink" href="#pprof-endpoint-table" title="Permanent link">#</a></h3>
@@ -3545,7 +3570,7 @@
 <td>8092</td>
 <td>/debug/pprof/</td>
 <td>None</td>
-<td></td>
+<td>Port configurable via Helm values.</td>
 </tr>
 <tr>
 <td>status-addon-controller</td>
@@ -3556,16 +3581,17 @@
 <td></td>
 </tr>
 <tr>
-<td>status-agent-controller</td>
+<td>status-addon-agent</td>
 <td>HTTP</td>
 <td>8082</td>
 <td>/debug/pprof/</td>
 <td>None</td>
-<td></td>
+<td>Port configurable via Helm values.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="example-accessing-metrics-and-debug-endpoints">Example: Accessing Metrics and Debug Endpoints<a class="headerlink" href="#example-accessing-metrics-and-debug-endpoints" title="Permanent link">#</a></h2>
+<p><strong>Note:</strong> The listed ports are defaults. Only the <code>ks-transport-controller</code> and <code>status-addon-agent</code> pprof ports are configurable via Helm values.</p>
+<h2 id="example-accessing-kubestellar-controller-metrics-and-debug-endpoints">Example: Accessing KubeStellar Controller Metrics and Debug Endpoints<a class="headerlink" href="#example-accessing-kubestellar-controller-metrics-and-debug-endpoints" title="Permanent link">#</a></h2>
 <p><strong>Note:</strong> The following example assumes you have a running KubeStellar controller-manager pod and access to the appropriate Kubernetes context and namespace. The Deployment name is always <code>kubestellar-controller-manager</code>, but you may need to adjust the context and namespace for your environment.</p>
 <div class="language-sh highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-kubeflex<span class="w"> </span>port-forward<span class="w"> </span>-n<span class="w"> </span>wds1-system<span class="w"> </span>deployment/kubestellar-controller-manager<span class="w"> </span><span class="m">8443</span>:8443<span class="w"> </span><span class="m">8082</span>:8082
 </code></pre></div>
