@@ -182,7 +182,7 @@ extra:
   #     link: 'https://www.youtube.com/@kubestellar'
   #     name: KubeStellar on YouTube
   #   - icon: fontawesome/brands/slack
-  #     link: 'https://kubernetes.slack.com/archives/C058SUSL5AA'
+  #     link: 'https://cloud-native.slack.com/archives/C097094RZ3M'
   #     name: KubeStellar on Slack
   #   - icon: fontawesome/solid/paper-plane
   #     link: mailto:kubestellar-dev@google.groups.com

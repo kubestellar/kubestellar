@@ -1,7 +1,7 @@
 # Contributing to KubeStellar
 Welcome to the KubeStellar Contribution Guide! We are excited to have you here. 
 
-You can join the community via our [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/).
+You can join the community via our [Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/).
 
 This section provides information on the Code of Conduct, guidelines, terms, and conditions that define the KubeStellar contribution processes. By contributing, you are enabling the success of KubeStellar users, and that goes a long way to make everyone happier, including you. We welcome individuals who are new to open-source contributions.
 
