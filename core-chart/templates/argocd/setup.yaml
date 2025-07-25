@@ -7,23 +7,22 @@ data:
   # This script is used by the "{{ .Release.Name }}-argocd-kubestellar-setup" job to:
   # 1. Register KubeStellar WDSes as Argo CD target clusters
   # 2. Create any Argo CD applications listed in KubeStellar values
-  # Note: Waiting logic for dependencies moved to initContainers for better reliability
   argocd-setup.sh: |
     #!/usr/bin/env bash
     set -e
 
     NS={{ .Release.Namespace }}
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Getting ArgoCD pod and credentials..."
+    echo "[$(date +"%H:%M:%S %Z")] Getting ArgoCD pod and credentials..."
     ARGOCD_POD=$(kubectl -n $NS get pods -l app.kubernetes.io/name=argocd-server -o 'jsonpath={.items[0].metadata.name}')
     ARGOCD_PASSWD=$(kubectl -n $NS get secret argocd-initial-admin-secret -o jsonpath="{.data.password}")
 
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Logging into Argo CD..."
+    echo "[$(date +"%H:%M:%S %Z")] Logging into Argo CD..."
     kubectl -n $NS exec $ARGOCD_POD -- argocd login "{{ .Release.Name }}-argocd-server.$NS" --username admin --password $(echo $ARGOCD_PASSWD | base64 -d) --insecure
 
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Adding WDS clusters..."
+    echo "[$(date +"%H:%M:%S %Z")] Adding WDS clusters..."
     {{- range $cp := .Values.WDSes }}
       cp_name={{ $cp.name }}
-      echo "[$(date +"%Y-%m-%d %H:%M:%S")] Processing WDS cluster: $cp_name"
+      echo "[$(date +"%H:%M:%S %Z")] Processing WDS cluster: $cp_name"
       
       # Get kubeconfig for the control plane
       key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
@@ -35,14 +34,14 @@ data:
       kubectl -n $NS cp "$kubeconfig" ${ARGOCD_POD}:/tmp
       rm "$kubeconfig"
       
-      echo "[$(date +"%Y-%m-%d %H:%M:%S")] Registering Control Plane \"$cp_name\"..."
+      echo "[$(date +"%H:%M:%S %Z")] Registering Control Plane \"$cp_name\"..."
       kubectl -n $NS exec $ARGOCD_POD -- argocd cluster add ${cp_name} -y --kubeconfig "$kubeconfig"
       kubectl -n $NS exec $ARGOCD_POD -- rm "$kubeconfig"
     {{- end }}
 
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating applications..."
+    echo "[$(date +"%H:%M:%S %Z")] Creating applications..."
     {{- range $app := .Values.argocd.applications }}
-      echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating application \"{{ $app.name }}\""
+      echo "[$(date +"%H:%M:%S %Z")] Creating application \"{{ $app.name }}\""
       kubectl -n $NS exec $ARGOCD_POD -- argocd app create "{{ $app.name }}" \
         --project "{{ $app.project | default "default" }}" \
         --repo "{{ $app.repoURL }}" \
@@ -54,7 +53,7 @@ data:
         --sync-policy "{{ $app.syncPolicy | default "manual" }}" || true
     {{- end }}
 
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Done."
+    echo "[$(date +"%H:%M:%S %Z")] Done."
 ---
 apiVersion: batch/v1
 kind: Job
@@ -140,7 +139,7 @@ spec:
             drop:
               - ALL
       
-      # INIT CONTAINER 4-N: Wait for Each Control Plane (Dynamic Loop)
+      # INIT CONTAINER 4-N: Wait for Each Control Plane 
       {{- range $cp := .Values.WDSes }}
       - name: wait-cp-{{ $cp.name }}-create
         image: quay.io/kubestellar/kubectl:{{ $.Values.KUBECTL_VERSION }}
