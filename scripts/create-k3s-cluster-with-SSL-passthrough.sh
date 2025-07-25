@@ -82,8 +82,7 @@ mkdir -p ~/.kube
 export KUBECONFIG=~/.kube/config
 sudo kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml config view --raw > "$KUBECONFIG"
 
-# Wait for k3s service to be ready and kubectl to work
-echo "Waiting for k3s service to be ready via socket file..."
+echo "Wait for k3s service to be ready and kubectl to work"
 timeout=300
 elapsed=0
 while [ $elapsed -lt $timeout ]; do
