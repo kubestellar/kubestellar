@@ -29,16 +29,18 @@ jobs:
 
           # Define allowed emoji prefixes using a safe regular expression match
           if ! printf '%s' "$TITLE" | grep -qE '^(⚠|✨|🐛|📖|🚀|🌱)'; then
-            echo "❌ Error: Invalid PR title format."
-            echo "Your PR title must start with one of the following indicators:"
-            echo "- ⚠  Breaking change"
-            echo "- ✨  Non-breaking feature"
-            echo "- 🐛  Patch fix"
-            echo "- 📖  Documentation"
-            echo "- 🚀  Release"
-            echo "- 🌱  Infra/Tests/Other"
+            printf "❌ required indicator not found at the start of title: %q\n" "$TITLE"
+            echo "Your PR title must start with one of the following special characters:"
+            echo "⚠ (indicates Breaking change)"
+            echo "✨ (indicates Non-breaking feature)"
+            echo "🐛 (indicates Patch fix)"
+            echo "📖 (indicates Documentation)"
+            echo "🚀 (indicates Release)"
+            echo "🌱 (indicates Infra/Tests/Other)"
+            echo -n "Your title's first character is, in hex: "
+            python3 -c "import os; print('%x' % ord(os.environ['TITLE'][0]))"
             exit 1
           fi
 
           # Safely print the title without allowing code execution
-          printf "✅ PR title is valid: %q\n" "$TITLE"
+          printf "✅ PR title is valid: '%q'\n" "$TITLE"
