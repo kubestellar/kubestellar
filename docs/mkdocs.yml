@@ -88,6 +88,7 @@ nav:
       - Onboarding: contribution-guidelines/onboarding-inc.md
       - Website:
           - Docs Management Overview: contribution-guidelines/operations/document-management.md
+          - Style Guide: contribution-guidelines/operations/docs-styleguide.md
           - Testing website PRs: contribution-guidelines/operations/testing-doc-prs.md
       - Security:
           - Policy: contribution-guidelines/security/security-inc.md
