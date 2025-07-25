@@ -11,18 +11,24 @@ data:
     #!/usr/bin/env bash
     set -e
 
+    # Add the timestamped_echo function for consistent logging
+    timestamped_echo() {
+      echo "[$(date +"%H:%M:%S %Z")] $1"
+    }
+
     NS={{ .Release.Namespace }}
-    echo "[$(date +"%H:%M:%S %Z")] Getting ArgoCD pod and credentials..."
+    timestamped_echo "Getting ArgoCD pod and credentials..."
     ARGOCD_POD=$(kubectl -n $NS get pods -l app.kubernetes.io/name=argocd-server -o 'jsonpath={.items[0].metadata.name}')
     ARGOCD_PASSWD=$(kubectl -n $NS get secret argocd-initial-admin-secret -o jsonpath="{.data.password}")
 
-    echo "[$(date +"%H:%M:%S %Z")] Logging into Argo CD..."
+    timestamped_echo "Logging into Argo CD..."
     kubectl -n $NS exec $ARGOCD_POD -- argocd login "{{ .Release.Name }}-argocd-server.$NS" --username admin --password $(echo $ARGOCD_PASSWD | base64 -d) --insecure
 
-    echo "[$(date +"%H:%M:%S %Z")] Adding WDS clusters..."
+    timestamped_echo "Adding WDS clusters..."
     {{- range $cp := .Values.WDSes }}
       cp_name={{ $cp.name }}
-      echo "[$(date +"%H:%M:%S %Z")] Processing WDS cluster: $cp_name"
+      timestamped_echo "==> Looking for Control Plane \"$cp_name\"..."
+      timestamped_echo "==> Control Plane \"$cp_name\" is ready."
       
       # Get kubeconfig for the control plane
       key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
@@ -30,18 +36,29 @@ data:
       secret_namespace=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
       kubeconfig="/tmp/${cp_name}.kubeconfig"
       
+      timestamped_echo "==> Populating \"$kubeconfig\" from key \"$key\" in secret \"$secret_name\" in namespace \"$secret_namespace\" for control plane \"$cp_name\""
       kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d > "$kubeconfig"
+      
+      timestamped_echo "==> Copying kubeconfig \"$kubeconfig\" to Argo CD pod \"$ARGOCD_POD\"..."
       kubectl -n $NS cp "$kubeconfig" ${ARGOCD_POD}:/tmp
       rm "$kubeconfig"
       
-      echo "[$(date +"%H:%M:%S %Z")] Registering Control Plane \"$cp_name\"..."
+      timestamped_echo "==> Registering Control Plane \"$cp_name\" as an Argo CD cluster..."
       kubectl -n $NS exec $ARGOCD_POD -- argocd cluster add ${cp_name} -y --kubeconfig "$kubeconfig"
       kubectl -n $NS exec $ARGOCD_POD -- rm "$kubeconfig"
     {{- end }}
 
-    echo "[$(date +"%H:%M:%S %Z")] Creating applications..."
+    timestamped_echo "Creating applications..."
     {{- range $app := .Values.argocd.applications }}
-      echo "[$(date +"%H:%M:%S %Z")] Creating application \"{{ $app.name }}\""
+      timestamped_echo "==> Creating application \"{{ $app.name }}\":"
+      timestamped_echo "    - project=\"{{ $app.project | default "default" }}\""
+      timestamped_echo "    - repoURL=\"{{ $app.repoURL }}\""
+      timestamped_echo "    - targetRevision=\"{{ $app.targetRevision | default "HEAD" }}\""
+      timestamped_echo "    - path=\"{{ $app.path | default "/" }}\""
+      timestamped_echo "    - destinationWDS=\"{{ $app.destinationWDS }}\""
+      timestamped_echo "    - destinationNamespace=\"{{ $app.destinationNamespace | default "default" }}\""
+      timestamped_echo "    - syncPolicy=\"{{ $app.syncPolicy | default "manual" }}\""
+
       kubectl -n $NS exec $ARGOCD_POD -- argocd app create "{{ $app.name }}" \
         --project "{{ $app.project | default "default" }}" \
         --repo "{{ $app.repoURL }}" \
@@ -53,7 +70,7 @@ data:
         --sync-policy "{{ $app.syncPolicy | default "manual" }}" || true
     {{- end }}
 
-    echo "[$(date +"%H:%M:%S %Z")] Done."
+    timestamped_echo "Done."
 ---
 apiVersion: batch/v1
 kind: Job
