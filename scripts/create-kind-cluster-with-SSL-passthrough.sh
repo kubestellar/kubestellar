@@ -117,9 +117,6 @@ else
   echo "Skipping... \"${name}\" kind cluster already exists."
 fi
 
-echo "Waiting for cluster nodes to be ready..."
-kubectl --context "kind-${name}" wait --for=condition=ready nodes --all --timeout=300s
-
 
 ###############################################################################
 # Waiting for prefetching to complete... load images into cluster
@@ -149,9 +146,6 @@ else
   kubectl --context "kind-${name}" apply -f "$NGINX_INGRESS_URL"
 fi
 
-echo "Waiting for nginx ingress deployment to be created..."
-kubectl --context "kind-${name}" wait --for=create deployment/ingress-nginx-controller \
-  --namespace ingress-nginx --timeout=300s
 
 echo "Patching nginx ingress to enable SSL passthrough..."
 kubectl --context "kind-${name}" patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","args":["/nginx-ingress-controller","--election-id=ingress-nginx-leader","--controller-class=k8s.io/ingress-nginx","--ingress-class=nginx","--configmap=$(POD_NAMESPACE)/ingress-nginx-controller","--validating-webhook=:8443","--validating-webhook-certificate=/usr/local/certificates/cert","--validating-webhook-key=/usr/local/certificates/key","--watch-ingress-without-class=true","--publish-status-address=localhost","--enable-ssl-passthrough"]}]}}}}'
