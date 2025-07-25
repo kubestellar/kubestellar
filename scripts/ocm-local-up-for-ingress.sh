@@ -42,30 +42,14 @@ nodes:
     protocol: TCP
 EOF
 
-# Wait for hub cluster nodes to be ready
-echo "Waiting for hub cluster nodes to be ready..."
-kubectl --context "${hubctx}" wait --for=condition=ready nodes --all --timeout=300s
-
 echo "Installing an nginx ingress controller into the hub cluster..."
-kubectl --context "${hubctx}" apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.1/deploy/static/provider/kind/deploy.yaml
-
-# Wait for nginx ingress deployment to be created
-echo "Waiting for nginx ingress deployment to be created..."
-kubectl --context "${hubctx}" wait --for=create deployment/ingress-nginx-controller \
-  --namespace ingress-nginx --timeout=300s
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.1/deploy/static/provider/kind/deploy.yaml
 
 echo "Patching nginx ingress controller to enable SSL passthrough..."
 kubectl --context "${hubctx}" patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","args":["/nginx-ingress-controller","--election-id=ingress-nginx-leader","--controller-class=k8s.io/ingress-nginx","--ingress-class=nginx","--configmap=$(POD_NAMESPACE)/ingress-nginx-controller","--validating-webhook=:8443","--validating-webhook-certificate=/usr/local/certificates/cert","--validating-webhook-key=/usr/local/certificates/key","--watch-ingress-without-class=true","--publish-status-address=localhost","--enable-ssl-passthrough"]}]}}}}'
 
 kind create cluster --name "${c1}"
 kind create cluster --name "${c2}"
-
-# Wait for worker cluster nodes to be ready
-echo "Waiting for ${c1} cluster nodes to be ready..."
-kubectl --context "${c1ctx}" wait --for=condition=ready nodes --all --timeout=300s
-
-echo "Waiting for ${c2} cluster nodes to be ready..."
-kubectl --context "${c2ctx}" wait --for=condition=ready nodes --all --timeout=300s
 
 echo "Waiting for nginx ingress controller with SSL passthrough to be ready..."
 # Wait for the deployment to roll out with the new configuration
