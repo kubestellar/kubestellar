@@ -11,7 +11,6 @@ spec:
     - hookName: kubestellar-controller
       vars:
         APIGroups: "{{ .APIGroups | default "" }}"
-        ITSName: "{{ .ITSName | default "" }}"
     - hookName: transport-controller
   globalVars:
     ControlPlaneName: {{ .name }}
