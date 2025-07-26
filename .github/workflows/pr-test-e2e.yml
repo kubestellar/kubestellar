@@ -132,6 +132,14 @@ jobs:
         if: always()
         run: kubectl --context cluster2 get deployments -A -o yaml
 
+      - name: show jobs in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get jobs -A -o yaml
+
+      - name: show jobs in its1
+        if: always()
+        run: kubectl --context its1 get jobs -A -o yaml
+
       - name: show manifestworks
         if: always()
         run: kubectl --context its1 get manifestworks -A -o yaml
@@ -148,34 +156,48 @@ jobs:
         if: always()
         run: |
           kubectl --context kind-kubeflex port-forward -n wds1-system deploy/kubestellar-controller-manager 8080 &
+          PF_PID=$!
           sleep 10
-          curl http://localhost:8080/metrics
-          kill %
+          curl http://localhost:8080/metrics || true
+          kill $PF_PID || true
 
       - name: scrape transport controller
         if: always()
         run: |
           kubectl --context kind-kubeflex port-forward -n wds1-system deploy/transport-controller 8090 &
+          PF_PID=$!
           sleep 10
-          curl http://localhost:8090/metrics
-          kill %
+          curl http://localhost:8090/metrics || true
+          kill $PF_PID || true
 
       - name: scrape OCM Status Add-On Controller
         if: always()
         run: |
           kubectl --context its1 port-forward -n open-cluster-management deploy/addon-status-controller 9280 &
+          PF_PID=$!
           sleep 10
-          curl http://localhost:9280/metrics
-          kill %
+          curl http://localhost:9280/metrics || true
+          kill $PF_PID || true
           sleep 1
 
       - name: scrape OCM Status Add-On Agent
         if: always()
         run: |
-          kubectl --context cluster1 port-forward -n open-cluster-management-agent-addon deploy/status-agent 8080 &
-          sleep 10
-          curl http://localhost:8080/metrics
-          kill %
+          if kubectl config get-contexts cluster1 >/dev/null 2>&1; then
+            echo "✅ Context cluster1 exists. Scraping metrics..."
+            kubectl --context cluster1 port-forward -n open-cluster-management-agent-addon deploy/status-agent 8080 &
+            PF_PID=$!
+            echo "Port-forward PID: $PF_PID"
+            sleep 10
+            curl http://localhost:8080/metrics || true
+            if ps -p $PF_PID > /dev/null; then
+              kill $PF_PID || true
+            else
+              echo "⚠️ Port-forward process $PF_PID is no longer running."
+            fi
+          else
+            echo "⚠️ Skipping: context cluster1 does not exist yet."
+          fi
 
   test-bash:
     name: Test in bash
@@ -207,7 +229,8 @@ jobs:
           TEST_FLAGS: ${{ github.event.inputs.testFlags }}
         run: |
           cd test/e2e/
-          KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
+          : "${TEST_FLAGS:=}"
+          KFLEX_DISABLE_CHATTY=true ./run-test.sh ${TEST_FLAGS:+$TEST_FLAGS}
 
       - name: show kubeconfig contexts
         if: always()
@@ -262,6 +285,14 @@ jobs:
         if: always()
         run: kubectl --context cluster2 get deployments -A -o yaml
 
+      - name: show jobs in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get jobs -A -o yaml
+
+      - name: show jobs in its1
+        if: always()
+        run: kubectl --context its1 get jobs -A -o yaml
+
       - name: show manifestworks
         if: always()
         run: kubectl --context its1 get manifestworks -A -o yaml
@@ -278,31 +309,40 @@ jobs:
         if: always()
         run: |
           kubectl --context kind-kubeflex port-forward -n wds1-system deploy/kubestellar-controller-manager 8080 &
+          PF_PID=$!
           sleep 10
-          curl http://localhost:8080/metrics
-          kill %
+          curl http://localhost:8080/metrics || true
+          kill $PF_PID || true
 
       - name: scrape transport controller
         if: always()
         run: |
           kubectl --context kind-kubeflex port-forward -n wds1-system deploy/transport-controller 8090 &
+          PF_PID=$!
           sleep 10
-          curl http://localhost:8090/metrics
-          kill %
+          curl http://localhost:8090/metrics || true
+          kill $PF_PID || true
 
       - name: scrape OCM Status Add-On Controller
         if: always()
         run: |
           kubectl --context its1 port-forward -n open-cluster-management deploy/addon-status-controller 9280 &
+          PF_PID=$!
           sleep 10
-          curl http://localhost:9280/metrics
-          kill %
+          curl http://localhost:9280/metrics || true
+          kill $PF_PID || true
           sleep 1
 
       - name: scrape OCM Status Add-On Agent
         if: always()
         run: |
-          kubectl --context cluster1 port-forward -n open-cluster-management-agent-addon deploy/status-agent 8080 &
-          sleep 10
-          curl http://localhost:8080/metrics
-          kill %
+          if kubectl config get-contexts cluster1 >/dev/null 2>&1; then
+            echo "✅ Context cluster1 exists. Scraping metrics..."
+            kubectl --context cluster1 port-forward -n open-cluster-management-agent-addon deploy/status-agent 8080 &
+            PF_PID=$!
+            sleep 10
+            curl http://localhost:8080/metrics || true
+            kill $PF_PID || true
+          else
+            echo "⚠️ Skipping: context cluster1 does not exist yet."
+          fi

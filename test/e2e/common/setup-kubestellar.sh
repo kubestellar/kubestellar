@@ -128,7 +128,9 @@ popd
 
 : Waiting for OCM hub to be ready...
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
+
 kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
+
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
