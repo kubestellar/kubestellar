@@ -130,12 +130,12 @@ popd
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
 
 kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s || {
-    # Check if at least one pod succeeded (which should be sufficient for the job to be considered complete)
-    succeeded=$(kubectl -n its1-system get job its-with-clusteradm -o jsonpath='{.status.succeeded}' 2>/dev/null || echo "0")
-    if [ "$succeeded" != "" ] && [ "$succeeded" != "0" ]; then
-        echo "At least one pod succeeded, continuing..."
+    # Check if the job is actually in a successful state
+    job_status=$(kubectl -n its1-system get job its-with-clusteradm -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}' 2>/dev/null || echo "Unknown")
+    if [ "$job_status" = "True" ]; then
+        echo "Job is actually complete, continuing..."
     else
-        echo "No pods succeeded, failing..."
+        echo "Job is not in complete state, failing..."
         exit 1
     fi
 }
@@ -176,12 +176,12 @@ function add_wec() {
 
 kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
 kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s || {
-    # Check if at least one pod succeeded (which should be sufficient for the job to be considered complete)
-    succeeded=$(kubectl --context $HOSTING_CONTEXT -n its1-system get job its-with-clusteradm -o jsonpath='{.status.succeeded}' 2>/dev/null || echo "0")
-    if [ "$succeeded" != "" ] && [ "$succeeded" != "0" ]; then
-        echo "At least one pod succeeded, continuing..."
+    # Check if the job is actually in a successful state
+    job_status=$(kubectl --context $HOSTING_CONTEXT -n its1-system get job its-with-clusteradm -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}' 2>/dev/null || echo "Unknown")
+    if [ "$job_status" = "True" ]; then
+        echo "Job is actually complete, continuing..."
     else
-        echo "No pods succeeded, failing..."
+        echo "Job is not in complete state, failing..."
         exit 1
     fi
 }
