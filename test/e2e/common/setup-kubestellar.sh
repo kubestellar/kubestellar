@@ -131,7 +131,8 @@ kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.s
 
 kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s || {
     # Check if at least one pod succeeded (which should be sufficient for the job to be considered complete)
-    if kubectl -n its1-system get job its-with-clusteradm -o jsonpath='{.status.succeeded}' | grep -q '[1-9]'; then
+    succeeded=$(kubectl -n its1-system get job its-with-clusteradm -o jsonpath='{.status.succeeded}' 2>/dev/null || echo "0")
+    if [ "$succeeded" != "" ] && [ "$succeeded" != "0" ]; then
         echo "At least one pod succeeded, continuing..."
     else
         echo "No pods succeeded, failing..."
@@ -176,7 +177,8 @@ function add_wec() {
 kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
 kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s || {
     # Check if at least one pod succeeded (which should be sufficient for the job to be considered complete)
-    if kubectl --context $HOSTING_CONTEXT -n its1-system get job its-with-clusteradm -o jsonpath='{.status.succeeded}' | grep -q '[1-9]'; then
+    succeeded=$(kubectl --context $HOSTING_CONTEXT -n its1-system get job its-with-clusteradm -o jsonpath='{.status.succeeded}' 2>/dev/null || echo "0")
+    if [ "$succeeded" != "" ] && [ "$succeeded" != "0" ]; then
         echo "At least one pod succeeded, continuing..."
     else
         echo "No pods succeeded, failing..."
