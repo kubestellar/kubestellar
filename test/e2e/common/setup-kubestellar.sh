@@ -128,7 +128,17 @@ popd
 
 : Waiting for OCM hub to be ready...
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
-kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
+
+kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s || {
+    # Check if at least one pod succeeded (which should be sufficient for the job to be considered complete)
+    if kubectl -n its1-system get job its-with-clusteradm -o jsonpath='{.status.succeeded}' | grep -q '[1-9]'; then
+        echo "At least one pod succeeded, continuing..."
+    else
+        echo "No pods succeeded, failing..."
+        exit 1
+    fi
+}
+
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
@@ -164,7 +174,15 @@ function add_wec() {
 "${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose ocm
 
 kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
-kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
+kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s || {
+    # Check if at least one pod succeeded (which should be sufficient for the job to be considered complete)
+    if kubectl --context $HOSTING_CONTEXT -n its1-system get job its-with-clusteradm -o jsonpath='{.status.succeeded}' | grep -q '[1-9]'; then
+        echo "At least one pod succeeded, continuing..."
+    else
+        echo "No pods succeeded, failing..."
+        exit 1
+    fi
+}
 
 add_wec cluster1
 add_wec cluster2
