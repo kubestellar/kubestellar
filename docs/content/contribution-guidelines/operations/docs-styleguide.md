@@ -4,10 +4,10 @@ _This document is just a starting point for a much more complete style guide and
 
 ## Why Have a Style Guide?
 
-For KubeStellar's website and other documentation to be useful and effective, the pages need to be readable and accessible to its audience. Given the cooperative nature of an open-source project, a Style Guide makes it easier for multiple contributors to write and maintain the documentation with a consistent and understandable format and authorial voice.
+For KubeStellar's website and other documentation to be useful and effective, the pages need to be readable and accessible to its audience. Given the cooperative nature of an open-source project, a style guide makes it easier for multiple contributors to write and maintain the documentation with a consistent and understandable format and authorial voice.
 
 An extended [Design System for KubeStellar's websites and UI is being developed](https://github.com/kubestellar/ui/blob/dev/docs/design-progress.md) during mid-2025. The resulting **Design Guide** will govern the visual language and components of KubeStellar UIs and docs.
-This **Style Guide** is intended to complement the Design Guide to govern the _prose_ (written language/text) components of the KubeStellar ecosystem, and will evolve alongside the Design Guide.
+This **Style Guide** is intended to complement the Design Guide to govern the _prose_ (written language/text) components of the KubeStellar ecosystem and will evolve alongside the Design Guide.
 
 ## Basic Style Considerations
 
