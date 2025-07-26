@@ -48,55 +48,7 @@ spec:
     - kind: ServiceAccount
       name: default
       namespace: "{{"{{.Namespace}}"}}"
-  - apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: transport-controller-config
-    data:
-      get-kubeconfig.sh: |
-        #!/bin/env bash
-        # Get the in-cluster kubeconfig for KubeFlex Control Planes
-        # get-kubeconfig.sh cp_name guess_its_name
-
-        # input parameters
-        cp_name="${1%"-system"}" # cp name or cp namespace
-        guess_its_name="$2" # true: try guessing the name of the ITS CP
-
-        # check if the CP name is valid or needs to be guessed
-        while [ "$cp_name" == "" ] ; do
-          if [ "$guess_its_name" == "true" ] ; then
-            cps=$(kubectl get controlplane -l 'kflex.kubestellar.io/cptype=its' 2> /dev/null | tail -n +2)
-            case $(echo -n "$cps" | grep -c '^') in
-              (0)
-                >&2 echo "Waiting for an ITS control plane to exist..."
-                sleep 10;;
-              (1)
-                cp_name="${cps%% *}"
-                break;;
-              (*)
-                >&2 echo "ERROR: found more than one Control Plane of type its!"
-                exit 1;;
-            esac
-          else
-            >&2 echo "ERROR: no Control Plane name specified!"
-            exit 3
-          fi
-        done
-
-        # wait for the CP to exists and be ready
-        while [[ $(kubectl get controlplane "$cp_name" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-          >&2 echo "Waiting for \"$cp_name\" control plane to exist and be ready..."
-          sleep 10
-        done
-
-        # determine the secret name and namespace
-        key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
-        secret_name=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
-        secret_namespace=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
-
-        # get the kubeconfig in base64
-        >&2 echo "Getting \"$key\" from \"$secret_name\" secret in \"$secret_namespace\" for control plane \"$cp_name\"..."
-        kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}"
+  
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -115,19 +67,50 @@ spec:
           - name: setup-wds-kubeconfig
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             imagePullPolicy: IfNotPresent
-            command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{"{{.ControlPlaneName}}"}}' false | base64 -d > /mnt/shared/wds-kubeconfig" ]
+            command:
+              - /bin/bash
+              - -c
+              - |
+                kubectl wait --for=condition=Ready controlplane {{.ControlPlaneName}} --timeout=120s && \
+                key=$(kubectl get controlplane {{.ControlPlaneName}} -o=jsonpath='{.status.secretRef.inClusterKey}') && \
+                secret_name=$(kubectl get controlplane {{.ControlPlaneName}} -o=jsonpath='{.status.secretRef.name}') && \
+                secret_namespace=$(kubectl get controlplane {{.ControlPlaneName}} -o=jsonpath='{.status.secretRef.namespace}') && \
+                until kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" > /dev/null 2>&1; do echo "Waiting for secret $secret_name to be populated..."; sleep 5; done && \
+                kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d > /mnt/shared/wds-kubeconfig
             volumeMounts:
-            - name: config-volume
-              mountPath: /mnt/config
             - name: shared-volume
               mountPath: /mnt/shared
           - name: setup-its-kubeconfig
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             imagePullPolicy: IfNotPresent
-            command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{.ITSName}}' true | base64 -d > /mnt/shared/transport-kubeconfig" ]
+            command:
+              - /bin/bash
+              - -c
+              - |
+                ITS_CP_NAME="{{.ITSName}}"
+                if [ "$ITS_CP_NAME" == "" ]; then
+                  while true;
+                    cps=$(kubectl get controlplane -l 'kflex.kubestellar.io/cptype=its' 2> /dev/null | tail -n +2)
+                    case $(echo -n "$cps" | grep -c '^') in
+                      (0)
+                        >&2 echo "Waiting for an ITS control plane to exist..."
+                        sleep 10;;
+                      (1)
+                        ITS_CP_NAME="${cps%% *}"
+                        break;;
+                      (*)
+                        >&2 echo "ERROR: found more than one Control Plane of type its! Exiting."
+                        exit 1;;
+                    esac
+                  done
+                fi
+                kubectl wait --for=condition=Ready controlplane $ITS_CP_NAME --timeout=120s && \
+                key=$(kubectl get controlplane $ITS_CP_NAME -o=jsonpath='{.status.secretRef.inClusterKey}') && \
+                secret_name=$(kubectl get controlplane $ITS_CP_NAME -o=jsonpath='{.status.secretRef.name}') && \
+                secret_namespace=$(kubectl get controlplane $ITS_CP_NAME -o=jsonpath='{.status.secretRef.namespace}') && \
+                until kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" > /dev/null 2>&1; do echo "Waiting for secret $secret_name to be populated..."; sleep 5; done && \
+                kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d > /mnt/shared/transport-kubeconfig
             volumeMounts:
-            - name: config-volume
-              mountPath: /mnt/config
             - name: shared-volume
               mountPath: /mnt/shared
           containers:
@@ -154,8 +137,5 @@ spec:
           volumes:
           - name: shared-volume
             emptyDir: {}
-          - name: config-volume
-            configMap:
-              name: transport-controller-config
-              defaultMode: 0744
+          
 {{- end }} 
