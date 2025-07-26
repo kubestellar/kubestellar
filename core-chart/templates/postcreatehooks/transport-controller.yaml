@@ -87,10 +87,27 @@ spec:
               - /bin/bash
               - -c
               - |
-                kubectl wait --for=condition=Ready controlplane {{.ITSName}} --timeout=120s && \
-                key=$(kubectl get controlplane {{.ITSName}} -o=jsonpath='{.status.secretRef.inClusterKey}') && \
-                secret_name=$(kubectl get controlplane {{.ITSName}} -o=jsonpath='{.status.secretRef.name}') && \
-                secret_namespace=$(kubectl get controlplane {{.ITSName}} -o=jsonpath='{.status.secretRef.namespace}') && \
+                ITS_CP_NAME="{{.ITSName}}"
+                if [ "$ITS_CP_NAME" == "" ]; then
+                  while true;
+                    cps=$(kubectl get controlplane -l 'kflex.kubestellar.io/cptype=its' 2> /dev/null | tail -n +2)
+                    case $(echo -n "$cps" | grep -c '^') in
+                      (0)
+                        >&2 echo "Waiting for an ITS control plane to exist..."
+                        sleep 10;;
+                      (1)
+                        ITS_CP_NAME="${cps%% *}"
+                        break;;
+                      (*)
+                        >&2 echo "ERROR: found more than one Control Plane of type its! Exiting."
+                        exit 1;;
+                    esac
+                  done
+                fi
+                kubectl wait --for=condition=Ready controlplane $ITS_CP_NAME --timeout=120s && \
+                key=$(kubectl get controlplane $ITS_CP_NAME -o=jsonpath='{.status.secretRef.inClusterKey}') && \
+                secret_name=$(kubectl get controlplane $ITS_CP_NAME -o=jsonpath='{.status.secretRef.name}') && \
+                secret_namespace=$(kubectl get controlplane $ITS_CP_NAME -o=jsonpath='{.status.secretRef.namespace}') && \
                 until kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" > /dev/null 2>&1; do echo "Waiting for secret $secret_name to be populated..."; sleep 5; done && \
                 kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}" | base64 -d > /mnt/shared/transport-kubeconfig
             volumeMounts:
