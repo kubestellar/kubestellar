@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
 # Copyright 2024 The KubeStellar Authors.
-# Licensed under the Apache License, Version 2.0 (see LICENSE).
-
-# -----------------------------------------------------------------------------
-# Smoke-test: verify that Argo CD is fully operational (Helm-based install).
-# The test will:
-#   1. Ensure all Argo CD system pods are Running.
-#   2. Log in to the Argo CD API using the CLI.
-#   3. Create a disposable "guestbook" sample app.
-#   4. Sync the app and wait until it is Synced + Healthy.
-#   5. Clean up by deleting the app.
-# -----------------------------------------------------------------------------
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 set -euo pipefail
 set -x
+
 
 CONTEXT="kind-kubeflex"     
 NAMESPACE="argocd"
@@ -60,6 +62,7 @@ kubectl --context "$CONTEXT" -n "$NAMESPACE" exec "$ARGOCD_POD" -- \
 echo "✅ SUCCESS: Argo CD application reconciled correctly!"
 
 kubectl --context "$CONTEXT" -n "$NAMESPACE" exec "$ARGOCD_POD" -- \
-  argocd app delete "$APP_NAME" --yes --cascade --timeout 120
+  argocd app delete "$APP_NAME" --yes --cascade
+
 
 echo "🧹 Cleanup complete. Argo CD smoke-test finished successfully."
