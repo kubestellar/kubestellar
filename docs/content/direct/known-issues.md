@@ -26,4 +26,4 @@ This can arise when using `kind` inside a virtual machine (e.g., when using Dock
 
 ## Insufficient CPU for your clusters
 
-This can happen when you are using a docker-in-docker technique. The symptom is that setup stops making progress at some point. See [Insufficient CPU for your clusters](knownissue-cpu-insufficient-fort-its1.md)
+This can happen when you are using a docker-in-docker technique. The symptom is that setup stops making progress at some point. See [Insufficient CPU for your clusters](knownissue-cpu-insufficient-for-its1.md)
