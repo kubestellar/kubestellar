@@ -25,7 +25,7 @@ jobs:
   broken-links-crawler:
     name: broken-links-crawler
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call' || github.event.workflow_run.conclusion == 'success'
     permissions:
       contents: write
     steps:
