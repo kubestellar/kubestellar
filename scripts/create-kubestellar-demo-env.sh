@@ -104,8 +104,6 @@ context_clean_up() {
 }
 
 checking_cluster() {
-    local timeout_duration="100s"
-
     while IFS= read -r line; do
         # Check for the cluster name and "Pending" status
         if echo "$line" | grep -q "$1" && echo "$line" | grep -q "Pending"; then
@@ -120,12 +118,8 @@ checking_cluster() {
                 return 1
             fi
         fi
-    done < <(timeout ${timeout_duration} kubectl --context its1 get csr --watch) 
-
-    echo "Timed out. CSR for $1 was not found within ${timeout_duration}."
-    return 1
+    done < <(kubectl --context its1 get csr --watch)
 }
-
 
 echo -e "\nStarting environment clean up..."
 echo -e "Starting cluster clean up..."
