@@ -7,6 +7,7 @@ metadata:
 spec:
   backend: shared
   type: {{ .type | default "k8s" }}
+  waitForPostCreateHooks: true
   postCreateHooks:
     - hookName: kubestellar-controller
       vars:
