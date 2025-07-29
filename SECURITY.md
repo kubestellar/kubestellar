@@ -8,16 +8,18 @@ Join the [kubestellar-security-announce](https://groups.google.com/u/1/g/kubeste
 KubeStellar manages its dependencies with the following policy:
 
 - **Dependency Detection:** We use [Dependabot](https://github.com/dependabot) to automatically check for and propose updates to dependencies in Go modules, Python requirements, Dockerfiles, and Helm charts. Dependabot PRs serve as prompts but are not automatically accepted.
-- **Update Process:** After Dependabot creates a PR, maintainers wait for potential issues to surface before proceeding. They then create their own PR that follows our [GitHub Action reference discipline](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#github-action-reference-discipline) and other established practices.
+- **Update Process:** After Dependabot creates a PR, maintainers wait for potential issues to surface before proceeding. The handling then depends on the type of dependency and whether Dependabot's proposal is functional:
+  - **GitHub Actions:** Maintainers create their own PR that follows our [GitHub Action reference discipline](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#github-action-reference-discipline) and other established practices.
+  - **Go Dependencies:** If Dependabot's proposal is functional, it may be accepted directly. If the proposal is broken, maintainers create their own PR to address the dependency update properly.
 - **Review Process:** All dependency update pull requests are subject to the same [review process](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#pull-requests) as other code changes. Maintainers verify that updates do not introduce breaking changes or known vulnerabilities before merging.
-- **Vulnerability Checking:** Before merging dependency updates, maintainers perform comprehensive security assessments:
-  - **Security Scanning:** Use available security scanning tools to check for known vulnerabilities in new dependency versions
+- **Vulnerability Checking:** Before merging dependency updates, maintainers perform security assessments:
+  - **Security Scanning:** Given that KubeStellar imports various types of dependencies (Go packages, pre-built binaries, container images, Helm charts, and GitHub Actions), we rely on GitHub's security advisory database and Dependabot's vulnerability detection capabilities. Specific additional security scanning tools are not currently standardized across all dependency types.
   - **Security Advisories:** Review security advisories and release notes for the updated dependencies
   - **Breaking Changes:** Verify that updates do not introduce breaking changes or compatibility issues
   - **GitHub Actions:** For GitHub Actions specifically, ensure updates follow our [GitHub Action Reference Discipline](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#github-action-reference-discipline) and use approved commit hashes. The [verify-action-hashes workflow](https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/verify-action-hashes.yaml) automatically checks that each GitHub Action reference uses an approved commit hash.
   - **SBOM Generation:** Generate Software Bill of Materials (SBOM) using [Anchore's syft tool](https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/goreleaser.yml) during releases to identify and track dependencies for security analysis
-  - **Testing:** Run comprehensive tests to ensure the updated dependencies work correctly with the codebase
-- **Security Best Practices:** We avoid using unmaintained or deprecated dependencies, and monitor for security advisories affecting our dependencies. Vulnerabilities in dependencies are prioritized for prompt remediation.
+  - **Testing:** Run available tests to verify that updated dependencies work correctly with the codebase
+- **Security Best Practices:** We avoid using unmaintained or deprecated dependencies. Monitoring for security advisories affecting our dependencies is primarily done through GitHub's security advisory database and Dependabot notifications. Vulnerabilities in dependencies are prioritized for prompt remediation.
 - **Documentation:** The dependency update process is documented in the repository's README and CONTRIBUTING guidelines.
 
 ## Report a Vulnerability
