@@ -1,6 +1,6 @@
 # KubeStellar Documentation Style Guide
 
-_This document is a just starting point for a much more complete style guide and toolbox being developed as a CNCF LXF Mentorship project in 2025_
+_This document is a just starting point for a much more complete style guide and toolbox being developed as a CNCF LFX Mentorship project in 2025_
 
 ## Why have a Style Guide?
 
@@ -30,7 +30,7 @@ Much of KubeStellar's existing documentation -- especially introductory and over
 ### Avoid Use of Emojis in Prose
 
 The **Design Guide** will include guidance on use and placement of iconography in KubeStellar docs and UIs.
-In textual documentation, however, emojis may interfere with rendering and navigation of the website documentation, _especially_ if they are used in headings or titles. They also may make the documenation inaccessible to visitors who must use screen reader technology.
+In textual documentation, however, emojis may interfere with rendering and navigation of the website documentation, _especially_ if they are used in headings or titles. They also may make the documentation inaccessible to visitors who must use screen reader technology.
 
 ### Always include alt-text for images
 
@@ -38,7 +38,7 @@ This is a basic requirement for accessibility. Images and diagrams should always
 
 ### Use Care If Using Generative AI
 
-The use of generative AI for writing assistance is becoming more common. Any text created via genAI should be **carefully** reviewed to make sure it is both coherent and accurate. It should also be checked to ensure it is not plagiarism, as some LLMs have been trained on copyrighted works.
+The use of generative AI for writing assistance is becoming more common. Any text created via generative AI tools should be **carefully** reviewed to make sure it is both coherent and accurate. It should also be checked to ensure it is not plagiarism, as some LLMs have been trained on copyrighted works.
 
 ## Always Do a Spelling and Grammar Check
 
