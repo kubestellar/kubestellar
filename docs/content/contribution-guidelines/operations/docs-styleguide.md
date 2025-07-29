@@ -1,6 +1,6 @@
 # KubeStellar Documentation Style Guide
 
-_This document is a just starting point for a much more complete style guide and toolbox being developed as a CNCF LFX Mentorship project in 2025_
+_This document is just a starting point for a much more complete style guide and toolbox being developed as a CNCF LFX Mentorship project in 2025_
 
 ## Why have a Style Guide?
 
