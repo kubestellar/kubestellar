@@ -93,20 +93,16 @@ source "$COMMON_SRCS/setup-shell.sh"
 source "$COMMON_SRCS/test-configs.sh"
 
 # Get scenario configuration
-scenario_config=( $(get_scenario_config "$TEST_SCENARIO") )
+set_scenario_config "$TEST_SCENARIO"
 if [ $? -ne 0 ]; then
     echo "Invalid scenario: $TEST_SCENARIO" >&2
     list_scenarios
     exit 1
 fi
 
-# Instead of associative array, parse scenario_config into variables
-config_name="${scenario_config[0]}"
-config_description="${scenario_config[1]}"
-config_wds_type="${scenario_config[2]}"
-config_its_type="${scenario_config[3]}"
-config_cluster_source="${scenario_config[4]}"
-config_combined_control_plane="${scenario_config[5]}"
+# Variables are now set directly by set_scenario_config:
+# config_name, config_description, config_wds_type, config_its_type, 
+# config_cluster_source, config_combined_control_plane
 
 :
 : -------------------------------------------------------------------------
