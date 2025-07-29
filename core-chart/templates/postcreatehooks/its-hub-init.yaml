@@ -15,7 +15,19 @@ spec:
       template:
         spec:
           containers:
-{{ include "pch.its.custeradm" . | indent 10 }}
+          - name: "{{"{{.HookName}}-clusteradm"}}"
+            image: quay.io/kubestellar/clusteradm:{{.Values.CLUSTERADM_VERSION}}
+            args:
+            - init
+            - -v={{.Values.verbosity.clusteradm | default .Values.verbosity.default | default 2 }}
+            - --wait
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
           volumes:
           - name: kubeconfig
             secret:
