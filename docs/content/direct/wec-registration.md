@@ -274,6 +274,6 @@ After successfully registering your WEC, you can:
 3. **Set up monitoring** for your WEC
 4. **Register additional WECs** to scale your deployment
 
-For more information on using WECs with KubeStellar, see the [example scenarios](example-scenarios.md) and [BindingPolicy documentation](binding-policies.md).
+For more information on using WECs with KubeStellar, see the [example scenarios](example-scenarios.md) and [BindingPolicy documentation](binding.md/#bindingpolicy).
 
 For the complete picture of how WEC registration fits into the overall KubeStellar architecture, see [The Full Story](user-guide-intro.md#the-full-story).
