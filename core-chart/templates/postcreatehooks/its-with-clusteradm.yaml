@@ -15,12 +15,30 @@ spec:
       template:
         spec:
           containers:
-{{ include "pch.its.custeradm"   . | indent 10 }}
+          - name: "{{"{{.HookName}}-registration-operator"}}"
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -x
+              kubectl apply -f /etc/kubestellar/registration-operator.yaml
+              kubectl wait --for=condition=Available deployment/registration-operator -n open-cluster-management --timeout=300s
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: /etc/kube
+              readOnly: true
+            - name: registration-operator
+              mountPath: /etc/kubestellar
+              readOnly: true
 {{ include "pch.its.statusaddon" . | indent 10 }}
           volumes:
           - name: kubeconfig
             secret:
               secretName: "{{"{{.ITSSecretName}}"}}"
+          - name: registration-operator
+            configMap:
+              name: registration-operator
           restartPolicy: Never
       backoffLimit: 1
 {{- end }}

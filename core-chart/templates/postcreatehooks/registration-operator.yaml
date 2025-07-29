@@ -1,0 +1,172 @@
+{{- if .Values.InstallPCHs }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: open-cluster-management
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registration-operator
+  namespace: open-cluster-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: registration-operator
+  template:
+    metadata:
+      labels:
+        name: registration-operator
+    spec:
+      serviceAccountName: registration-operator
+      containers:
+      - name: registration-operator
+        image: quay.io/open-cluster-management/registration-operator:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - /registration-operator
+        - --kubeconfig=/etc/kube/kubeconfig
+        volumeMounts:
+        - name: kubeconfig
+          mountPath: /etc/kube
+          readOnly: true
+      volumes:
+      - name: kubeconfig
+        secret:
+          secretName: "{{"{{.ITSSecretName}}"}}"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: registration-operator
+  namespace: open-cluster-management
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: registration-operator
+  namespace: open-cluster-management
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - secrets
+  - configmaps
+  - serviceaccounts
+  - services
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  - roles
+  - rolebindings
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  - validatingwebhookconfigurations
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - cluster.open-cluster-management.io
+  resources:
+  - managedclusters
+  - managedclustersets
+  - managedclustersetbindings
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - work.open-cluster-management.io
+  resources:
+  - manifestworks
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - addon.open-cluster-management.io
+  resources:
+  - clustermanagementaddons
+  - managedclusteraddons
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: registration-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: registration-operator
+subjects:
+- kind: ServiceAccount
+  name: registration-operator
+  namespace: open-cluster-management
+{{- end }}
