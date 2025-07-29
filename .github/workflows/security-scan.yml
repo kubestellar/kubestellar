@@ -81,10 +81,25 @@ jobs:
       - name: Install OSV Scanner
         run: |
           go install github.com/google/osv-scanner/cmd/osv-scanner@latest
+      - name: Get current date for cache key
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
       - name: Cache OSV database
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/osv-scanner
+            ~/.osv-scanner
+          key: osv-db-${{ steps.date.outputs.date }}
+          restore-keys: |
+            osv-db-
+      - name: Download OSV database
         run: |
-          mkdir -p ~/.cache/osv
-          echo "OSV scanner will update database automatically during scan"
+          echo "Downloading OSV vulnerability database..."
+          osv-scanner --update-databases || {
+            echo "Database download failed, continuing with existing cache"
+            echo "OSV scanner will attempt to update during scan if needed"
+          }
         continue-on-error: true
       - name: Run OSV Scanner
         run: |
