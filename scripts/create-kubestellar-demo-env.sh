@@ -159,30 +159,152 @@ echo -e "\nCreating two $k8s_platform clusters to serve as example WECs"
 clusters=(cluster1 cluster2)
 cluster_log_dir=$(mktemp -d)
 trap "rm -rf $cluster_log_dir" EXIT
+
+# Create WEC clusters in parallel for maximum speed
+wec_pids=()
 for cluster in "${clusters[@]}"; do
-    if {
+    echo "Creating cluster $cluster in background..."
+    {
       if [ "$k8s_platform" == "kind" ]; then
-        kind create cluster --name "${cluster}" &>"${cluster_log_dir}/${cluster}.log"
+        if kind create cluster --name "${cluster}" &>"${cluster_log_dir}/${cluster}.log"; then
+            echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
+            kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
+        else
+            echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
+            cat "${cluster_log_dir}/${cluster}.log" >&2
+            exit 1
+        fi
       else
-        k3d cluster create --network k3d-kubeflex "${cluster}" &>"${cluster_log_dir}/${cluster}.log"
+        if k3d cluster create --network k3d-kubeflex "${cluster}" &>"${cluster_log_dir}/${cluster}.log"; then
+            echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
+            kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
+        else
+            echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
+            cat "${cluster_log_dir}/${cluster}.log" >&2
+            exit 1
+        fi
       fi
-    }; then
-        echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
-        kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
-    else
-        echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
-        cat "${cluster_log_dir}/${cluster}.log" >&2
-        false
-    fi
+    } &
+    wec_pids+=($!)
 done
+
+echo "WEC clusters creating in parallel..."
+
+# Wait for all WEC cluster creation to complete
+for pid in "${wec_pids[@]}"; do
+    wait $pid
+done
+
+echo "All WEC clusters created successfully"
+
+# Function to prefetch nginx ingress images in parallel
+prefetch_nginx_images() {
+    local platform=$1
+    echo "Pre-fetching nginx ingress images in background..."
+    
+    # Get nginx ingress images
+    nginx_images=(
+        "registry.k8s.io/ingress-nginx/controller:v1.12.1"
+        "registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.1"
+    )
+    
+    for image in "${nginx_images[@]}"; do
+        docker pull "$image" &
+    done
+    
+    # Load images into cluster based on platform
+    for image in "${nginx_images[@]}"; do
+        if [ "$platform" == "kind" ]; then
+            kind load docker-image "$image" --name kubeflex &
+        else
+            k3d image import "$image" --cluster kubeflex &
+        fi
+    done
+}
+
+# Function for optimized k3d nginx installation  
+install_optimized_nginx_k3d() {
+    echo "Installing optimized nginx ingress for k3d..."
+    
+    # Use optimized Helm values for faster startup
+    if helm install ingress-nginx ingress-nginx \
+        --repo https://kubernetes.github.io/ingress-nginx \
+        --version 4.12.1 \
+        --namespace ingress-nginx \
+        --create-namespace \
+        --set controller.replicaCount=1 \
+        --set controller.nodeSelector."kubernetes\.io/os"=linux \
+        --set controller.admissionWebhooks.enabled=false \
+        --set controller.metrics.enabled=false \
+        --set controller.podAnnotations."prometheus\.io/scrape"=false \
+        --set controller.service.type=NodePort \
+        --set controller.service.nodePorts.http=30080 \
+        --set controller.service.nodePorts.https=30443 \
+        --set controller.extraArgs.enable-ssl-passthrough=true \
+        --set controller.extraArgs.default-ssl-certificate=ingress-nginx/default-ssl-certificate \
+        --set controller.lifecycle.preStop.exec.command=["/wait-shutdown"] \
+        --set defaultBackend.enabled=false \
+        --timeout=24h \
+        --wait; then
+        echo "Nginx ingress installation completed successfully"
+        
+        # Quick readiness check
+        kubectl --context k3d-kubeflex wait --namespace ingress-nginx \
+            --for=condition=ready pod \
+            --selector=app.kubernetes.io/component=controller \
+            --timeout=60s
+    else
+        echo "Error: Nginx ingress installation failed" >&2
+        return 1
+    fi
+}
 
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
 if [ "$k8s_platform" == "kind" ]; then
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
+    # Start nginx image prefetching in parallel with cluster creation
+    prefetch_nginx_images "kind" &
+    prefetch_pid=$!
+    
+    # Use optimized flags for Kind cluster creation
+    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext --prefetch --nowait &
+    kind_creation_pid=$!
+    
+    # Wait for prefetching to complete
+    wait $prefetch_pid
+    echo "Image prefetching completed"
+    
+    # Wait for Kind cluster creation to complete
+    wait $kind_creation_pid
+    echo "Kind cluster creation completed"
+    
 else
-    k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
-    sleep 15
-    helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.12.1 --namespace ingress-nginx --create-namespace --timeout 24h
+    # Optimized k3d path with parallel operations
+    echo "Creating k3d cluster and prefetching nginx images in parallel..."
+    
+    # Start cluster creation and image prefetching in parallel
+    k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex &
+    cluster_pid=$!
+    
+    prefetch_nginx_images "k3d" &
+    prefetch_pid=$!
+    
+    # Wait for cluster creation
+    wait $cluster_pid
+    echo "k3d cluster creation completed"
+    
+    # Wait a moment for cluster to be fully ready
+    sleep 10
+    
+    # Install optimized nginx while prefetching completes
+    install_optimized_nginx_k3d &
+    nginx_install_pid=$!
+    
+    # Wait for prefetching to complete
+    wait $prefetch_pid
+    echo "Image prefetching completed"
+    
+    # Wait for nginx installation to complete
+    wait $nginx_install_pid
 fi
 echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
 
@@ -194,18 +316,39 @@ images=("ghcr.io/loft-sh/vcluster:0.16.4"
         "quay.io/open-cluster-management/registration-operator:v0.15.2"
         "quay.io/kubestellar/postgresql:16.0.0-debian-11-r13")
 
+# Pull all images in parallel for faster completion
+pull_pids=()
 for image in "${images[@]}"; do
+    echo "Pulling $image in background..."
     docker pull "$image" &
+    pull_pids+=($!)
 done
-wait
 
+# Wait for all pulls to complete
+for pid in "${pull_pids[@]}"; do
+    wait $pid
+done
+echo "All image pulls completed"
+
+# Load images into cluster in parallel
+load_pids=()
 for image in "${images[@]}"; do
     if [ "$k8s_platform" == "kind" ]; then
-        kind load docker-image "$image" --name kubeflex
+        echo "Loading $image into kind cluster..."
+        kind load docker-image "$image" --name kubeflex &
+        load_pids+=($!)
     else
-        k3d image import "$image" --cluster kubeflex
+        echo "Importing $image into k3d cluster..."
+        k3d image import "$image" --cluster kubeflex &
+        load_pids+=($!)
     fi
 done
+
+# Wait for all loads to complete
+for pid in "${load_pids[@]}"; do
+    wait $pid
+done
+echo "All image loads completed"
 
 echo -e "\nStarting the process to install KubeStellar core: $k8s_platform-kubeflex..."
 if [ "$k8s_platform" == "k3d" ]

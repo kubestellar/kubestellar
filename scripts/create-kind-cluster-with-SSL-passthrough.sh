@@ -147,24 +147,67 @@ else
 fi
 
 echo "Patching nginx ingress to enable SSL passthrough..."
+# Base SSL passthrough patch (original functionality)
 kubectl --context "kind-${name}" patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","args":["/nginx-ingress-controller","--election-id=ingress-nginx-leader","--controller-class=k8s.io/ingress-nginx","--ingress-class=nginx","--configmap=$(POD_NAMESPACE)/ingress-nginx-controller","--validating-webhook=:8443","--validating-webhook-certificate=/usr/local/certificates/cert","--validating-webhook-key=/usr/local/certificates/key","--watch-ingress-without-class=true","--publish-status-address=localhost","--enable-ssl-passthrough"]}]}}}}'
+
+echo "Applying demo optimizations to nginx ingress..."
+# Add valid demo optimization flags in separate patches for reliability
+# Note: Removed invalid flags that were causing crashes
+
+# Disable admission webhooks for faster startup
+kubectl --context "kind-${name}" patch validatingwebhookconfiguration ingress-nginx-admission -p '{"webhooks":[{"name":"validate.nginx.ingress.kubernetes.io","admissionReviewVersions":["v1","v1beta1"],"clientConfig":{"service":{"name":"ingress-nginx-controller-admission","namespace":"ingress-nginx","path":"/networking/v1/ingresses"}},"rules":[{"operations":["CREATE","UPDATE"],"apiGroups":["networking.k8s.io"],"apiVersions":["v1"],"resources":["ingresses"]}],"failurePolicy":"Ignore","sideEffects":"None"}]}'
+
+# Add resource limits for faster scheduling
+kubectl --context "kind-${name}" patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","resources":{"requests":{"cpu":"100m","memory":"90Mi"},"limits":{"cpu":"1000m","memory":"500Mi"}}}]}}}}'
+
+# Optimize for demo environment by disabling unnecessary features via ConfigMap
+kubectl --context "kind-${name}" patch configmap ingress-nginx-controller -n ingress-nginx -p '{"data":{"enable-real-ip":"false","proxy-protocol":"false","server-tokens":"false","ssl-protocols":"TLSv1.2 TLSv1.3"}}'
 
 if [[ "$wait" == "true" ]] ; then
   echo "Waiting for nginx ingress with SSL passthrough to be ready..."
-  while true; do
-      sleep 5
-      pods=$(kubectl --context kind-${name} get pod -n ingress-nginx -l app.kubernetes.io/component=controller -o jsonpath='{.items[*].metadata.name}')
-      if [ -z "$pods" ]; then continue; fi
-      if [[ "$pods" =~ [[:space:]] ]]
-      then # both pre-patch and post-patch Pods are present
+  
+  # More efficient wait logic with shorter intervals and better detection
+  max_attempts=150  # 150 * 2 seconds = 5 minutes for progress feedback
+  attempt=0
+  
+  while [ $attempt -lt $max_attempts ]; do
+      sleep 2
+      attempt=$((attempt + 1))
+      
+      # Check if controller pod exists and is ready
+      pods=$(kubectl --context kind-${name} get pod -n ingress-nginx -l app.kubernetes.io/component=controller -o jsonpath='{.items[*].metadata.name}' 2>/dev/null)
+      if [ -z "$pods" ]; then 
+          echo "Waiting for nginx controller pod to be created... (attempt $attempt/$max_attempts)"
           continue
       fi
-      args=$(kubectl --context kind-${name} get pod -n ingress-nginx -l app.kubernetes.io/component=controller -o jsonpath='{.items[0].spec.containers[0].args}')
-      if [[ $args =~ enable-ssl-passthrough ]]
-      then break
-      # Otherwise this Pod is from before the patch
+      
+      # If multiple pods exist, we're in the middle of a rolling update
+      if [[ "$pods" =~ [[:space:]] ]]; then
+          echo "Rolling update in progress... (attempt $attempt/$max_attempts)"
+          continue
+      fi
+      
+      # Check if the pod has the SSL passthrough argument
+      args=$(kubectl --context kind-${name} get pod -n ingress-nginx -l app.kubernetes.io/component=controller -o jsonpath='{.items[0].spec.containers[0].args}' 2>/dev/null)
+      if [[ ! $args =~ enable-ssl-passthrough ]]; then
+          echo "Waiting for SSL passthrough configuration... (attempt $attempt/$max_attempts)"
+          continue
+      fi
+      
+      # Check if pod is actually ready
+      if kubectl --context kind-${name} get pod -n ingress-nginx -l app.kubernetes.io/component=controller -o jsonpath='{.items[0].status.conditions[?(@.type=="Ready")].status}' 2>/dev/null | grep -q "True"; then
+          echo "Nginx ingress controller is ready with SSL passthrough enabled"
+          break
+      else
+          echo "Pod exists but not ready yet... (attempt $attempt/$max_attempts)"
       fi
   done
+  
+  if [ $attempt -eq $max_attempts ]; then
+      echo "Warning: Maximum wait time reached. Nginx may not be fully ready."
+  fi
+  
+  # Final wait with timeout as backup
   kubectl --context "kind-${name}" wait --namespace ingress-nginx \
     --for=condition=ready pod \
     --selector=app.kubernetes.io/component=controller \
