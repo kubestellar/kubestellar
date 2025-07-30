@@ -33,7 +33,6 @@ type TransportOptions struct {
 	MaxSizeWrapped         int
 	MaxNumWrapped          int
 	WdsName                string
-	// REMOVED: WdsKubeconfigPath - using existing WdsClientOptions instead
 	ksopts.ProcessOptions
 }
 
@@ -54,7 +53,6 @@ func NewTransportOptions() *TransportOptions {
 
 func (options *TransportOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.IntVar(&options.Concurrency, "concurrency", options.Concurrency, "number of concurrent workers to run in parallel")
-
 	options.WdsClientOptions.AddFlags(fs)
 	options.TransportClientOptions.AddFlags(fs)
 	fs.IntVar(&options.MaxSizeWrapped, "max-size-wrapped", options.MaxSizeWrapped, "Max size of the wrapped object in bytes")
