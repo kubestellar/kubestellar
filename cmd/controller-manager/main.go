@@ -159,23 +159,11 @@ func main() {
 	setupLog.Info("Got config for WDS", "name", wdsName)
 	wdsRestConfig = wdsClientLimits.LimitConfig(wdsRestConfig)
 
-	// get the config for ITS with retry for resiliency
+	// get the config for ITS
 	setupLog.Info("Getting config for ITS")
-	var itsRestConfig *rest.Config
-	var err2 error
-
-	// Retry getting ITS config for up to 2 minutes to handle temporary unavailability
-	for i := 0; i < 24; i++ { // 24 * 5 seconds = 2 minutes
-		itsRestConfig, itsName, err2 = ctrlutil.GetITSKubeconfig(setupLog, itsName)
-		if err2 == nil {
-			break
-		}
-		setupLog.Info("ITS not available yet, retrying", "attempt", i+1, "error", err2)
-		time.Sleep(5 * time.Second)
-	}
-
-	if err2 != nil {
-		setupLog.Error(err2, "unable to get ITS kubeconfig after retries")
+	itsRestConfig, itsName, err := ctrlutil.GetITSKubeconfig(setupLog, itsName)
+	if err != nil {
+		setupLog.Error(err, "unable to get ITS kubeconfig")
 		os.Exit(1)
 	}
 	setupLog.Info("Got config for ITS", "name", itsName)
@@ -229,10 +217,11 @@ func startControllersWithLeaderElection(ctx context.Context, setupLog logr.Logge
 					Name: lockNamespace,
 				},
 			}, metav1.CreateOptions{FieldManager: fieldManagerName})
-			if err != nil {
+			if err != nil && !errors.IsAlreadyExists(err) {
 				setupLog.Error(err, "unable to create namespace for leader election")
 				os.Exit(1)
 			}
+			// AlreadyExists is treated as success - another replica created it
 		} else {
 			setupLog.Error(err, "unable to check namespace for leader election")
 			os.Exit(1)
