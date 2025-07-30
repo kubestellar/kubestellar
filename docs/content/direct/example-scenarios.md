@@ -117,16 +117,13 @@ kubectl --context "$wds_context" delete bindingpolicies nginx-bpolicy
 
 ## Scenario 2 - Out-of-tree workload
 
-This scenario is like the previous one but involves a workload whose
-kind of objects is not built into Kubernetes. Instead, the workload
-object kind is defined by a `CustomResourceDefinition` object. While
-KubeStellar can handle the case where the CRD is part of the workload,
-this example concerns the case where the CRD is established in the
-WECs by some other means.
+This scenario demonstrates deploying custom resources (CRDs) and highlights **KubeStellar's authorization model**. Unlike standard Kubernetes resources, custom resources require explicit authorization expansion for the OCM Agent.
 
-For this example, we use the `AppWrapper` custom resource defined in the
-[multi cluster app dispatcher](https://github.com/project-codeflare/multi-cluster-app-dispatcher)
-project.
+This example involves a workload whose kind of objects is not built into Kubernetes. Instead, the workload object kind is defined by a `CustomResourceDefinition` object. While KubeStellar can handle the case where the CRD is part of the workload, this example concerns the case where the CRD is established in the WECs by some other means.
+
+For this example, we use the `AppWrapper` custom resource defined in the [multi cluster app dispatcher](https://github.com/project-codeflare/multi-cluster-app-dispatcher) project.
+
+### Install the Custom Resource Definition
 
 Install the AppWrapper CRD in the WDS and the WECs.
 
@@ -137,8 +134,13 @@ clusters=("$wds_context" "$wec1_context" "$wec2_context");
 done
 ```
 
-Run the following command to give permission for the klusterlet to
-operate on the appwrapper cluster resource.
+### Expand OCM Agent Authorization
+
+**Why this step is needed**: KubeStellar follows the principle of least privilege. The OCM Agent (`klusterlet-work-sa`) has default permissions for standard Kubernetes resources, but custom resources like AppWrapper require additional authorization.
+
+**Authorization method**: This example uses the direct RBAC manipulation approach (Method 2) by applying permissions directly to each WEC. For production deployments, consider using the downsyncing RBAC approach (Method 1) as described in the [WEC Authorization documentation](wec.md#authorization-and-security).
+
+Run the following command to grant the OCM Agent permission to manage AppWrapper resources:
 
 ```shell
 clusters=("$wec1_context" "$wec2_context");
@@ -149,9 +151,9 @@ kind: ClusterRole
 metadata:
   name: appwrappers-access
 rules:
-- apiGroups: ["workload.codeflare.dev"]
-  resources: ["appwrappers"]
-  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: ["workload.codeflare.dev"]  # API group for AppWrapper CRD
+  resources: ["appwrappers"]              # Resource type name
+  verbs: ["get", "list", "watch", "create", "update", "patch"]  # Required operations
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -163,14 +165,19 @@ roleRef:
   name: appwrappers-access
 subjects:
 - kind: ServiceAccount
-  name: klusterlet-work-sa
-  namespace: open-cluster-management-agent
+  name: klusterlet-work-sa                    # OCM Agent service account
+  namespace: open-cluster-management-agent    # OCM Agent namespace
 EOF
 done
 ```
 
-This step will be eventually automated, see [this issue](https://github.com/kubestellar/kubestellar/issues/1542)
-for more details.
+**What this RBAC configuration does**:
+- **ClusterRole** `appwrappers-access`: Defines permissions for AppWrapper resources
+- **ClusterRoleBinding** `klusterlet-appwrappers-access`: Grants these permissions to the OCM Agent service account (`klusterlet-work-sa`)
+
+**Alternative approach**: Instead of applying RBAC directly to WECs, you could include these RBAC objects in your workload definition in the WDS, allowing KubeStellar to downsync the permissions along with the workload. This approach provides better auditability and GitOps integration.
+
+> **Note**: Future KubeStellar versions may automatically detect and request required permissions. See [issue #1542](https://github.com/kubestellar/kubestellar/issues/1542) for more details. However, this would remove the ability to have independent controls on what is authorized.
 
 Next, apply an appwrapper object to the WDS:
 

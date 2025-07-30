@@ -35,13 +35,14 @@ Installing and using KubeStellar progresses through the following steps.
     1. Register the WDS as a KubeFlex ControlPlane and initialize it for KubeStellar usage.
 6. Create a [Workload Execution Cluster](wec.md) (WEC).
 7. [Register the WEC in the ITS](wec-registration.md).
-8. Maintain workload desired state in the WDS.
-9. Maintain [control objects](control.md) in the WDS to bind workload with WEC and modulate the state propagation back and forth. The [API reference](https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1) documents all of them. There are control objects for the following topics.
+8. Configure [WEC authorization](wec.md#authorization-and-security) if your workloads require permissions beyond the default set.
+9. Maintain workload desired state in the WDS.
+10. Maintain [control objects](control.md) in the WDS to bind workload with WEC and modulate the state propagation back and forth. The [API reference](https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1) documents all of them. There are control objects for the following topics.
     1. [Binding workload with WEC(s)](binding.md).
     1. [Transforming desired state](transforming.md) as it travels from WDS to WEC.
     1. [Summarizing reported state](combined-status.md) from WECs into WDS.
-10. Enjoy the effects of workloads being propagated to the WEC.
-11. Consume reported state from WDS.
+11. Enjoy the effects of workloads being propagated to the WEC.
+12. Consume reported state from WDS.
 
 By "maintain" we mean create, read, update, delete, list, and watch as you like, over time. KubeStellar is eventually consistent: you can change your inputs as you like over time, and KubeStellar continually strives to achieve what you are currently asking it to do.
 

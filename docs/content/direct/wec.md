@@ -5,6 +5,12 @@
   - [Using K3d (for development/testing)](#using-k3d-for-developmenttesting)
   - [Using MicroShift (for edge deployments)](#using-microshift-for-edge-deployments)
   - [Using Production Kubernetes Distributions](#using-production-kubernetes-distributions)
+- [Authorization and Security](#authorization-and-security)
+  - [Authorization Model Overview](#authorization-model-overview)
+  - [Default Permissions](#default-permissions)
+  - [When Additional Authorization is Needed](#when-additional-authorization-is-needed)
+  - [Expanding Authorization](#expanding-authorization)
+  - [Troubleshooting Authorization Issues](#troubleshooting-authorization-issues)
 - [Registering a WEC](#registering-a-wec)
 - [Labeling WECs](#labeling-wecs)
 - [WEC Customization Properties](#wec-customization-properties)
@@ -29,6 +35,131 @@ For a Kubernetes cluster to function as a WEC in the KubeStellar ecosystem, it m
 2. **Be a valid Kubernetes cluster** with a working control plane
 3. **Have the OCM Agent installed** for integration with KubeStellar
 4. **Be registered with an ITS** to receive workloads
+
+## Authorization and Security
+
+### Authorization Model Overview
+
+KubeStellar implements a **security-first approach** to workload deployment. The system follows the **principle of least privilege** - the OCM Agent (klusterlet) that runs on each WEC operates with carefully limited permissions by default. This design ensures that workloads can only be deployed with explicitly granted permissions, providing better security posture and audit capabilities.
+
+> **⚠️ Important**: KubeStellar does not intend to violate the principle of least privilege any more than necessary. The default authorizations are intentionally minimal and must be expanded when deploying workloads that require additional permissions.
+
+### Default Permissions
+
+The OCM work agent (`klusterlet-work-sa` service account) comes with default permissions for common Kubernetes resources. These default authorizations are inherited from OCM and include:
+
+- **Core resources**: Pods, Services, ConfigMaps, Secrets, Namespaces
+- **Apps resources**: Deployments, ReplicaSets, DaemonSets, StatefulSets  
+- **Batch resources**: Jobs, CronJobs
+- **Limited RBAC**: Basic roles and role bindings
+
+> **📖 Complete Permission List**: For the authoritative and up-to-date list of default permissions, see the [OCM ManifestWork documentation](https://open-cluster-management.io/docs/concepts/work-distribution/manifestwork/#permission-setting-for-work-agent).
+
+### When Additional Authorization is Needed
+
+You'll need to expand OCM agent permissions when downsyncing:
+
+| Workload Type | Default Support | Additional Auth Required |
+|---------------|-----------------|-------------------------|
+| Standard Kubernetes resources | ✅ Supported | ❌ No |
+| Custom Resource Definitions and instances | ❌ Not supported | ✅ Yes |
+| Cluster-scoped resources beyond defaults | ❌ Limited support | ✅ Usually |
+| Operator-managed workloads | ⚠️ Partial support | ✅ Often required |
+
+**Common scenarios requiring additional authorization:**
+- Deploying custom resources (CRDs and their instances)
+- Using operators that manage cluster-scoped resources
+- Workloads requiring access to specific API groups not covered by defaults
+
+### Expanding Authorization
+
+KubeStellar provides two approaches for expanding OCM agent permissions:
+
+#### Method 1: Downsyncing RBAC Objects (Recommended)
+
+**Advantages**: Maintains KubeStellar's declarative model, provides audit trail, works with GitOps workflows
+
+Include RBAC objects as part of your workload definition in the WDS:
+
+```yaml
+# Define additional permissions for custom resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: my-custom-resource-access
+rules:
+- apiGroups: ["my-api-group.io"]
+  resources: ["mycustomresources"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: klusterlet-my-custom-resource-access
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: my-custom-resource-access
+subjects:
+- kind: ServiceAccount
+  name: klusterlet-work-sa
+  namespace: open-cluster-management-agent
+```
+
+This approach ensures that:
+- Permissions are version-controlled with your workload
+- All WECs receive consistent authorization
+- Changes are auditable and reversible
+- No direct WEC access is required
+
+#### Method 2: Direct WEC RBAC Manipulation
+
+**Advantages**: Immediate effect, doesn't require modifying workload definitions
+
+Apply RBAC directly to each WEC:
+
+```shell
+# Apply to each WEC individually
+kubectl --context wec1 apply -f rbac-expansion.yaml
+kubectl --context wec2 apply -f rbac-expansion.yaml
+```
+
+**Considerations**: 
+- Requires manual management across all WECs
+- May not align with GitOps practices
+- Risk of inconsistent permissions across WECs
+
+### Troubleshooting Authorization Issues
+
+#### Common Error Patterns
+
+```
+cannot create resource "mycustomresources" in API group "my-api-group.io"
+User "system:serviceaccount:open-cluster-management-agent:klusterlet-work-sa" cannot create resource
+```
+
+#### Debugging Steps
+
+1. **Identify the missing permission** from the error message
+2. **Check if the resource is custom** - custom resources always require additional RBAC
+3. **Verify the API group and resource name** for your RBAC rules
+4. **Test permissions** using `kubectl auth can-i`:
+
+```shell
+# Test if the work agent has the required permissions
+kubectl --context <wec-context> auth can-i create mycustomresources.my-api-group.io \
+  --as=system:serviceaccount:open-cluster-management-agent:klusterlet-work-sa
+```
+
+#### Complete Example
+
+For a complete working example of authorization expansion, see [Scenario 2 - Out-of-tree workload](example-scenarios.md#scenario-2---out-of-tree-workload), which demonstrates expanding permissions for AppWrapper custom resources.
+
+**Security Best Practices:**
+- Grant only the minimum necessary permissions
+- Use namespaced permissions (Role/RoleBinding) when possible instead of cluster-scoped
+- Document all permission expansions for audit purposes
+- Regularly review and clean up unused permissions
 
 ## Creating a WEC
 

@@ -49,7 +49,7 @@ Clusters (WECs). In the ITS, each mailbox namespace is associated with one WEC. 
 that are put in a mailbox namespace are delivered to the matching WEC.
 
 - *OCM Agent*: This module registers the WEC to the OCM Hub, watches for 
-[ManifestWork.v1.work.open-cluster-management.io](https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L17) objects and unwraps and syncs the objects into the WEC.
+[ManifestWork.v1.work.open-cluster-management.io](https://github.com/open-cluster-management-io/api/blob/v0.12.0/work/v1/types.go#L17) objects and unwraps and syncs the objects into the WEC. The agent operates with limited permissions by default - see [WEC Authorization](wec.md#authorization-and-security) for details on expanding permissions when needed.
 
 - *OCM Status Add-On Controller*: This module is instantiated once per ITS and uses the [OCM Add-on Framework](https://open-cluster-management.io/concepts/addon/) to get the OCM Status Add-On Agent installed in each WEC along with supporting RBAC objects.
 
