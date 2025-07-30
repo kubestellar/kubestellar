@@ -1,0 +1,98 @@
+name: KubeFlex E2E Tests
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Runs daily at 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      kubestellar_ref:
+        description: 'KubeStellar git ref (branch, tag, or commit)'
+        required: true
+        default: 'main'
+      kubeflex_ref:
+        description: 'KubeFlex git ref (branch, tag, or commit)'
+        required: true
+        default: 'main'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run E2E tests with KubeFlex
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout KubeStellar
+        uses: actions/checkout@v4
+        with:
+          repository: kubestellar/kubestellar
+          ref: ${{ github.event.inputs.kubestellar_ref || 'main' }}
+
+      - name: Checkout KubeFlex
+        uses: actions/checkout@v4
+        with:
+          repository: kubestellar/kubeflex
+          path: kubeflex
+          ref: ${{ github.event.inputs.kubeflex_ref || 'main' }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Set up ko
+        uses: ko-build/setup-ko@v0.7
+
+      - name: Install dependencies
+        run: |
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh)
+          go install github.com/onsi/ginkgo/v2/ginkgo
+
+      - name: Build and install kflex
+        run: |
+          cd kubeflex
+          make kflex
+          sudo mv bin/kflex /usr/local/bin
+          cd ..
+
+      - name: Run e2e tests
+        env:
+          KFLEX_DISABLE_CHATTY: "true"
+        run: |
+          cd test/e2e/ginkgo
+          ginkgo -vv --trace --no-color --fail-fast -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
+
+      - name: Show kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
+      - name: Show pods in hosting cluster
+        if: always()
+        run: |
+          echo "--- Pods in hosting cluster ---"
+          kubectl --context kind-kubeflex get pods -A
+          echo "--- Describe failing pods ---"
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do
+            echo "--- Describing pod $ns/$name ---"
+            kubectl --context kind-kubeflex describe pod -n $ns $name
+            echo "--- Logs for pod $ns/$name ---"
+            kubectl --context kind-kubeflex logs -n $ns $name --all-containers=true || true
+            echo "--- Previous logs for pod $ns/$name ---"
+            kubectl --context kind-kubeflex logs -p -n $ns $name --all-containers=true || true
+          done
+
+      - name: Show all resources in hosting cluster
+        if: always()
+        run: |
+          echo "--- All resources in hosting cluster ---"
+          kubectl --context kind-kubeflex get all -A
+
+      - name: Show all resources in its1
+        if: always()
+        run: |
+          echo "--- All resources in its1 cluster ---"
+          kubectl --context its1 get all -A
