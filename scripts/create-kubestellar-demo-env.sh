@@ -55,14 +55,14 @@ command_exists() {
 # Function to check if a port is free
 wait_for_port_free() {
     local port=$1
-    while lsof -i $port >/dev/null 2>&1; do
+    while lsof -i "$port" >/dev/null 2>&1; do
         echo "Waiting for port $port to be free..."
         sleep 5
     done
 }
 
 echo -e "Checking container runtime..."
-if ! dunsel=$(docker ps 2>&1); then
+if ! docker ps 2>&1; then
     echo "Error: The script cannot continue because Docker or Podman is not running. Please start your container runtime before running the script again."
     exit 1
 fi
@@ -105,11 +105,10 @@ context_clean_up() {
 
 checking_cluster() {
     while IFS= read -r line; do
-        # Check for the cluster name and "Pending" status
-        if echo "$line" | grep -q "$1" && echo "$line" | grep -q "Pending"; then
+        # Check for the cluster name and "Pending" status using Bash pattern matching
+        if [[ "$line" == *"$1"* && "$line" == *"Pending"* ]]; then
             echo "Pending CSR for $1 has been found, approving..."
             clusteradm --context its1 accept --clusters "$1"
-
             if [ $? -eq 0 ]; then
                 echo -e "\033[33m✔\033[0m CSR Approved for $1."
                 return 0
@@ -147,7 +146,7 @@ echo -e "\033[33m✔\033[0m Context space clean up completed"
 echo -e "\nCreating two $k8s_platform clusters to serve as example WECs"
 clusters=(cluster1 cluster2)
 cluster_log_dir=$(mktemp -d)
-trap "rm -rf $cluster_log_dir" EXIT
+trap 'rm -rf "$cluster_log_dir"' EXIT
 for cluster in "${clusters[@]}"; do
     if {
       if [ "$k8s_platform" == "kind" ]; then
@@ -172,10 +171,17 @@ else
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
     sleep 15
     helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.12.1 --namespace ingress-nginx --create-namespace --timeout 24h
+    # --- BEGIN ROBUST INGRESS READINESS WAIT (k3d) ---
+    echo "Waiting for nginx ingress controller pod to be ready (k3d)..."
+    kubectl --context k3d-kubeflex wait --namespace ingress-nginx \
+      --for=condition=ready pod \
+      --selector=app.kubernetes.io/component=controller \
+      --timeout=24h
+    # --- END ROBUST INGRESS READINESS WAIT (k3d) ---
 fi
 echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
 
-kubectl config use-context $k8s_platform-kubeflex
+kubectl config use-context "$k8s_platform"-kubeflex
 
 echo -e "\nPulling container images local..."
 images=("ghcr.io/loft-sh/vcluster:0.16.4"
@@ -217,10 +223,10 @@ kflex ctx --overwrite-existing-context wds2
 kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
-kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 24h
-kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 24h
+kubectl --context "$k8s_platform"-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 24h
+kubectl --context "$k8s_platform"-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 24h
 echo -e "\nWaiting for OCM hub cluster-info to be updated..."
-kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 24h
+kubectl --context "$k8s_platform"-kubeflex wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 24h
 echo -e "\033[33m✔\033[0m OCM hub is ready"
 
 echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..."
@@ -232,7 +238,7 @@ if ! joincmd=$(clusteradm --context its1 get token | grep '^clusteradm join')
 then echo -e "\033[0;31mX\033[0m get token failed!\n" >&2; echo "$joincmd" >&2; false
 fi
 for cluster in "${clusters[@]}"; do
-   if log=$(${joincmd/<cluster_name>/${cluster}} -v=6 --context ${cluster} --singleton ${flags} 2>&1)
+   if log=$(${joincmd/<cluster_name>/${cluster}} -v=6 --context "${cluster}" --singleton ${flags} 2>&1)
    then echo -e "\033[33m✔\033[0m clusteradm join of $cluster succeeded"
    else echo -e "\033[0;31mX\033[0m clusteradm join of $cluster failed!" >&2; echo "$log" >&2; false
    fi
