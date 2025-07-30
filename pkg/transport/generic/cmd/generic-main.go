@@ -74,23 +74,28 @@ func GenericMain(transportImplementation transport.Transport) {
 
 	ksctlr.Start(ctx, options.ProcessOptions)
 
-	// get the config for WDS
-	wdsRestConfig, err := options.WdsClientOptions.ToRESTConfig()
+	// NEW: Enhanced WDS kubeconfig resolution (same as kubestellar controller-manager)
+	logger.Info("Resolving WDS kubeconfig...")
+	wdsRestConfig, wdsName, err := resolveWDSKubeconfig(options, logger)
 	if err != nil {
-		logger.Error(err, "unable to build WDS kubeconfig")
+		logger.Error(err, "unable to resolve WDS kubeconfig")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 	wdsRestConfig.UserAgent = transportgeneric.ControllerName
+	logger.Info("Successfully resolved WDS kubeconfig", "wdsName", wdsName)
 
-	// get the config for Transport space
+	// OLD: Keep transport config as-is for now (will be updated in next task)
 	transportRestConfig, err := options.TransportClientOptions.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "unable to build transport kubeconfig")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 	transportRestConfig.UserAgent = transportgeneric.ControllerName
+
+	// Continue with existing logic (unchanged)...
 	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
 	ksmetrics.MustRegister(legacyregistry.Register, spacesClientMetrics)
+
 	// clients for WDS
 	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
 	wdsClientset, err := ksclientset.NewForConfig(wdsRestConfig)
@@ -103,6 +108,7 @@ func GenericMain(transportImplementation transport.Transport) {
 		logger.Error(err, "Failed to create dynamic k8s clientset for Workload Description Space (WDS)")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
+
 	// clients for transport space
 	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
 	transportClientset, err := kubernetes.NewForConfig(transportRestConfig)
