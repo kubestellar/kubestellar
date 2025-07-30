@@ -269,10 +269,11 @@ func startControllersWithLeaderElection(ctx context.Context, setupLog logr.Logge
 
 // startControllersDirectly starts controllers immediately without leader election
 func startControllersDirectly(ctx context.Context, setupLog logr.Logger, wdsRestConfig, itsRestConfig *rest.Config, wdsName, itsName string, allowedGroupsSet sets.Set[string], ctlrsToStart sets.Set[string], wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics) {
+	logger := klog.FromContext(ctx)  // Get base logger from context for controllers
 	workloadEventRelay := &workloadEventRelay{}
 
 	// create the binding controller
-	bindingController, err := binding.NewController(setupLog, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName, allowedGroupsSet, workloadEventRelay)
+	bindingController, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName, allowedGroupsSet, workloadEventRelay)
 	if err != nil {
 		setupLog.Error(err, "unable to create binding controller")
 		os.Exit(1)
@@ -309,7 +310,7 @@ func startControllersDirectly(ctx context.Context, setupLog logr.Logger, wdsRest
 			time.Sleep(15 * time.Second)
 		}
 		setupLog.Info("Creating controller", "name", status.ControllerName)
-		statusController, err = status.NewController(setupLog, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName,
+		statusController, err = status.NewController(logger, wdsClientMetrics, itsClientMetrics, wdsRestConfig, itsRestConfig, wdsName,
 			bindingController.GetBindingPolicyResolver())
 		if err != nil {
 			setupLog.Error(err, "unable to create status controller")
