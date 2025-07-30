@@ -269,7 +269,7 @@ func startControllersWithLeaderElection(ctx context.Context, setupLog logr.Logge
 
 // startControllersDirectly starts controllers immediately without leader election
 func startControllersDirectly(ctx context.Context, setupLog logr.Logger, wdsRestConfig, itsRestConfig *rest.Config, wdsName, itsName string, allowedGroupsSet sets.Set[string], ctlrsToStart sets.Set[string], wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics) {
-	logger := klog.FromContext(ctx)  // Get base logger from context for controllers
+	logger := klog.FromContext(ctx) // Get base logger from context for controllers
 	workloadEventRelay := &workloadEventRelay{}
 
 	// create the binding controller
