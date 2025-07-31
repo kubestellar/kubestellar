@@ -14,6 +14,17 @@ spec:
     spec:
       template:
         spec:
+          initContainers:
+          - name: wait-for-config-incluster
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - sh
+              - -c
+              - |
+                echo "Waiting for config-incluster in Secret {{.ITSSecretName}}..."
+                until kubectl get secret "{{.ITSSecretName}}" -n {{.ControlPlaneName}}-system -o jsonpath="{.data.config-incluster}" | grep -q .; do
+                  sleep 2
+                done
           containers:
           - name: "{{"{{.HookName}}-clusteradm"}}"
             image: quay.io/kubestellar/clusteradm:{{.Values.CLUSTERADM_VERSION}}

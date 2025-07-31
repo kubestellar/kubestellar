@@ -14,6 +14,24 @@ spec:
     spec:
       template:
         spec:
+          initContainers:
+          - name: wait-for-crd
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - sh
+              - -c
+              - |
+                echo "Waiting for ManagedClusterSetBinding CRD to be established..."
+                kubectl wait --for=condition=Established crd/managedclustersetbindings.cluster.open-cluster-management.io --timeout=300s
+                echo "Waiting for Placement CRD to be established..."
+                kubectl wait --for=condition=Established crd/placements.cluster.open-cluster-management.io --timeout=300s
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
           containers:
           - name: "{{"{{.HookName}}-statusaddon"}}"
             image: quay.io/kubestellar/helm:{{.Values.HELM_VERSION}}
