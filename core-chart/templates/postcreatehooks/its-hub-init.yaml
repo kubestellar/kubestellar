@@ -22,12 +22,15 @@ spec:
               - sh
               - -c
               - |
-                echo "Waiting for kubeconfig file /etc/kube/{{.ITSkubeconfig}} to exist and be non-empty..."
-                until [ -s /etc/kube/{{.ITSkubeconfig}} ]; do
+                echo "Waiting for kubeconfig file '$KUBECONFIG' to exist and be non-empty..."
+                until [ -s "$KUBECONFIG" ]; do
                   echo "Kubeconfig file not ready yet, waiting..."
                   sleep 2
                 done
                 echo "Kubeconfig file is ready"
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
