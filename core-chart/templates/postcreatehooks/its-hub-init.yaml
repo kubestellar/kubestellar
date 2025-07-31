@@ -15,18 +15,23 @@ spec:
       template:
         spec:
           initContainers:
+
           - name: wait-for-config-incluster
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
               - sh
               - -c
               - |
-                echo "Waiting for config-incluster in Secret {{.ITSSecretName}}..."
-                until kubectl get secret "{{.ITSSecretName}}" -n {{.ControlPlaneName}}-system -o jsonpath="{.data.config-incluster}" | grep -q .; do
-                  echo "Secret {{.ITSSecretName}} not ready yet, waiting..."
-                  sleep 5
+                echo "Waiting for kubeconfig file /etc/kube/{{.ITSkubeconfig}} to exist and be non-empty..."
+                until [ -s /etc/kube/{{.ITSkubeconfig}} ]; do
+                  echo "Kubeconfig file not ready yet, waiting..."
+                  sleep 2
                 done
-                echo "Secret {{.ITSSecretName}} is ready with config-incluster data"
+                echo "Kubeconfig file is ready"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
           containers:
           - name: "{{"{{.HookName}}-clusteradm"}}"
             image: quay.io/kubestellar/clusteradm:{{.Values.CLUSTERADM_VERSION}}
@@ -34,6 +39,7 @@ spec:
             - init
             - -v={{.Values.verbosity.clusteradm | default .Values.verbosity.default | default 2 }}
             - --wait
+            - --timeout=300
             env:
             - name: KUBECONFIG
               value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
