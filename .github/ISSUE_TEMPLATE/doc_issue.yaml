@@ -9,6 +9,9 @@ body:
       value: |
         Thanks for taking the time to report an issue with the documentation.
 
+        Before opening a new issue, look for an overlapping issue that
+        you could contribute to.
+
         Remember that documentation sources for the website are
         intended to [also render nicely when viewed directly on
         GitHub](https://github.com/kubestellar/kubestellar/blob/main/docs/README.md#dual-use-documentation-sources),

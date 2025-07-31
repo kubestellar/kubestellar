@@ -159,8 +159,8 @@ is_installed_kcp() {
 is_installed_kflex() {
     is_installed 'KubeFlex' \
         'kflex' \
-        'kflex version | head -1' \
-        'kflex version | head -1' \
+        'kflex version | grep "^Kubeflex version:"' \
+        'kflex version | grep "^Kubeflex version:"' \
         'https://github.com/kubestellar/kubeflex' \
         'Kubeflex version: v0.8.0'
 }
