@@ -1,0 +1,123 @@
+{{- if .Values.InstallPCHs }}
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: install-status-addon
+  labels:
+    kflex.kubestellar.io/cptype: its
+spec:
+  templates:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: "{{"{{.HookName}}"}}"
+    spec:
+      template:
+        spec:
+          initContainers:
+          - name: wait-for-kubeconfig
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - sh
+              - -c
+              - |
+                echo "Waiting for kubeconfig file /etc/kube/{{.ITSkubeconfig}} to exist and be non-empty..."
+                until [ -s /etc/kube/{{.ITSkubeconfig}} ]; do
+                  echo "Kubeconfig file not ready yet, waiting..."
+                  sleep 2
+                done
+                echo "Kubeconfig file is ready"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+
+          - name: wait-for-ocm-crds
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - sh
+              - -c
+              - |
+                echo "Waiting for OCM CRDs to be established..."
+                # Wait for essential OCM CRDs needed by the Status Add-on
+                # First check if clusteradm has created any OCM CRDs
+                echo "Checking if OCM CRDs exist..."
+                max_attempts=60
+                attempt=0
+                while [ $attempt -lt $max_attempts ]; do
+                  if kubectl get crd placements.cluster.open-cluster-management.io >/dev/null 2>&1; then
+                    echo "OCM CRDs found, waiting for them to be established..."
+                    kubectl wait --for=condition=Established crd/placements.cluster.open-cluster-management.io --timeout=300s
+                    kubectl wait --for=condition=Established crd/placementdecisions.cluster.open-cluster-management.io --timeout=300s
+                    echo "Required OCM CRDs are established"
+                    break
+                  else
+                    echo "OCM CRDs not found yet (attempt $((attempt+1))/$max_attempts), waiting..."
+                    sleep 10
+                    attempt=$((attempt+1))
+                  fi
+                done
+                if [ $attempt -eq $max_attempts ]; then
+                  echo "ERROR: OCM CRDs not found after $max_attempts attempts"
+                  exit 1
+                fi
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+          containers:
+          - name: "{{"{{.HookName}}"}}"
+            image: quay.io/kubestellar/helm:{{.Values.HELM_VERSION}}
+            args:
+            - upgrade
+            - --install
+            - status-addon
+            - oci://ghcr.io/kubestellar/ocm-status-addon-chart
+            - --version
+            - v{{.Values.OCM_STATUS_ADDON_VERSION}}
+            - --namespace
+            - open-cluster-management
+            - --create-namespace
+            - --set
+            - "controller.verbosity={{.Values.status_controller.v | default .Values.verbosity.status_controller | default .Values.verbosity.default | default 2 }}"
+            - --set
+            - "agent.hub_burst={{.Values.status_agent.hub_burst}}"
+            - --set
+            - "agent.hub_qps={{.Values.status_agent.hub_qps}}"
+            - --set
+            - "agent.local_burst={{.Values.status_agent.local_burst}}"
+            - --set
+            - "agent.local_qps={{.Values.status_agent.local_qps}}"
+            - --set
+            - "agent.log_flush_frequency={{.Values.status_agent.log_flush_frequency}}"
+            - --set
+            - "agent.logging_format={{.Values.status_agent.logging_format}}"
+            - --set
+            - "agent.metrics_bind_addr={{.Values.status_agent.metrics_bind_addr}}"
+            - --set
+            - "agent.pprof_bind_addr={{.Values.status_agent.pprof_bind_addr}}"
+            - --set
+            - "agent.v={{.Values.status_agent.v | default .Values.verbosity.status_agent | default .Values.verbosity.default | default 2 }}"
+            - --set
+            - "agent.vmodule={{.Values.status_agent.vmodule}}"
+            env:
+            - name: HELM_CONFIG_HOME
+              value: "/tmp"
+            - name: HELM_CACHE_HOME
+              value: "/tmp"
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+          volumes:
+          - name: kubeconfig
+            secret:
+              secretName: "{{"{{.ITSSecretName}}"}}"
+          restartPolicy: Never
+      backoffLimit: 1
+{{- end }}

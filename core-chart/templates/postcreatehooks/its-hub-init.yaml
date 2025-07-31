@@ -1,0 +1,56 @@
+{{- if .Values.InstallPCHs }}
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: its-hub-init
+  labels:
+    kflex.kubestellar.io/cptype: its
+spec:
+  templates:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: "{{"{{.HookName}}"}}"
+    spec:
+      template:
+        spec:
+          initContainers:
+
+          - name: wait-for-config-incluster
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - sh
+              - -c
+              - |
+                echo "Waiting for kubeconfig file /etc/kube/{{.ITSkubeconfig}} to exist and be non-empty..."
+                until [ -s /etc/kube/{{.ITSkubeconfig}} ]; do
+                  echo "Kubeconfig file not ready yet, waiting..."
+                  sleep 2
+                done
+                echo "Kubeconfig file is ready"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+          containers:
+          - name: "{{"{{.HookName}}-clusteradm"}}"
+            image: quay.io/kubestellar/clusteradm:{{.Values.CLUSTERADM_VERSION}}
+            args:
+            - init
+            - -v={{.Values.verbosity.clusteradm | default .Values.verbosity.default | default 2 }}
+            - --wait
+            - --timeout=300
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+          volumes:
+          - name: kubeconfig
+            secret:
+              secretName: "{{"{{.ITSSecretName}}"}}"
+          restartPolicy: Never
+      backoffLimit: 1
+{{- end }} 
