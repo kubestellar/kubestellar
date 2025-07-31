@@ -19,9 +19,11 @@ package cmd
 import (
 	"testing"
 
-	ksopts "github.com/kubestellar/kubestellar/options"
 	"github.com/spf13/pflag"
+
 	"k8s.io/klog/v2"
+
+	ksopts "github.com/kubestellar/kubestellar/options"
 )
 
 func TestResolveWDSKubeconfig(t *testing.T) {
