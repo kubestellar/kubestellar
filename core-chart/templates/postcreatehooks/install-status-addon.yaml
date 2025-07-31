@@ -104,4 +104,4 @@ spec:
               secretName: "{{"{{.ITSSecretName}}"}}"
           restartPolicy: Never
       backoffLimit: 1
-{{- end }} 
+{{- end }}
