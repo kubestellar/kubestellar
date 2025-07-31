@@ -202,5 +202,3 @@ then
     echo "Failed to see two clusters."
     exit 1
 fi
-
-
