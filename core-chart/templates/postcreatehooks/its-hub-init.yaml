@@ -23,8 +23,10 @@ spec:
               - |
                 echo "Waiting for config-incluster in Secret {{.ITSSecretName}}..."
                 until kubectl get secret "{{.ITSSecretName}}" -n {{.ControlPlaneName}}-system -o jsonpath="{.data.config-incluster}" | grep -q .; do
-                  sleep 2
+                  echo "Secret {{.ITSSecretName}} not ready yet, waiting..."
+                  sleep 5
                 done
+                echo "Secret {{.ITSSecretName}} is ready with config-incluster data"
           containers:
           - name: "{{"{{.HookName}}-clusteradm"}}"
             image: quay.io/kubestellar/clusteradm:{{.Values.CLUSTERADM_VERSION}}
