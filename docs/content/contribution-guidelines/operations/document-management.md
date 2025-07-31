@@ -165,6 +165,7 @@ Then, using your chosen environment with the requirements installed, build and s
 ```shell
 mkdocs serve
 ```
+
 Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
 
 Another way to view (not modify - this method reflects what has been deployed to the `gh-pages` branch of our repo) all branches/versions of our documentation locally using 'mike' [mike for mkdocs](https://github.com/jimporter/mike):
@@ -178,6 +179,7 @@ mike set-default {{ config.ks_branch }}
 cd ..
 make serve-docs
 ```
+
 Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
 
 -----
