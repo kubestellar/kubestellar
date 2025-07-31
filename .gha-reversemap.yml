@@ -83,3 +83,8 @@ actions/upload-artifact:
   sha-url: https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02
   tag: v4
   tag-url: https://github.com/actions/upload-artifact/tree/v4
+actions/download-artifact:
+  sha: d3f86a106a0bac45b974a628896c90dbdf5c8093
+  sha-url: https://github.com/actions/download-artifact/commit/d3f86a106a0bac45b974a628896c90dbdf5c8093
+  tag: v4.3.0
+  tag-url: https://github.com/actions/download-artifact/tree/v4.3.0
