@@ -74,19 +74,18 @@ func GenericMain(transportImplementation transport.Transport) {
 
 	ksctlr.Start(ctx, options.ProcessOptions)
 
-	// NEW: Enhanced WDS kubeconfig resolution (same as kubestellar controller-manager)
-	logger.Info("Resolving WDS kubeconfig...")
-	wdsRestConfig, wdsName, err := resolveWDSKubeconfig(options, logger)
+	// get the config for WDS
+	wdsRestConfig, _, err := resolveWDSKubeconfig(options, logger)
 	if err != nil {
-		logger.Error(err, "unable to build WDS kubeconfig")
+		logger.Error(err, "unable to resolve WDS kubeconfig")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 	wdsRestConfig.UserAgent = transportgeneric.ControllerName
-	logger.Info("Successfully resolved WDS kubeconfig", "wdsName", wdsName)
 
-	transportRestConfig, err := options.TransportClientOptions.ToRESTConfig()
+	// get the config for Transport space
+	transportRestConfig, _, err := resolveTransportKubeconfig(options, logger)
 	if err != nil {
-		logger.Error(err, "unable to build transport kubeconfig")
+		logger.Error(err, "unable to resolve transport kubeconfig")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 	transportRestConfig.UserAgent = transportgeneric.ControllerName
