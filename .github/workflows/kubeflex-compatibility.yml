@@ -83,7 +83,7 @@ jobs:
           ref: ${{ github.event.inputs.kubestellar_ref || 'main' }}
 
       - name: Download kubeconfig
-        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: kubeconfig
           path: ~/.kube
