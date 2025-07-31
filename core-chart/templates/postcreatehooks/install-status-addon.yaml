@@ -15,16 +15,36 @@ spec:
       template:
         spec:
           initContainers:
-          - name: wait-for-crd
+          - name: wait-for-its-hub-init
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
               - sh
               - -c
               - |
-                echo "Waiting for ManagedClusterSetBinding CRD to be established..."
+                echo "Waiting for its-hub-init job to complete..."
+                kubectl wait --for=condition=complete --timeout=600s job/its-hub-init -n {{"{{.ControlPlaneName}}"}}-system
+                echo "its-hub-init job completed successfully"
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+          - name: wait-for-ocm-crds
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - sh
+              - -c
+              - |
+                echo "Waiting for OCM CRDs to be established..."
+                # Wait for core OCM CRDs that clusteradm creates
+                kubectl wait --for=condition=Established crd/managedclusters.cluster.open-cluster-management.io --timeout=300s
+                kubectl wait --for=condition=Established crd/managedclustersets.cluster.open-cluster-management.io --timeout=300s
                 kubectl wait --for=condition=Established crd/managedclustersetbindings.cluster.open-cluster-management.io --timeout=300s
-                echo "Waiting for Placement CRD to be established..."
                 kubectl wait --for=condition=Established crd/placements.cluster.open-cluster-management.io --timeout=300s
+                kubectl wait --for=condition=Established crd/placementdecisions.cluster.open-cluster-management.io --timeout=300s
+                echo "All required OCM CRDs are established"
             env:
             - name: KUBECONFIG
               value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
