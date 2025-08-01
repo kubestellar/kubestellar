@@ -1,5 +1,3 @@
-<!-- Note that this repo has two readme files, with content that is as nearly identical as is practical: `/README.md` and `/docs/content/readme.md` -->
-
 <img alt="" width="500px" align="left" src="KubeStellar-with-Logo.png" />
 
 <br/>
@@ -9,20 +7,14 @@
 
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 
-[![](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
+[![](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)   
 [![](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml)
 [![](https://www.bestpractices.dev/projects/8266/badge)](https://www.bestpractices.dev/projects/8266)
 [![](https://api.scorecard.dev/projects/github.com/kubestellar/kubestellar/badge)](https://scorecard.dev/viewer/?uri=github.com/kubestellar/kubestellar)
 [![](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubestellar)](https://artifacthub.io/packages/search?repo=kubestellar)
-<<<<<<< HEAD
-<a href="https://kubernetes.slack.com/archives/C058SUSL5AA">
-<img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
-</a>
-=======
-<a href="https://cloud-native.slack.com/archives/C097094RZ3M"> 
-    <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
-  </a>
->>>>>>> upstream/main
+<a href="https://cloud-native.slack.com/archives/C097094RZ3M">
+    <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
+  </a>
 
 **KubeStellar** is a Cloud Native Computing Foundation (CNCF) Sandbox project that simplifies the deployment and configuration of applications across multiple Kubernetes clusters. It provides a seamless experience akin to using a single cluster, and it integrates with the tools you're already familiar with, eliminating the need to modify existing resources.
 
@@ -80,24 +72,17 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 
 - The [`#kubestellar-dev` channel](https://cloud-native.slack.com/archives/C097094RZ3M) in the [CNCF Slack workspace](https://communityinviter.com/apps/cloud-native/cncf)
 - Our mailing lists:
-<<<<<<< HEAD
-  - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
-  - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
-- Subscribe to the [community calendar](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MWM4a2loZDZrOWwzZWQzZ29xanZwa3NuMWdfMjAyMzA1MThUMTQwMDAwWiBiM2Q2NWM5MmJlZDdhOTg4NGVmN2ZlOWUzZjZjOGZlZDE2ZjZmYjJmODExZjU3NTBmNTQ3NTY3YTVkZDU4ZmVkQGc&tmsrc=b3d65c92bed7a9884ef7fe9e3f6c8fed16f6fb2f811f5750f547567a5dd58fed%40group.calendar.google.com&scp=ALL) for community meetings and events
-  - The [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list is subscribed to this calendar
-=======
-    - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
-    - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
+      - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
+      - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
 - Subscribe to the [community meeting calendar](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MWM4a2loZDZrOWwzZWQzZ29xanZwa3NuMWdfMjAyMzA1MThUMTQwMDAwWiBiM2Q2NWM5MmJlZDdhOTg4NGVmN2ZlOWUzZjZjOGZlZDE2ZjZmYjJmODExZjU3NTBmNTQ3NTY3YTVkZDU4ZmVkQGc&tmsrc=b3d65c92bed7a9884ef7fe9e3f6c8fed16f6fb2f811f5750f547567a5dd58fed%40group.calendar.google.com&scp=ALL) for community meetings and events
-    - The [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list is subscribed to this calendar
->>>>>>> upstream/main
+      - The [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list is subscribed to this calendar
 - See recordings of past KubeStellar community meetings on [YouTube](https://www.youtube.com/@kubestellar)
 - See [upcoming](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
-  - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
+    - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
 - Follow us on:
-  - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
-  - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
+    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
+    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
 
 <div>
 <h2><font size="6"><img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Red%20Heart.png" alt="Red Heart" width="40" height="40" /> Contributors </font></h2>
@@ -106,7 +91,7 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 
 <center>
 <a href="https://github.com/kubestellar/kubestellar/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=kubestellar/kubestellar" />
+  <img src="https://contrib.rocks/image?repo=kubestellar/kubestellar" />
 </a>
 </center>
 <br>
@@ -121,9 +106,9 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 <br>
 
 <td>
-    <a href="https://landscape.cncf.io">
-        <img src="/docs/overrides/images/cncf-color.png" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
-    </a>
+    <a href="https://landscape.cncf.io">
+        <img src="/docs/overrides/images/cncf-color.png" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
+    </a>
 </td>
 <br>We are a Cloud Native Computing Foundation sandbox project.
 <br>Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF).
