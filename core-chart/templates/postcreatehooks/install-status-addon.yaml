@@ -16,7 +16,7 @@ spec:
         spec:
           initContainers:
           - name: wait-for-kubeconfig
-            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            image: busybox:latest
             command:
               - sh
               - -c
@@ -51,7 +51,7 @@ spec:
                   if kubectl get crd placements.cluster.open-cluster-management.io >/dev/null 2>&1; then
                     echo "OCM CRDs found, waiting for them to be established..."
                     kubectl wait --for=condition=Established crd/placements.cluster.open-cluster-management.io --timeout=300s
-                    kubectl wait --for=condition=Established crd/placementdecisions.cluster.open-cluster-management.io --timeout=300s
+                    kubectl wait --for=condition=Established crd/managedclustersetbindings.cluster.open-cluster-management.io --timeout=300s
                     echo "Required OCM CRDs are established"
                     break
                   else
@@ -72,7 +72,7 @@ spec:
               mountPath: "/etc/kube"
               readOnly: true
           containers:
-          - name: "{{"{{.HookName}}"}}"
+          - name: install-status-addon
             image: quay.io/kubestellar/helm:{{.Values.HELM_VERSION}}
             args:
             - upgrade

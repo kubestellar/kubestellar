@@ -15,7 +15,6 @@ spec:
       template:
         spec:
           initContainers:
-
           - name: wait-for-config-incluster
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
