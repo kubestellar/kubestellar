@@ -29,50 +29,39 @@ spec:
                 echo "Kubeconfig file is ready"
             env:
             - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+              value: /etc/kube/config-incluster
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
               readOnly: true
 
           - name: wait-for-ocm-crds
-            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            image: busybox:latest
             command:
               - sh
               - -c
               - |
-                echo "Waiting for OCM CRDs to be established..."
-                # Wait for essential OCM CRDs needed by the Status Add-on
-                # First check if clusteradm has created any OCM CRDs
-                echo "Checking if OCM CRDs exist..."
+                echo "Waiting for essential OCM CRDs to become available..."
                 max_attempts=60
                 attempt=0
                 while [ $attempt -lt $max_attempts ]; do
-                  if kubectl get crd placements.cluster.open-cluster-management.io >/dev/null 2>&1; then
-                    echo "OCM CRDs found, waiting for them to be established..."
-                    kubectl wait --for=condition=Established crd/placements.cluster.open-cluster-management.io --timeout=300s
-                    kubectl wait --for=condition=Established crd/managedclustersetbindings.cluster.open-cluster-management.io --timeout=300s
-                    echo "Required OCM CRDs are established"
-                    break
-                  else
-                    echo "OCM CRDs not found yet (attempt $((attempt+1))/$max_attempts), waiting..."
-                    sleep 10
-                    attempt=$((attempt+1))
+                  if kubectl get crd placements.cluster.open-cluster-management.io >/dev/null 2>&1 && \
+                     kubectl get crd managedclustersetbindings.cluster.open-cluster-management.io >/dev/null 2>&1; then
+                    echo "Required CRDs are available."
+                    exit 0
                   fi
+                  echo "CRDs not ready (attempt $((attempt+1))/$max_attempts). Retrying in 2s..."
+                  attempt=$((attempt+1))
+                  sleep 2
                 done
-                if [ $attempt -eq $max_attempts ]; then
-                  echo "ERROR: OCM CRDs not found after $max_attempts attempts"
-                  exit 1
-                fi
-            env:
-            - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+                echo "ERROR: Required CRDs not available after $max_attempts attempts"
+                exit 1
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
               readOnly: true
           containers:
-          - name: install-status-addon
+          - name: status
             image: quay.io/kubestellar/helm:{{.Values.HELM_VERSION}}
             args:
             - upgrade
