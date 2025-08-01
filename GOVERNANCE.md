@@ -129,7 +129,7 @@ Maintainer who is accused of a CoC violation.
 Committee; most maintainer-run projects do not.  Remember to place a link
 to the private Maintainer mailing list or alias in the code-of-conduct file.-->
 
-[Code of Conduct](coc.md)
+[Code of Conduct](coc-inc.md)
 violations by community members will be discussed and resolved
 on the [private Maintainer mailing list](https://groups.google.com/u/1/g/kubestellar-dev-private).
 
@@ -142,7 +142,7 @@ contributors to handle it. The Maintainers will review who is assigned to this
 at least once a year.
 
 The Security Response Team is responsible for handling all reports of security 
-holes and breaches according to the [security policy](security/security.md).
+holes and breaches according to the [security policy](security/security-inc.md).
 
 ## Voting
 

@@ -41,19 +41,26 @@ nodes:
     hostPort: 9443
     protocol: TCP
 EOF
+
 echo "Installing an nginx ingress controller into the hub cluster..."
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.1/deploy/static/provider/kind/deploy.yaml
+
 echo "Patching nginx ingress controller to enable SSL passthrough..."
-kubectl patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","args":["/nginx-ingress-controller","--election-id=ingress-nginx-leader","--controller-class=k8s.io/ingress-nginx","--ingress-class=nginx","--configmap=$(POD_NAMESPACE)/ingress-nginx-controller","--validating-webhook=:8443","--validating-webhook-certificate=/usr/local/certificates/cert","--validating-webhook-key=/usr/local/certificates/key","--watch-ingress-without-class=true","--publish-status-address=localhost","--enable-ssl-passthrough"]}]}}}}'
+kubectl --context "${hubctx}" patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","args":["/nginx-ingress-controller","--election-id=ingress-nginx-leader","--controller-class=k8s.io/ingress-nginx","--ingress-class=nginx","--configmap=$(POD_NAMESPACE)/ingress-nginx-controller","--validating-webhook=:8443","--validating-webhook-certificate=/usr/local/certificates/cert","--validating-webhook-key=/usr/local/certificates/key","--watch-ingress-without-class=true","--publish-status-address=localhost","--enable-ssl-passthrough"]}]}}}}'
 
 kind create cluster --name "${c1}"
 kind create cluster --name "${c2}"
 
 echo "Waiting for nginx ingress controller with SSL passthrough to be ready..."
-while [ -z "$(kubectl --context ${hubctx} get pod --namespace ingress-nginx --selector=app.kubernetes.io/component=controller --no-headers -o name 2> /dev/null)" ] ;  do
-    sleep 5
-done
-kubectl --context ${hubctx} wait --namespace ingress-nginx \
+# Wait for the deployment to roll out with the new configuration
+echo "Waiting for nginx ingress controller deployment to be rolled out..."
+kubectl --context "${hubctx}" rollout status deployment/ingress-nginx-controller \
+  --namespace ingress-nginx \
+  --timeout=300s
+
+# Wait for the new pod to be ready
+echo "Waiting for nginx ingress controller pod to be ready..."
+kubectl --context "${hubctx}" wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
   --timeout=90s

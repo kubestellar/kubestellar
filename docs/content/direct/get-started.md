@@ -12,7 +12,7 @@ The two ways to create this simple configuration are as follows.
 
 ### Note for Windows users
 
-For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user `root` in Linux. There is a [known issue about this](knownissue-wsl-ghcr-helm.md).
+For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user `root` in Linux. There is a [known issue about this](knownissue-helm-ghcr.md).
 
 ### Important: Shell Variables for Example Scenarios
 
