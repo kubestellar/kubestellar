@@ -36,7 +36,7 @@ spec:
               readOnly: true
 
           - name: wait-for-ocm-crds
-            image: busybox:latest
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
               - sh
               - -c
@@ -56,6 +56,9 @@ spec:
                 done
                 echo "ERROR: Required CRDs not available after $max_attempts attempts"
                 exit 1
+            env:
+            - name: KUBECONFIG
+              value: /etc/kube/config-incluster
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -101,7 +104,7 @@ spec:
             - name: HELM_CACHE_HOME
               value: "/tmp"
             - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+              value: /etc/kube/config-incluster
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
