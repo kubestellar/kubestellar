@@ -130,40 +130,12 @@ popd
 # Wait for PostCreateHook to be triggered
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 400s
 
-# Wait for install-status-addon job to complete with robust error handling
-kubectl wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s || {
-    echo "install-status-addon job failed or timed out, checking pod status..."
-    # Get job details for debugging
-    kubectl -n its1-system get job install-status-addon -o yaml
-    # Get pod status
-    kubectl -n its1-system get pods -l job-name=install-status-addon
-    # Check if any pod succeeded
-    if kubectl -n its1-system get pods -l job-name=install-status-addon --field-selector=status.phase=Succeeded -o name | grep -q .; then
-        echo "At least one install-status-addon pod succeeded, continuing..."
-    else
-        echo "No install-status-addon pods succeeded, failing..."
-        exit 1
-    fi
-}
+kubectl wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s
 
 # Wait for PostCreateHook to be triggered
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 400s
 
-# Wait for its-hub-init job to complete with robust error handling
-kubectl wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s || {
-    echo "its-hub-init job failed or timed out, checking pod status..."
-    # Get job details for debugging
-    kubectl -n its1-system get job its-hub-init -o yaml
-    # Get pod status
-    kubectl -n its1-system get pods -l job-name=its-hub-init
-    # Check if any pod succeeded
-    if kubectl -n its1-system get pods -l job-name=its-hub-init --field-selector=status.phase=Succeeded -o name | grep -q .; then
-        echo "At least one its-hub-init pod succeeded, continuing..."
-    else
-        echo "No its-hub-init pods succeeded, failing..."
-        exit 1
-    fi
-}
+kubectl wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s
 
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
@@ -202,40 +174,12 @@ function add_wec() {
 # Wait for PostCreateHook to be triggered (with context)
 kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 200s
 
-# Wait for install-status-addon job to complete with robust error handling
-kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s || {
-    echo "install-status-addon job failed or timed out, checking pod status..."
-    # Get job details for debugging
-    kubectl --context $HOSTING_CONTEXT -n its1-system get job install-status-addon -o yaml
-    # Get pod status
-    kubectl --context $HOSTING_CONTEXT -n its1-system get pods -l job-name=install-status-addon
-    # Check if any pod succeeded
-    if kubectl --context $HOSTING_CONTEXT -n its1-system get pods -l job-name=install-status-addon --field-selector=status.phase=Succeeded -o name | grep -q .; then
-        echo "At least one install-status-addon pod succeeded, continuing..."
-    else
-        echo "No install-status-addon pods succeeded, failing..."
-        exit 1
-    fi
-}
+kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s
 
 # Wait for PostCreateHook to be triggered (with context)
 kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 200s
 
-# Wait for its-hub-init job to complete with robust error handling
-kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s || {
-    echo "its-hub-init job failed or timed out, checking pod status..."
-    # Get job details for debugging
-    kubectl --context $HOSTING_CONTEXT -n its1-system get job its-hub-init -o yaml
-    # Get pod status
-    kubectl --context $HOSTING_CONTEXT -n its1-system get pods -l job-name=its-hub-init
-    # Check if any pod succeeded
-    if kubectl --context $HOSTING_CONTEXT -n its1-system get pods -l job-name=its-hub-init --field-selector=status.phase=Succeeded -o name | grep -q .; then
-        echo "At least one its-hub-init pod succeeded, continuing..."
-    else
-        echo "No its-hub-init pods succeeded, failing..."
-        exit 1
-    fi
-}
+kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s
 
 add_wec cluster1
 add_wec cluster2
