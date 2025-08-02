@@ -52,12 +52,47 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Function to check if a port is free
-wait_for_port_free() {
-    local port=$1
-    while lsof -i $port >/dev/null 2>&1; do
-        echo "Waiting for port $port to be free..."
-        sleep 5
+# Function to wait for a kind cluster to be fully deleted
+wait_for_kind_cluster_deletion() {
+    local cluster_name=$1
+    local context_name="kind-${cluster_name}"
+    
+    # Wait for the cluster context to be unreachable (indicating deletion)
+    echo "Waiting for kind cluster $cluster_name to be fully deleted..."
+    kubectl wait --for=delete nodes --all --context="$context_name" --timeout=60s 2>/dev/null || true
+    
+    # Additional check using kind CLI as fallback
+    local max_wait=30
+    local wait_time=0
+    while kind get clusters 2>/dev/null | grep -q "^${cluster_name}$"; do
+        if [ $wait_time -ge $max_wait ]; then
+            echo "Warning: Timed out waiting for kind cluster $cluster_name to be fully deleted"
+            break
+        fi
+        sleep 1
+        wait_time=$((wait_time + 1))
+    done
+}
+
+# Function to wait for a k3d cluster to be fully deleted
+wait_for_k3d_cluster_deletion() {
+    local cluster_name=$1
+    local context_name="k3d-${cluster_name}"
+    
+    # Wait for the cluster context to be unreachable (indicating deletion)
+    echo "Waiting for k3d cluster $cluster_name to be fully deleted..."
+    kubectl wait --for=delete nodes --all --context="$context_name" --timeout=60s 2>/dev/null || true
+    
+    # Additional check using k3d CLI as fallback
+    local max_wait=30
+    local wait_time=0
+    while k3d cluster list 2>/dev/null | grep -q "^${cluster_name}\\s"; do
+        if [ $wait_time -ge $max_wait ]; then
+            echo "Warning: Timed out waiting for k3d cluster $cluster_name to be fully deleted"
+            break
+        fi
+        sleep 1
+        wait_time=$((wait_time + 1))
     done
 }
 
@@ -80,10 +115,79 @@ fi
 
 ##########################################
 cluster_clean_up() {
-    if ! error_message=$(eval "$1" 2>&1); then
+    local cmd=$1
+    local cluster_name=$2
+    local platform=$3
+    
+    if ! error_message=$(eval "$cmd" 2>&1); then
         echo "clean up failed. Error:"
         echo "$error_message"
+    else
+        # Wait for the cluster to be fully deleted
+        if [ "$platform" == "kind" ]; then
+            wait_for_kind_cluster_deletion "$cluster_name"
+        elif [ "$platform" == "k3d" ]; then
+            wait_for_k3d_cluster_deletion "$cluster_name"
+        fi
     fi
+}
+
+# Function to create kind cluster with retry logic
+create_kind_cluster_with_retry() {
+    local cluster_name=$1
+    local config_arg=$2
+    local max_attempts=3
+    local attempt=1
+    
+    while [ $attempt -le $max_attempts ]; do
+        echo "Attempt $attempt to create kind cluster '$cluster_name'..." >&2
+        
+        # First ensure any leftover containers or networks are cleaned up
+        if docker ps -a | grep -q "$cluster_name"; then
+            echo "Cleaning up leftover Docker containers for $cluster_name..." >&2
+            docker ps -a | grep "$cluster_name" | awk '{print $1}' | xargs -r docker rm -f
+        fi
+        
+        if docker network ls | grep -q "kind-$cluster_name" || docker network ls | grep -q "$cluster_name"; then
+            echo "Cleaning up leftover Docker networks for $cluster_name..." >&2
+            docker network ls --format "{{.Name}}" | grep -E "(kind-)?$cluster_name" | xargs -r docker network rm 2>/dev/null || true
+        fi
+        
+        # Wait a moment for Docker cleanup to settle
+        sleep 3
+        
+        # Try to create the cluster
+        if kind create cluster --name "$cluster_name" $config_arg; then
+            echo "Successfully created kind cluster '$cluster_name'" >&2
+            return 0
+        else
+            echo "Failed to create kind cluster '$cluster_name' on attempt $attempt" >&2
+            
+            # Clean up any partial creation
+            kind delete cluster --name "$cluster_name" 2>/dev/null || true
+            wait_for_kind_cluster_deletion "$cluster_name"
+            
+            if [ $attempt -eq $max_attempts ]; then
+                echo "ERROR: Failed to create kind cluster '$cluster_name' after $max_attempts attempts" >&2
+                return 1
+            fi
+            
+            # Wait before retrying
+            echo "Waiting 10 seconds before retry..." >&2
+            sleep 10
+        fi
+        
+        attempt=$((attempt + 1))
+    done
+}
+
+# Function to check if a port is free
+wait_for_port_free() {
+    local port=$1
+    while lsof -i $port >/dev/null 2>&1; do
+        echo "Waiting for port $port to be free..."
+        sleep 5
+    done
 }
 
 context_clean_up() {
@@ -126,13 +230,13 @@ echo -e "Starting cluster clean up..."
 
 if command_exists "k3d"; then
     cluster_clean_up "k3d cluster delete kubeflex"
-    cluster_clean_up "k3d cluster delete cluster1"
-    cluster_clean_up "k3d cluster delete cluster2"
+    cluster_clean_up "k3d cluster delete cluster1" "cluster1" "k3d"
+    cluster_clean_up "k3d cluster delete cluster2" "cluster2" "k3d"
 fi
 if command_exists "kind"; then
     cluster_clean_up "kind delete cluster --name kubeflex"
-    cluster_clean_up "kind delete cluster --name cluster1"
-    cluster_clean_up "kind delete cluster --name cluster2"
+    cluster_clean_up "kind delete cluster --name cluster1" "cluster1" "kind"
+    cluster_clean_up "kind delete cluster --name cluster2" "cluster2" "kind"
 fi
 
 echo -e "\033[33m✔\033[0m Cluster space clean up has been completed"
@@ -149,19 +253,26 @@ clusters=(cluster1 cluster2)
 cluster_log_dir=$(mktemp -d)
 trap "rm -rf $cluster_log_dir" EXIT
 for cluster in "${clusters[@]}"; do
-    if {
-      if [ "$k8s_platform" == "kind" ]; then
-        kind create cluster --name "${cluster}" &>"${cluster_log_dir}/${cluster}.log"
-      else
-        k3d cluster create --network k3d-kubeflex "${cluster}" &>"${cluster_log_dir}/${cluster}.log"
-      fi
-    }; then
-        echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
-        kubectl config rename-context "${k8s_platform}-${cluster}" "${cluster}" >/dev/null 2>&1
+    if [ "$k8s_platform" == "kind" ]; then
+        # Use retry function for kind clusters to handle race conditions
+        if create_kind_cluster_with_retry "${cluster}" "" &>"${cluster_log_dir}/${cluster}.log"; then
+            echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
+            kubectl config rename-context "kind-${cluster}" "${cluster}" >/dev/null 2>&1
+        else
+            echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
+            cat "${cluster_log_dir}/${cluster}.log" >&2
+            false
+        fi
     else
-        echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
-        cat "${cluster_log_dir}/${cluster}.log" >&2
-        false
+        # For k3d, use the original approach for now
+        if k3d cluster create --network k3d-kubeflex "${cluster}" &>"${cluster_log_dir}/${cluster}.log"; then
+            echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
+            kubectl config rename-context "k3d-${cluster}" "${cluster}" >/dev/null 2>&1
+        else
+            echo -e "\033[0;31mX\033[0m Creation of cluster $cluster failed!" >&2
+            cat "${cluster_log_dir}/${cluster}.log" >&2
+            false
+        fi
     fi
 done
 
