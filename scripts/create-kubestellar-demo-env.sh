@@ -104,32 +104,21 @@ context_clean_up() {
 }
 
 checking_cluster() {
-    found=false
+    while IFS= read -r line; do
+        # Check for the cluster name and "Pending" status
+        if echo "$line" | grep -q "$1" && echo "$line" | grep -q "Pending"; then
+            echo "Pending CSR for $1 has been found, approving..."
+            clusteradm --context its1 accept --clusters "$1"
 
-    while true; do
-
-        output=$(kubectl --context its1 get csr)
-
-        while IFS= read -r line; do
-
-            if echo "$line" | grep -q $1; then
-                echo "$1 has been found, approving CSR"
-                clusteradm --context its1 accept --clusters "$1"
-                found=true
-                break
+            if [ $? -eq 0 ]; then
+                echo -e "\033[33m✔\033[0m CSR Approved for $1."
+                return 0
+            else
+                echo -e "\033[0;31mX\033[0m Failed to approve CSR for $1."
+                return 1
             fi
-
-        done <<< "$output"
-
-        if [ "$found" = true ]; then
-            break
-
-        else
-            echo "CSR for $1 not found. Trying again..."
-            sleep 20
         fi
-
-    done
+    done < <(kubectl --context its1 get csr --watch)
 }
 
 echo -e "\nStarting environment clean up..."

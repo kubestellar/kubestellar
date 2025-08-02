@@ -25,6 +25,10 @@ two views (for example: indenting with four spaces instead of
 three). When that is not possible, considerations for the website
 rendering take precedence.
 
+### Style Guide
+
+With more contributors writing pages for our documentation, we are implementing a [Style Guide](docs-styleguide.md) to help ensure more usable documenations with a consistent style and voice.
+
 ### GitHub pages
 
 Our documentation is powered by [mike](https://github.com/jimporter/mike) and [MkDocs](https://www.mkdocs.org/). MkDocs is powered by [Python-Markdown](https://pypi.org/project/Markdown/). These are immensely configurable and extensible. You can see our MkDocs configuration in `docs/mkdocs.yml`. Following are some of the choices we have made.

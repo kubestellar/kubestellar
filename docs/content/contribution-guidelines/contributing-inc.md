@@ -2,12 +2,12 @@
 
 Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
 
-To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on [Slack](https://kubernetes.slack.com/archives/C058SUSL5AA).
+To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on [Slack](https://cloud-native.slack.com/archives/C097094RZ3M).
 
 We can't wait to collaborate with you!
 
 
-This document describes our policies, procedures and best practices for working on KubeStellar via the project and repository on GitHub. Much of this interaction (issues, pull requests, discussions) is meant to be viewed directly at the [KubeStellar repository webpage on GitHub](https://github.com/kubestellar/kubestellar/). Other community discussions and questions are available via our slack channel. If you have any inquiries, please feel free to reach out to us on the [KubeStellar-dev Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/).
+This document describes our policies, procedures and best practices for working on KubeStellar via the project and repository on GitHub. Much of this interaction (issues, pull requests, discussions) is meant to be viewed directly at the [KubeStellar repository webpage on GitHub](https://github.com/kubestellar/kubestellar/). Other community discussions and questions are available via our slack channel. If you have any inquiries, please feel free to reach out to us on the [KubeStellar-dev Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/).
 
 Please read the following guidelines if you're interested in contributing to KubeStellar.
 
@@ -122,7 +122,7 @@ Reviewers will review your PR within a business day. A PR requires both an `/lgt
 
 _Congratulations! Your pull request has been successfully merged!_ 👏
 
-If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/).
+If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev [Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/).
 
 
 

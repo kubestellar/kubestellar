@@ -3,7 +3,7 @@
 This document is an overview of the User Guide.
 See the KubeStellar [overview](../readme.md) for architecture and other information.
 
-This user guide is an ongoing project. If you find errors, please point them out in our [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/) or open an issue in our [github repository](https://github.com/kubestellar/kubestellar)!
+This user guide is an ongoing project. If you find errors, please point them out in our [Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/) or open an issue in our [github repository](https://github.com/kubestellar/kubestellar)!
 
 ## Simple Examples
 

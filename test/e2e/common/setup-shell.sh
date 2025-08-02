@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# shellcheck shell=bash
+
 # Usage: source this file, in a bash shell
 
 # wait-for-cmd concatenates its arguments into one command that is iterated

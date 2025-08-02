@@ -49,14 +49,14 @@ While not a complete list of supported hosting clusters, here we discuss how to 
     By default the KubeStellar Core chart uses a test domain `localtest.me`, which is OK for testing on a single host machine. However, for scenarios that span more than one machine, it is necessary to set `--set "kubeflex-operator.domain=<domain>"` to a more appropriate `<domain>` that can be reached from Workload Execution Clusters (WECs).
 
     For convenience, a new local **Kind** cluster that satisfies the requirements for KubeStellar setup
-    and that can be used to exercises the [examples](./examples.md) can be created with the following command:
+    and that can be used to exercises the [examples](./example-scenarios.md) can be created with the following command:
 
     ```shell
     bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
     ```
 
     Alternatively, a new local **k3s** cluster that satisfies the requirements for KubeStellar setup
-    and that can be used to exercises the [examples](./examples.md) can be created with the following command:
+    and that can be used to exercises the [examples](./example-scenarios.md) can be created with the following command:
 
     ```shell
     bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v$KUBESTELLAR_VERSION/scripts/create-k3s-cluster-with-SSL-passthrough.sh) --port 9443
