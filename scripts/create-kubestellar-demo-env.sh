@@ -173,10 +173,16 @@ else
     helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.12.1 --namespace ingress-nginx --create-namespace --timeout 24h
     # --- BEGIN ROBUST INGRESS READINESS WAIT (k3d) ---
     echo "Waiting for nginx ingress controller pod to be ready (k3d)..."
-    kubectl --context k3d-kubeflex wait --namespace ingress-nginx \
+    if ! kubectl --context k3d-kubeflex wait --namespace ingress-nginx \
       --for=condition=ready pod \
       --selector=app.kubernetes.io/component=controller \
-      --timeout=24h
+      --timeout=24h; then
+        echo "ERROR: nginx ingress controller pod did not become ready in time."
+        echo "Diagnostics:"
+        kubectl --context k3d-kubeflex get pods -n ingress-nginx -o wide
+        kubectl --context k3d-kubeflex describe pods -n ingress-nginx -l app.kubernetes.io/component=controller
+        exit 1
+    fi
     # --- END ROBUST INGRESS READINESS WAIT (k3d) ---
 fi
 echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
@@ -223,8 +229,10 @@ kflex ctx --overwrite-existing-context wds2
 kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
-kubectl --context "$k8s_platform"-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 24h
-kubectl --context "$k8s_platform"-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 24h
+kubectl --context "$k8s_platform"-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 24h
+kubectl --context "$k8s_platform"-kubeflex wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 24h
+kubectl --context "$k8s_platform"-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 24h
+kubectl --context "$k8s_platform"-kubeflex wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 24h
 echo -e "\nWaiting for OCM hub cluster-info to be updated..."
 kubectl --context "$k8s_platform"-kubeflex wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 24h
 echo -e "\033[33m✔\033[0m OCM hub is ready"
