@@ -106,19 +106,50 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 			policyErrors = append(policyErrors, fmt.Sprintf("Singleton reported status return is requested but some objects have the wrong number of associated WECs, for example: %s", string(badSRBytes)))
 		}
 	}
-	policyWithStatus := policy.DeepCopy()
-	policyWithStatus.Status = v1alpha1.BindingPolicyStatus{
-		ObservedGeneration: policy.Generation,
-		Conditions:         binding.Status.Conditions,
-		Errors:             append(policyErrors, binding.Status.Errors...),
+	// Update Binding status instead of BindingPolicy status
+	// when processing a Binding
+	
+	// Update Binding status with policy-level errors (if any)
+	if len(policyErrors) > 0 {
+		bindingWithStatus := binding.DeepCopy()
+		// Merge policy errors with existing binding errors, but don't duplicate
+		allErrors := make([]string, 0, len(bindingWithStatus.Status.Errors)+len(policyErrors))
+		allErrors = append(allErrors, bindingWithStatus.Status.Errors...)
+		allErrors = append(allErrors, policyErrors...)
+		
+		bindingWithStatus.Status = v1alpha1.BindingStatus{
+			ObservedGeneration: binding.Generation,
+			Conditions:         bindingWithStatus.Status.Conditions, // Keep existing binding conditions
+			Errors:             allErrors,
+		}
+		
+		bindingEcho, updateErr := c.bindingClient.UpdateStatus(ctx, bindingWithStatus, metav1.UpdateOptions{FieldManager: ControllerName})
+		if updateErr == nil {
+			logger.V(4).Info("Updated Status of Binding", "name", binding.Name, "generation", binding.Generation, "numErrors", len(allErrors), "resourceVersion", bindingEcho.ResourceVersion)
+		} else if errors.IsNotFound(updateErr) {
+			logger.V(2).Info("Did not update Status of absent Binding", "name", binding.Name)
+		} else {
+			return updateErr
+		}
 	}
-	policyEcho, updateErr := c.bindingPolicyClient.UpdateStatus(ctx, policyWithStatus, metav1.UpdateOptions{FieldManager: ControllerName})
-	if updateErr == nil {
-		logger.V(4).Info("Updated Status of BindingPolicy", "name", bindingPolicyIdentifier, "generation", policy.Generation, "numErrors", len(policyErrors), "resourceVersion", policyEcho.ResourceVersion)
-	} else if errors.IsNotFound(updateErr) {
-		logger.V(2).Info("Did not update Status of absent BindingPolicy", "name", bindingPolicyIdentifier)
-	} else {
-		return updateErr
+	
+	// Only update BindingPolicy status if there are policy-specific issues
+	// (This reduces unnecessary updates and potential circular dependencies)
+	if len(policyErrors) > 0 {
+		policyWithStatus := policy.DeepCopy()
+		policyWithStatus.Status = v1alpha1.BindingPolicyStatus{
+			ObservedGeneration: policy.Generation,
+			Conditions:         policyWithStatus.Status.Conditions, // Keep existing policy conditions, don't copy from binding
+			Errors:             policyErrors, // Only policy-level errors, not binding errors
+		}
+		policyEcho, updateErr := c.bindingPolicyClient.UpdateStatus(ctx, policyWithStatus, metav1.UpdateOptions{FieldManager: ControllerName})
+		if updateErr == nil {
+			logger.V(4).Info("Updated Status of BindingPolicy (policy errors only)", "name", bindingPolicyIdentifier, "generation", policy.Generation, "numPolicyErrors", len(policyErrors), "resourceVersion", policyEcho.ResourceVersion)
+		} else if errors.IsNotFound(updateErr) {
+			logger.V(2).Info("Did not update Status of absent BindingPolicy", "name", bindingPolicyIdentifier)
+		} else {
+			return updateErr
+		}
 	}
 
 	return nil
