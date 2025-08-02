@@ -129,12 +129,36 @@ popd
 : Waiting for OCM hub to be ready...
 if [ "$use_release" = true ] ; then
     kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
-    kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
+    kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s || {
+        # Check if any pod succeeded (handles backoffLimit retry case)
+        if kubectl -n its1-system get pods -l job-name=its-with-clusteradm --field-selector=status.phase=Succeeded -o name | grep -q .; then
+            echo "Job succeeded (some pods completed), continuing..."
+        else
+            echo "Job failed (no pods succeeded)"
+            exit 1
+        fi
+    }
 else
     kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 400s
-    kubectl wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s
+    kubectl wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s || {
+        # Check if any pod succeeded (handles backoffLimit retry case)
+        if kubectl -n its1-system get pods -l job-name=install-status-addon --field-selector=status.phase=Succeeded -o name | grep -q .; then
+            echo "Job succeeded (some pods completed), continuing..."
+        else
+            echo "Job failed (no pods succeeded)"
+            exit 1
+        fi
+    }
     kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 400s
-    kubectl wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s
+    kubectl wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s || {
+        # Check if any pod succeeded (handles backoffLimit retry case)
+        if kubectl -n its1-system get pods -l job-name=its-hub-init --field-selector=status.phase=Succeeded -o name | grep -q .; then
+            echo "Job succeeded (some pods completed), continuing..."
+        else
+            echo "Job failed (no pods succeeded)"
+            exit 1
+        fi
+    }
 fi
 
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
