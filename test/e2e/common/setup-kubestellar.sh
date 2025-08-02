@@ -127,18 +127,10 @@ else
 popd
 
 : Waiting for OCM hub to be ready...
-kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
-
-kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s || {
-    # Check if the job is actually in a successful state
-    job_status=$(kubectl -n its1-system get job its-with-clusteradm -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}' 2>/dev/null || echo "Unknown")
-    if [ "$job_status" = "True" ]; then
-        echo "Job is actually complete, continuing..."
-    else
-        echo "Job is not in complete state, failing..."
-        exit 1
-    fi
-}
+kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 400s
+kubectl wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s
+kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 400s
+kubectl wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s
 
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
@@ -174,17 +166,10 @@ function add_wec() {
 
 "${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose ocm
 
-kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
-kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s || {
-    # Check if the job is actually in a successful state
-    job_status=$(kubectl --context $HOSTING_CONTEXT -n its1-system get job its-with-clusteradm -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}' 2>/dev/null || echo "Unknown")
-    if [ "$job_status" = "True" ]; then
-        echo "Job is actually complete, continuing..."
-    else
-        echo "Job is not in complete state, failing..."
-        exit 1
-    fi
-}
+kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 200s
+kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s
+kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 200s
+kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s
 
 add_wec cluster1
 add_wec cluster2
