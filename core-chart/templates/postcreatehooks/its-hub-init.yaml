@@ -15,9 +15,8 @@ spec:
       template:
         spec:
           initContainers:
-
           - name: wait-for-config-incluster
-            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            image: busybox:latest
             command:
               - sh
               - -c
@@ -30,7 +29,7 @@ spec:
                 echo "Kubeconfig file is ready"
             env:
             - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+              value: /etc/kube/config-incluster
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -45,7 +44,7 @@ spec:
             - --timeout=300
             env:
             - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+              value: /etc/kube/config-incluster
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
