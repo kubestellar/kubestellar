@@ -52,9 +52,9 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
 
-- Update the version in `scripts/create-kubestellar-demo-env.sh`. Note: merging this change will cause the script to be broken until the release is made.
+- Update the version in `scripts/create-kubestellar-demo-env.sh`. **Note:** merging this change might cause the script to be broken until the release is made.
 
-- Finish the updates erroneously made in [PR 3121](https://github.com/kubestellar/kubestellar/pull/3121) and rolled back in [PR 3163](https://github.com/kubestellar/kubestellar/pull/3163). Then delete this step from this file (`release.md`), because it will not need to be repeated in later releases.
+- Finish the updates erroneously made in [PR 3121](https://github.com/kubestellar/kubestellar/pull/3121) and rolled back in [PR 3163](https://github.com/kubestellar/kubestellar/pull/3163). Then delete this step from this file (`release.md`), because it will not need to be repeated in later releases. **Note:** merging this change WILL cause `main` to be broken until the release is made.
 
     - In `docs/content/direct/get-started.md` replace the two waits (on PCH and Job `its-with-clusteradm`) with the four waits (on PCH and Job `install-status-addon`, and PCH and Job `its-hub-init`).
     - In `scripts/create-kubestellar-demo-env.sh` do the same replacement.
