@@ -29,7 +29,7 @@ spec:
                 echo "Kubeconfig file is ready"
             env:
             - name: KUBECONFIG
-              value: "{{\"/etc/kube/{{.ITSkubeconfig}}\"}}"
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -64,7 +64,7 @@ spec:
                 echo "All required CRDs are established."
             env:
             - name: KUBECONFIG
-              value: "{{\"/etc/kube/{{.ITSkubeconfig}}\"}}"
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -110,7 +110,7 @@ spec:
             - name: HELM_CACHE_HOME
               value: "/tmp"
             - name: KUBECONFIG
-              value: "{{\"/etc/kube/{{.ITSkubeconfig}}\"}}"
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
