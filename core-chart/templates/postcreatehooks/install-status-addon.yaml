@@ -29,7 +29,7 @@ spec:
                 echo "Kubeconfig file is ready"
             env:
             - name: KUBECONFIG
-              value: /etc/kube/config-incluster
+              value: "/etc/kube/{{.ITSkubeconfig}}"
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -43,22 +43,28 @@ spec:
               - |
                 echo "Waiting for essential OCM CRDs to become available..."
                 max_attempts=60
-                attempt=0
-                while [ $attempt -lt $max_attempts ]; do
-                  if kubectl get crd placements.cluster.open-cluster-management.io >/dev/null 2>&1 && \
-                     kubectl get crd managedclustersetbindings.cluster.open-cluster-management.io >/dev/null 2>&1; then
-                    echo "Required CRDs are available."
-                    exit 0
-                  fi
-                  echo "CRDs not ready (attempt $((attempt+1))/$max_attempts). Retrying in 2s..."
-                  attempt=$((attempt+1))
-                  sleep 2
-                done
-                echo "ERROR: Required CRDs not available after $max_attempts attempts"
-                exit 1
+
+                wait_for_crd() {
+                  local crd_name="$1"
+                  attempt=0
+                  while [ $attempt -lt $max_attempts ]; do
+                    if kubectl get crd "$crd_name" >/dev/null 2>&1; then
+                      echo "Found $crd_name, waiting for it to be established..."
+                      kubectl wait --for=condition=Established "crd/$crd_name" --timeout=300s && return 0
+                    fi
+                    attempt=$((attempt + 1))
+                    sleep 5
+                  done
+                  echo "Timeout waiting for $crd_name to exist and be established" >&2
+                  return 1
+                }
+
+                wait_for_crd "placements.cluster.open-cluster-management.io" || exit 1
+                wait_for_crd "managedclustersetbindings.cluster.open-cluster-management.io" || exit 1
+                echo "All required CRDs are established."
             env:
             - name: KUBECONFIG
-              value: /etc/kube/config-incluster
+              value: "/etc/kube/{{.ITSkubeconfig}}"
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -104,7 +110,7 @@ spec:
             - name: HELM_CACHE_HOME
               value: "/tmp"
             - name: KUBECONFIG
-              value: /etc/kube/config-incluster
+              value: "/etc/kube/{{.ITSkubeconfig}}"
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
