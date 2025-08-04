@@ -58,15 +58,7 @@ jobs:
         id: generate
         run: |
           MIN_VERSION="v0.8.0"
-          VERSIONS=$(curl -s "https://api.github.com/repos/kubestellar/kubeflex/releases" | jq -r '.[].tag_name' | grep -E "^v[0-9]+\.[0-9]+\.[0-9]+$" | sort -V)
-
-          MATRIX_VERSIONS='[]'
-          while read -r v; do
-            if [[ "$(printf '%s\n%s' "$v" "$MIN_VERSION" | sort -V | head -n1)" == "$MIN_VERSION" ]]; then
-              MATRIX_VERSIONS=$(echo $MATRIX_VERSIONS | jq --arg v "$v" '. + [$v]')
-            fi
-          done <<< "$VERSIONS"
-
+          MATRIX_VERSIONS=$(curl -s "https://api.github.com/repos/kubestellar/kubeflex/releases" | jq -r --arg MIN_VERSION "$MIN_VERSION" '[.[] | .tag_name | select(. >= $MIN_VERSION)]')
           echo "matrix=$(echo $MATRIX_VERSIONS | jq -c .)" >> $GITHUB_OUTPUT
 
   test-kubeflex-version:
