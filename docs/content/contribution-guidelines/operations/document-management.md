@@ -155,7 +155,7 @@ pip install -r requirements.txt
 Alternatively, use the following commands to use the Makefile target to construct an adequate virtual environment and enter it.
 
 ```shell
-(cd..; make venv)
+(cd ..; make venv)
 . venv/bin/activate
 ```
 
