@@ -3737,7 +3737,15 @@ clues about the problem.</p>
 <p>Update the version in the core chart defaults, <code>core-chart/values.yaml</code>.</p>
 </li>
 <li>
-<p>Update the version in <code>scripts/create-kubestellar-demo-env.sh</code>. Note: merging this change will cause the script to be broken until the release is made.</p>
+<p>Update the version in <code>scripts/create-kubestellar-demo-env.sh</code>. <strong>Note:</strong> merging this change might cause the script to be broken until the release is made.</p>
+</li>
+<li>
+<p>Finish the updates erroneously made in <a href="https://github.com/kubestellar/kubestellar/pull/3121">PR 3121</a> and rolled back in <a href="https://github.com/kubestellar/kubestellar/pull/3163">PR 3163</a>. Then delete this step from this file (<code>release.md</code>), because it will not need to be repeated in later releases. <strong>Note:</strong> merging this change WILL cause <code>main</code> to be broken until the release is made.</p>
+<ul>
+<li>In <code>docs/content/direct/get-started.md</code> replace the two waits (on PCH and Job <code>its-with-clusteradm</code>) with the four waits (on PCH and Job <code>install-status-addon</code>, and PCH and Job <code>its-hub-init</code>).</li>
+<li>In <code>scripts/create-kubestellar-demo-env.sh</code> do the same replacement.</li>
+<li>In <code>test/e2e/common/setup-kubestellar.sh</code> replace the conditional double-or-quad wait with the unconditional quad wait.</li>
+</ul>
 </li>
 <li>
 <p>Until we have our first stable release, edit the old docs README(<code>oldocs/README.md</code>, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to refer to the coming release.</p>
