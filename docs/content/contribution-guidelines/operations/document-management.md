@@ -152,11 +152,10 @@ You can view and modify our documentation in the branch you have checked out by 
 pip install -r requirements.txt
 ```
 
-Alternatively, use the following commands to use the Makefile target to construct an adequate virtual environment and enter it. From the root of the repository(where the Makefile is), run:
+Alternatively, use the following commands to use the Makefile target to construct an adequate virtual environment and enter it.
 
 ```shell
-make venv
-cd docs/
+(cd..; make venv)
 . venv/bin/activate
 ```
 
@@ -217,7 +216,7 @@ We have a few shortcut urls that come in handy when referring others to our proj
 - [https://kubestellar.io/youtube](https://kubestellar.io/tv) - also, our youtube channel
 - [https://kubestellar.io/infomercial](https://kubestellar.io/infomercial) - our infomercial that premieres on June 12th at 9am
 
-and.. the very important…
+and, the very important…
 - [https://kubestellar.io/quickstart](https://kubestellar.io/quickstart) - our 'stable' Getting Started recipe
 
 ## Jinja templating
