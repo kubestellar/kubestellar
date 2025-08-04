@@ -7,8 +7,12 @@ metadata:
 spec:
   backend: shared
   type: {{ $cp.type | default "vcluster" }}
-  postCreateHook: {{ (eq $cp.install_clusteradm false) | ternary "its-without-clusteradm" "its-with-clusteradm" }}
-  postCreateHookVars:
+  postCreateHooks:
+  {{- if or (not (hasKey $cp "install_clusteradm")) (eq $cp.install_clusteradm true) }}
+    - hookName: its-hub-init
+  {{- end }}
+    - hookName: install-status-addon
+  globalVars:
     ITSSecretName: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "admin-kubeconfig" "vc-vcluster" }}
     ITSkubeconfig: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
   {{- if eq $cp.type "external" }}
