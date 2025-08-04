@@ -1,6 +1,6 @@
 name: KubeFlex Compatibility Matrix
 
-on: 
+on:
   schedule:
     - cron: '0 4 * * *'
   workflow_dispatch:
@@ -14,27 +14,9 @@ permissions:
   contents: read
 
 jobs:
-  generate-matrix:
-    name: Generate KubeFlex version matrix
+  setup-and-deploy:
+    name: Setup Environment and Deploy KubeStellar
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.generate.outputs.matrix }}
-    steps:
-      - name: Generate kflex version matrix
-        id: generate
-        run: |
-          MIN_VERSION="v0.8.0"
-          MATRIX_VERSIONS=$(curl -s "https://api.github.com/repos/kubestellar/kubeflex/releases" | jq -r --arg MIN_VERSION "$MIN_VERSION" '[.[] | .tag_name | select(test("^v[0-9]+\\.[0-9]+\\.[0-9]+$")) | select(. >= $MIN_VERSION)]')
-          echo "matrix=$MATRIX_VERSIONS" >> $GITHUB_OUTPUT
-
-  test-kubeflex-version:
-    name: Test with kflex ${{ matrix.kflex_version }}
-    needs: [generate-matrix]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        kflex_version: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
@@ -50,10 +32,53 @@ jobs:
 
       - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
 
-      - name: Install dependencies
+      - name: Install common dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh)
           go install github.com/onsi/ginkgo/v2/ginkgo
+
+      - name: Setup KubeStellar
+        run: |
+          cd test/e2e/
+          ./common/setup-kubestellar.sh
+
+      - name: Upload kubeconfig
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: kubeconfig
+          path: ~/.kube/config
+
+  generate-matrix:
+    name: Generate KubeFlex version matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate.outputs.matrix }}
+    steps:
+      - name: Generate kflex version matrix
+        id: generate
+        run: |
+          MIN_VERSION="v0.8.0"
+          MATRIX_VERSIONS=$(curl -s "https://api.github.com/repos/kubestellar/kubeflex/releases" | jq -r --arg MIN_VERSION "$MIN_VERSION" '[.[] | .tag_name | select(test("^v[0-9]+\\.[0-9]+\\.[0-9]+$")) | select(. >= $MIN_VERSION)]')
+          echo "matrix=$MATRIX_VERSIONS" >> $GITHUB_OUTPUT
+
+  test-kubeflex-version:
+    name: Test with kflex ${{ matrix.kflex_version }}
+    needs: [setup-and-deploy, generate-matrix]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        kflex_version: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.inputs.kubestellar_ref || 'main' }}
+
+      - name: Download kubeconfig
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: kubeconfig
+          path: ~/.kube
 
       - name: Download and install kflex
         run: |
@@ -67,4 +92,35 @@ jobs:
           KFLEX_DISABLE_CHATTY: "true"
         run: |
           cd test/e2e/ginkgo
-          ginkgo -vv --trace --no-color --fail-fast -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
+          ginkgo -vv --trace --no-color --fail-fast -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5" --skip-setup
+
+      - name: Show kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
+      - name: Show pods in hosting cluster
+        if: always()
+        run: |
+          echo "--- Pods in hosting cluster ---"
+          kubectl --context kind-kubeflex get pods -A
+          echo "--- Describe failing pods ---"
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do
+            echo "--- Describing pod $ns/$name ---"
+            kubectl --context kind-kubeflex describe pod -n $ns $name
+            echo "--- Logs for pod $ns/$name ---"
+            kubectl --context kind-kubeflex logs -n $ns $name --all-containers=true || true
+            echo "--- Previous logs for pod $ns/$name ---"
+            kubectl --context kind-kubeflex logs -p -n $ns $name --all-containers=true || true
+          done
+
+      - name: Show all resources in hosting cluster
+        if: always()
+        run: |
+          echo "--- All resources in hosting cluster ---"
+          kubectl --context kind-kubeflex get all -A
+
+      - name: Show all resources in its1
+        if: always()
+        run: |
+          echo "--- All resources in its1 cluster ---"
+          kubectl --context its1 get all -A
