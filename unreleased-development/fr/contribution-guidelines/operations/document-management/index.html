@@ -4422,15 +4422,15 @@ More details on these techniques will be added here soon.</p>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </code></pre></div>
 <p>Alternatively, use the following commands to use the Makefile target to construct an adequate virtual environment and enter it.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">(</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>..<span class="p">;</span><span class="w"> </span>make<span class="w"> </span>venv<span class="w"> </span><span class="o">)</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">(</span><span class="nb">cd</span><span class="w"> </span>..<span class="p">;</span><span class="w"> </span>make<span class="w"> </span>venv<span class="o">)</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>.<span class="w"> </span>venv/bin/activate
 </code></pre></div>
 <p>Then, using your chosen environment with the requirements installed, build and serve the documents with the following command.</p>
-<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdocs<span class="w"> </span>serve
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdocs<span class="w"> </span>serve
 </code></pre></div>
-Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
+<p>Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
 <p>Another way to view (not modify - this method reflects what has been deployed to the <code>gh-pages</code> branch of our repo) all branches/versions of our documentation locally using 'mike' <a href="https://github.com/jimporter/mike">mike for mkdocs</a>:</p>
-<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nb">cd</span><span class="w"> </span>docs
@@ -4438,7 +4438,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nb">cd</span><span class="w"> </span>..
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>make<span class="w"> </span>serve-docs
 </code></pre></div>
-Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
+<p>Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
 <hr />
 <h2 id="supported-aliases-for-our-documentation">Supported aliases for our documentation<a class="headerlink" href="#supported-aliases-for-our-documentation" title="Permanent link">#</a></h2>
 <p><code>mike</code> has a concept of aliases. We currently maintain only one alias.</p>
@@ -4467,7 +4467,7 @@ is published as the version named "unreleased-development".</p>
 <li><a href="https://kubestellar.io/tv">https://kubestellar.io/youtube</a> - also, our youtube channel</li>
 <li><a href="https://kubestellar.io/infomercial">https://kubestellar.io/infomercial</a> - our infomercial that premieres on June 12th at 9am</li>
 </ul>
-<p>and.. the very important…
+<p>and, the very important…
 - <a href="https://kubestellar.io/quickstart">https://kubestellar.io/quickstart</a> - our 'stable' Getting Started recipe</p>
 <h2 id="jinja-templating">Jinja templating<a class="headerlink" href="#jinja-templating" title="Permanent link">#</a></h2>
 <p>Our documentation stack includes <a href="https://jinja.palletsprojects.com/en/3.1.x/">Jinja</a>. The Jinja constructs --- {# comment #}, {{ expression }}, and {&#37; statement &#37;} --- can appear in the markdown sources.</p>
