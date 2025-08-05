@@ -176,16 +176,12 @@ EOF
 
 ## 🛠️ Build & Run
 
-Build
-
-```bash
-make build
-```
-
 Run
 
 ```bash
-make run
+go build -o bin/latency-controller ./test/performance/latency-controller
+
+./bin/latency-controller
 ```
 
 ## 📊 Monitoring Setup

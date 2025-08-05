@@ -1,19 +1,3 @@
-/*
-Copyright 2025.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package main
 
 import (
@@ -39,7 +23,7 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	"github.com/kubestellar/latency-collector/internal/controller"
+	"github.com/kubestellar/kubestellar/test/performance/latency-controller/internal/controller"
 )
 
 var (
@@ -47,7 +31,6 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 )
 
-// Resource groups to exclude for watchers as they should not be delivered to other clusters
 var excludedGroups = map[string]bool{
 	"flowcontrol.apiserver.k8s.io": true,
 	"discovery.k8s.io":             true,
@@ -56,7 +39,6 @@ var excludedGroups = map[string]bool{
 	"control.kubestellar.io":       true,
 }
 
-// Resource names to exclude for watchers as they should not be delivered to other clusters
 var excludedResourceNames = map[string]bool{
 	"events":               true,
 	"nodes":                true,
@@ -68,7 +50,6 @@ var excludedResourceNames = map[string]bool{
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-	// Allow Unstructured (and lists) in v1 core
 	gv := schema.GroupVersion{Group: "", Version: "v1"}
 	scheme.AddKnownTypes(gv,
 		&unstructured.Unstructured{},
@@ -89,123 +70,106 @@ func main() {
 		itsContext         string
 		wecContexts        string
 		kubeconfigPath     string
+		wdsKubeconfigPath  string
+		itsKubeconfigPath  string
+		wecKubeconfigPaths string
 		monitoredNamespace string
 		bindingName        string
 		excludedResources  string
 		includedGroups     string
 	)
 
-	// Add flags
+	// Flags
 	pflag.StringVar(&wdsContext, "wds-context", "wds1", "Context name for WDS cluster in kubeconfig")
 	pflag.StringVar(&itsContext, "its-context", "its1", "Context name for ITS cluster in kubeconfig")
-	pflag.StringVar(&wecContexts, "wec-contexts", "cluster1", "Comma-separated context names for WEC clusters in kubeconfig")
-	pflag.StringVar(&kubeconfigPath, "kubeconfig", "~/.kube/config", "Path to kubeconfig file")
-	pflag.StringVar(&monitoredNamespace, "monitored-namespace", "default", "Namespace of the resources to monitor")
-	pflag.StringVar(&bindingName, "binding-name", "nginx-singleton-bpolicy", "Name of the binding policy for the monitored resources")
-	pflag.StringVar(&excludedResources, "excluded-resources", "events,nodes,componentstatuses,endpoints,persistentvolumes,clusterroles,clusterrolebindings", "Comma-separated list of resource types to exclude from monitoring")
-	pflag.StringVar(&includedGroups, "included-groups", "", "Comma-separated list of API groups to include (empty means all groups)")
+	pflag.StringVar(&wecContexts, "wec-contexts", "cluster1", "Comma-separated WEC contexts")
+	pflag.StringVar(&kubeconfigPath, "kubeconfig", "~/.kube/config", "Path to kubeconfig file for external use")
+	pflag.StringVar(&wdsKubeconfigPath, "wds-kubeconfig", "", "Path to WDS kubeconfig (empty = detect automatically)")
+	pflag.StringVar(&itsKubeconfigPath, "its-kubeconfig", "", "Path to ITS kubeconfig (empty = detect automatically)")
+	pflag.StringVar(&wecKubeconfigPaths, "wec-kubeconfigs", "", "Comma-separated paths to WEC kubeconfigs")
+	pflag.StringVar(&monitoredNamespace, "monitored-namespace", "default", "Namespace to monitor")
+	pflag.StringVar(&bindingName, "binding-name", "nginx-singleton-bpolicy", "Binding policy name")
+	pflag.StringVar(&excludedResources, "excluded-resources", "events,nodes,componentstatuses,endpoints,persistentvolumes,clusterroles,clusterrolebindings", "Resources to exclude")
+	pflag.StringVar(&includedGroups, "included-groups", "", "API groups to include (empty=all)")
 
-	// Existing flags
-	pflag.StringVar(&metricsAddr, "metrics-bind-address", ":2222", "The address the metric endpoint binds to.")
-	pflag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
-	pflag.BoolVar(&enableLeaderElection, "leader-elect", false,
-		"Enable leader election for controller manager. "+
-			"Enabling this will ensure there is only one active controller manager.")
-	pflag.BoolVar(&secureMetrics, "metrics-secure", false,
-		"If set the metrics endpoint is served securely")
-	pflag.BoolVar(&enableHTTP2, "enable-http2", false,
-		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
+	pflag.StringVar(&metricsAddr, "metrics-bind-address", ":2222", "Address for metrics endpoint")
+	pflag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "Address for health probes")
+	pflag.BoolVar(&enableLeaderElection, "leader-elect", false, "Enable leader election")
+	pflag.BoolVar(&secureMetrics, "metrics-secure", false, "Serve metrics securely")
+	pflag.BoolVar(&enableHTTP2, "enable-http2", false, "Enable HTTP2 for servers")
 
-	opts := zap.Options{
-		Development: true,
-	}
+	opts := zap.Options{Development: true}
 	opts.BindFlags(flag.CommandLine)
 	pflag.Parse()
-
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
-	// Create manager with unstructured cache support
-	mgrCfg := buildClusterConfig(kubeconfigPath, wdsContext)
+	// Build manager config from WDS cluster
+	// Automatic detection: use explicit path > in-cluster > default kubeconfig
+	mgrCfg := resolveConfig(wdsKubeconfigPath, kubeconfigPath, wdsContext)
 	mgr, err := ctrl.NewManager(mgrCfg, ctrl.Options{
 		Scheme: scheme,
-		Metrics: metricsserver.Options{
-			BindAddress:   metricsAddr,
-			SecureServing: secureMetrics,
-		},
+		Metrics: metricsserver.Options{BindAddress: metricsAddr, SecureServing: secureMetrics},
 		WebhookServer:          webhook.NewServer(webhook.Options{}),
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "34020a28.kubestellar.io",
-
-		// FIXED: Properly configure client with unstructured cache support
-		Client: client.Options{
-			Cache: &client.CacheOptions{
-				DisableFor:   []client.Object{},
-				Unstructured: true, // Enable unstructured caching
-			},
-		},
+		Client: client.Options{Cache: &client.CacheOptions{Unstructured: true}},
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
 
-	// Discover available resources
-	discoveredResources, err := discoverResources(mgrCfg, excludedResources, includedGroups)
+	// Discover resources
+	discovered, err := discoverResources(mgrCfg, excludedResources, includedGroups)
 	if err != nil {
 		setupLog.Error(err, "unable to discover resources")
 		os.Exit(1)
 	}
 
-	// Split WEC contexts
-	wecContextList := []string{}
-	if wecContexts != "" {
-		wecContextList = strings.Split(wecContexts, ",")
-	}
+	// Prepare per-cluster configs
+	wdsCfg := resolveConfig(wdsKubeconfigPath, kubeconfigPath, wdsContext)
+	itsCfg := resolveConfig(itsKubeconfigPath, kubeconfigPath, itsContext)
 
-	// Build clients for all clusters
-	wdsCfg := buildClusterConfig(kubeconfigPath, wdsContext)
-	itsCfg := buildClusterConfig(kubeconfigPath, itsContext)
-
-	// Create WEC clients map
+	// Build WEC clients
+	wecContextList := strings.Split(wecContexts, ",")
 	wecClients := make(map[string]kubernetes.Interface)
 	wecDynamics := make(map[string]dynamic.Interface)
-
-	for _, ctx := range wecContextList {
-		wecCfg := buildClusterConfig(kubeconfigPath, ctx)
-		clientSet, err := kubernetes.NewForConfig(wecCfg)
-		if err != nil {
-			setupLog.Error(err, "unable to create WEC client", "context", ctx)
-			os.Exit(1)
+	if wecKubeconfigPaths != "" {
+		paths := strings.Split(wecKubeconfigPaths, ",")
+		for i, ctx := range wecContextList {
+			path := kubeconfigPath
+			if i < len(paths) && paths[i] != "" {
+				path = paths[i]
+			}
+			cfg := resolveConfig(path, kubeconfigPath, ctx)
+			cs, err := kubernetes.NewForConfig(cfg)
+			utilruntime.Must(err)
+			dc, err := dynamic.NewForConfig(cfg)
+			utilruntime.Must(err)
+			wecClients[ctx], wecDynamics[ctx] = cs, dc
 		}
-		dynClient, err := dynamic.NewForConfig(wecCfg)
-		if err != nil {
-			setupLog.Error(err, "unable to create WEC dynamic client", "context", ctx)
-			os.Exit(1)
+	} else {
+		for _, ctx := range wecContextList {
+			cfg := resolveConfig(kubeconfigPath, kubeconfigPath, ctx)
+			cs, err := kubernetes.NewForConfig(cfg)
+			utilruntime.Must(err)
+			dc, err := dynamic.NewForConfig(cfg)
+			utilruntime.Must(err)
+			wecClients[ctx], wecDynamics[ctx] = cs, dc
 		}
-		wecClients[ctx] = clientSet
-		wecDynamics[ctx] = dynClient
 	}
 
-	wdsClient, err := kubernetes.NewForConfig(wdsCfg)
-	if err != nil {
-		setupLog.Error(err, "unable to create WDS client")
-		os.Exit(1)
-	}
-
+	// Build core clients
+	wdsClientset, err := kubernetes.NewForConfig(wdsCfg)
+	utilruntime.Must(err)
+	wdsClient := wdsClientset
 	wdsDynamic, err := dynamic.NewForConfig(wdsCfg)
-	if err != nil {
-		setupLog.Error(err, "unable to create WDS dynamic client")
-		os.Exit(1)
-	}
-
+	utilruntime.Must(err)
 	itsDynamic, err := dynamic.NewForConfig(itsCfg)
-	if err != nil {
-		setupLog.Error(err, "unable to create ITS dynamic client")
-		os.Exit(1)
-	}
+	utilruntime.Must(err)
 
-	// Initialize Generic Reconciler with dependencies
+	// Setup controller
 	r := &controller.GenericLatencyCollectorReconciler{
 		Client:              mgr.GetClient(),
 		Scheme:              mgr.GetScheme(),
@@ -216,29 +180,40 @@ func main() {
 		WecDynamics:         wecDynamics,
 		MonitoredNamespace:  monitoredNamespace,
 		BindingName:         bindingName,
-		DiscoveredResources: discoveredResources,
+		DiscoveredResources: discovered,
 	}
-
 	r.RegisterMetrics()
 	if err := r.SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "GenericLatencyCollector")
+		setupLog.Error(err, "unable to create controller")
 		os.Exit(1)
 	}
 
-	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up health check")
-		os.Exit(1)
-	}
-	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up ready check")
-		os.Exit(1)
-	}
+	// Health checks
+	mgr.AddHealthzCheck("healthz", healthz.Ping)
+	mgr.AddReadyzCheck("readyz", healthz.Ping)
 
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+// resolveConfig picks explicit path > in-cluster > default kubeconfig
+func resolveConfig(explicit, defaultPath, context string) *rest.Config {
+	// explicit flag
+	if explicit != "" {
+		return buildClusterConfig(explicit, context)
+	}
+	// in-cluster if env present
+	if os.Getenv("KUBERNETES_SERVICE_HOST") != "" {
+		cfg, err := rest.InClusterConfig()
+		if err == nil {
+			return cfg
+		}
+	}
+	// fallback to default kubeconfig
+	return buildClusterConfig(defaultPath, context)
 }
 
 // Update the discoverResources function to return GVK instead of GVR
