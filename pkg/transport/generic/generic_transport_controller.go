@@ -1165,10 +1165,10 @@ func popUnstructuredByID(list *unstructured.UnstructuredList, id klog.ObjectRef)
 func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Context, namespace string, wrappedObject *unstructured.Unstructured) error {
 	startTime := time.Now()
 	logger := klog.FromContext(ctx)
-	
+
 	// Extract objects from wrapped object for metrics labeling
 	objectInfos := c.extractObjectTypesFromWrapped(wrappedObject)
-	
+
 	existingWrappedObject, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Get(ctx, wrappedObject.GetName(), metav1.GetOptions{})
 	operation := "create"
 	if err != nil {
@@ -1205,13 +1205,13 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 			logger.V(2).Info("Updated wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject, "resourceVersion", wrappedObject2.GetResourceVersion())
 		}
 	}
-	
+
 	// Record sync duration and object size metrics for each object type in the wrapped object
 	syncDuration := time.Since(startTime).Seconds()
 	for _, objInfo := range objectInfos {
 		// Record sync duration metric
 		c.objectSyncDurationHist.WithLabelValues(objInfo.GVK.Group, objInfo.GVK.Version, objInfo.GVK.Kind, operation, namespace).Observe(syncDuration)
-		
+
 		// Record object size metric
 		c.objectSizeHist.WithLabelValues(objInfo.GVK.Group, objInfo.GVK.Version, objInfo.GVK.Kind, namespace).Observe(float64(objInfo.Size))
 	}
@@ -1222,7 +1222,7 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 // extractObjectTypesFromWrapped extracts GVK and size information from objects contained in a wrapped object
 func (c *genericTransportController) extractObjectTypesFromWrapped(wrappedObject *unstructured.Unstructured) []objectInfo {
 	var objectInfos []objectInfo
-	
+
 	// Extract the objects from the wrapped object's spec.objects field
 	specObjects, found, err := unstructured.NestedSlice(wrappedObject.Object, "spec", "objects")
 	if err != nil || !found {
@@ -1233,16 +1233,16 @@ func (c *genericTransportController) extractObjectTypesFromWrapped(wrappedObject
 			Size: int64(len(wrappedBytes)),
 		}}
 	}
-	
+
 	// Deduplicate object types and accumulate sizes
 	gvkSizeMap := make(map[schema.GroupVersionKind]int64)
-	
+
 	for _, obj := range specObjects {
 		if objMap, ok := obj.(map[string]interface{}); ok {
 			// Try to extract GVK from the object
 			apiVersion, _, _ := unstructured.NestedString(objMap, "apiVersion")
 			kind, _, _ := unstructured.NestedString(objMap, "kind")
-			
+
 			if apiVersion != "" && kind != "" {
 				gv, err := schema.ParseGroupVersion(apiVersion)
 				if err == nil {
@@ -1258,7 +1258,7 @@ func (c *genericTransportController) extractObjectTypesFromWrapped(wrappedObject
 			}
 		}
 	}
-	
+
 	// Convert map to slice
 	for gvk, size := range gvkSizeMap {
 		objectInfos = append(objectInfos, objectInfo{
@@ -1266,7 +1266,7 @@ func (c *genericTransportController) extractObjectTypesFromWrapped(wrappedObject
 			Size: size,
 		})
 	}
-	
+
 	// If no objects found, use wrapped object's GVK as fallback
 	if len(objectInfos) == 0 {
 		wrappedBytes, _ := wrappedObject.MarshalJSON()
@@ -1275,7 +1275,7 @@ func (c *genericTransportController) extractObjectTypesFromWrapped(wrappedObject
 			Size: int64(len(wrappedBytes)),
 		})
 	}
-	
+
 	return objectInfos
 }
 
