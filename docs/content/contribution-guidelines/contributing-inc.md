@@ -33,6 +33,32 @@ Your assistance in improving documentation is highly valued, regardless of your 
 
 To claim an issue that you are interested in, kindly leave a comment on the issue and request the maintainers to assign it to you.
 
+#### GitHub Slash Commands
+
+KubeStellar uses Prow and GitHub bots to help manage issues and pull requests through slash commands. These commands should be written as comments on their own line:
+
+**Issue Management Commands:**
+- `/assign @username` - Assign an issue to a specific user
+- `/unassign @username` - Remove assignment from a user  
+- `/assign` - Assign the issue to yourself
+- `/unassign` - Remove your assignment
+- `/good-first-issue` - Add the "good first issue" label
+- `/help-wanted` - Add the "help wanted" label
+- `/remove-good-first-issue` - Remove the "good first issue" label
+- `/remove-help-wanted` - Remove the "help wanted" label
+
+**Pull Request Review Commands:**
+- `/lgtm` - Indicate "looks good to me" (cannot be used on your own PR)
+- `/approve` - Approve the PR for merging (can be used on your own PR)
+- `/hold` - Prevent the PR from being merged
+- `/unhold` - Remove the hold
+- `/retest` - Re-run failed tests
+
+**General Commands:**
+- `/help` - Show available commands for the current repository
+
+These commands make it easier for contributors and maintainers to manage the workflow without needing special repository permissions.
+
 ### Committing
 We encourage all contributors to adopt [best practices in git commit management](https://hackmd.io/q22nrXjERBeIGb-fqwrUSg) to facilitate efficient reviews and retrospective analysis. Note: that document was written for projects where some of the contributors are doing merges into the main branch, but in KubeStellar we have GitHub doing that for us. For the kubestellar repository, this is controlled by [Prow](https://docs.prow.k8s.io/); for the other repositories in the kubestellar organization we use the GitHub mechanisms directly.
 
