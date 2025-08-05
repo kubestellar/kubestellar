@@ -15,6 +15,28 @@
 
 set -x # echo so users can understand what is happening
 set -e # exit on error
+dump_job_diagnostics() {
+  ns="$1"
+  job="$2"
+  echo " Dumping Job YAML: $job in namespace $ns "
+  kubectl get job -n "$ns" "$job" -o yaml || true
+  echo " Listing Related Pods "
+  kubectl get pods -n "$ns" -l job-name="$job" -o wide || true
+  for pod in $(kubectl get pods -n "$ns" -l job-name="$job" -o name); do
+    echo " Pod Description: $pod "
+    kubectl describe -n "$ns" "$pod" || true
+    echo " Logs for pod $pod (all containers) "
+    containers=$(kubectl get "$pod" -n "$ns" -o jsonpath='{.spec.containers[*].name}')
+    for c in $containers; do
+      echo " Logs for container $c-"
+      kubectl logs "$pod" -n "$ns" -c "$c" || true
+    done
+  done
+  echo " Namespace Events "
+  kubectl get events -n "$ns" --sort-by=.lastTimestamp || true
+  echo " End of diagnostic dump for job $job ="
+}
+
 
 use_release=false
 KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=5
@@ -128,8 +150,18 @@ popd
 
 : Waiting for OCM hub to be ready...
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
-kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
-kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
+if ! kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s; then
+  echo "ERROR: Job its-with-clusteradm failed to complete"
+  dump_job_diagnostics its1-system its-with-clusteradm
+  exit 1
+fi
+
+if ! kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s; then
+  echo "ERROR: Job update-cluster-info failed to complete"
+  dump_job_diagnostics its1-system update-cluster-info
+  exit 1
+fi
+
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
 
