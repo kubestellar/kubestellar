@@ -2616,6 +2616,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dependencies-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dependencies Policy
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#report-a-vulnerability" class="md-nav__link">
     <span class="md-ellipsis">
       Report a Vulnerability
@@ -3415,6 +3424,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dependencies-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dependencies Policy
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#report-a-vulnerability" class="md-nav__link">
     <span class="md-ellipsis">
       Report a Vulnerability
@@ -3501,6 +3519,28 @@
 
 <h2 id="security-announcements">Security Announcements<a class="headerlink" href="#security-announcements" title="Permanent link">#</a></h2>
 <p>Join the <a href="https://groups.google.com/u/1/g/kubestellar-security-announce">kubestellar-security-announce</a> group for emails about security and major API announcements.</p>
+<h2 id="dependencies-policy">Dependencies Policy<a class="headerlink" href="#dependencies-policy" title="Permanent link">#</a></h2>
+<p>KubeStellar manages its dependencies with the following policy:</p>
+<ul>
+<li><strong>Dependency Detection:</strong> We use <a href="https://github.com/dependabot">Dependabot</a> to automatically check for and propose updates to dependencies in Go modules, Python requirements, Dockerfiles, Helm charts, and GitHub Actions workflows. Dependabot PRs serve as prompts but are not automatically accepted.</li>
+<li><strong>Update Process:</strong> After Dependabot creates a PR, maintainers wait for potential issues to surface before proceeding. The handling then depends on the type of dependency and whether Dependabot's proposal is functional:<ul>
+<li><strong>GitHub Actions:</strong> Maintainers create their own PR that follows our <a href="https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#github-action-reference-discipline">GitHub Action reference discipline</a> and other established practices.</li>
+<li><strong>Go Dependencies:</strong> If Dependabot's proposal is functional, it may be accepted directly. If the proposal is broken, maintainers create their own PR to address the dependency update properly.</li>
+</ul>
+</li>
+<li><strong>Review Process:</strong> All dependency update pull requests are subject to the same <a href="https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#pull-requests">review process</a> as other code changes. Maintainers verify that updates do not introduce breaking changes or known vulnerabilities before merging.</li>
+<li><strong>Vulnerability Checking:</strong> Before merging dependency updates, maintainers perform security assessments:<ul>
+<li><strong>Security Scanning:</strong> Given that KubeStellar imports various types of dependencies (Go packages, pre-built binaries, container images, Helm charts, and GitHub Actions), we rely on GitHub's security advisory database and Dependabot's vulnerability detection capabilities. Specific additional security scanning tools are not currently standardized across all dependency types.</li>
+<li><strong>Security Advisories:</strong> Review security advisories and release notes for the updated dependencies</li>
+<li><strong>Breaking Changes:</strong> Verify that updates do not introduce breaking changes or compatibility issues</li>
+<li><strong>GitHub Actions:</strong> For GitHub Actions specifically, ensure updates follow our <a href="https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#github-action-reference-discipline">GitHub Action Reference Discipline</a> and use approved commit hashes. The <a href="https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/verify-action-hashes.yaml">verify-action-hashes workflow</a> automatically checks that each GitHub Action reference uses an approved commit hash.</li>
+<li><strong>SBOM Generation:</strong> Generate Software Bill of Materials (SBOM) using <a href="https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/goreleaser.yml">Anchore's syft tool</a> during releases to identify and track dependencies for security analysis</li>
+<li><strong>Testing:</strong> Run available tests to verify that updated dependencies work correctly with the codebase</li>
+</ul>
+</li>
+<li><strong>Security Best Practices:</strong> We avoid using unmaintained or deprecated dependencies. Monitoring for security advisories affecting our dependencies is primarily done through GitHub's security advisory database and Dependabot notifications. Vulnerabilities in dependencies are prioritized for prompt remediation.</li>
+<li><strong>Documentation:</strong> The dependency update process is documented in the repository's README and CONTRIBUTING guidelines.</li>
+</ul>
 <h2 id="report-a-vulnerability">Report a Vulnerability<a class="headerlink" href="#report-a-vulnerability" title="Permanent link">#</a></h2>
 <p>We're extremely grateful for security researchers and users that report vulnerabilities to the KubeStellar Open Source Community. All reports are thoroughly investigated by a set of community volunteers.</p>
 <p>You can also email the private <a href="mailto:kubestellar-security-announce@googlegroups.com">kubestellar-security-announce@googlegroups.com</a> list with the security details and the details expected for <a href="https://github.com/kubestellar/kubestellar/blob/main/.github/ISSUE_TEMPLATE/bug_report.yaml">all KubeStellar bug reports</a>.</p>
@@ -3508,8 +3548,10 @@
 <ul>
 <li>You think you discovered a potential security vulnerability in KubeStellar</li>
 <li>You are unsure how a vulnerability affects KubeStellar</li>
-<li>You think you discovered a vulnerability in another project that KubeStellar depends on</li>
+<li>You think you discovered a vulnerability in another project that KubeStellar depends on<ul>
 <li>For projects with their own vulnerability reporting and disclosure process, please report it directly there</li>
+</ul>
+</li>
 </ul>
 <h3 id="when-should-i-not-report-a-vulnerability">When Should I NOT Report a Vulnerability?<a class="headerlink" href="#when-should-i-not-report-a-vulnerability" title="Permanent link">#</a></h3>
 <ul>
