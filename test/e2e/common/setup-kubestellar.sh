@@ -111,6 +111,7 @@ if [ "$use_release" = true ] ; then
     --kube-context $HOSTING_CONTEXT \
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
+    --set ITSName=its1 \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
     --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
 else
@@ -121,6 +122,7 @@ else
     --kube-context $HOSTING_CONTEXT \
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
+    --set ITSName=its1 \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
     --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
   fi
