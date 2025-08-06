@@ -44,8 +44,6 @@ KubeStellar uses Prow and GitHub bots to help manage issues and pull requests th
 - `/unassign` - Remove your assignment
 - `/good-first-issue` - Add the "good first issue" label
 - `/help-wanted` - Add the "help wanted" label
-- `/remove-good-first-issue` - Remove the "good first issue" label
-- `/remove-help-wanted` - Remove the "help wanted" label
 
 **Pull Request Review Commands:**
 - `/lgtm` - Indicate "looks good to me" (cannot be used on your own PR)
@@ -53,9 +51,6 @@ KubeStellar uses Prow and GitHub bots to help manage issues and pull requests th
 - `/hold` - Prevent the PR from being merged
 - `/unhold` - Remove the hold
 - `/retest` - Re-run failed tests
-
-**General Commands:**
-- `/help` - Show available commands for the current repository
 
 These commands make it easier for contributors and maintainers to manage the workflow without needing special repository permissions.
 
