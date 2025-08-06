@@ -38,7 +38,10 @@ This is a basic requirement for accessibility. Images and diagrams should always
 
 ### Use Care If Using Generative AI
 
-The use of generative AI for writing assistance is becoming more common. Any text created via generative AI tools should be **carefully** reviewed to make sure it is both coherent and accurate. It should also be checked to ensure it is not plagiarism, as some LLMs have been trained on copyrighted works.
+The use of generative AI for writing assistance is becoming more common. Any text created via generative AI tools should be **carefully** reviewed to make sure it is both coherent and accurate. Among the items to check for (this is just a start): 
+
+- Ensure the generated text is not outright plagiarism, as some LLMs have been trained on copyrighted works.
+- The generated text should contain no derivative works (as understood in copyright law) of other copyrighted material.
 
 ## Always Do a Spelling and Grammar Check
 
