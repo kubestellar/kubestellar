@@ -2346,6 +2346,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#github-slash-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      GitHub Slash Commands
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -3525,6 +3540,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#github-slash-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      GitHub Slash Commands
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -3698,6 +3728,22 @@
 <p>We also have a subset of issues we've labeled <strong><a href="https://github.com/kubestellar/kubestellar/labels/help%20wanted">help wanted!</a></strong></p>
 <p>Your assistance in improving documentation is highly valued, regardless of your level of experience with the project.</p>
 <p>To claim an issue that you are interested in, kindly leave a comment on the issue and request the maintainers to assign it to you.</p>
+<h4 id="github-slash-commands">GitHub Slash Commands<a class="headerlink" href="#github-slash-commands" title="Permanent link">#</a></h4>
+<p>KubeStellar uses Prow and GitHub bots to help manage issues and pull requests through slash commands. These commands should be written as comments on their own line:</p>
+<p><strong>Issue Management Commands:</strong>
+- <code>/assign @username</code> - Assign an issue to a specific user
+- <code>/unassign @username</code> - Remove assignment from a user<br />
+- <code>/assign</code> - Assign the issue to yourself
+- <code>/unassign</code> - Remove your assignment
+- <code>/good-first-issue</code> - Add the "good first issue" label
+- <code>/help-wanted</code> - Add the "help wanted" label</p>
+<p><strong>Pull Request Review Commands:</strong>
+- <code>/lgtm</code> - Indicate "looks good to me" (cannot be used on your own PR)
+- <code>/approve</code> - Approve the PR for merging (can be used on your own PR)
+- <code>/hold</code> - Prevent the PR from being merged
+- <code>/unhold</code> - Remove the hold
+- <code>/retest</code> - Re-run failed tests</p>
+<p>These commands make it easier for contributors and maintainers to manage the workflow without needing special repository permissions.</p>
 <h3 id="committing">Committing<a class="headerlink" href="#committing" title="Permanent link">#</a></h3>
 <p>We encourage all contributors to adopt <a href="https://hackmd.io/q22nrXjERBeIGb-fqwrUSg">best practices in git commit management</a> to facilitate efficient reviews and retrospective analysis. Note: that document was written for projects where some of the contributors are doing merges into the main branch, but in KubeStellar we have GitHub doing that for us. For the kubestellar repository, this is controlled by <a href="https://docs.prow.k8s.io/">Prow</a>; for the other repositories in the kubestellar organization we use the GitHub mechanisms directly.</p>
 <p>Your git commits should provide ample context for reviewers and future codebase readers.</p>
