@@ -12,30 +12,15 @@ spec:
     metadata:
       name: "{{"{{.ControlPlaneName}}-transport-controller"}}"
     rules:
-    - apiGroups:
-      - ""
-      resources:
-      - secrets
-      verbs:
-      - get
-      - list
-      - watch
-    - apiGroups:
-      - tenancy.kflex.kubestellar.org
-      resources:
-      - controlplanes
-      verbs:
-      - get
-      - list
-      - watch
-    - apiGroups:
-      - tenancy.kflex.kubestellar.org
-      resources:
-      - controlplanes/status
-      verbs:
-      - get
-      - patch
-      - update
+    - apiGroups: [""]
+      resources: ["secrets"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["tenancy.kflex.kubestellar.org"]
+      resources: ["controlplanes"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["tenancy.kflex.kubestellar.org"]
+      resources: ["controlplanes/status"]
+      verbs: ["get", "patch", "update"]
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
@@ -158,4 +143,4 @@ spec:
             configMap:
               name: transport-controller-config
               defaultMode: 0744
-{{- end }} 
+{{- end }}
