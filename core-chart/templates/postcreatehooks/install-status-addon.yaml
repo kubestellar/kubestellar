@@ -51,13 +51,13 @@ spec:
               mountPath: "/etc/kube"
               readOnly: true
 
-          - name: wait-for-placementdecisions-crd
+          - name: wait-for-managedclustersetbindings-crd
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
               - kubectl
               - wait
               - --for=condition=Established
-              - crd/placementdecisions.cluster.open-cluster-management.io
+              - crd/managedclustersetbindings.cluster.open-cluster-management.io
               - --timeout=300s
             env:
             - name: KUBECONFIG
