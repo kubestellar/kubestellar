@@ -35,16 +35,30 @@ spec:
               mountPath: "/etc/kube"
               readOnly: true
 
-          - name: wait-for-ocm-crds
+          - name: wait-for-placements-crd
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
-              - sh
-              - -c
-              - |
-                echo "Waiting for essential OCM CRDs to become established..."
-                kubectl wait --for=condition=Established crd/placements.cluster.open-cluster-management.io --timeout=300s
-                kubectl wait --for=condition=Established crd/managedclustersetbindings.cluster.open-cluster-management.io --timeout=300s
-                echo "All required CRDs are established."
+              - kubectl
+              - wait
+              - --for=condition=Established
+              - crd/placements.cluster.open-cluster-management.io
+              - --timeout=300s
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+
+          - name: wait-for-placementdecisions-crd
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - kubectl
+              - wait
+              - --for=condition=Established
+              - crd/placementdecisions.cluster.open-cluster-management.io
+              - --timeout=300s
             env:
             - name: KUBECONFIG
               value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
