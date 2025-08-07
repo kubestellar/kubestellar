@@ -3,9 +3,7 @@
 # Declare variables to be passed into your templates.
 
 
-# Name of the ITS control plane to use for transport-controller (optional)
-# If not set, auto-discovery will be used (legacy behavior)
-ITSName: ""
+
 
 # Container/chart image versions. These values are set during the chart release process,
 # please do not change them unless you know what you are doing.
