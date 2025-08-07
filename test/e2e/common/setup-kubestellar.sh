@@ -17,6 +17,7 @@ set -x # echo so users can understand what is happening
 set -e # exit on error
 
 use_release=false
+enable_argocd=false
 KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY=5
 TRANSPORT_CONTROLLER_VERBOSITY=5
 CLUSTER_SOURCE=kind
@@ -25,10 +26,12 @@ HOSTING_CONTEXT=kind-kubeflex
 while [ $# != 0 ]; do
     case "$1" in
         (-h|--help)
-            echo "$0 usage: (--released | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp)*"
+            echo "$0 usage: (--released | --argocd | --kubestellar-controller-manager-verbosity \$num | --transport-controller-verbosity \$num | --env \$kind_or_ocp)*"
             exit;;
         (--released)
             use_release=true;;
+        (--argocd)
+            enable_argocd=true;;
         (--kubestellar-controller-manager-verbosity)
           if (( $# > 1 )); then
             KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY="$2"
@@ -105,6 +108,12 @@ esac
 :
 
 pushd "${SRC_DIR}/../../.."
+
+argocd_flags=""
+if [ "$enable_argocd" = true ]; then
+    argocd_flags="--set argocd.install=true"
+fi
+
 if [ "$use_release" = true ] ; then
   helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
     --version $(yq .KUBESTELLAR_VERSION core-chart/values.yaml) \
@@ -112,7 +121,8 @@ if [ "$use_release" = true ] ; then
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
-    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
+    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY} \
+    $argocd_flags
 else
   make kind-load-image
   helm dependency update core-chart/
@@ -122,21 +132,14 @@ else
     --set-json='ITSes=[{"name":"its1"}]' \
     --set-json='WDSes=[{"name":"wds1"}]' \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
-    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
+    --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY} \
+    $argocd_flags
   fi
 popd
 
 : Waiting for OCM hub to be ready...
-if [ "$use_release" = true ] ; then
-    kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
-    kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
-else
-    kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 400s
-    kubectl wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s
-    kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 400s
-    kubectl wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s
-fi
-
+kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 400s
+kubectl wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
 wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
@@ -170,6 +173,9 @@ function add_wec() {
 }
 
 "${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose ocm
+
+kubectl --context $HOSTING_CONTEXT wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 200s
+kubectl --context $HOSTING_CONTEXT wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 400s
 
 add_wec cluster1
 add_wec cluster2
