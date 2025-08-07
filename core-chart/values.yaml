@@ -2,9 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-
-
-
 # Container/chart image versions. These values are set during the chart release process,
 # please do not change them unless you know what you are doing.
 HELM_VERSION: "3.16.4"
