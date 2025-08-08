@@ -35,30 +35,31 @@ spec:
               mountPath: "/etc/kube"
               readOnly: true
 
-          - name: wait-for-placements-crd
+          - name: wait-for-ocm-crds
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
-              - kubectl
-              - wait
-              - --for=condition=Established
-              - crd/placements.cluster.open-cluster-management.io
-              - --timeout=300s
-            env:
-            - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
-            volumeMounts:
-            - name: kubeconfig
-              mountPath: "/etc/kube"
-              readOnly: true
-
-          - name: wait-for-managedclustersetbindings-crd
-            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
-            command:
-              - kubectl
-              - wait
-              - --for=condition=Established
-              - crd/managedclustersetbindings.cluster.open-cluster-management.io
-              - --timeout=300s
+              - sh
+              - -c
+              - |
+                echo "Waiting for required OCM CRDs to exist and be established..."
+                CRDS=(placements.cluster.open-cluster-management.io managedclustersetbindings.cluster.open-cluster-management.io)
+                for crd in "${CRDS[@]}"; do
+                  echo "Checking for CRD: $crd"
+                  for i in $(seq 1 60); do
+                    if kubectl get crd "$crd" > /dev/null 2>&1; then
+                      echo "CRD $crd found, waiting for Established..."
+                      kubectl wait --for=condition=Established crd/$crd --timeout=300s && break
+                    else
+                      echo "CRD $crd not found yet, attempt $i/60, sleeping..."
+                      sleep 5
+                    fi
+                    if [ $i -eq 60 ]; then
+                      echo "ERROR: CRD $crd not found after 5 minutes!"
+                      exit 1
+                    fi
+                  done
+                done
+                echo "All required OCM CRDs are established."
             env:
             - name: KUBECONFIG
               value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
