@@ -15,7 +15,7 @@ As a starting point, here are some very basic items to consider when working on 
 
 - [Use clear and concise prose](#use-clear-and-concise-prose)
 - [Avoid use of emojis (especially in headings)](#avoid-use-of-emojis-in-prose)
-- [Thinking about Accessibility](#think-accessibility)
+- [Think Accessibility](#compose-and-format-for-accessibility)
 - [Use care if using generative AI](#use-care-if-using-generative-ai) for writing assistance. Review text carefully to make sure it is both coherent and accurate.
 - [Always check spelling and grammar](#always-do-a-spelling-and-grammar-check) before committing docs changes
 
@@ -32,20 +32,29 @@ Much of KubeStellar's existing documentation -- especially introductory and over
 The **Design Guide** will include guidance on use and placement of iconography in KubeStellar docs and UIs.
 In textual documentation, however, emojis may interfere with rendering and navigation of the website documentation, _especially_ if they are used in headings or titles. They also may make the documentation inaccessible to visitors who must use screen reader technology.
 
-### Think Accessibility
+### Compose and Format for Accessibility
 
 Writing for accessibility means ensuring that screen readers can easily read your text, your content is easy to navigate, visually clear and logically structured. This includes the appropriate usage of Heading tags, styling your text consistently and using a 'gender-neutral' language where applicable.
 
-Accessibility is a part of any good web project, and docs are no different.
-As a bare minimum, we require that all our images and diagrams always have an appropriate 'alt-text' attribute to support visually impared users and screenreaders. We also recommend keeping the [W3C Guidelines for Accessibility](https://www.w3.org/TR/WCAG21/) in mind when writing/illustrating KubeStellar documentation.
+Accessibility is a part of any good web project, and docs are no different. As a bare minimum, we require that all our images and diagrams always have an appropriate 'alt-text' to support visually impared users and screenreaders. In Markdown, you can add alt-text using the following syntax:
+
+```{.bash}
+![An image of KubeStellar Contributors](images/contributors.png)
+```
+
+In this example, the text inside the square brackets ([An image of KubeStellar Contributors]) serves as the alt-text, and it should clearly describe the content or purpose of the image.
+
+For a more detailed guidance on writing alt-texts, we recommend checking out [WebAIM Guide to Alternative Texts.](https://webaim.org/techniques/alttext/)
+
+We also recommend keeping the [W3C Guidelines for Accessibility](https://www.w3.org/TR/WCAG21/) in mind when writing/illustrating KubeStellar documentation.
 
 That said, accessibility is an ever-evolving area in technical content. As an open-source contributor, familiarizing yourself with accessibility standards will help you make more thoughtful and inclusive descisions, whether in documentation, or other areas of your work.
 
 If you want to deepen your understanding of accessibility, we recommend checking out the following resources:
 
+- [Gruntwork Markdown Style Guide](https://docs.gruntwork.io/guides/style/markdown-style-guide/)
 - [Web Content Accessibility Guidelines (WCAG)](https://www.w3.org/WAI/standards-guidelines/wcag/)
 - [Google's Style Guide for Writing Inclusive Documentation](https://developers.google.com/style/inclusive-documentation)
-- [Introduction to Web Accessibility Course by W3C and EdX (free)](https://www.edx.org/learn/web-accessibility/the-world-wide-web-consortium-w3c-introduction-to-web-accessibility)
 
 ### Use Care If Using Generative AI
 
