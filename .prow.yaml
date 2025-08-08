@@ -52,3 +52,19 @@ presubmits:
             requests:
               memory: 4Gi
               cpu: 2
+
+  - name: pull-kubestellar-test-demo-env
+    always_run: false
+    run_if_changed: "^scripts/create-kubestellar-demo-env\\.sh$"
+    decorate: true
+    clone_uri: "https://github.com/kubestellar/kubestellar"
+    spec:
+      containers:
+        - image: ghcr.io/kubestellar/infra/build:1.24.2-1
+          command:
+            - make
+            - test-demo-env
+          resources:
+            requests:
+              memory: 8Gi
+              cpu: 4 
