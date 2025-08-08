@@ -3592,7 +3592,7 @@ usage. For general setup information, see <a href="../user-guide-intro/#the-full
 story</a>.</p>
 <h3 id="install-software-prerequisites">Install software prerequisites<a class="headerlink" href="#install-software-prerequisites" title="Permanent link">#</a></h3>
 <p>The following command will check for the prerequisites that KubeStellar will need for the later steps. See <a href="../pre-reqs/">the prerequisites doc</a> for more details.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.28.0/scripts/check_pre_req.sh<span class="o">)</span><span class="w"> </span>kflex<span class="w"> </span>ocm<span class="w"> </span>helm<span class="w"> </span>kubectl<span class="w"> </span>docker<span class="w"> </span>kind
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.29.0-alpha.1/scripts/check_pre_req.sh<span class="o">)</span><span class="w"> </span>kflex<span class="w"> </span>ocm<span class="w"> </span>helm<span class="w"> </span>kubectl<span class="w"> </span>docker<span class="w"> </span>kind
 </code></pre></div>
 <h3 id="cleanup-from-previous-runs">Cleanup from previous runs<a class="headerlink" href="#cleanup-from-previous-runs" title="Permanent link">#</a></h3>
 <p>If you have run this recipe or any related recipe previously then
@@ -3608,7 +3608,7 @@ commands tear down the state established by this recipe.</p>
 go unnoticed (the various cleanup commands may legitimately "fail" if
 there is nothing to clean up).</p>
 <h3 id="set-the-version-appropriately-as-an-environment-variable">Set the Version appropriately as an environment variable<a class="headerlink" href="#set-the-version-appropriately-as-an-environment-variable" title="Permanent link">#</a></h3>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">kubestellar_version</span><span class="o">=</span><span class="m">0</span>.28.0
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">kubestellar_version</span><span class="o">=</span><span class="m">0</span>.29.0-alpha.1
 </code></pre></div>
 <h3 id="ocm-quick-start-with-ingress">OCM Quick Start with Ingress<a class="headerlink" href="#ocm-quick-start-with-ingress" title="Permanent link">#</a></h3>
 <p>This recipe uses a modified version of <a href="https://raw.githubusercontent.com/open-cluster-management-io/OCM/v0.15.0/solutions/setup-dev-environment/local-up.sh">the OCM Quick Start script</a>. The modification is necessary because KubeStellar requires the hosting cluster to have an Ingress controller with SSL passthrough enabled. The modified Quick Start script has the following modifications compared to the baseline.</p>
@@ -3617,7 +3617,7 @@ there is nothing to clean up).</p>
 <li>The script installs <a href="https://docs.nginx.com/nginx-ingress-controller/">the NGINX Ingress Controller</a> into the hub cluster, then patches the controller to enable SSL passthrough, and later waits for it to be in service.</li>
 </ol>
 <p>You can invoke the modified OCM Quick Start as follows.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v0.28.0/scripts/ocm-local-up-for-ingress.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v0.29.0-alpha.1/scripts/ocm-local-up-for-ingress.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </code></pre></div>
 <p>Like the baseline, this script creates a <code>kind</code> cluster named "hub" to
 serve as hub cluster (known in KubeStellar as an Inventory and

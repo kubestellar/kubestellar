@@ -4329,7 +4329,7 @@ rendering take precedence.</p>
 (a) by downloading and rendering the documents locally, or
 (b) letting GitHub render a revised website from a branch in your fork of the kubestellar repository (which is highly recommended when making a PR that modifies the website).</p>
 <h3 id="serving-up-documents-globally-from-a-fork-of-the-repository-via-github">Serving up documents globally from a fork of the repository via GitHub<a class="headerlink" href="#serving-up-documents-globally-from-a-fork-of-the-repository-via-github" title="Permanent link">#</a></h3>
-<p>You can take advantage of <a href="https://github.com/kubestellar/kubestellar/blob/v0.28.0/.github/workflows/docs-gen-and-push.yml">the "Generate and Push Docs" GitHub Actions workflow</a>---invoked either explicitly in the GitHub web UI or implicitly by a branch naming convention---to create an online, shareable rendering of the website.
+<p>You can take advantage of <a href="https://github.com/kubestellar/kubestellar/blob/v0.29.0-alpha.1/.github/workflows/docs-gen-and-push.yml">the "Generate and Push Docs" GitHub Actions workflow</a>---invoked either explicitly in the GitHub web UI or implicitly by a branch naming convention---to create an online, shareable rendering of the website.
 This is particularly useful for documentation PRs, as it allows you to share a preview of your proposed changes directly via a URL to a working website.
 To take advantage of this action, you must (a) limit the character set used in the name of your branch and (b) ensure that your fork is properly set up for using <a href="https://pages.github.com/">GitHub Pages</a>. Your branch name should consist only of alphanumerics and dashes and dots. Fork setup for GitHub Pages entails two things: having a version of the branch named <code>gh-pages</code>, and configuring GitHub to publish a website based on that branch.</p>
 <p>The name of your branch equals the "version" of the website where the rendering appears.</p>
@@ -4534,7 +4534,7 @@ scripts in <code>hack</code>).</p>
 - ks_branch: main
 - ks_tag: latest
 - ks_latest_regular_release: 0.28.0
-- ks_latest_release: 0.28.0
+- ks_latest_release: 0.29.0-alpha.1
 </code></pre></div>
 <p>to use a variables/macro in your documentation reference like this:</p>
 <p>{{ config.&lt;var_name&gt; }}</p>
