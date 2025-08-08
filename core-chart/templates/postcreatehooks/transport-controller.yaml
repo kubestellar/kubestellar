@@ -44,7 +44,7 @@ spec:
         # get-kubeconfig.sh cp_name guess_its_name
 
         # input parameters
-        cp_name="${1%"-system"}" # cp name or cp namespace
+        cp_name="${1%-system}" # cp name or cp namespace
         guess_its_name="$2" # true: try guessing the name of the ITS CP
 
         # check if the CP name is valid or needs to be guessed
@@ -59,7 +59,7 @@ spec:
                 cp_name="${cps%% *}"
                 break;;
               (*)
-                >&2 echo "ERROR: found more than one Control Plane of type its!"
+                >&2 echo "ERROR: Multiple ITS control planes found, but none specified. Set ITSName Helm value or ITS_NAME env var to select one."
                 exit 1;;
             esac
           else
@@ -109,7 +109,7 @@ spec:
           - name: setup-its-kubeconfig
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             imagePullPolicy: IfNotPresent
-            command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{.ITSName}}' true | base64 -d > /mnt/shared/transport-kubeconfig" ]
+            command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{"{{.ITSName}}"}}' true | base64 -d > /mnt/shared/transport-kubeconfig" ]
             volumeMounts:
             - name: config-volume
               mountPath: /mnt/config
