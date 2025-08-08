@@ -124,7 +124,7 @@ spec:
           - name: setup-its-kubeconfig
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             imagePullPolicy: IfNotPresent
-            command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{"{{.ITSName}}"}}' true | base64 -d > /mnt/shared/transport-kubeconfig" ]
+            command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{\"{{.ITSName}}\"}}' true | base64 -d > /mnt/shared/transport-kubeconfig" ]
             volumeMounts:
             - name: config-volume
               mountPath: /mnt/config
