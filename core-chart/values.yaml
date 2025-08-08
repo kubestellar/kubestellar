@@ -127,4 +127,4 @@ WDSes: # all the CPs in this list will execute the transport-controller.yaml and
   # - name: wds1 # name of the control plane
   #   type: host # optional type of control plane host or k8s (default to k8s, if not specified)
   #   APIGroups: "" # optional string holding a comma-separated list of APIGroups
-  #    its1 # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCH starts
+  #   ITSName: its1 # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCH starts
