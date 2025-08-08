@@ -1,0 +1,6216 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://docs.kubestellar.io/release-0.29.0-alpha.1/en/">
+      
+      
+      
+        <link rel="next" href="readme/">
+      
+      
+      <link rel="icon" href="../favicons/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>Landing - KubeStellar</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=SapceMono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"SapceMono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/kubestellar.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-SR5TD1CXY7"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-SR5TD1CXY7",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-SR5TD1CXY7",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  <meta name="google-site-verification" content="QZFIkG95fMxODWgQDK2OUn73HUIu9fZmuTer-ZA4UwI" />
+
+  <!-- Determine title -->
+  
+  
+    
+  
+
+  <!-- The image needs to have an absolute URL -->
+  
+
+  <!-- Open graph meta tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="KubeStellar - Landing" />
+  <meta property="og:description" content="None" />
+  <meta property="og:url" content="https://docs.kubestellar.io/release-0.29.0-alpha.1/en/" />
+  <meta property="og:image" content="https://docs.kubestellar.io/release-0.29.0-alpha.1assets/images/illustrations/banner.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1080" />
+  <meta property="og:image:height" content="568" />
+
+  <!-- google-site-verification meta-tag -->
+  <meta name="google-site-verification" content="-Rj8YMCn9uu5IwOFdC-WfAzXp4ZOMJtYKxU40ZgcJIU" />
+
+<!-- Extra stylesheets -->
+<!--  <link
+    rel="stylesheet"
+    href="../assets/stylesheets/overrides.css"
+  />-->
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  You are not viewing the latest regular release.
+  <a href="../..">
+    <strong>Click here to go to the latest regular release.</strong>
+  </a> The <em>unreleased-development</em> release corresponds to the <em>main</em> branch of the repository.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL(".."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+       
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./" title="KubeStellar" class="md-header__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+      
+  <img src="../logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            KubeStellar
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Landing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="light-blue" data-md-color-accent="cyan"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kubestellar/kubestellar" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+       <header class='md-header' data-md-component='header' style="z-index:-10;">
+	       <div class='md-header__inner md-grid' data-md-component='container'>
+	       <p class='md_container' style="font-size:larger"> 
+	       KubeStellar has multiple documentation versions to match its multiple releases.<br />
+	       Please make sure you are viewing the docs version which matches the release version of the code you are using!
+	       </p>
+	       </div>
+       </header>
+
+
+    <div class="md-container" data-md-component="container">
+      
+      
+
+    
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Welcome
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="readme/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  What is KubeStellar?
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="direct/get-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="direct/user-guide-intro/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="direct/contribute/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="Community/_index/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Community
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Blog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+    
+    <!-- Additional styles for landing page -->
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+:root {
+  --font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", 
+                 "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+}
+
+h1, h2, h3, h4, h5, h6, p, span, a, li, div {
+  font-family: var(--font-family);
+}
+
+.section-sm {
+  display: none;
+  text-align: center;
+}
+
+.d-sm-mid {
+    display: none;
+}
+.d-sm-mid2 {
+    display: none;
+}
+
+@media (max-width: 1219px) {
+    .d-sm-mid2 {
+        display: contents;
+    }
+}
+
+@media (max-width: 960px) {
+    .d-lg-mid {
+        display:none;
+    }
+    .d-sm-mid {
+        display: contents;
+    }
+    .section-sm {
+        display:contents;
+    }
+}
+
+.shortcut-bar-text {
+    font-size: 15px;
+    transition: color 0.3s;
+}
+.shortcut-bar-text:hover {
+    color: #0065cb 
+}
+
+.shortcut-bar {
+  /* position: sticky */
+  width: 75%;
+  height: 90%;
+  position: absolute;
+  top: 8%;
+  left: 25%;
+  /* transform: translate(-25%, -50%);*/
+  text-align: center;
+  line-height: 60px;
+}
+.centered {
+  width: 20%;
+  height: 55%;
+  position:relative;
+  top: -25px;
+  left: 80%;
+  /* transform: translate(-50%, -50%); */
+  text-align: center;
+}
+
+/* Add a media query for screens with a maximum width of 768px (adjust as needed) */
+@media (max-width: 1000px) {
+  .shortcut-bar {
+    width: 100%; /* Adjust the width for mobile screens */
+    height: auto; /* Adjust the height for mobile screens */
+    top: 55px; /* Adjust the top position for mobile screens */
+    left: 25%; /* Adjust the left position for mobile screens */
+    transform: translateX(-25%); /* Adjust the horizontal centering for mobile screens */
+    line-height: 40px; /* Adjust the line height for mobile screens */
+  }
+}
+
+@media (max-width: 1219px) {
+  .centered {
+    width: 40%; /* Adjust the width for mobile screens and (min-width: 800px) */ 
+    /* height: auto;  */
+    top: -30px;
+    right: 200px;
+    transform: translateX(-50%); /* Adjust horizontal centering for mobile screens */
+    text-align: center;
+  }
+}
+@media (max-width: 1000px) {
+  .centered {
+    width: 40%;
+    top: -15px;
+    left: 95%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+}
+@media (max-width: 1000px) {
+  .mx-3 {
+     margin-left: 1rem;
+     margin-right: 1rem;
+     width: 90%;
+     height: 100%;
+  }
+  .md-source__repository {
+    display: inline-block;
+    /* max-width: calc(100% - 1.2rem); */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+}
+
+    
+        .d-flex {
+            display: flex;
+        }
+    
+        .cursor-pointer {
+            cursor: pointer;
+        }
+    
+        .ml-0 {
+            margin-left: 0rem;
+        }
+        .ml-1 {
+            margin-left: 0.25rem;
+        }
+        .ml-2 {
+            margin-left: 0.5rem;
+        }
+        .ml-3 {
+            margin-left: 1rem;
+        }
+        .ml-4 {
+            margin-left: 1.5rem;
+        }
+        .ml-5 {
+            margin-left: 3rem;
+        }
+    
+        .mr-0 {
+            margin-right: 0rem;
+        }
+        .mr-1 {
+            margin-right: 0.25rem;
+        }
+        .mr-2 {
+            margin-right: 0.5rem;
+        }
+        .mr-3 {
+            margin-right: 1rem;
+        }
+        .mr-4 {
+            margin-right: 1.5rem;
+        }
+        .mr-5 {
+            margin-right: 3rem;
+        }
+    
+        .pl-0 {
+            padding-left: 0rem;
+        }
+        .pl-1 {
+            padding-left: 0.25rem;
+        }
+        .pl-2 {
+            padding-left: 0.5rem;
+        }
+        .pl-3 {
+            padding-left: 1rem;
+        }
+        .pl-4 {
+            padding-left: 1.5rem;
+        }
+        .pl-5 {
+            padding-left: 3rem;
+        }
+    
+        .pr-0 {
+            padding-right: 0rem;
+        }
+        .pr-1 {
+            padding-right: 0.25rem;
+        }
+        .pr-2 {
+            padding-right: 0.5rem;
+        }
+        .pr-3 {
+            padding-right: 1rem;
+        }
+        .pr-4 {
+            padding-right: 1.5rem;
+        }
+        .pr-5 {
+            padding-right: 3rem;
+        }
+    
+    
+        .mt-0 {
+            margin-top: 0rem;
+        }
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+        .mt-3 {
+            margin-top: 1rem;
+        }
+        .mt-4 {
+            margin-top: 1.5rem;
+        }
+        .mt-5 {
+            margin-top: 3rem;
+        }
+    
+    
+        .pt-0 {
+            padding-top: 0rem;
+        }
+        .pt-1 {
+            padding-top: 0.25rem;
+        }
+        .pt-2 {
+            padding-top: 0.5rem;
+        }
+        .pt-3 {
+            padding-top: 1rem;
+        }
+        .pt-4 {
+            padding-top: 1.5rem;
+        }
+        .pt-5 {
+            padding-top: 3rem;
+        }
+    
+        .mb-0 {
+            margin-bottom: 0rem;
+        }
+        .mb-1 {
+            margin-bottom: 0.25rem;
+        }
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+        .mb-3 {
+            margin-bottom: 1rem;
+        }
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+        .mb-5 {
+            margin-bottom: 3rem;
+        }
+    
+    
+        .pb-0 {
+            padding-bottom: 0rem;
+        }
+        .pb-1 {
+            padding-bottom: 0.25rem;
+        }
+        .pb-2 {
+            padding-bottom: 0.5rem;
+        }
+        .pb-3 {
+            padding-bottom: 1rem;
+        }
+        .pb-4 {
+            padding-bottom: 1.5rem;
+        }
+        .pb-5 {
+            padding-bottom: 3rem;
+        }
+    
+    
+    
+        .mx-0 {
+            margin-left: 0rem;
+            margin-right: 0rem;
+        }
+        .mx-1 {
+            margin-left: 0.25rem;
+            margin-right: 0.25rem;
+        }
+        .mx-2 {
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
+        }
+        .mx-3 {
+            margin-left: 1rem;
+            margin-right: 1rem;
+        }
+        .mx-4 {
+            margin-left: 1.5rem;
+            margin-right: 1.5rem;
+        }
+        .mx-5 {
+            margin-left: 3rem;
+            margin-right: 3rem;
+        }
+    
+        .px-0 {
+            padding-left: 0rem;
+            padding-right: 0rem;
+        }
+        .px-1 {
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+        }
+        .px-2 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        .px-3 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        .px-4 {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        .px-5 {
+            padding-left: 3rem;
+            padding-right: 3rem;
+        }
+    
+    
+    
+        .my-0 {
+            margin-top: 0rem;
+            margin-bottom: 0rem;
+        }
+        .my-1 {
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+        .my-2 {
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .my-3 {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .my-4 {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 1000px) {
+          .my-4 {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+          }
+          .text-xs-center {
+            padding-top: 8px;
+          }
+        }
+
+        .my-5 {
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+        }
+    
+    
+        .py-0 {
+            padding-top: 0rem;
+            padding-bottom: 0rem;
+        }
+        .py-1 {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        .py-3 {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .py-4 {
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+        .py-5 {
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+    
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        .ml-auto {
+            margin-left: auto;
+        }
+    
+        .mr-auto {
+            margin-right: auto;
+        }
+    
+        .conteiner {
+            display: flex;
+            flex-flow: column;
+        }
+    
+        .conteiner-row {
+            display: flex;
+            flex-flow: row;
+        }
+    
+        .display-1 {
+            font-size: 6rem;
+        }
+    
+        .display-2 {
+            font-size: 5rem;
+        }
+    
+        .display-3 {
+            font-size: 4rem;
+        }
+    
+        .display-4 {
+            font-size: 3rem;
+        }
+    
+        .h1 {
+            font-size: 2.2rem;
+        }
+    
+        .h2 {
+            font-size: 1.5rem;
+        }
+    
+        .h3 {
+            font-size: 1rem;
+        }
+    
+        .h4 {
+            font-size: 0.5rem;
+        }
+    
+        .h5 {
+            font-size: 0.25rem;
+        }
+    
+        .t-b {
+            font-weight: bold;
+        }
+    
+        .text-pink {
+            color: #d328ae;
+        }
+
+        .text-blue {
+            color: #3d92fd;
+        }
+    
+        .text-white {
+            color: #fff;
+        }
+    
+        .text-dark {
+            color: #000;
+        }
+    
+        .text-align-center {
+            text-align: center;
+        }
+    
+        .text-start {
+            text-align: start;
+        }
+    
+        .text-end {
+            text-align: end;
+        }
+    
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Koulen&family=Lato&family=Nunito&family=Playfair+Display:ital@1&family=Prata&family=Raleway:ital,wght@1,100&family=Roboto&family=Roboto+Condensed&family=Teko&display=swap');
+    
+        .btn-dark {
+            font-family: Roboto, sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: #fff;
+            background-color: #000000;
+            padding: 10px 30px;
+            border: solid #000 2px;
+            box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+            border-radius: 8px;
+            transition : 1000ms;
+            transform: translateY(0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+    
+        .btn-dark:hover{
+            transition : 1000ms;
+            padding: 10px 50px;
+            transform : translateY(-0px);
+            background-color: #121212;
+            color: #ffffff;
+            border: solid 2px #292929;
+        }
+    
+    
+        .btn-warning {
+            font-family: Roboto, sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: #000000;
+            background-color: #bdd61c;
+            padding: 10px 30px;
+            border: solid #bdd61c 2px;
+            box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+            border-radius: 8px;
+            transition : 1000ms;
+            transform: translateY(0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+    
+        .btn-warning:hover{
+            transition : 1000ms;
+            padding: 10px 50px;
+            transform : translateY(-0px);
+            background-color: #e1ff00;
+            color: #000000;
+            border: solid 2px #bdd61c;
+        }
+    
+        .btn-white {
+            font-family: Roboto, sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: #000000;
+            background-color: #ffffff;
+            padding: 10px 30px;
+            border: solid #ffffff 2px;
+            box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+            border-radius: 8px;
+            transition : 1000ms;
+            transform: translateY(0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            }
+    
+        .btn-white:hover{
+            transition : 1000ms;
+            padding: 10px 50px;
+            transform : translateY(-0px);
+            background-color: #fff;
+            color: #0d0d0d;
+            border: solid 2px #ababab;
+        }
+    
+        .btn-rainbow {
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: Roboto, sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 10px 30px;
+            color: #fff;
+            box-shadow: 0 0 6px 0 rgba(157, 96, 212, 0.5);
+            border: solid 3px transparent;
+            background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), linear-gradient(101deg, #ff48fa, #BDD61C);
+            background-origin: border-box;
+            background-clip: content-box, border-box;
+            box-shadow: 2px 1000px 1px #181917 inset;
+        }
+    
+    
+    
+        .btn-rainbow:hover {
+            box-shadow: none;
+            color: white;
+            transition : 1000ms;
+            transform : translateY(-0px);
+        }
+    
+        .md-header {
+            display: none;
+        }
+
+        .md-tabs {
+            display: none;
+        }
+    
+        .box-shadow {
+            box-shadow: -5px 5px 10px 1px rgb(0 0 0 / 75%);
+        }
+    
+        .custom-paragraph:not([hasInfo]) {
+            display: none;
+        }
+    
+        .main-background {
+            background: rgba(79, 79, 175, 0.52);
+            background: linear-gradient(0deg, rgb(174, 174, 178, 0.52) 0%, rgba(0, 101, 203, 0) 30%);
+        }
+        /* rgba(36, 37, 113, 0.265) */
+        .blue-background {
+            background: rgba(174, 174, 178, 0.52);
+        }
+
+        .first-gradiant-body {
+            background: hsla(316, 100%, 63%, 1);
+            background: linear-gradient(0deg, hsla(316, 100%, 63%, 1) 0%, hsla(2, 62%, 69%, 1) 33%, hsla(68, 77%, 47%, 1) 87%);
+        }
+    
+        .second-gradiant-body {
+            background: hsla(316, 100%, 63%, 1);
+            background: linear-gradient(180deg, hsla(316, 100%, 63%, 1) 0%, hsla(2, 62%, 69%, 1) 33%, hsla(68, 77%, 47%, 1) 87%);
+        }
+    
+        .stack-tenology-gradient {
+            background: hsla(316, 100%, 63%, 1);
+            background: linear-gradient(90deg, hsla(316, 100%, 63%, 1) 0%, hsla(2, 62%, 69%, 1) 33%, hsla(68, 77%, 47%, 1) 87%);
+        }
+    
+        .third-dark-body {
+            background-color: #181917;
+        }
+    
+        .four-gray-body {
+            background-color: #D0D0D0;
+        }
+    
+        .bg-dark {
+            background-color: #181917;
+        }
+    
+        .w-100 {
+            width: 100%;
+        }
+    
+        .w-70 {
+            width: 70%;
+        }
+    
+        .w-50 {
+            width: 50%;
+        }
+    
+        .w-25 {
+            width: 25%;
+        }
+    
+        .w-10 {
+            width: 10%;
+        }
+    
+        .ctx-header-text {
+            flex:60%;
+            order:0;
+            display:flex;
+            color: #000
+        }
+    
+        .ctx-header-img {
+            flex:40%;
+            order:1;
+            display:flex;
+            flex-flow:column;
+        }
+    
+        .ctx-card-white-1 {
+            flex:50%;
+            order:0;
+            justify-content: center;
+        }
+    
+        .ctx-what-is {
+            order:0;
+            flex: 50%;
+            width: 50%;
+        }
+    
+        .laverage-header-img {
+            width: 55%;
+            margin-left: auto;
+        }
+    
+        .laverage-mac-img {
+            width: 200%;
+            margin-left: auto;
+        }
+    
+        .why-laverage-img {
+            width: 25%;
+            left: 60%;
+            position: relative;
+        }
+    
+        .laverage-mac2-img {
+            width: 60%;
+            left: 10%;
+            position: relative;
+        }
+    
+        .card-white {
+            width: 100%;
+            background-color: white;
+            border-radius: 60px 0px 60px 0px;
+        }
+    
+        .card-rainbow {
+            position: relative;
+            bottom: -170px;
+            border-radius: 15px;
+            width: 80%;
+            min-height: 600px;
+        }
+    
+        .leverage-title-logo {
+            margin-bottom: -10px;
+        }
+    
+        .md-main {
+            padding: 0px;
+        }
+    
+        .md-footer {
+            display: none;
+        }
+    
+        .item-social-media:hover {
+            background-color: #6a7a00;
+            border-radius: 10px;
+        }
+    
+        .item-text-footer:hover {
+            color:#c8ff00
+        }
+    
+    
+        @media (min-width: 1220px) {
+    
+            .conteiner-row-lg {
+                display: flex;
+                flex-flow: row;
+            }
+    
+            .d-xl-none {
+                display: none;
+            }
+    
+            .pt-lg-5 {
+                padding-top: 3rem;
+            }
+    
+            .my-xl-5 {
+                margin-top: 3rem;
+                margin-bottom: 3rem;
+            }
+    
+            .my-xl-4 {
+                margin-top: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+    
+            .my-xl-0 {
+                margin-left: 0rem;
+                margin-right: 0rem;
+            }
+    
+            .mx-xl-auto {
+                margin-left: auto;
+                margin-right: auto;
+            }
+    
+            .mx-xl-0 {
+                margin-left: 0rem;
+                margin-right: 0rem;
+            }
+    
+            .text-end-xl {
+                text-align: end;
+            }
+    
+            .text-start-xl {
+                text-align: start;
+            }
+    
+            .btn-xl-large:hover {
+                font-size: 22px;
+                padding: 15px 50px;
+            }
+    
+            .btn-lg-large {
+                font-size: 22px;
+                padding: 15px 30px;
+            }
+    
+            .btn-rainbow-custom {
+                margin-top: 15rem;
+            }
+    
+            .md-main {
+                display: none;
+            }
+    
+            .md-header__title .md-header__ellipsis .md-header__topic{
+                background-image: url(../assets/images/logos/binbash-nav-icon.svg);
+                height: 40px;
+                width: 150px;
+                background-repeat: no-repeat;
+                margin-top: 10px;
+            }
+    
+            .md-header__topic .md-ellipsis {
+                display: none;
+            }
+        }
+    
+        @media (min-width: 960px) and (max-width: 1219px)  {
+    
+            .conteiner-row-xl{
+                display: flex;
+                flex-flow: row;
+            }
+            
+            .d-lg-none {
+                display: none;
+            }
+            .d-xl {
+                display: none;
+            }
+    
+            .pt-lg-5 {
+                padding-top: 3rem;
+            }
+    
+            .my-lg-5 {
+                margin-top: 3rem;
+                margin-bottom: 3rem;
+            }
+    
+            .my-lg-4 {
+                margin-top: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+    
+            .mx-lg-0 {
+                margin-left: 0rem;
+                margin-right: 0rem;
+            }
+    
+            .mx-lg-5 {
+                margin-left: 3rem;
+                margin-right: 3rem;
+            }
+    
+            .ctx-card-white-1 {
+                flex:100%;
+            }
+    
+            .text-end-lg {
+                text-align: end;
+            }
+    
+            .text-start-lg {
+                text-align: start;
+            }
+    
+            .btn-xl-large:hover {
+                font-size: 22px;
+                padding: 15px 50px;
+            }
+    
+            .btn-lg-large {
+                font-size: 22px;
+                padding: 15px 30px;
+            }
+    
+            .btn-rainbow-custom {
+                margin-top: 15rem;
+            }
+    
+        }
+    
+        @media (min-width: 720px) and (max-width: 959px) {
+            .d-md-none {
+                display: none;
+            }
+            .d-xl {
+                display: none;
+            }
+            .d-lg-mid {
+                display:contents;
+            }
+            .d-sm {
+                display: none;
+            }
+            .d-lg {
+                display: none;
+            }
+    
+            .my-md-5 {
+                margin-top: 3rem;
+                margin-bottom: 3rem;
+            }
+    
+            .mx-md-auto {
+                margin-left: auto;
+                margin-right: auto;
+            }
+    
+            .ctx-header-text {
+                flex:100%;
+            }
+    
+            .ul-home {
+                width: 300px;
+            }
+    
+            .ctx-what-is {
+                width: 70%;
+            }
+    
+            .why-laverage-img {
+                width: 60%;
+                left: 0%;
+                position: relative;
+                margin-left: auto;
+                margin-right: auto;
+            }
+    
+            .laverage-mac2-img {
+                width: 100%;
+                left: 0%;
+                position: relative;
+            }
+    
+            .laverage-header-img {
+                width: 35%;
+            }
+    
+        }
+    
+         @media (min-width: 540px) and (max-width: 719px) {
+            .d-sm-none {
+                display:contents;
+            }
+            .d-xl {
+                display: none;
+            }
+            .d-sm {
+                display: none;
+            }
+            .d-lg {
+                display: none;
+            }
+            .d-md {
+                display: none;
+            }
+    
+            .mx-sm-auto {
+                margin-left: auto;
+                margin-right: auto;
+            }
+    
+            .my-sm-5 {
+                margin-top: 3rem;
+                margin-bottom: 3rem;
+            }
+    
+            .ul-home {
+                width: 300px;
+            }
+    
+            .ctx-what-is {
+                width: 70%;
+            }
+    
+            .why-laverage-img {
+                width: 60%;
+                left: 0%;
+                position: relative;
+                margin-left: auto;
+                margin-right: auto;
+            }
+    
+            .laverage-mac2-img {
+                width: 100%;
+                left: 0%;
+                position: relative;
+            }
+    
+            .laverage-header-img {
+                width: 35%;
+            }
+    
+        }
+    
+    
+         @media (min-width: 300px) and (max-width: 539px) {
+            .d-xs-none {
+                display: none;
+            }
+            .d-xl {
+                display: none;
+            }
+            .d-sm {
+                display: none;
+            }
+            .d-lg {
+                display: none;
+            }
+            .d-md {
+                display: none;
+            }
+            /* .d-sm {
+                display: none;
+            } */
+    
+            .text-xs-center {
+                text-align: center;
+            }
+    
+            .h1 {
+                font-size: 2.2rem;
+            }
+    
+            .leverage-title-logo {
+                margin-bottom: -5px;
+            }
+    
+            .conteiner-xs {
+                display: flex;
+                flex-flow: column;
+            }
+    
+            .mx-xs-auto {
+                margin-left: auto;
+                margin-right: auto;
+            }
+    
+            .my-xs-5 {
+                margin-top: 3rem;
+                margin-bottom: 3rem;
+            }
+    
+            .ul-home {
+                width: 300px;
+            }
+    
+            .ctx-what-is {
+                width: 70%;
+            }
+    
+            .laverage-mac-img {
+                width: 300%;
+            }
+    
+            .why-laverage-img {
+                width: 60%;
+                left: 0%;
+                position: relative;
+                margin-left: auto;
+                margin-right: auto;
+            }
+    
+            .laverage-mac2-img {
+                width: 100%;
+                left: 0%;
+                position: relative;
+            }
+    
+    
+        }
+    
+    
+    
+    
+    
+        .md-header {
+            position: initial
+        }
+    
+        .md-main__inner {
+            margin: 0
+        }
+    
+        .md-footer-copyright {
+            display: none
+        }
+    
+        .md-footer-nav__inner {
+            display: none
+        }
+    
+        .md-content {
+            display: none
+        }
+    
+        .md-footer-meta__inner {
+            align-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+    
+        /*
+         Table of content font color
+        */
+        a.md-nav__link {
+            color: #303C55;
+            text-decoration: none;
+        }
+    
+        .tx-container {
+            --md-primary-fg-color: #181917;
+            height: fit-content;
+            padding-top: 0rem;
+            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: white' /></svg>") no-repeat bottom, linear-gradient(to bottom, var(--md-primary-fg-color), #2a978d 99%, #fff 99%)
+        }
+    
+        .tx-hero {
+            color: var(--md-primary-bg-color);
+            justify-content: right;
+        }
+    
+        .tx-hero h1 {
+            margin-bottom: 0rem;
+            color: currentColor;
+            font-weight: 700
+        }
+    
+        .tx-hero__content {
+            padding-bottom: 9rem;
+            justify-content: left;
+            padding-right: 3rem;
+        }
+    
+        .tx-hero__content_small {
+            justify-content: left;
+            padding-right: 3rem;
+        }
+    
+        .tx-hero__image {
+            max-width: 100%;
+            max-height: 100%;
+            order: 1;
+            padding-right: 2.5rem;
+        }
+    
+        .tx-hero .md-button {
+            margin-top: .5rem;
+            margin-right: .5rem;
+            color: var(--md-primary-bg-color)
+        }
+    
+        .tx-hero .md-button--primary {
+            background-color: var(--md-primary-bg-color);
+            color: hsla(280deg, 37%, 48%, 1);
+            border-color: var(--md-primary-bg-color)
+        }
+    
+        .tx-hero .md-button:focus,
+        .tx-hero .md-button:hover {
+            background-color: var(--md-accent-fg-color);
+            color: var(--md-default-bg-color);
+            border-color: var(--md-accent-fg-color)
+        }
+    
+        .tx-container-2 {
+            padding: 0rem;
+            background-color: white;
+            margin-bottom: 0px;
+        }
+    
+        .tx-hero__image-2 {
+            max-width: 100%;
+            max-height: 100%;
+            order: 1;
+            padding-right: 0.5rem;
+            padding-left: 0rem;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            float: left;
+        }
+    
+        .tx-hero__content-2 {
+            margin-left: 50px;
+            justify-content: left;
+            color: #2a978d;
+            font-weight: 300;
+            padding: 0 0px;
+            padding-bottom: 40px;
+            word-break: break-word;
+            float: right;
+        }
+    
+        .tx-hero__content-2 h1 {
+            margin-top: 50px;
+            color: #2a978d;
+            font-weight: 600;
+            font-size: 36px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: normal;
+            /*font-family: inherit;*/
+        }
+    
+        .tx-hero__content-2 p {
+            font-size: 17px;
+            line-height: 1.8em;
+            text-rendering: optimizeLegibility;
+            color: black;
+            display: block;
+        }
+    
+        .tx-hero__content-2 a:link {
+            color: #2a978d;
+        }
+    
+        .tx-hero__content-2 a:visited {
+            color: #2a978d;
+        }
+    
+        .tx-container-3 {
+            --md-primary-fg-color: #181917;
+            height: auto;
+            background: linear-gradient(to bottom, var(--md-primary-fg-color), #181917 100%, #fff 99%);
+        }
+    
+        .tx-container-4 {
+            height: auto;
+            background: linear-gradient(to bottom, #2a978d, #181917 99%, #fff 99%);
+        }
+    
+        .tx-container-testimonial {
+            height: auto;
+            background: #EDEFF0;
+        }
+    
+        .tx-hero__image-3 {
+            max-width: 100%;
+            max-height: 100%;
+            order: 1;
+            padding-right: 2.5rem;
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+    
+        .tx-hero__image-4 {
+            max-width: 100%;
+            max-height: 100%;
+            order: 1;
+            padding-right: 2.5rem;
+            padding-top: 5px;
+            padding-bottom: 15px;
+        }
+    
+        .tx-footer {
+            margin: 0px 0rem;
+            background-color: white;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        .tx-hero__content-footer {
+            justify-content: left;
+            color: #2a978d;
+            font-weight: 300;
+            padding: 0 0px;
+            word-break: break-word;
+            float: left;
+        }
+    
+        .tx-footer p {
+            font-size: 12px;
+            line-height: 1.8em;
+            text-rendering: optimizeLegibility;
+            color: black;
+            display: block;
+            font-family: inherit;
+        }
+    
+        /**/
+        /*Adjusting Mobile UI */
+        /**/
+        @media screen and (max-width: 30em) {
+            .tx-hero h1 {
+                font-size: 1.4rem
+            }
+    
+            .tx-hero__content {
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+    
+            .tx-hero__content_small {
+                margin-bottom: 50px;
+                margin-left: 20px;
+                margin-right: 20px;
+                font-size: 1.1rem;
+            }
+    
+            .tx-hero__content-2 {
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+    
+            .tx-hero__content-3 {
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+    
+            .md-typeset .md-button {
+                font-size: 14px;
+            }
+        }
+    
+        @media screen and (min-width: 60em) {
+            .md-sidebar--secondary {
+                display: none
+            }
+    
+            .tx-hero {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+    
+            .tx-hero__content {
+                max-width: 28rem;
+                margin-top: 3.5rem;
+                margin-bottom: 3.5rem;
+                margin-left: 1.0rem;
+                margin-right: 4.0rem;
+                align-items: center;
+            }
+        }
+    
+        @media screen and (min-width: 76.25em) {
+            .md-sidebar--primary {
+                display: none
+            }
+    
+            .top-hr {
+                width: 100%;
+                display: flex;
+                max-width: 61rem;
+                margin-right: auto;
+                margin-left: auto;
+                padding: 0 .2rem;
+            }
+    
+            .bottom-hr {
+                margin-top: 10px;
+                width: 100%;
+                display: flex;
+                max-width: 61rem;
+                margin-right: auto;
+                margin-left: auto;
+                padding: 0 .2rem;
+            }
+        }
+    
+        .text-center {
+            text-align: center;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+            margin-top: 15px;
+            font-size: 23px;
+            font-weight: 300;
+            padding-bottom: 10px;
+        }
+    
+        .logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-flow: row wrap;
+            margin: 0 auto;
+        }
+    
+        .logos img {
+            flex: 1 1 auto;
+            padding: 25px;
+            max-height: 130px;
+            vertical-align: middle;
+        }
+    </style>
+    
+    <!-- Table Style -->
+    <style>
+        .table-wrapper{
+            margin: 10px 70px 70px;
+            box-shadow: 0px 35px 50px rgba( 0, 0, 0, 0.2 );
+        }
+    
+        .fl-table {
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: normal;
+            border: none;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 100%;
+            white-space: nowrap;
+            background-color: white;
+        }
+    
+        .fl-table td, .fl-table th {
+            text-align: left;
+            padding: 8px;
+        }
+    
+        .fl-table td {
+            border-right: 1px solid #f8f8f8;
+            font-size: 16px;
+        }
+    
+        .fl-table thead th {
+            color: #181917;
+            background: #D5EE1C;
+        }
+    
+    
+        .fl-table thead th:nth-child(odd) {
+            color: #ffffff;
+            background: #181917;
+        }
+    
+        .fl-table tr:nth-child(even) {
+            background: #F8F8F8;
+        }
+    
+        /* Responsive */
+    
+        @media (max-width: 767px) {
+            .fl-table {
+                display: block;
+                width: 100%;
+            }
+            .table-wrapper:before{
+                content: "Scroll horizontally >";
+                display: block;
+                text-align: right;
+                font-size: 10px;
+                color: white;
+                padding: 0 0 10px;
+            }
+            .fl-table thead, .fl-table tbody, .fl-table thead th {
+                display: block;
+            }
+            .fl-table thead th:last-child{
+                border-bottom: none;
+            }
+            .fl-table thead {
+                float: left;
+            }
+            .fl-table tbody {
+                width: auto;
+                position: relative;
+                overflow-x: auto;
+            }
+            .fl-table td, .fl-table th {
+                padding: 20px .625em .625em .625em;
+                height: 90px;
+                vertical-align: middle;
+                box-sizing: border-box;
+                overflow-x: hidden;
+                overflow-y: auto;
+                width: 110px;
+                font-size: 8px;
+                text-overflow: ellipsis;
+            }
+            .fl-table thead th {
+                text-align: left;
+                border-bottom: 1px solid #f7f7f9;
+            }
+            .fl-table tbody tr {
+                display: table-cell;
+            }
+            .fl-table tbody tr:nth-child(odd) {
+                background: none;
+            }
+            .fl-table tr:nth-child(even) {
+                background: transparent;
+            }
+            .fl-table tr td:nth-child(odd) {
+                background: #F8F8F8;
+                border-right: 1px solid #E6E4E4;
+            }
+            .fl-table tr td:nth-child(even) {
+                border-right: 1px solid #E6E4E4;
+            }
+            .fl-table tbody td {
+                display: block;
+                text-align: center;
+            }
+        }
+    
+    </style>
+    
+    <!-- Testimonial Section Style -->
+    <style>
+        *{
+            box-sizing: border-box
+        }
+        body{
+            margin: 0;
+            padding: 0;
+            font-family: Helvetica;
+            font-weight: 100;
+            color: #777;
+        }
+        .container-testimonial{
+            background: rgb(237, 239, 240);
+            height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            margin-left: 150px;
+            margin-right: 150px;
+    
+        }
+    
+        .testimonial-header{
+            margin-top: 50px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            position: center;
+            justify-content:center;
+            font-size: 42px;
+            color: #2a978d;
+        }
+    
+        .testimonial-card{
+            min-height: 400px;
+            width: 350px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,.3);
+            display: flex;
+            flex-flow: column;
+            justify-content:space-between;
+            margin-left: 10px;
+        }
+    
+        .text{
+            padding: 2em;
+            line-height: 1.7em;
+            position: relative;
+            font-size: 14px;
+            color: #181917;
+            margin-bottom: 50px;
+        }
+        .image{
+            background-color:tomato;
+            height: 120px;
+            width: 120px;
+            border-radius: 50%;
+            border: 5px solid white;
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            display:flex;
+            justify-content:center;
+        }
+    
+        .footer{
+            background: linear-gradient(90deg, #181917 0%, #2a978d 100%);
+            height: 165px;
+            border-radius: 0 0 10px 10px;
+            position:relative;
+        }
+    
+        .quote{
+            font-size: 400%;
+            float: right;
+            opacity: .1;
+            transform: rotate(10deg) translate(-10px, -40px);
+            color:#4D3FA3;
+        }
+    
+        .person{
+            color:white;
+            position: absolute;
+            margin-top: 0px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -100%);
+            font-size: 1rem;
+            font-weight: 550;
+        }
+    
+        .person-title{
+            color:white;
+            position: absolute;
+            margin-top: 10px;
+            top: 90%;
+            left: 50%;
+            transform: translate(-50%, -100%);
+            font-size:0.7rem;
+            font-weight: 300;
+        }
+    
+        @media screen and (max-width: 30em) {
+            .container-testimonial{
+                background: rgb(237, 239, 240);
+                height: 50vh;
+                display: table;
+                align-items: center;
+                justify-content: left;
+                margin-bottom: 30px;
+                margin-left: 5px;
+                margin-right: 5px;
+            }
+    
+            .testimonial-card {
+                min-height: 400px;
+                width: 350px;
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: 0 8px 30px rgb(0 0 0 / 30%);
+                display: flex;
+                flex-flow: column;
+                justify-content: space-between;
+                margin-left: 10px;
+                margin-bottom: 5px;
+        }
+            .testimonial-header{
+                margin-top: 50px;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                position: center;
+                justify-content:center;
+                font-size: 24px;
+                color: #2a978d;
+            }
+        }
+    
+        @media only screen and (min-width: 481px) and (max-width: 1600px) {
+            .container-testimonial{
+                background: rgb(237, 239, 240);
+                height: 50vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 100px;
+                margin-bottom: 100px;
+                margin-left: 150px;
+                margin-right: 150px;
+            }
+        }
+    
+    </style>
+    
+    <!-- Subscription Section Style -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+    
+        body {
+            background: #FFFFFF;
+            color: #FFF;
+            font-size: 62.5%;
+            font-family: 'Roboto', Arial, Helvetica, Sans-serif, Verdana;
+        }
+    
+        ul {
+            list-style-type: none;
+        }
+    
+        .pricing-table-title {
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 2.6em;
+            color: #2a978d;
+            margin-top: 15px;
+            text-align: left;
+            margin-bottom: 25px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+        }
+    
+        .pricing-table-title a {
+            font-size: 0.6em;
+        }
+    
+        .clearfix:after {
+            content: '';
+            display: block;
+            height: 0;
+            width: 0;
+            clear: both;
+        }
+    
+        /** ========================
+         * Container
+         ============================*/
+        .pricing-wrapper {
+            width: 1360px;
+            padding-bottom: 40px;
+            margin: 40px auto 0;
+        }
+    
+        .pricing-table {
+            margin: 0 10px;
+            text-align: center;
+            width: 300px;
+            float: left;
+            -webkit-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+            -webkit-transition: all 0.25s ease;
+            -o-transition: all 0.25s ease;
+            transition: all 0.25s ease;
+        }
+    
+        .pricing-table:hover {
+            -webkit-transform: scale(1.06);
+            -ms-transform: scale(1.06);
+            -o-transform: scale(1.06);
+            transform: scale(1.06);
+        }
+    
+        .pricing-title {
+            color: #FFF;
+            background: #172a45;
+            padding: 20px 0;
+            font-size: 2em;
+            text-transform: uppercase;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+        }
+    
+        .pricing-table.recommended .pricing-title {
+            background: #2a978d;
+        }
+    
+        .pricing-table.recommended .pricing-action {
+            background: #2a978d;
+        }
+    
+        .pricing-table .price {
+            background: #403e3d;
+            font-size: 3.4em;
+            font-weight: 700;
+            padding: 20px 0;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+        }
+    
+        .pricing-table .price sup {
+            font-size: 0.4em;
+            position: relative;
+            left: 5px;
+        }
+    
+        .table-list {
+            background: #FFF;
+            color: #403d3a;
+        }
+    
+        .table-list li {
+            font-size: 1.4em;
+            font-weight: 700;
+            padding: 12px 8px;
+        }
+    
+    /*    .table-list li:before {
+            content: "\f00c";
+            font-family: 'FontAwesome';
+            color: #3fab91;
+            display: inline-block;
+            position: relative;
+            right: 5px;
+            font-size: 16px;
+        }*/
+    
+        .table-list li span {
+            font-weight: 400;
+        }
+    
+        .table-list li span.unlimited {
+            color: #FFF;
+            background: #172a45;
+            font-size: 0.9em;
+            padding: 5px 7px;
+            display: inline-block;
+            -webkit-border-radius: 38px;
+            -moz-border-radius: 38px;
+            border-radius: 38px;
+        }
+    
+    
+        .table-list li:nth-child(2n) {
+            background: #F0F0F0;
+        }
+    
+        .table-buy {
+            background: #FFF;
+            padding: 15px;
+            text-align: left;
+            overflow: hidden;
+        }
+    
+        .table-buy p {
+            float: left;
+            color: #37353a;
+            font-weight: 700;
+            font-size: 2.4em;
+        }
+    
+        .table-buy p sup {
+            font-size: 0.5em;
+            position: relative;
+            left: 5px;
+        }
+    
+        .table-buy .pricing-action {
+            float: right;
+            color: #FFF;
+            background: #172a45;
+            padding: 10px 16px;
+            -webkit-border-radius: 2px;
+            -moz-border-radius: 2px;
+            border-radius: 2px;
+            font-weight: 700;
+            font-size: 1.4em;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+            -webkit-transition: all 0.25s ease;
+            -o-transition: all 0.25s ease;
+            transition: all 0.25s ease;
+        }
+    
+        .table-buy .pricing-action:hover {
+            background: #2a978d;
+        }
+    
+        .recommended .table-buy .pricing-action:hover {
+            background: #172a45;
+        }
+    
+        /** ================
+         * Responsive
+         ===================*/
+        @media only screen and (min-width: 768px) and (max-width: 959px) {
+            .pricing-wrapper {
+                width: 768px;
+            }
+    
+            .pricing-table {
+                width: 236px;
+            }
+    
+            .table-list li {
+                font-size: 1.3em;
+            }
+    
+        }
+    
+        @media only screen and (max-width: 767px) {
+            .pricing-wrapper {
+                width: 420px;
+            }
+    
+            .pricing-table {
+                display: block;
+                float: none;
+                margin: 0 0 20px 0;
+                width: 100%;
+            }
+        }
+    
+        @media only screen and (max-width: 479px) {
+            .pricing-wrapper {
+                width: 300px;
+            }
+        }
+    </style>
+    
+    <!-- Subscription Section Tooltip Style -->
+    <style>
+        /*
+      You want a simple and fancy tooltip?
+      Just copy all [data-tooltip] blocks:
+    */
+        [data-tooltip] {
+            position: relative;
+            z-index: 10;
+        }
+    
+        /* Positioning and visibility settings of the tooltip */
+        [data-tooltip]:before,
+        [data-tooltip]:after {
+            position: absolute;
+            visibility: hidden;
+            opacity: 0;
+            left: 50%;
+            bottom: calc(100% + 5px); /* 5px is the size of the arrow */
+            pointer-events: none;
+            transition: 0.2s;
+            will-change: transform;
+        }
+    
+        /* The actual tooltip with a dynamic width */
+        [data-tooltip]:before {
+            content: attr(data-tooltip);
+            padding: 10px 18px;
+            min-width: 50px;
+            max-width: 300px;
+            width: max-content;
+            width: -moz-max-content;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: rgba(59, 72, 80, 0.9);
+            background-image: linear-gradient(30deg,
+            rgba(59, 72, 80, 0.44),
+            rgba(59, 68, 75, 0.44),
+            rgba(60, 82, 88, 0.44));
+            box-shadow: 0px 0px 24px rgba(0, 0, 0, 0.2);
+            color: #fff;
+            text-align: center;
+            white-space: pre-wrap;
+            transform: translate(-50%, -5px) scale(0.5);
+        }
+    
+        /* Tooltip arrow */
+        [data-tooltip]:after {
+            content: '';
+            border-style: solid;
+            border-width: 5px 5px 0px 5px; /* CSS triangle */
+            border-color: rgba(55, 64, 70, 0.9) transparent transparent transparent;
+            transition-duration: 0s; /* If the mouse leaves the element,
+                                  the transition effects for the
+                                  tooltip arrow are "turned off" */
+            transform-origin: top;   /* Orientation setting for the
+                                  slide-down effect */
+            transform: translateX(-50%) scaleY(0);
+        }
+    
+        /* Tooltip becomes visible at hover */
+        [data-tooltip]:hover:before,
+        [data-tooltip]:hover:after {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* Scales from 0.5 to 1 -> grow effect */
+        [data-tooltip]:hover:before {
+            transition-delay: 0.3s;
+            transform: translate(-50%, -5px) scale(1);
+        }
+        /*
+          Arrow slide down effect only on mouseenter (NOT on mouseleave)
+        */
+        [data-tooltip]:hover:after {
+            transition-delay: 0.5s; /* Starting after the grow effect */
+            transition-duration: 0.2s;
+            transform: translateX(-50%) scaleY(1);
+        }
+        /*
+          That's it.
+        */
+    
+        /*
+          If you want some adjustability
+          here are some orientation settings you can use:
+        */
+    
+        /* LEFT */
+        /* Tooltip + arrow */
+        [data-tooltip-location="left"]:before,
+        [data-tooltip-location="left"]:after {
+            left: auto;
+            right: calc(100% + 5px);
+            bottom: 50%;
+        }
+    
+        /* Tooltip */
+        [data-tooltip-location="left"]:before {
+            transform: translate(-5px, 50%) scale(0.5);
+        }
+        [data-tooltip-location="left"]:hover:before {
+            transform: translate(-5px, 50%) scale(1);
+        }
+    
+        /* Arrow */
+        [data-tooltip-location="left"]:after {
+            border-width: 5px 0px 5px 5px;
+            border-color: transparent transparent transparent rgba(55, 64, 70, 0.9);
+            transform-origin: left;
+            transform: translateY(50%) scaleX(0);
+        }
+        [data-tooltip-location="left"]:hover:after {
+            transform: translateY(50%) scaleX(1);
+        }
+    
+        /* RIGHT */
+        [data-tooltip-location="right"]:before,
+        [data-tooltip-location="right"]:after {
+            left: calc(100% + 5px);
+            bottom: 50%;
+        }
+    
+        [data-tooltip-location="right"]:before {
+            transform: translate(5px, 50%) scale(0.5);
+        }
+        [data-tooltip-location="right"]:hover:before {
+            transform: translate(5px, 50%) scale(1);
+        }
+    
+        [data-tooltip-location="right"]:after {
+            border-width: 5px 5px 5px 0px;
+            border-color: transparent rgba(55, 64, 70, 0.9) transparent transparent;
+            transform-origin: right;
+            transform: translateY(50%) scaleX(0);
+        }
+        [data-tooltip-location="right"]:hover:after {
+            transform: translateY(50%) scaleX(1);
+        }
+    
+        @media (max-height: 450px) {
+            main {
+                margin: 2rem 0;
+            }
+        }
+    
+        @media (max-width: 800px) {
+            html {
+                font-size: 0.9em;
+            }
+        }
+    
+        /* Thumbnail settings */
+        @media (max-width: 750px) {
+            html {
+                animation-duration: 0.6s;
+                font-size: 1em;
+            }
+            body {
+                display: flex;
+                background: none;
+                height: 100%;
+                margin: 0px;
+            }
+            main {
+                font-size: 1.1em;
+                padding: 6%;
+            }
+            .info-wrapper p:before,
+            .info-wrapper p:after {
+                display: none;
+            }
+            .example-elements {
+                max-width: 150px;
+                font-size: 22px;
+            }
+            .example-elements a, button {
+                display: none;
+            }
+            .example-elements p:before,
+            .example-elements p:after {
+                visibility: visible;
+                opacity: 1;
+            }
+            .example-elements p:before {
+                content: "Tooltip";
+                font-size: 20px;
+                transform: translate(-50%, -5px) scale(1);
+            }
+            .example-elements p:after {
+                transform: translate(-50%, -1px) scaleY(1);
+            }
+    
+    
+            [data-tooltip]:after {
+                bottom: calc(100% + 3px);
+            }
+            [data-tooltip]:after {
+                border-width: 7px 7px 0px 7px;
+            }
+        }
+    </style>
+    
+
+<!-- =========================
+     TOP BANNER
+============================ -->
+<div id="top-banner" style="background:#3B82F6; color:white; text-align:center; padding:8px 16px; position:relative;">
+  <span>KubeStellar is now a Cloud Native Computing Foundation sandbox project! 🎉 Follow us</span>
+  <a href="https://www.linkedin.com/company/kubestellar/" target="_blank" rel="noopener noreferrer"
+     style="color:white; text-decoration:underline; margin-left:4px;">
+    @kubestellar on LinkedIn
+  </a>
+  <button onclick="document.getElementById('top-banner').style.display='none'"
+          aria-label="Close banner"
+          style="position:absolute; right:16px; top:50%; transform:translateY(-50%); background:none; border:none; color:white; cursor:pointer; font-size:1.25rem;">
+    &times;
+  </button>
+</div>
+
+<!-- =========================
+     NAVBAR
+============================ -->
+<style>
+  .navbar-container {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f3f4f6;  
+    color: #111;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .nav-links {
+    display: flex; 
+    gap: 1.2rem;
+    font-size:0.9rem;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .nav-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  /* MOBILE MENU */
+    #mobile-menu {
+    display: none;
+    flex-direction: column;
+    background:#f3f4f6;
+    color:#111;
+    padding:0.5rem 1rem;
+    text-align: center;
+    align-items: center;
+    gap: 0.5rem;  
+  }
+  #mobile-menu a {
+    text-decoration:none;
+    color:inherit;
+    padding:0.5rem 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  /* Style for action buttons in mobile menu */
+  #mobile-menu a.mobile-action {
+    padding: 8px 16px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    margin: 4px 0;
+    gap: 8px;  /* Space between icon and text */
+  }
+  #menu-btn {
+    display: none; /* Hidden by default */
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  @media only screen 
+  and (min-width: 1024px) 
+  and (max-width: 1024px) 
+  and (min-height: 1366px) {
+    .nav-links { display: none; }
+    .nav-actions { display: none; }
+    #menu-btn {
+      display: block !important;
+      font-size: 1.5rem;
+      color: inherit;
+    }
+  }
+
+  /* General tablet styles */
+  @media (max-width: 1024px) {
+    .nav-links { display: none; }
+    .nav-actions { display: none; }
+    #menu-btn {
+      display: block !important;
+      font-size: 1.5rem;
+      color: inherit;
+    }
+  }
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .nav-links {
+      font-size: 0.8rem;  /* Slightly smaller font */
+      gap: 0.8rem;  /* Reduced gap */
+    }
+
+    .nav-actions {
+      gap: 0.5rem;  /* Reduced gap */
+    }
+
+    .nav-actions a {
+      padding: 4px 6px !important;  /* Smaller padding */
+      font-size: 0.8rem;  /* Smaller font */
+    }
+
+    .nav-actions img {
+      height: 16px !important;  /* Smaller icons */
+    }
+  }
+
+  /* Large Tablet Styles (1024px to 1180px) */
+  @media (min-width: 1024px) and (max-width: 1180px) {
+    .nav-links {
+      font-size: 0.85rem;
+      gap: 1rem;
+    }
+
+    .nav-actions {
+      gap: 0.6rem;
+    }
+
+    .nav-actions a {
+      padding: 4px 8px !important;
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Mobile Styles (below 768px) */
+  @media (max-width: 767px) {
+    .nav-links { display: none; }
+    .nav-actions { display: none; }
+    #menu-btn {
+      display: block !important;
+      font-size: 1.5rem;
+      color: inherit;
+    }
+  }
+
+  /* Ensure menu button is visible on tablets when needed */
+  @media (max-width: 1024px) {
+    /* If content starts to overflow, switch to hamburger menu */
+    @media (max-width: 920px) {
+      .nav-links { display: none; }
+      .nav-actions { display: none; }
+      #menu-btn {
+        display: block !important;
+        font-size: 1.5rem;
+        color: inherit;
+      }
+    }
+  }
+
+  /* Mobile menu styling */
+  #mobile-menu a {
+    text-decoration: none;
+    color: inherit;
+    padding: 0.5rem 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #mobile-menu a.mobile-action {
+    padding: 8px 16px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    margin: 4px 0;
+    gap: 8px;
+  }
+</style>
+
+
+<div id="navbar" class="navbar-container">
+  <!-- Left side - Logo -->
+  <div style="display:flex; align-items:center; gap:1rem;">
+    <!-- Replace with your actual logo if needed -->
+    <img src="../images/KubeStellar-with-Logo-transparent-v2.png" alt="KubeStellar Logo" style="height:60px; width:auto;">
+  </div>
+
+  <!-- Center - Desktop Nav Links -->
+  <div class="nav-links">
+    <a href="direct/get-started/">Start</a>
+    <a href="readme/">About</a>
+    <a href="direct/user-guide-intro/">User Guide</a>
+    <a href="direct/contribute/">Contribute</a>
+    <a href="https://kubestellar.io/blog" target="_blank">Blog</a>
+    <a href="https://kubestellar.io/tv" target="_blank">Youtube</a>
+    <a href="https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?tab=t.0" target="_blank">Meetings</a>
+  </div>
+
+  <!-- Right side - Desktop actions -->
+  <div class="nav-actions">
+    <!-- Star on GitHub -->
+    <a href="https://github.com/kubestellar/kubestellar"
+       style="padding:4px 8px; border-radius:4px; background:#e5e7eb; color:#111; text-decoration:none; display:flex; align-items:center; gap:4px;"
+       target="_blank" rel="noopener noreferrer">
+       <img src="../icons/github.svg" alt="GitHub" style="height:20px; width:auto;">
+       Star on GitHub
+    </a>
+    <!-- Join Us -->
+    <a href="https://kubestellar.io/joinus"
+       style="padding:4px 8px; border-radius:4px; background:#e5e7eb; color:#111; text-decoration:none; display:flex; align-items:center; gap:4px;">
+       <img src="../icons/sign-in.svg" alt="Join" style="height:20px; width:auto;">
+       Join Us
+    </a>
+    <!-- Slack -->
+    <a href="https://kubestellar.io/slack"
+       style="padding:4px 8px; border-radius:4px; background:#e5e7eb; color:#111; text-decoration:none; display:flex; align-items:center; gap:4px;"
+       target="_blank" rel="noopener noreferrer">
+       <img src="../icons/slack.svg" alt="Slack" style="height:20px; width:auto;">
+       Slack
+    </a>
+  </div>
+
+  <!-- Mobile Menu Button -->
+  <button id="menu-btn" onclick="toggleMenu()">
+    <img src="../icons/hamburger.svg" alt="Menu" style="height:20px; width:auto;">
+  </button>
+</div>
+
+<!-- Mobile Nav Menu -->
+<div id="mobile-menu">
+  <a href="direct/get-started/">Start</a>
+  <a href="readme/">About</a>
+  <a href="direct/user-guide-intro/">User Guide</a>
+  <a href="direct/contribute/">Contribute</a>
+  <a href="https://kubestellar.io/blog" target="_blank">Blog</a>
+  <a href="https://kubestellar.io/tv" target="_blank">Youtube</a>
+  <a href="https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?tab=t.0" target="_blank">Meetings</a>
+  <a href="https://github.com/kubestellar/kubestellar" target="_blank" class="mobile-action">
+    <img src="../icons/github.svg" alt="GitHub" style="height:20px; width:auto;">
+    Star on GitHub
+  </a>
+  <a href="https://kubestellar.io/joinus" class="mobile-action">
+    <img src="../icons/sign-in.svg" alt="Join" style="height:20px; width:auto;">
+    Join Us
+  </a>
+  <a href="https://kubestellar.io/slack" target="_blank" class="mobile-action">
+    <img src="../icons/slack.svg" alt="Slack" style="height:20px; width:auto;">
+    Slack
+  </a>
+</div>
+
+<script>
+  function toggleMenu(){
+    const menu = document.getElementById('mobile-menu');
+    if(menu.style.display === 'flex'){
+      menu.style.display = 'none';
+    } else {
+      menu.style.display = 'flex';
+    }
+  }
+</script>
+<!-- =========================
+     HERO SECTION
+============================ -->
+<style>
+  /* SVG color override */
+  .hero-button img {
+    filter: brightness(0) invert(1); /* Makes SVGs white */
+  }
+  
+  /* Hero content responsive styling */
+  .hero-title {
+    font-size: 1.75rem;
+    white-space: nowrap; /* Keeps text in one line */
+    margin-bottom: 0.5rem;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .hero-title {
+      font-size: 1.0rem;
+      white-space: normal; /* Allows wrapping on smaller screens */
+    }
+  }
+  
+  /* Button styling */
+  .hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    gap: 12px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: transform 0.2s;
+    min-width: 200px; /* Ensure equal width */
+  }
+  
+  .hero-button:hover {
+    transform: translateY(-2px);
+  }
+</style>
+
+<!-- =========================
+     HERO SECTION
+============================ -->
+<div class="hero-container" style="
+  position: relative; 
+  min-height: 80vh; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+">
+  <img src="../images/background.png" alt="Background Image" style="
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  ">
+  <div class="hero-overlay" style="
+    position:absolute; 
+    inset:0; 
+    background:rgba(0,0,0,0.2);
+  "></div>
+  <div class="hero-content" style="
+    position:relative; 
+    z-index:2; 
+    max-width:1000px; /* Increased for title */
+    width:90%; 
+    background:rgba(0,0,0,0.5); 
+    backdrop-filter:blur(4px); 
+    border-radius:40px; 
+    color:#fff; 
+    text-align:center; 
+    padding:2rem; 
+    margin:1rem;
+  ">
+    <h1 class="hero-title">
+      Don't change anything, just add
+    </h1>
+    <img src="KubeStellar-with-Logo-transparent-v2.png" alt="KubeStellar" style="
+      width: 100%;
+      max-width: 800px; /* Increased logo size */
+      height: auto;
+      margin: 1rem 0;
+    " />
+    <p style="margin-bottom:2rem; text-shadow:1px 1px 3px rgba(0,0,0,0.7); font-size: 1rem; line-height: 1.2;">
+      Think of KubeStellar as a post office for your Kubernetes resources. Like a post office, KubeStellar doesn't open your packages; it safely stores and delivers them to selected clusters worldwide—public clouds, private clouds, or at the edge. It's a super useful solution for spreading your Kubernetes resources wherever you need them.
+    </p>
+    <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center;">
+      <a href="readme/"
+         class="hero-button"
+         style="background:#000; color:#fff;">
+        <img src="../icons/book.svg" alt="Docs" style="width:24px; height:auto;">
+        Documentation
+      </a>
+      <a href="https://kubestellar.io/joinus"
+         class="hero-button"
+         style="background:#3B82F6; color:#fff;">
+        <img src="../icons/sign-in.svg" alt="Join" style="width:24px; height:auto;">
+        Join Us
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Common section styling */
+  .sections-container {
+    background: #f8f9fa; /* Very light gray background */
+    padding: 2rem 0; /* Add some vertical padding */
+    margin-bottom: 0;
+  }
+  .section-card {
+    background: #fff;
+    color: #000;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.5rem;
+    margin: 2rem auto;
+    max-width: 1400px; 
+  }
+  .section-card:last-child {
+    margin-bottom: 0;
+  }
+  .section-title {
+    font-size: 1.5rem; 
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+
+  .section-text {
+    font-size: 0.8rem; 
+    line-height: 1.625;
+  }
+
+  .checkmark {
+    color: green;
+    font-size: 1.25rem; /* Reduced from 1.5rem */
+  }
+
+  /* GitHub icon in white */
+  .github-button img {
+    filter: brightness(0) invert(1);
+    width: 20px;
+    height: auto;
+  }
+
+  /* Image container specific styling */
+  .image-container {
+    flex: 1 1 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .image-container img {
+    border-radius: 8px;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  @media (max-width: 768px) {
+    html, body, .md-main, .md-main__inner, .md-content, .md-content__inner {
+      background: #fff !important;
+    }
+  }
+  .checkmark {
+    width: 22px;
+    height: 22px; 
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(90%) contrast(80%);
+  }
+</style>
+
+<!-- HOW IT WORKS -->
+<div class="sections-container">
+  <section class="section-card">
+    <div class="how-it-works" style="display: flex; align-items: center; gap: 2rem;">
+      <div class="image-container" style="flex: 1 1 50%;">
+        <img src="../images/kubestellar-deploy.png" alt="How It Works">
+      </div>
+      <div style="flex: 1 1 50%; display: flex; flex-direction: column; justify-content: center;">
+        <h3 class="section-title">How it works?</h3>
+        <p class="section-text">
+          Like a post office, <strong>KubeStellar</strong> doesn't open your <strong>resources</strong>. 
+          It safely stores and delivers them to selected clusters worldwide — 
+          <strong>public clouds</strong>, <strong>private clouds</strong>, or at the <strong>edge</strong>. 
+          It's a super useful solution for spreading your Kubernetes resources wherever you need them. 
+          Don't change anything, just add <strong>KubeStellar</strong>!
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREATE ONCE, DEPLOY MANY -->
+  <section class="section-card">
+    <h3 class="section-title" style="width:100%; text-align:center;">
+      Create once, Deploy many
+    </h3>
+    <ul style="text-align:left; margin:0 auto; max-width:1000px; list-style:none; padding:0;">
+      <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text"><strong>Centrally</strong> apply Kubernetes resources for selective deployment across multiple clusters</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text">Use <strong>standard Kubernetes-native deployment tools</strong> (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text">Make <strong>disconnected</strong> cluster operation possible</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text"><strong>Scale</strong> with 1:many or many:1 scenarios</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text"><strong>Remain compatible</strong> with cloud-native solutions</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; align-items:center;">
+        <img src="../icons/tick.svg" alt="✓" class="checkmark">
+        <span class="section-text">Easy to install with <strong>Helm</strong></span>
+      </li>
+    </ul>
+    <div style="margin-top:1.5rem; width:100%; text-align:center;">
+      <a href="https://github.com/kubestellar/kubestellar"
+        class="github-button"
+        style="display:inline-flex; align-items:center; background:#3B82F6; color:#fff; padding:0.75rem 1.5rem; border-radius:4px; text-decoration:none; gap:8px; font-size:1rem;">
+        <img src="../icons/github.svg" alt="GitHub">
+        Contribute on GitHub
+      </a>
+    </div>
+  </section>
+</div>
+<!-- =========================
+     FOOTER
+============================ -->
+<style>
+  /* Footer styling */
+  .footer-wrapper {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 0.1;
+  }
+
+  .footer-columns {
+    display: flex;
+    gap: 4rem;
+    flex-wrap: wrap;
+    flex: 1 1 50%;
+    padding-top:2rem;
+    justify-content: center;
+  }
+
+  .footer-section {
+    min-width: 200px;
+    flex: 0 1 auto;
+  }
+  .footer-right {
+    max-width: 400px;
+    flex: 1 1 40%;  /* Adjusted from 35% */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;  /* Align content to the left */
+  }
+
+  .footer-title {
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+  }
+
+  .footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.7rem;
+  }
+
+  .footer-list li {
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-list a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .footer-disclaimer {
+    font-size: 0.75rem; /* Smaller text */
+    line-height: 1.4;
+  }
+
+  .footer-logo {
+    width: 240px; /* Increased from 200px */
+    height: auto;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .footer-columns {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      flex: 1 1 100%;
+      gap: 2rem;
+    }
+    
+    .footer-section {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+</style>
+
+<footer style="background:#e5e7eb; color:#111; padding:2rem; margin-top:0px;">
+  <div class="footer-wrapper">
+    <!-- Left columns: Resources + Community -->
+    <div class="footer-columns">
+      <div class="footer-section">
+        <h4 class="footer-title">Resources</h4>
+        <ul class="footer-list">
+          <li><a href="direct/get-started/">Getting Started</a></li>
+          <li><a href="readme/">About Us</a></li>
+          <li><a href="direct/user-guide-intro/">User Guide</a></li>
+          <li><a href="direct/contribute/">Contributing</a></li>
+          <li><a href="https://kubestellar.io/blog">Blog</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4 class="footer-title">Community</h4>
+        <ul class="footer-list">
+          <li><a href="https://github.com/kubestellar/kubestellar">GitHub</a></li>
+          <li><a href="https://kubestellar.io/slack">Slack</a></li>
+          <li><a href="https://kubestellar.io/tv">YouTube</a></li>
+          <li><a href="https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?tab=t.0">Meetings</a></li>
+          <li><a href="https://kubestellar.io/joinus">Join Us</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right disclaimers + CNCF -->
+    <div class="footer-right">
+      <img src="../images/cncf-black.svg" alt="Cloud Native Computing Foundation"
+           style="width:300px; height:auto; margin-bottom:1.5rem;">
+           <p class="footer-disclaimer">
+            We are a <strong>Cloud Native Computing Foundation</strong>  sandbox project. Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF). The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our
+            <a href="https://www.linuxfoundation.org/legal/trademark-usage" 
+               style="text-decoration:underline; color:inherit;">
+              Trademark Usage page
+            </a>.<br>
+            © 2022-2025 The KubeStellar Authors.
+          </p>
+    </div>
+  </div>
+</footer>
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="./" title="KubeStellar" class="md-nav__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+      
+  <img src="../logo.png" alt="logo">
+
+    </a>
+    KubeStellar
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kubestellar/kubestellar" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="./" class="md-nav__link md-nav__link--active">
+              
+  
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Welcome
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    What is KubeStellar?
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            What is KubeStellar?
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="readme/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Related
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Related
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/ui-intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    KubeStellar UI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/kubeflex-intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    KubeFlex
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/galaxy-intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    KubeStellar Galaxy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/release-notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Release-notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/get-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    User Guide
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/user-guide-intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guide Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/observability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Observability
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/get-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/start-from-ocm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started from OCM
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    General Setup
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            General Setup
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/setup-overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/setup-limitations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Setup limitations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/pre-reqs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Prerequisites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5_4" id="__nav_4_5_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    KubeFlex Hosting cluster
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5_4">
+            <span class="md-nav__icon md-icon"></span>
+            KubeFlex Hosting cluster
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/acquire-hosting-cluster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Acquire cluster for KubeFlex Hosting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/init-hosting-cluster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Initialize KubeFlex Hosting cluster
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5_5" id="__nav_4_5_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Spaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5_5">
+            <span class="md-nav__icon md-icon"></span>
+            Core Spaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/its/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Inventory and Transport Spaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/wds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Workload Description Spaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/core-chart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Core Helm chart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/core-chart-argocd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Argo CD integration with Core Helm chart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5_8" id="__nav_4_5_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Workload Execution Clusters
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5_8">
+            <span class="md-nav__icon md-icon"></span>
+            Workload Execution Clusters
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/wec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    About Workload Execution Clusters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/wec-registration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Register a Workload Execution Cluster
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/usage-limitations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage limitations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6_2" id="__nav_4_6_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    KubeStellar API
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            KubeStellar API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API reference (new tab)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/binding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Binding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/transforming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transforming desired state
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/combined-status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Combining reported state
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/example-scenarios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Example Scenarios
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6_4" id="__nav_4_6_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Third-party integrations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_6_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6_4">
+            <span class="md-nav__icon md-icon"></span>
+            Third-party integrations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/argo-to-wds1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ArgoCD to WDS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6_6" id="__nav_4_6_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Known Issues
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_6_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6_6">
+            <span class="md-nav__icon md-icon"></span>
+            Known Issues
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/known-issues/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/knownissue-kflex-extension/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Hidden state in kubeconfig
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/knownissue-kind-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Kind needs OS reconfig
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/knownissue-helm-ghcr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Authorization failure while fetching Helm chart from ghcr.io
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/knownissue-collector-miss/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Missing results in a CombinedStatus object
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/installation-errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Kind host not configured for more than two clusters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/knownissue-cpu-insufficient-for-its1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Insufficient CPU for your clusters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ui-docs/ui-overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    UI (User Interface)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/teardown/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Teardown
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Contributing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview (How to join in)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/coc-inc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Code of Conduct
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/contributing-inc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guidelines
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/contributor_ladder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributor Ladder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/license-inc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    License
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/governance-inc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Governance
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/onboarding-inc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Onboarding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_8" id="__nav_5_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Website
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_8">
+            <span class="md-nav__icon md-icon"></span>
+            Website
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/operations/document-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Docs Management Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/operations/docs-styleguide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Style Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/operations/testing-doc-prs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing website PRs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_9" id="__nav_5_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Security
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_9">
+            <span class="md-nav__icon md-icon"></span>
+            Security
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/security/security-inc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Policy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribution-guidelines/security/security_contacts-inc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contacts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/packaging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Packaging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/release/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Release Process
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/release-testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Release Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="direct/pr-signoff/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sign-off and Signing Contributions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Community
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Community
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Community/_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Get Involved
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Contact Us
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            Contact Us
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/join_us" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mailing List
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/agenda" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Community Meeting Agenda (join mailing list first)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/slack" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Slack
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/blog" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Medium Blog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/tv" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    YouTube Channel
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://kubestellar.io/linkedin" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LinkedIn
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.reddit.com/r/kubestellar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Reddit
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Google Drive
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Partners
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            Partners
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Community/partners/argocd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ArgoCD
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Community/partners/turbonomic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Turbonomic
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Community/partners/mvi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MVI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Community/partners/fluxcd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FluxCD
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Community/partners/openziti/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenZiti
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Community/partners/kyverno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Kyverno
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Blog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/index.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+  <h1>Landing</h1>
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback! Help us improve this page by using our <a href="https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+        
+          
+          <a href="readme/" class="md-footer__link md-footer__link--next" aria-label="Next: Overview">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Overview
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.50899def.min.js"></script>
+      
+    
+  </body>
+</html>
