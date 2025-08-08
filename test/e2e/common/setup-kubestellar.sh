@@ -127,10 +127,10 @@ else
 popd
 
 : Waiting for OCM hub to be ready...
-kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 400s
-kubectl wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 400s
 kubectl wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 400s
+kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 400s
+kubectl wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 400s
 
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
