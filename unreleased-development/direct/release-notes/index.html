@@ -830,6 +830,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0290" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.29.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0280" class="md-nav__link">
     <span class="md-ellipsis">
       0.28.0
@@ -3740,6 +3749,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0290" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.29.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0280" class="md-nav__link">
     <span class="md-ellipsis">
       0.28.0
@@ -4163,6 +4181,12 @@
 
 <h1 id="release-notes">Release notes<a class="headerlink" href="#release-notes" title="Permanent link">#</a></h1>
 <p>The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. </p>
+<h2 id="0290">0.29.0<a class="headerlink" href="#0290" title="Permanent link">#</a></h2>
+<p>This release makes some backward-incompatible changes, as follows.</p>
+<ul>
+<li>Changes to the names of the PostCreateHooks and their Jobs that are using in a KubeFlex <code>ControlPlane</code> for an ITS. This changes what a careful user (and the KubeStellar scripts) wait on after instantiating KubeStellar's core Helm chart.</li>
+<li>Not actually shipped through KubeStellar, but the latest KubeFlex CLI makes a backward-incompatible change in the extensions that it puts in the user's kubeconfig file.</li>
+</ul>
 <h2 id="0280">0.28.0<a class="headerlink" href="#0280" title="Permanent link">#</a></h2>
 <p>Helm chart, the name of the subobject for ArgoCD has changed from
 <code>argo-cd</code> to <code>argocd</code>.</p>
