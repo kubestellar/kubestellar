@@ -110,7 +110,7 @@ if [ "$use_release" = true ] ; then
     --version $(yq .KUBESTELLAR_VERSION core-chart/values.yaml) \
     --kube-context $HOSTING_CONTEXT \
     --set-json='ITSes=[{"name":"its1"}]' \
-    --set-json='WDSes=[{"name":"wds1","ITSName":"its1"}]' \
+    --set-json='WDSes=[{"name":"wds1"}]' \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
     --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
 else
@@ -120,7 +120,7 @@ else
     --set KUBESTELLAR_VERSION=$(git rev-parse --short HEAD) \
     --kube-context $HOSTING_CONTEXT \
     --set-json='ITSes=[{"name":"its1"}]' \
-    --set-json='WDSes=[{"name":"wds1","ITSName":"its1"}]' \
+    --set-json='WDSes=[{"name":"wds1"}]' \
     --set verbosity.kubestellar=${KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY} \
     --set verbosity.transport=${TRANSPORT_CONTROLLER_VERBOSITY}
   fi
