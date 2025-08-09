@@ -1,14 +1,12 @@
-<!-- KubeStellar Docs README -->
+# KubeStellar Documentation
 
 <p align="center">
-  <img src="./docs/overrides/favicons/android-72x72.png"alt="KubeStellar Logo" />
+  <img src="./docs/overrides/favicons/android-72x72.png" alt="KubeStellar Logo" width="72"/>
 </p>
-
-<h1 align="center">KubeStellar Documentation</h1>
 
 <p align="center">
   <b>Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud</b><br/>
-  Official documentation source for the <a href="https://kubestellar.io">KubeStellar Website</a>.
+  Official documentation source for the <a href="https://kubestellar.io">KubeStellar Website</a>
 </p>
 
 <p align="center">
@@ -27,151 +25,155 @@
   <a href="https://artifacthub.io/packages/search?repo=kubestellar">
     <img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubestellar" alt="ArtifactHub">
   </a>
-  <a href="https://kubernetes.slack.com/archives/C058SUSL5AA">
-    <img src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack" alt="Slack">
+  <a href="https://communityinviter.com/apps/kubernetes/community">
+    <img src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack" alt="Join Slack">
   </a>
 </p>
 
 ---
 
-## 🚀 About KubeStellar
+## About KubeStellar
 
 **KubeStellar** is a [CNCF Sandbox Project](https://www.cncf.io/sandbox-projects/) that enables seamless deployment and configuration of Kubernetes objects across multiple clusters — whether you're operating in edge, multi-cloud, or hybrid environments.
 
-KubeStellar lets you:
+### Key Capabilities
 
-- Define **binding policies** between clusters and Kubernetes resources
-- Use familiar single-cluster tooling for multi-cluster operations
-- Improve compliance, resilience, availability, and developer productivity
+KubeStellar empowers you to:
+
+- **Define binding policies** between clusters and Kubernetes resources
+- **Use familiar single-cluster tooling** for multi-cluster operations  
+- **Improve compliance, resilience, availability, and developer productivity**
 
 Learn more at the official [KubeStellar Website](https://kubestellar.io).
 
 ---
 
-## 📘 Purpose of This Repository
+## About This Repository
 
-This repository powers the **KubeStellar Documentation Site**, serving as the canonical source for:
+This repository powers the **KubeStellar Documentation Site**, serving as the canonical source for comprehensive project documentation including:
 
-- User & operator guides
-- Architecture overviews
+- User and operator guides
+- Architecture overviews and technical references
 - Roadmaps and release notes
 - Contribution and governance documentation
-- Tutorials and examples
+- Tutorials and practical examples
 
-We aim to deliver well-organized, consistent, and comprehensive documentation to help both new users and experienced contributors.
+Our goal is to deliver well-organized, consistent, and comprehensive documentation that helps both newcomers and experienced contributors succeed with KubeStellar.
 
 ---
 
-## 🗺️ Key Resources
+## Quick Links
 
-- 🔗 **Main Site**: [https://kubestellar.io](https://kubestellar.io)
-- 📄 **Roadmap**: [docs/content/direct/roadmap.md](docs/content/direct/roadmap.md)
-- 🧑‍💻 **Contributing**: [CONTRIBUTING.md](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md)
+- 🌐 **Main Site**: [kubestellar.io](https://kubestellar.io)
+- 🗺️ **Roadmap**: [docs/content/direct/roadmap.md](docs/content/direct/roadmap.md)
+- 🤝 **Contributing**: [CONTRIBUTING.md](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md)
 - 📜 **Code of Conduct**: [CODE_OF_CONDUCT.md](https://github.com/kubestellar/kubestellar/blob/main/CODE_OF_CONDUCT.md)
-- 📅 **Join us**: [http://kubestellar.io/joinus](http://kubestellar.io/joinus)
+- 🚀 **Get Involved**: [kubestellar.io/joinus](http://kubestellar.io/joinus)
 
 ---
 
-## 🛠️ Local Development (Next.js)
+## Local Development Setup
 
-Follow these steps to set up and run the Next.js site locally:
+This documentation site is built with **Next.js**. Follow these steps to run it locally:
 
-1. Ensure you have **Node.js v18+** installed. Confirm with:
+### Prerequisites
 
-   ```bash
-   node --version
-   ```
+Ensure you have **Node.js v18+** installed:
 
-2. Install dependencies:
+```bash
+node --version
+```
 
+### Installation & Development
+
+1. **Install dependencies:**
    ```bash
    npm install
-   ```
-
-   or with Yarn:
-
-   ```bash
+   # or
    yarn
    ```
 
-3. Start the development server:
-
+2. **Start development server:**
    ```bash
    npm run dev
    ```
+   
+   Visit `http://localhost:3000` in your browser. The server supports hot-reload for instant feedback.
 
-   Visit `http://localhost:3000` in your browser. The server supports hot-reload.
-
-4. Build the production bundle:
-
+3. **Build for production:**
    ```bash
    npm run build
    ```
 
-5. (Optional) Preview the production build locally:
-
+4. **Preview production build locally:**
    ```bash
    npm start
    ```
 
 ---
 
-## 👥 Community & Communication
+## Community & Communication
 
-- 💬 Slack: [`#kubestellar-dev`](https://kubernetes.slack.com/archives/C058SUSL5AA) (Join via [slack.k8s.io](https://slack.k8s.io))
-- 📧 Mailing Lists:
-  - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev)
-  - [kubestellar-users](https://groups.google.com/g/kubestellar-users)
-- 🗓️ [Community Calendar](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MWM4a2loZDZrOWwzZWQzZ29xanZwa3NuMWdfMjAyMzA1MThUMTQwMDAwWiBiM2Q2NWM5MmJlZDdhOTg4NGVmN2ZlOWUzZjZjOGZlZDE2ZjZmYjJmODExZjU3NTBmNTQ3NTY3YTVkZDU4ZmVkQGc&tmsrc=b3d65c92bed7a9884ef7fe9e3f6c8fed16f6fb2f811f5750f547567a5dd58fed%40group.calendar.google.com)
-- 📺 [Community Meetings on YouTube](https://www.youtube.com/@kubestellar)
-- 🧾 [Meeting Agendas & Notes](https://github.com/kubestellar/kubestellar/issues?q=label%3Acommunity-meeting)
-- 📂 [Shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing)
-- 📣 Follow us:
-  - [LinkedIn](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
-  - [Medium](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
+### Join Our Community
 
----
+Get instant access to our documents and meeting invites at **[kubestellar.io/joinus](http://kubestellar.io/joinus)**
 
-## 🤝 How to Contribute
+### Communication Channels
 
-We welcome all contributors! Whether you're fixing a typo or writing new docs, your help makes a big impact.
+- **💬 Slack**: Join [`#kubestellar-dev`](https://kubernetes.slack.com/archives/C058SUSL5AA) in the [Kubernetes Slack workspace](https://communityinviter.com/apps/kubernetes/community)
+  
+- **📧 Mailing Lists**:
+  - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) - Development discussions
+  - [kubestellar-users](https://groups.google.com/g/kubestellar-users) - User discussions and support
 
-- Review our [Contributing Guidelines](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md)
-- Join discussions on Slack or our mailing lists
-- Open issues or PRs for any documentation improvements
+### Meetings & Events
 
----
+- **🗓️ Community Calendar**: [Subscribe here](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MWM4a2loZDZrOWwzZWQzZ29xanZwa3NuMWdfMjAyMzA1MThUMTQwMDAwWiBiM2Q2NWM5MmJlZDdhOTg4NGVmN2ZlOWUzZjZjOGZlZDE2ZjZmYjJmODExZjU3NTBmNTQ3NTY3YTVkZDU4ZmVkQGc&tmsrc=b3d65c92bed7a9884ef7fe9e3f6c8fed16f6fb2f811f5750f547567a5dd58fed%40group.calendar.google.com&scp=ALL)
+- **📺 Meeting Recordings**: [YouTube Channel](https://www.youtube.com/@kubestellar)
+- **📋 Meeting Notes**: [GitHub Issues](https://github.com/kubestellar/kubestellar/issues?q=label%3Acommunity-meeting) (upcoming and past agendas)
 
-## Getting in touch
+### Resources & Collaboration
 
-There are several ways to communicate with us:
+- **📂 Shared Documents**: [Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) 
+  *(Available to [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list members)*
 
-Instantly get access to our documents and meeting invites at http://kubestellar.io/joinus
+### Follow Us
 
-- The [`#kubestellar-dev` channel](https://kubernetes.slack.com/archives/C058SUSL5AA) in the [Kubernetes Slack workspace](https://slack.k8s.io)
-- Our mailing lists:
-    - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
-    - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
-- Subscribe to the [community meeting calendar](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MWM4a2loZDZrOWwzZWQzZ29xanZwa3NuMWdfMjAyMzA1MThUMTQwMDAwWiBiM2Q2NWM5MmJlZDdhOTg4NGVmN2ZlOWUzZjZjOGZlZDE2ZjZmYjJmODExZjU3NTBmNTQ3NTY3YTVkZDU4ZmVkQGc&tmsrc=b3d65c92bed7a9884ef7fe9e3f6c8fed16f6fb2f811f5750f547567a5dd58fed%40group.calendar.google.com&scp=ALL) for community meetings and events
-    - The [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list is subscribed to this calendar
-- See recordings of past KubeStellar community meetings on [YouTube](https://www.youtube.com/@kubestellar)
-- See [upcoming](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
-- Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
-    - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
-- Follow us on:
-   - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
-   - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
+- **LinkedIn**: [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
+- **Medium**: [KubeStellar Articles](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
 
 ---
 
-## 📊 Project Badges & Compliance
+## Contributing
 
-[![CLOMonitor](https://clomonitor.io/api/projects/cncf/kubestellar/report-summary?theme=light)](https://clomonitor.io/projects/cncf/kubestellar)  
-[![FOSSA License Scan](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkubestellar%2Fkubestellar.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkubestellar%2Fkubestellar?ref=badge_large&issueType=license)
+We welcome contributions from everyone! Whether you're fixing a typo, improving documentation, or adding new content, your help makes a meaningful impact.
+
+**Get started:**
+1. Review our [Contributing Guidelines](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md)
+2. Join discussions on Slack or mailing lists
+3. Open issues or pull requests for improvements
+
+We especially encourage first-time contributors and provide mentorship for those new to open source.
 
 ---
 
-## 🧠 Maintainers & Contributors
+## Project Status & Compliance
+
+<p align="center">
+  <a href="https://clomonitor.io/projects/cncf/kubestellar">
+    <img src="https://clomonitor.io/api/projects/cncf/kubestellar/report-summary?theme=light" alt="CLOMonitor"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fkubestellar%2Fkubestellar?ref=badge_large&issueType=license">
+    <img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkubestellar%2Fkubestellar.svg?type=large&issueType=license" alt="FOSSA License Scan"/>
+  </a>
+</p>
+
+---
+
+## Contributors
 
 <p align="center">
   <a href="https://github.com/kubestellar/kubestellar/graphs/contributors">
@@ -181,16 +183,20 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 
 ---
 
-## 🌐 CNCF & Licensing
+## CNCF & Licensing
 
 <p align="center">
   <a href="https://landscape.cncf.io">
-    <img src="/docs/overrides/images/cncf-color.png" width="300" alt="CNCF Logo" />
+    <img src="/docs/overrides/images/cncf-color.png" width="300" alt="CNCF Logo"/>
   </a>
 </p>
 
-We are a proud [Cloud Native Computing Foundation](https://cncf.io) Sandbox Project.
+<p align="center">
+  We are a proud <a href="https://cncf.io">Cloud Native Computing Foundation</a> Sandbox Project.
+</p>
 
-> Kubernetes® and the Kubernetes logo are registered trademarks of The Linux Foundation®.  
-> © 2022–2025 The KubeStellar Authors. All rights reserved.  
-> Licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+---
+
+**Legal Notice**: Kubernetes® and the Kubernetes logo are registered trademarks of The Linux Foundation®.  
+© 2022–2025 The KubeStellar Authors. All rights reserved.  
+Licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
