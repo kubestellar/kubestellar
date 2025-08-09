@@ -10,13 +10,21 @@
     {% set title = config.site_name ~ " - " ~ page.title | striptags %}
   {% endif %}
 
+  {# Determine description: prefer page-specific, fall back to site description #}
+  {% set description = config.site_description %}
+  {% if page and page.meta and page.meta.description %}
+    {% set description = page.meta.description %}
+  {% endif %}
+
+  {# Rely on Material for MkDocs' built-in description meta in site_meta block #}
+
   <!-- The image needs to have an absolute URL -->
   {% set image = config.site_url ~ 'assets/images/illustrations/banner.png' %}
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="{{ title }}" />
-  <meta property="og:description" content="{{ config.site_description }}" />
+  <meta property="og:description" content="{{ description }}" />
   <meta property="og:url" content="{{ page.canonical_url }}" />
   <meta property="og:image" content="{{ image }}" />
   <meta property="og:image:type" content="image/png" />
