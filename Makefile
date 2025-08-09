@@ -352,5 +352,8 @@ build: bin-dir require-jq require-go require-git verify-go-versions  ## Build th
 bin-dir:
 	mkdir -p bin
 
+.PHONY: test-demo-env
+test-demo-env: ## Test demo environment creation script
+	./test/ci/test-demo-env.sh
 
 include Makefile.venv
