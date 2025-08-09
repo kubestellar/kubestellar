@@ -173,8 +173,10 @@ extra:
   # social:
   #   - icon: fontawesome/brands/github
   #     link: 'https://github.com/kubestellar/kubestellar'
+  #     name: KubeStellar on GitHub
   #   - icon: fontawesome/brands/linkedin
   #     link: 'https://www.linkedin.com/feed/hashtag/?keywords=kubestellar'
+  #     name: KubeStellar on LinkedIn
   #   - icon: fontawesome/brands/medium
   #     link: 'https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST'
   #   - icon: fontawesome/brands/YouTube
