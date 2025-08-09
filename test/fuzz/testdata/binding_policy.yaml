@@ -1,0 +1,25 @@
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: test-binding-policy
+  namespace: default
+spec:
+  downsync:
+    - apiGroup: ""
+      resources: ["pods", "services"]
+      namespaces: ["default", "kube-system"]
+      objectSelectors:
+        - matchLabels:
+            app: test
+            tier: frontend
+        - matchExpressions:
+            - key: environment
+              operator: In
+              values: ["production", "staging"]
+  upsync:
+    - apiGroup: ""
+      resources: ["pods"]
+      namespaces: ["default"]
+      objectSelectors:
+        - matchLabels:
+            app: test 
