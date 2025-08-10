@@ -352,5 +352,18 @@ build: bin-dir require-jq require-go require-git verify-go-versions  ## Build th
 bin-dir:
 	mkdir -p bin
 
+##@ Testing
+
+.PHONY: test-e2e-argocd
+test-e2e-argocd: ## Run ArgoCD integration E2E tests
+	@echo " Running ArgoCD E2E tests..."
+	cd test/e2e && ./run-test.sh --test-type argocd-ginkgo --env kind
+
+.PHONY: test-e2e-argocd-released
+test-e2e-argocd-released: ## Run ArgoCD integration E2E tests against released build
+	@echo " Running ArgoCD E2E tests (released build)..."
+	cd test/e2e && ./run-test.sh --test-type argocd-ginkgo --released --env kind
+
+
 
 include Makefile.venv

@@ -66,8 +66,8 @@ case "$env" in
 esac
 
 case "$test" in
-    (bash|ginkgo) ;;
-    (*) echo "$0: --test-type must be 'bash' or 'ginkgo'" >&2
+      (bash|ginkgo|argocd-ginkgo) ;;
+    (*) echo "$0: --test-type must be 'bash', 'ginkgo', or 'argocd-ginkgo'" >&2   
         exit 1;;
 esac
 
@@ -81,6 +81,9 @@ scripts_dir="${SRC_DIR}/../../scripts"
 
 "${COMMON_SRCS}/cleanup.sh" --env "$env"
 source "${COMMON_SRCS}/setup-shell.sh"
+if [ "$test" == "argocd-ginkgo" ]; then
+    setup_flags="$setup_flags --argocd"
+fi
 "${COMMON_SRCS}/setup-kubestellar.sh" $setup_flags --env "$env"
 
 if [ $test == "bash" ];then
@@ -88,4 +91,8 @@ if [ $test == "bash" ];then
 elif [ $test == "ginkgo" ];then
     GINKGO_DIR="${SRC_DIR}/ginkgo"
     KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color $fail_flag $GINKGO_DIR -- -skip-setup
+elif [ $test == "argocd-ginkgo" ];then
+    GINKGO_DIR="${SRC_DIR}/ginkgo-argocd"
+    echo "Running ArgoCD integration tests from $GINKGO_DIR"
+    KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color --timeout=30m $fail_flag $GINKGO_DIR -- -skip-setup
 fi
