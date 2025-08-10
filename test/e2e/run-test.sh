@@ -95,4 +95,7 @@ elif [ $test == "argocd-ginkgo" ];then
     GINKGO_DIR="${SRC_DIR}/ginkgo-argocd"
     echo "Running ArgoCD integration tests from $GINKGO_DIR"
     KFLEX_DISABLE_CHATTY=true ginkgo --vv --trace --no-color --timeout=30m $fail_flag $GINKGO_DIR -- -skip-setup
+    else
+    echo "$0: unknown test type '$test'"
+    exit 1
 fi
