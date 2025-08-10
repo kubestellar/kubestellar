@@ -35,6 +35,21 @@ spec:
               mountPath: "/etc/kube"
               readOnly: true
 
+          - name: wait-for-placements-crd-created
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - sh
+              - -c
+              - |
+                until kubectl get crd placements.cluster.open-cluster-management.io >/dev/null 2>&1; do sleep 2; done
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+
           - name: wait-for-placements-crd
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
@@ -43,6 +58,21 @@ spec:
               - --for=condition=Established
               - crd/placements.cluster.open-cluster-management.io
               - --timeout=300s
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+
+          - name: wait-for-managedclustersetbindings-crd-created
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - sh
+              - -c
+              - |
+                until kubectl get crd managedclustersetbindings.cluster.open-cluster-management.io >/dev/null 2>&1; do sleep 2; done
             env:
             - name: KUBECONFIG
               value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
