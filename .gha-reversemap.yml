@@ -88,3 +88,8 @@ actions/stale:
   sha-url: https://github.com/actions/stale/commit/5bef64f19d7facfb25b37b414482c7164d639639
   tag: v9.1.0
   tag-url: https://github.com/actions/stale/tree/v9.1.0
+actions/github-script:
+  sha: 60a0d83039c74a4aee543508d2ffcb1c3799cdea
+  sha-url: https://github.com/actions/github-script/commit/60a0d83039c74a4aee543508d2ffcb1c3799cdea
+  tag: v7
+  tag-url: https://github.com/actions/github-script/tree/v7
