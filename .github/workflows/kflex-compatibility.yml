@@ -15,10 +15,10 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@27a176e7a0ad4b8574c7207a7ec46b80a0617c2a
         with:
           python-version: '3.11'
 
@@ -57,7 +57,7 @@ jobs:
         kflex_version: ${{fromJson(needs.build-matrix.outputs.matrix)}}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Download kflex CLI ${{ matrix.kflex_version }}
         run: |
