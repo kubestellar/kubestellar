@@ -12,76 +12,37 @@ spec:
     metadata:
       name: kubestellar-leader-election-role
     rules:
-      - apiGroups:
-          - ""
-        resources:
-          - configmaps
-        verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
-      - apiGroups:
-          - coordination.k8s.io
-        resources:
-          - leases
-        verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
-      - apiGroups:
-          - ""
-        resources:
-          - events
-        verbs:
-          - create
-          - patch
+      - apiGroups: [""]
+        resources: ["configmaps"]
+        verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+      - apiGroups: ["coordination.k8s.io"]
+        resources: ["leases"]
+        verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+      - apiGroups: [""]
+        resources: ["events"]
+        verbs: ["create", "patch"]
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
       creationTimestamp: null
       name: '{{"{{.ControlPlaneName}}"}}-kubestellar-manager-role'
     rules:
-      - apiGroups:
-          - ""
-        resources:
-          - secrets
-        verbs:
-          - get
-          - list
-          - watch
-      - apiGroups:
-          - tenancy.kflex.kubestellar.org
-        resources:
-          - controlplanes
-        verbs:
-          - get
-          - list
-          - watch
-      - apiGroups:
-          - tenancy.kflex.kubestellar.org
-        resources:
-          - controlplanes/status
-        verbs:
-          - get
-          - patch
-          - update
+      - apiGroups: [""]
+        resources: ["secrets"]
+        verbs: ["get", "list", "watch"]
+      - apiGroups: ["tenancy.kflex.kubestellar.org"]
+        resources: ["controlplanes"]
+        verbs: ["get", "list", "watch"]
+      - apiGroups: ["tenancy.kflex.kubestellar.org"]
+        resources: ["controlplanes/status"]
+        verbs: ["get", "patch", "update"]
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
       name: '{{"{{.ControlPlaneName}}"}}-kubestellar-metrics-reader'
     rules:
-      - nonResourceURLs:
-          - /metrics
-        verbs:
-          - get
+      - nonResourceURLs: ["/metrics"]
+        verbs: ["get"]
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -94,18 +55,12 @@ spec:
         app.kubernetes.io/part-of: kubestellar
       name: '{{"{{.ControlPlaneName}}"}}-kubestellar-proxy-role'
     rules:
-      - apiGroups:
-          - authentication.k8s.io
-        resources:
-          - tokenreviews
-        verbs:
-          - create
-      - apiGroups:
-          - authorization.k8s.io
-        resources:
-          - subjectaccessreviews
-        verbs:
-          - create
+      - apiGroups: ["authentication.k8s.io"]
+        resources: ["tokenreviews"]
+        verbs: ["create"]
+      - apiGroups: ["authorization.k8s.io"]
+        resources: ["subjectaccessreviews"]
+        verbs: ["create"]
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -200,15 +155,10 @@ spec:
                   - matchExpressions:
                       - key: kubernetes.io/arch
                         operator: In
-                        values:
-                          - amd64
-                          - arm64
-                          - ppc64le
-                          - s390x
+                        values: ["amd64", "arm64", "ppc64le", "s390x"]
                       - key: kubernetes.io/os
                         operator: In
-                        values:
-                          - linux
+                        values: ["linux"]
           containers:
             - args:
                 - --secure-listen-address=0.0.0.0:8443
@@ -231,8 +181,7 @@ spec:
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
-                  drop:
-                    - ALL
+                  drop: ["ALL"]
             - args:
                 - --health-probe-bind-address=:8081
                 - --metrics-bind-address=127.0.0.1:8080
@@ -271,10 +220,9 @@ spec:
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
-                  drop:
-                    - ALL
+                  drop: ["ALL"]
           securityContext:
             runAsNonRoot: true
           terminationGracePeriodSeconds: 10
 
-{{- end }} 
+{{- end }}

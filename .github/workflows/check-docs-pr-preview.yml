@@ -14,6 +14,10 @@ on:
       - 'docs/scripts/**'
       - 'docs/requirements.txt'
       - 'docs/main.py'
+      - 'SECURITY.md'
+      - 'CODE_OF_CONDUCT.md'
+      - 'GOVERNANCE.md'
+      - 'ONBOARDING.md'
 
 jobs:
   check-preview-link:

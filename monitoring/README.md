@@ -16,7 +16,7 @@ kubectl --context its1 -n cluster1 delete manifestwork addon-addon-status-deploy
 2. Re-deploy the status-addon controller and agents: 
 
 ```bash
-helm --kube-context its1 upgrade --install ocm-status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc15
+helm --kube-context its1 upgrade --install ocm-status-addon -n open-cluster-management oci://ghcr.io/kubestellar/ocm-status-addon-chart --version v0.2.0-rc16
 ```
 
 ### Description

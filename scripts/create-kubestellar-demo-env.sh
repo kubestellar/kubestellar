@@ -68,7 +68,7 @@ if ! dunsel=$(docker ps 2>&1); then
 fi
 echo "Container runtime is running."
 
-kubestellar_version=0.28.0
+kubestellar_version=0.29.0-alpha.1
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
@@ -217,8 +217,10 @@ kflex ctx --overwrite-existing-context wds2
 kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
-kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 24h
-kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 24h
 echo -e "\nWaiting for OCM hub cluster-info to be updated..."
 kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 24h
 echo -e "\033[33m✔\033[0m OCM hub is ready"
