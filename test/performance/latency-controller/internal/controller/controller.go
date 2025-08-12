@@ -158,37 +158,14 @@ func (r *GenericLatencyCollectorReconciler) SetupWithManager(mgr ctrl.Manager) e
 		},
 	}
 
-	excludedGroups := map[string]bool{
-		"flowcontrol.apiserver.k8s.io": true,
-		"discovery.k8s.io":             true,
-		"apiregistration.k8s.io":       true,
-		"coordination.k8s.io":          true,
-		"control.kubestellar.io":       true,
-	}
-	excludedResourceNames := map[string]bool{
-		"events":               true,
-		"nodes":                true,
-		"csistoragecapacities": true,
-		"csinodes":             true,
-		"endpoints":            true,
-		"workstatuses":         true,
-	}
-
 	controllerBuilder := ctrl.NewControllerManagedBy(mgr).
 		Named("generic-latency-collector").
 		WithEventFilter(preds)
 
+	// Remove lines 144-158 - exclusion logic is redundant
+	// Resources are already filtered in main.go during discovery
 	for _, gvk := range r.DiscoveredResources {
-		// Skip entire group
-		if excludedGroups[gvk.Group] {
-			continue
-		}
-		// Skip resource name
-		kindLower := strings.ToLower(gvk.Kind)
-		if excludedResourceNames[kindLower] {
-			continue
-		}
-		// Skip if no GVR mapping
+		// Skip if no GVR mapping (this check is still needed)
 		if _, found := r.gvkToGVR[gvk]; !found {
 			continue
 		}
@@ -367,31 +344,27 @@ func (r *GenericLatencyCollectorReconciler) processGenericObject(ctx context.Con
 }
 
 func (r *GenericLatencyCollectorReconciler) getGenericStatusTime(obj *unstructured.Unstructured) time.Time {
-	// First, try to get from conditions
+	// Use managedFields for status updates - more reliable than conditions
+	if managedFieldsTime := getStatusTime(obj); !managedFieldsTime.IsZero() {
+		return managedFieldsTime
+	}
+
+	// Fallback: only check conditions if no managedFields status update found
 	var latest time.Time
 	conditions, found, err := unstructured.NestedSlice(obj.Object, "status", "conditions")
 	if err == nil && found {
 		for _, cond := range conditions {
 			if condMap, ok := cond.(map[string]interface{}); ok {
-				timeFields := []string{"lastUpdateTime", "lastTransitionTime", "lastProbeTime"}
+				timeFields := []string{"lastUpdateTime", "lastTransitionTime"}
 				for _, field := range timeFields {
-					timeStr, found, _ := unstructured.NestedString(condMap, field)
-					if !found {
-						continue
-					}
-					if ts, err := time.Parse(time.RFC3339, timeStr); err == nil {
-						if ts.After(latest) {
+					if timeStr, found, _ := unstructured.NestedString(condMap, field); found {
+						if ts, err := time.Parse(time.RFC3339, timeStr); err == nil && ts.After(latest) {
 							latest = ts
 						}
 					}
 				}
 			}
 		}
-	}
-
-	// Fallback to managed fields for status updates
-	if managedFieldsTime := getStatusTime(obj); !managedFieldsTime.IsZero() && managedFieldsTime.After(latest) {
-		latest = managedFieldsTime
 	}
 
 	return latest
@@ -725,11 +698,28 @@ func normalizedGroupVersion(gvk schema.GroupVersionKind) string {
 }
 
 func getStatusTime(obj metav1.Object) time.Time {
+
+	// List of expected/preferred managers for status updates
+	preferredManagers := map[string]bool{
+		"controller-manager":             true,
+		"ocm-status-addon":               true,
+		"kubelet":                        true,
+		"work":                           true,
+		"Go-http-client":                 true,
+		"registration-operator":          true,
+		"transport-controller":           true,
+		"kube-controller-manager":        true,
+		"kubestellar-controller-manager": true,
+	}
+
 	var latest time.Time
 	for _, mf := range obj.GetManagedFields() {
 		if mf.Operation == metav1.ManagedFieldsOperationUpdate && mf.Subresource == "status" {
-			if mf.Time != nil && mf.Time.Time.After(latest) {
-				latest = mf.Time.Time
+			// Filter by preferred manager names
+			if mf.Manager != "" && preferredManagers[mf.Manager] {
+				if mf.Time != nil && mf.Time.Time.After(latest) {
+					latest = mf.Time.Time
+				}
 			}
 		}
 	}
