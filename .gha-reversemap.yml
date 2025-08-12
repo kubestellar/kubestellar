@@ -49,10 +49,10 @@ azure/setup-helm:
   tag: v4.3.0
   tag-url: https://github.com/azure/setup-helm/tree/v4.3.0
 docker/login-action:
-  sha: 74a5d142397b4f367a81961eba4e8cd7edddf772
-  sha-url: https://github.com/docker/login-action/commit/74a5d142397b4f367a81961eba4e8cd7edddf772
-  tag: v3
-  tag-url: https://github.com/docker/login-action/tree/v3
+  sha: 184bdaa0721073962dff0199f1fb9940f07167d1
+  sha-url: https://github.com/docker/login-action/commit/184bdaa0721073962dff0199f1fb9940f07167d1
+  tag: v3.5.0
+  tag-url: https://github.com/docker/login-action/tree/v3.5.0
 actions/first-interaction:
   sha: 2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
   sha-url: https://github.com/actions/first-interaction/commit/2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
@@ -83,3 +83,8 @@ actions/upload-artifact:
   sha-url: https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02
   tag: v4
   tag-url: https://github.com/actions/upload-artifact/tree/v4
+actions/github-script:
+  sha: 60a0d83039c74a4aee543508d2ffcb1c3799cdea
+  sha-url: https://github.com/actions/github-script/commit/60a0d83039c74a4aee543508d2ffcb1c3799cdea
+  tag: v7.0.1
+  tag-url: https://github.com/actions/github-script/tree/v7.0.1
