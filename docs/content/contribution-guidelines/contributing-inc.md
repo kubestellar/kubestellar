@@ -19,6 +19,13 @@ Please read the following guidelines if you're interested in contributing to Kub
 Please make sure that your environment has all the necessary versions as spelled out in the prerequisites section of our [user guide](../direct/pre-reqs.md)
 
 ### Issues
+
+**Before reporting a new issue, please search our [issue archive](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue) (including closed issues) to see if it has already been reported or resolved.**
+
+[View active issues on GitHub](https://github.com/kubestellar/kubestellar/issues)
+
+Our complete issue history is publicly available and searchable at our [GitHub Issues page](https://github.com/kubestellar/kubestellar/issues), where you can find both current and resolved issues with full discussion threads. 
+
 [View active issues on GitHub](https://github.com/kubestellar/kubestellar/issues)
 
 Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.
