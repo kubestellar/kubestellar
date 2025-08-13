@@ -31,26 +31,26 @@ We also have a subset of issues we've labeled **[help wanted!](https://github.co
 
 Your assistance in improving documentation is highly valued, regardless of your level of experience with the project.
 
-To claim an issue that you are interested in, kindly leave a comment on the issue and request the maintainers to assign it to you.
+To claim an issue that you are interested in, assign it to yourself by leaving a comment "/assign". You may also remove yourself from an issue with "/unassign" in a comment.
 
 #### GitHub Slash Commands
 
 KubeStellar uses Prow and GitHub bots to help manage issues and pull requests through slash commands. These commands should be written as comments on their own line:
 
 **Issue Management Commands:**
-- `/assign @username` - Assign an issue to a specific user
+- `/assign @username` - Assign an issue to a specific user  
 - `/unassign @username` - Remove assignment from a user  
-- `/assign` - Assign the issue to yourself
-- `/unassign` - Remove your assignment
-- `/good-first-issue` - Add the "good first issue" label
-- `/help-wanted` - Add the "help wanted" label
+- `/assign` - Assign the issue to yourself  
+- `/unassign` - Remove your assignment  
+- `/good-first-issue` - Add the "good first issue" label  
+- `/help-wanted` - Add the "help wanted" label  
 
 **Pull Request Review Commands:**
-- `/lgtm` - Indicate "looks good to me" (cannot be used on your own PR)
-- `/approve` - Approve the PR for merging (can be used on your own PR)
-- `/hold` - Prevent the PR from being merged
-- `/unhold` - Remove the hold
-- `/retest` - Re-run failed tests
+- `/lgtm` - Indicate "looks good to me" (cannot be used on your own PR)  
+- `/approve` - Approve the PR for merging (can be used on your own PR)  
+- `/hold` - Prevent the PR from being merged  
+- `/unhold` - Remove the hold  
+- `/retest` - Re-run failed tests  
 
 These commands make it easier for contributors and maintainers to manage the workflow without needing special repository permissions.
 
