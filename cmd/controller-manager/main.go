@@ -115,6 +115,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Duplicate detection across WDSes
+	if err := DetectDuplicateObjectIdentifiersAcrossWDSes(setupLog); err != nil {
+		setupLog.Error(err, "Error during duplicate object identifier detection across WDSes")
+	}
+
 	ksctlr.Start(ctx, processOpts)
 
 	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
