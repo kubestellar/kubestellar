@@ -15,7 +15,7 @@ As a starting point, here are some very basic items to consider when working on 
 
 - [Use clear and concise prose](#use-clear-and-concise-prose)
 - [Avoid use of emojis (especially in headings)](#avoid-use-of-emojis-in-prose)
-- [Think Accessibility](#compose-and-format-for-accessibility)
+- [Compose and format for Accessibility](#compose-and-format-for-accessibility)
 - [Use care if using generative AI](#use-care-if-using-generative-ai) for writing assistance. Review text carefully to make sure it is both coherent and accurate.
 - [Always check spelling and grammar](#always-do-a-spelling-and-grammar-check) before committing docs changes
 
@@ -38,11 +38,11 @@ Writing for accessibility means ensuring that screen readers can easily read you
 
 Accessibility is a part of any good web project, and docs are no different. As a bare minimum, we require that all our images and diagrams always have an appropriate 'alt-text' to support visually impared users and screenreaders. In Markdown, you can add alt-text using the following syntax:
 
-```{.bash}
+```{bash}
 ![An image of KubeStellar Contributors](images/contributors.png)
 ```
 
-In this example, the text inside the square brackets ([An image of KubeStellar Contributors]) serves as the alt-text, and it should clearly describe the content or purpose of the image.
+In this example, the text inside the square brackets [An image of KubeStellar Contributors] serves as the alt-text, and it should clearly describe the content or purpose of the image.
 
 For a more detailed guidance on writing alt-texts, we recommend checking out [WebAIM Guide to Alternative Texts.](https://webaim.org/techniques/alttext/)
 
@@ -56,9 +56,12 @@ If you want to deepen your understanding of accessibility, we recommend checking
 - [Web Content Accessibility Guidelines (WCAG)](https://www.w3.org/WAI/standards-guidelines/wcag/)
 - [Google's Style Guide for Writing Inclusive Documentation](https://developers.google.com/style/inclusive-documentation)
 
+>**Note:** KubeStellar docs are authored primarily in **Markdown**. The examples in this guide therefore use Markdown syntax (for example, `![Alt text](path/to/image.png)`).
+>While some resources above reference **HTML**, they remain useful for understanding core accessibility principles (like alt text and headings) and for cases where we embed raw HTML in Markdown. If you’re new to Markdown, start with Markdown-focused references first.
+
 ### Use Care If Using Generative AI
 
-The use of generative AI for writing assistance is becoming more common. Any text created via generative AI tools should be **carefully** reviewed to make sure it is both coherent and accurate. Among the items to check for (this is just a start): 
+The use of generative AI for writing assistance is becoming more common. Any text created via generative AI tools should be **carefully** reviewed to make sure it is both coherent and accurate. Among the items to check for (this is just a start):
 
 - Ensure the generated text is not outright plagiarism, as some LLMs have been trained on copyrighted works.
 - The generated text should contain no derivative works (as understood in copyright law) of other copyrighted material.
