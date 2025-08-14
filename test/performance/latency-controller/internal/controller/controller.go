@@ -183,54 +183,54 @@ func (r *GenericLatencyCollectorReconciler) RegisterMetrics() {
 		Name:    "kubestellar_downsync_packaging_duration_seconds",
 		Help:    "Histogram of WDS object → ManifestWork creation durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
-	}, []string{"workload", "cluster", "kind", "apiVersion"})
+	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.totalDeliveryHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "kubestellar_downsync_delivery_duration_seconds",
 		Help:    "Histogram of ManifestWork → AppliedManifestWork creation durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
-	}, []string{"workload", "cluster", "kind", "apiVersion"})
+	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.totalActivationHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "kubestellar_downsync_activation_duration_seconds",
 		Help:    "Histogram of AppliedManifestWork → WEC object creation durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
-	}, []string{"workload", "cluster", "kind", "apiVersion"})
+	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.totalDownsyncHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "kubestellar_downsync_duration_seconds",
 		Help:    "Histogram of WDS object → WEC object creation durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
-	}, []string{"workload", "cluster", "kind", "apiVersion"})
+	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.totalStatusPropagationReportHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "kubestellar_upsync_report_duration_seconds",
 		Help:    "Histogram of WEC object → WorkStatus report durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
-	}, []string{"workload", "cluster", "kind", "apiVersion"})
+	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.totalStatusPropagationFinalHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "kubestellar_upsync_finalization_duration_seconds",
 		Help:    "Histogram of WorkStatus → WDS object status durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
-	}, []string{"workload", "cluster", "kind", "apiVersion"})
+	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.totalStatusPropagationHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "kubestellar_upsync_duration_seconds",
 		Help:    "Histogram of WEC object → WDS object status durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
-	}, []string{"workload", "cluster", "kind", "apiVersion"})
+	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.totalE2EHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "kubestellar_e2e_latency_duration_seconds",
 		Help:    "Histogram of total binding → WDS status durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
-	}, []string{"workload", "cluster", "kind", "apiVersion"})
+	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.workloadCountGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "kubestellar_workload_count",
 		Help: "Number of workload objects deployed in clusters",
-	}, []string{"cluster", "kind", "apiVersion"})
+	}, []string{"cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	// Register all histograms
 	metrics.Registry.MustRegister(
@@ -600,10 +600,12 @@ func (r *GenericLatencyCollectorReconciler) processClusters(ctx context.Context,
 		now := time.Now()
 		apiVersion := entry.gvk.GroupVersion().String()
 		labels := prometheus.Labels{
-			"workload":   entry.name,
-			"cluster":    clusterName,
-			"kind":       entry.gvk.Kind,
-			"apiVersion": apiVersion,
+			"workload":      entry.name,
+			"cluster":       clusterName,
+			"kind":          entry.gvk.Kind,
+			"apiVersion":    apiVersion,
+			"namespace":     entry.namespace,
+			"bindingpolicy": r.BindingPolicy,
 		}
 
 		// Only record if timestamps are valid
@@ -663,6 +665,8 @@ func (r *GenericLatencyCollectorReconciler) processClusters(ctx context.Context,
 				clusterName,
 				entry.gvk.Kind,
 				entry.gvk.GroupVersion().String(),
+				entry.namespace,
+				r.BindingPolicy,
 			).Set(float64(len(list.Items)))
 		}
 	}
