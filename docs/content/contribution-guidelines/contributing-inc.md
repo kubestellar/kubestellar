@@ -37,7 +37,7 @@ To claim an issue that you are interested in, assign it to yourself by leaving a
 
 KubeStellar uses Prow and GitHub bots to help manage issues and pull requests through slash commands. These commands should be written as comments on their own line:
 
-**Issue Management Commands:**
+**Issue Management Commands:**  
 - `/assign @username` - Assign an issue to a specific user  
 - `/unassign @username` - Remove assignment from a user  
 - `/assign` - Assign the issue to yourself  
@@ -45,7 +45,7 @@ KubeStellar uses Prow and GitHub bots to help manage issues and pull requests th
 - `/good-first-issue` - Add the "good first issue" label  
 - `/help-wanted` - Add the "help wanted" label  
 
-**Pull Request Review Commands:**
+**Pull Request Review Commands:**  
 - `/lgtm` - Indicate "looks good to me" (cannot be used on your own PR)  
 - `/approve` - Approve the PR for merging (can be used on your own PR)  
 - `/hold` - Prevent the PR from being merged  
