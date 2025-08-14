@@ -80,25 +80,24 @@ type GenericLatencyCollectorReconciler struct {
 
 	// Configuration
 	MonitoredNamespace  string
-	BindingName         string
+	BindingPolicy       string
 	DiscoveredResources []schema.GroupVersionKind
 	gvkToGVR            map[schema.GroupVersionKind]schema.GroupVersionResource // Precomputed GVK to GVR mapping
 	bindingCreated      time.Time
 
-	// Cache mapping workload key (namespace/name/kind) -> timestamps
 	cache    map[string]*PerWorkloadCache
 	cacheMux sync.Mutex
 
 	// Histogram metrics for each stage
-	totalPackagingHistogram    *prometheus.HistogramVec
-	totalDeliveryHistogram     *prometheus.HistogramVec
-	totalActivationHistogram   *prometheus.HistogramVec
-	totalDownsyncHistogram     *prometheus.HistogramVec
-	totalUpsyncReportHistogram *prometheus.HistogramVec
-	totalUpsyncFinalHistogram  *prometheus.HistogramVec
-	totalUpsyncHistogram       *prometheus.HistogramVec
-	totalE2EHistogram          *prometheus.HistogramVec
-	workloadCountGauge         *prometheus.GaugeVec
+	totalPackagingHistogram               *prometheus.HistogramVec
+	totalDeliveryHistogram                *prometheus.HistogramVec
+	totalActivationHistogram              *prometheus.HistogramVec
+	totalDownsyncHistogram                *prometheus.HistogramVec
+	totalStatusPropagationReportHistogram *prometheus.HistogramVec
+	totalStatusPropagationFinalHistogram  *prometheus.HistogramVec
+	totalStatusPropagationHistogram       *prometheus.HistogramVec
+	totalE2EHistogram                     *prometheus.HistogramVec
+	workloadCountGauge                    *prometheus.GaugeVec
 }
 
 //+kubebuilder:rbac:groups=*,resources=*,verbs=get;list;watch
@@ -162,10 +161,7 @@ func (r *GenericLatencyCollectorReconciler) SetupWithManager(mgr ctrl.Manager) e
 		Named("generic-latency-collector").
 		WithEventFilter(preds)
 
-	// Remove lines 144-158 - exclusion logic is redundant
-	// Resources are already filtered in main.go during discovery
 	for _, gvk := range r.DiscoveredResources {
-		// Skip if no GVR mapping (this check is still needed)
 		if _, found := r.gvkToGVR[gvk]; !found {
 			continue
 		}
@@ -207,19 +203,19 @@ func (r *GenericLatencyCollectorReconciler) RegisterMetrics() {
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
 	}, []string{"workload", "cluster", "kind", "apiVersion"})
 
-	r.totalUpsyncReportHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	r.totalStatusPropagationReportHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "kubestellar_upsync_report_duration_seconds",
 		Help:    "Histogram of WEC object → WorkStatus report durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
 	}, []string{"workload", "cluster", "kind", "apiVersion"})
 
-	r.totalUpsyncFinalHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	r.totalStatusPropagationFinalHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "kubestellar_upsync_finalization_duration_seconds",
 		Help:    "Histogram of WorkStatus → WDS object status durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
 	}, []string{"workload", "cluster", "kind", "apiVersion"})
 
-	r.totalUpsyncHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	r.totalStatusPropagationHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "kubestellar_upsync_duration_seconds",
 		Help:    "Histogram of WEC object → WDS object status durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
@@ -242,9 +238,9 @@ func (r *GenericLatencyCollectorReconciler) RegisterMetrics() {
 		r.totalDeliveryHistogram,
 		r.totalActivationHistogram,
 		r.totalDownsyncHistogram,
-		r.totalUpsyncReportHistogram,
-		r.totalUpsyncFinalHistogram,
-		r.totalUpsyncHistogram,
+		r.totalStatusPropagationReportHistogram,
+		r.totalStatusPropagationFinalHistogram,
+		r.totalStatusPropagationHistogram,
 		r.totalE2EHistogram,
 		r.workloadCountGauge,
 	)
@@ -344,12 +340,10 @@ func (r *GenericLatencyCollectorReconciler) processGenericObject(ctx context.Con
 }
 
 func (r *GenericLatencyCollectorReconciler) getGenericStatusTime(obj *unstructured.Unstructured) time.Time {
-	// Use managedFields for status updates - more reliable than conditions
 	if managedFieldsTime := getStatusTime(obj); !managedFieldsTime.IsZero() {
 		return managedFieldsTime
 	}
 
-	// Fallback: only check conditions if no managedFields status update found
 	var latest time.Time
 	conditions, found, err := unstructured.NestedSlice(obj.Object, "status", "conditions")
 	if err == nil && found {
@@ -391,7 +385,7 @@ func (r *GenericLatencyCollectorReconciler) lookupManifestWorkForCluster(ctx con
 
 	// match on the originOwnerReferenceBindingKey label
 	labelKey := "transport.kubestellar.io/originOwnerReferenceBindingKey"
-	selector := fmt.Sprintf("%s=%s", labelKey, r.BindingName)
+	selector := fmt.Sprintf("%s=%s", labelKey, r.BindingPolicy)
 	list, err := r.ItsDynamic.
 		Resource(gvr).
 		Namespace(clusterName).
@@ -413,7 +407,7 @@ func (r *GenericLatencyCollectorReconciler) lookupManifestWorkForCluster(ctx con
 		return
 	}
 
-	logger.Info("No ManifestWork found with label", "label", labelKey, "value", r.BindingName)
+	logger.Info("No ManifestWork found with label", "label", labelKey, "value", r.BindingPolicy)
 }
 
 func (r *GenericLatencyCollectorReconciler) lookupAppliedManifestWork(ctx context.Context, key string, clusterName string, entry *PerWorkloadCache) {
@@ -490,7 +484,6 @@ func (r *GenericLatencyCollectorReconciler) lookupWorkStatus(ctx context.Context
 	}
 
 	logger.Info("Processing WorkStatuses", "count", len(list.Items))
-	// Format: <apiVersion>-<kind>-<namespace>-<name>
 	suffix := fmt.Sprintf(workStatusSuffixFmt,
 		normalizedGroupVersion(entry.gvk),
 		strings.ToLower(entry.gvk.Kind),
@@ -518,7 +511,6 @@ func (r *GenericLatencyCollectorReconciler) lookupWorkStatus(ctx context.Context
 
 	if !found {
 		logger.Info("No matching WorkStatus found", "suffix", suffix)
-		// Log first 5 WorkStatus names for debugging
 		statusNames := make([]string, 0, 5)
 		for i, ws := range list.Items {
 			if i >= 5 {
@@ -640,19 +632,19 @@ func (r *GenericLatencyCollectorReconciler) processClusters(ctx context.Context,
 		}
 
 		if !clusterData.wecObjectStatusTime.IsZero() && !clusterData.workStatusTime.IsZero() {
-			r.totalUpsyncReportHistogram.With(labels).Observe(
+			r.totalStatusPropagationReportHistogram.With(labels).Observe(
 				duration(clusterData.wecObjectStatusTime, clusterData.workStatusTime, now),
 			)
 		}
 
 		if !clusterData.workStatusTime.IsZero() && !entry.wdsObjectStatusTime.IsZero() {
-			r.totalUpsyncFinalHistogram.With(labels).Observe(
+			r.totalStatusPropagationFinalHistogram.With(labels).Observe(
 				duration(clusterData.workStatusTime, entry.wdsObjectStatusTime, now),
 			)
 		}
 
 		if !clusterData.wecObjectStatusTime.IsZero() && !entry.wdsObjectStatusTime.IsZero() {
-			r.totalUpsyncHistogram.With(labels).Observe(
+			r.totalStatusPropagationHistogram.With(labels).Observe(
 				duration(clusterData.wecObjectStatusTime, entry.wdsObjectStatusTime, now),
 			)
 		}
@@ -701,15 +693,13 @@ func getStatusTime(obj metav1.Object) time.Time {
 
 	// List of expected/preferred managers for status updates
 	preferredManagers := map[string]bool{
-		"controller-manager":             true,
-		"ocm-status-addon":               true,
-		"kubelet":                        true,
-		"work":                           true,
-		"Go-http-client":                 true,
-		"registration-operator":          true,
-		"transport-controller":           true,
-		"kube-controller-manager":        true,
-		"kubestellar-controller-manager": true,
+		"controller-manager":    true,
+		"ocm-status-addon":      true,
+		"kubelet":               true,
+		"Status":                true,
+		"Go-http-client":        true,
+		"registration-operator": true,
+		"transport-controller":  true,
 	}
 
 	var latest time.Time
@@ -719,6 +709,7 @@ func getStatusTime(obj metav1.Object) time.Time {
 			if mf.Manager != "" && preferredManagers[mf.Manager] {
 				if mf.Time != nil && mf.Time.Time.After(latest) {
 					latest = mf.Time.Time
+					break
 				}
 			}
 		}
