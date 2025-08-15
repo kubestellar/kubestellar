@@ -1,4 +1,4 @@
-* text=auto eol=lf
+text=auto 
 # Ignore generated code in diffs.
 **/zz_generated.*.go linguist-generated=true -diff
 /pkg/client/** linguist-generated=true -diff
