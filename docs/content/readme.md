@@ -18,7 +18,7 @@
 <a href="https://cloud-native.slack.com/archives/C097094RZ3M"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
-
+ 
 **KubeStellar** is a Cloud Native Computing Foundation (CNCF) Sandbox project that simplifies the deployment and configuration of applications across multiple Kubernetes clusters. It provides a seamless experience akin to using a single cluster, and it integrates with the tools you're already familiar with, eliminating the need to modify existing resources.
 
 KubeStellar is particularly beneficial if you're currently deploying in a single cluster and are looking to expand to multiple clusters, or if you're already using multiple clusters and are seeking a more streamlined developer experience.
@@ -70,6 +70,11 @@ Instantly get access to our documents and meeting invites [http://kubestellar.io
 - Follow us on:
    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
+## Release Notes
+
+For detailed, summaries of each release—including new features, bug fixes, and breaking changes—please visit our release notes page:
+
+https://docs.kubestellar.io/unreleased-development/direct/release-notes/
    
    
 ## ❤️ Contributors

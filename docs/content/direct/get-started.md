@@ -12,7 +12,11 @@ The two ways to create this simple configuration are as follows.
 
 ### Note about failures to fetch Helm charts from ghcr.io
 
+ doc-generic-setup-note-issue-3172
 When following this recipe or others: you might get a failure from the command to instantiate KubeStellar's core Helm chart or another from `ghcr.io`. There is a [known issue about this](knownissue-helm-ghcr.md).
+
+For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user `root` in Linux. There is a [known issue about this](knownissue-helm-ghcr.md).
+ main
 
 ### Important: Shell Variables for Example Scenarios
 
@@ -141,8 +145,10 @@ kflex ctx --overwrite-existing-context its1
 The Helm chart above has a Job that initializes the ITS as an OCM "hub" cluster. Helm does not have a way to wait for that initialization to finish. So you have to do the wait yourself. The following commands will do that.
 
 ```shell
-kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 90s
-kubectl --context kind-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 150s
+kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 90s
+kubectl --context kind-kubeflex wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 150s
+kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 90s
+kubectl --context kind-kubeflex wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 150s
 ```
 
 *To learn more about the Core Helm Chart, refer to the [Core Helm Chart documentation](./core-chart.md)*

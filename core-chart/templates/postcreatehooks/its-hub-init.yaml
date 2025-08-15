@@ -15,9 +15,14 @@ spec:
       template:
         spec:
           initContainers:
+ doc-generic-setup-note-issue-3172
 
           - name: wait-for-config-incluster
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+
+          - name: wait-for-config-incluster
+            image: busybox:latest
+ main
             command:
               - sh
               - -c

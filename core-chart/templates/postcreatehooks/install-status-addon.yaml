@@ -16,7 +16,11 @@ spec:
         spec:
           initContainers:
           - name: wait-for-kubeconfig
+ doc-generic-setup-note-issue-3172
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+
+            image: busybox:latest
+ main
             command:
               - sh
               - -c
@@ -35,12 +39,17 @@ spec:
               mountPath: "/etc/kube"
               readOnly: true
 
+ doc-generic-setup-note-issue-3172
           - name: wait-for-ocm-crds
+
+          - name: wait-for-placements-crd-created
+ main
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
               - sh
               - -c
               - |
+ doc-generic-setup-note-issue-3172
                 echo "Waiting for OCM CRDs to be established..."
                 # Wait for essential OCM CRDs needed by the Status Add-on
                 # First check if clusteradm has created any OCM CRDs
@@ -64,6 +73,56 @@ spec:
                   echo "ERROR: OCM CRDs not found after $max_attempts attempts"
                   exit 1
                 fi
+
+                until kubectl get crd placements.cluster.open-cluster-management.io >/dev/null 2>&1; do sleep 2; done
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+
+          - name: wait-for-placements-crd
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - kubectl
+              - wait
+              - --for=condition=Established
+              - crd/placements.cluster.open-cluster-management.io
+              - --timeout=300s
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+
+          - name: wait-for-managedclustersetbindings-crd-created
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - sh
+              - -c
+              - |
+                until kubectl get crd managedclustersetbindings.cluster.open-cluster-management.io >/dev/null 2>&1; do sleep 2; done
+            env:
+            - name: KUBECONFIG
+              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+            volumeMounts:
+            - name: kubeconfig
+              mountPath: "/etc/kube"
+              readOnly: true
+
+          - name: wait-for-managedclustersetbindings-crd
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            command:
+              - kubectl
+              - wait
+              - --for=condition=Established
+              - crd/managedclustersetbindings.cluster.open-cluster-management.io
+              - --timeout=300s
+ main
             env:
             - name: KUBECONFIG
               value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
@@ -72,7 +131,11 @@ spec:
               mountPath: "/etc/kube"
               readOnly: true
           containers:
+ doc-generic-setup-note-issue-3172
           - name: "{{"{{.HookName}}"}}"
+
+          - name: status
+ main
             image: quay.io/kubestellar/helm:{{.Values.HELM_VERSION}}
             args:
             - upgrade
