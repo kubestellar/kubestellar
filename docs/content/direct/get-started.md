@@ -10,9 +10,9 @@ The two ways to create this simple configuration are as follows.
 
 2. A [Step by step walkthrough](#step-by-step-setup) that demonstrates the core concepts and components, showing how to manually set up a simple single-host system.
 
-### Note for users experiencing setup issues
+### Note about failures to fetch Helm charts from ghcr.io
 
-For some users, use of the setup procedure on this page and/or the demo environment creation script may require running as the user `root` in Linux. There is a [known issue about this](knownissue-helm-ghcr.md).
+When following this recipe or others: you might get a failure from the command to instantiate KubeStellar's core Helm chart or another from `ghcr.io`. There is a [known issue about this](knownissue-helm-ghcr.md).
 
 ### Important: Shell Variables for Example Scenarios
 
