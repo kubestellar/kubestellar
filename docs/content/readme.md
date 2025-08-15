@@ -70,6 +70,11 @@ Instantly get access to our documents and meeting invites [http://kubestellar.io
 - Follow us on:
    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
+## Release Notes
+
+For detailed, summaries of each release—including new features, bug fixes, and breaking changes—please visit our release notes page:
+
+https://docs.kubestellar.io/unreleased-development/direct/release-notes/   
    
    
 ## ❤️ Contributors
