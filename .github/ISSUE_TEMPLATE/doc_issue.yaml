@@ -1,0 +1,36 @@
+name: Documentation Issue
+description: Report an issue with the documentation
+title: "doc: "
+labels:
+  - kind/documentation
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue with the documentation.
+
+        Before opening a new issue, look for an overlapping issue that
+        you could contribute to.
+
+        Remember that documentation sources for the website are
+        intended to [also render nicely when viewed directly on
+        GitHub](https://github.com/kubestellar/kubestellar/blob/main/docs/README.md#dual-use-documentation-sources),
+        _to the degree possible_.
+
+        Here is how you can help us serve you better:
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the issue
+      description: Please describe the issue. Include relevant URLs.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Want to contribute?
+      options:
+        - label: I would like to work on this issue.
+          required: false
