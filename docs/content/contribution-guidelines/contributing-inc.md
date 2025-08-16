@@ -1,15 +1,62 @@
 # Contributing to KubeStellar
 
-Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
+Greetings! 👋 We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
 
 To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on [Slack](https://cloud-native.slack.com/archives/C097094RZ3M).
 
 We can't wait to collaborate with you!
 
+---
 
-This document describes our policies, procedures and best practices for working on KubeStellar via the project and repository on GitHub. Much of this interaction (issues, pull requests, discussions) is meant to be viewed directly at the [KubeStellar repository webpage on GitHub](https://github.com/kubestellar/kubestellar/). Other community discussions and questions are available via our slack channel. If you have any inquiries, please feel free to reach out to us on the [KubeStellar-dev Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/).
+## 🚀 Quick Start Guide
+
+Welcome to KubeStellar! If you are new here, follow this quick guide to get started contributing:
+
+1. **Fork** the [KubeStellar repository](https://github.com/kubestellar/kubestellar/) on GitHub.
+2. **Clone** your fork to your local machine:
+   ```sh
+   git clone https://github.com/<your-username>/kubestellar.git
+   cd kubestellar
+   ```
+3. **Create a new branch** for your work (see [Branch Naming Conventions](#-branch-naming-conventions)):
+   ```sh
+   git checkout -b <branch-name>
+   ```
+4. **Make your changes** (code, docs, etc.).
+5. **Test your changes** locally (see [Test Commands](#-test-commands)).
+6. **Sign your commit** (see [DCO Instructions](#-developer-certificate-of-origin-dco)).
+7. **Push your branch** to your fork:
+   ```sh
+   git push origin <branch-name>
+   ```
+8. **Open a Pull Request** on GitHub, following our [Pull Request guidelines](#pull-requests).
+
+---
+
+
+This document describes our policies, procedures, and best practices for working on KubeStellar via the project and repository on GitHub. Much of this interaction (issues, pull requests, discussions) is meant to be viewed directly at the [KubeStellar repository webpage on GitHub](https://github.com/kubestellar/kubestellar/). Other community discussions and questions are available via our Slack channel. If you have any inquiries, please feel free to reach out to us on the [KubeStellar-dev Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/).
 
 Please read the following guidelines if you're interested in contributing to KubeStellar.
+
+---
+
+## 🌿 Branch Naming Conventions
+
+To keep our Git history clean and make collaboration easier, please follow these branch naming conventions:
+
+- Use prefixes to indicate the type of change:
+  - `feat/` for new features
+  - `fix/` for bug fixes
+  - `docs/` for documentation changes
+  - `test/` for testing-related changes
+  - `chore/` for maintenance or tooling
+- Use dashes `-` to separate words.
+- Example branch names:
+  - `feat/add-multi-cluster-support`
+  - `fix/typo-in-readme`
+  - `docs/update-contribution-guide`
+
+Please avoid using slashes or special characters in branch names, except for the prefix separator.
 
 ## General practices in the KubeStellar GitHub Project
 
@@ -59,15 +106,40 @@ We encourage all contributors to adopt [best practices in git commit management]
 
 Your git commits should provide ample context for reviewers and future codebase readers.
 
-A recommended format for final commit messages is as follows:
-
+**Recommended commit message format:**
 ```
 {Short Title}: {Problem this commit is solving and any important contextual information} {issue number if applicable}
 ```
-In conformance with CNCF expectations, we will only merge commits that indicate your agreement with the [Developer Certificate of Origin](#certificate-of-origin). The CNCF defines how to do this, and there are two cases: one for developers working for an organization that is a CNCF member, and one for contributors acting as individuals. For the latter, assent is indicated by doing a Git "sign-off" on the commit. 
 
+---
 
-See [Git Commit Signoff and Signing](../direct/pr-signoff.md) for more information on how to do that.
+## 📝 Developer Certificate of Origin (DCO)
+
+In conformance with CNCF expectations, we will only merge commits that indicate your agreement with the [Developer Certificate of Origin](#certificate-of-origin). This is required for all contributors.
+
+**How to sign your commits:**
+
+- Add the `--signoff` (or `-s`) flag to your commit command:
+  ```sh
+  git commit -s -m "fix: correct typo in docs"
+  ```
+- The sign-off line will look like:
+  ```
+  Signed-off-by: Your Name <your.email@example.com>
+  ```
+- If you forgot to sign a previous commit, you can amend the last commit:
+  ```sh
+  git commit --amend --signoff
+  ```
+- For multiple commits, you can rebase and sign each one:
+  ```sh
+  git rebase -i main
+  # Mark commits as 'edit', then for each:
+  git commit --amend --signoff
+  git rebase --continue
+  ```
+
+See [Git Commit Signoff and Signing](../direct/pr-signoff.md) for more information.
 
 ### Pull Requests
 [View active Pull Requests on GitHub](https://github.com/kubestellar/kubestellar/pulls)
@@ -147,8 +219,35 @@ If you have any questions about contributing, don't hesitate to reach out to us 
 
 
 
-## Testing Locally
+---
 
+## 🧪 Test Commands
+
+Before pushing your changes or opening a pull request, please run the appropriate tests for the language you are working on:
+
+- **Go**
+  - Run all unit tests:
+    ```sh
+    go test ./...
+    ```
+- **Python**
+  - Run all tests with pytest:
+    ```sh
+    pytest
+    ```
+- **TypeScript**
+  - Run all tests (assuming a typical npm/yarn setup):
+    ```sh
+    npm test
+    # or
+    yarn test
+    ```
+
+Refer to project-specific documentation for more details or additional test commands.
+
+---
+
+## Testing Locally
 
 Our [Getting Started](../direct/get-started.md) guide shows a user how to install a simple "kick the tires" instance of KubeStellar using a helm chart and kind.
 
@@ -161,17 +260,14 @@ If you are interested in modifying the Helm chart itself, look at the User Guide
 
 ### Testing the script against an upcoming release
 
-Prior to making a new release, there needs to be testing that the
-current Helm chart works with the executable behavior that will
-appear in the new release.  
+Prior to making a new release, there needs to be testing that the current Helm chart works with the executable behavior that will appear in the new release.
 
-## Licensing
+---
+
+## 📄 Licensing
 
 KubeStellar is [Apache 2.0 licensed](./license-inc.md) and we accept contributions via GitHub pull requests.
 
-## Certificate of Origin
+## 📜 Certificate of Origin
 
-By contributing to this project you agree to the Developer Certificate of
-Origin (DCO). This document was created by the Linux Kernel community and is a
-simple statement that you, as a contributor, have the legal right to make the
-contribution. See the [DCO]({{ config.repo_url }}/blob/{{ config.ks_branch }}/DCO)</a> file for details.
+By contributing to this project you agree to the Developer Certificate of Origin (DCO). This document was created by the Linux Kernel community and is a simple statement that you, as a contributor, have the legal right to make the contribution. See the [DCO]({{ config.repo_url }}/blob/{{ config.ks_branch }}/DCO) file for details.
