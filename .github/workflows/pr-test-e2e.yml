@@ -52,6 +52,12 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
+      - name: Validate inputs
+        run: |
+          bash scripts/validate-inputs.sh
+        env:
+          TEST_FLAGS: ${{ github.event.inputs.testFlags || '' }}
+
       - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
           go-version: 1.24
@@ -74,7 +80,7 @@ jobs:
 
       - name: Run test
         env:
-          TEST_FLAGS: ${{ github.event.inputs.testFlags }}
+          TEST_FLAGS: ${{ github.event.inputs.testFlags || '' }}
         run: |
           cd test/e2e/ginkgo
           KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color --fail-fast $TEST_FLAGS -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
@@ -183,6 +189,12 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
+      - name: Validate inputs
+        run: |
+          bash scripts/validate-inputs.sh
+        env:
+          TEST_FLAGS: ${{ github.event.inputs.testFlags || '' }}
+
       - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
           go-version: 1.24
@@ -204,7 +216,7 @@ jobs:
 
       - name: Run test
         env:
-          TEST_FLAGS: ${{ github.event.inputs.testFlags }}
+          TEST_FLAGS: ${{ github.event.inputs.testFlags || '' }}
         run: |
           cd test/e2e/
           KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS

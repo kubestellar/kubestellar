@@ -1,0 +1,47 @@
+name: Link checks
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scheme-enforce:
+    name: Enforce HTTPS scheme (no http except localhost)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail on non-localhost http links
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Scanning for non-localhost http:// links in Markdown files"
+          MATCHES="$(grep -RInE 'http://' --include='*.md' --include='*.MD' --include='*.markdown' . | grep -vE 'http://(localhost|127\.0\.0\.1)(:[0-9]+)?(/|$)')"
+          if [ -n "${MATCHES}" ]; then
+            echo "Found non-localhost http links:"
+            echo "${MATCHES}"
+            echo
+            echo "Please replace http:// with https:// where appropriate, or justify with localhost/127.0.0.1."
+            exit 1
+          fi
+          echo "No non-localhost http links found."
+
+  lychee:
+    name: Link validity (lychee)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --config .lychee.toml
+            .
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
