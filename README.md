@@ -44,6 +44,11 @@ KubeStellar simplifies this process by allowing developers to define a binding p
 
 For usage, architecture, and other documentation, see [the website](https://kubestellar.io).
 
+## Repository Ecosystem
+
+For a full list of KubeStellar repositories and their purposes, see [REPOSITORIES.md](./REPOSITORIES.md).
+
+
 ## Contributing
 
 We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md) guide and be sure to look at `main` or the release of interest to you.
