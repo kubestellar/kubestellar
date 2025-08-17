@@ -38,7 +38,7 @@ Writing for accessibility means ensuring that screen readers can easily read you
 
 Accessibility is a part of any good web project, and docs are no different. As a bare minimum, we require that all our images and diagrams always have an appropriate 'alt-text' to support visually impared users and screenreaders. In Markdown, you can add alt-text using the following syntax:
 
-```{bash}
+```markdown
 ![An image of KubeStellar Contributors](images/contributors.png)
 ```
 
