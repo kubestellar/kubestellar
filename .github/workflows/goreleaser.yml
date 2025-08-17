@@ -35,6 +35,19 @@ jobs:
       - name: Set LDFLAGS
         run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
 
+      - name: Validate tag and version
+        run: |
+          set -euo pipefail
+          ref="${{ github.ref_name }}"
+          if ! printf '%s' "$ref" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'; then
+            echo "Invalid tag format: $ref. Expected vMAJOR.MINOR.PATCH" >&2
+            exit 1
+          fi
+          VERSION="${ref#v}"
+          export VERSION
+          bash scripts/validate-inputs.sh
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
       - name: Install syft binary executable
         uses: anchore/sbom-action/download-syft@7b36ad622f042cab6f59a75c2ac24ccb256e9b45
 
@@ -63,7 +76,7 @@ jobs:
 
       - name: Package and push charts
         run: |
-          chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
+          chartVersion="${VERSION}"
 
           sed -i "s/^KUBESTELLAR_VERSION:.*$/KUBESTELLAR_VERSION: \"${chartVersion}\"/g" ${{ env.CORE_CHART_PATH }}/values.yaml
 

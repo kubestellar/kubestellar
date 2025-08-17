@@ -3,9 +3,13 @@ name: Link checks
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      - '**/*.md'
   push:
     branches: [ main ]
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'
 
 permissions:
   contents: read
@@ -45,3 +49,14 @@ jobs:
             .
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run link checker
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: --config .lychee.toml
