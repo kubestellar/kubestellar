@@ -17,7 +17,8 @@ jobs:
 
       - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
-          go-version: 1.24
+          go-version-file: go.mod
+          check-latest: true
           cache: true
 
       - name: Set up Helm
@@ -37,7 +38,7 @@ jobs:
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
           curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.9.0/kubeflex_0.9.0_linux_amd64.tar.gz --output kubeflex.tar.gz
           tar -xvf kubeflex.tar.gz bin/kflex
-          go install github.com/onsi/ginkgo/v2/ginkgo
+          go install github.com/onsi/ginkgo/v2/ginkgo@v2.22.0
           curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
           tar -xvf openshift-client-linux.tar.gz
           cp oc bin
@@ -69,7 +70,8 @@ jobs:
 
       - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
-          go-version: 1.24
+          go-version-file: go.mod
+          check-latest: true
           cache: true
 
       - name: Set up Helm
@@ -89,7 +91,7 @@ jobs:
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
           curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.9.0/kubeflex_0.9.0_linux_amd64.tar.gz --output kubeflex.tar.gz
           tar -xvf kubeflex.tar.gz bin/kflex
-          go install github.com/onsi/ginkgo/v2/ginkgo
+          go install github.com/onsi/ginkgo/v2/ginkgo@v2.22.0
           curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
           tar -xvf openshift-client-linux.tar.gz
           cp oc bin

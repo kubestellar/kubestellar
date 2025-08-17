@@ -19,7 +19,7 @@ jobs:
     name: Enforce HTTPS scheme (no http except localhost)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Fail on non-localhost http links
         shell: bash
         run: |
@@ -39,9 +39,9 @@ jobs:
     name: Link validity (lychee)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Run lychee
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@5c4ee84814c983aa7164eaee476f014e53ff3963
         with:
           args: >-
             --no-progress
@@ -54,9 +54,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Run link checker
-        uses: lycheeverse/lychee-action@v1
+        uses: lycheeverse/lychee-action@5c4ee84814c983aa7164eaee476f014e53ff3963
         with:
           args: --config .lychee.toml

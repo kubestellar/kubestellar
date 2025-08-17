@@ -28,6 +28,16 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
+      - name: Install yq v4.45.1
+        run: |
+          set -euo pipefail
+          YQ_VERSION=v4.45.1
+          BINARY=yq_linux_amd64
+          curl -sL https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${BINARY}.tar.gz | tar xz
+          chmod +x ${BINARY}
+          sudo mv ${BINARY} /usr/local/bin/yq
+          yq --version
+
       - name: Run test
         run: |
           hack/gha-reversemap.sh verify-mapusage

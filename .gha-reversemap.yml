@@ -83,3 +83,13 @@ actions/upload-artifact:
   sha-url: https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02
   tag: v4
   tag-url: https://github.com/actions/upload-artifact/tree/v4
+lycheeverse/lychee-action:
+  sha: 5c4ee84814c983aa7164eaee476f014e53ff3963
+  sha-url: https://github.com/lycheeverse/lychee-action/commit/5c4ee84814c983aa7164eaee476f014e53ff3963
+  tag: v2
+  tag-url: https://github.com/lycheeverse/lychee-action/tree/v2
+actions/github-script:
+  sha: 60a0d83039c74a4aee543508d2ffcb1c3799cdea
+  sha-url: https://github.com/actions/github-script/commit/60a0d83039c74a4aee543508d2ffcb1c3799cdea
+  tag: v7
+  tag-url: https://github.com/actions/github-script/tree/v7
