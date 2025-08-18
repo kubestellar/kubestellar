@@ -34,10 +34,10 @@ actions/setup-go:
   tag: v5
   tag-url: https://github.com/actions/setup-go/tree/v5
 anchore/sbom-action/download-syft:
-  sha: 7b36ad622f042cab6f59a75c2ac24ccb256e9b45
-  sha-url: https://github.com/anchore/sbom-action/commit/7b36ad622f042cab6f59a75c2ac24ccb256e9b45
-  tag: v0.20.4
-  tag-url: https://github.com/anchore/sbom-action/tree/v0.20.4
+  sha: da167eac915b4e86f08b264dbdbc867b61be6f0c
+  sha-url: https://github.com/anchore/sbom-action/commit/da167eac915b4e86f08b264dbdbc867b61be6f0c
+  tag: v0.20.5
+  tag-url: https://github.com/anchore/sbom-action/tree/v0.20.5
 goreleaser/goreleaser-action:
   sha: 9c156ee8a17a598857849441385a2041ef570552
   sha-url: https://github.com/goreleaser/goreleaser-action/commit/9c156ee8a17a598857849441385a2041ef570552
@@ -54,10 +54,10 @@ docker/login-action:
   tag: v3.5.0
   tag-url: https://github.com/docker/login-action/tree/v3.5.0
 actions/first-interaction:
-  sha: 2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
-  sha-url: https://github.com/actions/first-interaction/commit/2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
-  tag: v2.0.0
-  tag-url: https://github.com/actions/first-interaction/tree/v2.0.0
+  sha: 753c925c8d1ac6fede23781875376600628d9b5d
+  sha-url: https://github.com/actions/first-interaction/commit/753c925c8d1ac6fede23781875376600628d9b5d
+  tag: v3.0.0
+  tag-url: https://github.com/actions/first-interaction/tree/v3.0.0
 azure/setup-kubectl:
   sha: 776406bce94f63e41d621b960d78ee25c8b76ede
   sha-url: https://github.com/azure/setup-kubectl/commit/776406bce94f63e41d621b960d78ee25c8b76ede
