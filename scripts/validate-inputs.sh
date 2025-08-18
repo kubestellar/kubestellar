@@ -18,7 +18,7 @@ check_no_ctrl() {
 sanitize() {
   local input="$1"
   local sanitized
-  sanitized=$(printf '%s' "$input" | tr -cd 'a-zA-Z0-9._- +')
+  sanitized=$(printf '%s' "$input" | LC_ALL=C tr -cd '[:alnum:]._ +-' )
   if [[ "$input" != "$sanitized" ]]; then
     die "Invalid input detected: $input"
   fi
