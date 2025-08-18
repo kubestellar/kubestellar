@@ -45,6 +45,7 @@ jobs:
           version: v1.59.1
           args: --timeout=8m --issues-exit-code=0 --config=.golangci.yaml --fast --max-issues-per-linter=50 --max-same-issues=10
           only-new-issues: false
+          working-directory: .
 
       - name: Add Lint Summary
         if: always()
