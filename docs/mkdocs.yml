@@ -58,13 +58,13 @@ nav:
             - Register a Workload Execution Cluster: direct/wec-registration.md
       - Usage:
           - Usage limitations: direct/usage-limitations.md
-          - Authorization in WECs: direct/authorization.md
           - KubeStellar API:
               - Overview: direct/control.md
               - API reference (new tab): https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1
               - Binding: direct/binding.md
               - Transforming desired state: direct/transforming.md
               - Combining reported state: direct/combined-status.md
+          - Authorization in WECs: direct/authorization.md
           - Example Scenarios: direct/example-scenarios.md
           - Third-party integrations:
               - ArgoCD to WDS: direct/argo-to-wds1.md
