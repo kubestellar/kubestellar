@@ -39,13 +39,13 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.59.1
+
       - name: Run golangci-lint (Fast Mode)
-        uses: golangci/golangci-lint-action@4afd733a84b1f43292c63897423277bb7f4313a9
-        with:
-          version: v1.59.1
-          args: --timeout=8m --issues-exit-code=0 --config=.golangci.yaml --fast --max-issues-per-linter=50 --max-same-issues=10
-          only-new-issues: false
-          working-directory: .
+        run: |
+          golangci-lint run --timeout=8m --issues-exit-code=0 --config=.golangci.yaml --fast --max-issues-per-linter=50 --max-same-issues=10
 
       - name: Add Lint Summary
         if: always()
