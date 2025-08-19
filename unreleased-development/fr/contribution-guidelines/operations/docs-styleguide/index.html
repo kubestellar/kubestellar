@@ -2547,9 +2547,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#always-include-alt-text-for-images" class="md-nav__link">
+  <a href="#compose-and-format-for-accessibility" class="md-nav__link">
     <span class="md-ellipsis">
-      Always include alt-text for images
+      Compose and Format for Accessibility
     </span>
   </a>
   
@@ -3458,9 +3458,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#always-include-alt-text-for-images" class="md-nav__link">
+  <a href="#compose-and-format-for-accessibility" class="md-nav__link">
     <span class="md-ellipsis">
-      Always include alt-text for images
+      Compose and Format for Accessibility
     </span>
   </a>
   
@@ -3532,7 +3532,7 @@ This <strong>Style Guide</strong> is intended to complement the Design Guide to 
 <ul>
 <li><a href="#use-clear-and-concise-prose">Use clear and concise prose</a></li>
 <li><a href="#avoid-use-of-emojis-in-prose">Avoid use of emojis (especially in headings)</a></li>
-<li><a href="#always-include-alt-text-for-images">Always include alt-text for images</a></li>
+<li><a href="#compose-and-format-for-accessibility">Compose and format for Accessibility</a></li>
 <li><a href="#use-care-if-using-generative-ai">Use care if using generative AI</a> for writing assistance. Review text carefully to make sure it is both coherent and accurate.</li>
 <li><a href="#always-do-a-spelling-and-grammar-check">Always check spelling and grammar</a> before committing docs changes</li>
 </ul>
@@ -3543,10 +3543,27 @@ This <strong>Style Guide</strong> is intended to complement the Design Guide to 
 <h3 id="avoid-use-of-emojis-in-prose">Avoid Use of Emojis in Prose<a class="headerlink" href="#avoid-use-of-emojis-in-prose" title="Permanent link">#</a></h3>
 <p>The <strong>Design Guide</strong> will include guidance on use and placement of iconography in KubeStellar docs and UIs.
 In textual documentation, however, emojis may interfere with rendering and navigation of the website documentation, <em>especially</em> if they are used in headings or titles. They also may make the documentation inaccessible to visitors who must use screen reader technology.</p>
-<h3 id="always-include-alt-text-for-images">Always include alt-text for images<a class="headerlink" href="#always-include-alt-text-for-images" title="Permanent link">#</a></h3>
-<p>This is a basic requirement for accessibility. Images and diagrams should always have an appropriate alt-text attribute. In general, keep the <a href="https://www.w3.org/TR/WCAG21/">W3C Guidelines for Accessibility</a> in mind when writing/illustrating KubeStellar documentation </p>
+<h3 id="compose-and-format-for-accessibility">Compose and Format for Accessibility<a class="headerlink" href="#compose-and-format-for-accessibility" title="Permanent link">#</a></h3>
+<p>Writing for accessibility means ensuring that screen readers can easily read your text, your content is easy to navigate, visually clear and logically structured. This includes the appropriate usage of Heading tags, styling your text consistently and using a 'gender-neutral' language where applicable.</p>
+<p>Accessibility is a part of any good web project, and docs are no different. As a bare minimum, we require that all our images and diagrams always have an appropriate 'alt-text' to support visually impared users and screenreaders. In Markdown, you can add alt-text using the following syntax:</p>
+<div class="language-markdown highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>![<span class="nt">An image of KubeStellar Contributors</span>](<span class="na">images/contributors.png</span>)
+</code></pre></div>
+<p>In this example, the text inside the square brackets [An image of KubeStellar Contributors] serves as the alt-text, and it should clearly describe the content or purpose of the image.</p>
+<p>For a more detailed guidance on writing alt-texts, we recommend checking out <a href="https://webaim.org/techniques/alttext/">WebAIM Guide to Alternative Texts.</a></p>
+<p>We also recommend keeping the <a href="https://www.w3.org/TR/WCAG21/">W3C Guidelines for Accessibility</a> in mind when writing/illustrating KubeStellar documentation.</p>
+<p>That said, accessibility is an ever-evolving area in technical content. As an open-source contributor, familiarizing yourself with accessibility standards will help you make more thoughtful and inclusive descisions, whether in documentation, or other areas of your work.</p>
+<p>If you want to deepen your understanding of accessibility, we recommend checking out the following resources:</p>
+<ul>
+<li><a href="https://docs.gruntwork.io/guides/style/markdown-style-guide/">Gruntwork Markdown Style Guide</a></li>
+<li><a href="https://www.w3.org/WAI/standards-guidelines/wcag/">Web Content Accessibility Guidelines (WCAG)</a></li>
+<li><a href="https://developers.google.com/style/inclusive-documentation">Google's Style Guide for Writing Inclusive Documentation</a></li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> KubeStellar docs are authored primarily in <strong>Markdown</strong>. The examples in this guide therefore use Markdown syntax (for example, <code>![Alt text](path/to/image.png)</code>).
+While some resources above reference <strong>HTML</strong>, they remain useful for understanding core accessibility principles (like alt text and headings) and for cases where we embed raw HTML in Markdown. If you’re new to Markdown, start with Markdown-focused references first.</p>
+</blockquote>
 <h3 id="use-care-if-using-generative-ai">Use Care If Using Generative AI<a class="headerlink" href="#use-care-if-using-generative-ai" title="Permanent link">#</a></h3>
-<p>The use of generative AI for writing assistance is becoming more common. Any text created via generative AI tools should be <strong>carefully</strong> reviewed to make sure it is both coherent and accurate. Among the items to check for (this is just a start): </p>
+<p>The use of generative AI for writing assistance is becoming more common. Any text created via generative AI tools should be <strong>carefully</strong> reviewed to make sure it is both coherent and accurate. Among the items to check for (this is just a start):</p>
 <ul>
 <li>Ensure the generated text is not outright plagiarism, as some LLMs have been trained on copyrighted works.</li>
 <li>The generated text should contain no derivative works (as understood in copyright law) of other copyrighted material.</li>
