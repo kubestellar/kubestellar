@@ -9,7 +9,7 @@ die() { echo "Input validation error: $*" >&2; exit 2; }
 # Validate that inputs contain no control characters
 check_no_ctrl() {
   local name="$1" val
-  val="${!name}"
+  val="${!name:-}"
   if printf '%s' "$val" | LC_ALL=C grep -q '[[:cntrl:]]'; then
     die "$name contains control characters"
   fi
@@ -42,7 +42,7 @@ validate_version() {
 # --- Known inputs ---
 # TEST_FLAGS: allowed values are empty or "--released"
 check_test_flags() {
-  local val="${TEST_FLAGS}"
+  local val="${TEST_FLAGS:-}"
   case "$val" in
     ""|"--released") ;;
     *) die "TEST_FLAGS must be one of: '' or '--released' (got: '$val')" ;;
@@ -52,19 +52,19 @@ check_test_flags() {
 # Run checks
 check_no_ctrl TEST_FLAGS
 check_test_flags
-sanitize "${TEST_FLAGS}"
+sanitize "${TEST_FLAGS:-}"
 
 # Optional inputs: validate if provided
-if [[ -n "${ENVIRONMENT-}" ]]; then
+if [[ -n "${ENVIRONMENT:-}" ]]; then
   check_no_ctrl ENVIRONMENT
-  sanitize "${ENVIRONMENT}"
-  validate_environment "${ENVIRONMENT}"
+  sanitize "${ENVIRONMENT:-}"
+  validate_environment "${ENVIRONMENT:-}"
 fi
 
-if [[ -n "${VERSION-}" ]]; then
+if [[ -n "${VERSION:-}" ]]; then
   check_no_ctrl VERSION
-  sanitize "${VERSION}"
-  validate_version "${VERSION}"
+  sanitize "${VERSION:-}"
+  validate_version "${VERSION:-}"
 fi
 
 echo "Inputs validated successfully."
