@@ -74,7 +74,7 @@ Instantly get access to our documents and meeting invites [http://kubestellar.io
 
 For detailed, summaries of each release—including new features, bug fixes, and breaking changes—please visit our release notes page:
 
-https://docs.kubestellar.io/unreleased-development/direct/release-notes/
+https://docs.kubestellar.io/unreleased-development/direct/release-notes/ 
    
    
 ## ❤️ Contributors
