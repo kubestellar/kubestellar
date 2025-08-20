@@ -21,18 +21,12 @@ ScholliYT/Broken-Links-Crawler-Action:
 JasonEtco/create-an-issue:
   sha: 1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
   sha-url: https://github.com/JasonEtco/create-an-issue/commit/1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
-  tag: v2
-  tag-url: https://github.com/JasonEtco/create-an-issue/tree/v2
 actions/setup-python:
   sha: a26af69be951a213d495a4c3e4e4022e16d87065
   sha-url: https://github.com/actions/setup-python/commit/a26af69be951a213d495a4c3e4e4022e16d87065
-  tag: v5
-  tag-url: https://github.com/actions/setup-python/tree/v5
 actions/setup-go:
   sha: d35c59abb061a4a6fb18e82ac0862c26744d6ab5
   sha-url: https://github.com/actions/setup-go/commit/d35c59abb061a4a6fb18e82ac0862c26744d6ab5
-  tag: v5
-  tag-url: https://github.com/actions/setup-go/tree/v5
 anchore/sbom-action/download-syft:
   sha: 7b36ad622f042cab6f59a75c2ac24ccb256e9b45
   sha-url: https://github.com/anchore/sbom-action/commit/7b36ad622f042cab6f59a75c2ac24ccb256e9b45
@@ -41,8 +35,6 @@ anchore/sbom-action/download-syft:
 goreleaser/goreleaser-action:
   sha: 9c156ee8a17a598857849441385a2041ef570552
   sha-url: https://github.com/goreleaser/goreleaser-action/commit/9c156ee8a17a598857849441385a2041ef570552
-  tag: v6
-  tag-url: https://github.com/goreleaser/goreleaser-action/tree/v6
 azure/setup-helm:
   sha: b9e51907a09c216f16ebe8536097933489208112
   sha-url: https://github.com/azure/setup-helm/commit/b9e51907a09c216f16ebe8536097933489208112
@@ -51,8 +43,6 @@ azure/setup-helm:
 docker/login-action:
   sha: 74a5d142397b4f367a81961eba4e8cd7edddf772
   sha-url: https://github.com/docker/login-action/commit/74a5d142397b4f367a81961eba4e8cd7edddf772
-  tag: v3
-  tag-url: https://github.com/docker/login-action/tree/v3
 actions/first-interaction:
   sha: 2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
   sha-url: https://github.com/actions/first-interaction/commit/2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
@@ -81,15 +71,9 @@ rojopolis/spellcheck-github-actions:
 actions/upload-artifact:
   sha: ea165f8d65b6e75b540449e92b4886f43607fa02
   sha-url: https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02
-  tag: v4
-  tag-url: https://github.com/actions/upload-artifact/tree/v4
 lycheeverse/lychee-action:
   sha: 5c4ee84814c983aa7164eaee476f014e53ff3963
   sha-url: https://github.com/lycheeverse/lychee-action/commit/5c4ee84814c983aa7164eaee476f014e53ff3963
-  tag: v2
-  tag-url: https://github.com/lycheeverse/lychee-action/tree/v2
 actions/github-script:
   sha: 60a0d83039c74a4aee543508d2ffcb1c3799cdea
   sha-url: https://github.com/actions/github-script/commit/60a0d83039c74a4aee543508d2ffcb1c3799cdea
-  tag: v7
-  tag-url: https://github.com/actions/github-script/tree/v7
