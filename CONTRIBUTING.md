@@ -97,6 +97,16 @@ Approvers will review your PR within a business day. A PR requires both an /lgtm
 _Congratulations! Your pull request has been successfully merged!_ 👏
 
 If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/).
+ 
+## Documentation Preview
+
+When you open or update a pull request that modifies the website or documentation, an **automated documentation preview workflow** will build a live preview of your changes and publish it on GitHub Pages.
+
+- The preview site URL will be automatically posted as a comment on your pull request, so reviewers can view your changes live.
+- Contributors do **not** need to manually fork the `gh-pages` branch or manage preview links.
+- Simply update documentation files in your PR and the preview will be generated and linked for you.
+
+This feature improves the review process by allowing easy live previews of doc changes before merging.
 
 
 

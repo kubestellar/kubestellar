@@ -1,0 +1,100 @@
+name: Docs PR Preview
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    paths:
+      - 'docs/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build-and-deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for mike
+
+      - name: Setup Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Setup documentation environment
+        run: make venv
+
+      - name: Build and deploy to fork
+        if: github.event.action != 'closed'
+        run: |
+          source docs/venv/bin/activate
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+          # Identify contributor’s fork
+          FORK_OWNER="${{ github.event.pull_request.head.repo.owner.login }}"
+          FORK_NAME="${{ github.event.pull_request.head.repo.name }}"
+
+          # Point origin at the fork using GITHUB_TOKEN
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${FORK_OWNER}/${FORK_NAME}.git
+
+          # Deploy the preview via mike
+          mike deploy --push pr-${{ github.event.number }} --title "PR #${{ github.event.number }}"
+
+          # Set the PREVIEW_URL environment variable
+          echo "PREVIEW_URL=https://${FORK_OWNER}.github.io/${FORK_NAME}/pr-${{ github.event.number }}/" >> $GITHUB_ENV
+
+      - name: Remove preview
+        if: github.event.action == 'closed'
+        run: |
+          source docs/venv/bin/activate
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          mike delete --push pr-${{ github.event.number }} || true
+
+      - name: Comment PR
+        if: github.event.action != 'closed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr_number = context.payload.pull_request.number;
+            const preview_url = process.env.PREVIEW_URL;
+
+            const comment_body = `📖 **Documentation Preview**
+
+            Your documentation changes are available for preview at:
+            ${preview_url}
+
+            This preview will be updated automatically when you push changes to this PR.`;
+
+            // List existing comments to avoid duplicates
+            const comments = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: pr_number
+            });
+
+            const existing = comments.data.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.includes('Documentation Preview')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body: comment_body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pr_number,
+                body: comment_body
+              });
+            }
