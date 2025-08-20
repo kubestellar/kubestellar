@@ -22,19 +22,23 @@ presubmits:
             - |
               set -ex
               ./scripts/e2e-compatibility-matrix.sh
-          env:
-            - name: MATRIX
-              valueFrom:
-                configMapKeyRef:
-                  name: kubestellar-compatibility-matrix
-                  key: matrix
-          resources:
-            requests:
-              memory: 8Gi
-              cpu: 4
-          volumeMounts:
-            - name: kubeconfig
-              mountPath: /root/.kube
+          # MATRIX is populated from the 'kubestellar-compatibility-matrix' ConfigMap, managed by cluster admins or automation.
+          # This variable is used by the e2e-compatibility-matrix.sh script to determine which version pairs to test.
+        # MATRIX is populated from the 'kubestellar-compatibility-matrix' ConfigMap, managed by cluster admins or automation.
+        # This variable is used by the e2e-compatibility-matrix.sh script to determine which version pairs to test.
+        env:
+          - name: MATRIX
+            valueFrom:
+              configMapKeyRef:
+                name: kubestellar-compatibility-matrix
+                key: matrix
+        resources:
+          requests:
+            memory: 8Gi
+            cpu: 4
+        volumeMounts:
+          - name: kubeconfig
+            mountPath: /root/.kube
       volumes:
         - name: kubeconfig
           secret:
@@ -67,6 +71,8 @@ postsubmits:
               - |
                 set -ex
                 ./scripts/e2e-compatibility-matrix.sh
+            # MATRIX is populated from the 'kubestellar-compatibility-matrix' ConfigMap, managed by cluster admins or automation.
+            # This variable is used by the e2e-compatibility-matrix.sh script to determine which version pairs to test.
             env:
               - name: MATRIX
                 valueFrom:
@@ -110,6 +116,8 @@ postsubmits:
               - |
                 set -ex
                 ./scripts/e2e-compatibility-matrix.sh
+            # MATRIX is populated from the 'kubestellar-compatibility-matrix' ConfigMap, managed by cluster admins or automation.
+            # This variable is used by the e2e-compatibility-matrix.sh script to determine which version pairs to test.
             env:
               - name: MATRIX
                 valueFrom:
@@ -151,6 +159,8 @@ periodics:
             - |
               set -ex
               ./scripts/e2e-compatibility-matrix.sh
+          # MATRIX is populated from the 'kubestellar-compatibility-matrix' ConfigMap, managed by cluster admins or automation.
+          # This variable is used by the e2e-compatibility-matrix.sh script to determine which version pairs to test.
           env:
             - name: MATRIX
               valueFrom:
