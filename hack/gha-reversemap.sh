@@ -82,7 +82,12 @@ _return() {
 _check_yq_version() {
     if command -v yq >/dev/null 2>&1; then
         INSTALLED_VERSION=$(yq --version 2>/dev/null)
-        if ! [[ "$INSTALLED_VERSION" =~ $YQ_REQUIRED_VERSION ]]; then
+        # Extract version number from output like "yq (https://github.com/mikefarah/yq/) version v4.45.4"
+        INSTALLED_VER=$(echo "$INSTALLED_VERSION" | sed -n 's/.*version \(v[0-9]*\.[0-9]*\).*/\1/p')
+        REQUIRED_VER="$YQ_REQUIRED_VERSION"
+        
+        # Simple version comparison: check if installed version starts with required version
+        if ! [[ "$INSTALLED_VER" =~ ^$REQUIRED_VER ]]; then
             _exit_with_error $ERR_YQ_NOT_INSTALLED "yq is installed but the version is $INSTALLED_VERSION. Required version is $YQ_REQUIRED_VERSION."
         fi
     else

@@ -86,18 +86,19 @@ The fuzzing tests are integrated into the CI pipeline and will run automatically
 
 **CI Fuzzing Workflow:**
 - The `.github/workflows/cifuzz.yml` workflow runs all Go fuzzers in this directory on every push and pull request (except for documentation/OWNERS/MAINTAINERS changes).
-- The workflow uses OSS-Fuzz's official GitHub Actions to build and run the fuzzers.
+- The workflow uses native Go fuzzing (Go 1.18+) to build and run the fuzzers for 2 minutes each.
 - If any crash or bug is found, the workflow will fail and upload crash artifacts for maintainers to review.
 - Maintainers should review any failed fuzzing jobs and examine the uploaded artifacts to diagnose and fix bugs.
-- To add a new fuzzer to CI, simply add a new `Fuzz*` function in `kubestellar_fuzz_test.go` (see below), and it will be picked up automatically by the workflow.
+- To add a new fuzzer to CI, simply add a new `Fuzz*` function in `kubestellar_fuzz_test.go` and add a corresponding step in the GitHub Actions workflow.
 
 **Interpreting Results:**
 - If the CI fuzzing job fails, check the 'fuzzing-artifacts' in the workflow run for crash details and input that triggered the bug.
 - Fix the bug or update the fuzzer as needed, then re-run the workflow to verify the fix.
 
-### OSS-Fuzz Integration
+**Verification:**
+- Run `./verify-setup.sh` in this directory to verify your local fuzzing setup
+- The script checks Go version, dependencies, and runs a quick test
 
-KubeStellar is integrated with Google's OSS-Fuzz project for continuous fuzzing. The `oss_fuzz_build.sh` script is used to build fuzzers for OSS-Fuzz.
 
 ## Test Data
 
