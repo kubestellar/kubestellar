@@ -52,7 +52,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Update the version in the core chart defaults, `core-chart/values.yaml`.
 
-- Update the version in `scripts/create-kubestellar-demo-env.sh`. Note: merging this change will cause the script to be broken until the release is made.
+- Update the version in `scripts/create-kubestellar-demo-env.sh`. **Note:** merging this change might cause the script to be broken until the release is made.
 
 - Until we have our first stable release, edit the old docs README(`oldocs/README.md`, section "latest-stable-release") where it wishes it could cite a stable release but instead cites the latest release, to refer to the coming release.
 
@@ -110,7 +110,7 @@ For each tag `v$version` the following published artifacts will be created.
 
 ## Website
 
-We use `mike` and `MkDocs` to derive and publish GitHub pages. See `docs/README.md` for details.
+We use `mike` and `MkDocs` to derive and publish GitHub pages. See [the website documentation](../contribution-guidelines/operations/document-management.md) for details.
 
 The published GitHub pages are organized into "releases".  Each release in the GitHub pages corresponds to a git branch whose name begins with "release-" or is "main".
 

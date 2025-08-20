@@ -38,7 +38,7 @@ Usage: $0 [--kubeconfig <filename>] [--context <name>] [--names <list of names>]
 --silent                   no information output
 -X                         enable verbose execution of the script for debugging
 
-Note: if multiple KubeFlex Control Planes with the same names are found, only the last one found will be 
+Note: if multiple KubeFlex Control Planes with the same names are found, only the last one found will be used in the resulting kubeconfig
 EOF
 }
 
@@ -51,11 +51,12 @@ get_kubeconfig() {
 
     echov "Getting the kubeconfig of KubeFlex Control Plane \"$cp_name\" of type \"$cp_type\" from context \"$context\":"
 
-    # wait for CP ready
-    while [[ $(KUBECONFIG="$in_KUBECONFIG" kubectl --context $context get controlplane $cp_name -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-        echov "* Waiting for KubeFlex Control Plane \"$cp_name\" in context \"$context\" to be Ready..."
-        sleep 5
-    done
+    # Wait for Control Plane to be ready using kubectl wait
+    echov "* Waiting for KubeFlex Control Plane \"$cp_name\" in context \"$context\" to be Ready..."
+    KUBECONFIG="$in_KUBECONFIG" kubectl --context "$context" wait \
+        --for=condition=Ready \
+        controlplane "$cp_name" \
+        --timeout=300s
 
     # put into the shell variable "kubeconfig" the kubeconfig contents for use from outside of the hosting cluster
     if [[ "$cp_type" == "host" ]] ; then

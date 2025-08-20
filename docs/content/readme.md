@@ -1,4 +1,4 @@
-<!--readme-for-root-start-->
+<!-- Note that this repo has two readme files, with content that is as nearly identical as is practical: `/README.md` and `/docs/content/readme.md` -->
 
 <img alt="" width="500px" align="left" src="../KubeStellar-with-Logo.png" />
 
@@ -15,10 +15,10 @@
 [![](https://www.bestpractices.dev/projects/8266/badge)](https://www.bestpractices.dev/projects/8266)
 [![](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubestellar)](https://artifacthub.io/packages/search?repo=kubestellar)
 [![](https://api.scorecard.dev/projects/github.com/kubestellar/kubestellar/badge)](https://scorecard.dev/viewer/?uri=github.com/kubestellar/kubestellar)
-<a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
+<a href="https://cloud-native.slack.com/archives/C097094RZ3M"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
-
+ 
 **KubeStellar** is a Cloud Native Computing Foundation (CNCF) Sandbox project that simplifies the deployment and configuration of applications across multiple Kubernetes clusters. It provides a seamless experience akin to using a single cluster, and it integrates with the tools you're already familiar with, eliminating the need to modify existing resources.
 
 KubeStellar is particularly beneficial if you're currently deploying in a single cluster and are looking to expand to multiple clusters, or if you're already using multiple clusters and are seeking a more streamlined developer experience.
@@ -56,7 +56,7 @@ There are several ways to communicate with us:
 
 Instantly get access to our documents and meeting invites [http://kubestellar.io/joinus](http://kubestellar.io/joinus)
 
-- The [`#kubestellar-dev` channel](https://kubernetes.slack.com/archives/C058SUSL5AA) in the [Kubernetes Slack workspace](https://slack.k8s.io)
+- The [`#kubestellar-dev` channel](https://cloud-native.slack.com/archives/C097094RZ3M) in the [CNCF Slack workspace](https://communityinviter.com/apps/cloud-native/cncf)
 - Our mailing lists:
     - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
     - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
@@ -70,6 +70,11 @@ Instantly get access to our documents and meeting invites [http://kubestellar.io
 - Follow us on:
    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
+## Release Notes
+
+For detailed, summaries of each release—including new features, bug fixes, and breaking changes—please visit our release notes page:
+
+https://docs.kubestellar.io/unreleased-development/direct/release-notes/
    
    
 ## ❤️ Contributors
@@ -110,4 +115,3 @@ Thanks go to these wonderful people:
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-<!--readme-for-root-end-->

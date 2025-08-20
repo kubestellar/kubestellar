@@ -19,7 +19,7 @@ Medium - [Syncing Objects from one Kubernetes cluster to another Kubernetes clus
 </p>
 
 ### How do I get this working with my KubeStellar instance?
-[Work with us](https://kubernetes.slack.com/archives/C058SUSL5AA) to create this document
+[Work with us](https://cloud-native.slack.com/archives/C097094RZ3M) to create this document
 
 <style type="text/css">
 .centerImage

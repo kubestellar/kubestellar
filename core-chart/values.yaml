@@ -2,15 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-
 # Container/chart image versions. These values are set during the chart release process,
 # please do not change them unless you know what you are doing.
 HELM_VERSION: "3.16.4"
-KUBECTL_VERSION: "1.30.12"
-KUBESTELLAR_VERSION: "0.28.0-alpha.2"
+KUBECTL_VERSION: "1.30.14"
+KUBESTELLAR_VERSION: "0.29.0-alpha.1"
 # TRANSPORT_VERSION: e.g., "0.24.0"; defaults to KUBESTELLAR_VERSION value, if not defined
 CLUSTERADM_VERSION: "0.10.1"
-OCM_STATUS_ADDON_VERSION: "0.2.0-rc15"
+OCM_STATUS_ADDON_VERSION: "0.2.0-rc16"
 
 
 # Control controller log verbosity
@@ -124,7 +123,7 @@ ITSes: # all the CPs in this list will execute the its.yaml PCH
 # - type: host or k8s (default to k8s, if not specified)
 # - APIGroups: string holding a comma-separated list of APIGroups
 # - ITSName: the name of the ITS control plane to be used by the WDS. Note that the ITSName MUST be specified if more than one ITS exists at the moment the WDS PCH starts.
-WDSes: # all the CPs in this list will execute the wds.yaml PCH
+WDSes: # all the CPs in this list will execute the transport-controller.yaml and kubestellar-controller.yaml PCHs
   # - name: wds1 # name of the control plane
   #   type: host # optional type of control plane host or k8s (default to k8s, if not specified)
   #   APIGroups: "" # optional string holding a comma-separated list of APIGroups

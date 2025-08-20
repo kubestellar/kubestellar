@@ -25,14 +25,18 @@ set -e
 
 GITHUB_WORKFLOWS_PATH="./.github/workflows"
 REVERSEMAP_FILE=".gha-reversemap.yml"
-YQ_REQUIRED_VERSION="v4.45"
+YQ_MIN_VERSION="yq (https://github.com/mikefarah/yq/) version v4.45"
 GIT_COMMITSHA_LENGTH=40
 TMP_OUTPUT="/tmp/$(date -u -Iseconds | cut -d '+' -f1).json"
 
 ERR_YQ_DOWNLOAD_FAILED=50
 ERR_YQ_NOT_INSTALLED=60
 ERR_GITHUB_TOKEN_INVALID=70
+ERR_NO_SHA=79
 ERR_ARCH_UNSUPPORTED=80
+ERR_NO_LATEST=86
+ERR_NO_TAG=87
+ERR_VERIFY_FAIL=90
 
 help() {
     cat <<EOF
@@ -46,6 +50,10 @@ Example:
     $0  update actions/checkout
 
 Operations:
+    verify-mapusage         [WORKFLOW_FILE...]          -   Check that the given workflow files all reference GitHub Actions
+                                                            by commit hash and that hash is the one in the reversemap file;
+                                                            if no workflow files are given then all are checked
+
     apply-reversemap        [WORKFLOW_FILE...]          -   Update the given workflow files with the information in the reversemap
                                                             file; if no workflow files are given then all are updated
 
@@ -79,8 +87,8 @@ _return() {
 _check_yq_version() {
     if command -v yq >/dev/null 2>&1; then
         INSTALLED_VERSION=$(yq --version 2>/dev/null)
-        if ! [[ "$INSTALLED_VERSION" =~ $YQ_REQUIRED_VERSION ]]; then
-            _exit_with_error $ERR_YQ_NOT_INSTALLED "yq is installed but the version is $INSTALLED_VERSION. Required version is $YQ_REQUIRED_VERSION."
+        if ! [[ "$INSTALLED_VERSION" > "$YQ_MIN_VERSION" ]]; then
+            _exit_with_error $ERR_YQ_NOT_INSTALLED "yq is installed but the version is 'INSTALLED_VERSION'. Required version is at least '$YQ_MIN_VERSION'."
         fi
     else
         _exit_with_error $ERR_YQ_NOT_INSTALLED "yq is not installed."
@@ -142,9 +150,19 @@ _update_reversemap_with() {
 
 # Fetch latest release tag of an action upstream
 _fetch_latest_tag() {
+    local latest latest_json
     action_ref=$1
-    API_GITHUB_LATEST_RELEASE=https://api.github.com/repos/$action_ref/releases/latest
-    _return "$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_GITHUB_LATEST_RELEASE" | jq -r '.tag_name')"
+    action_ref_safe=$(echo "$action_ref" | cut -d '/' -f 1,2)
+    API_GITHUB_LATEST_RELEASE=https://api.github.com/repos/${action_ref_safe}/releases/latest
+    latest_json=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_GITHUB_LATEST_RELEASE")
+    if [ -z "$latest_json" ]; then
+        _exit_with_error $ERR_NO_LATEST "GitHub returned empty response to query for latest"
+    fi
+    latest=$(jq -r .tag_name <<<"$latest_json")
+    if [ -z "$latest" ] || [ "$latest" = null ]; then
+        _exit_with_error $ERR_NO_TAG "Latest release information for ${action_ref} lacks tag_name: ${latest_json}"
+    fi
+    _return "$latest"
 }
 
 # Update action version within a file
@@ -152,7 +170,7 @@ _update_action_version_infile() {
     file=$1
     action_ref=$2
     action_sha=$3
-    sed_replace_expr="s;(uses:) $action_ref@[a-zA-Z0-9 \._\-]+;\1 $action_ref@$action_sha ;g"
+    sed_replace_expr="s;(uses:) $action_ref@[a-zA-Z0-9\._\-]+;\1 $action_ref@$action_sha;g"
     if [[ "$(uname -s)" = "Darwin" ]]; then
         # MacOS sed usage of -i option differs from Linux version.
         sed -E -i '' "$sed_replace_expr" "$file"
@@ -166,9 +184,42 @@ _get_sha_from_reversemap() {
     action_ref=$1
     query=$(yq ".\"$action_ref\".sha" $REVERSEMAP_FILE)
     if [[ $? -ne 0 ]]; then
-        _exit_with_error "no sha has been found for $action_ref in $REVERSEMAP_FILE"
+        _exit_with_error $ERR_NO_SHA "no sha has been found for $action_ref in $REVERSEMAP_FILE"
     fi
     _return "$query"
+}
+
+# Args are workflow filenames.
+# For each one, check that every "uses:" entry in a job step references
+# the action by commit hash and that is the commit hash in the reversemap file.
+run_verify_mapusage() {
+    local files failed shadict action version goodsha
+    files=$@
+    failed=false
+    shadict=$(yq -o json 'map_values(.sha)' $REVERSEMAP_FILE)
+    for file in $files; do
+        for ref in $(yq '.jobs.[].steps.[].uses?' "$file"); do
+            if [ "$ref" == null ]; then continue; fi
+            action=$( echo "$ref" | cut -d@ -f1)
+            version=$(echo "$ref" | cut -d@ -f2)
+            if ! [[ "$version" =~ [0-9a-f]{40} ]]; then
+                _loginfo "$file uses $ref, whose version $version is not a commit hash"
+                failed=true
+                continue
+            fi
+            goodsha=$(jq -r --arg action "$action" 'getpath([$action])' <<<"$shadict")
+            if [ "$goodsha" == null ]; then
+                _loginfo "$file uses $ref, and the reversemap has no entry for $action"
+                failed=true
+            elif ! [ "$version" == "$goodsha" ]; then
+                _loginfo "$file uses $ref, whose version $version is not the right one ($goodsha)"
+                failed=true
+            fi
+        done
+    done
+    if [ "$failed" == true ]; then
+        _exit_with_error $ERR_VERIFY_FAIL "Action reference problems found; see https://docs.kubestellar.io/unreleased-development/contribution-guidelines/contributing-inc/#github-action-reference-discipline"
+    fi
 }
 
 # Apply the commit sha of every action listed in the reversemap as the version to use in all github workflows
@@ -213,12 +264,18 @@ run_cli() {
     "help")
         help
         ;;
+    "verify-mapusage")
+        shift
+        _check_yq_version
+        _loginfo "verifying reversemap usage in all workflows"
+        run_verify_mapusage ${GITHUB_WORKFLOWS_PATH}/*.y*ml
+        ;;
     "apply-reversemap")
         shift
         _check_yq_version
         files=$@
         if [[ "$#" -eq 0 ]]; then
-            files="$GITHUB_WORKFLOWS_PATH/*.yml"
+            files="$GITHUB_WORKFLOWS_PATH/*.y*ml"
         fi
         _loginfo "running $operation_arg on $files"
         run_apply_reversemap $files
@@ -240,7 +297,7 @@ run_cli() {
         _check_yq_version
         files=$@
         if [[ "$#" -eq 0 ]]; then
-            files="$GITHUB_WORKFLOWS_PATH/*.yml"
+            files="$GITHUB_WORKFLOWS_PATH/*.y*ml"
         fi
         _loginfo "running $operation_arg on $files"
         run_update_reversemap $files

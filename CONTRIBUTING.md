@@ -1,3 +1,4 @@
+
 # Contributing to KubeStellar
 
 _Note to contributors: the contents of this file are incorporated in sections into the KubeStellar website via the file [contributing-inc](./docs/content/contribution-guidelines/contributing-inc.md). **If you add or modify links in this file you will also need to update that file**_
@@ -145,3 +146,4 @@ By contributing to this project you agree to the Developer Certificate of
 Origin (DCO). This document was created by the Linux Kernel community and is a
 simple statement that you, as a contributor, have the legal right to make the
 contribution. See the [DCO]({{ config.repo_url }}/blob/{{ config.ks_branch }}/DCO)</a> file for details.
+

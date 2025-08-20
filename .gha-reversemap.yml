@@ -34,10 +34,10 @@ actions/setup-go:
   tag: v5
   tag-url: https://github.com/actions/setup-go/tree/v5
 anchore/sbom-action/download-syft:
-  sha: 9f7302141466aa6482940f15371237e9d9f4c34a
-  sha-url: https://github.com/anchore/sbom-action/commit/9f7302141466aa6482940f15371237e9d9f4c34a
-  tag: v0.19.0
-  tag-url: https://github.com/anchore/sbom-action/tree/v0.19.0
+  sha: da167eac915b4e86f08b264dbdbc867b61be6f0c
+  sha-url: https://github.com/anchore/sbom-action/commit/da167eac915b4e86f08b264dbdbc867b61be6f0c
+  tag: v0.20.5
+  tag-url: https://github.com/anchore/sbom-action/tree/v0.20.5
 goreleaser/goreleaser-action:
   sha: 9c156ee8a17a598857849441385a2041ef570552
   sha-url: https://github.com/goreleaser/goreleaser-action/commit/9c156ee8a17a598857849441385a2041ef570552
@@ -49,20 +49,20 @@ azure/setup-helm:
   tag: v4.3.0
   tag-url: https://github.com/azure/setup-helm/tree/v4.3.0
 docker/login-action:
-  sha: 74a5d142397b4f367a81961eba4e8cd7edddf772
-  sha-url: https://github.com/docker/login-action/commit/74a5d142397b4f367a81961eba4e8cd7edddf772
-  tag: v3
-  tag-url: https://github.com/docker/login-action/tree/v3
+  sha: 184bdaa0721073962dff0199f1fb9940f07167d1
+  sha-url: https://github.com/docker/login-action/commit/184bdaa0721073962dff0199f1fb9940f07167d1
+  tag: v3.5.0
+  tag-url: https://github.com/docker/login-action/tree/v3.5.0
 actions/first-interaction:
-  sha: 3c71ce730280171fd1cfb57c00c774f8998586f7
-  sha-url: https://github.com/actions/first-interaction/commit/3c71ce730280171fd1cfb57c00c774f8998586f7
-  tag: v1
-  tag-url: https://github.com/actions/first-interaction/tree/v1
+  sha: 753c925c8d1ac6fede23781875376600628d9b5d
+  sha-url: https://github.com/actions/first-interaction/commit/753c925c8d1ac6fede23781875376600628d9b5d
+  tag: v3.0.0
+  tag-url: https://github.com/actions/first-interaction/tree/v3.0.0
 azure/setup-kubectl:
-  sha: 3e0aec4d80787158d308d7b364cb1b702e7feb7f
-  sha-url: https://github.com/azure/setup-kubectl/commit/3e0aec4d80787158d308d7b364cb1b702e7feb7f
-  tag: v4
-  tag-url: https://github.com/azure/setup-kubectl/tree/v4
+  sha: 776406bce94f63e41d621b960d78ee25c8b76ede
+  sha-url: https://github.com/azure/setup-kubectl/commit/776406bce94f63e41d621b960d78ee25c8b76ede
+  tag: v4.0.1
+  tag-url: https://github.com/azure/setup-kubectl/tree/v4.0.1
 ko-build/setup-ko:
   sha: d006021bd0c28d1ce33a07e7943d48b079944c8d
   sha-url: https://github.com/ko-build/setup-ko/commit/d006021bd0c28d1ce33a07e7943d48b079944c8d
@@ -74,12 +74,17 @@ technote-space/assign-author:
   tag: v1.6.2
   tag-url: https://github.com/technote-space/assign-author/tree/v1.6.2
 rojopolis/spellcheck-github-actions:
-  sha: 23dc186319866e1de224f94fe1d31b72797aeec7
-  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/23dc186319866e1de224f94fe1d31b72797aeec7
-  tag: 0.48.0
-  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.48.0
+  sha: 35a02bae020e6999c5c37fabaf447f2eb8822ca7
+  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/35a02bae020e6999c5c37fabaf447f2eb8822ca7
+  tag: 0.51.0
+  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.51.0
 actions/upload-artifact:
   sha: ea165f8d65b6e75b540449e92b4886f43607fa02
   sha-url: https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02
   tag: v4
   tag-url: https://github.com/actions/upload-artifact/tree/v4
+actions/github-script:
+  sha: 60a0d83039c74a4aee543508d2ffcb1c3799cdea
+  sha-url: https://github.com/actions/github-script/commit/60a0d83039c74a4aee543508d2ffcb1c3799cdea
+  tag: v7.0.1
+  tag-url: https://github.com/actions/github-script/tree/v7.0.1

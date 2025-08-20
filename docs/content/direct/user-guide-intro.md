@@ -3,7 +3,7 @@
 This document is an overview of the User Guide.
 See the KubeStellar [overview](../readme.md) for architecture and other information.
 
-This user guide is an ongoing project. If you find errors, please point them out in our [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/) or open an issue in our [github repository](https://github.com/kubestellar/kubestellar)!
+This user guide is an ongoing project. If you find errors, please point them out in our [Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/) or open an issue in our [github repository](https://github.com/kubestellar/kubestellar)!
 
 ## Simple Examples
 
@@ -58,6 +58,10 @@ KubeStellar's [Core Helm chart](core-chart.md) combines (a) initializing the Kub
 You can find an example run through of steps 2--7 in [Getting Started](get-started.md). This dovetails with [the example scenarios document](example-scenarios.md), which shows examples of the later steps.
 
 There is also an example run through of steps 2--7 that starts with (a slightly modified version of) the OCM Quick Start and also dovetails with the example scenarios. See [here](start-from-ocm.md).
+
+## Observability and Monitoring
+
+KubeStellar provides several endpoints and integrations for observability, including Prometheus metrics and debug endpoints. See the [Observability](observability.md) page for details on available metrics, endpoints, and how to access them.
 
 ## Troubleshooting
 

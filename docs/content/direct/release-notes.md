@@ -2,11 +2,35 @@
 
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
-## 0.28.0-alpha.2
+## 0.29.0
+
+This release makes some backward-incompatible changes, as follows.
+
+- Changes to the names of the PostCreateHooks and their Jobs that are using in a KubeFlex `ControlPlane` for an ITS. This changes what a careful user (and the KubeStellar scripts) wait on after instantiating KubeStellar's core Helm chart.
+- Not actually shipped through KubeStellar, but the latest KubeFlex CLI makes a backward-incompatible change in the extensions that it puts in the user's kubeconfig file.
+
+## 0.28.0
+
+Helm chart, the name of the subobject for ArgoCD has changed from
+`argo-cd` to `argocd`.
+
+There have been minor fixups, including to the website.
+
+We have advanced the version of the kube-rbac-proxy image used, from 0.18.0 (which is based on Kubernetes 1.30) to 0.19.1 (which is based on Kubernetes 1.31). Depending on a later minor release of Kubernetes is generally risky, but expected to work OK in this case.
+
+### 0.28.0-rc.1
+
+There is one breaking change for users: in the "values" for the core
+Helm chart, the name of the subobject for ArgoCD has changed from
+`argo-cd` to `argocd`.
+
+There have been minor fixups, including to the website.
+
+### 0.28.0-alpha.2
 
 The main change is advancing the version of the kube-rbac-proxy image used, from 0.18.0 (which is based on Kubernetes 1.30) to 0.19.1 (which is based on Kubernetes 1.31). Depending on a later minor release of Kubernetes is generally risky, but expected to work OK in this case.
 
-## 0.28.0-alpha.1
+### 0.28.0-alpha.1
 
 The main changes are moving from Kubernetes 1.29 to 1.30, and picking
 up advances in other dependencies (but staying limited to Kubernetes

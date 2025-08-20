@@ -68,7 +68,7 @@ if ! dunsel=$(docker ps 2>&1); then
 fi
 echo "Container runtime is running."
 
-kubestellar_version=0.28.0-alpha.2
+kubestellar_version=0.29.0-alpha.1
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
@@ -104,32 +104,21 @@ context_clean_up() {
 }
 
 checking_cluster() {
-    found=false
+    while IFS= read -r line; do
+        # Check for the cluster name and "Pending" status
+        if echo "$line" | grep -q "$1" && echo "$line" | grep -q "Pending"; then
+            echo "Pending CSR for $1 has been found, approving..."
+            clusteradm --context its1 accept --clusters "$1"
 
-    while true; do
-
-        output=$(kubectl --context its1 get csr)
-
-        while IFS= read -r line; do
-
-            if echo "$line" | grep -q $1; then
-                echo "$1 has been found, approving CSR"
-                clusteradm --context its1 accept --clusters "$1"
-                found=true
-                break
+            if [ $? -eq 0 ]; then
+                echo -e "\033[33m✔\033[0m CSR Approved for $1."
+                return 0
+            else
+                echo -e "\033[0;31mX\033[0m Failed to approve CSR for $1."
+                return 1
             fi
-
-        done <<< "$output"
-
-        if [ "$found" = true ]; then
-            break
-
-        else
-            echo "CSR for $1 not found. Trying again..."
-            sleep 20
         fi
-
-    done
+    done < <(kubectl --context its1 get csr --watch)
 }
 
 echo -e "\nStarting environment clean up..."
@@ -181,7 +170,7 @@ if [ "$k8s_platform" == "kind" ]; then
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
 else
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
-    sleep 15
+    kubectl wait --for=condition=Ready node --all --timeout=600s #Ensure both API server and nodes are ready
     helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.12.1 --namespace ingress-nginx --create-namespace --timeout 24h
 fi
 echo -e "\033[33m✔\033[0m Completed KubeFlex cluster with SSL Passthrough"
@@ -228,8 +217,10 @@ kflex ctx --overwrite-existing-context wds2
 kflex ctx --overwrite-existing-context its1
 
 echo -e "\nWaiting for OCM cluster manager to be ready..."
-kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-with-clusteradm}=true' --timeout 24h
-kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its-with-clusteradm --for condition=Complete --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 24h
+kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 24h
 echo -e "\nWaiting for OCM hub cluster-info to be updated..."
 kubectl --context $k8s_platform-kubeflex wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 24h
 echo -e "\033[33m✔\033[0m OCM hub is ready"
