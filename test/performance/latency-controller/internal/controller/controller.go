@@ -204,19 +204,19 @@ func (r *GenericLatencyCollectorReconciler) RegisterMetrics() {
 	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.totalStatusPropagationReportHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "kubestellar_upsync_report_duration_seconds",
+		Name:    "kubestellar_statusPropagation_report_duration_seconds",
 		Help:    "Histogram of WEC object → WorkStatus report durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
 	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.totalStatusPropagationFinalHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "kubestellar_upsync_finalization_duration_seconds",
+		Name:    "kubestellar_statusPropagation_finalization_duration_seconds",
 		Help:    "Histogram of WorkStatus → WDS object status durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
 	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
 
 	r.totalStatusPropagationHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "kubestellar_upsync_duration_seconds",
+		Name:    "kubestellar_statusPropagation_duration_seconds",
 		Help:    "Histogram of WEC object → WDS object status durations",
 		Buckets: prometheus.ExponentialBuckets(0.1, 2, 15),
 	}, []string{"workload", "cluster", "kind", "apiVersion", "namespace", "bindingpolicy"})
