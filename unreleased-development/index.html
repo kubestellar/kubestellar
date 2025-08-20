@@ -6,6 +6,8 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="KubeStellar documentation: learn how to create once and deploy many across multiple Kubernetes clusters, clouds, and edge with a Kubernetes-native multi-cluster delivery system.">
+      
       
       
         <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/">
@@ -73,13 +75,21 @@
     
   
 
+  
+  
+  
+    
+  
+
+  
+
   <!-- The image needs to have an absolute URL -->
   
 
   <!-- Open graph meta tags -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="KubeStellar - Landing" />
-  <meta property="og:description" content="None" />
+  <meta property="og:description" content="KubeStellar documentation: learn how to create once and deploy many across multiple Kubernetes clusters, clouds, and edge with a Kubernetes-native multi-cluster delivery system." />
   <meta property="og:url" content="https://docs.kubestellar.io/unreleased-development/" />
   <meta property="og:image" content="https://docs.kubestellar.io/unreleased-developmentassets/images/illustrations/banner.png" />
   <meta property="og:image:type" content="image/png" />
@@ -2750,7 +2760,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, li, div {
 
   <!-- Center - Desktop Nav Links -->
   <div class="nav-links">
-    <a href="direct/get-started/">Start</a>
+    <a href="direct/get-started/">Getting Started</a>
     <a href="readme/">About</a>
     <a href="direct/user-guide-intro/">User Guide</a>
     <a href="direct/contribute/">Contribute</a>
@@ -2765,20 +2775,20 @@ h1, h2, h3, h4, h5, h6, p, span, a, li, div {
     <a href="https://github.com/kubestellar/kubestellar"
        style="padding:4px 8px; border-radius:4px; background:#e5e7eb; color:#111; text-decoration:none; display:flex; align-items:center; gap:4px;"
        target="_blank" rel="noopener noreferrer">
-       <img src="./icons/github.svg" alt="GitHub" style="height:20px; width:auto;">
+       <img src="./icons/github.svg" alt="" aria-hidden="true" style="height:20px; width:auto;">
        Star on GitHub
     </a>
     <!-- Join Us -->
     <a href="https://kubestellar.io/joinus"
        style="padding:4px 8px; border-radius:4px; background:#e5e7eb; color:#111; text-decoration:none; display:flex; align-items:center; gap:4px;">
-       <img src="./icons/sign-in.svg" alt="Join" style="height:20px; width:auto;">
+       <img src="./icons/sign-in.svg" alt="" aria-hidden="true" style="height:20px; width:auto;">
        Join Us
     </a>
     <!-- Slack -->
     <a href="https://kubestellar.io/slack"
        style="padding:4px 8px; border-radius:4px; background:#e5e7eb; color:#111; text-decoration:none; display:flex; align-items:center; gap:4px;"
        target="_blank" rel="noopener noreferrer">
-       <img src="./icons/slack.svg" alt="Slack" style="height:20px; width:auto;">
+       <img src="./icons/slack.svg" alt="" aria-hidden="true" style="height:20px; width:auto;">
        Slack
     </a>
   </div>
@@ -2791,7 +2801,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, li, div {
 
 <!-- Mobile Nav Menu -->
 <div id="mobile-menu">
-  <a href="direct/get-started/">Start</a>
+  <a href="direct/get-started/">Getting Started</a>
   <a href="readme/">About</a>
   <a href="direct/user-guide-intro/">User Guide</a>
   <a href="direct/contribute/">Contribute</a>
@@ -2799,15 +2809,15 @@ h1, h2, h3, h4, h5, h6, p, span, a, li, div {
   <a href="https://kubestellar.io/tv" target="_blank">Youtube</a>
   <a href="https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?tab=t.0" target="_blank">Meetings</a>
   <a href="https://github.com/kubestellar/kubestellar" target="_blank" class="mobile-action">
-    <img src="./icons/github.svg" alt="GitHub" style="height:20px; width:auto;">
+    <img src="./icons/github.svg" alt="" aria-hidden="true" style="height:20px; width:auto;">
     Star on GitHub
   </a>
   <a href="https://kubestellar.io/joinus" class="mobile-action">
-    <img src="./icons/sign-in.svg" alt="Join" style="height:20px; width:auto;">
+    <img src="./icons/sign-in.svg" alt="" aria-hidden="true" style="height:20px; width:auto;">
     Join Us
   </a>
   <a href="https://kubestellar.io/slack" target="_blank" class="mobile-action">
-    <img src="./icons/slack.svg" alt="Slack" style="height:20px; width:auto;">
+    <img src="./icons/slack.svg" alt="" aria-hidden="true" style="height:20px; width:auto;">
     Slack
   </a>
 </div>
@@ -2877,15 +2887,18 @@ h1, h2, h3, h4, h5, h6, p, span, a, li, div {
   align-items: center; 
   justify-content: center;
 ">
-  <img src="images/background.png" alt="Background Image" style="
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0;
-  ">
+  <picture>
+    <source srcset="images/background.webp" type="image/webp">
+    <img src="images/background.png" alt="" aria-hidden="true" style="
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    ">
+  </picture>
   <div class="hero-overlay" style="
     position:absolute; 
     inset:0; 
@@ -2907,12 +2920,15 @@ h1, h2, h3, h4, h5, h6, p, span, a, li, div {
     <h1 class="hero-title">
       Don't change anything, just add
     </h1>
-    <img src="KubeStellar-with-Logo-transparent-v2.png" alt="KubeStellar" style="
-      width: 100%;
-      max-width: 800px; /* Increased logo size */
-      height: auto;
-      margin: 1rem 0;
-    " />
+    <picture>
+      <source srcset="KubeStellar-with-Logo-transparent-v2.webp" type="image/webp">
+      <img src="KubeStellar-with-Logo-transparent-v2.png" alt="KubeStellar" style="
+        width: 100%;
+        max-width: 800px; /* Increased logo size */
+        height: auto;
+        margin: 1rem 0;
+      " />
+    </picture>
     <p style="margin-bottom:2rem; text-shadow:1px 1px 3px rgba(0,0,0,0.7); font-size: 1rem; line-height: 1.2;">
       Think of KubeStellar as a post office for your Kubernetes resources. Like a post office, KubeStellar doesn't open your packages; it safely stores and delivers them to selected clusters worldwide—public clouds, private clouds, or at the edge. It's a super useful solution for spreading your Kubernetes resources wherever you need them.
     </p>
@@ -2920,13 +2936,13 @@ h1, h2, h3, h4, h5, h6, p, span, a, li, div {
       <a href="readme/"
          class="hero-button"
          style="background:#000; color:#fff;">
-        <img src="./icons/book.svg" alt="Docs" style="width:24px; height:auto;">
+        <img src="./icons/book.svg" alt="" aria-hidden="true" style="width:24px; height:auto;">
         Documentation
       </a>
       <a href="https://kubestellar.io/joinus"
          class="hero-button"
          style="background:#3B82F6; color:#fff;">
-        <img src="./icons/sign-in.svg" alt="Join" style="width:24px; height:auto;">
+        <img src="./icons/sign-in.svg" alt="" aria-hidden="true" style="width:24px; height:auto;">
         Join Us
       </a>
     </div>
@@ -3010,10 +3026,13 @@ h1, h2, h3, h4, h5, h6, p, span, a, li, div {
   <section class="section-card">
     <div class="how-it-works" style="display: flex; align-items: center; gap: 2rem;">
       <div class="image-container" style="flex: 1 1 50%;">
-        <img src="./images/kubestellar-deploy.png" alt="How It Works">
+        <picture>
+          <source srcset="./images/kubestellar-deploy.webp" type="image/webp">
+          <img src="./images/kubestellar-deploy.png" alt="How KubeStellar works diagram">
+        </picture>
       </div>
       <div style="flex: 1 1 50%; display: flex; flex-direction: column; justify-content: center;">
-        <h3 class="section-title">How it works?</h3>
+        <h2 class="section-title">How it works?</h2>
         <p class="section-text">
           Like a post office, <strong>KubeStellar</strong> doesn't open your <strong>resources</strong>. 
           It safely stores and delivers them to selected clusters worldwide — 
@@ -3027,9 +3046,9 @@ h1, h2, h3, h4, h5, h6, p, span, a, li, div {
 
   <!-- CREATE ONCE, DEPLOY MANY -->
   <section class="section-card">
-    <h3 class="section-title" style="width:100%; text-align:center;">
+    <h2 class="section-title" style="width:100%; text-align:center;">
       Create once, Deploy many
-    </h3>
+    </h2>
     <ul style="text-align:left; margin:0 auto; max-width:1000px; list-style:none; padding:0;">
       <li style="display:flex; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
         <img src="./icons/tick.svg" alt="✓" class="checkmark">
