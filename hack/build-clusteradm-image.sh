@@ -78,10 +78,10 @@ cd "$clusteradm_folder"
 
 case "$clusteradm_version" in
     (0.10.*)
-        go get github.com/docker/docker@v25.0.10 \
-               github.com/containerd/containerd@v1.7.27 \
-               golang.org/x/crypto@v0.36.0 \
-               golang.org/x/net@v0.38.0 \
+        go get github.com/docker/docker@v25.0.12 \
+               github.com/containerd/containerd@v1.7.28 \
+               golang.org/x/crypto@v0.40.0 \
+               golang.org/x/net@v0.42.0 \
                golang.org/x/oauth2@v0.30.0 \
                helm.sh/helm/v3@v3.15.4
         go mod tidy
@@ -89,9 +89,9 @@ case "$clusteradm_version" in
         ;;
     (0.11.0)
         go get github.com/docker/docker@v27.5.1 \
-               github.com/containerd/containerd@v1.7.27 \
-               golang.org/x/crypto@v0.36.0 \
-               golang.org/x/net@v0.38.0 \
+               github.com/containerd/containerd@v1.7.28 \
+               golang.org/x/crypto@v0.40.0 \
+               golang.org/x/net@v0.42.0 \
                golang.org/x/oauth2@v0.30.0 \
                helm.sh/helm/v3@v3.16.4
         go mod tidy

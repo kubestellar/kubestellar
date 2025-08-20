@@ -17,7 +17,7 @@
 # NOTE WELL: Two copies of this file exist, one in kubestellar/hack/
 # and one in kubestellar/scripts/ . Keep them both up-to-date.
 BASE_URL="https://docs.kubestellar.io"
-VERSION="release-0.28.0"
+VERSION="release-0.29.0-alpha.1"
 INSTALLATION_ERROR_URL="${BASE_URL}/${VERSION}/direct/installation-errors#pod-errors-due-to-too-many-open-files"
 
 set -e # exit on error
@@ -159,8 +159,8 @@ is_installed_kcp() {
 is_installed_kflex() {
     is_installed 'KubeFlex' \
         'kflex' \
-        'kflex version | head -1' \
-        'kflex version | head -1' \
+        'kflex version | grep "^Kubeflex version:"' \
+        'kflex version | grep "^Kubeflex version:"' \
         'https://github.com/kubestellar/kubeflex' \
         'Kubeflex version: v0.8.0'
 }

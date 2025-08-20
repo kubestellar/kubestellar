@@ -51,3 +51,7 @@ dependencies:
   third-party-packages: true
   dependencies-lists:
   - https://github.com/kubestellar/kubestellar/blob/main/SECURITY.md
+  env-dependencies-policy:
+    policy-url: https://github.com/kubestellar/kubestellar/blob/main/SECURITY.md#dependencies-policy
+    comment: |
+      KubeStellar uses Dependabot for detecting dependency updates and follows the policy described in SECURITY.md.

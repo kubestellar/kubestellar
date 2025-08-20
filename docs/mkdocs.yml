@@ -14,7 +14,7 @@ edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: 'latest'
 ks_latest_regular_release: '0.28.0'
-ks_latest_release: '0.28.0'
+ks_latest_release: '0.29.0-alpha.1'
 
 ks_kind_port_num: '1119'
 
@@ -35,9 +35,10 @@ nav:
         - KubeStellar Galaxy: direct/galaxy-intro.md
       - Release-notes: direct/release-notes.md
       - Roadmap: direct/roadmap.md
-  - Getting Started: direct/get-started.md
+  - Getting Started: direct/get-started/
   - User Guide:
       - Guide Overview: direct/user-guide-intro.md
+      - Observability: direct/observability.md
       - Getting Started: direct/get-started.md
       - Getting Started from OCM: direct/start-from-ocm.md
       - General Setup:
@@ -81,11 +82,13 @@ nav:
       - Overview (How to join in): direct/contribute.md
       - Code of Conduct: contribution-guidelines/coc-inc.md
       - Guidelines: contribution-guidelines/contributing-inc.md
+      - Contributor Ladder: contribution-guidelines/contributor_ladder.md
       - License: contribution-guidelines/license-inc.md
       - Governance: contribution-guidelines/governance-inc.md
       - Onboarding: contribution-guidelines/onboarding-inc.md
       - Website:
           - Docs Management Overview: contribution-guidelines/operations/document-management.md
+          - Style Guide: contribution-guidelines/operations/docs-styleguide.md
           - Testing website PRs: contribution-guidelines/operations/testing-doc-prs.md
       - Security:
           - Policy: contribution-guidelines/security/security-inc.md
@@ -182,7 +185,7 @@ extra:
   #     link: 'https://www.youtube.com/@kubestellar'
   #     name: KubeStellar on YouTube
   #   - icon: fontawesome/brands/slack
-  #     link: 'https://kubernetes.slack.com/archives/C058SUSL5AA'
+  #     link: 'https://cloud-native.slack.com/archives/C097094RZ3M'
   #     name: KubeStellar on Slack
   #   - icon: fontawesome/solid/paper-plane
   #     link: mailto:kubestellar-dev@google.groups.com

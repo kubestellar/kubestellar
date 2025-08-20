@@ -1,0 +1,228 @@
+{{- if .Values.InstallPCHs }}
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: kubestellar-controller
+  labels:
+    kflex.kubestellar.io/cptype: wds
+spec:
+  templates:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: kubestellar-leader-election-role
+    rules:
+      - apiGroups: [""]
+        resources: ["configmaps"]
+        verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+      - apiGroups: ["coordination.k8s.io"]
+        resources: ["leases"]
+        verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+      - apiGroups: [""]
+        resources: ["events"]
+        verbs: ["create", "patch"]
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      creationTimestamp: null
+      name: '{{"{{.ControlPlaneName}}"}}-kubestellar-manager-role'
+    rules:
+      - apiGroups: [""]
+        resources: ["secrets"]
+        verbs: ["get", "list", "watch"]
+      - apiGroups: ["tenancy.kflex.kubestellar.org"]
+        resources: ["controlplanes"]
+        verbs: ["get", "list", "watch"]
+      - apiGroups: ["tenancy.kflex.kubestellar.org"]
+        resources: ["controlplanes/status"]
+        verbs: ["get", "patch", "update"]
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: '{{"{{.ControlPlaneName}}"}}-kubestellar-metrics-reader'
+    rules:
+      - nonResourceURLs: ["/metrics"]
+        verbs: ["get"]
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/component: kube-rbac-proxy
+        app.kubernetes.io/created-by: kubestellar
+        app.kubernetes.io/instance: proxy-role
+        app.kubernetes.io/managed-by: kustomize
+        app.kubernetes.io/name: clusterrole
+        app.kubernetes.io/part-of: kubestellar
+      name: '{{"{{.ControlPlaneName}}"}}-kubestellar-proxy-role'
+    rules:
+      - apiGroups: ["authentication.k8s.io"]
+        resources: ["tokenreviews"]
+        verbs: ["create"]
+      - apiGroups: ["authorization.k8s.io"]
+        resources: ["subjectaccessreviews"]
+        verbs: ["create"]
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: kubestellar-leader-election-rolebinding
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: kubestellar-leader-election-role
+    subjects:
+      - kind: ServiceAccount
+        name: default
+        namespace: '{{"{{.Namespace}}"}}'
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: rbac
+        app.kubernetes.io/created-by: kubestellar
+        app.kubernetes.io/instance: manager-rolebinding
+        app.kubernetes.io/managed-by: kustomize
+        app.kubernetes.io/name: clusterrolebinding
+        app.kubernetes.io/part-of: kubestellar
+      name: '{{"{{.ControlPlaneName}}"}}-kubestellar-manager-rolebinding'
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: '{{"{{.ControlPlaneName}}"}}-kubestellar-manager-role'
+    subjects:
+      - kind: ServiceAccount
+        name: default
+        namespace: '{{"{{.Namespace}}"}}'
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: kube-rbac-proxy
+        app.kubernetes.io/created-by: kubestellar
+        app.kubernetes.io/instance: proxy-rolebinding
+        app.kubernetes.io/managed-by: kustomize
+        app.kubernetes.io/name: clusterrolebinding
+        app.kubernetes.io/part-of: kubestellar
+      name: '{{"{{.ControlPlaneName}}"}}-kubestellar-proxy-rolebinding'
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: '{{"{{.ControlPlaneName}}"}}-kubestellar-proxy-role'
+    subjects:
+      - kind: ServiceAccount
+        name: default
+        namespace: '{{"{{.Namespace}}"}}'
+  - apiVersion: v1
+    data: {}
+    kind: ConfigMap
+    metadata:
+      name: kubestellar-config
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        control-plane: controller-manager
+      name: kubestellar-controller-manager-metrics-service
+    spec:
+      ports:
+        - name: metrics
+          port: 8443
+          protocol: TCP
+          targetPort: metrics
+      selector:
+        control-plane: controller-manager
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        control-plane: controller-manager
+      name: kubestellar-controller-manager
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          control-plane: controller-manager
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/default-container: manager
+          labels:
+            control-plane: controller-manager
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values: ["amd64", "arm64", "ppc64le", "s390x"]
+                      - key: kubernetes.io/os
+                        operator: In
+                        values: ["linux"]
+          containers:
+            - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+              image: quay.io/brancz/kube-rbac-proxy:v0.19.1
+              name: kube-rbac-proxy
+              ports:
+                - containerPort: 8443
+                  name: metrics
+                  protocol: TCP
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 128Mi
+                requests:
+                  cpu: 5m
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+            - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --pprof-bind-address=:8082
+                - --leader-elect
+                - --wds-name={{"{{.ControlPlaneName}}"}}
+                - --its-name={{"{{.ITSName}}"}}
+                - --api-groups={{"{{.APIGroups}}"}}
+                - -v={{.Values.verbosity.kubestellar | default .Values.verbosity.default | default 2 }}
+              image: ghcr.io/kubestellar/kubestellar/controller-manager:{{.Values.KUBESTELLAR_VERSION}}
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                httpGet:
+                  path: /healthz
+                  port: 8081
+                initialDelaySeconds: 15
+                periodSeconds: 20
+              name: manager
+              ports:
+                - containerPort: 8082
+                  name: debug-pprof
+                  protocol: TCP
+              readinessProbe:
+                httpGet:
+                  path: /readyz
+                  port: 8081
+                initialDelaySeconds: 5
+                periodSeconds: 10
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+          securityContext:
+            runAsNonRoot: true
+          terminationGracePeriodSeconds: 10
+
+{{- end }}
