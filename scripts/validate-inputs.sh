@@ -55,13 +55,13 @@ check_test_flags
 sanitize "${TEST_FLAGS}"
 
 # Optional inputs: validate if provided
-if [[ -n "${ENVIRONMENT}" ]]; then
+if [[ -n "${ENVIRONMENT-}" ]]; then
   check_no_ctrl ENVIRONMENT
   sanitize "${ENVIRONMENT}"
   validate_environment "${ENVIRONMENT}"
 fi
 
-if [[ -n "${VERSION}" ]]; then
+if [[ -n "${VERSION-}" ]]; then
   check_no_ctrl VERSION
   sanitize "${VERSION}"
   validate_version "${VERSION}"
