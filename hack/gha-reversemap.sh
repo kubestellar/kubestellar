@@ -29,14 +29,23 @@ YQ_MIN_VERSION="yq (https://github.com/mikefarah/yq/) version v4.45"
 GIT_COMMITSHA_LENGTH=40
 TMP_OUTPUT="/tmp/$(date -u -Iseconds | cut -d '+' -f1).json"
 
+ERR_LIMITED=47
 ERR_YQ_DOWNLOAD_FAILED=50
 ERR_YQ_NOT_INSTALLED=60
 ERR_GITHUB_TOKEN_INVALID=70
+ERR_FETCH_TAG_FAIL=74
+ERR_FETCH_BRANCH_FAIL=76
 ERR_NO_SHA=79
 ERR_ARCH_UNSUPPORTED=80
+ERR_NO_ACTION=84
 ERR_NO_LATEST=86
 ERR_NO_TAG=87
 ERR_VERIFY_FAIL=90
+
+if [[ -n "$GITHUB_TOKEN" ]]
+then github_auth=("-H" "Authorization: Bearer $GITHUB_TOKEN")
+else github_auth=()
+fi
 
 help() {
     cat <<EOF
@@ -95,9 +104,16 @@ _check_yq_version() {
     fi
 }
 
-# Check github token
+# Check github token.
+# This function is not needed because commonly the user will not
+# run into the GitHub rate limit, not even without a GITHUB_TOKEN,
+# and an understandable error message is given if and when the limit
+# is hit.
+# We temporarily make this function a no-op, while gaining confidence
+# in the improved error messaging.
+# Eventually we will delete this function and the calls on it.
 _check_github_token(){
-    if [[ -z $GITHUB_TOKEN ]]; then
+    if [[ -z $GITHUB_TOKEN ]] && false; then
         _exit_with_error $ERR_GITHUB_TOKEN_INVALID "environment variable GITHUB_TOKEN is not set."
     fi
 }
@@ -109,13 +125,20 @@ _fetch_sha_from_upstream_ref() {
     action_ref_safe=$(echo "$action_ref" | cut -d '/' -f 1,2)
     API_GITHUB_BRANCH="https://api.github.com/repos/${action_ref_safe}/git/refs/heads/${tag_or_branch}"
     API_GITHUB_TAG="https://api.github.com/repos/${action_ref_safe}/git/refs/tags/${tag_or_branch}"
-    HTTP_STATUS=$(curl -o "$TMP_OUTPUT" -s -w "%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" "$API_GITHUB_TAG")
+    HTTP_STATUS=$(curl -o "$TMP_OUTPUT" -s -w "%{http_code}" "${github_auth[@]}" "$API_GITHUB_TAG")
     if [[ $HTTP_STATUS -ge 200 && $HTTP_STATUS -lt 300 ]]; then
         commit_sha=$(jq -r '.object.sha' $TMP_OUTPUT)
         # _loginfo "tag api $commit_sha"
+    elif [[ "$HTTP_STATUS" =~ 403|429 ]]; then
+        _exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_TAG' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token"
+    elif [[ "$HTTP_STATUS" != 404 ]]; then
+        _exit_with_error $ERR_FETCH_TAG_FAIL "GitHub rejected 'GET $API_GITHUB_TAG' with status $HTTP_STATUS"
+    elif { HTTP_STATUS=$(curl -o "$TMP_OUTPUT" -s -w "%{http_code}" "${github_auth[@]}" "$API_GITHUB_BRANCH"); } && [[ $HTTP_STATUS -ge 200 && $HTTP_STATUS -lt 300 ]]; then
+        commit_sha=$(jq -r '.object.sha' $TMP_OUTPUT)
+    elif [[ "$HTTP_STATUS" =~ 403|429 ]]; then
+        _exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_BRANCH' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token"
     else
-        commit_sha=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_GITHUB_BRANCH" | jq -r '.object.sha')
-        # _loginfo "branch api $commit_sha"
+        _exit_with_error $ERR_FETCH_BRANCH_FAIL "GitHub rejected 'GET $API_GITHUB_BRANCH' with status $HTTP_STATUS"
     fi
     _return "$commit_sha"
 }
@@ -154,7 +177,16 @@ _fetch_latest_tag() {
     action_ref=$1
     action_ref_safe=$(echo "$action_ref" | cut -d '/' -f 1,2)
     API_GITHUB_LATEST_RELEASE=https://api.github.com/repos/${action_ref_safe}/releases/latest
-    latest_json=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_GITHUB_LATEST_RELEASE")
+    HTTP_STATUS=$(curl -o "$TMP_OUTPUT" -s -w "%{http_code}" "${github_auth[@]}" "$API_GITHUB_LATEST_RELEASE")
+    if [[ $HTTP_STATUS -ge 200 && $HTTP_STATUS -lt 300 ]]; then
+        latest_json=$(cat "$TMP_OUTPUT")
+    elif [[ "$HTTP_STATUS" =~ 403|429 ]]; then
+        _exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_LATEST_RELEASE' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token"
+    elif [[ "$HTTP_STATUS" == 404 ]]; then
+        _exit_with_error $ERR_NO_ACTION "There is no action named '$action_ref'"
+    else
+        _exit_with_error $ERR_NO_LATEST "GitHub rejected 'GET $API_GITHUB_LATEST_RELEASE' with status $HTTP_STATUS"
+    fi
     if [ -z "$latest_json" ]; then
         _exit_with_error $ERR_NO_LATEST "GitHub returned empty response to query for latest"
     fi
@@ -307,7 +339,7 @@ run_cli() {
         exit 1
         ;;
     esac
-
+    rm -rf "$TMP_OUTPUT"
 }
 
 # Execute the main program
