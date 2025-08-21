@@ -35,17 +35,17 @@ jobs:
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.4.0
 
-      - name: Run golangci-lint (Fast Mode)
+      - name: Run golangci-lint
         run: |
-          golangci-lint run --timeout=8m --issues-exit-code=0 --config=.golangci.yaml --fast --max-issues-per-linter=50 --max-same-issues=10
+          golangci-lint run --timeout=8m --issues-exit-code=0 --config=.golangci.yaml --max-issues-per-linter=50 --max-same-issues=10
 
       - name: Add Lint Summary
         if: always()
         run: |
           echo "### Static Analysis (Resource-Efficient Mode)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Schedule**: Weekly runs (Mondays 2 AM UTC) + main branch pushes" >> $GITHUB_STEP_SUMMARY
+          echo "- **Schedule**: Weekly runs (Mondays 2 AM UTC) + manual dispatch only" >> $GITHUB_STEP_SUMMARY
           echo "- **Timeout**: Strict 10-minute limit" >> $GITHUB_STEP_SUMMARY
-          echo "- **Mode**: Fast lint with concurrency controls" >> $GITHUB_STEP_SUMMARY
+          echo "- **Mode**: Standard lint with concurrency controls" >> $GITHUB_STEP_SUMMARY
           echo "- **Purpose**: OpenSSF badge compliance visibility" >> $GITHUB_STEP_SUMMARY
           echo "- **Config**: .golangci.yaml" >> $GITHUB_STEP_SUMMARY
-          echo "- **Resource Impact**: 99% reduction vs per-PR runs" >> $GITHUB_STEP_SUMMARY
+          echo "- **Resource Impact**: Minimal overhead - weekly scheduled runs only" >> $GITHUB_STEP_SUMMARY
