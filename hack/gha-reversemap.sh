@@ -33,6 +33,7 @@ ERR_LIMITED=47
 ERR_YQ_DOWNLOAD_FAILED=50
 ERR_YQ_NOT_INSTALLED=60
 ERR_GITHUB_TOKEN_INVALID=70
+ERR_BAD_VERSION=72
 ERR_FETCH_TAG_FAIL=74
 ERR_FETCH_BRANCH_FAIL=76
 ERR_NO_SHA=79
@@ -113,9 +114,6 @@ _check_yq_version() {
 # in the improved error messaging.
 # Eventually we will delete this function and the calls on it.
 _check_github_token(){
-    if [[ -z $GITHUB_TOKEN ]] && false; then
-        _exit_with_error $ERR_GITHUB_TOKEN_INVALID "environment variable GITHUB_TOKEN is not set."
-    fi
 }
 
 # Get commitsha from an action ref upstream
@@ -126,20 +124,18 @@ _fetch_sha_from_upstream_ref() {
     API_GITHUB_BRANCH="https://api.github.com/repos/${action_ref_safe}/git/refs/heads/${tag_or_branch}"
     API_GITHUB_TAG="https://api.github.com/repos/${action_ref_safe}/git/refs/tags/${tag_or_branch}"
     HTTP_STATUS=$(curl -o "$TMP_OUTPUT" -s -w "%{http_code}" "${github_auth[@]}" "$API_GITHUB_TAG")
-    if [[ $HTTP_STATUS -ge 200 && $HTTP_STATUS -lt 300 ]]; then
-        commit_sha=$(jq -r '.object.sha' $TMP_OUTPUT)
-        # _loginfo "tag api $commit_sha"
-    elif [[ "$HTTP_STATUS" =~ 403|429 ]]; then
-        _exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_TAG' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token"
-    elif [[ "$HTTP_STATUS" != 404 ]]; then
-        _exit_with_error $ERR_FETCH_TAG_FAIL "GitHub rejected 'GET $API_GITHUB_TAG' with status $HTTP_STATUS"
-    elif { HTTP_STATUS=$(curl -o "$TMP_OUTPUT" -s -w "%{http_code}" "${github_auth[@]}" "$API_GITHUB_BRANCH"); } && [[ $HTTP_STATUS -ge 200 && $HTTP_STATUS -lt 300 ]]; then
-        commit_sha=$(jq -r '.object.sha' $TMP_OUTPUT)
-    elif [[ "$HTTP_STATUS" =~ 403|429 ]]; then
-        _exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_BRANCH' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token"
-    else
-        _exit_with_error $ERR_FETCH_BRANCH_FAIL "GitHub rejected 'GET $API_GITHUB_BRANCH' with status $HTTP_STATUS"
-    fi
+    case "$HTTP_STATUS" in
+        (2??) commit_sha=$(jq -r '.object.sha' $TMP_OUTPUT) ;;
+        (403|429) exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_TAG' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the relevant version of the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token" ;;
+        (404) HTTP_STATUS=$(curl -o "$TMP_OUTPUT" -s -w "%{http_code}" "${github_auth[@]}" "$API_GITHUB_BRANCH")
+            case "$HTTP_STATUS" in
+                (2??) commit_sha=$(jq -r '.object.sha' $TMP_OUTPUT) ;;
+                (403|429) _exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_BRANCH' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the relevant version of the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token" ;;
+                (404) _exit_with_error $ERR_BAD_VERSION "${tag_or_branch} is neither a tag nor a branch of ${action_ref_safe}" ;;
+                (*) _exit_with_error $ERR_FETCH_BRANCH_FAIL "GitHub rejected 'GET $API_GITHUB_BRANCH' with status $HTTP_STATUS" ;;
+            esac
+        (*) _exit_with_error $ERR_FETCH_TAG_FAIL "GitHub rejected 'GET $API_GITHUB_TAG' with status $HTTP_STATUS" ;;
+    esac
     _return "$commit_sha"
 }
 
@@ -181,7 +177,7 @@ _fetch_latest_tag() {
     if [[ $HTTP_STATUS -ge 200 && $HTTP_STATUS -lt 300 ]]; then
         latest_json=$(cat "$TMP_OUTPUT")
     elif [[ "$HTTP_STATUS" =~ 403|429 ]]; then
-        _exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_LATEST_RELEASE' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token"
+        _exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_LATEST_RELEASE' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the relevant version of the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token"
     elif [[ "$HTTP_STATUS" == 404 ]]; then
         _exit_with_error $ERR_NO_ACTION "There is no action named '$action_ref'"
     else
