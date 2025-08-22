@@ -68,4 +68,3 @@ The use of generative AI for writing assistance is becoming more common. Any tex
 
 ## Always Do a Spelling and Grammar Check
 
-Before committing and/or pushing new docs to the repository and creating a pull request, be sure to check your written content for spelling and grammar errors. This will a) prevent the need to do a secondary commit to correct any discovered during the PR review and b) avoid the risk that such an error will confuse or throw a reader out of the text when they are using the documentation.

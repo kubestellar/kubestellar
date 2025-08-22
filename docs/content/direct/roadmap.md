@@ -11,4 +11,3 @@ This document defines the KubeStellar feature roadmap. This document is a work-i
 - Update KubeStellar to use that KubeFlex release.
 - Upgrade to Kubernetes 1.31 .
 - Address more security vulnerabilities.
-- Work on OCM/ACM convergence.
