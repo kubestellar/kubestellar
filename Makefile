@@ -171,6 +171,23 @@ vet: ## Run go vet against code.
 test: manifests generate fmt vet ## Run tests.
 	go test ./api/... ./cmd/... ./pkg/... -coverprofile cover.out
 
+# Fuzzing configuration
+FUZZ_TIME ?= 10s
+
+.PHONY: test-fuzz
+test-fuzz: ## Run all fuzzers in the test/fuzz folder one by one
+	@echo "Running fuzz tests..."
+	@for dir in $$(go list -f '{{.Dir}}' ./test/fuzz/...); do \
+		for test in $$(go test -list=Fuzz.* $$dir | grep ^Fuzz); do \
+			echo "go test -fuzz=$$test -fuzztime=$(FUZZ_TIME)"; \
+			(cd $$dir && go test -fuzz=$$test -fuzztime=$(FUZZ_TIME)) || exit 1; \
+		done; \
+	done
+
+.PHONY: test-fuzz-short
+test-fuzz-short: ## Run fuzz tests with short duration (5s)
+	@$(MAKE) test-fuzz FUZZ_TIME=5s
+
 ##@ Build
 
 .PHONY: run
