@@ -47,7 +47,7 @@ jobs:
       - run: echo "${{ github.event_name }}"
 
       - name: echo fetching push or pull_request branch
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           persist-credentials: "false"
@@ -56,7 +56,7 @@ jobs:
       #     if: github.event_name == 'push' || github.event_name == 'pull_request'
 
       #   - name: echo fetching workflow_dispatch branch
-      #     uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      #     uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       #     with:
       #         ref: ${GITHUB_REF##*/}
       #     if: github.event_name == 'workflow_dispatch'
@@ -70,7 +70,7 @@ jobs:
           echo "$EOF" >> "$GITHUB_ENV"
         id: run_make
 
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           persist-credentials: "false"

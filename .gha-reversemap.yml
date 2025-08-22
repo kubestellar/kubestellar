@@ -1,8 +1,8 @@
 actions/checkout:
-  sha: 08c6903cd8c0fde910a37f88322edcfb5dd907a8
-  sha-url: https://github.com/actions/checkout/commit/08c6903cd8c0fde910a37f88322edcfb5dd907a8
-  tag: v5.0.0
-  tag-url: https://github.com/actions/checkout/tree/v5.0.0
+  sha: 11bd71901bbe5b1630ceea73d27597364c9af683
+  sha-url: https://github.com/actions/checkout/commit/11bd71901bbe5b1630ceea73d27597364c9af683
+  tag: v4.2.2
+  tag-url: https://github.com/actions/checkout/tree/v4.2.2
 actions/add-to-project:
   sha: 244f685bbc3b7adfa8466e08b698b5577571133e
   sha-url: https://github.com/actions/add-to-project/commit/244f685bbc3b7adfa8466e08b698b5577571133e
@@ -34,30 +34,30 @@ actions/setup-go:
   tag: v5
   tag-url: https://github.com/actions/setup-go/tree/v5
 anchore/sbom-action/download-syft:
-  sha: da167eac915b4e86f08b264dbdbc867b61be6f0c
-  sha-url: https://github.com/anchore/sbom-action/commit/da167eac915b4e86f08b264dbdbc867b61be6f0c
-  tag: v0.20.5
-  tag-url: https://github.com/anchore/sbom-action/tree/v0.20.5
+  sha: 7b36ad622f042cab6f59a75c2ac24ccb256e9b45
+  sha-url: https://github.com/anchore/sbom-action/commit/7b36ad622f042cab6f59a75c2ac24ccb256e9b45
+  tag: v0.20.4
+  tag-url: https://github.com/anchore/sbom-action/tree/v0.20.4
 goreleaser/goreleaser-action:
-  sha: e435ccd777264be153ace6237001ef4d979d3a7a
-  sha-url: https://github.com/goreleaser/goreleaser-action/commit/e435ccd777264be153ace6237001ef4d979d3a7a
-  tag: v6.4.0
-  tag-url: https://github.com/goreleaser/goreleaser-action/tree/v6.4.0
+  sha: 9c156ee8a17a598857849441385a2041ef570552
+  sha-url: https://github.com/goreleaser/goreleaser-action/commit/9c156ee8a17a598857849441385a2041ef570552
+  tag: v6
+  tag-url: https://github.com/goreleaser/goreleaser-action/tree/v6
 azure/setup-helm:
   sha: b9e51907a09c216f16ebe8536097933489208112
   sha-url: https://github.com/azure/setup-helm/commit/b9e51907a09c216f16ebe8536097933489208112
   tag: v4.3.0
   tag-url: https://github.com/azure/setup-helm/tree/v4.3.0
 docker/login-action:
-  sha: 184bdaa0721073962dff0199f1fb9940f07167d1
-  sha-url: https://github.com/docker/login-action/commit/184bdaa0721073962dff0199f1fb9940f07167d1
-  tag: v3.5.0
-  tag-url: https://github.com/docker/login-action/tree/v3.5.0
+  sha: 74a5d142397b4f367a81961eba4e8cd7edddf772
+  sha-url: https://github.com/docker/login-action/commit/74a5d142397b4f367a81961eba4e8cd7edddf772
+  tag: v3
+  tag-url: https://github.com/docker/login-action/tree/v3
 actions/first-interaction:
-  sha: 753c925c8d1ac6fede23781875376600628d9b5d
-  sha-url: https://github.com/actions/first-interaction/commit/753c925c8d1ac6fede23781875376600628d9b5d
-  tag: v3.0.0
-  tag-url: https://github.com/actions/first-interaction/tree/v3.0.0
+  sha: 2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
+  sha-url: https://github.com/actions/first-interaction/commit/2d4393e6bc0e2efb2e48fba7e06819c3bf61ffc9
+  tag: v2.0.0
+  tag-url: https://github.com/actions/first-interaction/tree/v2.0.0
 azure/setup-kubectl:
   sha: 776406bce94f63e41d621b960d78ee25c8b76ede
   sha-url: https://github.com/azure/setup-kubectl/commit/776406bce94f63e41d621b960d78ee25c8b76ede
@@ -83,6 +83,11 @@ actions/upload-artifact:
   sha-url: https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02
   tag: v4
   tag-url: https://github.com/actions/upload-artifact/tree/v4
+actions/stale:
+  sha: 5bef64f19d7facfb25b37b414482c7164d639639
+  sha-url: https://github.com/actions/stale/commit/5bef64f19d7facfb25b37b414482c7164d639639
+  tag: v9.1.0
+  tag-url: https://github.com/actions/stale/tree/v9.1.0
 actions/github-script:
   sha: 60a0d83039c74a4aee543508d2ffcb1c3799cdea
   sha-url: https://github.com/actions/github-script/commit/60a0d83039c74a4aee543508d2ffcb1c3799cdea

@@ -1,7 +1,6 @@
 site_name: KubeStellar
 repo_url: https://github.com/kubestellar/kubestellar
 site_url: https://docs.kubestellar.io/
-site_description: "KubeStellar is a Kubernetes-native multi-cluster delivery system: create once, deploy many. Safely route and synchronize resources across clouds, datacenters, and edge."
 
 repo_short_name: kubestellar/kubestellar
 repo_default_file_path: kubestellar
