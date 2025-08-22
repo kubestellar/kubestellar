@@ -1,0 +1,187 @@
+# Prow job for KubeStellar/KubeFlex compatibility E2E testing
+# Place this in kubestellar/infra/prow/jobs/kubestellar/kubestellar-kubeflex-compatibility.yaml
+presubmits:
+  - name: pull-kubestellar-kubeflex-compatibility-e2e
+    decorate: true
+    optional: true
+    max_concurrency: 2
+    branches:
+      - main
+    trigger: "(?m)^/test compatibility-e2e$"
+    rerun_command: "/test compatibility-e2e"
+    run_if_changed: ".*"
+    context: prow-compatibility-e2e
+    cluster: oci-prow
+    timeout: 3h
+    spec:
+      containers:
+        - image: ghcr.io/kubestellar/infra/build:1.24.2-1
+          command:
+            - bash
+            - -c
+            - |
+              set -ex
+              ./scripts/e2e-compatibility-matrix.sh
+          # MATRIX is populated from the 'kubestellar-compatibility-matrix' ConfigMap, managed by cluster admins or automation.
+          # This variable is used by the e2e-compatibility-matrix.sh script to determine which version pairs to test.
+        # MATRIX is populated from the 'kubestellar-compatibility-matrix' ConfigMap, managed by cluster admins or automation.
+        # This variable is used by the e2e-compatibility-matrix.sh script to determine which version pairs to test.
+        env:
+          - name: MATRIX
+            valueFrom:
+              configMapKeyRef:
+                name: kubestellar-compatibility-matrix
+                key: matrix
+        resources:
+          requests:
+            memory: 8Gi
+            cpu: 4
+        volumeMounts:
+          - name: kubeconfig
+            mountPath: /root/.kube
+      volumes:
+        - name: kubeconfig
+          secret:
+            secretName: prow-oci-kubeconfig
+    annotations:
+      testgrid-dashboards: kubestellar-compatibility
+      testgrid-tab-name: KubeStellar-KubeFlex E2E Compatibility
+    labels:
+      preset-goproxy: "true"
+      preset-dind-enabled: "true"
+      preset-oci-kubeconfig: "true"
+
+postsubmits:
+  kubestellar/kubestellar:
+    - name: post-kubestellar-kubeflex-compatibility-e2e
+      decorate: true
+      optional: true
+      rerun_command: "/test compatibility-e2e"
+      max_concurrency: 1
+      branches:
+        - main
+      cluster: oci-prow
+      timeout: 3h
+      spec:
+        containers:
+          - image: ghcr.io/kubestellar/infra/build:1.24.2-1
+            command:
+              - bash
+              - -c
+              - |
+                set -ex
+                ./scripts/e2e-compatibility-matrix.sh
+            # MATRIX is populated from the 'kubestellar-compatibility-matrix' ConfigMap, managed by cluster admins or automation.
+            # This variable is used by the e2e-compatibility-matrix.sh script to determine which version pairs to test.
+            env:
+              - name: MATRIX
+                valueFrom:
+                  configMapKeyRef:
+                    name: kubestellar-compatibility-matrix
+                    key: matrix
+            resources:
+              requests:
+                memory: 8Gi
+                cpu: 4
+            volumeMounts:
+              - name: kubeconfig
+                mountPath: /root/.kube
+        volumes:
+          - name: kubeconfig
+            secret:
+              secretName: prow-oci-kubeconfig
+      annotations:
+        testgrid-dashboards: kubestellar-compatibility
+        testgrid-tab-name: KubeStellar-KubeFlex E2E Compatibility
+      labels:
+        preset-goproxy: "true"
+        preset-dind-enabled: "true"
+        preset-oci-kubeconfig: "true"
+  kubestellar/kubeflex:
+    - name: post-kubeflex-kubestellar-compatibility-e2e
+      decorate: true
+      optional: true
+      rerun_command: "/test compatibility-e2e"
+      max_concurrency: 1
+      branches:
+        - main
+      cluster: oci-prow
+      timeout: 3h
+      spec:
+        containers:
+          - image: ghcr.io/kubestellar/infra/build:1.24.2-1
+            command:
+              - bash
+              - -c
+              - |
+                set -ex
+                ./scripts/e2e-compatibility-matrix.sh
+            # MATRIX is populated from the 'kubestellar-compatibility-matrix' ConfigMap, managed by cluster admins or automation.
+            # This variable is used by the e2e-compatibility-matrix.sh script to determine which version pairs to test.
+            env:
+              - name: MATRIX
+                valueFrom:
+                  configMapKeyRef:
+                    name: kubestellar-compatibility-matrix
+                    key: matrix
+            resources:
+              requests:
+                memory: 8Gi
+                cpu: 4
+            volumeMounts:
+              - name: kubeconfig
+                mountPath: /root/.kube
+        volumes:
+          - name: kubeconfig
+            secret:
+              secretName: prow-oci-kubeconfig
+      annotations:
+        testgrid-dashboards: kubestellar-compatibility
+        testgrid-tab-name: KubeStellar-KubeFlex E2E Compatibility
+      labels:
+        preset-goproxy: "true"
+        preset-dind-enabled: "true"
+        preset-oci-kubeconfig: "true"
+
+periodics:
+  - name: periodic-kubestellar-kubeflex-compatibility-e2e
+    cron: "0 2 * * *"
+    decorate: true
+    optional: false
+    cluster: oci-prow
+    timeout: 3h
+    spec:
+      containers:
+        - image: ghcr.io/kubestellar/infra/build:1.24.2-1
+          command:
+            - bash
+            - -c
+            - |
+              set -ex
+              ./scripts/e2e-compatibility-matrix.sh
+          # MATRIX is populated from the 'kubestellar-compatibility-matrix' ConfigMap, managed by cluster admins or automation.
+          # This variable is used by the e2e-compatibility-matrix.sh script to determine which version pairs to test.
+          env:
+            - name: MATRIX
+              valueFrom:
+                configMapKeyRef:
+                  name: kubestellar-compatibility-matrix
+                  key: matrix
+          resources:
+            requests:
+              memory: 8Gi
+              cpu: 4
+          volumeMounts:
+            - name: kubeconfig
+              mountPath: /root/.kube
+      volumes:
+        - name: kubeconfig
+          secret:
+            secretName: prow-oci-kubeconfig
+    annotations:
+      testgrid-dashboards: kubestellar-compatibility
+      testgrid-tab-name: KubeStellar-KubeFlex E2E Compatibility
+    labels:
+      preset-goproxy: "true"
+      preset-dind-enabled: "true"
+      preset-oci-kubeconfig: "true"
