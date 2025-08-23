@@ -3,7 +3,7 @@
 KubeStellar aims to follow the principle of least privilege by not adding any privileges beyond those required by its dependencies. Because KubeStellar uses Open Cluster Management (OCM) for distribution, the default permissions for downsyncing are exactly those of the OCM work agent ("klusterlet work agent"). OCM provides broad default permissions for convenience, which KubeStellar inherits. You can customize these permissions to meet your specific security requirements.
 
 - The work agent runs in the WEC as ServiceAccount `klusterlet-work-sa` in the namespace `open-cluster-management-agent`.
-- The baseline, default permissions for the agent are defined by OCM. See OCM’s documentation: https://open-cluster-management.io/docs/concepts/work-distribution/manifestwork/#permission-setting-for-work-agent
+- The baseline, default permissions for the agent are defined by OCM. See OCM's documentation: [Permission setting for work agent](https://open-cluster-management.io/docs/concepts/work-distribution/manifestwork/#permission-setting-for-work-agent)
 
 If you want the agent to manipulate additional API resources (for example, custom resources not covered by the defaults), you must explicitly expand authorization.
 
@@ -24,13 +24,13 @@ metadata:
   name: example-crd-access  # Use a descriptive name for your use case
 rules:
 - apiGroups: ["example.my.group"]  # Replace with your actual API group
-  resources: ["widgets"]           # Replace with your custom resource types
-  verbs: ["get", "list", "watch", "create", "update", "patch"]  # Add only verbs you need
+  resources: ["widgets"]           # Replace with your custom resources
+  verbs: ["get", "list", "watch", "create", "update", "patch"]  # Recommendation: add only verbs you need
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: klusterlet-example-crd-access  # Must match your ClusterRole purpose
+  name: klusterlet-example-crd-access  # Should identify your ClusterRole purpose
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -59,15 +59,15 @@ metadata:
     open-cluster-management.io/aggregate-to-work: "true"  # This label enables auto-aggregation
 rules:
 - apiGroups: ["example.my.group"]  # Replace with your actual API group
-  resources: ["widgets"]           # Replace with your custom resource types
+  resources: ["widgets"]           # Replace with your custom resources
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]  # Include needed verbs
 ```
 
-Refer to OCM’s docs for details on both methods: https://open-cluster-management.io/docs/concepts/work-distribution/manifestwork/#permission-setting-for-work-agent
+Refer to OCM's docs for details on both methods: [Permission setting for work agent](https://open-cluster-management.io/docs/concepts/work-distribution/manifestwork/#permission-setting-for-work-agent)
 
 ## Concrete example: Out-of-tree CRDs
 
-Our Example Scenarios show how to grant the agent the additional rights needed to manipulate an out-of-tree CRD (AppWrapper). See [Scenario 2](./example-scenarios.md#scenario-2---out-of-tree-workload) in the Example Scenarios.
+Scenario 2 shows how to grant the agent the additional rights needed to manipulate an out-of-tree CRD (AppWrapper). See [Scenario 2](./example-scenarios.md#scenario-2---out-of-tree-workload) in the Example Scenarios.
 
 ## Why KubeStellar does not auto-grant
 
