@@ -35,8 +35,21 @@ jobs:
       - name: Set LDFLAGS
         run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
 
+      - name: Validate tag and version
+        run: |
+          set -euo pipefail
+          ref="${{ github.ref_name }}"
+          if ! printf '%s' "$ref" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'; then
+            echo "Invalid tag format: $ref. Expected vMAJOR.MINOR.PATCH, optionally with pre-release (-PRERELEASE) and/or build (+BUILD) metadata." >&2
+            exit 1
+          fi
+          VERSION="${ref#v}"
+          export VERSION
+          ./scripts/validate-inputs.sh
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
       - name: Install syft binary executable
-        uses: anchore/sbom-action/download-syft@da167eac915b4e86f08b264dbdbc867b61be6f0c
+        uses: anchore/sbom-action/download-syft@7b36ad622f042cab6f59a75c2ac24ccb256e9b45
 
       - name: Run GoReleaser on tag
         uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a
@@ -55,7 +68,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to registry
-        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -63,7 +76,7 @@ jobs:
 
       - name: Package and push charts
         run: |
-          chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
+          chartVersion="${VERSION}"
 
           sed -i "s/^KUBESTELLAR_VERSION:.*$/KUBESTELLAR_VERSION: \"${chartVersion}\"/g" ${{ env.CORE_CHART_PATH }}/values.yaml
 

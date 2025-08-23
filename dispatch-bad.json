@@ -1,0 +1,4 @@
+{
+  "ref": "refs/heads/main",
+  "inputs": { "testFlags": "--bad" }
+}

@@ -57,7 +57,7 @@ Have a look at what we are working on next, see our [Roadmap](docs/content/direc
 
 There are several ways to communicate with us:
 
-Instantly get access to our documents and meeting invites at http://kubestellar.io/joinus
+Instantly get access to our documents and meeting invites at https://kubestellar.io/joinus
 
 - The [`#kubestellar-dev` channel](https://cloud-native.slack.com/archives/C097094RZ3M) in the [CNCF Slack workspace](https://communityinviter.com/apps/cloud-native/cncf)
 - Our mailing lists:

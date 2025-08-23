@@ -1,0 +1,7 @@
+# lychee configuration for KubeStellar
+# Exclude localhost HTTP links from validation (dev-only)
+[exclude]
+regex = ["http://localhost", "http://127.0.0.1"]
+
+[options]
+max-concurrency = 20
