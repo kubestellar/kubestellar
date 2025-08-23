@@ -65,6 +65,7 @@ nav:
               - Binding: direct/binding.md
               - Transforming desired state: direct/transforming.md
               - Combining reported state: direct/combined-status.md
+          - Authorization in WECs: direct/authorization.md
           - Example Scenarios: direct/example-scenarios.md
           - Third-party integrations:
               - ArgoCD to WDS: direct/argo-to-wds1.md
