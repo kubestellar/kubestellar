@@ -50,6 +50,11 @@ See the [Getting Started setup guide](direct/get-started.md) for getting started
 
 We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](contribution-guidelines/contributing-inc.md) guide.
 
+## Repository Ecosystem
+
+For a full list of KubeStellar repositories and their purposes, see [REPOSITORIES.md](./REPOSITORIES.md).
+
+
 ## Getting in touch
 
 There are several ways to communicate with us:
