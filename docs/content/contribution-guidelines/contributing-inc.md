@@ -144,6 +144,36 @@ script](https://github.com/kubestellar/kubestellar/blob/main/hack/gha-reversemap
 for updating and checking this stuff. There is a workflow that checks
 that every workflow follows the discipline here.
 
+The following abbreviated typescript shows an example of using that
+script to bump the GitHub Action `actions/checkout` in the reversemap
+file to the Action's latest version and then applying that file to all
+the workflows --- thus bumping that Action in all the workflows while
+maintaining discipline.
+
+```console
+$ hack/gha-reversemap.sh update-action-version actions/checkout
+2025-08-22T02:13:38-04:00;INFO;running update-action-version on actions/checkout
+2025-08-22T02:13:38-04:00;INFO;updating dependency 'actions/checkout' tag to latest version available inside reverse map '.gha-reversemap.yml'
+
+$ hack/gha-reversemap.sh apply-reversemap      
+2025-08-22T02:13:50-04:00;INFO;running apply-reversemap on ./.github/workflows/*.y*ml
+2025-08-22T02:13:50-04:00;INFO;applying '.gha-reversemap.yml' commit sha to be used in './.github/workflows/add-help-wanted.yml' ...
+2025-08-22T02:13:50-04:00;INFO;found 'actions/github-script' in reversemap with sha=60a0d83039c74a4aee543508d2ffcb1c3799cdea
+2025-08-22T02:13:50-04:00;INFO;applying '.gha-reversemap.yml' commit sha to be used in './.github/workflows/add-to-project.yml' ...
+2025-08-22T02:13:50-04:00;INFO;found 'actions/checkout' in reversemap with sha=08c6903cd8c0fde910a37f88322edcfb5dd907a8
+...
+```
+
+The `update-action-version` and `update-reversemap` operations in that
+script make calls on the GitHub API --- which are [rate
+limited](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api). Unauthenticated
+calls have a relatively low rate limit. Modest usage of this script is
+unlikely to hit this rate limit. If you run into the rate limit when
+not using authentication then you can add authentication by setting
+the environment variable `GITHUB_TOKEN` to a GitHub Personal Access
+Token. All "classic" tokens suffice. For "fine-grained" tokens, the
+only privilege needed is Read access to `metadata`.
+
 #### Review and Approval Process
 
 Reviewers will review your PR within a business day. A PR requires both an `/lgtm` and then an `/approve` in order to get merged. These are commands to Prow, each appearing alone on a line in a comment of the PR. You may `/approve` your own PR but you may not `/lgtm` it. Once both forms of assent have been given and the other gating checks have passed, the PR will go into the Prow merge queue and eventually be merged. Once that happens, you will be notified:
