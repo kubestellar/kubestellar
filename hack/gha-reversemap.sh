@@ -174,9 +174,9 @@ _fetch_latest_tag() {
     action_ref_safe=$(echo "$action_ref" | cut -d '/' -f 1,2)
     API_GITHUB_LATEST_RELEASE=https://api.github.com/repos/${action_ref_safe}/releases/latest
     HTTP_STATUS=$(curl -o "$TMP_OUTPUT" -s -w "%{http_code}" "${github_auth[@]}" "$API_GITHUB_LATEST_RELEASE")
-    if [[ $HTTP_STATUS -ge 200 && $HTTP_STATUS -lt 300 ]]; then
+    if [[ "$HTTP_STATUS" -ge 200 && "$HTTP_STATUS" -lt 300 ]]; then
         latest_json=$(cat "$TMP_OUTPUT")
-    elif [[ "$HTTP_STATUS" =~ 403|429 ]]; then
+    elif [[ "$HTTP_STATUS" == 403 || "$HTTP_STATUS" == 429 ]]; then
         _exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_LATEST_RELEASE' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the relevant version of the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token"
     elif [[ "$HTTP_STATUS" == 404 ]]; then
         _exit_with_error $ERR_NO_ACTION "There is no action named '$action_ref'"
