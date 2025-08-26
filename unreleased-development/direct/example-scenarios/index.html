@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://docs.kubestellar.io/unreleased-development/direct/example-scenarios/">
       
       
-        <link rel="prev" href="../combined-status/">
+        <link rel="prev" href="../authorization/">
       
       
         <link rel="next" href="../argo-to-wds1/">
@@ -1515,6 +1515,8 @@
       
         
       
+        
+      
     
     
     
@@ -1743,6 +1745,29 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authorization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Authorization in WECs
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -2006,10 +2031,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6_5" >
         
           
-          <label class="md-nav__link" for="__nav_4_6_4" id="__nav_4_6_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_6_5" id="__nav_4_6_5_label" tabindex="0">
             
   
   
@@ -2022,8 +2047,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_6_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_6_4">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_6_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6_5">
             <span class="md-nav__icon md-icon"></span>
             Third-party integrations
           </label>
@@ -2117,10 +2142,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_6_6" id="__nav_4_6_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_6_7" id="__nav_4_6_7_label" tabindex="0">
             
   
   
@@ -2133,8 +2158,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_6_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_6_6">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_6_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6_7">
             <span class="md-nav__icon md-icon"></span>
             Known Issues
           </label>
@@ -3832,6 +3857,7 @@ object kind is defined by a <code>CustomResourceDefinition</code> object. While
 KubeStellar can handle the case where the CRD is part of the workload,
 this example concerns the case where the CRD is established in the
 WECs by some other means.</p>
+<p>For background on authorization of the OCM work agent in WECs and how to expand it safely, see <a href="../authorization/">Authorization in WECs</a>.</p>
 <p>For this example, we use the <code>AppWrapper</code> custom resource defined in the
 <a href="https://github.com/project-codeflare/multi-cluster-app-dispatcher">multi cluster app dispatcher</a>
 project.</p>
@@ -4230,7 +4256,7 @@ are not created in the WDS and both clusters:</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../combined-status/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Combining reported state">
+          <a href="../authorization/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Authorization in WECs">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -4240,7 +4266,7 @@ are not created in the WDS and both clusters:</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Combining reported state
+                Authorization in WECs
               </div>
             </div>
           </a>
