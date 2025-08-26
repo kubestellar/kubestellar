@@ -124,6 +124,8 @@ KubeStellar can handle the case where the CRD is part of the workload,
 this example concerns the case where the CRD is established in the
 WECs by some other means.
 
+For background on authorization of the OCM work agent in WECs and how to expand it safely, see [Authorization in WECs](./authorization.md).
+
 For this example, we use the `AppWrapper` custom resource defined in the
 [multi cluster app dispatcher](https://github.com/project-codeflare/multi-cluster-app-dispatcher)
 project.
