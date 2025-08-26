@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.17">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.18">
     
     
       
@@ -3824,6 +3824,32 @@ version. There is <a href="https://github.com/kubestellar/kubestellar/blob/main/
 script</a>
 for updating and checking this stuff. There is a workflow that checks
 that every workflow follows the discipline here.</p>
+<p>The following abbreviated typescript shows an example of using that
+script to bump the GitHub Action <code>actions/checkout</code> in the reversemap
+file to the Action's latest version and then applying that file to all
+the workflows --- thus bumping that Action in all the workflows while
+maintaining discipline.</p>
+<div class="language-console highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gp">$ </span>hack/gha-reversemap.sh<span class="w"> </span>update-action-version<span class="w"> </span>actions/checkout
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">2025-08-22T02:13:38-04:00;INFO;running update-action-version on actions/checkout</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="go">2025-08-22T02:13:38-04:00;INFO;updating dependency &#39;actions/checkout&#39; tag to latest version available inside reverse map &#39;.gha-reversemap.yml&#39;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="gp">$ </span>hack/gha-reversemap.sh<span class="w"> </span>apply-reversemap<span class="w">      </span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">2025-08-22T02:13:50-04:00;INFO;running apply-reversemap on ./.github/workflows/*.y*ml</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="go">2025-08-22T02:13:50-04:00;INFO;applying &#39;.gha-reversemap.yml&#39; commit sha to be used in &#39;./.github/workflows/add-help-wanted.yml&#39; ...</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="go">2025-08-22T02:13:50-04:00;INFO;found &#39;actions/github-script&#39; in reversemap with sha=60a0d83039c74a4aee543508d2ffcb1c3799cdea</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="go">2025-08-22T02:13:50-04:00;INFO;applying &#39;.gha-reversemap.yml&#39; commit sha to be used in &#39;./.github/workflows/add-to-project.yml&#39; ...</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="go">2025-08-22T02:13:50-04:00;INFO;found &#39;actions/checkout&#39; in reversemap with sha=08c6903cd8c0fde910a37f88322edcfb5dd907a8</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="go">...</span>
+</code></pre></div>
+<p>The <code>update-action-version</code> and <code>update-reversemap</code> operations in that
+script make calls on the GitHub API --- which are <a href="https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api">rate
+limited</a>. Unauthenticated
+calls have a relatively low rate limit. Modest usage of this script is
+unlikely to hit this rate limit. If you run into the rate limit when
+not using authentication then you can add authentication by setting
+the environment variable <code>GITHUB_TOKEN</code> to a GitHub Personal Access
+Token. All "classic" tokens suffice. For "fine-grained" tokens, the
+only privilege needed is Read access to <code>metadata</code>.</p>
 <h4 id="review-and-approval-process">Review and Approval Process<a class="headerlink" href="#review-and-approval-process" title="Permanent link">#</a></h4>
 <p>Reviewers will review your PR within a business day. A PR requires both an <code>/lgtm</code> and then an <code>/approve</code> in order to get merged. These are commands to Prow, each appearing alone on a line in a comment of the PR. You may <code>/approve</code> your own PR but you may not <code>/lgtm</code> it. Once both forms of assent have been given and the other gating checks have passed, the PR will go into the Prow merge queue and eventually be merged. Once that happens, you will be notified:</p>
 <p><em>Congratulations! Your pull request has been successfully merged!</em> 👏</p>
