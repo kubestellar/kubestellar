@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: latency-controller-servicemonitor
+  namespace: ks-monitoring
+  labels:
+    app: latency-controller
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: latency-controller
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: 30s
+  namespaceSelector:
+    matchNames:
+    - %WDS%-system
