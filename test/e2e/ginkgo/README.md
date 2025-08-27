@@ -1,8 +1,9 @@
 # ginkgo end-to-end testing
 
 This end to end testing includes:
-1. deployments are downsync propagated to the WECs
+1. Deployments are downsync propagated to the WECs
 1. Update of the workload object on WDS should update the object on the WECs. Increase the number of replicas from 1 to 2, verify they are updated on the WECs.
+1. Supports to the 'create-only' mode
 1. Changing the BindingPolicy objectSelector to no longer match should delete the object from the WECs
 1. Changing the BindingPolicy objectSelector to match should create the object on the WECs
 1. Delete of an overlapping BindingPolicy object should not delete objects on the WECs
