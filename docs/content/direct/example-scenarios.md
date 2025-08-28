@@ -20,7 +20,7 @@ Each example scenario concludes with instructions on how to undo its effects.
 
 There are also end-to-end (E2E) tests that are based on scenario 4 and an extended variant of scenario 1. These tests normally exercise the copy of the repo containing them (rather than a release). They can alternatively test a release. See the e2e tests (in `test/e2e`). Contributors can run these tests, and CI includes checking that these E2E tests pass. Some of these tests, and the setup for all of them, are written in `bash` so that contributors can easily follow them.
 
-## Scenario 0 - look around
+## Scenario 0: look around
 
 The following command will list all the `ManagedCluster` objects that will be relevant to these scenarios.
 
@@ -30,7 +30,7 @@ kubectl --context "$its_context" get managedclusters -l "$label_query_both"
 
 Expect to get a listing of your two `ManagedCluster` objects.
 
-## Scenario 1 - multi-cluster workload deployment with kubectl
+## Scenario 1: multi-cluster workload deployment with kubectl
 
 Create a BindingPolicy to deliver an app to all clusters in the WDS:
 
@@ -115,7 +115,7 @@ kubectl --context "$wds_context" delete ns nginx
 kubectl --context "$wds_context" delete bindingpolicies nginx-bpolicy
 ```
 
-## Scenario 2 - Out-of-tree workload
+## Scenario 2: Out-of-tree workload
 
 This scenario is like the previous one but involves a workload whose
 kind of objects is not built into Kubernetes. Instead, the workload
@@ -242,7 +242,7 @@ clusters=("$wds_context" "$wec1_context" "$wec2_context");
 done
 ```
 
-## Scenario 3 - multi-cluster workload deployment with helm
+## Scenario 3: multi-cluster workload deployment with helm
 
 Create a BindingPolicy for the helm chart app:
 
@@ -326,7 +326,7 @@ kubectl --context "$wds_context" delete ns postgres-system
 kubectl --context "$wds_context" delete bindingpolicies postgres-bpolicy
 ```
 
-## Scenario 4 - Singleton status
+## Scenario 4: Singleton status
 
 This scenario shows how to get the full status updated, by setting `wantSingletonReportedState`
 in a `DownsyncPolicyClause`. This still an experimental feature.
@@ -404,7 +404,7 @@ kubectl --context "$wds_context" delete bindingpolicies nginx-singleton-bpolicy
 kubectl --context "$wds_context" delete deployments nginx-singleton-deployment
 ```
 
-## Scenario 5 - Resiliency testing
+## Scenario 5: Resiliency testing
 
 This is a test that you can do after finishing Scenario 1.
 
@@ -500,7 +500,7 @@ kubectl --context "$wds_context" delete ns nginx-res
 kubectl --context "$wds_context" delete bindingpolicies nginx-res-bpolicy
 ```
 
-## Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD
+## Scenario 6: multi-cluster workload deployment of app with ServiceAccount with ArgoCD
 
 Before running this scenario, install ArgoCD on the hosting cluster and configure it
 work with the WDS as outlined [here](argo-to-wds1.md).
