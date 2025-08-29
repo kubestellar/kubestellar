@@ -154,6 +154,8 @@ if [ $opt == "core" ];then
       --set env.GF_AUTH_ANONYMOUS_ENABLED=true \
       --set env.GF_AUTH_ANONYMOUS_ORG_ROLE=Admin \
       --set env.GF_DIAGNOSTICS_PROFILING_ENABLED=true \
+      --set env.GF_SECURITY_ALLOW_EMBEDDING=true \
+      --set env.GF_SECURITY_X_FRAME_OPTIONS='' \
       --set env.GF_DIAGNOSTICS_PROFILING_ADDR=0.0.0.0 \
       --set env.GF_DIAGNOSTICS_PROFILING_PORT=6060 \
       --set-string 'podAnnotations.pyroscope\.grafana\.com/scrape=true' \
