@@ -130,7 +130,19 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				ctx, "nginx", types.MergePatchType, objPatch, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			time.Sleep(30 * time.Second)
+			// Wait for the CombinedStatus object to exist and have the right contents
+			// instead of using a fixed time delay
+			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, "nginx", "nginx", func(cs *ksapi.CombinedStatus) error {
+				// For create-only mode, we expect the CombinedStatus to reflect the original state
+				// The deployment should remain at 1 replica despite the WDS change
+				if len(cs.Results) == 0 {
+					return fmt.Errorf("expected CombinedStatus to have results, but got none")
+				}
+				// Additional validation can be added here if needed for specific status collectors
+				return nil
+			})
+
+			// Now validate that the deployment replicas remain unchanged (create-only mode)
 			gomega.Expect(util.GetNumDeploymentReplicas(ctx, wec1, ns)).To(gomega.Equal(1))
 			gomega.Expect(util.GetNumDeploymentReplicas(ctx, wec2, ns)).To(gomega.Equal(1))
 			dep1b := util.GetDeployment(ctx, wec1, ns, "nginx")
