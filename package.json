@@ -6,7 +6,18 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "analyze": "ANALYZE=true npm run build",
+    "export": "next export",
+    "clean": "rm -rf .next out",
+    "test": "echo \"No tests specified\" && exit 0",
+    "test:watch": "echo \"No tests specified\" && exit 0",
+    "audit": "npm audit --audit-level=moderate",
+    "update-deps": "npm update && npm audit fix"
   },
   "dependencies": {
     "react": "^19.0.0",
