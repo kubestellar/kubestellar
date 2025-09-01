@@ -33,8 +33,7 @@ You can also email the private [kubestellar-security-announce@googlegroups.com](
 - You think you discovered a potential security vulnerability in KubeStellar
 - You are unsure how a vulnerability affects KubeStellar
 - You think you discovered a vulnerability in another project that KubeStellar depends on
-    - For projects with their own vulnerability reporting and disclosure process, please report it directly there
-
+- For projects with their own vulnerability reporting and disclosure process, please report it directly there
 
 ### When Should I NOT Report a Vulnerability?
 
@@ -44,7 +43,12 @@ You can also email the private [kubestellar-security-announce@googlegroups.com](
 
 ## Security Vulnerability Response
 
-Each report is acknowledged and analyzed by the maintainers of KubeStellar within 3 working days.
+Each report is acknowledged and analyzed by the maintainers of KubeStellar within 3 working days, which is well within the OpenSSF requirement of an initial response within 14 days.
+We guarantee that all valid vulnerability reports will receive an initial acknowledgment within 14 days of receipt.
+
+If no vulnerability reports are received during a given 6‑month period, this will be noted in the OpenSSF badge application with a justification of "Not Applicable."
+
+This monitoring process ensures that any vulnerability report is seen, acknowledged, and acted upon in a timely and consistent manner.
 
 Any vulnerability information shared with Security Response Committee stays within KubeStellar project and will not be disseminated to other projects unless it is necessary to get the issue fixed.
 
