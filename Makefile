@@ -352,5 +352,4 @@ build: bin-dir require-jq require-go require-git verify-go-versions  ## Build th
 bin-dir:
 	mkdir -p bin
 
-
 include Makefile.venv
