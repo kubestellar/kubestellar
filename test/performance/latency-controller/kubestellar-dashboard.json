@@ -115,7 +115,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_e2e_latency_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_e2e_latency_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "99th %ile - {{cluster}}",
           "refId": "A"
         },
@@ -125,7 +125,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_e2e_latency_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_e2e_latency_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "75th %ile - {{cluster}}",
           "refId": "B"
         },
@@ -135,7 +135,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_e2e_latency_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_e2e_latency_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "50th %ile - {{cluster}}",
           "refId": "C"
         },
@@ -145,7 +145,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_e2e_latency_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_e2e_latency_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "25th %ile - {{cluster}}",
           "refId": "D"
         }
@@ -252,7 +252,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_downsync_packaging_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_downsync_packaging_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "99th %ile - {{cluster}}",
           "refId": "A"
         },
@@ -262,7 +262,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_downsync_packaging_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_downsync_packaging_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "75th %ile - {{cluster}}",
           "refId": "B"
         },
@@ -272,7 +272,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_downsync_packaging_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_downsync_packaging_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "50th %ile - {{cluster}}",
           "refId": "C"
         },
@@ -282,7 +282,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_downsync_packaging_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_downsync_packaging_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "25th %ile - {{cluster}}",
           "refId": "D"
         }
@@ -376,7 +376,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_downsync_delivery_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_downsync_delivery_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "99th %ile - {{cluster}}",
           "refId": "A"
         },
@@ -386,7 +386,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_downsync_delivery_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_downsync_delivery_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "75th %ile - {{cluster}}",
           "refId": "B"
         },
@@ -396,7 +396,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_downsync_delivery_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_downsync_delivery_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "50th %ile - {{cluster}}",
           "refId": "C"
         },
@@ -406,7 +406,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_downsync_delivery_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_downsync_delivery_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "25th %ile - {{cluster}}",
           "refId": "D"
         }
@@ -500,7 +500,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_downsync_activation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_downsync_activation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "99th %ile - {{cluster}}",
           "refId": "A"
         },
@@ -510,7 +510,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_downsync_activation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_downsync_activation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "75th %ile - {{cluster}}",
           "refId": "B"
         },
@@ -520,7 +520,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_downsync_activation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_downsync_activation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "50th %ile - {{cluster}}",
           "refId": "C"
         },
@@ -530,7 +530,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_downsync_activation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_downsync_activation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "25th %ile - {{cluster}}",
           "refId": "D"
         }
@@ -637,7 +637,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_statusPropagation_report_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_statusPropagation_report_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "99th %ile - {{cluster}}",
           "refId": "A"
         },
@@ -647,7 +647,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_statusPropagation_report_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_statusPropagation_report_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "75th %ile - {{cluster}}",
           "refId": "B"
         },
@@ -657,7 +657,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_statusPropagation_report_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_statusPropagation_report_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "50th %ile - {{cluster}}",
           "refId": "C"
         },
@@ -667,7 +667,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_statusPropagation_report_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_statusPropagation_report_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "25th %ile - {{cluster}}",
           "refId": "D"
         }
@@ -761,7 +761,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_statusPropagation_finalization_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_statusPropagation_finalization_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "99th %ile - {{cluster}}",
           "refId": "A"
         },
@@ -771,7 +771,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_statusPropagation_finalization_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_statusPropagation_finalization_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "75th %ile - {{cluster}}",
           "refId": "B"
         },
@@ -781,7 +781,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_statusPropagation_finalization_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_statusPropagation_finalization_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "50th %ile - {{cluster}}",
           "refId": "C"
         },
@@ -791,7 +791,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_statusPropagation_finalization_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_statusPropagation_finalization_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "25th %ile - {{cluster}}",
           "refId": "D"
         }
@@ -898,7 +898,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_downsync_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_downsync_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "99th %ile - {{cluster}}",
           "refId": "A"
         },
@@ -908,7 +908,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_downsync_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_downsync_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "75th %ile - {{cluster}}",
           "refId": "B"
         },
@@ -918,7 +918,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_downsync_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_downsync_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "50th %ile - {{cluster}}",
           "refId": "C"
         },
@@ -928,7 +928,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_downsync_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_downsync_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "25th %ile - {{cluster}}",
           "refId": "D"
         }
@@ -1022,7 +1022,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_statusPropagation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le, cluster) (rate(kubestellar_statusPropagation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "99th %ile - {{cluster}}",
           "refId": "A"
         },
@@ -1032,7 +1032,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_statusPropagation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.75, sum by (le, cluster) (rate(kubestellar_statusPropagation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "75th %ile - {{cluster}}",
           "refId": "B"
         },
@@ -1042,7 +1042,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_statusPropagation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le, cluster) (rate(kubestellar_statusPropagation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "50th %ile - {{cluster}}",
           "refId": "C"
         },
@@ -1052,7 +1052,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_statusPropagation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"}[5m])))",
+          "expr": "histogram_quantile(0.25, sum by (le, cluster) (rate(kubestellar_statusPropagation_duration_seconds_bucket{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"}[5m])))",
           "legendFormat": "25th %ile - {{cluster}}",
           "refId": "D"
         }
@@ -1157,7 +1157,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (cluster) (kubestellar_workload_count{cluster=~\"$cluster\", namespace=~\"$namespace\", bindingpolicy=~\"$bindingpolicy\"})",
+          "expr": "sum by (cluster) (kubestellar_workload_count{cluster=~\"$cluster\", namespace=~\"$namespace\", exported_namespace=~\"$exported_namespace\", bindingPolicyname=~\"$bindingPolicyname\"})",
           "legendFormat": "{{cluster}}",
           "refId": "A"
         }
@@ -1196,8 +1196,31 @@
         "type": "datasource"
       },
       {
+        "name": "exported_namespace",
+        "label": "namespace",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "query": {
+          "query": "label_values(kubestellar_downsync_packaging_duration_seconds_count, exported_namespace)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "multi": false,
+        "includeAll": false,
+        "skipUrlSync": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      },
+      {
         "name": "namespace",
-        "label": "Namespace",
+        "label": "WDS",
         "type": "query",
         "datasource": {
           "type": "prometheus",
@@ -1209,8 +1232,8 @@
         },
         "refresh": 1,
         "regex": "",
-        "multi": true,
-        "includeAll": true,
+        "multi": false,
+        "includeAll": false,
         "skipUrlSync": false,
         "current": {
           "selected": true,
@@ -1219,21 +1242,21 @@
         }
       },
       {
-        "name": "bindingpolicy",
-        "label": "Binding Policy",
+        "name": "bindingPolicyname",
+        "label": "Binding Policy Name",
         "type": "query",
         "datasource": {
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
         "query": {
-          "query": "label_values(kubestellar_downsync_packaging_duration_seconds_count, bindingpolicy)",
+          "query": "label_values(kubestellar_e2e_latency_duration_seconds_count, bindingPolicyname)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
         "regex": "",
-        "multi": true,
-        "includeAll": true,
+        "multi": false,
+        "includeAll": false,
         "skipUrlSync": false,
         "current": {
           "selected": true,
@@ -1258,12 +1281,12 @@
         },
         "definition": "label_values(kubestellar_downsync_packaging_duration_seconds_count, cluster)",
         "hide": 0,
-        "includeAll": true,
-        "multi": true,
+        "includeAll": false,
+        "multi": false,
         "name": "cluster",
         "options": [],
         "query": {
-          "query": "label_values(kubestellar_downsync_packaging_duration_seconds_count, cluster)",
+          "query": "label_values(kubestellar_e2e_latency_duration_seconds_count, cluster)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
@@ -1275,25 +1298,14 @@
       {
         "name": "object_type",
         "label": "Object Type",
-        "type": "custom",
-        "query": "Deployment",
-        "hide": 0,
-        "includeAll": false,
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "query": { "query": "label_values(kubestellar_e2e_latency_duration_seconds_count, kind)", "refId": "StandardVariableQuery" },
+        "refresh": 2,
         "multi": false,
-        "allValue": null,
-        "current": {
-          "selected": true,
-          "text": "Deployment",
-          "value": "Deployment"
-        },
-        "options": [
-          {
-            "text": "Deployment",
-            "value": "Deployment",
-            "selected": true
-          }
-        ],
-        "skipUrlSync": false
+        "includeAll": false,
+        "hide": 0,
+        "current": { "selected": true, "text": "All", "value": "$__all" }
       }
     ]
   },
