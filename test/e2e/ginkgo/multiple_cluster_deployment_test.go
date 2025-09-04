@@ -84,15 +84,15 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				ctx, "nginx", types.MergePatchType, patch, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 2)
-			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 2)
+			util.ValidateDeploymentReplicas(ctx, wec1, ns, "nginx", 2)
+			util.ValidateDeploymentReplicas(ctx, wec2, ns, "nginx", 2)
 		})
 
 		ginkgo.It("supports create-only mode", func(ctx context.Context) {
 			ginkgo.By("deleting old BindingPolicy and expecting Deployment deletions")
 			util.DeleteBindingPolicy(ctx, ksWds, "nginx")
-			util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 0)
-			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 0)
+			util.ValidateDeploymentDeletion(ctx, wec1, ns, "nginx")
+			util.ValidateDeploymentDeletion(ctx, wec2, ns, "nginx")
 
 			ginkgo.By("creating new BindingPolicy and expecting corresponding Binding")
 			util.CreateBindingPolicy(ctx, ksWds, "nginx",
@@ -119,8 +119,8 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					len(binding.Spec.Workload.NamespaceScope) == 1 &&
 					binding.Spec.Workload.NamespaceScope[0].CreateOnly
 			})
-			util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 1)
-			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 1)
+			util.ValidateDeploymentReplicas(ctx, wec1, ns, "nginx", 1)
+			util.ValidateDeploymentReplicas(ctx, wec2, ns, "nginx", 1)
 			dep1 := util.GetDeployment(ctx, wec1, ns, "nginx")
 			dep2 := util.GetDeployment(ctx, wec2, ns, "nginx")
 
