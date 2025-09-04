@@ -113,7 +113,8 @@ _check_yq_version() {
 # We temporarily make this function a no-op, while gaining confidence
 # in the improved error messaging.
 # Eventually we will delete this function and the calls on it.
-_check_github_token(){
+_check_github_token() {
+    return 0
 }
 
 # Get commitsha from an action ref upstream
@@ -133,7 +134,7 @@ _fetch_sha_from_upstream_ref() {
                 (403|429) _exit_with_error $ERR_LIMITED "GitHub rejected 'GET $API_GITHUB_BRANCH' with status $HTTP_STATUS, probably due to rate limiting. See https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api and information about 'GitHub Action reference discipline' on the relevant version of the [KubeStellar website](https://kubestellar.io/), then invoke this script with the environment variable GITHUB_TOKEN set to any valid token" ;;
                 (404) _exit_with_error $ERR_BAD_VERSION "${tag_or_branch} is neither a tag nor a branch of ${action_ref_safe}" ;;
                 (*) _exit_with_error $ERR_FETCH_BRANCH_FAIL "GitHub rejected 'GET $API_GITHUB_BRANCH' with status $HTTP_STATUS" ;;
-            esac
+            esac ;;
         (*) _exit_with_error $ERR_FETCH_TAG_FAIL "GitHub rejected 'GET $API_GITHUB_TAG' with status $HTTP_STATUS" ;;
     esac
     _return "$commit_sha"
