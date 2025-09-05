@@ -59,6 +59,16 @@ const (
 	workers = 4
 )
 
+<<<<<<< Updated upstream
+=======
+// readyFlag indicates whether the controller-manager is ready to serve requests.
+// It is set to true when:
+// 1. Leadership has been acquired (if leader election is enabled), OR
+// 2. Controllers have been started directly (if leader election is disabled)
+var readyFlag atomic.Bool
+var itsConnectedFlag atomic.Bool
+
+>>>>>>> Stashed changes
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
@@ -66,6 +76,59 @@ func init() {
 	//+kubebuilder:scaffold:scheme
 }
 
+<<<<<<< Updated upstream
+=======
+// getUniqueIdentity returns a unique identifier for leader election
+func getUniqueIdentity() string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = "unknown"
+	}
+	return fmt.Sprintf("%s-%d-%d", hostname, os.Getpid(), time.Now().UnixNano())
+}
+
+// isTransientError determines if an error is transient and should be retried
+func isTransientError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	// Check for common transient error patterns
+	switch {
+	case errors.IsServerTimeout(err):
+		return true
+	case errors.IsTooManyRequests(err):
+		return true
+	case errors.IsServiceUnavailable(err):
+		return true
+	case errors.IsInternalError(err):
+		return true
+	case errors.IsTimeout(err):
+		return true
+	}
+
+	// Check for network-related errors
+	errStr := err.Error()
+	transientPatterns := []string{
+		"connection refused",
+		"connection reset",
+		"timeout",
+		"temporary failure",
+		"network is unreachable",
+		"no route to host",
+		"i/o timeout",
+	}
+
+	for _, pattern := range transientPatterns {
+		if strings.Contains(strings.ToLower(errStr), pattern) {
+			return true
+		}
+	}
+
+	return false
+}
+
+>>>>>>> Stashed changes
 func main() {
 	processOpts := clientopts.ProcessOptions{
 		MetricsBindAddr:     ":8080",
