@@ -20,20 +20,30 @@ package main
 // to ensure that exec-entrypoint and run can make use of them.
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/spf13/pflag"
 
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/leaderelection"
+	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	_ "k8s.io/component-base/metrics/prometheus/version"
@@ -57,10 +67,12 @@ var (
 const (
 	// number of workers to run the reconciliation loop
 	workers = 4
+	// getUniqueIdentity returns a unique identifier for leader election
+	lockNamespace    = "kubestellar-system"
+	lockName         = "kubestellar-controller-manager"
+	fieldManagerName = "kubestellar-controller-manager"
 )
 
-<<<<<<< Updated upstream
-=======
 // readyFlag indicates whether the controller-manager is ready to serve requests.
 // It is set to true when:
 // 1. Leadership has been acquired (if leader election is enabled), OR
@@ -68,7 +80,6 @@ const (
 var readyFlag atomic.Bool
 var itsConnectedFlag atomic.Bool
 
->>>>>>> Stashed changes
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
@@ -76,8 +87,6 @@ func init() {
 	//+kubebuilder:scaffold:scheme
 }
 
-<<<<<<< Updated upstream
-=======
 // getUniqueIdentity returns a unique identifier for leader election
 func getUniqueIdentity() string {
 	hostname, err := os.Hostname()
@@ -128,7 +137,6 @@ func isTransientError(err error) bool {
 	return false
 }
 
->>>>>>> Stashed changes
 func main() {
 	processOpts := clientopts.ProcessOptions{
 		MetricsBindAddr:     ":8080",
@@ -185,8 +193,6 @@ func main() {
 	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
 	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
 
-	// TODO: engage leader election if requested
-
 	// get the config for WDS
 	setupLog.Info("Getting config for WDS", "name", wdsName)
 	wdsRestConfig, wdsName, err := ctrlutil.GetWDSKubeconfig(setupLog, wdsName)
@@ -207,6 +213,144 @@ func main() {
 	setupLog.Info("Got config for ITS", "name", itsName)
 	itsRestConfig = itsClientLimits.LimitConfig(itsRestConfig)
 
+	// Start /readyz endpoint - be resilient to ITS connection issues
+	go func() {
+		http.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
+			// Controller-manager is ready if:
+			// 1. It has become leader (if leader election is enabled), OR
+			// 2. It's running without leader election (if leader election is disabled)
+			// 3. AND it has successfully connected to WDS at least once
+			if readyFlag.Load() {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte("ok"))
+			} else {
+				w.WriteHeader(http.StatusServiceUnavailable)
+				w.Write([]byte("not ready - waiting for leadership or controller startup"))
+			}
+		})
+		http.ListenAndServe(":8081", nil)
+	}()
+
+	// Start controllers based on leader election setting
+	if enableLeaderElection {
+		setupLog.Info("Starting with leader election enabled")
+		startControllersWithLeaderElection(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
+	} else {
+		setupLog.Info("Starting without leader election")
+		startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
+	}
+
+	select {}
+}
+
+// startControllersWithLeaderElection uses client-go leader election instead of controller-runtime
+func startControllersWithLeaderElection(ctx context.Context, setupLog klog.Logger, wdsRestConfig, itsRestConfig *rest.Config, wdsName, itsName string, allowedGroupsSet sets.Set[string], ctlrsToStart sets.Set[string], wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics) {
+	// Create WDS client for leader election with retry for transient errors
+	var wdsClient *kubernetes.Clientset
+	var err error
+	for i := 0; i < 3; i++ {
+		wdsClient, err = kubernetes.NewForConfig(wdsRestConfig)
+		if err == nil {
+			break
+		}
+		if i < 2 && isTransientError(err) {
+			setupLog.Info("Failed to create WDS client due to transient error, retrying", "attempt", i+1, "error", err)
+			time.Sleep(time.Duration(i+1) * time.Second)
+		} else if i < 2 {
+			setupLog.Info("Failed to create WDS client, retrying", "attempt", i+1, "error", err)
+			time.Sleep(time.Duration(i+1) * time.Second)
+		}
+	}
+	if err != nil {
+		setupLog.Error(err, "unable to create WDS client for leader election after retries")
+		os.Exit(1)
+	}
+
+	// Check/create namespace for leader election with retry for transient errors
+	var namespaceErr error
+	for i := 0; i < 3; i++ {
+		_, namespaceErr = wdsClient.CoreV1().Namespaces().Get(ctx, lockNamespace, metav1.GetOptions{})
+		if namespaceErr == nil {
+			break
+		}
+		if errors.IsNotFound(namespaceErr) {
+			setupLog.Info("Creating namespace for leader election", "namespace", lockNamespace)
+			_, createErr := wdsClient.CoreV1().Namespaces().Create(ctx, &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: lockNamespace,
+				},
+			}, metav1.CreateOptions{FieldManager: fieldManagerName})
+			if createErr == nil || errors.IsAlreadyExists(createErr) {
+				// AlreadyExists is treated as success - another replica or previous run created it
+				namespaceErr = nil
+				break
+			}
+			if i < 2 {
+				setupLog.Info("Failed to create namespace, retrying", "attempt", i+1, "error", createErr)
+				time.Sleep(time.Duration(i+1) * time.Second)
+			} else {
+				namespaceErr = createErr
+			}
+		} else {
+			if i < 2 && isTransientError(namespaceErr) {
+				setupLog.Info("Failed to check namespace due to transient error, retrying", "attempt", i+1, "error", namespaceErr)
+				time.Sleep(time.Duration(i+1) * time.Second)
+			} else if i < 2 {
+				setupLog.Info("Failed to check namespace, retrying", "attempt", i+1, "error", namespaceErr)
+				time.Sleep(time.Duration(i+1) * time.Second)
+			}
+		}
+	}
+	if namespaceErr != nil {
+		setupLog.Error(namespaceErr, "unable to check/create namespace for leader election after retries")
+		os.Exit(1)
+	}
+
+	// Create resource lock for leader election
+	lock := &resourcelock.LeaseLock{
+		LeaseMeta: metav1.ObjectMeta{
+			Name:      lockName,
+			Namespace: lockNamespace,
+		},
+		Client: wdsClient.CoordinationV1(),
+		LockConfig: resourcelock.ResourceLockConfig{
+			Identity: getUniqueIdentity(),
+		},
+	}
+
+	// Configure leader election
+	// These durations follow the standard Kubernetes leader election patterns:
+	// - LeaseDuration: 60s provides more stability and reduces API server load
+	// - RenewDeadline: 40s allows for timely renewal (2/3 of lease duration)
+	// - RetryPeriod: 5s reduces retry frequency for better performance
+	lec := leaderelection.LeaderElectionConfig{
+		Lock:            lock,
+		ReleaseOnCancel: false, // Set to false as the shutdown behavior constraint is not met
+		LeaseDuration:   60 * time.Second,
+		RenewDeadline:   40 * time.Second,
+		RetryPeriod:     5 * time.Second,
+		Callbacks: leaderelection.LeaderCallbacks{
+			OnStartedLeading: func(ctx context.Context) {
+				setupLog.Info("Acquired leadership, starting controllers and workers")
+				startControllersDirectly(ctx, setupLog, wdsRestConfig, itsRestConfig, wdsName, itsName, allowedGroupsSet, ctlrsToStart, wdsClientMetrics, itsClientMetrics)
+			},
+			OnStoppedLeading: func() {
+				setupLog.Info("Lost leadership, stopping controllers")
+				// Controllers will be stopped when the context is cancelled
+			},
+			OnNewLeader: func(identity string) {
+				setupLog.Info("New leader elected", "identity", identity)
+			},
+		},
+	}
+
+	// Start leader election and block until leadership is acquired
+	leaderelection.RunOrDie(ctx, lec)
+}
+
+// startControllersDirectly starts controllers immediately without leader election
+func startControllersDirectly(ctx context.Context, setupLog klog.Logger, wdsRestConfig, itsRestConfig *rest.Config, wdsName, itsName string, allowedGroupsSet sets.Set[string], ctlrsToStart sets.Set[string], wdsClientMetrics, itsClientMetrics ksmetrics.ClientMetrics) {
+	logger := klog.FromContext(ctx) // Get base logger from context for controllers
 	workloadEventRelay := &workloadEventRelay{}
 
 	// create the binding controller
@@ -276,7 +420,9 @@ func main() {
 		}
 	}
 
-	select {}
+	// Mark as ready after controllers are started
+	readyFlag.Store(true)
+	setupLog.Info("Controllers started successfully, marking as ready")
 }
 
 // workloadEventRelay implements binding.WorkloadEventHandler and relays the notifications
