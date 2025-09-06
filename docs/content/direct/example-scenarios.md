@@ -2,7 +2,7 @@
 
 This document shows some simple examples of using the release that contains this version of this document. These scenarios can be used to test a KubeStellar installation for proper functionality. These scenarios suppose that you have done "setup". General setup instructions are outlined in [the User Guide Overview](user-guide-intro.md#the-full-story); a simple example setup is in [the Setup section of Getting Started](get-started.md#setup).
 
-## Assumptions and variables
+## Assumptions and Variables
 
 Each scenario supposes that one ITS and one WDS have been created, and that two WECs have been created and registered and also labeled for selection by KubeStellar control objects. These scenarios are written as shell commands (bash or zsh). These commands assume that you have defined the following shell variables to convey the needed information about that ITS and WDS and those WECs. For a concrete example of settings of these variables, see [the end of Getting Started](get-started.md#exercise-kubestellar).
 
@@ -20,7 +20,7 @@ Each example scenario concludes with instructions on how to undo its effects.
 
 There are also end-to-end (E2E) tests that are based on scenario 4 and an extended variant of scenario 1. These tests normally exercise the copy of the repo containing them (rather than a release). They can alternatively test a release. See the e2e tests (in `test/e2e`). Contributors can run these tests, and CI includes checking that these E2E tests pass. Some of these tests, and the setup for all of them, are written in `bash` so that contributors can easily follow them.
 
-## Scenario 0 - look around
+## Scenario 0: Look Around
 
 The following command will list all the `ManagedCluster` objects that will be relevant to these scenarios.
 
@@ -30,7 +30,7 @@ kubectl --context "$its_context" get managedclusters -l "$label_query_both"
 
 Expect to get a listing of your two `ManagedCluster` objects.
 
-## Scenario 1 - multi-cluster workload deployment with kubectl
+## Scenario 1: Multi-cluster Workload Deployment with Kubectl
 
 Create a BindingPolicy to deliver an app to all clusters in the WDS:
 
@@ -115,7 +115,7 @@ kubectl --context "$wds_context" delete ns nginx
 kubectl --context "$wds_context" delete bindingpolicies nginx-bpolicy
 ```
 
-## Scenario 2 - Out-of-tree workload
+## Scenario 2: Out-of-Tree Workload
 
 This scenario is like the previous one but involves a workload whose
 kind of objects is not built into Kubernetes. Instead, the workload
@@ -242,7 +242,7 @@ clusters=("$wds_context" "$wec1_context" "$wec2_context");
 done
 ```
 
-## Scenario 3 - multi-cluster workload deployment with helm
+## Scenario 3: Multi-Custer Workload Deployment with Helm
 
 Create a BindingPolicy for the helm chart app:
 
@@ -280,7 +280,7 @@ kubectl --context "$wec1_context" get statefulsets -n postgres-system
 kubectl --context "$wec2_context" get statefulsets -n postgres-system
 ```
 
-### [Optional] Propagate helm metadata Secret to managed clusters
+### [Optional] Propagate Helm Metadata Secret to Managed Clusters
 
 Run "helm list" on the WDS:
 
@@ -326,7 +326,7 @@ kubectl --context "$wds_context" delete ns postgres-system
 kubectl --context "$wds_context" delete bindingpolicies postgres-bpolicy
 ```
 
-## Scenario 4 - Singleton status
+## Scenario 4: Singleton Status
 
 This scenario shows how to get the full status updated, by setting `wantSingletonReportedState`
 in a `DownsyncPolicyClause`. This still an experimental feature.
@@ -404,7 +404,7 @@ kubectl --context "$wds_context" delete bindingpolicies nginx-singleton-bpolicy
 kubectl --context "$wds_context" delete deployments nginx-singleton-deployment
 ```
 
-## Scenario 5 - Resiliency testing
+## Scenario 5: Resiliency testing
 
 This is a test that you can do after finishing Scenario 1.
 
@@ -500,7 +500,7 @@ kubectl --context "$wds_context" delete ns nginx-res
 kubectl --context "$wds_context" delete bindingpolicies nginx-res-bpolicy
 ```
 
-## Scenario 6 - multi-cluster workload deployment of app with ServiceAccount with ArgoCD
+## Scenario 6: Multi-Cluster Workload Deployment of App with ServiceAccount with ArgoCD
 
 Before running this scenario, install ArgoCD on the hosting cluster and configure it
 work with the WDS as outlined [here](argo-to-wds1.md).
