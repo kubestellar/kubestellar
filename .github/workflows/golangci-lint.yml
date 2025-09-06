@@ -2,7 +2,7 @@ name: Static Analysis
 
 on:
   schedule:
-    - cron: "0 2 * * 1"
+    - cron: "0 8 * * *"
 
   workflow_dispatch:
 
@@ -43,9 +43,9 @@ jobs:
         if: always()
         run: |
           echo "### Static Analysis (Resource-Efficient Mode)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Schedule**: Weekly runs (Mondays 2 AM UTC) + manual dispatch only" >> $GITHUB_STEP_SUMMARY
+          echo "- **Schedule**: (Daily at 08:00 UTC) + manual dispatch" >> $GITHUB_STEP_SUMMARY
           echo "- **Timeout**: Strict 10-minute limit" >> $GITHUB_STEP_SUMMARY
           echo "- **Mode**: Standard lint with concurrency controls" >> $GITHUB_STEP_SUMMARY
           echo "- **Purpose**: OpenSSF badge compliance visibility" >> $GITHUB_STEP_SUMMARY
           echo "- **Config**: .golangci.yaml" >> $GITHUB_STEP_SUMMARY
-          echo "- **Resource Impact**: Minimal overhead - weekly scheduled runs only" >> $GITHUB_STEP_SUMMARY
+          echo "- **Resource Impact**: Minimal overhead - short daily runs" >> $GITHUB_STEP_SUMMARY
