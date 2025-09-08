@@ -575,6 +575,9 @@ func CleanupWDS(ctx context.Context, wds *kubernetes.Clientset, ksWds *ksClient.
 	DeleteAll[*ksapi.BindingPolicyList](ctx, ksWds.ControlV1alpha1().BindingPolicies(), func(objList *ksapi.BindingPolicyList) []string {
 		return objectsToNames((*ksapi.BindingPolicy).GetName, objList.Items)
 	})
+	DeleteAll[*ksapi.CustomTransformList](ctx, ksWds.ControlV1alpha1().CustomTransforms(), func(objList *ksapi.CustomTransformList) []string {
+		return objectsToNames((*ksapi.CustomTransform).GetName, objList.Items)
+	})
 	DeleteAll[*ksapi.StatusCollectorList](ctx, ksWds.ControlV1alpha1().StatusCollectors(), func(objList *ksapi.StatusCollectorList) []string {
 		return objectsToNames((*ksapi.StatusCollector).GetName, objList.Items)
 	})
