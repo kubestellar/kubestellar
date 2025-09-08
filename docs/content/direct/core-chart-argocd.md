@@ -124,7 +124,7 @@ Open your browser and navigate to: `https://argocd.localtest.me:9443/`
 
 ## Deploying Argo CD applications
 
-The KubeStellar Core chart can also be used to deploy Argo CD applications as specified by chart values. The example below shows the relevant fragment of the chart values that could be used for deploying an application corresponding to `scenario-6` in [KubeStellar docs](example-scenarios.md#scenario-6---multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd).
+The KubeStellar Core chart can also be used to deploy Argo CD applications as specified by chart values. The example below shows the relevant fragment of the chart values that could be used for deploying an application corresponding to `scenario-6` in [KubeStellar docs](example-scenarios.md#scenario-6-multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd).
 
 ```yaml
 argocd:
