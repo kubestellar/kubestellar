@@ -31,9 +31,3 @@ func (po *ProcessOptions) AddToFlags(flags *pflag.FlagSet) {
 	flags.StringVar(&po.PProfBindAddr, "pprof-bind-address", po.PProfBindAddr, "the [host]:port from which to serve /debug/pprof")
 	flags.StringVar(&po.HealthProbeBindAddr, "health-probe-bind-address", po.HealthProbeBindAddr, "the [host]:port from which to serve /healthz,/readyz (empty string to not serve)")
 }
-
-func (po *ProcessOptions) DeprecatedAddToFlags(flags *pflag.FlagSet) {
-	flags.StringVar(&po.MetricsBindAddr, "metrics-bind-addr", po.MetricsBindAddr, "the [host]:port from which to serve /metrics")
-	flags.StringVar(&po.PProfBindAddr, "pprof-bind-addr", po.PProfBindAddr, "the [host]:port from which to serve /debug/pprof")
-	flags.StringVar(&po.HealthProbeBindAddr, "health-bind-addr", po.HealthProbeBindAddr, "the [host]:port from which to serve /healthz,/readyz (empty string to not serve)")
-}
