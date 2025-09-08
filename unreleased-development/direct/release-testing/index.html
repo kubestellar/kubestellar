@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.18">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.19">
     
     
       
@@ -3510,7 +3510,7 @@ To reduce the exposure of unstable releases the update of the KubeStellar site <
 <p>Due to the lack of OCP based automatic testing, these tests will be performed only once a release candidate passed all other tests and is a candidate to become a regular release. </p>
 <p>Note:  We plan to automate all release tests in the future</p>
 <h3 id="automatic-github-based-release-tests">Automatic (github based) release tests<a class="headerlink" href="#automatic-github-based-release-tests" title="Permanent link">#</a></h3>
-<p>KubeStellar CICD automatically runs a set of e2e tests on each new release. Currently these tests include 2 main test types bash based e2e tests and ginkgo based e2e tests. The bash test basically tests the scenario of  <a href="../example-scenarios/#scenario-1---multi-cluster-workload-deployment-with-kubectl">multi-cluster workload deployment with kubectl</a>. The ginkgo test cover the <a href="../example-scenarios/#scenario-4---singleton-status">Singleton status test</a>, and several other tests that are listed in the test <a href="https://github.com/kubestellar/kubestellar/blob/main/test/e2e/ginkgo/README.md">README</a>. Note, however, that the content of the releases tests may be changed in the future. We will refer to those tests as the <strong>e2e release tests</strong>. 
+<p>KubeStellar CICD automatically runs a set of e2e tests on each new release. Currently these tests include 2 main test types bash based e2e tests and ginkgo based e2e tests. The bash test basically tests the scenario of  <a href="../example-scenarios/#scenario-1-multi-cluster-workload-deployment-with-kubectl">multi-cluster workload deployment with kubectl</a>. The ginkgo test cover the <a href="../example-scenarios/#scenario-4-singleton-status">Singleton status test</a>, and several other tests that are listed in the test <a href="https://github.com/kubestellar/kubestellar/blob/main/test/e2e/ginkgo/README.md">README</a>. Note, however, that the content of the releases tests may be changed in the future. We will refer to those tests as the <strong>e2e release tests</strong>. 
 The automatic tests are running on github hosted runners of type <strong>Ubuntu latest (currently 22.04) X86 64 bit</strong> 
 Note: When a new release is created please verify that the automatic tests indeed executed and passed. </p>
 <h3 id="e2e-release-tests-on-ocp">e2e release tests on OCP<a class="headerlink" href="#e2e-release-tests-on-ocp" title="Permanent link">#</a></h3>

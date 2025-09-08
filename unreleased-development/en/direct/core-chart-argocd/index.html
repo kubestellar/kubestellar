@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.18">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.19">
     
     
       
@@ -3690,7 +3690,7 @@ This section will cover installing Argo CD and mapping WDSes to target clusters;
 </p>
 </blockquote>
 <h2 id="deploying-argo-cd-applications">Deploying Argo CD applications<a class="headerlink" href="#deploying-argo-cd-applications" title="Permanent link">#</a></h2>
-<p>The KubeStellar Core chart can also be used to deploy Argo CD applications as specified by chart values. The example below shows the relevant fragment of the chart values that could be used for deploying an application corresponding to <code>scenario-6</code> in <a href="../example-scenarios/#scenario-6---multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd">KubeStellar docs</a>.</p>
+<p>The KubeStellar Core chart can also be used to deploy Argo CD applications as specified by chart values. The example below shows the relevant fragment of the chart values that could be used for deploying an application corresponding to <code>scenario-6</code> in <a href="../example-scenarios/#scenario-6-multi-cluster-workload-deployment-of-app-with-serviceaccount-with-argocd">KubeStellar docs</a>.</p>
 <div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">argocd</span><span class="p">:</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">applications</span><span class="p">:</span><span class="w"> </span><span class="c1"># list of Argo CD applications to be create</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scenario-6</span><span class="w"> </span><span class="c1"># required, must be unique</span>
