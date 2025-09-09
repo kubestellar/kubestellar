@@ -41,7 +41,7 @@
 KubeStellar empowers you to:
 
 - **Define binding policies** between clusters and Kubernetes resources
-- **Use familiar single-cluster tooling** for multi-cluster operations  
+- **Use familiar single-cluster tooling** for multi-cluster operations
 - **Improve compliance, resilience, availability, and developer productivity**
 
 Learn more at the official [KubeStellar Website](https://kubestellar.io).
@@ -87,6 +87,7 @@ node --version
 ### Installation & Development
 
 1. **Install dependencies:**
+
    ```bash
    npm install
    # or
@@ -94,13 +95,15 @@ node --version
    ```
 
 2. **Start development server:**
+
    ```bash
    npm run dev
    ```
-   
+
    Visit `http://localhost:3000` in your browser. The server supports hot-reload for instant feedback.
 
 3. **Build for production:**
+
    ```bash
    npm run build
    ```
@@ -121,7 +124,6 @@ Get instant access to our documents and meeting invites at **[kubestellar.io/joi
 ### Communication Channels
 
 - **💬 Slack**: Join [`#kubestellar-dev`](https://kubernetes.slack.com/archives/C058SUSL5AA) in the [Kubernetes Slack workspace](https://communityinviter.com/apps/kubernetes/community)
-  
 - **📧 Mailing Lists**:
   - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) - Development discussions
   - [kubestellar-users](https://groups.google.com/g/kubestellar-users) - User discussions and support
@@ -134,8 +136,8 @@ Get instant access to our documents and meeting invites at **[kubestellar.io/joi
 
 ### Resources & Collaboration
 
-- **📂 Shared Documents**: [Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) 
-  *(Available to [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list members)*
+- **📂 Shared Documents**: [Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing)
+  _(Available to [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list members)_
 
 ### Follow Us
 
@@ -149,6 +151,7 @@ Get instant access to our documents and meeting invites at **[kubestellar.io/joi
 We welcome contributions from everyone! Whether you're fixing a typo, improving documentation, or adding new content, your help makes a meaningful impact.
 
 **Get started:**
+
 1. Review our [Contributing Guidelines](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md)
 2. Join discussions on Slack or mailing lists
 3. Open issues or pull requests for improvements

@@ -5,34 +5,27 @@
 # Labels will be applied based on filepath modification in PR.
 
 # This workflow uses a regex based labeling config file(.github/labeler.yml) to take labeling decision.
- 
-name: 'PR Labeler'
+
+name: "PR Labeler"
 
 on:
-
   - pull_request_target
 
 jobs:
-
   label:
-
     permissions:
-
       contents: read
 
       pull-requests: write
 
     runs-on: ubuntu-latest
- 
-    steps:
 
+    steps:
       - uses: actions/labeler@v4
 
         with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
-          repo-token: '${{ secrets.GITHUB_TOKEN }}'
-
-          configuration-path: '.github/labeler.yml'
+          configuration-path: ".github/labeler.yml"
 
           sync-labels: false
- 

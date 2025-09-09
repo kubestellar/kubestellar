@@ -2,7 +2,7 @@ presubmits:
   - name: pull-kubestellar-docs-verify
     always_run: true
     decorate: true
-    clone_uri: 'https://github.com/kubestellar/docs'
+    clone_uri: "https://github.com/kubestellar/docs"
     spec:
       containers:
         - image: node:20
@@ -27,7 +27,7 @@ presubmits:
   - name: pull-kubestellar-docs-build
     always_run: true
     decorate: true
-    clone_uri: 'https://github.com/kubestellar/docs'
+    clone_uri: "https://github.com/kubestellar/docs"
     spec:
       containers:
         - image: node:20
@@ -56,7 +56,7 @@ presubmits:
   - name: pull-kubestellar-docs-test
     always_run: true
     decorate: true
-    clone_uri: 'https://github.com/kubestellar/docs'
+    clone_uri: "https://github.com/kubestellar/docs"
     spec:
       containers:
         - image: node:20
@@ -83,7 +83,7 @@ presubmits:
   - name: pull-kubestellar-docs-markdown-lint
     always_run: true
     decorate: true
-    clone_uri: 'https://github.com/kubestellar/docs'
+    clone_uri: "https://github.com/kubestellar/docs"
     spec:
       containers:
         - image: node:20
@@ -110,7 +110,7 @@ postsubmits:
     branches:
       - ^main$
     decorate: true
-    clone_uri: 'https://github.com/kubestellar/docs'
+    clone_uri: "https://github.com/kubestellar/docs"
     spec:
       containers:
         - image: node:20
@@ -121,13 +121,13 @@ postsubmits:
               # Install dependencies and build
               npm ci
               npm run build
-              
+
               # Export static site if using static export
               if npm run | grep -q "export"; then
                 npm run export
                 echo "✓ Static site exported"
               fi
-              
+
               # Here you would typically deploy to your hosting platform
               # For example, deploying to GitHub Pages, Netlify, or Vercel
               echo "✓ Documentation build ready for deployment"
@@ -141,7 +141,7 @@ postsubmits:
     branches:
       - ^dev$
     decorate: true
-    clone_uri: 'https://github.com/kubestellar/docs'
+    clone_uri: "https://github.com/kubestellar/docs"
     spec:
       containers:
         - image: node:20
@@ -158,5 +158,3 @@ postsubmits:
               memory: 3Gi
               cpu: 2
               ephemeral-storage: 6Gi
-
-  

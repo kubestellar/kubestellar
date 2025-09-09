@@ -11,7 +11,7 @@ body:
 
         Before opening a new issue, look for an overlapping issue that
         you could contribute to.
-        
+
         Here is how you can help us serve you better:
 
   - type: textarea
@@ -28,12 +28,12 @@ body:
     id: snapshot
     attributes:
       label: Output from KubeStellar-Snapshot.sh
-      description: | 
+      description: |
         Run kubestellar-snapshot.sh from the scripts directory and paste output here.
         Alternatively you can run the script remotely
         bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/kubestellar-snapshot.sh) -V -Y -L
         This will create kubestellar-snapshot.tar.gz which can be dragged and dropped into this text area.
-      
+
   - type: textarea
     id: reproducing
     attributes:
@@ -62,7 +62,7 @@ body:
       options:
         - label: I would like to work on this issue.
           required: false
-          
+
   - type: textarea
     id: additional
     attributes:
