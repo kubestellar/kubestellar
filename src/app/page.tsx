@@ -1,10 +1,10 @@
 import Navigation from "@/components/Navigation";
-import HeroSection from "@/components/HeroSection";
-import AboutSection from "@/components/AboutSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
-import UseCasesSection from "@/components/UseCasesSection";
-import GetStartedSection from "@/components/GetStartedSection";
-import ContactSection from "@/components/ContactSection";
+import HeroSection from "@/components/landing-page/HeroSection";
+import AboutSection from "@/components/landing-page/AboutSection";
+import HowItWorksSection from "@/components/landing-page/HowItWorksSection";
+import UseCasesSection from "@/components/landing-page/UseCasesSection";
+import GetStartedSection from "@/components/landing-page/GetStartedSection";
+import ContactSection from "@/components/landing-page/ContactSection";
 import Footer from "@/components/Footer";
 
 export default function Home() {

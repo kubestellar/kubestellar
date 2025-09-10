@@ -184,9 +184,10 @@ metadata:
                     2. Intelligent Placement
                   </h3>
                   <p className="text-gray-300 mb-6 leading-relaxed">
-                    KubeStellar's intelligent engine analyzes cluster capacity,
-                    network topology, and policy constraints to determine
-                    optimal workload placement across your infrastructure.
+                    KubeStellar&apos;s intelligent engine analyzes cluster
+                    capacity, network topology, and policy constraints to
+                    determine optimal workload placement across your
+                    infrastructure.
                   </p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-green-500/10 backdrop-blur-sm rounded-lg p-3 border border-green-500/30">

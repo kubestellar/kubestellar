@@ -87,7 +87,7 @@ export default function AboutSection() {
     // Feature cards animation
     const initFeatureCards = () => {
       const featureCards = document.querySelectorAll(".feature-card");
-      featureCards.forEach((card, index) => {
+      featureCards.forEach(card => {
         const cardElement = card as HTMLElement;
 
         // Add 3D hover effect

@@ -18,7 +18,7 @@ export default function HeroSection() {
         layerDiv.style.zIndex = layer.toString();
 
         const starCount = layer === 1 ? 150 : layer === 2 ? 100 : 50;
-        const speedFactor = layer === 1 ? 1 : layer === 2 ? 0.7 : 0.4;
+        // const speedFactor = layer === 1 ? 1 : layer === 2 ? 0.7 : 0.4;
 
         for (let i = 0; i < starCount; i++) {
           const star = document.createElement("div");

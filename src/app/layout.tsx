@@ -26,12 +26,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <head>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-      </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} bg-space-dark text-white overflow-x-hidden dark antialiased`}
       >
