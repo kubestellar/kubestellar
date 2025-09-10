@@ -33,72 +33,77 @@ fs.inotify.max_user_instances = 512
 If these parameters are set lower than the suggested values, the second cluster initialization may fail.
 
 ## Steps to Reproduce the Issue
+
 1. Install Rancher Desktop
-   * Download and install Rancher Desktop from the official website.
-   * Configure it to use Docker as the container runtime (`dockerd`).
+   - Download and install Rancher Desktop from the official website.
+   - Configure it to use Docker as the container runtime (`dockerd`).
 2. Install Kind
-   * Follow the installation instructions provided in the Kind documentation.
+   - Follow the installation instructions provided in the Kind documentation.
 3. Install Kubestellar Prerequisites
-   * Ensure that all required dependencies for Kubestellar are installed on your system. Refer to the Kubestellar documentation for a complete list.
+   - Ensure that all required dependencies for Kubestellar are installed on your system. Refer to the Kubestellar documentation for a complete list.
 4. Run the Kubestellar Getting Started Guide or Demo Environment Setup Script
-   * Follow the steps in the Kubestellar Getting Started guide or run the automated demo environment setup script.
+   - Follow the steps in the Kubestellar Getting Started guide or run the automated demo environment setup script.
 5. Monitor the Installation Process
-   * Confirm the successful installation of kubeflex.
-   * Ensure that ITS1 (Information Transformation Service 1) and WDS1 (Workload Distribution Service 1) are created.
-   * Verify the creation of the first cluster (cluster1).
+   - Confirm the successful installation of kubeflex.
+   - Ensure that ITS1 (Information Transformation Service 1) and WDS1 (Workload Distribution Service 1) are created.
+   - Verify the creation of the first cluster (cluster1).
 6. Wait for the Creation of Cluster2
-   * Allow the script to attempt the creation of the second remote cluster (cluster2).
-   * The error should occur during this step if the issue is present.
+   - Allow the script to attempt the creation of the second remote cluster (cluster2).
+   - The error should occur during this step if the issue is present.
 
 ## Expected Behavior
 
 Cluster 2 should create successfully, and the installation should complete without errors.
 
 ## Steps to Fix
+
 1. Check Current `sysctl` Parameter Values
-    * Use the command `rdctl shell` to log in to the Rancher Desktop VM.
-      Run:
-        ````
-        sysctl fs.inotify.max_user_watches
-        sysctl fs.inotify.max_user_instances
-        ````
-    * Confirm if these values are below the recommended settings (524288 for max_user_watches and 512 for max_user_instances).
+   - Use the command `rdctl shell` to log in to the Rancher Desktop VM.
+     Run:
+     ```
+     sysctl fs.inotify.max_user_watches
+     sysctl fs.inotify.max_user_instances
+     ```
+   - Confirm if these values are below the recommended settings (524288 for max_user_watches and 512 for max_user_instances).
 2. Modify the Parameter Settings
-    * Setting these parameters temporarily with `sysctl` will revert after restarting Rancher Desktop. To persist the changes, you need to modify the configuration using an overlay file.
+   - Setting these parameters temporarily with `sysctl` will revert after restarting Rancher Desktop. To persist the changes, you need to modify the configuration using an overlay file.
 3. Create an Override Configuration File
-    - On a Mac:
-        * Open a terminal and create a new file:
+   - On a Mac:
+     - Open a terminal and create a new file:
 
-            ```
-            vi ~/Library/Application\ Support/rancher-desktop/lima/_config/override.yaml
-            ```
+       ```
+       vi ~/Library/Application\ Support/rancher-desktop/lima/_config/override.yaml
+       ```
 
-        * Add the following content:
+     - Add the following content:
 
-            ```
-            provision:
-            - mode: system
-              script: |
-                #!/bin/sh
-                echo "fs.inotify.max_user_watches=524288" > /etc/sysctl.d/fs.inotify.conf
-                echo "fs.inotify.max_user_instances=512" >> /etc/sysctl.d/fs.inotify.conf
-                sysctl -p /etc/sysctl.d/fs.inotify.conf
-            ```
+       ```
+       provision:
+       - mode: system
+         script: |
+           #!/bin/sh
+           echo "fs.inotify.max_user_watches=524288" > /etc/sysctl.d/fs.inotify.conf
+           echo "fs.inotify.max_user_instances=512" >> /etc/sysctl.d/fs.inotify.conf
+           sysctl -p /etc/sysctl.d/fs.inotify.conf
+       ```
 
-        * Save the file.
+     - Save the file.
+
 4. Restart Rancher Desktop
-    * Restart Rancher Desktop for the changes to take effect and ensure the new `sysctl` parameter values persist.
+   - Restart Rancher Desktop for the changes to take effect and ensure the new `sysctl` parameter values persist.
 5. Delete Existing Kind Clusters
-    * Before re-running the Kubestellar Getting Started guide, delete all previously created clusters:
+   - Before re-running the Kubestellar Getting Started guide, delete all previously created clusters:
 
-        ```
-        kind delete cluster --name <cluster-name>
-        ```
+     ```
+     kind delete cluster --name <cluster-name>
+     ```
 
-    * Repeat for each cluster (e.g., kubeflex, cluster1, cluster2).
+   - Repeat for each cluster (e.g., kubeflex, cluster1, cluster2).
+
 6. Re-run the Kubestellar Setup
-    * With the updated configuration, run the Kubestellar Getting Started guide or the automated demo environment script again.
-    * Verify that both clusters are created successfully without errors.
+   - With the updated configuration, run the Kubestellar Getting Started guide or the automated demo environment script again.
+   - Verify that both clusters are created successfully without errors.
 
 ## Additional Note: Ensuring a Clean Environment for Reinstallation
+
 Deleting all existing Kind clusters before re-running the installation ensures no leftover configurations interfere with the new setup.

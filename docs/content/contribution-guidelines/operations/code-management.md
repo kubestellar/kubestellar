@@ -5,14 +5,17 @@
 %}
 
 <!-- Code management
-  Prow, Gh actions broken links, pr verifier, emoji in titles of prs, add issue to project. Add pr to project. Check spelling errors, wordlist.txt, 
+  Prow, Gh actions broken links, pr verifier, emoji in titles of prs, add issue to project. Add pr to project. Check spelling errors, wordlist.txt,
 Quay.io -->
+
 # Code Management
+
 Fork kubestellar into your own repo, create a local branch, set upstream to kubestellar, add and commit changes to local branch, and squash your commits
 
 ## Initial setup
 
 ### Fork the Github kubestellar repo into your own Github repo:
+
 You can do this either 1: from the kubestellar Github website using the "Fork" button or 2: by using the git fork command from your local git command line interface, such as git bash.
 
 copy the forked repo from Github to your local system by using the "git clone" command or by downloading the repository's zip file.
@@ -70,7 +73,7 @@ nothing to commit, working tree clean
 Ensure that you personal repository if up to date with the kubestellar repository.
 You can do this by opening your github repository page, check that the selected branch is "main", and press the "sync fork" button.
 
-### Select an issue to work on and create a local branch, 
+### Select an issue to work on and create a local branch,
 
 Create a local branch for your work, preferably including the issue number in the branch name
 
@@ -93,21 +96,22 @@ git push -u origin branch-name (-u sets upstream to origin which is your remote 
 ### When you have completed your work and tested it locally, then you should perform a squash of the git commits to make the upcoming push request more manageable.
 
 To perform a squash, checkout the branch you want to squash,
+
 1. use the "git log" command to see the history of commits to the branch
 2. Count the number of commits you want to squash
 3. use the "git rebase -i HEAD~n" where n is the number of commits you would like to squash together. (There are other ways to do this)
-4. The text editor you have configured to use with git should automatically open your source and you will see a list of commits preceded by "pick". Leaving the first "pick" as it is, replace the remaining "pick"s with "squash"es. 
+4. The text editor you have configured to use with git should automatically open your source and you will see a list of commits preceded by "pick". Leaving the first "pick" as it is, replace the remaining "pick"s with "squash"es.
 5. Save the text file and exit the editor.
 6. The text editor will open again to let you edit comments for your new squashed commit.
 7. Make your edits if any and save and exit the file.
-The commits will then be squashed into one commit.
+   The commits will then be squashed into one commit.
 
 ### When you are done with the squash, push your changes to your remote branch. You can either:
 
 ```
 git push -u origin <branch-name>
 
-or 
+or
 
 git push --force-with-lease
 ```
@@ -118,12 +122,12 @@ Note: if using the git push -u origin <branch-name> command, the -u only needs t
 
 1. Select the "Actions" tab toward the upper left of your github personal web page. This will cause a list of Actions to show.
 2. Select the action you wish to execute from the list of Actions. For example you might chose "docs-ecutable - example1".
-Note: docs-ecutable should be described in a separate section. But in a nutshell it's a Continuous Integration automation technique of embedding scripts and data within the body of documentation, and then parsing and executing those scripts which in turn interpret and execute source code from a branch that you designate. It's somewhat similar to Travis. So the Action "docs-ecutable - example1" executes scripts and data embedded within the documentation for the Example 1 scenario, described in the Kubestellar documents. Those scripts will run using the source code pointed to by the next step, step 3.
+   Note: docs-ecutable should be described in a separate section. But in a nutshell it's a Continuous Integration automation technique of embedding scripts and data within the body of documentation, and then parsing and executing those scripts which in turn interpret and execute source code from a branch that you designate. It's somewhat similar to Travis. So the Action "docs-ecutable - example1" executes scripts and data embedded within the documentation for the Example 1 scenario, described in the Kubestellar documents. Those scripts will run using the source code pointed to by the next step, step 3.
 3. Select the source code branch you wish to exercise by following the next 3 steps:
-  1. select the black and white "Run Workflow" on the right side of your github web page. This will open a dialog box.
-  2. within the dialog box, select the branch you wish to exercise by opening the dropdown labeled "use workflow from"
-  3. within the dialog box, select the green "Run Workflow" button 
-Your selected Action workflow will execute and the results will be available when it completes.  
+4. select the black and white "Run Workflow" on the right side of your github web page. This will open a dialog box.
+5. within the dialog box, select the branch you wish to exercise by opening the dropdown labeled "use workflow from"
+6. within the dialog box, select the green "Run Workflow" button
+   Your selected Action workflow will execute and the results will be available when it completes.
 
 ## Create a Pull Request (PR) from your Github repo branch in order to request review and approval from the Kubestellar team
 

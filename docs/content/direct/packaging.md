@@ -140,10 +140,10 @@ The dashed dependencies are at run time, not build time.
 "KCM" is the KubeStellar controller-manager.
 
 **NOTE**: among the references to published artifacts, some have a
-  version that is maintained in Git while others have a placeholder in
-  Git that is replaced in the publishing process. See [the release
-  document](release.md) for more details. This is an on-going matter
-  of development.
+version that is maintained in Git while others have a placeholder in
+Git that is replaced in the publishing process. See [the release
+document](release.md) for more details. This is an on-going matter
+of development.
 
 ### Local copy of KubeStellar git repo
 
@@ -253,7 +253,6 @@ KubeFlex hosting cluster, as follows.
 
 By our development practices and not doing any manual hacking, we maintain the association that the OCI image tagged `$VERSION` contains a Helm chart that declares its `version` and its `appVersion` to be `$VERSION` and instantiates version `$VERSION` of [the KubeStellar controller-manager container image](#kubestellar-controller-manager-container-image) and [the OCM Transport Controller container image](#ocm-transport-controller-container-image).
 
-
 ### KubeStellar controller-manager Helm Chart
 
 **NOTE**: This is not used for anything anymore, but the published OCI images still exist at [ghcr.io/kubestellar/kubestellar/controller-manager-chart](https://github.com/kubestellar/kubestellar/pkgs/container/kubestellar%2Fcontroller-manager-chart).
@@ -285,7 +284,6 @@ When setting up to test a release, the setup script uses the published core Helm
 When setting up to test the local copy/version, the setup script uses the local version of the core Helm chart.
 
 The script builds a local kubestellar controller-manager container image from local sources. Then the script loads that image into the KubeFlex hosting cluster (e.g., using `kind load`). The script does the same for the OCM transport controller. The core chart is instantiated with settings to use the images just built.
-
 
 ## Amalgamated graph
 

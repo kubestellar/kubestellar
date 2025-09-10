@@ -37,7 +37,7 @@ verbosity (`-v`) of various controllers.
 - Although not part of the interface, when debugging you can look at the ManifestWork and WorkStatus objects in the ITS.
 - More broadly, remember that KubeStellar uses OCM.
 - Look at logs of controllers. If they have had container restarts that look relevant, look also at the previous logs. Do not forget OCM controllers. Do not forget that some Pods have more than one interesting container.
-    - Remember that the amount of log retained is typically a configured option in the relevant container runtime. If your logs are too short, look into increasing that log retention.
+  - Remember that the amount of log retained is typically a configured option in the relevant container runtime. If your logs are too short, look into increasing that log retention.
 - If a controller's `-v` is not at least 5, increase it.
 - Remember that Kubernetes controllers tend to report transient problems as errors without making it clear that the problem is transient and tend to not make it clear if/when the problem has been resolved (sigh).
 
@@ -61,19 +61,19 @@ Show the particulars of something going wrong.
 - Show a run of `scripts/check_pre_req.sh`.
 - Report timestamps of when salient changes happened. Make it clear which timezone is involved in each one. Particularly interesting times are when KubeStellar did the wrong thing or failed to do anything at all in response to something.
 - Show the relevant API objects. When the problem is behavior over time, show the objects contents from before and after the misbehavior.
-    - In the WDS: the workload objects involved; any `BidingPolicy` involved, and the corresponding `Binding` for each; any `CustomTransform`, `StatusCollector`, or `CombinedStatus` involved.
-    - Any involved objects in the WEC(s).
-    - Implementation objects in the ITS: `ManifestWork`, `WorkStatus`.
-    - Here is one way to show the evolution of a relevant set of objects over time. The following command displays the `ManifestWork` objects, after creation and after each update (modulo the gaps allowed by eventual consistency), in an ITS as addressed by the kubeconfig context named `its1` --- after first listing the existing objects. Each line is prefixed with the hour:minute:second at which it appears.
-        ```shell
-        kubectl --context its1 get manifestworks -A --show-managed-fields -o yaml --watch | while IFS="" read line; do echo "$(date +%T)| $line"; done
-        ```
+  - In the WDS: the workload objects involved; any `BidingPolicy` involved, and the corresponding `Binding` for each; any `CustomTransform`, `StatusCollector`, or `CombinedStatus` involved.
+  - Any involved objects in the WEC(s).
+  - Implementation objects in the ITS: `ManifestWork`, `WorkStatus`.
+  - Here is one way to show the evolution of a relevant set of objects over time. The following command displays the `ManifestWork` objects, after creation and after each update (modulo the gaps allowed by eventual consistency), in an ITS as addressed by the kubeconfig context named `its1` --- after first listing the existing objects. Each line is prefixed with the hour:minute:second at which it appears.
+    ```shell
+    kubectl --context its1 get manifestworks -A --show-managed-fields -o yaml --watch | while IFS="" read line; do echo "$(date +%T)| $line"; done
+    ```
 - When reporting kube API object contents, include the `meta.managedFields`. For example, when using `kubectl get`, include `--show-managed-fields`.
 - Show the logs from relevant controllers. The most active and directly relevant ones are the following.
-    - The KubeStellar controller-manager (running in the KubeFlex hosting cluster) for the WDS
-    - KubeStellar's OCM-based transport-controller (running in the KubeFlex hosting cluster) for the WDS+ITS
-    - The OCM Status Add-On Agent in the WEC.
-    - OCM's klusterlet-agent in the WEC.
+  - The KubeStellar controller-manager (running in the KubeFlex hosting cluster) for the WDS
+  - KubeStellar's OCM-based transport-controller (running in the KubeFlex hosting cluster) for the WDS+ITS
+  - The OCM Status Add-On Agent in the WEC.
+  - OCM's klusterlet-agent in the WEC.
 
 ### Use the snapshot script
 

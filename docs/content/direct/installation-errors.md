@@ -26,22 +26,26 @@ point. Or maybe other errors about things not happening or things not
 existing.
 
 ## Solution
+
 To resolve this error, you need to increase the value of `fs.inotify.max_user_watches` and/or `fs.inotify.max_user_instances`. Follow the steps below:
 
 ### For Rancher Desktop
+
 1. Open the configuration file:
+
    ```sh
    vi "~/Library/Application Support/rancher-desktop/lima/_config/override.yaml"
    ```
 
 2. Add the following script to the `provision` section:
+
    ```yaml
    provision:
-   - mode: system
-     script: |
-       #!/bin/sh
-       sysctl fs.inotify.max_user_watches=524288
-       sysctl fs.inotify.max_user_instances=512
+     - mode: system
+       script: |
+         #!/bin/sh
+         sysctl fs.inotify.max_user_watches=524288
+         sysctl fs.inotify.max_user_instances=512
    ```
 
 3. Restart Rancher Desktop.
@@ -51,11 +55,13 @@ To resolve this error, you need to increase the value of `fs.inotify.max_user_wa
 The resolution in the [kind known issue](https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files) can be used directly.
 
 1. Create a new configuration file:
+
    ```sh
    sudo vi /etc/sysctl.d/99-sysctl.conf
    ```
 
 2. Add the following lines:
+
    ```sh
    fs.inotify.max_user_watches=1048576
    fs.inotify.max_user_instances=1024

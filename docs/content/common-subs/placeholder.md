@@ -1,1 +1,1 @@
-* *This is a placeholder file to allow  building the navigation*
+- _This is a placeholder file to allow building the navigation_

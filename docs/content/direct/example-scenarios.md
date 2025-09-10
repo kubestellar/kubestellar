@@ -50,7 +50,7 @@ EOF
 ```
 
 This BindingPolicy configuration determines **where** to deploy the workload by using
-the label selector expressions found in *clusterSelectors*. It also specifies **what**
+the label selector expressions found in _clusterSelectors_. It also specifies **what**
 to deploy through the downsync.labelSelectors expressions.
 Each matchLabels expression is a criterion for selecting a set of objects based on
 their labels. Other criteria can be added to filter objects based on their namespace,
@@ -261,7 +261,7 @@ spec:
 EOF
 ```
 
-Note that helm sets `app.kubernetes.io/instance` to the *name* of the installed *release*.
+Note that helm sets `app.kubernetes.io/instance` to the _name_ of the installed _release_.
 
 Create and label the namespace and install the chart:
 

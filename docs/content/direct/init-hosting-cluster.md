@@ -26,4 +26,3 @@ When the hosting cluster is an OpenShift cluster, the recipe for registering a W
 ## KubeStellar core Helm chart
 
 The [KubeStellar core Helm chart](core-chart.md) will install the KubeFlex implementation in the cluster that `kubectl` is configured to access, as well as create ITSes and WDSes.
-

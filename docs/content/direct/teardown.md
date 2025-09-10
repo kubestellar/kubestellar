@@ -154,7 +154,7 @@ kubectl --context $wec_context delete ns open-cluster-management
 
 The steps above still leave some `CustomResourceDefinition` (CRD)
 objects from OCM in the WECs. You should remove those, and their
-instances.  See [Deleting CRDs and their instances in the KubeFlex
+instances. See [Deleting CRDs and their instances in the KubeFlex
 hosting
 cluster](#deleting-crds-and-their-instances-in-the-kubeflex-hosting-cluster),
 but do it for the WECs instead of the KubeFlex hosting cluster and for
@@ -182,10 +182,10 @@ helm --kube-context $host_context list -A
 The output may look something like the following.
 
 ```console
-NAME                          	NAMESPACE            	REVISION	UPDATED                                	STATUS  	CHART                                    	APP VERSION  
+NAME                          	NAMESPACE            	REVISION	UPDATED                                	STATUS  	CHART                                    	APP VERSION
 ...
-kubeflex-operator             	kubeflex-system      	1       	2024-06-03 22:35:24.360137 -0400 EDT   	deployed	kubeflex-operator-v0.6.2                 	v0.6.2       
-postgres                      	kubeflex-system      	1       	2024-06-03 22:33:33.210041 -0400 EDT   	deployed	postgresql-13.1.5                        	16.0.0       
+kubeflex-operator             	kubeflex-system      	1       	2024-06-03 22:35:24.360137 -0400 EDT   	deployed	kubeflex-operator-v0.6.2                 	v0.6.2
+postgres                      	kubeflex-system      	1       	2024-06-03 22:33:33.210041 -0400 EDT   	deployed	postgresql-13.1.5                        	16.0.0
 ...
 ```
 

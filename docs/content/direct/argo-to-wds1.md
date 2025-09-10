@@ -1,7 +1,7 @@
 # Install ArgoCD for delivery to a WDS
 
 This document tells you how to install ArgoCD in the KubeFlex hosting
-cluster and configure ArgoCD to deliver applications to a WDS.  The
+cluster and configure ArgoCD to deliver applications to a WDS. The
 commands shown here assume that you access the KubeFlex hosting
 cluster via a kubeconfig context named "kind-kubeflex" and that you
 access the WDS via a kubeconfig context named "wds1"; adapt as
@@ -30,7 +30,7 @@ sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
 rm argocd-linux-amd64
 ```
 
-Check the [ArgoCD releases](https://github.com/argoproj/argo-cd/releases) page for the obtaining the latest 
+Check the [ArgoCD releases](https://github.com/argoproj/argo-cd/releases) page for the obtaining the latest
 stable release for other architectures and operating systems.
 
 Configure Argo to work with the ingress installed in the hosting cluster:

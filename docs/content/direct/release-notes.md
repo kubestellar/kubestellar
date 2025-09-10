@@ -1,6 +1,6 @@
 # Release notes
 
-The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
+The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release.
 
 ## 0.28.0
 
@@ -31,12 +31,12 @@ up advances in other dependencies (but staying limited to Kubernetes
 
 ### Remaining limitations in 0.28.0
 
-* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
-* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
-* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
-* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
-* If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
+- Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+- Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+- It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+- If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
 
 ## 0.27.2
 
@@ -69,17 +69,16 @@ The major changes since 0.25.1 are as follows.
 
 ### Remaining limitations in 0.26.0
 
-* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
-* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
-* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
-* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
-* If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
+- Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+- Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+- It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+- If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
 
 ## 0.26.0-alpha.5
 
 This release is intended to have the same functionality as 0.26.0-alpha.3 and 0.26.0-alpha.4 but test a change to the GitHub Actions workflow that makes a release; the change adds SBOM generation ([PR 2718](https://github.com/kubestellar/kubestellar/pull/2718)).
-
 
 ## 0.26.0-alpha.4
 
@@ -91,13 +90,12 @@ This release adds the option for the core Helm chart to not take responsibility 
 
 ### Remaining limitations in 0.26.0-alpha.3
 
-* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
-* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
-* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
-* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
-* If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
-
+- Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+- Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+- It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+- If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
 
 ## 0.26.0-alpha.1, 0.26.0-alpha.2
 
@@ -107,12 +105,12 @@ This release changes the schema for a `BindingPolicy` so that the request for si
 
 ### Remaining limitations in 0.26.0-alpha.1 and 0.26.0-alpha.2
 
-* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
-* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
-* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
-* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
-* If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
+- Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+- Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+- It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+- If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
 
 ## 0.25.1
 
@@ -123,35 +121,31 @@ This patch release fixes some bugs and some documentation oversights. Following 
 
 ### Remaining limitations in 0.25.1
 
-* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
-* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
-* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
-* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
-* If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. Unless you workload is very large, you can avoid this situation by setting the `transport_controller.max_num_wrapped` "value" of [the core Helm chart](core-chart.md) to a number that is larger than the number of your workload objects (double check your count in your `Binding` object).
-
+- Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+- Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+- It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+- If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. Unless you workload is very large, you can avoid this situation by setting the `transport_controller.max_num_wrapped` "value" of [the core Helm chart](core-chart.md) to a number that is larger than the number of your workload objects (double check your count in your `Binding` object).
 
 ## 0.25.0 and its candidates
 
-* The main advance in this release is finishing the implementation of the create-only feature. It is now available for use.
-* The default value of transport controller's `max-num-wrapped` flag is changed to 1, in the core Helm chart.
+- The main advance in this release is finishing the implementation of the create-only feature. It is now available for use.
+- The default value of transport controller's `max-num-wrapped` flag is changed to 1, in the core Helm chart.
 
 ### Remaining limitations in 0.25.0 and its candidates
 
-* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
-* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
-* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
-* If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there are bugs in the updating of workload objects in the WECs.
-* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
-* If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. Unless you workload is very large, you can avoid this situation by setting the `transport_controller.max_num_wrapped` "value" of [the core Helm chart](core-chart.md) to a number that is larger than the number of your workload objects (double check your count in your `Binding` object).
-
-
+- Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+- Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+- If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there are bugs in the updating of workload objects in the WECs.
+- It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+- If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. Unless you workload is very large, you can avoid this situation by setting the `transport_controller.max_num_wrapped` "value" of [the core Helm chart](core-chart.md) to a number that is larger than the number of your workload objects (double check your count in your `Binding` object).
 
 ## 0.25.0-alpha.1 test releases
 
 These test the release-building functionality, which has been revised in the course of merge the controller-manager and transport-controller Helm charts into the core Helm chart.
-
 
 ## 0.24.0 and its candidates and their precursors
 
@@ -159,14 +153,14 @@ The main functional change from 0.23.X is the completion of the status combinati
 
 ### Remaining limitations in 0.24.0
 
-* Job objects are not properly supported.
-* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
-* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
-* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
-* If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there are bugs in the updating of workload objects in the WECs.
-* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
-* If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality.
+- Job objects are not properly supported.
+- Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+- Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+- If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there are bugs in the updating of workload objects in the WECs.
+- It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+- If the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality.
 
 ## 0.23.1
 
@@ -174,25 +168,25 @@ The main change from 0.23.0 is a re-organization of the website, which is still 
 
 ### Remaining limitations in 0.23.1
 
-* Job objects are not properly supported.
-* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
-* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- Job objects are not properly supported.
+- Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+- Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 
 ## 0.23.0 and its release candidates
 
 The main change is introduction of the an all-in-one chart, called the core chart, for installing KubeStellar in a given hosting cluster and creating an initial set of WDSes and ITSes.
 
-This release also introduces a preliminary API for combining workload object reported state from the WECs --- **BUT THE IMPLEMENTATION IS NOT DONE***. The control objects can be created but the designed response is not there. The design of the control objects is likely to change in the future too (without change in the Kubernetes API group's version string). In short, stay away from this feature in this release.
+This release also introduces a preliminary API for combining workload object reported state from the WECs --- **BUT THE IMPLEMENTATION IS NOT DONE\***. The control objects can be created but the designed response is not there. The design of the control objects is likely to change in the future too (without change in the Kubernetes API group's version string). In short, stay away from this feature in this release.
 
 This release also features better observability (`/metrics` and `/debug/pprof`) and control over client-side self-restraint (request QPS and burst).
 
 ### Remaining limitations in 0.23.0 and its release candidates
 
-* Job objects are not properly supported.
-* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
-* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- Job objects are not properly supported.
+- Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+- Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 
 ## 0.22.0 and its release candidates
 
@@ -211,49 +205,48 @@ See [the changelogs on GitHub](https://github.com/kubestellar/kubestellar/releas
 
 ### Remaining limitations in 0.22.0 and its release candidates
 
-* Job objects are not properly supported.
-* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
-* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
-
+- Job objects are not properly supported.
+- Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+- Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 
 ## 0.21.2 and its release candidates
 
 The changes since 0.21.1 include efficiency improvements, reducing costs of running the kubestellar-controller-manager for a WDS that is an OpenShift cluster. There are also bug fixes and documentation improvements.
 
 ## 0.21.1
+
 This release mainly updates the documentation exposed under kubestellar.io.
 
 ## 0.21.0 and its release candidates
 
-
 ### Major changes for 0.21.0 and its release candidates
 
-* This release introduces pluggable transport. Currently the only plugin is [the OCM transport plugin](https://github.com/kubestellar/ocm-transport-plugin).
+- This release introduces pluggable transport. Currently the only plugin is [the OCM transport plugin](https://github.com/kubestellar/ocm-transport-plugin).
 
 ### Bug fixes in 0.21.0 and its release candidates
 
-* dynamic changes to WECs **are supported**. Existing Bindings and ManifestWorks will be updated when new WECs are added/updated/delete or when labels are added/updated/deleted on existing WECs
-* An update to a workload object that removes some BindingPolicies from the matching set _is_ handled correctly.
-* These changes that happen while a controller is down are handled correctly:
-   * If a workload object is deleted, or changed to remove some BindingPolicies from the matching set;
-   * A BindingPolicy update that removes workload objects or clusters from their respective matching sets.
+- dynamic changes to WECs **are supported**. Existing Bindings and ManifestWorks will be updated when new WECs are added/updated/delete or when labels are added/updated/deleted on existing WECs
+- An update to a workload object that removes some BindingPolicies from the matching set _is_ handled correctly.
+- These changes that happen while a controller is down are handled correctly:
+  - If a workload object is deleted, or changed to remove some BindingPolicies from the matching set;
+  - A BindingPolicy update that removes workload objects or clusters from their respective matching sets.
 
 ### Remaining limitations in 0.21.0 and its release candidates
 
-* Job objects are not properly supported.
-* Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
-* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- Job objects are not properly supported.
+- Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
+- Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
 
 ## 0.20.0 and its release candidates
 
-* Job objects are not properly supported.
-* Dynamic changes to WECs are not supported. Existing ManifestWorks will not be updated when new WECs are added or when labels are added/deleted on existing WECs
-* Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
-* Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
-* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
-* An update to a workload object that removes some BindingPolicies from the matching set is not handled correctly.
-* Some operations are not handled correctly while the controller is down:
-   * If a workload object is deleted, or changed to remove some BindingPolicies from the matching set, it will not be handled correctly.
-   * A BindingPolicy update that removes workload objects or clusters from their respective matching sets is not handled correctly.
+- Job objects are not properly supported.
+- Dynamic changes to WECs are not supported. Existing ManifestWorks will not be updated when new WECs are added or when labels are added/deleted on existing WECs
+- Removing of WorkStatus objects (on the transport namespace) is not supported and may not result in recreation of that object
+- Singleton status return: It is the user responsibility to make sure that if a BindingPolicy requesting singleton status return matches a given workload object then no other BindingPolicy matches the same object. Currently there is no enforcement of that.
+- Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+- An update to a workload object that removes some BindingPolicies from the matching set is not handled correctly.
+- Some operations are not handled correctly while the controller is down:
+  - If a workload object is deleted, or changed to remove some BindingPolicies from the matching set, it will not be handled correctly.
+  - A BindingPolicy update that removes workload objects or clusters from their respective matching sets is not handled correctly.

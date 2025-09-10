@@ -1,6 +1,7 @@
 # Using Argo CD with KubeStellar Core chart
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Pre-requisites](#pre-requisites)
 - [Installing Argo CD using KubeStellar Core chart](#installing-argo-cd-using-kubestellar-core-chart)
@@ -48,6 +49,7 @@ helm upgrade --install ks-core core-chart \
 ```
 
 **Expected output:**
+
 ```
 Release "ks-core" has been upgraded. Happy Helming!
 NAME: ks-core
@@ -88,6 +90,7 @@ kubectl -n default get secret argocd-initial-admin-secret -o jsonpath="{.data.pa
 ```
 
 **Expected output(similar):**
+
 ```
 EpQ2-OMgvfdHiMiD
 ```
@@ -101,6 +104,7 @@ kubectl get pods -A | grep -i argo
 ```
 
 **Expected output (similar to):**
+
 ```
 default              ks-core-argocd-application-controller-0                     1/1     Running     0          15m
 default              ks-core-argocd-applicationset-controller-6669c9f789-wd5h7   1/1     Running     0          15m
@@ -116,11 +120,12 @@ default              ks-core-argocd-server-84cbbd8cbd-bpl92                     
 Open your browser and navigate to: `https://argocd.localtest.me:9443/`
 
 **Login credentials:**
+
 - **Username**: `admin`
 - **Password**: Use the password obtained from the previous command (e.g., `EpQ2-OMgvfdHiMiD`)
 
 > **Note:** If you encounter SSL certificate warnings in your browser, proceed with "Advanced" → "Proceed to argocd.localtest.me (unsafe)" or similar option, as this is expected for local development setups.
-![alt text](images/argo-cd-signin-page.png)
+> ![alt text](images/argo-cd-signin-page.png)
 
 ## Deploying Argo CD applications
 
@@ -129,14 +134,14 @@ The KubeStellar Core chart can also be used to deploy Argo CD applications as sp
 ```yaml
 argocd:
   applications: # list of Argo CD applications to be create
-  - name: scenario-6 # required, must be unique
-    project: default # default: default
-    repoURL: https://github.com/pdettori/sample-apps.git
-    targetRevision: HEAD # default: HEAD
-    path: nginx
-    destinationWDS: wds1
-    destinationNamespace: nginx-sa # default: default
-    syncPolicy: auto # default: manual
+    - name: scenario-6 # required, must be unique
+      project: default # default: default
+      repoURL: https://github.com/pdettori/sample-apps.git
+      targetRevision: HEAD # default: HEAD
+      path: nginx
+      destinationWDS: wds1
+      destinationNamespace: nginx-sa # default: default
+      syncPolicy: auto # default: manual
 ```
 
 Alternatively, the same result can be achieved from Helm CLI by using the followig minimal argument (note that the default values are not explicitely set):
@@ -146,4 +151,5 @@ Alternatively, the same result can be achieved from Helm CLI by using the follow
 ```
 
 ![alt text](images/argocd-application.png)
+
 > **Important**: Currently, the KubeStellar controller does not return resource status correctly to Argo CD. This means that deployed applications may not show as "Healthy" or green in the Argo CD UI, even when they are actually running correctly on the workload execution clusters. This is a known limitation and does not indicate that your deployment has failed.

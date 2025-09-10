@@ -33,11 +33,10 @@ To solve this issue, increase colima resource capacity to increase KinD clusters
 colima stop
 ```
 
- 2. Increase colima cpu and memory capacity
+2.  Increase colima cpu and memory capacity
 
- ```bash
- colima start --cpu 4 --memory 8
- ```
+```bash
+colima start --cpu 4 --memory 8
+```
 
 3. Delete kind cluster created by the tutorial, and start over again on a clean state.
-

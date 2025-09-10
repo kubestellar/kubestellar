@@ -1,7 +1,9 @@
 # Check out KubeStellar working with Kyverno:
+
 Medium - [Syncing Objects from one Kubernetes cluster to another Kubernetes cluster](https://medium.com/@yana1205dev/syncing-objects-between-kubernetes-kubernetes-bcedafdc80c2)<br/>
 
 ### Kyverno and KubeStellar Demo Day
+
 <p align=center>
 <div id="spinner1">
   <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
@@ -11,6 +13,7 @@ Medium - [Syncing Objects from one Kubernetes cluster to another Kubernetes clus
 </p>
 
 ### Kyverno and KubeStellar in the news
+
 <p align=center>
 <div id="spinner2">
   <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
@@ -19,6 +22,7 @@ Medium - [Syncing Objects from one Kubernetes cluster to another Kubernetes clus
 </p>
 
 ### How do I get this working with my KubeStellar instance?
+
 [Work with us](https://kubernetes.slack.com/archives/C058SUSL5AA) to create this document
 
 <style type="text/css">

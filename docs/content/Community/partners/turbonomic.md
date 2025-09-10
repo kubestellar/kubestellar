@@ -1,7 +1,9 @@
 # Check out KubeStellar working with Turbonomic:
+
 Medium - [Make Multi-Cluster Scheduling a No-Brainer](https://medium.com/@waltforme/make-multi-cluster-scheduling-a-no-brainer-e1979ba5b9b2)<br/>
 
 ### Turbonomic and KubeStellar Demo Day
+
 <p align=center>
 <div id="spinner1">
   <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
@@ -10,7 +12,9 @@ Medium - [Make Multi-Cluster Scheduling a No-Brainer](https://medium.com/@waltfo
 </p>
 
 ### How do I get this working with my KubeStellar instance?
+
 As we can see from the blog and the demo, Turbonomic talks to KubeStellar via GitOps. The scheduling decisions are passed from Turbonomic to KubeStellar in two steps:
+
 1. Turbo -> GitHub repository.
 2. GitHub repository -> KubeStellar.
 
@@ -22,8 +26,8 @@ For the second step (GitHub repository-> KubeStellar), we can use Argo CD. The d
 
 As we can see from the blog and the demo, Turbonomic collects data from edge clusters. This is made possible by installing [kubeturbo](https://github.com/turbonomic/kubeturbo) into each of the edge clusters.
 
-
 ### Turbonomic and KubeStellar in the news
+
 <p align=center>
 <div id="spinner2">
     <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">

@@ -28,24 +28,24 @@ Installing and using KubeStellar progresses through the following steps.
 2. Acquire the ability to use a Kubernetes cluster to serve as the [KubeFlex](https://github.com/kubestellar/kubeflex/) hosting cluster. See [Acquire cluster for KubeFlex hosting](acquire-hosting-cluster.md).
 3. [Initialize that cluster as a KubeFlex hosting cluster](init-hosting-cluster.md).
 4. [Inventory and Transport Space](its.md) (ITS).
-    1. Create something to serve as ITS.
-    1. Register the ITS as a KubeFlex ControlPlane.
+   1. Create something to serve as ITS.
+   1. Register the ITS as a KubeFlex ControlPlane.
 5. [Workload Description Space](wds.md) (WDS).
-    1. Create something to serve as WDS.
-    1. Register the WDS as a KubeFlex ControlPlane and initialize it for KubeStellar usage.
+   1. Create something to serve as WDS.
+   1. Register the WDS as a KubeFlex ControlPlane and initialize it for KubeStellar usage.
 6. Create a [Workload Execution Cluster](wec.md) (WEC).
 7. [Register the WEC in the ITS](wec-registration.md).
 8. Maintain workload desired state in the WDS.
 9. Maintain [control objects](control.md) in the WDS to bind workload with WEC and modulate the state propagation back and forth. The [API reference](https://pkg.go.dev/github.com/kubestellar/kubestellar/api/control/v1alpha1) documents all of them. There are control objects for the following topics.
-    1. [Binding workload with WEC(s)](binding.md).
-    1. [Transforming desired state](transforming.md) as it travels from WDS to WEC.
-    1. [Summarizing reported state](combined-status.md) from WECs into WDS.
+   1. [Binding workload with WEC(s)](binding.md).
+   1. [Transforming desired state](transforming.md) as it travels from WDS to WEC.
+   1. [Summarizing reported state](combined-status.md) from WECs into WDS.
 10. Enjoy the effects of workloads being propagated to the WEC.
 11. Consume reported state from WDS.
 
 By "maintain" we mean create, read, update, delete, list, and watch as you like, over time. KubeStellar is eventually consistent: you can change your inputs as you like over time, and KubeStellar continually strives to achieve what you are currently asking it to do.
 
-There is some flexibility in the ordering of those steps. The following flowchart shows the key ordering constraints. 
+There is some flexibility in the ordering of those steps. The following flowchart shows the key ordering constraints.
 
 ![Ordering among installation and usage actions](images/usage-outline.svg)
 

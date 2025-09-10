@@ -7,7 +7,7 @@
 - [KubeFlex Hosting Cluster as ITS](#kubeflex-hosting-cluster-as-its)
 - [Important Note on ITS Registration](#important-note-on-its-registration)
 - [Architecture and Components](#architecture-and-components)
-An Inventory and Transport Space (ITS) is a core component of the KubeStellar architecture that serves two primary functions:
+  An Inventory and Transport Space (ITS) is a core component of the KubeStellar architecture that serves two primary functions:
 
 1. **Inventory Management**: It maintains a registry of all Workload Execution Clusters (WECs) available in the system.
 2. **Transport Facilitation**: It handles the movement of workloads from Workload Description Spaces (WDSes) to the appropriate WECs.
@@ -35,8 +35,9 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 ```
 
 You can customize your ITS by specifying:
+
 - `name`: A unique name for the ITS
-- `type`: 
+- `type`:
   - `vcluster` (default): Creates a virtual cluster
   - `host`: Uses the KubeFlex hosting cluster itself
   - `external`: Uses an external cluster
@@ -60,6 +61,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 ```
 
 This approach:
+
 - Avoids creating a separate virtual cluster
 - Simplifies the architecture by reusing the hosting cluster
 - Makes the ITS directly accessible through the hosting cluster's API server
@@ -71,6 +73,7 @@ Creating an ITS includes installing the relevant OCM (Open Cluster Management) m
 ## Architecture and Components
 
 The ITS runs the OCM Cluster Manager, which:
+
 - Accepts registrations from WECs through the OCM registration agent
 - Manages the distribution of workloads to WECs
 - Maintains status information from the WECs

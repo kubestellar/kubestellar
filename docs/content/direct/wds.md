@@ -34,8 +34,9 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 ```
 
 You can customize your WDS by specifying:
+
 - `name`: A unique name for the WDS
-- `type`: 
+- `type`:
   - `k8s` (default): Creates a basic Kubernetes API Server with a subset of kube controllers
   - `host`: Uses the KubeFlex hosting cluster itself
 - `APIGroups`: A comma-separated list of API Groups to include
@@ -61,6 +62,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 ```
 
 This approach:
+
 - Avoids creating a separate control plane
 - Simplifies the architecture by reusing the hosting cluster
 - Makes the WDS directly accessible through the hosting cluster's API server

@@ -16,7 +16,6 @@ Please make sure that your environment has all the necessary versions as spelled
 
 See [Git Commit Signoff and Signing](../direct/pr-signoff.md) for more information on how to do that.
 
-
 {%
     include "../../../CONTRIBUTING.md"
     start="<!--start-third-include-->"

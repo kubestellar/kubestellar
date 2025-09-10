@@ -1,7 +1,9 @@
 # Check out KubeStellar working with IBM's Maximo Visual Inspection (MVI):
+
 Medium - [Deployment and configuration of MVI-Edge using KubeStellar](https://medium.com/@francostellari/deployment-and-configuration-of-mvi-edge-using-kubestellar-8972ea949ebd)<br/>
 
 ### MVI and KubeStellar Demo Day
+
 <p align=center>
 <div id="spinner1">
   <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
@@ -10,9 +12,11 @@ Medium - [Deployment and configuration of MVI-Edge using KubeStellar](https://me
 </p>
 
 ### How do I get this working with my KubeStellar instance?
+
 [Work with us](https://kubernetes.slack.com/archives/C058SUSL5AA) to create this document
 
 ### MVI and KubeStellar in the news
+
 <p align=center>
 <div id="spinner1">
     <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">

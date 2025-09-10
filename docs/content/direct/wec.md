@@ -1,4 +1,5 @@
 # Workload Execution Clusters
+
 - [What is a WEC?](#what-is-a-wec)
 - [Creating a WEC](#creating-a-wec)
   - [Using Kind (for development/testing)](#using-kind-for-developmenttesting)
@@ -10,7 +11,7 @@
 - [WEC Customization Properties](#wec-customization-properties)
 - [WEC Status and Monitoring](#wec-status-and-monitoring)
 - [Workload Transformation](#workload-transformation)
-Workload Execution Clusters (WECs) are the Kubernetes clusters where KubeStellar deploys and runs the workloads defined in the Workload Description Spaces (WDSes).
+  Workload Execution Clusters (WECs) are the Kubernetes clusters where KubeStellar deploys and runs the workloads defined in the Workload Description Spaces (WDSes).
 
 ## What is a WEC?
 

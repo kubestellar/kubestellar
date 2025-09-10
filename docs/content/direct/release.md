@@ -17,10 +17,10 @@ Every release should pass all release tests before it can be officially declare 
 - `go mod tidy`
 - Update the KubeFlex release in `core-chart/Chart.yaml`
 - Update the KubeFlex release everywhere it occurs in any of the `.github/workflows`:
-    - `.github/workflows/ocp-self-runner.yml`
-    - `.github/workflows/pr-test-e2e.yml`
-    - `.github/workflows/pr-test-integration.yml`
-    - `.github/workflows/test-latest-release.yml`
+  - `.github/workflows/ocp-self-runner.yml`
+  - `.github/workflows/pr-test-e2e.yml`
+  - `.github/workflows/pr-test-integration.yml`
+  - `.github/workflows/test-latest-release.yml`
 
 Or you could search for appearances of the old release string yourself using a command like the following. And maybe also search for the release before that, in case it was overlooked earlier.
 
@@ -64,7 +64,7 @@ Making a new kubestellar release requires a contributor to do the following thin
 
 - Apply the Git tag `v$version` to that new commit in the shared repo.
 
-- After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed [above](#technology)) and then the "Test latest release" workflow will run the E2E tests using those artifacts. 
+- After that, the "goreleaser" GitHub workflow then creates and publishes the artifacts for that release (as discussed [above](#technology)) and then the "Test latest release" workflow will run the E2E tests using those artifacts.
 
 - Verify that the automatic tests indeed executed and passed (see more details in [CICD release testing](release-testing.md#automatic-github-based-release-tests))
 
@@ -112,7 +112,7 @@ For each tag `v$version` the following published artifacts will be created.
 
 We use `mike` and `MkDocs` to derive and publish GitHub pages. See `docs/README.md` for details.
 
-The published GitHub pages are organized into "releases".  Each release in the GitHub pages corresponds to a git branch whose name begins with "release-" or is "main".
+The published GitHub pages are organized into "releases". Each release in the GitHub pages corresponds to a git branch whose name begins with "release-" or is "main".
 
 Our documentation is, mostly, viewable in either of two ways. The source documents can be viewed directly through GitHub's web UI for files. The other way is through the website.
 

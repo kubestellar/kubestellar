@@ -23,10 +23,10 @@ registry credentials if that file exists.
 Fetching a Helm chart from an OCI registry can involve getting a
 temporary token. For a private Helm chart, registry credentials are
 required in order to get that temporary token; for a public Helm
-chart, registry credentials are not needed.  Even though fetching a
+chart, registry credentials are not needed. Even though fetching a
 public Helm chart does not require registry credentials, `helm` tries
 to get and use credentials for the `ghcr.io` registry if that Docker
-configuration file exists.  When that file exists but specifies
+configuration file exists. When that file exists but specifies
 something that does not work, that can lead to an error message about
 an authorization failure in the request to get the temporary token.
 

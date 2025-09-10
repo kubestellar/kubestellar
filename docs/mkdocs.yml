@@ -11,17 +11,17 @@ brew_repo_default_file_path: homebrew-kubestellar
 docs_url: https://docs.kubestellar.io
 repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
 edit_uri: edit/main/docs/content
-ks_branch: 'main'
-ks_tag: 'latest'
-ks_latest_regular_release: '0.28.0'
-ks_latest_release: '0.28.0'
+ks_branch: "main"
+ks_tag: "latest"
+ks_latest_regular_release: "0.28.0"
+ks_latest_release: "0.28.0"
 
-ks_kind_port_num: '1119'
+ks_kind_port_num: "1119"
 
 # Site content
-docs_dir: 'content'
+docs_dir: "content"
 # Where to generate
-site_dir: 'generated'
+site_dir: "generated"
 
 nav:
   - Welcome:
@@ -30,9 +30,9 @@ nav:
       - Overview: readme.md
       - Architecture: direct/architecture.md
       - Related:
-        - KubeStellar UI: direct/ui-intro.md
-        - KubeFlex: direct/kubeflex-intro.md
-        - KubeStellar Galaxy: direct/galaxy-intro.md
+          - KubeStellar UI: direct/ui-intro.md
+          - KubeFlex: direct/kubeflex-intro.md
+          - KubeStellar Galaxy: direct/galaxy-intro.md
       - Release-notes: direct/release-notes.md
       - Roadmap: direct/roadmap.md
   - Getting Started: direct/get-started.md
@@ -46,16 +46,16 @@ nav:
           - Setup limitations: direct/setup-limitations.md
           - Prerequisites: direct/pre-reqs.md
           - KubeFlex Hosting cluster:
-            - Acquire cluster for KubeFlex Hosting: direct/acquire-hosting-cluster.md
-            - Initialize KubeFlex Hosting cluster: direct/init-hosting-cluster.md
+              - Acquire cluster for KubeFlex Hosting: direct/acquire-hosting-cluster.md
+              - Initialize KubeFlex Hosting cluster: direct/init-hosting-cluster.md
           - Core Spaces:
-            - Inventory and Transport Spaces: direct/its.md
-            - Workload Description Spaces: direct/wds.md
+              - Inventory and Transport Spaces: direct/its.md
+              - Workload Description Spaces: direct/wds.md
           - Core Helm chart: direct/core-chart.md
           - Argo CD integration with Core Helm chart: direct/core-chart-argocd.md
           - Workload Execution Clusters:
-            - About Workload Execution Clusters: direct/wec.md
-            - Register a Workload Execution Cluster: direct/wec-registration.md
+              - About Workload Execution Clusters: direct/wec.md
+              - Register a Workload Execution Cluster: direct/wec-registration.md
       - Usage:
           - Usage limitations: direct/usage-limitations.md
           - KubeStellar API:
@@ -96,36 +96,36 @@ nav:
       - Release Testing: direct/release-testing.md
       - Sign-off and Signing Contributions: direct/pr-signoff.md
   - Community:
-    - Get Involved: Community/_index.md
-    - Contact Us:
-        - Mailing List: https://kubestellar.io/join_us
-        - Community Meeting Agenda (join mailing list first): https://kubestellar.io/agenda
-        - Slack: https://kubestellar.io/slack
-        - Medium Blog: https://kubestellar.io/blog
-        - YouTube Channel: https://kubestellar.io/tv
-        - LinkedIn: https://kubestellar.io/linkedin
-        - Reddit: https://www.reddit.com/r/kubestellar/
-        - Google Drive: https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS
-    - Partners:
-        - ArgoCD: Community/partners/argocd.md
-        - Turbonomic: Community/partners/turbonomic.md
-        - MVI: Community/partners/mvi.md
-        - FluxCD: Community/partners/fluxcd.md
-        - OpenZiti: Community/partners/openziti.md
-        - Kyverno: Community/partners/kyverno.md
-  - 'Blog': https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank
+      - Get Involved: Community/_index.md
+      - Contact Us:
+          - Mailing List: https://kubestellar.io/join_us
+          - Community Meeting Agenda (join mailing list first): https://kubestellar.io/agenda
+          - Slack: https://kubestellar.io/slack
+          - Medium Blog: https://kubestellar.io/blog
+          - YouTube Channel: https://kubestellar.io/tv
+          - LinkedIn: https://kubestellar.io/linkedin
+          - Reddit: https://www.reddit.com/r/kubestellar/
+          - Google Drive: https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS
+      - Partners:
+          - ArgoCD: Community/partners/argocd.md
+          - Turbonomic: Community/partners/turbonomic.md
+          - MVI: Community/partners/mvi.md
+          - FluxCD: Community/partners/fluxcd.md
+          - OpenZiti: Community/partners/openziti.md
+          - Kyverno: Community/partners/kyverno.md
+  - "Blog": https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank
   # # - Auto generated:
   #   - ... | auto-generated/*/*.md
 
 theme:
   font:
-    text: 'SapceMono'
-    code: 'Roboto Mono'
+    text: "SapceMono"
+    code: "Roboto Mono"
   name: material
 
   language: en
   # Common files such as images, stylesheets, theme overrides
-  custom_dir: 'overrides'
+  custom_dir: "overrides"
   features:
     # enable the ability to dismiss the announcement bar
     - announce.dismiss
@@ -216,8 +216,6 @@ plugins:
         en: "English"
         fr: "Français"
 
-
-
   # apidocs
   # - mkdocs-apidoc
   # Docs site search
@@ -228,8 +226,8 @@ plugins:
   - open-in-new-tab
   - include-markdown
   - macros:
-      include_dir: 'overrides'
-      module_name: 'main'
+      include_dir: "overrides"
+      module_name: "main"
   # Configure multiple language support
 
   # - redirects:
@@ -247,7 +245,7 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - attr_list
   - md_in_html
-  - toc:               # Builds a table of contents
+  - toc: # Builds a table of contents
       permalink: "#"
   # Code block highlighting
   - pymdownx.highlight:

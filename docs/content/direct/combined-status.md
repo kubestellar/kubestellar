@@ -21,7 +21,7 @@ The general technique for combining reported state from WECs is built upon the f
 1. A user can request a list without aggregation, possibly after filtering, but certainly with a limit on list length. The expectation is that such a list makes sense only if the length of the list will be modest. For users that want access to the full reported state from each WEC for a large number of WECs, KubeStellar should have an abstraction that gives the users access --- in a functional way, not by making another copy --- to that state (which is already in the mailbox namespaces).
 
 1. The reported state for a given workload object from a given WEC is implicitly augmented with metadata about the WEC and about the end-to-end propagation from WDS to that WEC. This extra information is available just like the regular contents of the object, for use in combining reported state.
-    * The specifics of queryable objects and implicit augmentations can be found in `api/control/v1alpha1/types.go` and are specified in [Queryable Objects](#queryable-objects).
+   - The specifics of queryable objects and implicit augmentations can be found in `api/control/v1alpha1/types.go` and are specified in [Queryable Objects](#queryable-objects).
 
 1. Errors in the user-supplied expressions are reported in relevant API objects (`StatusCollector` and `CombinedStatus`). For aggregation operations, input rows with expression errors are skipped.
 
@@ -38,14 +38,13 @@ To a given workload object, and in the context of a given `Binding` object, the 
 1. The SELECT statement either does aggregation or does not. In the case of not doing aggregation, the SELECT statement simply has a collection of named expressions defining the columns of its output.
 
 1. In the case of aggregation, the SELECT statement has the following.
+   - An optional `GROUP BY` clause saying how the rows (WECs) are
+     grouped to form the inputs for aggregation, in terms of named
+     expressions. For convenience here, each of these named
+     expressions is implicitly included in the output columns.
 
-    - An optional `GROUP BY` clause saying how the rows (WECs) are
-      grouped to form the inputs for aggregation, in terms of named
-      expressions. For convenience here, each of these named
-      expressions is implicitly included in the output columns.
-
-    - A collection of named expressions using aggregation functions to define
-      additional output columns.
+   - A collection of named expressions using aggregation functions to define
+     additional output columns.
 
 1. The SELECT statement has a LIMIT on the number of rows that it will yield.
 
@@ -103,16 +102,16 @@ from `DownsyncPolicyClause`, `NamespaceScopeDownsyncClause`, and
 A CEL expression within a `StatusCollector` can reference the following objects:
 
 1. `inventory`: The inventory object for the workload object:
-    - `inventory.name`: The name of the inventory object.
+   - `inventory.name`: The name of the inventory object.
 
 1. `obj`: The workload object from the WDS:
-    - All fields of the workload object except the status subresource.
+   - All fields of the workload object except the status subresource.
 
 1. `returned`: The reported state from the WEC:
-    - `returned.status`: The status section of the object returned from the WEC.
+   - `returned.status`: The status section of the object returned from the WEC.
 
 1. `propagation`: Metadata about the end-to-end propagation process:
-    - `propagation.lastReturnedUpdateTimestamp`: metav1.Time of last update to any returned state.
+   - `propagation.lastReturnedUpdateTimestamp`: metav1.Time of last update to any returned state.
 
 ## Examples of using the general technique
 
@@ -127,8 +126,8 @@ metadata:
   name: count-wecs
 spec:
   combinedFields:
-     - name: count
-       type: COUNT
+    - name: count
+      type: COUNT
   limit: 10
 ```
 
@@ -141,11 +140,11 @@ metadata:
   name: example-binding-policy
 spec:
   clusterSelectors:
-  - matchLabels: {"location-group":"edge"}
+    - matchLabels: { "location-group": "edge" }
   downsync:
-  - objectSelectors:
-    - matchLabels: {"app.kubernetes.io/name":"nginx"}
-    statusCollectors: [ count-wecs ]
+    - objectSelectors:
+        - matchLabels: { "app.kubernetes.io/name": "nginx" }
+      statusCollectors: [count-wecs]
 ```
 
 The analogous SQL statement would look something like the following.
@@ -175,13 +174,13 @@ metadata:
   resourceVersion: "604"
   uid: cc167004-073e-4a20-9857-449f692e9643
 results:
-- columnNames:
-  - count
-  name: count-wecs
-  rows:
-  - columns:
-    - float: "2"
-      type: Number
+  - columnNames:
+      - count
+    name: count-wecs
+    rows:
+      - columns:
+          - float: "2"
+            type: Number
 ```
 
 ### Histogram of Pod phase
@@ -189,12 +188,12 @@ results:
 The `spec` of the `StatusCollector` would look like the following.
 
 ```yaml
-  groupBy:
-     - name: phase
-       def: returned.status.phase
-  combinedFields:
-     - name: count
-       type: COUNT
+groupBy:
+  - name: phase
+    def: returned.status.phase
+combinedFields:
+  - name: count
+    type: COUNT
 ```
 
 The analogous SQL statement would look something like the following.
@@ -214,12 +213,12 @@ The result would have two columns, holding a phase value and a count. The number
 This reports, for each number of available replicas, how many WECs have that number. The `spec` of the `CombinedStatus` would look like the following.
 
 ```yaml
-  groupBy:
-     - name: numAvailable
-       def: returned.status.availableReplicas
-  combinedFields:
-     - name: count
-       type: COUNT
+groupBy:
+  - name: numAvailable
+    def: returned.status.availableReplicas
+combinedFields:
+  - name: count
+    type: COUNT
 ```
 
 ### List of WECs where the Deployment is not as available as desired
@@ -227,10 +226,10 @@ This reports, for each number of available replicas, how many WECs have that num
 The `spec` of the `CombinedStatus` would look like the following.
 
 ```yaml
-  filter: "obj.spec.replicas != returned.status.availableReplicas"
-  select:
-     - name: wec
-       def: inventory.name
+filter: "obj.spec.replicas != returned.status.availableReplicas"
+select:
+  - name: wec
+    def: inventory.name
 ```
 
 ### Full status from each WEC with information retrieval time
@@ -239,13 +238,13 @@ The `spec` of the `CombinedStatus` would look like the following.
 This produces a listing of object status paired with inventory object name.
 
 ```yaml
-  select:
-     - name: wec
-       def: inventory.name
-     - name: status
-       def: returned.status
-     - name: retrievalTime
-       def: propagation.lastReturnedUpdateTimestamp
+select:
+  - name: wec
+    def: inventory.name
+  - name: status
+    def: returned.status
+  - name: retrievalTime
+    def: propagation.lastReturnedUpdateTimestamp
 ```
 
 ## Special case for 1 WEC
@@ -291,11 +290,11 @@ For a given workload object in a given WDS, while singleton status
 return is requested, KubeStellar maintains a label on the object whose
 name (key) is `kubestellar.io/executing-count` and whose value is a
 string representation of the size of the qualified WEC set of that
-object.  While singleton status return is _not_ requested, KubeStellar
-suppresses the existence of a label with that name (key).  While
+object. While singleton status return is _not_ requested, KubeStellar
+suppresses the existence of a label with that name (key). While
 singleton status return is requested _and_ the size of the qualified
 WEC set is 1, KubeStellar propagates the object's `.status` from that
-WEC to the `.status` section of the object in the WDS.  While either
+WEC to the `.status` section of the object in the WDS. While either
 singleton status return is NOT requested or the size of the qualified
 WEC set is NOT 1, there is nothing in the `.status` of the object in
 the WDS that was propagated there from a WEC by KubeStellar.

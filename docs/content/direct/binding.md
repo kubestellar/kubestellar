@@ -56,20 +56,20 @@ metadata:
   name: nginx
 spec:
   clusterSelectors:
-  - matchLabels:
-      location-group: edge
+    - matchLabels:
+        location-group: edge
   downsync:
-  - objectSelectors:
-    - matchLabels:
-        app.kubernetes.io/name: nginx
-    resources:
-    - namespaces
-  - createOnly: true
-    objectSelectors:
-    - matchLabels:
-        app.kubernetes.io/name: nginx
-    resources:
-    - deployments
+    - objectSelectors:
+        - matchLabels:
+            app.kubernetes.io/name: nginx
+      resources:
+        - namespaces
+    - createOnly: true
+      objectSelectors:
+        - matchLabels:
+            app.kubernetes.io/name: nginx
+      resources:
+        - deployments
 ```
 
 ## Binding

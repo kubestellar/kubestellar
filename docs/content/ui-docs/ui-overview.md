@@ -1,4 +1,5 @@
 # KubeStellar UI (User Interface)
+
 ![UI splash page](kubestellar_splash_screen.png)
 
 The KubeStellar UI is an add-on developed to make managing workloads via KubeStellar even simpler and more intuitive.
@@ -7,6 +8,7 @@ With its web-based interface, you can view and manage your Workload Definition S
 ## Learn More
 
 ### UI Repository
+
 To explore more fully under the covers, [visit the UI repository at https://github.com/kubestellar/ui](https://github.com/kubestellar/ui)
 
 ---
@@ -18,6 +20,3 @@ To explore more fully under the covers, [visit the UI repository at https://gith
 {%
     include-markdown "./README.md"
 %}
-
-
-

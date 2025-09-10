@@ -2,7 +2,7 @@
 
 If a contributor has _**not**_ created a sharable preview of a documentation PR [as documented in the documents management overview](document-management.md#serving-up-documents-globally-from-a-fork-of-the-repository-via-github) , here are the steps to checkout a git pull request for local testing.
 
-## STEP 1: Checkout the Pull Request**
+## STEP 1: Checkout the Pull Request\*\*
 
 Helpers: [GitHub](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally), [DevOpsCube](https://devopscube.com/checkout-git-pull-request/)
 
@@ -28,7 +28,7 @@ git checkout BRANCH_NAME
 
 At this point, you can do anything you want with this branch. You can run some local tests, or merge other branches into the branch.
 
-## STEP 2: Test and Build the Documentation (optional)**
+## STEP 2: Test and Build the Documentation (optional)\*\*
 
 See [Serving up documents locally](document-management.md#serving-up-documents-locally) for how
 to view and modify the documentation in the branch that you have checked out.

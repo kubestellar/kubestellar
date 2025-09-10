@@ -18,14 +18,14 @@ them. These are the boxes outlined in red in the following flowchart.
 
 ![this copy of the general installation and usage flowchart](images/ocm-usage-outline.svg).
 
-  1. [Setup](#setup)
-    1. Install remaining software prerequisites
-    1. Cleanup from previous runs
-    1. OCM Quick Start with Ingress
-    1. Label WECs for selection by examples
-    1. Install Kubestellar core components
-  2. [Exercise KubeStellar](#exercise-kubestellar)
-  3. [Troubleshooting](#troubleshooting)
+1. [Setup](#setup)
+1. Install remaining software prerequisites
+1. Cleanup from previous runs
+1. OCM Quick Start with Ingress
+1. Label WECs for selection by examples
+1. Install Kubestellar core components
+1. [Exercise KubeStellar](#exercise-kubestellar)
+1. [Troubleshooting](#troubleshooting)
 
 ## Setup
 
@@ -153,6 +153,7 @@ wec2_context=kind-$wec2_name
 label_query_both=location-group=edge
 label_query_one=name=cluster1
 ```
+
 ## Troubleshooting
 
 In the event something goes wrong, check out the [troubleshooting page](troubleshooting.md) to see if someone else has experienced the same thing

@@ -65,9 +65,8 @@ spec:
   apiGroup: batch
   resource: jobs
   remove:
-  - "$.spec.suspend"
+    - "$.spec.suspend"
 ```
-
 
 ## Rule-based customization
 
@@ -80,7 +79,7 @@ At its current level of development, KubeStellar has a simple but limited way to
 Template expansion is an optional feature that a user can request on an object-by-object basis. The way to request this feature on an object is to put the following annotation on the object.
 
 ```yaml
-    control.kubestellar.io/expand-templates: "true"
+control.kubestellar.io/expand-templates: "true"
 ```
 
 The customization that template expansion does when distributing an object from a WDS to a WEC is applied independently to each leaf string of the object and is based on the "text/template" standard package of Go. The string is parsed as a template and then replaced with the result of expanding the template. Errors from this process are reported in the status field of the Binding object involved. Errors during template expansion usually produce broken YAML, in which case no corresponding object will be created in the WEC.
@@ -113,7 +112,6 @@ spec:
     - name: remote-loki
       type: loki
       url: "https://my.loki.server.com/{\u007B .clusterName }}-{\u007B.clusterHash}}"
-...
 ```
 
 (Note: "{\u007B" is JSON for a string consisting of two consecutive left curly brackets --- which mkdocs does not have a way to quote inside a fenced code block.)
@@ -128,13 +126,12 @@ metadata:
   name: virgo
 data:
   clusterHash: 1001-dead-beef
-...
 ```
 
 When distributed to the virgo WEC, that ClusterLogForwarder would say the following.
 
 ```yaml
-...
-      url: "https://my.loki.server.com/virgo-1001-dead-beef"
-...
+
+---
+url: "https://my.loki.server.com/virgo-1001-dead-beef"
 ```

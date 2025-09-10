@@ -39,7 +39,7 @@ kflex init --create-kind
 
 ### Create and init a kind cluster as hosting cluster with curl-to-bash script
 
-There is a bash script at [`https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh`](https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) that can be fed directly into `bash` and will create a `kind` cluster _AND ALSO_ initialize it as the KubeFlex hosting cluster. This script accepts the following command line flags.
+There is a bash script at [`https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks_latest_regular_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh`](https://raw.githubusercontent.com/kubestellar/kubestellar/v{{ config.ks*latest_regular_release }}/scripts/create-kind-cluster-with-SSL-passthrough.sh) that can be fed directly into `bash` and will create a `kind` cluster \_AND ALSO* initialize it as the KubeFlex hosting cluster. This script accepts the following command line flags.
 
 - `--name name`: set a specific name of the kind cluster (default: kubestellar).
 - `--port port`: map the specified host port to the kind cluster port 443 (default: 9443).
@@ -52,30 +52,33 @@ There is a bash script at [`https://raw.githubusercontent.com/kubestellar/kubest
 This has been tested with version 5.6.0 of [k3d](https://k3d.io).
 
 1. Create a K3D hosting cluster with nginx ingress controller:
-    ```shell
-    k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
-    helm install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --version 4.12.1 --namespace ingress-nginx --create-namespace
-    ```
 
-1. When we use kind, the name of the container is kubeflex-control-plane and that is what we use 
+   ```shell
+   k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
+   helm install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --version 4.12.1 --namespace ingress-nginx --create-namespace
+   ```
+
+1. When we use kind, the name of the container is kubeflex-control-plane and that is what we use
    in the internal URL for `--force-internal-endpoint-lookup`.
    Here the name of the container created by K3D is `k3d-kubeflex-server-0` so we rename it:
-    ```shell
-    docker stop k3d-kubeflex-server-0
-    docker rename k3d-kubeflex-server-0 kubeflex-control-plane
-    docker start kubeflex-control-plane
-    ```
-    Wait 1-2 minutes for all pods to be restarted.
-    Use the following command to confirm all are fully running:
-    ```shell
-    kubectl --context k3d-kubeflex get po -A
-    ```
+
+   ```shell
+   docker stop k3d-kubeflex-server-0
+   docker rename k3d-kubeflex-server-0 kubeflex-control-plane
+   docker start kubeflex-control-plane
+   ```
+
+   Wait 1-2 minutes for all pods to be restarted.
+   Use the following command to confirm all are fully running:
+
+   ```shell
+   kubectl --context k3d-kubeflex get po -A
+   ```
 
 1. Enable SSL passthrough:
    We are using nginx ingress with tls passthrough.
    The current install for kubeflex installs also nginx ingress but specifically for kind.
    To specify passthrough for K3D, edit the ingress placement controller with the following command and add `--enable-ssl-passthrough` to the list of arguments for the container
-    ```shell
-    kubectl edit deployment ingress-nginx-controller -n ingress-nginx  
-    ```
-
+   ```shell
+   kubectl edit deployment ingress-nginx-controller -n ingress-nginx
+   ```
