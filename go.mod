@@ -7,20 +7,20 @@ require (
 	github.com/go-logr/logr v1.4.2
 	github.com/google/cel-go v0.17.8
 	github.com/kubestellar/kubeflex v0.9.1
-	github.com/onsi/ginkgo/v2 v2.22.0
-	github.com/onsi/gomega v1.36.1
+	github.com/onsi/ginkgo/v2 v2.22.2
+	github.com/onsi/gomega v1.36.2
 	github.com/prometheus/client_golang v1.18.0
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/pflag v1.0.6
 	golang.org/x/time v0.7.0
-	google.golang.org/protobuf v1.35.1
-	k8s.io/api v0.30.12
-	k8s.io/apiextensions-apiserver v0.30.12
-	k8s.io/apimachinery v0.30.12
-	k8s.io/apiserver v0.30.12
-	k8s.io/cli-runtime v0.30.12
-	k8s.io/client-go v0.30.12
-	k8s.io/code-generator v0.30.12
-	k8s.io/component-base v0.30.12
+	google.golang.org/protobuf v1.36.1
+	k8s.io/api v0.30.14
+	k8s.io/apiextensions-apiserver v0.30.14
+	k8s.io/apimachinery v0.30.14
+	k8s.io/apiserver v0.30.14
+	k8s.io/cli-runtime v0.30.14
+	k8s.io/client-go v0.30.14
+	k8s.io/code-generator v0.30.14
+	k8s.io/component-base v0.30.14
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/kubernetes v1.30.12
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
@@ -67,7 +67,7 @@ require (
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/google/pprof v0.0.0-20241029153458-d1b30febd7db // indirect
+	github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -101,7 +101,7 @@ require (
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
-	github.com/spf13/cobra v1.8.1 // indirect
+	github.com/spf13/cobra v1.9.1 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.10 // indirect
@@ -136,7 +136,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20240528184218-531527333157 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240826202546-f6391c0de4c7 // indirect
 	google.golang.org/grpc v1.65.0 // indirect
-	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
+	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/gcfg.v1 v1.2.3 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
@@ -146,14 +146,14 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/cloud-provider v0.30.12 // indirect
 	k8s.io/cluster-bootstrap v0.0.0 // indirect
-	k8s.io/component-helpers v0.30.12 // indirect
+	k8s.io/component-helpers v0.30.14 // indirect
 	k8s.io/controller-manager v0.30.12 // indirect
 	k8s.io/dynamic-resource-allocation v0.0.0 // indirect
 	k8s.io/gengo/v2 v2.0.0-20240228010128-51d4e06bde70 // indirect
-	k8s.io/kms v0.30.12 // indirect
+	k8s.io/kms v0.30.14 // indirect
 	k8s.io/kube-aggregator v0.0.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340 // indirect
-	k8s.io/kubectl v0.30.12 // indirect
+	k8s.io/kubectl v0.30.14 // indirect
 	k8s.io/kubelet v0.30.12 // indirect
 	k8s.io/legacy-cloud-providers v0.0.0 // indirect
 	k8s.io/mount-utils v0.0.0 // indirect
