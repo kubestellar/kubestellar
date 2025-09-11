@@ -72,9 +72,23 @@ jobs:
           rm -fr bin kubeflex_0.9.0_linux_amd64.tar.gz
           go install github.com/onsi/ginkgo/v2/ginkgo
 
+      - name: Validate and sanitize test flags
+        id: validate_flags
+        run: |
+          # Validate testFlags input
+          TEST_FLAGS="${{ github.event.inputs.testFlags }}"
+          
+          # Only allow specific safe values
+          if [[ "$TEST_FLAGS" == "" || "$TEST_FLAGS" == "--released" ]]; then
+            echo "SANITIZED_TEST_FLAGS=$TEST_FLAGS" >> $GITHUB_OUTPUT
+          else
+            echo "Error: Invalid testFlags value. Only empty string or '--released' are allowed."
+            exit 1
+          fi
+
       - name: Run test
         env:
-          TEST_FLAGS: ${{ github.event.inputs.testFlags }}
+          TEST_FLAGS: ${{ steps.validate_flags.outputs.SANITIZED_TEST_FLAGS }}
         run: |
           cd test/e2e/ginkgo
           KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color --fail-fast $TEST_FLAGS -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
@@ -202,9 +216,23 @@ jobs:
           mv bin/kflex /usr/local/bin
           rm -fr bin kubeflex_0.9.0_linux_amd64.tar.gz
 
+      - name: Validate and sanitize test flags
+        id: validate_flags_2
+        run: |
+          # Validate testFlags input
+          TEST_FLAGS="${{ github.event.inputs.testFlags }}"
+          
+          # Only allow specific safe values
+          if [[ "$TEST_FLAGS" == "" || "$TEST_FLAGS" == "--released" ]]; then
+            echo "SANITIZED_TEST_FLAGS=$TEST_FLAGS" >> $GITHUB_OUTPUT
+          else
+            echo "Error: Invalid testFlags value. Only empty string or '--released' are allowed."
+            exit 1
+          fi
+
       - name: Run test
         env:
-          TEST_FLAGS: ${{ github.event.inputs.testFlags }}
+          TEST_FLAGS: ${{ steps.validate_flags_2.outputs.SANITIZED_TEST_FLAGS }}
         run: |
           cd test/e2e/
           KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
