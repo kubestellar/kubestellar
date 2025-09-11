@@ -86,3 +86,23 @@ presubmits:
             requests:
               memory: 8Gi
               cpu: 4
+
+periodics:
+  - name: periodic-kubestellar-kflex-compatibility
+    interval: 24h
+    decorate: true
+    clone_uri: "https://github.com/kubestellar/kubestellar"
+    spec:
+      containers:
+        - image: ghcr.io/kubestellar/infra/build:1.24.2-1
+          command:
+            - bash
+            - -c
+            - |
+              set -euo pipefail
+              echo "Running KubeFlex compatibility test..."
+              ./hack/test-kflex-compatibility.sh
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 1
