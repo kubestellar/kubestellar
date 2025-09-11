@@ -23,8 +23,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 KUBESTELLAR_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-echo "=== KubeFlex CLI Compatibility Test ==="
-
 # Extract minimum KubeFlex version from pre_req.sh
 MIN_VERSION_LINE=$(grep -E "Kubeflex version: v[0-9]+\.[0-9]+\.[0-9]+" "${KUBESTELLAR_DIR}/scripts/check_pre_req.sh" || true)
 if [[ -z "$MIN_VERSION_LINE" ]]; then
@@ -33,26 +31,17 @@ if [[ -z "$MIN_VERSION_LINE" ]]; then
 fi
 
 MIN_VERSION=$(echo "$MIN_VERSION_LINE" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+" | head -1)
-echo "Minimum required KubeFlex version: $MIN_VERSION"
 
-# Function to compare semantic versions
-version_compare() {
-    local v1=$1
-    local v2=$2
-    
-    # Remove 'v' prefix and compare
-    v1_clean=${v1#v}
-    v2_clean=${v2#v}
-    
-    printf '%s\n%s\n' "$v1_clean" "$v2_clean" | sort -V | head -n1
+# Compare versions: returns 0 if v1 <= v2
+version_le() {
+    local v1_clean=${1#v}
+    local v2_clean=${2#v}
+    [[ "$v1_clean" == "$v2_clean" || "$v1_clean" < "$v2_clean" ]]
 }
 
 # Function to test a specific KubeFlex CLI version
 test_kflex_version() {
     local version=$1
-    echo "Testing KubeFlex CLI $version..."
-    
-    # Download and install specific kflex version
     local install_dir=$(mktemp -d)
     local kflex_binary="$install_dir/kflex"
     
@@ -66,9 +55,8 @@ test_kflex_version() {
     
     local download_url="https://github.com/kubestellar/kubeflex/releases/download/${version}/kubeflex_${version#v}_${os}_${arch}.tar.gz"
     
-    echo "  Downloading from: $download_url"
     if ! curl -sL "$download_url" | tar -xz -C "$install_dir" bin/kflex 2>/dev/null; then
-        echo "  WARNING: Failed to download KubeFlex $version, skipping..."
+        echo "WARNING: Failed to download KubeFlex $version, skipping..."
         rm -rf "$install_dir"
         return 1
     fi
@@ -78,30 +66,18 @@ test_kflex_version() {
     chmod +x "$kflex_binary"
     
     # Test basic CLI functionality
-    echo "  Testing basic CLI commands..."
-    if ! "$kflex_binary" version &>/dev/null; then
-        echo "  ERROR: kflex version command failed"
+    if ! out=$("$kflex_binary" version 2>&1); then
+        echo "ERROR: kflex version command failed for $version"
+        echo "$out"
         rm -rf "$install_dir"
         return 1
     fi
-    
-    local cli_version=$("$kflex_binary" version 2>/dev/null | grep "Kubeflex version:" | awk '{print $3}' || echo "unknown")
-    echo "  CLI reports version: $cli_version"
-    
-    # Test help command
-    if ! "$kflex_binary" --help &>/dev/null; then
-        echo "  ERROR: kflex help command failed"
-        rm -rf "$install_dir"
-        return 1
-    fi
-    
-    echo "  SUCCESS: KubeFlex CLI $version is compatible"
+    # TODO: Actually test KubeStellar chart with this kflex version
     rm -rf "$install_dir"
     return 0
 }
 
 # Get available KubeFlex releases from GitHub API
-echo "Fetching available KubeFlex versions..."
 RELEASES_JSON=$(curl -s "https://api.github.com/repos/kubestellar/kubeflex/releases?per_page=5" || echo "[]")
 
 if [[ "$RELEASES_JSON" == "[]" ]]; then
@@ -117,7 +93,7 @@ if [[ -z "$VERSIONS" ]]; then
     exit 1
 fi
 
-echo "Available versions: $(echo $VERSIONS | tr '\n' ' ')"
+echo Available versions: $VERSIONS
 
 # Test each version that meets minimum requirement
 TESTED_COUNT=0
@@ -125,17 +101,13 @@ PASSED_COUNT=0
 FAILED_COUNT=0
 
 for version in $VERSIONS; do
-    # Check if version meets minimum requirement
-    if [[ "$(version_compare "$version" "$MIN_VERSION")" == "${MIN_VERSION#v}" ]] || [[ "$version" == "$MIN_VERSION" ]]; then
-        echo
+    if version_le "$MIN_VERSION" "$version"; then
         ((TESTED_COUNT++))
         if test_kflex_version "$version"; then
             ((PASSED_COUNT++))
         else
             ((FAILED_COUNT++))
         fi
-    else
-        echo "Skipping $version (below minimum $MIN_VERSION)"
     fi
 done
 

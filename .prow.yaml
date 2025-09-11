@@ -96,13 +96,8 @@ periodics:
       containers:
         - image: ghcr.io/kubestellar/infra/build:1.24.2-1
           command:
-            - bash
-            - -c
-            - |
-              set -euo pipefail
-              echo "Running KubeFlex compatibility test..."
-              ./hack/test-kflex-compatibility.sh
+            - ./hack/test-kflex-compatibility.sh
           resources:
             requests:
-              memory: 1Gi
-              cpu: 1
+              memory: 2Gi
+              cpu: 2
