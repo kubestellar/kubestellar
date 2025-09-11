@@ -131,7 +131,8 @@ help: ## Display this help.
 
 ##@ Development Dependencies
 
-CODE_GEN_VER := v0.30.14
+
+CODE_GEN_VER := v0.31.13
 CODE_GEN_DIR := $(TOOLS_DIR)/code-generator-clone-$(CODE_GEN_VER)
 export CODE_GEN_DIR
 
@@ -246,7 +247,7 @@ CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
 
 ## Tool Versions
-CONTROLLER_TOOLS_VERSION ?= v0.15.0
+CONTROLLER_TOOLS_VERSION ?= v0.16.5
 
 .PHONY: kustomize
 kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary.
