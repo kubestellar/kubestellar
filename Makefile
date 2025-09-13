@@ -172,10 +172,6 @@ vet: ## Run go vet against code.
 test: manifests generate fmt vet ## Run tests.
 	go test ./api/... ./cmd/... ./pkg/... -coverprofile cover.out
 
-.PHONY: test-kflex-compatibility
-test-kflex-compatibility: ## Test KubeFlex CLI compatibility.
-	./hack/test-kflex-compatibility.sh
-
 ##@ Build
 
 .PHONY: run
