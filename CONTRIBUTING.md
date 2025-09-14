@@ -35,7 +35,13 @@ Thank you for your interest in contributing to the docs repository! We welcome c
 
 7. **Open a Pull Request**
    - Go to the original repository and open a Pull Request from your branch.
-   - Provide a clear description of your changes and reference any related issues.
+   - **Title:** Your PR title should be descriptive. Please prefix it with `major:`, `minor:`, or `patch:` to indicate the scope of the change, following semantic versioning guidelines.
+     - Use `major:` for significant, breaking changes or large new features that are not backward-compatible.
+     - Use `minor:` for new features or enhancements that are backward-compatible.
+     - Use `patch:` for backward-compatible bug fixes, typo corrections, or small documentation updates.
+     - *Example: `patch: Fix typo in installation guide`*
+   - **Description:** Provide a concise summary of your changes in the PR description. **This summary must not be longer than two lines**, as it is used to automatically generate progress logs.
+   - Reference any related issues in the description (e.g., `Fixes #123`).
 
 ## Guidelines
 

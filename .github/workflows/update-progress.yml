@@ -1,0 +1,71 @@
+name: Update Progress
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  update-progress:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+        contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract PR Info & Generate summary
+        id: pr_info
+        run: |
+          LABELS=$(echo '${{ toJson(github.event.pull_request.labels) }}' | jq -r '.[].name' | tr '\n' ',' | tr '[:upper:]' '[:lower:]')
+          TITLE=$(echo "${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')
+          CATEGORY=""
+
+          if [[ "$LABELS" == *"major"* ]] || [[ "$TITLE" == *"major"* ]]; then
+            CATEGORY="MAJOR"
+          elif [[ "$LABELS" == *"minor"* ]] || [[ "$TITLE" == *"minor"* ]]; then
+            CATEGORY="MINOR"
+          elif [[ "$TITLE" == *"patch"* ]] || [[ "$TITLE" == *"patch"* ]]; then
+            CATEGORY="PATCH"
+          fi
+
+          echo "category=$CATEGORY" >> $GITHUB_OUTPUT
+
+          SUMMARY=$(echo "${{ github.event.pull_request.body }}" | sed -E '/^([-*_] ?){3,}$/d' | sed 's/^> //g' | grep -v '^\s*$' | head -n 2 | tr '\n' ' ' | sed 's/^[ \t]*/- /;s/[ \t]*$//')
+
+          if [[ -z "$SUMMARY" ]] || [[ "$SUMMARY" == "- " ]] ; then
+            SUMMARY="- ${{ github.event.pull_request.title }}"
+          fi
+          
+          echo "summary<<EOF" >> $GITHUB_ENV
+          echo "$SUMMARY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Update PROGRESS.md
+        if: steps.pr_info.outputs.category == 'MAJOR' || steps.pr_info.outputs.category == 'MINOR'
+        run: |
+          if [ ! -f PROGRESS.md ]; then
+            echo "# Progress Log" > PROGRESS.md
+            echo "" >> PROGRESS.md
+          fi
+
+          echo "### PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" >> PROGRESS.md
+          echo "${{ env.summary }}" >> PROGRESS.md
+          echo "" >> PROGRESS.md
+          
+          cat PROGRESS.md
+
+      - name: Commit Changes
+        if: steps.pr_info.outputs.category == 'MAJOR' || steps.pr_info.outputs.category == 'MINOR'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PROGRESS.md
+          if ! git diff --staged --quiet; then
+            git commit -m "Update progress log for PR #${{ github.event.pull_request.number }}"
+            git push
+          else
+            echo "No changes to commit."
+          fi
