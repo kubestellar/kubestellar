@@ -24,8 +24,8 @@
 
     - name: install golang
       shell: |
-             curl -LO https://go.dev/dl/go1.24.0.linux-amd64.tar.gz
-             rm -rf /usr/local/go && tar -C /usr/local -xzf go1.24.0.linux-amd64.tar.gz
+             curl -LO https://go.dev/dl/go1.24.7.linux-amd64.tar.gz
+             rm -rf /usr/local/go && tar -C /usr/local -xzf go1.24.7.linux-amd64.tar.gz
              export PATH=$PATH:/usr/local/go/bin
              go version
                   
@@ -40,7 +40,7 @@
     - name: install the KubeFlex CLI
       shell: |
              sudo su <<EOF
-             bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin --version v0.8.0
+             bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin --version v0.8.8
              EOF
 
     - name: install Helm
@@ -65,7 +65,7 @@
              kubectl config unset contexts.wds1
              kubectl delete -A --all postcreatehooks.tenancy.kflex.kubestellar.org --ignore-not-found
              kubectl delete crds $(kubectl get crds | grep kubestellar) --ignore-not-found
-             kubectl --context kscore delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.0/deploy/static/provider/kind/deploy.yaml  --ignore-not-found
+             kubectl --context kscore delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.1/deploy/static/provider/kind/deploy.yaml  --ignore-not-found
       when: result is success
 
 
@@ -73,7 +73,7 @@
       shell: |
              kubectl config rename-context kubernetes-admin@kubernetes kscore
              kubectl --context kscore label node --all ingress-ready="true"
-             kubectl --context kscore apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.0/deploy/static/provider/kind/deploy.yaml
+             kubectl --context kscore apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.1/deploy/static/provider/kind/deploy.yaml
 
     - name: patching nginx ingress to enable SSL passthrough
       shell: |
