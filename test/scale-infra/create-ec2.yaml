@@ -143,7 +143,7 @@
   - name: Number of instances to be created
     debug:
       msg: "Need to create {{ count }} instances "
-    when: count > "0"
+    when: count > 0
 
   - name: Deleting not required EC2 instances
     block:
