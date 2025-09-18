@@ -1,0 +1,103 @@
+# Documentation related changes
+documentation:
+  - docs/**/*
+  - README.md
+  - "**/*.md"
+
+# Next.js frontend changes
+frontend:
+  - src/**/*
+  - next.config.js
+  - package.json
+  - package-lock.json
+  - yarn.lock
+  - tailwind.config.js
+  - postcss.config.js
+
+# Pages and routing
+pages:
+  - src/app/**/*
+  - src/pages/**/*
+
+# Styles and assets
+styles:
+  - src/styles/**/*
+  - "**/*.css"
+  - "**/*.scss"
+  - "**/*.sass"
+
+# GitHub workflows and CI/CD
+ci-cd:
+  - .github/workflows/**/*
+  - .github/actions/**/*
+
+# Configuration files
+config:
+  - .github/labeler.yml
+  - .gitignore
+  - .eslintrc*
+  - .prettierrc*
+  - tsconfig.json
+  - next.config.js
+  - tailwind.config.js
+  - postcss.config.js
+
+# Dependencies
+dependencies:
+  - package.json
+  - package-lock.json
+  - yarn.lock
+
+# Contributing guidelines
+contributing:
+  - docs/content/contribution-guidelines/**/*
+  - CONTRIBUTING.md
+  - "**/*contribut*"
+
+# Operations
+operations:
+  - docs/content/contribution-guidelines/operations/**/*
+  - "**/*operation*"
+
+# TypeScript files
+typescript:
+  - "**/*.ts"
+  - "**/*.tsx"
+
+# JavaScript files
+javascript:
+  - "**/*.js"
+  - "**/*.jsx"
+
+# HTML files
+html:
+  - "**/*.html"
+
+# YAML files
+yaml:
+  - "**/*.yml"
+  - "**/*.yaml"
+
+# JSON files
+json:
+  - "**/*.json"
+
+# Minor changes (typically small fixes, typos, etc.)
+minor:
+  - "*.md"
+  - docs/**/*.md
+  - "**/*typo*"
+  - "**/*fix*"
+
+# Major changes (new features, breaking changes)
+major:
+  - src/components/**/*
+  - src/app/**/*
+  - package.json
+  - next.config.js
+
+# Patch changes (bug fixes, small improvements)
+patch:
+  - "**/*fix*"
+  - "**/*patch*"
+  - "**/*bug*"
