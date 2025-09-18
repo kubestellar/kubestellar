@@ -97,8 +97,26 @@ _return() {
 _check_yq_version() {
     if command -v yq >/dev/null 2>&1; then
         INSTALLED_VERSION=$(yq --version 2>/dev/null)
-        if ! [[ "$INSTALLED_VERSION" > "$YQ_MIN_VERSION" ]]; then
-            _exit_with_error $ERR_YQ_NOT_INSTALLED "yq is installed but the version is 'INSTALLED_VERSION'. Required version is at least '$YQ_MIN_VERSION'."
+        # Extract version number from output like "yq (https://github.com/mikefarah/yq/) version v4.45.4"
+        INSTALLED_VER=$(echo "$INSTALLED_VERSION" | sed -n 's/.*version v\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p')
+
+        REQUIRED_VER="$YQ_REQUIRED_VERSION"
+        MIN_VER="$YQ_MIN_VERSION"
+
+        # Compare installed version with minimum required version
+        if [ -n "$REQUIRED_VER" ]; then
+            if ! [[ "$INSTALLED_VER" =~ ^$REQUIRED_VER ]]; then
+                _exit_with_error $ERR_YQ_NOT_INSTALLED \
+                    "yq is installed but the version is $INSTALLED_VERSION. Required version is $YQ_REQUIRED_VERSION."
+            fi
+        elif [ -n "$MIN_VER" ]; then
+            # Use sort -V for semantic version comparison
+            if [ "$(printf '%s\n%s\n' "$MIN_VER" "$INSTALLED_VER" | sort -V | head -n1)" != "$MIN_VER" ]; then
+                : # ok, installed >= min
+            else
+                _exit_with_error $ERR_YQ_NOT_INSTALLED \
+                    "yq is installed but the version is $INSTALLED_VERSION. Required version is at least $YQ_MIN_VERSION."
+            fi
         fi
     else
         _exit_with_error $ERR_YQ_NOT_INSTALLED "yq is not installed."
