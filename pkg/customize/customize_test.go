@@ -28,39 +28,45 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
-func TestCustomize(t *testing.T) {
-	rg := rand.New(rand.NewSource(42))
-	rg.Uint64()
-	rg.Uint64()
-	rg.Uint64()
-	for try := 1; try <= 100; try++ {
-		gen := &generator{rg: rg, defs: map[string]string{}, undefined: sets.New[string]()}
-		input, expected := gen.generateData()
-		inputCopy := runtime.DeepCopyJSONValue(input)
-		actual, wantedChange, errs := ExpandTemplates(fmt.Sprintf("try%d", try), inputCopy, gen.defs)
-		t.Logf("Tested input=%#v, defs=%#v", input, gen.defs)
-		fail := false
-		if len(gen.errors) == len(errs) {
-			t.Logf("Got expected number of errors; errors=%#v", errs)
-		} else {
-			t.Errorf("Expected errors=%v, got errors %v", gen.errors, errs)
-			fail = true
+func FuzzTestCustomize(f *testing.F) {
+	f.Add(int64(42)) // Add seed values - must match the parameter types
+	f.Add(int64(19))
+
+	f.Fuzz(func(t *testing.T, seed int64) {
+		rg := rand.New(rand.NewSource(seed))
+		rg.Uint64()
+		rg.Uint64()
+		rg.Uint64()
+
+		for try := 1; try <= 100; try++ {
+			gen := &generator{rg: rg, defs: map[string]string{}, undefined: sets.New[string]()}
+			input, expected := gen.generateData()
+			inputCopy := runtime.DeepCopyJSONValue(input)
+			actual, wantedChange, errs := ExpandTemplates(fmt.Sprintf("try%d", try), inputCopy, gen.defs)
+			t.Logf("Tested input=%#v, defs=%#v", input, gen.defs)
+			fail := false
+			if len(gen.errors) == len(errs) {
+				t.Logf("Got expected number of errors; errors=%#v", errs)
+			} else {
+				t.Errorf("Expected errors=%v, got errors %v", gen.errors, errs)
+				fail = true
+			}
+			if apiequality.Semantic.DeepEqual(expected, actual) {
+				t.Logf("Got expected output %#v", actual)
+			} else {
+				t.Errorf("Expected %#v, got %#v", expected, actual)
+				fail = true
+			}
+			if (gen.changeSome || len(gen.errors) > 0) != wantedChange {
+				t.Errorf("Expected WantedChange=%v, got %v", (gen.changeSome || len(gen.errors) > 0), wantedChange)
+				fail = true
+			}
+			if fail {
+				t.FailNow()
+			}
+			t.Log("success")
 		}
-		if apiequality.Semantic.DeepEqual(expected, actual) {
-			t.Logf("Got expected output %#v", actual)
-		} else {
-			t.Errorf("Expected %#v, got %#v", expected, actual)
-			fail = true
-		}
-		if (gen.changeSome || len(gen.errors) > 0) != wantedChange {
-			t.Errorf("Expected WantedChange=%v, got %v", (gen.changeSome || len(gen.errors) > 0), wantedChange)
-			fail = true
-		}
-		if fail {
-			t.FailNow()
-		}
-		t.Log("Success")
-	}
+	})
 }
 
 type generator struct {
