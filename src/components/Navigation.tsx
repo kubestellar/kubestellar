@@ -214,7 +214,7 @@ export default function Navigation() {
           {/* Left side: Logo */}
           <Link href="/" className="cursor-pointer">
             <div className="flex-shrink-0 cursor-pointer relative z-10">
-              <img src="/KubeStellar-with-Logo-transparent-v2.png" alt="Kubestellar logo" className="h-10 w-auto" />
+              <img src="/KubeStellar-with-Logo-transparent.png" alt="Kubestellar logo" className="h-10 w-auto" />
             </div>
           </Link>
 
