@@ -148,7 +148,7 @@ export default function Footer() {
           <div className="lg:col-span-4">
             <div className="flex items-center-space-x-2 mb-2  ml-[-7px]">
               <img
-                src="/KubeStellar-with-Logo-transparent-v2.png"
+                src="/KubeStellar-with-Logo-transparent.png"
                 alt="Kubestellar logo"
                 className="h-10"
               />
