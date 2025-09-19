@@ -39,7 +39,7 @@ Thank you for your interest in contributing to the docs repository! We welcome c
      - Use `major:` for significant, breaking changes or large new features that are not backward-compatible.
      - Use `minor:` for new features or enhancements that are backward-compatible.
      - Use `patch:` for backward-compatible bug fixes, typo corrections, or small documentation updates.
-     - *Example: `patch: Fix typo in installation guide`*
+     - _Example: `patch: Fix typo in installation guide`_
    - **Description:** Provide a concise summary of your changes in the PR description. **This summary must not be longer than two lines**, as it is used to automatically generate progress logs.
    - Reference any related issues in the description (e.g., `Fixes #123`).
 
@@ -48,7 +48,9 @@ Thank you for your interest in contributing to the docs repository! We welcome c
 - **Write Clearly:** Use clear, concise language and proper formatting.
 - **Stay Consistent:** Follow the existing file structure and naming conventions.
 - **Be Respectful:** Review our [Code of Conduct](docs/contribution-guidelines/coc-inc.md) before contributing.
+
 ## Need Help?
+
 If you have questions, open an issue or ask in the community channels.
 
 Thank you for helping improve our documentation!

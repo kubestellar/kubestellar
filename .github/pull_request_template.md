@@ -1,6 +1,6 @@
 ### Description
 
-<!-- 
+<!--
 **IMPORTANT: The first two lines of your description will be used as a summary in the progress log.**
 Please provide a concise, user-facing summary of the changes within the first two lines. Do not add a heading.
 You can add more detailed context, implementation details, or other notes below the summary.

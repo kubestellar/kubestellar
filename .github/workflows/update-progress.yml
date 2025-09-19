@@ -9,7 +9,7 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
-        contents: write
+      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
           if [[ -z "$SUMMARY" ]] || [[ "$SUMMARY" == "- " ]] ; then
             SUMMARY="- ${{ github.event.pull_request.title }}"
           fi
-          
+
           echo "summary<<EOF" >> $GITHUB_ENV
           echo "$SUMMARY" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -54,7 +54,7 @@ jobs:
           echo "### PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" >> PROGRESS.md
           echo "${{ env.summary }}" >> PROGRESS.md
           echo "" >> PROGRESS.md
-          
+
           cat PROGRESS.md
 
       - name: Commit Changes

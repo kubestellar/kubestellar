@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-
+import Image from "next/image";
 export default function Footer() {
   useEffect(() => {
     // Create starfield and grid for Footer section
@@ -147,10 +147,12 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="lg:col-span-4">
             <div className="flex items-center-space-x-2 mb-2  ml-[-7px]">
-              <img
+              <Image
                 src="/KubeStellar-with-Logo-transparent.png"
                 alt="Kubestellar logo"
-                className="h-10"
+                width={160}
+                height={40}
+                className="h-10 w-auto"
               />
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
@@ -336,10 +338,7 @@ export default function Footer() {
               Stay Updated
             </h3>
             <div className="bg-gray-800/50 backdrop-blur-md rounded-lg p-4 border border-gray-700/50 transform transition-all duration-300 hover:border-blue-500/30">
-              <form
-                id="newsletter-form"
-                className="flex flex-col space-y-3"
-              >
+              <form id="newsletter-form" className="flex flex-col space-y-3">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg
