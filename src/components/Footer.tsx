@@ -135,20 +135,29 @@ export default function Footer() {
       {/* Grid lines background */}
       <div id="grid-lines-footer" className="absolute inset-0 opacity-20"></div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Background elements */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-blue-900/10 to-transparent"></div>
+        <div className="absolute top-0 right-0 w-full h-1/2 bg-gradient-to-b from-purple-900/10 to-transparent"></div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-8 sm:px-6 lg:px-8">
         {/* Main footer content */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 mb-12">
           {/* Brand Section */}
           <div className="lg:col-span-4">
-
-            <div className="flex items-center-space-x-2 mb-2">
-              <img src="/KubeStellar-with-Logo-transparent-v2.png" alt="Kubestellar logo" className="h-10" />
+            <div className="flex items-center-space-x-2 mb-2  ml-[-7px]">
+              <img
+                src="/KubeStellar-with-Logo-transparent-v2.png"
+                alt="Kubestellar logo"
+                className="h-10"
+              />
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
-              Multi-Cluster Kubernetes orchestration platform that simplifies distributed workload management across diverse infrastructure.
+              Multi-Cluster Kubernetes orchestration platform that simplifies
+              distributed workload management across diverse infrastructure.
             </p>
             <div className="flex space-x-4">
-
               <a
                 href="#"
                 className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-300"
@@ -205,13 +214,13 @@ export default function Footer() {
           </div>
 
           {/* Product Links */}
-          <div className="lg:col-span-1 mr-25">
+          <div className="lg:col-span-2">
             <h3 className="text-lg font-semibold text-white mb-4">Product</h3>
             <ul className="space-y-3">
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Features
                 </a>
@@ -219,7 +228,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Use Cases
                 </a>
@@ -227,7 +236,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Pricing
                 </a>
@@ -235,7 +244,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Roadmap
                 </a>
@@ -244,13 +253,13 @@ export default function Footer() {
           </div>
 
           {/* Resources Links */}
-          <div className="lg:col-span-1 ml-10">
+          <div className="lg:col-span-2">
             <h3 className="text-lg font-semibold text-white mb-4">Resources</h3>
             <ul className="space-y-3">
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Documentation
                 </a>
@@ -258,7 +267,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Tutorials
                 </a>
@@ -266,7 +275,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Blog
                 </a>
@@ -274,7 +283,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Community
                 </a>
@@ -283,13 +292,13 @@ export default function Footer() {
           </div>
 
           {/* Company Links */}
-          <div className="lg:col-span-1 ml-20">
+          <div className="lg:col-span-2">
             <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
             <ul className="space-y-3">
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   About
                 </a>
@@ -297,7 +306,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Team
                 </a>
@@ -305,7 +314,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Careers
                 </a>
@@ -313,7 +322,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-white transition-colors duration-300"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Contact
                 </a>
@@ -322,30 +331,84 @@ export default function Footer() {
           </div>
 
           {/* Stay updated */}
-          <div className="ml-30 lg:col-span-4">
-            <h3 className="text-lg font-semibold text-white mb-4">Stay Updated</h3>
-            <div className="border border-gray-700 bg-[#161A23] rounded-xl p-6">
-              <form action="" className="space-y-6">
-                <div className="relative ">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                  </svg>
-                  <input type="email" placeholder="Enter your email address" className=" w-full bg-[#252C39] border border-gray-700 rounded-lg py-3 text-wrap pl-10 pr-4 text-white placeholder-gray-400 focus:ring-purple-500 focus:border-purple-500 transition" />
+          <div className="sm:col-span-2 lg:col-span-2">
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+              Stay Updated
+            </h3>
+            <div className="bg-gray-800/50 backdrop-blur-md rounded-lg p-4 border border-gray-700/50 transform transition-all duration-300 hover:border-blue-500/30">
+              <form
+                id="newsletter-form"
+                className="flex flex-col space-y-3"
+              >
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    id="email-address"
+                    type="email"
+                    className="block w-full pl-10 pr-3 py-2 text-sm text-white placeholder-gray-400 bg-gray-700/50 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                    placeholder="Email"
+                  />
                 </div>
-                <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2.5 px-4 rounded-lg flex items-center justify-center transition-all duration-300">Subscribe
-                  <svg className="w-5 h-5 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                <button
+                  type="submit"
+                  className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 transform hover:translate-y-[-1px] flex items-center justify-center"
+                >
+                  <span>Subscribe</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="ml-2 h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </button>
               </form>
+
+              {/* Success message (hidden by default) */}
+              <div
+                id="newsletter-success"
+                className="hidden mt-3 text-sm text-green-400 flex items-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>Subscribed!</span>
+              </div>
             </div>
-            <p className=" text-gray-400 mt-3">We respect your privacy. No spam.</p>
+            <p className="mt-3 text-xs text-gray-400">
+              We respect your privacy. No spam.
+            </p>
           </div>
         </div>
-
-
-
 
         {/* Divider and bottom section */}
         <div className="border-t border-gray-800 pt-8">
