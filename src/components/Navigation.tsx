@@ -146,7 +146,12 @@ export default function Navigation() {
       <div className="absolute inset-0 bg-[#0a0a0a]/90 z-[-3]"></div>
 
       {/* Starfield background */}
-      <StarField density="low" showComets={true} cometCount={2} className="z-[-2]" />
+      <StarField
+        density="low"
+        showComets={true}
+        cometCount={2}
+        className="z-[-2]"
+      />
 
       {/* Grid lines background */}
       <div
