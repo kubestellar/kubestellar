@@ -1,42 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import StarField from "../StarField";
 
 export default function HowItWorksSection() {
   useEffect(() => {
-    // Create starfield and grid for How It Works section
-    const createStarfield = (container: HTMLElement) => {
-      if (!container) return;
-      container.innerHTML = "";
-
-      for (let layer = 1; layer <= 3; layer++) {
-        const layerDiv = document.createElement("div");
-        layerDiv.className = `star-layer layer-${layer}`;
-        layerDiv.style.position = "absolute";
-        layerDiv.style.inset = "0";
-        layerDiv.style.zIndex = layer.toString();
-
-        const starCount = layer === 1 ? 60 : layer === 2 ? 40 : 25;
-
-        for (let i = 0; i < starCount; i++) {
-          const star = document.createElement("div");
-          star.style.position = "absolute";
-          star.style.width = `${Math.random() * 2 + 1}px`;
-          star.style.height = star.style.width;
-          star.style.backgroundColor = "white";
-          star.style.borderRadius = "50%";
-          star.style.top = `${Math.random() * 100}%`;
-          star.style.left = `${Math.random() * 100}%`;
-          star.style.opacity = Math.random().toString();
-          star.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite alternate`;
-          star.style.animationDelay = `${Math.random() * 2}s`;
-          layerDiv.appendChild(star);
-        }
-
-        container.appendChild(layerDiv);
-      }
-    };
-
     const createGrid = (container: HTMLElement) => {
       if (!container) return;
       container.innerHTML = "";
@@ -84,10 +52,8 @@ export default function HowItWorksSection() {
       container.appendChild(gridSvg);
     };
 
-    const starsContainer = document.getElementById("stars-container-how");
     const gridContainer = document.getElementById("grid-lines-how");
 
-    if (starsContainer) createStarfield(starsContainer);
     if (gridContainer) createGrid(gridContainer);
   }, []);
 
@@ -100,10 +66,7 @@ export default function HowItWorksSection() {
       <div className="absolute inset-0 bg-[#0a0a0a]"></div>
 
       {/* Starfield background */}
-      <div
-        id="stars-container-how"
-        className="absolute inset-0 overflow-hidden"
-      ></div>
+      <StarField density="medium" showComets={true} cometCount={3} />
 
       {/* Grid lines background */}
       <div id="grid-lines-how" className="absolute inset-0 opacity-20"></div>

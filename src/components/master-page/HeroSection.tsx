@@ -1,64 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import StarField from "../StarField";
 
 export default function HeroSection() {
   useEffect(() => {
-    // Create starfield background with more stars and depth
-    const createStarfield = (container: HTMLElement) => {
-      if (!container) return;
-      container.innerHTML = "";
-
-      // Create three layers of stars for parallax effect
-      for (let layer = 1; layer <= 3; layer++) {
-        const layerDiv = document.createElement("div");
-        layerDiv.className = `star-layer layer-${layer}`;
-        layerDiv.style.position = "absolute";
-        layerDiv.style.inset = "0";
-        layerDiv.style.zIndex = layer.toString();
-
-        const starCount = layer === 1 ? 150 : layer === 2 ? 100 : 50;
-        // const speedFactor = layer === 1 ? 1 : layer === 2 ? 0.7 : 0.4;
-
-        for (let i = 0; i < starCount; i++) {
-          const star = document.createElement("div");
-          star.style.position = "absolute";
-          star.style.width = `${Math.random() * 3 + 1}px`;
-          star.style.height = star.style.width;
-          star.style.backgroundColor = "white";
-          star.style.borderRadius = "50%";
-          star.style.top = `${Math.random() * 100}%`;
-          star.style.left = `${Math.random() * 100}%`;
-          star.style.opacity = Math.random().toString();
-          star.style.animation = `twinkle ${Math.random() * 4 + 3}s infinite alternate`;
-          star.style.animationDelay = `${Math.random() * 3}s`;
-          star.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
-          layerDiv.appendChild(star);
-        }
-
-        container.appendChild(layerDiv);
-      }
-
-      // Add shooting stars
-      for (let i = 0; i < 5; i++) {
-        const shootingStar = document.createElement("div");
-        shootingStar.className = "shooting-star";
-        shootingStar.style.position = "absolute";
-        shootingStar.style.top = `${Math.random() * 70}%`;
-        shootingStar.style.left = `${Math.random() * 100}%`;
-        shootingStar.style.width = "2px";
-        shootingStar.style.height = "2px";
-        shootingStar.style.backgroundColor = "white";
-        shootingStar.style.borderRadius = "50%";
-        shootingStar.style.animation = `shootingStar ${Math.random() * 10 + 10}s infinite linear`;
-        shootingStar.style.animationDelay = `${Math.random() * 15}s`;
-        shootingStar.style.opacity = "0";
-        shootingStar.style.zIndex = "10";
-
-        container.appendChild(shootingStar);
-      }
-    };
-
     // Interactive grid canvas
     const initGridCanvas = () => {
       const canvas = document.getElementById(
@@ -153,9 +99,6 @@ export default function HeroSection() {
     };
 
     // Initialize all components
-    const starsContainer = document.getElementById("animated-stars");
-    if (starsContainer) createStarfield(starsContainer);
-
     initGridCanvas();
     initTypingAnimation();
     animateCounters();
@@ -208,14 +151,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 z-0">
         {/* Dynamic Star Field */}
         <div className="absolute inset-0 bg-[#0a0a0a]">
-          <div id="animated-stars" className="absolute inset-0"></div>
-        </div>
-
-        {/* Floating Nebula Clouds */}
-        <div className="absolute inset-0">
-          <div className="nebula-cloud nebula-1"></div>
-          <div className="nebula-cloud nebula-2"></div>
-          <div className="nebula-cloud nebula-3"></div>
+          <StarField density="high" showComets={true} cometCount={8} />
         </div>
 
         {/* Interactive Grid Network */}

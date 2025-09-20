@@ -2,41 +2,10 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
+import StarField from "./StarField";
+
 export default function Footer() {
   useEffect(() => {
-    // Create starfield and grid for Footer section
-    const createStarfield = (container: HTMLElement) => {
-      if (!container) return;
-      container.innerHTML = "";
-
-      for (let layer = 1; layer <= 2; layer++) {
-        const layerDiv = document.createElement("div");
-        layerDiv.className = `star-layer layer-${layer}`;
-        layerDiv.style.position = "absolute";
-        layerDiv.style.inset = "0";
-        layerDiv.style.zIndex = layer.toString();
-
-        const starCount = layer === 1 ? 40 : 20;
-
-        for (let i = 0; i < starCount; i++) {
-          const star = document.createElement("div");
-          star.style.position = "absolute";
-          star.style.width = `${Math.random() * 2 + 1}px`;
-          star.style.height = star.style.width;
-          star.style.backgroundColor = "white";
-          star.style.borderRadius = "50%";
-          star.style.top = `${Math.random() * 100}%`;
-          star.style.left = `${Math.random() * 100}%`;
-          star.style.opacity = Math.random().toString();
-          star.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite alternate`;
-          star.style.animationDelay = `${Math.random() * 2}s`;
-          layerDiv.appendChild(star);
-        }
-
-        container.appendChild(layerDiv);
-      }
-    };
-
     const createGrid = (container: HTMLElement) => {
       if (!container) return;
       container.innerHTML = "";
@@ -112,10 +81,8 @@ export default function Footer() {
       toggleButton();
     };
 
-    const starsContainer = document.getElementById("stars-container-footer");
     const gridContainer = document.getElementById("grid-lines-footer");
 
-    if (starsContainer) createStarfield(starsContainer);
     if (gridContainer) createGrid(gridContainer);
 
     initBackToTop();
@@ -127,10 +94,7 @@ export default function Footer() {
       <div className="absolute inset-0 bg-[#0a0a0a]"></div>
 
       {/* Starfield background */}
-      <div
-        id="stars-container-footer"
-        className="absolute inset-0 overflow-hidden"
-      ></div>
+      <StarField density="low" showComets={true} cometCount={2} />
 
       {/* Grid lines background */}
       <div id="grid-lines-footer" className="absolute inset-0 opacity-20"></div>
