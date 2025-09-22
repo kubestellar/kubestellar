@@ -14,6 +14,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
+          repository: kubestellar/docs
+          ref: main
           token: ${{ secrets.KS_DOCS_TOKEN }}
 
       - name: Extract PR Info & Generate summary
@@ -63,10 +65,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout main
+          git pull origin main
           git add PROGRESS.md
           if ! git diff --staged --quiet; then
             git commit -m "Update progress log for PR #${{ github.event.pull_request.number }}"
-            git push
+            git push origin main
           else
             echo "No changes to commit."
           fi
