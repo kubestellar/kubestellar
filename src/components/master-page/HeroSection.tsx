@@ -2,6 +2,89 @@
 
 import { useEffect } from "react";
 import StarField from "../StarField";
+import StatCard from "../StatsCard";
+
+interface StatData {
+  id: number;
+  icon: React.ReactNode;
+  value: number;
+  suffix: string;
+  title: string;
+  color: "blue" | "purple" | "emerald";
+  animationDelay: string;
+}
+
+const statsData: StatData[] = [
+  {
+    id: 1,
+    icon: (
+      <svg
+        className="w-8 h-8 text-blue-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M13 10V3L4 14h7v7l9-11h-7z"
+        ></path>
+      </svg>
+    ),
+    value: 40,
+    suffix: "x",
+    title: "Performance Boost",
+    color: "blue" as const,
+    animationDelay: "0s",
+  },
+  {
+    id: 2,
+    icon: (
+      <svg
+        className="w-8 h-8 text-purple-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+        ></path>
+      </svg>
+    ),
+    value: 99,
+    suffix: "%",
+    title: "Uptime Guarantee",
+    color: "purple" as const,
+    animationDelay: "0.2s",
+  },
+  {
+    id: 3,
+    icon: (
+      <svg
+        className="w-8 h-8 text-emerald-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+        ></path>
+      </svg>
+    ),
+    value: 50,
+    suffix: "k+",
+    title: "Active Users",
+    color: "emerald" as const,
+    animationDelay: "0.4s",
+  },
+];
 
 export default function HeroSection() {
   useEffect(() => {
@@ -149,6 +232,8 @@ export default function HeroSection() {
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white min-h-[85vh] flex items-center">
       {/* Animated Background Universe */}
       <div className="absolute inset-0 z-0">
+        {/*!-- Floating Nebula Clouds */}
+        {/* IMPLEMENTATION REMAINING WILL DO*/}
         {/* Dynamic Star Field */}
         <div className="absolute inset-0 bg-[#0a0a0a]">
           <StarField density="high" showComets={true} cometCount={8} />
@@ -197,69 +282,153 @@ export default function HeroSection() {
           {/* Left Column: Interactive Content */}
           <div className="hero-content space-y-6">
             {/* Animated Status Badge */}
-            <div
-              className="status-badge-container animate-fade-in-up"
-              style={{ animationDelay: "0.2s" }}
-            >
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-500/30 animate-status-glow">
-                <div className="relative mr-3">
-                  <div className="status-dot"></div>
-                  <div className="status-ripple"></div>
-                </div>
-                <span className="text-sm font-medium text-green-400">
-                  Platform Status: Operational
+            <div className="status-badge-container">
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-emerald-500/20 via-green-500/20 to-emerald-500/20 border border-emerald-400/40 rounded-full backdrop-blur-md shadow-lg">
+                <div className="status-dot"></div>
+                <span className="text-emerald-300 text-xs uppercase tracking-wider font-semibold">
+                  Ready to Deploy
                 </span>
               </div>
             </div>
 
             {/* Dynamic Main Heading */}
-            <div
-              className="heading-container space-y-4 animate-text-reveal"
-              style={{ animationDelay: "0.4s" }}
-            >
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                <span className="block text-white">Multi-Cluster</span>
-                <span className="block text-gradient-animated">Kubernetes</span>
-                <span className="block text-white">Orchestration</span>
+            <div className="heading-container space-y-4">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none">
+                {/* First Line */}
+                <span className="block text-white mb-3 animate-text-reveal">
+                  <span className="text-gradient">Multi-Cluster</span>
+                </span>
+
+                {/* Second Line with delay */}
+                <span className="block animate-text-reveal">
+                  <span className="text-gradient-animated">Kubernetes</span>
+                </span>
+
+                {/* Third Line with longer delay */}
+                <span className="block animate-text-reveal [animation-delay:0.4s]">
+                  <span className="text-gradient-animated">Orchestration</span>
+                </span>
               </h1>
-              <p className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl">
-                Simplify multi-cluster Kubernetes operations with intelligent
-                workload distribution, unified management, and seamless
-                orchestration across any infrastructure.
+
+              {/* Paragraph with fade-in-up effect and delay */}
+              <p className="text-lg sm:text-xl text-gray-300 max-w-2xl leading-snug animate-fade-in-up opacity-0 [animation-delay:0.6s] [animation-fill-mode:forwards]">
+                Experience the future of cloud-native orchestration. KubeStellar
+                revolutionizes multi-cluster management with AI-powered
+                automation and real-time intelligence.
               </p>
             </div>
 
             {/* Interactive Command Center */}
-            <div
-              className="command-center-container animate-slide-in-left"
-              style={{ animationDelay: "0.6s" }}
-            >
-              <div className="bg-gray-900/80 backdrop-blur-sm rounded-lg border border-gray-700/50 p-4 animate-command-glow">
-                <div className="flex items-center mb-2">
-                  <div className="flex space-x-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <div className="command-center-container">
+              <div className="bg-black/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 shadow-2xl animate-command-glow">
+                {/* Terminal Header */}
+                <div className="terminal-header flex items-center space-x-3 mb-4">
+                  {/* Terminal Control Buttons */}
+                  <div className="terminal-controls flex space-x-2">
+                    <div className="w-4 h-4 rounded-full bg-red-500 animate-pulse"></div>
+                    <div className="w-4 h-4 rounded-full bg-yellow-500 animate-pulse [animation-delay:0.2s]"></div>
+                    <div className="w-4 h-4 rounded-full bg-green-500 animate-pulse [animation-delay:0.4s]"></div>
                   </div>
-                  <span className="ml-4 text-gray-400 text-sm">
-                    KubeStellar Terminal
+
+                  {/* Terminal Title */}
+                  <span className="text-gray-400 text-sm font-mono">
+                    kubestellar-control-center
                   </span>
-                </div>
-                <div className="font-mono text-sm">
-                  <div className="text-green-400">
-                    $ kubectl apply -f kubestellar-deployment.yaml
+
+                  <div className="flex-1"></div>
+
+                  {/* Connection Status */}
+                  <div className="connection-status flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
+                    <span className="text-green-400 text-xs">CONNECTED</span>
                   </div>
-                  <div
-                    className="command-response text-blue-400 mt-2"
-                    style={{ opacity: 0 }}
-                  >
-                    ✅ Deployment successfully distributed to 5 clusters
-                    <br />
-                    📊 Monitoring workload health across regions
-                    <br />
-                    <span className="text-green-400">
-                      🚀 KubeStellar is ready!
+                </div>
+
+                {/* Terminal Content */}
+                <div className="terminal-content space-y-3 font-mono text-sm">
+                  {/* Command Line */}
+                  <div className="command-line animate-command-typing">
+                    <span className="text-green-400 mr-5">$</span>
+                    <span className="typing-text text-blue-300">
+                      kubectl kubestellar deploy --multi-cluster --ai-optimized
                     </span>
+                    &nbsp;
+                    <span className="typing-cursor bg-blue-300 w-0.5 h-6 animate-blink"></span>
+                  </div>
+
+                  {/* Command Output */}
+                  <div className="command-output space-y-2 ml-6 animate-fade-in [animation-delay:0.8s] [animation-fill-mode:forwards]">
+                    {/* Line 1 */}
+                    <div className="output-line animate-slide-in-left [animation-delay:1s]">
+                      <span className="text-cyan-400 font-bold">AI</span>
+                      <span className="text-gray-300 ml-4">
+                        Analyzing cluster topology and workload patterns...
+                      </span>
+                      <div className="loading-dots ml-2" aria-label="Loading">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                      </div>
+                    </div>
+
+                    {/* Line 2 */}
+                    <div className="output-line animate-slide-in-left [animation-delay:1.4s]">
+                      <span className="text-blue-400 font-bold">INFO</span>
+                      <span className="text-gray-300 ml-4">
+                        Discovered 8 clusters across 3 regions
+                      </span>
+                      <svg
+                        className="w-4 h-4 text-green-400 ml-2 animate-bounce"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        ></path>
+                      </svg>
+                    </div>
+
+                    {/* Line 3 */}
+                    <div className="output-line animate-slide-in-left [animation-delay:1.8s]">
+                      <span className="text-purple-400 font-bold">
+                        OPTIMIZE
+                      </span>
+                      <span className="text-gray-300 ml-4">
+                        AI optimizing resource allocation...
+                      </span>
+                      <div className="optimization-bar ml-2">
+                        <div className="optimization-progress"></div>
+                      </div>
+                    </div>
+
+                    {/* Line 4 */}
+                    <div className="output-line animate-slide-in-left [animation-delay:2.2s]">
+                      <span className="text-emerald-400 font-bold">
+                        SUCCESS
+                      </span>
+                      <span className="text-gray-300 ml-4">
+                        Deployment completed with 40% efficiency gain
+                      </span>
+                      <div className="success-indicator ml-2">
+                        <svg
+                          className="w-5 h-5 text-emerald-400 animate-ping"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 13l4 4L19 7"
+                          ></path>
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -267,72 +436,72 @@ export default function HeroSection() {
 
             {/* Interactive Action Buttons */}
             <div
-              className="action-buttons-container flex flex-col sm:flex-row gap-4 animate-fade-in"
+              className="action-buttons-container flex flex-col sm:flex-row gap-4 animate-btn-float"
               style={{ animationDelay: "0.8s" }}
             >
-              <button className="primary-action-btn btn-primary px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg font-semibold text-lg transition-all duration-300 animate-btn-float relative overflow-hidden group">
-                <span className="relative z-10">Get Started</span>
+              <a
+                href="#get-started"
+                className="primary-action-btn group relative overflow-hidden inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-xl text-white 
+                          bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 
+                          hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 
+                          transition-all duration-500 transform hover:-translate-y-1 
+                          hover:shadow-xl hover:shadow-blue-500/40 
+                          animate-btn-float"
+              >
+                <span className="relative z-10">Launch KubeStellar</span>
+                <svg
+                  className="relative z-10 ml-2 h-5 w-5 transition-all duration-300 group-hover:translate-x-1 group-hover:rotate-12"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
                 <div className="btn-shine"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
-              <button className="secondary-action-btn px-8 py-4 border-2 border-gray-600 hover:border-blue-500 rounded-lg font-semibold text-lg transition-all duration-300 hover-lift">
-                <span className="flex items-center">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1M9 16h1m4 0h1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  Live Demo
-                </span>
-              </button>
+              </a>
+
+              <a
+                href="#documentation"
+                className="secondary-action-btn inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-xl text-gray-200 
+                          bg-gray-800/40 hover:bg-gray-800/60 
+                          backdrop-blur-md border border-gray-700/50 hover:border-gray-600/50 
+                          transition-all duration-500 transform hover:-translate-y-1 hover:scale-105 
+                          animate-btn-float"
+                style={{ animationDelay: "0.1s" }}
+              >
+                <svg
+                  className="mr-2 h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  ></path>
+                </svg>
+                Explore Docs
+              </a>
             </div>
 
-            {/* Interactive Stats Dashboard */}
-            <div
-              className="stats-dashboard grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 animate-fade-in"
-              style={{ animationDelay: "1s" }}
-            >
-              <div className="stat-card stat-card-1 relative bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700/50 hover-lift animate-stat-float">
-                <div className="stat-glow"></div>
-                <div className="relative z-10">
-                  <div
-                    className="text-2xl font-bold text-green-400 counter"
-                    data-target="50"
-                  >
-                    0
-                  </div>
-                  <div className="text-sm text-gray-400">Active Clusters</div>
-                </div>
-              </div>
-              <div className="stat-card stat-card-2 relative bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700/50 hover-lift animate-stat-float">
-                <div className="stat-glow"></div>
-                <div className="relative z-10">
-                  <div
-                    className="text-2xl font-bold text-pink-400 counter"
-                    data-target="1000"
-                  >
-                    0
-                  </div>
-                  <div className="text-sm text-gray-400">Workloads Managed</div>
-                </div>
-              </div>
-              <div className="stat-card stat-card-3 relative bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700/50 hover-lift animate-stat-float">
-                <div className="stat-glow"></div>
-                <div className="relative z-10">
-                  <div className="text-2xl font-bold text-yellow-400">
-                    99.9%
-                  </div>
-                  <div className="text-sm text-gray-400">Uptime SLA</div>
-                </div>
-              </div>
+            {/* STATS DASHBOARD */}
+            <div className="stats-dashboard grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
+              {statsData.map(stat => (
+                <StatCard
+                  key={stat.id}
+                  icon={stat.icon}
+                  value={stat.value}
+                  suffix={stat.suffix}
+                  title={stat.title}
+                  color={stat.color}
+                  animationDelay={stat.animationDelay}
+                />
+              ))}
             </div>
           </div>
 

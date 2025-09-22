@@ -24,11 +24,14 @@ const config: Config = {
         gradient: "gradient 15s ease infinite",
         typing: "typing 2s steps(40, end) forwards",
         blink: "blink 1s infinite",
+
         "fade-in-up": "fade-in-up 0.8s ease-out forwards",
-        "slide-in-left": "slide-in-left 0.8s ease-out forwards",
+        "slide-in-left": "slide-in-left 0.6s ease-out forwards",
+        "command-typing": "command-typing 2s steps(30, end) forwards",
         "text-reveal":
           "text-reveal 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
         "status-glow": "status-glow 2s ease-in-out infinite",
+        "glow-pulse": "status-glow 3s ease-in-out infinite",
         "status-pulse": "status-pulse 2s ease-in-out infinite",
         "command-glow": "command-glow 3s ease-in-out infinite",
         "btn-float": "btn-float 3s ease-in-out infinite",
@@ -36,6 +39,7 @@ const config: Config = {
         "float-particle": "float-particle 4s ease-in infinite",
         "shooting-star": "shootingStar 15s infinite linear",
         "nebula-float": "nebula-float 60s infinite alternate ease-in-out",
+        "fade-in": "fade-in 0.8s ease-out forwards",
         "grid-pulse": "gridPulse 4s infinite alternate ease-in-out",
       },
       keyframes: {
@@ -56,12 +60,22 @@ const config: Config = {
           "0%": { opacity: "0.2", transform: "scale(0.8)" },
           "100%": { opacity: "1", transform: "scale(1)" },
         },
+
+        "command-typing": {
+          "0%": { width: "0%" },
+          "100%": { width: "100%" },
+        },
+
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
         "fade-in-up": {
           from: { opacity: "0", transform: "translateY(30px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
         "slide-in-left": {
-          from: { opacity: "0", transform: "translateX(-30px)" },
+          from: { opacity: "0", transform: "translateX(-20px)" },
           to: { opacity: "1", transform: "translateX(0)" },
         },
         typing: {

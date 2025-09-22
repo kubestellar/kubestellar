@@ -1,32 +1,37 @@
 "use client";
 
-import {useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import StarField from "../StarField";
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-    privacy: false
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+    privacy: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.privacy) {
-      alert('Please agree to the privacy policy to continue.');
+      alert("Please agree to the privacy policy to continue.");
       return;
     }
 
@@ -52,33 +57,34 @@ ${formData.name}
 This message was sent via the KubeStellar website contact form.
 Google Groups: https://groups.google.com/g/kubestellar-dev`
       );
-      
+
       const mailtoLink = `mailto:kubestellar-dev@googlegroups.com?subject=${subject}&body=${body}`;
-      
+
       // Small delay to show loading state
       await new Promise(resolve => setTimeout(resolve, 800));
-      
+
       // Open email client
       window.location.href = mailtoLink;
-      
+
       // Show success message
       setShowSuccess(true);
-      
+
       // Reset form
       setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: '',
-        privacy: false
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+        privacy: false,
       });
-      
+
       // Hide success message after 8 seconds
       setTimeout(() => setShowSuccess(false), 8000);
-      
     } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('There was an error opening your email client. Please try again or visit https://groups.google.com/g/kubestellar-dev directly.');
+      console.error("Error submitting form:", error);
+      alert(
+        "There was an error opening your email client. Please try again or visit https://groups.google.com/g/kubestellar-dev directly."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -148,7 +154,10 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
       <StarField density="medium" showComets={true} cometCount={4} />
 
       {/* Grid lines background */}
-      <div id="grid-lines-contact" className="absolute inset-0 opacity-20"></div>
+      <div
+        id="grid-lines-contact"
+        className="absolute inset-0 opacity-20"
+      ></div>
 
       {/* Background elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -170,7 +179,10 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
           {/* Left side: Contact info cards */}
           <div className="lg:col-span-2 flex flex-col justify-between space-y-4">
             {/* Contact card 1 */}
-            <a href="mailto:info@kubestellar.io" className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-gray-700/50 p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-blue-500/50 cursor-pointer">
+            <a
+              href="mailto:info@kubestellar.io"
+              className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-gray-700/50 p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-blue-500/50 cursor-pointer"
+            >
               <div className="flex items-center">
                 <div className="flex-shrink-0 h-12 w-12 rounded-full bg-blue-900/30 flex items-center justify-center">
                   <svg
@@ -189,12 +201,26 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                   </svg>
                 </div>
                 <div className="ml-5">
-                  <h3 className="text-lg font-medium text-white">Email Support</h3>
-                  <p className="text-gray-300 mt-1">Get direct support from our team</p>
+                  <h3 className="text-lg font-medium text-white">
+                    Email Support
+                  </h3>
+                  <p className="text-gray-300 mt-1">
+                    Get direct support from our team
+                  </p>
                   <p className="text-blue-400 mt-1 text-sm inline-flex items-center">
                     support@kubestellar.io
-                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    <svg
+                      className="ml-1 w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
                     </svg>
                   </p>
                 </div>
@@ -202,7 +228,12 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
             </a>
 
             {/* Contact card 2 */}
-            <a href="https://kubestellar.slack.com" target="_blank" rel="noopener noreferrer" className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-transparent p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-purple-500/70 cursor-pointer">
+            <a
+              href="https://kubestellar.slack.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-transparent p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-purple-500/70 cursor-pointer"
+            >
               <div className="flex items-center">
                 <div className="flex-shrink-0 h-12 w-12 rounded-full bg-purple-600 flex items-center justify-center">
                   <svg
@@ -221,12 +252,26 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                   </svg>
                 </div>
                 <div className="ml-5">
-                  <h3 className="text-lg font-medium text-white">Community Chat</h3>
-                  <p className="text-gray-300 mt-1">Join our Slack workspace for real-time support</p>
+                  <h3 className="text-lg font-medium text-white">
+                    Community Chat
+                  </h3>
+                  <p className="text-gray-300 mt-1">
+                    Join our Slack workspace for real-time support
+                  </p>
                   <p className="text-purple-400 mt-1 text-sm inline-flex items-center">
                     Join Slack
-                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    <svg
+                      className="ml-1 w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
                     </svg>
                   </p>
                 </div>
@@ -234,7 +279,12 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
             </a>
 
             {/* Contact card 3 */}
-            <a href="https://github.com/kubestellar/kubestellar" target="_blank" rel="noopener noreferrer" className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-gray-700/50 p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-green-500/50 cursor-pointer">
+            <a
+              href="https://github.com/kubestellar/kubestellar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-gray-700/50 p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-green-500/50 cursor-pointer"
+            >
               <div className="flex items-center">
                 <div className="flex-shrink-0 h-12 w-12 rounded-full bg-green-600 flex items-center justify-center">
                   <svg
@@ -243,23 +293,40 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                     fill="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                   </svg>
                 </div>
                 <div className="ml-5">
                   <h3 className="text-lg font-medium text-white">GitHub</h3>
-                  <p className="text-gray-300 mt-1">Contribute, report issues, or browse the source code</p>
+                  <p className="text-gray-300 mt-1">
+                    Contribute, report issues, or browse the source code
+                  </p>
                   <p className="text-green-400 mt-1 text-sm inline-flex items-center">
                     View Repository
-                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    <svg
+                      className="ml-1 w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
                     </svg>
                   </p>
                 </div>
               </div>
             </a>
             {/* Contact card 4 - LinkedIn */}
-            <a href="https://linkedin.com/company/kubestellar" target="_blank" rel="noopener noreferrer" className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-gray-700/50 p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-blue-500/50 cursor-pointer">
+            <a
+              href="https://linkedin.com/company/kubestellar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-gray-700/50 p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-blue-500/50 cursor-pointer"
+            >
               <div className="flex items-center">
                 <div className="flex-shrink-0 h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center">
                   <svg
@@ -268,22 +335,33 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                     fill="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                   </svg>
                 </div>
                 <div className="ml-5">
                   <h3 className="text-lg font-medium text-white">LinkedIn</h3>
-                  <p className="text-gray-300 mt-1">Connect with our professional community</p>
+                  <p className="text-gray-300 mt-1">
+                    Connect with our professional community
+                  </p>
                   <p className="text-blue-400 mt-1 text-sm inline-flex items-center">
                     Follow Us
-                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    <svg
+                      className="ml-1 w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
                     </svg>
                   </p>
                 </div>
               </div>
             </a>
-
           </div>
 
           {/* Right side: Contact form */}
@@ -294,7 +372,10 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                   Send us a message
                 </h3>
 
-                <form onSubmit={handleSubmit} className="space-y-4 flex-1 flex flex-col">
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-4 flex-1 flex flex-col"
+                >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label
@@ -354,22 +435,40 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                         <option value="" disabled className="text-gray-400">
                           Select a subject
                         </option>
-                        <option value="General Inquiry" className="bg-gray-800 text-white py-2">
+                        <option
+                          value="General Inquiry"
+                          className="bg-gray-800 text-white py-2"
+                        >
                           General Inquiry
                         </option>
-                        <option value="Technical Support" className="bg-gray-800 text-white py-2">
+                        <option
+                          value="Technical Support"
+                          className="bg-gray-800 text-white py-2"
+                        >
                           Technical Support
                         </option>
-                        <option value="Partnership" className="bg-gray-800 text-white py-2">
+                        <option
+                          value="Partnership"
+                          className="bg-gray-800 text-white py-2"
+                        >
                           Partnership
                         </option>
-                        <option value="Documentation Feedback" className="bg-gray-800 text-white py-2">
+                        <option
+                          value="Documentation Feedback"
+                          className="bg-gray-800 text-white py-2"
+                        >
                           Documentation Feedback
                         </option>
-                        <option value="Enterprise Solutions" className="bg-gray-800 text-white py-2">
+                        <option
+                          value="Enterprise Solutions"
+                          className="bg-gray-800 text-white py-2"
+                        >
                           Enterprise Solutions
                         </option>
-                        <option value="Other" className="bg-gray-800 text-white py-2">
+                        <option
+                          value="Other"
+                          className="bg-gray-800 text-white py-2"
+                        >
                           Other
                         </option>
                       </select>
@@ -488,8 +587,9 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium text-green-300">
-                          Your email will be sent to the KubeStellar development mailing list. 
-                          Please check your email client to complete sending!
+                          Your email will be sent to the KubeStellar development
+                          mailing list. Please check your email client to
+                          complete sending!
                         </p>
                       </div>
                     </div>
