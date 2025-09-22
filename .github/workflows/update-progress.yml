@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.KS_DOCS_TOKEN }}
 
       - name: Extract PR Info & Generate summary
         id: pr_info
@@ -33,7 +33,7 @@ jobs:
 
           echo "category=$CATEGORY" >> $GITHUB_OUTPUT
 
-          SUMMARY=$(echo "${{ github.event.pull_request.body }}" | sed -E '/^([-*_] ?){3,}$/d' | sed 's/^> //g' | grep -v '^\s*$' | head -n 2 | tr '\n' ' ' | sed 's/^[ \t]*/- /;s/[ \t]*$//')
+          SUMMARY=$(echo "${{ github.event.pull_request.body }}" | sed -n '/^#\+\s\+[Dd]escription/,$p' | sed '1d' | grep -v '^\s*$' | head -n 2 | tr '\n' ' ' | sed 's/^[ \t]*/- /;s/[ \t]*$//')
 
           if [[ -z "$SUMMARY" ]] || [[ "$SUMMARY" == "- " ]] ; then
             SUMMARY="- ${{ github.event.pull_request.title }}"
@@ -51,8 +51,9 @@ jobs:
             echo "" >> PROGRESS.md
           fi
 
+          PR_LINK="[#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
           echo "### PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" >> PROGRESS.md
-          echo "${{ env.summary }}" >> PROGRESS.md
+          echo "${{ env.summary }} ($PR_LINK)" >> PROGRESS.md
           echo "" >> PROGRESS.md
 
           cat PROGRESS.md
