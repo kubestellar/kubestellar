@@ -52,8 +52,11 @@ jobs:
           fi
 
           PR_LINK="[#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
-          echo "### PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" >> PROGRESS.md
-          echo "$summary ($PR_LINK)" >> PROGRESS.md
+          CONTRIBUTOR="[@${{ github.event.pull_request.user.login }}](${{ github.event.pull_request.user.html_url }})"
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          # The summary from the previous step already starts with '- '
+          echo "${{ env.SUMMARY }} ($PR_LINK) by $CONTRIBUTOR on $TIMESTAMP" >> PROGRESS.md
           echo "" >> PROGRESS.md
 
           cat PROGRESS.md
