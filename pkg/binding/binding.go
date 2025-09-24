@@ -140,14 +140,14 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 
 	// Set CreateOnly annotation if any DownsyncModulation in the spec has CreateOnly=true
 	effectiveCreateOnly := false
-	for _, downsync := range bdg.Spec.ClusterScopeDownsyncs {
+	for _, downsync := range bdg.Spec.Workload.ClusterScope {
 		if downsync.CreateOnly {
 			effectiveCreateOnly = true
 			break
 		}
 	}
 	if !effectiveCreateOnly {
-		for _, downsync := range bdg.Spec.NamespaceScopeDownsyncs {
+		for _, downsync := range bdg.Spec.Workload.NamespaceScope {
 			if downsync.CreateOnly {
 				effectiveCreateOnly = true
 				break
