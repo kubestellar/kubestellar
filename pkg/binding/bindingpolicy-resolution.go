@@ -167,6 +167,7 @@ func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec
 	for objIdentifier, objData := range resolution.objectIdentifierToData {
 		// check if object is cluster-scoped or namespaced by checking namespace
 		if objIdentifier.ObjectName.Namespace == metav1.NamespaceNone {
+			// The CreateOnly field from DownsyncModulation is carried through to the external BindingSpec
 			clause := v1alpha1.ClusterScopeDownsyncClause{
 				ClusterScopeDownsyncObject: v1alpha1.ClusterScopeDownsyncObject{
 					GroupVersionResource: metav1.GroupVersionResource(objIdentifier.GVR()),
@@ -179,6 +180,7 @@ func (resolution *bindingPolicyResolution) toBindingSpec() *v1alpha1.BindingSpec
 			continue
 		}
 
+		// The CreateOnly field from DownsyncModulation is carried through to the external BindingSpec
 		clause := v1alpha1.NamespaceScopeDownsyncClause{
 			NamespaceScopeDownsyncObject: v1alpha1.NamespaceScopeDownsyncObject{
 				GroupVersionResource: metav1.GroupVersionResource(objIdentifier.GVR()),

@@ -130,7 +130,8 @@ spec:
                     createOnly:
                       description: |-
                         `createOnly` indicates that in a given WEC, the object is not to be updated
-                        if it already exists.
+                        if it already exists. The object will be created if missing, but once present,
+                        no further updates will be applied. Deletion is unaffected.
                       type: boolean
                     namespaceSelectors:
                       description: |-

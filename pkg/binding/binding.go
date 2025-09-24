@@ -138,6 +138,29 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 	// use the passed binding and set its spec
 	bdg.Spec = *generatedBindingSpec
 
+	// Set CreateOnly annotation if any DownsyncModulation in the spec has CreateOnly=true
+	effectiveCreateOnly := false
+	for _, downsync := range bdg.Spec.ClusterScopeDownsyncs {
+		if downsync.CreateOnly {
+			effectiveCreateOnly = true
+			break
+		}
+	}
+	if !effectiveCreateOnly {
+		for _, downsync := range bdg.Spec.NamespaceScopeDownsyncs {
+			if downsync.CreateOnly {
+				effectiveCreateOnly = true
+				break
+			}
+		}
+	}
+	if effectiveCreateOnly {
+		if bdg.Annotations == nil {
+			bdg.Annotations = make(map[string]string)
+		}
+		bdg.Annotations["kubestellar.io/create-only"] = "true"
+	}
+
 	// set owner reference
 	ownerReference, err := c.bindingPolicyResolver.GetOwnerReference(bdg.GetName())
 	if err != nil {

@@ -279,9 +279,9 @@ func (tt *testTransport) WrapObjects(wrapees []transport.Wrapee, kindToResource 
 	tt.extra = []any{}
 	for _, wrapee := range wrapees {
 		obj := wrapee.Object
-		// TODO: test wrapee.CreateOnly
 		key := util.RefToRuntimeObj(obj)
 		delete(tt.missed, key.String())
+		// Check that wrapee.CreateOnly matches the expected value
 		if expectedJMTW, found := tt.expect[key]; found {
 			if wrapee.CreateOnly != expectedJMTW.createOnly {
 				tt.t.Errorf("Expected createOnly=%v, got %v obj=%v", expectedJMTW.createOnly, wrapee.CreateOnly, key)

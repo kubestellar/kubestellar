@@ -60,7 +60,7 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 					Namespace: wrapee.Object.GetNamespace(),
 					Name:      wrapee.Object.GetName(),
 				},
-				UpdateStrategy: &createOnlyStrategy,
+				UpdateStrategy: &createOnlyStrategy, // ensures create-only behavior
 			})
 		}
 	}

@@ -127,7 +127,8 @@ type DownsyncPolicyClause struct {
 // DownsyncModulation is about variations on downsync behavior.
 type DownsyncModulation struct {
 	// `createOnly` indicates that in a given WEC, the object is not to be updated
-	// if it already exists.
+	// if it already exists. The object will be created if missing, but once present,
+	// no further updates will be applied. Deletion is unaffected.
 	// +optional
 	CreateOnly bool `json:"createOnly,omitempty"`
 
