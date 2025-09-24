@@ -41,20 +41,22 @@ var bindingsKind = v1alpha1.SchemeGroupVersion.WithKind("Binding")
 
 // Get takes name of the binding, and returns the corresponding binding object, and an error if there is any.
 func (c *FakeBindings) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Binding, err error) {
+	emptyResult := &v1alpha1.Binding{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(bindingsResource, name), &v1alpha1.Binding{})
+		Invokes(testing.NewRootGetActionWithOptions(bindingsResource, name, options), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Binding), err
 }
 
 // List takes label and field selectors, and returns the list of Bindings that match those selectors.
 func (c *FakeBindings) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.BindingList, err error) {
+	emptyResult := &v1alpha1.BindingList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(bindingsResource, bindingsKind, opts), &v1alpha1.BindingList{})
+		Invokes(testing.NewRootListActionWithOptions(bindingsResource, bindingsKind, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -73,36 +75,39 @@ func (c *FakeBindings) List(ctx context.Context, opts v1.ListOptions) (result *v
 // Watch returns a watch.Interface that watches the requested bindings.
 func (c *FakeBindings) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(bindingsResource, opts))
+		InvokesWatch(testing.NewRootWatchActionWithOptions(bindingsResource, opts))
 }
 
 // Create takes the representation of a binding and creates it.  Returns the server's representation of the binding, and an error, if there is any.
 func (c *FakeBindings) Create(ctx context.Context, binding *v1alpha1.Binding, opts v1.CreateOptions) (result *v1alpha1.Binding, err error) {
+	emptyResult := &v1alpha1.Binding{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(bindingsResource, binding), &v1alpha1.Binding{})
+		Invokes(testing.NewRootCreateActionWithOptions(bindingsResource, binding, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Binding), err
 }
 
 // Update takes the representation of a binding and updates it. Returns the server's representation of the binding, and an error, if there is any.
 func (c *FakeBindings) Update(ctx context.Context, binding *v1alpha1.Binding, opts v1.UpdateOptions) (result *v1alpha1.Binding, err error) {
+	emptyResult := &v1alpha1.Binding{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(bindingsResource, binding), &v1alpha1.Binding{})
+		Invokes(testing.NewRootUpdateActionWithOptions(bindingsResource, binding, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Binding), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeBindings) UpdateStatus(ctx context.Context, binding *v1alpha1.Binding, opts v1.UpdateOptions) (*v1alpha1.Binding, error) {
+func (c *FakeBindings) UpdateStatus(ctx context.Context, binding *v1alpha1.Binding, opts v1.UpdateOptions) (result *v1alpha1.Binding, err error) {
+	emptyResult := &v1alpha1.Binding{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateSubresourceAction(bindingsResource, "status", binding), &v1alpha1.Binding{})
+		Invokes(testing.NewRootUpdateSubresourceActionWithOptions(bindingsResource, "status", binding, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Binding), err
 }
@@ -116,7 +121,7 @@ func (c *FakeBindings) Delete(ctx context.Context, name string, opts v1.DeleteOp
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeBindings) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(bindingsResource, listOpts)
+	action := testing.NewRootDeleteCollectionActionWithOptions(bindingsResource, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.BindingList{})
 	return err
@@ -124,10 +129,11 @@ func (c *FakeBindings) DeleteCollection(ctx context.Context, opts v1.DeleteOptio
 
 // Patch applies the patch and returns the patched binding.
 func (c *FakeBindings) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Binding, err error) {
+	emptyResult := &v1alpha1.Binding{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(bindingsResource, name, pt, data, subresources...), &v1alpha1.Binding{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(bindingsResource, name, pt, data, opts, subresources...), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Binding), err
 }

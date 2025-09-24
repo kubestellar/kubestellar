@@ -42,22 +42,24 @@ var combinedstatusesKind = v1alpha1.SchemeGroupVersion.WithKind("CombinedStatus"
 
 // Get takes name of the combinedStatus, and returns the corresponding combinedStatus object, and an error if there is any.
 func (c *FakeCombinedStatuses) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.CombinedStatus, err error) {
+	emptyResult := &v1alpha1.CombinedStatus{}
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(combinedstatusesResource, c.ns, name), &v1alpha1.CombinedStatus{})
+		Invokes(testing.NewGetActionWithOptions(combinedstatusesResource, c.ns, name, options), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.CombinedStatus), err
 }
 
 // List takes label and field selectors, and returns the list of CombinedStatuses that match those selectors.
 func (c *FakeCombinedStatuses) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.CombinedStatusList, err error) {
+	emptyResult := &v1alpha1.CombinedStatusList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(combinedstatusesResource, combinedstatusesKind, c.ns, opts), &v1alpha1.CombinedStatusList{})
+		Invokes(testing.NewListActionWithOptions(combinedstatusesResource, combinedstatusesKind, c.ns, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -76,28 +78,30 @@ func (c *FakeCombinedStatuses) List(ctx context.Context, opts v1.ListOptions) (r
 // Watch returns a watch.Interface that watches the requested combinedStatuses.
 func (c *FakeCombinedStatuses) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(combinedstatusesResource, c.ns, opts))
+		InvokesWatch(testing.NewWatchActionWithOptions(combinedstatusesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a combinedStatus and creates it.  Returns the server's representation of the combinedStatus, and an error, if there is any.
 func (c *FakeCombinedStatuses) Create(ctx context.Context, combinedStatus *v1alpha1.CombinedStatus, opts v1.CreateOptions) (result *v1alpha1.CombinedStatus, err error) {
+	emptyResult := &v1alpha1.CombinedStatus{}
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(combinedstatusesResource, c.ns, combinedStatus), &v1alpha1.CombinedStatus{})
+		Invokes(testing.NewCreateActionWithOptions(combinedstatusesResource, c.ns, combinedStatus, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.CombinedStatus), err
 }
 
 // Update takes the representation of a combinedStatus and updates it. Returns the server's representation of the combinedStatus, and an error, if there is any.
 func (c *FakeCombinedStatuses) Update(ctx context.Context, combinedStatus *v1alpha1.CombinedStatus, opts v1.UpdateOptions) (result *v1alpha1.CombinedStatus, err error) {
+	emptyResult := &v1alpha1.CombinedStatus{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(combinedstatusesResource, c.ns, combinedStatus), &v1alpha1.CombinedStatus{})
+		Invokes(testing.NewUpdateActionWithOptions(combinedstatusesResource, c.ns, combinedStatus, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.CombinedStatus), err
 }
@@ -112,7 +116,7 @@ func (c *FakeCombinedStatuses) Delete(ctx context.Context, name string, opts v1.
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeCombinedStatuses) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(combinedstatusesResource, c.ns, listOpts)
+	action := testing.NewDeleteCollectionActionWithOptions(combinedstatusesResource, c.ns, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.CombinedStatusList{})
 	return err
@@ -120,11 +124,12 @@ func (c *FakeCombinedStatuses) DeleteCollection(ctx context.Context, opts v1.Del
 
 // Patch applies the patch and returns the patched combinedStatus.
 func (c *FakeCombinedStatuses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.CombinedStatus, err error) {
+	emptyResult := &v1alpha1.CombinedStatus{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(combinedstatusesResource, c.ns, name, pt, data, subresources...), &v1alpha1.CombinedStatus{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(combinedstatusesResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.CombinedStatus), err
 }

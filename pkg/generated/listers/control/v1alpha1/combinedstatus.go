@@ -19,8 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -39,25 +39,17 @@ type CombinedStatusLister interface {
 
 // combinedStatusLister implements the CombinedStatusLister interface.
 type combinedStatusLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.CombinedStatus]
 }
 
 // NewCombinedStatusLister returns a new CombinedStatusLister.
 func NewCombinedStatusLister(indexer cache.Indexer) CombinedStatusLister {
-	return &combinedStatusLister{indexer: indexer}
-}
-
-// List lists all CombinedStatuses in the indexer.
-func (s *combinedStatusLister) List(selector labels.Selector) (ret []*v1alpha1.CombinedStatus, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.CombinedStatus))
-	})
-	return ret, err
+	return &combinedStatusLister{listers.New[*v1alpha1.CombinedStatus](indexer, v1alpha1.Resource("combinedstatus"))}
 }
 
 // CombinedStatuses returns an object that can list and get CombinedStatuses.
 func (s *combinedStatusLister) CombinedStatuses(namespace string) CombinedStatusNamespaceLister {
-	return combinedStatusNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return combinedStatusNamespaceLister{listers.NewNamespaced[*v1alpha1.CombinedStatus](s.ResourceIndexer, namespace)}
 }
 
 // CombinedStatusNamespaceLister helps list and get CombinedStatuses.
@@ -75,26 +67,5 @@ type CombinedStatusNamespaceLister interface {
 // combinedStatusNamespaceLister implements the CombinedStatusNamespaceLister
 // interface.
 type combinedStatusNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all CombinedStatuses in the indexer for a given namespace.
-func (s combinedStatusNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.CombinedStatus, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.CombinedStatus))
-	})
-	return ret, err
-}
-
-// Get retrieves the CombinedStatus from the indexer for a given namespace and name.
-func (s combinedStatusNamespaceLister) Get(name string) (*v1alpha1.CombinedStatus, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("combinedstatus"), name)
-	}
-	return obj.(*v1alpha1.CombinedStatus), nil
+	listers.ResourceIndexer[*v1alpha1.CombinedStatus]
 }

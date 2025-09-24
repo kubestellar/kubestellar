@@ -19,8 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -40,30 +40,10 @@ type CustomTransformLister interface {
 
 // customTransformLister implements the CustomTransformLister interface.
 type customTransformLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.CustomTransform]
 }
 
 // NewCustomTransformLister returns a new CustomTransformLister.
 func NewCustomTransformLister(indexer cache.Indexer) CustomTransformLister {
-	return &customTransformLister{indexer: indexer}
-}
-
-// List lists all CustomTransforms in the indexer.
-func (s *customTransformLister) List(selector labels.Selector) (ret []*v1alpha1.CustomTransform, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.CustomTransform))
-	})
-	return ret, err
-}
-
-// Get retrieves the CustomTransform from the index for a given name.
-func (s *customTransformLister) Get(name string) (*v1alpha1.CustomTransform, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("customtransform"), name)
-	}
-	return obj.(*v1alpha1.CustomTransform), nil
+	return &customTransformLister{listers.New[*v1alpha1.CustomTransform](indexer, v1alpha1.Resource("customtransform"))}
 }

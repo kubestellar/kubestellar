@@ -41,20 +41,22 @@ var customtransformsKind = v1alpha1.SchemeGroupVersion.WithKind("CustomTransform
 
 // Get takes name of the customTransform, and returns the corresponding customTransform object, and an error if there is any.
 func (c *FakeCustomTransforms) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.CustomTransform, err error) {
+	emptyResult := &v1alpha1.CustomTransform{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(customtransformsResource, name), &v1alpha1.CustomTransform{})
+		Invokes(testing.NewRootGetActionWithOptions(customtransformsResource, name, options), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.CustomTransform), err
 }
 
 // List takes label and field selectors, and returns the list of CustomTransforms that match those selectors.
 func (c *FakeCustomTransforms) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.CustomTransformList, err error) {
+	emptyResult := &v1alpha1.CustomTransformList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(customtransformsResource, customtransformsKind, opts), &v1alpha1.CustomTransformList{})
+		Invokes(testing.NewRootListActionWithOptions(customtransformsResource, customtransformsKind, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -73,36 +75,39 @@ func (c *FakeCustomTransforms) List(ctx context.Context, opts v1.ListOptions) (r
 // Watch returns a watch.Interface that watches the requested customTransforms.
 func (c *FakeCustomTransforms) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(customtransformsResource, opts))
+		InvokesWatch(testing.NewRootWatchActionWithOptions(customtransformsResource, opts))
 }
 
 // Create takes the representation of a customTransform and creates it.  Returns the server's representation of the customTransform, and an error, if there is any.
 func (c *FakeCustomTransforms) Create(ctx context.Context, customTransform *v1alpha1.CustomTransform, opts v1.CreateOptions) (result *v1alpha1.CustomTransform, err error) {
+	emptyResult := &v1alpha1.CustomTransform{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(customtransformsResource, customTransform), &v1alpha1.CustomTransform{})
+		Invokes(testing.NewRootCreateActionWithOptions(customtransformsResource, customTransform, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.CustomTransform), err
 }
 
 // Update takes the representation of a customTransform and updates it. Returns the server's representation of the customTransform, and an error, if there is any.
 func (c *FakeCustomTransforms) Update(ctx context.Context, customTransform *v1alpha1.CustomTransform, opts v1.UpdateOptions) (result *v1alpha1.CustomTransform, err error) {
+	emptyResult := &v1alpha1.CustomTransform{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(customtransformsResource, customTransform), &v1alpha1.CustomTransform{})
+		Invokes(testing.NewRootUpdateActionWithOptions(customtransformsResource, customTransform, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.CustomTransform), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeCustomTransforms) UpdateStatus(ctx context.Context, customTransform *v1alpha1.CustomTransform, opts v1.UpdateOptions) (*v1alpha1.CustomTransform, error) {
+func (c *FakeCustomTransforms) UpdateStatus(ctx context.Context, customTransform *v1alpha1.CustomTransform, opts v1.UpdateOptions) (result *v1alpha1.CustomTransform, err error) {
+	emptyResult := &v1alpha1.CustomTransform{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateSubresourceAction(customtransformsResource, "status", customTransform), &v1alpha1.CustomTransform{})
+		Invokes(testing.NewRootUpdateSubresourceActionWithOptions(customtransformsResource, "status", customTransform, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.CustomTransform), err
 }
@@ -116,7 +121,7 @@ func (c *FakeCustomTransforms) Delete(ctx context.Context, name string, opts v1.
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeCustomTransforms) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(customtransformsResource, listOpts)
+	action := testing.NewRootDeleteCollectionActionWithOptions(customtransformsResource, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.CustomTransformList{})
 	return err
@@ -124,10 +129,11 @@ func (c *FakeCustomTransforms) DeleteCollection(ctx context.Context, opts v1.Del
 
 // Patch applies the patch and returns the patched customTransform.
 func (c *FakeCustomTransforms) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.CustomTransform, err error) {
+	emptyResult := &v1alpha1.CustomTransform{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(customtransformsResource, name, pt, data, subresources...), &v1alpha1.CustomTransform{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(customtransformsResource, name, pt, data, opts, subresources...), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.CustomTransform), err
 }

@@ -19,8 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -40,30 +40,10 @@ type BindingPolicyLister interface {
 
 // bindingPolicyLister implements the BindingPolicyLister interface.
 type bindingPolicyLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.BindingPolicy]
 }
 
 // NewBindingPolicyLister returns a new BindingPolicyLister.
 func NewBindingPolicyLister(indexer cache.Indexer) BindingPolicyLister {
-	return &bindingPolicyLister{indexer: indexer}
-}
-
-// List lists all BindingPolicies in the indexer.
-func (s *bindingPolicyLister) List(selector labels.Selector) (ret []*v1alpha1.BindingPolicy, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.BindingPolicy))
-	})
-	return ret, err
-}
-
-// Get retrieves the BindingPolicy from the index for a given name.
-func (s *bindingPolicyLister) Get(name string) (*v1alpha1.BindingPolicy, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("bindingpolicy"), name)
-	}
-	return obj.(*v1alpha1.BindingPolicy), nil
+	return &bindingPolicyLister{listers.New[*v1alpha1.BindingPolicy](indexer, v1alpha1.Resource("bindingpolicy"))}
 }
