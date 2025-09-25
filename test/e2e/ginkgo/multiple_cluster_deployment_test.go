@@ -78,6 +78,25 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1, testLabelAbsent)
 		})
 
+		
+		ginkgo.AfterEach(func(ctx context.Context) {
+            By("deleting the CustomTransform resource")
+            customTransform := &ksapi.CustomTransform{
+                ObjectMeta: metav1.ObjectMeta{Name: "test"},
+            }
+            // Delete the resource. It's okay if it's already gone, so we ignore "NotFound" errors.
+            err := ksWds.Delete(ctx, customTransform)
+            gomega.Expect(util.IgnoreNotFound(err)).NotTo(gomega.HaveOccurred())
+
+            // Wait to make sure the resource is fully deleted before the next test starts.
+            gomega.Eventually(func() bool {
+                // client.ObjectKeyFromObject is needed to get the key for the Get call
+                key := client.ObjectKeyFromObject(customTransform)
+                return util.IsNotFound(ksWds.Get(ctx, key, customTransform))
+            }, "1m", "5s").Should(gomega.BeTrue())
+        })
+
+
 		ginkgo.It("updates objects on the WECs following an update on the WDS", func(ctx context.Context) {
 			patch := []byte(`{"spec":{"replicas": 2}}`)
 			_, err := wds.AppsV1().Deployments(ns).Patch(
