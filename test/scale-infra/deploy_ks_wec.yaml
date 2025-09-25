@@ -1,0 +1,230 @@
+---
+- hosts: add_workers
+  remote_user: ubuntu
+  become: yes
+  gather_facts: yes
+  vars:
+    num_wecs: "{{ num_wecs }}"
+    region: "{{ region }}"
+    vpc_name:  "{{ vpc_name }}"
+  tasks:
+    - name: Wait for target connection to become reachable/usable
+      wait_for_connection:
+
+    - name: install jq
+      shell: |
+             sudo apt install jq -y
+
+    - name: install Docker
+      shell: |
+             sudo apt-get update -y
+             sudo apt-get install ca-certificates curl -y
+             sudo install -m 0755 -d /etc/apt/keyrings -y
+             sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+             sudo chmod a+r /etc/apt/keyrings/docker.asc
+             echo \
+              "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+              $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+              sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+             sudo apt-get update -y
+             sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+      register: docker_install
+      until: "docker_install is not failed"
+      retries: 3
+      delay: 1
+
+    - name: install kind
+      shell: |
+             [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.30.0/kind-linux-amd64
+             [ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.30.0/kind-linux-arm64
+             chmod +x ./kind
+             sudo mv ./kind /usr/local/bin/kind
+
+    - name: install OCM CLI
+      shell: curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+
+    - name: install kubectl
+      shell: |
+             curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+             curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+             echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+             sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+    - name: Fix kind issue - Pod errors due to “too many open files
+      shell: | 
+             echo "fs.inotify.max_user_watches = 2099999999" >> /etc/sysctl.conf
+             echo "fs.inotify.max_user_instances = 2099999999" >> /etc/sysctl.conf
+             sysctl -p
+
+    - name: Create variable from command
+      command: "kind get clusters"
+      register: result
+
+    - set_fact:
+       old_wecs: "{{result.stdout | split('\n') }}"
+   
+    - debug:
+        msg: "{{ old_wecs }}"
+
+    - name: Unregister old WEC clusters from KS core
+      shell: |
+             kubectl --context {{ item }} delete ns -l app.kubernetes.io/name=kwok --ignore-not-found
+             clusteradm unjoin --cluster-name {{ item }}  2> /dev/null --ignore-not-found
+             kubectl --context {{ item }} delete ns open-cluster-management open-cluster-management-agent open-cluster-management-agent-addon --ignore-not-found
+      with_items: '{{ old_wecs }}'
+      when: old_wecs[0] != ""
+    
+    - name: Delete old deployed clusters
+      shell: |
+             sudo rm /tmp/{{ region }}_{{ vpc_name }}_wec_join_command
+             kind delete cluster --name {{ item }}
+             kubectl config unset contexts.{{ item }}
+      with_items: '{{ old_wecs }}'
+      when: old_wecs[0] != ""
+
+    - set_fact:
+        wec_name_prefix: "{{ ansible_ssh_host.split('.') | join('-') }}"
+
+    - set_fact:
+        wec_list: "{{ [ prefix ]|product(range(start,end | int))|map('join')|list }}"
+      vars:
+        start: 0
+        end: "{{ num_wecs }}"
+        prefix: '{{ wec_name_prefix }}-'
+
+    - debug:
+        msg: "{{ wec_list }}"
+
+    - name: Get public IP address of the node, which is used to label the node kubeconfig file copied to the Ansible control node
+      shell: curl checkip.amazonaws.com
+      register: node_public_ip
+
+    - name: copy file with kind cluster configuration to WEC instances
+      ansible.builtin.copy:
+        src:  ./kind-cluster-config.yaml
+        dest: /tmp/kind-cluster-config.yaml
+        mode: '0644'
+    
+    - name: add host external IP address to the extraSANs of the kind cluster
+      ansible.builtin.replace:
+        path: /tmp/kind-cluster-config.yaml
+        regexp: example.com
+        replace: '{{ node_public_ip.stdout }}'
+
+    - name: create WEC kind clusters
+      shell: |
+             kind create cluster --name {{ item }} --config /tmp/kind-cluster-config.yaml
+             sleep 15
+      with_items: '{{ wec_list }}'
+
+    - name: rename WEC kind clusters contexts
+      shell: kubectl config rename-context kind-{{ item }} {{ item }}
+      with_items: '{{ wec_list }}'
+
+    - name: copy file with join command to WEC instances
+      ansible.builtin.copy:
+        src: .data/{{ region }}_{{ vpc_name }}/wec_join_command
+        dest: /tmp/{{ region }}_{{ vpc_name }}_wec_join_command
+        mode: '0644'
+
+    - name: register WEC cluster(s) with KubeStellar core
+      shell: |
+             kubectl config use-context {{ item }}
+             sleep 10
+             cat /tmp/{{ region }}_{{ vpc_name }}_wec_join_command | sed -e "s/<cluster_name>/{{ item }}/g" | sh
+      with_items: '{{ wec_list }}'
+
+    - name: Deploy kwok in the clusters and create a fake node
+      shell: |
+             KWOK_REPO=kubernetes-sigs/kwok
+             KWOK_LATEST_RELEASE=$(curl "https://api.github.com/repos/${KWOK_REPO}/releases/latest" | jq -r '.tag_name')
+             kubectl --context {{ item }} apply -f "https://github.com/${KWOK_REPO}/releases/download/${KWOK_LATEST_RELEASE}/kwok.yaml"
+             kubectl --context {{ item }} apply -f "https://github.com/${KWOK_REPO}/releases/download/${KWOK_LATEST_RELEASE}/stage-fast.yaml"
+             kubectl --context {{ item }} apply -f "https://github.com/${KWOK_REPO}/releases/download/${KWOK_LATEST_RELEASE}/metrics-usage.yaml"
+             kubectl --context {{ item }} apply -f https://raw.githubusercontent.com/dumb0002/kubestellar/refs/heads/aws-infra/test/performance/kwok-workloads/node.yaml
+      with_items: '{{ wec_list }}'
+
+    - name: Get public IP address of the node, which is used to label the node kubeconfig file copied to the Ansible control node
+      shell: curl checkip.amazonaws.com
+      register: node_public_ip
+
+    - name: Parse node hostname
+      set_fact:
+        host_config: "{{ node_public_ip.stdout.split('.') | join('-') }}.conf"
+
+    - name: Create a directory to persist wec kubeconfig file if it does not exist
+      ansible.builtin.file:
+        path: .data/{{ region }}_{{ vpc_name }}/wecs_config
+        state: directory
+        mode: '0755'
+
+    - name: Fetch kubeconfig file
+      ansible.builtin.fetch:
+        src: $HOME/.kube/config
+        dest: .data/{{ region }}_{{ vpc_name }}/wecs_config/{{ host_config }}
+        flat: yes
+
+    - name: Protect kubeconfig file
+      delegate_to: localhost
+      become: no
+      ansible.builtin.file:
+        mode: o-rwx
+        path: .data/{{ region }}_{{ vpc_name }}/wecs_config/{{ host_config }}
+
+    - name: Make node kubeconfig use public server address
+      delegate_to: localhost
+      become: no
+      ansible.builtin.replace:
+        path: .data/{{ region }}_{{ vpc_name }}/wecs_config/{{ host_config }}
+        regexp: '0.0.0.0'
+        replace: '{{ node_public_ip.stdout }}'
+
+# Approval of the CSRs to complete the WEC cluster registration
+- hosts: masters
+  remote_user: ubuntu
+  become: yes
+  gather_facts: yes
+  vars:
+    num_wecs: "{{ num_wecs }}"
+  tasks:
+    - set_fact:
+        wec_set: "{{ [ prefix ]|product(range(start,end | int))|map('join')|list }}"
+      vars:
+        start: 0
+        end: "{{ num_wecs }}"
+        prefix: '{{ hostvars[item].ansible_host }}-'
+      with_items:
+      - "{{ groups['add_workers'] }}"
+      register: wecs_info
+
+    - name: Obtaining the WEC names list
+      set_fact: temp_wec_list="{{ wecs_info.results | map(attribute='ansible_facts.wec_set') | list }}"
+
+    - name: Processing the WEC names list
+      set_fact:
+         wec_list: "{{ wec_list + [ item.split('.') |join('-') ] }}"
+      with_items: "{{ temp_wec_list }}"
+      vars:
+         wec_list: []
+
+    # - debug: 
+    #     msg: "{{ item  }}"
+    #   with_items: "{{ wec_list }}"
+
+    - name: Wait for csrs in its1
+      shell: |
+             c=$(kubectl --context kscore get csr | grep -c Pending)
+             b={{ num_wecs }}
+             if [ $((c)) -ge $((b)) ]; then echo "true"; else echo "false"; fi
+      register: wait_for_csrs
+      until: wait_for_csrs.stdout != "false"
+      retries: "{{ num_wecs | int + 5 }}"
+      delay: 15
+
+
+    - name: approve CSRs to complete the WEC cluster registration
+      shell: |
+             kubectl --context kscore get csr && clusteradm --context kscore accept --clusters {{ item }}
+             kubectl --context kscore label managedcluster {{ item }} location-group=edge name={{ item }}
+      with_items: "{{ wec_list }}"
+      delay: 2

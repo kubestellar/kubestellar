@@ -1,0 +1,7 @@
+- name: Terminate instance(s)
+  amazon.aws.ec2_instance:
+    region: "{{ region }}"
+    state: "absent"
+    instance_ids: "{{ instance_ids }}"
+    wait: yes
+  register: ec2_instances
