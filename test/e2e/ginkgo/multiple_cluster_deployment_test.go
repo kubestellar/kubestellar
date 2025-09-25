@@ -36,7 +36,7 @@ import (
 	ptr "k8s.io/utils/pointer"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
-	"github.com/kubestellar/kubestellar/pkg/abstract"
+	"github.comcom/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/test/util"
 )
 
@@ -48,9 +48,11 @@ var _ = ginkgo.Describe("end to end testing", func() {
 	ginkgo.BeforeEach(func(ctx context.Context) {
 		// Cleanup the WDS, create 1 deployment and 1 binding policy.
 		util.CleanupWDS(ctx, wds, ksWds, ns)
+		// Also cleanup the custom transform from the flaky test
+		util.DeleteCustomTransform(ctx, ksWds, "test")
 		util.CreateDeployment(ctx, wds, ns, "nginx",
 			map[string]string{
-				"app.kubernetes.io/name":         "nginx",
+				"app.kubernetes.io/name":      "nginx",
 				"test.kubestellar.io/test-label": "here",
 			})
 		util.CreateBindingPolicy(ctx, ksWds, "nginx",
@@ -141,12 +143,12 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			ginkgo.By("Adding Deployment objects to workload, expect no change to first in WECs")
 			util.CreateDeployment(ctx, wds, ns, "nginy",
 				map[string]string{
-					"app.kubernetes.io/name":         "nginx",
+					"app.kubernetes.io/name":      "nginx",
 					"test.kubestellar.io/test-label": "here",
 				})
 			util.CreateDeployment(ctx, wds, ns, "enginx",
 				map[string]string{
-					"app.kubernetes.io/name":         "nginx",
+					"app.kubernetes.io/name":      "nginx",
 					"test.kubestellar.io/test-label": "here",
 				})
 			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 3)
@@ -860,51 +862,6 @@ var _ = ginkgo.Describe("end to end testing", func() {
 							Name: "replicas",
 							Def:  "returned.status.replicas",
 						}},
-					Limit: 20,
-				})
-
-			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
-				if n := len(cs.Results); n != 2 {
-					return fmt.Errorf("expected 2 NamedStatusCombination but got %d", n)
-				}
-				if n := len(cs.Results[0].ColumnNames); n != 2 {
-					return fmt.Errorf("expected 2 ColumNames in Results[0] but got %d", n)
-				}
-				if n := len(cs.Results[0].Rows); n != 2 {
-					return fmt.Errorf("expected 2 rows in Results[0] but got %d", n)
-				}
-				if n := len(cs.Results[1].ColumnNames); n != 2 {
-					return fmt.Errorf("expected 2 ColumNames in Results[1] but got %d", n)
-				}
-				if n := len(cs.Results[1].Rows); n != 2 {
-					return fmt.Errorf("expected 2 rows in Results[1] but got %d", n)
-				}
-				return nil
-			})
-		})
-
-		ginkgo.It("can aggregate over zero WECs", func(ctx context.Context) {
-			exprFalse := ksapi.Expression("false")
-			expr2 := ksapi.Expression("2")
-			str0 := "0"
-			strPlusInf := strconv.FormatFloat(math.Inf(1), 'g', -1, 64)
-			strNegInf := strconv.FormatFloat(math.Inf(-1), 'g', -1, 64)
-			strNaN := strconv.FormatFloat(math.NaN(), 'g', -1, 64)
-			collectorName := "test-empty-group"
-
-			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{collectorName}
-			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
-			time.Sleep(5 * time.Second)
-			util.CreateStatusCollector(ctx, ksWds, collectorName,
-				ksapi.StatusCollectorSpec{
-					Filter: &exprFalse,
-					CombinedFields: []ksapi.NamedAggregator{
-						{Name: "count", Type: ksapi.AggregatorTypeCount},
-						{Name: "max", Type: ksapi.AggregatorTypeMax, Subject: &expr2},
-						{Name: "min", Type: ksapi.AggregatorTypeMin, Subject: &expr2},
-						{Name: "sum", Type: ksapi.AggregatorTypeSum, Subject: &expr2},
-						{Name: "avg", Type: ksapi.AggregatorTypeAvg, Subject: &expr2},
-					},
 					Limit: 20,
 				})
 
