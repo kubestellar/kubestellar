@@ -95,6 +95,21 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 0)
 
 			ginkgo.By("creating new BindingPolicy and expecting corresponding Binding")
+			// Create a StatusCollector so CombinedStatus gets created and can be waited on deterministically
+			util.CreateStatusCollector(ctx, ksWds, "create-only-status",
+				ksapi.StatusCollectorSpec{
+					Select: []ksapi.NamedExpression{
+						{
+							Name: "wecName",
+							Def:  "inventory.name",
+						},
+						{
+							Name: "replicas",
+							Def:  "returned.status.replicas",
+						},
+					},
+					Limit: 10,
+				})
 			util.CreateBindingPolicy(ctx, ksWds, "nginx",
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"location-group": "edge"}},
@@ -109,7 +124,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx"}}},
 					},
 						DownsyncModulation: ksapi.DownsyncModulation{
-							CreateOnly: true}},
+							CreateOnly:       true,
+							StatusCollectors: []string{"create-only-status"},
+						}},
 				},
 			)
 			util.ValidateBinding(ctx, ksWds, "nginx", func(binding *ksapi.Binding) bool {
@@ -130,15 +147,21 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				ctx, "nginx", types.MergePatchType, objPatch, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			// Wait for the CombinedStatus object to exist and have the right contents
-			// instead of using a fixed time delay
+			// Wait for the CombinedStatus object to exist and validate create-only behavior
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, "nginx", "nginx", func(cs *ksapi.CombinedStatus) error {
-				// For create-only mode, we expect the CombinedStatus to reflect the original state
-				// The deployment should remain at 1 replica despite the WDS change
 				if len(cs.Results) == 0 {
 					return fmt.Errorf("expected CombinedStatus to have results, but got none")
 				}
-				// Additional validation can be added here if needed for specific status collectors
+				// Validate that we have status from both WECs
+				if len(cs.Results[0].Rows) != 2 {
+					return fmt.Errorf("expected status from 2 WECs, got %d", len(cs.Results[0].Rows))
+				}
+				// Check that replicas remain at 1 (create-only mode working)
+				for _, row := range cs.Results[0].Rows {
+					if row.Columns[1].Number == nil || *row.Columns[1].Number != "1" {
+						return fmt.Errorf("expected replicas to remain at 1 in create-only mode")
+					}
+				}
 				return nil
 			})
 
