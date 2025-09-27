@@ -37,6 +37,11 @@ core-chart/charts/
 /test/performance/common/.venv/
 /test/performance/common/__pycache__/
 
+# Data created when deploy the large-scale test infra
+/test/scale-infra/.data/
+/test/scale-infra/.venv/
+/test/scale-infra/__pycache__/
+
 # Compiled binaries and libraries
 *.exe
 *.dll
