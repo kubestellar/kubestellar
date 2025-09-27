@@ -180,7 +180,7 @@ Reviewers will review your PR within a business day. A PR requires both an `/lgt
 
 _Congratulations! Your pull request has been successfully merged!_ 👏
 
-If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev [Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/).
+If you have any questions about contributing, don't hesitate to reach out to us on the [KubeStellar-dev Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/).
 
 
 
