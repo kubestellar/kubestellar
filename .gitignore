@@ -44,3 +44,25 @@ core-chart/charts/
 *.dylib
 *.jar
 *.class
+
+# Documentation build artifacts
+docs/generated/
+docs/venv/
+docs/site/
+
+# Python virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# mkdocs build artifacts
+.mkdocs/
