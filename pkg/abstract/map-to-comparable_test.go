@@ -32,59 +32,61 @@ type Pair[First, Second any] struct {
 func NewPair[First, Second any](first First, second Second) Pair[First, Second] {
 	return Pair[First, Second]{first, second}
 }
-
-func TestLockedMapToComparable(t *testing.T) {
-	rg := rand.New(rand.NewSource(42))
-	var randMutex sync.Mutex
-	intn := func(bound int) int {
-		randMutex.Lock()
-		defer randMutex.Unlock()
-		return rg.Intn(bound)
-	}
-	for round := 1; round <= 16; round++ {
-		t.Logf("Start of round %d", round)
-		lmc := NewLockedMapToComparable[int, int](nil,
-			NewPrimitiveMapToComparable[int, int]())
-		N := 24
-		goChan := make(chan sets.Empty, N)
-		allowed := sets.New[Pair[int, int]]()
-		var allowedLock sync.Mutex
-		var wgTrigger, wgDone sync.WaitGroup
-		wgTrigger.Add(N)
-		wgDone.Add(N)
-		for i := 0; i < N; i++ {
-			go func() {
-				kv := NewPair(intn(N), intn(N))
-				add := intn(12) < 8
-				wgTrigger.Add(-1)
-				<-goChan
-				if add {
-					lmc.Put(kv.First, kv.Second)
-				} else {
-					lmc.Delete(kv.First)
-				}
-				if add {
-					allowedLock.Lock()
-					defer allowedLock.Unlock()
-					allowed.Insert(kv)
-				}
-				wgDone.Add(-1)
-			}()
+func FuzzTestLockedMapToComparable(f *testing.F) {
+	f.Add(int64(42))
+	f.Add(int64(446))
+	f.Fuzz(func(t *testing.T, seed int64) {
+		rg := rand.New(rand.NewSource(seed))
+		var randMutex sync.Mutex
+		intn := func(bound int) int {
+			randMutex.Lock()
+			defer randMutex.Unlock()
+			return rg.Intn(bound)
 		}
-		wgTrigger.Wait()
-		close(goChan)
-		wgDone.Wait()
-		mtcCheckConsistency(t, lmc)
-		lmc.Iterate2(func(key, val int) error {
-			kv := NewPair(key, val)
-			if !allowed.Has(kv) {
-				t.Errorf("Found disallowed entry %v", kv)
+		for round := 1; round <= 16; round++ {
+			t.Logf("Start of round %d", round)
+			lmc := NewLockedMapToComparable(nil,
+				NewPrimitiveMapToComparable[int, int]())
+			N := 24
+			goChan := make(chan sets.Empty, N)
+			allowed := sets.New[Pair[int, int]]()
+			var allowedLock sync.Mutex
+			var wgTrigger, wgDone sync.WaitGroup
+			wgTrigger.Add(N)
+			wgDone.Add(N)
+			for i := 0; i < N; i++ {
+				go func() {
+					kv := NewPair(intn(N), intn(N))
+					add := intn(12) < 8
+					wgTrigger.Done()
+					<-goChan
+					if add {
+						lmc.Put(kv.First, kv.Second)
+					} else {
+						lmc.Delete(kv.First)
+					}
+					if add {
+						allowedLock.Lock()
+						allowed.Insert(kv)
+						allowedLock.Unlock()
+					}
+					wgDone.Done()
+				}()
 			}
-			return nil
-		})
-	}
+			wgTrigger.Wait()
+			close(goChan)
+			wgDone.Wait()
+			mtcCheckConsistency(t, lmc)
+			lmc.Iterate2(func(key, val int) error {
+				kv := NewPair(key, val)
+				if !allowed.Has(kv) {
+					t.Errorf("Found disallowed entry %v", kv)
+				}
+				return nil
+			})
+		}
+	})
 }
-
 func mtcCheckConsistency(t *testing.T, mtc MutableMapToComparable[int, int]) {
 	inverse := mtc.ReadInverse()
 	mtc.Iterate2(func(key, val int) error {

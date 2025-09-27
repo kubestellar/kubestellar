@@ -1,4 +1,4 @@
-## Workload Benchmark for KubeStellar
+## Benchmarking Tools for KubeStellar
 
 ### Pre-requisite: 
 
@@ -13,8 +13,10 @@ pip3 install -r requirements.txt
 
 Additionally, you must have an environment with KubeStellar installed; see [KubeStellar getting started](https://docs.kubestellar.io/release-0.23.1/direct/get-started/). Alternatively, you can also use KubeStellar e2e script [run-test.sh](https://github.com/kubestellar/kubestellar/blob/main/test/e2e/run-test.sh) to setup an environment.
 
-Use the following instructions to generate the sample workload for KubeStellar performance experiments:
+Use the following instructions to conduct short and long running performance tests for KubeStellar using our benchmarking workloads:
 
 a)[Instructions for short-running tests](short-running-tests/README.md)
 
 b)[Instructions for long-running tests](long-running-tests/README.md)
+
+Use the following instructions to deploy our framework to benchmark KubeStellar data-plane: [data-plane latencies](latency-controller/README.md)

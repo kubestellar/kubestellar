@@ -134,7 +134,7 @@ kubectl wait -n its1-system job.batch/install-status-addon --for condition=Compl
 
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 200s
 
-wait-for-cmd "(kubectl --context '$HOSTING_CONTEXT' -n wds1-system wait --for=condition=Ready pod/\$(kubectl --context '$HOSTING_CONTEXT' -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}'))"
+kubectl --context "$HOSTING_CONTEXT" -n wds1-system wait --for=condition=Ready pod -l name=transport-controller --timeout 400s
 
 echo "transport controller is running."
 
