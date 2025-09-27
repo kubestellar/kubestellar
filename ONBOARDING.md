@@ -20,7 +20,7 @@ The purpose of this policy is to ensure a smooth on-boarding and off-boarding pr
 - Upon approval, the member will receive an invitation to join the KubeStellar GitHub organization.
 
 2.3. Getting Help:
-- The organization's maintainers are here to help contributors be efficient and confident in their collaboration effort. If you need help you can reach out to the maintainers on slack at the [KubeStellar-dev channel](https://cloud-native.slack.com/archives/C097094RZ3M).
+- The organization's maintainers are here to help contributors be efficient and confident in their collaboration effort. If you need help you can reach out to the maintainers on slack at the [KubeStellar-dev Slack Channel](https://cloud-native.slack.com/archives/C097094RZ3M).
 - Be sure to join the [KubeStellar-dev Google Group](https://groups.google.com/g/kubestellar-dev) to get access to important artifacts like proposals, diagrams, and meeting invitations.
 
 2.4. Orientation:
