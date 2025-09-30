@@ -156,6 +156,9 @@ Whether it's editing files from Kubestellar.io or directly from the Kubestellar 
 
 1. If the PR addresses a specific issue that has already been opened in GitHub, make sure to include the open issue number in **Related Issue(s)** (i.e. `Fixes #NNNN`); this will cause GitHub to automatically close the Issue once the PR is merged. If you have finished addressing an open issue without getting it automatically closed then explicitly close it.
 
+   - If you want the issue to remain open after this PR is merged (for example, large issues that are addressed across multiple PRs), avoid the auto-closing keywords `fix`, `fixes`, `fixed`, `close`, `closes`, `closed`, `resolve`, `resolves`, `resolved`. Instead, reference the issue without auto-closing by using: `Related to #NNNN`.
+   - Use an auto-closing keyword only in the final PR that fully resolves the issue.
+
 ## Repairing commits
 
 If you have already created a PR that proposes to merge a branch that
