@@ -82,7 +82,17 @@ jobs:
             exit 1
           fi
           cd test/e2e/ginkgo
+          
+          # Run the test and save its exit code to report it later
+          set +e
           KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color --fail-fast $TEST_FLAGS -- -kubestellar-setup-flags="--kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
+          exit_code=$?
+          set -e
+
+          echo "INFO: Test run finished. Dumping logs before cleanup..."
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || echo "WARNING: Could not dump kubeflex-controller-manager logs."
+          
+          exit $exit_code
 
       - name: show kubeconfig contexts
         if: always()
@@ -217,7 +227,17 @@ jobs:
             exit 1
           fi
           cd test/e2e/
+
+          # Run the test and save its exit code to report it later
+          set +e
           KFLEX_DISABLE_CHATTY=true ./run-test.sh $TEST_FLAGS
+          exit_code=$?
+          set -e
+
+          echo "INFO: Test run finished. Dumping logs before cleanup..."
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || echo "WARNING: Could not dump kubeflex-controller-manager logs."
+
+          exit $exit_code
 
       - name: show kubeconfig contexts
         if: always()
