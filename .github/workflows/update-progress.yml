@@ -27,21 +27,29 @@ jobs:
             CATEGORY="MAJOR"
           elif [[ "$LABELS" == *"minor"* ]] || [[ "$TITLE" == *"minor"* ]]; then
             CATEGORY="MINOR"
-          elif [[ "$TITLE" == *"patch"* ]] || [[ "$TITLE" == *"patch"* ]]; then
+          elif [[ "$LABELS" == *"patch"* ]] || [[ "$TITLE" == *"patch"* ]]; then
             CATEGORY="PATCH"
           fi
 
           echo "category=$CATEGORY" >> $GITHUB_OUTPUT
 
-          SUMMARY=$(echo "${{ github.event.pull_request.body }}" | sed -n '/^#\+\s\+[Dd]escription/,$p' | sed '1d' | grep -v '^\s*$' | head -n 2 | tr '\n' ' ' | sed 's/^[ \t]*/- /;s/[ \t]*$//')
+          # More robust extraction - look for content between Description and next ### heading
+          PR_BODY="${{ github.event.pull_request.body }}"
+          SUMMARY=""
+          
+          if [[ -n "$PR_BODY" ]]; then
+            # Extract everything between ### Description and next ### heading
+            SUMMARY=$(echo "$PR_BODY" | sed -n '/^###\s*[Dd]escription/,/^###/p' | sed '1d' | sed '/^###/d' | sed '/<!--/,/-->/d' | grep -v '^\s*$' | head -n 2 | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//')
+          fi
 
-          if [[ -z "$SUMMARY" ]] || [[ "$SUMMARY" == "- " ]] ; then
+          # Add dash prefix and fallback to title if empty
+          if [[ -n "$SUMMARY" ]]; then
+            SUMMARY="- $SUMMARY"
+          else
             SUMMARY="- ${{ github.event.pull_request.title }}"
           fi
 
-          echo "summary<<EOF" >> $GITHUB_ENV
-          echo "$SUMMARY" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "summary=$SUMMARY" >> $GITHUB_OUTPUT
 
       - name: Update PROGRESS.md
         if: steps.pr_info.outputs.category == 'MAJOR' || steps.pr_info.outputs.category == 'MINOR'
@@ -56,7 +64,7 @@ jobs:
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           
           # The summary from the previous step already starts with '- '
-          echo "${{ env.SUMMARY }} ($PR_LINK) by $CONTRIBUTOR on $TIMESTAMP" >> PROGRESS.md
+          echo "${{ steps.pr_info.outputs.summary }} ($PR_LINK) by $CONTRIBUTOR on $TIMESTAMP" >> PROGRESS.md
           echo "" >> PROGRESS.md
 
           cat PROGRESS.md
