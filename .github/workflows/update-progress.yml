@@ -62,7 +62,7 @@ jobs:
           PR_LINK="[#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
           CONTRIBUTOR="[@${{ github.event.pull_request.user.login }}](${{ github.event.pull_request.user.html_url }})"
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          
+
           # The summary from the previous step already starts with '- '
           echo "${{ steps.pr_info.outputs.summary }} ($PR_LINK) by $CONTRIBUTOR on $TIMESTAMP" >> PROGRESS.md
           echo "" >> PROGRESS.md

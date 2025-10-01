@@ -157,7 +157,7 @@ export default function AboutSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            What is{' '}
+            What is{" "}
             <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
               KubeStellar
             </span>

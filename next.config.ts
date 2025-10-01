@@ -6,8 +6,8 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   experimental: {
-    optimizePackageImports: ['@/components']
-  }
+    optimizePackageImports: ["@/components"],
+  },
 };
 
 export default nextConfig;

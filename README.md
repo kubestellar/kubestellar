@@ -203,4 +203,3 @@ We especially encourage first-time contributors and provide mentorship for those
 **Legal Notice**: Kubernetes® and the Kubernetes logo are registered trademarks of The Linux Foundation®.  
 © 2022–2025 The KubeStellar Authors. All rights reserved.  
 Licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
-
