@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KubeStellar - Community Handbook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e' },
+                        space: { dark: '#0f172a', light: '#f8fafc', accent: '#7c3aed' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    animation: { 'float': 'float 6s ease-in-out infinite', 'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite', 'gradient': 'gradient 8s linear infinite', 'spin-slow': 'spin 8s linear infinite' },
+                    keyframes: {
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20px)' } },
+                        gradient: { '0%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' }, '100%': { backgroundPosition: '0% 50%' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-gradient {
+                @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-500;
+            }
+            .bg-star-pattern {
+                background-image: radial-gradient(circle at 10px 10px, rgba(255, 255, 255, 0.1) 1px, transparent 0);
+                background-size: 40px 40px;
+            }
+            .animated-gradient {
+                background-size: 200% 200%;
+                animation: gradient 15s ease infinite;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .text-shadow-lg {
+                text-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+            }
+            .glow {
+                box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+            }
+            .kubestellar-shadow-sm {
+                box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+            }
+            .kubestellar-shadow-md {
+                box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+            }
+            .kubestellar-shadow-lg {
+                box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+            }
+            .kubestellar-shadow-xl {
+                box-shadow: 0 12px 40px rgba(124, 58, 237, 0.4);
+            }
+            .kubestellar-shadow-2xl {
+                box-shadow: 0 20px 50px rgba(124, 58, 237, 0.5);
+            }
+            .learn-more-enhanced {
+                font-family: 'Inter', sans-serif;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                color: #7c3aed;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                display: inline-flex;
+                align-items: center;
+                gap: 0.375rem;
+            }
+            .learn-more-enhanced:hover {
+                color: #8b5cf6;
+                transform: translateX(4px);
+                text-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+            }
+            .learn-more-enhanced::after {
+                content: '→';
+                transition: transform 0.3s ease;
+                font-size: 1.1em;
+            }
+            .learn-more-enhanced:hover::after {
+                transform: translateX(2px);
+            }
+            .filter-none {
+                filter: none;
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .pulsing {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        .animated-gradient {
+            background-size: 200% 200%;
+            animation: gradient 15s ease infinite;
+        }
+
+        .parallax {
+            transform: translateZ(0);
+            will-change: transform;
+        }
+        
+        /* Dropdown styles */
+        [data-dropdown-menu] {
+            transition: all 0.3s ease;
+            transform-origin: top center;
+            display: none;
+        }
+        
+        /* Ensure dropdowns are above other content */
+        [data-dropdown] {
+            position: relative;
+            z-index: 1000;
+        }
+        
+        [data-dropdown-menu] {
+            z-index: 1001;
+        }
+        
+        /* Remove any gaps between button and menu */
+        [data-dropdown] {
+            display: inline-block;
+        }
+        
+        /* Ensure menu items are clickable */
+        [data-dropdown-menu] a {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        
+        /* Enhanced dropdown menu item hover effects */
+        [data-dropdown-menu] a:hover {
+            background: rgba(124, 58, 237, 0.2) !important;
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+        }
+        
+        /* Prevent text selection on dropdown buttons */
+        [data-dropdown-button] {
+            user-select: none;
+        }
+        
+        /* Enhanced hover effects for navigation */
+        .nav-link-hover {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-link-hover:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+        }
+        
+        .nav-link-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .nav-link-hover:hover::before {
+            left: 100%;
+        }
+        
+        /* Icon effects */
+        .nav-link-hover svg {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-link-hover:hover svg {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+        
+        /* Enhanced icon animations */
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px) scale(1.1); }
+            50% { transform: translateY(-2px) scale(1.1); }
+        }
+        
+        .nav-link-hover:hover svg {
+            animation: iconFloat 2s ease-in-out infinite;
+        }
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap">
+</head>
+<body class="bg-space-dark text-white overflow-x-hidden dark">
+    <!-- Enhanced Navigation Bar -->
+    <nav class="fixed w-full z-50 bg-slate-900/90 backdrop-blur-md border-b border-gray-700/50 transition-all duration-300">
+        <!-- Dark base background -->
+        <div class="absolute inset-0 bg-[#0a0a0a]/90"></div>
+        
+        <!-- Starfield background -->
+        <div id="stars-container-nav" class="absolute inset-0 overflow-hidden"></div>
+        
+        <!-- Grid lines background -->
+        <div id="grid-lines-nav" class="absolute inset-0 opacity-10"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Left side: Logo -->
+                <div class="flex-shrink-0">
+                    <a href="#" class="flex-shrink-0">
+                        <img src="https://docs.kubestellar.io/release-0.27.2/images/KubeStellar-with-Logo-transparent-v2.png" alt="KubeStellar Logo" class="h-10 w-auto">
+                    </a>
+                </div>
+
+                <!-- Center: Nav Links -->
+                <div class="hidden md:flex flex-1 justify-center">
+                    <div class="flex items-center space-x-8">
+                        <a href="#documentation" class="text-sm font-medium text-gray-300 hover:text-blue-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-blue-500/10 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transform group nav-link-hover">
+                            <div class="relative">
+                                <svg class="w-5 h-5 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <span>Docs</span>
+                        </a>
+                        <a href="#blog" class="text-sm font-medium text-gray-300 hover:text-purple-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-purple-500/10 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transform group nav-link-hover">
+                            <div class="relative">
+                                <svg class="w-5 h-5 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2v-6a2 2 0 012-2h8z" class="opacity-0 group-hover:opacity-100 transition-opacity duration-300"></path>
+                                </svg>
+                            </div>
+                            <span>Blog</span>
+                        </a>
+                        <!-- Contribute Dropdown -->
+                        <div class="relative group" data-dropdown>
+                            <button type="button" class="text-sm font-medium text-gray-300 hover:text-emerald-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-emerald-500/10 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transform nav-link-hover" data-dropdown-button aria-haspopup="true" aria-expanded="false">
+                                <div class="relative">
+                                    <svg class="w-5 h-5 transition-all duration-300 group-hover:-rotate-12 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" class="opacity-0 group-hover:opacity-100 transition-opacity duration-300"></path>
+                                    </svg>
+                                </div>
+                                <span>Contribute</span>
+                                <svg class="ml-1 h-4 w-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-56 bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl py-2 ring-1 ring-gray-700/50 opacity-0 pointer-events-none transition-all duration-200 z-50 kubestellar-shadow-2xl" data-dropdown-menu style="display: none;">
+                                <a href="#join-in" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                    </svg>
+                                    Join In
+                                </a>
+                                <a href="#contribute-handbook" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                    Contribute Handbook
+                                </a>
+                                <a href="#security" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                    </svg>
+                                    Security
+                                </a>
+                            </div>
+                        </div>
+                        <!-- Community Dropdown -->
+                        <div class="relative group" data-dropdown>
+                            <button type="button" class="text-sm font-medium text-gray-300 hover:text-cyan-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-cyan-500/10 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transform nav-link-hover" data-dropdown-button aria-haspopup="true" aria-expanded="false">
+                                <div class="relative">
+                                    <svg class="w-5 h-5 transition-all duration-300 group-hover:scale-125 group-hover:rotate-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                </div>
+                                <span>Community</span>
+                                <svg class="ml-1 h-4 w-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-56 bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl py-2 ring-1 ring-gray-700/50 opacity-0 pointer-events-none transition-all duration-200 z-50 kubestellar-shadow-2xl" data-dropdown-menu style="display: none;">
+                                <a href="#get-involved" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                    </svg>
+                                    Get Involved
+                                </a>
+                                <a href="#programs" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    </svg>
+                                    Programs
+                                </a>
+                                <a href="#ladder" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                    Ladder
+                                </a>
+                                <a href="#contact-us" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Contact Us
+                                </a>
+                                <a href="#partners" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                    Partners
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right side: Controls -->
+                <div class="flex items-center space-x-4">
+                    <!-- Version Dropdown -->
+                    <div class="relative group" data-dropdown>
+                        <button type="button" class="flex items-center text-sm font-medium text-gray-300 hover:text-blue-400 transition-all duration-300 focus:outline-none px-3 py-2 rounded-lg hover:bg-blue-500/10 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transform nav-link-hover" data-dropdown-button aria-haspopup="true" aria-expanded="false">
+                            <span class="font-medium">3.8.1</span>
+                            <svg class="ml-1 h-4 w-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl py-2 ring-1 ring-gray-700/50 opacity-0 pointer-events-none transition-all duration-200 z-50 kubestellar-shadow-2xl" data-dropdown-menu style="display: none;">
+                            <a href="#" class="block px-5 py-2 text-sm text-gray-300 hover:bg-blue-900/30 rounded transition-all duration-200 hover:text-blue-300 hover:shadow-md">3.8.1 (Current)</a>
+                            <a href="#" class="block px-5 py-2 text-sm text-gray-300 hover:bg-blue-900/30 rounded transition-all duration-200 hover:text-blue-300 hover:shadow-md">3.8.0</a>
+                            <a href="#" class="block px-5 py-2 text-sm text-gray-300 hover:bg-blue-900/30 rounded transition-all duration-200 hover:text-blue-300 hover:shadow-md">All versions</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Language Dropdown -->
+                    <div class="relative group" data-dropdown>
+                        <button type="button" class="flex items-center text-sm font-medium text-gray-300 hover:text-purple-400 transition-all duration-300 focus:outline-none px-3 py-2 rounded-lg hover:bg-purple-500/10 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transform nav-link-hover" data-dropdown-button aria-haspopup="true" aria-expanded="false">
+                            <svg class="h-5 w-5 mr-1 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                            </svg>
+                            <span class="font-medium">English</span>
+                            <svg class="ml-1 h-4 w-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-40 bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl py-2 ring-1 ring-gray-700/50 opacity-0 pointer-events-none transition-all duration-200 z-50 kubestellar-shadow-2xl" data-dropdown-menu style="display: none;">
+                            <a href="#" class="block px-5 py-2 text-sm text-gray-300 hover:bg-purple-900/30 rounded transition-all duration-200 hover:text-purple-300 hover:shadow-md">English</a>
+                            <a href="#" class="block px-5 py-2 text-sm text-gray-300 hover:bg-purple-900/30 rounded transition-all duration-200 hover:text-purple-300 hover:shadow-md">日本語</a>
+                            <a href="#" class="block px-5 py-2 text-sm text-gray-300 hover:bg-purple-900/30 rounded transition-all duration-200 hover:text-purple-300 hover:shadow-md">简体中文</a>
+                        </div>
+                    </div>
+                    
+                    <!-- GitHub Dropdown -->
+                    <div class="relative group" data-dropdown>
+                        <button type="button" tabindex="0" class="hover:text-emerald-400 transition-all duration-300 flex items-center px-3 py-2 rounded-lg hover:bg-emerald-500/10 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transform nav-link-hover" aria-label="GitHub" data-dropdown-button aria-haspopup="true" aria-expanded="false">
+                            <svg class="w-5 h-5 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+                            <svg class="ml-1 h-4 w-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-56 bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl py-2 ring-1 ring-gray-700/50 opacity-0 pointer-events-none transition-all duration-200 z-50 kubestellar-shadow-2xl" data-dropdown-menu style="display: none;">
+                            <a href="https://github.com/kubestellar/kubestellar" target="_blank" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2C5.58 2 2 5.58 2 10c0 3.87 2.69 7.13 6.39 7.93.47.09.64-.2.64-.45 0-.22-.01-.94-.01-1.7-2.6.57-3.15-1.25-3.15-1.25-.43-1.09-1.05-1.38-1.05-1.38-.86-.59.07-.58.07-.58.95.07 1.45.98 1.45.98.85 1.45 2.23 1.03 2.78.79.09-.62.33-1.03.6-1.27-2.22-.25-4.555-1.11-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+                                Star
+                                <span class="ml-auto bg-gray-700 text-gray-300 text-xs rounded px-2 py-0.5">12.3k</span>
+                            </a>
+                            <a href="https://github.com/kubestellar/kubestellar/fork" target="_blank" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a3 3 0 106 0 3 3 0 00-6 0zm0 2a2 2 0 114 0 2 2 0 01-4 0zm10 10a3 3 0 11-6 0 3 3 0 016 0zm-2-2a2 2 0 100 4 2 2 0 000-4zm-6 2a2 2 0 100-4 2 2 0 000 4zm8-2a2 2 0 100-4 2 2 0 000 4z"/></svg>
+                                Fork
+                                <span class="ml-auto bg-gray-700 text-gray-300 text-xs rounded px-2 py-0.5">2.1k</span>
+                            </a>
+                            <a href="https://github.com/kubestellar/kubestellar/watchers" target="_blank" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2C5.454 2 1.73 5.11.458 9.09a1.5 1.5 0 000 1.82C1.73 14.89 5.454 18 10 18s8.27-3.11 9.542-7.09a1.5 1.5 0 000-1.82C18.27 5.11 14.546 2 10 2zm0 14c-3.866 0-7.09-2.61-8.13-6C2.91 6.61 6.134 4 10 4s7.09 2.61 8.13 6c-1.04 3.39-4.264 6-8.13 6zm0-8a2 2 0 110 4 2 2 0 010-4z"/></svg>
+                                Watch
+                                <span class="ml-auto bg-gray-700 text-gray-300 text-xs rounded px-2 py-0.5">350</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+
+                    
+                    <!-- Mobile menu button -->
+                    <button class="md:hidden p-2 rounded focus:outline-none hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Open menu">
+                        <svg class="h-6 w-6 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24 relative overflow-hidden bg-slate-900 text-white">
+        <!-- Dark base background -->
+        <div class="absolute inset-0 bg-[#0a0a0a]"></div>
+        
+        <!-- Starfield background -->
+        <div id="stars-container-handbook" class="absolute inset-0 overflow-hidden"></div>
+        
+        <!-- Grid lines background -->
+        <div id="grid-lines-handbook" class="absolute inset-0 opacity-20"></div>
+        
+        <!-- Interactive Grid Network -->
+        <div class="absolute inset-0">
+            <canvas id="grid-canvas-handbook" class="w-full h-full opacity-20"></canvas>
+        </div>
+        
+        <!-- Floating Nebula Clouds - Removed for cleaner background -->
+        <div class="absolute inset-0">
+            <!-- Nebula clouds removed -->
+        </div>
+        
+        <!-- Floating Data Particles -->
+        <div class="absolute inset-0">
+            <div class="data-particle" style="--delay: 0s"></div>
+            <div class="data-particle" style="--delay: 1s"></div>
+            <div class="data-particle" style="--delay: 2s"></div>
+            <div class="data-particle" style="--delay: 3s"></div>
+            <div class="data-particle" style="--delay: 4s"></div>
+            <div class="data-particle" style="--delay: 5s"></div>
+        </div>
+        
+
+        
+        <div class="relative py-16">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <h1 class="text-6xl font-bold text-center mb-16 text-shadow-lg">
+                    <span class="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">Contribute</span>
+                    <span class="text-white"> </span>
+                    <span class="text-gradient animated-gradient bg-gradient-to-r from-cyan-400 via-emerald-500 to-blue-500">Handbook</span>
+                </h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Onboarding Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Onboarding</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">KubeStellar GitHub Organization On-boarding and Off-boarding Policy. Learn how to get started with our community.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- Code of Conduct Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Code of Conduct</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">Our pledge to create a welcoming and inclusive community for everyone to contribute and thrive.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- Guidelines Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Guidelines</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">Best practices for contributing to the KubeStellar project. Essential guidelines for quality contributions.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- License Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">License</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">KubeStellar is licensed under the Apache 2.0 License. Learn about open source licensing and terms.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- Governance Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Governance</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">How the KubeStellar project is governed and organized. Understand our decision-making processes.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- Testing Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Testing</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">Procedures and guidelines for testing contributions. Ensure quality and reliability in every change.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- Packaging Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-indigo-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Packaging</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">How to package and distribute KubeStellar components. Learn about build and deployment processes.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- Docs Management Overview Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-teal-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Docs Management Overview</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">Overview of how documentation is managed and updated. Comprehensive documentation workflow.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- Testing Website PRs Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Testing Website PRs</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">How to test pull requests for the KubeStellar website. Quality assurance for web changes.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- Release Process Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V3a1 1 0 011 1v8.5l-5-5-5 5V4a1 1 0 011-1m0 0h10m-9 4h8m-8 4h8m-8 4h3.5"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Release Process</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">The process for creating and publishing new KubeStellar releases. Complete release lifecycle management.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- Release Testing Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Release Testing</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">How to test and validate new releases before publication. Comprehensive release validation process.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                    <!-- Signoff and Signing Contributions Card -->
+                    <div class="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
+                        <div class="transition-all duration-300 group-hover:-translate-y-2 h-full flex flex-col">
+                            <div class="w-12 h-12 bg-violet-500/20 rounded-lg flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Signoff and Signing Contributions</h3>
+                            <p class="text-gray-300 leading-relaxed flex-grow">Requirements for signing off on your contributions. Legal compliance and contribution verification.</p>
+                        </div>
+                        <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="learn-more-enhanced">Learn More</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white relative overflow-hidden pt-16 pb-8">
+        <!-- Dark base background -->
+        <div class="absolute inset-0 bg-[#0a0a0a]"></div>
+        
+        <!-- Starfield background -->
+        <div id="stars-container-footer" class="absolute inset-0 overflow-hidden"></div>
+        
+        <!-- Grid lines background -->
+        <div id="grid-lines-footer" class="absolute inset-0 opacity-20"></div>
+        
+        <!-- Background elements -->
+        <div class="absolute inset-0 z-0">
+            <!-- Gradient backgrounds removed -->
+        </div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Main footer content -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 mb-12">
+                <!-- Logo and description -->
+                <div class="sm:col-span-2 lg:col-span-4">
+                    <div class="flex items-center">
+                        <img src="https://docs.kubestellar.io/release-0.27.2/images/KubeStellar-with-Logo-transparent-v2.png" alt="KubeStellar Logo" class="h-10 w-auto">
+                    </div>
+                    <p class="mt-4 text-gray-400 text-sm leading-relaxed">
+                        Multi-cluster Kubernetes orchestration platform that simplifies distributed workload management across diverse infrastructure.
+                    </p>
+                    <div class="mt-6 flex space-x-5">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 transform hover:scale-110">
+                            <span class="sr-only">Twitter</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 transform hover:scale-110">
+                            <span class="sr-only">GitHub</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 transform hover:scale-110">
+                            <span class="sr-only">LinkedIn</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 transform hover:scale-110">
+                            <span class="sr-only">Slack</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick links -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Product</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Features</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Use Cases</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Roadmap</a></li>
+                    </ul>
+                </div>
+                
+                <div class="lg:col-span-2">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Resources</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Documentation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Tutorials</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Community</a></li>
+                    </ul>
+                </div>
+                
+                <div class="lg:col-span-2">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Company</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">About</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Team</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Newsletter -->
+                <div class="sm:col-span-2 lg:col-span-2">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Stay Updated</h3>
+                    <div class="bg-gray-800/50 backdrop-blur-md rounded-lg p-4 border border-gray-700/50 transform transition-all duration-300 hover:border-blue-500/30">
+                        <form id="newsletter-form" class="flex flex-col space-y-3">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <input id="email-address" type="email" class="block w-full pl-10 pr-3 py-2 text-sm text-white placeholder-gray-400 bg-gray-700/50 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" placeholder="Enter your email address">
+                            </div>
+                            <button type="submit" class="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 transform hover:translate-y-[-1px] flex items-center justify-center">
+                                <span>Subscribe</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </form>
+                        
+                        <!-- Success message (hidden by default) -->
+                        <div id="newsletter-success" class="hidden mt-3 text-sm text-green-400 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Subscribed!</span>
+                        </div>
+                    </div>
+                    <p class="mt-3 text-xs text-gray-400">We respect your privacy. No spam.</p>
+                </div>
+            </div>
+            
+            <!-- Divider and bottom section -->
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-400 text-sm">
+                        &copy; 2023 KubeStellar. All rights reserved. Apache 2.0 License.
+                    </p>
+                    <div class="mt-4 md:mt-0 flex flex-wrap justify-center md:justify-end gap-4 md:gap-6">
+                        <a href="#" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-white text-sm">Terms of Service</a>
+                        <a href="#" class="text-gray-400 hover:text-white text-sm">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating back to top button -->
+        <button id="back-to-top" class="fixed bottom-8 right-8 p-2 rounded-full bg-blue-600 text-white shadow-lg z-50 transition-all duration-300 opacity-0 translate-y-10">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+        </button>
+        
+        <!-- Back to top script -->
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const backToTopButton = document.getElementById('back-to-top');
+                const newsletterForm = document.getElementById('newsletter-form');
+                const successMessage = document.getElementById('newsletter-success');
+                
+                // Back to top functionality
+                if (backToTopButton) {
+                    window.addEventListener('scroll', () => {
+                        if (window.pageYOffset > 300) {
+                            backToTopButton.classList.remove('opacity-0', 'translate-y-10');
+                            backToTopButton.classList.add('opacity-100', 'translate-y-0');
+                        } else {
+                            backToTopButton.classList.add('opacity-0', 'translate-y-10');
+                            backToTopButton.classList.remove('opacity-100', 'translate-y-0');
+                        }
+                    });
+                    
+                    backToTopButton.addEventListener('click', () => {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+                }
+                
+                // Newsletter form functionality
+                if (newsletterForm) {
+                    newsletterForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        
+                        // Simulate form submission
+                        newsletterForm.style.opacity = '0.5';
+                        newsletterForm.style.pointerEvents = 'none';
+                        
+                        setTimeout(() => {
+                            newsletterForm.style.display = 'none';
+                            successMessage.classList.remove('hidden');
+                        }, 800);
+                    });
+                }
+            });
+        </script>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create starfield background with more stars and depth
+            function createStarfield(starsContainer) {
+                if (!starsContainer) return;
+                
+                // Clear existing stars
+                starsContainer.innerHTML = '';
+                
+                // Create three layers of stars for parallax effect
+                for (let layer = 1; layer <= 3; layer++) {
+                    const layerDiv = document.createElement('div');
+                    layerDiv.className = `star-layer layer-${layer}`;
+                    layerDiv.style.position = 'absolute';
+                    layerDiv.style.inset = '0';
+                    layerDiv.style.zIndex = layer;
+                    
+                    const starCount = layer === 1 ? 150 : (layer === 2 ? 100 : 50);
+                    const speedFactor = layer === 1 ? 1 : (layer === 2 ? 0.7 : 0.4);
+                    
+                    for (let i = 0; i < starCount; i++) {
+                        const star = document.createElement('div');
+                        star.className = 'absolute bg-white rounded-full';
+                        
+                        // Size varies by layer
+                        const size = layer === 1 ? Math.random() * 1.5 + 0.5 : 
+                                   layer === 2 ? Math.random() * 1 + 0.8 : 
+                                   Math.random() * 0.8 + 1.2;
+                        
+                        star.style.width = `${size}px`;
+                        star.style.height = `${size}px`;
+                        star.style.top = `${Math.random() * 100}%`;
+                        star.style.left = `${Math.random() * 100}%`;
+                        
+                        // Opacity varies by layer
+                        const opacity = layer === 1 ? Math.random() * 0.6 + 0.2 :
+                                      layer === 2 ? Math.random() * 0.8 + 0.3 :
+                                      Math.random() * 1 + 0.5;
+                        
+                        star.style.opacity = opacity;
+                        
+                        // Animation with different speeds
+                        const duration = Math.random() * 4 + 2;
+                        star.style.animation = `twinkle ${duration}s infinite alternate`;
+                        star.style.animationDelay = `${Math.random() * 5}s`;
+                        
+                        layerDiv.appendChild(star);
+                    }
+                    
+                    starsContainer.appendChild(layerDiv);
+                }
+                
+                // Add shooting stars
+                for (let i = 0; i < 5; i++) {
+                    const shootingStar = document.createElement('div');
+                    shootingStar.className = 'shooting-star';
+                    shootingStar.style.position = 'absolute';
+                    shootingStar.style.top = `${Math.random() * 70}%`;
+                    shootingStar.style.left = `${Math.random() * 100}%`;
+                    shootingStar.style.width = '2px';
+                    shootingStar.style.height = '2px';
+                    shootingStar.style.backgroundColor = 'white';
+                    shootingStar.style.borderRadius = '50%';
+                    shootingStar.style.animation = `shootingStar ${Math.random() * 10 + 10}s infinite linear`;
+                    shootingStar.style.animationDelay = `${Math.random() * 15}s`;
+                    shootingStar.style.opacity = '0';
+                    shootingStar.style.zIndex = '10';
+                    
+                    starsContainer.appendChild(shootingStar);
+                }
+                
+                // Nebula effects removed for cleaner background
+            }
+            
+            // Create grid lines with subtle animation
+            function createGrid(gridContainer) {
+                if (!gridContainer) return;
+                
+                // Clear existing content
+                gridContainer.innerHTML = '';
+                
+                const gridSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                gridSvg.setAttribute('width', '100%');
+                gridSvg.setAttribute('height', '100%');
+                gridSvg.style.position = 'absolute';
+                gridSvg.style.top = '0';
+                gridSvg.style.left = '0';
+                
+                // Create horizontal grid lines with animation
+                for (let i = 0; i < 20; i++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', '0');
+                    line.setAttribute('y1', `${i * 5}%`);
+                    line.setAttribute('x2', '100%');
+                    line.setAttribute('y2', `${i * 5}%`);
+                    line.setAttribute('stroke', '#6366F1');
+                    line.setAttribute('stroke-width', '0.5');
+                    line.setAttribute('stroke-opacity', '0.3');
+                    line.setAttribute('class', 'grid-line');
+                    line.style.animation = `gridPulse ${3 + i % 5}s infinite alternate ease-in-out`;
+                    line.style.animationDelay = `${i * 0.2}s`;
+                    gridSvg.appendChild(line);
+                }
+                
+                // Create vertical grid lines with animation
+                for (let i = 0; i < 20; i++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', `${i * 5}%`);
+                    line.setAttribute('y1', '0');
+                    line.setAttribute('x2', `${i * 5}%`);
+                    line.setAttribute('y2', '100%');
+                    line.setAttribute('stroke', '#6366F1');
+                    line.setAttribute('stroke-width', '0.5');
+                    line.setAttribute('stroke-opacity', '0.3');
+                    line.setAttribute('class', 'grid-line');
+                    line.style.animation = `gridPulse ${3 + i % 5}s infinite alternate ease-in-out`;
+                    line.style.animationDelay = `${i * 0.2}s`;
+                    gridSvg.appendChild(line);
+                }
+                
+                gridContainer.appendChild(gridSvg);
+            }
+            
+            // Interactive grid canvas initialization
+            function initGridCanvas() {
+                const canvas = document.getElementById('grid-canvas-handbook');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                
+                const gridSize = 50;
+                const gridColor = 'rgba(99, 102, 241, 0.3)';
+                
+                function drawGrid() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.strokeStyle = gridColor;
+                    ctx.lineWidth = 0.5;
+                    
+                    // Draw vertical lines
+                    for (let x = 0; x <= canvas.width; x += gridSize) {
+                        ctx.beginPath();
+                        ctx.moveTo(x, 0);
+                        ctx.lineTo(x, canvas.height);
+                        ctx.stroke();
+                    }
+                    
+                    // Draw horizontal lines
+                    for (let y = 0; y <= canvas.height; y += gridSize) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(canvas.width, y);
+                        ctx.stroke();
+                    }
+                }
+                
+                drawGrid();
+                
+                // Redraw on resize
+                window.addEventListener('resize', () => {
+                    canvas.width = canvas.offsetWidth;
+                    canvas.height = canvas.offsetHeight;
+                    drawGrid();
+                });
+            }
+
+            // --- Generate for all sections ---
+            createStarfield(document.getElementById('stars-container-nav'));
+            createStarfield(document.getElementById('stars-container-handbook'));
+            createStarfield(document.getElementById('stars-container-footer'));
+            createGrid(document.getElementById('grid-lines-nav'));
+            createGrid(document.getElementById('grid-lines-handbook'));
+            createGrid(document.getElementById('grid-lines-footer'));
+            
+            // Initialize canvas grid
+            initGridCanvas();
+        });
+    </script>
+
+    <!-- Working Dropdown Menu Script -->
+    <script>
+        // Wait for DOM to be ready
+        function initDropdowns() {
+            console.log('Initializing dropdowns...');
+            
+            // Find all dropdown containers
+            const dropdownContainers = document.querySelectorAll('[data-dropdown]');
+            console.log('Found dropdown containers:', dropdownContainers.length);
+            
+            dropdownContainers.forEach((container, index) => {
+                const button = container.querySelector('[data-dropdown-button]');
+                const menu = container.querySelector('[data-dropdown-menu]');
+                
+                if (!button || !menu) {
+                    console.log(`Dropdown ${index} missing button or menu:`, { button, menu });
+                    return;
+                }
+                
+                console.log(`Setting up dropdown ${index}:`, { button, menu });
+                
+                // Toggle dropdown on button click
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log(`Button clicked for dropdown ${index}`);
+                    
+                    // Close all other dropdowns first
+                    dropdownContainers.forEach((otherContainer, otherIndex) => {
+                        if (otherIndex !== index) {
+                            const otherMenu = otherContainer.querySelector('[data-dropdown-menu]');
+                            const otherButton = otherContainer.querySelector('[data-dropdown-button]');
+                            if (otherMenu && otherButton) {
+                                otherMenu.style.display = 'none';
+                                otherMenu.style.opacity = '0';
+                                otherMenu.style.pointerEvents = 'none';
+                                otherButton.setAttribute('aria-expanded', 'false');
+                            }
+                        }
+                    });
+                    
+                    // Toggle current dropdown
+                    const isOpen = menu.style.display === 'block';
+                    if (isOpen) {
+                        menu.style.display = 'none';
+                        menu.style.opacity = '0';
+                        menu.style.pointerEvents = 'none';
+                        button.setAttribute('aria-expanded', 'false');
+                    } else {
+                        menu.style.display = 'block';
+                        menu.style.opacity = '1';
+                        menu.style.pointerEvents = 'auto';
+                        button.setAttribute('aria-expanded', 'true');
+                    }
+                });
+                
+                // Handle mouse enter/leave for desktop hover behavior
+                container.addEventListener('mouseenter', function() {
+                    if (window.innerWidth >= 768) { // Only on desktop
+                        menu.style.display = 'block';
+                        menu.style.opacity = '1';
+                        menu.style.pointerEvents = 'auto';
+                        button.setAttribute('aria-expanded', 'true');
+                    }
+                });
+                
+                container.addEventListener('mouseleave', function() {
+                    if (window.innerWidth >= 768) { // Only on desktop
+                        setTimeout(() => {
+                            if (!container.matches(':hover')) {
+                                menu.style.display = 'none';
+                                menu.style.opacity = '0';
+                                menu.style.pointerEvents = 'none';
+                                button.setAttribute('aria-expanded', 'false');
+                            }
+                        }, 100);
+                    }
+                });
+            });
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('[data-dropdown]')) {
+                    dropdownContainers.forEach(container => {
+                        const menu = container.querySelector('[data-dropdown-menu]');
+                        const button = container.querySelector('[data-dropdown-button]');
+                        if (menu && button) {
+                            menu.style.display = 'none';
+                            menu.style.opacity = '0';
+                            menu.style.pointerEvents = 'none';
+                            button.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                }
+            });
+            
+            // Close on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    dropdownContainers.forEach(container => {
+                        const menu = container.querySelector('[data-dropdown-menu]');
+                        const button = container.querySelector('[data-dropdown-button]');
+                        if (menu && button) {
+                            menu.style.display = 'none';
+                            menu.style.opacity = '0';
+                            menu.style.pointerEvents = 'none';
+                            button.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDropdowns);
+        } else {
+            initDropdowns();
+        }
+        
+        // Also try to initialize after a short delay to ensure everything is loaded
+        setTimeout(initDropdowns, 100);
+    </script>
+    <style>
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes parallaxMove {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+        
+        @keyframes shootingStar {
+            0% {
+                opacity: 0;
+                transform: translateX(0) translateY(0);
+            }
+            2% {
+                opacity: 1;
+            }
+            7% {
+                opacity: 1;
+                transform: translateX(300px) translateY(-100px);
+            }
+            9% {
+                opacity: 0;
+                transform: translateX(400px) translateY(-150px);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(400px) translateY(-150px);
+            }
+        }
+        
+        @keyframes nebulaFloat {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            50% {
+                transform: translate(20px, -30px) rotate(180deg);
+            }
+            100% {
+                transform: translate(-10px, 10px) rotate(360deg);
+            }
+        }
+        
+        @keyframes gridPulse {
+            0% { stroke-opacity: 0.1; }
+            100% { stroke-opacity: 0.4; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .animate-spin-slow {
+            animation: spin 20s linear infinite;
+        }
+        
+        .animate-gradient-x {
+            background-size: 200% 200%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .star-layer {
+            will-change: transform;
+        }
+        
+        /* Data Particles */
+        .data-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: particle-float 8s ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+        
+        .data-particle:nth-child(1) { top: 20%; left: 10%; }
+        .data-particle:nth-child(2) { top: 40%; left: 80%; }
+        .data-particle:nth-child(3) { top: 70%; left: 30%; }
+        .data-particle:nth-child(4) { top: 30%; left: 70%; }
+        .data-particle:nth-child(5) { top: 80%; left: 60%; }
+        .data-particle:nth-child(6) { top: 60%; left: 20%; }
+        
+        @keyframes particle-float {
+            0%, 100% {
+                transform: translate(0, 0);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translate(20px, -30px);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-15px, -60px);
+                opacity: 0.7;
+            }
+            75% {
+                transform: translate(30px, -30px);
+                opacity: 1;
+            }
+        }
+    </style>
+</body>
+</html>

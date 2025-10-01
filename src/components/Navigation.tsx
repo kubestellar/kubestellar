@@ -305,7 +305,7 @@ export default function Navigation() {
                     Join In
                   </a>
                   <a
-                    href="#contribute-handbook"
+                    href="/community-handbook"
                     className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
                   >
                     <svg
