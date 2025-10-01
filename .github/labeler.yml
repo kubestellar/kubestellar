@@ -82,22 +82,3 @@ yaml:
 json:
   - "**/*.json"
 
-# Minor changes (typically small fixes, typos, etc.)
-minor:
-  - "*.md"
-  - docs/**/*.md
-  - "**/*typo*"
-  - "**/*fix*"
-
-# Major changes (new features, breaking changes)
-major:
-  - src/components/**/*
-  - src/app/**/*
-  - package.json
-  - next.config.js
-
-# Patch changes (bug fixes, small improvements)
-patch:
-  - "**/*fix*"
-  - "**/*patch*"
-  - "**/*bug*"
