@@ -25,7 +25,7 @@ If you are contributing via the GitHub web interface, navigate to the **Settings
 
 ![signoff-via-github-ui](./images/signoff-via-github-ui.png)
 
-If you are contributing via the command line terminal, run the `git commit --signoff --message [commit message]` or `git commit -s -m [commit message]` command when making each commit.
+If you are contributing via the command line terminal, run the `git commit --signoff --message [commit message]` or `git commit -s -m [commit message]` command when making each commit. For more detailed information about signing and signing off on commits, including steps to create signing keys and use both the `-s` and `-S` options, see [Sign-off and Signing Contributions](pr-signoff.md).
 
 
 
