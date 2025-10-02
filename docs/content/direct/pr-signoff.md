@@ -117,7 +117,7 @@ For Windows users, **Git Bash** is also highly recommended.
     ```
    
 2. Press `Enter` to select the default option if prompted to set a save-file or passphrase for the key (you may choose to enter a passphrase if desired; this will prompt you to enter the passphrase every time you perform a DCO sign-off).
-   - The following output should generate a `randomart` image 
+    - The following output should generate a `randomart` image 
 3. Use the following command to copy the new SSH key to your clipboard:
 
     ```shell
@@ -156,8 +156,8 @@ Whether it's editing files from Kubestellar.io or directly from the Kubestellar 
 
 1. If the PR addresses a specific issue that has already been opened in GitHub, make sure to include the open issue number in **Related Issue(s)** (i.e. `Fixes #NNNN`); this will cause GitHub to automatically close the Issue once the PR is merged. If you have finished addressing an open issue without getting it automatically closed then explicitly close it.
 
-   - If you want the issue to remain open after this PR is merged (for example, large issues that are addressed across multiple PRs), avoid the auto-closing keywords `fix`, `fixes`, `fixed`, `close`, `closes`, `closed`, `resolve`, `resolves`, `resolved`. Instead, reference the issue without auto-closing by using: `Related to #NNNN`.
-   - Use an auto-closing keyword only in the final PR that fully resolves the issue.
+    - If you want the issue to remain open after this PR is merged (for example, large issues that are addressed across multiple PRs), avoid the auto-closing keywords `fix`, `fixes`, `fixed`, `close`, `closes`, `closed`, `resolve`, `resolves`, `resolved`. Instead, reference the issue without auto-closing by using: `Related to #NNNN`.
+    - Use an auto-closing keyword only in the final PR that fully resolves the issue.
 
 ## Repairing commits
 
@@ -174,7 +174,7 @@ more than one commit then you can extrapolate using `git cherry-pick
 The following instructions provide a basic walk-through if you have already created your own fork of the repository but yet not made a clone on your workstation.
 
 1. Navigate to the **Code** page of the Kubestellar github.
-   
+
 2. Click the **Fork** dropdown in the top right corner of the page.
     - Under "Existing Forks" click your fork (should look something like "your_username/kubestellar")
 3. Once in your fork, click the **Code** dropdown.
