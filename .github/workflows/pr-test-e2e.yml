@@ -66,8 +66,7 @@ jobs:
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz 
-
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
           tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
           rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
@@ -182,6 +181,27 @@ jobs:
           sleep 10
           curl http://localhost:8080/metrics
           kill %
+
+      - name: Dump redacted Secret YAMLs
+        if: always()
+        run: |
+          SECRETS_LIST=$(kubectl --context kind-kubeflex get secrets -A -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{"\n"}{end}')
+          if [ -z "$SECRETS_LIST" ]; then
+            echo "No secrets found."
+            exit 0
+          fi
+          echo "$SECRETS_LIST" | while read -r ns name; do
+            echo "---"
+            SECRET_JSON=$(kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o json)
+            # Print the Secret's metadata, deleting both data fields as suggested.
+            echo "$SECRET_JSON" | jq 'del(.data) | del(.stringData)' | yq -P
+            # Combine both .data and .stringData fields, then check if the result is a non-empty object.
+            COMBINED_DATA=$(echo "$SECRET_JSON" | jq '.data + .stringData | select(. != null and . != {})')
+            if [ -n "$COMBINED_DATA" ]; then
+              # Use the more succinct `map_values` function to redact all keys, then format as YAML.
+              echo "$COMBINED_DATA" | jq '{"data": map_values("<redacted>")}' | yq -P
+            fi
+          done
 
   test-bash:
     name: Test in bash
@@ -317,3 +337,24 @@ jobs:
           sleep 10
           curl http://localhost:8080/metrics
           kill %
+          
+      - name: Dump redacted Secret YAMLs
+        if: always()
+        run: |
+          SECRETS_LIST=$(kubectl --context kind-kubeflex get secrets -A -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{"\n"}{end}')
+          if [ -z "$SECRETS_LIST" ]; then
+            echo "No secrets found."
+            exit 0
+          fi
+          echo "$SECRETS_LIST" | while read -r ns name; do
+            echo "---"
+            SECRET_JSON=$(kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o json)
+            # Print the Secret's metadata, deleting both data fields as suggested.
+            echo "$SECRET_JSON" | jq 'del(.data) | del(.stringData)' | yq -P
+            # Combine both .data and .stringData fields, then check if the result is a non-empty object.
+            COMBINED_DATA=$(echo "$SECRET_JSON" | jq '.data + .stringData | select(. != null and . != {})')
+            if [ -n "$COMBINED_DATA" ]; then
+              # Use the more succinct `map_values` function to redact all keys, then format as YAML.
+              echo "$COMBINED_DATA" | jq '{"data": map_values("<redacted>")}' | yq -P
+            fi
+          done
