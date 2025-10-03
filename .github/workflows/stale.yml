@@ -2,7 +2,7 @@ name: Mark and close stale issues
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch: {}
 
 jobs:
@@ -26,14 +26,13 @@ jobs:
             Closing this issue due to prolonged inactivity after being marked as stale. If this remains
             an active concern, feel free to reopen or create a new issue with updated details.
           close-issue-label: lifecycle/auto-closed
-
           # PRs: disable stale for PRs (start conservatively)
           days-before-pr-stale: -1
           days-before-pr-close: -1
 
           # Exemptions and behavior
           exempt-issue-labels: >-
-            security,bug,enhancement,good first issue,help wanted,
+            security,bug,enhancement,good first issue,help wanted,hacktober-fest,
             lifecycle/frozen
           exempt-pr-labels: >-
             security,lifecycle/frozen
