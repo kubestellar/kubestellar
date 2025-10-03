@@ -32,7 +32,7 @@ jobs:
 
           # Exemptions and behavior
           exempt-issue-labels: >-
-            security,bug,enhancement,good first issue,help wanted,hacktober-fest,
+            security,bug,enhancement,good first issue,help wanted,hacktoberfest,
             lifecycle/frozen
           exempt-pr-labels: >-
             security,lifecycle/frozen
