@@ -62,7 +62,22 @@ To take advantage of this action, you must (a) limit the character set used in t
 
 The name of your branch equals the "version" of the website where the rendering appears.
 
-#### Automatically render the website
+#### Automatically render the website and generate PR previews
+
+**🎉 New Automated Process (Recommended)**: When you create a Pull Request from a fork
+that modifies documentation files, KubeStellar will automatically:
+
+1. **Generate a preview link** and add it to your PR description
+2. **Trigger the docs build** on your fork (if your branch starts with `doc-`)
+3. **Provide setup guidance** if your branch doesn't follow the naming convention
+
+**For automatic preview generation:**
+
+- Name your branch starting with `doc-` (e.g., `doc-myversion`, `doc-fix-typos`)
+- Ensure your fork has the `gh-pages` branch and GitHub Pages enabled
+- The preview will be available at: `https://your-username.github.io/kubestellar/your-branch-name`
+
+**How it works:**
 
 The website rendering workflow will trigger automatically whenever you
 commit changes to a branch whose name begins with `doc-`
@@ -76,10 +91,31 @@ the GitHub Pages of your fork. For example: if you name your branch
 `doc-holliday` then the GitHub pages for your fork will get a website
 version named `doc-holliday`.
 
-When preparing a PR that modifies the website, it is **strongly
-recommended** that you take advantage of this to get a preview
-automatically created, and include a URL for the preview in a comment
-in your PR.
+When you create a documentation PR, the preview link will be **automatically
+added to your PR description**, eliminating the need to manually include it.
+
+#### Quick Start: Automated Documentation PR Process
+
+**For contributors using forks (recommended workflow):**
+
+1. **Fork the repository** (including the `gh-pages` branch - see below for setup)
+2. **Create a documentation branch** starting with `doc-`:
+   ```bash
+   git checkout -b doc-my-awesome-changes
+   ```
+3. **Make your documentation changes** and commit them
+4. **Push the branch** to your fork:
+   ```bash
+   git push origin doc-my-awesome-changes
+   ```
+5. **Create a Pull Request** - the automation will:
+   - ✅ Automatically add a preview link to your PR description
+   - 🔄 Trigger the docs build on your fork
+   - 📝 Provide setup instructions if needed
+
+**That's it!** No manual preview link creation required.
+
+**Preview URL format:** `https://your-username.github.io/kubestellar/doc-your-branch-name`
 
 #### Creating a fork that can use the Generate and Push Docs Action
 

@@ -1,5 +1,5 @@
-# This workflow checks that PRs modifying website docs include a preview link in the PR description.
-# It enforces KubeStellar's documentation PR best practices.
+# This workflow validates that PRs modifying website docs include proper preview setup.
+# It works in conjunction with the auto-docs-preview workflow to ensure documentation PRs have previews.
 
 name: Check Docs PR Preview Link
 
@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
-      - name: Check for Preview Link in PR Description (bash)
+      - name: Check for Preview Link in PR Description
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -37,30 +37,52 @@ jobs:
           DOC_BRANCH_REGEX='^doc-'
           OWNER=$(gh pr view "$PR_NUMBER" --json headRepositoryOwner -q '.headRepositoryOwner.login')
           REPO_NAME=$(gh pr view "$PR_NUMBER" --json headRepository -q '.headRepository.name')
+          HEAD_REPO_FULL_NAME=$(gh pr view "$PR_NUMBER" --json headRepository -q '.headRepository.full_name')
+          BASE_REPO_FULL_NAME=$(gh pr view "$PR_NUMBER" --json baseRepository -q '.baseRepository.full_name')
           GITHUB_PAGES_URL="https://${OWNER}.github.io/${REPO_NAME}/${BRANCH}"
           GREEN=$'\033[0;32m'
           RED=$'\033[0;31m'
           YELLOW=$'\033[1;33m'
+          BLUE=$'\033[0;34m'
           NC=$'\033[0m' # No Color
 
-          if ! PREVIEW_LINE=$(echo "$BODY" | grep -iE '^\s*Preview.*https?://') ; then
-            echo "${RED}[ERROR] Docs PR: No preview link found. Please include a line starting with 'Preview' and a valid GitHub Pages URL for your changes.${NC}"
-            echo "👉 For instructions on how to create a preview, see:"
-            echo "   https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/#rendering-and-previewing-modifications-to-the-website"
-            echo
-            exit 1
-          else
-            if [[ "$PREVIEW_LINE" == *"$GITHUB_PAGES_URL"* ]]; then
+          # Check if this is from a fork
+          IS_FROM_FORK=false
+          if [[ "$HEAD_REPO_FULL_NAME" != "$BASE_REPO_FULL_NAME" ]]; then
+            IS_FROM_FORK=true
+          fi
+
+          # Look for preview section (auto-generated or manual)
+          if echo "$BODY" | grep -q "📖 Documentation Preview" || echo "$BODY" | grep -iE "(preview|Preview).*https?://"; then
+            echo "${GREEN}[OK] Docs PR: Preview section found in PR description.${NC}"
+            
+            # Additional validation for fork-based PRs
+            if [[ "$IS_FROM_FORK" == "true" ]]; then
               if [[ "$BRANCH" =~ $DOC_BRANCH_REGEX ]]; then
-                echo "${GREEN}[OK] Docs PR: doc- branch and preview link format matches expected GitHub Pages URL.${NC}"
+                echo "${GREEN}[OK] Fork PR with doc- branch naming convention detected.${NC}"
+                echo "${BLUE}[INFO] Auto-preview should be available at: ${GITHUB_PAGES_URL}${NC}"
               else
-                echo "${YELLOW}[WARN] Docs PR: Preview link format is good, but branch does not start with doc-. Consider renaming to enable automatic previews.${NC}"
+                echo "${YELLOW}[WARN] Fork PR: Branch does not start with 'doc-'. Auto-preview may not work.${NC}"
+                echo "${BLUE}[INFO] Consider renaming branch to 'doc-${BRANCH}' for automatic preview generation.${NC}"
               fi
             else
-              echo "${YELLOW}[WARN] Docs PR: Preview link found, but it does not match the expected GitHub Pages URL."
-              PREVIEW_URL=$(echo "$PREVIEW_LINE" | grep -oE 'https?://[^ ]*' || true)
-              echo "Expected: ${GITHUB_PAGES_URL}"
-              echo "Found:    ${PREVIEW_URL}${NC}"
+              echo "${BLUE}[INFO] PR from main repository - manual preview setup required.${NC}"
+            fi
+          else
+            if [[ "$IS_FROM_FORK" == "true" ]]; then
+              echo "${YELLOW}[WARN] Fork PR: No preview section found, but auto-preview workflow should handle this.${NC}"
+              echo "${BLUE}[INFO] Expected auto-preview URL: ${GITHUB_PAGES_URL}${NC}"
+              if [[ "$BRANCH" =~ $DOC_BRANCH_REGEX ]]; then
+                echo "${GREEN}[OK] Branch follows doc- naming convention for auto-preview.${NC}"
+              else
+                echo "${YELLOW}[WARN] Branch should start with 'doc-' for automatic preview generation.${NC}"
+              fi
+            else
+              echo "${RED}[ERROR] Main repo PR: No preview link found. Please include a preview of your changes.${NC}"
+              echo "👉 For instructions on how to create a preview, see:"
+              echo "   https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/#rendering-and-previewing-modifications-to-the-website"
+              echo
+              exit 1
             fi
           fi
           echo
