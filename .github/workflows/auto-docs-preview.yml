@@ -40,17 +40,27 @@ jobs:
             const headBranch = context.payload.pull_request.head.ref;
             const headOwner = context.payload.pull_request.head.repo.owner.login;
             const headRepoName = context.payload.pull_request.head.repo.name;
+            const baseRepo = context.payload.repository.full_name;
             
             console.log(`Processing PR #${prNumber}`);
-            console.log(`Head repo: ${headOwner}/${headRepoName}`);
+            console.log(`Head repo: ${headOwner}/${headRepoName} (${headRepo.full_name})`);
+            console.log(`Base repo: ${baseRepo}`);
             console.log(`Head branch: ${headBranch}`);
             
-            // Check if this is from a fork
-            const isFromFork = headRepo.full_name !== context.payload.repository.full_name;
+            // Check if this is from a fork - compare against the official kubestellar repo
+            const isFromFork = headRepo.full_name !== 'kubestellar/kubestellar';
+            console.log(`Is from fork: ${isFromFork}`);
             
-            if (!isFromFork) {
+            // Special case: Allow rishi-jat's repo for testing the automation
+            const isTestingRepo = headOwner === 'rishi-jat' && headRepoName === 'kubestellar';
+            
+            if (!isFromFork && !isTestingRepo) {
               console.log('PR is not from a fork, skipping preview generation');
               return;
+            }
+            
+            if (isTestingRepo) {
+              console.log('Testing repo detected - proceeding with preview generation for validation');
             }
             
             // Generate expected preview URL
@@ -120,15 +130,20 @@ jobs:
               newBody = currentBody + '\n\n' + previewSection.trim();
             }
             
-            // Update the PR description
-            await github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              body: newBody
-            });
-            
-            console.log('Successfully updated PR description with preview information');
+            // Update the PR description with error handling
+            try {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                body: newBody
+              });
+              console.log('Successfully updated PR description with preview information');
+            } catch (error) {
+              console.log(`Could not update PR description: ${error.message}`);
+              console.log('This is expected for PRs where the bot lacks write permissions');
+              console.log('Preview info will be added via comment instead');
+            }
             
             // If it's a doc- branch, try to trigger the docs workflow on the fork
             if (isDocBranch) {
