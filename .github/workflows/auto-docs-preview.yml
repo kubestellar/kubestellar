@@ -22,10 +22,12 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  issues: write
 
 jobs:
   generate-docs-preview:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Check out code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
@@ -184,6 +186,7 @@ jobs:
             }
 
       - name: Add Preview Generation Comment
+        continue-on-error: true
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -246,11 +249,15 @@ jobs:
             *This comment was automatically generated for documentation PRs.*`;
             }
             
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-              body: commentBody
-            });
-            
-            console.log('Added preview generation comment to PR');
+            try {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody
+              });
+              console.log('Added preview generation comment to PR');
+            } catch (error) {
+              console.log(`Could not add comment: ${error.message}`);
+              console.log('This is expected when the bot lacks comment permissions');
+            }

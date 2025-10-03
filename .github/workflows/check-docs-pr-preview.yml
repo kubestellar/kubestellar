@@ -38,7 +38,7 @@ jobs:
           OWNER=$(gh pr view "$PR_NUMBER" --json headRepositoryOwner -q '.headRepositoryOwner.login')
           REPO_NAME=$(gh pr view "$PR_NUMBER" --json headRepository -q '.headRepository.name')
           HEAD_REPO_FULL_NAME=$(gh pr view "$PR_NUMBER" --json headRepository -q '.headRepository.full_name')
-          BASE_REPO_FULL_NAME=$(gh pr view "$PR_NUMBER" --json baseRepository -q '.baseRepository.full_name')
+          BASE_REPO_FULL_NAME="${{ github.repository }}"
           GITHUB_PAGES_URL="https://${OWNER}.github.io/${REPO_NAME}/${BRANCH}"
           GREEN=$'\033[0;32m'
           RED=$'\033[0;31m'
