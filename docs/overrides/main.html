@@ -41,6 +41,51 @@
   />-->
 {% endblock %}
 
+{% block scripts %}
+  {{ super() }}
+  <!-- KubeStellar Search Keyboard Shortcut -->
+  <script src="{{ 'javascripts/search-shortcut.js' | url }}"></script>
+  
+  <!-- Search shortcut hint styles -->
+  <style>
+    .md-search__hint {
+      position: absolute;
+      top: 50%;
+      right: 2.5rem;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      color: var(--md-default-fg-color--lighter);
+      background: var(--md-default-bg-color);
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      border: 1px solid var(--md-default-fg-color--lightest);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      z-index: 10;
+    }
+    
+    .md-search__hint kbd {
+      font-family: var(--md-code-font);
+      font-size: 0.7rem;
+      padding: 0.125rem 0.25rem;
+      background: var(--md-default-fg-color--lightest);
+      border-radius: 0.125rem;
+      border: 1px solid var(--md-default-fg-color--light);
+    }
+    
+    .md-search__hint--visible {
+      opacity: 1;
+    }
+    
+    @media (max-width: 59.9375em) {
+      .md-search__hint {
+        display: none;
+      }
+    }
+  </style>
+{% endblock %}
+
 {% block outdated %}
   You are not viewing the latest regular release.
   <a href="{{ '../' ~ base_url }}">
