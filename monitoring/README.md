@@ -4,7 +4,7 @@
 
 
 ### Requirement
-To follow the instructions here you need to use KubeStellar `main` branch or any future KubeStellar release higher than `0.24.0`. Also, you need to have release `v0.2.0-rc15` or higher for the status-addon controller and agent installed in your environment. If you're using an older release, please follow these instructions to update your environment: 
+To follow the instructions here you need to use KubeStellar `main` branch or any future KubeStellar release higher than `0.24.0`. Also, you need to have release `v0.2.0-rc16` or higher for the status-addon controller and agent installed in your environment. If you're using an older release, please follow these instructions to update your environment: 
 
 1.  Remove the status-addon-controller and status-addon-agent from your current environment:
 
