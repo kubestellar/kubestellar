@@ -124,7 +124,7 @@ nav:
 
 theme:
   font:
-    text: 'SpaceMono'
+    text: 'spacemono'
     code: 'Roboto Mono'
   name: material
 
