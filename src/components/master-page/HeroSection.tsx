@@ -281,21 +281,11 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[70vh]">
           {/* Left Column: Interactive Content */}
           <div className="hero-content space-y-6">
-            {/* Animated Status Badge */}
-            <div className="status-badge-container">
-              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-emerald-500/20 via-green-500/20 to-emerald-500/20 border border-emerald-400/40 rounded-full backdrop-blur-md shadow-lg">
-                <div className="status-dot"></div>
-                <span className="text-emerald-300 text-xs uppercase tracking-wider font-semibold">
-                  Ready to Deploy
-                </span>
-              </div>
-            </div>
-
             {/* Dynamic Main Heading */}
             <div className="heading-container space-y-4">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none">
                 {/* First Line */}
-                <span className="block text-white mb-3 animate-text-reveal">
+                <span className="block text-white mb-3 animate-text-reveal pt-5">
                   <span className="text-gradient">Multi-Cluster</span>
                 </span>
 
