@@ -131,8 +131,52 @@ Note: the **main** branch will render as `https://${repo_owner}.github.io/${fork
 
 #### Removing outdated (draft branch) versions after rendering
 
-You can use `mike` to remove versions, or replace gh-pages with a copy of the shared version. 
-More details on these techniques will be added here soon.
+When you've finished working with draft branches (like `doc-*` branches used for previewing documentation changes), you should clean up the rendered versions to avoid cluttering your fork's GitHub Pages site.
+
+**Method 1: Using mike to remove specific versions**
+
+The `mike` tool provides a clean way to remove individual versions:
+
+```shell
+# Remove a specific version (replace 'doc-mybranch' with your actual branch name)
+mike delete doc-mybranch
+
+# To remove and push changes immediately
+mike delete --push doc-mybranch
+```
+
+You can also work locally on your `gh-pages` branch and then push the changes:
+
+```shell
+git checkout gh-pages
+git pull
+mike delete doc-mybranch
+git commit -m "Remove outdated doc-mybranch version"
+git push origin gh-pages
+```
+
+**Method 2: Reset gh-pages to match the shared repository**
+
+If you have many outdated versions or want a complete reset, you can replace your fork's `gh-pages` branch with a copy from the shared repository:
+
+```shell
+# Assuming 'upstream' points to https://github.com/kubestellar/kubestellar
+git checkout upstream/gh-pages
+git push -f origin gh-pages
+```
+
+> **Warning:** This method will remove ALL your custom versions and replace them with only the official versions from the shared repository.
+
+**Best practices for version cleanup**
+
+- **Clean up regularly:** Remove draft versions after your PR is merged to keep your fork's site organized
+- **Use descriptive branch names:** Stick to alphanumerics, dashes, and dots for branch names to ensure compatibility with the rendering workflow
+- **Check before deleting:** Use `mike list` to see all available versions before removing any
+- **Coordinate with team:** If working on shared documentation, communicate with other contributors before removing versions that might be referenced elsewhere
+
+**Notes**
+
+The documentation system uses `mike` for version management, which maintains a `versions.json` file that tracks all available versions and aliases. The cleanup methods described above work by modifying this file and the associated directory structure in the `gh-pages` branch.
 
 -----
 
