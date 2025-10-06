@@ -4,220 +4,19 @@
 {{ super() }}
 
 <!-- =========================
-     DUAL BANNER SYSTEM
+     TOP BANNER
 ============================ -->
-<style>
-  .banner-container {
-    position: relative;
-    overflow: hidden;
-    height: 48px;
-    background: #3B82F6;
-  }
-  
-  .banner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 16px;
-    color: white;
-    text-align: center;
-    transition: all 0.6s ease-in-out;
-    z-index: 1;
-    background: #3B82F6; /* Default blue background */
-  }
-  
-  .banner.active {
-    transform: translateY(0);
-    opacity: 1;
-    z-index: 2;
-  }
-  
-  .banner.inactive {
-    transform: translateY(-100%);
-    opacity: 0;
-    z-index: 1;
-  }
-  
-  .banner-close {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 1.25rem;
-    z-index: 10;
-    padding: 4px 8px;
-  }
-  
-  .banner-close:hover {
-    background: rgba(255,255,255,0.2);
-    border-radius: 4px;
-  }
-  
-  .banner-content {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: calc(100% - 60px);
-    color: white;
-  }
-  
-  .banner-content span {
-    color: white;
-    font-weight: 500;
-  }
-  
-  .banner-link {
-    color: white;
-    text-decoration: underline;
-    margin-left: 4px;
-    font-weight: 500;
-  }
-  
-  .banner-link:hover {
-    opacity: 0.8;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .banner-container {
-      height: auto;
-      min-height: 48px;
-    }
-    
-    .banner {
-      height: auto;
-      min-height: 48px;
-      padding: 12px 16px;
-      flex-direction: column;
-      gap: 4px;
-    }
-    
-    .banner-content {
-      flex-direction: column;
-      text-align: center;
-      max-width: calc(100% - 40px);
-    }
-  }
-</style>
-
-<div class="banner-container">
-  <!-- CNCF Banner -->
-  <div id="banner-cncf" class="banner inactive" style="background: linear-gradient(135deg, #3B82F6, #1E40AF); color: white;">
-    <div class="banner-content">
-      <span>KubeStellar is now a Cloud Native Computing Foundation sandbox project! 🎉 Follow us</span>
-      <a href="https://www.linkedin.com/company/kubestellar/" target="_blank" rel="noopener noreferrer" class="banner-link">
-        @kubestellar on LinkedIn
-      </a>
-    </div>
-    <button class="banner-close" onclick="hideBanner('banner-cncf')" aria-label="Close banner">
-      &times;
-    </button>
+<div id="banner-hacktoberfest" class="banner active" style="background: linear-gradient(135deg, #FF6B35, #F7931E); color: white; text-align:center; padding:8px 16px; position:relative;">
+  <div class="banner-content">
+    <span>KubeStellar is participating in Hacktoberfest 2025! 🎃 Read our blog for more info</span>
+    <a href="https://medium.com/@sagarutekar2366/your-ultimate-guide-to-contributing-to-open-source-through-hacktoberfest-2025-881735dd7ba7" class="banner-link" target="_blank" rel="noopener noreferrer" style="color:white; text-decoration:underline; margin-left:4px;">
+      Read this blog
+    </a>
   </div>
-  
-  <!-- Hacktoberfest Banner -->
-  <div id="banner-hacktoberfest" class="banner active" style="background: linear-gradient(135deg, #FF6B35, #F7931E); color: white;">
-    <div class="banner-content">
-      <span>KubeStellar is participating in Hacktoberfest 2025! 🎃 Read our blog for more info</span>
-      <a href="https://medium.com/@sagarutekar2366/your-ultimate-guide-to-contributing-to-open-source-through-hacktoberfest-2025-881735dd7ba7" class="banner-link">
-        Read this blog
-      </a>
-    </div>
-    <button class="banner-close" onclick="hideBanner('banner-hacktoberfest')" aria-label="Close banner">
-      &times;
-    </button>
-  </div>
+  <button class="banner-close" onclick="document.getElementById('banner-hacktoberfest').style.display='none'" aria-label="Close banner" style="position:absolute; right:16px; top:50%; transform:translateY(-50%); background:none; border:none; color:white; cursor:pointer; font-size:1.25rem;">
+    &times;
+  </button>
 </div>
-
-<script>
-  let currentBannerIndex = 1; // Start with Hacktoberfest banner
-  const banners = ['banner-cncf', 'banner-hacktoberfest'];
-  let bannerRotationInterval;
-  
-  function showBanner(bannerId) {
-    // Hide all banners by adding inactive class
-    banners.forEach(id => {
-      const banner = document.getElementById(id);
-      if (banner) {
-        banner.classList.remove('active');
-        banner.classList.add('inactive');
-      }
-    });
-    
-    // Show the specified banner by adding active class
-    const banner = document.getElementById(bannerId);
-    if (banner) {
-      banner.classList.remove('inactive');
-      banner.classList.add('active');
-    }
-  }
-  
-  function hideBanner(bannerId) {
-    const banner = document.getElementById(bannerId);
-    if (banner) {
-      banner.classList.remove('active');
-      banner.classList.add('inactive');
-      
-      // Move to next banner
-      rotateBanners();
-    }
-  }
-  
-  function rotateBanners() {
-    // Switch to next banner
-    currentBannerIndex = (currentBannerIndex + 1) % banners.length;
-    showBanner(banners[currentBannerIndex]);
-  }
-  
-  function startBannerRotation() {
-    bannerRotationInterval = setInterval(rotateBanners, 6000); // 6 seconds
-  }
-  
-  function stopBannerRotation() {
-    if (bannerRotationInterval) {
-      clearInterval(bannerRotationInterval);
-      bannerRotationInterval = null;
-    }
-  }
-  
-  // Initialize banner system
-  function initBanners() {
-    // Show Hacktoberfest banner initially
-    showBanner('banner-hacktoberfest');
-    
-    // Start rotation after 4 seconds
-    setTimeout(startBannerRotation, 4000);
-    
-    // Pause rotation when user hovers over banner
-    banners.forEach(id => {
-      const banner = document.getElementById(id);
-      if (banner) {
-        banner.addEventListener('mouseenter', stopBannerRotation);
-        banner.addEventListener('mouseleave', startBannerRotation);
-      }
-    });
-  }
-  
-  // Start when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initBanners);
-  } else {
-    initBanners();
-  }
-  
-  // Clean up on page unload
-  window.addEventListener('beforeunload', stopBannerRotation);
-</script>
 
 <!-- =========================
      NAVBAR
@@ -819,7 +618,7 @@
           <li><a href="readme/">About Us</a></li>
           <li><a href="direct/user-guide-intro/">User Guide</a></li>
           <li><a href="direct/contribute/">Contributing</a></li>
-          <li><a href="https://kubestellar.io/blog" target="_blank" rel="noopener noreferrer">Blog</a></li>
+          <li><a href="https://kubestellar.io/blog">Blog</a></li>
         </ul>
       </div>
       <div class="footer-section">
