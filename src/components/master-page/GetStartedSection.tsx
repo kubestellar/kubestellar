@@ -209,7 +209,7 @@ export default function GetStartedSection() {
               </p>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <a
-                  href="#"
+                  href="https://kubestellar.io/slack"
                   className="flex items-center justify-center p-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
                 >
                   <svg
