@@ -7,17 +7,9 @@ on:
   pull_request:
     types: [opened, synchronize]
     paths:
-      - 'docs/content/**'
-      - 'docs/README.md'
-      - 'docs/mkdocs.yml'
-      - 'docs/overrides/**'
-      - 'docs/scripts/**'
-      - 'docs/requirements.txt'
-      - 'docs/main.py'
-      - 'SECURITY.md'
-      - 'CODE_OF_CONDUCT.md'
-      - 'GOVERNANCE.md'
-      - 'ONBOARDING.md'
+      - "docs/**"
+      - "*.md"
+      - ".github/workflows/auto-docs-preview.yml"
 
 permissions:
   contents: read
@@ -49,20 +41,13 @@ jobs:
             console.log(`Base repo: ${baseRepo}`);
             console.log(`Head branch: ${headBranch}`);
             
-            // Check if this is from a fork - compare against the official kubestellar repo
-            const isFromFork = headRepo.full_name !== 'kubestellar/kubestellar';
+            // Check if this is from a fork
+            const isFromFork = headRepo.full_name !== baseRepo;
             console.log(`Is from fork: ${isFromFork}`);
             
-            // Special case: Allow rishi-jat's repo for testing the automation
-            const isTestingRepo = headOwner === 'rishi-jat' && headRepoName === 'kubestellar';
-            
-            if (!isFromFork && !isTestingRepo) {
+            if (!isFromFork) {
               console.log('PR is not from a fork, skipping preview generation');
               return;
-            }
-            
-            if (isTestingRepo) {
-              console.log('Testing repo detected - proceeding with preview generation for validation');
             }
             
             // Generate expected preview URL
@@ -79,7 +64,7 @@ jobs:
             const currentBody = pr.body || '';
             
             // Check if preview link already exists in PR description
-            const previewRegex = /Preview:\s*(https?:\/\/[^\s\)]+)/i;
+            const previewRegex = /\*?\*?Preview:\s*(https?:\/\/[^\s\)]+)/i;
             const existingPreview = currentBody.match(previewRegex);
             
             if (existingPreview && existingPreview[1] === expectedPreviewUrl) {
@@ -112,7 +97,7 @@ jobs:
             ⚠️ **Action Required**: Your branch name (\`${headBranch}\`) doesn't start with \`doc-\`. 
             
             To enable automatic preview generation:
-            1. Rename your branch to start with \`doc-\` (e.g., \`doc-${headBranch}\`)
+            1. Create a new branch starting with \`doc-\` (e.g., \`doc-${headBranch}\`) and recreate your PR
             2. Or manually trigger the "Generate and Push Docs" workflow on your fork
             
             For instructions, see: [Document Management Guide](https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/#rendering-and-previewing-modifications-to-the-website)
@@ -146,44 +131,6 @@ jobs:
               console.log('This is expected for PRs where the bot lacks write permissions');
               console.log('Preview info will be added via comment instead');
             }
-            
-            // If it's a doc- branch, try to trigger the docs workflow on the fork
-            if (isDocBranch) {
-              try {
-                console.log('Attempting to trigger docs workflow on fork...');
-                
-                // First check if the fork has the workflow
-                const { data: workflows } = await github.rest.actions.listRepoWorkflows({
-                  owner: headOwner,
-                  repo: headRepoName
-                }).catch(e => {
-                  console.log('Cannot access fork workflows (likely private or no permission)');
-                  return { data: { workflows: [] } };
-                });
-                
-                const docsWorkflow = workflows.workflows.find(w => 
-                  w.name === 'Generate and push docs' || w.path.includes('docs-gen-and-push')
-                );
-                
-                if (docsWorkflow) {
-                  // Trigger the workflow
-                  await github.rest.actions.createWorkflowDispatch({
-                    owner: headOwner,
-                    repo: headRepoName,
-                    workflow_id: docsWorkflow.id,
-                    ref: headBranch
-                  }).catch(e => {
-                    console.log(`Could not trigger workflow: ${e.message}`);
-                  });
-                  
-                  console.log('Successfully triggered docs generation workflow on fork');
-                } else {
-                  console.log('Docs workflow not found on fork');
-                }
-              } catch (error) {
-                console.log(`Error triggering workflow: ${error.message}`);
-              }
-            }
 
       - name: Add Preview Generation Comment
         continue-on-error: true
@@ -197,8 +144,9 @@ jobs:
             const headRepoName = context.payload.pull_request.head.repo.name;
             const headRepo = context.payload.pull_request.head.repo;
             
-            // Only add comment for forks
-            const isFromFork = headRepo.full_name !== context.payload.repository.full_name;
+            // Only add comment for forks  
+            const baseRepo = context.payload.repository.full_name;
+            const isFromFork = headRepo.full_name !== baseRepo;
             if (!isFromFork) return;
             
             const isDocBranch = headBranch.startsWith('doc-');
@@ -213,7 +161,7 @@ jobs:
             
             const botComment = comments.find(comment => 
               comment.user.type === 'Bot' && 
-              comment.body.includes('📖 Documentation Preview Generated')
+              comment.body.includes('📖 Documentation Preview')
             );
             
             if (botComment) {
@@ -223,11 +171,11 @@ jobs:
             
             let commentBody;
             if (isDocBranch) {
-              commentBody = `## 📖 Documentation Preview Generated
+              commentBody = `## 📖 Documentation Preview
             
             ✅ Your branch name (\`${headBranch}\`) follows the \`doc-\` naming convention.
             
-            🔄 A preview is being generated at: **${expectedPreviewUrl}**
+            � Preview will be available at: **${expectedPreviewUrl}**
             
             ⏱️ The preview should be available within a few minutes after the docs build completes on your fork.
             

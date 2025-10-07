@@ -7,17 +7,9 @@ on:
   pull_request:
     types: [opened, edited, synchronize]
     paths:
-      - 'docs/content/**'
-      - 'docs/README.md'
-      - 'docs/mkdocs.yml'
-      - 'docs/overrides/**'
-      - 'docs/scripts/**'
-      - 'docs/requirements.txt'
-      - 'docs/main.py'
-      - 'SECURITY.md'
-      - 'CODE_OF_CONDUCT.md'
-      - 'GOVERNANCE.md'
-      - 'ONBOARDING.md'
+      - "docs/**"
+      - "*.md"
+      - ".github/workflows/check-docs-pr-preview.yml"
 
 jobs:
   check-preview-link:
@@ -51,21 +43,10 @@ jobs:
           if [[ "$HEAD_REPO_FULL_NAME" != "$BASE_REPO_FULL_NAME" ]]; then
             IS_FROM_FORK=true
           fi
-          
-          # Special case for testing the automation system itself
-          IS_AUTOMATION_TEST=false
-          if [[ "$OWNER" == "rishi-jat" && "$REPO_NAME" == "kubestellar" ]]; then
-            IS_AUTOMATION_TEST=true
-            echo "${BLUE}[INFO] Automation testing PR detected from rishi-jat/kubestellar${NC}"
-          fi
 
-          # Look for preview section (auto-generated or manual)
-          if echo "$BODY" | grep -q "📖 Documentation Preview" || echo "$BODY" | grep -iE "(preview|Preview).*https?://" || [[ "$IS_AUTOMATION_TEST" == "true" ]]; then
-            if [[ "$IS_AUTOMATION_TEST" == "true" ]]; then
-              echo "${GREEN}[OK] Automation testing PR - preview validation bypassed.${NC}"
-            else
-              echo "${GREEN}[OK] Docs PR: Preview section found in PR description.${NC}"
-            fi
+          # Look for actual preview links (auto-generated or manual)
+          if echo "$BODY" | grep -iE "\*\*Preview:\s*https?://|\bPreview:\s*https?://" > /dev/null; then
+            echo "${GREEN}[OK] Docs PR: Preview link found in PR description.${NC}"
             
             # Additional validation for fork-based PRs
             if [[ "$IS_FROM_FORK" == "true" ]]; then
@@ -74,19 +55,18 @@ jobs:
                 echo "${BLUE}[INFO] Auto-preview should be available at: ${GITHUB_PAGES_URL}${NC}"
               else
                 echo "${YELLOW}[WARN] Fork PR: Branch does not start with 'doc-'. Auto-preview may not work.${NC}"
-                echo "${BLUE}[INFO] Consider renaming branch to 'doc-${BRANCH}' for automatic preview generation.${NC}"
+                echo "${BLUE}[INFO] For automatic preview generation, create a new branch starting with 'doc-'.${NC}"
               fi
             else
               echo "${BLUE}[INFO] PR from main repository - manual preview setup required.${NC}"
             fi
           else
             if [[ "$IS_FROM_FORK" == "true" ]]; then
-              echo "${YELLOW}[WARN] Fork PR: No preview section found, but auto-preview workflow should handle this.${NC}"
-              echo "${BLUE}[INFO] Expected auto-preview URL: ${GITHUB_PAGES_URL}${NC}"
+              echo "${YELLOW}[WARN] Fork PR: No preview link found yet. Auto-preview workflow should add one.${NC}"
               if [[ "$BRANCH" =~ $DOC_BRANCH_REGEX ]]; then
                 echo "${GREEN}[OK] Branch follows doc- naming convention for auto-preview.${NC}"
               else
-                echo "${YELLOW}[WARN] Branch should start with 'doc-' for automatic preview generation.${NC}"
+                echo "${YELLOW}[WARN] For automatic preview generation, create a new branch starting with 'doc-'.${NC}"
               fi
             else
               echo "${RED}[ERROR] Main repo PR: No preview link found. Please include a preview of your changes.${NC}"
