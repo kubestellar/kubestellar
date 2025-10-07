@@ -1,0 +1,212 @@
+# GitHub Action workflow for automatically creating documentation preview links in PRs
+# This workflow addresses issue #3189 to automate the preview creation process
+
+name: Auto-generate Docs PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "docs/**"
+      - "*.md"
+      - ".github/workflows/auto-docs-preview.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  generate-docs-preview:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Check out code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+
+      - name: Generate Documentation Preview
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const headRepo = context.payload.pull_request.head.repo;
+            const headBranch = context.payload.pull_request.head.ref;
+            const headOwner = context.payload.pull_request.head.repo.owner.login;
+            const headRepoName = context.payload.pull_request.head.repo.name;
+            const baseRepo = context.payload.repository.full_name;
+            
+            console.log(`Processing PR #${prNumber}`);
+            console.log(`Head repo: ${headOwner}/${headRepoName} (${headRepo.full_name})`);
+            console.log(`Base repo: ${baseRepo}`);
+            console.log(`Head branch: ${headBranch}`);
+            
+            // Check if this is from a fork
+            const isFromFork = headRepo.full_name !== baseRepo;
+            console.log(`Is from fork: ${isFromFork}`);
+            
+            if (!isFromFork) {
+              console.log('PR is not from a fork, skipping preview generation');
+              return;
+            }
+            
+            // Generate expected preview URL
+            const expectedPreviewUrl = `https://${headOwner}.github.io/${headRepoName}/${headBranch}`;
+            console.log(`Expected preview URL: ${expectedPreviewUrl}`);
+            
+            // Get current PR body
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            
+            const currentBody = pr.body || '';
+            
+            // Check if preview link already exists in PR description
+            const previewRegex = /\*?\*?Preview:\s*(https?:\/\/[^\s\)]+)/i;
+            const existingPreview = currentBody.match(previewRegex);
+            
+            if (existingPreview && existingPreview[1] === expectedPreviewUrl) {
+              console.log('Preview link already exists and is correct');
+              return;
+            }
+            
+            // Check if the head branch follows the doc- naming convention
+            const isDocBranch = headBranch.startsWith('doc-');
+            
+            // Create preview comment/description
+            let previewSection;
+            if (isDocBranch) {
+              previewSection = `
+            ## 📖 Documentation Preview
+            
+            A preview of the documentation changes will be available at:
+            **Preview: ${expectedPreviewUrl}**
+            
+            *Note: The preview will be automatically generated after the docs build completes on your fork. This may take a few minutes.*
+            
+            ✅ Your branch name (\`${headBranch}\`) follows the \`doc-\` naming convention for automatic preview generation.
+            `;
+            } else {
+              previewSection = `
+            ## 📖 Documentation Preview
+            
+            Expected preview URL: **${expectedPreviewUrl}**
+            
+            ⚠️ **Action Required**: Your branch name (\`${headBranch}\`) doesn't start with \`doc-\`. 
+            
+            To enable automatic preview generation:
+            1. Create a new branch starting with \`doc-\` (e.g., \`doc-${headBranch}\`) and recreate your PR
+            2. Or manually trigger the "Generate and Push Docs" workflow on your fork
+            
+            For instructions, see: [Document Management Guide](https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/#rendering-and-previewing-modifications-to-the-website)
+            `;
+            }
+            
+            // Update PR body
+            let newBody;
+            if (existingPreview) {
+              // Replace existing preview section
+              newBody = currentBody.replace(
+                /## 📖 Documentation Preview[\s\S]*?(?=\n##|\n---|\n\*\*|$)/,
+                previewSection.trim()
+              );
+            } else {
+              // Add preview section to the end
+              newBody = currentBody + '\n\n' + previewSection.trim();
+            }
+            
+            // Update the PR description with error handling
+            try {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                body: newBody
+              });
+              console.log('Successfully updated PR description with preview information');
+            } catch (error) {
+              console.log(`Could not update PR description: ${error.message}`);
+              console.log('This is expected for PRs where the bot lacks write permissions');
+              console.log('Preview info will be added via comment instead');
+            }
+
+      - name: Add Preview Generation Comment
+        continue-on-error: true
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const headBranch = context.payload.pull_request.head.ref;
+            const headOwner = context.payload.pull_request.head.repo.owner.login;
+            const headRepoName = context.payload.pull_request.head.repo.name;
+            const headRepo = context.payload.pull_request.head.repo;
+            
+            // Only add comment for forks  
+            const baseRepo = context.payload.repository.full_name;
+            const isFromFork = headRepo.full_name !== baseRepo;
+            if (!isFromFork) return;
+            
+            const isDocBranch = headBranch.startsWith('doc-');
+            const expectedPreviewUrl = `https://${headOwner}.github.io/${headRepoName}/${headBranch}`;
+            
+            // Check if we already commented on this PR
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('📖 Documentation Preview')
+            );
+            
+            if (botComment) {
+              console.log('Already commented on this PR');
+              return;
+            }
+            
+            let commentBody;
+            if (isDocBranch) {
+              commentBody = `## 📖 Documentation Preview
+            
+            ✅ Your branch name (\`${headBranch}\`) follows the \`doc-\` naming convention.
+            
+            � Preview will be available at: **${expectedPreviewUrl}**
+            
+            ⏱️ The preview should be available within a few minutes after the docs build completes on your fork.
+            
+            ---
+            *This comment was automatically generated for documentation PRs.*`;
+            } else {
+              commentBody = `## 📖 Documentation Preview Setup Required
+            
+            ⚠️ Your branch name (\`${headBranch}\`) doesn't start with \`doc-\`.
+            
+            **To enable automatic preview generation:**
+            1. Rename your branch to start with \`doc-\` (e.g., \`doc-${headBranch}\`)
+            2. Or manually trigger the "Generate and Push Docs" workflow on your fork
+            3. Your preview will be available at: ${expectedPreviewUrl}
+            
+            📚 **Setup Guide:** [Document Management](https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/#rendering-and-previewing-modifications-to-the-website)
+            
+            ---
+            *This comment was automatically generated for documentation PRs.*`;
+            }
+            
+            try {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody
+              });
+              console.log('Added preview generation comment to PR');
+            } catch (error) {
+              console.log(`Could not add comment: ${error.message}`);
+              console.log('This is expected when the bot lacks comment permissions');
+            }
+                        
