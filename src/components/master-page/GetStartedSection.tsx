@@ -222,7 +222,7 @@ export default function GetStartedSection() {
                   Slack
                 </a>
                 <a
-                  href="#"
+                  href="https://github.com/kubestellar/kubestellar"
                   className="flex items-center justify-center p-2 rounded bg-gray-700 hover:bg-gray-800 text-white text-sm"
                 >
                   <svg
