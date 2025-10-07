@@ -209,3 +209,4 @@ jobs:
               console.log(`Could not add comment: ${error.message}`);
               console.log('This is expected when the bot lacks comment permissions');
             }
+              
