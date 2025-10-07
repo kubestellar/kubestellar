@@ -1,5 +1,6 @@
 site_name: KubeStellar
 repo_url: https://github.com/kubestellar/kubestellar
+repo_name: kubestellar/kubestellar
 site_url: https://docs.kubestellar.io/
 site_description: "KubeStellar is a Kubernetes-native multi-cluster delivery system: create once, deploy many. Safely route and synchronize resources across clouds, datacenters, and edge."
 
@@ -127,6 +128,8 @@ theme:
     text: 'SapceMono'
     code: 'Roboto Mono'
   name: material
+  icon:
+    repo: fontawesome/brands/github
 
   language: en
   # Common files such as images, stylesheets, theme overrides
