@@ -151,7 +151,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://www.linkedin.com/company/kubestellar/posts/?feedView=all"
+                href="https://www.linkedin.com/company/kubestellar/"
                 className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-300"
               >
                 <svg
