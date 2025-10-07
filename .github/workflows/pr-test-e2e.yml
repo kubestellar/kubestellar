@@ -66,8 +66,7 @@ jobs:
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz 
-
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
           tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
           rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
@@ -182,6 +181,31 @@ jobs:
           sleep 10
           curl http://localhost:8080/metrics
           kill %
+
+      - name: Dump redacted Secret YAMLs
+        if: always()
+        run: |
+          echo "--- Dumping redacted Secret YAMLs from context kind-kubeflex ---"
+          SECRETS_LIST=$(kubectl --context kind-kubeflex get secrets -A -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{"\n"}{end}')
+          if [ -z "$SECRETS_LIST" ]; then
+            echo "No secrets found."
+            exit 0
+          fi
+          echo "$SECRETS_LIST" | while read -r ns name; do
+            echo "---"
+            # Get the main structure of the Secret, but remove the data field and any fields that follow it.
+            # This is a safe way to show only metadata and spec without complex parsing.
+            kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o yaml | sed '/^\s*data:/,$d'
+
+            # Now, get just the keys from the data field and print them in a new data block
+            DATA_KEYS=$(kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o jsonpath='{.data}')
+            if [ -n "$DATA_KEYS" ] && [ "$DATA_KEYS" != "{}" ]; then
+              echo "  data:"
+              kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o jsonpath='{.data}' | jq -r 'keys | .[]' | while read -r key; do
+                echo "    $key: <redacted>"
+              done
+            fi
+          done
 
   test-bash:
     name: Test in bash
@@ -317,3 +341,28 @@ jobs:
           sleep 10
           curl http://localhost:8080/metrics
           kill %
+          
+      - name: Dump redacted Secret YAMLs
+        if: always()
+        run: |
+          echo "--- Dumping redacted Secret YAMLs from context kind-kubeflex ---"
+          SECRETS_LIST=$(kubectl --context kind-kubeflex get secrets -A -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{"\n"}{end}')
+          if [ -z "$SECRETS_LIST" ]; then
+            echo "No secrets found."
+            exit 0
+          fi
+          echo "$SECRETS_LIST" | while read -r ns name; do
+            echo "---"
+            # Get the main structure of the Secret, but remove the data field and any fields that follow it.
+            # This is a safe way to show only metadata and spec without complex parsing.
+            kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o yaml | sed '/^\s*data:/,$d'
+
+            # Now, get just the keys from the data field and print them in a new data block
+            DATA_KEYS=$(kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o jsonpath='{.data}')
+            if [ -n "$DATA_KEYS" ] && [ "$DATA_KEYS" != "{}" ]; then
+              echo "  data:"
+              kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o jsonpath='{.data}' | jq -r 'keys | .[]' | while read -r key; do
+                echo "    $key: <redacted>"
+              done
+            fi
+          done
