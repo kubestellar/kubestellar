@@ -64,8 +64,8 @@ export default function ProgramsPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-center justify-center z-10">
-        <div className="relative z-10 text-center px-4 pt-20">
+      <section className="relative min-h-[40vh] flex items-center justify-center z-10">
+        <div className="relative z-10 text-center px-4 pt-20 pb-2">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-shadow-lg">
             Join Our <span className="text-gradient">Mission</span>
           </h1>
@@ -77,7 +77,7 @@ export default function ProgramsPage() {
       </section>
 
       {/* Programs Section */}
-      <section id="programs" className="relative py-24 z-10">
+      <section id="programs" className="relative pt-8 pb-24 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-2">
             {programs.map(program => (
