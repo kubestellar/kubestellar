@@ -1,57 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import StarField from "../StarField";
+import { GridLines, StarField} from "../index";
 
 export default function AboutSection() {
   useEffect(() => {
-    const createGrid = (container: HTMLElement) => {
-      if (!container) return;
-      container.innerHTML = "";
-
-      const gridSvg = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "svg"
-      );
-      gridSvg.setAttribute("width", "100%");
-      gridSvg.setAttribute("height", "100%");
-      gridSvg.style.position = "absolute";
-      gridSvg.style.top = "0";
-      gridSvg.style.left = "0";
-
-      for (let i = 0; i < 15; i++) {
-        const line = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "line"
-        );
-        line.setAttribute("x1", "0");
-        line.setAttribute("y1", `${i * 7}%`);
-        line.setAttribute("x2", "100%");
-        line.setAttribute("y2", `${i * 7}%`);
-        line.setAttribute("stroke", "#6366F1");
-        line.setAttribute("stroke-width", "0.5");
-        line.setAttribute("stroke-opacity", "0.3");
-        gridSvg.appendChild(line);
-      }
-
-      for (let i = 0; i < 15; i++) {
-        const line = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "line"
-        );
-        line.setAttribute("x1", `${i * 7}%`);
-        line.setAttribute("y1", "0");
-        line.setAttribute("x2", `${i * 7}%`);
-        line.setAttribute("y2", "100%");
-        line.setAttribute("stroke", "#6366F1");
-        line.setAttribute("stroke-width", "0.5");
-        line.setAttribute("stroke-opacity", "0.3");
-        gridSvg.appendChild(line);
-      }
-
-      container.appendChild(gridSvg);
-    };
-
     // Feature cards animation
     const initFeatureCards = () => {
       const featureCards = document.querySelectorAll(".feature-card");
@@ -133,10 +86,6 @@ export default function AboutSection() {
       });
     };
 
-    const gridContainer = document.getElementById("grid-lines-about");
-
-    if (gridContainer) createGrid(gridContainer);
-
     initFeatureCards();
   }, []);
 
@@ -152,7 +101,10 @@ export default function AboutSection() {
       <StarField density="medium" showComets={true} cometCount={3} />
 
       {/* Grid lines background */}
-      <div id="grid-lines-about" className="absolute inset-0 opacity-20"></div>
+      <GridLines
+        horizontalLines={21}
+        verticalLines={15}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center">

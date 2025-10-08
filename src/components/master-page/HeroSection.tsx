@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import StarField from "../StarField";
+import { GridLines, StarField} from "../index";
 import StatCard from "../StatsCard";
 
 interface StatData {
@@ -88,53 +88,6 @@ const statsData: StatData[] = [
 
 export default function HeroSection() {
   useEffect(() => {
-    // Interactive grid canvas
-    const initGridCanvas = () => {
-      const canvas = document.getElementById(
-        "grid-canvas"
-      ) as HTMLCanvasElement;
-      if (!canvas) return;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-
-      const gridSize = 50;
-
-      const drawGrid = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = "rgba(99, 102, 241, 0.2)";
-        ctx.lineWidth = 0.5;
-
-        // Draw vertical lines
-        for (let x = 0; x < canvas.width; x += gridSize) {
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, canvas.height);
-          ctx.stroke();
-        }
-
-        // Draw horizontal lines
-        for (let y = 0; y < canvas.height; y += gridSize) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(canvas.width, y);
-          ctx.stroke();
-        }
-      };
-
-      drawGrid();
-
-      // Redraw on resize
-      window.addEventListener("resize", () => {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-        drawGrid();
-      });
-    };
-
     // Enhanced typing animation for terminal
     const initTypingAnimation = () => {
       const typingText = document.querySelector(".typing-text") as HTMLElement;
@@ -182,7 +135,6 @@ export default function HeroSection() {
     };
 
     // Initialize all components
-    initGridCanvas();
     initTypingAnimation();
     animateCounters();
 
@@ -241,10 +193,10 @@ export default function HeroSection() {
 
         {/* Interactive Grid Network */}
         <div className="absolute inset-0">
-          <canvas
-            id="grid-canvas"
-            className="w-full h-full opacity-20"
-          ></canvas>
+          <GridLines
+            verticalLines={15}
+            horizontalLines={18}
+          />
         </div>
 
         {/* Floating Data Particles */}
