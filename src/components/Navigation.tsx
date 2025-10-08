@@ -115,7 +115,8 @@ export default function Navigation() {
             <div className="flex items-center space-x-8">
               {/* Docs Link */}
               <div className="relative group">
-                <a
+                <Link
+                  target="_blank"
                   href="#docs"
                   className="text-sm font-medium text-gray-300 hover:text-blue-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20 nav-link-hover"
                 >
@@ -135,12 +136,13 @@ export default function Navigation() {
                     </svg>
                   </div>
                   <span>Docs</span>
-                </a>
+                </Link>
               </div>
 
               {/* Blog Link */}
               <div className="relative group">
-                <a
+                <Link
+                  target="_blank"
                   href="https://kubestellar.medium.com/list/predefined:e785a0675051:READING_LIST"
                   className="text-sm font-medium text-gray-300 hover:text-purple-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-purple-500/10 hover:shadow-lg hover:shadow-purple-500/20 transform nav-link-hover"
                 >
@@ -167,7 +169,7 @@ export default function Navigation() {
                     </svg>
                   </div>
                   <span>Blog</span>
-                </a>
+                </Link>
               </div>
 
               {/* Contribute Dropdown */}
