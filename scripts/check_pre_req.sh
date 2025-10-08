@@ -38,7 +38,7 @@ is_installed() {
     wantver="$6"
     addlver="$7"
     exclver="$8"
-    #Checks if helm version installed is compatiable
+    #Checks if helm version installed is compatiable or not
     local INSTALLED_VERSION
     INSTALLED_VERSION=$(helm version --template={{.Version}} 2>/dev/null)
     local MIN_HELM_VERSION="v3.10.0" 
