@@ -38,6 +38,16 @@ is_installed() {
     wantver="$6"
     addlver="$7"
     exclver="$8"
+    #Checks if helm version installed is compatiable
+    local INSTALLED_VERSION
+    INSTALLED_VERSION=$(helm version --template={{.Version}} 2>/dev/null)
+    local MIN_HELM_VERSION="v3.10.0" 
+    if [ "$(printf '%s\n' "$MIN_HELM_VERSION" "$INSTALLED_VERSION" | sort -V | head -n1)" != "$MIN_HELM_VERSION" ]; then
+        echo -e "\033[0;31mX\033[0m Helm version $INSTALLED_VERSION is less than required $MIN_HELM_VERSION"
+        [ "$assert" == "true" ] && exit 2
+    else
+        echo -e "\033[0;32m✔\033[0m Helm version $INSTALLED_VERSION meets minimum requirement $MIN_HELM_VERSION"
+    fi
     if which $2 > /dev/null ; then
         if [ $# -gt 2 ]; then
             gotver=$(eval "$4" 2> /dev/null)
