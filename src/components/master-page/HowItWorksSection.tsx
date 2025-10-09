@@ -69,7 +69,7 @@ export default function HowItWorksSection() {
                       </span>
                       :{"\n"}{" "}
                       <span className="text-emerald-400">
-                        "region=us-east,tier=prod"
+                        &quot;region=us-east,tier=prod&quot;
                       </span>
                     </code>
                   </pre>

@@ -8,6 +8,11 @@ import { GridLines, StarField} from "./index";
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [githubStats, setGithubStats] = useState({
+    stars: "0",
+    forks: "0",
+    watchers: "0",
+  })
 
   useEffect(() => {
     // Initialize dropdowns functionality
@@ -75,6 +80,81 @@ export default function Navigation() {
         }
       });
     };
+
+    const fetchGithubStats = async () => {
+      try{
+        const response = await fetch("https://api.github.com/repos/kubestellar/kubestellar");
+        if (!response.ok) {
+          throw new Error("Network reposone was not okay");
+        }
+        const data = await response.json();
+        const formatNumber = (num: number): string => {
+          if(num >= 1000) {
+            return (num/1000).toFixed(1) + "K";
+          }
+          return num.toString();
+        };
+        setGithubStats({
+          stars: formatNumber(data.stargazers_count),
+          forks: formatNumber(data.forks_count),
+          watchers: formatNumber(data.subscribers_count),
+        });
+      } catch (err) {
+        console.error("Failed to fetch Github stats: ", err);
+      }
+    };
+    fetchGithubStats();
+
+    const createGrid = (container: HTMLElement) => {
+      if (!container) return;
+      container.innerHTML = "";
+
+      const gridSvg = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "svg"
+      );
+      gridSvg.setAttribute("width", "100%");
+      gridSvg.setAttribute("height", "100%");
+      gridSvg.style.position = "absolute";
+      gridSvg.style.top = "0";
+      gridSvg.style.left = "0";
+
+      for (let i = 0; i < 10; i++) {
+        const line = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "line"
+        );
+        line.setAttribute("x1", "0");
+        line.setAttribute("y1", `${i * 10}%`);
+        line.setAttribute("x2", "100%");
+        line.setAttribute("y2", `${i * 10}%`);
+        line.setAttribute("stroke", "#6366F1");
+        line.setAttribute("stroke-width", "0.5");
+        line.setAttribute("stroke-opacity", "0.3");
+        gridSvg.appendChild(line);
+      }
+
+      for (let i = 0; i < 10; i++) {
+        const line = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "line"
+        );
+        line.setAttribute("x1", `${i * 10}%`);
+        line.setAttribute("y1", "0");
+        line.setAttribute("x2", `${i * 10}%`);
+        line.setAttribute("y2", "100%");
+        line.setAttribute("stroke", "#6366F1");
+        line.setAttribute("stroke-width", "0.5");
+        line.setAttribute("stroke-opacity", "0.3");
+        gridSvg.appendChild(line);
+      }
+
+      container.appendChild(gridSvg);
+    };
+
+    const gridContainer = document.getElementById("grid-lines-nav");
+
+    if (gridContainer) createGrid(gridContainer);
 
     initDropdowns();
   }, []);
@@ -580,7 +660,7 @@ export default function Navigation() {
                   </svg>
                   Star
                   <span className="ml-auto bg-gray-700 text-gray-300 text-xs rounded px-2 py-0.5">
-                    12.3k
+                    {githubStats.stars}
                   </span>
                 </a>
                 <a
@@ -596,7 +676,7 @@ export default function Navigation() {
                   </svg>
                   Fork
                   <span className="ml-auto bg-gray-700 text-gray-300 text-xs rounded px-2 py-0.5">
-                    2.1k
+                    {githubStats.forks}
                   </span>
                 </a>
                 <a
@@ -612,7 +692,7 @@ export default function Navigation() {
                   </svg>
                   Watch
                   <span className="ml-auto bg-gray-700 text-gray-300 text-xs rounded px-2 py-0.5">
-                    350
+                    {githubStats.watchers}
                   </span>
                 </a>
               </div>
