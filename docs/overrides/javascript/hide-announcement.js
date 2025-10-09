@@ -13,5 +13,4 @@ document.addEventListener("DOMContentLoaded", function() {
       }
       lastScrollY = window.scrollY;
     });
-  });
-  
+  });  
