@@ -274,7 +274,7 @@ extra_css:
   - stylesheets/kubestellar.css
 
 extra_javascript:
-  - assets/javascript/hide-announcement.js
+  - javascript/hide-announcement.js
 
 # Live reload if any of these change when running 'mkdocs serve'
 watch:
