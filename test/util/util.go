@@ -529,18 +529,29 @@ func GetDeployment(ctx context.Context, wec *kubernetes.Clientset, ns, name stri
 	return ans
 }
 
-func ValidateNumDeploymentReplicas(ctx context.Context, wec *kubernetes.Clientset, ns string, numReplicas int) {
+func ValidateDeploymentDeletion(ctx context.Context, wec *kubernetes.Clientset, ns, name string) {
 	ginkgo.GinkgoHelper()
-	gomega.Eventually(func() int {
-		deployments, err := wec.AppsV1().Deployments(ns).List(ctx, metav1.ListOptions{})
-		gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		if len(deployments.Items) != 1 {
-			return 0
+	gomega.Eventually(func() error {
+		_, err := wec.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
+		if k8serrors.IsNotFound(err) {
+			return nil
 		}
-		d := deployments.Items[0]
-		print()
-		return int(*d.Spec.Replicas)
-	}, timeout).Should(gomega.Equal(numReplicas))
+		return fmt.Errorf("Deployment %q in namespace %q still exists, or some error other than NotFound occurred", name, ns)
+	}, timeout).Should(gomega.Succeed())
+}
+
+func ValidateDeploymentReplicas(ctx context.Context, wec *kubernetes.Clientset, ns, name string, numReplicas int) {
+	ginkgo.GinkgoHelper()
+	gomega.Eventually(func() error {
+		d, err := wec.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return fmt.Errorf("Failed to get Deployment %q in namespace %q: %w", name, ns, err)
+		}
+		if int(*d.Spec.Replicas) != numReplicas {
+			return fmt.Errorf("Deployment %q in namespace %q has %d replicas, expected %d", name, ns, *d.Spec.Replicas, numReplicas)
+		}
+		return nil
+	}, timeout).Should(gomega.Succeed())
 }
 
 func DeleteWECDeployments(ctx context.Context, wec *kubernetes.Clientset, ns string) {
@@ -563,6 +574,9 @@ func CleanupWDS(ctx context.Context, wds *kubernetes.Clientset, ksWds *ksClient.
 	})
 	DeleteAll[*ksapi.BindingPolicyList](ctx, ksWds.ControlV1alpha1().BindingPolicies(), func(objList *ksapi.BindingPolicyList) []string {
 		return objectsToNames((*ksapi.BindingPolicy).GetName, objList.Items)
+	})
+	DeleteAll[*ksapi.CustomTransformList](ctx, ksWds.ControlV1alpha1().CustomTransforms(), func(objList *ksapi.CustomTransformList) []string {
+		return objectsToNames((*ksapi.CustomTransform).GetName, objList.Items)
 	})
 	DeleteAll[*ksapi.StatusCollectorList](ctx, ksWds.ControlV1alpha1().StatusCollectors(), func(objList *ksapi.StatusCollectorList) []string {
 		return objectsToNames((*ksapi.StatusCollector).GetName, objList.Items)

@@ -91,7 +91,7 @@ func main() {
 		itsKubeconfigPath  string
 		wecKubeconfigPaths string
 		monitoredNamespace string
-		bindingPolicy      string
+		bindingPolicyname  string
 		excludedResources  string
 		includedGroups     string
 	)
@@ -105,7 +105,7 @@ func main() {
 	pflag.StringVar(&itsKubeconfigPath, "its-kubeconfig", "", "Path to ITS kubeconfig (empty = detect automatically)")
 	pflag.StringVar(&wecKubeconfigPaths, "wec-kubeconfigs", "", "Comma-separated paths to WEC kubeconfigs")
 	pflag.StringVar(&monitoredNamespace, "monitored-namespace", "default", "Namespace to monitor")
-	pflag.StringVar(&bindingPolicy, "binding-name", "nginx-singleton-bpolicy", "Binding policy name")
+	pflag.StringVar(&bindingPolicyname, "binding-policy-name", "nginx-singleton-bpolicy", "Binding policy name")
 	pflag.StringVar(&excludedResources, "excluded-resources", "events,nodes,componentstatuses,endpoints,persistentvolumes,clusterroles,clusterrolebindings", "Resources to exclude")
 	pflag.StringVar(&includedGroups, "included-groups", "", "API groups to include (empty=all)")
 
@@ -196,7 +196,7 @@ func main() {
 		ItsDynamic:          itsDynamic,
 		WecDynamics:         wecDynamics,
 		MonitoredNamespace:  monitoredNamespace,
-		BindingPolicy:       bindingPolicy,
+		BindingPolicyName:   bindingPolicyname,
 		DiscoveredResources: discovered,
 	}
 	r.RegisterMetrics()

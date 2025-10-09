@@ -67,7 +67,7 @@ Refer to OCM's docs for details on both methods: [Permission setting for work ag
 
 ## Concrete example: Out-of-tree CRDs
 
-Scenario 2 shows how to grant the agent the additional rights needed to manipulate an out-of-tree CRD (AppWrapper). See [Scenario 2](./example-scenarios.md#scenario-2---out-of-tree-workload) in the Example Scenarios.
+Scenario 2 shows how to grant the agent the additional rights needed to manipulate an out-of-tree CRD (AppWrapper). See [Scenario 2](./example-scenarios.md#scenario-2-out-of-tree-workload) in the Example Scenarios.
 
 ## Why KubeStellar does not auto-grant
 

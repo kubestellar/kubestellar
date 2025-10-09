@@ -1,0 +1,157 @@
+---
+- hosts: masters
+  remote_user: ubuntu
+  become: yes
+  gather_facts: no
+  vars:
+    ks_release:  "{{ ks_release }}"
+    region: "{{ region }}"
+    vpc_name:  "{{ vpc_name }}"
+    cluster_name: "{{ cluster_name }}"
+  tasks:
+    - name: Read instance data
+      include_vars:
+        file: ".data/{{ region }}_{{ vpc_name }}/ec2_instances_{{ cluster_name }}.json"
+        name: ec2_instances
+
+    - fail: msg="ks_release var is empty"
+      when: ks_release == ""
+
+    - name: install jq and make
+      shell: |
+             sudo apt update
+             sudo apt install jq make -y
+
+    - name: install golang
+      shell: |
+             curl -LO https://go.dev/dl/go1.24.7.linux-amd64.tar.gz
+             rm -rf /usr/local/go && tar -C /usr/local -xzf go1.24.7.linux-amd64.tar.gz
+             export PATH=$PATH:/usr/local/go/bin
+             go version
+                  
+    - name: install yq
+      shell: |
+             sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+             sudo chmod a+x /usr/local/bin/yq
+
+    - name: install OCM CLI
+      shell: curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+        
+    - name: install the KubeFlex CLI
+      shell: |
+             sudo su <<EOF
+             bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin --version v0.8.8
+             EOF
+
+    - name: install Helm
+      shell: |
+             curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+             sudo apt-get install apt-transport-https --yes
+             echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+             sudo apt-get update
+             sudo apt-get install helm
+
+    - name: Check if kscore context exists, ignore errors and continue
+      ansible.builtin.command: kubectl config use-context kscore
+      register: result
+      ignore_errors: true
+
+    - name: Delete old KS deployment
+      shell: |
+             kubectl config rename-context kubernetes-admin@kubernetes kscore --ignore-not-found
+             helm delete ks-core  --ignore-not-found
+             helm -n open-cluster-management delete status-addon  --ignore-not-found
+             kubectl --context kscore delete ns open-cluster-management-hub open-cluster-management  --ignore-not-found
+             kubectl config unset contexts.wds1
+             kubectl delete -A --all postcreatehooks.tenancy.kflex.kubestellar.org --ignore-not-found
+             kubectl delete crds $(kubectl get crds | grep kubestellar) --ignore-not-found
+             kubectl --context kscore delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.1/deploy/static/provider/kind/deploy.yaml  --ignore-not-found
+      when: result is success
+
+
+    - name: install ingress controller
+      shell: |
+             kubectl config rename-context kubernetes-admin@kubernetes kscore
+             kubectl --context kscore label node --all ingress-ready="true"
+             kubectl --context kscore apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.12.1/deploy/static/provider/kind/deploy.yaml
+
+    - name: patching nginx ingress to enable SSL passthrough
+      shell: |
+             kubectl --context kscore patch deployment ingress-nginx-controller -n ingress-nginx -p '{"spec":{"template":{"spec":{"containers":[{"name":"controller","args":["/nginx-ingress-controller","--election-id=ingress-nginx-leader","--controller-class=k8s.io/ingress-nginx","--ingress-class=nginx","--configmap=$(POD_NAMESPACE)/ingress-nginx-controller","--validating-webhook=:8443","--validating-webhook-certificate=/usr/local/certificates/cert","--validating-webhook-key=/usr/local/certificates/key","--watch-ingress-without-class=true","--publish-status-address=localhost","--enable-ssl-passthrough"]}]}}}}'
+
+    - name: extract the port number for the ingress controller
+      shell: kubectl --context kscore -n ingress-nginx get svc ingress-nginx-controller -o=jsonpath='{.spec.ports[1].nodePort}'
+      register: ingress_port
+      
+    - debug:
+        msg: "{{ ec2_instances.instances[0].public_dns_name }}"
+
+    - name: install KubeStellar using core helm-cart
+      shell: |
+             export KUBESTELLAR_VERSION="{{ ks_release }}"
+             helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
+             --version $KUBESTELLAR_VERSION \
+             --set-json='ITSes=[{"name":"its1","type":"host"}]' \
+             --set-json='WDSes=[{"name":"wds1"}]' \
+             --set-json='verbosity.default=5' \
+             --set kubeflex-operator.externalPort={{ ingress_port.stdout }} \
+             --set kubeflex-operator.domain="{{ ec2_instances.instances[0].public_dns_name }}"
+
+    - name: Get kubeconfig "context" for wds1 space
+      shell: |
+             kflex ctx wds1
+
+    - name: Get the token to register managed clusters
+      shell: clusteradm --context kscore get token | grep '^clusteradm join'
+      register: wec_join_command
+      until: "wec_join_command is not failed"
+      retries: 5
+      delay: 15
+             
+    -  name: write wec_join_command to file
+       ansible.builtin.copy:
+         content: "{{ wec_join_command.stdout }}"
+         dest:  /tmp/wec_join_command
+    
+    - name: Copy join command to local file (Ansible control node)
+      ansible.builtin.fetch:
+        src: /tmp/wec_join_command
+        dest: .data/{{ region }}_{{ vpc_name }}/
+        flat: yes
+
+    - name: Set the current kubeconfig context to the KubeFlex hosting cluster
+      shell: |
+             alias k="kubectl"
+             k config use-context kscore
+
+    - name: Fetch kubeconfig file
+      ansible.builtin.fetch:
+        src: $HOME/.kube/config
+        dest: .data/{{ region }}_{{ vpc_name }}/admin.conf
+        flat: yes
+
+    - name: Protect admin.conf file
+      delegate_to: localhost
+      become: no
+      ansible.builtin.file:
+        mode: o-rwx
+        path: .data/{{ region }}_{{ vpc_name }}/admin.conf
+    
+    - name: Make admin.conf use public server address
+      delegate_to: localhost
+      become: no
+      ansible.builtin.command: "kubectl --kubeconfig .data/{{ region }}_{{ vpc_name }}/admin.conf config set-cluster kubernetes --server https://{{ kubehost }}:6443"
+      vars:
+        kubehost: "{{ ansible_host }}"
+      when: inventory_hostname == ansible_play_hosts_all[0]
+
+
+    - name: Command to edit your etc/hosts file with wds1 host entry
+      debug:
+        msg: "echo '{{ ansible_host }} wds1.{{ ec2_instances.instances[0].public_dns_name }}' | sudo tee -a /etc/hosts"
+      vars:
+        kubehost: "{{ ansible_host }}"
+      when: inventory_hostname == ansible_play_hosts_all[0]
+
+
+
