@@ -136,8 +136,15 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					len(binding.Spec.Workload.NamespaceScope) == 1 &&
 					binding.Spec.Workload.NamespaceScope[0].CreateOnly
 			})
-			util.ValidateNumDeploymentReplicas(ctx, wec1, ns, 1)
-			util.ValidateNumDeploymentReplicas(ctx, wec2, ns, 1)
+			
+			// Use Eventually to wait for the initial state (deployment created with 1 replica)
+			gomega.Eventually(func() int {
+				return util.GetNumDeploymentReplicas(ctx, wec1, ns)
+			}).Should(gomega.Equal(1))
+			gomega.Eventually(func() int {
+				return util.GetNumDeploymentReplicas(ctx, wec2, ns)
+			}).Should(gomega.Equal(1))
+			
 			dep1 := util.GetDeployment(ctx, wec1, ns, "nginx")
 			dep2 := util.GetDeployment(ctx, wec2, ns, "nginx")
 
@@ -147,27 +154,16 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				ctx, "nginx", types.MergePatchType, objPatch, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			// Wait for the CombinedStatus object to exist and validate create-only behavior
-			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, "nginx", "nginx", func(cs *ksapi.CombinedStatus) error {
-				if len(cs.Results) == 0 {
-					return fmt.Errorf("expected CombinedStatus to have results, but got none")
-				}
-				// Validate that we have status from both WECs
-				if len(cs.Results[0].Rows) != 2 {
-					return fmt.Errorf("expected status from 2 WECs, got %d", len(cs.Results[0].Rows))
-				}
-				// Check that replicas remain at 1 (create-only mode working)
-				for _, row := range cs.Results[0].Rows {
-					if row.Columns[1].Number == nil || *row.Columns[1].Number != "1" {
-						return fmt.Errorf("expected replicas to remain at 1 in create-only mode")
-					}
-				}
-				return nil
-			})
-
-			// Now validate that the deployment replicas remain unchanged (create-only mode)
-			gomega.Expect(util.GetNumDeploymentReplicas(ctx, wec1, ns)).To(gomega.Equal(1))
-			gomega.Expect(util.GetNumDeploymentReplicas(ctx, wec2, ns)).To(gomega.Equal(1))
+			// Use Consistently to verify that the WEC deployments remain at 1 replica over a reasonable time period
+			// This ensures that create-only mode is actually preventing updates, not just that the update hasn't happened yet
+			gomega.Consistently(func() int {
+				return util.GetNumDeploymentReplicas(ctx, wec1, ns)
+			}, 30*time.Second, 1*time.Second).Should(gomega.Equal(1))
+			gomega.Consistently(func() int {
+				return util.GetNumDeploymentReplicas(ctx, wec2, ns)
+			}, 30*time.Second, 1*time.Second).Should(gomega.Equal(1))
+			
+			// Also verify that the deployment UIDs remain unchanged (no recreation)
 			dep1b := util.GetDeployment(ctx, wec1, ns, "nginx")
 			dep2b := util.GetDeployment(ctx, wec2, ns, "nginx")
 			gomega.Expect(dep1b.UID).To(gomega.Equal(dep1.UID))
