@@ -143,6 +143,7 @@ theme:
     # - navigation.expand
     - navigation.path
     - navigation.footer
+    - navigation.top
     # - navigation.tracking
     # Enable a copy button in code blocks
     - content.code.copy
