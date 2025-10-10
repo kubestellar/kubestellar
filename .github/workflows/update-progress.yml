@@ -36,7 +36,7 @@ jobs:
           # More robust extraction - look for content between Description and next ### heading
           PR_BODY="${{ github.event.pull_request.body }}"
           SUMMARY=""
-          
+
           if [[ -n "$PR_BODY" ]]; then
             # Extract everything between ### Description and next ### heading
             SUMMARY=$(echo "$PR_BODY" | sed -n '/^###\s*[Dd]escription/,/^###/p' | sed '1d' | sed '/^###/d' | sed '/<!--/,/-->/d' | grep -v '^\s*$' | head -n 2 | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//')

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { GridLines, StarField} from "../index";
+import { GridLines, StarField } from "../index";
 import StatCard from "../StatsCard";
 
 interface StatData {
@@ -193,10 +193,7 @@ export default function HeroSection() {
 
         {/* Interactive Grid Network */}
         <div className="absolute inset-0">
-          <GridLines
-            verticalLines={15}
-            horizontalLines={18}
-          />
+          <GridLines verticalLines={15} horizontalLines={18} />
         </div>
 
         {/* Floating Data Particles */}
@@ -382,7 +379,7 @@ export default function HeroSection() {
               style={{ animationDelay: "0.8s" }}
             >
               <a
-                href="#get-started"
+                href="/quick-installation"
                 className="primary-action-btn group relative overflow-hidden inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-xl text-white 
                           bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 
                           hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 
@@ -390,7 +387,7 @@ export default function HeroSection() {
                           hover:shadow-xl hover:shadow-blue-500/40 
                           animate-btn-float"
               >
-                <span className="relative z-10">Launch KubeStellar</span>
+                <span className="relative z-10">Install KubeStellar</span>
                 <svg
                   className="relative z-10 ml-2 h-5 w-5 transition-all duration-300 group-hover:translate-x-1 group-hover:rotate-12"
                   viewBox="0 0 20 20"

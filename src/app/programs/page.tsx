@@ -57,10 +57,7 @@ export default function ProgramsPage() {
         <StarField density="medium" showComets={true} cometCount={3} />
 
         {/* Grid lines background */}
-        <GridLines
-          horizontalLines={21}
-          verticalLines={18}
-        />
+        <GridLines horizontalLines={21} verticalLines={18} />
       </div>
 
       {/* Hero Section */}
@@ -84,10 +81,11 @@ export default function ProgramsPage() {
               <Link
                 key={program.id}
                 href={`/programs/${program.id}`}
-                className={`program-card bg-gray-800/50 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 p-8 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${program.isPaid
+                className={`program-card bg-gray-800/50 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 p-8 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
+                  program.isPaid
                     ? "hover:border-blue-500/50"
                     : "hover:border-purple-500/50"
-                  }`}
+                }`}
               >
                 <div className="relative w-32 h-24 mb-6 flex items-center justify-center">
                   <Image
@@ -106,10 +104,11 @@ export default function ProgramsPage() {
                   {program.description}
                 </p>
                 <span
-                  className={`inline-block text-xs font-semibold px-3 py-1 rounded-full ${program.isPaid
+                  className={`inline-block text-xs font-semibold px-3 py-1 rounded-full ${
+                    program.isPaid
                       ? "bg-green-500/20 text-green-300"
                       : "bg-purple-500/20 text-purple-300"
-                    }`}
+                  }`}
                 >
                   {program.isPaid ? "Paid Program" : "Unpaid Internship"}
                 </span>

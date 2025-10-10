@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { GridLines, StarField} from "./index";
+import { GridLines, StarField } from "./index";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

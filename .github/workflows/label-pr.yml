@@ -24,7 +24,7 @@ jobs:
             } else if (title.startsWith('patch:')) {
               labels.push('patch');
             }
-            
+
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,

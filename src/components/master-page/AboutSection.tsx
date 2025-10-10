@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { GridLines, StarField} from "../index";
+import { GridLines, StarField } from "../index";
 
 export default function AboutSection() {
   useEffect(() => {
@@ -101,10 +101,7 @@ export default function AboutSection() {
       <StarField density="medium" showComets={true} cometCount={3} />
 
       {/* Grid lines background */}
-      <GridLines
-        horizontalLines={21}
-        verticalLines={15}
-      />
+      <GridLines horizontalLines={21} verticalLines={15} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center">

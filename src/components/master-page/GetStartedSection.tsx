@@ -1,7 +1,6 @@
 "use client";
 
-import { GridLines, StarField} from "../index";
-import { useState } from "react";
+import { GridLines, StarField } from "../index";
 
 const Icon = ({
   path,
@@ -27,21 +26,6 @@ const Icon = ({
 );
 
 export default function GetStartedSection() {
-  const [isCopied, setIsCopied] = useState(false);
-
-  const commandToCopy =
-    "kubectl apply -f https://github.com/kubestellar/kubestellar/releases/latest/download/install.yaml";
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(commandToCopy);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 10000);
-    } catch (err) {
-      console.error("Failed to copy text: ", err);
-    }
-  };
-
   return (
     <section
       id="get-started"
@@ -53,10 +37,7 @@ export default function GetStartedSection() {
       <StarField density="medium" showComets={true} cometCount={3} />
 
       {/* Gridlines background */}
-      <GridLines
-        verticalLines={20}
-        horizontalLines={33}
-      />
+      <GridLines verticalLines={20} horizontalLines={33} />
 
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-2/5 left-2/11 w-[6rem] h-[6rem] bg-purple-500/10 rounded-full blur-[120px]"></div>
@@ -82,51 +63,33 @@ export default function GetStartedSection() {
                 <Icon path="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </div>
               <h3 className="text-lg font-bold mb-2">Quick Installation</h3>
-              <p className="text-blue-100 mb-4">
-                Get up and running with KubeStellar in minutes using our simple
-                installation guide.
+              <p className="text-blue-100 mb-6">
+                Get up and running with KubeStellar in minutes using our streamlined
+                installation guide with prerequisites and step-by-step instructions.
               </p>
-              <div className="relative  bg-black/30 p-3 rounded font-mono text-sm text-blue-100">
-                <pre className="whitespace-pre-wrap break-all pr-10 leading-relaxed">
-                  {commandToCopy}
-                </pre>
-                <button
-                  onClick={handleCopy}
-                  className="absolute bottom-2 right-2 p-1 rounded-md text-gray-400 transition-colors cursor-pointer"
-                  aria-label="Copy command"
+              <div className="mt-auto">
+                <a
+                  href="/quick-installation"
+                  className="inline-flex items-center justify-center w-full px-6 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200"
                 >
-                  {isCopied ? (
-                    <Icon
-                      path="M5 13l4 4L19 7"
-                      className="w-4 h-4"
-                      strokeColor="#4ade80"
+                  Start Quick Installation
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="ml-2 h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
                     />
-                  ) : (
-                    <Icon
-                      path="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                      className="w-4 h-4"
-                    />
-                  )}
-                </button>
+                  </svg>
+                </a>
+                <p className="mt-3 text-sm text-blue-200 text-center">
+                  Kubernetes experience required
+                </p>
               </div>
-              <a
-                href="#"
-                className="mt-4 inline-flex items-center text-sm font-medium text-white"
-              >
-                View installation guide
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="ml-1 h-4 w-4"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </a>
             </div>
           </div>
 

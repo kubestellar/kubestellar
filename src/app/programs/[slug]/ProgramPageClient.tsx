@@ -135,10 +135,7 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
           <StarField density="medium" showComets={true} cometCount={3} />
 
           {/* Grid lines background */}
-          <GridLines
-            horizontalLines={21}
-            verticalLines={18}
-          />
+          <GridLines horizontalLines={21} verticalLines={18} />
 
           {/* Parallax Background */}
         </div>

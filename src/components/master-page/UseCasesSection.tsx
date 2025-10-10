@@ -1,6 +1,6 @@
 "use client";
 
-import { GridLines, StarField} from "../index";
+import { GridLines, StarField } from "../index";
 
 export default function UseCasesSection() {
   const getIcon = (iconType: string) => {
@@ -187,10 +187,7 @@ export default function UseCasesSection() {
       <StarField density="medium" showComets={true} cometCount={4} />
 
       {/* Grid lines background */}
-      <GridLines
-        horizontalLines={18}
-        verticalLines={15}
-      />
+      <GridLines horizontalLines={18} verticalLines={15} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12">

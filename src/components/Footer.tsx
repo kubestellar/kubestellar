@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import { GridLines, StarField} from "./index";
+import { GridLines, StarField } from "./index";
 
 export default function Footer() {
   useEffect(() => {
@@ -46,10 +46,7 @@ export default function Footer() {
       <StarField density="low" showComets={true} cometCount={2} />
 
       {/* Grid lines background */}
-      <GridLines
-        horizontalLines={21}
-        verticalLines={15}
-      />
+      <GridLines horizontalLines={21} verticalLines={15} />
 
       {/* Background elements */}
       <div className="absolute inset-0 z-0">

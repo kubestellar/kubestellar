@@ -81,4 +81,3 @@ yaml:
 # JSON files
 json:
   - "**/*.json"
-
