@@ -69,13 +69,14 @@ spec:
           - name: wait-for-managedclustersetbindings-crd-created
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
-              - sh
-              - -c
-              - |
-                until kubectl get crd managedclustersetbindings.cluster.open-cluster-management.io >/dev/null 2>&1; do sleep 2; done
+              - kubectl
+              - wait
+              - --for=create
+              - crd/managedclustersetbindings.cluster.open-cluster-management.io
+              - --timeout=300s
             env:
             - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+              value: '{{"/etc/kube/{{.ITSkubeconfig}}"}}'
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
