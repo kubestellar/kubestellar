@@ -49,14 +49,14 @@
 {% endblock %}
 
 {% block header %}
-       {{ super() }}
-       <header class='md-header' data-md-component='header' style="z-index:-10;">
-	       <div class='md-header__inner md-grid' data-md-component='container'>
-	       <p class='md_container' style="font-size:larger"> 
-	       KubeStellar has multiple documentation versions to match its multiple releases.<br />
-	       Please make sure you are viewing the docs version which matches the release version of the code you are using!
-	       </p>
-	       </div>
-       </header>
+  {{ super() }}
+  <header class="custom-announcement md-header" data-md-component="announcement">
+    <div class="md-header__inner md-grid">
+      <p class="md_container" style="font-size: larger;"> 
+        KubeStellar has multiple documentation versions to match its multiple releases.<br />
+        Please make sure you are viewing the docs version which matches the release version of the code you are using!
+      </p>
+    </div>
+  </header>
 
 {% endblock %}
