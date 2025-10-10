@@ -30,6 +30,7 @@ nav:
   - What is KubeStellar?:
       - Overview: readme.md
       - Architecture: direct/architecture.md
+      - Subprojects: direct/subprojects.md
       - Related:
         - KubeStellar UI: direct/ui-intro.md
         - KubeFlex: direct/kubeflex-intro.md
