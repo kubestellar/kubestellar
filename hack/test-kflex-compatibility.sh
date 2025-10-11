@@ -70,7 +70,7 @@ MIN_VERSION=$(echo "$MIN_VERSION_LINE" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+" | he
 version_le() {
     local v1_clean=${1#v}
     local v2_clean=${2#v}
-    [[ "$(printf '%s\n' "$v1_clean" "$v2_clean" | sort -V | head -n1)" == "$v1_clean" ]]
+    [[ "$v1_clean" < "$v2_clean" || "$v1_clean" == "$v2_clean" ]]
 }
 
 # Check prerequisites once before testing any versions
@@ -163,7 +163,7 @@ test_kflex_version() {
     local arch=$(uname -m)
     case $arch in
         x86_64) arch="amd64" ;;
-        aarch64|arm64) arch="arm64" ;;
+        aarch64) arch="arm64" ;;
     esac
     
     local download_url="https://github.com/kubestellar/kubeflex/releases/download/${version}/kubeflex_${version#v}_${os}_${arch}.tar.gz"

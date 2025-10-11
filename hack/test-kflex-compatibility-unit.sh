@@ -42,11 +42,7 @@ run_test() {
     local output
     
     # Capture both stdout and stderr, and the exit code
-    if output=$("$@" 2>&1); then
-        actual_exit_code=0
-    else
-        actual_exit_code=$?
-    fi
+    output=$("$@" 2>&1) || actual_exit_code=$?
     
     if [[ $actual_exit_code -eq $expected_exit_code ]]; then
         echo "  ✓ PASS"

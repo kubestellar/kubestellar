@@ -96,7 +96,7 @@ periodics:
       containers:
         - image: ghcr.io/kubestellar/infra/build:1.24.2-1
           command:
-            - ./hack/test-kflex-compatibility.sh
+            - hack/test-kflex-compatibility.sh
           workingDir: /home/prow/go/src/github.com/kubestellar/kubestellar
           resources:
             requests:
