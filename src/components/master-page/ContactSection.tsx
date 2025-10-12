@@ -174,7 +174,7 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
 
             {/* Contact card 2 */}
             <a
-              href="https://kubestellar.slack.com"
+              href="https://kubestellar.io/slack"
               target="_blank"
               rel="noopener noreferrer"
               className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-transparent p-4 sm:p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-purple-500/70 cursor-pointer"
