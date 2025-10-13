@@ -140,7 +140,7 @@ dl.crd-meta {
     background: var(--md-primary-fg-color);
     color: var(--md-primary-bg-color);
     transition: transform 0.3s ease, opacity 0.3s ease;
-    z-index: 100;
+    z-index: 1;
   }
   
   .custom-announcement.hidden {
