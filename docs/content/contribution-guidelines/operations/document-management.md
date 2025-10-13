@@ -135,17 +135,7 @@ When you've finished working with draft branches (like `doc-*` branches used for
 
 **Method 1: Using mike to remove specific versions**
 
-The `mike` tool provides a clean way to remove individual versions:
-
-```shell
-# Remove a specific version (replace 'doc-mybranch' with your actual branch name)
-mike delete doc-mybranch
-
-# To remove and push changes immediately
-mike delete --push doc-mybranch
-```
-
-You can also work locally on your `gh-pages` branch and then push the changes:
+To remove individual versions, work locally on your `gh-pages` branch and then push the changes:
 
 ```shell
 git checkout gh-pages
@@ -153,6 +143,14 @@ git pull
 mike delete doc-mybranch
 git commit -m "Remove outdated doc-mybranch version"
 git push origin gh-pages
+```
+
+Alternatively, you can remove and push changes immediately:
+
+```shell
+git checkout gh-pages
+git pull
+mike delete --push doc-mybranch
 ```
 
 **Method 2: Reset gh-pages to match the shared repository**
