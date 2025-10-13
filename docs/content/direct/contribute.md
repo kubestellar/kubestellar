@@ -23,9 +23,9 @@ Ensure that you comply with the rules and policy guiding the repository contribu
 
 If you are contributing via the GitHub web interface, navigate to the **Settings** section of your forked repository and enable the **Require contributors to sign off on web-based commits** setting. This will allow you to automatically sign off your commits via GitHub directly, as shown below.
 
-![signoff-via-github-ui](https://github.com/user-attachments/assets/ddfd3988-142e-4380-a738-1a767b1aaba6)
+![signoff-via-github-ui](./images/signoff-via-github-ui.png)
 
-If you are contributing via the command line terminal, run the `git commit --signoff --message [commit message]` or `git commit -s -m [commit message]` command when making each commit.
+If you are contributing via the command line terminal, run the `git commit --signoff --message [commit message]` or `git commit -s -m [commit message]` command when making each commit. For more detailed information about signing and signing off on commits, including steps to create signing keys and use both the `-s` and `-S` options, see [Sign-off and Signing Contributions](pr-signoff.md).
 
 
 
