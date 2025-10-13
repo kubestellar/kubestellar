@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@theme {
+  --breakpoint-lgcustom: 900px;
+}
 :root {
   --background: #0a0a0a;
   --foreground: #ffffff;

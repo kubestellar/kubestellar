@@ -12,7 +12,7 @@ export default function Navigation() {
     stars: "0",
     forks: "0",
     watchers: "0",
-  })
+  });
 
   useEffect(() => {
     // Initialize dropdowns functionality
@@ -82,15 +82,17 @@ export default function Navigation() {
     };
 
     const fetchGithubStats = async () => {
-      try{
-        const response = await fetch("https://api.github.com/repos/kubestellar/kubestellar");
+      try {
+        const response = await fetch(
+          "https://api.github.com/repos/kubestellar/kubestellar"
+        );
         if (!response.ok) {
           throw new Error("Network reposone was not okay");
         }
         const data = await response.json();
         const formatNumber = (num: number): string => {
-          if(num >= 1000) {
-            return (num/1000).toFixed(1) + "K";
+          if (num >= 1000) {
+            return (num / 1000).toFixed(1) + "K";
           }
           return num.toString();
         };
