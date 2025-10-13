@@ -20,6 +20,6 @@ jobs:
     steps:
       - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: "Thank you for contributing your first Issue to KubeStellar. We are delighted to have you in our Universe!"
-          pr-message: "Thank you for submitting your first Pull Request to KubeStellar. We are delighted to have you in our Universe!"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_message: "Thank you for contributing your first Issue to KubeStellar. We are delighted to have you in our Universe!"
+          pr_message: "Thank you for submitting your first Pull Request to KubeStellar. We are delighted to have you in our Universe!"
