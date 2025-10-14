@@ -4442,34 +4442,64 @@ in your PR.</p>
 <p>Each branch of your fork will render as its own version. You can use the release dropdown inside the rendered pages to quickly switch between versions.</p>
 <p>Note: the <strong>main</strong> branch will render as <code>https://${repo_owner}.github.io/${fork_name}/main</code>, <strong>NOT</strong> as "unreleased-development" which is a special alias on the main kubestellar.io website.</p>
 <h4 id="removing-outdated-draft-branch-versions-after-rendering">Removing outdated (draft branch) versions after rendering<a class="headerlink" href="#removing-outdated-draft-branch-versions-after-rendering" title="Permanent link">#</a></h4>
-<p>You can use <code>mike</code> to remove versions, or replace gh-pages with a copy of the shared version. 
-More details on these techniques will be added here soon.</p>
+<p>When you've finished working with draft branches (like <code>doc-*</code> branches used for previewing documentation changes), you should clean up the rendered versions to avoid cluttering your fork's GitHub Pages site.</p>
+<p><strong>Method 1: Using mike to remove specific versions</strong></p>
+<p>To remove individual versions, work locally on your <code>gh-pages</code> branch and then push the changes:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>gh-pages
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>git<span class="w"> </span>pull
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>mike<span class="w"> </span>delete<span class="w"> </span>doc-mybranch
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Remove outdated doc-mybranch version&quot;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>gh-pages
+</code></pre></div>
+<p>Alternatively, you can remove and push changes immediately:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>gh-pages
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>git<span class="w"> </span>pull
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>mike<span class="w"> </span>delete<span class="w"> </span>--push<span class="w"> </span>doc-mybranch
+</code></pre></div>
+<p><strong>Method 2: Reset gh-pages to match the shared repository</strong></p>
+<p>If you have many outdated versions or want a complete reset, you can replace your fork's <code>gh-pages</code> branch with a copy from the shared repository:</p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Assuming &#39;upstream&#39; points to https://github.com/kubestellar/kubestellar</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>git<span class="w"> </span>checkout<span class="w"> </span>upstream/gh-pages
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>git<span class="w"> </span>push<span class="w"> </span>-f<span class="w"> </span>origin<span class="w"> </span>gh-pages
+</code></pre></div>
+<blockquote>
+<p><strong>Warning:</strong> This method will remove ALL your custom versions and replace them with only the official versions from the shared repository.</p>
+</blockquote>
+<p><strong>Best practices for version cleanup</strong></p>
+<ul>
+<li><strong>Clean up regularly:</strong> Remove draft versions after your PR is merged to keep your fork's site organized</li>
+<li><strong>Use descriptive branch names:</strong> Stick to alphanumerics, dashes, and dots for branch names to ensure compatibility with the rendering workflow</li>
+<li><strong>Check before deleting:</strong> Use <code>mike list</code> to see all available versions before removing any</li>
+<li><strong>Coordinate with team:</strong> If working on shared documentation, communicate with other contributors before removing versions that might be referenced elsewhere</li>
+</ul>
+<p><strong>Notes</strong></p>
+<p>The documentation system uses <code>mike</code> for version management, which maintains a <code>versions.json</code> file that tracks all available versions and aliases. The cleanup methods described above work by modifying this file and the associated directory structure in the <code>gh-pages</code> branch.</p>
 <hr />
 <h3 id="serving-up-documents-locally">Serving up documents locally<a class="headerlink" href="#serving-up-documents-locally" title="Permanent link">#</a></h3>
 <p>You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar/docs
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar/docs
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 </code></pre></div>
 <p>You can view and modify our documentation in the branch you have checked out by using <code>mkdocs serve</code> from <a href="https://www.mkdocs.org">mkdocs</a>.  We have a Python requirements file in <code>requirements.txt</code>, and a Makefile target that builds a Python virtual environment and installs the requirements there.  You can either install those requirements into your global Python environment or use the Makefile target.  To install those requirements into your global Python environment, do the following usual thing.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </code></pre></div>
 <p>Alternatively, use the following commands to use the Makefile target to construct an adequate virtual environment and enter it.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">(</span><span class="nb">cd</span><span class="w"> </span>..<span class="p">;</span><span class="w"> </span>make<span class="w"> </span>venv<span class="o">)</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>.<span class="w"> </span>venv/bin/activate
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="o">(</span><span class="nb">cd</span><span class="w"> </span>..<span class="p">;</span><span class="w"> </span>make<span class="w"> </span>venv<span class="o">)</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>.<span class="w"> </span>venv/bin/activate
 </code></pre></div>
 <p>Then, using your chosen environment with the requirements installed, build and serve the documents with the following command.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdocs<span class="w"> </span>serve
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>mkdocs<span class="w"> </span>serve
 </code></pre></div>
 <p>Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
 <p>Another way to view (not modify - this method reflects what has been deployed to the <code>gh-pages</code> branch of our repo) all branches/versions of our documentation locally using 'mike' <a href="https://github.com/jimporter/mike">mike for mkdocs</a>:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nb">cd</span><span class="w"> </span>docs
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>mike<span class="w"> </span>set-default<span class="w"> </span>main
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nb">cd</span><span class="w"> </span>..
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>make<span class="w"> </span>serve-docs
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nb">cd</span><span class="w"> </span>docs
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>mike<span class="w"> </span>set-default<span class="w"> </span>main
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="nb">cd</span><span class="w"> </span>..
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>make<span class="w"> </span>serve-docs
 </code></pre></div>
 <p>Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
 <hr />
@@ -4580,10 +4610,10 @@ scripts in <code>hack</code>).</p>
 The section which begins with <strong>nav:</strong> lays out the navigation structure and which markdown files correspond to each topic. </p>
 <h3 id="page-variables">Page variables<a class="headerlink" href="#page-variables" title="Permanent link">#</a></h3>
 <p>A markdown source file can contribute additional variables by defining them in <code>name: value</code> lines at the start of the file, set off by lines of triple dashes. For example, suppose a markdown file begins with the following.</p>
-<div class="language-markdown highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>---
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>short_name: example1
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="gu">manifest_name: &#39;docs/content/Coding Milestones/PoC2023q1/example1.md&#39;</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="gu">---</span>
+<div class="language-markdown highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>---
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>short_name: example1
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="gu">manifest_name: &#39;docs/content/Coding Milestones/PoC2023q1/example1.md&#39;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="gu">---</span>
 </code></pre></div>
 <p>These variables can be referenced as {{ page.meta.short_name }} and {{ page.meta.manifest_name }}.</p>
 <h3 id="including-external-markdown">Including external markdown<a class="headerlink" href="#including-external-markdown" title="Permanent link">#</a></h3>
@@ -4604,83 +4634,83 @@ The section which begins with <strong>nav:</strong> lays out the navigation stru
 <h4 id="seen-and-executed">Seen and executed<a class="headerlink" href="#seen-and-executed" title="Permanent link">#</a></h4>
 <p>For a codeblock that can be 'tested' (and seen by the reader) as part of our CI, use the <b><i><code>shell</code></i></b> block:
 <br/><b>codeblock:</b>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>```shell
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>mkdocs serve
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>```
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>```shell
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>mkdocs serve
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>```
 </code></pre></div>
 <b>as seen by reader:</b>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>mkdocs<span class="w"> </span>serve
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>mkdocs<span class="w"> </span>serve
 </code></pre></div>
 <br/></p>
 <h4 id="executed-but-not-seen">Executed but not seen<a class="headerlink" href="#executed-but-not-seen" title="Permanent link">#</a></h4>
 <p>(Think hard before hiding stuff from your reader.)</p>
 <p>For a codeblock that should be 'tested', BUT <b>not</b> seen by the reader, use the <b><i><code>.bash</code></i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style (great for hiding a sleep command that user does not need to run, but CI does):
 <br/><b>codeblock:</b>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>``` {.bash .hide-me}
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>sleep 10
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>```
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>``` {.bash .hide-me}
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>sleep 10
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>```
 </code></pre></div>
 <b>as seen by reader:</b>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>
 </code></pre></div>
 <br/></p>
 <h4 id="seen-but-not-executed">Seen but not executed<a class="headerlink" href="#seen-but-not-executed" title="Permanent link">#</a></h4>
 <p>(To avoid confusing readers of the HTML, this should be used only for <em>output</em> seen in a shell session.)</p>
 <p>For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i><code>.bash</code></i></b> with the plain codeblock, and <b>without</b> the <b><i>'.hide-me'</b></i> style:
 <br/><b>codeblock:</b>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>``` {.bash}
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>mkdocs server
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>```
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>``` {.bash}
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>mkdocs server
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>```
 </code></pre></div>
 <b>as seen by reader:</b>
-<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>mkdocs<span class="w"> </span>server
+<div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>mkdocs<span class="w"> </span>server
 </code></pre></div>
 <br/></p>
 <h4 id="seen-but-not-executed-and-no-copy-button">Seen but not executed and no copy button<a class="headerlink" href="#seen-but-not-executed-and-no-copy-button" title="Permanent link">#</a></h4>
 <p>For a codeblock that should not be 'tested', be seen by the reader, and not include a 'copy' icon (great for output-only instances), use the <b><i><code>.bash</code></i></b> codeblock <b>without</b> the <b><i>'.no-copy'</b></i> style:
 <br/><b>codeblock:</b>
-<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="sb">```</span><span class="w"> </span><span class="o">{</span>.bash<span class="w"> </span>.no-copy<span class="o">}</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.867837<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.969533<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.970003<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>what-resolver
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="sb">```</span>
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="sb">```</span><span class="w"> </span><span class="o">{</span>.bash<span class="w"> </span>.no-copy<span class="o">}</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.867837<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.969533<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.970003<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>what-resolver
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="sb">```</span>
 </code></pre></div>
 <b>as seen by reader:</b>
-<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.867837<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.969533<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.970003<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>what-resolver
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.867837<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.969533<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.970003<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>what-resolver
 </code></pre></div>
 <br/></p>
 <h4 id="other-language-specific-highlighting">Other language-specific highlighting<a class="headerlink" href="#other-language-specific-highlighting" title="Permanent link">#</a></h4>
 <p>For other language-specific highlighting (yaml, etc.), use the <b><i>yaml</i></b> codeblock
 <br/><b>codeblock:</b>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>```yaml
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>nav:
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>  - Home: index.md
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>  - QuickStart: Getting-Started/quickstart.md
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>  - Contributing: 
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>      - Guidelines: Contribution guidelines/CONTRIBUTING.md
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>```
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>```yaml
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>nav:
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>  - Home: index.md
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>  - QuickStart: Getting-Started/quickstart.md
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>  - Contributing: 
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>      - Guidelines: Contribution guidelines/CONTRIBUTING.md
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>```
 </code></pre></div>
 <b>as seen by reader:</b>
-<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nt">nav</span><span class="p">:</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Home</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">index.md</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">QuickStart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Getting-Started/quickstart.md</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Contributing</span><span class="p">:</span><span class="w"> </span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Guidelines</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Contribution guidelines/CONTRIBUTING.md</span>
+<div class="language-yaml highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nt">nav</span><span class="p">:</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Home</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">index.md</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">QuickStart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Getting-Started/quickstart.md</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Contributing</span><span class="p">:</span><span class="w"> </span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Guidelines</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Contribution guidelines/CONTRIBUTING.md</span>
 </code></pre></div>
 <br/></p>
 <h4 id="codeblock-with-a-title">Codeblock with a title<a class="headerlink" href="#codeblock-with-a-title" title="Permanent link">#</a></h4>
 <p>For a codeblock that has a title, and will not be tested, use the <b><i>'title'</i></b> parameter in conjunction with the plain codeblock (greater for showing or prescribing contents of files):
 <br/><b>codeblock:</b>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>``` title=&quot;testing.sh&quot;
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>#!/bin/sh
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>echo hello KubeStellar
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>```
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>``` title=&quot;testing.sh&quot;
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>#!/bin/sh
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>echo hello KubeStellar
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>```
 </code></pre></div>
 <b>as seen by reader:</b>
-<div class="language-text highlight"><span class="filename">testing.sh</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>#!/bin/sh
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>echo hello KubeStellar
+<div class="language-text highlight"><span class="filename">testing.sh</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>#!/bin/sh
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>echo hello KubeStellar
 </code></pre></div>
 <br/></p>
 <p>(other variations are possible, PR an update to the <a href="https://github.com/kubestellar/kubestellar/blob/main/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)</p>
@@ -4713,12 +4743,12 @@ The section which begins with <strong>nav:</strong> lays out the navigation stru
 </li>
 </ul>
 <p>All of this is invoke in a target in our <a href="https://github.com/kubestellar/kubestellar/blob/main/Makefile">Makefile</a>
-<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>.PHONY:<span class="w"> </span>docs-ecutable
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>docs-ecutable:<span class="w"> </span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="nv">MANIFEST</span><span class="o">=</span><span class="k">$(</span>MANIFEST<span class="k">)</span><span class="w"> </span>docs/scripts/docs-ecutable.sh
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>.PHONY:<span class="w"> </span>docs-ecutable
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>docs-ecutable:<span class="w"> </span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="nv">MANIFEST</span><span class="o">=</span><span class="k">$(</span>MANIFEST<span class="k">)</span><span class="w"> </span>docs/scripts/docs-ecutable.sh
 </code></pre></div></p>
 <p>You give the path from that follows the 'https://github.com/kubestellar/kubestellar/docs' path, and name of the .md file you want to 'execute'/'test' as the value for the <b><i>MANIFEST</i></b> variable:</p>
-<div class="language-text highlight"><span class="filename">How to 'make' our docs-ecutable target</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>make MANIFEST=&quot;&#39;docs/content/Getting-Started/quickstart.md&#39;&quot; docs-ecutable
+<div class="language-text highlight"><span class="filename">How to 'make' our docs-ecutable target</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>make MANIFEST=&quot;&#39;docs/content/Getting-Started/quickstart.md&#39;&quot; docs-ecutable
 </code></pre></div>
 <p><b>note:</b> there are single and double-quotes used here to avoid issues with 'spaces' used in files names or directories.  Use the single and double-quotes as specified in the quickstart example here.</p>
 <h4 id="the-new-and-improved-secret-sauce">The new and improved secret sauce:<a class="headerlink" href="#the-new-and-improved-secret-sauce" title="Permanent link">#</a></h4>
@@ -4734,15 +4764,15 @@ The section which begins with <strong>nav:</strong> lays out the navigation stru
 </li>
 </ul>
 <p>All of this is invoked in a target in our <a href="https://github.com/kubestellar/kubestellar/blob/main/Makefile">Makefile</a>
-<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>.PHONY:<span class="w"> </span>execute-html
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>execute-html:<span class="w"> </span>venv
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">    </span>.<span class="w"> </span><span class="k">$(</span>VENV<span class="k">)</span>/activate<span class="p">;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">    </span><span class="nb">cd</span><span class="w"> </span>docs<span class="p">;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">    </span>mkdocs<span class="w"> </span>build<span class="p">;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">    </span>scripts/execute-html.sh<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$$</span><span class="s2">PWD/..&quot;</span><span class="w"> </span><span class="s2">&quot;generated/</span><span class="k">$(</span>MANIFEST<span class="k">)</span><span class="s2">/index.html&quot;</span>
+<div class="language-bash no-copy highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>.PHONY:<span class="w"> </span>execute-html
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>execute-html:<span class="w"> </span>venv
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">    </span>.<span class="w"> </span><span class="k">$(</span>VENV<span class="k">)</span>/activate<span class="p">;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">    </span><span class="nb">cd</span><span class="w"> </span>docs<span class="p">;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">    </span>mkdocs<span class="w"> </span>build<span class="p">;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">    </span>scripts/execute-html.sh<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$$</span><span class="s2">PWD/..&quot;</span><span class="w"> </span><span class="s2">&quot;generated/</span><span class="k">$(</span>MANIFEST<span class="k">)</span><span class="s2">/index.html&quot;</span>
 </code></pre></div></p>
 <p>The <code>make</code> target requires the variable <code>MANIFEST</code> to be set to the directory that contains the generated <code>index.html</code> file, relative to 'https://github.com/kubestellar/kubestellar/docs/generated'. This is the name of the markdown source file, relative to 'https://github.com/kubestellar/kubestellar/docs/content' and with the <code>.md</code> extension dropped.</p>
-<div class="language-text highlight"><span class="filename">How to 'make' a docs-ecutable target</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>make MANIFEST=&quot;Coding Milestones/PoC2023q1/example1&quot; execute-html
+<div class="language-text highlight"><span class="filename">How to 'make' a docs-ecutable target</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>make MANIFEST=&quot;Coding Milestones/PoC2023q1/example1&quot; execute-html
 </code></pre></div>
 <p><b>note:</b> this target has no special needs for quoting --- which is not to deny the quoting that your shell needs.</p>
 <h3 id="important-files-in-our-gh-pages-branch">Important files in our gh-pages branch<a class="headerlink" href="#important-files-in-our-gh-pages-branch" title="Permanent link">#</a></h3>
@@ -4753,23 +4783,23 @@ The section which begins with <strong>nav:</strong> lays out the navigation stru
 <li><a href="https://github.com/kubestellar/kubestellar/blob/gh-pages/index.html">https://github.com/kubestellar/kubestellar/blob/gh-pages/index.html</a></li>
 </ul>
 <p>both files have content similar to:
-<div class="language-html highlight"><span class="filename">index.html and home.html</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>KubeStellar<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
-<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;content-type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">&gt;</span>
-<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;refresh&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;0; URL=https://docs.kubestellar.io/latest&quot;</span> <span class="p">/&gt;</span>
-<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<div class="language-html highlight"><span class="filename">index.html and home.html</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>KubeStellar<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;content-type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">&gt;</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;refresh&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;0; URL=https://docs.kubestellar.io/latest&quot;</span> <span class="p">/&gt;</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
 </code></pre></div></p>
 <p>Do not remove these files!</p>
 <h4 id="cname">CNAME<a class="headerlink" href="#cname" title="Permanent link">#</a></h4>
 <p>The CNAME file has to be in the gh-pages root to allow github to recognize the url tls cert served by our hosting provider.  Do not remove this file!</p>
 <p>the CNAME file must have the following content in it:
-<div class="language-text highlight"><span class="filename">CNAME</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>docs.kubestellar.io
+<div class="language-text highlight"><span class="filename">CNAME</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>docs.kubestellar.io
 </code></pre></div></p>
 <h4 id="versionsjson">versions.json<a class="headerlink" href="#versionsjson" title="Permanent link">#</a></h4>
 <p>The versions.json file contains the version and alias information required by 'mike' to properly serve our doc site.  This file is maintained by the 'mike' environment and should not be edited by hand.</p>
-<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">[{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.22.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.22.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;latest&quot;</span><span class="p">]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.22.0-rc3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.22.0-rc3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.2-rc1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.2-rc1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.14&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.14&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]}]</span>
+<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">[{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.22.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.22.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;latest&quot;</span><span class="p">]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.22.0-rc3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.22.0-rc3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.2-rc1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.2-rc1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.21.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.14&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.14&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]}]</span>
 </code></pre></div>
 <h3 id="in-case-of-emergency">In case of emergency<a class="headerlink" href="#in-case-of-emergency" title="Permanent link">#</a></h3>
 <p>If you find yourself in a jam and the pages are not showing up at kubestellar.io or docs.kubestellar.io, check the following
@@ -4778,28 +4808,28 @@ The section which begins with <strong>nav:</strong> lays out the navigation stru
 <h3 id="how-to-recreate-the-gh-pages-branch">How to recreate the gh-pages branch<a class="headerlink" href="#how-to-recreate-the-gh-pages-branch" title="Permanent link">#</a></h3>
 <p>To recreate the gh-pages branch, do the following:
 - checkout the gh-pages branch to your local system
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>gh-pages<span class="w"> </span>https://github.com/kubestellar/kubestellar<span class="w"> </span>KubeStellar
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="nb">cd</span><span class="w"> </span>KubeStellar
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>gh-pages<span class="w"> </span>https://github.com/kubestellar/kubestellar<span class="w"> </span>KubeStellar
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="nb">cd</span><span class="w"> </span>KubeStellar
 </code></pre></div>
 - delete all files in the branch and push it to GitHub
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>*
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>git<span class="w"> </span>add<span class="p">;</span><span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;removing all gh-pages files&quot;</span><span class="p">;</span><span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>gh-pages
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>*
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>git<span class="w"> </span>add<span class="p">;</span><span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;removing all gh-pages files&quot;</span><span class="p">;</span><span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>gh-pages
 </code></pre></div>
 - switch to the 'release' branch, switch to /docs and run 'mike deploy' for the release branch. Add the alias 'latest' for the latest release 
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>release-0.22
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>git<span class="w"> </span>pull
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>release-0.22<span class="w"> </span>latest
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>release-0.22
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>git<span class="w"> </span>pull
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>release-0.22<span class="w"> </span>latest
 </code></pre></div>
 - switch back to the gh-pages branch and recreate the home.html, index.html, and CNAME files as needed (make sure you back out of the docs path first before switching to gh-pages because that path does not exist in that branch)
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nb">cd</span><span class="w"> </span>..
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>git<span class="w"> </span>checkout<span class="w"> </span>gh-pages
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>git<span class="w"> </span>pull
-<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>vi<span class="w"> </span>index.html
-<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>vi<span class="w"> </span>home.html
-<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>vi<span class="w"> </span>CNAME
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nb">cd</span><span class="w"> </span>..
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>git<span class="w"> </span>checkout<span class="w"> </span>gh-pages
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>git<span class="w"> </span>pull
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>vi<span class="w"> </span>index.html
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>vi<span class="w"> </span>home.html
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>vi<span class="w"> </span>CNAME
 </code></pre></div>
 - push the new files into gh-pages
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>git<span class="w"> </span>add<span class="w"> </span>.<span class="p">;</span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;add index, home, and CNAME files&quot;</span><span class="p">;</span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>gh-pages
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>git<span class="w"> </span>add<span class="w"> </span>.<span class="p">;</span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;add index, home, and CNAME files&quot;</span><span class="p">;</span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>gh-pages
 </code></pre></div>
 - go into the GitHub UI and go to the settings for the project and click on 'Pages' to add https://docs.kubestellar.io as the domain and check the box to enforce https.</p>
 <ul>
