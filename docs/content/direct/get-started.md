@@ -123,18 +123,22 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
     --version "$kubestellar_version" \
     --set-json ITSes='[{"name":"its1"}]' \
     --set-json WDSes='[{"name":"wds1"},{"name":"wds2","type":"host"}]' \
-    --set verbosity.default=5  # so we can debug your problem reports
+    --set verbosity.default=5
 ```
+The `verbosity.default=5` flag enables more detailed logs for easier debugging.
 
 That command will print some notes about how to get kubeconfig "contexts" named "its1", "wds1", and "wds2" defined. Do that, because those contexts are used in the steps that follow.
 
 ```shell
-kubectl config use-context kind-kubeflex # this is here only to remind you, it will already be the current context if you are following this recipe exactly
-kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
+kubectl config use-context kind-kubeflex 
+kflex ctx --set-current-for-hosting 
 kflex ctx --overwrite-existing-context wds1
 kflex ctx --overwrite-existing-context wds2
 kflex ctx --overwrite-existing-context its1
 ```
+
+The first command, `kubectl config use-context kind-kubeflex`, is only to remind you, it will already be the current context if you are following this recipe exactly.
+The second command, `kflex ctx --set-current-for-hosting`, is for making sure the KubeFlex CLI's hidden state is right for what the Helm chart just did.
 
 #### Wait for ITS to be fully initialized
 
