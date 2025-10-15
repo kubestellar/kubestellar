@@ -34,6 +34,30 @@ To run one of the individual tests, issue a command like the following example.
 go test -v -timeout 60s -run ^TestCRDHandling$ ./test/integration/controller-manager
 ```
 
+## KubeFlex compatibility testing
+
+KubeStellar includes automated testing to ensure compatibility with different versions of the KubeFlex CLI. This test verifies that KubeStellar can work with KubeFlex CLI versions that meet the minimum version requirement.
+
+To run the compatibility test manually:
+
+```shell
+make test-kflex-compatibility
+```
+
+Or run the script directly:
+
+```shell
+./hack/test-kflex-compatibility.sh
+```
+
+This test:
+- Reads the minimum KubeFlex version requirement from `scripts/check_pre_req.sh`
+- Downloads and tests recent KubeFlex CLI versions that meet the minimum requirement
+- Verifies basic CLI functionality with each version
+- Reports compatibility status
+
+The test runs automatically as a daily periodic job in the CI system to catch compatibility issues early.
+
 ## End-to-end testing
 
 See `test/e2e/` in the GitHub repository. It has a README.
