@@ -35,23 +35,24 @@ export default function GetStartedSection() {
       <div className="absolute inset-0 bg-[#0a0a0a] pointer-events-none"></div>
 
       {/* Starfield background */}
-      <StarField density="medium" showComets={true} cometCount={3} />
+      <StarField density="low" showComets={true} cometCount={3} />
 
       {/* Gridlines background */}
-      <GridLines verticalLines={20} horizontalLines={33} />
+      <GridLines verticalLines={20} horizontalLines={30} />
 
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-2/5 left-2/11 w-[6rem] h-[6rem] bg-purple-500/10 rounded-full blur-[120px]"></div>
 
         <div className="absolute top-4/5 left-1/2 w-[10rem] h-[10rem] bg-purple-500/5 rounded-full blur-[180px]"></div>
+        <div className="absolute -top-40 left-0 z-3 h-[16rem] w-[16rem] rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 blur-[60px] flex-none order-3 grow-0"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold sm:text-4xl">
+          <h2 className="text-3xl font-extrabold sm:text-[2.4rem]">
             Ready to Get Started?
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg sm:text-xl text-blue-100">
+          <p className="mt-3 max-w-2xl mx-auto text-lg sm:text-xl text-blue-100">
             Join the growing community of KubeStellar users and contributors.
           </p>
         </div>
@@ -72,12 +73,12 @@ export default function GetStartedSection() {
                 step-by-step instructions.
               </p>
               <div>
-                <a
+                <Link
                   href="/quick-installation"
                   className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 sm:px-6 sm:py-3 sm:text-base transition-colors duration-20"
                 >
                   Start Quick Installation
-                </a>
+                </Link>
               </div>
             </div>
           </div>

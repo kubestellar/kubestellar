@@ -188,7 +188,7 @@ export default function HeroSection() {
         {/* IMPLEMENTATION REMAINING WILL DO*/}
         {/* Dynamic Star Field */}
         <div className="absolute inset-0 bg-[#0a0a0a]">
-          <StarField density="high" showComets={true} cometCount={8} />
+          <StarField density="medium" showComets={true} cometCount={8} />
         </div>
 
         {/* Interactive Grid Network */}

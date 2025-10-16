@@ -184,19 +184,20 @@ export default function UseCasesSection() {
       <div className="absolute inset-0 bg-[#0a0a0a]"></div>
 
       {/* Starfield background */}
-      <StarField density="medium" showComets={true} cometCount={4} />
+      <StarField density="low" showComets={true} cometCount={4} />
 
       {/* Grid lines background */}
       <GridLines horizontalLines={18} verticalLines={15} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
-            <span className="bg-gradient-to-r from-[#667EEA] to-[#764BA2] bg-clip-text text-transparent">
-              Use Cases
+          <h2 className="text-3xl font-extrabold text-white sm:text-[2.4rem]">
+            Use{" "}
+            <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
+              Cases
             </span>
           </h2>
-          <p className="max-w-2xl mx-auto text-lg sm:text-xl text-[#D1D5DB] font-normal px-4">
+          <p className="max-w-2xl mt-3 mx-auto text-lg sm:text-xl text-[#D1D5DB] font-normal px-4">
             Discover how organizations leverage KubeStellar for their
             multi-cluster needs.
           </p>

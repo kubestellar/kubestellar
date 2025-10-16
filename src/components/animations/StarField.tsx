@@ -11,7 +11,7 @@ interface StarFieldProps {
 
 export default function StarField({
   className = "",
-  density = "medium",
+  density = "low",
   showComets = true,
   cometCount = 3,
 }: StarFieldProps) {
@@ -27,9 +27,9 @@ export default function StarField({
 
     // Calculate star count based on density
     const densityMap = {
-      low: 200,
-      medium: 300,
-      high: 600,
+      low: 100,
+      medium: 150,
+      high: 200,
     };
 
     const starCount = densityMap[density];

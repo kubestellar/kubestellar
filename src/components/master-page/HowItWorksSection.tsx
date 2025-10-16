@@ -20,8 +20,11 @@ export default function HowItWorksSection() {
       <div className="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-blue-500/10 to-transparent"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white">
-            How <span className="text-gradient">It Works</span>
+          <h2 className="text-3xl font-extrabold text-white sm:text-[2.4rem]">
+            How{" "}
+            <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
+              It Works
+            </span>
           </h2>
           <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-gray-300 px-4">
             KubeStellar orchestrates your multi-cluster environment with a
