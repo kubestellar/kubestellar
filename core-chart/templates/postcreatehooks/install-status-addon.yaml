@@ -15,36 +15,17 @@ spec:
       template:
         spec:
           initContainers:
-          - name: wait-for-kubeconfig
-            image: busybox:latest
-            command:
-              - sh
-              - -c
-              - |
-                echo "Waiting for kubeconfig file '$KUBECONFIG' to exist and be non-empty..."
-                until [ -s "$KUBECONFIG" ]; do
-                  echo "Kubeconfig file not ready yet, waiting..."
-                  sleep 2
-                done
-                echo "Kubeconfig file is ready"
-            env:
-            - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
-            volumeMounts:
-            - name: kubeconfig
-              mountPath: "/etc/kube"
-              readOnly: true
-
           - name: wait-for-placements-crd-created
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
-              - sh
-              - -c
-              - |
-                until kubectl get crd placements.cluster.open-cluster-management.io >/dev/null 2>&1; do sleep 2; done
+              - kubectl
+              - wait
+              - --for=create
+              - crd/placements.cluster.open-cluster-management.io
+              - --timeout=300s
             env:
             - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+              value: '{{"/etc/kube/{{.ITSkubeconfig}}"}}'
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -69,13 +50,14 @@ spec:
           - name: wait-for-managedclustersetbindings-crd-created
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             command:
-              - sh
-              - -c
-              - |
-                until kubectl get crd managedclustersetbindings.cluster.open-cluster-management.io >/dev/null 2>&1; do sleep 2; done
+              - kubectl
+              - wait
+              - --for=create
+              - crd/managedclustersetbindings.cluster.open-cluster-management.io
+              - --timeout=300s
             env:
             - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+              value: '{{"/etc/kube/{{.ITSkubeconfig}}"}}'
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"

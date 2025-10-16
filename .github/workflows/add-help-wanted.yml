@@ -1,4 +1,4 @@
-name: Add Help Wanted or Good First Issue Labels
+name: Add Help Wanted, Good First Issue, or Hacktober Fest Labels
 
 on:
   issue_comment:
@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   label-on-comment:
-    if: github.event.comment.body == '/help-wanted' || github.event.comment.body == '/good-first-issue'
+    if: github.event.comment.body == '/help-wanted' || github.event.comment.body == '/good-first-issue' || github.event.comment.body == '/hacktober-fest'
     runs-on: ubuntu-latest
     steps:
       - name: Add label based on comment
@@ -26,6 +26,8 @@ jobs:
               label = 'help wanted';
             } else if (comment === '/good-first-issue') {
               label = 'good first issue';
+            } else if (comment === '/hacktober-fest') {
+              label = 'hacktober-fest';
             }
 
             if (label) {

@@ -17,6 +17,9 @@
 <a href="https://cloud-native.slack.com/archives/C097094RZ3M"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
+<a href="https://deepwiki.com/kubestellar/kubestellar">
+  <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
+</a>
 
 **KubeStellar** is a Cloud Native Computing Foundation (CNCF) Sandbox project that simplifies the deployment and configuration of applications across multiple Kubernetes clusters. It provides a seamless experience akin to using a single cluster, and it integrates with the tools you're already familiar with, eliminating the need to modify existing resources.
 
