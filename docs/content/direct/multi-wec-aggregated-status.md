@@ -24,7 +24,7 @@
 
 1. **Reuse Existing Patterns**
 
-   * Collect WorkStatus slices per WDS object using the CombinedStatus slice/map approach.
+   * Collect WorkStatus slices per WDS object using the SingletonStatus slice/map approach.
    * Reuse `updateObjectStatus()` from SingletonStatus for safe `.status` patching.
 
 2. **Predefined Field-Type Aggregation**
@@ -44,7 +44,6 @@
 5. **Deterministic Multi-BindingPolicy Handling**
 
    * Conflicting policies fall back to **conservative defaults** (`min()` for numeric, AND for negative conditions, OR for positive conditions).
-   * `.status.kubestellar/policyBreakdown` records contributing policies and modes for observability.
 
 ---
 
@@ -63,7 +62,7 @@ c.workStatusToObject.ReadInverse().ContGet(wObjID, func(wsONSet sets.Set[cache.O
 })
 ```
 
-* Slice mirrors CombinedStatus:
+* Slice mirrors SingletonStatus:
   * `.status` map from each WEC
   * Cluster metadata
   * Last update timestamp
@@ -78,7 +77,7 @@ c.workStatusToObject.ReadInverse().ContGet(wObjID, func(wsONSet sets.Set[cache.O
 | Field                                                       | Aggregation             | Notes                                           |
 | ----------------------------------------------------------- | ----------------------- | ----------------------------------------------- |
 | replicas, readyReplicas, availableReplicas, updatedReplicas | min(values) across WECs | Conservative; prevents over-reporting in ArgoCD |
-| Optional override                                           | sum / average / quorum  | For analytics/reporting                         |
+| Optional override                                           | sum / average           | For analytics/reporting                         |
 
 **Example:** 3 clusters `[1, 0, 1]` → Output `0` (reflects weakest cluster)
 
@@ -106,7 +105,6 @@ c.workStatusToObject.ReadInverse().ContGet(wObjID, func(wsONSet sets.Set[cache.O
 
 * `lastTransitionTime`: max across WECs
 * `observedGeneration`: max across WECs
-* `ObjectMeta.Generation`: ignored for health
 
 ### D. Other Fields
 
@@ -143,7 +141,6 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
   * DeploymentAggregator
   * StatefulSetAggregator
   * DaemonSetAggregator
-  * GenericAggregator fallback → `.status.kubestellar/combined`
 * Aggregation mode configurable per BindingPolicy / StatusCollector (`min` default)
 * Optional overrides for sum/average/quorum
 
@@ -153,7 +150,6 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 
 * Patch only if `.status` changed (deep-equal check)
 * Use MergePatch to avoid conflicts with other controllers
-* Per-WEC breakdown stored in `.status.kubestellar/combined`
 * Rate-limit updates to reduce API server churn
 * Log warnings for ambiguous fields and conflicting policies
 
