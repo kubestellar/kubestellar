@@ -10,32 +10,12 @@ spec:
   - apiVersion: batch/v1
     kind: Job
     metadata:
-      name: "{{"{{.HookName}}"}}"
+      name: '{{"{{.HookName}}"}}'
     spec:
       template:
         spec:
-          initContainers:
-          - name: wait-for-config-incluster
-            image: busybox:latest
-            command:
-              - sh
-              - -c
-              - |
-                echo "Waiting for kubeconfig file '$KUBECONFIG' to exist and be non-empty..."
-                until [ -s "$KUBECONFIG" ]; do
-                  echo "Kubeconfig file not ready yet, waiting..."
-                  sleep 2
-                done
-                echo "Kubeconfig file is ready"
-            env:
-            - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
-            volumeMounts:
-            - name: kubeconfig
-              mountPath: "/etc/kube"
-              readOnly: true
           containers:
-          - name: "{{"{{.HookName}}-clusteradm"}}"
+          - name: '{{"{{.HookName}}-clusteradm"}}'
             image: quay.io/kubestellar/clusteradm:{{.Values.CLUSTERADM_VERSION}}
             args:
             - init
@@ -44,7 +24,7 @@ spec:
             - --timeout=300
             env:
             - name: KUBECONFIG
-              value: "{{"/etc/kube/{{.ITSkubeconfig}}"}}"
+              value: '{{"/etc/kube/{{.ITSkubeconfig}}"}}'
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -52,7 +32,7 @@ spec:
           volumes:
           - name: kubeconfig
             secret:
-              secretName: "{{"{{.ITSSecretName}}"}}"
+              secretName: '{{"{{.ITSSecretName}}"}}'
           restartPolicy: Never
       backoffLimit: 1
-{{- end }} 
+{{- end }}
