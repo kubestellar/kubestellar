@@ -224,5 +224,4 @@ spec:
           securityContext:
             runAsNonRoot: true
           terminationGracePeriodSeconds: 10
-
 {{- end }}
