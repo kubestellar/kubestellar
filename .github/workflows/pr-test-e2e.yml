@@ -106,6 +106,14 @@ jobs:
         if: always()
         run: kubectl --context kind-kubeflex get deployments -A
 
+      - name: Dump kubeflex-controller-manager logs
+        if: always()
+        run: |
+          echo "--- Dumping logs for previous kubeflex-controller-manager container ---"
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager -p || echo "INFO: No previous container found."
+          echo "--- Dumping logs for current kubeflex-controller-manager container ---"
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || echo "ERROR: Could not dump current logs."
+
       - name: show Deployment objects in its1
         if: always()
         run: kubectl --context its1 get deployments -A
@@ -240,6 +248,14 @@ jobs:
       - name: show Deployment objects in hosting cluster
         if: always()
         run: kubectl --context kind-kubeflex get deployments -A
+
+      - name: Dump kubeflex-controller-manager logs
+        if: always()
+        run: |
+          echo "--- Dumping logs for previous kubeflex-controller-manager container ---"
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager -p || echo "INFO: No previous container found."
+          echo "--- Dumping logs for current kubeflex-controller-manager container ---"
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || echo "ERROR: Could not dump current logs."
 
       - name: show Deployment objects in its1
         if: always()
