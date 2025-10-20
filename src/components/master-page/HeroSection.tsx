@@ -403,7 +403,7 @@ export default function HeroSection() {
               </a>
 
               <a
-                href="#documentation"
+                href="/docs"
                 className="secondary-action-btn inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-xl text-gray-200 
                           bg-gray-800/40 hover:bg-gray-800/60 
                           backdrop-blur-md border border-gray-700/50 hover:border-gray-600/50 

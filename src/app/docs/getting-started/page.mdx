@@ -1,0 +1,84 @@
+# Getting Started
+
+Welcome to the **KubeStellar Getting Started Guide**! 🚀
+
+This guide will help you set up and start using KubeStellar for multi-cluster Kubernetes orchestration.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- **Kubernetes clusters** (2 or more)
+- **kubectl** installed and configured
+- **Helm 3** or later
+- Basic understanding of Kubernetes concepts
+
+## Installation Steps
+
+### Step 1: Install KubeStellar Core
+
+```bash
+kubectl apply -f https://github.com/kubestellar/kubestellar/releases/latest/download/kubestellar.yaml
+```
+
+### Step 2: Verify Installation
+
+Check that all KubeStellar components are running:
+
+```bash
+kubectl get pods -n kubestellar-system
+```
+
+Expected output:
+```plaintext
+NAME                                   READY   STATUS    RESTARTS   AGE
+kubestellar-controller-manager-xxx     1/1     Running   0          30s
+kubestellar-webhook-xxx                1/1     Running   0          30s
+```
+
+### Step 3: Register Your Clusters
+
+Register your workload clusters with KubeStellar:
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: control.kubestellar.io/v1alpha1
+kind: WorkloadCluster
+metadata:
+  name: cluster-1
+spec:
+  kubeconfig:
+    secretRef:
+      name: cluster-1-kubeconfig
+      namespace: kubestellar-system
+EOF
+```
+
+## Quick Example
+
+Deploy a sample application across multiple clusters:
+
+```yaml
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: nginx-deployment
+spec:
+  clusterSelectors:
+    - matchLabels:
+        environment: production
+  downsync:
+    - apiGroup: apps
+      resources: [deployments]
+      namespaces: [default]
+```
+
+## Next Steps
+
+- 📚 Read the [API Documentation](/docs/api-reference)
+- 🎯 Follow the [Tutorials](/docs/tutorials)
+- 💬 Join our [Community](https://github.com/kubestellar/kubestellar/discussions)
+
+---
+
+✅ **You're all set to start orchestrating with KubeStellar!**

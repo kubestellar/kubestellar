@@ -4,6 +4,7 @@
   --breakpoint-lgcustom: 900px;
 }
 :root {
+  /* Dark mode colors (default) */
   --background: #0a0a0a;
   --foreground: #ffffff;
   --color-background: var(--background);
@@ -12,17 +13,59 @@
   --font-mono: var(--font-jetbrains-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root:not(.dark) {
+  /* Light mode colors */
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+}
+
+.dark {
+  /* Dark mode colors */
+  --background: #0a0a0a;
+  --foreground: #ffffff;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Nextra Theme Overrides for proper light/dark mode */
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
+}
+
+/* Light mode specific styles */
+html:not(.dark) body {
+  background: #ffffff;
+  color: #0a0a0a;
+}
+
+/* Dark mode specific styles */
+html.dark body {
+  background: #0a0a0a;
+  color: #ffffff;
+}
+
+/* Ensure Nextra sidebar is visible in light mode */
+html:not(.dark) nav {
+  background: #ffffff;
+  color: #0a0a0a;
+}
+
+html:not(.dark) aside {
+  background: #ffffff;
+  border-right-color: #e5e7eb;
+}
+
+html:not(.dark) .nextra-sidebar-container {
+  background: #ffffff;
 }
 
 /* Custom Tailwind utilities */

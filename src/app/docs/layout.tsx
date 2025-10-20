@@ -1,7 +1,8 @@
-import { Footer, Layout, Navbar } from 'nextra-theme-docs'
+import { Layout, Navbar } from 'nextra-theme-docs'
 import { Banner } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
+import Footer from '@/components/Footer'
  
 export const metadata = {
   title: 'KubeStellar - Multi-Cluster Kubernetes Orchestration',
@@ -15,16 +16,26 @@ const navbar = (
     projectLink="https://github.com/kubestellar/kubestellar"
   />
 )
-const footer = <Footer>MIT {new Date().getFullYear()} © KubeStellar.</Footer>
+const footer = <Footer />
  
 export default async function DocsLayout({ children }: { children: React.ReactNode }) {
+  // Get the full pageMap and filter to only docs routes
+  const fullPageMap = await getPageMap()
+  
+  // Create a filtered pageMap with only the docs folder content
+  const docsPageMap = fullPageMap.filter((item: any) => {
+    // Only include items that are within the docs route
+    return item.route === '/docs' || item.route?.startsWith('/docs/')
+  })
+  
   return (
     <Layout
       banner={banner}
       navbar={navbar}
-      pageMap={await getPageMap()}
+      pageMap={docsPageMap}
       docsRepositoryBase="https://github.com/kubestellar/kubestellar"
       footer={footer}
+      darkMode={true}
     >
       {children}
     </Layout>

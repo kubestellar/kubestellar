@@ -198,8 +198,7 @@ export default function Navigation() {
               {/* Docs Link */}
               <div className="relative group">
                 <Link
-                  target="_blank"
-                  href="#docs"
+                  href="/docs"
                   className="text-sm font-medium text-gray-300 hover:text-blue-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20 nav-link-hover"
                 >
                   <div className="relative">
