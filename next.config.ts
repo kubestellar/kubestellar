@@ -1,4 +1,12 @@
 import type { NextConfig } from "next";
+import nextra from "nextra";
+
+const withNextra = nextra({
+  latex: true,
+  search: {
+    codeblocks: false,
+  },
+});
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -8,6 +16,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["@/components"],
   },
+  pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
 };
 
-export default nextConfig;
+export default withNextra(nextConfig);
