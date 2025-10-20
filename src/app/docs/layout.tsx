@@ -23,6 +23,7 @@ export default async function DocsLayout({ children }: { children: React.ReactNo
   const fullPageMap = await getPageMap()
   
   // Create a filtered pageMap with only the docs folder content
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const docsPageMap = fullPageMap.filter((item: any) => {
     // Only include items that are within the docs route
     return item.route === '/docs' || item.route?.startsWith('/docs/')
