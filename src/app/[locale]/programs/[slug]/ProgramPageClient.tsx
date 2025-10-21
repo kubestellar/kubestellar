@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import Navigation from "../../../components/Navigation";
-import Footer from "../../../components/Footer";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import { Program } from "../programs";
 import { StarField, GridLines } from "@/components";
 

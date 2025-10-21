@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { GridLines, StarField } from "./index";
 
@@ -180,12 +181,12 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-white mb-4">Resources</h3>
             <ul className="space-y-3">
               <li>
-                <a
+                <Link
                   href="/docs"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   Documentation
-                </a>
+                </Link>
               </li>
               <li>
                 <a

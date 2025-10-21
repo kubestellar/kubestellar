@@ -2,12 +2,11 @@
 
 import { getAllPrograms } from "./programs";
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect } from "react";
-import Navigation from "../../components/Navigation";
-import Footer from "../../components/Footer";
+import Navigation from "../../../components/Navigation";
+import Footer from "../../../components/Footer";
 import { GridLines, StarField } from "@/components";
-
+import { Link } from "@/i18n/navigation";
 export default function ProgramsPage() {
   const programs = getAllPrograms();
 
