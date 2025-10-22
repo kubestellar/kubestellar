@@ -386,7 +386,9 @@ export default function MaintainerLadderPage() {
                   </thead>
                   <tbody className="text-gray-300">
                     <tr className="border-b border-gray-700/50">
-                      <td className="py-4 px-6">&quot;Help Wanted&quot; Issues</td>
+                      <td className="py-4 px-6">
+                        &quot;Help Wanted&quot; Issues
+                      </td>
                       <td className="py-4 px-6 text-green-400 font-semibold">
                         ≥ 2
                       </td>

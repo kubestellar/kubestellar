@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Link as IntlLink } from "@/i18n/navigation";
-import { GridLines, StarField } from "../index";
+import { GridLines, StarField, EarthAnimation } from "../index";
 import StatCard from "../StatsCard";
 import { useTranslations } from "next-intl";
 
@@ -138,50 +138,9 @@ export default function HeroSection() {
       });
     };
 
-    // Initialize all components
+    // Initialize components
     initTypingAnimation();
     animateCounters();
-
-    // Enhanced 3D hover effect for mission control scene
-    const sceneContainer = document.querySelector(
-      ".scene-container"
-    ) as HTMLElement;
-    const missionControlScene = document.querySelector(
-      ".mission-control-scene"
-    ) as HTMLElement;
-
-    if (sceneContainer && missionControlScene) {
-      // Initial animation to bring the scene into view
-      setTimeout(() => {
-        sceneContainer.style.transform =
-          "perspective(1000px) rotateY(3deg) rotateX(2deg) translateZ(0)";
-        sceneContainer.style.opacity = "1";
-      }, 500);
-
-      missionControlScene.addEventListener("mousemove", e => {
-        const rect = missionControlScene.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        // Calculate rotation values with easing
-        const rotateY = (x - centerX) / 40;
-        const rotateX = (centerY - y) / 40;
-
-        // Apply smooth transition
-        sceneContainer.style.transition = "transform 0.1s ease-out";
-        sceneContainer.style.transform = `perspective(1000px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) translateZ(10px)`;
-      });
-
-      // Reset on mouse leave with smooth transition
-      missionControlScene.addEventListener("mouseleave", () => {
-        sceneContainer.style.transition = "transform 0.5s ease-out";
-        sceneContainer.style.transform =
-          "perspective(1000px) rotateY(3deg) rotateX(2deg) translateZ(0)";
-      });
-    }
   }, []);
 
   return (
@@ -189,7 +148,6 @@ export default function HeroSection() {
       {/* Animated Background Universe */}
       <div className="absolute inset-0 z-0">
         {/*!-- Floating Nebula Clouds */}
-        {/* IMPLEMENTATION REMAINING WILL DO*/}
         {/* Dynamic Star Field */}
         <div className="absolute inset-0 bg-[#0a0a0a]">
           <StarField density="medium" showComets={true} cometCount={8} />
@@ -448,206 +406,22 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right Column: Astronaut Mission Control Scene */}
-          <div className="mission-control-scene relative h-[500px]">
-            {/* Main scene container with perspective */}
-            <div className="absolute inset-0 scene-container perspective-1000">
-              {/* Holographic Control Panels */}
-              <div className="absolute top-8 left-8 control-panel bg-blue-500/10 backdrop-blur-sm rounded-lg p-4 border border-blue-500/30">
-                <div className="text-xs text-blue-400 mb-2">CLUSTER STATUS</div>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-300">US-East</span>
-                    <div className="w-12 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-green-500 rounded-full"
-                        style={{ width: "85%" }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-300">EU-West</span>
-                    <div className="w-12 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-green-500 rounded-full"
-                        style={{ width: "92%" }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-300">Asia-Pacific</span>
-                    <div className="w-12 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-yellow-500 rounded-full"
-                        style={{ width: "78%" }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Metrics Panel */}
-              <div className="absolute top-8 right-8 metrics-panel bg-purple-500/10 backdrop-blur-sm rounded-lg p-4 border border-purple-500/30">
-                <div className="text-xs text-purple-400 mb-2">PERFORMANCE</div>
-                <div className="space-y-1 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">CPU</span>
-                    <span className="text-green-400">67%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Memory</span>
-                    <span className="text-blue-400">43%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Network</span>
-                    <span className="text-yellow-400">28%</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Central Astronaut */}
-              <div className="absolute inset-0 flex items-center justify-center astronaut-container">
-                <div className="relative astronaut">
-                  <svg
-                    width="120"
-                    height="120"
-                    viewBox="0 0 120 120"
-                    className="drop-shadow-2xl"
-                  >
-                    {/* Helmet */}
-                    <circle
-                      cx="60"
-                      cy="45"
-                      r="25"
-                      fill="url(#helmet-gradient)"
-                      stroke="#3b82f6"
-                      strokeWidth="2"
-                    />
-
-                    {/* Helmet Visor */}
-                    <path
-                      d="M 40 45 Q 60 25 80 45 Q 60 65 40 45"
-                      fill="url(#visor-gradient)"
-                      opacity="0.8"
-                    />
-
-                    {/* Body */}
-                    <path
-                      d="M 45 70 L 75 70 L 78 95 L 42 95 Z"
-                      fill="url(#suit-gradient)"
-                      stroke="#6366f1"
-                      strokeWidth="1"
-                    />
-
-                    {/* Arms */}
-                    <path
-                      d="M 45 75 L 30 85 L 35 90 L 50 80"
-                      fill="url(#suit-gradient)"
-                      stroke="#6366f1"
-                      strokeWidth="1"
-                    />
-                    <path
-                      d="M 75 75 L 90 85 L 85 90 L 70 80"
-                      fill="url(#suit-gradient)"
-                      stroke="#6366f1"
-                      strokeWidth="1"
-                    />
-
-                    {/* Control Device */}
-                    <circle
-                      cx="85"
-                      cy="87"
-                      r="4"
-                      fill="#10b981"
-                      className="pulsing"
-                    />
-
-                    {/* Gradients */}
-                    <defs>
-                      <linearGradient
-                        id="helmet-gradient"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="100%"
-                      >
-                        <stop
-                          offset="0%"
-                          style={{ stopColor: "#1e293b", stopOpacity: 0.9 }}
-                        />
-                        <stop
-                          offset="100%"
-                          style={{ stopColor: "#334155", stopOpacity: 0.9 }}
-                        />
-                      </linearGradient>
-                      <linearGradient
-                        id="visor-gradient"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="100%"
-                      >
-                        <stop
-                          offset="0%"
-                          style={{ stopColor: "#3b82f6", stopOpacity: 0.3 }}
-                        />
-                        <stop
-                          offset="100%"
-                          style={{ stopColor: "#1d4ed8", stopOpacity: 0.6 }}
-                        />
-                      </linearGradient>
-                      <linearGradient
-                        id="suit-gradient"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="100%"
-                      >
-                        <stop offset="0%" style={{ stopColor: "#374151" }} />
-                        <stop offset="100%" style={{ stopColor: "#4b5563" }} />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                </div>
-              </div>
-
-              {/* Floating Connection Lines */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                <path
-                  className="connection-path"
-                  d="M 60 60 Q 100 80 140 100"
-                  stroke="url(#connection-gradient)"
-                  strokeWidth="1"
-                  fill="none"
-                  strokeDasharray="5,5"
-                />
-                <path
-                  className="connection-path"
-                  d="M 60 60 Q 20 40 -20 20"
-                  stroke="url(#connection-gradient)"
-                  strokeWidth="1"
-                  fill="none"
-                  strokeDasharray="5,5"
-                />
-                <defs>
-                  <linearGradient id="connection-gradient">
-                    <stop
-                      offset="0%"
-                      style={{ stopColor: "#3b82f6", stopOpacity: 0.6 }}
-                    />
-                    <stop
-                      offset="100%"
-                      style={{ stopColor: "#8b5cf6", stopOpacity: 0.2 }}
-                    />
-                  </linearGradient>
-                </defs>
-              </svg>
-
-              {/* Orbital Rings */}
-              <div className="orbit-container animate-spin-slow">
-                <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-blue-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
-              </div>
-            </div>
+          {/* Right Column: Earth Animation */}
+          <div className="earth-animation-container relative h-[500px] flex items-center justify-center">
+            <EarthAnimation
+              width="100%"
+              height="500px"
+              scale={3.5}
+              autoRotate={true}
+              autoRotateSpeed={0.5}
+              enableZoom={false}
+              fov={50}
+              cameraPosition={[-4, 2, 6]}
+              className="rounded-xl overflow-hidden"
+              style={{
+                filter: "drop-shadow(0 25px 50px rgba(59, 130, 246, 0.3))",
+              }}
+            />
           </div>
         </div>
       </div>

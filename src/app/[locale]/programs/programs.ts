@@ -33,7 +33,7 @@ export const programs: Program[] = [
     fullName: "Google Summer of Code",
     description:
       "Transform your coding skills with Google's premier open source program",
-    logo: "/GSoC image.png",
+    logo: "/programs/GSoC image.png",
     isPaid: true,
     theme: {
       gradient: "linear-gradient(135deg, #FDE047, #FACC15, #EAB308, #CA8A04)",
@@ -73,7 +73,7 @@ export const programs: Program[] = [
     name: "ESoC",
     fullName: "European Summer of Code",
     description: "Empower European talent in open source development",
-    logo: "/ESoC.png",
+    logo: "/programs/ESoC.png",
     isPaid: true,
     theme: {
       gradient: "linear-gradient(135deg, #CA8A04, #A16207, #92400E, #78350F)",
@@ -113,7 +113,7 @@ export const programs: Program[] = [
     name: "IFoS",
     fullName: "Interns for Open Source",
     description: "Kickstart your open source journey with KubeStellar",
-    logo: "/IFoS logo.png",
+    logo: "/programs/IFoS logo.png",
     isPaid: false,
     theme: {
       gradient: "linear-gradient(135deg, #06B6D4, #0891B2, #0E7490, #155E75)",
@@ -154,7 +154,7 @@ export const programs: Program[] = [
     fullName: "LFX Mentorship",
     description:
       "Accelerate your open source journey with Linux Foundation mentorship",
-    logo: "/lfx-logo.png",
+    logo: "/programs/lfx-logo.png",
     isPaid: true,
     theme: {
       gradient: "linear-gradient(135deg, #3B82F6, #1D4ED8, #1E40AF, #1E3A8A)",
