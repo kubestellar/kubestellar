@@ -1,8 +1,9 @@
-import { Layout, Navbar } from 'nextra-theme-docs'
+import { Layout } from 'nextra-theme-docs'
 import { Banner } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
 import Footer from '@/components/Footer'
+import DocsNavbar from '@/components/docs/DocsNavbar'
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 
@@ -21,24 +22,16 @@ export const metadata = {
   title: 'KubeStellar - Multi-Cluster Kubernetes Orchestration',
   description: 'Official documentation for KubeStellar - Multi-cluster orchestration platform',
 }
- 
-const banner = <Banner storageKey="kubestellar-demo">Welcome to KubeStellar Docs - Powered by Nextra! 🎉</Banner>
-const navbar = (
-  <Navbar
-    logo={<b>KubeStellar Docs</b>}
-    projectLink="https://github.com/kubestellar/kubestellar"
-  />
-)
+
+const banner = <Banner storageKey="kubestellar-demo"><strong>Hacktoberfest 2025</strong> is here! Join us to learn, share, and contribute to our community🎉</Banner>
+const navbar = <DocsNavbar />
 const footer = <Footer />
  
 export default async function DocsLayout({ children }: { children: React.ReactNode }) {
-  // Get the full pageMap and filter to only docs routes
   const fullPageMap = await getPageMap()
   
-  // Create a filtered pageMap with only the docs folder content
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const docsPageMap = fullPageMap.filter((item: any) => {
-    // Only include items that are within the docs route
     return item.route === '/docs' || item.route?.startsWith('/docs/')
   })
   
