@@ -6,12 +6,37 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { StarField, GridLines } from "@/components";
 import { handbookCards, HandbookCard } from "./handbook";
+import { useTranslations } from "next-intl";
 
 interface HandbookCardComponentProps {
   card: HandbookCard;
 }
 
 function HandbookCardComponent({ card }: HandbookCardComponentProps) {
+  const t = useTranslations("communityHandbook");
+
+  // Map card IDs to translation keys
+  const getCardTranslations = (cardId: string) => {
+    const translationKeyMap: Record<string, string> = {
+      onboarding: "onboarding",
+      "code-of-conduct": "codeOfConduct",
+      guidelines: "guidelines",
+      license: "license",
+      governance: "governance",
+      testing: "testing",
+      packaging: "packaging",
+      "docs-management": "docsManagement",
+      "testing-website-prs": "testingWebsitePRs",
+      "release-process": "releaseProcess",
+      "release-testing": "releaseTesting",
+      "signoff-signing": "signoffSigning",
+    };
+
+    return translationKeyMap[cardId] || cardId;
+  };
+
+  const translationKey = getCardTranslations(card.id);
+
   return (
     <Link href={card.link}>
       <div className="relative group bg-slate-800/50 border border-slate-700 rounded-xl p-8 h-72 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30">
@@ -33,13 +58,15 @@ function HandbookCardComponent({ card }: HandbookCardComponentProps) {
               ></path>
             </svg>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-4">{card.title}</h3>
+          <h3 className="text-2xl font-bold text-white mb-4">
+            {t(`cards.${translationKey}.title`)}
+          </h3>
           <p className="text-gray-300 leading-relaxed flex-grow">
-            {card.description}
+            {t(`cards.${translationKey}.description`)}
           </p>
         </div>
         <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <span className="learn-more-enhanced">Learn More</span>
+          <span className="learn-more-enhanced">{t("learnMore")}</span>
         </div>
       </div>
     </Link>
@@ -47,6 +74,9 @@ function HandbookCardComponent({ card }: HandbookCardComponentProps) {
 }
 
 export default function CommunityHandbook() {
+  const t = useTranslations("communityHandbook");
+  const footerT = useTranslations("footer");
+
   useEffect(() => {
     // Back to top functionality
     const backToTopButton = document.getElementById("back-to-top");
@@ -121,10 +151,10 @@ export default function CommunityHandbook() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <h1 className="text-6xl font-bold text-center mb-16 text-shadow-lg">
               <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
-                Contribute
+                {t("title")}
               </span>{" "}
               <span className="text-gradient animated-gradient bg-gradient-to-r from-cyan-400 via-emerald-500 to-blue-500">
-                Handbook
+                {t("titleSpan")}
               </span>
             </h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -142,6 +172,7 @@ export default function CommunityHandbook() {
       <button
         id="back-to-top"
         className="fixed bottom-8 right-8 p-2 rounded-full bg-blue-600 text-white shadow-lg z-50 transition-all duration-300 opacity-0 translate-y-10"
+        aria-label={footerT("backToTop")}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

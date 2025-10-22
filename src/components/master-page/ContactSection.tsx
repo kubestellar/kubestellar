@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { GridLines, StarField } from "../index";
+import { useTranslations } from "next-intl";
 
 export default function ContactSection() {
+  const t = useTranslations("contactSection");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -113,13 +115,13 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-8 sm:mb-10 md:mb-12">
           <h2 className="text-3xl font-extrabold text-white sm:text-[2.4rem]">
-            Get{" "}
+            {t("title")}{" "}
             <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
-              in Touch
+              {t("titleSpan")}
             </span>
           </h2>
           <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-gray-300 px-4">
-            Have questions about KubeStellar? We&apos;re here to help!
+            {t("subtitle")}
           </p>
         </div>
 
@@ -150,13 +152,13 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                 </div>
                 <div className="ml-3 sm:ml-5">
                   <h3 className="text-base sm:text-lg font-medium text-white">
-                    Email Support
+                    {t("card1Title")}
                   </h3>
                   <p className="text-gray-300 mt-1 text-sm sm:text-base">
-                    Get direct support from our team
+                    {t("card1Description")}
                   </p>
                   <p className="text-blue-400 mt-1 text-xs sm:text-sm inline-flex items-center">
-                    support@kubestellar.io
+                    {t("card1Link")}
                     <svg
                       className="ml-1 w-3 h-3 sm:w-4 sm:h-4"
                       fill="none"
@@ -210,13 +212,13 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                 </div>
                 <div className="ml-3 sm:ml-5">
                   <h3 className="text-base sm:text-lg font-medium text-white">
-                    Community Chat
+                    {t("card2Title")}
                   </h3>
                   <p className="text-gray-300 mt-1 text-sm sm:text-base">
-                    Join our Slack workspace for real-time support
+                    {t("card2Description")}
                   </p>
                   <p className="text-purple-400 mt-1 text-xs sm:text-sm inline-flex items-center">
-                    Join Slack
+                    {t("card2Link")}
                     <svg
                       className="ml-1 w-3 h-3 sm:w-4 sm:h-4"
                       fill="none"
@@ -255,13 +257,13 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                 </div>
                 <div className="ml-3 sm:ml-5">
                   <h3 className="text-base sm:text-lg font-medium text-white">
-                    GitHub
+                    {t("card3Title")}
                   </h3>
                   <p className="text-gray-300 mt-1 text-sm sm:text-base">
-                    Contribute, report issues, or browse the source code
+                    {t("card3Description")}
                   </p>
                   <p className="text-green-400 mt-1 text-xs sm:text-sm inline-flex items-center">
-                    View Repository
+                    {t("card3Link")}
                     <svg
                       className="ml-1 w-3 h-3 sm:w-4 sm:h-4"
                       fill="none"
@@ -299,13 +301,13 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                 </div>
                 <div className="ml-3 sm:ml-5">
                   <h3 className="text-base sm:text-lg font-medium text-white">
-                    LinkedIn
+                    {t("card4Title")}
                   </h3>
                   <p className="text-gray-300 mt-1 text-sm sm:text-base">
-                    Connect with our professional community
+                    {t("card4Description")}
                   </p>
                   <p className="text-blue-400 mt-1 text-xs sm:text-sm inline-flex items-center">
-                    Follow Us
+                    {t("card4Link")}
                     <svg
                       className="ml-1 w-3 h-3 sm:w-4 sm:h-4"
                       fill="none"
@@ -330,7 +332,7 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
             <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-700/50 overflow-hidden h-full flex flex-col">
               <div className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col">
                 <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 text-center">
-                  Send us a message
+                  {t("formTitle")}
                 </h3>
 
                 <form
@@ -343,7 +345,7 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                         htmlFor="name"
                         className="block text-sm font-semibold text-gray-300 mb-1 sm:mb-2"
                       >
-                        Name *
+                        {t("formName")}
                       </label>
                       <input
                         type="text"
@@ -353,7 +355,7 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                         onChange={handleInputChange}
                         required
                         className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/60 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm text-sm sm:text-base"
-                        placeholder="Your full name"
+                        placeholder={t("formNamePlaceholder")}
                       />
                     </div>
 
@@ -362,7 +364,7 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                         htmlFor="email"
                         className="block text-sm font-semibold text-gray-300 mb-1 sm:mb-2"
                       >
-                        Email *
+                        {t("formEmail")}
                       </label>
                       <input
                         type="email"
@@ -372,7 +374,7 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                         onChange={handleInputChange}
                         required
                         className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/60 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm text-sm sm:text-base"
-                        placeholder="you@example.com"
+                        placeholder={t("formEmailPlaceholder")}
                       />
                     </div>
                   </div>
@@ -382,7 +384,7 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                       htmlFor="subject"
                       className="block text-sm font-semibold text-gray-300 mb-1 sm:mb-2"
                     >
-                      Subject *
+                      {t("formSubject")}
                     </label>
                     <div className="relative">
                       <select
@@ -394,43 +396,43 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                         className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-12 bg-gray-700/60 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm appearance-none cursor-pointer hover:border-gray-500/60 hover:bg-gray-700/70 text-sm sm:text-base"
                       >
                         <option value="" disabled className="text-gray-400">
-                          Select a subject
+                          {t("formSubjectPlaceholder")}
                         </option>
                         <option
                           value="General Inquiry"
                           className="bg-gray-800 text-white py-2"
                         >
-                          General Inquiry
+                          {t("formSubjectOption1")}
                         </option>
                         <option
                           value="Technical Support"
                           className="bg-gray-800 text-white py-2"
                         >
-                          Technical Support
+                          {t("formSubjectOption2")}
                         </option>
                         <option
                           value="Partnership"
                           className="bg-gray-800 text-white py-2"
                         >
-                          Partnership
+                          {t("formSubjectOption3")}
                         </option>
                         <option
                           value="Documentation Feedback"
                           className="bg-gray-800 text-white py-2"
                         >
-                          Documentation Feedback
+                          {t("formSubjectOption4")}
                         </option>
                         <option
                           value="Enterprise Solutions"
                           className="bg-gray-800 text-white py-2"
                         >
-                          Enterprise Solutions
+                          {t("formSubjectOption5")}
                         </option>
                         <option
                           value="Other"
                           className="bg-gray-800 text-white py-2"
                         >
-                          Other
+                          {t("formSubjectOption6")}
                         </option>
                       </select>
                       {/* Custom dropdown chevron */}
@@ -457,7 +459,7 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                       htmlFor="message"
                       className="block text-sm font-semibold text-gray-300 mb-1 sm:mb-2"
                     >
-                      Message *
+                      {t("formMessage")}
                     </label>
                     <textarea
                       id="message"
@@ -466,7 +468,7 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                       onChange={handleInputChange}
                       required
                       className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/60 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm resize-none flex-1 min-h-[100px] sm:min-h-[120px] text-sm sm:text-base"
-                      placeholder="Tell us about your use case and how we can help..."
+                      placeholder={t("formMessagePlaceholder")}
                     ></textarea>
                   </div>
 
@@ -484,14 +486,14 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                       htmlFor="privacy"
                       className="text-xs sm:text-sm text-gray-300 leading-relaxed"
                     >
-                      I agree to the{" "}
+                      {t("formPrivacy")}{" "}
                       <a
                         href="#"
                         className="text-blue-400 hover:text-blue-300 underline transition-colors duration-200"
                       >
-                        privacy policy
+                        {t("formPrivacyLink")}
                       </a>{" "}
-                      and consent to being contacted by the KubeStellar team.
+                      {t("formPrivacyCont")}
                     </label>
                   </div>
 
@@ -504,11 +506,11 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                       {isSubmitting ? (
                         <div className="flex items-center justify-center space-x-2">
                           <div className="animate-spin h-4 w-4 sm:h-5 sm:w-5 border-2 border-white border-t-transparent rounded-full"></div>
-                          <span>Sending...</span>
+                          <span>{t("formSubmitting")}</span>
                         </div>
                       ) : (
                         <div className="flex items-center justify-center space-x-2">
-                          <span>Send Message</span>
+                          <span>{t("formSubmit")}</span>
                         </div>
                       )}
                     </button>
@@ -535,9 +537,7 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                       </div>
                       <div className="ml-2 sm:ml-3">
                         <p className="text-xs sm:text-sm font-medium text-green-300">
-                          Your email will be sent to the KubeStellar development
-                          mailing list. Please check your email client to
-                          complete sending!
+                          {t("formSuccess")}
                         </p>
                       </div>
                     </div>

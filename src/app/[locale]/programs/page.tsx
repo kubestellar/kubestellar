@@ -7,7 +7,10 @@ import Navigation from "../../../components/Navigation";
 import Footer from "../../../components/Footer";
 import { GridLines, StarField } from "@/components";
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+
 export default function ProgramsPage() {
+  const t = useTranslations("programsPage");
   const programs = getAllPrograms();
 
   useEffect(() => {
@@ -63,11 +66,10 @@ export default function ProgramsPage() {
       <section className="relative min-h-[40vh] flex items-center justify-center z-10">
         <div className="relative z-10 text-center px-4 pt-20 pb-2">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-shadow-lg">
-            Join Our <span className="text-gradient">Mission</span>
+            {t("title")} <span className="text-gradient">{t("titleSpan")}</span>
           </h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-300">
-            Discover meaningful opportunities to contribute to KubeStellar and
-            advance your career in open source development.
+            {t("subtitle")}
           </p>
         </div>
       </section>
@@ -89,7 +91,7 @@ export default function ProgramsPage() {
                 <div className="relative w-32 h-24 mb-6 flex items-center justify-center">
                   <Image
                     src={program.logo}
-                    alt={`${program.name} Logo`}
+                    alt={`${t(`programs.${program.id}.name`)} Logo`}
                     fill
                     className="object-contain"
                     sizes="128px"
@@ -97,10 +99,10 @@ export default function ProgramsPage() {
                   />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">
-                  {program.fullName}
+                  {t(`programs.${program.id}.fullName`)}
                 </h3>
                 <p className="text-gray-400 mb-4 flex-grow">
-                  {program.description}
+                  {t(`programs.${program.id}.description`)}
                 </p>
                 <span
                   className={`inline-block text-xs font-semibold px-3 py-1 rounded-full ${
@@ -109,7 +111,7 @@ export default function ProgramsPage() {
                       : "bg-purple-500/20 text-purple-300"
                   }`}
                 >
-                  {program.isPaid ? "Paid Program" : "Unpaid Internship"}
+                  {program.isPaid ? t("paid") : t("unpaid")}
                 </span>
               </Link>
             ))}

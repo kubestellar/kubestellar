@@ -6,12 +6,15 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Program } from "../programs";
 import { StarField, GridLines } from "@/components";
+import { useTranslations } from "next-intl";
 
 interface ProgramPageClientProps {
   program: Program;
 }
 
 export default function ProgramPageClient({ program }: ProgramPageClientProps) {
+  const t = useTranslations("programsPage");
+  const tDetails = useTranslations("programDetailsPage");
   useEffect(() => {
     // Add CSS for animations and program-specific styling
     const style = document.createElement("style");
@@ -148,7 +151,7 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
               <div className="relative inline-block mb-6">
                 <Image
                   src={program.logo}
-                  alt={`${program.name} Logo`}
+                  alt={`${t(`programs.${program.id}.name`)} Logo`}
                   width={128}
                   height={128}
                   className="h-32 w-auto mx-auto"
@@ -156,10 +159,10 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
                 />
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gradient mb-4 px-6 py-2 relative z-10">
-                {program.fullName}
+                {t(`programs.${program.id}.fullName`)}
               </h1>
               <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-4 relative z-0">
-                {program.description}
+                {t(`programs.${program.id}.description`)}
               </p>
             </div>
 
@@ -182,10 +185,12 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
                       ></path>
                     </svg>
                   </div>
-                  <h2 className="text-2xl font-bold text-white">Benefits</h2>
+                  <h2 className="text-2xl font-bold text-white">
+                    {tDetails("benefits")}
+                  </h2>
                 </div>
                 <p className="text-gray-300 leading-relaxed">
-                  {program.sections.benefits}
+                  {t(`programs.${program.id}.sections.benefits`)}
                 </p>
               </div>
 
@@ -195,10 +200,12 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mr-4">
                     <IconComponent type="description" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white">Description</h2>
+                  <h2 className="text-2xl font-bold text-white">
+                    {tDetails("description")}
+                  </h2>
                 </div>
                 <p className="text-gray-300 leading-relaxed">
-                  {program.sections.description}
+                  {t(`programs.${program.id}.sections.description`)}
                 </p>
               </div>
 
@@ -208,10 +215,12 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
                   <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center mr-4">
                     <IconComponent type="overview" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white">Overview</h2>
+                  <h2 className="text-2xl font-bold text-white">
+                    {tDetails("overview")}
+                  </h2>
                 </div>
                 <p className="text-gray-300 leading-relaxed">
-                  {program.sections.overview}
+                  {t(`programs.${program.id}.sections.overview`)}
                 </p>
               </div>
 
@@ -222,11 +231,11 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
                     <IconComponent type="eligibility" />
                   </div>
                   <h2 className="text-2xl font-bold text-white">
-                    Eligibility Criteria
+                    {tDetails("eligibility")}
                   </h2>
                 </div>
                 <p className="text-gray-300 leading-relaxed">
-                  {program.sections.eligibility}
+                  {t(`programs.${program.id}.sections.eligibility`)}
                 </p>
               </div>
 
@@ -236,10 +245,12 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
                   <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-4">
                     <IconComponent type="timeline" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white">Timeline</h2>
+                  <h2 className="text-2xl font-bold text-white">
+                    {tDetails("timeline")}
+                  </h2>
                 </div>
                 <p className="text-gray-300 leading-relaxed">
-                  {program.sections.timeline}
+                  {t(`programs.${program.id}.sections.timeline`)}
                 </p>
               </div>
 
@@ -250,11 +261,11 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
                     <IconComponent type="structure" />
                   </div>
                   <h2 className="text-2xl font-bold text-white">
-                    Program Structure
+                    {tDetails("structure")}
                   </h2>
                 </div>
                 <p className="text-gray-300 leading-relaxed">
-                  {program.sections.structure}
+                  {t(`programs.${program.id}.sections.structure`)}
                 </p>
               </div>
 
@@ -265,11 +276,11 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
                     <IconComponent type="howToApply" />
                   </div>
                   <h2 className="text-2xl font-bold text-white">
-                    How to Apply
+                    {tDetails("howToApply")}
                   </h2>
                 </div>
                 <p className="text-gray-300 leading-relaxed">
-                  {program.sections.howToApply}
+                  {t(`programs.${program.id}.sections.howToApply`)}
                 </p>
               </div>
 
@@ -279,7 +290,9 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
                   <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center mr-4">
                     <IconComponent type="resources" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white">Resources</h2>
+                  <h2 className="text-2xl font-bold text-white">
+                    {tDetails("resources")}
+                  </h2>
                 </div>
                 <ul className="space-y-3">
                   {program.sections.resources.map((resource, index) => (

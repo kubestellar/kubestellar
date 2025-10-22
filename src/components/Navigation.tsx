@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { GridLines, StarField } from "./index";
+import { useTranslations } from "next-intl";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +15,7 @@ export default function Navigation() {
     watchers: "0",
   });
 
+  const t = useTranslations("navigation");
   useEffect(() => {
     // Initialize dropdowns functionality
     const initDropdowns = () => {
@@ -216,7 +218,7 @@ export default function Navigation() {
                       ></path>
                     </svg>
                   </div>
-                  <span>Docs</span>
+                  <span>{t("docs")}</span>
                 </Link>
               </div>
 
@@ -249,7 +251,7 @@ export default function Navigation() {
                       ></path>
                     </svg>
                   </div>
-                  <span>Blog</span>
+                  <span>{t("blog")}</span>
                 </Link>
               </div>
 
@@ -284,7 +286,7 @@ export default function Navigation() {
                       ></path>
                     </svg>
                   </div>
-                  <span>Contribute</span>
+                  <span>{t("contribute")}</span>
                   <svg
                     className="ml-1 h-4 w-4 transition-transform duration-300"
                     fill="none"
@@ -321,7 +323,7 @@ export default function Navigation() {
                         d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
                       ></path>
                     </svg>
-                    Join In
+                    {t("joinIn")}
                   </a>
                   <Link
                     href="/community-handbook"
@@ -340,7 +342,7 @@ export default function Navigation() {
                         d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                       ></path>
                     </svg>
-                    Contribute Handbook
+                    {t("contributeHandbook")}
                   </Link>
                   <a
                     href="#security"
@@ -359,7 +361,7 @@ export default function Navigation() {
                         d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                       ></path>
                     </svg>
-                    Security
+                    {t("security")}
                   </a>
                 </div>
               </div>
@@ -387,7 +389,7 @@ export default function Navigation() {
                       ></path>
                     </svg>
                   </div>
-                  <span>Community</span>
+                  <span>{t("community")}</span>
                   <svg
                     className="ml-1 h-4 w-4 transition-transform duration-300 "
                     fill="none"
@@ -424,7 +426,7 @@ export default function Navigation() {
                         d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
                       ></path>
                     </svg>
-                    Get Involved
+                    {t("getInvolved")}
                   </a>
                   <Link
                     href="/programs"
@@ -443,7 +445,7 @@ export default function Navigation() {
                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v2M7 7h10"
                       ></path>
                     </svg>
-                    Programs
+                    {t("programs")}
                   </Link>
                   <Link
                     href="/ladder"
@@ -462,7 +464,7 @@ export default function Navigation() {
                         d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
                       ></path>
                     </svg>
-                    Ladder
+                    {t("ladder")}
                   </Link>
                   <a
                     href="#contact-us"
@@ -481,7 +483,7 @@ export default function Navigation() {
                         d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                       ></path>
                     </svg>
-                    Contact Us
+                    {t("contactUs")}
                   </a>
                   <a
                     href="#partners"
@@ -500,7 +502,7 @@ export default function Navigation() {
                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                       ></path>
                     </svg>
-                    Partners
+                    {t("partners")}
                   </a>
                 </div>
               </div>
@@ -538,19 +540,19 @@ export default function Navigation() {
                   href="#"
                   className="block px-5 py-2 text-sm text-gray-300 hover:bg-blue-900/30 rounded transition-all duration-200 hover:text-blue-300 hover:shadow-md"
                 >
-                  3.8.1 (Current)
+                  {t("versionCurrent")}
                 </a>
                 <a
                   href="#"
                   className="block px-5 py-2 text-sm text-gray-300 hover:bg-blue-900/30 rounded transition-all duration-200 hover:text-blue-300 hover:shadow-md"
                 >
-                  3.8.0
+                  {t("version380")}
                 </a>
                 <a
                   href="#"
                   className="block px-5 py-2 text-sm text-gray-300 hover:bg-blue-900/30 rounded transition-all duration-200 hover:text-blue-300 hover:shadow-md"
                 >
-                  All versions
+                  {t("allVersions")}
                 </a>
               </div>
             </div>
@@ -574,7 +576,7 @@ export default function Navigation() {
                     d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
                   />
                 </svg>
-                English
+                {t("language")}
                 <svg
                   className="w-4 h-4 ml-1"
                   fill="none"
@@ -597,19 +599,13 @@ export default function Navigation() {
                   href="#"
                   className="block px-5 py-2 text-sm text-gray-300 hover:bg-purple-900/30 rounded transition-all duration-200 hover:text-purple-300 hover:shadow-md"
                 >
-                  English
+                  {t("langEnglish")}
                 </a>
                 <a
                   href="#"
                   className="block px-5 py-2 text-sm text-gray-300 hover:bg-purple-900/30 rounded transition-all duration-200 hover:text-purple-300 hover:shadow-md"
                 >
-                  日本語
-                </a>
-                <a
-                  href="#"
-                  className="block px-5 py-2 text-sm text-gray-300 hover:bg-purple-900/30 rounded transition-all duration-200 hover:text-purple-300 hover:shadow-md"
-                >
-                  简体中文
+                  {t("langHindi")}
                 </a>
               </div>
             </div>
@@ -659,7 +655,7 @@ export default function Navigation() {
                       clipRule="evenodd"
                     ></path>
                   </svg>
-                  Star
+                  {t("githubStar")}
                   <span className="ml-auto bg-gray-700 text-gray-300 text-xs rounded px-2 py-0.5">
                     {githubStats.stars}
                   </span>
@@ -675,7 +671,7 @@ export default function Navigation() {
                   >
                     <path d="M5 3a3 3 0 106 0 3 3 0 00-6 0zm0 2a2 2 0 114 0 2 2 0 01-4 0zm10 10a3 3 0 11-6 0 3 3 0 016 0zm-2-2a2 2 0 100 4 2 2 0 000-4zm-6 2a2 2 0 100-4 2 2 0 000 4zm8-2a2 2 0 100-4 2 2 0 000 4z" />
                   </svg>
-                  Fork
+                  {t("githubFork")}
                   <span className="ml-auto bg-gray-700 text-gray-300 text-xs rounded px-2 py-0.5">
                     {githubStats.forks}
                   </span>
@@ -691,7 +687,7 @@ export default function Navigation() {
                   >
                     <path d="M10 2C5.454 2 1.73 5.11.458 9.09a1.5 1.5 0 000 1.82C1.73 14.89 5.454 18 10 18s8.27-3.11 9.542-7.09a1.5 1.5 0 000-1.82C18.27 5.11 14.546 2 10 2zm0 14c-3.866 0-7.09-2.61-8.13-6C2.91 6.61 6.134 4 10 4s7.09 2.61 8.13 6c-1.04 3.39-4.264 6-8.13 6zm0-8a2 2 0 110 4 2 2 0 010-4z" />
                   </svg>
-                  Watch
+                  {t("githubWatch")}
                   <span className="ml-auto bg-gray-700 text-gray-300 text-xs rounded px-2 py-0.5">
                     {githubStats.watchers}
                   </span>
@@ -730,31 +726,31 @@ export default function Navigation() {
                 href="#about"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
               >
-                About
+                {t("mobileAbout")}
               </a>
               <a
                 href="#how-it-works"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
               >
-                How It Works
+                {t("mobileHowItWorks")}
               </a>
               <a
                 href="#use-cases"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
               >
-                Use Cases
+                {t("mobileUseCases")}
               </a>
               <a
                 href="#get-started"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
               >
-                Get Started
+                {t("mobileGetStarted")}
               </a>
               <a
                 href="#contact"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
               >
-                Contact
+                {t("mobileContact")}
               </a>
             </div>
           </div>

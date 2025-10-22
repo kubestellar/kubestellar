@@ -2,8 +2,7 @@ import { Layout } from 'nextra-theme-docs'
 import { Banner } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
-import Footer from '@/components/Footer'
-import DocsNavbar from '@/components/docs/DocsNavbar'
+import { DocsNavbar, DocsFooter } from '@/components/docs/index'
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 
@@ -25,7 +24,7 @@ export const metadata = {
 
 const banner = <Banner storageKey="kubestellar-demo"><strong>Hacktoberfest 2025</strong> is here! Join us to learn, share, and contribute to our community🎉</Banner>
 const navbar = <DocsNavbar />
-const footer = <Footer />
+const footer = <DocsFooter />
  
 export default async function DocsLayout({ children }: { children: React.ReactNode }) {
   const fullPageMap = await getPageMap()

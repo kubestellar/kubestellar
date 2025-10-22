@@ -1,8 +1,10 @@
 "use client";
 
 import { GridLines, StarField } from "../index";
+import { useTranslations } from "next-intl";
 
 export default function HowItWorksSection() {
+  const t = useTranslations("howItWorksSection");
   return (
     <section
       id="how-it-works"
@@ -21,14 +23,13 @@ export default function HowItWorksSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
           <h2 className="text-3xl font-extrabold text-white sm:text-[2.4rem]">
-            How{" "}
+            {t("title")}{" "}
             <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
-              It Works
+              {t("titleSpan")}
             </span>
           </h2>
           <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-gray-300 px-4">
-            KubeStellar orchestrates your multi-cluster environment with a
-            simple, powerful architecture
+            {t("subtitle")}
           </p>
         </div>
 
@@ -46,11 +47,10 @@ export default function HowItWorksSection() {
 
               <div className="pt-4">
                 <h3 className="text-lg font-bold text-white mb-2 text-center">
-                  Define Workloads
+                  {t("step1Title")}
                 </h3>
                 <p className="text-gray-300 text-sm leading-relaxed mb-3 text-center">
-                  Create Kubernetes resources with placement constraints and
-                  policies.
+                  {t("step1Description")}
                 </p>
                 <div className="bg-slate-900/90 rounded-lg p-3 overflow-x-auto">
                   <pre className="text-xs font-mono text-white">
@@ -97,21 +97,20 @@ export default function HowItWorksSection() {
 
               <div className="pt-4">
                 <h3 className="text-lg font-bold text-white mb-2 text-center">
-                  Workload Orchestration
+                  {t("step2Title")}
                 </h3>
                 <p className="text-gray-300 text-sm leading-relaxed mb-3 text-center">
-                  KubeStellar analyzes workloads and determines optimal
-                  placement.
+                  {t("step2Description")}
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   <div className="bg-blue-900/80 backdrop-blur-lg rounded-full px-3 py-1 text-white text-xs">
-                    Policy Evaluation
+                    {t("step2Tag1")}
                   </div>
                   <div className="bg-purple-900/80 backdrop-blur-lg rounded-full px-3 py-1 text-white text-xs">
-                    Constraint Matching
+                    {t("step2Tag2")}
                   </div>
                   <div className="bg-green-900/80 backdrop-blur-lg rounded-full px-3 py-1 text-white text-xs">
-                    Resource Analysis
+                    {t("step2Tag3")}
                   </div>
                 </div>
               </div>
@@ -134,11 +133,10 @@ export default function HowItWorksSection() {
 
               <div className="pt-4">
                 <h3 className="text-lg font-bold text-white mb-2 text-center">
-                  Automated Deployment
+                  {t("step3Title")}
                 </h3>
                 <p className="text-gray-300 text-sm leading-relaxed mb-3 text-center">
-                  Workloads are deployed and continuously monitored across
-                  clusters.
+                  {t("step3Description")}
                 </p>
                 <div className="flex justify-center">
                   <div className="flex items-center space-x-4">
@@ -148,10 +146,14 @@ export default function HowItWorksSection() {
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                     </div>
                     <div className="flex flex-col space-y-2">
-                      <span className="text-white text-xs">Edge Cluster</span>
-                      <span className="text-white text-xs">Cloud Cluster</span>
                       <span className="text-white text-xs">
-                        On-Prem Cluster
+                        {t("step3Cluster1")}
+                      </span>
+                      <span className="text-white text-xs">
+                        {t("step3Cluster2")}
+                      </span>
+                      <span className="text-white text-xs">
+                        {t("step3Cluster3")}
                       </span>
                     </div>
                   </div>
@@ -175,12 +177,10 @@ export default function HowItWorksSection() {
                     <span className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 mr-3 text-white font-bold text-base">
                       1
                     </span>
-                    Define Workloads
+                    {t("step1Title")}
                   </h3>
                   <p className="text-gray-300 mb-6 leading-relaxed">
-                    Create Kubernetes resource in the KubeStellar control plane
-                    using familiar tools and manifests. Tag resource with
-                    placement constraints and policies.
+                    {t("step1DescriptionDesktop")}
                   </p>
                   <div className="bg-slate-900/90 rounded-lg overflow-hidden shadow-lg w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
                     <pre className="text-sm font-mono text-white p-4 leading-6 whitespace-pre-wrap">
@@ -239,28 +239,26 @@ export default function HowItWorksSection() {
                     <span className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 mr-3 text-white font-bold text-base">
                       2
                     </span>
-                    Workload Orchestration
+                    {t("step2Title")}
                   </h3>
 
                   <p className="text-gray-300 mb-6 leading-relaxed">
-                    KubeStellar&apos;s orchestration engine analyzes workloads
-                    and determines optimal placement across registered clusters
-                    based on constraints and policies.
+                    {t("step2DescriptionDesktop")}
                   </p>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="bg-blue-900/80 backdrop-blur-lg rounded-full px-3 py-2 text-white text-sm flex items-center justify-center transition-all duration-300 hover:bg-blue-900/90 hover:scale-105">
                       <div className="text-sm opacity-70 font-semibold text-center">
-                        Policy Evaluation
+                        {t("step2Tag1")}
                       </div>
                     </div>
                     <div className="bg-purple-900/80 backdrop-blur-lg rounded-full px-3 py-2 text-white text-sm flex items-center justify-center transition-all duration-300 hover:bg-purple-900/90 hover:scale-105">
                       <div className="text-sm opacity-70 font-semibold text-center">
-                        Constraint Matching
+                        {t("step2Tag2")}
                       </div>
                     </div>
                     <div className="bg-green-900/80 backdrop-blur-lg rounded-full px-3 py-2 text-white text-sm flex items-center justify-center transition-all duration-300 hover:bg-green-900/90 hover:scale-105">
                       <div className="text-sm opacity-70 font-semibold text-center">
-                        Resource Analysis
+                        {t("step2Tag3")}
                       </div>
                     </div>
                   </div>
@@ -301,32 +299,30 @@ export default function HowItWorksSection() {
                     <span className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 mr-3 text-white font-bold text-base">
                       3
                     </span>
-                    Automated Deployment
+                    {t("step3Title")}
                   </h3>
 
                   <p className="text-gray-300 mb-6 leading-relaxed">
-                    Workloads are automatically deployed to selected clusters.
-                    KubeStellar continuously monitors health and ensures desired
-                    state across all clusters.
+                    {t("step3DescriptionDesktop")}
                   </p>
                   <div className="flex items-center justify-center space-x-4">
                     <div className="bg-blue-900/40 backdrop-blur-lg px-3 py-2 text-white text-sm flex flex-col items-center justify-center w-40 rounded-lg transition-all duration-300 hover:bg-blue-900/50 hover:scale-105">
                       <span className="text-sm opacity-50 text-center">
-                        Edge Cluster
+                        {t("step3Cluster1")}
                       </span>
                       <div className="w-full h-1 bg-blue-500 mt-2 rounded"></div>
                     </div>
 
                     <div className="bg-purple-900/40 backdrop-blur-lg px-3 py-2 text-white text-sm flex flex-col items-center justify-center w-40 rounded-lg transition-all duration-300 hover:bg-purple-900/50 hover:scale-105">
                       <span className="text-sm opacity-50 text-center">
-                        Cloud Cluster
+                        {t("step3Cluster2")}
                       </span>
                       <div className="w-full h-1 bg-purple-500 mt-2 rounded"></div>
                     </div>
 
                     <div className="bg-green-900/40 backdrop-blur-lg px-3 py-2 text-white text-sm flex flex-col items-center justify-center w-40 rounded-lg transition-all duration-300 hover:bg-green-900/50 hover:scale-105">
                       <span className="text-sm opacity-50 text-center">
-                        On-Prem Cluster
+                        {t("step3Cluster3")}
                       </span>
                       <div className="w-full h-1 bg-green-500 mt-2 rounded"></div>
                     </div>

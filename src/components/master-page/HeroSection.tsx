@@ -130,9 +130,7 @@ export default function HeroSection() {
 
               {/* Paragraph with fade-in-up effect and delay */}
               <p className="sm:text-xl text-gray-300 max-w-2xl leading-snug animate-fade-in-up opacity-0 [animation-delay:0.6s] [animation-fill-mode:forwards] mt-4">
-                Experience the future of cloud-native orchestration. KubeStellar
-                revolutionizes multi-cluster management with AI-powered
-                automation and real-time intelligence.
+                {t("subtitle")}
               </p>
             </div>
 
@@ -190,46 +188,55 @@ export default function HeroSection() {
                   {/* Command Output */}
                   <div className="command-output space-y-2 ml-6 animate-fade-in [animation-delay:0.8s] [animation-fill-mode:forwards]">
                     {/* Header */}
-                    <div className="output-line animate-slide-in-left [animation-delay:1s]">
-                      <span className="text-cyan-400 font-bold">INFO</span>
-                      <span className="text-gray-300 ml-4">
+                    <div className="output-line flex animate-slide-in-left [animation-delay:1s]">
+                      <span className="text-cyan-400 font-bold w-22 inline-block">
+                        INFO
+                      </span>
+                      <span className="text-gray-300 flex-1">
                         Installing KubeStellar demo environment...
                       </span>
+                      <span className="text-emerald-400 ml-2 text-xs">✓</span>
                     </div>
 
                     {/* Creating clusters */}
-                    <div className="output-line animate-slide-in-left [animation-delay:1.2s]">
-                      <span className="text-blue-400 font-bold">SETUP</span>
-                      <span className="text-gray-300 ml-4">
+                    <div className="output-line flex animate-slide-in-left [animation-delay:1.2s]">
+                      <span className="text-blue-400 font-bold w-22 inline-block">
+                        SETUP
+                      </span>
+                      <span className="text-gray-300 flex-1">
                         Creating kind clusters: kubeflex, cluster1, cluster2
                       </span>
                       <span className="text-emerald-400 ml-2 text-xs">✓</span>
                     </div>
 
                     {/* Installing KubeFlex */}
-                    <div className="output-line animate-slide-in-left [animation-delay:1.4s]">
-                      <span className="text-purple-400 font-bold">INSTALL</span>
-                      <span className="text-gray-300 ml-4">
+                    <div className="output-line flex animate-slide-in-left [animation-delay:1.4s]">
+                      <span className="text-purple-400 font-bold w-22 inline-block">
+                        INSTALL
+                      </span>
+                      <span className="text-gray-300 flex-1">
                         Deploying KubeFlex control plane components
                       </span>
                       <span className="text-emerald-400 ml-2 text-xs">✓</span>
                     </div>
 
                     {/* Configuring OCM */}
-                    <div className="output-line animate-slide-in-left [animation-delay:1.6s]">
-                      <span className="text-yellow-400 font-bold">CONFIG</span>
-                      <span className="text-gray-300 ml-4">
+                    <div className="output-line flex animate-slide-in-left [animation-delay:1.6s]">
+                      <span className="text-yellow-400 font-bold w-22 inline-block">
+                        CONFIG
+                      </span>
+                      <span className="text-gray-300 flex-1">
                         Configuring Open Cluster Management
                       </span>
                       <span className="text-emerald-400 ml-2 text-xs">✓</span>
                     </div>
 
                     {/* Final Success */}
-                    <div className="output-line animate-slide-in-left [animation-delay:1.8s]">
-                      <span className="text-emerald-400 font-bold">
+                    <div className="output-line flex animate-slide-in-left [animation-delay:1.8s]">
+                      <span className="text-emerald-400 font-bold w-22 inline-block">
                         SUCCESS
                       </span>
-                      <span className="text-gray-300 ml-4">
+                      <span className="text-gray-300 flex-1">
                         KubeStellar demo environment ready! Setup complete
                       </span>
                       <span className="text-emerald-400 ml-2 text-xs">✓</span>
@@ -253,7 +260,7 @@ export default function HeroSection() {
                           hover:shadow-xl hover:shadow-blue-500/40 
                           animate-btn-float"
               >
-                <span className="relative z-10">Install KubeStellar</span>
+                <span className="relative z-10">{t("buttonInstall")}</span>
                 <svg
                   className="relative z-10 ml-2 h-5 w-5 transition-all duration-300 group-hover:translate-x-1 group-hover:rotate-12"
                   viewBox="0 0 20 20"
@@ -290,7 +297,7 @@ export default function HeroSection() {
                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                   ></path>
                 </svg>
-                Explore Docs
+                {t("buttonDocs")}
               </Link>
             </div>
           </div>

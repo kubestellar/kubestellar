@@ -13,12 +13,16 @@ import {
   Zap,
   Info,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { GridLines, StarField } from "@/components/index";
 
 // Define platform type for installation
 type Platform = "kind" | "k3d";
+
+// Define translation function type
+type TranslationFunction = (key: string) => string;
 
 // Define prerequisite data structure
 interface Prerequisite {
@@ -39,12 +43,12 @@ interface PrerequisiteCategory {
   prerequisites: Prerequisite[];
 }
 
-// Core prerequisites for using KubeStellar
-const corePrerequisites: Prerequisite[] = [
+// Core prerequisites for using KubeStellar - now using translations
+const getCorePrerequisites = (t: TranslationFunction): Prerequisite[] => [
   {
     name: "docker",
-    displayName: "Docker",
-    description: "Container runtime platform",
+    displayName: t("coreDocker"),
+    description: t("coreDockerDesc"),
     minVersion: "20.0.0",
     installCommand:
       "curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh",
@@ -53,8 +57,8 @@ const corePrerequisites: Prerequisite[] = [
   },
   {
     name: "kubectl",
-    displayName: "kubectl",
-    description: "Kubernetes command-line tool",
+    displayName: t("coreKubectl"),
+    description: t("coreKubectlDesc"),
     minVersion: "1.27.0",
     installCommand:
       'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x kubectl && sudo mv kubectl /usr/local/bin/',
@@ -63,8 +67,8 @@ const corePrerequisites: Prerequisite[] = [
   },
   {
     name: "kubeflex",
-    displayName: "KubeFlex",
-    description: "Core component for multi-cluster management",
+    displayName: t("coreKubeflex"),
+    description: t("coreKubeflexDesc"),
     minVersion: "0.8.0",
     installCommand:
       "bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin",
@@ -74,8 +78,8 @@ const corePrerequisites: Prerequisite[] = [
   },
   {
     name: "clusteradm",
-    displayName: "OCM CLI",
-    description: "Open Cluster Management command line interface",
+    displayName: t("coreOcm"),
+    description: t("coreOcmDesc"),
     minVersion: "0.7.0",
     installCommand:
       "bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh) 0.10.1",
@@ -84,8 +88,8 @@ const corePrerequisites: Prerequisite[] = [
   },
   {
     name: "helm",
-    displayName: "Helm",
-    description: "Package manager for Kubernetes",
+    displayName: t("coreHelm"),
+    description: t("coreHelmDesc"),
     minVersion: "3.0.0",
     installCommand:
       "curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash",
@@ -94,12 +98,12 @@ const corePrerequisites: Prerequisite[] = [
   },
 ];
 
-// Additional prerequisites for running examples
-const examplePrerequisites: Prerequisite[] = [
+// Additional prerequisites for running examples - now using translations
+const getExamplePrerequisites = (t: TranslationFunction): Prerequisite[] => [
   {
     name: "kind",
-    displayName: "kind",
-    description: "Kubernetes IN Docker - local Kubernetes cluster",
+    displayName: t("additionalKind"),
+    description: t("additionalKindDesc"),
     minVersion: "0.20.0",
     installCommand:
       "curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64 && chmod +x ./kind && sudo mv ./kind /usr/local/bin/kind",
@@ -108,8 +112,8 @@ const examplePrerequisites: Prerequisite[] = [
   },
   {
     name: "k3d",
-    displayName: "k3d",
-    description: "Lightweight wrapper to run k3s in Docker",
+    displayName: t("additionalK3d"),
+    description: t("additionalK3dDesc"),
     minVersion: "5.0.0",
     installCommand:
       "curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash",
@@ -118,8 +122,8 @@ const examplePrerequisites: Prerequisite[] = [
   },
   {
     name: "argo",
-    displayName: "Argo CD CLI",
-    description: "GitOps continuous delivery tool for Kubernetes",
+    displayName: t("additionalArgo"),
+    description: t("additionalArgoDesc"),
     minVersion: "2.8.0",
     installCommand:
       "curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 && sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd && rm argocd-linux-amd64",
@@ -128,12 +132,12 @@ const examplePrerequisites: Prerequisite[] = [
   },
 ];
 
-// Prerequisites for building KubeStellar
-const buildPrerequisites: Prerequisite[] = [
+// Prerequisites for building KubeStellar - now using translations
+const getBuildPrerequisites = (t: TranslationFunction): Prerequisite[] => [
   {
     name: "make",
-    displayName: "Make",
-    description: "Build automation tool",
+    displayName: t("buildMake"),
+    description: t("buildMakeDesc"),
     installCommand:
       "sudo apt-get update && sudo apt-get install -y build-essential",
     installUrl: "https://www.gnu.org/software/make/",
@@ -141,8 +145,8 @@ const buildPrerequisites: Prerequisite[] = [
   },
   {
     name: "go",
-    displayName: "Go",
-    description: "Programming language for building KubeStellar",
+    displayName: t("buildGo"),
+    description: t("buildGoDesc"),
     minVersion: "1.21.0",
     installCommand:
       'curl -fsSL https://golang.org/dl/go1.21.6.linux-amd64.tar.gz | sudo tar -C /usr/local -xzf - && echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc',
@@ -151,8 +155,8 @@ const buildPrerequisites: Prerequisite[] = [
   },
   {
     name: "ko",
-    displayName: "ko",
-    description: "Container image builder for Go applications",
+    displayName: t("buildKo"),
+    description: t("buildKoDesc"),
     minVersion: "0.14.0",
     installCommand: "go install github.com/google/ko@latest",
     installUrl: "https://ko.build/install/",
@@ -160,25 +164,27 @@ const buildPrerequisites: Prerequisite[] = [
   },
 ];
 
-// Define prerequisite categories
-const prerequisiteCategories: PrerequisiteCategory[] = [
+// Define prerequisite categories - now using translations
+const getPrerequisiteCategories = (
+  t: TranslationFunction
+): PrerequisiteCategory[] => [
   {
-    title: "Core Prerequisites",
-    description: "Essential tools for using KubeStellar",
+    title: t("coreTitle"),
+    description: t("coreDescription"),
     icon: <Server size={24} />,
-    prerequisites: corePrerequisites,
+    prerequisites: getCorePrerequisites(t),
   },
   {
-    title: "Additional Prerequisites",
-    description: "Additional tools for running KubeStellar examples",
+    title: t("additionalTitle"),
+    description: t("additionalDescription"),
     icon: <Terminal size={24} />,
-    prerequisites: examplePrerequisites,
+    prerequisites: getExamplePrerequisites(t),
   },
   {
-    title: "Build Prerequisites",
-    description: "Tools required for building KubeStellar from source",
+    title: t("buildTitle"),
+    description: t("buildDescription"),
     icon: <Zap size={24} />,
-    prerequisites: buildPrerequisites,
+    prerequisites: getBuildPrerequisites(t),
   },
 ];
 
@@ -188,39 +194,32 @@ const platformInstallationScripts = {
   k3d: "bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v0.27.2/scripts/create-kubestellar-demo-env.sh) --platform k3d",
 };
 
-// FAQ data
-const faqData = [
+// FAQ data - now using translations
+const getFaqData = (t: TranslationFunction) => [
   {
     id: 1,
-    question:
-      "What's the difference between Core, Additional, and Build prerequisites?",
-    answer:
-      "Core prerequisites are essential for using KubeStellar. Additional prerequisites are needed for running examples and demos. Build prerequisites are only required if you plan to build KubeStellar from source code.",
+    question: t("faq1Q"),
+    answer: t("faq1A"),
   },
   {
     id: 2,
-    question:
-      "Can I automatically check if I have all prerequisites installed?",
-    answer:
-      "Yes! Use the automated prerequisite check script: 'curl -fsSL https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/check_pre_req.sh | bash'. This script will verify all prerequisites and provide installation guidance for missing tools.",
+    question: t("faq2Q"),
+    answer: t("faq2A"),
   },
   {
     id: 3,
-    question: "Do I need to install all prerequisites?",
-    answer:
-      "For basic KubeStellar usage, you only need the Core prerequisites. Install Additional prerequisites if you want to run examples. Build prerequisites are only needed for development and building from source.",
+    question: t("faq3Q"),
+    answer: t("faq3A"),
   },
   {
     id: 4,
-    question: "Can I use KubeStellar with existing Kubernetes clusters?",
-    answer:
-      "Yes! KubeStellar can manage existing Kubernetes clusters. You can connect your production clusters alongside local development clusters for unified multi-cluster management.",
+    question: t("faq4Q"),
+    answer: t("faq4A"),
   },
   {
     id: 5,
-    question: "What are the minimum system requirements?",
-    answer:
-      "KubeStellar requires at least 4GB RAM and 2 CPU cores. You'll need Docker (v20.0+), kubectl (v1.27+), and either kind (v0.20+) or k3d for local clusters.",
+    question: t("faq5Q"),
+    answer: t("faq5A"),
   },
 ];
 
@@ -356,7 +355,13 @@ const FAQItem = ({
 };
 
 // Prerequisite card component
-const PrerequisiteCard = ({ prerequisite }: { prerequisite: Prerequisite }) => {
+const PrerequisiteCard = ({
+  prerequisite,
+  t,
+}: {
+  prerequisite: Prerequisite;
+  t: TranslationFunction;
+}) => {
   return (
     <div className="relative group h-full">
       <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
@@ -381,7 +386,7 @@ const PrerequisiteCard = ({ prerequisite }: { prerequisite: Prerequisite }) => {
           <div>
             <h4 className="mb-2 flex items-center text-xs font-medium text-emerald-400">
               <Terminal size={14} className="mr-1" />
-              Install:
+              {t("prerequisitesInstall")}
             </h4>
             <CodeBlock code={prerequisite.installCommand} />
           </div>
@@ -389,7 +394,7 @@ const PrerequisiteCard = ({ prerequisite }: { prerequisite: Prerequisite }) => {
           <div>
             <h4 className="mb-2 flex items-center text-xs font-medium text-blue-400">
               <CheckCircle2 size={14} className="mr-1" />
-              Verify:
+              {t("prerequisitesVerify")}
             </h4>
             <CodeBlock code={prerequisite.versionCommand} />
           </div>
@@ -402,8 +407,10 @@ const PrerequisiteCard = ({ prerequisite }: { prerequisite: Prerequisite }) => {
 // Prerequisite category section component
 const PrerequisiteCategorySection = ({
   category,
+  t,
 }: {
   category: PrerequisiteCategory;
+  t: TranslationFunction;
 }) => {
   return (
     <div className="mb-12">
@@ -420,6 +427,7 @@ const PrerequisiteCategorySection = ({
           <PrerequisiteCard
             key={prerequisite.name}
             prerequisite={prerequisite}
+            t={t}
           />
         ))}
       </div>
@@ -431,14 +439,16 @@ const PrerequisiteCategorySection = ({
 const PlatformSelector = ({
   platform,
   setPlatform,
+  t,
 }: {
   platform: Platform;
   setPlatform: (platform: Platform) => void;
+  t: TranslationFunction;
 }) => {
   return (
     <div className="mb-6">
       <h3 className="mb-4 text-lg font-medium text-white">
-        Choose Your Platform:
+        {t("installPlatform")}
       </h3>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <button
@@ -452,8 +462,8 @@ const PlatformSelector = ({
           <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg blur opacity-0 group-hover:opacity-30 transition duration-300"></div>
           <div className="relative flex items-center justify-between">
             <div>
-              <h4 className="font-medium text-white">kind</h4>
-              <p className="text-sm text-gray-400">Kubernetes in Docker</p>
+              <h4 className="font-medium text-white">{t("installKind")}</h4>
+              <p className="text-sm text-gray-400">{t("installKindDesc")}</p>
             </div>
             {platform === "kind" && (
               <CheckCircle2 size={18} className="text-blue-400" />
@@ -472,8 +482,8 @@ const PlatformSelector = ({
           <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg blur opacity-0 group-hover:opacity-30 transition duration-300"></div>
           <div className="relative flex items-center justify-between">
             <div>
-              <h4 className="font-medium text-white">k3d</h4>
-              <p className="text-sm text-gray-400">Lightweight Kubernetes</p>
+              <h4 className="font-medium text-white">{t("installK3d")}</h4>
+              <p className="text-sm text-gray-400">{t("installK3dDesc")}</p>
             </div>
             {platform === "k3d" && (
               <CheckCircle2 size={18} className="text-blue-400" />
@@ -488,6 +498,11 @@ const PlatformSelector = ({
 // Main Quick Installation Page component
 const QuickInstallationPage = () => {
   const [platform, setPlatform] = useState<Platform>("kind");
+  const t = useTranslations("quickInstallationPage");
+
+  // Get data with translations
+  const prerequisiteCategories = getPrerequisiteCategories(t);
+  const faqData = getFaqData(t);
 
   return (
     <main className="min-h-screen">
@@ -508,12 +523,10 @@ const QuickInstallationPage = () => {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              <span className="text-gradient">Quick Installation Guide</span>
+              <span className="text-gradient">{t("title")}</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Get KubeStellar up and running quickly with this streamlined
-              installation guide. Follow the prerequisites and installation
-              steps below.
+              {t("subtitle")}
             </p>
           </div>
 
@@ -521,12 +534,16 @@ const QuickInstallationPage = () => {
           <AnimatedCard className="mb-12 p-8">
             <SectionHeader
               icon={<Server size={24} />}
-              title="Prerequisites"
-              description="Install the required tools based on your use case"
+              title={t("prerequisitesTitle")}
+              description={t("prerequisitesSubtitle")}
             />
 
             {prerequisiteCategories.map((category, index) => (
-              <PrerequisiteCategorySection key={index} category={category} />
+              <PrerequisiteCategorySection
+                key={index}
+                category={category}
+                t={t}
+              />
             ))}
 
             {/* Single Guide Button */}
@@ -538,7 +555,7 @@ const QuickInstallationPage = () => {
                 className="inline-flex items-center rounded-lg bg-gradient-to-r from-purple-600/80 to-blue-600/80 px-6 py-3 text-sm font-medium text-white transition-all hover:from-purple-500/80 hover:to-blue-500/80 hover:scale-105 hover:shadow-lg"
               >
                 <ExternalLink size={16} className="mr-2" />
-                View Detailed Installation Guides
+                {t("prerequisitesButton")}
               </a>
             </div>
           </AnimatedCard>
@@ -547,13 +564,13 @@ const QuickInstallationPage = () => {
           <AnimatedCard className="mb-12 p-8">
             <SectionHeader
               icon={<CheckCircle2 size={24} />}
-              title="Automated Check of Prerequisites"
-              description="Use this script to automatically verify your system has all required tools"
+              title={t("autoCheckTitle")}
+              description={t("autoCheckSubtitle")}
             />
 
             <div className="mb-6">
               <h3 className="mb-4 text-lg font-medium text-white">
-                Run Prerequisites Check:
+                {t("autoCheckRun")}
               </h3>
               <CodeBlock code="curl -fsSL https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/check_pre_req.sh | bash" />
             </div>
@@ -566,7 +583,7 @@ const QuickInstallationPage = () => {
                 />
                 <div>
                   <h4 className="mb-3 text-lg font-medium text-blue-300">
-                    About the Prerequisites Check Script
+                    {t("autoCheckAboutTitle")}
                   </h4>
                   <ul className="space-y-2 text-blue-200">
                     <li className="flex items-start">
@@ -574,34 +591,28 @@ const QuickInstallationPage = () => {
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-blue-400"
                       />
-                      Self-contained script suitable for
-                      &quot;curl-to-bash&quot; usage
+                      {t("autoCheckAbout1")}
                     </li>
                     <li className="flex items-start">
                       <ChevronRight
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-blue-400"
                       />
-                      Checks for prerequisite presence in your $PATH using the{" "}
-                      <code className="bg-gray-900/50 px-2 py-1 rounded text-blue-200 text-sm">
-                        which
-                      </code>{" "}
-                      command
+                      {t("autoCheckAbout2")}
                     </li>
                     <li className="flex items-start">
                       <ChevronRight
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-blue-400"
                       />
-                      Provides version and path information for present
-                      prerequisites
+                      {t("autoCheckAbout3")}
                     </li>
                     <li className="flex items-start">
                       <ChevronRight
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-blue-400"
                       />
-                      Shows installation information for missing prerequisites
+                      {t("autoCheckAbout4")}
                     </li>
                   </ul>
                 </div>
@@ -616,17 +627,13 @@ const QuickInstallationPage = () => {
                 />
                 <div>
                   <h4 className="mb-3 text-lg font-medium text-emerald-300">
-                    For Specific Releases
+                    {t("autoCheckReleaseTitle")}
                   </h4>
                   <p className="text-emerald-200 mb-3">
-                    To check prerequisites for a particular KubeStellar release,
-                    use the script from that specific release instead of the
-                    main branch.
+                    {t("autoCheckReleaseDesc")}
                   </p>
                   <p className="text-emerald-200">
-                    <strong>Tip:</strong> Run this check before proceeding with
-                    the installation to ensure your system is properly
-                    configured.
+                    <strong>{t("autoCheckReleaseTip")}</strong>
                   </p>
                 </div>
               </div>
@@ -637,15 +644,19 @@ const QuickInstallationPage = () => {
           <AnimatedCard className="p-8">
             <SectionHeader
               icon={<Terminal size={24} />}
-              title="KubeStellar Installation"
-              description="Choose your platform and run the installation script"
+              title={t("installTitle")}
+              description={t("installSubtitle")}
             />
 
-            <PlatformSelector platform={platform} setPlatform={setPlatform} />
+            <PlatformSelector
+              platform={platform}
+              setPlatform={setPlatform}
+              t={t}
+            />
 
             <div className="mb-6">
               <h3 className="mb-4 text-lg font-medium text-white">
-                Installation Script for {platform}:
+                {t("installScriptTitle")} {platform}:
               </h3>
               <CodeBlock code={platformInstallationScripts[platform]} />
             </div>
@@ -659,7 +670,7 @@ const QuickInstallationPage = () => {
                 />
                 <div>
                   <h4 className="mb-3 text-lg font-medium text-blue-300">
-                    Installation Process
+                    {t("installProcessTitle")}
                   </h4>
                   <ul className="space-y-2 text-blue-200">
                     <li className="flex items-start">
@@ -667,28 +678,28 @@ const QuickInstallationPage = () => {
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-blue-400"
                       />
-                      Creates a local {platform} cluster
+                      {t("installProcess1", { platform: platform })}
                     </li>
                     <li className="flex items-start">
                       <ChevronRight
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-blue-400"
                       />
-                      Installs KubeStellar core components
+                      {t("installProcess2")}
                     </li>
                     <li className="flex items-start">
                       <ChevronRight
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-blue-400"
                       />
-                      Sets up multi-cluster management capabilities
+                      {t("installProcess3")}
                     </li>
                     <li className="flex items-start">
                       <ChevronRight
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-blue-400"
                       />
-                      Configures workload distribution
+                      {t("installProcess4")}
                     </li>
                   </ul>
                 </div>
@@ -704,7 +715,7 @@ const QuickInstallationPage = () => {
                 />
                 <div>
                   <h4 className="mb-3 text-lg font-medium text-emerald-300">
-                    Next Steps
+                    {t("installNextTitle")}
                   </h4>
                   <ul className="space-y-2 text-emerald-200">
                     <li className="flex items-start">
@@ -712,7 +723,7 @@ const QuickInstallationPage = () => {
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-emerald-400"
                       />
-                      Verify installation:{" "}
+                      {t("installNext1")}:{" "}
                       <code className="ml-1 bg-gray-900/50 px-2 py-1 rounded text-emerald-200 text-sm">
                         kubectl get namespaces
                       </code>
@@ -722,7 +733,7 @@ const QuickInstallationPage = () => {
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-emerald-400"
                       />
-                      Check KubeStellar status:{" "}
+                      {t("installNext2")}:{" "}
                       <code className="ml-1 bg-gray-900/50 px-2 py-1 rounded text-emerald-200 text-sm">
                         kflex ctx
                       </code>
@@ -732,7 +743,7 @@ const QuickInstallationPage = () => {
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-emerald-400"
                       />
-                      Explore the{" "}
+                      {t("installNext3")}{" "}
                       <a
                         href="https://docs.kubestellar.io/latest/direct/get-started/"
                         target="_blank"
@@ -753,8 +764,8 @@ const QuickInstallationPage = () => {
           <AnimatedCard className="mt-12 p-8">
             <SectionHeader
               icon={<Info size={24} />}
-              title="Frequently Asked Questions"
-              description="Common questions about KubeStellar installation and setup"
+              title={t("faqTitle")}
+              description={t("faqSubtitle")}
             />
 
             <div className="space-y-4">

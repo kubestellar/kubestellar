@@ -3,11 +3,9 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { GridLines, StarField } from "./index";
-import { useTranslations } from "next-intl";
+import { GridLines, StarField } from "../index";
 
-export default function Footer() {
-  const t = useTranslations("footer");
+export default function DocsFooter() {
   useEffect(() => {
     // Back to top functionality
     const initBackToTop = () => {
@@ -72,7 +70,8 @@ export default function Footer() {
               />
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
-              {t("description")}
+              Multi-cluster orchestration platform for Kubernetes, simplifying
+              complex deployments across distributed environments.
             </p>
             <div className="flex space-x-6">
               <a
@@ -140,16 +139,14 @@ export default function Footer() {
 
           {/* Product Links */}
           <div className="lg:col-span-2">
-            <h3 className="text-lg font-semibold text-white mb-4">
-              {t("product")}
-            </h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Product</h3>
             <ul className="space-y-3">
               <li>
                 <a
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("features")}
+                  Features
                 </a>
               </li>
               <li>
@@ -157,7 +154,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("useCases")}
+                  Use Cases
                 </a>
               </li>
               <li>
@@ -165,7 +162,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("pricing")}
+                  Pricing
                 </a>
               </li>
               <li>
@@ -173,7 +170,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("roadmap")}
+                  Roadmap
                 </a>
               </li>
             </ul>
@@ -181,16 +178,14 @@ export default function Footer() {
 
           {/* Resources Links */}
           <div className="lg:col-span-2">
-            <h3 className="text-lg font-semibold text-white mb-4">
-              {t("resources")}
-            </h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Resources</h3>
             <ul className="space-y-3">
               <li>
                 <Link
                   href="/docs"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("documentation")}
+                  Documentation
                 </Link>
               </li>
               <li>
@@ -198,7 +193,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("tutorials")}
+                  Tutorials
                 </a>
               </li>
               <li>
@@ -206,7 +201,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("blog")}
+                  Blog
                 </a>
               </li>
               <li>
@@ -214,7 +209,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("community")}
+                  Community
                 </a>
               </li>
             </ul>
@@ -222,16 +217,14 @@ export default function Footer() {
 
           {/* Company Links */}
           <div className="lg:col-span-2">
-            <h3 className="text-lg font-semibold text-white mb-4">
-              {t("company")}
-            </h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
             <ul className="space-y-3">
               <li>
                 <a
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("about")}
+                  About
                 </a>
               </li>
               <li>
@@ -239,7 +232,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("team")}
+                  Team
                 </a>
               </li>
               <li>
@@ -247,7 +240,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("careers")}
+                  Careers
                 </a>
               </li>
               <li>
@@ -255,7 +248,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  {t("contact")}
+                  Contact
                 </a>
               </li>
             </ul>
@@ -264,7 +257,7 @@ export default function Footer() {
           {/* Stay updated */}
           <div className="sm:col-span-2 lg:col-span-2">
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
-              {t("stayUpdated")}
+              Stay Updated
             </h3>
             <div className="bg-gray-800/50 backdrop-blur-md rounded-lg p-4 border border-gray-700/50 transform transition-all duration-300 hover:border-blue-500/30">
               <form id="newsletter-form" className="flex flex-col space-y-3">
@@ -289,14 +282,14 @@ export default function Footer() {
                     id="email-address"
                     type="email"
                     className="block w-full pl-10 pr-3 py-2 text-sm text-white placeholder-gray-400 bg-gray-700/50 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                    placeholder={t("emailPlaceholder")}
+                    placeholder="Enter your email"
                   />
                 </div>
                 <button
                   type="submit"
                   className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 transform hover:translate-y-[-1px] flex items-center justify-center"
                 >
-                  <span>{t("subscribe")}</span>
+                  <span>Subscribe</span>
                 </button>
               </form>
 
@@ -317,10 +310,12 @@ export default function Footer() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>{t("subscribed")}</span>
+                <span>Thank you for subscribing!</span>
               </div>
             </div>
-            <p className="mt-3 text-xs text-gray-400">{t("privacyNotice")}</p>
+            <p className="mt-3 text-xs text-gray-400">
+              We respect your privacy. No spam, unsubscribe anytime.
+            </p>
           </div>
         </div>
 
@@ -328,32 +323,36 @@ export default function Footer() {
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-6 mb-4 md:mb-0">
-              <p className="text-gray-400">{t("copyright")}</p>
+              <p className="text-gray-400">
+                © 2024 KubeStellar. All rights reserved.
+              </p>
               <div className="flex items-center space-x-4">
                 <a
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
                 >
-                  {t("privacyPolicy")}
+                  Privacy Policy
                 </a>
                 <span className="text-gray-600">•</span>
                 <a
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
                 >
-                  {t("termsOfService")}
+                  Terms of Service
                 </a>
                 <span className="text-gray-600">•</span>
                 <a
                   href="#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
                 >
-                  {t("cookiePolicy")}
+                  Cookie Policy
                 </a>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-400 text-sm">{t("madeWithLove")}</span>
+              <span className="text-gray-400 text-sm">
+                Made with ❤️ for the community
+              </span>
             </div>
           </div>
         </div>
@@ -363,7 +362,7 @@ export default function Footer() {
       <button
         id="back-to-top"
         className="fixed bottom-8 right-8 p-3 rounded-full bg-blue-600 text-white shadow-lg z-50 transition-all duration-300 opacity-0 translate-y-10 hover:bg-blue-700 hover:scale-110"
-        aria-label={t("backToTop")}
+        aria-label="Back to top"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

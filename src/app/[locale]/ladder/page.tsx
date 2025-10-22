@@ -3,19 +3,22 @@
 import { GridLines, StarField } from "../../../components/index";
 import Navigation from "../../../components/Navigation";
 import Footer from "../../../components/Footer";
+import { useTranslations } from "next-intl";
 
 export default function MaintainerLadderPage() {
+  const t = useTranslations("ladderPage");
+
   const levels = [
     {
       id: 1,
-      title: "Contributor",
-      nextLevel: "Unpaid Intern",
-      description: "Start your journey in the KubeStellar community",
+      title: t("levels.contributor.title"),
+      nextLevel: t("levels.contributor.nextLevel"),
+      description: t("levels.contributor.description"),
       requirements: [
-        "Minimum of 3 contributions (bug reports, documentation, or code PRs)",
-        "Display enthusiasm and interest in long-term participation",
-        "Be active on GitHub and Slack",
-        "Informal application or nomination to join the intern program",
+        t("levels.contributor.requirements.0"),
+        t("levels.contributor.requirements.1"),
+        t("levels.contributor.requirements.2"),
+        t("levels.contributor.requirements.3"),
       ],
       icon: (
         <svg
@@ -36,17 +39,17 @@ export default function MaintainerLadderPage() {
     },
     {
       id: 2,
-      title: "Unpaid Intern",
-      nextLevel: "Paid Intern",
-      description: "12-week journey to demonstrate commitment and skill",
+      title: t("levels.unpaidIntern.title"),
+      nextLevel: t("levels.unpaidIntern.nextLevel"),
+      description: t("levels.unpaidIntern.description"),
       requirements: [
-        "Open at least 6 'help wanted' issues",
-        "Merge at least 20 PRs (8 within first 6 weeks)",
-        "Attend weekly team meetings or submit summaries",
-        "Work collaboratively with mentors",
-        "Receive mentor's recommendation",
+        t("levels.unpaidIntern.requirements.0"),
+        t("levels.unpaidIntern.requirements.1"),
+        t("levels.unpaidIntern.requirements.2"),
+        t("levels.unpaidIntern.requirements.3"),
+        t("levels.unpaidIntern.requirements.4"),
       ],
-      timeframe: "12 weeks",
+      timeframe: t("levels.unpaidIntern.timeframe"),
       icon: (
         <svg
           className="w-8 h-8"
@@ -66,16 +69,15 @@ export default function MaintainerLadderPage() {
     },
     {
       id: 3,
-      title: "Paid Intern",
-      nextLevel: "Mentor",
-      description:
-        "Recognized contributor with compensation and responsibility",
+      title: t("levels.paidIntern.title"),
+      nextLevel: t("levels.paidIntern.nextLevel"),
+      description: t("levels.paidIntern.description"),
       requirements: [
-        "Successfully complete at least one 12-week paid internship cycle",
-        "Help onboard and support at least one new intern or contributor",
-        "Submit ≥3 PR reviews",
-        "Submit ≥5 helpful comments on PRs or issues",
-        "Present or co-present at a community call",
+        t("levels.paidIntern.requirements.0"),
+        t("levels.paidIntern.requirements.1"),
+        t("levels.paidIntern.requirements.2"),
+        t("levels.paidIntern.requirements.3"),
+        t("levels.paidIntern.requirements.4"),
       ],
       icon: (
         <svg
@@ -96,14 +98,14 @@ export default function MaintainerLadderPage() {
     },
     {
       id: 4,
-      title: "Mentor",
-      nextLevel: "Maintainer",
-      description: "Guide and support the next generation of contributors",
+      title: t("levels.mentor.title"),
+      nextLevel: t("levels.mentor.nextLevel"),
+      description: t("levels.mentor.description"),
       requirements: [
-        "Demonstrate technical leadership in one or more key areas",
-        "Maintain consistent contribution activity",
-        "Engage with the community in GitHub and Slack",
-        "Approved by core maintainers following a public review process",
+        t("levels.mentor.requirements.0"),
+        t("levels.mentor.requirements.1"),
+        t("levels.mentor.requirements.2"),
+        t("levels.mentor.requirements.3"),
       ],
       icon: (
         <svg
@@ -124,14 +126,14 @@ export default function MaintainerLadderPage() {
     },
     {
       id: 5,
-      title: "Maintainer",
-      nextLevel: "Core Team",
-      description: "Trusted leader with full project responsibilities",
+      title: t("levels.maintainer.title"),
+      nextLevel: t("levels.maintainer.nextLevel"),
+      description: t("levels.maintainer.description"),
       requirements: [
-        "≥2 'Help Wanted' issues every 2 months",
-        "≥3 PRs merged every 2 months",
-        "≥8 PR reviews or constructive comments every 2 months",
-        "≥3 community meeting attendances every 2 months",
+        t("levels.maintainer.requirements.0"),
+        t("levels.maintainer.requirements.1"),
+        t("levels.maintainer.requirements.2"),
+        t("levels.maintainer.requirements.3"),
       ],
       icon: (
         <svg
@@ -176,14 +178,13 @@ export default function MaintainerLadderPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-                Contribution{" "}
+                {t("title")}{" "}
                 <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
-                  Ladder
+                  {t("titleSpan")}
                 </span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                A transparent, merit-based path from first-time contributor to
-                trusted maintainer in the KubeStellar community
+                {t("subtitle")}
               </p>
             </div>
           </div>
@@ -230,7 +231,7 @@ export default function MaintainerLadderPage() {
 
                       <div className="space-y-2">
                         <h4 className="text-sm font-semibold text-white mb-2">
-                          Requirements:
+                          {t("requirementsLabel")}
                         </h4>
                         <ul className="space-y-1">
                           {level.requirements.map((req, reqIndex) => (
@@ -250,7 +251,7 @@ export default function MaintainerLadderPage() {
                       {index < levels.length - 1 && (
                         <div className="text-center mt-4">
                           <div className="text-xs text-gray-400">
-                            Next Level:
+                            {t("nextLevelLabel")}
                           </div>
                           <div className="text-sm font-semibold text-blue-400">
                             {level.nextLevel}
@@ -309,7 +310,7 @@ export default function MaintainerLadderPage() {
 
                         <div className="space-y-3">
                           <h4 className="text-lg font-semibold text-white">
-                            Requirements:
+                            {t("requirementsLabel")}
                           </h4>
                           <ul className="space-y-2">
                             {level.requirements.map((req, reqIndex) => (
@@ -331,7 +332,7 @@ export default function MaintainerLadderPage() {
                         {index < levels.length - 1 && (
                           <div className="mt-6 pt-4 border-t border-gray-700/50">
                             <div className="text-sm text-gray-400">
-                              Next Level:
+                              {t("nextLevelLabel")}
                             </div>
                             <div className="text-lg font-semibold text-blue-400">
                               {level.nextLevel}
@@ -365,11 +366,10 @@ export default function MaintainerLadderPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-gray-800/40 backdrop-blur-md rounded-lg p-8 border border-white/10">
               <h2 className="text-3xl font-bold text-white mb-8 text-center">
-                Maintainer Activity Requirements
+                {t("activityRequirements.title")}
               </h2>
               <p className="text-gray-300 text-center mb-8 text-lg">
-                Maintainers must meet these bi-monthly (every 2 months)
-                contribution minimums:
+                {t("activityRequirements.subtitle")}
               </p>
 
               <div className="overflow-x-auto">
@@ -377,31 +377,33 @@ export default function MaintainerLadderPage() {
                   <thead>
                     <tr className="border-b border-gray-600">
                       <th className="py-4 px-6 text-white font-semibold">
-                        Metric
+                        {t("activityRequirements.table.metric")}
                       </th>
                       <th className="py-4 px-6 text-white font-semibold">
-                        Requirement (Per 2 Months)
+                        {t("activityRequirements.table.requirement")}
                       </th>
                     </tr>
                   </thead>
                   <tbody className="text-gray-300">
                     <tr className="border-b border-gray-700/50">
                       <td className="py-4 px-6">
-                        &quot;Help Wanted&quot; Issues
+                        {t("activityRequirements.table.helpWantedIssues")}
                       </td>
                       <td className="py-4 px-6 text-green-400 font-semibold">
                         ≥ 2
                       </td>
                     </tr>
                     <tr className="border-b border-gray-700/50">
-                      <td className="py-4 px-6 font-semibold">PRs Merged</td>
+                      <td className="py-4 px-6 font-semibold">
+                        {t("activityRequirements.table.prsMerged")}
+                      </td>
                       <td className="py-4 px-6 text-green-400 font-semibold">
                         ≥ 3
                       </td>
                     </tr>
                     <tr className="border-b border-gray-700/50">
                       <td className="py-4 px-6">
-                        PR Reviews or Constructive Comments
+                        {t("activityRequirements.table.prReviews")}
                       </td>
                       <td className="py-4 px-6 text-green-400 font-semibold">
                         ≥ 8
@@ -409,7 +411,7 @@ export default function MaintainerLadderPage() {
                     </tr>
                     <tr>
                       <td className="py-4 px-6">
-                        Community Meeting Attendance
+                        {t("activityRequirements.table.meetingAttendance")}
                       </td>
                       <td className="py-4 px-6 text-green-400 font-semibold">
                         ≥ 3
@@ -425,24 +427,23 @@ export default function MaintainerLadderPage() {
         <section className="py-16 sm:py-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold text-white mb-6">
-              Ready to Start Your Journey?
+              {t("callToAction.title")}
             </h2>
             <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-              Join the KubeStellar community and begin climbing the maintainer
-              ladder today
+              {t("callToAction.subtitle")}
             </p>
             <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
               <a
                 href="https://cloud-native.slack.com/archives/C097094RZ3M"
                 className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 hover:from-blue-700 hover:to-purple-700 hover:scale-105"
               >
-                Community Meetings
+                {t("callToAction.communityMeetingsButton")}
               </a>
               <a
                 href="https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22"
                 className="inline-block bg-gray-700 text-white font-semibold py-3 px-8 rounded-lg border border-gray-600 transition-all duration-300 hover:bg-gray-600 hover:scale-105"
               >
-                View Open Issues
+                {t("callToAction.viewIssuesButton")}
               </a>
             </div>
           </div>

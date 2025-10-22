@@ -2,8 +2,10 @@
 
 import { useEffect } from "react";
 import { GridLines, StarField } from "../index";
+import { useTranslations } from "next-intl";
 
 export default function AboutSection() {
+  const t = useTranslations("aboutSection");
   useEffect(() => {
     // Feature cards animation
     const initFeatureCards = () => {
@@ -109,14 +111,13 @@ export default function AboutSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-white sm:text-[2.4rem]">
-            What is{" "}
+            {t("title")}{" "}
             <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
-              KubeStellar
+              {t("titleSpan")}
             </span>
           </h2>
           <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-300">
-            A multi-cluster Kubernetes orchestration platform that simplifies
-            how you manage distributed workloads.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -145,19 +146,17 @@ export default function AboutSection() {
                 </div>
 
                 <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">
-                  Single Control Plane
+                  {t("card1Title")}
                 </h3>
 
-                <p className="text-gray-300 mb-6">
-                  Manage multiple Kubernetes clusters from a unified control
-                  plane, eliminating the need to switch contexts and
-                  streamlining operations.
-                </p>
+                <p className="text-gray-300 mb-6">{t("card1Description")}</p>
 
                 {/* Animated arrow on hover */}
                 <div className="h-8 overflow-hidden">
                   <div className="transform translate-y-8 group-hover:translate-y-0 transition-transform duration-300 text-primary-600 dark:text-primary-400 flex items-center">
-                    <span className="text-sm font-medium">Learn more</span>
+                    <span className="text-sm font-medium">
+                      {t("learnMore")}
+                    </span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300"
@@ -200,19 +199,17 @@ export default function AboutSection() {
                 </div>
 
                 <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">
-                  Intelligent Workload Placement
+                  {t("card2Title")}
                 </h3>
 
-                <p className="text-gray-300 mb-6">
-                  Automatically distribute workloads based on cluster
-                  capabilities, availability, and custom constraints for optimal
-                  performance.
-                </p>
+                <p className="text-gray-300 mb-6">{t("card2Description")}</p>
 
                 {/* Animated arrow on hover */}
                 <div className="h-8 overflow-hidden">
                   <div className="transform translate-y-8 group-hover:translate-y-0 transition-transform duration-300 text-primary-600 dark:text-primary-400 flex items-center">
-                    <span className="text-sm font-medium">Learn more</span>
+                    <span className="text-sm font-medium">
+                      {t("learnMore")}
+                    </span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300"
@@ -255,19 +252,17 @@ export default function AboutSection() {
                 </div>
 
                 <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">
-                  Policy-Driven Management
+                  {t("card3Title")}
                 </h3>
 
-                <p className="text-gray-300 mb-6">
-                  Define policies for governance, security, and compliance
-                  across your entire Kubernetes estate with centralized
-                  enforcement.
-                </p>
+                <p className="text-gray-300 mb-6">{t("card3Description")}</p>
 
                 {/* Animated arrow on hover */}
                 <div className="h-8 overflow-hidden">
                   <div className="transform translate-y-8 group-hover:translate-y-0 transition-transform duration-300 text-primary-600 dark:text-primary-400 flex items-center">
-                    <span className="text-sm font-medium">Learn more</span>
+                    <span className="text-sm font-medium">
+                      {t("learnMore")}
+                    </span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300"

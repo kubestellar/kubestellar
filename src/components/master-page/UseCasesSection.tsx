@@ -1,8 +1,10 @@
 "use client";
 
 import { GridLines, StarField } from "../index";
+import { useTranslations } from "next-intl";
 
 export default function UseCasesSection() {
+  const t = useTranslations("useCasesSection");
   const getIcon = (iconType: string) => {
     switch (iconType) {
       case "globe":
@@ -121,54 +123,48 @@ export default function UseCasesSection() {
   const useCases = [
     {
       icon: "globe",
-      title: "Edge Computing",
-      description:
-        "Deploy applications across edge locations with centralized management. Ideal for retail, manufacturing, and telecom with distributed infrastructure.",
+      title: t("cases.edge.title"),
+      description: t("cases.edge.description"),
       borderColor: "bg-blue-500",
       iconBgColor: "bg-blue-400/20",
       hoverBorderColor: "hover:border-[#60A5FA]",
     },
     {
       icon: "security",
-      title: "Multi-Region Compliance",
-      description:
-        "Deploy applications with specific regional compliance requirements. Ensure data residency and regulatory compliance across global operations.",
+      title: t("cases.compliance.title"),
+      description: t("cases.compliance.description"),
       borderColor: "bg-purple-500",
       iconBgColor: "bg-purple-400/20",
       hoverBorderColor: "hover:border-[#C084FC]",
     },
     {
       icon: "power",
-      title: "Hybrid/Multi-Cloud",
-      description:
-        "Seamlessly manage workloads across multiple cloud providers and on-premises infrastructure with unified policies and consistent experience.",
+      title: t("cases.hybrid.title"),
+      description: t("cases.hybrid.description"),
       borderColor: "bg-green-500",
       iconBgColor: "bg-green-400/20",
       hoverBorderColor: "hover:border-[#4ADE80]",
     },
     {
       icon: "clock",
-      title: "Disaster Recovery",
-      description:
-        "Implement robust disaster recovery strategies with automatic workload replication and failover across multiple clusters in different regions.",
+      title: t("cases.dr.title"),
+      description: t("cases.dr.description"),
       borderColor: "bg-red-500",
       iconBgColor: "bg-red-400/20",
       hoverBorderColor: "hover:border-[#F87171]",
     },
     {
       icon: "cloud",
-      title: "Multi-Tenant Isolation",
-      description:
-        "Create isolated environments for different teams or customers while maintaining centralized control. Ideal for SaaS providers and large enterprises.",
+      title: t("cases.multitenant.title"),
+      description: t("cases.multitenant.description"),
       borderColor: "bg-yellow-500",
       iconBgColor: "bg-yellow-400/20",
       hoverBorderColor: "hover:border-[#FACC15]",
     },
     {
       icon: "network",
-      title: "Performance Optimization",
-      description:
-        "Deploy workloads closest to users or data sources for optimal performance, reducing latency and improving user experience across global operations.",
+      title: t("cases.performance.title"),
+      description: t("cases.performance.description"),
       borderColor: "bg-indigo-500",
       iconBgColor: "bg-indigo-400/20",
       hoverBorderColor: "hover:border-[#818CF8]",
@@ -192,14 +188,13 @@ export default function UseCasesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-extrabold text-white sm:text-[2.4rem]">
-            Use{" "}
+            {t("title")}{" "}
             <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
-              Cases
+              {t("titleSpan")}
             </span>
           </h2>
           <p className="max-w-2xl mt-3 mx-auto text-lg sm:text-xl text-[#D1D5DB] font-normal px-4">
-            Discover how organizations leverage KubeStellar for their
-            multi-cluster needs.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -232,7 +227,7 @@ export default function UseCasesSection() {
 
                 {/* Learn more button */}
                 <button className="text-blue-400 font-medium hover:text-blue-300 transition-all duration-300 flex items-center text-sm hover:scale-110 transform origin-left">
-                  Learn more
+                  {t("learnMore")}
                   <svg
                     className="ml-1 w-4 h-4 transition-transform duration-300 hover:scale-125"
                     fill="none"
