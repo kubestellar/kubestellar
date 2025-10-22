@@ -1,0 +1,215 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextra-pr-rollout-script
+  namespace: docs
+data:
+  check-pr-rollouts.sh: |-
+    #!/bin/bash
+    set -e
+    export OCI_CLI_SUPPRESS_FILE_PERMISSIONS_WARNING=True
+    echo "===== Starting PR rollout check at $(date -u) ====="
+
+    NAMESPACE="docs"
+
+    # Ensure required environment variables are set
+    : "${REPO_OCID:?REPO_OCID not set}"
+    : "${COMPARTMENT_OCID:?COMPARTMENT_OCID not set}"
+    : "${IMAGE_PREFIX:=}"
+
+    TEMPLATE="/scripts/nextra-preview.yaml.tmpl"
+
+    echo "[INFO] Listing all PR images..."
+    PR_IMAGES=$(oci artifacts container image list \
+      --compartment-id "$COMPARTMENT_OCID" \
+      --repository-id "$REPO_OCID" \
+      --all \
+      --query 'data.items[?contains("display-name", `pr-`)] | sort_by(@,&"display-name")' \
+      --raw-output)
+
+    [ -z "$PR_IMAGES" ] && echo "[INFO] No PR images found." || echo "$PR_IMAGES" | jq -r '.[]."display-name"'
+
+    echo "[DEBUG] PR_IMAGES: $PR_IMAGES"
+
+    echo "[INFO] Extracting PR numbers..."
+    ACTIVE_PRS=$(echo "$PR_IMAGES" | jq -r '.[]."display-name"' | grep -oE 'pr-[0-9]+' | sort -u || true)
+    echo "[DEBUG] Active PRs: $ACTIVE_PRS"
+
+    echo "[INFO] Listing current preview deployments..."
+    CURRENT_DEPLOYS=$(kubectl get deploy -n "$NAMESPACE" -l app=pr-preview -o json | jq -r '.items[].metadata.name' || true)
+
+    for PR_TAG in $ACTIVE_PRS; do
+      PR_NUM=${PR_TAG#pr-}
+      DEPLOY_NAME="nextra-preview-${PR_NUM}"
+      IMAGE_NAME="${IMAGE_PREFIX}:${PR_TAG}"
+
+      echo "[INFO] Processing PR #${PR_NUM}..."
+      if kubectl get deploy "$DEPLOY_NAME" -n "$NAMESPACE" >/dev/null 2>&1; then
+        echo "[DEBUG] Deployment ${DEPLOY_NAME} exists, checking rollout annotation and image timestamps..."
+
+        LAST_ROLLOUT=$(kubectl get deploy "$DEPLOY_NAME" -n "$NAMESPACE" -o yaml | grep 'kubestellar.io/last-rollout-time' | awk '{print $2}' | tr -d '"')
+        echo "[DEBUG] Extracted LAST_ROLLOUT: '${LAST_ROLLOUT:-<none>}'"
+
+        LATEST_IMAGE_TIME=$(echo "$PR_IMAGES" | jq -r --arg TAG "$PR_TAG" '.[] | select(."display-name" | contains($TAG)) | ."time-created"' | sort | tail -1)
+        echo "[DEBUG] Retrieved LATEST_IMAGE_TIME: '${LATEST_IMAGE_TIME:-<none)}'"
+
+        # Compare timestamps
+        if [ -z "$LAST_ROLLOUT" ]; then
+          echo "[DEBUG] No previous rollout annotation found. Triggering rollout."
+        elif [[ "$LATEST_IMAGE_TIME" > "$LAST_ROLLOUT" ]]; then
+          echo "[DEBUG] Newer image detected (${LATEST_IMAGE_TIME} > ${LAST_ROLLOUT}). Triggering rollout."
+        else
+          echo "[DEBUG] No new image detected (${LATEST_IMAGE_TIME} <= ${LAST_ROLLOUT}). Skipping."
+        fi
+
+        # Perform rollout if needed
+        if [ -z "$LAST_ROLLOUT" ] || [[ "$LATEST_IMAGE_TIME" > "$LAST_ROLLOUT" ]]; then
+          echo "[INFO] Updating ${DEPLOY_NAME} with new image..."
+          kubectl set image deploy/"$DEPLOY_NAME" nextra="$IMAGE_NAME" -n "$NAMESPACE"
+          kubectl annotate deploy "$DEPLOY_NAME" -n "$NAMESPACE" "kubestellar.io/last-rollout-time=$LATEST_IMAGE_TIME" --overwrite
+          echo "[INFO] Rollout annotation updated to ${LATEST_IMAGE_TIME}"
+
+          echo "[INFO] Forcing rollout restart for ${DEPLOY_NAME}..."
+          kubectl rollout restart deploy/"$DEPLOY_NAME" -n "$NAMESPACE"
+          kubectl rollout status deploy/"$DEPLOY_NAME" -n "$NAMESPACE" --timeout=120s || echo "[WARN] Rollout did not complete within timeout."
+        else
+          echo "[DEBUG] ${DEPLOY_NAME} is already up to date — no rollout performed."
+        fi
+      else
+        echo "[INFO] Deployment ${DEPLOY_NAME} not found — creating new preview deployment for PR #${PR_NUM}..."
+        export DEPLOY_NAME
+        export IMAGE_NAME
+        export PR_NUM
+        export NAMESPACE
+        echo "[DEBUG] Applying template with envsubst (DEPLOY_NAME=${DEPLOY_NAME}, IMAGE_NAME=${IMAGE_NAME}, PR_NUM=${PR_NUM}, NAMESPACE=${NAMESPACE})"
+        envsubst < "$TEMPLATE" | kubectl apply -n "$NAMESPACE" -f -
+        echo "[INFO] Created new preview deployment and service for PR #${PR_NUM}"
+      fi
+    done
+
+    for DEPLOY in $CURRENT_DEPLOYS; do
+      PR_ID=$(echo "$DEPLOY" | grep -oE '[0-9]+$' || true)
+      if ! echo "$ACTIVE_PRS" | grep -q "pr-$PR_ID"; then
+        echo "[INFO] Removing stale preview for PR #$PR_ID..."
+        kubectl delete deploy "$DEPLOY" -n "$NAMESPACE" --ignore-not-found
+        kubectl delete svc "$DEPLOY" -n "$NAMESPACE" --ignore-not-found
+        kubectl delete ingress "$DEPLOY" -n "$NAMESPACE" --ignore-not-found
+      fi
+    done
+
+    echo "===== Completed at $(date -u) ====="
+
+  nextra-preview.yaml.tmpl: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: ${DEPLOY_NAME}
+      namespace: ${NAMESPACE}
+      labels:
+        app: pr-preview
+        pr: "${PR_NUM}"
+    spec:
+      replicas: 1
+      revisionHistoryLimit: 2
+      selector:
+        matchLabels:
+          app: pr-preview
+          pr: "${PR_NUM}"
+      template:
+        metadata:
+          labels:
+            app: pr-preview
+            pr: "${PR_NUM}"
+        spec:
+          imagePullSecrets:
+            - name: ocir-secret
+          containers:
+            - name: nextra
+              image: ${IMAGE_NAME}
+              ports:
+                - containerPort: 3000
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: ${DEPLOY_NAME}
+      namespace: ${NAMESPACE}
+      labels:
+        app: pr-preview
+        pr: "${PR_NUM}"
+    spec:
+      type: ClusterIP
+      selector:
+        app: pr-preview
+        pr: "${PR_NUM}"
+      ports:
+        - name: http
+          port: 80
+          targetPort: 3000
+    ---
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: ${DEPLOY_NAME}
+      namespace: ${NAMESPACE}
+      labels:
+        app: pr-preview
+        pr: "${PR_NUM}"
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+    spec:
+      ingressClassName: nginx
+      rules:
+        - host: pr-${PR_NUM}.previews.kubestellar.io
+          http:
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: ${DEPLOY_NAME}
+                    port:
+                      number: 80
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nextra-pr-rollout-checker
+  namespace: docs
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          serviceAccountName: nextra-rollout-sa
+          restartPolicy: Never
+          containers:
+            - name: pr-rollout-checker
+              image: iad.ocir.io/id4wyucbsggm/docs-rollout-checker:latest
+              imagePullPolicy: Always
+              command:
+                - /bin/bash
+                - -c
+                - bash /scripts/check-pr-rollouts.sh
+              volumeMounts:
+                - name: script
+                  mountPath: /scripts
+                - name: oci-config
+                  mountPath: /root/.oci
+              envFrom:
+                - secretRef:
+                    name: oci-config-secret
+          volumes:
+            - name: script
+              configMap:
+                name: nextra-pr-rollout-script
+                defaultMode: 0755
+            - name: oci-config
+              secret:
+                secretName: oci-config-secret
+                defaultMode: 0600
