@@ -11,9 +11,9 @@ env:
   NODE_VERSION: "20"
 
 jobs:
-  # Single consolidated CI job
+  # Code Quality and Build Pipeline
   ci:
-    name: Build and Test
+    name: Code Quality & Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -36,41 +36,61 @@ jobs:
         run: npm run lint
         continue-on-error: false
 
-      - name: TypeScript type check
-        run: npx tsc --noEmit
+      - name: Check formatting (Prettier)
+        run: npm run format:check
         continue-on-error: false
 
-      - name: Check formatting (Prettier)
-        run: |
-          if [ -f .prettierrc ] || [ -f .prettierrc.json ] || [ -f .prettierrc.js ]; then
-            npx prettier --check .
-          else
-            echo "Prettier not configured, skipping format check"
-          fi
-        continue-on-error: true
+      - name: TypeScript type check
+        run: npm run type-check
+        continue-on-error: false
 
       - name: Build application
         run: npm run build
         env:
           NODE_ENV: production
 
-      - name: Check build output
+      - name: Verify build output
         run: |
           if [ -d ".next" ]; then
             echo "✅ Build successful - .next directory created"
-            ls -la .next/
+            echo "Build size info:"
+            du -sh .next/
+            if [ -f ".next/build-manifest.json" ]; then
+              echo "✅ Build manifest exists"
+            fi
           else
             echo "❌ Build failed - .next directory not found"
             exit 1
           fi
 
+      - name: Run tests (if available)
+        run: npm test
+        continue-on-error: false
+
+      - name: Security audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
       - name: Upload build artifacts
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
+          name: build-artifacts-${{ github.sha }}
           path: |
             .next/
             public/
             package.json
             next.config.ts
           retention-days: 7
+
+      - name: Upload CI reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-reports-${{ github.sha }}
+          path: |
+            npm-debug.log*
+            yarn-debug.log*
+            yarn-error.log*
+          retention-days: 3
+          if-no-files-found: ignore

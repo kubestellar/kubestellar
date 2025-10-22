@@ -33,7 +33,11 @@ interface EarthProps {
 }
 
 // Earth/Planet 3D model component
-const Earth: React.FC<EarthProps> = ({ scale = 2.5, position = [0, 0, 0], rotation = [0, 0, 0] }) => {
+const Earth: React.FC<EarthProps> = ({
+  scale = 2.5,
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+}) => {
   const earth = useGLTF("./planet/scene.gltf");
 
   return (
