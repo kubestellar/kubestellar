@@ -4,90 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { Link as IntlLink } from "@/i18n/navigation";
 import { GridLines, StarField, EarthAnimation } from "../index";
-import StatCard from "../StatsCard";
 import { useTranslations } from "next-intl";
-
-interface StatData {
-  id: number;
-  icon: React.ReactNode;
-  value: number;
-  suffix: string;
-  title: string;
-  color: "blue" | "purple" | "emerald";
-  animationDelay: string;
-}
-
-const statsData: StatData[] = [
-  {
-    id: 1,
-    icon: (
-      <svg
-        className="w-8 h-8 text-blue-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M13 10V3L4 14h7v7l9-11h-7z"
-        ></path>
-      </svg>
-    ),
-    value: 40,
-    suffix: "x",
-    title: "Performance Boost",
-    color: "blue" as const,
-    animationDelay: "0s",
-  },
-  {
-    id: 2,
-    icon: (
-      <svg
-        className="w-8 h-8 text-purple-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
-        ></path>
-      </svg>
-    ),
-    value: 99,
-    suffix: "%",
-    title: "Uptime Guarantee",
-    color: "purple" as const,
-    animationDelay: "0.2s",
-  },
-  {
-    id: 3,
-    icon: (
-      <svg
-        className="w-8 h-8 text-emerald-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-        ></path>
-      </svg>
-    ),
-    value: 50,
-    suffix: "k+",
-    title: "Active Users",
-    color: "emerald" as const,
-    animationDelay: "0.4s",
-  },
-];
 
 export default function HeroSection() {
   const t = useTranslations("heroSection");
@@ -144,7 +61,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white min-h-[85vh] flex items-center">
+    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white min-h-[100vh] flex items-center">
       {/* Animated Background Universe */}
       <div className="absolute inset-0 z-0">
         {/*!-- Floating Nebula Clouds */}
@@ -189,11 +106,11 @@ export default function HeroSection() {
 
       {/* Main Content Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[70vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-screen lg:min-h-[70vh]">
           {/* Left Column: Interactive Content */}
-          <div className="hero-content space-y-6">
+          <div className="hero-content space-y-6 sm:space-y-8 lg:space-y-12 min-h-[calc(100vh-4rem)] lg:min-h-0 flex flex-col justify-center lg:block pt-8 md:pt-0">
             {/* Dynamic Main Heading */}
-            <div className="heading-container space-y-4">
+            <div className="heading-container">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none">
                 {/* First Line */}
                 <span className="block text-white mb-3 animate-text-reveal pt-5">
@@ -212,7 +129,7 @@ export default function HeroSection() {
               </h1>
 
               {/* Paragraph with fade-in-up effect and delay */}
-              <p className="text-lg sm:text-xl text-gray-300 max-w-2xl leading-snug animate-fade-in-up opacity-0 [animation-delay:0.6s] [animation-fill-mode:forwards]">
+              <p className="sm:text-xl text-gray-300 max-w-2xl leading-snug animate-fade-in-up opacity-0 [animation-delay:0.6s] [animation-fill-mode:forwards] mt-4">
                 Experience the future of cloud-native orchestration. KubeStellar
                 revolutionizes multi-cluster management with AI-powered
                 automation and real-time intelligence.
@@ -241,7 +158,7 @@ export default function HeroSection() {
                   {/* Connection Status */}
                   <div className="connection-status flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
-                    <span className="text-green-400 text-xs">CONNECTED</span>
+                    <span className="text-green-400 text-xs">READY</span>
                   </div>
                 </div>
 
@@ -249,86 +166,73 @@ export default function HeroSection() {
                 <div className="terminal-content space-y-3 font-mono text-sm">
                   {/* Command Line */}
                   <div className="command-line animate-command-typing">
-                    <span className="text-green-400 mr-5">$</span>
-                    <span className="typing-text text-blue-300">
-                      kubectl kubestellar deploy --multi-cluster --ai-optimized
-                    </span>
-                    &nbsp;
-                    <span className="typing-cursor bg-blue-300 w-0.5 h-6 animate-blink"></span>
+                    <div className="flex flex-col space-y-1">
+                      <div className="flex items-start">
+                        <span className="text-green-400 mr-2 flex-shrink-0">
+                          $
+                        </span>
+                        <div className="typing-text text-blue-300 leading-relaxed text-xs sm:text-sm">
+                          <div>bash &lt;(curl -s \</div>
+                          <div className="ml-4">
+                            https://raw.githubusercontent.com/kubestellar/ \
+                          </div>
+                          <div className="ml-4">
+                            kubestellar/refs/tags/v0.27.2/scripts/ \
+                          </div>
+                          <div className="ml-4">
+                            create-kubestellar-demo-env.sh) --platform kind
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Command Output */}
                   <div className="command-output space-y-2 ml-6 animate-fade-in [animation-delay:0.8s] [animation-fill-mode:forwards]">
-                    {/* Line 1 */}
+                    {/* Header */}
                     <div className="output-line animate-slide-in-left [animation-delay:1s]">
-                      <span className="text-cyan-400 font-bold">AI</span>
+                      <span className="text-cyan-400 font-bold">INFO</span>
                       <span className="text-gray-300 ml-4">
-                        Analyzing cluster topology and workload patterns...
+                        Installing KubeStellar demo environment...
                       </span>
-                      <div className="loading-dots ml-2" aria-label="Loading">
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                      </div>
                     </div>
 
-                    {/* Line 2 */}
+                    {/* Creating clusters */}
+                    <div className="output-line animate-slide-in-left [animation-delay:1.2s]">
+                      <span className="text-blue-400 font-bold">SETUP</span>
+                      <span className="text-gray-300 ml-4">
+                        Creating kind clusters: kubeflex, cluster1, cluster2
+                      </span>
+                      <span className="text-emerald-400 ml-2 text-xs">✓</span>
+                    </div>
+
+                    {/* Installing KubeFlex */}
                     <div className="output-line animate-slide-in-left [animation-delay:1.4s]">
-                      <span className="text-blue-400 font-bold">INFO</span>
+                      <span className="text-purple-400 font-bold">INSTALL</span>
                       <span className="text-gray-300 ml-4">
-                        Discovered 8 clusters across 3 regions
+                        Deploying KubeFlex control plane components
                       </span>
-                      <svg
-                        className="w-4 h-4 text-green-400 ml-2 animate-bounce"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M5 13l4 4L19 7"
-                        ></path>
-                      </svg>
+                      <span className="text-emerald-400 ml-2 text-xs">✓</span>
                     </div>
 
-                    {/* Line 3 */}
+                    {/* Configuring OCM */}
+                    <div className="output-line animate-slide-in-left [animation-delay:1.6s]">
+                      <span className="text-yellow-400 font-bold">CONFIG</span>
+                      <span className="text-gray-300 ml-4">
+                        Configuring Open Cluster Management
+                      </span>
+                      <span className="text-emerald-400 ml-2 text-xs">✓</span>
+                    </div>
+
+                    {/* Final Success */}
                     <div className="output-line animate-slide-in-left [animation-delay:1.8s]">
-                      <span className="text-purple-400 font-bold">
-                        OPTIMIZE
-                      </span>
-                      <span className="text-gray-300 ml-4">
-                        AI optimizing resource allocation...
-                      </span>
-                      <div className="optimization-bar ml-2">
-                        <div className="optimization-progress"></div>
-                      </div>
-                    </div>
-
-                    {/* Line 4 */}
-                    <div className="output-line animate-slide-in-left [animation-delay:2.2s]">
                       <span className="text-emerald-400 font-bold">
                         SUCCESS
                       </span>
                       <span className="text-gray-300 ml-4">
-                        Deployment completed with 40% efficiency gain
+                        KubeStellar demo environment ready! Setup complete
                       </span>
-                      <div className="success-indicator ml-2">
-                        <svg
-                          className="w-5 h-5 text-emerald-400 animate-ping"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 13l4 4L19 7"
-                          ></path>
-                        </svg>
-                      </div>
+                      <span className="text-emerald-400 ml-2 text-xs">✓</span>
                     </div>
                   </div>
                 </div>
@@ -342,7 +246,7 @@ export default function HeroSection() {
             >
               <IntlLink
                 href="/quick-installation"
-                className="primary-action-btn group relative overflow-hidden inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-xl text-white 
+                className="primary-action-btn group relative overflow-hidden inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-bold rounded-xl text-white 
                           bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 
                           hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 
                           transition-all duration-500 transform hover:-translate-y-1 
@@ -366,7 +270,7 @@ export default function HeroSection() {
 
               <Link
                 href="/docs"
-                className="secondary-action-btn inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-xl text-gray-200 
+                className="secondary-action-btn inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-bold rounded-xl text-gray-200 
                           bg-gray-800/40 hover:bg-gray-800/60 
                           backdrop-blur-md border border-gray-700/50 hover:border-gray-600/50 
                           transition-all duration-500 transform hover:-translate-y-1 hover:scale-105 
@@ -388,21 +292,6 @@ export default function HeroSection() {
                 </svg>
                 Explore Docs
               </Link>
-            </div>
-
-            {/* STATS DASHBOARD */}
-            <div className="stats-dashboard grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
-              {statsData.map(stat => (
-                <StatCard
-                  key={stat.id}
-                  icon={stat.icon}
-                  value={stat.value}
-                  suffix={stat.suffix}
-                  title={stat.title}
-                  color={stat.color}
-                  animationDelay={stat.animationDelay}
-                />
-              ))}
             </div>
           </div>
 
