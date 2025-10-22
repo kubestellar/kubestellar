@@ -106,6 +106,10 @@ jobs:
         if: always()
         run: kubectl --context kind-kubeflex get deployments -A
 
+      - name: show namespaces in its1
+        if: always()
+        run: kubectl --context its1 get namespaces
+
       - name: show Deployment objects in its1
         if: always()
         run: kubectl --context its1 get deployments -A
@@ -240,6 +244,10 @@ jobs:
       - name: show Deployment objects in hosting cluster
         if: always()
         run: kubectl --context kind-kubeflex get deployments -A
+
+      - name: show namespaces in its1
+        if: always()
+        run: kubectl --context its1 get namespaces
 
       - name: show Deployment objects in its1
         if: always()
