@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { GridLines, StarField } from "./index";
+import { GridLines, StarField, LanguageSwitcher } from "./index";
 import { useTranslations } from "next-intl";
 
 export default function Navigation() {
@@ -557,58 +557,8 @@ export default function Navigation() {
               </div>
             </div>
 
-            {/* Language Dropdown */}
-            <div className="relative group" data-dropdown>
-              <button
-                data-dropdown-button
-                className="text-sm font-medium text-gray-300 hover:text-pink-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-pink-500/10 hover:shadow-lg hover:shadow-pink-500/20 hover:scale-100 transform nav-link-hover"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
-                  />
-                </svg>
-                {t("language")}
-                <svg
-                  className="w-4 h-4 ml-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              <div
-                data-dropdown-menu
-                className="absolute right-0 mt-2 w-32 bg-gray-800/95 backdrop-blur-sm rounded-md shadow-lg border border-gray-700"
-              >
-                <a
-                  href="#"
-                  className="block px-5 py-2 text-sm text-gray-300 hover:bg-purple-900/30 rounded transition-all duration-200 hover:text-purple-300 hover:shadow-md"
-                >
-                  {t("langEnglish")}
-                </a>
-                <a
-                  href="#"
-                  className="block px-5 py-2 text-sm text-gray-300 hover:bg-purple-900/30 rounded transition-all duration-200 hover:text-purple-300 hover:shadow-md"
-                >
-                  {t("langHindi")}
-                </a>
-              </div>
-            </div>
+            {/* Language Switcher */}
+            <LanguageSwitcher className="relative group" />
 
             {/* GitHub Dropdown */}
             <div className="relative group" data-dropdown>
