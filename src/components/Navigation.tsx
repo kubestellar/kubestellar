@@ -344,6 +344,25 @@ export default function Navigation() {
                     </svg>
                     {t("contributeHandbook")}
                   </Link>
+                  <Link
+                    href="/quick-installation"
+                    className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      ></path>
+                    </svg>
+                    {t("quickInstallation")}
+                  </Link>
                   <a
                     href="#security"
                     className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
