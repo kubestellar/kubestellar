@@ -136,7 +136,7 @@ jobs:
           IMAGE_IDS=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query "data[?contains(display-name, 'pr-${{ github.event.number }}')].id" \
+            --query 'data[?contains(`"display-name"`, `pr-${{ github.event.number }}`)].id' \
             --raw-output)
 
           if [ -z "$IMAGE_IDS" ]; then
