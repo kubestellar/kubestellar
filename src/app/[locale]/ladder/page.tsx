@@ -4,6 +4,7 @@ import { GridLines, StarField } from "../../../components/index";
 import Navigation from "../../../components/Navigation";
 import Footer from "../../../components/Footer";
 import { useTranslations } from "next-intl";
+import GetStartedSection from "@/components/master-page/GetStartedSection";
 
 export default function MaintainerLadderPage() {
   const t = useTranslations("ladderPage");
@@ -423,31 +424,8 @@ export default function MaintainerLadderPage() {
             </div>
           </div>
         </section>
-        {/* Call to Action */}
-        <section className="py-16 sm:py-20">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-white mb-6">
-              {t("callToAction.title")}
-            </h2>
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-              {t("callToAction.subtitle")}
-            </p>
-            <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
-              <a
-                href="https://cloud-native.slack.com/archives/C097094RZ3M"
-                className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 hover:from-blue-700 hover:to-purple-700 hover:scale-105"
-              >
-                {t("callToAction.communityMeetingsButton")}
-              </a>
-              <a
-                href="https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22"
-                className="inline-block bg-gray-700 text-white font-semibold py-3 px-8 rounded-lg border border-gray-600 transition-all duration-300 hover:bg-gray-600 hover:scale-105"
-              >
-                {t("callToAction.viewIssuesButton")}
-              </a>
-            </div>
-          </div>
-        </section>
+        {/* Ready To Get Started Section */}
+        <GetStartedSection />
       </div>
       <Footer />
     </div>
