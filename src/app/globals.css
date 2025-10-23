@@ -976,7 +976,8 @@ html:not(.dark) .nextra-sidebar-container {
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.3);
   }
   50% {
@@ -1032,7 +1033,7 @@ html:not(.dark) .nextra-sidebar-container {
 
 /* Enhanced dropdown styles for language switcher */
 .language-dropdown-shadow {
-  box-shadow: 
+  box-shadow:
     0 10px 25px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05),
     0 0 0 1px rgba(255, 255, 255, 0.05);
