@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextra-rollout-script
+  namespace: docs
+data:
+  check-latest-rollout.sh: |
+    #!/bin/bash
+    set -e
+    echo "===== Starting rollout check at $(date -u) ====="
+
+    # --- Configuration ---
+    NAMESPACE="docs"
+    DEPLOYMENT="kubestellar-docs"
+
+    # Ensure required environment variables are set
+    : "${COMPARTMENT_OCID:?COMPARTMENT_OCID not set}"
+    : "${PROD_REPO_OCID:=}"
+
+    echo "[DEBUG] Namespace: $NAMESPACE"
+    echo "[DEBUG] Deployment: $DEPLOYMENT"
+
+    echo "[DEBUG] Checking kubectl availability..."
+    kubectl version --client
+    echo "[DEBUG] Checking OCI CLI availability..."
+    oci --version
+
+    echo "[DEBUG] Fetching latest image info from OCI..."
+    OCI_OUTPUT=$(oci artifacts container image list \
+      --compartment-id "$COMPARTMENT_OCID" \
+      --repository-id "$PROD_REPO_OCID" \
+      --sort-by TIMECREATED \
+      --sort-order DESC \
+      --limit 1)
+    echo "[DEBUG] Raw OCI output:"
+    echo "$OCI_OUTPUT"
+
+    # ✅ Corrected jq path
+    LATEST_IMAGE_TIME=$(echo "$OCI_OUTPUT" | jq -r '.data.items[0]."time-created"')
+    echo "[DEBUG] Latest image timestamp: $LATEST_IMAGE_TIME"
+
+    echo "[DEBUG] Checking last rollout annotation..."
+    LAST_ROLLOUT=$(kubectl get deploy "$DEPLOYMENT" -n "$NAMESPACE" -o yaml \
+      | grep 'kubestellar.io/last-rollout-time' \
+      | awk '{print $2}' \
+      | tr -d '"')
+
+    if [ -z "$LAST_ROLLOUT" ]; then
+      echo "[DEBUG] No previous rollout annotation found."
+    else
+      echo "[DEBUG] Last rollout annotation: $LAST_ROLLOUT"
+    fi
+
+    echo "[DEBUG] Comparing timestamps..."
+    echo "[DEBUG] Latest image: $LATEST_IMAGE_TIME"
+    echo "[DEBUG] Last rollout: ${LAST_ROLLOUT:-<none>}"
+
+    # --- Compare timestamps ---
+    if [ -z "$LAST_ROLLOUT" ] || [[ "$LATEST_IMAGE_TIME" > "$LAST_ROLLOUT" ]]; then
+      echo "🟢 New image detected — triggering rollout restart..."
+      kubectl rollout restart deploy "$DEPLOYMENT" -n "$NAMESPACE"
+      kubectl annotate deploy "$DEPLOYMENT" -n "$NAMESPACE" \
+        "kubestellar.io/last-rollout-time=$LATEST_IMAGE_TIME" --overwrite
+      echo "✅ Rollout completed successfully."
+    else
+      echo "🟡 No newer image found. Skipping rollout."
+    fi
+
+    echo "===== Rollout check completed at $(date -u) ====="
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nextra-rollout-checker
+  namespace: docs
+spec:
+  schedule: "*/2 * * * *" # run every 5 minutes instead of every 1
+  concurrencyPolicy: Forbid # never overlap jobs
+  successfulJobsHistoryLimit: 1 # keep only last success
+  failedJobsHistoryLimit: 1 # keep only last failure
+  jobTemplate:
+    spec:
+      backoffLimit: 0 # don't retry failed jobs
+      template:
+        spec:
+          serviceAccountName: nextra-rollout-sa
+          restartPolicy: Never # don't restart failed pods
+          containers:
+            - name: rollout-checker
+              image: iad.ocir.io/id4wyucbsggm/docs-rollout-checker:latest
+              imagePullPolicy: Always
+              command:
+                - /bin/sh
+                - -c
+                - bash /scripts/check-latest-rollout.sh
+              volumeMounts:
+                - name: script
+                  mountPath: /scripts
+                - name: oci-config
+                  mountPath: /root/.oci
+              envFrom:
+                - secretRef:
+                    name: oci-config-secret
+          volumes:
+            - name: script
+              configMap:
+                name: nextra-rollout-script
+                defaultMode: 0755
+            - name: oci-config
+              secret:
+                secretName: oci-config-secret
+                defaultMode: 0600
