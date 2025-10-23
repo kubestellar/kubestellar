@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Link as IntlLink } from "@/i18n/navigation";
-import { GridLines, StarField, EarthAnimation } from "../index";
+import { GridLines, StarField, GlobeAnimation } from "../index";
 import { useTranslations } from "next-intl";
 
 export default function HeroSection() {
@@ -302,18 +302,16 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right Column: Earth Animation */}
-          <div className="earth-animation-container relative h-[500px] flex items-center justify-center">
-            <EarthAnimation
+          {/* Right Column: Globe Animation */}
+          <div className="globe-animation-container relative h-[500px] flex items-center justify-center">
+            <GlobeAnimation
               width="100%"
-              height="500px"
-              scale={3.5}
-              autoRotate={true}
-              autoRotateSpeed={0.5}
-              enableZoom={false}
-              fov={50}
-              cameraPosition={[-4, 2, 6]}
+              height="600px"
               className="rounded-xl overflow-hidden"
+              showLoader={true}
+              enableControls={true}
+              enablePan={false}
+              autoRotate={true}
               style={{
                 filter: "drop-shadow(0 25px 50px rgba(59, 130, 246, 0.3))",
               }}
