@@ -50,7 +50,7 @@ jobs:
   # ============================================================
   auto-ok-to-test:
     name: Auto-label kubestellar org team members
-    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    if: github.event_name == 'pull_request' && contains(fromJson('["opened","reopened","synchronize"]'), github.event.action)
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
