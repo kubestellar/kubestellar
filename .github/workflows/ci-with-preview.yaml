@@ -43,7 +43,7 @@ jobs:
             fi
           done
           echo "🕓 Letting GitHub settle for 10 seconds..."
-          sleep 10
+          sleep 5
 
   # ============================================================
   # 🤖 Auto-apply "ok-to-test" for kubestellar org team members
@@ -305,11 +305,13 @@ jobs:
       - name: Delete PR image from OCIR
         run: |
           echo "Searching for image: pr-${{ github.event.number }}"
+
           IMAGE_IDS=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query "data[?contains(display-name, 'pr-${{ github.event.number }}')].id" \
+            --query 'data[?contains(`"display-name"`, `pr-${{ github.event.number }}`)].id' \
             --raw-output)
+
           if [ -z "$IMAGE_IDS" ]; then
             echo "No image found for PR #${{ github.event.number }}"
           else
