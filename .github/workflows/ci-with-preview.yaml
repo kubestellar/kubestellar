@@ -27,7 +27,7 @@ jobs:
       - name: Add ok-to-test for trusted kubestellar team members
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.ORG_TOKEN }}  # Must have read:org (and repo if private)
+          github-token: ${{ secrets.ORG_TOKEN }} # Must have read:org (and repo if private)
           script: |
             const org = 'kubestellar';
             const teams = ['kubestellar-contributors', 'kubestellar-docs'];
