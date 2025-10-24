@@ -2,7 +2,7 @@ name: Mark and close stale issues
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch: {}
 
 jobs:
@@ -11,7 +11,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/stale@3a9db7e6a41a89f618792c92c0e97cc736e1b13f
+      - uses: actions/stale@5f858e3efba33a5ca4407a664cc011ad407f2008
         with:
           # Issues: mark after 90 days of inactivity, close after 90 more days
           days-before-issue-stale: 90
@@ -26,14 +26,13 @@ jobs:
             Closing this issue due to prolonged inactivity after being marked as stale. If this remains
             an active concern, feel free to reopen or create a new issue with updated details.
           close-issue-label: lifecycle/auto-closed
-
           # PRs: disable stale for PRs (start conservatively)
           days-before-pr-stale: -1
           days-before-pr-close: -1
 
           # Exemptions and behavior
           exempt-issue-labels: >-
-            security,bug,enhancement,good first issue,help wanted,
+            security,bug,enhancement,good first issue,help wanted,hacktober-fest,
             lifecycle/frozen
           exempt-pr-labels: >-
             security,lifecycle/frozen

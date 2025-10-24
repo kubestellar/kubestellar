@@ -66,10 +66,10 @@ jobs:
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.0/kubeflex_0.9.0_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.9.0_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.9.0_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
           go install github.com/onsi/ginkgo/v2/ginkgo
 
       - name: Run test
@@ -105,13 +105,17 @@ jobs:
         if: always()
         run: kubectl --context kind-kubeflex get deployments -A
 
+      - name: show namespaces in its1
+        if: always()
+        run: kubectl --context its1 get namespaces
+
       - name: Dump kubeflex-controller-manager logs
         if: always()
         run: |
           echo "--- Dumping logs for previous kubeflex-controller-manager container ---"
-          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager -p || echo "INFO: No previous container found."
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager -p || true
           echo "--- Dumping logs for current kubeflex-controller-manager container ---"
-          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || echo "ERROR: Could not dump current logs."
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
 
       - name: show Deployment objects in its1
         if: always()
@@ -210,10 +214,10 @@ jobs:
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.0/kubeflex_0.9.0_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.9.0_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.9.0_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
 
       - name: Run test
         env:
@@ -248,13 +252,17 @@ jobs:
         if: always()
         run: kubectl --context kind-kubeflex get deployments -A
 
+      - name: show namespaces in its1
+        if: always()
+        run: kubectl --context its1 get namespaces
+
       - name: Dump kubeflex-controller-manager logs
         if: always()
         run: |
           echo "--- Dumping logs for previous kubeflex-controller-manager container ---"
-          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager -p || echo "INFO: No previous container found."
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager -p || true
           echo "--- Dumping logs for current kubeflex-controller-manager container ---"
-          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || echo "ERROR: Could not dump current logs."
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
 
       - name: show Deployment objects in its1
         if: always()
@@ -298,7 +306,7 @@ jobs:
 
       - name: show combinedstatuses
         if: always()
-        run: kubectl --context wds1 get combinedstatuses -A -o yaml
+        run: kubectl --context wDds1 get combinedstatuses -A -o yaml
 
       - name: scrape kubestellar controller-manager
         if: always()

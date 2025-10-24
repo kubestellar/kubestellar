@@ -131,7 +131,7 @@ help: ## Display this help.
 
 ##@ Development Dependencies
 
-CODE_GEN_VER := v0.30.12
+CODE_GEN_VER := v0.30.14
 CODE_GEN_DIR := $(TOOLS_DIR)/code-generator-clone-$(CODE_GEN_VER)
 export CODE_GEN_DIR
 
