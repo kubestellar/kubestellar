@@ -76,7 +76,7 @@ jobs:
   # 🔹 CI job (builds .next and uploads artifacts)
   # ============================================================
   ci:
-    name: Code Quality & Build
+    name: Code Quality & Build v2
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
