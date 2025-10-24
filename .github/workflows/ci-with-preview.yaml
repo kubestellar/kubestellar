@@ -168,7 +168,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts-${{ github.sha }}
+          name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: |
             .next/
             public/
@@ -227,7 +227,6 @@ jobs:
         with:
           name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: .
-          if-no-files-found: ignore
 
       - name: Validate artifact presence
         run: |
