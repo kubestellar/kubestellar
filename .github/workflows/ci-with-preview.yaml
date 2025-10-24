@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    types: [opened, reopened, synchronize, closed]
+    types: [opened, reopened, synchronize, closed, labeled]
   pull_request_target:
     types: [labeled]
   workflow_dispatch:
@@ -14,11 +14,43 @@ env:
 
 jobs:
   # ============================================================
+  # 🕒 Wait for Labeler to finish before starting CI
+  # ============================================================
+  wait-for-labeler:
+    name: Wait for Labeler completion
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    steps:
+      - name: Wait for any running Labeler workflow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "⏳ Checking if 'Labeler' workflow is still running..."
+          for i in {1..30}; do
+            running=$(gh run list \
+              --repo "${GITHUB_REPOSITORY}" \
+              --workflow "Labeler" \
+              --branch "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" \
+              --json status \
+              --jq '.[] | select(.status=="in_progress")' || true)
+            if [ -n "$running" ]; then
+              echo "Labeler is still running, waiting 10s..."
+              sleep 10
+            else
+              echo "✅ Labeler finished."
+              break
+            fi
+          done
+          echo "🕓 Letting GitHub settle for 10 seconds..."
+          sleep 10
+
+  # ============================================================
   # 🤖 Auto-apply "ok-to-test" for kubestellar org team members
   # ============================================================
   auto-ok-to-test:
     name: Auto-label kubestellar org team members
-    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    if: github.event_name == 'pull_request' && contains(fromJson('["opened","reopened","synchronize"]'), github.event.action)
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -27,7 +59,7 @@ jobs:
       - name: Add ok-to-test for trusted kubestellar team members
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.ORG_TOKEN }} # Must have read:org
+          github-token: ${{ secrets.ORG_TOKEN }}
           script: |
             const org = 'kubestellar';
             const teams = ['kubestellar-contributors', 'kubestellar-docs'];
@@ -55,17 +87,16 @@ jobs:
 
             for (const team of teams) {
               if (await isTeamMember(org, team, prAuthor)) {
-                const { Octokit } = require('@octokit/rest');
-                const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-
-                await octokit.rest.issues.addLabels({
+                const gh = new github.constructor({
+                  auth: process.env.GITHUB_TOKEN
+                });
+                await gh.rest.issues.addLabels({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: prNumber,
                   labels: [label]
                 });
-
-                console.log(`🏷️ Added '${label}' for ${prAuthor} using GITHUB_TOKEN`);
+                console.log(`🏷️ Added '${label}' for ${prAuthor}`);
                 return;
               }
             }
@@ -85,8 +116,7 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
-    needs: [auto-ok-to-test]
-
+    needs: [wait-for-labeler, auto-ok-to-test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -131,14 +161,14 @@ jobs:
         run: npm test
 
       - name: Security audit
-        run: npm audit --audit-level=moderate || true
+        run: npm audit --audit-level=moderate
         continue-on-error: true
 
       - name: Upload build artifacts
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts-${{ github.sha }}
+          name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: |
             .next/
             public/
@@ -159,6 +189,20 @@ jobs:
           if-no-files-found: ignore
 
   # ============================================================
+  # 🧪 Debug event info (temporary)
+  # ============================================================
+  debug-event:
+    name: Debug Event Payload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print GitHub event info
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Event action: ${{ github.event.action }}"
+          echo "Label name: ${{ github.event.label.name }}"
+          echo "All labels: ${{ toJson(github.event.pull_request.labels.*.name) }}"
+
+  # ============================================================
   # 🔹 Preview image job (triggered when label added)
   # ============================================================
   build-preview:
@@ -166,14 +210,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ci]
     if: >
-      github.event_name == 'pull_request_target' &&
-      github.event.action == 'labeled' &&
-      github.event.label.name == 'ok-to-test'
+      (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') &&
+      (github.event.action == 'labeled' || contains(github.event.pull_request.labels.*.name, 'ok-to-test'))
     permissions:
       contents: read
       pull-requests: write
       issues: write
-
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -185,7 +227,6 @@ jobs:
         with:
           name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: .
-          if-no-files-found: ignore
 
       - name: Validate artifact presence
         run: |
@@ -225,7 +266,7 @@ jobs:
             iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.pull_request.number }}
             ```
             🌐 **Live Preview (after rollout):**
-            [https://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io](https://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io)
+            [http://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io](http://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io)
 
   # ============================================================
   # 🧹 Cleanup when PR closes
@@ -288,4 +329,4 @@ jobs:
             iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.number }}
             ```
             📴 **Preview URL Removed**
-            https://pr-${{ github.event.number }}.previews.kubestellar.io
+            http://pr-${{ github.event.number }}.previews.kubestellar.io
