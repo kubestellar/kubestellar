@@ -29,6 +29,7 @@ jobs:
           echo "⏳ Checking if 'Labeler' workflow is still running..."
           for i in {1..30}; do
             running=$(gh run list \
+              --repo "${GITHUB_REPOSITORY}" \
               --workflow "Labeler" \
               --branch "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" \
               --json status \
