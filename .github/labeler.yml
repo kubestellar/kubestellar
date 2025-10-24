@@ -83,4 +83,4 @@ json:
   - "**/*.json"
 
 ok-to-test:
-  - ''   # No matching paths; prevents removal
+  - "" # No matching paths; prevents removal
