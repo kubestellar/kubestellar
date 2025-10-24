@@ -27,7 +27,7 @@ jobs:
       - name: Add ok-to-test for trusted kubestellar team members
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.ORG_TOKEN }} # Must have read:org
+          github-token: ${{ secrets.ORG_TOKEN }}   # used for team membership check
           script: |
             const org = 'kubestellar';
             const teams = ['kubestellar-contributors', 'kubestellar-docs'];
@@ -55,16 +55,16 @@ jobs:
 
             for (const team of teams) {
               if (await isTeamMember(org, team, prAuthor)) {
-                const { Octokit } = require('@octokit/rest');
-                const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-
-                await octokit.rest.issues.addLabels({
+                // ✅ use built-in github client with the repo’s GITHUB_TOKEN
+                const gh = new github.constructor({
+                  auth: process.env.GITHUB_TOKEN
+                });
+                await gh.rest.issues.addLabels({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: prNumber,
                   labels: [label]
                 });
-
                 console.log(`🏷️ Added '${label}' for ${prAuthor} using GITHUB_TOKEN`);
                 return;
               }
@@ -131,7 +131,7 @@ jobs:
         run: npm test
 
       - name: Security audit
-        run: npm audit --audit-level=moderate || true
+        run: npm audit --audit-level=moderate
         continue-on-error: true
 
       - name: Upload build artifacts
@@ -225,7 +225,7 @@ jobs:
             iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.pull_request.number }}
             ```
             🌐 **Live Preview (after rollout):**
-            [https://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io](https://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io)
+            [http://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io](http://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io)
 
   # ============================================================
   # 🧹 Cleanup when PR closes
@@ -288,4 +288,4 @@ jobs:
             iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.number }}
             ```
             📴 **Preview URL Removed**
-            https://pr-${{ github.event.number }}.previews.kubestellar.io
+            http://pr-${{ github.event.number }}.previews.kubestellar.io
