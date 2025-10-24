@@ -1,6 +1,12 @@
 name: CI/CD & PR Preview Pipeline
 
 on:
+  # Run after Labeler finishes
+  workflow_run:
+    workflows: ["Labeler"]
+    types: [completed]
+
+  # Standard triggers
   push:
     branches: [main, develop]
   pull_request:
@@ -27,7 +33,7 @@ jobs:
       - name: Add ok-to-test for trusted kubestellar team members
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.ORG_TOKEN }} # used for team membership check
+          github-token: ${{ secrets.ORG_TOKEN }}   # used for team membership check
           script: |
             const org = 'kubestellar';
             const teams = ['kubestellar-contributors', 'kubestellar-docs'];
@@ -55,7 +61,7 @@ jobs:
 
             for (const team of teams) {
               if (await isTeamMember(org, team, prAuthor)) {
-                // ✅ use built-in github client with the repo’s GITHUB_TOKEN
+                // ✅ Use repo’s GitHub token to add the label (trusted event)
                 const gh = new github.constructor({
                   auth: process.env.GITHUB_TOKEN
                 });
@@ -65,7 +71,7 @@ jobs:
                   issue_number: prNumber,
                   labels: [label]
                 });
-                console.log(`🏷️ Added '${label}' for ${prAuthor} using GITHUB_TOKEN`);
+                console.log(`🏷️ Added '${label}' for ${prAuthor}`);
                 return;
               }
             }
@@ -86,7 +92,6 @@ jobs:
       pull-requests: write
       issues: write
     needs: [auto-ok-to-test]
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -159,6 +164,20 @@ jobs:
           if-no-files-found: ignore
 
   # ============================================================
+  # 🧪 Debug event info (temporary)
+  # ============================================================
+  debug-event:
+    name: Debug Event Payload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print GitHub event info
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Event action: ${{ github.event.action }}"
+          echo "Label name: ${{ github.event.label.name }}"
+          echo "All labels: ${{ toJson(github.event.pull_request.labels.*.name) }}"
+
+  # ============================================================
   # 🔹 Preview image job (triggered when label added)
   # ============================================================
   build-preview:
@@ -166,14 +185,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ci]
     if: >
-      (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') &&
-      github.event.action == 'labeled' &&
+      (github.event_name == 'pull_request' || github.event_name == 'pull_request_target' || github.event_name == 'workflow_run') &&
+      (github.event.action == 'labeled' || github.event.workflow_run.conclusion == 'success') &&
       (github.event.label.name == 'ok-to-test' || contains(github.event.pull_request.labels.*.name, 'ok-to-test'))
     permissions:
       contents: read
       pull-requests: write
       issues: write
-
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -225,7 +243,7 @@ jobs:
             iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.pull_request.number }}
             ```
             🌐 **Live Preview (after rollout):**
-            [http://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io](http://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io)
+            [https://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io](https://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io)
 
   # ============================================================
   # 🧹 Cleanup when PR closes
@@ -288,4 +306,4 @@ jobs:
             iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.number }}
             ```
             📴 **Preview URL Removed**
-            http://pr-${{ github.event.number }}.previews.kubestellar.io
+            https://pr-${{ github.event.number }}.previews.kubestellar.io
