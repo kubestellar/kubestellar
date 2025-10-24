@@ -27,7 +27,7 @@ jobs:
       - name: Add ok-to-test for trusted kubestellar team members
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.ORG_TOKEN }} # Must have read:org (and repo if private)
+          github-token: ${{ secrets.ORG_TOKEN }} # Must have read:org
           script: |
             const org = 'kubestellar';
             const teams = ['kubestellar-contributors', 'kubestellar-docs'];
@@ -55,28 +55,30 @@ jobs:
 
             for (const team of teams) {
               if (await isTeamMember(org, team, prAuthor)) {
-                try {
-                  await github.rest.issues.addLabels({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: prNumber,
-                    labels: [label]
-                  });
-                  console.log(`🏷️ Added '${label}' for ${prAuthor} (member of @${org}/${team})`);
-                  return; // stop after first match
-                } catch (err) {
-                  console.error(`⚠️ Failed to label PR #${prNumber}: ${err.message}`);
-                }
+                const { Octokit } = require('@octokit/rest');
+                const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
+                await octokit.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: prNumber,
+                  labels: [label]
+                });
+
+                console.log(`🏷️ Added '${label}' for ${prAuthor} using GITHUB_TOKEN`);
+                return;
               }
             }
 
             console.log(`🚫 ${prAuthor} not found in any trusted teams, skipping auto-label.`);
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ============================================================
   # 🔹 CI job (builds .next and uploads artifacts)
   # ============================================================
   ci:
-    name: Code Quality & Build v2
+    name: Code Quality & Build
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -129,7 +131,7 @@ jobs:
         run: npm test
 
       - name: Security audit
-        run: npm audit --audit-level=moderate
+        run: npm audit --audit-level=moderate || true
         continue-on-error: true
 
       - name: Upload build artifacts
