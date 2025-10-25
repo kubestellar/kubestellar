@@ -6,15 +6,14 @@
 <!-- =========================
      TOP BANNER
 ============================ -->
-<div id="top-banner" style="background:#3B82F6; color:white; text-align:center; padding:8px 16px; position:relative;">
-  <span>KubeStellar is now a Cloud Native Computing Foundation sandbox project! 🎉 Follow us</span>
-  <a href="https://www.linkedin.com/company/kubestellar/" target="_blank" rel="noopener noreferrer"
-     style="color:white; text-decoration:underline; margin-left:4px;">
-    @kubestellar on LinkedIn
-  </a>
-  <button onclick="document.getElementById('top-banner').style.display='none'"
-          aria-label="Close banner"
-          style="position:absolute; right:16px; top:50%; transform:translateY(-50%); background:none; border:none; color:white; cursor:pointer; font-size:1.25rem;">
+<div id="banner-hacktoberfest" class="banner active" style="background: linear-gradient(135deg, #FF6B35, #F7931E); color: white; text-align:center; padding:8px 16px; position:relative;">
+  <div class="banner-content">
+    <span>KubeStellar is participating in Hacktoberfest 2025! 🎃 Read our blog for more info</span>
+    <a href="https://medium.com/@sagarutekar2366/your-ultimate-guide-to-contributing-to-open-source-through-hacktoberfest-2025-881735dd7ba7" class="banner-link" target="_blank" rel="noopener noreferrer" style="color:white; text-decoration:underline; margin-left:4px;">
+      Read this blog
+    </a>
+  </div>
+  <button class="banner-close" onclick="document.getElementById('banner-hacktoberfest').style.display='none'" aria-label="Close banner" style="position:absolute; right:16px; top:50%; transform:translateY(-50%); background:none; border:none; color:white; cursor:pointer; font-size:1.25rem;">
     &times;
   </button>
 </div>
