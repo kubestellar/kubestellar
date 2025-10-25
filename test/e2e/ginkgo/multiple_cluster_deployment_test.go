@@ -48,10 +48,12 @@ var _ = ginkgo.Describe("end to end testing", func() {
 	ginkgo.BeforeEach(func(ctx context.Context) {
 		// Cleanup the WDS, create 1 deployment and 1 binding policy.
 		util.CleanupWDS(ctx, wds, ksWds, ns)
+		// NOTE: Cleanup for "test" CustomTransform moved into util.CleanupWDS
+
 		util.CreateDeployment(ctx, wds, ns, "nginx",
 			map[string]string{
-				"app.kubernetes.io/name":         "nginx",
-				"test.kubestellar.io/test-label": "here",
+				"app.kubernetes.io/name":         "nginx", // Added spaces for alignment
+				"test.kubestellar.io/test-label": "here",  // Added spaces for alignment
 			})
 		util.CreateBindingPolicy(ctx, ksWds, "nginx",
 			[]metav1.LabelSelector{
@@ -669,10 +671,16 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.Expect1PodOfEach(ctx, coreCluster, "its1-system", "vcluster")
 		})
 	})
-
 	ginkgo.Context("combined status testing", func() {
 		const workloadName = "nginx"
 		const bpName = "nginx-combinedstatus"
+
+		// ADD THESE LINES HERE:
+		str0 := "0"
+		strPlusInf := strconv.FormatFloat(math.Inf(1), 'g', -1, 64)
+		strNegInf := strconv.FormatFloat(math.Inf(-1), 'g', -1, 64)
+		strNaN := strconv.FormatFloat(math.NaN(), 'g', -1, 64)
+		// END OF ADDED LINES
 
 		clusterSelector := []metav1.LabelSelector{
 			{MatchLabels: map[string]string{"location-group": "edge"}},
@@ -864,9 +872,11 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				})
 
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
-				if n := len(cs.Results); n != 2 {
+				// Check results for multiple collectors
+				if n := len(cs.Results); n != 2 { // Expecting 2 results now
 					return fmt.Errorf("expected 2 NamedStatusCombination but got %d", n)
 				}
+				// Basic validation, assuming order matches the collectors requested
 				if n := len(cs.Results[0].ColumnNames); n != 2 {
 					return fmt.Errorf("expected 2 ColumNames in Results[0] but got %d", n)
 				}
@@ -886,10 +896,6 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		ginkgo.It("can aggregate over zero WECs", func(ctx context.Context) {
 			exprFalse := ksapi.Expression("false")
 			expr2 := ksapi.Expression("2")
-			str0 := "0"
-			strPlusInf := strconv.FormatFloat(math.Inf(1), 'g', -1, 64)
-			strNegInf := strconv.FormatFloat(math.Inf(-1), 'g', -1, 64)
-			strNaN := strconv.FormatFloat(math.NaN(), 'g', -1, 64)
 			collectorName := "test-empty-group"
 
 			testAndStatusCollection[0].DownsyncModulation.StatusCollectors = []string{collectorName}
@@ -919,6 +925,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				if n := len(cs.Results[0].Rows); n != 1 {
 					return fmt.Errorf("expected 1 StatusCombinationRow but got %d", n)
 				}
+				// Use the variables defined at the start of the Context block
 				expectedRow := []ksapi.Value{
 					{Type: ksapi.TypeNumber, Number: &str0},
 					{Type: ksapi.TypeNumber, Number: &strNegInf},
