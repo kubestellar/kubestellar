@@ -92,6 +92,7 @@ jobs:
             ${{ github.workspace }}/package-lock.json
             ${{ github.workspace }}/next.config.js
             ${{ github.workspace }}/next.config.ts
+          include-hidden-files: true
           retention-days: 7
 
   # ============================================================
