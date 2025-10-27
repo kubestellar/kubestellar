@@ -5,8 +5,8 @@ on:
     branches: [main, develop]
   pull_request:
     types: [opened, reopened, synchronize, labeled, unlabeled]
-#   pull_request_target:
-#     types: [labeled, unlabeled]
+  #   pull_request_target:
+  #     types: [labeled, unlabeled]
   workflow_dispatch:
 
 env:
@@ -27,13 +27,25 @@ jobs:
         github.event.label.name != 'ok-to-test'
       )
     steps:
-      - name: Check for changed files
+      - name: Check for changed files (ignore docs & workflows)
         id: changes
         uses: tj-actions/changed-files@v44
-      - name: Skip if no files changed
+        with:
+          files_ignore: |
+            cluster-objects/**
+            .github/**
+            README.md
+            LICENSE
+            .gitignore
+            .prettierrc*
+            .prettierignore
+            .prow.yaml
+            *.md
+
+      - name: Skip if no relevant files changed
         if: steps.changes.outputs.all_changed_files == ''
         run: |
-          echo "🟡 No code changes detected — skipping CI steps"
+          echo "🟡 No relevant code changes detected — skipping CI steps"
           exit 0
 
       - name: Checkout code
