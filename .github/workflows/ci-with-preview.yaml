@@ -244,5 +244,3 @@ jobs:
             ```
             📴 **Preview URL Removed**
             http://pr-${{ github.event.number }}.previews.kubestellar.io
-
-            
