@@ -14,43 +14,48 @@ env:
 
 jobs:
   # ============================================================
-  # 🔹 Code Quality & Build (Single build)
+  # 🧮 Detect if relevant files changed
   # ============================================================
-  ci:
-    name: Code Quality & Build
+  check_changes:
+    name: Detect relevant changes
     runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'pull_request' &&
-      github.event.action != 'closed' &&
-      (
-        github.event.action != 'labeled' ||
-        github.event.label.name != 'ok-to-test'
-      )
+    outputs:
+      has_changes: ${{ steps.filter.outputs.has_changes }}
     steps:
-      - name: Check for changed files (ignore docs & workflows)
+      - name: Check for changed files (ignore root .md and config)
         id: changes
         uses: tj-actions/changed-files@v44
         with:
           files_ignore: |
-            cluster-objects/**
-            .github/**
-            ./README.md
-            ./LICENSE
-            ./.gitignore
-            ./.prettierrc*
-            ./.prettierignore
-            ./.prow.yaml
             ./*.md
+            .github/**
+            cluster-objects/**
+            LICENSE
+            .gitignore
+            .prettier*
+            .prow.yaml
 
-      - name: Set skip flag if no relevant files changed
-        id: skipcheck
+      - name: Set has_changes output
+        id: filter
         run: |
           if [ -z "${{ steps.changes.outputs.all_changed_files }}" ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "No relevant file changes detected."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
           else
-            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "Detected relevant changes:"
+            echo "${{ steps.changes.outputs.all_changed_files }}"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
 
+  # ============================================================
+  # 🔹 Code Quality & Build
+  # ============================================================
+  ci:
+    name: Code Quality & Build
+    runs-on: ubuntu-latest
+    needs: check_changes
+    if: needs.check_changes.outputs.has_changes == 'true'
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
