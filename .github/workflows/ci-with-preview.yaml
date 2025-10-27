@@ -19,12 +19,22 @@ jobs:
   ci:
     name: Code Quality & Build
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action != 'closed'
-    timeout-minutes: 20
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
+      (
+        github.event.action != 'labeled' ||
+        github.event.label.name != 'ok-to-test'
+      )
+    steps:
+      - name: Check for changed files
+        id: changes
+        uses: tj-actions/changed-files@v44
+      - name: Skip if no files changed
+        if: steps.changes.outputs.all_changed_files == ''
+        run: |
+          echo "🟡 No code changes detected — skipping CI steps"
+          exit 0
 
     steps:
       - name: Checkout code
