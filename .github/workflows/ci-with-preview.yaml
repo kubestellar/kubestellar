@@ -34,19 +34,22 @@ jobs:
           files_ignore: |
             cluster-objects/**
             .github/**
-            README.md
-            LICENSE
-            .gitignore
-            .prettierrc*
-            .prettierignore
-            .prow.yaml
-            *.md
+            ./README.md
+            ./LICENSE
+            ./.gitignore
+            ./.prettierrc*
+            ./.prettierignore
+            ./.prow.yaml
+            ./*.md
 
-      - name: Skip if no relevant files changed
-        if: steps.changes.outputs.all_changed_files == ''
+      - name: Set skip flag if no relevant files changed
+        id: skipcheck
         run: |
-          echo "🟡 No relevant code changes detected — skipping CI steps"
-          exit 0
+          if [ -z "${{ steps.changes.outputs.all_changed_files }}" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Checkout code
         uses: actions/checkout@v4
