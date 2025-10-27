@@ -148,7 +148,8 @@ jobs:
             const teams = ['kubestellar-contributors', 'kubestellar-docs'];
             const prAuthor = context.payload.pull_request.user.login;
             const labels = context.payload.pull_request.labels.map(l => l.name);
-            let hasLabel = labels.includes('ok-to-test');
+            const addedLabel = context.payload.label?.name || "";
+            const hasLabel = labels.includes('ok-to-test') || addedLabel === 'ok-to-test';
 
             let isTeamMember = false;
             for (const team of teams) {
