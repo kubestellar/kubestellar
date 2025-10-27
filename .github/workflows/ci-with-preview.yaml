@@ -92,20 +92,21 @@ jobs:
       # ---------------------------------------------
       # Upload build artifacts for Docker packaging
       # ---------------------------------------------
-      - name: Upload build artifacts
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts-${{ github.event.pull_request.head.sha }}
-          path: |
-            .next/
-            public/
-            package.json
-            package-lock.json
-            next.config.js
-            next.config.ts
-          retention-days: 7
 
+    - name: Upload build artifacts
+    if: success()
+    uses: actions/upload-artifact@v4
+    with:
+        name: build-artifacts-${{ github.event.pull_request.head.sha }}
+        path: |
+        .next/**
+        public/**
+        package.json
+        package-lock.json
+        next.config.js
+        next.config.ts
+        retention-days: 7
+    
   # ============================================================
   # 🔹 Build & Push PR Preview Image (No rebuild)
   # ============================================================
@@ -143,6 +144,19 @@ jobs:
           name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: .
 
+      - name: Inspect artifact contents
+      run: |
+          echo "Downloaded artifact structure:"
+          ls -R | head -n 100
+
+      - name: Move artifact files if nested
+      run: |
+          if [ -d build-artifacts-* ]; then
+          echo "Flattening artifact directory..."
+          mv build-artifacts-*/* .
+          fi
+          [ -d ".next" ] || (echo "❌ .next still missing after flattening" && exit 1)
+        
       - name: Validate prebuilt assets
         run: |
           [ -d ".next" ] || (echo "❌ Missing .next directory — build artifacts not found" && exit 1)
