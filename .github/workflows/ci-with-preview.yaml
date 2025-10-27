@@ -93,7 +93,7 @@ jobs:
             next.config.js
             next.config.ts
           retention-days: 7
-    
+
   # ============================================================
   # 🔹 Build & Push PR Preview Image (No rebuild)
   # ============================================================
@@ -114,20 +114,20 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
-  
+
       # 2️⃣ Download the artifacts produced by the CI job
       - name: Download last successful build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: .
-  
+
       # 3️⃣ (NEW) Inspect the artifact contents to see where .next actually is
       - name: Inspect artifact contents
         run: |
           echo "Downloaded artifact structure (first 100 lines):"
           ls -R | head -n 100
-  
+
       # 4️⃣ (NEW) Move artifact files if GitHub wrapped them in a subfolder
       - name: Move artifact files if nested
         run: |
@@ -140,24 +140,24 @@ jobs:
             exit 1
           fi
           echo "✅ .next directory found and ready"
-  
+
       # 5️⃣ Validate prebuilt assets (now guaranteed to work)
       - name: Validate prebuilt assets
         run: |
           [ -d ".next" ] || (echo "❌ Missing .next directory — build artifacts not found" && exit 1)
           echo "✅ Found prebuilt .next directory, proceeding with Docker packaging"
-  
+
       # 6️⃣ Set up Buildx and push Docker image
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-  
+
       - name: Log in to Oracle Cloud Container Registry
         uses: docker/login-action@v3
         with:
           registry: iad.ocir.io
           username: ${{ secrets.OCI_USERNAME }}
           password: ${{ secrets.OCI_AUTH_TOKEN }}
-  
+
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
@@ -167,7 +167,7 @@ jobs:
           push: true
           tags: iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.pull_request.number }}
           provenance: false
-  
+
       # 7️⃣ Post a PR comment
       - name: Comment PR with preview info
         uses: peter-evans/create-or-update-comment@v4
@@ -180,7 +180,7 @@ jobs:
             ```
             🌐 **Live Preview:**
             [http://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io](http://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io)
-  
+
   # ============================================================
   # 🧹 Cleanup on PR close
   # ============================================================
