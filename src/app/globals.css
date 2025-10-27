@@ -3,7 +3,6 @@
 @theme {
   --breakpoint-lgcustom: 900px;
 }
-
 :root {
   /* Dark mode colors (default) */
   --background: #0a0a0a;
@@ -81,9 +80,11 @@ html:not(.dark) .nextra-sidebar-container {
 }
 
 .bg-star-pattern {
-  background-image: radial-gradient(circle at 10px 10px,
-      rgba(255, 255, 255, 0.1) 1px,
-      transparent 0);
+  background-image: radial-gradient(
+    circle at 10px 10px,
+    rgba(255, 255, 255, 0.1) 1px,
+    transparent 0
+  );
   background-size: 40px 40px;
 }
 
@@ -116,7 +117,6 @@ html:not(.dark) .nextra-sidebar-container {
 
 /* Animations */
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -128,7 +128,6 @@ html:not(.dark) .nextra-sidebar-container {
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;
@@ -320,7 +319,6 @@ html:not(.dark) .nextra-sidebar-container {
 }
 
 @keyframes blink {
-
   0%,
   100% {
     opacity: 1;
@@ -366,7 +364,6 @@ html:not(.dark) .nextra-sidebar-container {
 }
 
 @keyframes gradient-shift {
-
   0%,
   100% {
     background-position: 0% 50%;
@@ -390,7 +387,6 @@ html:not(.dark) .nextra-sidebar-container {
 }
 
 @keyframes status-glow {
-
   0%,
   100% {
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
@@ -402,7 +398,6 @@ html:not(.dark) .nextra-sidebar-container {
 }
 
 @keyframes status-pulse {
-
   0%,
   100% {
     transform: scale(1);
@@ -428,7 +423,6 @@ html:not(.dark) .nextra-sidebar-container {
 }
 
 @keyframes command-glow {
-
   0%,
   100% {
     box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
@@ -449,161 +443,7 @@ html:not(.dark) .nextra-sidebar-container {
   }
 }
 
-/* Custom Responsive Navigation Styles */
-.mobile-menu-panel {
-  position: absolute;
-  top: 2.5rem;
-  left: -1rem;
-  right: -1rem;
-  background: inherit;
-  border-bottom: 1px solid #4a5568;
-  z-index: 40;
-}
-
-.main-nav-links,
-.secondary-nav-controls {
-  display: none;
-}
-
-.mobile-menu-button {
-  display: flex;
-}
-
-.mobile-menu-panel .mobile-primary-links {
-  display: block;
-}
-
-.mobile-menu-panel .mobile-secondary-controls {
-  display: block;
-}
-
-
-@media (min-width: 768px) and (max-width: 1279px) {
-  .main-nav-links {
-    display: none !important;
-  }
-
-  .secondary-nav-controls {
-    display: none;
-  }
-
-  .mobile-menu_button,
-  .mobile-menu-button {
-    display: flex;
-  }
-
-  /* Keep primary links inside hamburger visible on tablets */
-  .mobile-menu-panel .mobile-primary-links {
-    display: block;
-  }
-
-  .mobile-menu-panel .mobile-secondary-controls {
-    display: block;
-    padding-left: 4%;
-    padding-right: 4%;
-  }
-
-  .mobile-ipad {
-    padding-left: 1% !important;
-    padding-right: 1% !important;
-  }
-}
-
-@media (max-width: 1279px) and (min-width: 1024px) {
-  .mobile-ipad {
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-  }
-
-}
-
-@media (max-width: 726px) {
-  .mobile-menu-panel .mobile-secondary-controls button {
-    padding-left: 2.5rem;
-    /* px-10 */
-    padding-right: 2.5rem;
-    /* px-10 */
-  }
-
-  .mobile-wid {
-    padding-left: 4rem;
-    padding-right: 4rem;
-  }
-}
-
-@media (max-width: 768px) and (min-width: 726px) {
-  .mobile-ipad {
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
-  }
-
-}
-
-/* Solid backgrounds for dropdown UI */
-
-/* Hamburger panel */
-.mobile-menu-panel {
-  background-color: var(--background) !important;
-  /* solid */
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-top: 1px solid rgba(100, 116, 139, 0.5);
-  /* keep the divider if you want */
-  margin-top: 24px;
-}
-
-/* Desktop popover menus (they have data-dropdown-menu) */
-[data-dropdown-menu] {
-  background-color: var(--background) !important;
-  /* solid */
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-color: rgba(100, 116, 139, 0.5) !important;
-}
-
-/* Mobile popover menus inside the hamburger (absolute dropdown panels) */
-.mobile-menu-panel .mobile-secondary-controls .absolute {
-  background-color: var(--background) !important;
-  /* solid */
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-color: rgba(100, 116, 139, 0.5) !important;
-}
-
-/* Optional: tweak exact colors per theme */
-html.dark [data-dropdown-menu],
-html.dark .mobile-menu-panel,
-html.dark .mobile-menu-panel .mobile-secondary-controls .absolute {
-  background-color: #0b0d14 !important;
-}
-
-html:not(.dark) [data-dropdown-menu],
-html:not(.dark) .mobile-menu-panel,
-html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
-  background-color: #ffffff !important;
-}
-
-@media (min-width: 1280px) {
-  .mobile-menu-panel {
-    display: none;
-  }
-
-  .main-nav-links {
-    display: flex;
-    left: 50%
-  }
-
-  .secondary-nav-controls {
-    display: flex;
-  }
-
-  .mobile-menu-button {
-    display: none;
-  }
-}
-
 @keyframes loading-bounce {
-
   0%,
   80%,
   100% {
@@ -626,7 +466,6 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
 }
 
 @keyframes btn-float {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -638,7 +477,6 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
 }
 
 @keyframes stat-float {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -869,10 +707,12 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -915,10 +755,12 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -961,6 +803,12 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
   transition: all 0.2s ease;
 }
 
+[data-dropdown-menu] a:hover {
+  background: rgba(59, 130, 246, 0.2) !important;
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
 [data-dropdown-button] {
   user-select: none;
 }
@@ -977,10 +825,12 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
 .nebula-1 {
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle,
-      rgba(147, 51, 234, 0.4) 0%,
-      rgba(59, 130, 246, 0.2) 50%,
-      transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(147, 51, 234, 0.4) 0%,
+    rgba(59, 130, 246, 0.2) 50%,
+    transparent 70%
+  );
   top: 20%;
   left: 10%;
   animation-duration: 50s;
@@ -989,10 +839,12 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
 .nebula-2 {
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle,
-      rgba(236, 72, 153, 0.3) 0%,
-      rgba(168, 85, 247, 0.2) 50%,
-      transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(236, 72, 153, 0.3) 0%,
+    rgba(168, 85, 247, 0.2) 50%,
+    transparent 70%
+  );
   top: 60%;
   right: 20%;
   animation-duration: 70s;
@@ -1002,10 +854,12 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
 .nebula-3 {
   width: 150px;
   height: 150px;
-  background: radial-gradient(circle,
-      rgba(34, 197, 94, 0.3) 0%,
-      rgba(59, 130, 246, 0.2) 50%,
-      transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(34, 197, 94, 0.3) 0%,
+    rgba(59, 130, 246, 0.2) 50%,
+    transparent 70%
+  );
   bottom: 30%;
   left: 60%;
   animation-duration: 45s;
@@ -1052,6 +906,148 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
 .data-particle:nth-child(6) {
   top: 60%;
   left: 20%;
+}
+
+/* Language Switcher specific styles */
+.language-switcher-dropdown {
+  transform-origin: top center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.language-switcher-item {
+  transition: all 0.15s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.language-switcher-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.25);
+}
+
+.language-switcher-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: linear-gradient(180deg, #ec4899, #f472b6);
+  transform: scaleY(0);
+  transition: transform 0.2s ease-out;
+}
+
+.language-switcher-item:hover::before {
+  transform: scaleY(1);
+}
+
+.language-switcher-loading {
+  backdrop-filter: blur(8px);
+  background: rgba(31, 41, 55, 0.9);
+}
+
+/* Language flag/icon animations */
+.language-flag {
+  transition: all 0.2s ease-out;
+}
+
+.language-switcher-item:hover .language-flag {
+  transform: scale(1.1);
+}
+
+/* Selected language indicator */
+.language-selected {
+  background: rgba(236, 72, 153, 0.15);
+  border-left: 3px solid #ec4899;
+}
+
+.language-selected::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: #ec4899;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.3);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.6);
+  }
+}
+
+/* Animate in styles */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes zoom-in-95 {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-in {
+  animation: fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-in-0 {
+  animation: fade-in 0.2s ease-out;
+}
+
+.zoom-in-95 {
+  animation: zoom-in-95 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Loading spinner for language switch */
+@keyframes language-switch-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.language-switch-loading {
+  animation: language-switch-spin 1s linear infinite;
+}
+
+/* Enhanced dropdown styles for language switcher */
+.language-dropdown-shadow {
+  box-shadow:
+    0 10px 25px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Accessibility focus styles */
+.language-switcher-item:focus {
+  outline: 2px solid #ec4899;
+  outline-offset: 2px;
+}
+
+.language-switcher-button:focus {
+  outline: 2px solid #ec4899;
+  outline-offset: 2px;
 }
 
 /* Responsive adjustments */
@@ -1102,7 +1098,6 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
 
 /* Enhanced icon animations */
 @keyframes iconFloat {
-
   0%,
   100% {
     transform: translateY(0px) scale(1.1);
@@ -1184,10 +1179,12 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -1212,9 +1209,11 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
   position: absolute;
   inset: 0;
   border-radius: 12px;
-  background: radial-gradient(circle at center,
-      var(--glow-color, rgba(59, 130, 246, 0.2)) 0%,
-      transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    var(--glow-color, rgba(59, 130, 246, 0.2)) 0%,
+    transparent 70%
+  );
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -1224,21 +1223,27 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
 }
 
 .stat-card-1:hover .stat-glow {
-  background: radial-gradient(circle at center,
-      rgba(34, 197, 94, 0.2) 0%,
-      transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(34, 197, 94, 0.2) 0%,
+    transparent 70%
+  );
 }
 
 .stat-card-2:hover .stat-glow {
-  background: radial-gradient(circle at center,
-      rgba(147, 51, 234, 0.2) 0%,
-      transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(147, 51, 234, 0.2) 0%,
+    transparent 70%
+  );
 }
 
 .stat-card-3:hover .stat-glow {
-  background: radial-gradient(circle at center,
-      rgba(16, 185, 129, 0.2) 0%,
-      transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(16, 185, 129, 0.2) 0%,
+    transparent 70%
+  );
 }
 
 /* .stat-card-1:hover .stat-glow {
@@ -1471,10 +1476,12 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -1494,12 +1501,10 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
 
 /* Enhanced icon animations */
 @keyframes iconFloat {
-
   0%,
   100% {
     transform: translateY(0px) scale(1.1);
   }
-
   50% {
     transform: translateY(-2px) scale(1.1);
   }
@@ -1524,50 +1529,41 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
   top: 20%;
   left: 10%;
 }
-
 .data-particle:nth-child(2) {
   top: 40%;
   left: 80%;
 }
-
 .data-particle:nth-child(3) {
   top: 70%;
   left: 30%;
 }
-
 .data-particle:nth-child(4) {
   top: 30%;
   left: 70%;
 }
-
 .data-particle:nth-child(5) {
   top: 80%;
   left: 60%;
 }
-
 .data-particle:nth-child(6) {
   top: 60%;
   left: 20%;
 }
 
 @keyframes particle-float {
-
   0%,
   100% {
     transform: translateY(0) translateX(0) scale(1);
     opacity: 0.7;
   }
-
   25% {
     transform: translateY(-20px) translateX(10px) scale(1.2);
     opacity: 1;
   }
-
   50% {
     transform: translateY(-10px) translateX(-15px) scale(0.8);
     opacity: 0.8;
   }
-
   75% {
     transform: translateY(-30px) translateX(5px) scale(1.1);
     opacity: 0.9;
@@ -1579,7 +1575,6 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
   0% {
     stroke-opacity: 0.1;
   }
-
   100% {
     stroke-opacity: 0.4;
   }
@@ -1589,23 +1584,19 @@ html:not(.dark) .mobile-menu-panel .mobile-secondary-controls .absolute {
   0% {
     transform: translateY(0) rotate(0deg);
   }
-
   50% {
     transform: translateY(-10px) rotate(1deg);
   }
-
   100% {
     transform: translateY(0) rotate(0deg);
   }
 }
 
 @keyframes blink {
-
   0%,
   100% {
     opacity: 1;
   }
-
   50% {
     opacity: 0;
   }
