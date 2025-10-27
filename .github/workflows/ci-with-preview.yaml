@@ -145,12 +145,12 @@ jobs:
           path: .
 
       - name: Inspect artifact contents
-      run: |
+        run: |
           echo "Downloaded artifact structure:"
           ls -R | head -n 100
 
       - name: Move artifact files if nested
-      run: |
+        run: |
           if [ -d build-artifacts-* ]; then
           echo "Flattening artifact directory..."
           mv build-artifacts-*/* .
