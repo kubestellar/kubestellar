@@ -4,9 +4,9 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    types: [opened, reopened, synchronize, closed, labeled, unlabeled]
-  pull_request_target:
     types: [opened, reopened, synchronize, labeled, unlabeled]
+  pull_request_target:
+    types: [labeled, unlabeled]
   workflow_dispatch:
 
 env:
@@ -19,11 +19,22 @@ jobs:
   ci:
     name: Code Quality & Build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
+      (
+        github.event.action != 'labeled' ||
+        github.event.label.name != 'ok-to-test'
+      )
+    steps:
+      - name: Check for changed files
+        id: changes
+        uses: tj-actions/changed-files@v44
+      - name: Skip if no files changed
+        if: steps.changes.outputs.all_changed_files == ''
+        run: |
+          echo "🟡 No code changes detected — skipping CI steps"
+          exit 0
 
     steps:
       - name: Checkout code
@@ -102,31 +113,70 @@ jobs:
     name: Build & Push PR Preview Image
     runs-on: ubuntu-latest
     needs: [ci]
-    if: >
-      (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') &&
-      contains(github.event.pull_request.labels.*.name, 'ok-to-test')
+    if: github.event_name == 'pull_request_target' && github.event.action != 'closed'
     permissions:
       contents: read
       pull-requests: write
       issues: write
     steps:
+      - name: Check if author is team member or ok-to-test label present
+        id: check_access
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.ORG_TOKEN }}
+          script: |
+            const org = 'kubestellar';
+            const teams = ['kubestellar-contributors', 'kubestellar-docs'];
+            const prAuthor = context.payload.pull_request.user.login;
+            const labels = context.payload.pull_request.labels.map(l => l.name);
+            let hasLabel = labels.includes('ok-to-test');
+
+            let isTeamMember = false;
+            for (const team of teams) {
+              try {
+                await github.rest.teams.getMembershipForUserInOrg({
+                  org,
+                  team_slug: team,
+                  username: prAuthor
+                });
+                isTeamMember = true;
+                console.log(`✅ ${prAuthor} is a member of @${org}/${team}`);
+                break;
+              } catch (error) {
+                if (error.status === 404) continue;
+                throw error;
+              }
+            }
+
+            if (hasLabel || isTeamMember) {
+              core.setOutput('authorized', 'true');
+              console.log(`🚀 Authorized to run preview (label=${hasLabel}, member=${isTeamMember})`);
+            } else {
+              core.setOutput('authorized', 'false');
+              console.log(`🚫 Not authorized to run preview`);
+            }
+
       - name: Checkout PR branch
+        if: steps.check_access.outputs.authorized == 'true'
         uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
 
       - name: Download last successful build artifacts
+        if: steps.check_access.outputs.authorized == 'true'
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: .
 
       - name: Inspect artifact contents
+        if: steps.check_access.outputs.authorized == 'true'
         run: |
           echo "Downloaded artifact structure (first 100 lines):"
           ls -R | head -n 100
 
       - name: Move artifact files if nested
+        if: steps.check_access.outputs.authorized == 'true'
         run: |
           if compgen -G "build-artifacts-*/*" > /dev/null; then
             echo "Flattening artifact directory..."
@@ -139,14 +189,17 @@ jobs:
           echo "✅ .next directory found and ready"
 
       - name: Validate prebuilt assets
+        if: steps.check_access.outputs.authorized == 'true'
         run: |
           [ -d ".next" ] || (echo "❌ Missing .next directory — build artifacts not found" && exit 1)
           echo "✅ Found prebuilt .next directory, proceeding with Docker packaging"
 
       - name: Set up Docker Buildx
+        if: steps.check_access.outputs.authorized == 'true'
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Oracle Cloud Container Registry
+        if: steps.check_access.outputs.authorized == 'true'
         uses: docker/login-action@v3
         with:
           registry: iad.ocir.io
@@ -154,6 +207,7 @@ jobs:
           password: ${{ secrets.OCI_AUTH_TOKEN }}
 
       - name: Build and push image
+        if: steps.check_access.outputs.authorized == 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -164,6 +218,7 @@ jobs:
           provenance: false
 
       - name: Comment PR with preview info
+        if: steps.check_access.outputs.authorized == 'true'
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
