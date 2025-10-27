@@ -5,8 +5,8 @@ on:
     branches: [main, develop]
   pull_request:
     types: [opened, reopened, synchronize, labeled, unlabeled]
-  #   pull_request_target:
-  #     types: [labeled, unlabeled]
+  # pull_request_target:
+  #   types: [labeled, unlabeled]
   workflow_dispatch:
 
 env:
@@ -126,17 +126,18 @@ jobs:
           retention-days: 7
 
   # ============================================================
-  # 🔹 Build & Push PR Preview Image (No rebuild)
+  # 🔹 Build & Push PR Preview Image (runs even with no changes)
   # ============================================================
   build-preview:
     name: Build & Push PR Preview Image
     runs-on: ubuntu-latest
-    needs: [ci]
+    needs: [check_changes]   # no longer blocks on ci
     if: github.event.action != 'closed'
     permissions:
       contents: read
       pull-requests: write
       issues: write
+
     steps:
       - name: Check if author is team member or ok-to-test label present
         id: check_access
@@ -182,37 +183,30 @@ jobs:
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
 
+      # try to reuse artifacts if available
       - name: Download last successful build artifacts
-        if: steps.check_access.outputs.authorized == 'true'
+        if: steps.check_access.outputs.authorized == 'true' && needs.check_changes.outputs.has_changes == 'true'
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: .
 
-      - name: Inspect artifact contents
-        if: steps.check_access.outputs.authorized == 'true'
+      # fallback: rebuild locally if there were no relevant changes
+      - name: Fallback: build app for preview
+        if: steps.check_access.outputs.authorized == 'true' && needs.check_changes.outputs.has_changes != 'true'
         run: |
-          echo "Downloaded artifact structure (first 100 lines):"
-          ls -R | head -n 100
+          echo "No relevant file changes — performing fresh build for preview."
+          npm ci
+          npm run build
 
-      - name: Move artifact files if nested
+      - name: Verify build output
         if: steps.check_access.outputs.authorized == 'true'
         run: |
-          if compgen -G "build-artifacts-*/*" > /dev/null; then
-            echo "Flattening artifact directory..."
-            mv build-artifacts-*/* .
-          fi
           if [ ! -d ".next" ]; then
-            echo "❌ .next still missing after flattening"
+            echo "❌ .next directory not found — build step failed"
             exit 1
           fi
-          echo "✅ .next directory found and ready"
-
-      - name: Validate prebuilt assets
-        if: steps.check_access.outputs.authorized == 'true'
-        run: |
-          [ -d ".next" ] || (echo "❌ Missing .next directory — build artifacts not found" && exit 1)
-          echo "✅ Found prebuilt .next directory, proceeding with Docker packaging"
+          echo "✅ .next directory verified"
 
       - name: Set up Docker Buildx
         if: steps.check_access.outputs.authorized == 'true'
