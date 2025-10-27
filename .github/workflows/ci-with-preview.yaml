@@ -26,17 +26,11 @@ jobs:
       issues: write
 
     steps:
-      # ---------------------------------------------
-      # Checkout code
-      # ---------------------------------------------
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ---------------------------------------------
-      # Setup Node.js and cache dependencies
-      # ---------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -51,9 +45,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
-      # ---------------------------------------------
-      # Install, lint, type check, and build
-      # ---------------------------------------------
       - name: Install dependencies
         run: npm ci --frozen-lockfile
 
@@ -89,23 +80,19 @@ jobs:
         run: npm audit --audit-level=moderate
         continue-on-error: true
 
-      # ---------------------------------------------
-      # Upload build artifacts for Docker packaging
-      # ---------------------------------------------
-
-    - name: Upload build artifacts
-    if: success()
-    uses: actions/upload-artifact@v4
-    with:
-        name: build-artifacts-${{ github.event.pull_request.head.sha }}
-        path: |
-        .next/**
-        public/**
-        package.json
-        package-lock.json
-        next.config.js
-        next.config.ts
-        retention-days: 7
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-${{ github.event.pull_request.head.sha }}
+          path: |
+            .next/**
+            public/**
+            package.json
+            package-lock.json
+            next.config.js
+            next.config.ts
+          retention-days: 7
     
   # ============================================================
   # 🔹 Build & Push PR Preview Image (No rebuild)
