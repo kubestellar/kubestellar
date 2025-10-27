@@ -86,14 +86,14 @@ jobs:
         with:
           name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: |
-            .next/**
-            public/**
-            package.json
-            package-lock.json
-            next.config.js
-            next.config.ts
+            ${{ github.workspace }}/.next/
+            ${{ github.workspace }}/public/
+            ${{ github.workspace }}/package.json
+            ${{ github.workspace }}/package-lock.json
+            ${{ github.workspace }}/next.config.js
+            ${{ github.workspace }}/next.config.ts
           retention-days: 7
-
+          
   # ============================================================
   # 🔹 Build & Push PR Preview Image (No rebuild)
   # ============================================================
