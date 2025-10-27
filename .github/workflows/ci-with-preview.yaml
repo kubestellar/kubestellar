@@ -36,7 +36,6 @@ jobs:
           echo "🟡 No code changes detected — skipping CI steps"
           exit 0
 
-    steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
