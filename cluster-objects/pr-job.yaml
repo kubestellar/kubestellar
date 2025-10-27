@@ -126,6 +126,7 @@ data:
           containers:
             - name: nextra
               image: ${IMAGE_NAME}
+              imagePullPolicy: Always
               ports:
                 - containerPort: 3000
     ---
