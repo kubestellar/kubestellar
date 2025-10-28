@@ -204,7 +204,7 @@ jobs:
           EXISTING_IMAGE=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query "data[?contains(display-name, 'pr-${{ github.event.pull_request.number }}')].id" \
+            --query 'data[?contains(`"display-name"`, `pr-${{ github.event.pull_request.number }}`)].id' \
             --raw-output)
           if [ -n "$EXISTING_IMAGE" ]; then
             echo "existing=true" >> $GITHUB_OUTPUT
@@ -322,14 +322,14 @@ jobs:
 
       - name: Delete PR image from OCIR
         run: |
-          echo "Searching for image: pr-${{ github.event.number }}"
+          echo "Searching for image: pr-${{ github.event.pull_request.number }}"
           IMAGE_IDS=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query 'data[?contains(`"display-name"`, `pr-${{ github.event.number }}`)].id' \
+            --query 'data[?contains(`"display-name"`, `pr-${{ github.event.pull_request.number }}`)].id' \
             --raw-output)
           if [ -z "$IMAGE_IDS" ]; then
-            echo "No image found for PR #${{ github.event.number }}"
+            echo "No image found for PR #${{ github.event.pull_request.number }}"
           else
             for IMAGE_ID in $IMAGE_IDS; do
               echo "Deleting image: $IMAGE_ID"
@@ -340,11 +340,11 @@ jobs:
       - name: Comment PR cleanup
         uses: peter-evans/create-or-update-comment@v4
         with:
-          issue-number: ${{ github.event.number }}
+          issue-number: ${{ github.event.pull_request.number }}
           body: |
             🧹 **Deleted preview image from OCIR**
             ```
-            iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.number }}
+            iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.pull_request.number }}
             ```
             📴 **Preview URL Removed**
-            http://pr-${{ github.event.number }}.previews.kubestellar.io
+            http://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io
