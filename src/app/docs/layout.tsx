@@ -1,6 +1,5 @@
 import { Layout } from 'nextra-theme-docs'
 import { Banner } from 'nextra/components'
-import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
 import { DocsNavbar, DocsFooter } from '@/components/docs/index'
 import { Inter, JetBrains_Mono } from "next/font/google";
@@ -16,6 +15,8 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
+import Footer from '@/components/Footer'
+import { pageMap } from './[...slug]/page'
 
 export const metadata = {
   title: 'KubeStellar - Multi-Cluster Kubernetes Orchestration',
@@ -27,12 +28,6 @@ const navbar = <DocsNavbar />
 const footer = <DocsFooter />
  
 export default async function DocsLayout({ children }: { children: React.ReactNode }) {
-  const fullPageMap = await getPageMap()
-  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const docsPageMap = fullPageMap.filter((item: any) => {
-    return item.route === '/docs' || item.route?.startsWith('/docs/')
-  })
   
   return (
     <html lang="en" suppressHydrationWarning>
@@ -40,7 +35,7 @@ export default async function DocsLayout({ children }: { children: React.ReactNo
         <Layout
           banner={banner}
           navbar={navbar}
-          pageMap={docsPageMap}
+          pageMap={pageMap}
           docsRepositoryBase="https://github.com/kubestellar/kubestellar"
           footer={footer}
           darkMode={true}
