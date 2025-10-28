@@ -191,7 +191,6 @@ jobs:
           name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: .
 
-      # fallback: rebuild locally if there were no relevant changes
       - name: Fallback - build app for preview
         if: steps.check_access.outputs.authorized == 'true' && needs.check_changes.outputs.has_changes != 'true'
         run: |
