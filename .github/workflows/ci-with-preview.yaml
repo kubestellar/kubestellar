@@ -186,6 +186,7 @@ jobs:
                   team_slug: team,
                   username: prAuthor
                 });
+                console.log(`✅ ${prAuthor} is a member of @${org}/${team}`);
                 isTeamMember = true;
                 break;
               } catch (error) {
@@ -194,7 +195,14 @@ jobs:
               }
             }
 
-            core.setOutput('authorized', hasLabel || isTeamMember ? 'true' : 'false');
+            const authorized = hasLabel || isTeamMember;
+            core.setOutput('authorized', authorized ? 'true' : 'false');
+
+            if (authorized) {
+              console.log(`🚀 Authorized to run preview (label=${hasLabel}, member=${isTeamMember})`);
+            } else {
+              console.log(`🚫 ${prAuthor} is NOT authorized to run preview (label=${hasLabel}, member=${isTeamMember})`);
+            }
 
       - name: Check if preview image already exists in OCIR
         id: check_existing
