@@ -139,6 +139,32 @@ jobs:
       issues: write
 
     steps:
+      - name: Install OCI CLI
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y python3-pip
+          pip install oci-cli
+
+      - name: Configure OCI CLI
+        env:
+          OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+          OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+          OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+          OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+          OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+        run: |
+          mkdir -p ~/.oci
+          echo "$OCI_CLI_KEY_CONTENT" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem
+          cat <<EOF > ~/.oci/config
+          [DEFAULT]
+          user=${OCI_CLI_USER}
+          fingerprint=${OCI_CLI_FINGERPRINT}
+          key_file=~/.oci/oci_api_key.pem
+          tenancy=${OCI_CLI_TENANCY}
+          region=${OCI_CLI_REGION}
+          EOF
+
       - name: Check if author is team member or ok-to-test label present
         id: check_access
         uses: actions/github-script@v7
