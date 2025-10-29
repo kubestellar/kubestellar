@@ -14,7 +14,7 @@ spec:
     rules:
     - apiGroups: [""]
       resources: ["secrets"]
-      verbs: ["get", "list", "watch"]
+      verbs: ["get", "list", "watch", "patch"]
     - apiGroups: ["tenancy.kflex.kubestellar.org"]
       resources: ["controlplanes"]
       verbs: ["get", "list", "watch"]
@@ -34,57 +34,11 @@ spec:
       name: default
       namespace: '{{"{{.Namespace}}"}}'
   - apiVersion: v1
-    kind: ConfigMap
+    kind: Secret
     metadata:
-      name: transport-controller-config
-    data:
-      get-kubeconfig.sh: |
-        #!/bin/env bash
-        # Get the in-cluster kubeconfig for KubeFlex Control Planes
-        # get-kubeconfig.sh cp_name guess_its_name
-
-        # input parameters
-        cp_name="${1%-system}" # cp name or cp namespace
-        guess_its_name="$2" # true: try guessing the name of the ITS CP
-        wait_for_cp_ready="$3"
-
-        # check if the CP name is valid or needs to be guessed
-        while [ "$cp_name" == "" ] ; do
-          if [ "$guess_its_name" == "true" ] ; then
-            cps=$(kubectl get controlplane -l 'kflex.kubestellar.io/cptype=its' 2> /dev/null | tail -n +2)
-            case $(echo -n "$cps" | grep -c '^') in
-              (0)
-                >&2 echo "Waiting for an ITS control plane to exist..."
-                sleep 10;;
-              (1)
-                cp_name="${cps%% *}"
-                break;;
-              (*)
-                >&2 echo "ERROR: Multiple ITS control planes found, but none specified. Set ITSName Helm value or ITS_NAME env var to select one."
-                exit 1;;
-            esac
-          else
-            >&2 echo "ERROR: no Control Plane name specified!"
-            exit 3
-          fi
-        done
-
-        if [ "$wait_for_cp_ready" == "true" ]; then
-          # wait for the CP to exist and be ready
-          while [[ $(kubectl get controlplane "$cp_name" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-            >&2 echo "Waiting for \"$cp_name\" control plane to exist and be ready..."
-            sleep 10
-          done
-        fi
-
-        # determine the secret name and namespace
-        key=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.inClusterKey}')
-        secret_name=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.name}')
-        secret_namespace=$(kubectl get controlplane $cp_name -o=jsonpath='{.status.secretRef.namespace}')
-
-        # get the kubeconfig in base64
-        >&2 echo "Getting \"$key\" from \"$secret_name\" secret in \"$secret_namespace\" for control plane \"$cp_name\"..."
-        kubectl get secret $secret_name -n $secret_namespace -o=jsonpath="{.data.$key}"
+      name: its-kubeconfig
+    type: Opaque
+    data: {}
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -100,15 +54,22 @@ spec:
             name: transport-controller
         spec:
           initContainers:
-          - name: setup-its-kubeconfig
+          - name: wait-its-ready
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            args:
+              - wait
+              - --for=condition=Ready
+              - cp/its1
+              - --namespace
+              - its1-system
+              - --timeout=300s
+          - name: copy-its-secret
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             imagePullPolicy: IfNotPresent
-            command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{"{{.ITSName}}"}}' true true | base64 -d > /mnt/shared/transport-kubeconfig" ]
-            volumeMounts:
-            - name: config-volume
-              mountPath: /mnt/config
-            - name: shared-volume
-              mountPath: /mnt/shared
+            command:
+              - bin/sh
+              - -c
+              - 'kubectl get secret/vc-vcluster --namespace its1-system -o yaml | sed "/ownerReferences:/,/^- /d;/namespace:/d;/creationTimestamp:/d;/uid:/d;/resourceVersion:/d;s/\(name: \).*/\1its-kubeconfig/" | kubectl apply -f -'
           containers:
           - name: transport-controller
             image: ghcr.io/kubestellar/kubestellar/ocm-transport-controller:{{ .Values.TRANSPORT_VERSION | default .Values.KUBESTELLAR_VERSION }}
@@ -116,7 +77,7 @@ spec:
             args:
             - --metrics-bind-address={{.Values.transport_controller.metrics_bind_addr}}
             - --pprof-bind-address={{.Values.transport_controller.pprof_bind_addr}}
-            - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
+            - --transport-kubeconfig=/etc/kube/its/{{"{{.ITSkubeconfig}}"}}
             - --transport-qps={{.Values.transport_controller.transport_qps}}
             - --transport-burst={{.Values.transport_controller.transport_burst}}
             - --wds-kubeconfig=/etc/kube/wds/{{"{{.WDSkubeconfig}}"}}
@@ -127,20 +88,15 @@ spec:
             - --max-num-wrapped={{.Values.transport_controller.max_num_wrapped}}
             - --max-size-wrapped={{.Values.transport_controller.max_size_wrapped}}
             volumeMounts:
-            - name: shared-volume
-              mountPath: /mnt/shared
-              readOnly: true
             - name: wds-kubeconfig-volume
               mountPath: /etc/kube/wds
-              readOnly: true
+            - name: its-kubeconfig-volume
+              mountPath: /etc/kube/its/
           volumes:
-          - name: shared-volume
-            emptyDir: {}
-          - name: config-volume
-            configMap:
-              name: transport-controller-config
-              defaultMode: 0744
           - name: wds-kubeconfig-volume
             secret:
               secretName: '{{"{{.WDSSecretName}}"}}'
+          - name: its-kubeconfig-volume
+            secret:
+              secretName: its-kubeconfig
 {{- end }}
