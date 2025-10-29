@@ -6,7 +6,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, labeled, unlabeled]
   pull_request_target:
-    types: [labeled, unlabeled]
+    types: [opened, reopened, synchronize, labeled, unlabeled]
   workflow_dispatch:
 
 env:
@@ -14,28 +14,47 @@ env:
 
 jobs:
   # ============================================================
-  # 🔹 Code Quality & Build (Single build)
+  # 🧮 Detect if relevant files changed
+  # ============================================================
+  check_changes:
+    name: Detect relevant changes
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.filter.outputs.has_changes }}
+    steps:
+      - name: Check for changed files (ignore root .md and config)
+        id: changes
+        uses: tj-actions/changed-files@v44
+        with:
+          files_ignore: |
+            ./*.md
+            .github/**
+            cluster-objects/**
+            LICENSE
+            .gitignore
+            .prettier*
+            .prow.yaml
+
+      - name: Set has_changes output
+        id: filter
+        run: |
+          if [ -z "${{ steps.changes.outputs.all_changed_files }}" ]; then
+            echo "No relevant file changes detected."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Detected relevant changes:"
+            echo "${{ steps.changes.outputs.all_changed_files }}"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+  # ============================================================
+  # 🔹 Code Quality & Build
   # ============================================================
   ci:
     name: Code Quality & Build
     runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'pull_request' &&
-      github.event.action != 'closed' &&
-      (
-        github.event.action != 'labeled' ||
-        github.event.label.name != 'ok-to-test'
-      )
-    steps:
-      - name: Check for changed files
-        id: changes
-        uses: tj-actions/changed-files@v44
-      - name: Skip if no files changed
-        if: steps.changes.outputs.all_changed_files == ''
-        run: |
-          echo "🟡 No code changes detected — skipping CI steps"
-          exit 0
-
+    needs: check_changes
+    if: needs.check_changes.outputs.has_changes == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -107,18 +126,45 @@ jobs:
           retention-days: 7
 
   # ============================================================
-  # 🔹 Build & Push PR Preview Image (No rebuild)
+  # 🔹 Build & Push PR Preview Image (runs even with no changes)
   # ============================================================
   build-preview:
     name: Build & Push PR Preview Image
     runs-on: ubuntu-latest
-    needs: [ci]
-    if: github.event_name == 'pull_request_target' && github.event.action != 'closed'
+    needs: [check_changes]
+    if: github.event.action != 'closed'
     permissions:
       contents: read
       pull-requests: write
       issues: write
+
     steps:
+      - name: Install OCI CLI
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y python3-pip
+          pip install oci-cli
+
+      - name: Configure OCI CLI
+        env:
+          OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+          OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+          OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+          OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+          OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+        run: |
+          mkdir -p ~/.oci
+          echo "$OCI_CLI_KEY_CONTENT" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem
+          cat <<EOF > ~/.oci/config
+          [DEFAULT]
+          user=${OCI_CLI_USER}
+          fingerprint=${OCI_CLI_FINGERPRINT}
+          key_file=~/.oci/oci_api_key.pem
+          tenancy=${OCI_CLI_TENANCY}
+          region=${OCI_CLI_REGION}
+          EOF
+
       - name: Check if author is team member or ok-to-test label present
         id: check_access
         uses: actions/github-script@v7
@@ -129,7 +175,8 @@ jobs:
             const teams = ['kubestellar-contributors', 'kubestellar-docs'];
             const prAuthor = context.payload.pull_request.user.login;
             const labels = context.payload.pull_request.labels.map(l => l.name);
-            let hasLabel = labels.includes('ok-to-test');
+            const addedLabel = context.payload.label?.name || "";
+            const hasLabel = labels.includes('ok-to-test') || addedLabel === 'ok-to-test';
 
             let isTeamMember = false;
             for (const team of teams) {
@@ -139,8 +186,8 @@ jobs:
                   team_slug: team,
                   username: prAuthor
                 });
-                isTeamMember = true;
                 console.log(`✅ ${prAuthor} is a member of @${org}/${team}`);
+                isTeamMember = true;
                 break;
               } catch (error) {
                 if (error.status === 404) continue;
@@ -148,58 +195,75 @@ jobs:
               }
             }
 
-            if (hasLabel || isTeamMember) {
-              core.setOutput('authorized', 'true');
+            const authorized = hasLabel || isTeamMember;
+            core.setOutput('authorized', authorized ? 'true' : 'false');
+
+            if (authorized) {
               console.log(`🚀 Authorized to run preview (label=${hasLabel}, member=${isTeamMember})`);
             } else {
-              core.setOutput('authorized', 'false');
-              console.log(`🚫 Not authorized to run preview`);
+              console.log(`🚫 ${prAuthor} is NOT authorized to run preview (label=${hasLabel}, member=${isTeamMember})`);
             }
 
-      - name: Checkout PR branch
+      - name: Check if preview image already exists in OCIR
+        id: check_existing
         if: steps.check_access.outputs.authorized == 'true'
-        uses: actions/checkout@v4
-        with:
-          ref: refs/pull/${{ github.event.pull_request.number }}/head
+        run: |
+          echo "Checking if preview image exists for PR-${{ github.event.pull_request.number }}"
+          EXISTING_IMAGE=$(oci artifacts container image list \
+            --repository-name "kubestellar-docs-prs" \
+            --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
+            --query 'data[?contains(`display-name`, `pr-${{ github.event.pull_request.number }}`)].id' \
+            --raw-output)
+          if [ -n "$EXISTING_IMAGE" ]; then
+            echo "existing=true" >> $GITHUB_OUTPUT
+            echo "✅ Found existing preview image."
+          else
+            echo "existing=false" >> $GITHUB_OUTPUT
+            echo "🆕 No existing preview image found."
+          fi
 
       - name: Download last successful build artifacts
-        if: steps.check_access.outputs.authorized == 'true'
+        id: get_artifacts
+        if: |
+          steps.check_access.outputs.authorized == 'true' &&
+          needs.check_changes.outputs.has_changes == 'false'
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts-${{ github.event.pull_request.head.sha }}
           path: .
 
-      - name: Inspect artifact contents
-        if: steps.check_access.outputs.authorized == 'true'
+      - name: Skip build if preview and artifacts already exist
+        if: |
+          steps.check_access.outputs.authorized == 'true' &&
+          steps.check_existing.outputs.existing == 'true' &&
+          needs.check_changes.outputs.has_changes == 'false' &&
+          success()
         run: |
-          echo "Downloaded artifact structure (first 100 lines):"
-          ls -R | head -n 100
+          echo "✅ No relevant changes and existing preview image found. Skipping rebuild and redeploy."
+          echo "skip_build=true" >> $GITHUB_OUTPUT
 
-      - name: Move artifact files if nested
-        if: steps.check_access.outputs.authorized == 'true'
+      - name: Build app for preview
+        if: |
+          steps.check_access.outputs.authorized == 'true' &&
+          (needs.check_changes.outputs.has_changes == 'true' ||
+           steps.get_artifacts.outcome != 'success')
         run: |
-          if compgen -G "build-artifacts-*/*" > /dev/null; then
-            echo "Flattening artifact directory..."
-            mv build-artifacts-*/* .
-          fi
-          if [ ! -d ".next" ]; then
-            echo "❌ .next still missing after flattening"
-            exit 1
-          fi
-          echo "✅ .next directory found and ready"
+          echo "⚙️ Building new preview..."
+          npm ci
+          npm run build
 
-      - name: Validate prebuilt assets
-        if: steps.check_access.outputs.authorized == 'true'
+      - name: Verify build output
+        if: steps.check_access.outputs.authorized == 'true' && steps.skip_build.outputs.skip_build != 'true'
         run: |
-          [ -d ".next" ] || (echo "❌ Missing .next directory — build artifacts not found" && exit 1)
-          echo "✅ Found prebuilt .next directory, proceeding with Docker packaging"
+          [ -d ".next" ] && echo "✅ .next verified" || (echo "❌ missing .next" && exit 1)
 
       - name: Set up Docker Buildx
-        if: steps.check_access.outputs.authorized == 'true'
+        if: steps.check_access.outputs.authorized == 'true' && steps.skip_build.outputs.skip_build != 'true'
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Oracle Cloud Container Registry
-        if: steps.check_access.outputs.authorized == 'true'
+        if: steps.check_access.outputs.authorized == 'true' && steps.skip_build.outputs.skip_build != 'true'
         uses: docker/login-action@v3
         with:
           registry: iad.ocir.io
@@ -207,7 +271,7 @@ jobs:
           password: ${{ secrets.OCI_AUTH_TOKEN }}
 
       - name: Build and push image
-        if: steps.check_access.outputs.authorized == 'true'
+        if: steps.check_access.outputs.authorized == 'true' && steps.skip_build.outputs.skip_build != 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -218,12 +282,12 @@ jobs:
           provenance: false
 
       - name: Comment PR with preview info
-        if: steps.check_access.outputs.authorized == 'true'
+        if: steps.check_access.outputs.authorized == 'true' && steps.skip_build.outputs.skip_build != 'true'
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            🧩 **Preview image built and pushed to OCIR**
+            🧩 **Preview image built and pushed**
             ```
             iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.pull_request.number }}
             ```
@@ -266,14 +330,14 @@ jobs:
 
       - name: Delete PR image from OCIR
         run: |
-          echo "Searching for image: pr-${{ github.event.number }}"
+          echo "Searching for image: pr-${{ github.event.pull_request.number }}"
           IMAGE_IDS=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query 'data[?contains(`"display-name"`, `pr-${{ github.event.number }}`)].id' \
+            --query 'data.items[?contains(`display-name`, `pr-${{ github.event.pull_request.number }}`)].id' \
             --raw-output)
           if [ -z "$IMAGE_IDS" ]; then
-            echo "No image found for PR #${{ github.event.number }}"
+            echo "No image found for PR #${{ github.event.pull_request.number }}"
           else
             for IMAGE_ID in $IMAGE_IDS; do
               echo "Deleting image: $IMAGE_ID"
@@ -284,11 +348,11 @@ jobs:
       - name: Comment PR cleanup
         uses: peter-evans/create-or-update-comment@v4
         with:
-          issue-number: ${{ github.event.number }}
+          issue-number: ${{ github.event.pull_request.number }}
           body: |
             🧹 **Deleted preview image from OCIR**
             ```
-            iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.number }}
+            iad.ocir.io/id4wyucbsggm/kubestellar-docs-prs:pr-${{ github.event.pull_request.number }}
             ```
             📴 **Preview URL Removed**
-            http://pr-${{ github.event.number }}.previews.kubestellar.io
+            http://pr-${{ github.event.pull_request.number }}.previews.kubestellar.io
