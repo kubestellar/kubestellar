@@ -43,6 +43,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/pkg/abstract"
+	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
 //const noNamespace = "**"
@@ -57,8 +58,16 @@ func main() {
 	cliOpts.AddFlags(fs)
 	outputFormat := "table"
 	fs.StringVarP(&outputFormat, "output-format", "o", outputFormat, "output format, either json or table")
-	queryResourceList := []string{"*"}
-	fs.StringSliceVar(&queryResourceList, "resources", queryResourceList, "comma-separated list of resources to include; resource syntax is plural.group/subresource; .group and /subresource are omitted when appropriate; '*' means all resources")
+	userNameFilterOptions := util.NewStringFilterOptions()
+	userNameFilterOptions.AddToFlags(fs, "subject-user-names", "subject user names to focus on; '*' means all")
+	userGroupFilterOptions := util.NewStringFilterOptions().SeparateBySpacesToo()
+	userGroupFilterOptions.AddToFlags(fs, "subject-user-groups", "subject user groups to focus on; '*' means all")
+	serviceAccountFilterOptions := util.NewStringFilterOptions()
+	serviceAccountFilterOptions.AddToFlags(fs, "subject-service-accounts", "subject service accounts to focus on; syntax for one is namespace:name; '*' means all")
+	verbFilterOptions := util.NewStringFilterOptions("*")
+	verbFilterOptions.AddToFlags(fs, "verbs", "verbs to focus on; '*' means all")
+	resourceFilterOptions := util.NewStringFilterOptions("*")
+	resourceFilterOptions.AddToFlags(fs, "resources", "resources to focus on; resource syntax is plural.group/subresource; .group and /subresource are omitted when appropriate; '*' means all resources")
 	showRole := true
 	fs.BoolVar(&showRole, "show-role", showRole, "include role in listing for resource grans")
 	fs.Parse(os.Args[1:])
@@ -67,8 +76,9 @@ func main() {
 	logger := klog.FromContext(ctx)
 	ctx = klog.NewContext(ctx, logger)
 
-	queryResources := sets.New(queryResourceList...)
-	queryAllResources := queryResources.Has("*")
+	subjFilter := newSubjectFilter(userNameFilterOptions, userGroupFilterOptions, serviceAccountFilterOptions)
+	verbFilter, _ := verbFilterOptions.ToFilter()
+	resourceFilter, _ := resourceFilterOptions.ToFilter()
 
 	config, err := cliOpts.ToRESTConfig()
 	if err != nil {
@@ -84,19 +94,17 @@ func main() {
 			logger.Error(err, "Failed to fetch all resources")
 		}
 	}
-	if !queryAllResources {
-		for grStr := range queryResources {
-			gr := schema.ParseGroupResource(grStr)
-			if _, have := rscMap[metav1.GroupResource(gr)]; !have {
-				logger.Error(nil, "Given resource does not exist", "resource", grStr)
-			}
+	for grStr := range resourceFilter.Literals {
+		gr := schema.ParseGroupResource(grStr)
+		if _, have := rscMap[metav1.GroupResource(gr)]; !have {
+			logger.Error(nil, "Given resource does not exist", "resource", grStr)
 		}
 	}
 	client := kubeClient.RbacV1()
-	flat, errs := getFlat(ctx, client, rscMap, queryResources)
+	flat, errs := getFlat(ctx, client, rscMap, subjFilter, verbFilter, resourceFilter)
 	switch outputFormat {
 	case "table":
-		showRsc := queryAllResources || len(queryResources) != 1
+		showRsc := resourceFilter.AllPass || len(resourceFilter.Literals) != 1
 		tw := printers.GetNewTabWriter(os.Stdout)
 		tw.Write([]byte("BINDING\t"))
 		if showRole {
@@ -137,7 +145,7 @@ func main() {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 		}
-		if queryAllResources {
+		if resourceFilter.AllPass {
 			fmt.Println()
 			tw = printers.GetNewTabWriter(os.Stdout)
 			tw.Write([]byte("BINDING\t"))
@@ -214,6 +222,43 @@ func getResourceMap(discoClient discovery.DiscoveryInterface) (resourceMap, []er
 	return rm, errs
 }
 
+type subjectFilter struct {
+	UserName       util.StringFilter
+	UserGroup      util.StringFilter
+	ServiceAccount util.StringFilter
+}
+
+func newSubjectFilter(userName, userGroup, serviceAccount util.StringFilterOptions) subjectFilter {
+	userNameFilter, filteringOnName := userName.ToFilter()
+	userGroupFilter, filteringOnGroup := userGroup.ToFilter()
+	svcAcctFilter, filteringOnSvcAcct := serviceAccount.ToFilter()
+	if !(filteringOnName || filteringOnGroup || filteringOnSvcAcct) {
+		userNameFilter = util.StringFilter{AllPass: true}
+		userGroupFilter = util.StringFilter{AllPass: true}
+		svcAcctFilter = util.StringFilter{AllPass: true}
+	}
+	return subjectFilter{
+		UserName:       userNameFilter,
+		UserGroup:      userGroupFilter,
+		ServiceAccount: svcAcctFilter}
+}
+
+func (sf *subjectFilter) Passes(subj rbac.Subject) bool {
+	if subj.APIGroup != "" && subj.APIGroup != "rbac.authorization.k8s.io" {
+		return false
+	}
+	switch subj.Kind {
+	case "User":
+		return sf.UserName.Passes(subj.Name, false)
+	case "Group":
+		return sf.UserGroup.Passes(subj.Name, false)
+	case "ServiceAccount":
+		return sf.ServiceAccount.Passes(subj.Namespace+":"+subj.Name, false)
+	default:
+		return false
+	}
+}
+
 type Flat []Tuple
 
 type Tuple struct {
@@ -231,7 +276,7 @@ type PolicyRule struct {
 	NonResourcePaths []string
 }
 
-func getFlat(ctx context.Context, client auth_client.RbacV1Interface, rscMap resourceMap, queryResources sets.Set[string]) (Flat, []error) {
+func getFlat(ctx context.Context, client auth_client.RbacV1Interface, rscMap resourceMap, subjFilter subjectFilter, verbFilter, rscFilter util.StringFilter) (Flat, []error) {
 	var errs []error
 	var crMap map[string]rbac.ClusterRole
 	var crbList []rbac.ClusterRoleBinding
@@ -257,7 +302,6 @@ func getFlat(ctx context.Context, client auth_client.RbacV1Interface, rscMap res
 	} else {
 		rbList = list.Items
 	}
-	allResources := queryResources.Has("*")
 	complainedCSRoles := sets.New[NamespacedName]()
 	complainedNRRoles := sets.New[NamespacedName]()
 	ans := Flat{}
@@ -289,8 +333,8 @@ func getFlat(ctx context.Context, client auth_client.RbacV1Interface, rscMap res
 					continue
 				}
 				rrStr := rr.String()
-				if allResources || queryResources.Has(rrStr) {
-					ruledResourceStrs = append(ruledResourceStrs, rr.String())
+				if rscFilter.Passes(rrStr, false) {
+					ruledResourceStrs = append(ruledResourceStrs, rrStr)
 				}
 			}
 			if len(ruledResourceStrs) == 0 {
@@ -300,18 +344,21 @@ func getFlat(ctx context.Context, client auth_client.RbacV1Interface, rscMap res
 			if len(rule.ResourceNames) == 0 {
 				rule.ResourceNames = []string{"*"}
 			}
+			pr := PolicyRule{
+				Verbs:            verbFilter.FilterSlice(rule.Verbs, true),
+				Resources:        ruledResourceStrs,
+				ObjectNames:      rule.ResourceNames,
+				NonResourcePaths: rule.NonResourceURLs,
+			}
 			for _, subj := range subjects {
-				tup := Tuple{Binding: source,
-					RoleInCluster: roleInCluster,
-					RoleName:      roleName,
-					Subject:       subj,
-					Rule: PolicyRule{
-						Verbs:            rule.Verbs,
-						Resources:        ruledResourceStrs,
-						ObjectNames:      rule.ResourceNames,
-						NonResourcePaths: rule.NonResourceURLs,
-					}}
-				ans = append(ans, tup)
+				if subjFilter.Passes(subj) {
+					tup := Tuple{Binding: source,
+						RoleInCluster: roleInCluster,
+						RoleName:      roleName,
+						Subject:       subj,
+						Rule:          pr}
+					ans = append(ans, tup)
+				}
 			}
 		}
 		if complainCS {
