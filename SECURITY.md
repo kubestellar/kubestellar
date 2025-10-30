@@ -1,3 +1,4 @@
+<!-- SECURITY_INC_START -->
 ## Security Announcements
 
 Join the [kubestellar-security-announce](https://groups.google.com/u/1/g/kubestellar-security-announce) group for emails about security and major API announcements.
@@ -15,7 +16,7 @@ KubeStellar manages its dependencies with the following policy:
     - **Security Scanning:** Given that KubeStellar imports various types of dependencies (Go packages, pre-built binaries, container images, Helm charts, and GitHub Actions), we rely on GitHub's security advisory database and Dependabot's vulnerability detection capabilities. Specific additional security scanning tools are not currently standardized across all dependency types.
     - **Security Advisories:** Review security advisories and release notes for the updated dependencies
     - **Breaking Changes:** Verify that updates do not introduce breaking changes or compatibility issues
-    - **GitHub Actions:** For GitHub Actions specifically, ensure updates follow our [GitHub Action Reference Discipline](https://github.com/kubestellar/kubestellar/V/main/CONTRIBUTING.md#github-action-reference-discipline) and use approved commit hashes. The [verify-action-hashes workflow](https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/verify-action-hashes.yaml) automatically checks that each GitHub Action reference uses an approved commit hash.
+    - **GitHub Actions:** For GitHub Actions specifically, ensure updates follow our [GitHub Action Reference Discipline](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md#github-action-reference-discipline) and use approved commit hashes. The [verify-action-hashes workflow](https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/verify-action-hashes.yaml) automatically checks that each GitHub Action reference uses an approved commit hash.
     - **SBOM Generation:** Generate Software Bill of Materials (SBOM) using [Anchore's syft tool](https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/goreleaser.yml) during releases to identify and track dependencies for security analysis
     - **Testing:** Run available tests to verify that updated dependencies work correctly with the codebase
 - **Security Best Practices:** We avoid using unmaintained or deprecated dependencies. Monitoring for security advisories affecting our dependencies is primarily done through GitHub's security advisory database and Dependabot notifications. Vulnerabilities in dependencies are prioritized for prompt remediation.
@@ -51,3 +52,4 @@ As the security issue moves from triage, to identified fix, to release planning 
 ## Public Disclosure Timing
 
 A public disclosure date is negotiated by the KubeStellar Security Response Committee and the bug submitter. We prefer to fully disclose the bug as soon as possible once a user mitigation is available. It is reasonable to delay disclosure when the bug or the fix is not yet fully understood, the solution is not well-tested, or for vendor coordination. The timeframe for disclosure is from immediate (especially if it's already publicly known) to a few weeks. For a vulnerability with a straightforward mitigation, we expect report date to disclosure date to be on the order of 7 days. The KubeStellar maintainers hold the final say when setting a disclosure date.
+<!-- SECURITY_INC_END -->
