@@ -10,7 +10,7 @@ spec:
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
-      name: "{{"{{.ControlPlaneName}}-transport-controller"}}"
+      name: '{{"{{.ControlPlaneName}}-transport-controller"}}'
     rules:
     - apiGroups: [""]
       resources: ["secrets"]
@@ -24,15 +24,15 @@ spec:
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
-      name: "{{"{{.ControlPlaneName}}"}}-transport-controller"
+      name: '{{"{{.ControlPlaneName}}"}}-transport-controller'
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
-      name: "{{"{{.ControlPlaneName}}"}}-transport-controller"
+      name: '{{"{{.ControlPlaneName}}"}}-transport-controller'
     subjects:
     - kind: ServiceAccount
       name: default
-      namespace: "{{"{{.Namespace}}"}}"
+      namespace: '{{"{{.Namespace}}"}}'
   - apiVersion: v1
     kind: ConfigMap
     metadata:
@@ -100,15 +100,6 @@ spec:
             name: transport-controller
         spec:
           initContainers:
-          - name: setup-wds-kubeconfig
-            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
-            imagePullPolicy: IfNotPresent
-            command: [ "bin/sh", "-c", "sh /mnt/config/get-kubeconfig.sh '{{"{{.ControlPlaneName}}"}}' false false | base64 -d > /mnt/shared/wds-kubeconfig" ]
-            volumeMounts:
-            - name: config-volume
-              mountPath: /mnt/config
-            - name: shared-volume
-              mountPath: /mnt/shared
           - name: setup-its-kubeconfig
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             imagePullPolicy: IfNotPresent
@@ -128,7 +119,7 @@ spec:
             - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
             - --transport-qps={{.Values.transport_controller.transport_qps}}
             - --transport-burst={{.Values.transport_controller.transport_burst}}
-            - --wds-kubeconfig=/mnt/shared/wds-kubeconfig
+            - --wds-kubeconfig=/etc/kube/wds/{{"{{.WDSkubeconfig}}"}}
             - --wds-name={{"{{.ControlPlaneName}}"}}
             - --wds-qps={{.Values.transport_controller.wds_qps}}
             - --wds-burst={{.Values.transport_controller.wds_burst}}
@@ -139,6 +130,9 @@ spec:
             - name: shared-volume
               mountPath: /mnt/shared
               readOnly: true
+            - name: wds-kubeconfig-volume
+              mountPath: /etc/kube/wds
+              readOnly: true
           volumes:
           - name: shared-volume
             emptyDir: {}
@@ -146,4 +140,7 @@ spec:
             configMap:
               name: transport-controller-config
               defaultMode: 0744
+          - name: wds-kubeconfig-volume
+            secret:
+              secretName: '{{"{{.WDSSecretName}}"}}'
 {{- end }}
