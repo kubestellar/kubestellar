@@ -119,7 +119,7 @@ spec:
             - --transport-kubeconfig=/mnt/shared/transport-kubeconfig
             - --transport-qps={{.Values.transport_controller.transport_qps}}
             - --transport-burst={{.Values.transport_controller.transport_burst}}
-            - --wds-kubeconfig=/etc/kube/wds-kubeconfig
+            - --wds-kubeconfig=/etc/kube/wds/{{"{{.WDSkubeconfig}}"}}
             - --wds-name={{"{{.ControlPlaneName}}"}}
             - --wds-qps={{.Values.transport_controller.wds_qps}}
             - --wds-burst={{.Values.transport_controller.wds_burst}}
@@ -131,8 +131,7 @@ spec:
               mountPath: /mnt/shared
               readOnly: true
             - name: wds-kubeconfig-volume
-              mountPath: /etc/kube/wds-kubeconfig
-              subPath: '{{"{{.WDSkubeconfig}}"}}'
+              mountPath: /etc/kube/wds
               readOnly: true
           volumes:
           - name: shared-volume
