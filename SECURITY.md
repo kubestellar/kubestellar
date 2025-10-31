@@ -1,4 +1,4 @@
-<!--security-start-->
+<!-- SECURITY_INC_START -->
 ## Security Announcements
 
 Join the [kubestellar-security-announce](https://groups.google.com/u/1/g/kubestellar-security-announce) group for emails about security and major API announcements.
@@ -35,7 +35,6 @@ You can also email the private [kubestellar-security-announce@googlegroups.com](
 - You think you discovered a vulnerability in another project that KubeStellar depends on
     - For projects with their own vulnerability reporting and disclosure process, please report it directly there
 
-
 ### When Should I NOT Report a Vulnerability?
 
 - You need help tuning KubeStellar components for security
@@ -53,4 +52,4 @@ As the security issue moves from triage, to identified fix, to release planning 
 ## Public Disclosure Timing
 
 A public disclosure date is negotiated by the KubeStellar Security Response Committee and the bug submitter. We prefer to fully disclose the bug as soon as possible once a user mitigation is available. It is reasonable to delay disclosure when the bug or the fix is not yet fully understood, the solution is not well-tested, or for vendor coordination. The timeframe for disclosure is from immediate (especially if it's already publicly known) to a few weeks. For a vulnerability with a straightforward mitigation, we expect report date to disclosure date to be on the order of 7 days. The KubeStellar maintainers hold the final say when setting a disclosure date.
-<!--security-end-->
+<!-- SECURITY_INC_END -->
