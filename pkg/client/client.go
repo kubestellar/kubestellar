@@ -17,10 +17,10 @@ limitations under the License.
 package client
 
 import (
-	"fmt"
 	"os"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
@@ -30,20 +30,22 @@ import (
 )
 
 func GetClient() *client.Client {
+	logger := klog.Background().WithName("client")
+
 	config := config.GetConfigOrDie()
 	scheme := runtime.NewScheme()
 
 	if err := controlv1alpha1.AddToScheme(scheme); err != nil {
-		fmt.Fprintf(os.Stderr, "Error adding to schema: %v\n", err)
+		logger.Error(err, "Error adding to schema - controlv1alpha1")
 		os.Exit(1)
 	}
 	if err := tenancyv1alpha1.AddToScheme(scheme); err != nil {
-		fmt.Fprintf(os.Stderr, "Error adding to schema: %v\n", err)
+		logger.Error(err, "Error adding to schema - tenancyv1alpha1")
 		os.Exit(1)
 	}
 	c, err := client.New(config, client.Options{Scheme: scheme})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating client: %v\n", err)
+		logger.Error(err, "Error creating client")
 		os.Exit(1)
 	}
 	return &c
