@@ -1,192 +1,152 @@
-# KubeStellar Multi-WEC Status Aggregation Proposal
+# Proposal: Multi-WEC Aggregated Status Controller Enhancement
 
-**Status:** Design for Review | **Issue:** #2809
-
----
-
-## 1. Problem Statement
-
-**Current Behavior:**
-
-* Singleton workloads (nWECs == 1) propagate `.status` correctly in WDS objects.
-* Multi-WEC deployments (nWECs > 1) leave WDS `.status` empty, preventing users and tools like ArgoCD from seeing true readiness.
-
-**Goal:**
-
-* Aggregate per-WEC `WorkStatus` and update `.status` in WDS workload objects to reflect **true multi-cluster readiness**.
-* Maintain **backward compatibility** with singleton workloads.
-* Avoid conflicts with other controllers (e.g., ArgoCD, Helm).
-* Ensure **deterministic and observable behavior** across multiple BindingPolicies.
+**Status:** Proposal  
+**Related Issue:** [#2809 – KubeStellar controller logic to map back the status from WECs to READY values in WDSes](https://github.com/kubestellar/kubestellar/issues/2809)
 
 ---
 
-## 2. Key Principles
+## Current Scenario
 
-1. **Reuse Existing Patterns**
+In the current KubeStellar implementation:
 
-   * Collect WorkStatus slices per WDS object using the SingletonStatus slice/map approach.
-   * Reuse `updateObjectStatus()` from SingletonStatus for safe `.status` patching.
+1. **Singleton Enabled (WEC == 1):**  
+   The WDS and WEC workload statuses match correctly when `wantSingletonReportedState: true` is enabled.
 
-2. **Predefined Field-Type Aggregation**
+2. **Singleton Disabled (WEC > 1):**  
+   For workloads deployed to multiple WECs, the `.status` field in the WDS remains empty, resulting in non-matching WDS and WEC status.
 
-   * Rules are **field-type based**, no user-defined expressions initially.
-   * Configurable for future analytics (sum, average, quorum).
+This leads to limited visibility in ArgoCD, where workloads appear as *OutOfSync* or *Unknown*, even though all WECs are healthy.
 
-3. **Direct WDS Update**
-
-   * Aggregated status is pushed **directly into WDS workload objects**, maintaining a single source of truth.
-
-4. **Opt-In**
-
-   * Aggregation triggered via `wantMultiReportedState: true` per BindingPolicy/StatusCollector.
-   * Singleton behavior remains unchanged for nWECs == 1.
-
-5. **Deterministic Multi-BindingPolicy Handling**
-
-   * Conflicting policies fall back to **conservative defaults** (`min()` for numeric, AND for negative conditions, OR for positive conditions).
+**Reference:**  
+- [PR #3297](https://github.com/kubestellar/kubestellar/pull/3297)  
+- [Multi-cluster example in docs](https://docs.kubestellar.io/release-0.28.0/direct/example-scenarios/#scenario-1-multi-cluster-workload-deployment-with-kubectl)
 
 ---
 
-## 3. Slice/Map Data Gathering
+## Goal
 
-```go
-c.workStatusToObject.ReadInverse().ContGet(wObjID, func(wsONSet sets.Set[cache.ObjectName]) {
-    for wsON := range wsONSet {
-        ws := c.workStatusLister.Get(wsON)
-        workStatuses = append(workStatuses, WorkStatusData{
-            ClusterName: ws.ClusterName,
-            Status:      ws.Status,
-            UpdateTime:  ws.LastUpdateTime,
-        })
-    }
-})
+Implement a **multi-WEC aggregated status reporting mechanism** in KubeStellar to reflect combined readiness in the WDS.  
+This will allow aggregated workload visibility across all WECs and ensure compatibility with ArgoCD’s health checks.
+
+Key objectives:
+- Aggregate per-WEC `WorkStatus` objects.
+- Update the `.status` field in WDS workload objects.
+- Maintain backward compatibility with singleton workloads.
+- Provide fallback to existing singleton mechanism when applicable.
+
+---
+
+## Solution Approach
+
+### 1. Extend BindingPolicy CRD
+
+Add a new field `wantMultiWECReportedState`, similar to `wantSingletonReportedState`.
+
+Logic:
+- If **enabled** and number of WECs == 1 → use existing singleton mechanism.
+- If **enabled** and number of WECs > 1 → invoke new multi-WEC aggregation logic.
+- If **disabled**, retain existing empty status behavior.
+
+```yaml
+spec:
+  wantMultiWECReportedState: true
 ```
 
-* Slice mirrors SingletonStatus:
-  * `.status` map from each WEC
-  * Cluster metadata
-  * Last update timestamp
-* Stale WorkStatus (`LastUpdateTime` older than configurable threshold, e.g., 30s) is ignored during aggregation.
+---
+
+### 2. Introduce `handleMultiReportedState()` Function
+
+A new controller function will handle multi-WEC aggregation:
+
+**Responsibilities:**
+1. Collect `.status` from all target WECs using existing status collection logic.  
+2. Aggregate status data according to defined field rules (numeric, conditions, timestamps, string).  
+3. Update the aggregated `.status` back into the WDS workload object.
+
+**Focus:** Aggregation of fields relevant to ArgoCD health interpretation.
 
 ---
 
-## 4. Aggregation Rules
+### 3. Status Aggregation Rules
 
-### A. Numeric Fields
-
-| Field                                                       | Aggregation             | Notes                                           |
-| ----------------------------------------------------------- | ----------------------- | ----------------------------------------------- |
-| replicas, readyReplicas, availableReplicas, updatedReplicas | min(values) across WECs | Conservative; prevents over-reporting in ArgoCD |
-| Optional override                                           | sum / average           | For analytics/reporting                         |
-
-**Example:** 3 clusters `[1, 0, 1]` → Output `0` (reflects weakest cluster)
-
-### B. Conditions
-
-* Group conditions by `Type`
-* Aggregation logic:
-
-| Type                        | Aggregation                                          |
-| --------------------------- | ---------------------------------------------------- |
-| Available / Ready / Healthy | OR / majority → healthy if any cluster ready         |
-| Progressing / Updating      | OR / majority → shows ongoing work                   |
-| Degraded / Failed / Error   | AND / conservative → unhealthy if any cluster failed |
-| Unknown                     | OR → positive by default                             |
-
-* Reason: pick latest/worst-case across WECs
-* Message: include most informative message from degraded cluster
-
-**Example:**
-
-* Available: `[True, False, True]` → `False`
-* Progressing: `[False, True, False]` → `True`
-
-### C. Timestamps
-
-* `lastTransitionTime`: max across WECs
-* `observedGeneration`: max across WECs
-
-### D. Other Fields
-
-* Copy from dominant WEC or leave untouched
-* Nested maps, strings, or CRD-specific fields: no aggregation; log warning if ambiguous
+| Field Type | Aggregation Logic | Description |
+|-------------|------------------|--------------|
+| **Numeric** | Average or Minimum | Used for fields like replica counts. |
+| **Condition** | Group by `type`; aggregate status accordingly. | Ensures consistent boolean conditions across clusters. |
+| **Timestamp** | Use latest timestamp. | Reflects the most recent update across all WECs. |
+| **String** | Use latest value. | Keeps newest message or reason from clusters. |
 
 ---
 
-## 5. Controller Integration
+### 4. Implementation Approach
 
-```go
-func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectIdentifier) error {
-    singleRequested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
-    multiRequested := c.bindingPolicyResolver.GetMultiReportedStateRequestForObject(wObjID)
+1. Extend BindingPolicy CRD with `wantMultiWECReportedState`.
+2. Add flag detection logic in the status controller.
+3. Implement `handleMultiReportedState()` using the aggregation approach above.
+4. Use type-specific aggregators for common workload kinds (Deployment, StatefulSet, etc.).
+5. Patch `.status` only if a change is detected (deep equality check).
 
-    if singleRequested && nWECs == 1 {
-        return c.handleSingleton(...) // existing path
-    }
-    if multiRequested && nWECs > 1 {
-        return c.handleMultiWECs(...) // slice -> aggregator -> updateObjectStatus
-    }
-    return c.updateObjectStatus(ctx, wObjID, nil, c.listers) // clear status
-}
+**Code Reference:**
+- [ArgoCD Health Logic](https://github.com/argoproj/argo-cd/blob/master/gitops-engine/pkg/health/health.go)
+- [Initial Proposal PR](https://github.com/rishi-jat/kubestellar/pull/1)
+
+---
+
+## Example
+
+```yaml
+apiVersion: policies.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: multiwec-nginx
+spec:
+  objectSelector:
+    kind: Deployment
+    namespace: nginx
+    name: nginx-deployment
+  targetClusters:
+    - cluster1
+    - cluster2
+  wantMultiWECReportedState: true
 ```
 
-* `handleMultiWECs()` collects the WorkStatus slice, calls `processSlice()` for aggregation, and patches `.status` safely.
-* Rate-limiting ensures performance at scale.
+After aggregation, the corresponding WDS Deployment status:
+
+```yaml
+status:
+  replicas: 2
+  readyReplicas: 2
+  availableReplicas: 2
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: AllClustersReady
+      message: "Deployment ready in cluster1, cluster2"
+      lastTransitionTime: "2025-11-01T12:34:56Z"
+```
 
 ---
 
-## 6. Aggregator Architecture
+## Validation Plan
 
-* Pluggable per-kind aggregators:
-  * DeploymentAggregator
-  * StatefulSetAggregator
-  * DaemonSetAggregator
-* Aggregation mode configurable per BindingPolicy / StatusCollector (`min` default)
-* Optional overrides for sum/average/quorum
+- Verify aggregated `.status` in WDS after multi-cluster propagation.
+- Confirm ArgoCD displays workloads as *Synced* and *Healthy*.
+- Validate fallback to singleton logic when only one WEC is bound.
+- Add integration tests under `test/e2e/status/` to verify correctness.
 
 ---
 
-## 7. Safety & Observability
+## Future Work
 
-* Patch only if `.status` changed (deep-equal check)
-* Use MergePatch to avoid conflicts with other controllers
-* Rate-limit updates to reduce API server churn
-* Log warnings for ambiguous fields and conflicting policies
-
----
-
-## 8. Expected Outcomes
-
-* Accurate multi-cluster health in ArgoCD/Flux
-* Meaningful READY counts in `kubectl get`
-* Operators can debug per-cluster status
-* Singleton workloads remain unaffected
-* Flexible aggregation modes for reporting or analytics
+- Weighted aggregation logic based on cluster priority or capacity.
+- Enhanced visualization for per-WEC readiness.
+- Unified CRD version for both singleton and multi-WEC status.
 
 ---
 
-## 9. Known Risks & Mitigations
+## References
 
-| Risk                               | Impact | Mitigation                                     |
-| ---------------------------------- | ------ | ---------------------------------------------- |
-| Transient degraded state (WEC lag) | Medium | Ignore stale WorkStatus, document expected lag |
-| Scale-up/down misreporting         | Medium | Optional override (sum/average/quorum)         |
-| Non-numeric / non-condition fields | Low    | Copy from dominant WEC; log warning            |
-| Conflicts with other controllers   | High   | MergePatch + rate-limiting                     |
-| Multiple BindingPolicies           | Medium | Deterministic mode, log policy breakdown       |
-| Condition message ambiguity        | Medium | Pick latest/worst-case; log for audit          |
-| ObjectMeta.Generation              | Low    | Max stored for reference; not used for health  |
-
----
-
-## 10. Summary
-
-* Default numeric aggregation: **min()**
-* Condition aggregation: **OR for positive, AND for negative**
-* Timestamps: **max**
-* `.status` patched directly in WDS workload objects (singleton path untouched)
-* Configurable overrides per CR for sum/average/quorum
-* Fully aligned with CombinedStatus slice/map mechanism, safe, ArgoCD-compatible
-* Deterministic multi-BindingPolicy handling, transient state handling, and performance rate-limiting addressed
-
----
+- [KubeStellar Status Controller](https://github.com/kubestellar/kubestellar/tree/main/pkg/status)
+- [ArgoCD Health Evaluation](https://argo-cd.readthedocs.io/en/stable/operator-manual/health/)
+- [Issue #2809 – Multi-WEC Aggregation](https://github.com/kubestellar/kubestellar/issues/2809)
+- [Related PR #3423](https://github.com/kubestellar/kubestellar/pull/3423)
