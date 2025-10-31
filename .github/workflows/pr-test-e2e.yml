@@ -113,9 +113,9 @@ jobs:
         if: always()
         run: |
           echo "--- Dumping logs for previous kubeflex-controller-manager container ---"
-          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager -p || true
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager -p
           echo "--- Dumping logs for current kubeflex-controller-manager container ---"
-          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager
 
       - name: show Deployment objects in its1
         if: always()
@@ -260,9 +260,9 @@ jobs:
         if: always()
         run: |
           echo "--- Dumping logs for previous kubeflex-controller-manager container ---"
-          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager -p || true
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager -p
           echo "--- Dumping logs for current kubeflex-controller-manager container ---"
-          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
+          kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager
 
       - name: show Deployment objects in its1
         if: always()
@@ -306,7 +306,7 @@ jobs:
 
       - name: show combinedstatuses
         if: always()
-        run: kubectl --context wDds1 get combinedstatuses -A -o yaml
+        run: kubectl --context wds1 get combinedstatuses -A -o yaml
 
       - name: scrape kubestellar controller-manager
         if: always()
