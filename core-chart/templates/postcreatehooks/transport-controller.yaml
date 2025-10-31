@@ -54,22 +54,29 @@ spec:
             name: transport-controller
         spec:
           initContainers:
+          - name: wait-its-create
+            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+            args:
+              - wait
+              - --for=create
+              - cp
+              - '{{"{{.ITSName}}"}}'
+              - --timeout=300s
           - name: wait-its-ready
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             args:
               - wait
               - --for=condition=Ready
-              - cp/its1
-              - --namespace
-              - its1-system
+              - cp
+              - '{{"{{.ITSName}}"}}'
               - --timeout=300s
           - name: copy-its-secret
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             imagePullPolicy: IfNotPresent
             command:
-              - bin/sh
+              - sh
               - -c
-              - 'kubectl get secret/vc-vcluster --namespace its1-system -o yaml | sed "/ownerReferences:/,/^- /d;/namespace:/d;/creationTimestamp:/d;/uid:/d;/resourceVersion:/d;s/\(name: \).*/\1its-kubeconfig/" | kubectl apply -f -'
+              - 'kubectl get secret {{"{{.ITSSecretName}}"}} --namespace {{"{{.ITSSecretNamespace}}"}} -o yaml | sed "/ownerReferences:/,/^- /d;/namespace:/d;/creationTimestamp:/d;/uid:/d;/resourceVersion:/d;s/\(name: \).*/\1its-kubeconfig/" | kubectl apply -f -'
           containers:
           - name: transport-controller
             image: ghcr.io/kubestellar/kubestellar/ocm-transport-controller:{{ .Values.TRANSPORT_VERSION | default .Values.KUBESTELLAR_VERSION }}
