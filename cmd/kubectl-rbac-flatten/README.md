@@ -68,7 +68,7 @@ object, role-ism, and binding --- with the exception of wildcards.
 
 This command can be directed to filter the reported grants to include
 only those that involve a given set of subjects, set of verbs, and/or
-set of objects.
+set of resources.
 
 ## Usage
 
@@ -80,11 +80,20 @@ client command line flags (e.g., `--kubeconfig`, `--context`) plus the
 additional ones listed below.
 
 ```
-  -o, --output-format string             output format, either json or table (default "table")
-      --resources strings                comma-separated list of resources to include; resource syntax is plural.group/subresource; .group and /subresource are omitted when appropriate; '*' means all resources (default [*])
-      --show-role                        include role in listing for resource grans (default true)
+  -o, --output-format string               output format, either json or table (default "table")
+      --resources strings                  comma separated list of resources to focus on; resource syntax is plural.group/subresource; .group and /subresource are omitted when appropriate; '*' means all resources (default [*])
+      --show-role                          include role in listing for resource grans (default true)
+      --subject-service-accounts strings   comma separated list of subject service accounts to focus on; syntax for one is namespace:name; '*' means all
+      --subject-user-groups strings        comma and/or space separated list of subject user groups to focus on; '*' means all
+      --subject-user-names strings         comma separated list of subject user names to focus on; '*' means all
+      --verbs strings                      comma separated list of verbs to focus on; '*' means all (default [*])
 ```
 
+The filtering on subjects is a little irregular, for convenience. If
+`--subject-service-accounts`, `--subject-user-groups`, and
+`--subject-user-names` are all empty lists (which is the default for
+these) then there is no filtering on subject. Otherwise, only the
+specified subjects pass the filter.
 
 ## Output
 
@@ -172,3 +181,39 @@ The columns are as follows.
 - **RESOURCE:** Including API group and subresource. Omitted if exactly 1 resource is being queried for.
 - **OBJNAME:** Name of an individual object. `*` matches all names.
 - **NRURL:** A URL path usable in Non-Resource URLs; `*` matches all paths.
+
+## Examples
+
+### Who can list nodes?
+
+```shell
+go run ./cmd/kubectl-rbac-flatten \
+    --show-role=false \
+    --resources=nodes \
+    --verbs=list \
+    >/tmp/can-list-nodes.txt 2>/tmp/errs.txt
+```
+
+### What can I do with nodes?
+
+First, find out your username and groups.
+
+```console
+mspreitz@mjs13 kubestellar % kubectl auth whoami
+ATTRIBUTE                                  VALUE
+Username                                   mspreitz@us.ibm.com
+UID                                        83ded72e-e466-4ea4-b204-cd881218e405
+Groups                                     [vcp-mspreitz-admin system:authenticated:oauth system:authenticated]
+Extra: scopes.authorization.openshift.io   [user:full]
+```
+
+Then, restrict to my user name and groups.
+
+```shell
+go run ./cmd/kubectl-rbac-flatten \
+    --show-role=false \
+    --resources=nodes \
+    --subject-user-names=mspreitz@us.ibm.com \
+    --subject-user-groups="vcp-mspreitz-admin system:authenticated:oauth system:authenticated" \
+    > /tmp/i-can-nodes.txt 2>/tmp/errs.txt
+```
