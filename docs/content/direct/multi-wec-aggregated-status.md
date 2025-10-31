@@ -67,14 +67,32 @@ A new controller function will handle multi-WEC aggregation:
 
 ---
 
+
 ### 3. Status Aggregation Rules
+
+The aggregation logic depends on the **workload object kind**.
+
+#### Case 1 – Known Workload Kinds
+If the workload kind is **recognized by ArgoCD** (for example Deployment, StatefulSet, DaemonSet, ReplicaSet), the controller applies **predetermined field aggregation rules** consistent with ArgoCD’s native health evaluation.  
+
+Examples:
+- **Deployment:** mark `Available=True` when `availableReplicas == replicas`.
+- **StatefulSet:** mark `Ready=True` when all replicas are `current` and `ready`.
+- **DaemonSet:** mark `Ready=True` when `numberAvailable == desiredNumberScheduled`.
+
+These mappings are defined statically in the controller. No per-field aggregation is performed in this case.
+
+#### Case 2 – Unknown Workload Kinds
+If the workload kind is **not known to ArgoCD**, the controller performs **generic per-field aggregation** to derive a combined `.status`.
 
 | Field Type | Aggregation Logic | Description |
 |-------------|------------------|--------------|
-| **Numeric** | Average or Minimum | Used for fields like replica counts. |
-| **Condition** | Group by `type`; aggregate status accordingly. | Ensures consistent boolean conditions across clusters. |
-| **Timestamp** | Use latest timestamp. | Reflects the most recent update across all WECs. |
-| **String** | Use latest value. | Keeps newest message or reason from clusters. |
+| **Numeric** | Average or Minimum | For counts like `replicas` or `availableReplicas`. |
+| **Condition** | Group by `type`; aggregate per condition type | Use AND for Available/Ready, OR for Progressing/Degraded. |
+| **Timestamp** | Latest timestamp | Reflects the most recent cluster update. |
+| **String** | Latest value | Keeps newest message or reason from clusters. |
+
+This two-step approach keeps aggregation consistent with ArgoCD’s semantics for known workloads while providing a fallback for unknown kinds.
 
 ---
 
