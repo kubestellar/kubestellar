@@ -49,8 +49,15 @@ Logic:
 
 ```yaml
 spec:
-  wantMultiWECReportedState: true
+  clusterSelectors:
+  - matchLabels: {"location": "edge"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name": "nginx-multi"}
+    wantMultiWECReportedState: true
 ```
+
+The flag is defined under each downsync rule, consistent with [example scenario 4](https://docs.kubestellar.io/release-0.28.0/direct/example-scenarios/#scenario-4-singleton-status).
 
 ---
 
@@ -59,8 +66,8 @@ spec:
 A new controller function will handle multi-WEC aggregation:
 
 **Responsibilities:**
-1. Collect `.status` from all target WECs using existing status collection logic.  
-2. Aggregate status data according to defined field rules (numeric, conditions, timestamps, string).  
+1. Collect `.status` from all target WECs using existing status collection logic (see [pkg/status/singletonstatus.go#L64](https://github.com/kubestellar/kubestellar/blob/main/pkg/status/singletonstatus.go#L64)).  
+2. Aggregate status data according to defined field rules (numeric, conditions, timestamps, string) or use a per-kind aggregator if it is a known KIND.  
 3. Update the aggregated `.status` back into the WDS workload object.
 
 **Focus:** Aggregation of fields relevant to ArgoCD health interpretation.
@@ -118,15 +125,15 @@ kind: BindingPolicy
 metadata:
   name: multiwec-nginx
 spec:
-  objectSelector:
-    kind: Deployment
-    namespace: nginx
-    name: nginx-deployment
-  targetClusters:
-    - cluster1
-    - cluster2
-  wantMultiWECReportedState: true
+  clusterSelectors:
+  - matchLabels: {"location": "edge"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name": "nginx-multi"}
+    wantMultiWECReportedState: true
 ```
+
+This example follows the [singleton status example](https://docs.kubestellar.io/release-0.28.0/direct/example-scenarios/#scenario-4-singleton-status) but replaces `wantSingletonReportedState` with `wantMultiWECReportedState`.
 
 After aggregation, the corresponding WDS Deployment status:
 
@@ -142,6 +149,8 @@ status:
       message: "Deployment ready in cluster1, cluster2"
       lastTransitionTime: "2025-11-01T12:34:56Z"
 ```
+# Note: Only fields relevant to ArgoCD's built-in health checks are aggregated.
+# Reference: https://github.com/argoproj/argo-cd/blob/master/gitops-engine/pkg/health/health_deployment.go
 
 ---
 
@@ -151,14 +160,6 @@ status:
 - Confirm ArgoCD displays workloads as *Synced* and *Healthy*.
 - Validate fallback to singleton logic when only one WEC is bound.
 - Add integration tests under `test/e2e/status/` to verify correctness.
-
----
-
-## Future Work
-
-- Weighted aggregation logic based on cluster priority or capacity.
-- Enhanced visualization for per-WEC readiness.
-- Unified CRD version for both singleton and multi-WEC status.
 
 ---
 
