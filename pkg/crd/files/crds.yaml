@@ -294,9 +294,9 @@ spec:
                       items:
                         type: string
                       type: array
-                    wantMultiReportedState:
+                    wantMultiWECReportedState:
                       description: |-
-                        WantMultiReportedState, in short, indicates an expectation that the matching
+                        WantMultiWECReportedState, in short, indicates an expectation that the matching
                         objects are distributed to multiple WECs and requests that .status from each
                         WEC.
                         If object is of known KIND(includes built-in aggregation logic ) then we perform per KIND aggregation of .status from each
@@ -488,9 +488,9 @@ spec:
                           type: array
                         version:
                           type: string
-                        wantMultiReportedState:
+                        wantMultiWECReportedState:
                           description: |-
-                            WantMultiReportedState, in short, indicates an expectation that the matching
+                            WantMultiWECReportedState, in short, indicates an expectation that the matching
                             objects are distributed to multiple WECs and requests that .status from each
                             WEC.
                             If object is of known KIND(includes built-in aggregation logic ) then we perform per KIND aggregation of .status from each
@@ -583,9 +583,9 @@ spec:
                           type: array
                         version:
                           type: string
-                        wantMultiReportedState:
+                        wantMultiWECReportedState:
                           description: |-
-                            WantMultiReportedState, in short, indicates an expectation that the matching
+                            WantMultiWECReportedState, in short, indicates an expectation that the matching
                             objects are distributed to multiple WECs and requests that .status from each
                             WEC.
                             If object is of known KIND(includes built-in aggregation logic ) then we perform per KIND aggregation of .status from each
