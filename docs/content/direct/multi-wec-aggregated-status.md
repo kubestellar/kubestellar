@@ -87,7 +87,7 @@ Examples:
 - **StatefulSet:** mark `Ready=True` when all replicas are `current` and `ready`.
 - **DaemonSet:** mark `Ready=True` when `numberAvailable == desiredNumberScheduled`.
 
-These mappings are defined statically in the controller. No per-field aggregation is performed in this case.
+These mappings are defined statically in the controller. No per-field data type aggregation is performed in this case.
 
 #### Case 2 – Unknown Workload Kinds
 If the workload kind is **not known to ArgoCD**, the controller performs **generic per-field aggregation** to derive a combined `.status`.
