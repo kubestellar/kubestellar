@@ -84,10 +84,10 @@ rojopolis/spellcheck-github-actions:
   tag: 0.52.0
   tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.52.0
 actions/upload-artifact:
-  sha: ea165f8d65b6e75b540449e92b4886f43607fa02
-  sha-url: https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02
-  tag: v4
-  tag-url: https://github.com/actions/upload-artifact/tree/v4
+  sha: 330a01c490aca151604b8cf639adc76d48f6c5d4
+  sha-url: https://github.com/actions/upload-artifact/commit/330a01c490aca151604b8cf639adc76d48f6c5d4
+  tag: v5.0.0
+  tag-url: https://github.com/actions/upload-artifact/tree/v5.0.0
 actions/github-script:
   sha: ed597411d8f924073f98dfc5c65a23a2325f34cd
   sha-url: https://github.com/actions/github-script/commit/ed597411d8f924073f98dfc5c65a23a2325f34cd
