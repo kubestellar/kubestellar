@@ -4,7 +4,6 @@ import { Callout, Tabs } from 'nextra/components'
 import { evaluate } from 'nextra/evaluate'
 import {
   convertToPageMap,
-  mergeMetaWithPageMap,
   normalizePageMap
 } from 'nextra/page-map'
 import { useMDXComponents as getMDXComponents } from '../../../../mdx-components'
@@ -54,7 +53,7 @@ const filePaths = INCLUDE_PREFIXES.length
   )
   : allDocFiles
 
-const { mdxPages, pageMap: _pageMap } = convertToPageMap({
+const { pageMap: _pageMap } = convertToPageMap({
   filePaths,
   basePath
 })

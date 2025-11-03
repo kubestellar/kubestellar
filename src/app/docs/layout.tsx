@@ -15,7 +15,6 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
-import Footer from '@/components/Footer'
 import { pageMap } from './[...slug]/page'
 
 export const metadata = {
