@@ -25,9 +25,9 @@ import (
 )
 
 func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdentifier, nWECs int) error {
-	// TODO: To be implemented
+	// TODO: Implement multiwec handling logic
 	logger := klog.FromContext(ctx)
-	logger.V(4).Info("To be implemented", "object", wObjID, "nWECs", nWECs)
+	logger.V(4).Info("Implement multiwec handling logic", "object", wObjID, "nWECs", nWECs)
 
 	return nil
 }
