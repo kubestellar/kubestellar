@@ -95,6 +95,10 @@ jobs:
           kubectl --context kind-kubeflex get pods -A
           kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
 
+      - name: Dump kubeflex-controller-manager logs
+        if: always()
+        run: kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
+
       - name: show previous logs in hosting cluster
         if: always()
         run: |
@@ -198,16 +202,13 @@ jobs:
             echo "---"
             # Get the full secret JSON once for efficiency
             SECRET_JSON=$(kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o json)
-            
             # 1. Print the Secret's metadata (apiVersion, kind, metadata, type)
             echo "$SECRET_JSON" | jq 'del(.data) | del(.stringData)' | yq -P
-
             # 2. Check for and print redacted .data if it exists
             DATA_BLOCK=$(echo "$SECRET_JSON" | jq '.data | select(. != null and . != {})')
             if [ -n "$DATA_BLOCK" ]; then
               echo "$DATA_BLOCK" | jq '{"data": map_values("<redacted>")}' | yq -P
             fi
-
             # 3. Check for and print redacted .stringData if it exists
             STRING_DATA_BLOCK=$(echo "$SECRET_JSON" | jq '.stringData | select(. != null and . != {})')
             if [ -n "$STRING_DATA_BLOCK" ]; then
@@ -261,7 +262,11 @@ jobs:
         run: |
           date
           kubectl --context kind-kubeflex get pods -A
-          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -p -n $ns $name || true; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+
+      - name: Dump kubeflex-controller-manager logs
+        if: always()
+        run: kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
 
       - name: show previous logs in hosting cluster
         if: always()
@@ -353,7 +358,7 @@ jobs:
           sleep 10
           curl http://localhost:8080/metrics
           kill %
-          
+
       - name: Dump redacted Secret YAMLs
         if: always()
         run: |
@@ -366,16 +371,13 @@ jobs:
             echo "---"
             # Get the full secret JSON once for efficiency
             SECRET_JSON=$(kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o json)
-            
             # 1. Print the Secret's metadata (apiVersion, kind, metadata, type)
             echo "$SECRET_JSON" | jq 'del(.data) | del(.stringData)' | yq -P
-
             # 2. Check for and print redacted .data if it exists
             DATA_BLOCK=$(echo "$SECRET_JSON" | jq '.data | select(. != null and . != {})')
             if [ -n "$DATA_BLOCK" ]; then
               echo "$DATA_BLOCK" | jq '{"data": map_values("<redacted>")}' | yq -P
             fi
-
             # 3. Check for and print redacted .stringData if it exists
             STRING_DATA_BLOCK=$(echo "$SECRET_JSON" | jq '.stringData | select(. != null and . != {})')
             if [ -n "$STRING_DATA_BLOCK" ]; then
