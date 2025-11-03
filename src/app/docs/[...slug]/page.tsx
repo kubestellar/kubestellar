@@ -8,30 +8,28 @@ import {
   normalizePageMap
 } from 'nextra/page-map'
 import { useMDXComponents as getMDXComponents } from '../../../../mdx-components'
+import { convertHtmlScriptsToJsxComments } from '@/lib/transformMdx'  
+import { MermaidComponent } from '@/lib/Mermaid'
+
+export const dynamic = 'force-dynamic'
 
 const user = 'kubestellar'
 const repo = 'kubestellar'
 const branch = 'main'
 const docsPath = 'docs/content/'
-// const filePaths = [
-//   'configs.mdx',
-//   'custom-rules.mdx',
-//   'getting-started.mdx',
-//   'getting-started/parser-options.mdx',
-//   'getting-started/parser.mdx',
-//   'index.mdx'
-// ]
-
-const INCLUDE_PREFIXES: string[] = [
-
-]
+const INCLUDE_PREFIXES: string[] = []
 const basePath = 'docs'
-const headers: Record<string, string> = {
-  'User-Agent': 'kubestellar-docs-dev',
-  'Accept': 'application/vnd.github+json'
-}
-if (process.env.GITHUB_TOKEN) {
-  headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
+
+
+function makeGitHubHeaders(): Record<string, string> {
+  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.GITHUB_PAT
+  const h: Record<string, string> = {
+    'User-Agent': 'kubestellar-docs-dev',
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  }
+  if (token) h.Authorization = `Bearer ${token}`
+  return h
 }
 
 type GitTreeItem = { path: string; type: 'blob' | 'tree' }
@@ -41,10 +39,12 @@ const treeUrl = `https://api.github.com/repos/${user}/${repo}/git/trees/${encode
   branch
 )}?recursive=1`
 
-const treeData: GitTreeResp = await fetch(treeUrl, { headers, cache: 'force-cache' }).then(r =>
-  r.ok ? r.json() : Promise.reject(new Error(`GitHub tree fetch failed: ${r.status}`))
-)
-
+const treeResp = await fetch(treeUrl, { headers: makeGitHubHeaders(), cache: 'no-store' })
+if (!treeResp.ok) {
+  const body = await treeResp.text().catch(() => '')
+  throw new Error(`GitHub tree fetch failed: ${treeResp.status} ${treeResp.statusText} ${body}`)
+}
+const treeData: GitTreeResp = await treeResp.json()
 
 const allDocFiles = treeData.tree?.filter(t => t.type === 'blob' && t.path.startsWith(docsPath) && (t.path.endsWith('.md') || t.path.endsWith('.mdx'))).map(t => t.path.slice(docsPath.length)) ?? []
 
@@ -61,7 +61,6 @@ const { mdxPages, pageMap: _pageMap } = convertToPageMap({
 
 function normalizeRoute(noExtPath: string) {
   let r = noExtPath;
-  // strip folder index files
   r = r.replace(/\/(readme|index)$/i, '');
   r = r.replace(/^(readme|index)$/i, '');
   return r;
@@ -77,11 +76,9 @@ for (const fp of filePaths) {
     routeMap[`content/${noExt}`] = fp;
   }
 
-  // clean route without "content/" and without README/index
   const isIndex = /\/(readme|index)$/i.test(noExt) || /^(readme|index)$/i.test(noExt);
   if (!routeMap[norm] || isIndex) routeMap[norm] = fp;
 
-  // expose normalized route with 'content/' prefix 
   if (norm !== '' && !norm.startsWith('content/')) {
     const contentNorm = `content/${norm}`;
     if (!routeMap[contentNorm] || isIndex) routeMap[contentNorm] = fp;
@@ -96,6 +93,11 @@ const { wrapper: Wrapper, ...components } = getMDXComponents({
   Callout
 })
 
+const component = {
+  ...components,
+  Mermaid: MermaidComponent
+}
+
 type PageProps = Readonly<{
   params: Promise<{
     slug?: string[]
@@ -109,7 +111,6 @@ export default async function Page(props: PageProps) {
 
   console.log(route);
 
-  // Use normalized map instead of mdxPages
   const filePath =
     routeMap[route] ??
     [`${route}.mdx`, `${route}.md`, `${route}/README.md`, `${route}/readme.md`, `${route}/index.mdx`, `${route}/index.md`]
@@ -121,28 +122,23 @@ export default async function Page(props: PageProps) {
 
   const response = await fetch(
     `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${docsPath}${filePath}`,
-    { headers, cache: 'force-cache' }
+    { headers: makeGitHubHeaders(), cache: 'no-store' }
   )
   if (!response.ok) notFound()
 
   const data = await response.text()
-  const processedData = data
-    // Convert HTML comments to JSX comments
-    .replace(/<!--/g, '{/*')
-    .replace(/-->/g, '*/}')
-    .replace(/<br\s*\/?>/gi, '<br />')
-    .replace(/\{\{.*?\}\}/g, '')
-    .replace(/style="border: 0"/g, 'style={{border:"0"}}')
-    .replace(/align=center/g, 'align="center"')
-    .replace(/frameborder="0"/g, 'frameBorder="0"')
-    .replace(/allowfullscreen/g, 'allowFullScreen')
-    .replace(/scrolling=no/g, 'scrolling="no"')
-    .replace(/onload="[^"]*"/g, '')
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
-    .replace(/<\/?ol>/g, '')
-    .replace(/<\/?li>/g, '')
+  const processedData = convertHtmlScriptsToJsxComments(data)
+     .replace(/<br\s*\/?>/gi, '<br />')
+     .replace(/align=center/g, 'align="center"')
+     .replace(/frameborder="0"/g, 'frameBorder="0"')
+     .replace(/allowfullscreen/g, 'allowFullScreen')
+     .replace(/scrolling=no/g, 'scrolling="no"')
+     .replace(/onload="[^"]*"/g, '')
+     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
+     .replace(/<\/?ol>/g, '')
+     .replace(/<\/?li>/g, '')
   const rawJs = await compileMdx(processedData, { filePath })
-  const { default: MDXContent, toc, metadata } = evaluate(rawJs, components)
+  const { default: MDXContent, toc, metadata } = evaluate(rawJs, component)
 
   return (
     <Wrapper toc={toc} metadata={metadata} sourceCode={rawJs}>
