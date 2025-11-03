@@ -79,10 +79,10 @@ technote-space/assign-author:
   tag: v1.6.2
   tag-url: https://github.com/technote-space/assign-author/tree/v1.6.2
 rojopolis/spellcheck-github-actions:
-  sha: 739a1e3ceb79a98a5d4a9bf76f351137f9d78892
-  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/739a1e3ceb79a98a5d4a9bf76f351137f9d78892
-  tag: 0.52.0
-  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.52.0
+  sha: 336d2b4c911d9e582a8e7aa1143f0e862daefbc0
+  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/336d2b4c911d9e582a8e7aa1143f0e862daefbc0
+  tag: 0.53.0
+  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.53.0
 actions/upload-artifact:
   sha: 330a01c490aca151604b8cf639adc76d48f6c5d4
   sha-url: https://github.com/actions/upload-artifact/commit/330a01c490aca151604b8cf639adc76d48f6c5d4
