@@ -66,8 +66,7 @@ jobs:
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz 
-
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
           tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
           rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
@@ -186,6 +185,35 @@ jobs:
           sleep 10
           curl http://localhost:8080/metrics
           kill %
+
+      - name: Dump redacted Secret YAMLs
+        if: always()
+        run: |
+          SECRETS_LIST=$(kubectl --context kind-kubeflex get secrets -A -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{"\n"}{end}')
+          if [ -z "$SECRETS_LIST" ]; then
+            echo "No secrets found."
+            exit 0
+          fi
+          echo "$SECRETS_LIST" | while read -r ns name; do
+            echo "---"
+            # Get the full secret JSON once for efficiency
+            SECRET_JSON=$(kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o json)
+            
+            # 1. Print the Secret's metadata (apiVersion, kind, metadata, type)
+            echo "$SECRET_JSON" | jq 'del(.data) | del(.stringData)' | yq -P
+
+            # 2. Check for and print redacted .data if it exists
+            DATA_BLOCK=$(echo "$SECRET_JSON" | jq '.data | select(. != null and . != {})')
+            if [ -n "$DATA_BLOCK" ]; then
+              echo "$DATA_BLOCK" | jq '{"data": map_values("<redacted>")}' | yq -P
+            fi
+
+            # 3. Check for and print redacted .stringData if it exists
+            STRING_DATA_BLOCK=$(echo "$SECRET_JSON" | jq '.stringData | select(. != null and . != {})')
+            if [ -n "$STRING_DATA_BLOCK" ]; then
+              echo "$STRING_DATA_BLOCK" | jq '{"stringData": map_values("<redacted>")}' | yq -P
+            fi
+          done
 
   test-bash:
     name: Test in bash
@@ -325,3 +353,32 @@ jobs:
           sleep 10
           curl http://localhost:8080/metrics
           kill %
+          
+      - name: Dump redacted Secret YAMLs
+        if: always()
+        run: |
+          SECRETS_LIST=$(kubectl --context kind-kubeflex get secrets -A -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{"\n"}{end}')
+          if [ -z "$SECRETS_LIST" ]; then
+            echo "No secrets found."
+            exit 0
+          fi
+          echo "$SECRETS_LIST" | while read -r ns name; do
+            echo "---"
+            # Get the full secret JSON once for efficiency
+            SECRET_JSON=$(kubectl --context kind-kubeflex get secret "$name" -n "$ns" -o json)
+            
+            # 1. Print the Secret's metadata (apiVersion, kind, metadata, type)
+            echo "$SECRET_JSON" | jq 'del(.data) | del(.stringData)' | yq -P
+
+            # 2. Check for and print redacted .data if it exists
+            DATA_BLOCK=$(echo "$SECRET_JSON" | jq '.data | select(. != null and . != {})')
+            if [ -n "$DATA_BLOCK" ]; then
+              echo "$DATA_BLOCK" | jq '{"data": map_values("<redacted>")}' | yq -P
+            fi
+
+            # 3. Check for and print redacted .stringData if it exists
+            STRING_DATA_BLOCK=$(echo "$SECRET_JSON" | jq '.stringData | select(. != null and . != {})')
+            if [ -n "$STRING_DATA_BLOCK" ]; then
+              echo "$STRING_DATA_BLOCK" | jq '{"stringData": map_values("<redacted>")}' | yq -P
+            fi
+          done
