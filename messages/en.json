@@ -531,5 +531,63 @@
       "communityMeetingsButton": "Community Meetings",
       "viewIssuesButton": "View Open Issues"
     }
+  },
+  "partnersPage": {
+    "title": "Our",
+    "titleSpan": "Partners",
+    "subtitle": "Collaborating with leading open source projects to enhance multi-cluster Kubernetes orchestration",
+    "learnMore": "Learn More",
+    "partners": {
+      "argocd": {
+        "description": "Declarative GitOps continuous delivery tool for Kubernetes that automates application deployment and lifecycle management."
+      },
+      "fluxcd": {
+        "description": "Progressive delivery tool for Kubernetes that enables automated deployments from Git repositories with powerful GitOps capabilities."
+      },
+      "kyverno": {
+        "description": "Kubernetes-native policy management solution that validates, mutates, and generates configurations using declarative policies."
+      },
+      "mvi": {
+        "description": "Multi-cluster visibility and insights platform providing comprehensive monitoring and analytics across distributed Kubernetes environments."
+      },
+      "openziti": {
+        "description": "Zero trust network overlay and edge application platform providing secure connectivity for distributed applications."
+      },
+      "turbonomic": {
+        "description": "Application resource management platform that ensures application performance while optimizing infrastructure costs through AI-driven automation."
+      }
+    },
+    "whyPartner": {
+      "title": "Why Partner With Us",
+      "subtitle": "Join our ecosystem of innovative partners to shape the future of multi-cluster Kubernetes management",
+      "benefits": [
+        {
+          "title": "Innovation",
+          "description": "Collaborate on cutting-edge multi-cluster orchestration solutions"
+        },
+        {
+          "title": "Community",
+          "description": "Connect with a vibrant ecosystem of cloud-native developers and organizations"
+        },
+        {
+          "title": "Excellence",
+          "description": "Drive industry standards and best practices in Kubernetes orchestration"
+        }
+      ]
+    },
+    "partnershipOpportunities": {
+      "title": "Become a Partner",
+      "subtitle": "Join forces with KubeStellar to drive innovation in multi-cluster Kubernetes orchestration and expand your reach in the cloud-native ecosystem.",
+      "description": "Our partnership program is designed to foster collaboration with technology providers, cloud platforms, and service integrators who share our vision of simplifying multi-cluster Kubernetes management. Together, we can deliver comprehensive solutions that empower enterprises to manage their distributed workloads seamlessly.",
+      "features": [
+        "Technical integration support and engineering resources",
+        "Joint go-to-market initiatives and co-marketing opportunities",
+        "Access to our growing community of cloud-native practitioners",
+        "Featured placement on our partners page and documentation",
+        "Collaborative product development and roadmap input",
+        "Priority support and dedicated partnership manager"
+      ],
+      "contactButton": "Get in Touch"
+    }
   }
 }

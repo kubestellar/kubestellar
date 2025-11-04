@@ -1602,6 +1602,24 @@ html:not(.dark) .nextra-sidebar-container {
   }
 }
 
+@keyframes slide-partners {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-2544px));
+  }
+}
+
+.animate-slide-partners {
+  animation: slide-partners 30s linear infinite;
+  will-change: transform;
+}
+
+.animate-slide-partners.pause-animation {
+  animation-play-state: paused;
+}
+
 .animate-spin-slow {
   animation: spin 20s linear infinite;
 }

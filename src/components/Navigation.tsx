@@ -504,8 +504,8 @@ export default function Navigation() {
                     </svg>
                     {t("contactUs")}
                   </a>
-                  <a
-                    href="#partners"
+                  <Link
+                    href="/partners"
                     className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md"
                   >
                     <svg
@@ -522,7 +522,7 @@ export default function Navigation() {
                       ></path>
                     </svg>
                     {t("partners")}
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
