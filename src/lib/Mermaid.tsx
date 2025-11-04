@@ -1,30 +1,34 @@
-'use client'
+"use client";
 
-import { useEffect, useRef } from 'react'
-import mermaid from 'mermaid'
+import { useEffect, useRef } from "react";
+import mermaid from "mermaid";
 
-mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+mermaid.initialize({ startOnLoad: false, theme: "neutral" });
 
 type MermaidProps = {
-  children: string
-}
+  children: string;
+};
 
 export const MermaidComponent = ({ children }: MermaidProps) => {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null);
   const chart = children;
 
   useEffect(() => {
     if (ref.current && chart) {
-      ref.current.innerHTML = '';
+      ref.current.innerHTML = "";
       mermaid.run({
         nodes: [ref.current],
       });
     }
-  }, [chart])
+  }, [chart]);
 
   if (!chart) {
-    return null
+    return null;
   }
 
-  return <div className="mermaid" ref={ref}>{chart}</div>
-}
+  return (
+    <div className="mermaid" ref={ref}>
+      {chart}
+    </div>
+  );
+};

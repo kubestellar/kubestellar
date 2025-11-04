@@ -115,48 +115,54 @@ export default function PartnersPage() {
             <div className="relative overflow-hidden">
               <div className="flex gap-6 animate-slide-partners group-hover:pause">
                 {/* Triple the partners for seamless infinite loop */}
-                {[...partners, ...partners, ...partners].map((partner, index) => (
-                  <div
-                    key={index}
-                    className="flex-shrink-0 w-[400px] group/card"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.closest('.animate-slide-partners')?.classList.add('pause-animation');
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.closest('.animate-slide-partners')?.classList.remove('pause-animation');
-                    }}
-                  >
-                    <Link
-                      href={partner.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="relative block bg-slate-800/50 border border-slate-700 rounded-2xl p-10 h-96 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50"
+                {[...partners, ...partners, ...partners].map(
+                  (partner, index) => (
+                    <div
+                      key={index}
+                      className="flex-shrink-0 w-[400px] group/card"
+                      onMouseEnter={e => {
+                        e.currentTarget
+                          .closest(".animate-slide-partners")
+                          ?.classList.add("pause-animation");
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget
+                          .closest(".animate-slide-partners")
+                          ?.classList.remove("pause-animation");
+                      }}
                     >
-                      <div className="transition-all duration-300 group-hover/card:-translate-y-2 h-full flex flex-col">
-                        <div className="mb-6">
-                          <Image
-                            src={partner.logo}
-                            alt={`${partner.name} logo`}
-                            width={partner.slug === "argocd" ? 130 : 96}
-                            height={partner.slug === "argocd" ? 130 : 96}
-                            className={`${partner.slug === "argocd" ? "w-[130px] h-[130px]" : "w-24 h-24"} object-contain ${partner.slug === "mvi" || partner.slug === "turbonomic" ? "bg-white rounded-lg p-2" : ""}`}
-                          />
+                      <Link
+                        href={partner.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="relative block bg-slate-800/50 border border-slate-700 rounded-2xl p-10 h-96 overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50"
+                      >
+                        <div className="transition-all duration-300 group-hover/card:-translate-y-2 h-full flex flex-col">
+                          <div className="mb-6">
+                            <Image
+                              src={partner.logo}
+                              alt={`${partner.name} logo`}
+                              width={partner.slug === "argocd" ? 130 : 96}
+                              height={partner.slug === "argocd" ? 130 : 96}
+                              className={`${partner.slug === "argocd" ? "w-[130px] h-[130px]" : "w-24 h-24"} object-contain ${partner.slug === "mvi" || partner.slug === "turbonomic" ? "bg-white rounded-lg p-2" : ""}`}
+                            />
+                          </div>
+                          <h3 className="text-3xl font-bold text-white mb-5">
+                            {partner.name}
+                          </h3>
+                          <p className="text-gray-300 leading-relaxed text-base flex-grow">
+                            {partner.description}
+                          </p>
                         </div>
-                        <h3 className="text-3xl font-bold text-white mb-5">
-                          {partner.name}
-                        </h3>
-                        <p className="text-gray-300 leading-relaxed text-base flex-grow">
-                          {partner.description}
-                        </p>
-                      </div>
-                      <div className="absolute bottom-6 right-6 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300">
-                        <span className="learn-more-enhanced">
-                          {t("learnMore")}
-                        </span>
-                      </div>
-                    </Link>
-                  </div>
-                ))}
+                        <div className="absolute bottom-6 right-6 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300">
+                          <span className="learn-more-enhanced">
+                            {t("learnMore")}
+                          </span>
+                        </div>
+                      </Link>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -307,42 +313,114 @@ export default function PartnersPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <ul className="space-y-2">
                       <li className="flex items-start">
-                        <svg className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
-                        <span className="text-gray-300">{t("partnershipOpportunities.features.0")}</span>
+                        <span className="text-gray-300">
+                          {t("partnershipOpportunities.features.0")}
+                        </span>
                       </li>
                       <li className="flex items-start">
-                        <svg className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
-                        <span className="text-gray-300">{t("partnershipOpportunities.features.1")}</span>
+                        <span className="text-gray-300">
+                          {t("partnershipOpportunities.features.1")}
+                        </span>
                       </li>
                       <li className="flex items-start">
-                        <svg className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
-                        <span className="text-gray-300">{t("partnershipOpportunities.features.2")}</span>
+                        <span className="text-gray-300">
+                          {t("partnershipOpportunities.features.2")}
+                        </span>
                       </li>
                     </ul>
                     <ul className="space-y-2">
                       <li className="flex items-start">
-                        <svg className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
-                        <span className="text-gray-300">{t("partnershipOpportunities.features.3")}</span>
+                        <span className="text-gray-300">
+                          {t("partnershipOpportunities.features.3")}
+                        </span>
                       </li>
                       <li className="flex items-start">
-                        <svg className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
-                        <span className="text-gray-300">{t("partnershipOpportunities.features.4")}</span>
+                        <span className="text-gray-300">
+                          {t("partnershipOpportunities.features.4")}
+                        </span>
                       </li>
                       <li className="flex items-start">
-                        <svg className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-5 h-5 text-green-400 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
-                        <span className="text-gray-300">{t("partnershipOpportunities.features.5")}</span>
+                        <span className="text-gray-300">
+                          {t("partnershipOpportunities.features.5")}
+                        </span>
                       </li>
                     </ul>
                   </div>
@@ -370,7 +448,7 @@ export default function PartnersPage() {
                     </svg>
                     {t("partnershipOpportunities.contactButton")}
                   </a>
-                  
+
                   <a
                     href="https://kubestellar.io/slack"
                     target="_blank"

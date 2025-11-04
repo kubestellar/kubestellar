@@ -184,27 +184,81 @@
     "cases": {
       "edge": {
         "title": "Edge Computing",
-        "description": "Deploy applications across edge locations with centralized management. Ideal for retail, manufacturing, and telecom with distributed infrastructure."
+        "description": "Deploy applications across edge locations with centralized management. Ideal for retail, manufacturing, and telecom with distributed infrastructure.",
+        "backContent": {
+          "title": "Edge Computing Excellence",
+          "description": "Deploy applications across edge locations with intelligent workload distribution. KubeStellar automatically manages resource allocation, ensures low-latency connectivity, and maintains consistency across your edge infrastructure.",
+          "features": [
+            "Automatic edge deployment",
+            "Low-latency optimization",
+            "Resource intelligent distribution"
+          ]
+        }
       },
       "compliance": {
         "title": "Multi-Region Compliance",
-        "description": "Deploy applications with specific regional compliance requirements. Ensure data residency and regulatory compliance across global operations."
+        "description": "Deploy applications with specific regional compliance requirements. Ensure data residency and regulatory compliance across global operations.",
+        "backContent": {
+          "title": "Security & Compliance",
+          "description": "Enforce security policies and compliance requirements across all clusters with centralized governance. Automated policy distribution ensures consistent security posture throughout your infrastructure.",
+          "features": [
+            "Centralized policy management",
+            "Automated compliance checks",
+            "Security posture monitoring"
+          ]
+        }
       },
       "hybrid": {
         "title": "Hybrid/Multi-Cloud",
-        "description": "Seamlessly manage workloads across multiple cloud providers and on-premises infrastructure with unified policies and consistent experience."
+        "description": "Seamlessly manage workloads across multiple cloud providers and on-premises infrastructure with unified policies and consistent experience.",
+        "backContent": {
+          "title": "Hybrid Cloud Mastery",
+          "description": "Seamlessly connect and manage workloads across public clouds, private data centers, and edge locations. Enable true hybrid deployment with unified management and automated failover capabilities.",
+          "features": [
+            "Multi-cloud orchestration",
+            "Unified management plane",
+            "Automated failover & recovery"
+          ]
+        }
       },
       "dr": {
         "title": "Disaster Recovery",
-        "description": "Implement robust disaster recovery strategies with automatic workload replication and failover across multiple clusters in different regions."
+        "description": "Implement robust disaster recovery strategies with automatic workload replication and failover across multiple clusters in different regions.",
+        "backContent": {
+          "title": "Disaster Recovery",
+          "description": "Implement robust disaster recovery strategies with automated backup, replication, and restoration capabilities. Ensure business continuity with multi-region deployment and instant failover mechanisms.",
+          "features": [
+            "Automated backup & replication",
+            "Multi-region deployment",
+            "Instant failover capabilities"
+          ]
+        }
       },
       "multitenant": {
         "title": "Multi-Tenant Isolation",
-        "description": "Create isolated environments for different teams or customers while maintaining centralized control. Ideal for SaaS providers and large enterprises."
+        "description": "Create isolated environments for different teams or customers while maintaining centralized control. Ideal for SaaS providers and large enterprises.",
+        "backContent": {
+          "title": "Multi-Tenant Architecture",
+          "description": "Support multiple tenants with isolated environments while maximizing resource efficiency. Implement tenant-specific policies, resource quotas, and secure data separation across your clusters.",
+          "features": [
+            "Tenant isolation & security",
+            "Resource quota management",
+            "Scalable multi-tenancy"
+          ]
+        }
       },
       "performance": {
         "title": "Performance Optimization",
-        "description": "Deploy workloads closest to users or data sources for optimal performance, reducing latency and improving user experience across global operations."
+        "description": "Deploy workloads closest to users or data sources for optimal performance, reducing latency and improving user experience across global operations.",
+        "backContent": {
+          "title": "Performance Optimization",
+          "description": "Optimize application performance with intelligent resource allocation, auto-scaling, and load balancing across clusters. Monitor and improve performance metrics in real-time.",
+          "features": [
+            "Intelligent resource allocation",
+            "Auto-scaling optimization",
+            "Real-time performance monitoring"
+          ]
+        }
       }
     }
   },

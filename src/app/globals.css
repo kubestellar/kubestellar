@@ -1654,3 +1654,12 @@ html:not(.dark) .nextra-sidebar-container {
     opacity: 0.7;
   }
 }
+
+/* 3D Card Flip Effects */
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}

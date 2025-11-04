@@ -128,6 +128,15 @@ export default function UseCasesSection() {
       borderColor: "bg-blue-500",
       iconBgColor: "bg-blue-400/20",
       hoverBorderColor: "hover:border-[#60A5FA]",
+      backContent: {
+        title: t("cases.edge.backContent.title"),
+        description: t("cases.edge.backContent.description"),
+        features: [
+          t("cases.edge.backContent.features.0"),
+          t("cases.edge.backContent.features.1"),
+          t("cases.edge.backContent.features.2"),
+        ],
+      },
     },
     {
       icon: "security",
@@ -136,6 +145,15 @@ export default function UseCasesSection() {
       borderColor: "bg-purple-500",
       iconBgColor: "bg-purple-400/20",
       hoverBorderColor: "hover:border-[#C084FC]",
+      backContent: {
+        title: t("cases.compliance.backContent.title"),
+        description: t("cases.compliance.backContent.description"),
+        features: [
+          t("cases.compliance.backContent.features.0"),
+          t("cases.compliance.backContent.features.1"),
+          t("cases.compliance.backContent.features.2"),
+        ],
+      },
     },
     {
       icon: "power",
@@ -144,6 +162,15 @@ export default function UseCasesSection() {
       borderColor: "bg-green-500",
       iconBgColor: "bg-green-400/20",
       hoverBorderColor: "hover:border-[#4ADE80]",
+      backContent: {
+        title: t("cases.hybrid.backContent.title"),
+        description: t("cases.hybrid.backContent.description"),
+        features: [
+          t("cases.hybrid.backContent.features.0"),
+          t("cases.hybrid.backContent.features.1"),
+          t("cases.hybrid.backContent.features.2"),
+        ],
+      },
     },
     {
       icon: "clock",
@@ -152,6 +179,15 @@ export default function UseCasesSection() {
       borderColor: "bg-red-500",
       iconBgColor: "bg-red-400/20",
       hoverBorderColor: "hover:border-[#F87171]",
+      backContent: {
+        title: t("cases.dr.backContent.title"),
+        description: t("cases.dr.backContent.description"),
+        features: [
+          t("cases.dr.backContent.features.0"),
+          t("cases.dr.backContent.features.1"),
+          t("cases.dr.backContent.features.2"),
+        ],
+      },
     },
     {
       icon: "cloud",
@@ -160,6 +196,15 @@ export default function UseCasesSection() {
       borderColor: "bg-yellow-500",
       iconBgColor: "bg-yellow-400/20",
       hoverBorderColor: "hover:border-[#FACC15]",
+      backContent: {
+        title: t("cases.multitenant.backContent.title"),
+        description: t("cases.multitenant.backContent.description"),
+        features: [
+          t("cases.multitenant.backContent.features.0"),
+          t("cases.multitenant.backContent.features.1"),
+          t("cases.multitenant.backContent.features.2"),
+        ],
+      },
     },
     {
       icon: "network",
@@ -168,6 +213,15 @@ export default function UseCasesSection() {
       borderColor: "bg-indigo-500",
       iconBgColor: "bg-indigo-400/20",
       hoverBorderColor: "hover:border-[#818CF8]",
+      backContent: {
+        title: t("cases.performance.backContent.title"),
+        description: t("cases.performance.backContent.description"),
+        features: [
+          t("cases.performance.backContent.features.0"),
+          t("cases.performance.backContent.features.1"),
+          t("cases.performance.backContent.features.2"),
+        ],
+      },
     },
   ];
 
@@ -202,46 +256,94 @@ export default function UseCasesSection() {
           {useCases.map((useCase, index) => (
             <div
               key={index}
-              className={`group relative rounded-lg overflow-hidden border border-gray-700 transition-all duration-300 ${useCase.hoverBorderColor} hover:shadow-2xl hover:shadow-gray-900/50 hover:-translate-y-2 hover:scale-105 cursor-pointer w-full max-w-sm h-[280px] bg-gray-800 z-10`}
+              className="group relative w-full max-w-sm h-[320px]"
+              style={{ perspective: "1000px" }}
             >
-              {/* Top colored border */}
-              <div className={`h-2 ${useCase.borderColor}`}></div>
-
-              <div className="p-6">
-                {/* Logo container */}
+              <div
+                className="relative w-full h-full transition-transform duration-700 cursor-pointer"
+                style={{
+                  transformStyle: "preserve-3d",
+                  transform: "rotateY(0deg)",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "rotateY(180deg)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "rotateY(0deg)";
+                }}
+              >
+                {/* Front Face */}
                 <div
-                  className={`${useCase.iconBgColor} rounded-lg flex items-center justify-center mb-4 w-12 h-12`}
+                  className="absolute inset-0 w-full h-full bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50"
+                  style={{ backfaceVisibility: "hidden" }}
                 >
-                  {getIcon(useCase.icon)}
+                  <div className="p-6 h-full flex flex-col">
+                    {/* Logo container */}
+                    <div
+                      className={`${useCase.iconBgColor} rounded-lg flex items-center justify-center mb-6 w-14 h-14 backdrop-blur-sm border border-white/10`}
+                    >
+                      <div className="scale-110">{getIcon(useCase.icon)}</div>
+                    </div>
+
+                    {/* Main heading */}
+                    <h3 className="font-bold text-white mb-5 transition-colors duration-300 group-hover:text-blue-300 text-xl leading-7">
+                      {useCase.title}
+                    </h3>
+
+                    {/* Description text */}
+                    <p className="text-gray-300 font-normal transition-colors duration-300 group-hover:text-gray-200 text-base leading-6 line-clamp-6 flex-grow">
+                      {useCase.description}
+                    </p>
+
+                    {/* Hover indicator */}
+                    <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="text-sm text-purple-400 font-medium">
+                        Hover to learn more →
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Main heading */}
-                <h3 className="font-bold text-white mb-4 transition-colors duration-300 group-hover:text-blue-300 text-lg leading-7 overflow-hidden">
-                  {useCase.title}
-                </h3>
+                {/* Back Face */}
+                <div
+                  className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-900/60 via-slate-800/60 to-blue-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl overflow-hidden"
+                  style={{
+                    backfaceVisibility: "hidden",
+                    transform: "rotateY(180deg)",
+                  }}
+                >
+                  <div className="p-6 h-full flex flex-col justify-center">
+                    {/* Enhanced title */}
+                    <h3 className="font-bold text-white mb-4 text-xl text-center">
+                      {useCase.backContent.title}
+                    </h3>
 
-                {/* Description text */}
-                <p className="text-gray-300 font-normal mb-2 transition-colors duration-300 group-hover:text-gray-200 text-sm leading-5 overflow-hidden line-clamp-4">
-                  {useCase.description}
-                </p>
+                    {/* Enhanced description */}
+                    <p className="text-gray-200 text-sm leading-relaxed mb-6 text-center">
+                      {useCase.backContent.description}
+                    </p>
 
-                {/* Learn more button */}
-                <button className="text-blue-400 font-medium hover:text-blue-300 transition-all duration-300 flex items-center text-sm hover:scale-110 transform origin-left">
-                  {t("learnMore")}
-                  <svg
-                    className="ml-1 w-4 h-4 transition-transform duration-300 hover:scale-125"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M14 5l7 7m0 0l-7 7m7-7H3"
-                    />
-                  </svg>
-                </button>
+                    {/* Features list */}
+                    <div className="space-y-2 mb-6">
+                      {useCase.backContent.features.map(
+                        (feature, featureIndex) => (
+                          <div
+                            key={featureIndex}
+                            className="flex items-center text-xs"
+                          >
+                            <div className="w-1.5 h-1.5 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mr-2 flex-shrink-0"></div>
+                            <span className="text-gray-300">{feature}</span>
+                          </div>
+                        )
+                      )}
+                    </div>
+
+                    {/* Decorative element */}
+                    <div className="flex justify-center">
+                      <div className="w-12 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
