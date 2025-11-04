@@ -606,16 +606,29 @@
         "metric": "Metric",
         "requirement": "Requirement (Per 2 Months)",
         "helpWantedIssues": "\"Help Wanted\" Issues",
+        "helpWantedIssuesValue": "≥ 2",
         "prsMerged": "PRs Merged",
+        "prsMergedValue": "≥ 3",
         "prReviews": "PR Reviews or Constructive Comments",
-        "meetingAttendance": "Community Meeting Attendance"
+        "prReviewsValue": "≥ 8",
+        "meetingAttendance": "Community Meeting Attendance",
+        "meetingAttendanceValue": "≥ 3"
       }
     },
     "callToAction": {
       "title": "Ready to Start Your Journey?",
       "subtitle": "Join the KubeStellar community and begin climbing the maintainer ladder today",
       "communityMeetingsButton": "Community Meetings",
-      "viewIssuesButton": "View Open Issues"
+      "viewIssuesButton": "View Open Issues",
+      "exploreCodeTitle": "Explore Code",
+      "exploreCodeDescription": "Browse our codebase and contribute to the project",
+      "viewRepositoryLink": "View Repository →",
+      "joinSlackTitle": "Join Slack",
+      "joinSlackDescription": "Connect with the community for real-time discussions",
+      "joinCommunityLink": "Join Community →",
+      "learnGuideTitle": "Learn Guide",
+      "learnGuideDescription": "Read our comprehensive contribution handbook",
+      "viewHandbookLink": "View Handbook →"
     }
   },
   "partnersPage": {

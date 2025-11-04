@@ -294,13 +294,6 @@ export default function UseCasesSection() {
                     <p className="text-gray-300 font-normal transition-colors duration-300 group-hover:text-gray-200 text-base leading-6 line-clamp-6 flex-grow">
                       {useCase.description}
                     </p>
-
-                    {/* Hover indicator */}
-                    <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="text-sm text-purple-400 font-medium">
-                        Hover to learn more →
-                      </span>
-                    </div>
                   </div>
                 </div>
 

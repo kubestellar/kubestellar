@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Link as IntlLink } from "@/i18n/navigation";
 import { GridLines, StarField, GlobeAnimation } from "../index";
@@ -8,6 +8,22 @@ import { useTranslations } from "next-intl";
 
 export default function HeroSection() {
   const t = useTranslations("heroSection");
+  const [copied, setCopied] = useState(false);
+
+  const installScript = `bash <(curl -s \\
+  https://raw.githubusercontent.com/kubestellar/ \\
+  kubestellar/refs/tags/v0.27.2/scripts/ \\
+  create-kubestellar-demo-env.sh) --platform kind`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(installScript);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
   useEffect(() => {
     // Enhanced typing animation for terminal
     const initTypingAnimation = () => {
@@ -158,6 +174,54 @@ export default function HeroSection() {
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
                     <span className="text-green-400 text-xs">READY</span>
                   </div>
+
+                  {/* Copy Button */}
+                  <button
+                    onClick={handleCopy}
+                    className={`copy-button ml-3 p-2 rounded-md bg-gray-700/50 hover:bg-gray-600/50 
+                              border border-gray-600/50 hover:border-gray-500/50 
+                              transition-all duration-200 group relative ${copied ? "copy-success" : ""}`}
+                    title="Copy installation script"
+                  >
+                    {copied ? (
+                      <svg
+                        className="w-4 h-4 text-green-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-4 h-4 text-gray-400 group-hover:text-gray-200 transition-colors"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        />
+                      </svg>
+                    )}
+
+                    {/* Tooltip */}
+                    <div
+                      className="absolute -top-10 right-0 bg-gray-800 text-white text-xs 
+                                    px-2 py-1 rounded opacity-0 group-hover:opacity-100 
+                                    transition-opacity duration-200 whitespace-nowrap z-50"
+                    >
+                      {copied ? "Copied!" : "Copy script"}
+                    </div>
+                  </button>
                 </div>
 
                 {/* Terminal Content */}

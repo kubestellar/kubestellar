@@ -1663,3 +1663,38 @@ html:not(.dark) .nextra-sidebar-container {
 .preserve-3d {
   transform-style: preserve-3d;
 }
+
+/* Copy Button Animations */
+@keyframes copy-success {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.copy-button:active {
+  transform: scale(0.95);
+}
+
+.copy-button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.copy-button svg {
+  transition: all 0.2s ease;
+}
+
+.copy-button:hover svg {
+  transform: scale(1.1);
+}
+
+/* Copy success animation */
+.copy-success {
+  animation: copy-success 0.3s ease;
+}

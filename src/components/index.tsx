@@ -6,3 +6,4 @@ export {
   LanguageSwitcherMinimal,
   LanguageSwitcherFull,
 } from "./LanguageSwitcher";
+export { default as ContributionCallToAction } from "./ContributionCallToAction";
