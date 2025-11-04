@@ -32,7 +32,7 @@ is_installed() {
     # $3 == command to get the version, unstructured
     # $4 == command to get the version for lexicographic comparison
     # $5 == help
-    # $6 == min required version
+    # $6 == min required version (empty string to use only $7 and $8)
     # (optional) $7 == another, numerically higher lexically lower, min version (covering case of roll from 9 to 10)
     # (optional) $8 == exclusive upper bound on version (required if $7 given)
     wantver="$6"
@@ -43,10 +43,16 @@ is_installed() {
             gotver=$(eval "$4" 2> /dev/null)
             echo -e "\033[0;32m\xE2\x9C\x94\033[0m $1 ($gotver)"
             echov "  version (unstructured): $(eval "$3" 2> /dev/null)"
-            if ! [[ "$gotver" < "$wantver" ]]; then : OK, easy case
+            if [ -n "$wantver" ] && ! [[ "$gotver" < "$wantver" ]]; then : OK, easy case
             elif [ -n "$exclver" ] && [[ "$gotver" < "$exclver" ]] && ! [[ "$gotver" < "$addlver" ]]; then : OK, hard case
-            else
-                echo -e "\033[0;31mX\033[0m  structured version '$gotver' is less than required minimum '$wantver'" $([ -z "$addlver" ] || echo or "'$addlver' but less than '$exclver'") >&2
+            else # failed, now report it reasonably
+                if [ -z "$exclver" ]; then
+                    echo -e "\033[0;31mX\033[0m  structured version '$gotver' is less than required minimum '$wantver'" >&2
+                elif [ -z "$wantver" ]; then
+                    echo -e "\033[0;31mX\033[0m  structured version '$gotver' is not between '$addlver' (inclusive) and '$exclver' (exclusive)" >&2
+                else
+                    echo -e "\033[0;31mX\033[0m  structured version '$gotver' is either less than '$wantver' or not between '$addlver' (inclusive) and '$exclver' (exclusive)" >&2
+		fi
                 exit 2
             fi
         else
@@ -217,7 +223,7 @@ is_installed_ocm() {
         'clusteradm version 2> /dev/null | grep ^client' \
         "clusteradm version 2> /dev/null | grep ^client | awk '"'{ print $3 }'"'" \
         'bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh) 0.10.1' \
-        :v0.10 \
+        "" \
         :v0.10 \
         :v0.11
 }
