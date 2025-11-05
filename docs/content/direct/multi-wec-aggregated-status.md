@@ -30,6 +30,8 @@ This leads to limited visibility in ArgoCD, where workloads appear as *Unknown*,
 
 KubeStellar already collects per-WEC status in `WorkStatus` objects. This enhancement propagates that aggregated information into the `.status` field of the original workload object in the WDS, enabling ArgoCD and similar tools to observe combined readiness and health across all WECs.
 
+This ensures required status fields are populated correctly but not limited to only that. We provide best effort to aggregate other status fields as much as possible.
+
 Key objectives:  
 - Maintain backward compatibility when `wantMultiWECReportedState` is false, preserving existing behavior.  
 - When `wantMultiWECReportedState` is enabled, provide fallback to the singleton mechanism if only one WEC is bound.  
