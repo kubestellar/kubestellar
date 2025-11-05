@@ -59,6 +59,7 @@
     "joinIn": "Join In",
     "contributeHandbook": "Contribute Handbook",
     "quickInstallation": "Quick Installation",
+    "products": "Products",
     "security": "Security",
     "community": "Community",
     "getInvolved": "Get Involved",
@@ -147,6 +148,8 @@
     "card2Description": "Connect with other users, contributors, and maintainers through Slack, forums, and community calls.",
     "card2Button1": "Slack",
     "card2Button2": "GitHub",
+    "card2Button3": "Products",
+    "card2Button4": "Handbook",
     "card3Title": "Explore Documentation",
     "card3Description": "Comprehensive guides, tutorials, and API references to help you master KubeStellar's capabilities.",
     "card3Link1": "Getting Started",
@@ -527,6 +530,35 @@
             }
           ]
         }
+      }
+    }
+  },
+  "productsPage": {
+    "title": "Our",
+    "titleSpan": "Products",
+    "subtitle": "Discover our suite of tools and platforms that enhance the KubeStellar ecosystem and empower multi-cluster Kubernetes management.",
+    "repoButton": "Repository",
+    "websiteButton": "Website",
+    "products": {
+      "kubestellarUI": {
+        "name": "KubeStellar UI",
+        "fullName": "KubeStellar UI",
+        "description": "A powerful web-based interface for managing multi-cluster Kubernetes orchestration with intuitive dashboards, real-time monitoring, and comprehensive controls for streamlined cluster management. Features advanced visualization tools, customizable workspaces, and intelligent alerts to optimize your multi-cluster operations."
+      },
+      "kubeflex": {
+        "name": "KubeFlex",
+        "fullName": "KubeFlex",
+        "description": "A flexible Kubernetes management platform providing comprehensive tools and resources for multi-cluster orchestration and workload distribution. Enables dynamic cluster provisioning, automated scaling, and intelligent resource allocation across heterogeneous environments. Simplifies complex deployment scenarios with policy-driven automation."
+      },
+      "a2a": {
+        "name": "A2A",
+        "fullName": "A2A",
+        "description": "Application-to-Application communication platform enabling seamless connectivity within the KubeStellar ecosystem. Facilitates secure data exchange and real-time communication between distributed microservices. Provides advanced routing, load balancing, and service discovery capabilities for complex multi-cluster deployments."
+      },
+      "galaxyMarketplace": {
+        "name": "Galaxy Marketplace",
+        "fullName": "KS Galaxy Marketplace",
+        "description": "A centralized marketplace for KubeStellar extensions, plugins, and community-contributed tools and integrations. Discover, install, and manage third-party components to enhance your multi-cluster orchestration capabilities. Features automated compatibility checking, version management, and seamless integration with existing KubeStellar deployments."
       }
     }
   },
