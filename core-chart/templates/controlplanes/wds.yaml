@@ -52,10 +52,10 @@ spec:
       vars:
         WDSSecretName: admin-kubeconfig
         WDSkubeconfig: kubeconfig-incluster
-        ITSName: '{{ $ITSName }}'
         ITSSecretName: '{{ $ITSSecretName }}'
         ITSSecretNamespace: '{{ $ITSSecretNamespace }}'
         ITSkubeconfig: '{{ $ITSkubeconfig }}'
   globalVars:
     ControlPlaneName: {{ .name }}
+    ITSName: '{{ $ITSName }}'
 {{- end }}
