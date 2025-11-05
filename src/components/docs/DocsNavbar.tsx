@@ -257,7 +257,7 @@ export default function DocsNavbar() {
                 Join In
               </Link>
               <Link
-                href="/community-handbook"
+                href="/contribute-handbook"
                 className={dropdownItemClasses}
               >
                 <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -773,7 +773,7 @@ export default function DocsNavbar() {
             }`}>
               Join In
             </Link>
-            <Link href="/community-handbook" className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/contribute-handbook" className={`block px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'

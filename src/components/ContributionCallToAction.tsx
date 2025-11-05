@@ -190,7 +190,7 @@ export default function ContributionCallToAction() {
               {t("learnGuideDescription")}
             </p>
             <IntlLink
-              href="/community-handbook"
+              href="/contribute-handbook"
               className="block text-center text-blue-300 hover:text-blue-200 font-medium"
             >
               {t("viewHandbookLink")}

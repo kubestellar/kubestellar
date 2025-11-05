@@ -326,7 +326,7 @@ export default function Navigation() {
                     {t("joinIn")}
                   </a>
                   <Link
-                    href="/community-handbook"
+                    href="/contribute-handbook"
                     className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
                   >
                     <svg
@@ -530,52 +530,6 @@ export default function Navigation() {
 
           {/* Right side: Controls */}
           <div className="flex items-center space-x-4">
-            {/* Version Dropdown */}
-            <div className="relative group" data-dropdown>
-              <button
-                data-dropdown-button
-                className="text-sm font-medium text-gray-300 hover:text-indigo-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-indigo-500/10 hover:shadow-lg hover:shadow-indigo-500/20 hover:scale-100 transform nav-link-hover"
-              >
-                3.8.1
-                <svg
-                  className="w-4 h-4 ml-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              <div
-                data-dropdown-menu
-                className="absolute right-0 mt-2 w-48 bg-gray-800/95 backdrop-blur-sm rounded-md shadow-lg border border-gray-700"
-              >
-                <a
-                  href="#"
-                  className="block px-5 py-2 text-sm text-gray-300 hover:bg-blue-900/30 rounded transition-all duration-200 hover:text-blue-300 hover:shadow-md"
-                >
-                  {t("versionCurrent")}
-                </a>
-                <a
-                  href="#"
-                  className="block px-5 py-2 text-sm text-gray-300 hover:bg-blue-900/30 rounded transition-all duration-200 hover:text-blue-300 hover:shadow-md"
-                >
-                  {t("version380")}
-                </a>
-                <a
-                  href="#"
-                  className="block px-5 py-2 text-sm text-gray-300 hover:bg-blue-900/30 rounded transition-all duration-200 hover:text-blue-300 hover:shadow-md"
-                >
-                  {t("allVersions")}
-                </a>
-              </div>
-            </div>
-
             {/* Language Switcher */}
             <LanguageSwitcher className="relative group" />
 
