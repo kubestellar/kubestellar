@@ -12,10 +12,13 @@ In the current KubeStellar implementation:
 ### Case 1 — Single WEC and `wantSingletonReportedState` is true  
 The WDS workload `.status` is propagated from the single WEC.
 
-### Case 2 — Multiple WECs and `wantSingletonReportedState` is false  
-For workloads deployed to multiple WECs, the `.status` field in the WDS remains empty, resulting in no aggregated status propagated.
+### Case 2 - Multiple WEC and `wantSingletonReportedState` is true  
+For workloads deployed to multiple WECs when `wantSingletonReportedState` is true then `.status` field in the WDS remains empty.
 
-This leads to limited visibility in ArgoCD, where workloads appear as *OutOfSync* or *Unknown*, even though all WECs are healthy.
+### Case 3 — Multiple WECs and `wantSingletonReportedState` is false  
+For workloads deployed to multiple WECs, the `.status` field in the WDS remains empty.
+
+This leads to limited visibility in ArgoCD, where workloads appear as *Unknown*, even though all WECs are healthy.
 
 **Reference:**  
 - [PR #3297](https://github.com/kubestellar/kubestellar/pull/3297)  
@@ -38,7 +41,7 @@ Key objectives:
 
 ### 1. Extend BindingPolicy CRD
 
-The configuration bit `wantMultiWECReportedState` is added under each `DownsyncModulation` rule (not directly under `BindingPolicy`), consistent with the canonical definition available at [./combined-status/#special-case-for-1-wec](./combined-status/#special-case-for-1-wec).
+The configuration bit `wantMultiWECReportedState` is added under each `DownsyncModulation` struct (not directly under `BindingPolicy`), analogously to how [singleton state return ](./combined-status.md#special-case-for-1-wec) is requested.
 
 Example:
 
@@ -76,7 +79,7 @@ The aggregation logic depends on the **workload object kind**.
 
 For workload kinds recognized by ArgoCD, the controller applies predetermined field aggregation rules consistent with ArgoCD’s native health evaluation. These include:
 
-- **Deployment**  
+##### **Deployment**  
   - `replicas`, `updatedReplicas`, `availableReplicas`, `readyReplicas`: use `min()` across clusters to reflect the least ready state.  
   - `conditions`: apply three-value logic per condition type:  
     - `False` if any cluster reports `False`.  
@@ -85,28 +88,27 @@ For workload kinds recognized by ArgoCD, the controller applies predetermined fi
   - `observedGeneration`: use the minimum observed generation.  
   - `unavailableReplicas`: use `max()` to represent the worst state.
 
-- **StatefulSet**  
-  - `replicas`, `readyReplicas`, `currentReplicas`: use `min()`.  
-  - `updatedReplicas`: use `min()`.  
+##### **StatefulSet**  
+  - `replicas`, `readyReplicas`, `currentReplicas`, `updatedReplicas`: use `min()`.  
   - `conditions`: three-value logic as above.
 
-- **DaemonSet**  
+##### **DaemonSet**  
   - `currentNumberScheduled`, `desiredNumberScheduled`, `numberAvailable`, `numberReady`: use `min()`.  
   - `conditions`: three-value logic.
 
-- **ReplicaSet**  
+##### **ReplicaSet**  
   - `replicas`, `readyReplicas`, `availableReplicas`: use `min()`.  
   - `conditions`: three-value logic.
 
-- **Job**  
+##### **Job**  
   - `active`, `succeeded`, `failed`: use `min()` for all numeric fields to represent the least-ready state across clusters.  
   - `conditions`: three-value logic.
 
-- **CronJob**  
+##### **CronJob**  
   - `lastScheduleTime`: use the latest timestamp across clusters.  
   - `conditions`: three-value logic.
 
-- **Pod**  
+##### **Pod**  
   - `phase`: aggregate by prioritizing `Failed` > `Unknown` > `Running` > `Succeeded` > `Pending`.  
   - `conditions`: three-value logic.
 
