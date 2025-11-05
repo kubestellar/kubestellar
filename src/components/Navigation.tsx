@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [githubStats, setGithubStats] = useState({
     stars: "0",
@@ -34,6 +35,7 @@ export default function Navigation() {
               timeoutRef.current = null;
             }
 
+            // Close all other dropdowns including language switcher
             dropdownContainers.forEach(otherContainer => {
               if (otherContainer !== container) {
                 const otherMenu = otherContainer.querySelector<HTMLElement>(
@@ -46,12 +48,19 @@ export default function Navigation() {
               }
             });
 
+            // Close language switcher when hovering other dropdowns
+            if ((window as any).closeLangSwitcher) {
+              (window as any).closeLangSwitcher();
+            }
+
             menu.style.display = "block";
+            setIsDropdownOpen(true);
           });
 
           container.addEventListener("mouseleave", () => {
             timeoutRef.current = setTimeout(() => {
               menu.style.display = "none";
+              setIsDropdownOpen(false);
             }, 100);
           });
 
@@ -64,6 +73,7 @@ export default function Navigation() {
 
           menu.addEventListener("mouseleave", () => {
             menu.style.display = "none";
+            setIsDropdownOpen(false);
           });
         }
       });
@@ -79,6 +89,13 @@ export default function Navigation() {
               menu.style.display = "none";
             }
           });
+          
+          // Also close language switcher
+          if ((window as any).closeLangSwitcher) {
+            (window as any).closeLangSwitcher();
+          }
+          
+          setIsDropdownOpen(false);
         }
       });
     };
@@ -161,23 +178,139 @@ export default function Navigation() {
     if (gridContainer) createGrid(gridContainer);
 
     initDropdowns();
+
+    // Initialize LanguageSwitcher hover functionality
+    const initLanguageSwitcher = () => {
+      const langSwitcher = document.querySelector<HTMLElement>('.language-switcher-container');
+      
+      if (langSwitcher) {
+        let isLangHovered = false;
+        let langDropdownElement: HTMLElement | null = null;
+        
+        const handleMouseEnter = () => {
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+          }
+          
+          // Close other dropdowns
+          const dropdownContainers = document.querySelectorAll<HTMLElement>("[data-dropdown]");
+          dropdownContainers.forEach(container => {
+            const menu = container.querySelector<HTMLElement>("[data-dropdown-menu]");
+            if (menu) {
+              menu.style.display = "none";
+            }
+          });
+          
+          // Trigger LanguageSwitcher open
+          const langButton = langSwitcher.querySelector('button');
+          if (langButton && !isLangHovered) {
+            isLangHovered = true;
+            langButton.click();
+            setIsDropdownOpen(true);
+          }
+        };
+        
+        const handleMouseLeave = () => {
+          timeoutRef.current = setTimeout(() => {
+            const langButton = langSwitcher.querySelector('button');
+            if (langButton && isLangHovered) {
+              isLangHovered = false;
+              langButton.click();
+              setIsDropdownOpen(false);
+            }
+          }, 100);
+        };
+
+        const closeLangSwitcher = () => {
+          const langButton = langSwitcher.querySelector('button');
+          if (langButton && isLangHovered) {
+            isLangHovered = false;
+            langButton.click();
+            setIsDropdownOpen(false);
+          }
+        };
+
+        // Add method to global scope for other dropdowns to call
+        (window as any).closeLangSwitcher = closeLangSwitcher;
+        
+        langSwitcher.addEventListener('mouseenter', handleMouseEnter);
+        langSwitcher.addEventListener('mouseleave', handleMouseLeave);
+        
+        // Handle dropdown menu hover with improved detection
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                const element = node as HTMLElement;
+                const dropdown = element.querySelector?.('[role="listbox"]') as HTMLElement || 
+                               (element.getAttribute?.('role') === 'listbox' ? element as HTMLElement : null);
+                
+                if (dropdown) {
+                  langDropdownElement = dropdown;
+                  
+                  dropdown.addEventListener('mouseenter', () => {
+                    if (timeoutRef.current) {
+                      clearTimeout(timeoutRef.current);
+                      timeoutRef.current = null;
+                    }
+                  });
+                  
+                  dropdown.addEventListener('mouseleave', () => {
+                    handleMouseLeave();
+                  });
+                }
+              }
+            });
+
+            // Handle removed nodes (when dropdown closes)
+            mutation.removedNodes.forEach((node) => {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                const element = node as HTMLElement;
+                if (element === langDropdownElement || element.contains?.(langDropdownElement)) {
+                  langDropdownElement = null;
+                  if (isLangHovered) {
+                    isLangHovered = false;
+                    setIsDropdownOpen(false);
+                  }
+                }
+              }
+            });
+          });
+        });
+        
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
+    };
+
+    // Small delay to ensure LanguageSwitcher is mounted
+    setTimeout(initLanguageSwitcher, 100);
   }, []);
 
   return (
-    <nav className="fixed w-full z-50 bg-gradient-to-br from-green-900 via-purple-900 to-green-900/90 backdrop-blur-md border-b border-gray-700/50 transition-all duration-300">
-      {/* Dark base background */}
-      <div className="absolute inset-0 bg-[#0a0a0a]/90 z-[-3]"></div>
+    <>
+      {/* Blur overlay when dropdown is open */}
+      {isDropdownOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-md z-40 transition-all duration-300"
+          style={{ backdropFilter: 'blur(8px)' }}
+        />
+      )}
+      
+      <nav className="fixed w-full z-50 bg-gradient-to-br from-green-900 via-purple-900 to-green-900/90 backdrop-blur-md border-b border-gray-700/50 transition-all duration-300">
+        {/* Dark base background */}
+        <div className="absolute inset-0 bg-[#0a0a0a]/90 z-[-3]"></div>
 
-      {/* Starfield background */}
-      <StarField
-        density="low"
-        showComets={true}
-        cometCount={2}
-        className="z-[-2]"
-      />
+        {/* Starfield background */}
+        <StarField
+          density="low"
+          showComets={true}
+          cometCount={2}
+          className="z-[-2]"
+        />
 
-      {/* Grid lines background */}
-      <GridLines />
+        {/* Grid lines background */}
+        <GridLines />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex justify-between h-16 items-center">
@@ -550,7 +683,9 @@ export default function Navigation() {
           {/* Right side: Controls */}
           <div className="flex items-center space-x-4">
             {/* Language Switcher */}
-            <LanguageSwitcher className="relative group" />
+            <div className="language-switcher-container">
+              <LanguageSwitcher className="relative group" />
+            </div>
 
             {/* GitHub Dropdown */}
             <div className="relative group" data-dropdown>
@@ -699,5 +834,6 @@ export default function Navigation() {
         )}
       </div>
     </nav>
+    </>
   );
 }

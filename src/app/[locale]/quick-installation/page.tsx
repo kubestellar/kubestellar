@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   Terminal,
   Server,
@@ -236,10 +237,9 @@ const AnimatedCard = ({
   return (
     <div
       id={id}
-      className={`relative bg-gray-800/50 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 transition-all duration-300 ${className}`}
+      className={`bg-gray-800/50 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 transition-all duration-300 hover:shadow-2xl hover:border-blue-500/50 ${className}`}
     >
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl blur opacity-30"></div>
-      <div className="relative">{children}</div>
+      {children}
     </div>
   );
 };
@@ -316,10 +316,10 @@ const FAQItem = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border border-gray-700/50 rounded-lg bg-gray-800/50 backdrop-blur-md">
+    <div className="border border-gray-700/50 rounded-lg bg-gray-800/50 backdrop-blur-md transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-700/30 transition-colors duration-200"
+        className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-700/30 transition-colors duration-200 rounded-lg"
       >
         <h3 className="text-lg font-medium text-white pr-4">{faq.question}</h3>
         <div className="text-gray-400 flex-shrink-0">
@@ -363,41 +363,38 @@ const PrerequisiteCard = ({
   t: TranslationFunction;
 }) => {
   return (
-    <div className="relative group h-full">
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
-      <div className="relative bg-gray-800/50 backdrop-blur-md rounded-lg shadow-lg p-6 border border-gray-700/50 transition-all duration-300 hover:border-gray-600/70 h-full flex flex-col">
-        {/* Header */}
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">
-            {prerequisite.displayName}
-          </h3>
-          <span className="rounded-full bg-blue-500/20 border border-blue-500/30 px-2 py-1 font-mono text-xs text-blue-400">
-            {prerequisite.minVersion
-              ? `v${prerequisite.minVersion}+`
-              : "Latest"}
-          </span>
+    <div className="bg-gray-800/50 backdrop-blur-md rounded-lg shadow-lg p-6 border border-gray-700/50 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:border-blue-500/50 h-full flex flex-col">
+      {/* Header */}
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-white">
+          {prerequisite.displayName}
+        </h3>
+        <span className="rounded-full bg-blue-500/20 border border-blue-500/30 px-2 py-1 font-mono text-xs text-blue-400">
+          {prerequisite.minVersion
+            ? `v${prerequisite.minVersion}+`
+            : "Latest"}
+        </span>
+      </div>
+
+      <p className="mb-4 text-gray-300 text-sm flex-grow">
+        {prerequisite.description}
+      </p>
+
+      <div className="space-y-3 mt-auto">
+        <div>
+          <h4 className="mb-2 flex items-center text-xs font-medium text-emerald-400">
+            <Terminal size={14} className="mr-1" />
+            {t("prerequisitesInstall")}
+          </h4>
+          <CodeBlock code={prerequisite.installCommand} />
         </div>
 
-        <p className="mb-4 text-gray-300 text-sm flex-grow">
-          {prerequisite.description}
-        </p>
-
-        <div className="space-y-3 mt-auto">
-          <div>
-            <h4 className="mb-2 flex items-center text-xs font-medium text-emerald-400">
-              <Terminal size={14} className="mr-1" />
-              {t("prerequisitesInstall")}
-            </h4>
-            <CodeBlock code={prerequisite.installCommand} />
-          </div>
-
-          <div>
-            <h4 className="mb-2 flex items-center text-xs font-medium text-blue-400">
-              <CheckCircle2 size={14} className="mr-1" />
-              {t("prerequisitesVerify")}
-            </h4>
-            <CodeBlock code={prerequisite.versionCommand} />
-          </div>
+        <div>
+          <h4 className="mb-2 flex items-center text-xs font-medium text-blue-400">
+            <CheckCircle2 size={14} className="mr-1" />
+            {t("prerequisitesVerify")}
+          </h4>
+          <CodeBlock code={prerequisite.versionCommand} />
         </div>
       </div>
     </div>
@@ -453,14 +450,13 @@ const PlatformSelector = ({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <button
           onClick={() => setPlatform("kind")}
-          className={`group relative rounded-lg border p-4 text-left transition-all duration-300 ${
+          className={`rounded-lg border p-4 text-left transition-all duration-300 ${
             platform === "kind"
-              ? "border-blue-500/50 bg-blue-500/10"
-              : "border-gray-700/50 bg-gray-800/30 hover:border-gray-600/70"
+              ? "border-blue-500/50 bg-blue-500/10 shadow-lg shadow-blue-500/20"
+              : "border-gray-700/50 bg-gray-800/30 hover:border-gray-600/70 hover:bg-gray-800/50"
           }`}
         >
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg blur opacity-0 group-hover:opacity-30 transition duration-300"></div>
-          <div className="relative flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-white">{t("installKind")}</h4>
               <p className="text-sm text-gray-400">{t("installKindDesc")}</p>
@@ -473,14 +469,13 @@ const PlatformSelector = ({
 
         <button
           onClick={() => setPlatform("k3d")}
-          className={`group relative rounded-lg border p-4 text-left transition-all duration-300 ${
+          className={`rounded-lg border p-4 text-left transition-all duration-300 ${
             platform === "k3d"
-              ? "border-blue-500/50 bg-blue-500/10"
-              : "border-gray-700/50 bg-gray-800/30 hover:border-gray-600/70"
+              ? "border-blue-500/50 bg-blue-500/10 shadow-lg shadow-blue-500/20"
+              : "border-gray-700/50 bg-gray-800/30 hover:border-gray-600/70 hover:bg-gray-800/50"
           }`}
         >
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg blur opacity-0 group-hover:opacity-30 transition duration-300"></div>
-          <div className="relative flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-white">{t("installK3d")}</h4>
               <p className="text-sm text-gray-400">{t("installK3dDesc")}</p>
@@ -529,36 +524,6 @@ const QuickInstallationPage = () => {
               {t("subtitle")}
             </p>
           </div>
-
-          {/* Prerequisites Section */}
-          <AnimatedCard className="mb-12 p-8">
-            <SectionHeader
-              icon={<Server size={24} />}
-              title={t("prerequisitesTitle")}
-              description={t("prerequisitesSubtitle")}
-            />
-
-            {prerequisiteCategories.map((category, index) => (
-              <PrerequisiteCategorySection
-                key={index}
-                category={category}
-                t={t}
-              />
-            ))}
-
-            {/* Single Guide Button */}
-            <div className="text-center">
-              <a
-                href="https://docs.kubestellar.io/latest/direct/pre-reqs/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center rounded-lg bg-gradient-to-r from-purple-600/80 to-blue-600/80 px-6 py-3 text-sm font-medium text-white transition-all hover:from-purple-500/80 hover:to-blue-500/80 hover:scale-105 hover:shadow-lg"
-              >
-                <ExternalLink size={16} className="mr-2" />
-                {t("prerequisitesButton")}
-              </a>
-            </div>
-          </AnimatedCard>
 
           {/* Automated Prerequisites Check Section */}
           <AnimatedCard className="mb-12 p-8">
@@ -640,8 +605,38 @@ const QuickInstallationPage = () => {
             </div>
           </AnimatedCard>
 
+          {/* Prerequisites Section */}
+          <AnimatedCard className="mb-12 p-8">
+            <SectionHeader
+              icon={<Server size={24} />}
+              title={t("prerequisitesTitle")}
+              description={t("prerequisitesSubtitle")}
+            />
+
+            {prerequisiteCategories.map((category, index) => (
+              <PrerequisiteCategorySection
+                key={index}
+                category={category}
+                t={t}
+              />
+            ))}
+
+            {/* Single Guide Button */}
+            <div className="text-center">
+              <a
+                href="https://docs.kubestellar.io/latest/direct/pre-reqs/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded-lg bg-gradient-to-r from-purple-600/80 to-blue-600/80 px-6 py-3 text-sm font-medium text-white transition-all hover:from-purple-500/80 hover:to-blue-500/80 hover:scale-105 hover:shadow-lg"
+              >
+                <ExternalLink size={16} className="mr-2" />
+                {t("prerequisitesButton")}
+              </a>
+            </div>
+          </AnimatedCard>
+
           {/* Platform Installation Section */}
-          <AnimatedCard className="p-8">
+          <AnimatedCard className="mb-12 p-8">
             <SectionHeader
               icon={<Terminal size={24} />}
               title={t("installTitle")}
@@ -743,16 +738,18 @@ const QuickInstallationPage = () => {
                         size={16}
                         className="mr-2 mt-0.5 flex-shrink-0 text-emerald-400"
                       />
-                      {t("installNext3")}{" "}
-                      <a
-                        href="https://docs.kubestellar.io/latest/direct/get-started/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-emerald-300 hover:text-emerald-200 underline"
-                      >
-                        documentation
-                      </a>{" "}
-                      for examples and advanced usage
+                      <span>
+                        {t("installNext3")}{" "}
+                        <Link
+                          href="https://docs.kubestellar.io/latest/direct/get-started/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-emerald-300 hover:text-emerald-200 underline"
+                        >
+                          {t("installNext3Link")}
+                        </Link>{" "}
+                        {t("installNext3Suffix")}
+                      </span>
                     </li>
                   </ul>
                 </div>
@@ -761,7 +758,7 @@ const QuickInstallationPage = () => {
           </AnimatedCard>
 
           {/* FAQ Section */}
-          <AnimatedCard className="mt-12 p-8">
+          <AnimatedCard className="p-8">
             <SectionHeader
               icon={<Info size={24} />}
               title={t("faqTitle")}

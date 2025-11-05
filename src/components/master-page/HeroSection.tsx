@@ -178,8 +178,7 @@ export default function HeroSection() {
                   {/* Copy Button */}
                   <button
                     onClick={handleCopy}
-                    className={`copy-button ml-3 p-2 rounded-md bg-gray-700/50 hover:bg-gray-600/50 
-                              border border-gray-600/50 hover:border-gray-500/50 
+                    className={`copy-button ml-3 rounded-md 
                               transition-all duration-200 group relative ${copied ? "copy-success" : ""}`}
                     title="Copy installation script"
                   >

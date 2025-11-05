@@ -423,6 +423,8 @@
     "installNext1": "Verify installation",
     "installNext2": "Check KubeStellar status",
     "installNext3": "Explore the",
+    "installNext3Link": "documentation",
+    "installNext3Suffix": "for examples and advanced usage",
     "faqTitle": "Frequently Asked Questions",
     "faqSubtitle": "Common questions about KubeStellar installation and setup",
     "faq1Q": "What's the difference between Core, Additional, and Build prerequisites?",
@@ -539,7 +541,13 @@
     "subtitle": "Discover our suite of tools and platforms that enhance the KubeStellar ecosystem and empower multi-cluster Kubernetes management.",
     "repoButton": "Repository",
     "websiteButton": "Website",
+    "watchDemoButton": "Watch Demo",
     "products": {
+      "kubestellar": {
+        "name": "KubeStellar",
+        "fullName": "KubeStellar",
+        "description": "Multi-cluster Kubernetes orchestration platform that simplifies distributed workload management across diverse infrastructure environments. Provides unified control plane, intelligent workload placement, and policy-driven governance for complex multi-cluster deployments with automated scaling, resource optimization, and seamless integration capabilities across cloud providers."
+      },
       "kubestellarUI": {
         "name": "KubeStellar UI",
         "fullName": "KubeStellar UI",
@@ -554,6 +562,11 @@
         "name": "A2A",
         "fullName": "A2A",
         "description": "Application-to-Application communication platform enabling seamless connectivity within the KubeStellar ecosystem. Facilitates secure data exchange and real-time communication between distributed microservices. Provides advanced routing, load balancing, and service discovery capabilities for complex multi-cluster deployments."
+      },
+      "kubectlMulti": {
+        "name": "kubectl-multi",
+        "fullName": "kubectl-multi",
+        "description": "A comprehensive kubectl plugin for multi-cluster operations with KubeStellar. This plugin extends kubectl to work seamlessly across all KubeStellar managed clusters, providing unified views and operations while filtering out workflow staging clusters (WDS). Execute commands across multiple clusters simultaneously with intelligent output aggregation."
       },
       "galaxyMarketplace": {
         "name": "Galaxy Marketplace",
