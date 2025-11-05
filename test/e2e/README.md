@@ -1,4 +1,4 @@
-# Kubestellar end to end testing
+### End-to-end testing
 
 KubeStellar end-to-end testing covers the following test matrix.
 
@@ -8,7 +8,7 @@ KubeStellar end-to-end testing covers the following test matrix.
 
 However there is a restriction: when using OCP, only a release can be tested.
 
-This directory has a script that will run a given one of the six allowed cells in that matrix. The script is [run-test.sh](run-test.sh). The command line flags say which cell to run. The default is the bash scenario using three new `kind` clusters and the local copy of the repo.
+This directory has a script that will run a given one of the six allowed cells in that matrix. The script is [run-test.sh](https://github.com/kubestellar/kubestellar/blob/main/test/e2e/run-test.sh). The command line flags say which cell to run. The default is the bash scenario using three new `kind` clusters and the local copy of the repo.
 
 ## Version
 
@@ -16,7 +16,7 @@ This script will test the relevant release if `--released` appears on the comman
 
 ## Scenario
 
-Select the scenario by putting `--test-type $scenario` on the command line, where `$scenario` is either `bash` (for the scenario in the [bash subdirectory](bash)) or `ginkgo` (for the scenario in the [ginkgo subdirectory](ginkgo)). In order to run the ginkgo scenario you **need to** have [ginkgo](https://onsi.github.io/ginkgo/) installed; see [ginkgo Getting Started](https://onsi.github.io/ginkgo/#getting-started).
+Select the scenario by putting `--test-type $scenario` on the command line, where `$scenario` is either `bash` (for the scenario in the [bash subdirectory](https://github.com/kubestellar/kubestellar/blob/main/test/e2e/bash)) or `ginkgo` (for the scenario in the [ginkgo subdirectory](https://github.com/kubestellar/kubestellar/blob/main/test/e2e/ginkgo)). In order to run the ginkgo scenario you **need to** have [ginkgo](https://onsi.github.io/ginkgo/) installed; see [ginkgo Getting Started](https://onsi.github.io/ginkgo/#getting-started).
 
 ## Infrastructure
 
@@ -26,19 +26,17 @@ When using `kind`, this test involves three `kind` clusters, so you **need to** 
 
 When using three pre-existing OCP clusters, your kubeconfig must include contexts named `kscore` (for the kubeflex hosting cluster), `cluster1` and `cluster2`. The following shows an example listing of adequate contexts.
 
-```bash
 $ kubectl config get-contexts
-CURRENT   NAME          CLUSTER                   AUTHINFO               NAMESPACE
-          kscore       <url>:port               <defaul-value>            default
-          cluster1     <url>:port               <defaul-value>            default
-*         cluster2     <url>:port               <defaul-value>            default
-```
+CURRENT NAME CLUSTER AUTHINFO NAMESPACE
+kscore <url>:port <defaul-value> default
+cluster1 <url>:port <defaul-value> default
+
+    cluster2     <url>:port               <defaul-value>            default
 
 FYI, if you need to rename a kubeconfig context in order to reach the above configuration then you can use the `kubectl config rename-context` command. For example:
 
-```bash 
 $ kubectl config rename-context <default-wec1-context-name> cluster1
-```
+
 
 ## Fail fast or run every test case
 
