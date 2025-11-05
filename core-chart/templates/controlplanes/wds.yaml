@@ -14,22 +14,22 @@
     {{- $ITSkubeconfig = or (eq (index $ITSes 0).type "host") (eq (index $ITSes 0).type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
   {{- else }}
     {{- $allCPs := lookup "tenancy.kflex.kubestellar.org/v1alpha1" "ControlPlane" "" "" }}
-    {{- $ITSes := dict }}
+    {{- $ITS := "" }}
     {{- $count := 0 }}
     {{- range $i, $item := $allCPs.items }}
       {{- $label := get $item.metadata.labels "kflex.kubestellar.io/cptype" }}
       {{- if eq $label "its" }}
-        {{- $_ := set $ITSes (printf "%d" $count) $item }}
+        {{- $ITS = $item }}
         {{- $count = add $count 1 }}
       {{- end }}
     {{- end }}
     {{- if gt $count 1 }}
       {{- fail "Too many ITSes found in the cluster!" }}
     {{- else if eq $count 1 }}
-      {{- $ITSName = get (index $ITSes "0").metadata "name" }}
-      {{- $ITSSecretName = (index $ITSes "0").status.secretRef.name }}
-      {{- $ITSSecretNamespace = (index $ITSes "0").status.secretRef.namespace }}
-      {{- $ITSkubeconfig = (index $ITSes "0").status.secretRef.inClusterKey }}
+      {{- $ITSName = get $ITS.metadata "name" }}
+      {{- $ITSSecretName = $ITS.status.secretRef.name }}
+      {{- $ITSSecretNamespace = $ITS.status.secretRef.namespace }}
+      {{- $ITSkubeconfig = $ITS.status.secretRef.inClusterKey }}
     {{- else }}
       {{- fail "No ITS found in the current chart or in the cluster!" }}
     {{- end }}
