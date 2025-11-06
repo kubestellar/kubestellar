@@ -205,32 +205,32 @@ export default function HowToUseSection() {
                 <div className="w-0.5 h-6 bg-gradient-to-b from-green-500 to-orange-500"></div>
               </div>
             )}
-          </div>
 
-          {/* Blur Overlay - Full Width */}
-          {!showAllSteps && (
-            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pointer-events-none z-30 flex items-end justify-center pb-4">
-              <button
-                onClick={() => setShowAllSteps(true)}
-                className="pointer-events-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 animate-bounce-slow"
-              >
-                <span>Show More Steps</span>
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            {/* Blur Overlay - Full Width */}
+            {!showAllSteps && (
+              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pointer-events-none z-30 flex items-end justify-center pb-4">
+                <button
+                  onClick={() => setShowAllSteps(true)}
+                  className="pointer-events-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 animate-bounce-slow"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-            </div>
-          )}
+                  <span>Show More Steps</span>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Mobile Step 4 */}
           {showAllSteps && (
@@ -486,33 +486,32 @@ export default function HowToUseSection() {
               </div>
               <div className="w-1/2 pl-12"></div>
             </div>
-          </div>
 
-          {/* Blur Overlay - Full Width Desktop */}
-          {!showAllSteps && (
-            <div className="absolute inset-x-0 bottom-0 h-60 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pointer-events-none z-40 flex items-end justify-center pb-12">
-              <button
-                onClick={() => setShowAllSteps(true)}
-                className="pointer-events-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-3 border border-purple-400/30 animate-bounce-slow"
-              >
-                <span className="text-lg">Show More Steps</span>
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            {/* Blur Overlay - Full Width Desktop */}
+            {!showAllSteps && (
+              <div className="absolute inset-x-0 bottom-0 h-60 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pointer-events-none z-40 flex items-end justify-center pb-12">
+                <button
+                  onClick={() => setShowAllSteps(true)}
+                  className="pointer-events-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-3 border border-purple-400/30 animate-bounce-slow"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-            </div>
-          )}
-
+                  <span className="text-lg">Show More Steps</span>
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
           {/* Desktop Step 4 */}
           {showAllSteps && (
             <div className="relative mb-4 lg:mb-6 z-20 -mt-24 step-animate opacity-0 translate-y-8 transition-all duration-700 ease-out delay-300">
