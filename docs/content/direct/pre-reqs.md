@@ -113,7 +113,7 @@ $ scripts/check_pre_req.sh
 Checking pre-requisites for using KubeStellar:
 ✔ Docker (Docker version 27.2.1-rd, build cc0ee3e)
 ✔ kubectl (v1.29.2)
-✔ KubeFlex (Kubeflex version: v0.6.3.672cc8a 2024-09-23T16:15:47Z)
+✔ KubeFlex (Kubeflex version: v0.9.2.0f47e82 2025-11-04T16:15:39Z)
 ✔ OCM CLI (:v0.9.0-0-g56e1fc8)
 ✔ Helm (v3.16.1)
 ✔ helm can fetch public charts
