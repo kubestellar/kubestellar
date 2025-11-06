@@ -91,13 +91,13 @@
   "aboutSection": {
     "title": "What is",
     "titleSpan": "KubeStellar",
-    "subtitle": "A multi-cluster Kubernetes orchestration platform that simplifies how you manage distributed workloads.",
+    "subtitle": "A multi-cluster Kubernetes orchestration platform that simplifies how organizations manage distributed workloads across multiple Kubernetes clusters.",
     "card1Title": "Single Control Plane",
-    "card1Description": "Manage multiple Kubernetes clusters from a unified control plane, eliminating the need to switch contexts and streamlining operations.",
+    "card1Description": "Work with Kubernetes objects in their native format without wrapping or bundling. Store and manage workload definitions centrally through Workload Definition Spaces (WDSes) and efficiently manage cluster inventory through Inventory and Transport Spaces (ITSes).",
     "card2Title": "Intelligent Workload Placement",
-    "card2Description": "Automatically distribute workloads based on cluster capabilities, availability, and custom constraints for optimal performance.",
+    "card2Description": "Use label-based selection and binding policies to specify what workloads run where. Support for standard Kubernetes resources, Custom Resources (CRDs), Helm charts, and out-of-tree workload types with automatic synchronization to keep workloads in sync across clusters.",
     "card3Title": "Policy-Driven Management",
-    "card3Description": "Define policies for governance, security, and compliance across your entire Kubernetes estate with centralized enforcement.",
+    "card3Description": "Implement comprehensive governance through the BindingPolicy system. Manage singleton status for individual cluster monitoring and combined status aggregation. Apply custom transforms with automatic recovery after disruptions.",
     "learnMore": "Learn more"
   },
   "contactSection": {

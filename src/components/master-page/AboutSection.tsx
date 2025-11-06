@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { GridLines, StarField } from "../index";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 export default function AboutSection() {
   const t = useTranslations("aboutSection");
@@ -152,7 +153,10 @@ export default function AboutSection() {
                 <p className="text-gray-300 mb-6">{t("card1Description")}</p>
 
                 {/* Animated arrow on hover */}
-                <div className="h-8 overflow-hidden">
+                <Link
+                  href="/docs/direct/architecture"
+                  className="block h-8 overflow-hidden"
+                >
                   <div className="transform translate-y-8 group-hover:translate-y-0 transition-transform duration-300 text-primary-600 dark:text-primary-400 flex items-center">
                     <span className="text-sm font-medium">
                       {t("learnMore")}
@@ -170,7 +174,7 @@ export default function AboutSection() {
                       />
                     </svg>
                   </div>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
@@ -205,7 +209,10 @@ export default function AboutSection() {
                 <p className="text-gray-300 mb-6">{t("card2Description")}</p>
 
                 {/* Animated arrow on hover */}
-                <div className="h-8 overflow-hidden">
+                <Link
+                  href="/docs/direct/binding"
+                  className="block h-8 overflow-hidden"
+                >
                   <div className="transform translate-y-8 group-hover:translate-y-0 transition-transform duration-300 text-primary-600 dark:text-primary-400 flex items-center">
                     <span className="text-sm font-medium">
                       {t("learnMore")}
@@ -223,7 +230,7 @@ export default function AboutSection() {
                       />
                     </svg>
                   </div>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
@@ -258,7 +265,10 @@ export default function AboutSection() {
                 <p className="text-gray-300 mb-6">{t("card3Description")}</p>
 
                 {/* Animated arrow on hover */}
-                <div className="h-8 overflow-hidden">
+                <Link
+                  href="/docs/direct/control"
+                  className="block h-8 overflow-hidden"
+                >
                   <div className="transform translate-y-8 group-hover:translate-y-0 transition-transform duration-300 text-primary-600 dark:text-primary-400 flex items-center">
                     <span className="text-sm font-medium">
                       {t("learnMore")}
@@ -276,7 +286,7 @@ export default function AboutSection() {
                       />
                     </svg>
                   </div>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
