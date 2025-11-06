@@ -1,0 +1,9 @@
+dependencies:
+- name: kubeflex-operator
+  repository: oci://ghcr.io/kubestellar/kubeflex/chart
+  version: v0.9.2
+- name: argo-cd
+  repository: oci://ghcr.io/argoproj/argo-helm
+  version: 8.3.5
+digest: sha256:eec5a4adf80847a5299d966e5adec01d974a85b20bf8e4d23e276460ce44fa2d
+generated: "2025-11-06T01:05:51.5975936+05:30"
