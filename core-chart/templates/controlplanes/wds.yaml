@@ -2,7 +2,7 @@
 {{- $ITSName := .ITSName }}
 {{- $ITSSecretName := "" }}
 {{- $ITSSecretNamespace := "" }}
-{{- $ITSkubeconfig := "" }}
+{{- $ITSSecretKey := "" }}
 {{- if not $ITSName }}
   {{- $ITSes := (hasKey $.Values "ITSes") | ternary $.Values.ITSes (list) }}
   {{- if and $ITSes (gt (len $ITSes) 1) }}
@@ -11,7 +11,7 @@
     {{- $ITSName = (index $ITSes 0).name }}
     {{- $ITSSecretName = or (eq (index $ITSes 0).type "host") (eq (index $ITSes 0).type "external") | ternary "admin-kubeconfig" "vc-vcluster" }}
     {{- $ITSSecretNamespace = printf "%s-system" $ITSName }}
-    {{- $ITSkubeconfig = or (eq (index $ITSes 0).type "host") (eq (index $ITSes 0).type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
+    {{- $ITSSecretKey = or (eq (index $ITSes 0).type "host") (eq (index $ITSes 0).type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
   {{- else }}
     {{- $allCPs := lookup "tenancy.kflex.kubestellar.org/v1alpha1" "ControlPlane" "" "" }}
     {{- $ITS := "" }}
@@ -29,7 +29,7 @@
       {{- $ITSName = get $ITS.metadata "name" }}
       {{- $ITSSecretName = $ITS.status.secretRef.name }}
       {{- $ITSSecretNamespace = $ITS.status.secretRef.namespace }}
-      {{- $ITSkubeconfig = $ITS.status.secretRef.inClusterKey }}
+      {{- $ITSSecretKey = $ITS.status.secretRef.inClusterKey }}
     {{- else }}
       {{- fail "No ITS found in the current chart or in the cluster!" }}
     {{- end }}
@@ -51,10 +51,10 @@ spec:
     - hookName: transport-controller
       vars:
         WDSSecretName: admin-kubeconfig
-        WDSkubeconfig: kubeconfig-incluster
+        WDSSecretKey: kubeconfig-incluster
         ITSSecretName: '{{ $ITSSecretName }}'
         ITSSecretNamespace: '{{ $ITSSecretNamespace }}'
-        ITSkubeconfig: '{{ $ITSkubeconfig }}'
+        ITSSecretKey: '{{ $ITSSecretKey }}'
   globalVars:
     ControlPlaneName: {{ .name }}
     ITSName: '{{ $ITSName }}'
