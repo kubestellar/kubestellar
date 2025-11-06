@@ -46,7 +46,7 @@ export default function PartnersPage() {
     },
     {
       id: 4,
-      name: "Mvi",
+      name: "MVI",
       slug: "mvi",
       description: t("partners.mvi.description"),
       logo: "/partners/mvi.png",
@@ -92,7 +92,7 @@ export default function PartnersPage() {
         <GridLines horizontalLines={21} verticalLines={18} />
       </div>
 
-      <div className="relative z-10 pt-16">
+      <div className="relative z-10 pt-7">
         {" "}
         {/* Add padding-top to account for fixed navbar */}
         {/* Header Section */}
@@ -112,7 +112,7 @@ export default function PartnersPage() {
           </div>
         </section>
         {/* Partners Carousel Section */}
-        <section className="py-4 sm:py-8 md:py-12 lg:py-16 overflow-hidden">
+        <section className="py-4 sm:py-8 md:py-12 lg:py-3 overflow-hidden">
           {/* Desktop Sliding View */}
           <div className="hidden lg:block">
             <div className="relative overflow-hidden">
