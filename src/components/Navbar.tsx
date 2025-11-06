@@ -373,16 +373,15 @@ export default function Navbar() {
                   </Link>
                 </div>
 
-                {/* Blog Link */}
+                {/* Playground Link */}
                 <div className="relative group">
                   <Link
-                    target="_blank"
-                    href="https://kubestellar.medium.com/list/predefined:e785a0675051:READING_LIST"
-                    className="text-sm font-medium text-gray-300 hover:text-purple-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-purple-500/10 hover:shadow-lg hover:shadow-purple-500/20 transform nav-link-hover"
+                    href="/playground"
+                    className="text-sm font-medium text-gray-300 hover:text-orange-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-orange-500/10 hover:shadow-lg hover:shadow-orange-500/20 transform nav-link-hover"
                   >
                     <div className="relative">
                       <svg
-                        className="w-5 h-5 transition-all duration-300"
+                        className="w-5 h-5 transition-all duration-300 group-hover:scale-110"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -391,18 +390,12 @@ export default function Navbar() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth="2"
-                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                        ></path>
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M16 8a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2v-6a2 2 0 012-2h8z"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                          className="group-hover:stroke-[2.5] transition-all duration-300"
                         ></path>
                       </svg>
                     </div>
-                    <span>{t("blog")}</span>
+                    <span>{t("playground")}</span>
                   </Link>
                 </div>
 

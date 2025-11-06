@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import StarField from "../StarField";
 import GridLines from "../GridLines";
 
@@ -69,10 +70,12 @@ const DocsLoader = ({
 
             {/* Favicon container */}
             <div className="absolute inset-6 bg-gradient-to-br from-[#667eea]/10 to-[#764ba2]/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-[#667eea]/30">
-              <img
+              <Image
                 src="/favicon.ico"
                 alt="KubeStellar"
-                className="h-12 w-12 object-contain filter brightness-110 drop-shadow-lg"
+                width={58}
+                height={58}
+                className="object-contain filter brightness-110 drop-shadow-lg"
               />
             </div>
           </div>
