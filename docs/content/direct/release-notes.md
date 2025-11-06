@@ -9,6 +9,15 @@ This release makes some backward-incompatible changes, as follows.
 - Changes to the names of the PostCreateHooks and their Jobs that are using in a KubeFlex `ControlPlane` for an ITS. This changes what a careful user (and the KubeStellar scripts) wait on after instantiating KubeStellar's core Helm chart.
 - Not actually shipped through KubeStellar, but the latest KubeFlex CLI makes a backward-incompatible change in the extensions that it puts in the user's kubeconfig file.
 
+### Remaining limitations in 0.29.0
+
+* Although the create-only feature can be used with Job objects to avoid trouble with `.spec.selector`, requesting singleton reported state return will still lead to a controller fight over `.status.replicas` while the Job is in progress.
+* Removing of WorkStatus objects (in the transport namespace) is not supported and may not result in recreation of that object
+* Objects on two different WDSes shouldn't have the exact same identifier (same group, version, kind, name and namespace). Such a conflict is currently not identified.
+* Creation, deletion, and modification of `CustomTransform` objects does not cause corresponding updates to the workload objects in the WECs; the current state of the `CustomTransform` objects is simply read at any moment when the objects in the WECs are being updated for other reasons.
+* It is not known what actually happens when two different `Binding` objects list the same workload object and either or both say "create only".
+* If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
+
 ## 0.28.0
 
 Helm chart, the name of the subobject for ArgoCD has changed from
