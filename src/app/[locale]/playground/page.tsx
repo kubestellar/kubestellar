@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { Loader } from "@/components/animations/loader";
+import Loader from "@/components/animations/Loader";
 
 export default function PlaygroundPage() {
   const router = useRouter();
@@ -14,5 +14,7 @@ export default function PlaygroundPage() {
     router.replace("/coming-soon");
   }, [router]);
 
-  return <Loader isLoading={isRedirecting} text="Redirecting to Coming Soon" />;
+  return(
+    <Loader/>
+  );
 }

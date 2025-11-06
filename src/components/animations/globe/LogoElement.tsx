@@ -1,132 +1,97 @@
-import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
-import { Text, Billboard } from "@react-three/drei";
-import * as THREE from "three";
-import { COLORS } from "./colors";
+import { useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+import GlowingSphere from './GlowingSphere';
 
-/**
- * LogoElement Component
- *
- * Creates the central logo element with a pulsing sphere and rotating ring.
- * Displays KubeStellar branding in the center.
- *
- * @param animate - Controls whether animation is running
- */
+// KubeStellar theme colors
+const COLORS = {
+  primary: '#1a90ff', // Main blue color
+  secondary: '#6236FF', // Purple accent
+  highlight: '#00C2FF', // Bright blue for highlights
+  success: '#00E396', // Green for active connections
+  background: '#0a0f1c', // Dark background
+  accent1: '#FF5E84', // Accent color for special elements
+  accent2: '#FFD166', // Secondary accent for highlights
+};
 
+// KubeStellar logo element
 interface LogoElementProps {
-  animate?: boolean;
+  position?: [number, number, number];
+  rotation?: [number, number, number];
+  scale?: number;
 }
 
-const LogoElement = ({ animate = true }: LogoElementProps) => {
-  const coreRef = useRef<THREE.Mesh>(null);
-  const outerRingRef = useRef<THREE.Mesh>(null);
-  const frameCount = useRef(0);
-
-  // Create shared materials for better performance
-  const coreMaterial = useMemo(
-    () =>
-      new THREE.MeshPhongMaterial({
-        color: COLORS.highlight,
-        emissive: COLORS.highlight,
-        emissiveIntensity: 0.5,
-        shininess: 100,
-        transparent: true,
-      }),
-    []
-  );
-
-  const ringMaterial = useMemo(
-    () =>
-      new THREE.MeshBasicMaterial({
-        color: COLORS.primary,
-        transparent: true,
-        wireframe: true,
-      }),
-    []
-  );
-
-  // Create shared geometries for better performance
-  const coreGeometry = useMemo(() => new THREE.SphereGeometry(0.3, 16, 16), []);
-  const ringGeometry = useMemo(
-    () => new THREE.TorusGeometry(0.6, 0.02, 8, 48),
-    []
-  );
-
-  // Optimize animation frequency
-  useFrame(state => {
-    // Skip animation when not animate
-    if (!animate) return;
-
-    // Skip frames to improve performance
-    frameCount.current += 1;
-    if (frameCount.current % 2 !== 0) return;
-
-    const time = state.clock.getElapsedTime();
-
-    // Core pulsing effect
-    if (coreRef.current) {
-      const scale = 1 + Math.sin(time * 2) * 0.05;
-      coreRef.current.scale.setScalar(scale);
-
-      // Update material opacity instead of changing instance
-      if (coreRef.current.material) {
-        (
-          coreRef.current.material as THREE.MeshPhongMaterial
-        ).emissiveIntensity = 0.5 + Math.sin(time * 2) * 0.2;
-      }
+const LogoElement = ({ 
+  position = [0, 0, 0], 
+  rotation = [0, 0, 0], 
+  scale = 1 
+}: LogoElementProps) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const ringRef1 = useRef<THREE.Mesh>(null);
+  const ringRef2 = useRef<THREE.Mesh>(null);
+  const ringRef3 = useRef<THREE.Mesh>(null);
+  
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    
+    if (groupRef.current) {
+      groupRef.current.rotation.y = t * 0.2;
+      groupRef.current.rotation.z = Math.sin(t * 0.5) * 0.1;
     }
-
-    // Rotate outer ring
-    if (outerRingRef.current) {
-      outerRingRef.current.rotation.z = time * 0.5;
-      outerRingRef.current.rotation.x = Math.sin(time * 0.2) * 0.2;
+    
+    // Animate rings independently
+    if (ringRef1.current) {
+      ringRef1.current.rotation.x = t * 0.5;
+      ringRef1.current.rotation.z = t * 0.2;
+    }
+    
+    if (ringRef2.current) {
+      ringRef2.current.rotation.x = -t * 0.3;
+      ringRef2.current.rotation.y = t * 0.4;
+    }
+    
+    if (ringRef3.current) {
+      ringRef3.current.rotation.y = t * 0.2;
+      ringRef3.current.rotation.z = -t * 0.3;
     }
   });
-
+  
   return (
-    <group>
-      {/* Central core sphere */}
-      <mesh
-        ref={coreRef}
-        geometry={coreGeometry}
-        material={coreMaterial}
-        frustumCulled
-      />
-
-      {/* Outer rotating ring */}
-      <mesh
-        ref={outerRingRef}
-        geometry={ringGeometry}
-        material={ringMaterial}
-        frustumCulled
-      />
-
-      {/* KubeStellar Branding */}
-      <Billboard position={[0, 1, 0]} frustumCulled>
-        <Text
-          fontSize={0.2}
-          color={COLORS.highlight}
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.01}
-          outlineColor={COLORS.background}
-          fillOpacity={animate ? 1 : 0}
-          characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"
-        >
-          KubeStellar
-        </Text>
-        <Text
-          position={[0, -0.25, 0]}
-          fontSize={0.1}
-          color={COLORS.primary}
-          anchorX="center"
-          anchorY="middle"
-          fillOpacity={animate ? 1 : 0}
-          characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
-        >
-          Multi-Cluster Management
-        </Text>
-      </Billboard>
+    <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
+      {/* Central glowing sphere */}
+      <GlowingSphere position={[0, 0, 0]} color={COLORS.secondary} size={0.25} />
+      
+      {/* Orbital rings representing the stellar aspect */}
+      <mesh ref={ringRef1}>
+        <torusGeometry args={[0.6, 0.02, 16, 100]} />
+        <meshPhongMaterial color={COLORS.primary} emissive={COLORS.primary} emissiveIntensity={0.5} />
+      </mesh>
+      
+      <mesh ref={ringRef2}>
+        <torusGeometry args={[0.7, 0.02, 16, 100]} />
+        <meshPhongMaterial color={COLORS.highlight} emissive={COLORS.highlight} emissiveIntensity={0.5} />
+      </mesh>
+      
+      <mesh ref={ringRef3}>
+        <torusGeometry args={[0.5, 0.02, 16, 100]} />
+        <meshPhongMaterial color={COLORS.accent1} emissive={COLORS.accent1} emissiveIntensity={0.5} />
+      </mesh>
+      
+      {/* Small orbiting particles */}
+      {Array.from({ length: 8 }).map((_, i) => {
+        const angle = (i / 8) * Math.PI * 2;
+        const radius = 0.8;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        const color = i % 2 === 0 ? COLORS.highlight : COLORS.accent2;
+        
+        return (
+          <mesh key={i} position={[x, y, 0]}>
+            <sphereGeometry args={[0.03, 8, 8]} />
+            <meshBasicMaterial color={color} />
+          </mesh>
+        );
+      })}
     </group>
   );
 };

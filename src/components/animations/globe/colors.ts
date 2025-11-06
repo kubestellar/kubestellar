@@ -1,23 +1,12 @@
-/**
- * Color configuration for the globe animation
- *
- * Customize these colors to match your brand or theme.
- * All colors should be in hex format.
- */
-
+// KubeStellar theme colors
 export const COLORS = {
-  // Main colors
-  primary: "#1a90ff", // Main blue color - used for globe and primary elements
-  secondary: "#6236FF", // Purple accent - used for control flows
-  highlight: "#00C2FF", // Bright blue - used for highlights and logos
-  success: "#00E396", // Green - used for active connections
-  background: "#0a0f1c", // Dark background - used for text outlines
-
-  // Accent colors
-  accent1: "#FF5E84", // Pink accent - for special elements
-  accent2: "#FFD166", // Yellow accent - for secondary highlights
-
-  // AI-specific colors
-  aiTraining: "#B83FF7", // Bright purple - for AI training clusters
-  aiInference: "#00D6E4", // Bright cyan - for AI inference clusters
+  primary: '#1a90ff', // Main blue color
+  secondary: '#6236FF', // Purple accent
+  highlight: '#00C2FF', // Bright blue for highlights
+  success: '#00E396', // Green for active connections
+  background: '#0a0f1c', // Dark background
+  accent1: '#FF5E84', // Accent color for special elements
+  accent2: '#FFD166', // Secondary accent for highlights
+  aiTraining: '#B83FF7', // Brighter purple for AI Training
+  aiInference: '#00D6E4', // Brighter cyan for AI Inference
 };

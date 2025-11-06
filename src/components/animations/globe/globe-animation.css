@@ -1,0 +1,43 @@
+/* Globe Animation Styles */
+.globe-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.globe-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+/* Fade in animation for the globe */
+.globe-fade-in {
+  animation: globeFadeIn 2s ease-in-out forwards;
+}
+
+@keyframes globeFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Optional: Glow effect for the globe container */
+.globe-glow {
+  box-shadow: 
+    0 0 60px rgba(26, 144, 255, 0.3),
+    0 0 120px rgba(26, 144, 255, 0.1);
+}
+
+/* Ensure canvas is responsive */
+.globe-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}

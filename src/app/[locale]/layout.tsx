@@ -6,7 +6,6 @@ import { getMessages } from "next-intl/server";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { locales, type Locale } from "@/i18n/settings";
-import { PageTransitionLoader } from "@/components/animations/loader";
 import "../globals.css";
 
 const inter = Inter({
@@ -61,7 +60,7 @@ export default async function RootLayout({ children, params }: Props) {
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <PageTransitionLoader>{children}</PageTransitionLoader>
+          {children}
         </NextIntlClientProvider>
       </body>
     </html>

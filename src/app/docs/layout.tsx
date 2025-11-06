@@ -2,7 +2,6 @@ import { Layout } from 'nextra-theme-docs'
 import { Banner } from 'nextra/components'
 import 'nextra-theme-docs/style.css'
 import { DocsNavbar, DocsFooter } from '@/components/docs/index'
-import DocsPageTransition from '@/components/animations/docsLoader/docs-page-transition'
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 
@@ -32,18 +31,16 @@ export default async function DocsLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
-        <DocsPageTransition>
-          <Layout
-            banner={banner}
-            navbar={navbar}
-            pageMap={pageMap}
-            docsRepositoryBase="https://github.com/kubestellar/kubestellar"
-            footer={footer}
-            darkMode={true}
-          >
-            {children}
-          </Layout>
-        </DocsPageTransition>
+        <Layout
+          banner={banner}
+          navbar={navbar}
+          pageMap={pageMap}
+          docsRepositoryBase="https://github.com/kubestellar/kubestellar"
+          footer={footer}
+          darkMode={true}
+        >
+          {children}
+        </Layout>
       </body>
     </html>
   )

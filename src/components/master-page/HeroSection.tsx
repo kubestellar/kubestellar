@@ -178,9 +178,8 @@ export default function HeroSection() {
                   {/* Copy Button */}
                   <button
                     onClick={handleCopy}
-                    className={`copy-button ml-3 rounded-md 
+                    className={`copy-button ml-3 rounded-md p-2 
                               transition-all duration-200 group relative ${copied ? "copy-success" : ""}`}
-                    title="Copy installation script"
                   >
                     {copied ? (
                       <svg
@@ -198,7 +197,7 @@ export default function HeroSection() {
                       </svg>
                     ) : (
                       <svg
-                        className="w-4 h-4 text-gray-400 group-hover:text-gray-200 transition-colors"
+                        className="w-4 h-4 text-sky-400 hover:text-sky-300 transition-colors"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -211,15 +210,6 @@ export default function HeroSection() {
                         />
                       </svg>
                     )}
-
-                    {/* Tooltip */}
-                    <div
-                      className="absolute -top-10 right-0 bg-gray-800 text-white text-xs 
-                                    px-2 py-1 rounded opacity-0 group-hover:opacity-100 
-                                    transition-opacity duration-200 whitespace-nowrap z-50"
-                    >
-                      {copied ? "Copied!" : "Copy script"}
-                    </div>
                   </button>
                 </div>
 
