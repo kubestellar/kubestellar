@@ -24,7 +24,7 @@ spec:
             - --timeout=300
             env:
             - name: KUBECONFIG
-              value: '{{"/etc/kube/{{.ITSkubeconfig}}"}}'
+              value: '{{"/etc/kube/{{.ITSSecretKey}}"}}'
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"

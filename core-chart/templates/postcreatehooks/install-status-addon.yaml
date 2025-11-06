@@ -25,7 +25,7 @@ spec:
               - --timeout=300s
             env:
             - name: KUBECONFIG
-              value: '{{"/etc/kube/{{.ITSkubeconfig}}"}}'
+              value: '{{"/etc/kube/{{.ITSSecretKey}}"}}'
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -39,7 +39,7 @@ spec:
               - --timeout=300s
             env:
             - name: KUBECONFIG
-              value: '{{"/etc/kube/{{.ITSkubeconfig}}"}}'
+              value: '{{"/etc/kube/{{.ITSSecretKey}}"}}'
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -53,7 +53,7 @@ spec:
               - --timeout=300s
             env:
             - name: KUBECONFIG
-              value: '{{"/etc/kube/{{.ITSkubeconfig}}"}}'
+              value: '{{"/etc/kube/{{.ITSSecretKey}}"}}'
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -67,7 +67,7 @@ spec:
               - --timeout=300s
             env:
             - name: KUBECONFIG
-              value: '{{"/etc/kube/{{.ITSkubeconfig}}"}}'
+              value: '{{"/etc/kube/{{.ITSSecretKey}}"}}'
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
@@ -113,7 +113,7 @@ spec:
             - name: HELM_CACHE_HOME
               value: "/tmp"
             - name: KUBECONFIG
-              value: '{{"/etc/kube/{{.ITSkubeconfig}}"}}'
+              value: '{{"/etc/kube/{{.ITSSecretKey}}"}}'
             volumeMounts:
             - name: kubeconfig
               mountPath: "/etc/kube"
