@@ -54,7 +54,6 @@ presubmits:
               cpu: 2
 
   - name: pull-kubestellar-test-demo-env-kind
-    always_run: false
     optional: true
     run_if_changed: "^scripts/create-kubestellar-demo-env\\.sh$"
     decorate: true
@@ -71,7 +70,6 @@ presubmits:
               cpu: 4
 
   - name: pull-kubestellar-test-demo-env-k3d
-    always_run: false
     optional: true
     run_if_changed: "^scripts/create-kubestellar-demo-env\\.sh$"
     decorate: true
