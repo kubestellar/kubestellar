@@ -142,11 +142,11 @@
     "title": "Ready to Get Started?",
     "subtitle": "Join the growing community of KubeStellar users and contributors.",
     "card1Title": "Quick Installation",
-    "card1Description": "Get up and running with KubeStellar in minutes using our streamlined installation guide with prerequisites and step-by-step instructions.",
+    "card1Description": "Get up and running with KubeStellar in minutes using our streamlined installation guide with automated prerequisite checking and step-by-step deployment procedures.",
     "card1Button": "Start Quick Installation",
-    "card2Title": "Join the Community",
-    "card2Description": "Connect with other users, contributors, and maintainers through Slack, forums, and community calls.",
-    "card2Button1": "Slack",
+    "card2Title": "Explore Use Cases & Community",
+    "card2Description": "Discover multi-cluster workload management capabilities and connect with the community.",
+    "card2Button1": "Join Slack",
     "card2Button2": "GitHub",
     "card2Button3": "Products",
     "card2Button4": "Handbook",
@@ -218,12 +218,12 @@
         "title": "Edge Computing",
         "description": "Deploy applications across edge locations with centralized management. Ideal for retail, manufacturing, and telecom with distributed infrastructure.",
         "backContent": {
-          "title": "Edge Computing Excellence",
-          "description": "Deploy applications across edge locations with intelligent workload distribution. KubeStellar automatically manages resource allocation, ensures low-latency connectivity, and maintains consistency across your edge infrastructure.",
+          "title": "Declarative Multi-Cluster Workload Management",
+          "description": "Deploy and manage Kubernetes workloads across multiple clusters using native Kubernetes objects without wrapping or bundling.",
           "features": [
-            "Automatic edge deployment",
-            "Low-latency optimization",
-            "Resource intelligent distribution"
+            "Deploy native Kubernetes objects across clusters",
+            "Use label-based cluster selection for workload targeting",
+            "Centralized management through Workload Definition Spaces (WDS)"
           ]
         }
       },
@@ -231,12 +231,12 @@
         "title": "Multi-Region Compliance",
         "description": "Deploy applications with specific regional compliance requirements. Ensure data residency and regulatory compliance across global operations.",
         "backContent": {
-          "title": "Security & Compliance",
-          "description": "Enforce security policies and compliance requirements across all clusters with centralized governance. Automated policy distribution ensures consistent security posture throughout your infrastructure.",
+          "title": "Custom Resource Distribution",
+          "description": "Distribute and manage custom resources (CRDs) across multiple clusters while maintaining proper synchronization and lifecycle management.",
           "features": [
-            "Centralized policy management",
-            "Automated compliance checks",
-            "Security posture monitoring"
+            "Support for out-of-tree workload types",
+            "Automatic CRD synchronization",
+            "Flexible RBAC configuration"
           ]
         }
       },
@@ -244,12 +244,12 @@
         "title": "Hybrid/Multi-Cloud",
         "description": "Seamlessly manage workloads across multiple cloud providers and on-premises infrastructure with unified policies and consistent experience.",
         "backContent": {
-          "title": "Hybrid Cloud Mastery",
-          "description": "Seamlessly connect and manage workloads across public clouds, private data centers, and edge locations. Enable true hybrid deployment with unified management and automated failover capabilities.",
+          "title": "Resilient Multi-Cluster Operations",
+          "description": "Maintain reliable workload distribution and management even during control plane disruptions or network issues.",
           "features": [
-            "Multi-cloud orchestration",
-            "Unified management plane",
-            "Automated failover & recovery"
+            "Resilient architecture with multiple spaces",
+            "Automatic recovery after disruptions",
+            "State reconciliation across clusters"
           ]
         }
       },
@@ -257,12 +257,12 @@
         "title": "Disaster Recovery",
         "description": "Implement robust disaster recovery strategies with automatic workload replication and failover across multiple clusters in different regions.",
         "backContent": {
-          "title": "Disaster Recovery",
-          "description": "Implement robust disaster recovery strategies with automated backup, replication, and restoration capabilities. Ensure business continuity with multi-region deployment and instant failover mechanisms.",
+          "title": "Advanced Status Management",
+          "description": "Monitor and manage workload status across multiple clusters with options for both individual and aggregated status reporting.",
           "features": [
-            "Automated backup & replication",
-            "Multi-region deployment",
-            "Instant failover capabilities"
+            "Singleton status reporting for individual cluster monitoring",
+            "Combined status aggregation across clusters",
+            "Real-time status updates through OCM Status Add-On"
           ]
         }
       },
@@ -270,12 +270,12 @@
         "title": "Multi-Tenant Isolation",
         "description": "Create isolated environments for different teams or customers while maintaining centralized control. Ideal for SaaS providers and large enterprises.",
         "backContent": {
-          "title": "Multi-Tenant Architecture",
-          "description": "Support multiple tenants with isolated environments while maximizing resource efficiency. Implement tenant-specific policies, resource quotas, and secure data separation across your clusters.",
+          "title": "Helm Chart Distribution",
+          "description": "Deploy and manage Helm charts across multiple clusters while maintaining chart metadata and release information.",
           "features": [
-            "Tenant isolation & security",
-            "Resource quota management",
-            "Scalable multi-tenancy"
+            "Native Helm chart support",
+            "Consistent release management across clusters",
+            "Label-based chart distribution"
           ]
         }
       },
@@ -283,12 +283,12 @@
         "title": "Performance Optimization",
         "description": "Deploy workloads closest to users or data sources for optimal performance, reducing latency and improving user experience across global operations.",
         "backContent": {
-          "title": "Performance Optimization",
-          "description": "Optimize application performance with intelligent resource allocation, auto-scaling, and load balancing across clusters. Monitor and improve performance metrics in real-time.",
+          "title": "Template-Based Customization",
+          "description": "Customize workload configurations for different clusters while maintaining a single source of truth.",
           "features": [
-            "Intelligent resource allocation",
-            "Auto-scaling optimization",
-            "Real-time performance monitoring"
+            "Support for template expansion",
+            "Cluster-specific customization",
+            "Property-based configuration"
           ]
         }
       }

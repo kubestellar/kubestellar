@@ -62,10 +62,13 @@ export default function GetStartedSection() {
 
         <div className="mt-12 grid grid-cols-1 lgcustom:grid-cols-3 gap-6 lg:gap-8">
           {/* Installation Card */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 hover:bg-white/20 transition-colors duration-300 w-11/12 max-w-xl mx-auto lgcustom:w-auto lgcustom:max-w-none">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50 w-11/12 max-w-xl mx-auto lgcustom:w-auto lgcustom:max-w-none">
             <div className="p-6 flex flex-col h-full">
               <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
-                <Icon path="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                <Icon 
+                  path="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" 
+                  className="h-6 w-6 white"
+                />
               </div>
               <h3 className="text-base sm:text-lg font-bold mb-2">
                 {t("card1Title")}
@@ -76,7 +79,7 @@ export default function GetStartedSection() {
               <div>
                 <Link
                   href="/quick-installation"
-                  className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 sm:px-6 sm:py-3 sm:text-base transition-colors duration-20"
+                  className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600/80 to-blue-700/80 hover:from-blue-600 hover:to-blue-700 rounded-lg sm:px-6 sm:py-3 sm:text-base transition-all duration-200 border border-blue-500/30 mt-7"
                 >
                   {t("card1Button")}
                 </Link>
@@ -84,11 +87,24 @@ export default function GetStartedSection() {
             </div>
           </div>
 
-          {/* Community Card */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 hover:bg-white/20 transition-colors duration-300 w-11/12 max-w-xl mx-auto lgcustom:w-auto lgcustom:max-w-none">
+          {/* Use Cases & Resources Card */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50 w-11/12 max-w-xl mx-auto lgcustom:w-auto lgcustom:max-w-none">
             <div className="p-6">
               <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
-                <Icon path="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M13 7A4 4 0 1 1 5 7A4 4 0 0 1 13 7 M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                <svg
+                  className="h-6 w-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M13 7A4 4 0 1 1 5 7A4 4 0 0 1 13 7 M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+                  />
+                </svg>
               </div>
               <h3 className="text-base sm:text-lg font-bold mb-2 text-white">
                 {t("card2Title")}
@@ -102,7 +118,7 @@ export default function GetStartedSection() {
                     href="https://kubestellar.io/slack"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center px-3 py-2.5 rounded-lg bg-[#4A154B] hover:bg-[#5A1F5B] text-white text-sm font-medium transition-colors duration-200"
+                    className="flex items-center justify-center px-3 py-2.5 rounded-lg bg-gradient-to-r from-purple-600/80 to-purple-700/80 hover:from-purple-600 hover:to-purple-700 text-white text-sm font-medium transition-all duration-200 border border-purple-500/30"
                   >
                     <svg
                       className="h-4 w-4 mr-2 flex-shrink-0"
@@ -133,7 +149,7 @@ export default function GetStartedSection() {
                     href="https://github.com/kubestellar/kubestellar"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center px-3 py-2.5 rounded-lg bg-[#24292e] hover:bg-[#2f363d] text-white text-sm font-medium transition-colors duration-200"
+                    className="flex items-center justify-center px-3 py-2.5 rounded-lg bg-gradient-to-r from-slate-700/80 to-slate-800/80 hover:from-slate-700 hover:to-slate-800 text-white text-sm font-medium transition-all duration-200 border border-slate-600/30"
                   >
                     <svg
                       className="h-4 w-4 mr-2"
@@ -149,7 +165,7 @@ export default function GetStartedSection() {
                 <div className="grid grid-cols-2 gap-3">
                   <Link
                     href="/products"
-                    className="flex items-center justify-center px-3 py-2.5 rounded-lg bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-sm font-medium transition-colors duration-200"
+                    className="flex items-center justify-center px-3 py-2.5 rounded-lg bg-gradient-to-r from-orange-600/80 to-orange-700/80 hover:from-orange-600 hover:to-orange-700 text-white text-sm font-medium transition-all duration-200 border border-orange-500/30"
                   >
                     <svg
                       className="h-4 w-4 mr-2"
@@ -168,7 +184,7 @@ export default function GetStartedSection() {
                   </Link>
                   <Link
                     href="/contribute-handbook"
-                    className="flex items-center justify-center px-3 py-2.5 rounded-lg bg-[#059669] hover:bg-[#047857] text-white text-sm font-medium transition-colors duration-200"
+                    className="flex items-center justify-center px-3 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600/80 to-emerald-700/80 hover:from-emerald-600 hover:to-emerald-700 text-white text-sm font-medium transition-all duration-200 border border-emerald-500/30"
                   >
                     <svg
                       className="h-4 w-4 mr-2"
@@ -191,7 +207,7 @@ export default function GetStartedSection() {
           </div>
 
           {/* Documentation Card */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 hover:bg-white/20 transition-colors duration-300 w-11/12 max-w-xl mx-auto lgcustom:w-auto lgcustom:max-w-none">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50 w-11/12 max-w-xl mx-auto lgcustom:w-auto lgcustom:max-w-none">
             <div className="p-6">
               <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
                 <Icon path="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
