@@ -174,14 +174,14 @@ export default function MaintainerLadderPage() {
         <GridLines horizontalLines={21} verticalLines={18} />
       </div>
 
-      <div className="relative z-10 pt-16">
+      <div className="relative z-10 pt-7">
         {" "}
         {/* Add padding-top to account for fixed navbar */}
         {/* Header Section */}
-        <section className="py-16 sm:py-20 lg:py-24">
+        <section className="pt-12 pb-12 sm:pt-28 sm:pb-16 lg:pt-24 lg:pb-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3">
                 {t("title")}{" "}
                 <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
                   {t("titleSpan")}
@@ -362,68 +362,6 @@ export default function MaintainerLadderPage() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-        {/* Maintainer Activity Requirements */}
-        <section className="py-16 sm:py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-gray-800/40 backdrop-blur-md rounded-lg p-8 border border-white/10">
-              <h2 className="text-3xl font-bold text-white mb-8 text-center">
-                {t("activityRequirements.title")}
-              </h2>
-              <p className="text-gray-300 text-center mb-8 text-lg">
-                {t("activityRequirements.subtitle")}
-              </p>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="border-b border-gray-600">
-                      <th className="py-4 px-6 text-white font-semibold">
-                        {t("activityRequirements.table.metric")}
-                      </th>
-                      <th className="py-4 px-6 text-white font-semibold">
-                        {t("activityRequirements.table.requirement")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-gray-300">
-                    <tr className="border-b border-gray-700/50">
-                      <td className="py-4 px-6">
-                        {t("activityRequirements.table.helpWantedIssues")}
-                      </td>
-                      <td className="py-4 px-6 text-green-400 font-semibold">
-                        {t("activityRequirements.table.helpWantedIssuesValue")}
-                      </td>
-                    </tr>
-                    <tr className="border-b border-gray-700/50">
-                      <td className="py-4 px-6 font-semibold">
-                        {t("activityRequirements.table.prsMerged")}
-                      </td>
-                      <td className="py-4 px-6 text-green-400 font-semibold">
-                        {t("activityRequirements.table.prsMergedValue")}
-                      </td>
-                    </tr>
-                    <tr className="border-b border-gray-700/50">
-                      <td className="py-4 px-6">
-                        {t("activityRequirements.table.prReviews")}
-                      </td>
-                      <td className="py-4 px-6 text-green-400 font-semibold">
-                        {t("activityRequirements.table.prReviewsValue")}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="py-4 px-6">
-                        {t("activityRequirements.table.meetingAttendance")}
-                      </td>
-                      <td className="py-4 px-6 text-green-400 font-semibold">
-                        {t("activityRequirements.table.meetingAttendanceValue")}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
           </div>
         </section>
