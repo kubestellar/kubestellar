@@ -56,17 +56,17 @@ html.dark body {
 }
 
 /* Ensure Nextra sidebar is visible in light mode */
-html:not(.dark) nav {
+html:not(.dark) .nextra-docs-theme nav {
   background: #ffffff;
   color: #0a0a0a;
 }
 
-html:not(.dark) aside {
+html:not(.dark) .nextra-docs-theme aside {
   background: #ffffff;
   border-right-color: #e5e7eb;
 }
 
-html:not(.dark) .nextra-sidebar-container {
+html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   background: #ffffff;
 }
 

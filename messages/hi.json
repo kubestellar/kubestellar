@@ -1,9 +1,9 @@
 {
   "heroSection": {
-    "line1": "Multi-Cluster",
-    "line2": "Kubernetes",
-    "line3": "Orchestration",
-    "subtitle": "क्लाउड-नेटिव ऑर्केस्ट्रेशन के भविष्य का अनुभव करें। KubeStellar, AI-संचालित ऑटोमेशन और रीयल-टाइम इंटेलिजेंस के साथ मल्टी-क्लस्टर प्रबंधन में क्रांति लाता है।",
+    "line1": "मल्टी-क्लस्टर",
+    "line2": "कुबेरनेटिस",
+    "line3": "ऑर्केस्ट्रेशन",
+    "subtitle": "क्लाउड-नेटिव ऑर्केस्ट्रेशन का भविष्य अनुभव करें। KubeStellar एआई-सक्षम ऑटोमेशन और रीयल-टाइम इंटेलिजेंस के साथ मल्टी-क्लस्टर प्रबंधन को क्रांतिकारी बनाता है।",
     "terminalTitle": "kubestellar-control-center",
     "terminalStatus": "READY",
     "terminalCommandL1": "bash <(curl -s \\",
@@ -11,27 +11,27 @@
     "terminalCommandL3": "  kubestellar/refs/tags/v0.27.2/scripts/ \\",
     "terminalCommandL4": "  create-kubestellar-demo-env.sh) --platform kind",
     "terminalOutputInfo": "INFO",
-    "terminalOutputInfoText": "KubeStellar डेमो वातावरण इंस्टॉल किया जा रहा है...",
+    "terminalOutputInfoText": "KubeStellar डेमो वातावरण इंस्टॉल किया जा रहा है…",
     "terminalOutputSetup": "SETUP",
-    "terminalOutputSetupText": "kind क्लस्टर बनाए जा रहे हैं: kubeflex, cluster1, cluster2",
+    "terminalOutputSetupText": "kind क्लस्टर बना रहा है: kubeflex, cluster1, cluster2",
     "terminalOutputInstall": "INSTALL",
-    "terminalOutputInstallText": "KubeFlex कंट्रोल प्लेन कंपोनेंट्स डिप्लॉय किए जा रहे हैं",
+    "terminalOutputInstallText": "KubeFlex कंट्रोल प्लेन घटक डिप्लॉय कर रहा है",
     "terminalOutputConfig": "CONFIG",
-    "terminalOutputConfigText": "Open Cluster Management कॉन्फ़िगर किया जा रहा है",
+    "terminalOutputConfigText": "ओपन क्लस्टर मैनेजमेंट को कॉन्फ़िगर कर रहा है",
     "terminalOutputSuccess": "SUCCESS",
-    "terminalOutputSuccessText": "KubeStellar डेमो वातावरण तैयार है! सेटअप पूरा हुआ",
+    "terminalOutputSuccessText": "KubeStellar डेमो वातावरण तैयार! सेटअप पूरा",
     "buttonInstall": "KubeStellar इंस्टॉल करें",
-    "buttonDocs": "डॉक्स देखें"
+    "buttonDocs": "डॉक्स एक्सप्लोर करें"
   },
   "footer": {
-    "description": "Multi-Cluster Kubernetes ऑर्केस्ट्रेशन प्लेटफ़ॉर्म जो विविध बुनियादी ढाँचे में वितरित वर्कलोड प्रबंधन को सरल बनाता है।",
+    "description": "मल्टी-क्लस्टर क्यूबेरनेटिस ऑर्केस्ट्रेशन प्लेटफ़ॉर्म जो विविध इंफ्रास्ट्रक्चर में वितरित वर्कलोड प्रबंधन को सरल बनाता है।",
     "product": "उत्पाद",
     "features": "विशेषताएँ",
     "useCases": "उपयोग के मामले",
     "pricing": "मूल्य निर्धारण",
-    "roadmap": "Roadmap",
+    "roadmap": "रोडमैप",
     "resources": "संसाधन",
-    "documentation": "दस्तावेज़ीकरण",
+    "documentation": "डॉक्यूमेंटेशन",
     "tutorials": "ट्यूटोरियल",
     "blog": "ब्लॉग",
     "community": "समुदाय",
@@ -39,18 +39,18 @@
     "about": "हमारे बारे में",
     "team": "टीम",
     "careers": "करियर",
-    "contact": "संपर्क",
-    "stayUpdated": "अपडेट रहें",
+    "contact": "संपर्क करें",
+    "stayUpdated": "अपडेटेड रहें",
     "emailPlaceholder": "ईमेल",
     "subscribe": "सब्सक्राइब करें",
-    "subscribed": "सब्सक्राइब किया गया!",
+    "subscribed": "सब्सक्राइब हो गया!",
     "privacyNotice": "हम आपकी गोपनीयता का सम्मान करते हैं। कोई स्पैम नहीं।",
     "copyright": "© 2025 KubeStellar। सर्वाधिकार सुरक्षित। Apache 2.0 लाइसेंस",
     "privacyPolicy": "गोपनीयता नीति",
     "termsOfService": "सेवा की शर्तें",
     "cookiePolicy": "कुकी नीति",
     "madeWithLove": "KubeStellar टीम द्वारा ❤️ के साथ बनाया गया",
-    "backToTop": "वापस ऊपर जाएँ"
+    "backToTop": "ऊपर लौटें"
   },
   "navigation": {
     "docs": "डॉक्स",
@@ -58,16 +58,15 @@
     "contribute": "योगदान दें",
     "joinIn": "शामिल हों",
     "contributeHandbook": "योगदान हैंडबुक",
-    "security": "Security",
+    "quickInstallation": "त्वरित इंस्टॉलेशन",
+    "products": "उत्पाद",
+    "security": "सुरक्षा",
     "community": "समुदाय",
     "getInvolved": "शामिल हों",
-    "programs": "कार्यक्रम",
-    "ladder": "Ladder",
+    "programs": "प्रोग्राम",
+    "ladder": "स्टेप-अप",
     "contactUs": "हमसे संपर्क करें",
     "partners": "भागीदार",
-    "versionCurrent": "3.8.1 (Current)",
-    "version380": "3.8.0",
-    "allVersions": "सभी संस्करण",
     "language": "हिन्दी",
     "selectLanguage": "भाषा चुनें",
     "langHindi": "हिन्दी",
@@ -80,185 +79,273 @@
     "langChineseSimplified": "简体中文",
     "langChineseTraditional": "繁體中文",
     "langPortuguese": "Português",
-    "githubStar": "Star",
-    "githubFork": "Fork",
-    "githubWatch": "Watch",
+    "githubStar": "Star करें",
+    "githubFork": "Fork करें",
+    "githubWatch": "Watch करें",
     "mobileAbout": "हमारे बारे में",
-    "mobileHowItWorks": "यह कैसे काम करता है",
+    "mobileHowItWorks": "कैसे काम करता है",
     "mobileUseCases": "उपयोग के मामले",
     "mobileGetStarted": "शुरू करें",
-    "mobileContact": "संपर्क"
+    "mobileContact": "संपर्क करें"
   },
   "aboutSection": {
     "title": "क्या है",
     "titleSpan": "KubeStellar",
-    "subtitle": "एक मल्टी-क्लस्टर Kubernetes ऑर्केस्ट्रेशन प्लेटफ़ॉर्म जो आपके वितरित वर्कलोड के प्रबंधन को सरल बनाता है।",
-    "card1Title": "Single Control Plane",
-    "card1Description": "एक यूनिफाइड कंट्रोल प्लेन से कई Kubernetes क्लस्टरों का प्रबंधन करें, जिससे कॉन्टेक्स्ट स्विच करने की आवश्यकता समाप्त हो जाती है और संचालन सुव्यवस्थित होता है।",
-    "card2Title": "Intelligent Workload Placement",
-    "card2Description": "सर्वोत्तम प्रदर्शन के लिए क्लस्टर क्षमताओं, उपलब्धता और कस्टम बाधाओं के आधार पर स्वचालित रूप से वर्कलोड वितरित करें।",
-    "card3Title": "Policy-Driven Management",
-    "card3Description": "केंद्रीकृत प्रवर्तन के साथ अपने संपूर्ण Kubernetes एस्टेट में गवर्नेंस, सिक्योरिटी और कंप्लायंस के लिए नीतियां परिभाषित करें।",
-    "learnMore": "और अधिक जानें"
+    "subtitle": "एक मल्टी-क्लस्टर क्यूबेरनेटिस ऑर्केस्ट्रेशन प्लेटफ़ॉर्म जो वितरित वर्कलोड प्रबंधन को सरल बनाता है।",
+    "card1Title": "सिंगल कंट्रोल प्लेन",
+    "card1Description": "एकीकृत कंट्रोल प्लेन से कई क्यूबेरनेटिस क्लस्टर्स का प्रबंधन करें, कॉन्टेक्स्ट बदलने की जरूरत समाप्त करें और संचालन को सुव्यवस्थित करें।",
+    "card2Title": "बुद्धिमान वर्कलोड प्लेसमेंट",
+    "card2Description": "क्लस्टर क्षमताओं, उपलब्धता और कस्टम प्रतिबंधों के आधार पर वर्कलोड्स को स्वचालित रूप से वितरित करें, ताकि प्रदर्शन बेहतर हो सके।",
+    "card3Title": "नीति-आधारित प्रबंधन",
+    "card3Description": "गवर्नेंस, सुरक्षा और अनुपालन के लिए नीतियाँ परिभाषित करें और पूरे क्यूबेरनेटिस एस्टेट में केंद्रीकृत प्रवर्तन सुनिश्चित करें।",
+    "learnMore": "और सीखें"
   },
   "contactSection": {
-    "title": "संपर्क",
-    "titleSpan": "करें",
-    "subtitle": "KubeStellar के बारे में प्रश्न हैं? हम सहायता के लिए यहां हैं!",
-    "card1Title": "ईमेल सपोर्ट",
-    "card1Description": "हमारी टीम से सीधी सहायता प्राप्त करें",
+    "title": "संपर्क में",
+    "titleSpan": "हों",
+    "subtitle": "KubeStellar के बारे में आपके कोई सवाल हैं? हम मदद के लिए तैयार हैं!",
+    "card1Title": "ईमेल सहायता",
+    "card1Description": "हमारी टीम से सीधे सहायता प्राप्त करें",
     "card1Link": "support@kubestellar.io",
     "card2Title": "कम्युनिटी चैट",
-    "card2Description": "रीयल-टाइम सपोर्ट के लिए हमारे Slack वर्कस्पेस से जुड़ें",
-    "card2Link": "Slack से जुड़ें",
+    "card2Description": "रीयल-टाइम समर्थन के लिए हमारा स्लैक वर्कस्पेस जॉइन करें",
+    "card2Link": "Slack जॉइन करें",
     "card3Title": "GitHub",
-    "card3Description": "योगदान दें, इश्यू रिपोर्ट करें, या सोर्स कोड ब्राउज़ करें",
-    "card3Link": "रिपॉजिटरी देखें",
+    "card3Description": "प्रोजेक्ट में योगदान दें, मुद्दे रिपोर्ट करें या स्रोत कोड देखें",
+    "card3Link": "रेपो देखें",
     "card4Title": "LinkedIn",
-    "card4Description": "हमारे पेशेवर समुदाय से जुड़ें",
+    "card4Description": "हमारे प्रोफेशनल समुदाय से जुड़ें",
     "card4Link": "हमें फॉलो करें",
-    "formTitle": "हमें एक संदेश भेजें",
+    "formTitle": "हमें संदेश भेजें",
     "formName": "नाम *",
     "formNamePlaceholder": "आपका पूरा नाम",
     "formEmail": "ईमेल *",
     "formEmailPlaceholder": "you@example.com",
     "formSubject": "विषय *",
-    "formSubjectPlaceholder": "एक विषय चुनें",
+    "formSubjectPlaceholder": "विषय चुनें",
     "formSubjectOption1": "सामान्य पूछताछ",
-    "formSubjectOption2": "Technical Support",
-    "formSubjectOption3": "Partnership",
-    "formSubjectOption4": "Documentation Feedback",
-    "formSubjectOption5": "Enterprise Solutions",
+    "formSubjectOption2": "तकनीकी समर्थन",
+    "formSubjectOption3": "भागीदारी",
+    "formSubjectOption4": "डॉक्यूमेंटेशन प्रतिक्रिया",
+    "formSubjectOption5": "एंटरप्राइज समाधान",
     "formSubjectOption6": "अन्य",
     "formMessage": "संदेश *",
-    "formMessagePlaceholder": "हमें अपने यूज़ केस के बारे में बताएं और हम कैसे मदद कर सकते हैं...",
-    "formPrivacy": "मैं",
+    "formMessagePlaceholder": "हमें अपने उपयोग-के-मामले और कैसे मदद कर सकते हैं ये बताएं…",
+    "formPrivacy": "मैं सहमत हूँ",
     "formPrivacyLink": "गोपनीयता नीति",
-    "formPrivacyCont": "से सहमत हूँ और KubeStellar टीम द्वारा संपर्क किए जाने की सहमति देता हूँ।",
+    "formPrivacyCont": "और KubeStellar टीम द्वारा संपर्क किए जाने की सहमति देता हूँ।",
     "formSubmit": "संदेश भेजें",
-    "formSubmitting": "भेजा जा रहा है...",
-    "formSuccess": "आपका ईमेल KubeStellar डेवलपमेंट मेलिंग लिस्ट को भेजा जाएगा। कृपया भेजने को पूरा करने के लिए अपने ईमेल क्लाइंट की जांच करें!"
+    "formSubmitting": "भेजा जा रहा है…",
+    "formSuccess": "आपका ईमेल KubeStellar विकास मेनलिस्ट को भेजा जाएगा। कृपया अपने ईमेल क्लाइंट में जाँच करें!"
   },
   "getStartedSection": {
-    "title": "शुरू करने के लिए तैयार हैं?",
-    "subtitle": "KubeStellar उपयोगकर्ताओं और योगदानकर्ताओं के बढ़ते समुदाय में शामिल हों।",
-    "card1Title": "Quick Installation",
-    "card1Description": "हमारी सुव्यवस्थित इंस्टॉलेशन गाइड के साथ मिनटों में KubeStellar को शुरू करें और चलाएं, जिसमें पूर्वापेक्षाएँ और चरण-दर-चरण निर्देश शामिल हैं।",
-    "card1Button": "Quick Installation शुरू करें",
-    "card2Title": "समुदाय से जुड़ें",
-    "card2Description": "Slack, फ़ोरम और सामुदायिक कॉल के माध्यम से अन्य उपयोगकर्ताओं, योगदानकर्ताओं और मेंटेनर्स से जुड़ें।",
+    "title": "शुरू करने के लिए तैयार?",
+    "subtitle": "KubeStellar उपयोगकर्ताओं और योगदानकर्ताओं की बढ़ती कम्युनिटी में शामिल हों।",
+    "card1Title": "त्वरित इंस्टॉलेशन",
+    "card1Description": "हमारी स्ट्रीमलाइन इंस्टॉलेशन गाइड का उपयोग करके मिनटों में KubeStellar सेट-अप करें। आवश्यकताएँ और चरण-बद्ध निर्देश उपलब्ध हैं।",
+    "card1Button": "त्वरित इंस्टॉलेशन शुरू करें",
+    "card2Title": "समुदाय में शामिल हों",
+    "card2Description": "स्लैक, फोरम और कम्युनिटी कॉल्स के माध्यम से अन्य उपयोगकर्ताओं, योगदानकर्ताओं और मेंटेनर्स से जुड़ें।",
     "card2Button1": "Slack",
     "card2Button2": "GitHub",
-    "card3Title": "Documentation देखें",
-    "card3Description": "KubeStellar की क्षमताओं में महारत हासिल करने में आपकी सहायता के लिए व्यापक गाइड, ट्यूटोरियल और API संदर्भ।",
-    "card3Link1": "Getting Started",
-    "card3Link2": "Tutorials",
-    "card3Link3": "API Reference"
+    "card2Button3": "उत्पाद",
+    "card2Button4": "हैंडबुक",
+    "card3Title": "डॉक्यूमेंटेशन खोजें",
+    "card3Description": "मास्टर करने के लिए व्यापक गाइड्स, ट्यूटोरियल्स और API संदर्भ उपलब्ध हैं।",
+    "card3Link1": "शुरू करें",
+    "card3Link2": "ट्यूटोरियल्स",
+    "card3Link3": "API संदर्भ"
   },
-  "howItWorksSection": {
-    "title": "यह कैसे",
-    "titleSpan": "काम करता है",
-    "subtitle": "KubeStellar एक सरल, शक्तिशाली आर्किटेक्चर के साथ आपके मल्टी-क्लस्टर वातावरण को ऑर्केस्ट्रेट करता है",
-    "step1Title": "Workloads परिभाषित करें",
-    "step1Description": "प्लेसमेंट बाधाओं और नीतियों के साथ Kubernetes रिसोर्स बनाएं।",
-    "step1DescriptionDesktop": "परिचित टूल और मैनिफ़ेस्ट का उपयोग करके KubeStellar कंट्रोल प्लेन में Kubernetes रिसोर्स बनाएं। रिसोर्स को प्लेसमेंट बाधाओं और नीतियों के साथ टैग करें।",
-    "step2Title": "Workload Orchestration",
-    "step2Description": "KubeStellar वर्कलोड का विश्लेषण करता है और इष्टतम प्लेसमेंट निर्धारित करता है।",
-    "step2DescriptionDesktop": "KubeStellar का ऑर्केस्ट्रेशन इंजन वर्कलोड का विश्लेषण करता है और बाधाओं और नीतियों के आधार पर पंजीकृत क्लस्टरों में इष्टतम प्लेसमेंट निर्धारित करता है।",
-    "step2Tag1": "Policy Evaluation",
-    "step2Tag2": "Constraint Matching",
-    "step2Tag3": "Resource Analysis",
-    "step3Title": "Automated Deployment",
-    "step3Description": "वर्कलोड को क्लस्टरों में डिप्लॉय किया जाता है और लगातार मॉनिटर किया जाता है।",
-    "step3DescriptionDesktop": "वर्कलोड स्वचालित रूप से चयनित क्लस्टरों में डिप्लॉय किए जाते हैं। KubeStellar लगातार स्वास्थ्य की मॉनिटर करता है और सभी क्लस्टरों में वांछित स्थिति सुनिश्चित करता है।",
-    "step3Cluster1": "Edge Cluster",
-    "step3Cluster2": "Cloud Cluster",
-    "step3Cluster3": "On-Prem Cluster"
+  "howToUseSection": {
+    "title": "कैसे उपयोग करें",
+    "titleSpan": "KubeStellar",
+    "subtitle": "इन 5 आसान चरणों का अनुसरण करें ताकि आप KubeStellar मल्टी-क्लस्टर ऑर्केस्ट्रेशन शुरू कर सकें",
+    "step1Title": "अपना वातावरण सेट करें",
+    "step1Description": "आवश्यक टूल इंस्टॉल करें और कोर घटकों को इनिशियलाइज़ करें",
+    "step1DescriptionDesktop": "आवश्यक टूल इंस्टॉल करें और KubeFlex होस्टिंग क्लस्टर, ITS, WDS, और WECs सहित कोर कंपोनेंट्स इनिशियलाइज़ करें।",
+    "step1CodeComment": "# आवश्यक टूल इंस्टॉल करें",
+    "step1Tool1": "kubectl",
+    "step1Tool2": "helm",
+    "step1Tool3": "docker",
+    "step1Tool4": "kind/k3d",
+    "step1Tool5": "KubeFlex",
+    "step1Tool6": "OCM CLI",
+    "step2Title": "क्लस्टर्स पंजीकृत और लेबल करें",
+    "step2Description": "WECs पंजीकृत करें और लक्ष्यीकरण के लिए लेबल लागू करें",
+    "step2DescriptionDesktop": "OCM के साथ WECs को ITS में पंजीकृत करें, क्लस्टर्स को लेबल करें और सुरक्षित कनेक्शन स्थापित करें।",
+    "step2CodeComment": "# उदाहरण क्लस्टर लेबलिंग",
+    "step2Command": "kubectl label managedcluster",
+    "step2Cluster": "cluster1",
+    "step2Label1": "location-group=edge",
+    "step2Label2": "name=cluster1",
+    "step3Title": "वर्कलोड प्लेसमेंट परिभाषित करें",
+    "step3Description": "डिप्लॉयमेंट नियम निर्धारित करने के लिए BindingPolicy ऑब्जेक्ट्स बनाएँ",
+    "step3DescriptionDesktop": "BindingPolicy ऑब्जेक्ट्स बनाएं ताकि यह निर्दिष्ट हो सके कि कौन-से क्लस्टर्स को वर्कलोड मिलेंगे और किन वर्कलोड्स को वितरित किया जाए।",
+    "step3ApiVersion": "control.kubestellar.io/v1alpha1",
+    "step3Kind": "BindingPolicy",
+    "step3MetadataName": "example-policy",
+    "step3SpecClusterSelectors": "clusterSelectors",
+    "step3MatchLabels": "matchLabels",
+    "step3LocationGroup": "location-group: edge",
+    "step4Title": "अपने वर्कलोड्स डिप्लॉय करें",
+    "step4Description": "नैटिव क्यूबेरनेटिस फ़ॉर्मेट में वर्कलोड्स डिप्लॉय करें",
+    "step4DescriptionDesktop": "kubectl apply, Helm चार्ट्स, ArgoCD, या कस्टम रिसोर्सेस का उपयोग करके नैटिव क्यूबेरनेटिस फ़ॉर्मेट में वर्कलोड्स डिप्लॉय करें।",
+    "step4ApiVersion": "apps/v1",
+    "step4Kind": "Deployment",
+    "step4MetadataName": "example-app",
+    "step4Labels": "labels",
+    "step4AppName": "app.kubernetes.io/name: myapp",
+    "step4Spec": "spec",
+    "step4Replicas": "replicas",
+    "step4ReplicasValue": "3",
+    "step5Title": "मॉनिटर और प्रबंधित करें",
+    "step5Description": "डिप्लॉयमेंट स्थिति देखें और वर्कलोड हेल्थ प्रबंधित करें",
+    "step5DescriptionDesktop": "क्लस्टर्स में डिप्लॉयमेंट स्थिति देखें, वर्कलोड हेल्थ मैनेज करें, स्थिति जानकारी एकत्र करें, और नीति अनुपालन प्रबंधित करें।",
+    "step5Tag1": "स्थिति संग्रह",
+    "step5Tag2": "स्वास्थ्य मॉनिटरिंग",
+    "step5Tag3": "नीति प्रबंधन",
+    "step5Command1Comment": "# सभी क्लस्टर्स में डिप्लॉयमेंट स्थिति देखें",
+    "step5Command2Comment": "# वर्कलोड वितरण देखें",
+    "step5Command3Comment": "# संसाधन उपयोग मॉनिटर करें"
   },
   "useCasesSection": {
-    "title": "उपयोग के",
-    "titleSpan": "मामले",
-    "subtitle": "जानें कि संगठन अपनी मल्टी-क्लस्टर ज़रूरतों के लिए KubeStellar का लाभ कैसे उठाते हैं।",
-    "learnMore": "और अधिक जानें",
+    "title": "उपयोग",
+    "titleSpan": "के मामले",
+    "subtitle": "जानिए कि कैसे संगठन विभिन्न मल्टी-क्लस्टर जरूरतों के लिए KubeStellar का उपयोग करते हैं।",
+    "learnMore": "और जानें",
     "cases": {
       "edge": {
-        "title": "Edge Computing",
-        "description": "केंद्रीकृत प्रबंधन के साथ एज स्थानों पर एप्लिकेशन डिप्लॉय करें। वितरित बुनियादी ढाँचे के साथ रिटेल, मैन्युफैक्चरिंग और टेलीकॉम के लिए आदर्श।"
+        "title": "एज कंप्यूटिंग",
+        "description": "मल्टी-लोकेशन एज इंफ्रास्ट्रक्चर में ऐप्लिकेशन डिप्लॉय करें। खुदरा, निर्माण, और टेलीकॉम के लिए आदर्श।",
+        "backContent": {
+          "title": "एज कंप्यूटिंग उत्कृष्टता",
+          "description": "इंटेलिजेंट वर्कलोड वितरण के साथ एज लोकेशंस में ऐप्लिकेशन डिप्लॉय करें। KubeStellar स्वचालित रूप से संसाधन आवंटन प्रबंधित करता है, कम-लेटेन्सी कनेक्टिविटी सुनिश्चित करता है, और आपके एज इंफ्रास्ट्रक्चर में स्थिरता बनाए रखता है।",
+          "features": [
+            "स्वचालित एज डिप्लॉयमेंट",
+            "कम-लेटेन्सी अनुकूलन",
+            "संसाधन बुद्धिमान वितरण"
+          ]
+        }
       },
       "compliance": {
-        "title": "Multi-Region Compliance",
-        "description": "विशिष्ट क्षेत्रीय अनुपालन आवश्यकताओं के साथ एप्लिकेशन डिप्लॉय करें। वैश्विक परिचालनों में डेटा रेजीडेंसी और विनियामक अनुपालन सुनिश्चित करें।"
+        "title": "मल्टी-रीजन अनुपालन",
+        "description": "ऐप्लिकेशन को विशिष्ट क्षेत्रीय अनुपालन आवश्यकताओं के साथ डिप्लॉय करें। डेटा रेसिडेंसी और नियम-अनुपालन सुनिश्चित करें।",
+        "backContent": {
+          "title": "सुरक्षा और अनुपालन",
+          "description": "पूरे क्लस्टर एस्टेट में केंद्रित नीति के साथ सुरक्षा और अनुपालन आवश्यकताओं को लागू करें। स्वचालित नीति वितरण आपके इंफ्रास्ट्रक्चर में लगातार सुरक्षा स्थिति सुनिश्चित करता है।",
+          "features": [
+            "केंद्रीकृत नीति प्रबंधन",
+            "स्वचालित अनुपालन जांच",
+            "सुरक्षा स्थिति मॉनिटरिंग"
+          ]
+        }
       },
       "hybrid": {
-        "title": "Hybrid/Multi-Cloud",
-        "description": "एकीकृत नीतियों और सुसंगत अनुभव के साथ कई क्लाउड प्रदाताओं और ऑन-प्रिमाइसेस बुनियादी ढाँचे में वर्कलोड को निर्बाध रूप से प्रबंधित करें।"
+        "title": "हाइब्रिड/मल्टी-क्लाउड",
+        "description": "कई क्लाउड प्रदाताओं और ऑन-प्रिमाइस इंफ्रास्ट्रक्चर में वर्कलोड्स का सहज प्रबंधन करें, एकीकृत नीतियों और समान अनुभव के साथ।",
+        "backContent": {
+          "title": "हाइब्रिड क्लाउड मास्टरी",
+          "description": "पब्लिक क्लाउड्स, प्राइवेट डेटा-सेंटर और एज लोकेशंस में वर्कलोड्स को सहजता से कनेक्ट और प्रबंधित करें। एकीकृत प्रबंधन एवं स्वचालित फेलओवर क्षमताओं के साथ वास्तविक हाइब्रिड डिप्लॉयमेंट सक्षम करें।",
+          "features": [
+            "मल्टी-क्लाउड ऑर्केस्ट्रेशन",
+            "एकीकृत प्रबंधन प्लेन",
+            "स्वचालित फेलओवर और रिकवरी"
+          ]
+        }
       },
       "dr": {
-        "title": "Disaster Recovery",
-        "description": "विभिन्न क्षेत्रों में कई क्लस्टरों में स्वचालित वर्कलोड प्रतिकृति और फेलओवर के साथ मजबूत डिजास्टर रिकवरी रणनीतियों को लागू करें।"
+        "title": "डिजास्टर रिकवरी",
+        "description": "मल्टी-क्लस्टर रणनीतियों के साथ मजबूत डिजास्टर रिकवरी लागू करें जिसमें स्वचालित वर्कलोड प्रतिकृति और विभिन्न क्षेत्रों में फेलओवर शामिल हों।",
+        "backContent": {
+          "title": "डिजास्टर रिकवरी",
+          "description": "स्वचालित बैकअप, प्रतिकृति, और रिस्टॉरेशन क्षमताओं के साथ मजबूत डिजास्टर रिकवरी रणनीति लागू करें। व्यवसाय निरंतरता सुनिश्चित करें मल्टी-रीजन डिप्लॉयमेंट और इंस्टेंट फेलओवर मेकैनिज्म के साथ।",
+          "features": [
+            "स्वचालित बैकअप और प्रतिलिपि",
+            "मल्टी-रीजन डिप्लॉयमेंट",
+            "इंस्टेंट फेलओवर क्षमताएँ"
+          ]
+        }
       },
       "multitenant": {
-        "title": "Multi-Tenant Isolation",
-        "description": "केंद्रीकृत नियंत्रण बनाए रखते हुए विभिन्न टीमों या ग्राहकों के लिए पृथक वातावरण बनाएं। SaaS प्रदाताओं और बड़े उद्यमों के लिए आदर्श।"
+        "title": "मल्टी-टेनेंट अलगाव",
+        "description": "विभिन्न टीम्स या ग्राहकों के लिए अलग-अलग वातावरण बनाएं, जबकि केंद्रीकृत नियंत्रण बनाए रखें। SaaS प्रोवाइडर्स और बड़े एंटरप्राइजेस के लिए आदर्श।",
+        "backContent": {
+          "title": "मल्टी-टेनेंट आर्किटेक्चर",
+          "description": "अलग-अलग वातावरणों का समर्थन करें विभिन्न टेनेंट्स के लिए, जबकि संसाधन-क्षमता अधिकतम करें। टेनेंट-विशिष्ट नीतियाँ, संसाधन कोटा, और सुरक्षित डेटा पृथक्करण लागू करें अपने क्लस्टर्स में।",
+          "features": [
+            "टेनेंट अलगाव और सुरक्षा",
+            "संसाधन कोटा प्रबंधन",
+            "स्केलेबल मल्टी-टेनेंसी"
+          ]
+        }
       },
       "performance": {
-        "title": "Performance Optimization",
-        "description": "इष्टतम प्रदर्शन के लिए उपयोगकर्ताओं या डेटा स्रोतों के निकटतम वर्कलोड डिप्लॉय करें, जिससे वैश्विक परिचालनों में विलंबता कम हो और उपयोगकर्ता अनुभव में सुधार हो।"
+        "title": "प्रदर्शन अनुकूलन",
+        "description": "उपयोगकर्ताओं या डेटा स्रोतों के सबसे करीब वर्कलोड्स डिप्लॉय करें बेहतर प्रदर्शन के लिए, लेटेन्सी कम करें और वैश्विक संचालन में उपयोगकर्ता अनुभव बेहतर करें।",
+        "backContent": {
+          "title": "प्रदर्शन अनुकूलन",
+          "description": "बुद्धिमान संसाधन आवंटन, ऑटो-स्केलिंग, और क्लस्टर्स में लोड-बैलेंसिंग के साथ ऐप्लिकेशन प्रदर्शन को अनुकूलित करें। वास्तविक-समय में प्रदर्शन मेट्रिक्स मॉनिटर करें और सुधारें।",
+          "features": [
+            "बुद्धिमान संसाधन आवंटन",
+            "ऑटो-स्केलिंग अनुकूलन",
+            "रीयल-टाइम प्रदर्शन मॉनिटरिंग"
+          ]
+        }
       }
     }
   },
   "communityHandbook": {
-    "title": "योगदान",
+    "title": "योगदान दें",
     "titleSpan": "हैंडबुक",
-    "learnMore": "और अधिक जानें",
+    "learnMore": "और जानें",
     "cards": {
       "onboarding": {
-        "title": "Onboarding",
-        "description": "KubeStellar GitHub Organization On-boarding और Off-boarding Policy. जानें कि हमारे समुदाय के साथ कैसे शुरुआत करें।"
+        "title": "ऑनबोर्डिंग",
+        "description": "KubeStellar GitHub संगठन ऑन-बोर्डिंग और ऑफ-बोर्डिंग नीति। हमारा समुदाय में शामिल होने का तरीका जानें।"
       },
       "codeOfConduct": {
-        "title": "Code of Conduct",
-        "description": "सभी के योगदान और आगे बढ़ने के लिए एक स्वागत योग्य और समावेशी समुदाय बनाने का हमारा संकल्प।"
+        "title": "व्यवहार संहिता",
+        "description": "हमारी प्रतिबद्धता सभी योगदानकर्ताओं के लिए एक स्वागत-योग्य और समावेशी समुदाय बनाने की।"
       },
       "guidelines": {
-        "title": "Guidelines",
-        "description": "KubeStellar प्रोजेक्ट में योगदान देने के लिए सर्वश्रेष्ठ अभ्यास। गुणवत्तापूर्ण योगदान के लिए आवश्यक दिशानिर्देश।"
+        "title": "दिशा-निर्देश",
+        "description": "KubeStellar प्रोजेक्ट में योगदान के लिए सर्वोत्तम प्रथाएँ। गुणवत्ता वाले योगदान के लिए आवश्यक दिशा-निर्देश।"
       },
       "license": {
-        "title": "License",
-        "description": "KubeStellar, Apache 2.0 License के तहत लाइसेंस प्राप्त है। ओपन सोर्स लाइसेंसिंग और शर्तों के बारे में जानें।"
+        "title": "लाइसेंस",
+        "description": "KubeStellar Apache 2.0 लाइसेंस के अधीन है। ओपन-सोर्स लाइसेंसिंग और शर्तें जानें।"
       },
       "governance": {
-        "title": "Governance",
-        "description": "KubeStellar प्रोजेक्ट को कैसे शासित और व्यवस्थित किया जाता है। हमारी निर्णय लेने की प्रक्रियाओं को समझें।"
+        "title": "शासन",
+        "description": "KubeStellar प्रोजेक्ट के निर्णय-प्रक्रियाओं और संगठन संरचना को समझें।"
       },
       "testing": {
-        "title": "Testing",
-        "description": "योगदानों की टेस्टिंग के लिए प्रक्रियाएं और दिशानिर्देश। हर बदलाव में गुणवत्ता और विश्वसनीयता सुनिश्चित करें।"
+        "title": "परीक्षण",
+        "description": "योगदानों के परीक्षण के लिए प्रक्रियाएँ और दिशानिर्देश। प्रत्येक बदलाव की गुणवत्ता और विश्वसनीयता सुनिश्चित करें।"
       },
       "packaging": {
-        "title": "Packaging",
-        "description": "KubeStellar कंपोनेंट्स को कैसे पैकेज और वितरित करें। बिल्ड और डिप्लॉयमेंट प्रक्रियाओं के बारे में जानें।"
+        "title": "पैकेजिंग",
+        "description": "KubeStellar घटकों को पैकेज और वितरित करने का तरीका। बिल्ड और डिप्लॉयमेंट प्र süreç जानें।"
       },
       "docsManagement": {
-        "title": "Docs Management Overview",
-        "description": "डॉक्यूमेंटेशन को कैसे प्रबंधित और अपडेट किया जाता है, इसका अवलोकन। व्यापक डॉक्यूमेंटेशन वर्कफ़्लो।"
+        "title": "डॉक्स प्रबंधन अवलोकन",
+        "description": "डॉक्यूमेंटेशन कैसे प्रबंधित और अपडेट की जाती है इस पर व्यापक प्रक्रिया।"
       },
       "testingWebsitePRs": {
-        "title": "Testing Website PRs",
-        "description": "KubeStellar वेबसाइट के लिए पुल रिक्वेस्ट्स (PRs) को कैसे टेस्ट करें। वेब परिवर्तनों के लिए क्वालिटी एश्योरेंस।"
+        "title": "वेबसाइट PRs का परीक्षण",
+        "description": "KubeStellar वेबसाइट के पुल रिक्वेस्ट्स का परीक्षण कैसे करें। गुणवत्ता आश्वासन।"
       },
       "releaseProcess": {
-        "title": "Release Process",
-        "description": "नए KubeStellar रिलीज़ बनाने और प्रकाशित करने की प्रक्रिया। संपूर्ण रिलीज़ लाइफसाइकिल प्रबंधन।"
+        "title": "रिलीज़ प्रक्रिया",
+        "description": "नए KubeStellar रिलीज़ बनाने एवं प्रकाशित करने की प्रक्रिया। पूर्ण रिलीज़ लाइफसायकल प्रबंधन।"
       },
       "releaseTesting": {
-        "title": "Release Testing",
-        "description": "प्रकाशन से पहले नई रिलीज़ को कैसे टेस्ट और वैलिडेट करें। व्यापक रिलीज़ वैलिडेशन प्रक्रिया।"
+        "title": "रिलीज़ परीक्षण",
+        "description": "नए रिलीज़ को प्रकाशित करने से पहले कैसे परीक्षण और वैधता करें। व्यापक रिलीज़ प्रमाणिकरण प्रक्रिया।"
       },
       "signoffSigning": {
-        "title": "Signoff and Signing Contributions",
-        "description": "अपने योगदानों पर साइनऑफ करने की आवश्यकताएं। कानूनी अनुपालन और योगदान सत्यापन।"
+        "title": "साइन-ऑफ और साइनिंग योगदान",
+        "description": "आपके योगदानों के साइन-ऑफ और सत्यापन की आवश्यकताएँ। कानूनी अनुपालन और योगदान सत्यापन।"
       }
     }
   },
@@ -267,107 +354,108 @@
     "description": "विवरण",
     "overview": "अवलोकन",
     "eligibility": "पात्रता मापदंड",
-    "timeline": "समयसीमा",
-    "structure": "कार्यक्रम संरचना",
-    "howToApply": "आवेदन कैसे करें",
+    "timeline": "टाइमलाइन",
+    "structure": "प्रोग्राम संरचना",
+    "howToApply": "कैसे आवेदन करें",
     "resources": "संसाधन"
   },
   "quickInstallationPage": {
-    "title": "Quick Installation Guide",
-    "subtitle": "इस सुव्यवस्थित इंस्टॉलेशन गाइड के साथ KubeStellar को जल्दी से शुरू करें और चलाएं। नीचे दी गई पूर्वापेक्षाओं और इंस्टॉलेशन चरणों का पालन करें।",
-    "prerequisitesTitle": "Prerequisites",
-    "prerequisitesSubtitle": "अपने यूज़ केस के आधार पर आवश्यक टूल इंस्टॉल करें",
-    "coreTitle": "Core Prerequisites",
-    "coreDescription": "KubeStellar का उपयोग करने के लिए आवश्यक टूल",
+    "title": "त्वरित इंस्टॉलेशन गाइड",
+    "subtitle": "KubeStellar को जल्दी से चलाने-के-लिए, इस स्ट्रीमलाइन इंस्टॉलेशन गाइड का अनुसरण करें। नीचे प्री-रेक्विज़िट्स और इंस्टॉलेशन स्टेप्स दिए गए हैं।",
+    "prerequisitesTitle": "प्री-रेक्विज़िट्स",
+    "prerequisitesSubtitle": "अपनी उपयोग-स्थिति के अनुसार आवश्यक टूल इंस्टॉल करें",
+    "coreTitle": "कोर प्री-रेक्विज़िट्स",
+    "coreDescription": "KubeStellar इस्तेमाल करने के लिए आवश्यक टूल",
     "coreDocker": "Docker",
-    "coreDockerDesc": "Container runtime platform",
+    "coreDockerDesc": "कंटेनर रनटाइम प्लेटफ़ॉर्म",
     "coreKubectl": "kubectl",
-    "coreKubectlDesc": "Kubernetes command-line tool",
+    "coreKubectlDesc": "क्यूबेरनेटिस कमांड-लाइन टूल",
     "coreKubeflex": "KubeFlex",
-    "coreKubeflexDesc": "Core component for multi-cluster management",
+    "coreKubeflexDesc": "मल्टी-क्लस्टर प्रबंधन के लिए कोर कॉम्पोनेंट",
     "coreOcm": "OCM CLI",
-    "coreOcmDesc": "Open Cluster Management command line interface",
+    "coreOcmDesc": "ओपन क्लस्टर मैनेजमेंट कमांड-लाइन इंटरफेस",
     "coreHelm": "Helm",
-    "coreHelmDesc": "Package manager for Kubernetes",
-    "additionalTitle": "Additional Prerequisites",
-    "additionalDescription": "KubeStellar उदाहरण चलाने के लिए अतिरिक्त टूल",
+    "coreHelmDesc": "क्यूबेरनेटिस के लिए पैकेज मैनेजर",
+    "additionalTitle": "अतिरिक्त प्री-रेक्विज़िट्स",
+    "additionalDescription": "KubeStellar उदाहरण चलाने-के लिए अतिरिक्त टूल्स",
     "additionalKind": "kind",
-    "additionalKindDesc": "Kubernetes IN Docker - local Kubernetes cluster",
+    "additionalKindDesc": "कुबेरनेटिस इन डॉकर - लोकल क्यूबेरनेटिस क्लस्टर",
     "additionalK3d": "k3d",
-    "additionalK3dDesc": "Lightweight wrapper to run k3s in Docker",
+    "additionalK3dDesc": "डॉकर में k3s चलाने-के लिए लाइटवेट रैपर",
     "additionalArgo": "Argo CD CLI",
-    "additionalArgoDesc": "GitOps continuous delivery tool for Kubernetes",
-    "buildTitle": "Build Prerequisites",
-    "buildDescription": "सोर्स से KubeStellar को बिल्ड करने के लिए आवश्यक टूल",
+    "additionalArgoDesc": "क्यूबेरनेटिस के लिए गिटऑप्स लगातार डिलीवरी टूल",
+    "buildTitle": "बिल्ड प्री-रेक्विज़िट्स",
+    "buildDescription": "सोर्स से KubeStellar बिल्ड करने-के लिए टूल्स",
     "buildMake": "Make",
-    "buildMakeDesc": "Build automation tool",
+    "buildMakeDesc": "बिल्ड ऑटोमेशन टूल",
     "buildGo": "Go",
-    "buildGoDesc": "KubeStellar बनाने के लिए प्रोग्रामिंग भाषा",
+    "buildGoDesc": "KubeStellar बनाने की प्रोग्रामिंग भाषा",
     "buildKo": "ko",
-    "buildKoDesc": "Go एप्लिकेशन्स के लिए Container image builder",
+    "buildKoDesc": "Go ऐप्लिकेशन्स के लिए कंटेनर इमेज बिल्डर",
     "prerequisitesInstall": "इंस्टॉल करें:",
-    "prerequisitesVerify": "सत्यापित करें:",
+    "prerequisitesVerify": "जाँच करें:",
     "prerequisitesButton": "विस्तृत इंस्टॉलेशन गाइड देखें",
-    "autoCheckTitle": "Automated Check of Prerequisites",
-    "autoCheckSubtitle": "यह स्वचालित रूप से सत्यापित करने के लिए इस स्क्रिप्ट का उपयोग करें कि आपके सिस्टम में सभी आवश्यक टूल हैं",
-    "autoCheckRun": "Prerequisites Check चलाएँ:",
-    "autoCheckAboutTitle": "Prerequisites Check Script के बारे में",
-    "autoCheckAbout1": "\"curl-to-bash\" उपयोग के लिए उपयुक्त सेल्फ-कंटेन्ड स्क्रिप्ट",
-    "autoCheckAbout2": "`which` कमांड का उपयोग करके आपके $PATH में पूर्वापेक्षाओं की उपस्थिति की जाँच करता है",
-    "autoCheckAbout3": "मौजूद पूर्वापेक्षाओं के लिए वर्शन और पाथ की जानकारी प्रदान करता है",
-    "autoCheckAbout4": "गायब पूर्वापेक्षाओं के लिए इंस्टॉलेशन जानकारी दिखाता है",
-    "autoCheckReleaseTitle": "Specific Releases के लिए",
-    "autoCheckReleaseDesc": "किसी विशेष KubeStellar रिलीज़ के लिए पूर्वापेक्षाओं की जाँच करने के लिए, `main` ब्रांच के बजाय उस विशिष्ट रिलीज़ से स्क्रिप्ट का उपयोग करें।",
-    "autoCheckReleaseTip": "टिप: इंस्टॉलेशन के साथ आगे बढ़ने से पहले यह सुनिश्चित करने के लिए इस जाँच को चलाएँ कि आपका सिस्टम ठीक से कॉन्फ़िगर किया गया है।",
-    "installTitle": "KubeStellar Installation",
-    "installSubtitle": "अपना प्लेटफ़ॉर्म चुनें और इंस्टॉलेशन स्क्रिप्ट चलाएँ",
-    "installPlatform": "अपना प्लेटफ़ॉर्म चुनें:",
+    "autoCheckTitle": "प्री-रेक्विज़िट्स ऑटो चेक",
+    "autoCheckSubtitle": "इस स्क्रिप्ट का उपयोग करें यह जाँचने के लिए कि आपके सिस्टम में सभी आवश्यक टूल्स हैं",
+    "autoCheckAboutTitle": "ऑटो चेक स्क्रिप्ट के बारे में",
+    "autoCheckAbout1": "स्व-समाविष्ट स्क्रिप्ट, \"curl-to-bash\" उपयोग के लिए उपयुक्त",
+    "autoCheckAbout2": "which कमांड द्वारा PATH में टूल्स की उपस्थिति जाँचती है",
+    "autoCheckAbout3": "वर्तमान संस्करण और पथ जानकारी प्रदान करती है",
+    "autoCheckAbout4": "गायब टूल्स के लिए इंस्टॉलेशन जानकारी दिखाती है",
+    "autoCheckReleaseTitle": "विशिष्ट रिलीज़ के लिए",
+    "autoCheckReleaseDesc": "एक विशेष KubeStellar रिलीज़ के लिए, मुख्य शाखा की बजाए उस रिलीज़ की स्क्रिप्ट का उपयोग करें।",
+    "autoCheckReleaseTip": "टिप: इंस्टॉलेशन से पहले इस चेक को चलाएँ ताकि आपका सिस्टम ठीक से कॉन्फ़िगर हो।",
+    "installTitle": "KubeStellar इंस्टॉलेशन",
+    "installSubtitle": "अपनी प्लेटफ़ॉर्म चुनें और इंस्टॉलेशन स्क्रिप्ट चलाएँ",
+    "installPlatform": "अपनी प्लेटफ़ॉर्म चुनें:",
     "installKind": "kind",
-    "installKindDesc": "Kubernetes in Docker",
+    "installKindDesc": "डॉकर में क्यूबेरनेटिस",
     "installK3d": "k3d",
-    "installK3dDesc": "Lightweight Kubernetes",
-    "installScriptTitle": "Installation Script for",
-    "installProcessTitle": "Installation Process",
-    "installProcess1": "एक लोकल {platform} क्लस्टर बनाता है",
-    "installProcess2": "KubeStellar कोर कंपोनेंट्स इंस्टॉल करता है",
-    "installProcess3": "मल्टी-क्लस्टर प्रबंधन क्षमताएं सेट करता है",
-    "installProcess4": "वर्कलोड वितरण कॉन्फ़िगर करता है",
-    "installNextTitle": "अगले चरण",
+    "installK3dDesc": "लाइटवेट क्यूबेरनेटिस",
+    "installScriptTitle": "इंस्टॉलेशन स्क्रिप्ट के लिए",
+    "installProcessTitle": "इंस्टॉलेशन प्रक्रिया",
+    "installProcess1": "लोकल {platform} क्लस्टर बनाएँ",
+    "installProcess2": "KubeStellar कोर कंपोनेंट्स इंस्टॉल करें",
+    "installProcess3": "मल्टी-क्लस्टर प्रबंधन क्षमताएँ सेट-अप करें",
+    "installProcess4": "वर्कलोड वितरण कॉन्फ़िगर करें",
+    "installNextTitle": "अगले कदम",
     "installNext1": "इंस्टॉलेशन सत्यापित करें",
-    "installNext2": "KubeStellar स्टेटस जांचें",
-    "installNext3": "अन्वेषण करें",
-    "faqTitle": "अक्सर पूछे जाने वाले प्रश्न (FAQ)",
-    "faqSubtitle": "KubeStellar इंस्टॉलेशन और सेटअप के बारे में सामान्य प्रश्न",
-    "faq1Q": "Core, Additional, और Build Prerequisites में क्या अंतर है?",
-    "faq1A": "KubeStellar का उपयोग करने के लिए Core Prerequisites आवश्यक हैं। उदाहरण और डेमो चलाने के लिए Additional Prerequisites की आवश्यकता होती है। Build Prerequisites की आवश्यकता केवल तभी होती है जब आप सोर्स कोड से KubeStellar को बिल्ड करने की योजना बनाते हैं।",
-    "faq2Q": "क्या मैं स्वचालित रूप से जांच सकता हूँ कि मेरे पास सभी Prerequisites इंस्टॉल हैं?",
-    "faq2A": "हाँ! स्वचालित prerequisite check स्क्रिप्ट का उपयोग करें: 'curl -fsSL https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/check_pre_req.sh | bash'। यह स्क्रिप्ट सभी पूर्वापेक्षाओं को सत्यापित करेगी और गायब टूल्स के लिए इंस्टॉलेशन मार्गदर्शन प्रदान करेगी।",
-    "faq3Q": "क्या मुझे सभी Prerequisites इंस्टॉल करने की आवश्यकता है?",
-    "faq3A": "बुनियादी KubeStellar उपयोग के लिए, आपको केवल Core Prerequisites की आवश्यकता है। यदि आप उदाहरण चलाना चाहते हैं तो Additional Prerequisites इंस्टॉल करें। Build Prerequisites केवल डेवलपमेंट और सोर्स से बिल्डिंग के लिए आवश्यक हैं।",
-    "faq4Q": "क्या मैं मौजूदा Kubernetes क्लस्टरों के साथ KubeStellar का उपयोग कर सकता हूँ?",
-    "faq4A": "हाँ! KubeStellar मौजूदा Kubernetes क्लस्टरों का प्रबंधन कर सकता है। आप यूनिफाइड मल्टी-क्लस्टर प्रबंधन के लिए अपने प्रोडक्शन क्लस्टरों को लोकल डेवलपमेंट क्लस्टरों के साथ जोड़ सकते हैं।",
-    "faq5Q": "न्यूनतम सिस्टम आवश्यकताएं क्या हैं?",
-    "faq5A": "KubeStellar के लिए कम से कम 4GB RAM और 2 CPU कोर की आवश्यकता होती है। आपको Docker (v20.0+), kubectl (v1.27+), और लोकल क्लस्टरों के लिए या तो kind (v0.20+) या k3d की आवश्यकता होगी।"
+    "installNext2": "KubeStellar स्थिति जांचें",
+    "installNext3": "डॉक्यूमेंटेशन एक्सप्लोर करें",
+    "installNext3Link": "documentation",
+    "installNext3Suffix": "उदाहरणों और उन्नत उपयोग के लिए",
+    "faqTitle": "अक्सर पूछे जाने वाले प्रश्न",
+    "faqSubtitle": "KubeStellar इंस्टॉलेशन और सेट-अप के आम प्रश्न",
+    "faq1Q": "कोर, अतिरिक्त, और बिल्ड प्री-रेक्विज़िट्स में क्या अंतर है?",
+    "faq1A": "कोर प्री-रेक्विज़िट्स KubeStellar इस्तेमाल करने के लिए अनिवार्य हैं। उदाहरण चलाने के लिए अतिरिक्त प्री-रेक्विज़िट्स चाहिए। सोर्स से बिल्ड करने के लिए बिल्ड प्री-रेक्विज़िट्स आवश्यक हैं।",
+    "faq2Q": "क्या मैं ऑटोमैटिकली चेक कर सकता हूँ कि मेरे सिस्टम में सभी प्री-रेक्विज़िट्स हैं?",
+    "faq2A": "हाँ! इस स्क्रिप्ट का उपयोग करें: 'curl -fsSL https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/check_pre_req.sh | bash'। यह स्क्रिप्ट सभी प्री-रेक्विज़िट्स वर्शन व पथ जानकारी सहित जाँच करेगी।",
+    "faq3Q": "क्या मुझे सभी प्री-रेक्विज़िट्स इंस्टॉल करना ज़रूरी है?",
+    "faq3A": "मूल KubeStellar उपयोग के लिए सिर्फ कोर प्री-रेक्विज़िट्स ही चाहिए। उदाहरण चलाने के लिए अतिरिक्त प्री-रेक्विज़िट्स इंस्टॉल करें। सोर्स से बिल्ड करने के लिए बिल्ड प्री-रेक्विज़िट्स।",
+    "faq4Q": "क्या मैं KubeStellar को मौजूदा क्यूबेरनेटिस क्लस्टर्स के साथ उपयोग कर सकता हूँ?",
+    "faq4A": "हाँ! KubeStellar मौजूदा क्यूबेरनेटिस क्लस्टर्स को प्रबंधित कर सकता है। आप अपने प्रोडक्शन क्लस्टर्स को लोकल डेवेलपमेंट क्लस्टर्स के साथ यूनिफाइड मल्टी-क्लस्टर प्रबंधन के लिए कनेक्ट कर सकते हैं।",
+    "faq5Q": "न्यूनतम सिस्टम आवश्यकताएँ क्या हैं?",
+    "faq5A": "KubeStellar को कम से कम 4 GB RAM एवं 2 CPU कोर चाहिए। Docker (v20.0+) और kubectl (v1.27+) तथा या तो kind (v0.20+) या k3d लोकल क्लस्टर्स के लिए चाहिए।"
   },
   "programsPage": {
-    "title": "हमारे साथ जुड़ें",
+    "title": "हमारी",
     "titleSpan": "मिशन",
-    "subtitle": "KubeStellar में योगदान देने और ओपन सोर्स डेवलपमेंट में अपने करियर को आगे बढ़ाने के लिए सार्थक अवसरों की खोज करें।",
-    "paid": "सशुल्क कार्यक्रम",
-    "unpaid": "अवैतनिक इंटर्नशिप",
+    "subtitle": "KubeStellar में योगदान करें और ओपन-सोर्स विकास में अपना करियर आगे बढ़ाएँ।",
+    "paid": "वेतनप्राप्त प्रोग्राम",
+    "unpaid": "बिना वेतन का इंटर्नशिप",
     "programs": {
       "gsoc": {
         "name": "GSoC",
         "fullName": "Google Summer of Code",
-        "description": "Google के प्रमुख ओपन सोर्स कार्यक्रम के साथ अपने कोडिंग कौशल को बदलें",
+        "description": "Google के प्रमुख ओपन-सोर्स प्रोग्राम के साथ अपनी कोडिंग स्किल्स को ट्रांसफॉर्म करें",
         "sections": {
-          "benefits": "वास्तविक दुनिया का अनुभव प्राप्त करें, अनुभवी सलाहकारों से सीखें, ओपन-सोर्स समुदाय का हिस्सा बनें, और कार्यक्रम के सफल समापन पर वेतन प्राप्त करें।",
-          "description": "Google Summer of Code एक वैश्विक कार्यक्रम है जो अधिक छात्र डेवलपर्स को ओपन सोर्स सॉफ्टवेयर डेवलपमेंट में लाने पर केंद्रित है। छात्र अपनी स्कूल की छुट्टियों के दौरान एक ओपन सोर्स संगठन के साथ 3 महीने की प्रोग्रामिंग परियोजना पर काम करते हैं।",
-          "overview": "KubeStellar एक सलाहकार संगठन के रूप में भाग लेता है। हम छात्रों को सीखने और योगदान देने के लिए परियोजना विचार, सलाहकार और एक स्वागत करने वाला समुदाय प्रदान करते हैं।",
-          "eligibility": "प्रतिभागियों की आयु कम से कम 18 वर्ष होनी चाहिए, एक छात्र होना चाहिए या ओपन सोर्स सॉफ्टवेयर डेवलपमेंट में नया होना चाहिए। विस्तृत मापदंड के लिए, कृपया आधिकारिक GSoC वेबसाइट देखें।",
-          "timeline": "कार्यक्रम आम तौर पर मई से अगस्त तक चलता है। मुख्य तारीखों में आवेदन अवधि, समुदायिक बंधन, और कोडिंग चरण शामिल हैं। आधिकारिक समयसीमा के लिए GSoC वेबसाइट देखें।",
-          "structure": "स्वीकृत योगदानकर्ता KubeStellar के एक या अधिक सलाहकारों के मार्गदर्शन में अपनी परियोजना पर काम करते हैं। कार्यक्रम के मध्य बिंदु और अंत में मूल्यांकन होते हैं।",
-          "howToApply": "छात्र आवेदन अवधि के दौरान Google Summer of Code वेबसाइट के माध्यम से आवेदन कर सकते हैं। हम पहले से ही हमारे समुदाय के साथ जुड़ने और KubeStellar में योगदान देने की सलाह देते हैं।",
+          "benefits": "वास्तव-विश्व का अनुभव प्राप्त करें, अनुभवी मेंटर्स से सीखें, एक ओपन-सोर्स समुदाय का हिस्सा बनें, सफल समापन पर स्टाइपेंड प्राप्त करें।",
+          "description": "Google Summer of Code एक वैश्विक प्रोग्राम है जो छात्र डेवलपर्स को ओपन-सोर्स सॉफ़्टवेयर विकास में शामिल करता है। छात्र तीन-महीने के प्रोजेक्ट पर काम करते हैं।",
+          "overview": "KubeStellar मेंटर ऑर्गेनाइजेशन के रूप में भाग लेता है। हम प्रोजेक्ट आइडियाज़, मेंटर्स, और एक स्वागत-योग्य समुदाय प्रदान करते हैं।",
+          "eligibility": "प्रतिभागियों को कम-से-कम 18 वर्ष आयु का होना चाहिए, एक छात्र या ओपन-सोर्स सॉफ़्टवेयर विकास में नए होना चाहिए। विस्तृत मापदंड GSoC वेबसाइट पर देखें।",
+          "timeline": "प्रोग्राम आमतौर पर मई से अगस्त तक चलता है। आवेदन काल, समाज-बंधन, और कोडिंग चरण शामिल हैं। ताज़ा दिनांक के लिए GSoC वेबसाइट देखें।",
+          "structure": "स्वीकृत योगदानकर्ता एक मेंटर के साथ काम करते हैं। मध्य-मूल्यांकन और अंत-मूल्यांकन होते हैं।",
+          "howToApply": "छात्र GSoC वेबसाइट के माध्यम से आवेदन कर सकते हैं। हम सुझाव देते हैं कि पहले हमारे समुदाय में योगदान करें।",
           "resources": [
             {
               "name": "आधिकारिक GSoC वेबसाइट"
@@ -381,15 +469,15 @@
       "esoc": {
         "name": "ESoC",
         "fullName": "European Summer of Code",
-        "description": "ओपन सोर्स डेवलपमेंट में यूरोपीय प्रतिभा को सशक्त बनाएं",
+        "description": "यूरोपीय प्रतिभाओं को ओपन-सोर्स विकास में सामर्थ्य प्रदान करें",
         "sections": {
-          "benefits": "एक वास्तविक परियोजना पर काम करने, वेतन प्राप्त करने, और ओपन सोर्स समुदाय से जुड़ने का एक बेहतरीन अवसर।",
-          "description": "European Summer of Code यूरोप के छात्रों और हाल के स्नातकों के लिए एक कार्यक्रम है, जो उन्हें ओपन सोर्स परियोजनाओं में योगदान करने का अवसर प्रदान करता है।",
-          "overview": "KubeStellar ESoC में प्रतिभागियों को सलाह देने के लिए उत्साहित है, चुनौतीपूर्ण परियोजनाएं और समर्पित सहायता प्रदान करता है ताकि वे डेवलपर्स के रूप में विकसित हो सकें।",
-          "eligibility": "यूरोप में स्थित छात्रों और हाल के स्नातकों के लिए खुला। विस्तृत पात्रता नियमों के लिए कृपया आधिकारिक ESoC वेबसाइट देखें।",
-          "timeline": "कार्यक्रम आम तौर पर गर्मियों के महीनों में होता है। विशिष्ट तारीखों और समय सीमा के लिए ESoC वेबसाइट देखें।",
-          "structure": "प्रतिभागी नियमित चेक-इन और फीडबैक सत्रों के साथ पूर्व-परिभाषित परियोजना पर KubeStellar सलाहकारों के साथ मिलकर काम करते हैं।",
-          "howToApply": "आवेदन आधिकारिक European Summer of Code पोर्टल के माध्यम से जमा किए जाने चाहिए।",
+          "benefits": "एक शानदार अवसर वास्तविक-विश्व प्रोजेक्ट पर काम करने का, स्टाइपेंड प्राप्त करें, और ओपन-सोर्स समुदाय से जुड़ें।",
+          "description": "European Summer of Code एक प्रोग्राम है जो यूरोप के छात्रों और हाल-ही में स्नातक हुए व्यक्तियों को ओपन-सोर्स प्रोजेक्ट्स में मौका देता है।",
+          "overview": "KubeStellar ESoC में भाग लेने के लिए उत्साहित है, चुनौतीपूर्ण प्रोजेक्ट्स और समर्पित समर्थन प्रदान कर रहा है।",
+          "eligibility": "यूरोप में आधारित छात्रों और हाल-ही में स्नातक हुए व्यक्तियों के लिए खुला। विस्तृत मापदंड ESoC वेबसाइट पर देखें।",
+          "timeline": "प्रोग्राम आमतौर पर गर्मियों में होता है। विशिष्ट तिथियाँ ESoC वेबसाइट पर देखें।",
+          "structure": "प्रतिभागी KubeStellar मेंटर्स के साथ काम करते हैं, नियमित चेक-इन और प्रतिक्रिया सत्र शामिल हैं।",
+          "howToApply": "डॉक्युमेंटेशन देखें और आवेदन करें।",
           "resources": [
             {
               "name": "आधिकारिक ESoC वेबसाइट (लिंक उपलब्ध नहीं)"
@@ -403,21 +491,20 @@
       "ifos": {
         "name": "IFoS",
         "fullName": "Interns for Open Source",
-        "description": "KubeStellar के साथ अपनी ओपन सोर्स यात्रा की शुरुआत करें",
+        "description": "KubeStellar के साथ अपना ओपन-सोर्स सफर शुरू करें",
         "sections": {
-          "benefits": "हालांकि यह एक अवैतनिक कार्यक्रम है, सफल स्नातक पूर्णता का प्रमाणपत्र, सिफारिश पत्र प्राप्त करते हैं, और GSoC या LFX जैसे भविष्य के सशुल्क सलाह कार्यक्रमों के लिए प्राथमिकता विचार दिया जाता है।",
-          "description": "Interns for Open Source (IFoS) KubeStellar द्वारा बनाया गया एक अनोखा, अवैतनिक इंटर्नशिप कार्यक्रम है। यह उन व्यक्तियों के लिए डिज़ाइन किया गया है जो ओपन सोर्स के बारे में भावुक हैं और अत्याधुनिक परियोजना के साथ व्यावहारिक अनुभव प्राप्त करना चाहते हैं।",
-          "overview": "यह 3-महीने का कार्यक्रम KubeStellar समुदाय में प्रत्यक्ष मार्ग प्रदान करता है। प्रतिभागी सार्थक परियोजनाओं पर काम करते हैं और हमारे मुख्य डेवलपर्स द्वारा सलाह दी जाती है।",
-          "eligibility": "हम Kubernetes, multi-cluster orchestration, और ओपन सोर्स में मजबूत रुचि रखने वाले किसी भी व्यक्ति से आवेदन का स्वागत करते हैं। Go और कंटेनर प्रौद्योगिकियों का बुनियादी ज्ञान एक प्लस है।",
-          "timeline": "IFoS एक रोलिंग कार्यक्रम है। आवेदन साल भर स्वीकार किए जाते हैं, और इंटर्नशिप परियोजना उपलब्धता और आवेदक के शेड्यूल के आधार पर शुरू होते हैं।",
-          "structure": "इंटर्न को एक सलाहकार के साथ जोड़ा जाता है और हमारी विकास टीमों में से एक में एकीकृत किया जाता है। कार्यक्रम लचीला है, जो अंशकालिक या पूर्णकालिक प्रतिबद्धता की अनुमति देता है।",
-          "howToApply": "आवेदन के लिए, कृपया अपना रिज्यूमे और रुचि का संक्षिप्त विवरण हमारे समुदाय ईमेल पर भेजें। हम आपको हमारे GitHub रिपॉजिटरी में योगदान देना शुरू करने के लिए भी प्रोत्साहित करते हैं।",
+          "benefits": "हालाँकि यह एक बिना वेतन का प्रोग्राम है, सफल प्रतिभागियों को प्रमाणपत्र मिलेगा, अनुशंसा पत्र मिलेगा, और भविष्य के वेतनप्राप्त मेंटोरशिप प्रोग्राम में प्राथमिकता मिलेगी।",
+          "description": "Interns for Open Source (IFoS) एक अद्वितीय, बिना वेतन वाला इंटर्नशिप प्रोग्राम है जिसे KubeStellar ने बनाया है। यह ओपन-सोर्स में रुचि रखने वाले लोगों के लिए हैंड्स-ऑन अनुभव प्रदान करता है।",
+          "eligibility": "हम नेटवर्क से जुड़ने वालों का स्वागत करते हैं- विशेष रूप से उन लोगों का जिनमें Kubernetes, मल्टी-क्लस्टर ऑर्केस्ट्रेशन और ओपन-सोर्स में रुचि है। Go और कंटेनर तकनीकों का मूल ज्ञान एक प्लस है।",
+          "timeline": "IFoS एक चलने-वाला (रोलिंग) प्रोग्राम है। आवेदन वर्ष-भर स्वीकार किए जाते हैं, और इंटर्नशिप प्रोजेक्ट की उपलब्धता एवं आवेदक के शेड्यूल पर आधारित शुरू होती है।",
+          "structure": "इंटर्न को एक मेंटर से जोड़ा जाता है और हमारी विकास टीम का हिस्सा बनता है। प्रोग्राम पार्ट-टाइम या फुल-टाइम दोनों हो सकता है।",
+          "howToApply": "अपने बायोडाटा और एक संक्षिप्त रुचि वक्तव्य हमारे कम्युनिटी ई-मेल पर भेजें। हम यह भी सुझाव देते हैं कि पहले GitHub पर योगदान करना शुरू करें।",
           "resources": [
             {
               "name": "KubeStellar GitHub"
             },
             {
-              "name": "KubeStellar Community Page"
+              "name": "KubeStellar कम्युनिटी पेज"
             }
           ]
         }
@@ -425,18 +512,18 @@
       "lfx": {
         "name": "LFX",
         "fullName": "LFX Mentorship",
-        "description": "Linux Foundation सलाह के साथ अपनी ओपन सोर्स यात्रा को तेज़ करें",
+        "description": "Linux Foundation मेंटरशिप के साथ अपना ओपन-सोर्स सफर तेज करें",
         "sections": {
-          "benefits": "वेतन प्राप्त करें, अत्याधुनिक प्रौद्योगिकी के साथ व्यावहारिक अनुभव प्राप्त करें, अपना पेशेवर नेटवर्क बनाएं, और अपने रिज्यूमे को बेहतर बनाएं।",
-          "description": "LFX Mentorship कार्यक्रम, Linux Foundation द्वारा संचालित, महत्वाकांक्षी ओपन सोर्स योगदानकर्ताओं के लिए एक संरचित, दूरस्थ सीखने का अवसर प्रदान करता है। Mentees को अनुभवी सलाहकारों के साथ वास्तविक परियोजनाओं पर काम करने का मौका मिलता है।",
-          "overview": "KubeStellar को LFX Mentorship कार्यक्रम का हिस्सा होने पर गर्व है। हम ऐसी परियोजनाएं प्रदान करते हैं जो हमारे रोडमैप के लिए महत्वपूर्ण हैं, जो mentees को महत्वपूर्ण प्रभाव डालने का मौका देती हैं।",
-          "eligibility": "कार्यक्रम सभी पृष्ठभूमि के डेवलपर्स के लिए खुला है। विशिष्ट आवश्यकताएं परियोजना के अनुसार भिन्न हो सकती हैं। पात्रता के विवरण के लिए LFX Mentorship प्लेटफॉर्म देखें।",
-          "timeline": "LFX Mentorship टर्म में चलता है, आमतौर पर वसंत, गर्मी और पतझड़। प्रत्येक टर्म लगभग 12 सप्ताह लंबा होता है।",
-          "structure": "Mentees KubeStellar के एक सलाहकार के साथ एक-पर-एक काम करते हैं, परियोजना में योगदान देते हैं और समुदाय में भाग लेते हैं।",
-          "howToApply": "आवेदन LFX Mentorship प्लेटफॉर्म के माध्यम से जमा किए जाते हैं। KubeStellar परियोजनाओं को ब्राउज़ करें और आवेदन करें।",
+          "benefits": "स्टाइपेंड प्राप्त करें, क्रांतिकारी तकनीक पर काम करें, अपना प्रोफेशनल नेटवर्क बढ़ाएँ, और अपनी रिज़्यूम हाइलाइट करें।",
+          "description": "LFX Mentorship प्रोग्राम, Linux Foundation द्वारा चलाया जाता है, ओपन-सोर्स विकास के इच्छुक लोगों को संरचित, रिमोट लर्निंग अवसर प्रदान करता है। मेटे इस दौरान वास्तविक-विश्व प्रोजेक्ट्स पर काम करते हैं।",
+          "overview": "KubeStellar LFX Mentorship प्रोग्राम का हिस्सा है। हम ऐसे प्रोजेक्ट्स ऑफर करते हैं जो हमारे रोडमैप के लिए महत्वपूर्ण हैं, जिससे मेंटी को महत्वपूर्ण प्रभाव बनाने का अवसर मिलता है।",
+          "eligibility": "प्रोग्राम सभी पृष्ठभूमियों के डेवलपर्स के लिए खुला है। विशिष्ट मापदंड प्रोजेक्ट के अनुसार अलग-हो सकते हैं। LFX Mentorship प्लेटफॉर्म पर विवरण देखें।",
+          "timeline": "LFX Mentorship आमतौर पर वसंत, ग्रीष्म और पतंजलि ट्रर्म्स में चलता है। प्रत्येक ट्रर्म लगभग 12 हफ्ते का होता है।",
+          "structure": "मेंटी KubeStellar से एक-से-एक मेंटर के साथ काम करते हैं, प्रोजेक्ट में योगदान देते हैं और कम्युनिटी में भाग लेते हैं।",
+          "howToApply": "आवेदन LFX Mentorship प्लेटफॉर्म के माध्यम से जमा करें। KubeStellar प्रोजेक्ट्स के लिए वांछित देखें और आवेदन करें।",
           "resources": [
             {
-              "name": "LFX Mentorship Platform"
+              "name": "LFX Mentorship प्लेटफॉर्म"
             },
             {
               "name": "KubeStellar GitHub"
@@ -446,89 +533,223 @@
       }
     }
   },
+  "productsPage": {
+    "title": "हमारे",
+    "titleSpan": "उत्पाद",
+    "subtitle": "जानिए हमारी टूल्स और प्लेटफ़ॉर्म-सुइट, जो KubeStellar इकोसिस्टम को सशक्त बनाती हैं और मल्टी-क्लस्टर क्यूबेरनेटिस प्रबंधन को सक्षम करती हैं।",
+    "repoButton": "रेपो",
+    "websiteButton": "वेबसाइट",
+    "watchDemoButton": "डेमो देखें",
+    "products": {
+      "kubestellar": {
+        "name": "KubeStellar",
+        "fullName": "KubeStellar",
+        "description": "मल्टी-क्लस्टर क्यूबेरनेटिस ऑर्केस्ट्रेशन प्लेटफ़ॉर्म जो विविध इंफ्रास्ट्रक्चर वातावरणों में वितरित वर्कलोड प्रबंधन को सरल बनाता है। यह एकीकृत कंट्रोल प्लेन, बुद्धिमान वर्कलोड प्लेसमेंट, और नीति-आधारित गवर्नेंस प्रदान करता है जटिल मल्टी-क्लस्टर डिप्लॉयमेंट्स के लिए स्वचालित स्केलिंग, संसाधन अनुकूलन, और क्लाउड-प्रोवाइडर्स में सहज इंटीग्रेशन क्षमताओं के साथ।"
+      },
+      "kubestellarUI": {
+        "name": "KubeStellar UI",
+        "fullName": "KubeStellar UI",
+        "description": "मल्टी-क्लस्टर क्यूबेरनेटिस ऑर्केस्ट्रेशन के लिए एक शक्तिशाली वेब-आधारित इंटरफेस जिसमें सहज डैशबोर्ड्स, रियल-टाइम मॉनिटरिंग, और क्लस्टर प्रबंधन के लिए व्यापक नियंत्रण शामिल हैं। उन्नत विज़ुअलाइज़ेशन टूल्स, कस्टमाइज़ेबल वर्कस्पेस, और बुद्धिमान अलर्ट्स की विशेषताएँ प्रदान करता है ताकि आप अपने मल्टी-क्लस्टर ऑपरेशंस को बेहतर बना सकें।"
+      },
+      "kubeflex": {
+        "name": "KubeFlex",
+        "fullName": "KubeFlex",
+        "description": "एक लचीला क्यूबेरनेटिस प्रबंधन प्लेटफ़ॉर्म जो मल्टी-क्लस्टर ऑर्केस्ट्रेशन और वर्कलोड वितरण के लिए व्यापक टूल्स और संसाधन प्रदान करता है। यह डायनेमिक क्लस्टर प्रोविजनिंग, स्वचालित स्केलिंग, और असहजित वातावरणों में बुद्धिमान संसाधन आवंटन सक्षम करता है। नीति-आधारित ऑटोमेशन के साथ जटिल डिप्लॉयमेंट्स को सरल बनाता है।"
+      },
+      "a2a": {
+        "name": "A2A",
+        "fullName": "A2A",
+        "description": "एप्लिकेशन-से-एप्लिकेशन संचार प्लेटफ़ॉर्म जो KubeStellar इकोसिस्टम के भीतर सहज कनेक्टिविटी सक्षम करता है। वितरित माइक्रो-सर्विसेस के बीच सुरक्षित डेटा एक्सचेंज और रीयल-टाइम संचार को आसान बनाता है। उन्नत रूटिंग, लोड-बैलेंसिंग और सर्विस डिस्कवरी क्षमताओं से युक्त है जटिल मल्टी-क्लस्टर डिप्लॉयमेंट्स के लिए।"
+      },
+      "kubectlMulti": {
+        "name": "kubectl-multi",
+        "fullName": "kubectl-multi",
+        "description": "मल्टी-क्लस्टर ऑपरेशंस के लिए एक व्यापक kubectl प्लग-इन, KubeStellar के साथ सहज काम करता है। यह kubectl को सभी KubeStellar प्रबंधित क्लस्टर्स पर एक साथ काम करने योग्य बनाता है, जबकि वर्कफ्लो स्टेजिंग क्लस्टर्स (WDS) को फिल्टर करता है। एक साथ कई क्लस्टर्स में कमांड एक्सेक्यूट करें और बुद्धिमान आउटपुट एग्रीगेशन देखें।"
+      },
+      "galaxyMarketplace": {
+        "name": "Galaxy Marketplace",
+        "fullName": "KS Galaxy Marketplace",
+        "description": "KubeStellar एक्सटेंशन्स, प्लग-इन्स, और कम्युनिटी-योगदान टूल्स के लिए एक केंद्रीकृत मार्केटप्लेस। थर्ड-पार्टी कॉम्पोनेंट्स खोजें, इंस्टॉल करें तथा प्रबंधित करें ताकि आपके मल्टी-क्लस्टर ऑर्केस्ट्रेशन क्षमताओं को बढ़ावा मिले। स्वचालित संगतता जाँच, वर्शन प्रबंधन, और मौजूदा KubeStellar डिप्लॉयमेंट्स के साथ सहज इंटीग्रेशन प्रदान करता है।"
+      }
+    }
+  },
   "ladderPage": {
-    "title": "Contribution",
-    "titleSpan": "Ladder",
-    "subtitle": "KubeStellar समुदाय में पहली बार योगदानकर्ता से विश्वसनीय मेंटेनर तक का एक पारदर्शी, योग्यता-आधारित मार्ग",
+    "title": "योगदान",
+    "titleSpan": "लैडर",
+    "subtitle": "पहली-बार योगदानकर्ता से विश्वसनीय मेंटेनर तक का एक पारदर्शी, मेरिट-आधारित पथ KubeStellar समुदाय में",
     "requirementsLabel": "आवश्यकताएँ:",
-    "nextLevelLabel": "अगला लेवल:",
+    "nextLevelLabel": "अगले स्तर:",
     "levels": {
       "contributor": {
-        "title": "Contributor",
-        "nextLevel": "Unpaid Intern",
+        "title": "योगदानकर्ता",
+        "nextLevel": "बिना वेतन इंटर्न",
         "description": "KubeStellar समुदाय में अपनी यात्रा शुरू करें",
         "requirements": [
-          "न्यूनतम 3 योगदान (बग रिपोर्ट, डॉक्यूमेंटेशन, या कोड PRs)",
-          "दीर्घकालिक भागीदारी में उत्साह और रुचि प्रदर्शित करें",
+          "कम-से-कम 3 योगदान (बग रिपोर्ट्स, डॉक्स, या कोड PRs)",
+          "लंबी अवधि की भागीदारी में रुचि और उत्साह दिखाएँ",
           "GitHub और Slack पर सक्रिय रहें",
-          "इंटर्न प्रोग्राम में शामिल होने के लिए अनौपचारिक आवेदन या नामांकन"
+          "अनौपचारिक आवेदन या नामांकन इंटर्न प्रोग्राम में"
         ]
       },
       "unpaidIntern": {
-        "title": "Unpaid Intern",
-        "nextLevel": "Paid Intern",
-        "description": "प्रतिबद्धता और कौशल प्रदर्शित करने के लिए 12-सप्ताह की यात्रा",
+        "title": "बिना वेतन इंटर्न",
+        "nextLevel": "वेतनप्राप्त इंटर्न",
+        "description": "12-सप्ताह की यात्रा कौशल और प्रतिबद्धता दिखाने की",
         "timeframe": "12 सप्ताह",
         "requirements": [
-          "कम से कम 6 'help wanted' इश्यू खोलें",
-          "कम से कम 20 PRs मर्ज करें (पहले 6 हफ्तों में 8)",
-          "साप्ताहिक टीम मीटिंग में भाग लें या सारांश जमा करें",
-          "मेंटर्स के साथ मिलकर काम करें",
-          "मेंटर की सिफारिश प्राप्त करें"
+          "कम-से-कम 6 'help wanted' issues खोलें",
+          "कम-से-कम 20 PRs मर्ज करें (पहले 6 सप्ताह में 8)",
+          "साप्ताहिक टीम मीटिंग्स में भाग लें या सारांश जमा करें",
+          "मेंटर्स के साथ सहयोग करें",
+          "एक मेंटर की सिफारिश प्राप्त करें"
         ]
       },
       "paidIntern": {
-        "title": "Paid Intern",
-        "nextLevel": "Mentor",
-        "description": "मुआवजे और जिम्मेदारी के साथ मान्यता प्राप्त योगदानकर्ता",
+        "title": "वेतनप्राप्त इंटर्न",
+        "nextLevel": "मेंटोर",
+        "description": "पहचाने गए योगदानकर्ता जिन्हें मुआवजा और ज़िम्मेदारी मिलती है",
         "requirements": [
-          "कम से कम एक 12-सप्ताह का पेड इंटर्नशिप साइकिल सफलतापूर्वक पूरा करें",
-          "कम से कम एक नए इंटर्न या योगदानकर्ता को ऑनबोर्ड करने और समर्थन करने में मदद करें",
-          "≥3 PR रिव्यू जमा करें",
-          "PRs या इश्यू पर ≥5 उपयोगी टिप्पणियाँ जमा करें",
-          "एक सामुदायिक कॉल में प्रस्तुत या सह-प्रस्तुत करें"
+          "कम-से-कम एक 12-सप्ताह वेतनप्राप्त इंटर्नशिप सफलतापूर्वक पूरी करें",
+          "कम-से-कम एक नए इंटर्न या योगदानकर्ता को ऑन-बोर्ड और सहायता करें",
+          "कम-से-कम 3 PR समीक्षाएँ जमा करें",
+          "कम-से-कम 5 सहायक टिप्पणी PRs या मुद्दों पर दें",
+          "एक कम्युनिटी कॉल में (या सह-प्रस्तुति) प्रस्तुत करें"
         ]
       },
       "mentor": {
-        "title": "Mentor",
-        "nextLevel": "Maintainer",
-        "description": "योगदानकर्ताओं की अगली पीढ़ी का मार्गदर्शन और समर्थन करें",
+        "title": "मेंटोर",
+        "nextLevel": "मेंटेनर",
+        "description": "अगली पीढ़ी के योगदानकर्ताओं का मार्गदर्शन करें",
         "requirements": [
-          "एक या अधिक प्रमुख क्षेत्रों में तकनीकी नेतृत्व प्रदर्शित करें",
-          "लगातार योगदान गतिविधि बनाए रखें",
-          "GitHub और Slack में समुदाय के साथ जुड़ें",
-          "एक सार्वजनिक रिव्यू प्रक्रिया के बाद कोर मेंटेनर्स द्वारा अनुमोदित"
+          "एक या अधिक प्रमुख क्षेत्रों में तकनीकी नेतृत्व दिखाएँ",
+          "निरंतर योगदान गतिविधि बनाए रखें",
+          "GitHub और Slack में कम्युनिटी-सक्रिय रहें",
+          "पब्लिक समीक्षा प्रक्रिया के बाद कोर मेंटेनर्स द्वारा स्वीकृत"
         ]
       },
       "maintainer": {
-        "title": "Maintainer",
-        "nextLevel": "Core Team",
-        "description": "पूरी प्रोजेक्ट जिम्मेदारियों के साथ विश्वसनीय लीडर",
+        "title": "मेंटेनर",
+        "nextLevel": "कोर टीम",
+        "description": "विश्वसनीय नेता जिनके पास पूर्ण प्रोजेक्ट जिम्मेदारियाँ हैं",
         "requirements": [
-          "हर 2 महीने में ≥2 'Help Wanted' इश्यू",
-          "हर 2 महीने में ≥3 PRs मर्ज किए गए",
-          "हर 2 महीने में ≥8 PR रिव्यू या रचनात्मक टिप्पणियाँ",
-          "हर 2 महीने में ≥3 सामुदायिक मीटिंग अटेंडेंस"
+          "प्रति 2 महीने ‘Help Wanted’issues ≥ 2",
+          "प्रति 2 महीने PRs मर्ज ≥ 3",
+          "प्रति 2 महीने PR समीक्षा / रचनात्मक टिप्पणी ≥ 8",
+          "प्रति 2 महीने 3 कम्युनिटी मीटिंग्स में भाग लें"
         ]
       }
     },
     "activityRequirements": {
-      "title": "Maintainer Activity Requirements",
-      "subtitle": "Maintainers को इन द्वि-मासिक (हर 2 महीने) न्यूनतम योगदानों को पूरा करना होगा:",
+      "title": "मेंटेनर सक्रियता आवश्यकताएँ",
+      "subtitle": "मेंटेनर्स को इन बाय-महीने (प्रति 2 महीने) निम्न न्यूनतम पूरा करना चाहिए:",
       "table": {
-        "metric": "Metric",
-        "requirement": "Requirement (Per 2 Months)",
-        "helpWantedIssues": "\"Help Wanted\" Issues",
-        "prsMerged": "PRs Merged",
-        "prReviews": "PR Reviews or Constructive Comments",
-        "meetingAttendance": "Community Meeting Attendance"
+        "metric": "मापदंड",
+        "requirement": "प्रति 2 महीने आवश्यकता",
+        "helpWantedIssues": "'Help Wanted' Issues",
+        "helpWantedIssuesValue": "≥ 2",
+        "prsMerged": "PRs मर्ज",
+        "prsMergedValue": "≥ 3",
+        "prReviews": "PR समीक्षा या रचनात्मक टिप्पणी",
+        "prReviewsValue": "≥ 8",
+        "meetingAttendance": "कम्युनिटी मीटिंग्स उपस्थिति",
+        "meetingAttendanceValue": "≥ 3"
       }
     },
     "callToAction": {
-      "title": "अपनी यात्रा शुरू करने के लिए तैयार हैं?",
-      "subtitle": "KubeStellar समुदाय से जुड़ें और आज ही मेंटेनर लैडर पर चढ़ना शुरू करें",
-      "communityMeetingsButton": "Community Meetings",
-      "viewIssuesButton": "View Open Issues"
+      "title": "क्या आप अपनी यात्रा शुरू करने के लिए तैयार हैं?",
+      "subtitle": "KubeStellar समुदाय में शामिल हों और आज ही मेंटेनर लैडर चढ़ना शुरू करें",
+      "communityMeetingsButton": "कम्युनिटी मीटिंग्स",
+      "viewIssuesButton": "खुले मुद्दे देखें",
+      "exploreCodeTitle": "कोड देखें",
+      "exploreCodeDescription": "हमारे कोडबेस ब्राउज़ करें और योगदान दें",
+      "viewRepositoryLink": "रेपो देखें →",
+      "joinSlackTitle": "Slack जॉइन करें",
+      "joinSlackDescription": "रीयल-टाइम चर्चाओं के लिए कम्युनिटी से जुड़ें",
+      "joinCommunityLink": "कम्युनिटी में शामिल हों →",
+      "learnGuideTitle": "गाइड पढ़ें",
+      "learnGuideDescription": "हमारी व्यापक योगदान हैंडबुक पढ़ें",
+      "viewHandbookLink": "हैंडबुक देखें →"
+    }
+  },
+  "partnersPage": {
+    "title": "हमारे",
+    "titleSpan": "भागीदार",
+    "subtitle": "मल्टी-क्लस्टर क्यूबेरनेटिस ऑर्केस्ट्रेशन को बढ़ावा देने के लिए अग्रणी ओपन-सोर्स प्रोजेक्ट्स के साथ सहयोग।",
+    "learnMore": "और जानें",
+    "partners": {
+      "argocd": {
+        "description": "क्यूबेरनेटिस के लिए घोषणात्मक GitOps लगातार डिलीवरी टूल जो ऐप्लिकेशन डिप्लॉयमेंट और जीवन-चक्र प्रबंधन को स्वचालित करता है।"
+      },
+      "fluxcd": {
+        "description": "क्यूबेरनेटिस के लिए प्रोग्रेसिव डिलीवरी टूल जो गिट रिपॉजिटरीज से स्वचालित डिप्लॉयमेंट सक्षम करता है सशक्त GitOps क्षमताओं के साथ।"
+      },
+      "kyverno": {
+        "description": "क्यूबेरनेटिस-नेटिव नीति प्रबंधन समाधान जो डिक्लेरेटिव नीतियों का उपयोग कर विनियमन, उत्पन्न और म्युटेशन करता है।"
+      },
+      "mvi": {
+        "description": "मल्टी-क्लस्टर विजिबिलिटी और इनसाइट्स प्लेटफ़ॉर्म जो वितरित क्यूबेरनेटिस वातावरणों में व्यापक मॉनिटरिंग और विश्लेषण प्रदान करता है।"
+      },
+      "openziti": {
+        "description": "ज़ीरो-ट्रस्ट नेटवर्क ओवरले और एज ऐप्लिकेशन प्लेटफ़ॉर्म जो वितरित ऐप्लिकेशन के लिए सुरक्षित कनेक्टिविटी प्रदान करता है।"
+      },
+      "turbonomic": {
+        "description": "ऐप्लिकेशन संसाधन प्रबंधन प्लेटफ़ॉर्म जो एआई-सक्षम ऑटोमेशन के माध्यम से ऐप प्रदर्शन सुनिश्चित करता है और इंफ्रास्ट्रक्चर लागत को अनुकूलित करता है।"
+      }
+    },
+    "whyPartner": {
+      "title": "हमारे साथ क्यों भागीदार बनें",
+      "subtitle": "हमारे इकोसिस्टम में शामिल हों और मल्टी-क्लस्टर क्यूबेरनेटिस प्रबंधन के भविष्य को आकार दें",
+      "benefits": [
+        {
+          "title": "नवाचार",
+          "description": "कटींग-एज मल्टी-क्लस्टर ऑर्केस्ट्रेशन समाधानों पर सहयोग करें"
+        },
+        {
+          "title": "समुदाय",
+          "description": "एक जीवंत क्लाउड-नेटिव डेवलपर्स और संगठनों के समुदाय से जुड़ें"
+        },
+        {
+          "title": "उत्कृष्टता",
+          "description": "क्यूबेरनेटिस ऑर्केस्ट्रेशन में उद्योग मानक और सर्वोत्तम प्रथाएँ चलाएँ"
+        }
+      ]
+    },
+    "partnershipOpportunities": {
+      "title": "भागीदार बनें",
+      "subtitle": "KubeStellar के साथ मिलकर मल्टी-क्लस्टर क्यूबेरनेटिस ऑर्केस्ट्रेशन में नवाचार चलाएँ और क्लाउड-नेटिव ईकोसिस्टम में अपनी पहुँच बढ़ाएँ।",
+      "description": "हमारा भागीदारी प्रोग्राम तकनीकी इंटीग्रेशन समर्थन, इंजीनियरिंग संसाधन, साझा गो-टू-मार्केट पहल, और विकसित कम्युनिटी तक पहुँच प्रदान करता है।",
+      "features": [
+        "तकनीकी इंटीग्रेशन समर्थन और इंजीनियरिंग संसाधन",
+        "साझा गो-टू-मार्केट पहल और को-मार्केटिंग मौके",
+        "हमारी बढ़ती कम्युनिटी ऑफ क्लाउड-नेटिव प्रैक्टिशनर्स तक पहुँच",
+        "हमारी पार्टनर्स पेज और डॉक्यूमेंटेशन में विशेष स्थान",
+        "सहयोगात्मक उत्पाद विकास और रोडमैप इनपुट",
+        "प्राथमिकता समर्थन और समर्पित पार्टनरशिप मेनेजर"
+      ],
+      "contactButton": "संपर्क करें"
+    }
+  },
+  "comingSoonPage": {
+    "title": "जल्द ही",
+    "titleSpan": "आरंभ",
+    "subtitle": "हम KubeStellar समुदाय के लिए कुछ शानदार तैयार कर रहे हैं",
+    "description": "यह नया फीचर वर्तमान में विकास में है। हमारी टीम एक उत्कृष्ट अनुभव बना रही है जो आपकी मल्टी-क्लस्टर क्यूबेरनेटिस ऑर्केस्ट्रेशन यात्रा को बेहतर करेगा।",
+    "statusBadge": "विकासाधीन",
+    "cta": {
+      "title": "KubeStellar अभी एक्सप्लोर करें",
+      "subtitle": "जब तक आपका इंतज़ार है, जानिए कि आज KubeStellar आपके लिए क्या कर सकता है",
+      "documentsButton": "डॉक्यूमेंट्स देखें",
+      "documentsDescription": "विस्तृत गाइड्स और API संदर्भ",
+      "documentsAction": "डॉक्स एक्सप्लोर करें",
+      "quickStartButton": "त्वरित स्टार्ट गाइड",
+      "quickStartDescription": "मिनटों में चलान शुरू करें",
+      "quickStartAction": "इंस्टॉल करें",
+      "communityButton": "समुदाय में शामिल हों",
+      "communityDescription": "डेवलपर्स और योगदानकर्ताओं से जुड़ें",
+      "handbookButton": "हैंडबुक",
+      "ladderButton": "लैडर",
+      "programsButton": "प्रोग्राम्स",
+      "partnersButton": "भागीदार"
     }
   }
 }
