@@ -370,9 +370,7 @@ const PrerequisiteCard = ({
           {prerequisite.displayName}
         </h3>
         <span className="rounded-full bg-blue-500/20 border border-blue-500/30 px-2 py-1 font-mono text-xs text-blue-400">
-          {prerequisite.minVersion
-            ? `v${prerequisite.minVersion}+`
-            : "Latest"}
+          {prerequisite.minVersion ? `v${prerequisite.minVersion}+` : "Latest"}
         </span>
       </div>
 

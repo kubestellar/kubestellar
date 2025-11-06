@@ -59,9 +59,9 @@ export default function Footer() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-8 sm:px-6 lg:px-8">
         {/* Main footer content */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 mb-12">
+        <div className="grid grid-cols-3 sm:grid-cols-12 md:grid-cols-12 gap-8 mb-12">
           {/* Brand Section */}
-          <div className="lg:col-span-4">
+          <div className="col-span-3 sm:col-span-6 lg:col-span-4">
             <div className="flex items-center-space-x-2 mb-2  ml-[-7px]">
               <Image
                 src="/KubeStellar-with-Logo-transparent.png"
@@ -139,7 +139,7 @@ export default function Footer() {
           </div>
 
           {/* Product Links */}
-          <div className="lg:col-span-2">
+          <div className="col-span-1 sm:col-span-4 lg:col-span-2 order-3 sm:order-3">
             <h3 className="text-lg font-semibold text-white mb-4">
               {t("product")}
             </h3>
@@ -180,7 +180,7 @@ export default function Footer() {
           </div>
 
           {/* Resources Links */}
-          <div className="lg:col-span-2">
+          <div className="col-span-1 sm:col-span-4 lg:col-span-2 order-4 sm:order-4">
             <h3 className="text-lg font-semibold text-white mb-4">
               {t("resources")}
             </h3>
@@ -221,7 +221,7 @@ export default function Footer() {
           </div>
 
           {/* Company Links */}
-          <div className="lg:col-span-2">
+          <div className="col-span-1 sm:col-span-4 lg:col-span-2 order-5 sm:order-5">
             <h3 className="text-lg font-semibold text-white mb-4">
               {t("company")}
             </h3>
@@ -262,8 +262,8 @@ export default function Footer() {
           </div>
 
           {/* Stay updated */}
-          <div className="sm:col-span-2 lg:col-span-2">
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+          <div className="col-span-3 sm:col-span-6 lg:col-span-2 sm:order-2 lg:order-6 md:ml-12 lg:ml-0">
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider sm:mt-3 md:mt-2 lg:mt-1 mb-4">
               {t("stayUpdated")}
             </h3>
             <div className="bg-gray-800/50 backdrop-blur-md rounded-lg p-4 border border-gray-700/50 transform transition-all duration-300 hover:border-blue-500/30">
@@ -294,7 +294,7 @@ export default function Footer() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 transform hover:translate-y-[-1px] flex items-center justify-center"
+                  className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 transform hover:translate-y-[-1px] flex items-center justify-center cursor-pointer"
                 >
                   <span>{t("subscribe")}</span>
                 </button>
@@ -327,33 +327,31 @@ export default function Footer() {
         {/* Divider and bottom section */}
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-6 mb-4 md:mb-0">
-              <p className="text-gray-400">{t("copyright")}</p>
-              <div className="flex items-center space-x-4">
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
-                >
-                  {t("privacyPolicy")}
-                </a>
-                <span className="text-gray-600">•</span>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
-                >
-                  {t("termsOfService")}
-                </a>
-                <span className="text-gray-600">•</span>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
-                >
-                  {t("cookiePolicy")}
-                </a>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-400 text-sm">{t("madeWithLove")}</span>
+            {/* Left side - copyright */}
+            <p className="text-gray-400 text-sm mb-4 md:mb-0">
+              {t("copyright")}
+            </p>
+
+            {/* Right side - policy links */}
+            <div className="flex items-center space-x-8">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
+              >
+                {t("privacyPolicy")}
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
+              >
+                {t("termsOfService")}
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
+              >
+                {t("cookiePolicy")}
+              </a>
             </div>
           </div>
         </div>
@@ -362,7 +360,7 @@ export default function Footer() {
       {/* Floating back to top button */}
       <button
         id="back-to-top"
-        className="fixed bottom-8 right-8 p-3 rounded-full bg-blue-600 text-white shadow-lg z-50 transition-all duration-300 opacity-0 translate-y-10 hover:bg-blue-700 hover:scale-110"
+        className="fixed bottom-18 right-8 p-3 rounded-full bg-blue-600 text-white shadow-lg z-50 transition-all duration-300 opacity-0 translate-y-10 hover:bg-blue-700 hover:scale-110"
         aria-label={t("backToTop")}
       >
         <svg

@@ -8,11 +8,11 @@ export default function HowToUseSection() {
   const t = useTranslations("howToUseSection");
   const [showAllSteps, setShowAllSteps] = useState(false);
   const stepsRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             entry.target.classList.add("step-visible");
           }
@@ -25,11 +25,11 @@ export default function HowToUseSection() {
     );
 
     const steps = document.querySelectorAll(".step-animate");
-    steps.forEach((step) => observer.observe(step));
+    steps.forEach(step => observer.observe(step));
 
     return () => observer.disconnect();
   }, [showAllSteps]);
-  
+
   return (
     <section
       id="how-to-use"
@@ -198,7 +198,7 @@ export default function HowToUseSection() {
                 </div>
               </div>
             </div>
-            
+
             {/* Mobile Connector - only show if steps are expanded */}
             {showAllSteps && (
               <div className="flex justify-center mt-4">
@@ -206,7 +206,7 @@ export default function HowToUseSection() {
               </div>
             )}
           </div>
-          
+
           {/* Blur Overlay - Full Width */}
           {!showAllSteps && (
             <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pointer-events-none z-30 flex items-end justify-center pb-4">
@@ -215,8 +215,18 @@ export default function HowToUseSection() {
                 className="pointer-events-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 animate-bounce-slow"
               >
                 <span>Show More Steps</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
             </div>
@@ -477,7 +487,7 @@ export default function HowToUseSection() {
               <div className="w-1/2 pl-12"></div>
             </div>
           </div>
-          
+
           {/* Blur Overlay - Full Width Desktop */}
           {!showAllSteps && (
             <div className="absolute inset-x-0 bottom-0 h-60 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pointer-events-none z-40 flex items-end justify-center pb-12">
@@ -486,8 +496,18 @@ export default function HowToUseSection() {
                 className="pointer-events-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-3 border border-purple-400/30 animate-bounce-slow"
               >
                 <span className="text-lg">Show More Steps</span>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
             </div>
@@ -519,7 +539,8 @@ export default function HowToUseSection() {
                           <span className="text-yellow-300">kind</span>:{" "}
                           <span className="text-white">{t("step4Kind")}</span>
                           {"\n"}
-                          <span className="text-yellow-300">metadata</span>:{"\n"}
+                          <span className="text-yellow-300">metadata</span>:
+                          {"\n"}
                           {"  "}
                           <span className="text-yellow-300">name</span>:{" "}
                           <span className="text-white">

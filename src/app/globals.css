@@ -1728,7 +1728,8 @@ html:not(.dark) .nextra-sidebar-container {
 
 /* Bounce animation for button */
 @keyframes bounce-slow {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {

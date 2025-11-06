@@ -85,6 +85,7 @@ for (const fp of filePaths) {
 
 }
 
+// @ts-expect-error - Nextra's type definitions have a mismatch between convertToPageMap return type and normalizePageMap parameter type
 export const pageMap = normalizePageMap(_pageMap)
 
 const { wrapper: Wrapper, ...components } = getMDXComponents({
