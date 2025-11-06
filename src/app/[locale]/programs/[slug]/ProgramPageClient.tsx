@@ -2,10 +2,8 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { Program } from "../programs";
-import { StarField, GridLines } from "@/components";
+import { Navbar, Footer, StarField, GridLines } from "@/components";
 import { useTranslations } from "next-intl";
 
 interface ProgramPageClientProps {
@@ -125,7 +123,7 @@ export default function ProgramPageClient({ program }: ProgramPageClientProps) {
   return (
     <div className="bg-[#0a0a0a] text-white min-h-screen">
       {/* Navigation */}
-      <Navigation />
+      <Navbar />
 
       {/* Main Content with full background */}
       <main className="relative min-h-screen">

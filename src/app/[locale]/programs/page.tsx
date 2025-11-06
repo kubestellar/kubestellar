@@ -3,9 +3,7 @@
 import { getAllPrograms } from "./programs";
 import Image from "next/image";
 import { useEffect } from "react";
-import Navigation from "../../../components/Navigation";
-import Footer from "../../../components/Footer";
-import { GridLines, StarField } from "@/components";
+import { Navbar, Footer, GridLines, StarField } from "@/components";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
@@ -48,7 +46,7 @@ export default function ProgramsPage() {
   return (
     <div className="bg-[#0a0a0a] text-white overflow-x-hidden min-h-screen">
       {/* Navigation */}
-      <Navigation />
+      <Navbar />
 
       {/* Full page background with starfield */}
       <div className="fixed inset-0 z-0">

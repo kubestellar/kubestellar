@@ -7,3 +7,6 @@ export {
   LanguageSwitcherFull,
 } from "./LanguageSwitcher";
 export { default as ContributionCallToAction } from "./ContributionCallToAction";
+export { default as ComingSoonCTA } from "./ComingSoonCTA";
+export { default as Navbar } from "./Navbar";
+export { default as Footer } from "./Footer";

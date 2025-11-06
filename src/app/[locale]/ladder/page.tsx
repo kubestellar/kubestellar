@@ -4,9 +4,9 @@ import {
   GridLines,
   StarField,
   ContributionCallToAction,
+  Navbar,
+  Footer,
 } from "../../../components/index";
-import Navigation from "../../../components/Navigation";
-import Footer from "../../../components/Footer";
 import { useTranslations } from "next-intl";
 
 export default function MaintainerLadderPage() {
@@ -160,7 +160,7 @@ export default function MaintainerLadderPage() {
 
   return (
     <div className="bg-[#0a0a0a] text-white overflow-x-hidden min-h-screen">
-      <Navigation />
+      <Navbar />
 
       {/* Full page background with starfield */}
       <div className="fixed inset-0 z-0">

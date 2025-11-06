@@ -1,8 +1,11 @@
 "use client";
 
-import { GridLines, StarField } from "../../../components/index";
-import Navigation from "../../../components/Navigation";
-import Footer from "../../../components/Footer";
+import {
+  Navbar,
+  Footer,
+  GridLines,
+  StarField,
+} from "../../../components/index";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
@@ -75,7 +78,7 @@ export default function PartnersPage() {
 
   return (
     <div className="bg-[#0a0a0a] text-white overflow-x-hidden min-h-screen">
-      <Navigation />
+      <Navbar />
 
       {/* Full page background with starfield */}
       <div className="fixed inset-0 z-0">

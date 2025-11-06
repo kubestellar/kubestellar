@@ -15,9 +15,7 @@ import {
   Info,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import { GridLines, StarField } from "@/components/index";
+import { Navbar, Footer, GridLines, StarField } from "@/components/index";
 
 // Define platform type for installation
 type Platform = "kind" | "k3d";
@@ -499,7 +497,7 @@ const QuickInstallationPage = () => {
 
   return (
     <main className="min-h-screen">
-      <Navigation />
+      <Navbar />
 
       <section className="relative py-24 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden">
         {/* Dark base background */}
