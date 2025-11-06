@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../favicons/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
     
     
       
@@ -3817,10 +3817,10 @@
 <h3 id="run-the-script">Run the script<a class="headerlink" href="#run-the-script" title="Permanent link">#</a></h3>
 <p>The script can install KubeStellar's demonstration environment on top of kind or k3d</p>
 <p>For use with kind</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v0.29.0-alpha.1/scripts/create-kubestellar-demo-env.sh<span class="o">)</span><span class="w"> </span>--platform<span class="w"> </span>kind
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v0.29.0-rc.1/scripts/create-kubestellar-demo-env.sh<span class="o">)</span><span class="w"> </span>--platform<span class="w"> </span>kind
 </code></pre></div>
 <p>For use with k3d</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v0.29.0-alpha.1/scripts/create-kubestellar-demo-env.sh<span class="o">)</span><span class="w"> </span>--platform<span class="w"> </span>k3d
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v0.29.0-rc.1/scripts/create-kubestellar-demo-env.sh<span class="o">)</span><span class="w"> </span>--platform<span class="w"> </span>k3d
 </code></pre></div>
 <p>If successful, the script will output the variable definitions that you would use when proceeding to the example scenarios. After successfully running the script, proceed to the <a href="#exercise-kubestellar">Exercise KubeStellar</a> section below.</p>
 <p><em>Note: the script does the same things as described in the <a href="#step-by-step-setup">Step by Step Setup</a> but with a little more concurrency, so it can complete a bit faster. While this is great for getting started quickly with a demo system, you may want to follow the manual setup below to better understand the components and how to create a <a href="#next-steps">configuration that meets your needs</a>.</em></p>
@@ -3829,7 +3829,7 @@
 <p>This walks you through the steps to produce the same configuration as does the script above, suitable for study but not production usage. For general setup information, see <a href="../user-guide-intro/#the-full-story">the full story</a>.</p>
 <h3 id="install-software-prerequisites_1">Install software prerequisites<a class="headerlink" href="#install-software-prerequisites_1" title="Permanent link">#</a></h3>
 <p>The following command will check for the prerequisites that you will need for the later steps. See <a href="../pre-reqs/">the prerequisites doc</a> for more details.</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.29.0-alpha.1/scripts/check_pre_req.sh<span class="o">)</span><span class="w"> </span>kflex<span class="w"> </span>ocm<span class="w"> </span>helm<span class="w"> </span>kubectl<span class="w"> </span>docker<span class="w"> </span>kind
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.29.0-rc.1/scripts/check_pre_req.sh<span class="o">)</span><span class="w"> </span>kflex<span class="w"> </span>ocm<span class="w"> </span>helm<span class="w"> </span>kubectl<span class="w"> </span>docker<span class="w"> </span>kind
 </code></pre></div>
 <p>If that script complains then take it seriously! For example, the following indicates that you have a version of clusteradm that KubeStellar cannot use.</p>
 <div class="language-console highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gp">$ </span>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.27.1/scripts/check_pre_req.sh<span class="o">)</span><span class="w"> </span>kflex<span class="w"> </span>ocm<span class="w"> </span>helm<span class="w"> </span>kubectl<span class="w"> </span>docker<span class="w"> </span>kind
@@ -3856,11 +3856,11 @@ commands tear down the state established by this recipe.</p>
 go unnoticed (the various cleanup commands may legitimately "fail" if
 there is nothing to clean up).</p>
 <h3 id="set-the-version-appropriately-as-an-environment-variable">Set the Version appropriately as an environment variable<a class="headerlink" href="#set-the-version-appropriately-as-an-environment-variable" title="Permanent link">#</a></h3>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">kubestellar_version</span><span class="o">=</span><span class="m">0</span>.29.0-alpha.1
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">kubestellar_version</span><span class="o">=</span><span class="m">0</span>.29.0-rc.1
 </code></pre></div>
 <h3 id="create-a-kind-cluster-to-host-kubeflex">Create a kind cluster to host KubeFlex<a class="headerlink" href="#create-a-kind-cluster-to-host-kubeflex" title="Permanent link">#</a></h3>
 <p>For convenience, a new local <strong>Kind</strong> cluster that satisfies the requirements for playing the role of KubeFlex hosting cluster can be created with the following command:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.29.0-alpha.1/scripts/create-kind-cluster-with-SSL-passthrough.sh<span class="o">)</span><span class="w"> </span>--name<span class="w"> </span>kubeflex<span class="w"> </span>--port<span class="w"> </span><span class="m">9443</span>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/v0.29.0-rc.1/scripts/create-kind-cluster-with-SSL-passthrough.sh<span class="o">)</span><span class="w"> </span>--name<span class="w"> </span>kubeflex<span class="w"> </span>--port<span class="w"> </span><span class="m">9443</span>
 </code></pre></div>
 <h3 id="use-core-helm-chart-to-initialize-kubeflex-and-create-its-and-wds">Use Core Helm chart to initialize KubeFlex and create ITS and WDS<a class="headerlink" href="#use-core-helm-chart-to-initialize-kubeflex-and-create-its-and-wds" title="Permanent link">#</a></h3>
 <div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ks-core<span class="w"> </span>oci://ghcr.io/kubestellar/kubestellar/core-chart<span class="w"> </span><span class="se">\</span>
