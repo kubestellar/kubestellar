@@ -112,11 +112,6 @@ spec:
         name: default
         namespace: '{{"{{.Namespace}}"}}'
   - apiVersion: v1
-    data: {}
-    kind: ConfigMap
-    metadata:
-      name: kubestellar-config
-  - apiVersion: v1
     kind: Service
     metadata:
       labels:
