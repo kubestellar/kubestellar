@@ -33,12 +33,6 @@ spec:
     - kind: ServiceAccount
       name: default
       namespace: '{{"{{.Namespace}}"}}'
-  - apiVersion: v1
-    kind: Secret
-    metadata:
-      name: its-kubeconfig
-    type: Opaque
-    data: {}
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -59,32 +53,31 @@ spec:
             args:
               - wait
               - --for=create
-              - cp
-              - '{{"{{.ITSName}}"}}'
+              - cp/{{"{{.ITSName}}"}}
               - --timeout=300s
           - name: wait-its-ready
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
             args:
               - wait
               - --for=condition=Ready
-              - cp
-              - '{{"{{.ITSName}}"}}'
+              - cp/{{"{{.ITSName}}"}}
               - --timeout=300s
           - name: copy-its-secret
             image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
-            imagePullPolicy: IfNotPresent
             command:
               - sh
               - -c
-              - 'kubectl get secret {{"{{.ITSSecretName}}"}} --namespace {{"{{.ITSSecretNamespace}}"}} -o yaml | sed "/ownerReferences:/,/^- /d;/namespace:/d;/creationTimestamp:/d;/uid:/d;/resourceVersion:/d;s/\(name: \).*/\1its-kubeconfig/" | kubectl apply -f -'
+              - 'kubectl get secret {{"{{.ITSSecretName}}"}} --namespace {{"{{.ITSSecretNamespace}}"}} -o jsonpath="{.data.{{"{{.ITSSecretKey}}"}}}" | base64 --decode > /etc/kube/its/kubeconfig'
+            volumeMounts:
+            - name: its-kubeconfig-volume
+              mountPath: /etc/kube/its/
           containers:
           - name: transport-controller
             image: ghcr.io/kubestellar/kubestellar/ocm-transport-controller:{{ .Values.TRANSPORT_VERSION | default .Values.KUBESTELLAR_VERSION }}
-            imagePullPolicy: IfNotPresent
             args:
             - --metrics-bind-address={{.Values.transport_controller.metrics_bind_addr}}
             - --pprof-bind-address={{.Values.transport_controller.pprof_bind_addr}}
-            - --transport-kubeconfig=/etc/kube/its/{{"{{.ITSSecretKey}}"}}
+            - --transport-kubeconfig=/etc/kube/its/kubeconfig
             - --transport-qps={{.Values.transport_controller.transport_qps}}
             - --transport-burst={{.Values.transport_controller.transport_burst}}
             - --wds-kubeconfig=/etc/kube/wds/{{"{{.WDSSecretKey}}"}}
@@ -97,13 +90,15 @@ spec:
             volumeMounts:
             - name: wds-kubeconfig-volume
               mountPath: /etc/kube/wds
+              readOnly: True
             - name: its-kubeconfig-volume
               mountPath: /etc/kube/its/
+              readOnly: True
           volumes:
           - name: wds-kubeconfig-volume
             secret:
               secretName: '{{"{{.WDSSecretName}}"}}'
           - name: its-kubeconfig-volume
-            secret:
-              secretName: its-kubeconfig
+            emptyDir:
+              medium: Memory
 {{- end }}
