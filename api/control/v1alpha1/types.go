@@ -167,15 +167,15 @@ type DownsyncModulation struct {
 	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 
 	// WantMultiWECReportedState, in short, indicates an expectation that the matching
-	// objects are distributed to multiple WECs and requests that .status from each
-	// WEC.
+	// objects are distributed to multiple WECs, requests that .status from each
+	// WEC and propagates aggregated .status to object in WDS.
 	// If there's no matching WEC then will update empty status to WDS.
-	// When this above condition is true, the instruction below does not apply.
-	// If object is of known KIND(includes built-in aggregation logic ) then we perform per KIND aggregation of .status from each
-	// WEC.
-	// Else we perform generic aggregation of .status from each WEC.
+	//
+	// If object is of a few particular kinds that this feature handles specially,
+	// the aggregation is done with awareness of, and consideration for, the semantics of their .status sections;
+	// for the rest, the aggregation is done by simple general-purpose rules.
 	// The basis of the aggregation logic is explained in the docs.
-	// After aggregation, we propagate the aggregated .status to the object in the WDS.
+	// NOTE: This API isn't yet implemented.
 	// +optional
 	WantMultiWECReportedState bool `json:"wantMultiWECReportedState,omitempty"`
 }
