@@ -165,6 +165,19 @@ type DownsyncModulation struct {
 	// in the WDS that was propagated there from a WEC by KubeStellar.
 	// +optional
 	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
+
+	// WantMultiWECReportedState, in short, indicates an expectation that the matching
+	// objects are distributed to multiple WECs, requests that .status from each
+	// WEC and propagates aggregated .status to object in WDS.
+	// If there's no matching WEC then will update empty status to WDS.
+	//
+	// If object is of a few particular kinds that this feature handles specially,
+	// the aggregation is done with awareness of, and consideration for, the semantics of their .status sections;
+	// for the rest, the aggregation is done by simple general-purpose rules.
+	// The basis of the aggregation logic is explained in the docs.
+	// NOTE: This API isn't yet implemented.
+	// +optional
+	WantMultiWECReportedState bool `json:"wantMultiWECReportedState,omitempty"`
 }
 
 // DownsyncObjectTest is a set of criteria that characterize matching objects.

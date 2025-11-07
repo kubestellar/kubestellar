@@ -130,6 +130,7 @@ type DownsyncModulation struct {
 	CreateOnly                 bool
 	StatusCollectors           sets.Set[string]
 	WantSingletonReportedState bool
+	WantMultiWECReportedState  bool
 }
 
 func ZeroDownsyncModulation() DownsyncModulation {
@@ -141,6 +142,7 @@ func DownsyncModulationFromExternal(external v1alpha1.DownsyncModulation) Downsy
 		CreateOnly:                 external.CreateOnly,
 		StatusCollectors:           sets.New(external.StatusCollectors...),
 		WantSingletonReportedState: external.WantSingletonReportedState,
+		WantMultiWECReportedState:  external.WantMultiWECReportedState,
 	}
 }
 
@@ -149,17 +151,22 @@ func (dm *DownsyncModulation) ToExternal() v1alpha1.DownsyncModulation {
 		CreateOnly:                 dm.CreateOnly,
 		StatusCollectors:           sets.List(dm.StatusCollectors),
 		WantSingletonReportedState: dm.WantSingletonReportedState,
+		WantMultiWECReportedState:  dm.WantMultiWECReportedState,
 	}
 }
 
 func (left *DownsyncModulation) Equal(right DownsyncModulation) bool {
-	return left.CreateOnly == right.CreateOnly && left.WantSingletonReportedState == right.WantSingletonReportedState && left.StatusCollectors.Equal(right.StatusCollectors)
+	return left.CreateOnly == right.CreateOnly &&
+		left.WantSingletonReportedState == right.WantSingletonReportedState &&
+		left.WantMultiWECReportedState == right.WantMultiWECReportedState &&
+		left.StatusCollectors.Equal(right.StatusCollectors)
 }
 
 func (dm *DownsyncModulation) AddExternal(external v1alpha1.DownsyncModulation) {
 	dm.CreateOnly = dm.CreateOnly || external.CreateOnly
 	dm.StatusCollectors.Insert(external.StatusCollectors...)
 	dm.WantSingletonReportedState = dm.WantSingletonReportedState || external.WantSingletonReportedState
+	dm.WantMultiWECReportedState = dm.WantMultiWECReportedState || external.WantMultiWECReportedState
 }
 
 // SingletonReportedStateReturnStatus reports the resolver's state regarding
