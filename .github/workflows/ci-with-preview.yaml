@@ -367,7 +367,7 @@ jobs:
           IMAGE_IDS=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query 'data.items[?contains("display-name", `pr-${{ github.event.pull_request.number }}`)].id' \
+            --query 'data.items[?contains("display-name", `pr-${{ github.event.pull_request.number }}`)].id | [0]' \
             --raw-output)
 
           echo "Found image IDs: $IMAGE_IDS"
