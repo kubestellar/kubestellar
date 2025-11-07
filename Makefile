@@ -19,6 +19,7 @@ TRANSPORT_CMD_NAME ?= ocm-transport-controller
 IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
 CONTROLLER_MANAGER_IMAGE ?= ${DOCKER_REGISTRY}/${CONTROLLER_MANAGER_CMD_NAME}:${IMAGE_TAG}
 TRANSPORT_IMAGE ?= ${DOCKER_REGISTRY}/${TRANSPORT_CMD_NAME}:${IMAGE_TAG}
+GET_KFCFG_IMAGE ?= ${DOCKER_REGISTRY}/kflex-get-kubeconfig:${IMAGE_TAG}
 INSTALL_KUBEFLEX ?= true
 
 KUBESTELLAR_CONTROLLER_MANAGER_VERBOSITY ?= 2
@@ -198,17 +199,29 @@ ko-build-transport-local: ## Build local transport container image with `ko`.
 	KO_DOCKER_REPO=ko.local ko build -B ./pkg/transport/${TRANSPORT_CMD_NAME} -t ${IMAGE_TAG} --platform linux/${ARCH}
 	docker tag ko.local/${TRANSPORT_CMD_NAME}:${IMAGE_TAG} ${TRANSPORT_IMAGE}
 
+.PHONY: ko-build-get-kubeconfig-local
+ko-build-get-kubeconfig-local: ## Build local kflex-get-kubeconfig container image with `ko`.
+	@if ! docker images &> /dev/null; then \
+		echo "Error: docker command is not working. Please ensure you have a working docker setup."; \
+		echo "For podman users, you may need to set up docker compatibility or configure DOCKER_HOST."; \
+		exit 1; \
+	fi
+	KO_DOCKER_REPO=ko.local ko build -B ./cmd/kflex-get-kubeconfig -t ${IMAGE_TAG} --platform linux/${ARCH}
+	docker tag ko.local/kflex-get-kubeconfig:${IMAGE_TAG} ${GET_KFCFG_IMAGE}
+
 # this is used for local testing
 .PHONY: kind-load-image
-kind-load-image: ko-build-controller-manager-local ko-build-transport-local
+kind-load-image: ko-build-controller-manager-local ko-build-transport-local ko-build-get-kubeconfig-local
 	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${CONTROLLER_MANAGER_IMAGE}
 	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${TRANSPORT_IMAGE}
+	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${GET_KFCFG_IMAGE}
 
 # this is used for local testing
 .PHONY: k3d-load-image
 k3d-load-image: ko-build-controller-manager-local ko-build-transport-local
 	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${K3D_HOSTING_CLUSTER}
 	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${TRANSPORT_IMAGE}
+	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${GET_KFCFG_IMAGE}
 
 ##@ Deployment
 
