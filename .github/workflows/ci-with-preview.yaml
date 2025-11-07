@@ -1,12 +1,12 @@
-name: CI/CD & PR Preview Pipeline
+name: CI/CD Build & PR Preview Pipeline
 
 on:
   push:
     branches: [main, develop]
   pull_request:
     types: [opened, reopened, synchronize, labeled, unlabeled]
-  pull_request_target:
-    types: [opened, reopened, synchronize, labeled, unlabeled]
+  # pull_request_target:
+  #   types: [opened, reopened, synchronize, labeled, unlabeled]
   workflow_dispatch:
 
 env:
@@ -91,6 +91,7 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify build output
         run: |
@@ -252,6 +253,8 @@ jobs:
           echo "⚙️ Building new preview..."
           npm ci
           npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify build output
         if: steps.check_access.outputs.authorized == 'true' && steps.skip_build.outputs.skip_build != 'true'
