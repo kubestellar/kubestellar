@@ -245,6 +245,15 @@ jobs:
           echo "✅ No relevant changes and existing preview image found. Skipping rebuild and redeploy."
           echo "skip_build=true" >> $GITHUB_OUTPUT
 
+      - name: Checkout code
+        if: |
+          steps.check_access.outputs.authorized == 'true' &&
+          (needs.check_changes.outputs.has_changes == 'true' ||
+           steps.get_artifacts.outcome != 'success')
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Build app for preview
         if: |
           steps.check_access.outputs.authorized == 'true' &&
@@ -252,7 +261,7 @@ jobs:
            steps.get_artifacts.outcome != 'success')
         run: |
           echo "⚙️ Building new preview..."
-          # npm ci
+          npm ci
           npm run build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
