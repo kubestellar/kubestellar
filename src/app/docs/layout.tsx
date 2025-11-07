@@ -15,7 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
-import { pageMap } from './[...slug]/page'
+import { pageMap } from './page-map'
 
 export const metadata = {
   title: 'KubeStellar - Multi-Cluster Kubernetes Orchestration',

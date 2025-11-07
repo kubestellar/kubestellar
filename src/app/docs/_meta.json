@@ -1,5 +1,40 @@
 {
-  "index": "Hello World",
-  "getting-started": "Getting Started"
+  "index": "Index",
+  "install-configure": {
+    "title": "Install & Configure",
+    "type": "folder"
+  },
+  "ui-tools": {
+    "title": "UI & Tools",
+    "type": "folder"
+  },
+  "use-integrate": {
+    "title": "Use & Integrate",
+    "type": "folder"
+  },
+  "user-guide-support": {
+    "title": "User Guide & Support",
+    "type": "folder"
+  },
+  "what-is-kubestellar": {
+    "title": "What Is Kubestellar?",
+    "type": "folder"
+  },
+  "community": {
+    "title": "Community",
+    "type": "folder"
+  },
+  "common-subs": {
+    "title": "Common Subs",
+    "type": "folder"
+  },
+  "contribution-guidelines": {
+    "title": "Contribution Guidelines",
+    "type": "folder"
+  },
+  "readme": "Readme",
+  "ui-docs": {
+    "title": "UI Docs",
+    "type": "folder"
+  }
 }
-
