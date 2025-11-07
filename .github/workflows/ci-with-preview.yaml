@@ -19,6 +19,7 @@ jobs:
   # ============================================================
   check_changes:
     name: Detect relevant changes
+    if: "!startsWith(github.event.head_commit.message, 'Merge')"
     runs-on: ubuntu-latest
     outputs:
       has_changes: ${{ steps.filter.outputs.has_changes }}
