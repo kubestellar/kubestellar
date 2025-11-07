@@ -23,6 +23,11 @@ jobs:
     outputs:
       has_changes: ${{ steps.filter.outputs.has_changes }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Check for changed files (ignore root .md and config)
         id: changes
         uses: tj-actions/changed-files@v44
