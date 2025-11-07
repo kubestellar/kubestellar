@@ -91,6 +91,7 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify build output
         run: |
@@ -252,6 +253,8 @@ jobs:
           echo "⚙️ Building new preview..."
           npm ci
           npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify build output
         if: steps.check_access.outputs.authorized == 'true' && steps.skip_build.outputs.skip_build != 'true'
