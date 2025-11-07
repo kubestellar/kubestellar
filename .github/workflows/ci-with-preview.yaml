@@ -1,4 +1,4 @@
-name: CI/CD & PR Preview Pipeline
+name: CI/CD Build & PR Preview Pipeline
 
 on:
   push:
