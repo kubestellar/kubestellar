@@ -107,6 +107,8 @@ spec:
                             WantMultiWECReportedState, in short, indicates an expectation that the matching
                             objects are distributed to multiple WECs and requests that .status from each
                             WEC.
+                            If there's no matching WEC then will update empty status to WDS.
+                            When this above condition is true, the instruction below does not apply.
                             If object is of known KIND(includes built-in aggregation logic ) then we perform per KIND aggregation of .status from each
                             WEC.
                             Else we perform generic aggregation of .status from each WEC.
@@ -202,6 +204,8 @@ spec:
                             WantMultiWECReportedState, in short, indicates an expectation that the matching
                             objects are distributed to multiple WECs and requests that .status from each
                             WEC.
+                            If there's no matching WEC then will update empty status to WDS.
+                            When this above condition is true, the instruction below does not apply.
                             If object is of known KIND(includes built-in aggregation logic ) then we perform per KIND aggregation of .status from each
                             WEC.
                             Else we perform generic aggregation of .status from each WEC.
