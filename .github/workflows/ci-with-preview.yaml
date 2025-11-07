@@ -217,14 +217,14 @@ jobs:
           EXISTING_IMAGES=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query "data[?contains(display_name, 'pr-')].id" \
+            --query 'data.items[?contains("display-name", `pr-`)].id' \
             --raw-output)
           echo "Existing images: $EXISTING_IMAGES"
 
           EXISTING_IMAGE=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query 'data[?contains(`display-name`, `pr-${{ github.event.pull_request.number }}`)].id' \
+            --query 'data.items[?contains("display-name", `pr-${{ github.event.pull_request.number }}`)].id' \
             --raw-output)
           if [ -n "$EXISTING_IMAGE" ]; then
             echo "existing=true" >> $GITHUB_OUTPUT
@@ -357,7 +357,7 @@ jobs:
           IMAGE_IDS=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query "data[?contains(display_name, 'pr-${{ github.event.pull_request.number }}')].id" \
+            --query 'data.items[?contains("display-name", `pr-${{ github.event.pull_request.number }}`)].id' \
             --raw-output)
           if [ -z "$IMAGE_IDS" ]; then
             echo "No image found for PR #${{ github.event.pull_request.number }}"
