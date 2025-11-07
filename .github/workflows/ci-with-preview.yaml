@@ -217,7 +217,7 @@ jobs:
           EXISTING_IMAGES=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query 'data.items[?contains("display-name", `pr-`)].{id:id,name:`"display-name"`}' \
+            --query 'data.items[?contains("display-name", `pr-`)].{id:id,name:["display-name"]}' \
             --raw-output)
           echo "Existing images: $EXISTING_IMAGES"
 
@@ -357,7 +357,7 @@ jobs:
           EXISTING_IMAGES=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query 'data.items[?contains("display-name", `pr-`)].{id:id,name:`"display-name"`}' \
+            --query 'data.items[?contains("display-name", `pr-`)].{id:id,name:["display-name"]}' \
             --raw-output)
           echo "Existing images: $EXISTING_IMAGES"
 
