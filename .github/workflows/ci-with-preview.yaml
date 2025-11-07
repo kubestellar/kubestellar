@@ -214,6 +214,13 @@ jobs:
         if: steps.check_access.outputs.authorized == 'true'
         run: |
           echo "Checking if preview image exists for PR-${{ github.event.pull_request.number }}"
+          EXISTING_IMAGES=$(oci artifacts container image list \
+            --repository-name "kubestellar-docs-prs" \
+            --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
+            --query "data[?contains(display_name, 'pr-')].id" \
+            --raw-output)
+          echo "Existing images: $EXISTING_IMAGES"
+
           EXISTING_IMAGE=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
