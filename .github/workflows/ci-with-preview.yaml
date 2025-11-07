@@ -217,7 +217,7 @@ jobs:
           EXISTING_IMAGES=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
-            --query 'data.items[?contains("display-name", `pr-`)].id' \
+            --query 'data.items[?contains("display-name", `pr-`)].{id:id,name:display-name}' \
             --raw-output)
           echo "Existing images: $EXISTING_IMAGES"
 
@@ -354,6 +354,13 @@ jobs:
       - name: Delete PR image from OCIR
         run: |
           echo "Searching for image: pr-${{ github.event.pull_request.number }}"
+          EXISTING_IMAGES=$(oci artifacts container image list \
+            --repository-name "kubestellar-docs-prs" \
+            --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
+            --query 'data.items[?contains("display-name", `pr-`)].{id:id,name:display-name}' \
+            --raw-output)
+          echo "Existing images: $EXISTING_IMAGES"
+
           IMAGE_IDS=$(oci artifacts container image list \
             --repository-name "kubestellar-docs-prs" \
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
