@@ -61,8 +61,9 @@ export async function buildPageMapForBranch(branch: string) {
   })
 
   const { pageMap: baseMap } = convertToPageMap({ filePaths, basePath })
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   type PageMapNode = { kind: 'Folder' | 'MdxPage'; name: string; route: string; children?: any[] } | any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const _pageMap: PageMapNode[] = baseMap as any
 
   // Your category mappings...

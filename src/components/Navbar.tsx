@@ -223,8 +223,9 @@ export default function Navbar() {
           if (langButton) {
             // Check if dropdown is currently open
             const dropdown = document.querySelector('[role="listbox"]');
-            const isDropdownVisible = dropdown && window.getComputedStyle(dropdown).display !== 'none';
-            
+            const isDropdownVisible =
+              dropdown && window.getComputedStyle(dropdown).display !== "none";
+
             if (!isDropdownVisible) {
               isLangHovered = true;
               langButton.click();
@@ -239,8 +240,9 @@ export default function Navbar() {
           timeoutRef.current = setTimeout(() => {
             const langButton = langSwitcher.querySelector("button");
             const dropdown = document.querySelector('[role="listbox"]');
-            const isDropdownVisible = dropdown && window.getComputedStyle(dropdown).display !== 'none';
-            
+            const isDropdownVisible =
+              dropdown && window.getComputedStyle(dropdown).display !== "none";
+
             if (langButton && isLangHovered && isDropdownVisible) {
               isLangHovered = false;
               langButton.click();
@@ -255,8 +257,9 @@ export default function Navbar() {
         const closeLangSwitcher = () => {
           const langButton = langSwitcher.querySelector("button");
           const dropdown = document.querySelector('[role="listbox"]');
-          const isDropdownVisible = dropdown && window.getComputedStyle(dropdown).display !== 'none';
-          
+          const isDropdownVisible =
+            dropdown && window.getComputedStyle(dropdown).display !== "none";
+
           if (langButton && isDropdownVisible) {
             isLangHovered = false;
             langButton.click();
