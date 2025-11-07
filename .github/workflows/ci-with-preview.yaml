@@ -1,4 +1,4 @@
-name: CI/CD Build & PR Preview Pipeline
+name: CI/CD Build, PR Preview, and Container Cleanup Pipeline
 
 on:
   push:
@@ -226,6 +226,9 @@ jobs:
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
             --query 'data.items[?contains("display-name", `pr-${{ github.event.pull_request.number }}`)].id' \
             --raw-output)
+
+          echo "Found image ID: $EXISTING_IMAGE"
+          
           if [ -n "$EXISTING_IMAGE" ]; then
             echo "existing=true" >> $GITHUB_OUTPUT
             echo "✅ Found existing preview image."
@@ -366,6 +369,9 @@ jobs:
             --compartment-id "${{ secrets.OCI_CLI_TENANCY }}" \
             --query 'data.items[?contains("display-name", `pr-${{ github.event.pull_request.number }}`)].id' \
             --raw-output)
+
+          echo "Found image IDs: $IMAGE_IDS"
+
           if [ -z "$IMAGE_IDS" ]; then
             echo "No image found for PR #${{ github.event.pull_request.number }}"
           else
