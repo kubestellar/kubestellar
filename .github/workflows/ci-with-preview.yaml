@@ -252,7 +252,7 @@ jobs:
            steps.get_artifacts.outcome != 'success')
         run: |
           echo "⚙️ Building new preview..."
-          npm ci
+          # npm ci
           npm run build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
