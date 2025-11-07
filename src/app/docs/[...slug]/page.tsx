@@ -5,34 +5,36 @@ import { evaluate } from 'nextra/evaluate'
 import { useMDXComponents as getMDXComponents } from '../../../../mdx-components'
 import { convertHtmlScriptsToJsxComments } from '@/lib/transformMdx'
 import { MermaidComponent } from '@/lib/Mermaid'
-import { routeMap, filePaths, user, repo, branch, docsPath, makeGitHubHeaders } from '../page-map'
+import { buildPageMapForBranch, makeGitHubHeaders, user, repo, docsPath } from '../page-map'
+import { getBranchForVersion, getDefaultVersion, type VersionKey } from '@/config/versions'
 
 export const dynamic = 'force-dynamic'
 
 const { wrapper: Wrapper, ...components } = getMDXComponents({ $Tabs: Tabs, Callout })
 const component = { ...components, Mermaid: MermaidComponent }
 
-type PageProps = Readonly<{ params: Promise<{ slug?: string[] }> }>
+type PageProps = Readonly<{
+  params: Promise<{ slug?: string[] }>
+  searchParams: Promise<{ version?: string }>
+}>
 
 export default async function Page(props: PageProps) {
   const params = await props.params
+  const searchParams = await props.searchParams
+  
+  // Get version from URL or use default
+  const version = (searchParams.version as VersionKey) || getDefaultVersion()
+  const branch = getBranchForVersion(version)
+  
+  // Build page map for this branch
+  const { routeMap, filePaths } = await buildPageMapForBranch(branch)
+  
   const route = params.slug ? params.slug.join('/') : ''
 
-  const normalizedRoute = route.startsWith('docs/')
-  ? route.slice(5) // remove 'docs/' prefix if present
-  : route
-
-  let filePath: string | undefined =
-  routeMap[normalizedRoute] ??
-  [
-    `${normalizedRoute}.mdx`,
-    `${normalizedRoute}.md`,
-    `${normalizedRoute}/README.md`,
-    `${normalizedRoute}/readme.md`,
-    `${normalizedRoute}/index.mdx`,
-    `${normalizedRoute}/index.md`
-  ].find(p => filePaths.includes(p))
-
+  const filePath =
+    routeMap[route] ??
+    [`${route}.mdx`, `${route}.md`, `${route}/README.md`, `${route}/readme.md`, `${route}/index.mdx`, `${route}/index.md`]
+      .find(p => filePaths.includes(p))
 
   if (!filePath) notFound()
 
@@ -64,6 +66,9 @@ export default async function Page(props: PageProps) {
   )
 }
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const defaultVersion = getDefaultVersion()
+  const branch = getBranchForVersion(defaultVersion)
+  const { routeMap } = await buildPageMapForBranch(branch)
   return Object.keys(routeMap).filter(k => k !== '').map(route => ({ slug: route.split('/') }))
 }
