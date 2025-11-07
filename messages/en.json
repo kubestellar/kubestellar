@@ -54,6 +54,7 @@
   },
   "navigation": {
     "docs": "Docs",
+    "blog": "Blog",
     "playground": "Playground",
     "contribute": "Contribute",
     "joinIn": "Join In",
@@ -79,6 +80,7 @@
     "langChineseSimplified": "简体中文",
     "langChineseTraditional": "繁體中文",
     "langPortuguese": "Português",
+    "github": "Github",
     "githubStar": "Star",
     "githubFork": "Fork",
     "githubWatch": "Watch",

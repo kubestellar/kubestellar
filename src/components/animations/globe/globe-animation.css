@@ -30,7 +30,7 @@
 
 /* Optional: Glow effect for the globe container */
 .globe-glow {
-  box-shadow: 
+  box-shadow:
     0 0 60px rgba(26, 144, 255, 0.3),
     0 0 120px rgba(26, 144, 255, 0.1);
 }

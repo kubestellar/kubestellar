@@ -55,6 +55,7 @@
   "navigation": {
     "docs": "डॉक्स",
     "blog": "ब्लॉग",
+    "playground": "प्लेग्राउंड",
     "contribute": "योगदान दें",
     "joinIn": "शामिल हों",
     "contributeHandbook": "योगदान हैंडबुक",
@@ -79,6 +80,7 @@
     "langChineseSimplified": "简体中文",
     "langChineseTraditional": "繁體中文",
     "langPortuguese": "Português",
+    "github": "Github",
     "githubStar": "Star करें",
     "githubFork": "Fork करें",
     "githubWatch": "Watch करें",

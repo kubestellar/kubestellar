@@ -60,7 +60,7 @@ export async function buildPageMapForBranch(branch: string) {
     return true
   })
 
-  const { pageMap: baseMap } = convertToPageMap({ filePaths, basePath, meta: {} })
+  const { pageMap: baseMap } = convertToPageMap({ filePaths, basePath })
 
   type PageMapNode = { kind: 'Folder' | 'MdxPage'; name: string; route: string; children?: any[] } | any
   const _pageMap: PageMapNode[] = baseMap as any
@@ -152,7 +152,6 @@ export async function buildPageMapForBranch(branch: string) {
     if (!alias.startsWith('content/')) routeMap[`content/${alias}`] = fp
   }
 
-  // @ts-expect-error nextra typing
   const pageMap = normalizePageMap(_pageMap)
 
   return { pageMap, routeMap, filePaths: allDocFiles, branch }

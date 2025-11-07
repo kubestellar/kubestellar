@@ -173,7 +173,7 @@ export default function LanguageSwitcher({
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         disabled={isTransitioning}
-        className="text-sm font-medium text-gray-300 hover:text-pink-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-pink-500/10 hover:shadow-lg hover:shadow-pink-500/20 hover:scale-100 transform nav-link-hover disabled:opacity-50"
+        className="cursor-pointer text-sm font-medium text-gray-300 hover:text-pink-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-pink-500/10 hover:shadow-lg hover:shadow-pink-500/20 hover:scale-100 transform nav-link-hover disabled:opacity-50"
         aria-label={`Current language: ${currentLanguage}. Click to change language`}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
@@ -210,7 +210,7 @@ export default function LanguageSwitcher({
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute right-0 mt-2 w-56 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl py-2 ring-1 ring-gray-700/50 transition-all duration-200 z-50 animate-in fade-in-0 zoom-in-95"
+          className="absolute right-0 w-56 mt-1 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl py-2 ring-1 ring-gray-700/50 transition-all duration-200 z-50 animate-in fade-in-0 zoom-in-95 before:content-[''] before:absolute before:bottom-full before:left-0 before:right-0 before:h-2 before:bg-transparent"
           role="listbox"
           aria-label="Select language"
         >
@@ -223,7 +223,7 @@ export default function LanguageSwitcher({
               key={loc}
               onClick={() => handleLanguageChange(loc)}
               disabled={isTransitioning}
-              className={`w-full text-left px-4 py-3 text-sm transition-all duration-200 hover:bg-pink-500/20 hover:text-pink-300 disabled:opacity-50 flex items-center justify-between group ${
+              className={`cursor-pointer w-full text-left px-4 py-3 text-sm transition-all duration-200 hover:bg-pink-500/20 hover:text-pink-300 disabled:opacity-50 flex items-center justify-between group ${
                 loc === locale
                   ? "bg-pink-500/10 text-pink-300 font-medium"
                   : "text-gray-300"

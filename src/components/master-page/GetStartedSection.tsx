@@ -65,8 +65,8 @@ export default function GetStartedSection() {
           <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50 w-11/12 max-w-xl mx-auto lgcustom:w-auto lgcustom:max-w-none">
             <div className="p-6 flex flex-col h-full">
               <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
-                <Icon 
-                  path="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" 
+                <Icon
+                  path="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
                   className="h-6 w-6 white"
                 />
               </div>

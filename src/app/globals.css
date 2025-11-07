@@ -805,7 +805,6 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 
 [data-dropdown-menu] a:hover {
   background: rgba(59, 130, 246, 0.2) !important;
-  transform: translateX(5px);
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 

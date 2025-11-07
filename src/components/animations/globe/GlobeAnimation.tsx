@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useState, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
-import NetworkGlobe from './NetworkGlobe';
-import GlobeLoader from './GlobeLoader';
+import { Suspense, useState, useEffect } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import NetworkGlobe from "./NetworkGlobe";
+import GlobeLoader from "./GlobeLoader";
 
 interface GlobeAnimationProps {
   width?: string;
@@ -25,7 +25,7 @@ const GlobeAnimation = ({
   enableControls = false,
   enablePan = false,
   autoRotate = false,
-  style = {}
+  style = {},
 }: GlobeAnimationProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -39,8 +39,8 @@ const GlobeAnimation = ({
   }, []);
 
   return (
-    <div 
-      className={`relative ${className}`} 
+    <div
+      className={`relative ${className}`}
       style={{ width, height, ...style }}
     >
       {/* Loader */}
@@ -51,10 +51,7 @@ const GlobeAnimation = ({
       )}
 
       {/* Three.js Canvas */}
-      <Canvas
-        className="w-full h-full"
-        style={{ background: 'transparent' }}
-      >
+      <Canvas className="w-full h-full" style={{ background: "transparent" }}>
         {/* Camera */}
         <PerspectiveCamera
           makeDefault
