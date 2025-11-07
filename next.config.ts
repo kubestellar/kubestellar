@@ -19,9 +19,6 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["@/components"],
   },
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
-  env: {
-    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
-  },
 };
 
 const configWithNextra = withNextra(nextConfig);
