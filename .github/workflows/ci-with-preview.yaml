@@ -4,9 +4,7 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    types: [opened, reopened, synchronize, labeled, unlabeled]
-  # pull_request_target:
-  #   types: [opened, reopened, synchronize, labeled, unlabeled, closed]
+    types: [opened, reopened, synchronize, labeled, unlabeled, closed]
   workflow_dispatch:
 
 env:
