@@ -64,6 +64,12 @@ func (c *Controller) updateWorkStatusToObject(ctx context.Context, workStatusON 
 func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
 	requested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
+
+	// will implement this feature soon
+	isMultiWECRequested, nWECMulti := c.bindingPolicyResolver.GetMultiWECReportedStateRequestForObject(wObjID)
+
+	logger.V(4).Info("isMultiWEC: ", isMultiWECRequested, "nWECMulti: ", nWECMulti, "isSingleton: ", requested, "nWEC: ", nWECs)
+
 	var wsONs [2]cache.ObjectName
 	var numWS int
 	if requested && nWECs == 1 {
