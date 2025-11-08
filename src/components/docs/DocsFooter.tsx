@@ -57,10 +57,10 @@ export default function Footer() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-8 sm:px-6 lg:px-8">
         {/* Main footer content */}
-        <div className="grid grid-cols-1 sm:grid-cols-12 md:grid-cols-12 gap-8 mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-12 md:grid-cols-12 mb-12 items-start gap-1 sm:gap-6">
           {/* Brand Section */}
-          <div className="col-span-3 sm:col-span-6 lg:col-span-4">
-            <div className="flex items-center-space-x-2 mb-2  ml-[-7px]">
+          <div className="col-span-2 sm:col-span-6 lg:col-span-4">
+            <div className="flex items-center space-x-2 mb-2  ml-[-7px]">
               <Image
                 src="/KubeStellar-with-Logo-transparent.png"
                 alt="Kubestellar logo"
@@ -137,48 +137,10 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Docs Links */}
-          <div className="col-span-1 sm:col-span-4 lg:col-span-2 order-3 sm:order-3">
-            <h3 className="text-lg font-semibold text-white mb-4">Docs</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  href="/docs"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
-                >
-                  Overview
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/docs"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
-                >
-                  User Guide
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/docs"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
-                >
-                  Onboarding
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/docs"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
-                >
-                  Releases Notes
-                </Link>
-              </li>
-            </ul>
-          </div>
 
           {/* Getting Started Links */}
-          <div className="col-span-1 sm:col-span-4 lg:col-span-2 order-4 sm:order-4">
-            <h3 className="text-lg font-semibold text-white mb-4">
+          <div className="col-span-1 sm:col-span-4 lg:col-span-3 order-4 sm:order-4 mt-4 sm:mt-0">
+            <h3 className="text-md sm:text-lg font-semibold text-white mb-4">
               Getting Started
             </h3>
             <ul className="space-y-3">
@@ -217,8 +179,49 @@ export default function Footer() {
             </ul>
           </div>
 
+          <div className="col-span-1 sm:col-span-4 lg:col-span-2 order-5 sm:order-5 mt-4 sm:mt-0">
+            <h3 className="text-md sm:text-lg font-semibold text-white mb-4">
+              Resources
+            </h3>
+            <ul className="space-y-3">
+              <li>
+                <Link
+                  href="/playground"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
+                >
+                  Playground
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/programs"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
+                >
+                  Programs
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/partners"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
+                >
+                    Partners
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="https://blog.kubestellar.io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
+                >
+                  Blog
+                </a>
+              </li>
+            </ul>
+          </div>
           {/* Stay updated */}
-          <div className="col-span-3 sm:col-span-6 lg:col-span-4 sm:order-2 lg:order-6 md:ml-12 lg:ml-0">
+          <div className="col-span-2 sm:col-span-6 lg:col-span-2 sm:order-2 lg:order-6 md:ml-12 lg:ml-0 mt-4 sm:mt-0" >
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider sm:mt-3 md:mt-2 lg:mt-1 mb-4">
               Stay Updated
             </h3>
