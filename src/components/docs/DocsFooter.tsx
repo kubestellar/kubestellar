@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { GridLines, StarField } from "../index";
+import Link from "next/link";
 
-export default function DocsFooter() {
+export default function Footer() {
   useEffect(() => {
     // Back to top functionality
     const initBackToTop = () => {
@@ -57,9 +57,9 @@ export default function DocsFooter() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-8 sm:px-6 lg:px-8">
         {/* Main footer content */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-12 md:grid-cols-12 gap-8 mb-12">
           {/* Brand Section */}
-          <div className="lg:col-span-4">
+          <div className="col-span-3 sm:col-span-6 lg:col-span-4">
             <div className="flex items-center-space-x-2 mb-2  ml-[-7px]">
               <Image
                 src="/KubeStellar-with-Logo-transparent.png"
@@ -70,8 +70,8 @@ export default function DocsFooter() {
               />
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
-              Multi-cluster orchestration platform for Kubernetes, simplifying
-              complex deployments across distributed environments.
+              Multi-Cluster Kubernetes orchestration platform that simplifies
+              distributed workload management across diverse infrastructure.
             </p>
             <div className="flex space-x-6">
               <a
@@ -79,15 +79,15 @@ export default function DocsFooter() {
                 className="group relative w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300"
               >
                 <svg
-                  className="w-7 h-7 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(29,161,242,0.8)]"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    className="transition-colors duration-300 text-gray-400 group-hover:text-[#1DA1F2]"
-                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
-                  />
-                </svg>
+  className="w-7 h-7 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+  fill="currentColor"
+  viewBox="0 0 24 24"
+>
+  <path
+    className="transition-colors duration-300 text-gray-400 group-hover:text-white"
+    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+  />
+</svg>
               </a>
               <a
                 href="https://github.com/kubestellar"
@@ -137,126 +137,89 @@ export default function DocsFooter() {
             </div>
           </div>
 
-          {/* Product Links */}
-          <div className="lg:col-span-2">
-            <h3 className="text-lg font-semibold text-white mb-4">Product</h3>
-            <ul className="space-y-3">
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
-                >
-                  Features
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
-                >
-                  Use Cases
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
-                >
-                  Pricing
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
-                >
-                  Roadmap
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources Links */}
-          <div className="lg:col-span-2">
-            <h3 className="text-lg font-semibold text-white mb-4">Resources</h3>
+          {/* Docs Links */}
+          <div className="col-span-1 sm:col-span-4 lg:col-span-2 order-3 sm:order-3">
+            <h3 className="text-lg font-semibold text-white mb-4">Docs</h3>
             <ul className="space-y-3">
               <li>
                 <Link
                   href="/docs"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  Documentation
+                  Overview
                 </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/docs"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  Tutorials
-                </a>
+                  User Guide
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/docs"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  Blog
-                </a>
+                  Onboarding
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/docs"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  Community
-                </a>
+                  Releases Notes
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Company Links */}
-          <div className="lg:col-span-2">
-            <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
+          {/* Getting Started Links */}
+          <div className="col-span-1 sm:col-span-4 lg:col-span-2 order-4 sm:order-4">
+            <h3 className="text-lg font-semibold text-white mb-4">
+              Getting Started
+            </h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/quick-installation"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  About
-                </a>
+                  Installation Page
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/ladder"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  Team
-                </a>
+                  Ladder
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/products"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  Careers
-                </a>
+                  Products
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/contribute-handbook"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  Contact
-                </a>
+                  Contribute Handbook
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* Stay updated */}
-          <div className="sm:col-span-2 lg:col-span-2">
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+          <div className="col-span-3 sm:col-span-6 lg:col-span-4 sm:order-2 lg:order-6 md:ml-12 lg:ml-0">
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider sm:mt-3 md:mt-2 lg:mt-1 mb-4">
               Stay Updated
             </h3>
             <div className="bg-gray-800/50 backdrop-blur-md rounded-lg p-4 border border-gray-700/50 transform transition-all duration-300 hover:border-blue-500/30">
@@ -282,12 +245,12 @@ export default function DocsFooter() {
                     id="email-address"
                     type="email"
                     className="block w-full pl-10 pr-3 py-2 text-sm text-white placeholder-gray-400 bg-gray-700/50 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                    placeholder="Enter your email"
+                    placeholder="Email"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 transform hover:translate-y-[-1px] flex items-center justify-center"
+                  className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 border border-transparent rounded-md shadow-sm hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 transform hover:translate-y-[-1px] flex items-center justify-center cursor-pointer"
                 >
                   <span>Subscribe</span>
                 </button>
@@ -310,11 +273,11 @@ export default function DocsFooter() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>Thank you for subscribing!</span>
+                <span>Subscribed!</span>
               </div>
             </div>
             <p className="mt-3 text-xs text-gray-400">
-              We respect your privacy. No spam, unsubscribe anytime.
+              We respect your privacy. No spam.
             </p>
           </div>
         </div>
@@ -322,37 +285,31 @@ export default function DocsFooter() {
         {/* Divider and bottom section */}
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-6 mb-4 md:mb-0">
-              <p className="text-gray-400">
-                © 2024 KubeStellar. All rights reserved.
-              </p>
-              <div className="flex items-center space-x-4">
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
-                >
-                  Privacy Policy
-                </a>
-                <span className="text-gray-600">•</span>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
-                >
-                  Terms of Service
-                </a>
-                <span className="text-gray-600">•</span>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
-                >
-                  Cookie Policy
-                </a>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-400 text-sm">
-                Made with ❤️ for the community
-              </span>
+            {/* Left side - copyright */}
+            <p className="text-gray-400 text-sm mb-4 md:mb-0">
+              © 2025 KubeStellar. All rights reserved. Apache 2.0 Licence
+            </p>
+
+            {/* Right side - policy links */}
+            <div className="flex items-center space-x-8">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
+              >
+                Terms of Service
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
+              >
+                Cookie Policy
+              </a>
             </div>
           </div>
         </div>
@@ -361,7 +318,7 @@ export default function DocsFooter() {
       {/* Floating back to top button */}
       <button
         id="back-to-top"
-        className="fixed bottom-8 right-8 p-3 rounded-full bg-blue-600 text-white shadow-lg z-50 transition-all duration-300 opacity-0 translate-y-10 hover:bg-blue-700 hover:scale-110"
+        className="fixed bottom-18 right-8 p-3 rounded-full bg-blue-600 text-white shadow-lg z-50 transition-all duration-300 opacity-0 translate-y-10 hover:bg-blue-700 hover:scale-110"
         aria-label="Back to top"
       >
         <svg
