@@ -52,6 +52,7 @@ export async function buildPageMapForBranch(branch: string) {
   const ROOT_FOLDERS = Array.from(new Set(allDocFiles.map(fp => fp.split('/')[0])))
   const DIRECT_ROOT = ROOT_FOLDERS.find(r => r.toLowerCase() === 'direct')
   const UI_DOCS_ROOT = ROOT_FOLDERS.find(r => r.toLowerCase() === 'ui docs' || r.toLowerCase() === 'ui-docs')
+  const COMMON_SUBS_ROOT = ROOT_FOLDERS.find(r => r.toLowerCase() === 'common subs' || r.toLowerCase() === 'common-subs')
 
   // Strong types for page-map nodes (no `any`)
   type MdxPageNode = { kind: 'MdxPage'; name: string; route: string }
@@ -228,8 +229,17 @@ export async function buildPageMapForBranch(branch: string) {
     const lower = fp.toLowerCase()
     if (
       (DIRECT_ROOT && lower.startsWith(`${DIRECT_ROOT.toLowerCase()}/`)) ||
-      (UI_DOCS_ROOT && lower.startsWith(`${UI_DOCS_ROOT.toLowerCase()}/`))
+      (UI_DOCS_ROOT && lower.startsWith(`${UI_DOCS_ROOT.toLowerCase()}/`)) ||
+      (COMMON_SUBS_ROOT && lower.startsWith(`${COMMON_SUBS_ROOT.toLowerCase()}/`))
     ) {
+      return false
+    }
+    // Filter out files that would create "Index" entry
+    if (lower.includes('index.md') || lower.includes('index.mdx') || fp === 'index.md' || fp === 'index.mdx') {
+      return false
+    }
+    // Filter out common-subs folder
+    if (lower.startsWith('common-subs/') || fp === 'common-subs' || lower.startsWith('common subs/')) {
       return false
     }
     return true
@@ -250,7 +260,18 @@ export async function buildPageMapForBranch(branch: string) {
     }
   }
 
+  function prettifyNames(nodes: PageMapNode[]) {
+    for (const node of nodes) {
+      if (hasName(node)) {
+        // Apply the pretty function to format names properly
+        node.name = pretty(node.name)
+      }
+      if (hasChildren(node)) prettifyNames(node.children)
+    }
+  }
+
   addBasePathToRoutes(remainingFileNodes)
+  prettifyNames(remainingFileNodes)
 
   _pageMap.push(...remainingFileNodes)
 
@@ -260,6 +281,7 @@ export async function buildPageMapForBranch(branch: string) {
   }
   for (const item of remainingFileNodes) {
     if (hasName(item)) {
+      // Use the prettified name for both key and value
       meta[item.name] = item.name
     }
   }
