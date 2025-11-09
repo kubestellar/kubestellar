@@ -1,5 +1,7 @@
 # Proposal: Multi-WEC Aggregated Status Controller Enhancement
 
+## Note: This isn't fully implemented. Implementation work is ongoing and the feature won't work till implementation work is done. 
+
 **Status:** Proposal  
 **Related Issue:** [#2809 – KubeStellar controller logic to map back the status from WECs to READY values in WDSes](https://github.com/kubestellar/kubestellar/issues/2809)
 
