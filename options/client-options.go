@@ -65,6 +65,11 @@ func (opts *ClientLimits) AddFlags(flags *pflag.FlagSet) {
 	flags.IntVar(&opts.Burst, opts.name+"-burst", opts.Burst, "Allowed burst in requests/sec for "+opts.description)
 }
 
+func (opts *ClientLimits) AddFlagsSansName(flags *pflag.FlagSet) {
+	flags.Float64Var(&opts.QPS, "qps", opts.QPS, "Max average requests/sec for "+opts.description)
+	flags.IntVar(&opts.Burst, "burst", opts.Burst, "Allowed burst in requests/sec for "+opts.description)
+}
+
 func (opts *ClientOptions) AddFlags(flags *pflag.FlagSet) {
 	opts.ClientLimits.AddFlags(flags)
 	flags.StringVar(&opts.loadingRules.ExplicitPath, opts.name+"-kubeconfig", opts.loadingRules.ExplicitPath, "Path to the kubeconfig file to use for "+opts.description)
@@ -72,6 +77,14 @@ func (opts *ClientOptions) AddFlags(flags *pflag.FlagSet) {
 	flags.StringVar(&opts.overrides.Context.AuthInfo, opts.name+"-user", opts.overrides.Context.AuthInfo, "The name of the kubeconfig user to use for "+opts.description)
 	flags.StringVar(&opts.overrides.Context.Cluster, opts.name+"-cluster", opts.overrides.Context.Cluster, "The name of the kubeconfig cluster to use for "+opts.description)
 
+}
+
+func (opts *ClientOptions) AddFlagsSansName(flags *pflag.FlagSet) {
+	opts.ClientLimits.AddFlags(flags)
+	flags.StringVar(&opts.loadingRules.ExplicitPath, "kubeconfig", opts.loadingRules.ExplicitPath, "Path to the kubeconfig file to use for "+opts.description)
+	flags.StringVar(&opts.overrides.CurrentContext, "context", opts.overrides.CurrentContext, "The name of the kubeconfig context to use for "+opts.description)
+	flags.StringVar(&opts.overrides.Context.AuthInfo, "user", opts.overrides.Context.AuthInfo, "The name of the kubeconfig user to use for "+opts.description)
+	flags.StringVar(&opts.overrides.Context.Cluster, "cluster", opts.overrides.Context.Cluster, "The name of the kubeconfig cluster to use for "+opts.description)
 }
 
 func (opts *ClientOptions) ToRESTConfig() (*rest.Config, error) {

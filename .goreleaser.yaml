@@ -24,6 +24,18 @@ builds:
   - arm64
   env:
   - CGO_ENABLED=0
+- id: "kflex-get-kubeconfig"
+  main: ./cmd/kflex-get-kubeconfig
+  binary: bin/kflex-get-kubeconfig
+  ldflags:
+  - "{{ .Env.LDFLAGS }}"
+  goos:
+  - linux
+  goarch:
+  - amd64
+  - arm64
+  env:
+  - CGO_ENABLED=0
 kos:           
   - id: kubestellar-controller-manager
     repository: ghcr.io/kubestellar/kubestellar/controller-manager
@@ -40,6 +52,18 @@ kos:
   - id: ocm-transport-controller
     repository: ghcr.io/kubestellar/kubestellar/ocm-transport-controller
     build: ocm-transport-controller
+    tags:
+    - '{{.Version}}'
+    bare: true
+    preserve_import_paths: false
+    ldflags:
+    - "{{ .Env.LDFLAGS }}"
+    platforms:
+    - linux/amd64
+    - linux/arm64
+  - id: kflex-get-kubeconfig
+    repository: ghcr.io/kubestellar/kubestellar/kflex-get-kubeconfig
+    build: kflex-get-kubeconfig
     tags:
     - '{{.Version}}'
     bare: true
