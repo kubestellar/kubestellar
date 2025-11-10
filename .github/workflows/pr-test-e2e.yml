@@ -109,6 +109,14 @@ jobs:
         if: always()
         run: kubectl --context kind-kubeflex get deployments -A
 
+      - name: show Job objects and Events in hosting cluster
+        if: always()
+        run: |
+          echo "---Dumping Job YAML for diagnostics (kubestellar/kubestellar#3182)---"
+          kubectl --context kind-kubeflex get jobs -A -o yaml || echo "Failed to get jobs"
+          echo "---Dumping Job Events for diagnostics (kubestellar/kubestellar#3182)---"
+          kubectl --context kind-kubeflex get events -A --field-selector involvedObject.kind=Job || echo "Failed to get events"
+
       - name: show namespaces in its1
         if: always()
         run: kubectl --context its1 get namespaces
@@ -277,6 +285,14 @@ jobs:
       - name: show Deployment objects in hosting cluster
         if: always()
         run: kubectl --context kind-kubeflex get deployments -A
+
+      - name: show Job objects and Events in hosting cluster
+        if: always()
+        run: |
+          echo "---Dumping Job YAML for diagnostics (kubestellar/kubestellar#3182)---"
+          kubectl --context kind-kubeflex get jobs -A -o yaml || echo "Failed to get jobs"
+          echo "---Dumping Job Events for diagnostics (kubestellar/kubestellar#3182)---"
+          kubectl --context kind-kubeflex get events -A --field-selector involvedObject.kind=Job || echo "Failed to get events"
 
       - name: show namespaces in its1
         if: always()
