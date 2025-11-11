@@ -1,204 +1,149 @@
-import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { NextRequest, NextResponse } from "next/server"
+import { convertHtmlScriptsToJsxComments } from "@/lib/transformMdx"
+import { buildPageMapForBranch, makeGitHubHeaders, user, repo, docsPath, basePath } from "../../docs/page-map"
+import { getBranchForVersion, getDefaultVersion, type VersionKey } from "@/config/versions"
 
 interface SearchResult {
-  title: string;
-  url: string;
-  category: string;
-  content: string;
-  snippet: string;
-  highlightedSnippet: string;
-  matchType: "title" | "content" | "category";
+  title: string
+  url: string
+  category: string
+  content: string
+  snippet: string
+  highlightedSnippet: string
+  matchType: "title" | "content" | "category"
 }
 
-// Function to extract text content from MDX
-function extractTextFromMDX(content: string): string {
-  // Remove code blocks
-  let text = content.replace(/```[\s\S]*?```/g, "");
+function toPlainText(content: string): string {
+  let text = content
 
-  // Remove inline code
-  text = text.replace(/`[^`]+`/g, "");
+  // Remove code blocks, inline code, comments
+  text = text.replace(/```[\s\S]*?```/g, "")
+  text = text.replace(/`[^`]+`/g, "")
+  text = text.replace(/<!--[\s\S]*?-->/g, "")
 
-  // Remove HTML comments
-  text = text.replace(/<!--[\s\S]*?-->/g, "");
+  // Links/images
+  text = text.replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1")
+  text = text.replace(/!\[([^\]]*)\]\([^\)]+\)/g, "")
 
-  // Remove markdown links but keep text: [text](url) -> text
-  text = text.replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1");
+  // Headings -> keep text
+  text = text.replace(/^#{1,6}\s+(.+)$/gm, "$1")
 
-  // Remove images: ![alt](url)
-  text = text.replace(/!\[([^\]]*)\]\([^\)]+\)/g, "");
+  // Bold/italic
+  text = text.replace(/\*\*([^\*]+)\*\*/g, "$1")
+  text = text.replace(/\*([^\*]+)\*/g, "$1")
+  text = text.replace(/_([^_]+)_/g, "$1")
 
-  // Remove headers markup: ## Header -> Header
-  text = text.replace(/^#{1,6}\s+(.+)$/gm, "$1");
+  // HR
+  text = text.replace(/^---+$/gm, "")
 
-  // Remove bold/italic: **text** or *text* -> text
-  text = text.replace(/\*\*([^\*]+)\*\*/g, "$1");
-  text = text.replace(/\*([^\*]+)\*/g, "$1");
+  // Strip residual HTML tags
+  text = text.replace(/<\/?[^>]+>/g, "")
 
-  // Remove horizontal rules
-  text = text.replace(/^---+$/gm, "");
-
-  // Remove extra whitespace
-  text = text.replace(/\n\s*\n/g, "\n");
-  text = text.trim();
-
-  return text;
+  // Collapse whitespace
+  text = text.replace(/\n\s*\n/g, "\n").trim()
+  return text
 }
 
-// Function to extract title from MDX (first # heading)
-function extractTitle(content: string): string {
-  const match = content.match(/^#\s+(.+)$/m);
-  return match ? match[1] : "Untitled";
+function extractTitle(md: string, fallback: string): string {
+  const m = md.match(/^#\s+(.+)$/m)
+  return m ? m[1].trim() : fallback
 }
 
-// Function to read all MDX files recursively
-function getAllMDXFiles(
-  dir: string,
-  baseDir: string = dir
-): Array<{ path: string; relativePath: string }> {
-  const files: Array<{ path: string; relativePath: string }> = [];
+function routeKeyToUrl(routeKey: string): string {
+  return routeKey ? `/${basePath}/${routeKey}` : `/${basePath}`
+}
 
-  try {
-    const items = fs.readdirSync(dir);
-
-    for (const item of items) {
-      const fullPath = path.join(dir, item);
-      const stat = fs.statSync(fullPath);
-
-      if (stat.isDirectory()) {
-        // Recursively read subdirectories
-        files.push(...getAllMDXFiles(fullPath, baseDir));
-      } else if (item.endsWith(".mdx") || item.endsWith(".md")) {
-        const relativePath = path.relative(baseDir, fullPath);
-        files.push({ path: fullPath, relativePath });
-      }
+async function mapLimit<T, R>(items: T[], limit: number, worker: (x: T) => Promise<R>): Promise<R[]> {
+  const results: R[] = []
+  let i = 0
+  const run = async () => {
+    while (i < items.length) {
+      const idx = i++
+      results[idx] = await worker(items[idx])
     }
-  } catch (error) {
-    console.error("Error reading directory:", error);
   }
-
-  return files;
-}
-
-// Convert file path to URL path
-function filePathToUrl(relativePath: string): string {
-  // Remove file extension
-  let url = relativePath.replace(/\.(mdx|md)$/, "");
-
-  // Remove 'page' from path (Next.js convention)
-  url = url.replace(/\/page$/, "");
-  url = url.replace(/^page$/, "");
-
-  // Ensure it starts with /docs
-  if (!url.startsWith("/")) {
-    url = "/" + url;
-  }
-
-  // If it's empty, it's the root docs page
-  if (url === "/" || url === "") {
-    return "/docs";
-  }
-
-  return "/docs" + url;
+  await Promise.all(Array(Math.min(limit, items.length)).fill(0).map(run))
+  return results
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const query = searchParams.get("q")?.toLowerCase() || "";
+    const sp = request.nextUrl.searchParams
+    const queryRaw = sp.get("q") || ""
+    const query = queryRaw.toLowerCase().trim()
+    const version = (sp.get("version") as VersionKey | null) || getDefaultVersion()
+    if (!query) return NextResponse.json({ results: [], count: 0 })
 
-    if (!query.trim()) {
-      return NextResponse.json({ results: [] });
-    }
+    const branch = getBranchForVersion(version)
+    const { routeMap } = await buildPageMapForBranch(branch)
 
-    // Path to docs directory
-    const docsDir = path.join(process.cwd(), "src", "app", "docs");
+    const entries = Object.entries(routeMap) as Array<[string, string]>
 
-    // Get all MDX files
-    const mdxFiles = getAllMDXFiles(docsDir);
-
-    const results: SearchResult[] = [];
-
-    for (const { path: filePath, relativePath } of mdxFiles) {
+    const resultsArray = await mapLimit(entries, 8, async ([routeKey, filePath]) => {
       try {
-        const fileContent = fs.readFileSync(filePath, "utf-8");
-        const title = extractTitle(fileContent);
-        const textContent = extractTextFromMDX(fileContent);
-        const url = filePathToUrl(relativePath);
+        const res = await fetch(
+          `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${docsPath}${filePath}`,
+          { headers: makeGitHubHeaders(), cache: "no-store" }
+        )
+        if (!res.ok) return null
 
-        // Determine category based on path
-        let category = "Documentation";
-        if (relativePath.includes("getting-started"))
-          category = "Getting Started";
-        if (relativePath.includes("tutorial")) category = "Tutorial";
-        if (relativePath.includes("api")) category = "API Reference";
-        if (relativePath.includes("guide")) category = "Guide";
+        const raw = await res.text()
 
-        // Check if query matches
-        const titleMatch = title.toLowerCase().includes(query);
-        const contentMatch = textContent.toLowerCase().includes(query);
+        const preprocessed = convertHtmlScriptsToJsxComments(raw)
 
-        if (titleMatch || contentMatch) {
-          let snippet = "";
-          let highlightedSnippet = "";
+        const text = toPlainText(preprocessed)
 
-          if (contentMatch) {
-            // Find the position of the match in content
-            const contentLower = textContent.toLowerCase();
-            const matchIndex = contentLower.indexOf(query);
-            const start = Math.max(0, matchIndex - 60);
-            const end = Math.min(
-              textContent.length,
-              matchIndex + query.length + 80
-            );
-            snippet =
-              (start > 0 ? "..." : "") +
-              textContent.slice(start, end) +
-              (end < textContent.length ? "..." : "");
+        const fallbackTitle =
+          routeKey.split("/").pop()?.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()) || "Untitled"
+        const title = extractTitle(raw, fallbackTitle)
 
-            // Highlight the matched term (case-insensitive)
-            const regex = new RegExp(
-              `(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
-              "gi"
-            );
-            highlightedSnippet = snippet.replace(regex, "<mark>$1</mark>");
-          } else {
-            // If only title matches, show beginning of content
-            snippet =
-              textContent.slice(0, 120) +
-              (textContent.length > 120 ? "..." : "");
-            highlightedSnippet = snippet;
-          }
+        const hay = text.toLowerCase()
+        const titleMatch = title.toLowerCase().includes(query)
+        const contentMatch = hay.includes(query)
+        if (!titleMatch && !contentMatch) return null
 
-          results.push({
-            title,
-            url,
-            category,
-            content: textContent,
-            snippet,
-            highlightedSnippet,
-            matchType: titleMatch ? "title" : "content",
-          });
+        let snippet = ""
+        let highlightedSnippet = ""
+        if (contentMatch) {
+          const idx = hay.indexOf(query)
+          const start = Math.max(0, idx - 60)
+          const end = Math.min(text.length, idx + query.length + 80)
+          snippet = (start > 0 ? "..." : "") + text.slice(start, end) + (end < text.length ? "..." : "")
+          const rx = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
+          highlightedSnippet = snippet.replace(rx, "<mark>$1</mark>")
+        } else {
+          snippet = text.slice(0, 140) + (text.length > 140 ? "..." : "")
+          highlightedSnippet = snippet
         }
-      } catch (error) {
-        console.error(`Error processing file ${filePath}:`, error);
+
+        const category =
+          routeKey.split("/")[0]?.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()) || "Documentation"
+
+        const url = routeKeyToUrl(routeKey)
+
+        const result: SearchResult = {
+          title,
+          url,
+          category,
+          content: text,
+          snippet,
+          highlightedSnippet,
+          matchType: titleMatch ? "title" : "content"
+        }
+        return result
+      } catch {
+        return null
       }
-    }
+    })
 
-    // Sort results: title matches first, then by relevance
-    results.sort((a, b) => {
-      if (a.matchType === "title" && b.matchType !== "title") return -1;
-      if (a.matchType !== "title" && b.matchType === "title") return 1;
-      return 0;
-    });
+    const results = resultsArray.filter((r): r is SearchResult => !!r)
 
-    return NextResponse.json({ results, count: results.length });
-  } catch (error) {
-    console.error("Search API error:", error);
-    return NextResponse.json(
-      { error: "Failed to perform search" },
-      { status: 500 }
-    );
+    // Sort: title matches first
+    results.sort((a, b) => (a.matchType === "title" && b.matchType !== "title" ? -1 : a.matchType === b.matchType ? 0 : 1))
+
+    return NextResponse.json({ results, count: results.length })
+  } catch (e) {
+    console.error("Search API error:", e)
+    return NextResponse.json({ error: "Failed to perform search" }, { status: 500 })
   }
 }
