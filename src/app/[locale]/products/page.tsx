@@ -127,31 +127,34 @@ export default function ProductsPage() {
 
       {/* Hero Section */}
       <section className="relative min-h-[40vh] flex items-center justify-center z-10">
-        <div className="relative z-10 text-center px-4 pt-20 pb-2">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-shadow-lg">
+        <div className="relative z-10 text-center px-2 sm:px-4 pt-16 sm:pt-20 pb-2">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tighter text-shadow-lg">
             {t("title")} <span className="text-gradient">{t("titleSpan")}</span>
           </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-300">
+          <p className="mt-4 max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-gray-300">
             {t("subtitle")}
           </p>
         </div>
       </section>
 
       {/* Products Section */}
-      <section id="products" className="relative pt-8 pb-24 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-2">
+      <section
+        id="products"
+        className="relative pt-6 sm:pt-8 pb-16 sm:pb-24 z-10"
+      >
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 relative">
+          <div className="grid gap-6 sm:gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
             {products.map(product => {
               return (
                 <div
                   key={product.id}
-                  className={`product-card bg-gray-800/50 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 p-8 flex flex-col text-left transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:border-blue-500/50`}
+                  className={`product-card bg-gray-800/50 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/50 p-4 sm:p-8 flex flex-col text-left transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:border-blue-500/50`}
                 >
                   {/* Top section: Logo on left, Title on right */}
-                  <div className="flex items-center mb-6">
+                  <div className="flex flex-col sm:flex-row items-center mb-4 sm:mb-6">
                     {/* Logo on the left */}
                     <div
-                      className={`relative ${product.id === "kubestellar" ? "w-full h-24" : product.id === "a2a" ? "w-96 h-24" : product.id === "galaxy-marketplace" ? "w-40 h-28" : product.id === "kubectl-multi" ? "w-40 h-28" : "w-32 h-24"} ${product.id === "kubestellar" ? "" : "mr-6"} flex items-center justify-center flex-shrink-0`}
+                      className={`relative ${product.id === "kubestellar" ? "w-full h-20 sm:h-24" : product.id === "a2a" ? "w-64 sm:w-96 h-20 sm:h-24" : product.id === "galaxy-marketplace" ? "w-28 sm:w-40 h-20 sm:h-28" : product.id === "kubectl-multi" ? "w-28 sm:w-40 h-20 sm:h-28" : "w-24 sm:w-32 h-16 sm:h-24"} ${product.id === "kubestellar" ? "" : "sm:mr-6"} flex items-center justify-center flex-shrink-0 mb-4 sm:mb-0`}
                     >
                       <Image
                         src={product.logo}
@@ -160,13 +163,13 @@ export default function ProductsPage() {
                         className="object-contain"
                         sizes={
                           product.id === "kubestellar"
-                            ? "100%"
+                            ? "100vw"
                             : product.id === "a2a"
-                              ? "224px"
+                              ? "(min-width: 640px) 384px, 256px"
                               : product.id === "galaxy-marketplace" ||
                                   product.id === "kubectl-multi"
-                                ? "160px"
-                                : "128px"
+                                ? "(min-width: 640px) 160px, 112px"
+                                : "(min-width: 640px) 128px, 96px"
                         }
                         priority
                       />
@@ -174,8 +177,8 @@ export default function ProductsPage() {
 
                     {/* Title on the right - hidden for kubestellar */}
                     {product.id !== "kubestellar" && (
-                      <div className="flex-1">
-                        <h3 className="text-2xl font-bold text-white">
+                      <div className="flex-1 text-center sm:text-left">
+                        <h3 className="text-lg sm:text-2xl font-bold text-white">
                           {product.fullName}
                         </h3>
                       </div>
@@ -184,15 +187,17 @@ export default function ProductsPage() {
 
                   {/* Bottom section: Description and buttons */}
                   <div className="flex-1">
-                    <p className="text-gray-400 mb-6">{product.description}</p>
+                    <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">
+                      {product.description}
+                    </p>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <a
                         href={product.repository}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 bg-gray-700/50 hover:bg-gray-600/50 hover:text-white transition-all duration-200"
+                        className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 bg-gray-700/50 hover:bg-gray-600/50 hover:text-white transition-all duration-200 mb-2 sm:mb-0"
                       >
                         <svg
                           className="w-4 h-4 mr-2"
