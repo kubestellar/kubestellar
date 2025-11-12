@@ -63,28 +63,55 @@ func (c *Controller) updateWorkStatusToObject(ctx context.Context, workStatusON 
 
 func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
-	requested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
+	isSingletonRequested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
+	logger.V(4).Info("Workload object (singleton status requested)", "object", wObjID, "isSingletonRequested", isSingletonRequested, "nWECs", nWECs)
+
+	// TODO: GetMultiWECReportedStateRequestForObject is yet to be implemented.
+	// just declaring these variables, we will get its actual value once above function is implemented.
+	var isMultiWECRequested bool
+	logger.V(4).Info("Workload object (multiWEC status requested)", "object", wObjID, "isMultiWECRequested", isMultiWECRequested, "nWECsMulti", nWECs)
+
+	if (isMultiWECRequested || isSingletonRequested) && nWECs == 1 {
+		logger.V(4).Info("Either singleton or multiWEC status is requested and nWEC == 1", "object: ", wObjID, "nWEC", nWECs)
+		return c.handleSingleton(ctx, wObjID)
+	}
+
+	if isMultiWECRequested && nWECs > 1 {
+		logger.V(4).Info("multiWEC status is requested and nWEC != 1", "object: ", wObjID, "nWEC", nWECs)
+		return c.handleMultiWEC(ctx, wObjID, nWECs)
+	}
+
+	logger.V(4).Info("None of the above condition for singleton and multiwec is true for workload object", wObjID)
+	if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Controller) handleSingleton(ctx context.Context, wObjID util.ObjectIdentifier) error {
+	logger := klog.FromContext(ctx)
 	var wsONs [2]cache.ObjectName
 	var numWS int
-	if requested && nWECs == 1 {
-		c.workStatusToObject.ReadInverse().ContGet(wObjID, func(wsONSet sets.Set[cache.ObjectName]) {
-			numWS = wsONSet.Len()
-			var idx int
-			for it := range wsONSet {
-				wsONs[idx] = it
-				idx++
-				if idx > 1 {
-					break
-				}
+
+	c.workStatusToObject.ReadInverse().ContGet(wObjID, func(wsONSet sets.Set[cache.ObjectName]) {
+		numWS = wsONSet.Len()
+		var idx int
+		for it := range wsONSet {
+			wsONs[idx] = it
+			idx++
+			if idx > 1 {
+				break
 			}
-		})
-	}
-	if !requested || nWECs != 1 || numWS != 1 {
+		}
+	})
+
+	if numWS != 1 {
 		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
 			return err
 		}
 		logger.V(4).Info("Cleaned singleton status for workload object",
-			"object", wObjID, "requested", requested, "nWECs", nWECs, "numWS", numWS)
+			"object", wObjID, "numWS", numWS)
 		return nil
 	}
 	wsON := wsONs[0]
