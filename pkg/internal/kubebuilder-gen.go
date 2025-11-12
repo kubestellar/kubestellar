@@ -23,11 +23,12 @@ import (
 )
 
 // NoOpReconciler is used only to support the kubebuilder RBAC generators
+// Note: controlplanes/status only requires 'get' - write operations are not used
 type NoOpReconciler struct {
 }
 
 //+kubebuilder:rbac:groups=tenancy.kflex.kubestellar.org,resources=controlplanes,verbs=get;list;watch
-//+kubebuilder:rbac:groups=tenancy.kflex.kubestellar.org,resources=controlplanes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=tenancy.kflex.kubestellar.org,resources=controlplanes/status,verbs=get
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
 
 func (r *NoOpReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
