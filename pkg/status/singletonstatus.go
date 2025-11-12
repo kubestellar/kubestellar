@@ -94,8 +94,8 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 	}
 
 	if isMultiWECRequested && nWECsMulti > 1 {
-		logger.V(4).Info("multiWEC status is requested and nWEC != 1", "object: ", wObjID, "nWEC", nWECs)
-		return c.handleMultiWEC(ctx, wObjID, nWECs)
+		logger.V(4).Info("multiWEC status is requested and nWEC != 1", "object: ", wObjID, "nWEC", nWECsMulti)
+		return c.handleMultiWEC(ctx, wObjID, nWECsMulti)
 	}
 
 	logger.V(4).Info("None of the condition mentioned in doc for execution of handleSingleton and handleMultiWEC function is matched.", wObjID)
