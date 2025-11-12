@@ -1,40 +1,4 @@
 {{- range .Values.WDSes }}
-{{- $ITSName := .ITSName }}
-{{- $ITSSecretName := "" }}
-{{- $ITSSecretNamespace := "" }}
-{{- $ITSSecretKey := "" }}
-{{- if not $ITSName }}
-  {{- $ITSes := (hasKey $.Values "ITSes") | ternary $.Values.ITSes (list) }}
-  {{- if and $ITSes (gt (len $ITSes) 1) }}
-    {{- fail "Too many ITSes found in the current chart!" }}
-  {{- else if and $ITSes (eq (len $ITSes) 1) }}
-    {{- $ITSName = (index $ITSes 0).name }}
-    {{- $ITSSecretName = or (eq (index $ITSes 0).type "host") (eq (index $ITSes 0).type "external") | ternary "admin-kubeconfig" "vc-vcluster" }}
-    {{- $ITSSecretNamespace = printf "%s-system" $ITSName }}
-    {{- $ITSSecretKey = or (eq (index $ITSes 0).type "host") (eq (index $ITSes 0).type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
-  {{- else }}
-    {{- $allCPs := lookup "tenancy.kflex.kubestellar.org/v1alpha1" "ControlPlane" "" "" }}
-    {{- $ITS := "" }}
-    {{- $count := 0 }}
-    {{- range $i, $item := $allCPs.items }}
-      {{- $label := get $item.metadata.labels "kflex.kubestellar.io/cptype" }}
-      {{- if eq $label "its" }}
-        {{- $ITS = $item }}
-        {{- $count = add $count 1 }}
-      {{- end }}
-    {{- end }}
-    {{- if gt $count 1 }}
-      {{- fail "Too many ITSes found in the cluster!" }}
-    {{- else if eq $count 1 }}
-      {{- $ITSName = get $ITS.metadata "name" }}
-      {{- $ITSSecretName = $ITS.status.secretRef.name }}
-      {{- $ITSSecretNamespace = $ITS.status.secretRef.namespace }}
-      {{- $ITSSecretKey = $ITS.status.secretRef.inClusterKey }}
-    {{- else }}
-      {{- fail "No ITS found in the current chart or in the cluster!" }}
-    {{- end }}
-  {{- end }}
-{{- end }}
 ---
 apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
 kind: ControlPlane
@@ -47,15 +11,12 @@ spec:
   postCreateHooks:
     - hookName: kubestellar-controller
       vars:
-        APIGroups: '{{ .APIGroups | default "" }}'
+        APIGroups: '{{ .APIGroups }}'
     - hookName: transport-controller
       vars:
         WDSSecretName: admin-kubeconfig
         WDSSecretKey: kubeconfig-incluster
-        ITSSecretName: '{{ $ITSSecretName }}'
-        ITSSecretNamespace: '{{ $ITSSecretNamespace }}'
-        ITSSecretKey: '{{ $ITSSecretKey }}'
   globalVars:
     ControlPlaneName: {{ .name }}
-    ITSName: '{{ $ITSName }}'
+    ITSName: '{{ .ITSName }}'
 {{- end }}

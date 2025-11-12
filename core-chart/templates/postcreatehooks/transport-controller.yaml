@@ -45,32 +45,21 @@ spec:
             name: transport-controller
         spec:
           initContainers:
-          - name: wait-its-create
-            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
+          - name: get-its-kubeconfig
+            image: ghcr.io/kubestellar/kubestellar/kflex-get-kubeconfig:{{.Values.KFLEX_GET_KUBECONFIG | default .Values.KUBESTELLAR_VERSION}}
             args:
-              - wait
-              - --for=create
-              - cp/{{"{{.ITSName}}"}}
-              - --timeout=300s
-          - name: wait-its-ready
-            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
-            args:
-              - wait
-              - --for=condition=Ready
-              - cp/{{"{{.ITSName}}"}}
-              - --timeout=300s
-          - name: copy-its-secret
-            image: quay.io/kubestellar/kubectl:{{.Values.KUBECTL_VERSION}}
-            command:
-              - sh
-              - -c
-              - 'kubectl get secret {{"{{.ITSSecretName}}"}} --namespace {{"{{.ITSSecretNamespace}}"}} -o jsonpath="{.data.{{"{{.ITSSecretKey}}"}}}" | base64 --decode > /etc/kube/its/kubeconfig'
+              - --control-plane-label-selector
+              - 'kflex.kubestellar.io/cptype=its'
+              - --control-plane-name
+              - '{{"{{.ITSName}}"}}'
+              - --output-file
+              - /etc/kube/its/kubeconfig
             volumeMounts:
             - name: its-kubeconfig-volume
-              mountPath: /etc/kube/its/
+              mountPath: /etc/kube/its
           containers:
           - name: transport-controller
-            image: ghcr.io/kubestellar/kubestellar/ocm-transport-controller:{{ .Values.TRANSPORT_VERSION | default .Values.KUBESTELLAR_VERSION }}
+            image: ghcr.io/kubestellar/kubestellar/ocm-transport-controller:{{.Values.TRANSPORT_VERSION | default .Values.KUBESTELLAR_VERSION}}
             args:
             - --metrics-bind-address={{.Values.transport_controller.metrics_bind_addr}}
             - --pprof-bind-address={{.Values.transport_controller.pprof_bind_addr}}
@@ -87,10 +76,10 @@ spec:
             volumeMounts:
             - name: wds-kubeconfig-volume
               mountPath: /etc/kube/wds
-              readOnly: True
+              readOnly: true
             - name: its-kubeconfig-volume
-              mountPath: /etc/kube/its/
-              readOnly: True
+              mountPath: /etc/kube/its
+              readOnly: true
           volumes:
           - name: wds-kubeconfig-volume
             secret:
