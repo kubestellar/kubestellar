@@ -63,16 +63,11 @@ func (c *Controller) updateWorkStatusToObject(ctx context.Context, workStatusON 
 
 func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
-	requested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
+	isSingletonRequested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
 
 	isMultiWECRequested, nWECMulti := c.bindingPolicyResolver.GetMultiWECReportedStateRequestForObject(wObjID)
 
-	logger.V(4).Info("isMultiWEC: ", isMultiWECRequested, "nWECMulti: ", nWECMulti, "isSingleton: ", requested, "nWEC: ", nWECs)
-
-	isSingletonRequested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
-	logger.V(4).Info("Workload object (singleton status requested)", "object", wObjID, "isSingletonRequested", isSingletonRequested, "nWECs", nWECs)
-
-	logger.V(4).Info("Workload object (multiWEC status requested)", "object", wObjID, "isMultiWECRequested", isMultiWECRequested, "nWECsMulti", nWECs)
+	logger.V(4).Info("Object: ", wObjID, "isMultiWEC: ", isMultiWECRequested, "nWECMulti: ", nWECMulti, "isSingleton: ", isSingletonRequested, "nWEC: ", nWECs)
 
 	if (isMultiWECRequested || isSingletonRequested) && nWECs == 1 {
 		logger.V(4).Info("Either singleton or multiWEC status is requested and nWEC == 1", "object: ", wObjID, "nWEC", nWECs)
