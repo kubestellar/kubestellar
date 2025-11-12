@@ -361,7 +361,7 @@ const PrerequisiteCard = ({
   t: TranslationFunction;
 }) => {
   return (
-    <div className="bg-gray-800/50 backdrop-blur-md rounded-lg shadow-lg p-6 border border-gray-700/50 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:border-blue-500/50 h-full flex flex-col">
+    <div className="bg-gray-800/50 backdrop-blur-md rounded-lg shadow-lg p-7 border border-gray-700/50 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:border-blue-500/50 h-full flex flex-col">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white">

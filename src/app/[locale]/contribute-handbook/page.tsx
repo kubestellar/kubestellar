@@ -145,7 +145,7 @@ export default function CommunityHandbook() {
           ></div>
         </div>
 
-        <div className="relative py-16">
+        <div className="relative pt-5 pb-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <h1 className="text-6xl font-bold text-center mb-16 text-shadow-lg">
               <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
