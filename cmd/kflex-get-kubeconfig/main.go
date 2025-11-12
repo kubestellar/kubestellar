@@ -47,8 +47,8 @@ func main() {
 	var outputFilePath string
 	inCluster := true
 	clientOptions.AddFlagsSansName(pflag.CommandLine)
-	pflag.StringVar(&cpName, "control-plane-name", cpName, "name of ControlPlane to read; mutually exclusive with --control-plane-label-selector")
-	pflag.StringVar(&cpLabelSelectorStr, "control-plane-label-selector", cpLabelSelectorStr, "label selector that identifies exactly one ControlPlane")
+	pflag.StringVar(&cpName, "control-plane-name", cpName, "name of ControlPlane to read, or empty string (meaning to pick by label selector); default is empty string")
+	pflag.StringVar(&cpLabelSelectorStr, "control-plane-label-selector", cpLabelSelectorStr, "label selector that identifies exactly one ControlPlane, or empty string (meaning to pick by name); default is empty string")
 	pflag.StringVar(&outputFilePath, "output-file", outputFilePath, "pathname of file where the kubeconfig will be written; '-' means stdout")
 	pflag.BoolVar(&inCluster, "in-cluster", inCluster, "whether to extract the kubeconfig for use in the kubeflex hosting cluster")
 	klog.InitFlags(nil)
