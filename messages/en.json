@@ -770,5 +770,125 @@
       "programsButton": "Programs",
       "partnersButton": "Partners"
     }
+  },
+  "marketplace": {
+    "hero": {
+      "title": "KubeStellar Galaxy",
+      "titleSuffix": "Marketplace",
+      "subtitle": "Extend your KubeStellar deployment with powerful plugins and tools. From free community projects to enterprise solutions.",
+      "stats": {
+        "pluginsAvailable": "Plugins Available",
+        "freePlugins": "Free Plugins",
+        "totalDownloads": "Total Downloads"
+      }
+    },
+    "featured": {
+      "title": "Featured",
+      "titleSuffix": "& Most Popular",
+      "subtitle": "Discover our top-rated and most downloaded plugins"
+    },
+    "browse": {
+      "title": "Browse All Plugins",
+      "subtitle": "Find the perfect tools to extend your KubeStellar deployment",
+      "searchPlaceholder": "Search plugins...",
+      "categoryFilter": "All",
+      "pricingFilter": {
+        "all": "All Pricing",
+        "free": "Free",
+        "monthly": "Monthly",
+        "oneTime": "One-time"
+      },
+      "showing": "Showing",
+      "of": "of",
+      "plugins": "plugins",
+      "noResults": {
+        "title": "No plugins found",
+        "subtitle": "Try adjusting your search or filters"
+      },
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+      }
+    },
+    "plugin": {
+      "badge": {
+        "free": "FREE"
+      },
+      "version": "v",
+      "by": "by",
+      "rating": "/5.0",
+      "downloads": "downloads",
+      "free": "Free",
+      "monthly": "/month",
+      "oneTime": "once",
+      "viewDetails": "View Details",
+      "backToMarketplace": "Back to Marketplace",
+      "installPlugin": "Install Plugin",
+      "payAndInstall": "Pay & Install",
+      "github": "GitHub",
+      "about": "About this plugin",
+      "keyFeatures": "Key Features",
+      "requirements": "Requirements",
+      "compatibility": "Compatibility",
+      "maintainers": "Maintainers",
+      "tags": "Tags",
+      "links": "Links",
+      "documentation": "Documentation",
+      "githubRepository": "GitHub Repository",
+      "officialWebsite": "Official Website",
+      "notFound": {
+        "title": "Plugin Not Found"
+      }
+    },
+    "payment": {
+      "title": "Complete Payment",
+      "subtitle": "Purchase {name} to get started",
+      "details": {
+        "plugin": "Plugin",
+        "licenseType": "License Type",
+        "total": "Total"
+      },
+      "form": {
+        "cardNumber": "Card Number",
+        "cardPlaceholder": "1234 5678 9012 3456",
+        "expiry": "Expiry",
+        "expiryPlaceholder": "MM/YY",
+        "cvv": "CVV",
+        "cvvPlaceholder": "123",
+        "cancel": "Cancel",
+        "payNow": "Pay Now",
+        "processing": "Processing...",
+        "secureNote": "🔒 Secure payment powered by KubeStellar Gateway"
+      },
+      "success": {
+        "title": "Payment Successful!",
+        "subtitle": "Starting installation..."
+      }
+    },
+    "installation": {
+      "installing": "Installing {name}",
+      "pleaseWait": "Please wait...",
+      "success": {
+        "title": "Successfully Installed!",
+        "subtitle": "{name} has been installed to your KubeStellar deployment.",
+        "commandTitle": "Run this command to get started:",
+        "close": "Close"
+      }
+    },
+    "categories": {
+      "all": "All",
+      "cliTools": "CLI Tools",
+      "synchronization": "Synchronization",
+      "security": "Security",
+      "observability": "Observability",
+      "visualization": "Visualization",
+      "developmentTools": "Development Tools",
+      "backupRecovery": "Backup & Recovery",
+      "resourceManagement": "Resource Management",
+      "governance": "Governance",
+      "networking": "Networking",
+      "gitops": "GitOps",
+      "costManagement": "Cost Management"
+    }
   }
 }

@@ -2,11 +2,13 @@
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Navbar, Footer } from "@/components";
 import { GridLines, StarField } from "@/components/";
 import { plugins } from "./plugins";
 
 export default function MarketplacePage() {
+  const t = useTranslations("marketplace");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedPricing, setSelectedPricing] = useState("All");
@@ -136,12 +138,12 @@ export default function MarketplacePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 text-center">
             <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-              Featured
+              {t("featured.title")}
             </span>{" "}
-            & Most Popular
+            {t("featured.titleSuffix")}
           </h2>
           <p className="text-gray-400 text-center mb-8">
-            Discover our top-rated and most downloaded plugins
+            {t("featured.subtitle")}
           </p>
         </div>
 
@@ -283,7 +285,7 @@ export default function MarketplacePage() {
                   <div className="absolute top-4 right-4">
                     {plugin.pricing.type === "free" ? (
                       <span className="px-3 py-1 bg-green-500/20 text-green-300 text-xs font-semibold rounded-full">
-                        FREE
+                        {t("plugin.badge.free")}
                       </span>
                     ) : (
                       <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-semibold rounded-full">
@@ -361,10 +363,10 @@ export default function MarketplacePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              Browse All Plugins
+              {t("browse.title")}
             </h2>
             <p className="text-gray-400">
-              Find the perfect tools to extend your KubeStellar deployment
+              {t("browse.subtitle")}
             </p>
           </div>
 
@@ -375,7 +377,7 @@ export default function MarketplacePage() {
               <div className="flex-1 relative">
                 <input
                   type="text"
-                  placeholder="Search plugins..."
+                  placeholder={t("browse.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-6 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm"
@@ -454,12 +456,12 @@ export default function MarketplacePage() {
                 >
                   <span>
                     {selectedPricing === "All"
-                      ? "All Pricing"
+                      ? t("browse.pricingFilter.all")
                       : selectedPricing === "free"
-                      ? "Free"
+                      ? t("browse.pricingFilter.free")
                       : selectedPricing === "monthly"
-                      ? "Monthly"
-                      : "One-time"}
+                      ? t("browse.pricingFilter.monthly")
+                      : t("browse.pricingFilter.oneTime")}
                   </span>
                   <svg
                     className={`w-5 h-5 transition-transform duration-200 ${
@@ -509,7 +511,7 @@ export default function MarketplacePage() {
           {/* Results Count */}
           <div className="mb-6">
             <p className="text-gray-400">
-              Showing {filteredPlugins.length} of {plugins.length} plugins
+              {t("browse.showing")} {filteredPlugins.length} {t("browse.of")} {plugins.length} {t("browse.plugins")}
             </p>
           </div>
 
@@ -585,7 +587,7 @@ export default function MarketplacePage() {
                     <div>
                       {plugin.pricing.type === "free" ? (
                         <span className="text-green-400 font-semibold">
-                          Free
+                          {t("plugin.free")}
                         </span>
                       ) : (
                         <div>
@@ -594,8 +596,8 @@ export default function MarketplacePage() {
                           </span>
                           <span className="text-gray-400 text-sm ml-1">
                             {plugin.pricing.type === "monthly"
-                              ? "/month"
-                              : "once"}
+                              ? t("plugin.monthly")
+                              : t("plugin.oneTime")}
                           </span>
                         </div>
                       )}
@@ -604,7 +606,7 @@ export default function MarketplacePage() {
                       href={`/marketplace/${plugin.slug}`}
                       className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/50"
                     >
-                      View Details
+                      {t("plugin.viewDetails")}
                     </Link>
                   </div>
                 </div>
@@ -620,7 +622,7 @@ export default function MarketplacePage() {
                 disabled={currentPage === 1}
                 className="px-4 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-all duration-300"
               >
-                Previous
+                {t("browse.pagination.previous")}
               </button>
               
               <div className="flex gap-2">
@@ -644,7 +646,7 @@ export default function MarketplacePage() {
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-all duration-300"
               >
-                Next
+                {t("browse.pagination.next")}
               </button>
             </div>
           )}
@@ -654,10 +656,10 @@ export default function MarketplacePage() {
             <div className="text-center py-20">
               <div className="text-6xl mb-4">🔍</div>
               <h3 className="text-2xl font-bold text-white mb-2">
-                No plugins found
+                {t("browse.noResults.title")}
               </h3>
               <p className="text-gray-400">
-                Try adjusting your search or filters
+                {t("browse.noResults.subtitle")}
               </p>
             </div>
           )}
