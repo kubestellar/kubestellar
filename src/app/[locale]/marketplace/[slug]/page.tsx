@@ -335,35 +335,34 @@ export default function PluginDetailPage() {
                 </div>
               </div>
 
-              {/* Maintainers */}
               <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6">
                 <h3 className="text-xl font-bold text-white mb-4">{t("plugin.maintainers")}</h3>
                 <ul className="space-y-2">
                   <li className="text-gray-300 text-sm flex items-start gap-2">
                     <span className="text-purple-400 mt-1">•</span>
                     <span>
-                      Andy Anderson -{" "}
+                      {t("maintainers.andy")} -{" "}
                       <a
                         href="https://github.com/pdettori"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-purple-400 hover:text-purple-300 transition-colors underline"
                       >
-                        GitHub
+                        {t("plugin.github")}
                       </a>
                     </span>
                   </li>
                   <li className="text-gray-300 text-sm flex items-start gap-2">
                     <span className="text-purple-400 mt-1">•</span>
                     <span>
-                      Mike Spreitzer -{" "}
+                      {t("maintainers.mike")} -{" "}
                       <a
                         href="https://github.com/MikeSpreitzer"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-purple-400 hover:text-purple-300 transition-colors underline"
                       >
-                        GitHub
+                        {t("plugin.github")}
                       </a>
                     </span>
                   </li>
@@ -482,26 +481,26 @@ export default function PluginDetailPage() {
                     </svg>
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-2">
-                    Complete Payment
+                    {t("payment.title")}
                   </h3>
                   <p className="text-gray-400">
-                    Purchase {plugin.name} to get started
+                    {t("payment.subtitle", { name: plugin.name })}
                   </p>
                 </div>
 
                 {/* Payment Details */}
                 <div className="bg-gray-900/50 rounded-xl p-4 mb-6 border border-gray-700/50">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-gray-400">Plugin</span>
+                    <span className="text-gray-400">{t("payment.details.plugin")}</span>
                     <span className="text-white font-semibold">{plugin.name}</span>
                   </div>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-gray-400">License Type</span>
+                    <span className="text-gray-400">{t("payment.details.licenseType")}</span>
                     <span className="text-white capitalize">{plugin.pricing.type}</span>
                   </div>
                   <div className="border-t border-gray-700/50 my-3"></div>
                   <div className="flex justify-between items-center">
-                    <span className="text-white font-semibold">Total</span>
+                    <span className="text-white font-semibold">{t("payment.details.total")}</span>
                     <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                       ${plugin.pricing.amount}
                     </span>
@@ -511,29 +510,29 @@ export default function PluginDetailPage() {
                 {/* Mock Payment Form */}
                 <div className="space-y-4 mb-6">
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">Card Number</label>
+                    <label className="block text-sm text-gray-400 mb-2">{t("payment.form.cardNumber")}</label>
                     <input
                       type="text"
-                      placeholder="1234 5678 9012 3456"
+                      placeholder={t("payment.form.cardPlaceholder")}
                       className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       disabled={isProcessing}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-gray-400 mb-2">Expiry</label>
+                      <label className="block text-sm text-gray-400 mb-2">{t("payment.form.expiry")}</label>
                       <input
                         type="text"
-                        placeholder="MM/YY"
+                        placeholder={t("payment.form.expiryPlaceholder")}
                         className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         disabled={isProcessing}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-400 mb-2">CVV</label>
+                      <label className="block text-sm text-gray-400 mb-2">{t("payment.form.cvv")}</label>
                       <input
                         type="text"
-                        placeholder="123"
+                        placeholder={t("payment.form.cvvPlaceholder")}
                         className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         disabled={isProcessing}
                       />
@@ -548,7 +547,7 @@ export default function PluginDetailPage() {
                     className="flex-1 px-6 py-3 bg-gray-700/50 text-white rounded-lg hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isProcessing}
                   >
-                    Cancel
+                    {t("payment.form.cancel")}
                   </button>
                   <button
                     onClick={handlePayment}
@@ -558,7 +557,7 @@ export default function PluginDetailPage() {
                     {isProcessing ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Processing...
+                        {t("payment.form.processing")}
                       </>
                     ) : (
                       <>
@@ -575,14 +574,14 @@ export default function PluginDetailPage() {
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        Pay Now
+                        {t("payment.form.payNow")}
                       </>
                     )}
                   </button>
                 </div>
 
                 <p className="text-xs text-gray-500 text-center mt-4">
-                  🔒 Secure payment powered by KubeStellar Gateway
+                  {t("payment.form.secureNote")}
                 </p>
               </div>
             ) : (
@@ -603,10 +602,10 @@ export default function PluginDetailPage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">
-                  Payment Successful!
+                  {t("payment.success.title")}
                 </h3>
                 <p className="text-gray-400 mb-4">
-                  Starting installation...
+                  {t("payment.success.subtitle")}
                 </p>
               </div>
             )}
@@ -622,9 +621,9 @@ export default function PluginDetailPage() {
               <div className="text-center">
                 <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <h3 className="text-xl font-bold text-white mb-2">
-                  Installing {plugin.name}
+                  {t("installation.installing", { name: plugin.name })}
                 </h3>
-                <p className="text-gray-400">Please wait...</p>
+                <p className="text-gray-400">{t("installation.pleaseWait")}</p>
               </div>
             ) : (
               <div className="text-center">
@@ -644,15 +643,14 @@ export default function PluginDetailPage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">
-                  Successfully Installed!
+                  {t("installation.success.title")}
                 </h3>
                 <p className="text-gray-400 mb-6">
-                  {plugin.name} has been installed to your KubeStellar
-                  deployment.
+                  {t("installation.success.subtitle", { name: plugin.name })}
                 </p>
                 <div className="bg-gray-900/50 rounded-lg p-4 mb-6 text-left border border-gray-700/50">
                   <p className="text-sm text-gray-400 mb-2">
-                    Run this command to get started:
+                    {t("installation.success.commandTitle")}
                   </p>
                   <code className="text-purple-400 text-sm block break-all">
                     kubectl ks plugin enable {plugin.slug}
@@ -666,7 +664,7 @@ export default function PluginDetailPage() {
                   }}
                   className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/50"
                 >
-                  Close
+                  {t("installation.success.close")}
                 </button>
               </div>
             )}

@@ -865,6 +865,10 @@
         "subtitle": "Starting installation..."
       }
     },
+    "maintainers": {
+      "andy": "Andy Anderson",
+      "mike": "Mike Spreitzer"
+    },
     "installation": {
       "installing": "Installing {name}",
       "pleaseWait": "Please wait...",
