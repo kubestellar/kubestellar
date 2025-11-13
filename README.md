@@ -8,7 +8,6 @@
   <b>Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud</b><br/>
   Official documentation source for the <a href="https://kubestellar.io">KubeStellar Website</a>
 </p>
-
 <p align="center">
   <a href="https://www.firsttimersonly.com/">
     <img src="https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square" alt="First Timers Only">
