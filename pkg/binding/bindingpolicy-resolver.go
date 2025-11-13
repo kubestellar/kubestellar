@@ -376,7 +376,7 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject
 		}
 	}
 	if !requested {
-		return false, 0
+		return false, 0, sets.New[string]()
 	}
 	requested = false
 	matchingWECs := sets.New[string]()
