@@ -588,4 +588,335 @@ Pay once, use forever. Includes all future updates and features.`,
       "premium",
     ],
   },
+  {
+    id: "13",
+    name: "Secrets Manager",
+    slug: "secrets-manager",
+    tagline: "Centralized secrets management for distributed clusters",
+    description:
+      "Securely manage and distribute secrets across all your KubeStellar clusters with automatic rotation, encryption, and audit logging.",
+    longDescription: `Secrets Manager provides enterprise-grade secrets management for your KubeStellar infrastructure. Centralize secret storage, automate rotation, and ensure secrets are encrypted at rest and in transit. Built-in integration with HashiCorp Vault, AWS Secrets Manager, and Azure Key Vault.
+
+Automatic secret rotation prevents credential compromise, while detailed audit logs ensure compliance. RBAC controls determine who can access which secrets, and automatic sync ensures secrets are always up-to-date across all clusters.`,
+    icon: "🔐",
+    category: "Security",
+    pricing: {
+      type: "monthly",
+      amount: 129,
+    },
+    author: "VaultStar Security",
+    downloads: 8456,
+    rating: 4.9,
+    version: "1.6.0",
+    features: [
+      "Centralized secret storage",
+      "Automatic secret rotation",
+      "Integration with Vault, AWS, Azure",
+      "End-to-end encryption",
+      "Detailed audit logging",
+      "RBAC and access policies",
+      "Cross-cluster secret sync",
+      "Emergency secret revocation",
+    ],
+    requirements: [
+      "KubeStellar v0.21.0 or higher",
+      "External secrets backend (optional)",
+    ],
+    compatibility: ["Linux", "macOS"],
+    screenshots: [],
+    documentation: "https://docs.vaultstar.io",
+    website: "https://vaultstar.io",
+    tags: ["security", "secrets", "vault", "encryption", "premium"],
+  },
+  {
+    id: "14",
+    name: "Load Balancer Controller",
+    slug: "load-balancer-controller",
+    tagline: "Intelligent load balancing across cluster boundaries",
+    description:
+      "Free load balancer controller optimized for KubeStellar deployments. Distribute traffic intelligently across clusters based on latency, capacity, and custom rules.",
+    longDescription: `Load Balancer Controller extends Kubernetes load balancing capabilities to work seamlessly across KubeStellar-managed clusters. Route traffic based on geographic proximity, cluster capacity, custom weights, or health scores.
+
+Automatic failover ensures high availability, while built-in circuit breakers prevent cascading failures. Compatible with major cloud load balancers and on-premises solutions.
+
+Open source and community-driven, perfect for hybrid and multi-cloud deployments.`,
+    icon: "⚖️",
+    category: "Networking",
+    pricing: {
+      type: "free",
+    },
+    author: "KubeStellar Community",
+    downloads: 14782,
+    rating: 4.6,
+    version: "2.2.0",
+    features: [
+      "Cross-cluster load balancing",
+      "Geographic traffic routing",
+      "Health-based routing",
+      "Automatic failover",
+      "Circuit breaker support",
+      "Custom routing rules",
+      "Integration with cloud LBs",
+      "Real-time metrics",
+    ],
+    requirements: [
+      "KubeStellar v0.20.0 or higher",
+      "Kubernetes 1.24+",
+    ],
+    compatibility: ["Linux", "macOS"],
+    screenshots: [],
+    documentation: "https://docs.kubestellar.io/plugins/lb-controller",
+    github: "https://github.com/kubestellar/lb-controller",
+    tags: ["networking", "load-balancing", "traffic", "free", "open-source"],
+  },
+  {
+    id: "15",
+    name: "Workload Migrator",
+    slug: "workload-migrator",
+    tagline: "Seamlessly migrate workloads between clusters",
+    description:
+      "Migrate applications and data between KubeStellar clusters with zero downtime. Perfect for cluster upgrades, disaster recovery, and rebalancing.",
+    longDescription: `Workload Migrator makes cluster migrations painless. Whether you're upgrading clusters, rebalancing workloads, or responding to disasters, Workload Migrator ensures smooth transitions with zero downtime.
+
+Intelligent pre-flight checks catch potential issues, automated data migration handles persistent volumes, and gradual traffic shifting ensures reliability. Rollback capabilities provide a safety net if anything goes wrong.
+
+Essential tool for production KubeStellar deployments.`,
+    icon: "🚚",
+    category: "CLI Tools",
+    pricing: {
+      type: "one-time",
+      amount: 199,
+    },
+    author: "MigrateStar",
+    downloads: 5934,
+    rating: 4.8,
+    version: "1.4.2",
+    features: [
+      "Zero-downtime migrations",
+      "Pre-flight validation checks",
+      "Persistent volume migration",
+      "Gradual traffic shifting",
+      "Automated rollback",
+      "Migration scheduling",
+      "Progress tracking",
+      "Dry-run mode",
+    ],
+    requirements: [
+      "KubeStellar v0.21.0 or higher",
+      "kubectl v1.26+",
+    ],
+    compatibility: ["Linux", "macOS", "Windows"],
+    screenshots: [],
+    documentation: "https://docs.migratestar.io",
+    website: "https://migratestar.io",
+    tags: ["migration", "workload", "cli", "disaster-recovery", "premium"],
+  },
+  {
+    id: "16",
+    name: "Metrics Aggregator",
+    slug: "metrics-aggregator",
+    tagline: "Unified metrics collection from all clusters",
+    description:
+      "Free tool to aggregate metrics from all your KubeStellar clusters into a single Prometheus instance. Simplify monitoring and alerting.",
+    longDescription: `Metrics Aggregator solves the challenge of monitoring distributed clusters by aggregating metrics into a centralized location. Compatible with Prometheus, it provides a unified view of your entire infrastructure without the complexity of federated setups.
+
+Automatic cluster discovery, intelligent metric filtering, and built-in dashboards get you up and running in minutes. Reduce monitoring overhead and costs while maintaining complete visibility.
+
+Free forever, built by the community for the community.`,
+    icon: "📉",
+    category: "Observability",
+    pricing: {
+      type: "free",
+    },
+    author: "KubeStellar Community",
+    downloads: 12876,
+    rating: 4.5,
+    version: "1.7.1",
+    features: [
+      "Multi-cluster metrics aggregation",
+      "Prometheus compatibility",
+      "Automatic cluster discovery",
+      "Metric filtering and sampling",
+      "Built-in Grafana dashboards",
+      "Low resource overhead",
+      "High availability support",
+      "Custom metric pipelines",
+    ],
+    requirements: [
+      "KubeStellar v0.19.0 or higher",
+      "Prometheus operator",
+    ],
+    compatibility: ["Linux", "macOS"],
+    screenshots: [],
+    documentation: "https://docs.kubestellar.io/plugins/metrics-aggregator",
+    github: "https://github.com/kubestellar/metrics-aggregator",
+    tags: ["observability", "metrics", "prometheus", "monitoring", "free"],
+  },
+  {
+    id: "17",
+    name: "Cluster Provisioner",
+    slug: "cluster-provisioner",
+    tagline: "Automate cluster creation and onboarding",
+    description:
+      "Streamline cluster provisioning with automated creation, configuration, and onboarding to KubeStellar. Support for major cloud providers and on-prem.",
+    longDescription: `Cluster Provisioner eliminates the manual work of creating and onboarding new clusters. Define your cluster specifications in code, and let Cluster Provisioner handle creation across AWS, Azure, GCP, or on-premises infrastructure.
+
+Automatic KubeStellar onboarding ensures new clusters are ready to use immediately. Built-in compliance templates ensure clusters meet your security and governance requirements from day one.
+
+One-time purchase includes lifetime updates.`,
+    icon: "🏗️",
+    category: "CLI Tools",
+    pricing: {
+      type: "one-time",
+      amount: 349,
+    },
+    author: "ProvisionStar",
+    downloads: 6123,
+    rating: 4.7,
+    version: "2.1.3",
+    features: [
+      "Multi-cloud cluster creation",
+      "Infrastructure-as-code support",
+      "Automatic KubeStellar onboarding",
+      "Compliance template library",
+      "Cluster templating",
+      "Batch provisioning",
+      "Cost estimation",
+      "Terraform and Pulumi integration",
+    ],
+    requirements: [
+      "KubeStellar v0.20.0 or higher",
+      "Cloud provider credentials",
+    ],
+    compatibility: ["Linux", "macOS", "Windows"],
+    screenshots: [],
+    documentation: "https://docs.provisionstar.io",
+    website: "https://provisionstar.io",
+    tags: ["provisioning", "automation", "infrastructure", "cli", "premium"],
+  },
+  {
+    id: "18",
+    name: "Alert Manager Plus",
+    slug: "alert-manager-plus",
+    tagline: "Advanced alerting and incident management",
+    description:
+      "Sophisticated alerting system for KubeStellar with smart routing, deduplication, and integration with popular incident management platforms.",
+    longDescription: `Alert Manager Plus transforms Kubernetes alerts into actionable insights. Smart alert routing ensures the right people get notified, while intelligent deduplication reduces noise. Integration with PagerDuty, OpsGenie, and Slack ensures alerts reach your team wherever they are.
+
+Alert correlation detects patterns and prevents alert storms. Runbook automation can auto-remediate common issues, reducing manual intervention and MTTR.
+
+Affordable monthly pricing with enterprise support.`,
+    icon: "🚨",
+    category: "Observability",
+    pricing: {
+      type: "monthly",
+      amount: 89,
+    },
+    author: "AlertStar Inc.",
+    downloads: 9234,
+    rating: 4.8,
+    version: "1.5.0",
+    features: [
+      "Smart alert routing",
+      "Intelligent deduplication",
+      "PagerDuty/OpsGenie integration",
+      "Alert correlation",
+      "Runbook automation",
+      "Escalation policies",
+      "Custom alert templates",
+      "Detailed analytics",
+    ],
+    requirements: [
+      "KubeStellar v0.20.0 or higher",
+      "Prometheus or compatible metrics source",
+    ],
+    compatibility: ["Linux", "macOS"],
+    screenshots: [],
+    documentation: "https://docs.alertstar.io",
+    website: "https://alertstar.io",
+    tags: ["alerting", "observability", "incident-management", "automation", "premium"],
+  },
+  {
+    id: "19",
+    name: "Resource Optimizer",
+    slug: "resource-optimizer",
+    tagline: "AI-powered resource recommendations",
+    description:
+      "Free tool that analyzes workload patterns and provides AI-powered recommendations for right-sizing resources across your clusters.",
+    longDescription: `Resource Optimizer uses machine learning to analyze your workload behavior and recommend optimal resource allocations. Stop wasting money on over-provisioned pods and prevent performance issues from under-provisioning.
+
+Historical analysis identifies trends, while predictive modeling forecasts future needs. One-click apply makes optimization effortless. Typical users save 30-40% on infrastructure costs.
+
+Completely free and open source.`,
+    icon: "🎛️",
+    category: "Resource Management",
+    pricing: {
+      type: "free",
+    },
+    author: "KubeStellar Community",
+    downloads: 11567,
+    rating: 4.6,
+    version: "1.3.2",
+    features: [
+      "AI-powered recommendations",
+      "Historical usage analysis",
+      "Predictive resource modeling",
+      "One-click optimization",
+      "Cost savings estimates",
+      "Cluster-wide analysis",
+      "Custom recommendation policies",
+      "Integration with VPA",
+    ],
+    requirements: [
+      "KubeStellar v0.20.0 or higher",
+      "Metrics server",
+    ],
+    compatibility: ["Linux", "macOS", "Windows"],
+    screenshots: [],
+    documentation: "https://docs.kubestellar.io/plugins/resource-optimizer",
+    github: "https://github.com/kubestellar/resource-optimizer",
+    tags: ["optimization", "resources", "ai", "cost-savings", "free"],
+  },
+  {
+    id: "20",
+    name: "Compliance Reporter",
+    slug: "compliance-reporter",
+    tagline: "Automated compliance reporting and auditing",
+    description:
+      "Generate compliance reports for SOC 2, ISO 27001, HIPAA, and custom frameworks. Continuous monitoring ensures you stay compliant.",
+    longDescription: `Compliance Reporter automates the tedious work of compliance auditing and reporting. Continuous monitoring checks your KubeStellar infrastructure against compliance frameworks, automatically generating reports and alerting you to violations.
+
+Built-in templates for SOC 2, ISO 27001, HIPAA, PCI-DSS, and GDPR. Custom framework support lets you define your own requirements. Evidence collection happens automatically, making audits stress-free.
+
+Essential for regulated industries. One-time purchase, lifetime value.`,
+    icon: "📝",
+    category: "Governance",
+    pricing: {
+      type: "one-time",
+      amount: 449,
+    },
+    author: "ComplianceStar",
+    downloads: 4567,
+    rating: 4.9,
+    version: "2.0.1",
+    features: [
+      "Automated compliance monitoring",
+      "SOC 2, ISO 27001, HIPAA templates",
+      "Custom framework support",
+      "Automated evidence collection",
+      "Scheduled report generation",
+      "Violation alerts",
+      "Audit trail management",
+      "Export to PDF, CSV, JSON",
+    ],
+    requirements: [
+      "KubeStellar v0.21.0 or higher",
+      "Audit logging enabled",
+    ],
+    compatibility: ["Linux", "macOS", "Windows"],
+    screenshots: [],
+    documentation: "https://docs.compliancestar.io",
+    website: "https://compliancestar.io",
+    tags: ["compliance", "governance", "auditing", "reporting", "premium"],
+  },
 ];

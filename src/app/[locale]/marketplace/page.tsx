@@ -88,6 +88,249 @@ export default function MarketplacePage() {
               tools. From free community projects to enterprise solutions.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Featured & Most Popular Plugins Carousel */}
+      <section className="relative py-12 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <StarField density="low" showComets={false} cometCount={0} />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 text-center">
+            <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+              Featured
+            </span>{" "}
+            & Most Popular
+          </h2>
+          <p className="text-gray-400 text-center mb-8">
+            Discover our top-rated and most downloaded plugins
+          </p>
+        </div>
+
+        {/* Desktop Sliding View */}
+        <div className="hidden lg:block relative">
+          <div className="overflow-hidden">
+            <div className="flex gap-6 animate-slide-partners">
+              {/* Get top 6 plugins by downloads and triple them for seamless loop */}
+              {[
+                ...plugins.slice().sort((a, b) => b.downloads - a.downloads).slice(0, 6),
+                ...plugins.slice().sort((a, b) => b.downloads - a.downloads).slice(0, 6),
+                ...plugins.slice().sort((a, b) => b.downloads - a.downloads).slice(0, 6),
+              ].map((plugin, index) => (
+                <div
+                  key={`${plugin.id}-${index}`}
+                  className="flex-shrink-0 w-[400px] group/card"
+                  onMouseEnter={(e) => {
+                    e.currentTarget
+                      .closest(".animate-slide-partners")
+                      ?.classList.add("pause-animation");
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget
+                      .closest(".animate-slide-partners")
+                      ?.classList.remove("pause-animation");
+                  }}
+                >
+                  <Link
+                    href={`/marketplace/${plugin.slug}`}
+                    className="relative block bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 h-80 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50 hover:-translate-y-1"
+                  >
+                    {/* Badge for pricing */}
+                    <div className="absolute top-4 right-4">
+                      {plugin.pricing.type === "free" ? (
+                        <span className="px-3 py-1 bg-green-500/20 text-green-300 text-xs font-semibold rounded-full">
+                          FREE
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-semibold rounded-full">
+                          ${plugin.pricing.amount}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="transition-all duration-300 group-hover/card:-translate-y-2 h-full flex flex-col">
+                      {/* Icon */}
+                      <div className="text-6xl mb-4 group-hover/card:scale-110 transition-transform duration-300">
+                        {plugin.icon}
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="text-2xl font-bold text-white mb-3 group-hover/card:text-purple-400 transition-colors">
+                        {plugin.name}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-gray-300 leading-relaxed text-sm mb-4 flex-grow line-clamp-3">
+                        {plugin.tagline}
+                      </p>
+
+                      {/* Stats */}
+                      <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
+                        <div className="flex items-center gap-1">
+                          <svg
+                            className="w-4 h-4 text-yellow-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          <span>{plugin.rating}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                            />
+                          </svg>
+                          <span>{plugin.downloads.toLocaleString()}</span>
+                        </div>
+                      </div>
+
+                      {/* Category Badge */}
+                      <div>
+                        <span className="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 text-xs rounded-full">
+                          {plugin.category}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Learn More */}
+                    <div className="absolute bottom-6 right-6 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300">
+                      <span className="text-purple-400 font-semibold flex items-center gap-2">
+                        View Details
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </span>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile/Tablet Grid View */}
+        <div className="lg:hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {plugins
+              .slice()
+              .sort((a, b) => b.downloads - a.downloads)
+              .slice(0, 6)
+              .map((plugin) => (
+                <Link
+                  key={plugin.id}
+                  href={`/marketplace/${plugin.slug}`}
+                  className="relative group bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50"
+                >
+                  {/* Badge for pricing */}
+                  <div className="absolute top-4 right-4">
+                    {plugin.pricing.type === "free" ? (
+                      <span className="px-3 py-1 bg-green-500/20 text-green-300 text-xs font-semibold rounded-full">
+                        FREE
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-semibold rounded-full">
+                        ${plugin.pricing.amount}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="transition-all duration-300 group-hover:-translate-y-2">
+                    {/* Icon */}
+                    <div className="text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">
+                      {plugin.icon}
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">
+                      {plugin.name}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-gray-300 text-sm mb-3 line-clamp-2">
+                      {plugin.tagline}
+                    </p>
+
+                    {/* Stats */}
+                    <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
+                      <div className="flex items-center gap-1">
+                        <svg
+                          className="w-3 h-3 text-yellow-500"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span>{plugin.rating}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                          />
+                        </svg>
+                        <span>{plugin.downloads.toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    {/* Category Badge */}
+                    <div>
+                      <span className="inline-block px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded-full">
+                        {plugin.category}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Browse All Plugins Section */}
+      <section className="relative pt-12 pb-20 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <StarField density="medium" showComets={true} cometCount={3} />
+          <GridLines />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
+              Browse All Plugins
+            </h2>
+            <p className="text-gray-400">
+              Find the perfect tools to extend your KubeStellar deployment
+            </p>
+          </div>
 
           {/* Search and Filters */}
           <div className="mb-12">
