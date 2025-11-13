@@ -84,3 +84,19 @@ presubmits:
             requests:
               memory: 8Gi
               cpu: 4
+
+periodics:
+  - name: periodic-kubestellar-kflex-compatibility
+    interval: 24h
+    decorate: true
+    clone_uri: "https://github.com/kubestellar/kubestellar"
+    spec:
+      containers:
+        - image: ghcr.io/kubestellar/infra/build:1.24.2-1
+          command:
+            - hack/test-kflex-compatibility.sh
+          workingDir: /home/prow/go/src/github.com/kubestellar/kubestellar
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: 4
