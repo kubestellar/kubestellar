@@ -63,7 +63,7 @@ func (c *Controller) updateWorkStatusToObject(ctx context.Context, workStatusON 
 
 func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
-	isSingletonRequested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
+	isSingletonRequested, nWECs, qualifiedWEC := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
 	logger.V(4).Info("Workload object (singleton status requested)", "object", wObjID, "isSingletonRequested", isSingletonRequested, "nWECs", nWECs)
 
 	// TODO: GetMultiWECReportedStateRequestForObject is yet to be implemented.
@@ -73,7 +73,7 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 
 	if (isMultiWECRequested || isSingletonRequested) && nWECs == 1 {
 		logger.V(4).Info("Either singleton or multiWEC status is requested and nWEC == 1", "object: ", wObjID, "nWEC", nWECs)
-		return c.handleSingleton(ctx, wObjID)
+		return c.handleSingleton(ctx, wObjID, qualifiedWEC)
 	}
 
 	if isMultiWECRequested && nWECs > 1 {
@@ -89,21 +89,10 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 	return nil
 }
 
-func (c *Controller) handleSingleton(ctx context.Context, wObjID util.ObjectIdentifier) error {
+func (c *Controller) handleSingleton(ctx context.Context, wObjID util.ObjectIdentifier, qualifiedWEC sets.Set[string]) error {
 	logger := klog.FromContext(ctx)
 	var wsON cache.ObjectName
 	var numWS int
-
-	// check for qualified WECs
-	qualifiedWEC := c.bindingPolicyResolver.GetQualifiedWECForSingletonReportedStateRequest(wObjID)
-	if qualifiedWEC.Len() != 1 {
-		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
-			return err
-		}
-		logger.V(4).Info("Cleaned singleton status for workload object - wrong number of qualified WECs",
-			wObjID, "qualifiedWEC", qualifiedWEC)
-		return nil
-	}
 
 	// Get the WEC name
 	var qualifiedWECName string
