@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Navbar, Footer } from "@/components";
 import { GridLines, StarField } from "@/components/";
@@ -10,6 +10,31 @@ export default function MarketplacePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedPricing, setSelectedPricing] = useState("All");
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const categoryRef = useRef<HTMLDivElement>(null);
+  const pricingRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        categoryRef.current &&
+        !categoryRef.current.contains(event.target as Node)
+      ) {
+        setIsCategoryOpen(false);
+      }
+      if (
+        pricingRef.current &&
+        !pricingRef.current.contains(event.target as Node)
+      ) {
+        setIsPricingOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -52,7 +77,7 @@ export default function MarketplacePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient-x">
                 KubeStellar Galaxy
               </span>
               <br />
@@ -92,29 +117,113 @@ export default function MarketplacePage() {
               </div>
 
               {/* Category Filter */}
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-6 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm cursor-pointer"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
+              <div className="relative" ref={categoryRef}>
+                <button
+                  onClick={() => {
+                    setIsCategoryOpen(!isCategoryOpen);
+                    setIsPricingOpen(false);
+                  }}
+                  className="w-full md:w-48 px-6 py-4 bg-gray-800/90 backdrop-blur-md border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer hover:bg-gray-700/90 transition-all duration-200 shadow-lg flex items-center justify-between"
+                >
+                  <span>{selectedCategory}</span>
+                  <svg
+                    className={`w-5 h-5 transition-transform duration-200 ${
+                      isCategoryOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                {isCategoryOpen && (
+                  <div className="absolute z-50 mt-2 w-full md:w-64 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl py-2 ring-1 ring-gray-700/50 max-h-96 overflow-y-auto scrollbar-hide">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => {
+                          setSelectedCategory(cat);
+                          setIsCategoryOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 ${
+                          selectedCategory === cat
+                            ? "bg-purple-600/30 text-purple-300"
+                            : "text-gray-300 hover:bg-gray-700/50 hover:text-white"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Pricing Filter */}
-              <select
-                value={selectedPricing}
-                onChange={(e) => setSelectedPricing(e.target.value)}
-                className="px-6 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm cursor-pointer"
-              >
-                <option value="All">All Pricing</option>
-                <option value="free">Free</option>
-                <option value="monthly">Monthly</option>
-                <option value="one-time">One-time</option>
-              </select>
+              <div className="relative" ref={pricingRef}>
+                <button
+                  onClick={() => {
+                    setIsPricingOpen(!isPricingOpen);
+                    setIsCategoryOpen(false);
+                  }}
+                  className="w-full md:w-48 px-6 py-4 bg-gray-800/90 backdrop-blur-md border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer hover:bg-gray-700/90 transition-all duration-200 shadow-lg flex items-center justify-between"
+                >
+                  <span>
+                    {selectedPricing === "All"
+                      ? "All Pricing"
+                      : selectedPricing === "free"
+                      ? "Free"
+                      : selectedPricing === "monthly"
+                      ? "Monthly"
+                      : "One-time"}
+                  </span>
+                  <svg
+                    className={`w-5 h-5 transition-transform duration-200 ${
+                      isPricingOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                {isPricingOpen && (
+                  <div className="absolute z-50 mt-2 w-full bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl py-2 ring-1 ring-gray-700/50">
+                    {[
+                      { value: "All", label: "All Pricing" },
+                      { value: "free", label: "Free" },
+                      { value: "monthly", label: "Monthly" },
+                      { value: "one-time", label: "One-time" },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          setSelectedPricing(option.value);
+                          setIsPricingOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 ${
+                          selectedPricing === option.value
+                            ? "bg-purple-600/30 text-purple-300"
+                            : "text-gray-300 hover:bg-gray-700/50 hover:text-white"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

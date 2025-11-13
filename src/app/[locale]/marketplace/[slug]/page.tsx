@@ -14,7 +14,10 @@ export default function PluginDetailPage() {
 
   const plugin = plugins.find((p) => p.slug === slug);
   const [showInstallModal, setShowInstallModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [installedSuccess, setInstalledSuccess] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   if (!plugin) {
     return (
@@ -35,11 +38,33 @@ export default function PluginDetailPage() {
   }
 
   const handleInstall = () => {
-    setShowInstallModal(true);
-    // Simulate installation
+    // For paid plugins, show payment modal first
+    if (plugin.pricing.type !== "free") {
+      setShowPaymentModal(true);
+    } else {
+      // For free plugins, install directly
+      setShowInstallModal(true);
+      setTimeout(() => {
+        setInstalledSuccess(true);
+      }, 2000);
+    }
+  };
+
+  const handlePayment = () => {
+    setIsProcessing(true);
+    // Simulate payment processing
     setTimeout(() => {
-      setInstalledSuccess(true);
-    }, 2000);
+      setPaymentSuccess(true);
+      setIsProcessing(false);
+      // After payment, start installation
+      setTimeout(() => {
+        setShowPaymentModal(false);
+        setShowInstallModal(true);
+        setTimeout(() => {
+          setInstalledSuccess(true);
+        }, 2000);
+      }, 1500);
+    }, 3000);
   };
 
   return (
@@ -151,7 +176,7 @@ export default function PluginDetailPage() {
                       </div>
                     ) : (
                       <div>
-                        <span className="text-3xl font-bold text-white">
+                        <span className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                           ${plugin.pricing.amount}
                         </span>
                         <span className="text-gray-400 text-lg ml-2">
@@ -164,16 +189,53 @@ export default function PluginDetailPage() {
                   </div>
                   <button
                     onClick={handleInstall}
-                    className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/50 hover:scale-105"
+                    className="group relative px-8 py-4 bg-gradient-to-r from-purple-600/80 to-pink-600/80 backdrop-blur-xl text-white font-semibold rounded-xl border border-purple-500/30 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/50 hover:scale-105 hover:border-purple-400/50 overflow-hidden"
                   >
-                    Install Plugin
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                    <span className="relative flex items-center gap-2">
+                      {plugin.pricing.type === "free" ? (
+                        <>
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                            />
+                          </svg>
+                          Install Plugin
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                            />
+                          </svg>
+                          Pay & Install
+                        </>
+                      )}
+                    </span>
                   </button>
                   {plugin.github && (
                     <a
                       href={plugin.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-6 py-4 bg-gray-700/50 text-white rounded-xl hover:bg-gray-700 transition-all duration-300 flex items-center gap-2"
+                      className="px-6 py-4 bg-gray-700/50 backdrop-blur-sm text-white rounded-xl hover:bg-gray-700 transition-all duration-300 flex items-center gap-2 border border-gray-600/50"
                     >
                       <svg
                         className="w-5 h-5"
@@ -360,10 +422,165 @@ export default function PluginDetailPage() {
 
       <Footer />
 
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            {!paymentSuccess ? (
+              <div>
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-purple-500/30">
+                    <svg
+                      className="w-8 h-8 text-purple-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Complete Payment
+                  </h3>
+                  <p className="text-gray-400">
+                    Purchase {plugin.name} to get started
+                  </p>
+                </div>
+
+                {/* Payment Details */}
+                <div className="bg-gray-900/50 rounded-xl p-4 mb-6 border border-gray-700/50">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-gray-400">Plugin</span>
+                    <span className="text-white font-semibold">{plugin.name}</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-gray-400">License Type</span>
+                    <span className="text-white capitalize">{plugin.pricing.type}</span>
+                  </div>
+                  <div className="border-t border-gray-700/50 my-3"></div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-white font-semibold">Total</span>
+                    <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                      ${plugin.pricing.amount}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mock Payment Form */}
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Card Number</label>
+                    <input
+                      type="text"
+                      placeholder="1234 5678 9012 3456"
+                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      disabled={isProcessing}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Expiry</label>
+                      <input
+                        type="text"
+                        placeholder="MM/YY"
+                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        disabled={isProcessing}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">CVV</label>
+                      <input
+                        type="text"
+                        placeholder="123"
+                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        disabled={isProcessing}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowPaymentModal(false)}
+                    className="flex-1 px-6 py-3 bg-gray-700/50 text-white rounded-lg hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isProcessing}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handlePayment}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    disabled={isProcessing}
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Pay Now
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <p className="text-xs text-gray-500 text-center mt-4">
+                  🔒 Secure payment powered by KubeStellar Gateway
+                </p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg
+                    className="w-10 h-10 text-green-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Payment Successful!
+                </h3>
+                <p className="text-gray-400 mb-4">
+                  Starting installation...
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Install Modal */}
       {showInstallModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 max-w-md w-full">
+          <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 max-w-md w-full shadow-2xl">
             {!installedSuccess ? (
               <div className="text-center">
                 <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -374,7 +591,7 @@ export default function PluginDetailPage() {
               </div>
             ) : (
               <div className="text-center">
-                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30">
                   <svg
                     className="w-10 h-10 text-green-400"
                     fill="none"
@@ -396,17 +613,21 @@ export default function PluginDetailPage() {
                   {plugin.name} has been installed to your KubeStellar
                   deployment.
                 </p>
-                <div className="bg-gray-900/50 rounded-lg p-4 mb-6 text-left">
+                <div className="bg-gray-900/50 rounded-lg p-4 mb-6 text-left border border-gray-700/50">
                   <p className="text-sm text-gray-400 mb-2">
                     Run this command to get started:
                   </p>
-                  <code className="text-purple-400 text-sm">
+                  <code className="text-purple-400 text-sm block break-all">
                     kubectl ks plugin enable {plugin.slug}
                   </code>
                 </div>
                 <button
-                  onClick={() => setShowInstallModal(false)}
-                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+                  onClick={() => {
+                    setShowInstallModal(false);
+                    setInstalledSuccess(false);
+                    setPaymentSuccess(false);
+                  }}
+                  className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/50"
                 >
                   Close
                 </button>
