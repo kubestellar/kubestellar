@@ -104,6 +104,9 @@ type BindingPolicyResolver interface {
 	// given bindingpolicy key.
 	ResolutionExists(bindingPolicyKey string) bool
 
+	// GetQualifiedWECForSingletonReportedStateRequest returns the set of WECs that are qualified for singleton reported state return for the given workload object.
+	GetQualifiedWECForSingletonReportedStateRequest(util.ObjectIdentifier) sets.Set[string]
+
 	// GetSingletonReportedStateRequestForObject returns the combined effects of all
 	// the resolutions regarding singleton reported state return for a given workload object.
 	// The returned `bool` indicates whether singleton reported state return is requested.
@@ -355,6 +358,21 @@ func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string)
 	return true
 }
 
+// GetQualifiedWECForSingletonReportedStateRequest returns the set of WECs that are qualified for singleton reported state return for the given workload object.
+func (resolver *bindingPolicyResolver) GetQualifiedWECForSingletonReportedStateRequest(objId util.ObjectIdentifier) sets.Set[string] {
+	resolver.RWMutex.RLock()
+	defer resolver.RWMutex.RUnlock()
+
+	qualifiedWEC := sets.New[string]()
+	for _, resolution := range resolver.bindingPolicyToResolution {
+		matches, thisRequest, thisDests := resolution.getSingletonReportedStateRequestForObject(objId)
+		if matches && thisRequest {
+			qualifiedWEC = qualifiedWEC.Union(thisDests)
+		}
+	}
+	return qualifiedWEC
+}
+
 // GetSingletonReportedStateRequestForObject returns two things.
 // First is the `bool` indicating whether any BindingPolicy requests singleton reported state return
 // for the given object.
@@ -384,7 +402,9 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject
 			continue
 		}
 		requested = requested || thisRequest
-		matchingWECs = matchingWECs.Union(thisDests)
+		if thisRequest {
+			matchingWECs = matchingWECs.Union(thisDests)
+		}
 	}
 	return requested, matchingWECs.Len()
 }

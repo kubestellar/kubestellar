@@ -91,17 +91,35 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 
 func (c *Controller) handleSingleton(ctx context.Context, wObjID util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
-	var wsONs [2]cache.ObjectName
+	var wsON cache.ObjectName
 	var numWS int
 
+	// check for qualified WECs
+	qualifiedWEC := c.bindingPolicyResolver.GetQualifiedWECForSingletonReportedStateRequest(wObjID)
+	if qualifiedWEC.Len() != 1 {
+		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
+			return err
+		}
+		logger.V(4).Info("Cleaned singleton status for workload object - wrong number of qualified WECs",
+			wObjID, "qualifiedWEC", qualifiedWEC)
+		return nil
+	}
+
+	// Get the WEC name
+	var qualifiedWECName string
+	for wecName := range qualifiedWEC {
+		qualifiedWECName = wecName
+		break
+	}
+
 	c.workStatusToObject.ReadInverse().ContGet(wObjID, func(wsONSet sets.Set[cache.ObjectName]) {
-		numWS = wsONSet.Len()
-		var idx int
 		for it := range wsONSet {
-			wsONs[idx] = it
-			idx++
-			if idx > 1 {
-				break
+			if it.Namespace == qualifiedWECName {
+				wsON = it
+				numWS++
+				if numWS > 1 {
+					break
+				}
 			}
 		}
 	})
@@ -114,7 +132,6 @@ func (c *Controller) handleSingleton(ctx context.Context, wObjID util.ObjectIden
 			"object", wObjID, "numWS", numWS)
 		return nil
 	}
-	wsON := wsONs[0]
 	wsObj, err := c.workStatusLister.ByNamespace(wsON.Namespace).Get(wsON.Name)
 	if err != nil {
 		return err
